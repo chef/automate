@@ -77,10 +77,7 @@
           "description": "Filters to apply to the request for nodes list."
         },
         "sorting": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.common.query.Sorting"
-          },
+          "$ref": "#/definitions/chef.automate.api.common.query.Sorting",
           "description": "sorting parameters to apply to the returned node list."
         },
         "output_type": {
