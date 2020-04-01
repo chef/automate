@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ChefComponentsModule } from 'app/components/chef-components.module';
+import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 
 import { DailyCheckInComponent } from './daily-check-in/daily-check-in.component';
 import { CheckInTimeSeriesComponent } from './check-in-time-series/check-in-time-series.component';
@@ -17,7 +18,8 @@ import { DesktopRoutingModule } from './desktop-routing.module';
     FormsModule,
     ReactiveFormsModule,
     ChefComponentsModule,
-    DesktopRoutingModule
+    DesktopRoutingModule,
+    ChefPipesModule
   ],
   exports: [
     DailyCheckInComponent,

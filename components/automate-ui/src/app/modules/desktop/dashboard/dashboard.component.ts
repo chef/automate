@@ -38,6 +38,8 @@ export class DashboardComponent implements OnInit {
   public days$: Observable<DayPercentage[]>;
   public selectedDaysAgo$: Observable<number>;
   public topErrorsItems$: Observable<TopErrorsItem[]>;
+  public checkInCountCollectedUpdated$: Observable<Date>;
+  public topErrorsUpdated$: Observable<Date>;
 
   constructor(
     private store: Store<NgrxStateAtom>
@@ -61,6 +63,10 @@ export class DashboardComponent implements OnInit {
           }
           return {daysAgo: index, percentage: percentage};
         }))
+    );
+
+    this.checkInCountCollectedUpdated$ = this.checkInCountCollection$.pipe(
+      map(collection => collection.updated)
     );
 
     this.last24HourCheckInCount$ = this.checkInCountCollection$.pipe(
@@ -99,6 +105,10 @@ export class DashboardComponent implements OnInit {
 
     this.topErrorsItems$ = this.store.select(topErrorsCollection).pipe(
       map(collection => collection.items)
+    );
+
+    this.topErrorsUpdated$ = this.store.select(topErrorsCollection).pipe(
+      map(collection => collection.updated)
     );
   }
 
