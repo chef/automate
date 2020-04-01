@@ -463,7 +463,7 @@ func TestServers(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 
-		t.Run("when the server name for the server to update is already exists, raise invalid argument error", func(t *testing.T) {
+		t.Run("when the server name for the server to update already exists, raise invalid argument error", func(t *testing.T) {
 			resp1, err1 := cl.CreateServer(ctx, &request.CreateServer{
 				Name:        "chef-infra-server",
 				Description: "Chef infra server",
