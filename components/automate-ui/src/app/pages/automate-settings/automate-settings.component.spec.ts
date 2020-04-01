@@ -237,9 +237,9 @@ describe('AutomateSettingsComponent', () => {
 
     using([
       // Event Feed
-      ['eventFeedRemoveData', 'nested', 'feed',
+      ['eventFeedRemoveData', 'feed',
           genNestedIngestJob('event_feed', 'periodic_purge', 'feed', 1, false)] ,
-      ['eventFeedServerActions', 'nested', 'actions',
+      ['eventFeedServerActions', 'actions',
           genNestedIngestJob('infra', 'periodic_purge_timeseries', 'actions', 2, false)],
 
       // Services --> not yet enabled
@@ -247,50 +247,55 @@ describe('AutomateSettingsComponent', () => {
       // ['serviceGroupRemoveServices'],
 
       // Client Runs
-      ['clientRunsRemoveData', 'non-nested', 'not applicable',
-          genInjestJob('infra', 'missing_nodes', '5m', false)],
-      ['clientRunsLabelMissing', 'non-nested', 'not applicable',
-          genInjestJob('infra', 'missing_nodes_for_deletion', '6h', false)],
-      ['clientRunsRemoveNodes', 'nested', 'converge-history',
+      ['clientRunsRemoveNodes', 'converge-history',
           genNestedIngestJob('infra', 'periodic_purge_timeseries', 'converge-history', 7, false)],
 
         // Compliance
-      ['complianceRemoveReports', 'nested', 'compliance-reports',
+      ['complianceRemoveReports', 'compliance-reports',
           genNestedIngestJob('compliance', 'periodic_purge', 'compliance-reports', 8, false)],
-      ['complianceRemoveScans', 'nested', 'compliance-scans',
+      ['complianceRemoveScans', 'compliance-scans',
           genNestedIngestJob('compliance', 'periodic_purge', 'compliance-scans', 9, false)]
-    ], function(formName: string, jobType: string, nestedName: string, job: IngestJob) {
+    ], function(formName: string, nestedName: string, job: IngestJob) {
       it(`when updating ${formName} form,
-            the form data is extracted from the ${jobType} form`, () => {
+            the form data is extracted from the nested form`, () => {
         const thisJobScheduler = new JobSchedulerStatus([job]);
         component.updateForm(thisJobScheduler);
 
         const newFormValues = component[formName].value;
+        const jobData = job.purge_policies.elasticsearch.find(item => item.name === nestedName);
 
-        let jobData = job;
-        if (jobType === 'nested') {
-          jobData = job.purge_policies.elasticsearch.find(item => item.name === nestedName);
-          expect(newFormValues.threshold).toEqual(jobData.older_than_days);
-        } else {
-          // non-nested threshold is stored differently, so we need to separate it
-          // into threshold and unit first.
-          const [jobThreshold, jobUnit] = [job.threshold.slice(0, job.threshold.length - 1),
-                                           job.threshold.slice(-1)
-          ];
-          expect(newFormValues.threshold).toEqual(jobThreshold);
-          expect(newFormValues.unit).toEqual(jobUnit);
-        }
-
-        // all forms share the same expectation of being disabled
+        expect(newFormValues.threshold).toEqual(jobData.older_than_days);
         expect(newFormValues.disabled).toEqual(jobData.disabled);
       });
     });
 
     using([
+      // Client Runs
+      ['clientRunsRemoveData', genInjestJob('infra', 'missing_nodes', '5m', false)],
+      ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes_for_deletion', '6h', false)]
+    ], function (formName: string, job: IngestJob) {
+      it(`when updating ${formName} form,
+            the form data is extracted from the non-nested form`, () => {
+        const thisJobScheduler = new JobSchedulerStatus([job]);
+        component.updateForm(thisJobScheduler);
+
+        const newFormValues = component[formName].value;
+
+        // non-nested threshold is stored differently, so we need to separate it
+        // into threshold and unit first.
+        const [jobThreshold, jobUnit] = [job.threshold.slice(0, job.threshold.length - 1),
+                                        job.threshold.slice(-1)];
+        expect(newFormValues.threshold).toEqual(jobThreshold);
+        expect(newFormValues.unit).toEqual(jobUnit);
+        expect(newFormValues.disabled).toEqual(job.disabled);
+      });
+    });
+
+    using([
       // Event Feed
-      ['eventFeedRemoveData', 'nested', 'feed',
+      ['eventFeedRemoveData', 'feed',
         genNestedIngestJob('event_feed', 'periodic_purge', 'feed', 1, true)],
-      ['eventFeedServerActions', 'nested', 'actions',
+      ['eventFeedServerActions', 'actions',
         genNestedIngestJob('infra', 'periodic_purge_timeseries', 'actions', 2, true)],
 
       // Services --> not yet enabled
@@ -298,39 +303,47 @@ describe('AutomateSettingsComponent', () => {
       // ['serviceGroupRemoveServices'],
 
       // Client Runs
-      ['clientRunsRemoveData', 'non-nested', 'not applicable',
-        genInjestJob('infra', 'missing_nodes', '5m', true)],
-      ['clientRunsLabelMissing', 'non-nested', 'not applicable',
-        genInjestJob('infra', 'missing_nodes_for_deletion', '6h', true)],
-      ['clientRunsRemoveNodes', 'nested', 'converge-history',
+      ['clientRunsRemoveNodes', 'converge-history',
         genNestedIngestJob('infra', 'periodic_purge_timeseries', 'converge-history', 7, true)],
 
       // Compliance
-      ['complianceRemoveReports', 'nested', 'compliance-reports',
+      ['complianceRemoveReports', 'compliance-reports',
         genNestedIngestJob('compliance', 'periodic_purge', 'compliance-reports', 8, true)],
-      ['complianceRemoveScans', 'nested', 'compliance-scans',
+      ['complianceRemoveScans', 'compliance-scans',
         genNestedIngestJob('compliance', 'periodic_purge', 'compliance-scans', 9, true)]
-    ], function (formName: string, jobType: string, nestedName: string, job: IngestJob) {
-        it(`when ${formName} form is saved as disabled, unit and threshold are undefined
-            because they are not present in the form anymore`, () => {
+    ], function (formName: string, nestedName: string, job: IngestJob) {
+        it(`when ${formName} form is saved as disabled, threshold is undefined
+            because it is not present in the nested form anymore`, () => {
+        const thisJobScheduler = new JobSchedulerStatus([job]);
+        component.updateForm(thisJobScheduler);
+
+        const newFormValues = component[formName].value;
+        const jobData = job.purge_policies.elasticsearch.find(item => item.name === nestedName);
+
+        expect(newFormValues.threshold).toEqual(undefined);
+        expect(newFormValues.disabled).toEqual(jobData.disabled);
+      });
+    });
+
+    using([
+      // Client Runs
+      ['clientRunsRemoveData', genInjestJob('infra', 'missing_nodes', '5m', true)],
+      ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes_for_deletion', '6h', true)],
+    ], function (formName: string, job: IngestJob) {
+      it(`when ${formName} form is saved as disabled, unit and threshold are undefined
+            because they are not present in the non-nested form anymore`, () => {
         const thisJobScheduler = new JobSchedulerStatus([job]);
         component.updateForm(thisJobScheduler);
 
         const newFormValues = component[formName].value;
 
-        let jobData = job;
-        if (jobType === 'nested') {
-          jobData = job.purge_policies.elasticsearch.find(item => item.name === nestedName);
-          expect(newFormValues.threshold).toEqual(undefined);
-        } else {
-          expect(newFormValues.threshold).toEqual(undefined);
-          expect(newFormValues.unit).toEqual(undefined);
-        }
-
-        // all forms share the same expectation of being disabled
-        expect(newFormValues.disabled).toEqual(jobData.disabled);
+        expect(newFormValues.threshold).toEqual(undefined);
+        expect(newFormValues.unit).toEqual(undefined);
+        expect(newFormValues.disabled).toEqual(job.disabled);
       });
     });
+
+
 
     describe('when user applyChanges()', () => {
       it('saves settings', () => {
