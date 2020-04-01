@@ -8,10 +8,10 @@ message AffectedNodes {
     string org_id = 1;
     // ID of the Server.
     string server_id = 2;
-    // The resource name (e.g. 'cookbooks', 'roles').
-    string resource = 3;
-    // Name of the resource.
+    // Type of the chef object (e.g. 'cookbooks', 'roles', etc).
+    string chef_type = 3;
+    // Name of the chef object.
     string name = 4;
-    // Version of the resource.
+    // Version of the chef object.
     string version = 5;
 }

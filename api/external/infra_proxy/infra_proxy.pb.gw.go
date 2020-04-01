@@ -1974,15 +1974,15 @@ func request_InfraProxy_GetAffectedNodes_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org_id", err)
 	}
 
-	val, ok = pathParams["resource"]
+	val, ok = pathParams["chef_type"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "chef_type")
 	}
 
-	protoReq.Resource, err = runtime.String(val)
+	protoReq.ChefType, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "resource", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "chef_type", err)
 	}
 
 	val, ok = pathParams["name"]
@@ -2045,15 +2045,15 @@ func local_request_InfraProxy_GetAffectedNodes_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org_id", err)
 	}
 
-	val, ok = pathParams["resource"]
+	val, ok = pathParams["chef_type"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "chef_type")
 	}
 
-	protoReq.Resource, err = runtime.String(val)
+	protoReq.ChefType, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "resource", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "chef_type", err)
 	}
 
 	val, ok = pathParams["name"]
@@ -3223,7 +3223,7 @@ var (
 
 	pattern_InfraProxy_GetEnvironment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "environments", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetAffectedNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"infra", "servers", "server_id", "orgs", "org_id", "affected-nodes", "resource", "name", "version"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetAffectedNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"infra", "servers", "server_id", "orgs", "org_id", "affected-nodes", "chef_type", "name", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

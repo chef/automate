@@ -13,22 +13,22 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
-// GetAffectedNodes get the nodes using resource
+// GetAffectedNodes get the nodes using chef object
 func (s *Server) GetAffectedNodes(ctx context.Context, req *request.AffectedNodes) (*response.AffectedNodes, error) {
 	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	res, err := c.FetchAffectedNodes(ctx, req.Resource, req.Name, req.Version)
+	res, err := c.FetchAffectedNodes(ctx, req.ChefType, req.Name, req.Version)
 
 	return &response.AffectedNodes{
 		Nodes: fromSearchAPIToAffectedNodes(*res),
 	}, nil
 }
 
-// FetchAffectedNodes get the nodes used by resource
-func (c *ChefClient) FetchAffectedNodes(ctx context.Context, resource, name, version string) (*chef.SearchResult, error) {
+// FetchAffectedNodes get the nodes used by chef object
+func (c *ChefClient) FetchAffectedNodes(ctx context.Context, chefType, name, version string) (*chef.SearchResult, error) {
 	query := map[string]interface{}{
 		"name":             []string{"name"},
 		"platform":         []string{"platform"},
@@ -40,9 +40,9 @@ func (c *ChefClient) FetchAffectedNodes(ctx context.Context, resource, name, ver
 	}
 	var url string
 	if version != "" {
-		url = fmt.Sprintf("%s_%s_version:%s", resource, name, version)
+		url = fmt.Sprintf("%s_%s_version:%s", chefType, name, version)
 	} else {
-		url = fmt.Sprintf("%s:%s", resource, name)
+		url = fmt.Sprintf("%s:%s", chefType, name)
 	}
 
 	res, err := c.client.Search.PartialExec("node", url, query)

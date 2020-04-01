@@ -332,7 +332,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{resource}/{name}/{version}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}/{version}": {
       "get": {
         "operationId": "GetAffectedNodes",
         "responses": {
@@ -359,22 +359,22 @@ func init() {
             "type": "string"
           },
           {
-            "name": "resource",
-            "description": "The resource name (e.g. 'cookbooks', 'roles').",
+            "name": "chef_type",
+            "description": "Type of the chef object (e.g. 'cookbooks', 'roles', etc).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "description": "Name of the resource.",
+            "description": "Name of the chef object.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "version",
-            "description": "Version of the resource.",
+            "description": "Version of the chef object.",
             "in": "path",
             "required": true,
             "type": "string"
