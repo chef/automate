@@ -3,6 +3,7 @@ package pg
 import (
 	"context"
 	"database/sql"
+	"regexp"
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -14,6 +15,8 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
+
+var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
 func (a *adapter) CreateToken(ctx context.Context,
 	id, description string, active bool, projects []string) (*tokens.Token, error) {
@@ -36,8 +39,19 @@ func (a *adapter) CreateTokenWithValue(ctx context.Context,
 		}
 		id = uid.String()
 	}
+	err := validateTokenInputs(description)
+	if err != nil {
+		return nil, err
+	}
 
 	return a.insertToken(ctx, id, description, value, active, projects, true)
+}
+
+func validateTokenInputs(description string) error {
+	if emptyOrWhitespaceOnlyRE.MatchString(description) {
+		return errors.New("a token name must contain non-whitespace characters")
+	}
+	return nil
 }
 
 func (a *adapter) CreateLegacyTokenWithValue(ctx context.Context, value string) (*tokens.Token, error) {

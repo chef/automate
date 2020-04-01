@@ -2,7 +2,6 @@ package v2
 
 import (
 	"encoding/json"
-	"regexp"
 
 	"github.com/pkg/errors"
 
@@ -16,9 +15,6 @@ type Project struct {
 	Type   Type   `json:"type"`
 	Status string `json:"status"`
 }
-
-// Note: also catches empty names ("")
-var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
 // Scan implements pq Scan interface for a Project reference
 // so we can pull them out of the database directly as the correct type.
@@ -40,11 +36,10 @@ func NewProject(
 	name string,
 	typeVal Type,
 	status ProjectRulesStatus) (Project, error) {
-	if emptyOrWhitespaceOnlyRE.MatchString(name) {
-		return Project{}, errors.New("a project name must contain non-whitespace characters")
-	}
-	if emptyOrWhitespaceOnlyRE.MatchString(id) {
-		return Project{}, errors.New("a project id must contain non-whitespace characters")
+
+	err := validateProjectInputs(id, name)
+	if err != nil {
+		return Project{}, err
 	}
 
 	return Project{
@@ -53,4 +48,14 @@ func NewProject(
 		Type:   typeVal,
 		Status: status.String(),
 	}, nil
+}
+
+func validateProjectInputs(id string, name string) error {
+	if emptyOrWhitespaceOnlyRE.MatchString(name) {
+		return errors.New("a project name must contain non-whitespace characters")
+	}
+	if emptyOrWhitespaceOnlyRE.MatchString(id) {
+		return errors.New("a project id must contain non-whitespace characters")
+	}
+	return nil
 }

@@ -2,7 +2,6 @@ package v2
 
 import (
 	"encoding/json"
-	"regexp"
 
 	"github.com/pkg/errors"
 
@@ -70,26 +69,18 @@ func NewUpdateRole(id string, name string, actions []string, projects []string) 
 }
 
 func validateRoleInputs(id string, name string, actions []string, projects []string) error {
-	if id == "" {
-		return errors.New("a role must have an id")
+	if emptyOrWhitespaceOnlyRE.MatchString(id) {
+		return errors.New("a role id must contain non-whitespace characters")
 	}
-
-	if name == "" {
-		return errors.New("a role must have a name")
+	if emptyOrWhitespaceOnlyRE.MatchString(name) {
+		return errors.New("a role name must contain non-whitespace characters")
 	}
-
-	if regexp.MustCompile(`^\s+$`).MatchString(name) {
-		return errors.New("a role name can't be whitespace only")
-	}
-
 	if len(actions) == 0 {
 		return errors.New("a role must contain at least one action")
 	}
-
 	err := ValidateProjects(projects)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }

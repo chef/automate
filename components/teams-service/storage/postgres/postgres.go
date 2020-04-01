@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"regexp"
 
 	"github.com/lib/pq" // adapter for database/sql
 	"github.com/pkg/errors"
@@ -15,6 +16,8 @@ import (
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
+
+var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
 // WARNING
 // TODO (tc): The storage interface is still using V1 verbiage, so
@@ -77,14 +80,8 @@ func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 	if len(projects) == 0 {
 		projects = []string{}
 	}
-	// will only return an error if authz is in v2.1 mode
-	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-		Subjects:    auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-		OldProjects: []string{},
-		NewProjects: projects,
-	})
+	err := p.validateTeamInputs(ctx, name, description, projects)
 	if err != nil {
-		// return error unaltered because it's already a GRPC status code
 		return storage.Team{}, err
 	}
 
@@ -94,6 +91,25 @@ func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 	}
 
 	return team, nil
+}
+
+func (p *postgres) validateTeamInputs(ctx context.Context, name string, description string, projects []string) error {
+	if emptyOrWhitespaceOnlyRE.MatchString(name) {
+		return errors.New("a team id must contain non-whitespace characters")
+	}
+	if emptyOrWhitespaceOnlyRE.MatchString(description) {
+		return errors.New("a team name must contain non-whitespace characters")
+	}
+	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+		Subjects:    auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+		OldProjects: []string{},
+		NewProjects: projects,
+	})
+	if err != nil {
+		// return error unaltered because it's already a GRPC status code
+		return err
+	}
+	return nil
 }
 
 func (p *postgres) insertTeam(ctx context.Context,

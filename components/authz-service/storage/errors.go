@@ -52,18 +52,6 @@ func (e *TxCommitError) Error() string {
 }
 
 // MissingFieldError occurs when a required field was not passed.
-type MissingFieldError struct {
-	field string
-}
-
-func NewMissingFieldError(f string) error {
-	return &MissingFieldError{field: f}
-}
-
-func (e *MissingFieldError) Error() string {
-	return "must supply policy " + e.field
-}
-
 type ForeignKeyError struct {
 	Msg string
 }
