@@ -80,7 +80,7 @@ func TestServers(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 
-		t.Run("when the server name is already exist, raise invalid argument error", func(t *testing.T) {
+		t.Run("when the server name already exists, raise invalid argument error", func(t *testing.T) {
 			req1 := &request.CreateServer{
 				Name:        "chef-infra-server",
 				Description: "Chef infra server",
@@ -178,7 +178,7 @@ func TestServers(t *testing.T) {
 			cleanupServer(ctx, t, cl, resp2.Server.Id)
 		})
 
-		t.Run("when the server is exist with it's orgs, return servers list with orgs's count successfully", func(t *testing.T) {
+		t.Run("when the server exists with orgs, return servers list with org count", func(t *testing.T) {
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
@@ -267,7 +267,7 @@ func TestServers(t *testing.T) {
 			cleanupServer(ctx, t, cl, resp1.Server.Id)
 		})
 
-		t.Run("when the server exists with it's orgs, return the server with orgs's count successfully", func(t *testing.T) {
+		t.Run("when the server exists with orgs, return the server with org count", func(t *testing.T) {
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
@@ -353,7 +353,7 @@ func TestServers(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 
-		t.Run("when the server to delete is does not exist, returns server not found", func(t *testing.T) {
+		t.Run("when the server to delete does not exist, returns server not found", func(t *testing.T) {
 			resp, err := cl.GetServer(ctx, &request.GetServer{
 				Id: "97e01ea1-976e-4626-88c8-43345c5d934f",
 			})
