@@ -196,8 +196,8 @@ export class TeamEffects {
   @Effect()
   addTeamUsersSuccess$ = this.actions$.pipe(
     ofType(TeamActionTypes.ADD_USERS_SUCCESS),
-    map(({ payload: { user_ids } }: AddTeamUsersSuccess ) => {
-      const message = user_ids.length === 1 ? 'Added 1 user.' : `Added ${user_ids.length} users.`;
+    map(({ payload: { membership_ids } }: AddTeamUsersSuccess ) => {
+      const message = membership_ids.length === 1 ? 'Added 1 user.' : `Added ${membership_ids.length} users.`;
       return new CreateNotification({
         type: Type.info,
         message: message

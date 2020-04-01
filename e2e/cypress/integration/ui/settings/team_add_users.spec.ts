@@ -108,7 +108,7 @@ describe('team add users', () => {
         method: 'PUT',
         url: `/apis/iam/v2/teams/${teamID}/users`,
         body: {
-          user_ids: [resp.body.id]
+          membership_ids: [resp.body.id]
         }
       });
     });

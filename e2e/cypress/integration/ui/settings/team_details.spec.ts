@@ -69,7 +69,7 @@ describe('team details', () => {
           method: 'POST',
           url: `/apis/iam/v2/teams/${teamID}/users:add`,
           body: {
-            user_ids: [userMembershipID]
+            membership_ids: [userMembershipID]
           }
         });
 
