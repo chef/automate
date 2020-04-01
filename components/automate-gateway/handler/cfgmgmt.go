@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	// Cfgmgmt Request/Response definitions
+	cfgService "github.com/chef/automate/api/external/cfgmgmt"
 	cfgReq "github.com/chef/automate/api/external/cfgmgmt/request"
 	cfgRes "github.com/chef/automate/api/external/cfgmgmt/response"
 
@@ -303,6 +304,16 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context, request *sharedReq.S
 	}
 
 	return s.cfgMgmtClient.GetSuggestions(ctx, &sugRequest)
+}
+
+func (a *CfgMgmtServer) NodeExport(*cfgReq.NodeExport, cfgService.ConfigMgmt_NodeExportServer) error {
+	// Please see components/automate-gateway/services.go configMgmtNodeExportHandler for implementation
+	return nil
+}
+
+func (a *CfgMgmtServer) ReportExport(*cfgReq.ReportExport, cfgService.ConfigMgmt_ReportExportServer) error {
+	// Please see components/automate-gateway/services.go configMgmtReportExportHandler for implementation
+	return nil
 }
 
 func toResponseRun(run *cmsRes.Run) *cfgRes.Run {

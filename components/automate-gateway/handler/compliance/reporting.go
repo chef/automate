@@ -118,12 +118,12 @@ func (a *Reporting) ListProfiles(ctx context.Context, in *reporting.Query) (*rep
 }
 
 func (a *Reporting) Export(*reporting.Query, reporting.ReportingService_ExportServer) error {
-	// Please see components/automate-gateway/services/services.go for implementation
+	// Please see components/automate-gateway/services.go ReportExportHandler for implementation
 	return nil
 }
 
 func (a *Reporting) ExportNode(*reporting.Query, reporting.ReportingService_ExportNodeServer) error {
-	// Please see components/automate-gateway/services/services.go for implementation
+	// Please see components/automate-gateway/services.go NodeExportHandler for implementation
 	return nil
 }
 
