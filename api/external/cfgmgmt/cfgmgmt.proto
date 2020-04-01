@@ -17,6 +17,7 @@ import "api/external/cfgmgmt/response/errors.proto";
 
 import "api/external/common/query/parameters.proto";
 import "api/external/common/version/version.proto";
+import "api/external/common/response.proto";
 
 import "api/external/compliance/reporting/reporting.proto";
 
@@ -291,7 +292,7 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }
 
-  rpc NodeExport(cfgmgmt.request.NodeExport) returns (stream chef.automate.api.compliance.reporting.v1.ExportData) {};
+  rpc NodeExport(cfgmgmt.request.NodeExport) returns (stream chef.automate.api.common.ExportData) {};
 
-  rpc ReportExport(cfgmgmt.request.ReportExport) returns (stream chef.automate.api.compliance.reporting.v1.ExportData) {};
+  rpc ReportExport(cfgmgmt.request.ReportExport) returns (stream chef.automate.api.common.ExportData) {};
 }

@@ -262,6 +262,16 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.common.ExportData": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "format": "byte",
+          "description": "Exported reports in JSON or CSV."
+        }
+      }
+    },
     "chef.automate.api.common.version.VersionInfo": {
       "type": "object",
       "properties": {
@@ -507,16 +517,6 @@ func init() {
         "skip_message": {
           "type": "string",
           "description": "The reason this profile was skipped in the generated report, if any."
-        }
-      }
-    },
-    "chef.automate.api.compliance.reporting.v1.ExportData": {
-      "type": "object",
-      "properties": {
-        "content": {
-          "type": "string",
-          "format": "byte",
-          "description": "Exported reports in JSON or CSV."
         }
       }
     },
@@ -1358,17 +1358,17 @@ func init() {
     }
   },
   "x-stream-definitions": {
-    "chef.automate.api.compliance.reporting.v1.ExportData": {
+    "chef.automate.api.common.ExportData": {
       "type": "object",
       "properties": {
         "result": {
-          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ExportData"
+          "$ref": "#/definitions/chef.automate.api.common.ExportData"
         },
         "error": {
           "$ref": "#/definitions/grpc.gateway.runtime.StreamError"
         }
       },
-      "title": "Stream result of chef.automate.api.compliance.reporting.v1.ExportData"
+      "title": "Stream result of chef.automate.api.common.ExportData"
     }
   }
 }
