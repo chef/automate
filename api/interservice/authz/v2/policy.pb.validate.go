@@ -909,7 +909,12 @@ func (m *UpdatePolicyReq) Validate() error {
 
 	}
 
-	// no validation rules for Name
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		return UpdatePolicyReqValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	_UpdatePolicyReq_Projects_Unique := make(map[string]struct{}, len(m.GetProjects()))
 
@@ -1177,6 +1182,13 @@ func (m *AddPolicyMembersReq) Validate() error {
 		return AddPolicyMembersReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
+		}
+	}
+
+	if len(m.GetMembers()) < 1 {
+		return AddPolicyMembersReqValidationError{
+			field:  "Members",
+			reason: "value must contain at least 1 item(s)",
 		}
 	}
 
@@ -1844,10 +1856,17 @@ func (m *UpdateRoleReq) Validate() error {
 		}
 	}
 
-	if !_UpdateRoleReq_Name_Pattern.MatchString(m.GetName()) {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return UpdateRoleReqValidationError{
 			field:  "Name",
-			reason: "value does not match regex pattern \"\\\\S\"",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	if len(m.GetActions()) < 1 {
+		return UpdateRoleReqValidationError{
+			field:  "Actions",
+			reason: "value must contain at least 1 item(s)",
 		}
 	}
 
@@ -1955,8 +1974,6 @@ var _ interface {
 } = UpdateRoleReqValidationError{}
 
 var _UpdateRoleReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
-
-var _UpdateRoleReq_Name_Pattern = regexp.MustCompile("\\S")
 
 var _UpdateRoleReq_Actions_Pattern = regexp.MustCompile("^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$")
 
@@ -2117,6 +2134,13 @@ func (m *RemovePolicyMembersReq) Validate() error {
 		return RemovePolicyMembersReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
+		}
+	}
+
+	if len(m.GetMembers()) < 1 {
+		return RemovePolicyMembersReqValidationError{
+			field:  "Members",
+			reason: "value must contain at least 1 item(s)",
 		}
 	}
 
@@ -2625,10 +2649,17 @@ func (m *CreateRoleReq) Validate() error {
 		}
 	}
 
-	if !_CreateRoleReq_Name_Pattern.MatchString(m.GetName()) {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return CreateRoleReqValidationError{
 			field:  "Name",
-			reason: "value does not match regex pattern \"\\\\S\"",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	if len(m.GetActions()) < 1 {
+		return CreateRoleReqValidationError{
+			field:  "Actions",
+			reason: "value must contain at least 1 item(s)",
 		}
 	}
 
@@ -2736,8 +2767,6 @@ var _ interface {
 } = CreateRoleReqValidationError{}
 
 var _CreateRoleReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
-
-var _CreateRoleReq_Name_Pattern = regexp.MustCompile("\\S")
 
 var _CreateRoleReq_Actions_Pattern = regexp.MustCompile("^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$")
 

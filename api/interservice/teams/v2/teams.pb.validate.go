@@ -108,10 +108,10 @@ func (m *GetTeamReq) Validate() error {
 		return nil
 	}
 
-	if !_GetTeamReq_Id_Pattern.MatchString(m.GetId()) {
+	if utf8.RuneCountInString(m.GetId()) < 1 {
 		return GetTeamReqValidationError{
 			field:  "Id",
-			reason: "value does not match regex pattern \"\\\\S\"",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -171,8 +171,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetTeamReqValidationError{}
-
-var _GetTeamReq_Id_Pattern = regexp.MustCompile("\\S")
 
 // Validate checks the field values on GetTeamResp with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -402,17 +400,17 @@ func (m *UpdateTeamReq) Validate() error {
 		return nil
 	}
 
-	if !_UpdateTeamReq_Id_Pattern.MatchString(m.GetId()) {
+	if utf8.RuneCountInString(m.GetId()) < 1 {
 		return UpdateTeamReqValidationError{
 			field:  "Id",
-			reason: "value does not match regex pattern \"\\\\S\"",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
-	if !_UpdateTeamReq_Name_Pattern.MatchString(m.GetName()) {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return UpdateTeamReqValidationError{
 			field:  "Name",
-			reason: "value does not match regex pattern \"\\\\S\"",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -495,10 +493,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpdateTeamReqValidationError{}
-
-var _UpdateTeamReq_Id_Pattern = regexp.MustCompile("\\S")
-
-var _UpdateTeamReq_Name_Pattern = regexp.MustCompile("\\S")
 
 var _UpdateTeamReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
@@ -585,10 +579,10 @@ func (m *DeleteTeamReq) Validate() error {
 		return nil
 	}
 
-	if !_DeleteTeamReq_Id_Pattern.MatchString(m.GetId()) {
+	if utf8.RuneCountInString(m.GetId()) < 1 {
 		return DeleteTeamReqValidationError{
 			field:  "Id",
-			reason: "value does not match regex pattern \"\\\\S\"",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -648,8 +642,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteTeamReqValidationError{}
-
-var _DeleteTeamReq_Id_Pattern = regexp.MustCompile("\\S")
 
 // Validate checks the field values on DeleteTeamResp with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -741,10 +733,10 @@ func (m *CreateTeamReq) Validate() error {
 		}
 	}
 
-	if !_CreateTeamReq_Name_Pattern.MatchString(m.GetName()) {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return CreateTeamReqValidationError{
 			field:  "Name",
-			reason: "value does not match regex pattern \"\\\\S\"",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -829,8 +821,6 @@ var _ interface {
 } = CreateTeamReqValidationError{}
 
 var _CreateTeamReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
-
-var _CreateTeamReq_Name_Pattern = regexp.MustCompile("\\S")
 
 var _CreateTeamReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
@@ -917,10 +907,10 @@ func (m *AddTeamMembersReq) Validate() error {
 		return nil
 	}
 
-	if !_AddTeamMembersReq_Id_Pattern.MatchString(m.GetId()) {
+	if utf8.RuneCountInString(m.GetId()) < 1 {
 		return AddTeamMembersReqValidationError{
 			field:  "Id",
-			reason: "value does not match regex pattern \"\\\\S\"",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -1013,8 +1003,6 @@ var _ interface {
 	ErrorName() string
 } = AddTeamMembersReqValidationError{}
 
-var _AddTeamMembersReq_Id_Pattern = regexp.MustCompile("\\S")
-
 var _AddTeamMembersReq_UserIds_Pattern = regexp.MustCompile("^[[:alnum:]_.+@-]+$")
 
 // Validate checks the field values on AddTeamMembersResp with the rules
@@ -1092,10 +1080,10 @@ func (m *RemoveTeamMembersReq) Validate() error {
 		return nil
 	}
 
-	if !_RemoveTeamMembersReq_Id_Pattern.MatchString(m.GetId()) {
+	if utf8.RuneCountInString(m.GetId()) < 1 {
 		return RemoveTeamMembersReqValidationError{
 			field:  "Id",
-			reason: "value does not match regex pattern \"\\\\S\"",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -1187,8 +1175,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RemoveTeamMembersReqValidationError{}
-
-var _RemoveTeamMembersReq_Id_Pattern = regexp.MustCompile("\\S")
 
 var _RemoveTeamMembersReq_UserIds_Pattern = regexp.MustCompile("^[[:alnum:]_.+@-]+$")
 
@@ -1425,10 +1411,10 @@ func (m *GetTeamMembershipReq) Validate() error {
 		return nil
 	}
 
-	if !_GetTeamMembershipReq_Id_Pattern.MatchString(m.GetId()) {
+	if utf8.RuneCountInString(m.GetId()) < 1 {
 		return GetTeamMembershipReqValidationError{
 			field:  "Id",
-			reason: "value does not match regex pattern \"\\\\S\"",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -1490,8 +1476,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetTeamMembershipReqValidationError{}
-
-var _GetTeamMembershipReq_Id_Pattern = regexp.MustCompile("\\S")
 
 // Validate checks the field values on GetTeamMembershipResp with the rules
 // defined in the proto definition for this message. If any rules are

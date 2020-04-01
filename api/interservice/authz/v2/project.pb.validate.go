@@ -113,7 +113,12 @@ func (m *CreateProjectReq) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		return CreateProjectReqValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	if !_CreateProjectReq_Id_Pattern.MatchString(m.GetId()) {
 		return CreateProjectReqValidationError{
@@ -560,7 +565,12 @@ func (m *UpdateProjectReq) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		return UpdateProjectReqValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	if !_UpdateProjectReq_Id_Pattern.MatchString(m.GetId()) {
 		return UpdateProjectReqValidationError{

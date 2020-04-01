@@ -48,7 +48,12 @@ func (m *CreateTokenReq) Validate() error {
 		}
 	}
 
-	// no validation rules for Description
+	if utf8.RuneCountInString(m.GetDescription()) < 1 {
+		return CreateTokenReqValidationError{
+			field:  "Description",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for Active
 
@@ -146,7 +151,12 @@ func (m *CreateTokenWithValueReq) Validate() error {
 
 	// no validation rules for Id
 
-	// no validation rules for Description
+	if utf8.RuneCountInString(m.GetDescription()) < 1 {
+		return CreateTokenWithValueReqValidationError{
+			field:  "Description",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for Active
 
@@ -248,7 +258,12 @@ func (m *UpdateTokenReq) Validate() error {
 
 	// no validation rules for Active
 
-	// no validation rules for Description
+	if utf8.RuneCountInString(m.GetDescription()) < 1 {
+		return UpdateTokenReqValidationError{
+			field:  "Description",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	_UpdateTokenReq_Projects_Unique := make(map[string]struct{}, len(m.GetProjects()))
 
