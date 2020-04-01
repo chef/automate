@@ -33,8 +33,6 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 				msg.Report.Platform.Release = "unknown"
 			}
 
-			msg.Report.Profiles = compliance.FixInheritedProfiles(msg.Report.Profiles)
-
 			perProfileSums := make([]relaxting.ESInSpecSummaryProfile, 0)
 			totalSum := &reportingTypes.NodeControlSummary{}
 			for _, profile := range msg.Report.Profiles {

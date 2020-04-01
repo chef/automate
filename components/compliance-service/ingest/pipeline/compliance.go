@@ -23,10 +23,10 @@ type Compliance struct {
 func NewCompliancePipeline(client *ingestic.ESClient, authzClient iam_v2.ProjectsClient, nodeMgrClient manager.NodeManagerServiceClient) Compliance {
 	in := make(chan message.Compliance, 100)
 	compliancePipeline(in,
+		processor.ComplianceProfile(client),
 		processor.ComplianceShared,
 		processor.ComplianceSummary,
 		processor.ComplianceReport,
-		processor.ComplianceProfile,
 		processor.BundleReportProjectTagger(authzClient),
 		publisher.BuildNodeManagerPublisher(nodeMgrClient),
 		publisher.StoreCompliance(client, 100))
