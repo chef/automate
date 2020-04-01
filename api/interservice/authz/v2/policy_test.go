@@ -650,69 +650,77 @@ func TestValidationCreateRole(t *testing.T) {
 		"empty ID": &v2.CreateRoleReq{
 			Id:       "",
 			Name:     "name of my team",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"test"},
 		},
 		"invalid ID": &v2.CreateRoleReq{
 			Id:       "i d !",
 			Name:     "name of my team",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"test"},
 		},
 		"whitespace ID": &v2.CreateRoleReq{
 			Id:       "      ",
 			Name:     "name of my team",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"test"},
 		},
 		"missing ID": &v2.CreateRoleReq{
 			Name:     "name of my team",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"test"},
 		},
 		"empty Name": &v2.CreateRoleReq{
 			Id:       "test",
 			Name:     "",
-			Projects: []string{"test"},
-		},
-		"whitespace Name": &v2.CreateRoleReq{
-			Id:       "test",
-			Name:     "          ",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"test"},
 		},
 		"missing Name": &v2.CreateRoleReq{
 			Id:       "test",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"test"},
 		},
 		"ID contains invalid characters": &v2.CreateRoleReq{
 			Id:       "invalid~~~",
 			Name:     "this is valid ~ fun characters",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"test", "test-2"},
 		},
 		"ID contains whitespace": &v2.CreateRoleReq{
 			Id:       "invalid id",
 			Name:     "this is valid ~ fun characters",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"test", "test-2"},
 		},
 		"whitespace projects list": &v2.CreateRoleReq{
 			Id:       "this-is-valid-1",
 			Name:     "name of my team ~ fun characters 1 %",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"     ", "test"},
 		},
 		"repeated projects in list": &v2.CreateRoleReq{
 			Id:       "this-is-valid-1",
 			Name:     "name of my team ~ fun characters 1 %",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"repeat", "repeat"},
 		},
 		"Project has invalid characters": &v2.CreateRoleReq{
 			Id:       "this-is-valid-1",
 			Name:     "name of my team ~ fun characters 1 %",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"valid", "wrong~"},
 		},
 		"Project has spaces": &v2.CreateRoleReq{
 			Id:       "this-is-valid-1",
 			Name:     "name of my team ~ fun characters 1 %",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"valid", "wrong space"},
 		},
 		"project has uppercase characters": &v2.CreateRoleReq{
 			Id:       "this-is-valid-1",
 			Name:     "name of my team ~ fun characters 1 %",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"valid", "PROJECT1"},
 		},
 	}
@@ -721,16 +729,19 @@ func TestValidationCreateRole(t *testing.T) {
 		"alphanumeric IDs allowed": &v2.CreateRoleReq{
 			Id:       "asdf-123-fun",
 			Name:     "this is valid ~ fun characters",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"test", "test-2"},
 		},
 		"empty projects list": &v2.CreateRoleReq{
 			Id:       "this-is-valid-1",
 			Name:     "name of my team ~ fun characters 1 %",
+			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{},
 		},
 		"missing projects list": &v2.CreateRoleReq{
-			Id:   "this-is-valid-1",
-			Name: "name of my team ~ fun characters 1 %",
+			Id:      "this-is-valid-1",
+			Name:    "name of my team ~ fun characters 1 %",
+			Actions: []string{"cfgmgmt:nodes:*"},
 		},
 	}
 

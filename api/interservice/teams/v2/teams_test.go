@@ -13,9 +13,6 @@ func TestGetTeamReq(t *testing.T) {
 		"empty ID": &v2.GetTeamReq{
 			Id: "",
 		},
-		"whitespace ID": &v2.GetTeamReq{
-			Id: "      ",
-		},
 		"missing ID": &v2.GetTeamReq{},
 	}
 	positiveCases := map[string]*v2.GetTeamReq{
@@ -50,9 +47,6 @@ func TestDeleteTeamReq(t *testing.T) {
 	negativeCases := map[string]*v2.DeleteTeamReq{
 		"empty ID": &v2.DeleteTeamReq{
 			Id: "",
-		},
-		"whitespace ID": &v2.DeleteTeamReq{
-			Id: "       ",
 		},
 		"missing ID": &v2.DeleteTeamReq{},
 	}
@@ -91,11 +85,6 @@ func TestUpdateTeamReq(t *testing.T) {
 			Name:     "name of my team",
 			Projects: []string{"test"},
 		},
-		"whitespace ID": &v2.UpdateTeamReq{
-			Id:       "      ",
-			Name:     "name of my team",
-			Projects: []string{"test"},
-		},
 		"missing ID": &v2.UpdateTeamReq{
 			Name:     "name of my team",
 			Projects: []string{"test"},
@@ -103,11 +92,6 @@ func TestUpdateTeamReq(t *testing.T) {
 		"empty Name": &v2.UpdateTeamReq{
 			Id:       "test",
 			Name:     "",
-			Projects: []string{"test"},
-		},
-		"whitespace Name": &v2.UpdateTeamReq{
-			Id:       "test",
-			Name:     "          ",
 			Projects: []string{"test"},
 		},
 		"missing Name": &v2.UpdateTeamReq{
@@ -185,11 +169,6 @@ func TestCreateTeamReq(t *testing.T) {
 			Name:     "name of my team",
 			Projects: []string{"test"},
 		},
-		"whitespace ID": &v2.CreateTeamReq{
-			Id:       "           ",
-			Name:     "name of my team",
-			Projects: []string{"test"},
-		},
 		"missing ID": &v2.CreateTeamReq{
 			Name:     "name of my team",
 			Projects: []string{"test"},
@@ -197,11 +176,6 @@ func TestCreateTeamReq(t *testing.T) {
 		"empty Name": &v2.CreateTeamReq{
 			Id:       "test",
 			Name:     "",
-			Projects: []string{"test"},
-		},
-		"whitespace Name": &v2.CreateTeamReq{
-			Id:       "test",
-			Name:     "          ",
 			Projects: []string{"test"},
 		},
 		"missing Name": &v2.CreateTeamReq{
@@ -288,10 +262,6 @@ func TestAddTeamMembersReq(t *testing.T) {
 			Id:      "",
 			UserIds: []string{"valid"},
 		},
-		"whitespace ID": &v2.AddTeamMembersReq{
-			Id:      "    ",
-			UserIds: []string{"valid"},
-		},
 		"missing ID": &v2.AddTeamMembersReq{
 			UserIds: []string{"valid"},
 		},
@@ -354,10 +324,6 @@ func TestRemoveTeamMembersReq(t *testing.T) {
 	negativeCases := map[string]*v2.RemoveTeamMembersReq{
 		"empty ID": &v2.RemoveTeamMembersReq{
 			Id:      "",
-			UserIds: []string{"valid"},
-		},
-		"whitespace ID": &v2.RemoveTeamMembersReq{
-			Id:      "      ",
 			UserIds: []string{"valid"},
 		},
 		"missing ID": &v2.RemoveTeamMembersReq{
@@ -467,9 +433,6 @@ func TestGetTeamMembershipReq(t *testing.T) {
 	negativeCases := map[string]*v2.GetTeamMembershipReq{
 		"empty ID": &v2.GetTeamMembershipReq{
 			Id: "",
-		},
-		"whitespace ID": &v2.GetTeamMembershipReq{
-			Id: "     ",
 		},
 		"missing ID": &v2.GetTeamMembershipReq{},
 	}
