@@ -283,7 +283,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     ].map(jobName => {
       // Extract the raw values from the formGroup so that
       // we can make sure to keep disabled inputs populated in the UI
-      const jobForm = this.getJobForm(jobName).getRawValue();
+      const jobForm = this[jobName].getRawValue();
 
       const isNested = jobForm.nested_name ? true : false;
       const job = new IngestJob(null, null);
@@ -373,11 +373,6 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
           break;
       }
     });
-  }
-
-  // private getJobForm(jobName: string): RawJobFormGroupValues {
-  private getJobForm(jobName: string): FormGroup {
-    return this[jobName];
   }
 
   // Splits a packed threshold into a number and a unit, where unit is a single character
