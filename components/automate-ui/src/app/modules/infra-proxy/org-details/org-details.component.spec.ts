@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CookbooksListComponent } from './cookbooks-list.component';
+import { OrgDetailsComponent } from './org-details.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
@@ -9,9 +9,9 @@ import { StoreModule } from '@ngrx/store';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
-describe('CookbooksListComponent', () => {
-  let component: CookbooksListComponent;
-  let fixture: ComponentFixture<CookbooksListComponent>;
+describe('OrgDetailsComponent', () => {
+  let component: OrgDetailsComponent;
+  let fixture: ComponentFixture<OrgDetailsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -34,7 +34,7 @@ describe('CookbooksListComponent', () => {
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        CookbooksListComponent
+        OrgDetailsComponent
       ],
       providers: [
         FeatureFlagsService
@@ -51,12 +51,16 @@ describe('CookbooksListComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CookbooksListComponent);
+    fixture = TestBed.createComponent(OrgDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('defaults to showing cookbooks section', () => {
+    expect(component.tabValue).toBe('cookbooks');
   });
 });
