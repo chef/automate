@@ -27,7 +27,7 @@ func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destinat
 
 func updateToDBDestination(inDestination *datafeed.UpdateDestinationRequest) *Destination {
 	newDestination := Destination{}
-	newDestination.ID = inDestination.Id
+	newDestination.ID, _ = strconv.ParseInt(inDestination.Id, 10 , 64)
 	newDestination.Name = inDestination.Name
 	newDestination.URL = inDestination.Url
 	newDestination.Secret = inDestination.Secret
