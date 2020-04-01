@@ -16,7 +16,6 @@ import {
 } from './automate-settings.model';
 
 import { environment } from '../../../environments/environment';
-import { error } from '@angular/compiler/src/util';
 
 const RETENTION_URL = environment.retention_url;
 
@@ -101,7 +100,7 @@ export class AutomateSettingsRequests {
           if (thisObject) {
             thisObject.purge_policies.elasticsearch.push(thisJob);
           } else {
-            console.log('TDODO: send an error');
+            console.log('TODO: send an error');
           }
           break;
 
