@@ -104,6 +104,9 @@ func (a *Server) GetTeamMembership(ctx context.Context,
 	r *gwreq.GetTeamMembershipReq) (*gwres.GetTeamMembershipResp, error) {
 
 	res, err := a.client.GetTeamMembership(ctx, (*teams.GetTeamMembershipReq)(r))
+	if err != nil {
+		return nil, err
+	}
 	return &gwres.GetTeamMembershipResp{
 		MembershipIds: res.UserIds,
 	}, err
