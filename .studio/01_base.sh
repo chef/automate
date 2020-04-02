@@ -220,27 +220,16 @@ document "install_go_tool" <<DOC
   @(arg:*) The array of packages you wish to install.
   The default behavior is to install go tools with 'go install -v -mod=vendor'
 
-  To attempt to build the binary statically set GO_BIN_STATIC=true
-
   To install tools using not included in the vendor you'll either need to
   include them and revendor or unset GO_LDFLAGS so that we don't use the
   module vendor directory when installing the binary to the GOBIN directory.
 DOC
 install_go_tool() {
   install_if_missing "$(desired_golang_ident)" go
-
-  local go_cmd="go install -v"
-
-  # Add static linked flags if needed
-  if [[ $GO_STATIC_BIN == true ]]; then
-    go_static_linked_envs
-    go_cmd+=" $GO_ARGS"
-  fi
-
   for tool in "$@"; do
     go_tool=$(basename "$tool")
     if [[ ! -f "${GOBIN}/${go_tool}" ]]; then
-      eval "$go_cmd $tool"
+      eval "go install -v $tool"
     fi
   done
 }
