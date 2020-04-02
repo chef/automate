@@ -451,7 +451,16 @@ func (es Backend) MissingNodeDurationCounts(durations []string) ([]backend.Count
 
 	rangeAggRes, found := searchResult.Aggregations.Range(aggTag)
 	if !found {
-		return []backend.CountedDuration{}, nil
+		// This case is if there are no nodes for all the durations
+		// We are creating the buckets manually with zero count
+		countedDurations := make([]backend.CountedDuration, len(durations))
+		for index, duration := range durations {
+			countedDurations[index] = backend.CountedDuration{
+				Duration: duration,
+				Count:    0,
+			}
+		}
+		return countedDurations, nil
 	}
 
 	if len(rangeAggRes.Buckets) != len(durations) {

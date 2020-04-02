@@ -40,11 +40,6 @@ func TestValidDurations(t *testing.T) {
 			durations:   []string{"1M", "4M", "2M", "13M"},
 			expected:    true,
 		},
-		{
-			description: "years valid",
-			durations:   []string{"1y", "4y", "2y", "5y"},
-			expected:    true,
-		},
 	}
 
 	for _, testCase := range cases {
@@ -57,7 +52,7 @@ func TestValidDurations(t *testing.T) {
 
 func TestValidDurationsNot(t *testing.T) {
 
-	durations := []string{"h1", "1h2", "3H*", "1Q", "3p", "4.1w", "1H", "1hy"}
+	durations := []string{"h1", "1y", "1h2", "3H*", "1Q", "3p", "4.1w", "1H", "1hy"}
 
 	for _, duration := range durations {
 		t.Run(fmt.Sprintf("invalid %s", duration), func(t *testing.T) {

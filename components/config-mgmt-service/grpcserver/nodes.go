@@ -383,7 +383,7 @@ func (s *CfgMgmtServer) MissingNodeDurationCounts(
 }
 
 func ValidDurations(durations []string) bool {
-	re := regexp.MustCompile(`^\d+[hdwMy]$`)
+	re := regexp.MustCompile(`^\d+[hdwM]$`)
 	for _, duration := range durations {
 		if !re.MatchString(duration) {
 			return false

@@ -96,6 +96,97 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 				},
 			},
 		},
+
+		{
+			description: "days: no nodes are missing after 3 days",
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().Add(time.Hour*-24*3 + time.Hour*2),
+				},
+			},
+			durations: []string{"3d"},
+			expectedResponse: []*response.CountedDuration{
+				{
+					Duration: "3d",
+					Count:    0,
+				},
+			},
+		},
+		{
+			description: "days: one node is missing after 2 days",
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().Add(time.Hour*-24*3 + time.Hour*-2),
+				},
+			},
+			durations: []string{"3d"},
+			expectedResponse: []*response.CountedDuration{
+				{
+					Duration: "3d",
+					Count:    1,
+				},
+			},
+		},
+		{
+			description: "weeks: no nodes are missing after 2 weeks",
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().AddDate(0, 0, -14).Add(time.Hour * 2),
+				},
+			},
+			durations: []string{"2w"},
+			expectedResponse: []*response.CountedDuration{
+				{
+					Duration: "2w",
+					Count:    0,
+				},
+			},
+		},
+		{
+			description: "weeks: one node is missing after 2 weeks",
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().AddDate(0, 0, -14).Add(time.Hour * -2),
+				},
+			},
+			durations: []string{"2w"},
+			expectedResponse: []*response.CountedDuration{
+				{
+					Duration: "2w",
+					Count:    1,
+				},
+			},
+		},
+		{
+			description: "months: no nodes are missing after 2 months",
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().AddDate(0, -2, 0).Add(time.Hour * 2),
+				},
+			},
+			durations: []string{"2M"},
+			expectedResponse: []*response.CountedDuration{
+				{
+					Duration: "2M",
+					Count:    0,
+				},
+			},
+		},
+		{
+			description: "months: one node is missing after 2 months",
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().AddDate(0, -2, 0).Add(time.Hour * -2),
+				},
+			},
+			durations: []string{"2M"},
+			expectedResponse: []*response.CountedDuration{
+				{
+					Duration: "2M",
+					Count:    1,
+				},
+			},
+		},
 	}
 
 	for _, testCase := range cases {
@@ -119,7 +210,7 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 			for _, expected := range testCase.expectedResponse {
 				actualFound, found := findMatchingCountedDurations(expected, actualResponse.CountedDurations)
 
-				assert.Truef(t, found, "Did not find expected duration %s", expected.Duration)
+				require.Truef(t, found, "Did not find expected duration %s", expected.Duration)
 				assert.Equal(t, expected.Count, actualFound.Count)
 			}
 		})
