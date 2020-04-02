@@ -353,7 +353,7 @@ describe('AutomateSettingsComponent', () => {
         // expect(component.notificationVisible).toBe(true);
         expect(component.notificationType).toEqual('info');
         expect(component.notificationMessage)
-        .toEqual('All settings have been updated successfully');
+        .toEqual('Settings saved.');
       });
 
       xdescribe('and there is an error', () => {
