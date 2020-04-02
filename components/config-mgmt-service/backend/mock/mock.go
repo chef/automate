@@ -194,3 +194,7 @@ func (es Backend) GetDeletedCountsTimeSeries(startTime, endTime time.Time,
 func (m Backend) GetErrors(int32, map[string][]string) ([]*backend.ChefErrorCount, error) {
 	return nil, nil
 }
+
+func (m Backend) MissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
+	return nil, nil
+}

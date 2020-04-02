@@ -424,3 +424,8 @@ func (es Backend) GetErrors(size int32, filters map[string][]string) ([]*backend
 
 	return chefErrs, nil
 }
+
+func (m Backend) MissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
+
+	return []backend.CountedDuration{}, nil
+}

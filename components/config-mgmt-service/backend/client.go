@@ -66,6 +66,7 @@ type Client interface {
 	GetDeletedCountsTimeSeries(time.Time, time.Time, map[string][]string) ([]CountPeroid, error)
 	GetCreateCountsTimeSeries(time.Time, time.Time, map[string][]string) ([]CountPeroid, error)
 	GetErrors(int32, map[string][]string) ([]*ChefErrorCount, error)
+	MissingNodeDurationCounts(durations []string) ([]CountedDuration, error)
 }
 
 // Types that we consume from the ingest-service
@@ -83,6 +84,11 @@ type Action ingest.InternalChefAction
 type Deprecation ingest.Deprecation
 
 type Resource ingest.Resource
+
+type CountedDuration struct {
+	Duration string
+	Count    int32
+}
 
 type CountPeroid struct {
 	Start time.Time

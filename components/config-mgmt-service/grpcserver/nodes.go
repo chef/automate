@@ -316,6 +316,76 @@ func backendNodeArrayToMessageArray(nodes []backend.Node,
 	return messages
 }
 
+func (s *CfgMgmtServer) GetErrors(ctx context.Context, req *extReq.Errors) (*externalResp.Errors, error) {
+	log.WithFields(log.Fields{
+		"request": req,
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	filters, err := stringutils.FormatFiltersWithKeyConverter(req.Filter,
+		params.ConvertParamToNodeStateBackendLowerFilter)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	if _, filterRequested := filters["status"]; filterRequested {
+		return nil, status.Errorf(codes.InvalidArgument, "Cannot filter GetErrors request by 'status'")
+	}
+
+	chefErrors, err := s.client.GetErrors(req.Size, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	res := externalResp.Errors{}
+	for _, chefErr := range chefErrors {
+		res.Errors = append(
+			res.Errors,
+			&externalResp.ErrorCount{
+				Count:        chefErr.Count,
+				Type:         chefErr.Type,
+				ErrorMessage: chefErr.Message,
+			},
+		)
+	}
+
+	return &res, nil
+}
+
+func (s *CfgMgmtServer) MissingNodeDurationCounts(
+	ctx context.Context,
+	request *pRequest.MissingNodeDurationCounts) (*interserviceResp.MissingNodeDurationCounts, error) {
+	if !ValidDurations(request.Durations) {
+		return &interserviceResp.MissingNodeDurationCounts{},
+			status.Errorf(codes.InvalidArgument, "Parameter 'durations' are incorrect")
+	}
+
+	countedDurations, err := s.client.MissingNodeDurationCounts(request.Durations)
+	if err != nil {
+		return &interserviceResp.MissingNodeDurationCounts{}, status.Errorf(codes.Internal, err.Error())
+	}
+
+	responseCountedDurations := make([]*interserviceResp.CountedDuration, len(countedDurations))
+	for index := range countedDurations {
+		responseCountedDurations[index] = &interserviceResp.CountedDuration{
+			Duration: countedDurations[index].Duration,
+			Count:    countedDurations[index].Count,
+		}
+	}
+
+	return &interserviceResp.MissingNodeDurationCounts{CountedDurations: responseCountedDurations}, nil
+}
+
+func ValidDurations(durations []string) bool {
+
+	return true
+}
+
 func backendNodeArrayToInventoryNodeArray(nodes []backend.InventoryNode) []*interserviceResp.InventoryNode {
 	inventoryNodes := make([]*interserviceResp.InventoryNode, len(nodes))
 	for i, node := range nodes {
@@ -398,46 +468,4 @@ func (s *CfgMgmtServer) nodeExistsAsync(nodeID string, projectFilters map[string
 	}()
 
 	return nodeExistsChan
-}
-
-func (s *CfgMgmtServer) GetErrors(ctx context.Context, req *extReq.Errors) (*externalResp.Errors, error) {
-	log.WithFields(log.Fields{
-		"request": req,
-		"func":    nameOfFunc(),
-	}).Debug("rpc call")
-
-	filters, err := stringutils.FormatFiltersWithKeyConverter(req.Filter,
-		params.ConvertParamToNodeStateBackendLowerFilter)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	}
-
-	filters, err = filterByProjects(ctx, filters)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
-	}
-
-	if _, filterRequested := filters["status"]; filterRequested {
-		return nil, status.Errorf(codes.InvalidArgument, "Cannot filter GetErrors request by 'status'")
-	}
-
-	chefErrors, err := s.client.GetErrors(req.Size, filters)
-	if err != nil {
-		return nil, err
-	}
-
-	res := externalResp.Errors{}
-	for _, chefErr := range chefErrors {
-		res.Errors = append(
-			res.Errors,
-			&externalResp.ErrorCount{
-				Count:        chefErr.Count,
-				Type:         chefErr.Type,
-				ErrorMessage: chefErr.Message,
-			},
-		)
-	}
-
-	return &res, nil
-
 }
