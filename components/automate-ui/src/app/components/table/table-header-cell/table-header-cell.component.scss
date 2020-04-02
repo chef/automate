@@ -9,6 +9,10 @@
   background-color: $chef-lightest-grey;
   border-bottom: 1px solid $chef-grey;
   border-top: 1px solid $chef-grey;
+
+  &[hidden] {
+    display: none !important; // sass-lint:disable-line no-important
+  }
 }
 
 :host:first-child {

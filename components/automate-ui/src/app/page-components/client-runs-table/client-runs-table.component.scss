@@ -16,7 +16,7 @@ a, a:visited {
 }
 
 chef-table-header-cell,
-chef-table-cell {
+chef-td {
   line-height: 1.2;
 
   &.sort:hover {
@@ -32,9 +32,9 @@ chef-table-cell {
     padding-right: 0;
   }
 
-  // &.node-name {
-  //   flex-basis: 24%;
-  // }
+  &.node-name {
+    flex-basis: 24%;
+  }
 
   &.check-in {
     min-width: 140px;
@@ -57,7 +57,7 @@ chef-table-cell {
   }
 }
 
-chef-table-cell {
+chef-td {
   padding: 1em;
 
   &.has-runs {
@@ -78,8 +78,8 @@ chef-table-cell {
   }
 }
 
-chef-table-row.row {
-  & > chef-table-cell:first-child:before {
+chef-tr.row {
+  & > chef-td:first-child:before {
     content: '';
     position: absolute;
     top: 0;
@@ -92,15 +92,15 @@ chef-table-row.row {
     border-bottom-left-radius: $global-radius;
   }
 
-  &:hover > chef-table-cell:first-child:before {
+  &:hover > chef-td:first-child:before {
     width: 7px;
   }
 
-  & > chef-table-cell.failure:first-child:before {
+  & > chef-td.failure:first-child:before {
     background: $chef-critical;
   }
 
-  & > chef-table-cell.missing:first-child:before {
+  & > chef-td.missing:first-child:before {
     background: $chef-dark-grey;
   }
 }
