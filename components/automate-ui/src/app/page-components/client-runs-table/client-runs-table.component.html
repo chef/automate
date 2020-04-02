@@ -6,7 +6,7 @@
 </app-deletable-node-control>
 <chef-table class="node-list">
   <caption class="visually-hidden">Node List Table with Node States</caption>
-  <chef-thead>
+  <chef-table-header>
     <chef-table-row>
       <chef-table-header-cell *ngIf="canDeleteNodes" class="delete" scope="col">
         <chef-checkbox class="delete-checkbox header"
@@ -70,8 +70,8 @@
         </chef-click-outside>
       </chef-table-header-cell>
     </chef-table-row>
-  </chef-thead>
-  <chef-tbody>
+  </chef-table-header>
+  <chef-table-body>
     <ng-container *ngFor="let node of nodes; index as i" >
       <chef-table-row *ngIf=node.hasRuns tabindex="0" class="row">
         <chef-table-cell  *ngIf="canDeleteNodes" class="{{node.status}} delete">
@@ -181,7 +181,7 @@
         </chef-table-cell>
       </chef-table-row>
     </ng-container>
-  </chef-tbody>
+  </chef-table-body>
 </chef-table>
 
 <app-page-picker
