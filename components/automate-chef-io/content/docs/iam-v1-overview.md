@@ -25,13 +25,10 @@ This guide helps you understand and use Chef Automate's IAM v1 authorization sys
 ## Overview
 
 Chef Automate IAM v1 uses a policy-based authorization system.
-A policy defines which **actions** a user, team, or client (**subject**) may perform
-on a **resource**.
+A policy defines which **actions** a user, team, or client (**subject**) may perform on a **resource**.
 Without a policy, a user cannot perform the desired action upon the resource.
 
-For example, the following policy permits both the user with
-the email user&#64;example.com and members of the LDAP team `ops`
-to `read` the profiles collected under the `compliance` namespace:
+For example, the following policy permits both the user with the email user&#64;example.com and members of the LDAP team `ops` to `read` the profiles collected under the `compliance` namespace:
 
 ```bash
 {
@@ -48,18 +45,15 @@ Policies can contain wildcards to match a range of values.
 
 ## Structure
 
-A policy has three components: the **subjects**, which is
-a list of users and teams, the **action** that those users/team members are allowed to perform,
-and the **resource** on which they perform actions. Resources can be very granular,
-but for most instances, restricting at the uppermost namespace will suffice.
+A policy has three components: the **subjects**, which is a list of users and teams, the allowed **action** that the users/team members can perform, and the **resource** on which they perform actions.
+Resources can be granular, but for most instances, restricting at the uppermost namespace will suffice.
 A command to create a policy has this form:
 
 ```bash
 curl -s -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"subjects":["subject1", "subject2"], "action":"whatever_action", "resource":"whatever_resource"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
 ```
 
-Here is a concrete example, granting `read` permission for the user `user@example.com`
-and for the members of `team:ldap:ops` on resource `cfgmgmt:nodes:*`:
+Here is a concrete example, granting `read` permission for the user `user@example.com` and for the members of `team:ldap:ops` on resource `cfgmgmt:nodes:*`:
 
 ```bash
 curl -s -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"subjects":["user:local:user@example.com", "team:ldap:ops"], "action":"read", "resource":"cfgmgmt:nodes:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
@@ -69,8 +63,7 @@ curl -s -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"subject
 
 An `action` is the operation that a subject performs.
 Examples include `create`, `read`, `upload` and `mark-deleted`.
-This policy allows `user@example.com` to `read` the `compliance:profiles` namespace;
-however, the user cannot perform any other actions on it:
+This policy allows `user@example.com` to `read` the `compliance:profiles` namespace, but the user cannot perform any other actions on it:
 
 ```bash
 {
@@ -82,30 +75,29 @@ however, the user cannot perform any other actions on it:
 }
 ```
 
-On the other hand, a [wildcard]({{< relref "#wildcards" >}}) in the `action` field
-permits _any_ action on the resource.
+A [wildcard]({{< relref "#wildcards" >}}) in the `action` field permits _any_ action on the resource.
 
 ### Subjects
 
-The `subjects` field of a policy contains an array of individual subjects. A subject can be:
+The `subjects` field of a policy contains an array of individual subjects.
+A subject can be:
 
 * A user, identified by provider and email (`user:local:foo@bar.com`)
 * A team, identified by provider and name (`team:local:the_foos`)
 * An API token identified by ID (`token:1234-5678-9785`)
 
-A wildcard can replace any term of the subject; however, no terms can follow the wildcard.
+A wildcard can replace any term of the subject, but no terms can follow the wildcard.
 
 Each user or team must specify its _provider_: _local_, _ldap_, or _saml_.
 
-IAM v1 supports LDAP, SAML,
-and local users or teams.
+IAM v1 supports LDAP, SAML, and local users or teams.
 
 ### Resource
 
-An `action` is performed on a `resource`.
+An `action` performs on a `resource`.
 Some types of resources are `nodes`, `compliance`, and `compliance:profiles`.
 
-Resources are defined in hierarchical terms of increasing granularity and may have any number of terms.
+Resources define themselves in hierarchical terms of increasing granularity and may have any number of terms.
 With a wildcard (`*`), you can define policies with permission on any tier of the hierarchy.
 
 ### Wildcards
@@ -117,20 +109,17 @@ You can use a wildcard in two ways:
 
 A policy with a wildcard permits access to any action, resource, or subject in that space.
 
-Authorization permits wildcards in policy definitions, so you can create a policy covering
-a range of possible values.
+Authorization permits wildcards in policy definitions, so you can create a policy covering a range of possible values.
 
 ## Default Authorization Settings
 
-By default, Chef Automate IAM v1 is initialized with policies that allow the following:
+By default, Chef Automate IAM v1 initializes with policies that allow the following:
 
 * Admin users can perform any action on any Chef Automate IAM v1 resource.
-* All non-Admin users can perform any action on Chef Automate IAM v1 resources,
-  with the exception of actions on resources related to authorization (`auth`) or other system-level resources.
-  Only Admins can modify teams, API tokens, other users, policies, notifications, and node lifecycle settings.
+* All non-Admin users can perform any action on Chef Automate IAM v1 resources, not including actions on resources related to authorization (`auth`) or other system-level resources.
+  Only Admins can edit teams, API tokens, other users, policies, notifications, and data lifecycle settings.
 
-See the [IAM v1 Policies]({{< relref "#iam-v1-policies" >}}) documentation for more information
-on how Chef Automate IAM v1's default policies map to different functions.
+See the [IAM v1 Policies]({{< relref "#iam-v1-policies" >}}) documentation for more information on how Chef Automate IAM v1's default policies map to different functions.
 
 ## Viewing Policies
 
@@ -153,7 +142,8 @@ curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/au
 ## Restrict Permissions on Resources
 
 To remove a user's permission to act on a resource, find and delete the policy granting it permission, including any applicable top-level policies.
-This may be a policy that gives permissions directly to a user, but more likely grants access indirectly through either user teams or wildcards. If the latter, be aware that your changes will affect other users as well.
+This may be a policy that gives permissions directly to a user, or grants access indirectly through either user teams or wildcards. 
+If the latter, be aware that your changes will affect other users as well.
 
 Use the ID of the policy to delete it:
 
@@ -166,9 +156,7 @@ curl -s -X DELETE -H "api-token: $TOKEN" -H "Content-Type: application/json" htt
 Chef Automate IAM v1 by default allows all teams access to all parts of the
 application except for administrative features.
 
-If you would like to allow another team to access administrative features without
-adding team members to the local `admins` team, you can create a policy allowing
-access to all resources.
+If you would like to allow another team to access administrative features without adding team members to the local `admins` team, you can create a policy allowing access to all resources.
 
 ```bash
 curl -s -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"subjects":["user:ldap:example_user@example.com"], "action":"*", "resource":"*"}' https:/{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
@@ -186,7 +174,7 @@ To create a token that gives a client permission to read any Compliance resource
     95aef20b-0a4e-4698-bd69-ce2cf44c2e35
     ```
 
-1. Copy the ID that is returned.
+1. Copy the returned ID.
 
 1. Create policies to permit that client to read `compliance:*`
 

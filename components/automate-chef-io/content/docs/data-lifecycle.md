@@ -14,7 +14,7 @@ toc = true
 +++
 
 Data Lifecycle manages the retention of events, service groups, Chef Client runs, compliance reports and scans in Chef Automate.
-Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in ElasticSearch or PostgreSQL.
+Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in Elasticsearch or PostgreSQL.
 Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
 
 {{% warning %}}
@@ -28,7 +28,7 @@ You can also use the [previous data retention documentation](https://github.com/
 
 Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes, use the **Save Changes** button to apply your changes.
 
-Only users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs.
+Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs.
 
 ![](/images/docs/data-lifecycle.png)
 
@@ -56,7 +56,7 @@ The default is to remove compliance reports after 60 days, and to remove complia
 
 ## Data Lifecycle API
 
-Chef Automate stores data from the `ingest-service`, `event-feed-service`, `compliance-service` and `applications-service` in ElasticSearch or PostgreSQL.
+Chef Automate stores data from the `ingest-service`, `event-feed-service`, `compliance-service` and `applications-service` in Elasticsearch or PostgreSQL.
 
 The `data-lifecycle` API allows configuring and running lifecycle jobs by data type:
 
@@ -83,7 +83,7 @@ curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/da
 
 Swap `event-feed` for `infra` or `compliance` to see their corresponding jobs.
 
-The status is an aggregate of the job configuration, details about its next scheduled run, and details about any previous runs.
+The status is the total of the job configuration, details about its next scheduled run, and details about any previous runs.
 
 ### Configuration
 
@@ -178,7 +178,7 @@ Save the JSON file as `config.json` in the current working directory:
 curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/config
 ```
 
-If you wish to configure a specific endpoint only, you can specify the `job_settings` for that data type and configure it using data types sub-resource. 
+If you wish to configure a specific endpoint, you can specify the `job_settings` for that data type and configure it using data types sub-resource. 
 For example, if you want to configure compliance settings, create a smaller JSON payload:
 
 ```json
@@ -217,23 +217,23 @@ curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_
 All jobs have the following options:
 
 * `recurrence` (string) - A recurrence rule that determines how often, at what interval, and when to initially start a scheduled job. Any valid recurrence rule [as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt) is valid in this field.
-* `disabled` (bool) - Whether or not this job should be enabled
+* `disabled` (bool) - True or false if this job is an enabled job.
 
 Infra node lifecycle jobs have the following options:
 
-* `threshold` (string) - Setting that allows the user to use `1w` style notation to denote how long before the infra job is triggered.
+* `threshold` (string) - Setting that allows the user to use `1w` style notation to denote how long before the Infra job triggers.
 
 Purge jobs have the following options:
 
-* `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage backend before it is purged.
-  * `elasticsearch` (array) - An array of ElasticSearch purge policies
-    * `disabled` (bool) - Whether or not this job should be enabled
-    * `policy_name` (string) - The name of the purge policy you wish to update
-    * `older_than_days` (int) - The name of the purge policy you wish to update
+* `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage backend before purging occurs.
+  * `elasticsearch` (array) - An array of Elasticsearch purge policies
+    * `disabled` (bool) - True or false if this job is an enabled job.
+    * `policy_name` (string) - The name of the purge policy you wish to update.
+    * `older_than_days` (int) - The threshold for what qualifies for deletion.
 
 ##### Infra Job Settings
 
-The `infra` data type has four data lifecycle jobs: three are for node lifecycle and one is for purge job with two ElasticSearch purge policies.
+The `infra` data type has four data lifecycle jobs: three are for node lifecycle and one is for purge job with two Elasticsearch purge policies.
 
 ```json
 { "job_settings": [
@@ -275,15 +275,15 @@ The `infra` data type has four data lifecycle jobs: three are for node lifecycle
 ```
 
 * `delete_nodes` - How long a node can exist before deletion.
-* `missing_nodes` - How long between a node's last check-in before it is marked as missing.
-* `missing_nodes_for_deletion` - How long a node can be missing before it is deleted
+* `missing_nodes` - How long between a node's last check-in before marked as missing.
+* `missing_nodes_for_deletion` - How long a node can be missing before deletion
 * `periodic_purge_timeseries` - How often to run the purge job
   * `actions` - Chef Infra Server actions
   * `converge-history` - Chef Infra Client converge data
 
 ##### Compliance Job Settings
 
-The `compliance` data type has one compliance purge job with two ElasticSearch purge policies.
+The `compliance` data type has one compliance purge job with two Elasticsearch purge policies.
 
 ```json
 { "job_settings": [
@@ -311,12 +311,12 @@ The `compliance` data type has one compliance purge job with two ElasticSearch p
 ```
 
 * `periodic_purge` - How often to run the purge job
-  * `compliance-reports` - Chef Inspec reports
+  * `compliance-reports` - Chef InSpec reports
   * `compliance-scans` - Chef Compliance scans
 
 ##### Event Feed Job Settings
 
-The `event_feed` data type has one event feed purge job with one ElasticSearch purge policy.
+The `event_feed` data type has one event feed purge job with one Elasticsearch purge policy.
 
 ```json
 { "job_settings": [
@@ -344,13 +344,13 @@ The `event_feed` data type has one event feed purge job with one ElasticSearch p
 
 As with `status` and `configure`, you can run data lifecycle jobs globally across all data or by using the data type sub-resource.
 
-To run all data lifecycle jobs, immediately run the following command:
+To run all data lifecycle jobs, run the following command:
 
 ```bash
 curl -s -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/run
 ```
 
-To only run jobs for a specific data type, you can make the request to the sub-resource:
+To run jobs for a specific data type, you can make the request to the sub-resource:
 
 ```bash
 curl -s -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/infra/run

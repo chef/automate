@@ -58,7 +58,7 @@ If there are multiple Service Groups with the same _OK_ health percentage, then 
 
 ### Service Group
 
-The _Service Group_ column lists the Service Group name and the number of healthy services, services reporting an _OK_ status, out of the total number of services in the group. 
+The _Service Group_ column lists the Service Group name and the number of healthy services, which are services reporting an _OK_ status, out of the total number of services in the group. 
 A broken chain icon appears if there are any disconnected services in the group, along with the number of disconnected services.
 
 ### Additional Service Group Information
@@ -112,7 +112,7 @@ See the [Habitat CLI documentation](https://www.habitat.sh/docs/habitat-cli/#hab
 
 Configure the threshold for marking a service as disconnected through the Chef Automate API.
 
-Using the API, change the `threshold` setting for marking a service as disconnected with an API call similar to:
+Using the API, change the `threshold` setting for marking a service as disconnected with an API call like:
 
 ```bash
 curl -sSX POST "https://automate-url/api/v0/retention/service_groups/disconnected_services/config" -d \
@@ -125,13 +125,16 @@ curl -sSX POST "https://automate-url/api/v0/retention/service_groups/disconnecte
 ### Periodic Removal
 
 Removing services disconnected after a period of time keeps the dashboard populated with the most relevent information and saves storage space.
-The removal threshold is optional. The default is 7 days. Disabling the threshold setting provides you with a long-term record of services.
+The removal threshold is optional.
+The default is 7 days.
+Disabling the threshold setting provides you with a long-term record of services.
 
-Configure the threshold  for removing a disconnected service through either Chef Automate or the Chef Automate API. The threshold is the amount of time from when a service was marked as disconnected.
+Configure the threshold for removing a disconnected service through either Chef Automate or the Chef Automate API.
+The threshold is the amount of time since marking a service as disconnected.
 
 Through the API, disable service removal by setting `"running": false`.
 
-Configure the `threshold` for removing disconnected services with an API with a call similar to:
+Configure the `threshold` for removing disconnected services with an API with a call like:
 
 ```bash
 curl -sSX POST "https://automate-url/api/v0/retention/service_groups/delete_disconnected_services/config" -d \
