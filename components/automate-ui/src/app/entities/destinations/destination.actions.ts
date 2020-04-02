@@ -109,7 +109,7 @@ export class UpdateDestination implements Action {
 export class UpdateDestinationSuccess implements Action {
   readonly type = DestinationActionTypes.UPDATE_SUCCESS;
 
-  constructor(public payload: DestinationSuccessPayload) { }
+  constructor(public payload) { }
 }
 
 export class UpdateDestinationFailure implements Action {

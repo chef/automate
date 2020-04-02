@@ -61,9 +61,8 @@ export class DestinationRequests {
   }
 
   public updateDestination(destination: Destination): Observable<DestinationResponse> {
-    const response: any = destination.toRequest();
     return this.http.patch<DestinationResponse>(encodeURI(
-      this.joinToDatafeedUrl(['destination', destination.id.toString()])), response);
+      this.joinToDatafeedUrl(['destination', destination.id.toString()])), destination.toRequest());
   }
 
   public deleteDestination(id: number): Observable<DestinationResponse> {
