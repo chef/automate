@@ -74,6 +74,7 @@ mkdir -p /tmp/docs /tmp/aliases
 # Only if the '.studio/' directory exists and it is not empty
 if ls -A /src/.studio &>/dev/null; then
   for file in /src/.studio/*; do
+    # shellcheck disable=SC1090
     source "$file"
   done
   source_msg="$source_msg and your local .studio folder";

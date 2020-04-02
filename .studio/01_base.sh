@@ -71,48 +71,6 @@ exit_with() {
   exit "$2"
 }
 
-document "install" <<DOC
-  Install the specified Habitat packages (defaults to $HAB_ORIGIN/$pkg_name).
-  @(arg:*) The array of packages you wish to install.
-  If none specified it will use the last package built.
-  If there are no packages available, it will build one and install it.
-  Example 1 :: Install the package described in plan.sh
-  -----------------------------------------------------
-  install
-  Example 2 :: Install (and binlink) the listed packages from the 'stable' channel.
-  ---------------------------------------------------------------------------------
-  OPTS="--binlink" install core/curl core/git
-  Example 3 :: Install the listed packages from the 'unstable' channel.
-  ---------------------------------------------------------------------
-  dev_dependencies=(core/curl core/git)
-  OPTS="--channel unstable" install \${dev_dependencies[@]}
-DOC
-function install() {
-  install_cmd="install"
-
-  local install_cmd_opts=${OPTS:-""}
-
-  if [[ "x$install_cmd_opts" != "x" ]]; then
-    install_cmd="$install_cmd $install_cmd_opts"
-  fi
-
-  if [[ "x$1" == "x" ]]; then
-    # Trying to use the last package built
-    ( cd /src || exit
-      # If there are no packages available, build one for me
-      [[ ! -f results/last_build.env ]] && build .
-      source results/last_build.env
-      eval "hab pkg $install_cmd results/$pkg_artifact >/dev/null"
-    )
-  else
-    for pkg in "$@"
-    do
-      log_line "Installing $pkg"
-      eval "hab pkg $install_cmd $pkg >/dev/null"
-    done
-  fi
-}
-
 document "install_if_missing" <<DOC
   Install the package if it is not installed already and binlink the binary to
   the latest installed package.
@@ -128,7 +86,8 @@ install_if_missing() {
 
   # Install the package if it is not installed
   if [[ ! -d "/hab/pkgs/$1" ]]; then
-    install "$1" > /dev/null
+    log_line "Installing $1"
+    hab pkg install "$1" > /dev/null
   fi
 
   # Ensure we are binlinking to the same version `hab pkg exec` would run
