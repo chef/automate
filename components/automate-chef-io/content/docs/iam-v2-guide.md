@@ -248,17 +248,15 @@ Policy Name                      | Policy ID                        | Associated
 
 These policies are discussed in more detail in [Project Policies]({{< relref "iam-v2-guide.md#project-policies" >}}).
 
-#### Assigning Resources to Projects
+#### Assigning Teams and Tokens to Projects
 
-Projects can be assigned to Automate-created resources on creation or update.
+Projects can be assigned to Automate-created teams or tokens on creation or update.
 
 To assign a team to projects, select a team from the _Teams_ list, then select **Details**.
 Likewise, to assign a token to projects, select a token from the API tokens list, then select **Details**.
 In either case, you can select projects from the projects dropdown to assign.
 
 You may also assign teams and tokens to projects on creation. In the creation modal, select any projects to which the new resource should belong.
-
-Presently, policies and roles can only be assigned to projects using the command line, not the browser. Users cannot be assigned to projects from the browser or the command line.
 
 If you would like to delegate ownership of a project to another user so that they may assign resources, you will want to make that user a [Project Owner]({{< relref "iam-v2-guide.md#project-owners" >}}) of that project.
 
