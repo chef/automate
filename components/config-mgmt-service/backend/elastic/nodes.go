@@ -425,7 +425,46 @@ func (es Backend) GetErrors(size int32, filters map[string][]string) ([]*backend
 	return chefErrs, nil
 }
 
-func (m Backend) MissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
+func (es Backend) MissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
+	var (
+		aggTag    = "date_range"
+		mainQuery = elastic.NewBoolQuery()
+	)
 
-	return []backend.CountedDuration{}, nil
+	// This is using the custom_search_aggs_bucket_date_range because it need to set the missing option
+	dateRangeAgg := NewDateRangeAggregation().Field(backend.CheckIn).
+		Format("yyyy-MM-dd'T'HH:mm:ssZ").
+		Missing(time.Time{}.Format(time.RFC3339)) // count all nodes that do not have a create date
+
+	for _, duration := range durations {
+		dateRangeAgg.AddUnboundedFromWithKey(duration, "now-"+duration)
+	}
+
+	searchResult, err := es.client.Search().
+		Index(IndexNodeState).
+		Query(mainQuery).
+		Aggregation(aggTag, dateRangeAgg).
+		Do(context.Background())
+	if err != nil {
+		return []backend.CountedDuration{}, err
+	}
+
+	rangeAggRes, found := searchResult.Aggregations.Range(aggTag)
+	if !found {
+		return []backend.CountedDuration{}, nil
+	}
+
+	if len(rangeAggRes.Buckets) != len(durations) {
+		return []backend.CountedDuration{}, errors.NewBackendError(
+			"The number of buckets found is incorrect expected %d actual %d",
+			len(durations), len(rangeAggRes.Buckets))
+	}
+
+	countedDurations := make([]backend.CountedDuration, len(rangeAggRes.Buckets))
+	for index, _ := range rangeAggRes.Buckets {
+		countedDurations[index].Count = int32(rangeAggRes.Buckets[index].DocCount)
+		countedDurations[index].Duration = rangeAggRes.Buckets[index].Key
+	}
+
+	return countedDurations, nil
 }

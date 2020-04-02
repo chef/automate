@@ -16,10 +16,9 @@ import (
 func TestMissingNodeRangeCounts(t *testing.T) {
 	cases := []struct {
 		description      string
-		filter           map[string][]string
 		nodes            []iBackend.Node
 		durations        []string
-		expectedResponse []response.CountedDuration
+		expectedResponse []*response.CountedDuration
 	}{
 		{
 			description: "normal case",
@@ -73,8 +72,8 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 					Checkin: time.Now().AddDate(0, 0, -100),
 				},
 			},
-			durations: []string{"3d", "1w", "2w", "1m", "3m"},
-			expectedResponse: []response.CountedDuration{
+			durations: []string{"3d", "1w", "2w", "1M", "3M"},
+			expectedResponse: []*response.CountedDuration{
 				{
 					Duration: "3d",
 					Count:    11,
@@ -88,11 +87,11 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 					Count:    6,
 				},
 				{
-					Duration: "1m",
+					Duration: "1M",
 					Count:    2,
 				},
 				{
-					Duration: "3m",
+					Duration: "3M",
 					Count:    1,
 				},
 			},
@@ -112,20 +111,27 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 			suite.IngestNodes(testCase.nodes)
 			defer suite.DeleteAllDocuments()
 
-			if testCase.filter == nil {
-				testCase.filter = map[string][]string{}
-			}
 			actualResponse, err := cfgmgmt.MissingNodeDurationCounts(context.Background(),
 				&request.MissingNodeDurationCounts{Durations: testCase.durations})
 			require.NoError(t, err)
 
 			assert.Equal(t, len(testCase.expectedResponse), len(actualResponse.CountedDurations))
-			for index := range actualResponse.CountedDurations {
-				expected := testCase.expectedResponse[index]
-				actual := actualResponse.CountedDurations[index]
-				assert.Equal(t, expected.Duration, actual.Duration)
-				assert.Equal(t, expected.Count, actual.Count)
+			for _, expected := range testCase.expectedResponse {
+				actualFound, found := findMatchingCountedDurations(expected, actualResponse.CountedDurations)
+
+				assert.Truef(t, found, "Did not find expected duration %s", expected.Duration)
+				assert.Equal(t, expected.Count, actualFound.Count)
 			}
 		})
 	}
+}
+
+func findMatchingCountedDurations(needle *response.CountedDuration,
+	haystack []*response.CountedDuration) (*response.CountedDuration, bool) {
+	for _, hay := range haystack {
+		if needle.Duration == hay.Duration {
+			return hay, true
+		}
+	}
+	return nil, false
 }
