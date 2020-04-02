@@ -14,7 +14,7 @@ export class SettingsLandingComponent {
     { anyOfCheck: [['/datafeed/destinations', 'post', '']], route: '/settings/data-feed' },
     { anyOfCheck: [['/nodemanagers/search', 'post', '']], route: '/settings/node-integrations' },
     { anyOfCheck: [['/secrets/search', 'post', '']], route: '/settings/node-credentials' },
-    { anyOfCheck: [['/retention/nodes/status', 'get', '']], route: '/settings/node-lifecycle' },
+    { anyOfCheck: [['/retention/nodes/status', 'get', '']], route: '/settings/data-lifecycle' },
     { allOfCheck: [['/iam/v2/users', 'get', '']], route: '/settings/users' },
     { allOfCheck: [['/iam/v2/teams', 'get', '']], route: '/settings/teams' },
     { allOfCheck: [['/iam/v2/tokens', 'get', '']], route: '/settings/tokens' },
