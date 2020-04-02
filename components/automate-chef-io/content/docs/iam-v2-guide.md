@@ -115,7 +115,7 @@ The statement allows us to specify the `actions` a user is permitted to take upo
 The `projects` field on a statement is an array that may contain more than one existing project, a wildcard `*` to indicate permission to resources in _any project_, or `(unassigned)` to indicate permission to resources that have not been assigned to a project.
 
 Note that the `projects` property in statements designates permission for the resources within the statement (here, that is `iam:users` and `iam:teams`), _not_ for the policy itself, and _cannot_ be left empty.
-For more about projects, see [Projects in the IAM Guide]({{< relref "iam-v2-guide.md#projects" >}} documentation.
+For more about projects, see [Projects in the IAM Guide]({{< relref "iam-v2-guide.md#projects" >}}) documentation.
 
 In this case, we only need a single statement providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_ that have been assigned to the project `project-devops`.
 
