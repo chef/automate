@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"database/sql"
 	"strconv"
 
 	datafeed "github.com/chef/automate/api/external/data_feed"
@@ -65,13 +66,16 @@ func (db *DB) DeleteDestination(delete *datafeed.DeleteDestinationRequest) (bool
 	var err error
 	err = Transact(db, func(tx *DBTrans) error {
 		count, err = tx.Delete(&Destination{ID: delete.Id})
+		if count == 0 {
+			return errorutils.ProcessSQLNotFound(sql.ErrNoRows, strconv.FormatInt(delete.Id, 10), "DeleteDestination")
+		}
 		if err != nil {
 			return errorutils.ProcessSQLNotFound(err, strconv.FormatInt(delete.Id, 10), "DeleteDestination")
 		}
 		return nil
 	})
 
-	if err != nil || count == 0 {
+	if err != nil {
 		return false, err
 	}
 	return true, err
@@ -85,10 +89,12 @@ func (db *DB) UpdateDestination(destination *datafeed.UpdateDestinationRequest) 
 		if count, err = tx.Update(dbDestination); err != nil {
 			return errors.Wrap(err, "UpdateDestination: unable to update destination")
 		}
+		if count == 0 {
+			return errorutils.ProcessSQLNotFound(sql.ErrNoRows, strconv.FormatInt(destination.Id, 10), "UpdateDestination")
+		}
 		return nil
 	})
-
-	if err != nil || count == 0 {
+	if err != nil {
 		return false, err
 	}
 	return true, err
@@ -104,7 +110,7 @@ func (db *DB) GetDestination(get *datafeed.GetDestinationRequest) (*datafeed.Get
 		}
 		if obj == nil {
 			dest = &Destination{}
-			err = errorutils.ProcessSQLNotFound(errors.New("Record not found"), strconv.FormatInt(get.Id, 10), "GetDestination")
+			err = errorutils.ProcessSQLNotFound(sql.ErrNoRows, strconv.FormatInt(get.Id, 10), "GetDestination")
 		} else {
 			dest = obj.(*Destination)
 		}
