@@ -28,8 +28,6 @@ BUILD_TIME ?= $(shell date -u '+%Y%m%d%H%M%S')
 # Add -s -w in LDFLAGS to reduce the size of the binary by ~40%
 LDFLAGS="-X $(LIBRARY_PATH)/version.Version=$(BUILD_TIME) -X $(LIBRARY_PATH)/version.GitSHA=$(GIT_SHA) -X $(LIBRARY_PATH)/version.BuildTime=$(BUILD_TIME)"
 
-SECRETS_KEY ?= 12345678901234567890123456789012
-
 MANAGER_SSL_CERT="$(PWD)/../../dev/certs/nodemanager-service.crt"
 MANAGER_SSL_KEY="$(PWD)/../../dev/certs/nodemanager-service.key"
 SSL_CERT="$(PWD)/../../dev/certs/compliance-service.crt"
@@ -141,14 +139,14 @@ wait-for-compliance-service:
 
 
 ## RUN COMMANDS ##
-run-log-level-info: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
+run-log-level-info: clean build-inspec-runner profiles-path
 	$(MAKE) run-nodemanager
 	@printf "\n===> ${blue}Running compliance-service in background${reset} with logs redirected to ${yellow}$(COMPLIANCE_LOG_PATH)${reset}\n"
 	$(RUN_COMMAND_INFO) &> $(COMPLIANCE_LOG_PATH)&
 	# since we background the service, we need to give it some time to start
 	@$(MAKE) wait-for-compliance-service
 
-run: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
+run: clean build-inspec-runner profiles-path
 	@$(MAKE) golang_version_check
 	$(MAKE) run-nodemanager
 	@printf "\n===> ${blue}Running compliance-service in background${reset} with logs redirected to ${yellow}$(COMPLIANCE_LOG_PATH)${reset}\n"
@@ -156,19 +154,19 @@ run: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
 	# since we background the service, we need to give it some time to start
 	@$(MAKE) wait-for-compliance-service
 
-run-debug: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
+run-debug: clean build-inspec-runner profiles-path
 	@$(MAKE) golang_version_check
 	$(MAKE) run-nodemanager
 	@printf "\n===> ${blue}Running compliance-service${reset}\n"
 	$(DEBUG_COMMAND)
 
-run-with-logs: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
+run-with-logs: clean build-inspec-runner profiles-path
 	$(MAKE) run-nodemanager
 	@printf "\n===> ${blue}Running compliance-service${reset}\n"
 	$(RUN_COMMAND_DEBUG)
 	@$(MAKE) wait-for-compliance-service
 
-run-with-race-check: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
+run-with-race-check: clean build-inspec-runner profiles-path
 	$(MAKE) run-nodemanager
 	$(RUN_COMMAND_RACECHECK)
 	@$(MAKE) wait-for-compliance-service
@@ -465,7 +463,7 @@ test: generate-ruby-grpc wait-for-compliance-service
 	bundle exec ./run.rb $$TEST \
 	echo
 
-test-prep: $(MARKET_PATH) $(PROFILES_PATH) start-ssh-node download-sample-market-profiles install-inspec start-es-pg
+test-prep: profiles-path start-ssh-node download-sample-market-profiles install-inspec start-es-pg
 
 install-inspec:
 	@inspec --version 2> /dev/null | grep -q $(shell cat ../../INSPEC_VERSION) || gem install inspec-bin --no-document --version $(shell cat ../../INSPEC_VERSION)
@@ -487,13 +485,12 @@ send-ingest-report:
 	go run examples/ingest/ingest_client.go --file ingest/examples/compliance-success-tiny-report.json --threads 1 --reports-per-thread 1
 
 ## DATA ##
-$(MARKET_PATH):
+profiles-path:
+	@mkdir -p $(TMP_PATH)
 	@mkdir -p $(MARKET_PATH)
-
-$(PROFILES_PATH):
 	@mkdir -p $(PROFILES_PATH)
 
-download-sample-market-profiles: $(MARKET_PATH)
+download-sample-market-profiles: profiles-path
 	@printf "\n===> ${blue}Downloading profiles...${reset}\n"
 	@if [ -f $(MARKET_PATH)/linux-patch-baseline-0.3.0.tar.gz ]; then printf " * ${blue}linux-patch-baseline${reset} already downloaded\n"; else curl -LSs -o $(MARKET_PATH)/linux-patch-baseline-0.3.0.tar.gz https://github.com/dev-sec/linux-patch-baseline/archive/0.3.0.tar.gz; fi;
 	@if [ -f $(MARKET_PATH)/windows-baseline-1.1.0.tar.gz ]; then printf " * ${blue}windows-baseline${reset} already downloaded\n"; else curl -LSs -o $(MARKET_PATH)/windows-baseline-1.1.0.tar.gz https://github.com/dev-sec/windows-baseline/archive/1.1.0.tar.gz; fi;
