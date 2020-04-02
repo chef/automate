@@ -251,13 +251,11 @@ DOC
 compile_go_protobuf() {
   local rc
   proto_script="${1:-scripts/grpc.sh}"
-  OLD_CC=$CC
-  unset CC
 
-  # Verify that the script exist ans it is an executable
+  # Verify that the script exist and it is an executable
   if [[ -x $proto_script ]]; then
     install_if_missing core/protobuf-cpp protoc
-    GO_TOOL_VENDOR=true install_go_tool github.com/golang/protobuf/protoc-gen-go
+    install_go_tool github.com/golang/protobuf/protoc-gen-go
 
     # Install grpc-gateway
     # only_if the script has an entry like: '--grpc-gateway_out'
@@ -267,7 +265,7 @@ compile_go_protobuf() {
         github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
       )
 
-      GO_TOOL_VENDOR=true install_go_tool "${grpc_gateway_proto_tools[@]}"
+      install_go_tool "${grpc_gateway_proto_tools[@]}"
     fi
 
     # Install protoc-gen-lint from the internet instead of
@@ -276,7 +274,7 @@ compile_go_protobuf() {
     #
     # only_if the script has an entry like: '--lint_out'
     if [[ "$(grep -w "\\-\\-lint_out" "$proto_script")" != "" ]]; then
-      GO_TOOL_METHOD="get" install_go_tool github.com/ckaznocha/protoc-gen-lint
+      install_go_tool github.com/ckaznocha/protoc-gen-lint
     fi
 
     eval "$proto_script";
@@ -284,10 +282,8 @@ compile_go_protobuf() {
   else
     error "File '$proto_script' doesn't exist or is not executable."
     error "Try 'describe ${FUNCNAME[0]}'."
-    CC=$OLD_CC
     return 1
   fi
 
-  CC=$OLD_CC
   return $rc
 }
