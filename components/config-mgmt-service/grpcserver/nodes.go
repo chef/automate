@@ -2,6 +2,7 @@ package grpcserver
 
 import (
 	"context"
+	"regexp"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -382,6 +383,12 @@ func (s *CfgMgmtServer) MissingNodeDurationCounts(
 }
 
 func ValidDurations(durations []string) bool {
+	re := regexp.MustCompile(`^\d+[hdwMy]$`)
+	for _, duration := range durations {
+		if !re.MatchString(duration) {
+			return false
+		}
+	}
 
 	return true
 }
