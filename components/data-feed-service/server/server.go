@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"strconv"
 
 	//"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -169,6 +170,7 @@ func (datafeedServer *DatafeedServer) UpdateDestination(ctx context.Context, des
 	response := &datafeed.UpdateDestinationResponse{Success: false}
 	success, err := datafeedServer.db.UpdateDestination(destination)
 	response.Success = success
+	response.Id, _ = strconv.ParseInt(destination.Id, 10, 64)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
