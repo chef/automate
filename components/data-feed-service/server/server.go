@@ -22,6 +22,9 @@ import (
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // DatafeedServer is the interface to this component.
@@ -120,10 +123,11 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	} else {
 		log.Infof("Test data posted to %v, Status %v", url, httpResponse.Status)
 	}
-	if httpResponse.StatusCode != http.StatusOK {
-		return response, errors.New(httpResponse.Status)
-	} else {
+
+	if httpResponse.StatusCode == http.StatusOK {
 		response.Success = true
+	} else {
+		return response, status.Newf(codes.Internal, "%s posting test message to: %s", httpResponse.Status, url).Err()
 	}
 	err = httpResponse.Body.Close()
 	if err != nil {
@@ -140,7 +144,7 @@ func (datafeedServer *DatafeedServer) DeleteDestination(ctx context.Context, des
 	success, err := datafeedServer.db.DeleteDestination(destination)
 	response.Success = success
 	if err != nil {
-		return response, errorutils.FormatErrorMsg(err, "")
+		return response, errorutils.FormatErrorMsg(err, strconv.FormatInt(destination.Id, 10))
 	}
 
 	return response, nil
@@ -150,7 +154,7 @@ func (datafeedServer *DatafeedServer) GetDestination(ctx context.Context, destin
 	log.Infof("GetDestination %s", destination)
 	response, err := datafeedServer.db.GetDestination(destination)
 	if err != nil {
-		return nil, errorutils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, strconv.FormatInt(destination.Id, 10))
 	}
 	return response, nil
 }
