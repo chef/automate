@@ -142,6 +142,24 @@ service ConfigMgmt {
   };
 
   /*
+  MissingNodeDurationCounts
+
+  Returns a count of missing nodes for the provided durations.
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc MissingNodeDurationCounts(cfgmgmt.request.MissingNodeDurationCounts) returns (cfgmgmt.response.MissingNodeDurationCounts) {
+    option (google.api.http).get =  "/cfgmgmt/stats/missing_node_duration_counts";
+    option (chef.automate.api.policy).resource = "cfgmgmt:stats:missing_node_duration_counts";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+
+  /*
   GetNodeRun
 
   Returns the infra run report for the provided node ID and run ID.
