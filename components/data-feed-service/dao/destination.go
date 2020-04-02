@@ -28,7 +28,7 @@ func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destinat
 
 func updateToDBDestination(inDestination *datafeed.UpdateDestinationRequest) *Destination {
 	newDestination := Destination{}
-	newDestination.ID, _ = strconv.ParseInt(inDestination.Id, 10 , 64)
+	newDestination.ID, _ = strconv.ParseInt(inDestination.Id, 10, 64)
 	newDestination.Name = inDestination.Name
 	newDestination.URL = inDestination.Url
 	newDestination.Secret = inDestination.Secret
@@ -90,7 +90,7 @@ func (db *DB) UpdateDestination(destination *datafeed.UpdateDestinationRequest) 
 			return errors.Wrap(err, "UpdateDestination: unable to update destination")
 		}
 		if count == 0 {
-			return errorutils.ProcessSQLNotFound(sql.ErrNoRows, strconv.FormatInt(destination.Id, 10), "UpdateDestination")
+			return errorutils.ProcessSQLNotFound(sql.ErrNoRows, destination.Id, "UpdateDestination")
 		}
 		return nil
 	})
