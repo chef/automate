@@ -26,13 +26,15 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 			msg.Report.Profiles = compliance.FixInheritedProfiles(msg.Report.Profiles)
 
 			reportProfilesShas := make([]string, len(msg.Report.Profiles))
-			reportProfilesShasMissingMeta := make(map[string]string, 0)
+			reportProfilesShasMissingMetaMap := make(map[string]string, 0)
+			reportProfilesShasMissingMetaArr := make([]string, 0)
 			msg.Shared.EsProfilesMissingMeta = make(map[string]interface{}, 0)
 
 			for i, profile := range msg.Report.Profiles {
 				reportProfilesShas[i] = profile.Sha256
+				reportProfilesShasMissingMetaArr = append(reportProfilesShasMissingMetaArr, profile.Sha256)
 				if profile.Name == "" {
-					reportProfilesShasMissingMeta[profile.Sha256] = profile.Title
+					reportProfilesShasMissingMetaMap[profile.Sha256] = profile.Title
 				}
 			}
 
@@ -46,22 +48,36 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 			// If a report being ingested is missing the metadata for a profile, ES must have it in the backend, otherwise we can't continue
 			for _, esMissingSha := range esProfilesMissingMeta {
 				msg.Shared.EsProfilesMissingMeta[esMissingSha] = struct{}{}
-				if reportProfilesShasMissingMeta[esMissingSha] != "" {
+				if reportProfilesShasMissingMetaMap[esMissingSha] != "" {
 					grpcErr := status.Errorf(codes.Internal, "Ingesting report '%s' is not possible because profile '%s' with id '%s' does "+
-						"not have the metadata known to the backend.", msg.Report.ReportUuid, reportProfilesShasMissingMeta[esMissingSha], esMissingSha)
+						"not have the metadata known to the backend.", msg.Report.ReportUuid, reportProfilesShasMissingMetaMap[esMissingSha], esMissingSha)
 					msg.FinishProcessingCompliance(grpcErr)
 					continue
 				}
 			}
 
 			// If one of the profiles coming in is missing the metadata, we pull the metadata from the backend for it to complement the report
-			if len(reportProfilesShasMissingMeta) > 0 {
+			if len(reportProfilesShasMissingMetaArr) > 0 {
 				// Pull the profiles metadata from the backend
-				for _, profile := range msg.Report.Profiles {
-					if profile.Name == "" {
+				esProfilesForMissingMeta, err := client.GetProfilesMissingMetadata(reportProfilesShasMissingMetaArr)
+				if err != nil {
+					grpcErr := status.Errorf(codes.Internal, "Unable to get the profiles missing metadata: %s", err)
+					msg.FinishProcessingCompliance(grpcErr)
+					continue
+				}
 
-						//HEREEEEEEEEE
-
+				for _, repProfile := range msg.Report.Profiles {
+					if repProfile.Name == "" {
+						esProfile := esProfilesForMissingMeta[repProfile.Sha256]
+						if esProfile != nil {
+							grpcErr := status.Errorf(codes.Internal, "Unable to find profile '%s' metadata in the profiles store.", repProfile.Sha256)
+							msg.FinishProcessingCompliance(grpcErr)
+							continue
+						}
+						repProfile.Name = esProfile.Name
+						repProfile.Copyright = esProfile.Copyright
+						repProfile.CopyrightEmail = esProfile.CopyrightEmail
+						logrus.Debugf("!!!!!!!!!!!!!!!!! updated repProfile %+v", repProfile)
 					}
 				}
 			}

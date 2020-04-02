@@ -2,17 +2,18 @@ package ingestic
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"time"
-
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	project_update_lib "github.com/chef/automate/lib/authz"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 type ESClient struct {
@@ -168,6 +169,68 @@ func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []st
 	}
 
 	return missingHashes, nil
+}
+
+// Internal helper method to get profile meta information to complement
+// reports being ingested without profile metadata information
+func (backend *ESClient) GetProfilesMissingMetadata(profileIDs []string) (map[string]*relaxting.ESInspecProfile, error) {
+	esProfilesMeta := make(map[string]*relaxting.ESInspecProfile, 0)
+	esIndex := relaxting.CompProfilesIndex
+
+	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery.Ids(profileIDs...)
+
+	fsc := elastic.NewFetchSourceContext(true).Include(
+		"took",
+		"name",
+		"license",
+		"supports",
+		"maintainer",
+		"copyright",
+		"copyright_email",
+		"summary",
+		"depends",
+		"controls.id",
+		"controls.title",
+		"controls.tags",
+		"controls.refs",
+		"controls.waiver_data",
+	)
+
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(idsQuery).
+		Size(10)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return esProfilesMeta, errors.Wrap(err, "GetProfilesMissingMetadata unable to get Source")
+	}
+	relaxting.LogQueryPartMin(esIndex, source, "GetProfilesMissingMetadata query searchSource")
+
+	scroll := backend.client.Scroll().
+		Index(esIndex).
+		SearchSource(searchSource)
+
+	for {
+		results, err := scroll.Do(context.Background())
+		//LogQueryPartMin(results, "GetProfilesMissingMetadata query results")
+		if err == io.EOF {
+			return esProfilesMeta, nil // all results retrieved
+		}
+		if err != nil {
+			return esProfilesMeta, errors.Wrap(err, "GetProfilesMissingMetadata unable to get results")
+		}
+		if results.TotalHits() > 0 && len(results.Hits.Hits) > 0 {
+			for _, hit := range results.Hits.Hits {
+				esProfile := &relaxting.ESInspecProfile{}
+				if err := json.Unmarshal(*hit.Source, &esProfile); err != nil {
+					logrus.Errorf("GetProfilesMissingMetadata unmarshal error: %s", err.Error())
+				}
+				esProfilesMeta[hit.Id] = esProfile
+			}
+		}
+	}
 }
 
 func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, endTime time.Time, data *relaxting.ESInSpecSummary) error {
