@@ -9,6 +9,8 @@ import { sidebar,  showPageLoading } from './layout.selectors';
 import { ShowPageLoading } from './layout.actions';
 
 import { GetProjects } from 'app/entities/projects/project.actions';
+import { AuthorizedChecker } from 'app/helpers/auth/authorized';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 
 // Important! These must match components/automate-ui/src/styles/_variables.scss
 enum Height {
@@ -53,15 +55,24 @@ export class LayoutFacadeService {
   public contentHeight = `calc(100% - ${Height.Navigation}px)`;
   public sidebar$: Observable<MenuItemGroup[]>;
   public showPageLoading$: Observable<boolean>;
+  private authorizedChecker: AuthorizedChecker;
 
   constructor(
+    fullStore: Store<NgrxStateAtom>,
     private store: Store<fromLayout.LayoutEntityState>,
     private layoutSidebarService: LayoutSidebarService
   ) {
     this.sidebar$ = store.select(sidebar);
     this.showPageLoading$ = store.select(showPageLoading);
     this.updateDisplay();
-    this.store.dispatch(new GetProjects());
+
+    this.authorizedChecker = new AuthorizedChecker(fullStore);
+    this.authorizedChecker.setPermissions([{ endpoint: '/iam/v2/projects', verb: 'get' }], []);
+    this.authorizedChecker.isAuthorized$.subscribe((isAuthorized) => {
+      if (isAuthorized) {
+        this.store.dispatch(new GetProjects());
+      }
+    });
   }
 
   getContentStyle(): any {
