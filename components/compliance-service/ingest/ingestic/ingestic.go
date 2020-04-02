@@ -175,7 +175,7 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 	index := mapping.IndexTimeseriesFmt(endTime)
 	data.DailyLatest = true
 	data.ReportID = id
-
+	logrus.Debugf("***SSSSSSS*** Inserting InsertInspecSummary data for node %s: %+v", (*data).NodeName, *data)
 	// Add the summary document to the compliance timeseries index using the specified report id as document id
 	_, err := backend.client.Index().
 		Index(index).
@@ -198,6 +198,7 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	data.DailyLatest = true
 	data.ReportID = id
 
+	logrus.Debugf("***RRRRRRRRR*** InsertInspecReport data for node %s: %+v", (*data).NodeName, *data)
 	// Add the report document to the compliance timeseries index using the specified report id as document id
 	_, err := backend.client.Index().
 		Index(index).
@@ -215,6 +216,7 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 
 func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxting.ESInspecProfile) error {
 	mapping := mappings.ComplianceProfiles
+	logrus.Debugf("***PPPPPPPPP** InsertInspecProfile data for profile %s: %+v", (*data).Name, *data)
 	err := backend.addDataToIndexWithID(ctx, mapping, data.Sha256, data)
 	return err
 }

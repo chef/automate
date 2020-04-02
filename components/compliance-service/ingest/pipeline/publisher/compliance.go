@@ -46,11 +46,14 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Publishing Compliance Report")
 
 			errChannels := make([]<-chan error, 0)
+			for _, profile := range msg.InspecProfiles {
+				// Only add the profile to the metadata store if it's missing
+				if _, ok := msg.Shared.EsProfilesMissingMeta[profile.Sha256]; !ok {
+					errChannels = append(errChannels, insertInspecProfile(msg, profile, client))
+				}
+			}
 			errChannels = append(errChannels, insertInspecSummary(msg, client))
 			errChannels = append(errChannels, insertInspecReport(msg, client))
-			for _, profile := range msg.InspecProfiles {
-				errChannels = append(errChannels, insertInspecProfile(msg, profile, client))
-			}
 
 			for err := range merge(errChannels...) {
 				if err != nil {
