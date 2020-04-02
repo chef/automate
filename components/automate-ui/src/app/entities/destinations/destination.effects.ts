@@ -9,7 +9,6 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
-  DestinationSuccessPayload,
   GetDestinationsSuccess,
   GetDestinationsSuccessPayload,
   GetDestinationsFailure,
@@ -111,7 +110,7 @@ export class DestinationEffects {
     ofType(DestinationActionTypes.UPDATE),
     mergeMap(({ payload: { destination } }: UpdateDestination) =>
       this.requests.updateDestination(destination).pipe(
-        map((resp: DestinationSuccessPayload) => new UpdateDestinationSuccess(resp)),
+        map((resp) => new UpdateDestinationSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new UpdateDestinationFailure(error))))));
 

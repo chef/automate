@@ -120,8 +120,8 @@ export function destinationEntityReducer(
     case DestinationActionTypes.UPDATE_SUCCESS:
       return set(UPDATE_STATUS, EntityStatus.loadingSuccess,
         destinationEntityAdapter.updateOne({
-          id: action.payload.destination.id,
-          changes: action.payload.destination
+          id: action.payload.id,
+          changes: action.payload
         }, state));
 
     case DestinationActionTypes.UPDATE_FAILURE:
