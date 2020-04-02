@@ -16,7 +16,19 @@ a, a:visited {
 }
 
 chef-table-header-cell,
-chef-td {
+chef-table-cell {
+  padding: 0 1em;
+  flex-direction: row;
+  min-width: 0;
+  flex-basis: 0;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 14px;
+}
+
+chef-table-header-cell,
+chef-table-cell {
   line-height: 1.2;
 
   &.sort:hover {
@@ -57,8 +69,7 @@ chef-td {
   }
 }
 
-chef-td {
-  padding: 1em;
+chef-table-cell {
 
   &.has-runs {
     & > a {
@@ -71,15 +82,22 @@ chef-td {
 
   &:first-child {
     position: relative;
+    padding: 1em;
   }
 
   &.node-name chef-icon {
     margin-right: 1em;
   }
+
+  &.view-more {
+    chef-button {
+      margin-left: 0;
+    }
+  }
 }
 
-chef-tr.row {
-  & > chef-td:first-child:before {
+chef-table-row.row {
+  & > chef-table-cell:first-child:before {
     content: '';
     position: absolute;
     top: 0;
@@ -92,21 +110,22 @@ chef-tr.row {
     border-bottom-left-radius: $global-radius;
   }
 
-  &:hover > chef-td:first-child:before {
+  &:hover > chef-table-cell:first-child:before {
     width: 7px;
   }
 
-  & > chef-td.failure:first-child:before {
+  & > chef-table-cell.failure:first-child:before {
     background: $chef-critical;
   }
 
-  & > chef-td.missing:first-child:before {
+  & > chef-table-cell.missing:first-child:before {
     background: $chef-dark-grey;
   }
 }
 
 .column-dropdown {
   position: relative;
+  justify-content: center;
 
   chef-checkbox {
     margin-bottom: 7px;
@@ -207,3 +226,5 @@ chef-tooltip {
     }
   }
 }
+
+

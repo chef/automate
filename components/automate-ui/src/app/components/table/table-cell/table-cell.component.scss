@@ -10,6 +10,10 @@
   border-top: 1px solid $chef-grey;
   overflow: hidden;
   // text-overflow: ellipsis;
+  
+  &[hidden] {
+    display: none !important; // sass-lint:disable-line no-important
+  }
 
   &.text-right {
     text-align: right;
