@@ -68,8 +68,9 @@ export class LayoutFacadeService {
 
     this.authorizedChecker = new AuthorizedChecker(fullStore);
     this.authorizedChecker.setPermissions([{ endpoint: '/iam/v2/projects', verb: 'get' }], []);
-    this.authorizedChecker.isAuthorized$.subscribe((isAuthorized) => {
+    const authSub = this.authorizedChecker.isAuthorized$.subscribe((isAuthorized) => {
       if (isAuthorized) {
+        authSub.unsubscribe();
         this.store.dispatch(new GetProjects());
       }
     });
