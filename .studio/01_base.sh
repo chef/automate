@@ -86,7 +86,6 @@ install_if_missing() {
 
   # Install the package if it is not installed
   if [[ ! -d "/hab/pkgs/$1" ]]; then
-    log_line "Installing $1"
     hab pkg install "$1" > /dev/null
   fi
 
