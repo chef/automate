@@ -27,7 +27,7 @@ Notifications sent by Chef Automate do not support retries; therefore, notificat
 
 To add a Slack notification for Chef Automate:
 
-![Node Lifecycle](/images/docs/notifications-navigation.png)
+![Notifications Navigation](/images/docs/notifications-navigation.png)
 
 1. In the **Settings** tab, navigate to the _Notifications_ page in the sidebar.
 1. Select **Create Notification**.
@@ -61,7 +61,7 @@ To delete a Slack notification for Chef Automate:
 
 To add a webhook notification for Chef Automate:
 
-![Node Lifecycle](/images/docs/notifications-navigation.png)
+![Notifications Navigation](/images/docs/notifications-navigation.png)
 
 1. In the **Settings** tab navigate to the _Notifications_ page in the sidebar.
 1. Select **Create Notification**.

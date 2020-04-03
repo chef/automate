@@ -9,7 +9,7 @@ toc = true
 [menu]
   [menu.docs]
     parent = "settings"
-    weight = 20
+    weight = 30
 +++
 
 Set up Chef Automate to detect and monitor the nodes in your AWS EC2 and Azure accounts by providing your credentials and creating a node manager. Chef Automate creates a node reference for each instance in your account. Associate your EC2 and Azure instances with ssh and WinRM credentials using tags--the values supports wildcard match--in your node manager. Run scan jobs with your node manager reference and you're suddenly running an `inspec exec` across your instances. Every two hours, Chef Automate queries your AWS or Azure account to see the current state of all your nodes, if they are running, stopped, or terminated, and then updates Chef Automate accordingly. If the node manager finds an instance that used to be running and reachable, but which no is--if the node is stopped, terminated, or a transition state--it updates the status of that node in Chef Automate accordingly.
