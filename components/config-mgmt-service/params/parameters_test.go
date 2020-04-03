@@ -106,7 +106,7 @@ func TestConverParamToNodeStateBackendLowerFilter(t *testing.T) {
 		{input: backend.Id, expected: backend.Id},
 
 		// Does this function transform unexpected values?
-		{input: "watlololol", expected: "watlololol"},
+		{input: "othervalues", expected: "othervalues"},
 	}
 
 	for _, test := range cases {
