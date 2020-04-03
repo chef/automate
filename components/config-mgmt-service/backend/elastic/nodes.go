@@ -470,9 +470,13 @@ func (es Backend) MissingNodeDurationCounts(durations []string) ([]backend.Count
 	}
 
 	countedDurations := make([]backend.CountedDuration, len(rangeAggRes.Buckets))
-	for index, _ := range rangeAggRes.Buckets {
-		countedDurations[index].Count = int32(rangeAggRes.Buckets[index].DocCount)
-		countedDurations[index].Duration = rangeAggRes.Buckets[index].Key
+
+	// reversing the order
+	lastIndex := len(rangeAggRes.Buckets) - 1
+	for index := range rangeAggRes.Buckets {
+		responseIndex := lastIndex - index
+		countedDurations[responseIndex].Count = int32(rangeAggRes.Buckets[index].DocCount)
+		countedDurations[responseIndex].Duration = rangeAggRes.Buckets[index].Key
 	}
 
 	return countedDurations, nil
