@@ -46,7 +46,7 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
     private router: Router
-  ) { 
+  ) {
     this.updateOrgForm = this.fb.group({
       name: new FormControl({value: ''}, [Validators.required]),
       admin_user: new FormControl({value: ''}, [Validators.required]),
