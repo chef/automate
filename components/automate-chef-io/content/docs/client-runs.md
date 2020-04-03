@@ -205,8 +205,7 @@ curl -sSX POST "https://automate-url/api/v0/retention/nodes/missing-nodes/config
 -H "api-token: $TOKEN"
 ```
 
-You will need an API token to send API requests. 
-You can either [create a new token]({{< relref "api-tokens.md#creating-a-standard-api-token" >}}) or [use an Chef Automate 1 data collector token]({{< relref "data-collection.md#existing-data-collector-token-setup" >}}) if you are migrating from Chef Automate 1.
+You will need an [API token]({{< relref "api-tokens.md#creating-api-tokens" >}}) to send API requests. 
 
 ### Configuring Data Cleanup
 
@@ -233,5 +232,4 @@ curl -sSX POST "https://automate-url/api/v0/retention/nodes/delete-nodes/config"
 -H "api-token: $TOKEN"
 ```
 
-You will need an API token to send API requests. 
-You can either [create a new token]({{< relref "api-tokens.md#creating-a-standard-api-token" >}}) or use a [Chef Automate 1 data collector token]({{< relref "data-collection.md#existing-data-collector-token-setup" >}}) if you are migrating from Chef Automate 1.
+You will need an [API token]({{< relref "api-tokens.md#creating-api-tokens" >}}) to send API requests. 

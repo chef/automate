@@ -217,7 +217,7 @@ curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_
 All jobs have the following options:
 
 * `recurrence` (string) - A recurrence rule that determines how often, at what interval, and when to initially start a scheduled job. Any valid recurrence rule [as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt) is valid in this field.
-* `disabled` (bool) - True or false if this job is an enabled job.
+* `disabled` (bool) - True or false if this job is enabled.
 
 Infra node lifecycle jobs have the following options:
 
@@ -227,7 +227,7 @@ Purge jobs have the following options:
 
 * `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage backend before purging occurs.
   * `elasticsearch` (array) - An array of Elasticsearch purge policies
-    * `disabled` (bool) - True or false if this job is an enabled job.
+    * `disabled` (bool) - True or false if this job is enabled.
     * `policy_name` (string) - The name of the purge policy you wish to update.
     * `older_than_days` (int) - The threshold for what qualifies for deletion.
 
