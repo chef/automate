@@ -25,3 +25,13 @@ export interface TopErrorsItem {
   type: string;
   message: string;
 }
+
+export interface CountedDurationCollection {
+  items: CountedDurationItem[];
+  updated: Date;
+}
+
+export interface CountedDurationItem {
+  duration: string;
+  count: number;
+}

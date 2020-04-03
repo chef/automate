@@ -12,7 +12,10 @@ import {
   DesktopActionTypes,
   GetTopErrorsCollection,
   GetTopErrorsCollectionSuccess,
-  GetTopErrorsCollectionFailure
+  GetTopErrorsCollectionFailure,
+  GetUnknownDesktopDurationCounts,
+  GetUnknownDesktopDurationCountsSuccess,
+  GetUnknownDesktopDurationCountsFailure
 } from './desktop.actions';
 import { DesktopRequests } from './desktop.requests';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -76,6 +79,28 @@ export class DesktopEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not get top errors: ${msg || error}`
+      });
+    }));
+
+  @Effect()
+  getUnknownDesktopDurationCounts$ =
+    this.actions$.pipe(ofType<GetUnknownDesktopDurationCounts>(
+      DesktopActionTypes.GET_UNKNOWN_DESKTOP_DURATION_COUNTS),
+      mergeMap((_action) =>
+        this.requests.getUnknownDesktopDurationCounts().pipe(
+          map(countedDurationCollection =>
+        new GetUnknownDesktopDurationCountsSuccess(countedDurationCollection)),
+        catchError((error) => of(new GetUnknownDesktopDurationCountsFailure(error)))))
+    );
+
+  @Effect()
+  getUnknownDesktopDurationCountsFailure$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_UNKNOWN_DESKTOP_DURATION_COUNTS_FAILURE),
+    map(({ payload: { error } }: GetUnknownDesktopDurationCountsFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get unknown desktop duration counts errors: ${msg || error}`
       });
     }));
 }

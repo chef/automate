@@ -2,7 +2,8 @@ import { set, pipe } from 'lodash/fp';
 
 import { EntityStatus } from '../entities';
 import { DesktopActionTypes, DesktopActions } from './desktop.actions';
-import { DailyCheckInCountCollection, TopErrorsCollection } from './desktop.model';
+import { DailyCheckInCountCollection, TopErrorsCollection,
+  CountedDurationCollection } from './desktop.model';
 
 export interface DesktopEntityState {
   dailyCheckInCountCollection: DailyCheckInCountCollection;
@@ -10,6 +11,8 @@ export interface DesktopEntityState {
   selectedDaysAgo: number;
   topErrorCollection: TopErrorsCollection;
   getTopErrorCollectionStatus: EntityStatus;
+  unknownDesktopDurationCounts: CountedDurationCollection;
+  getUnknownDesktopDurationCountsStatus: EntityStatus;
 }
 
 export const desktopEntityInitialState: DesktopEntityState = {
@@ -17,7 +20,9 @@ export const desktopEntityInitialState: DesktopEntityState = {
   getDailyCheckInTimeSeriesStatus: EntityStatus.notLoaded,
   selectedDaysAgo: 3,
   topErrorCollection: {items: [], updated: new Date(0)},
-  getTopErrorCollectionStatus: EntityStatus.notLoaded
+  getTopErrorCollectionStatus: EntityStatus.notLoaded,
+  unknownDesktopDurationCounts: {items: [], updated: new Date(0)},
+  getUnknownDesktopDurationCountsStatus: EntityStatus.notLoaded
 };
 
 export function userEntityReducer(state: DesktopEntityState = desktopEntityInitialState,
@@ -48,6 +53,17 @@ export function userEntityReducer(state: DesktopEntityState = desktopEntityIniti
 
     case DesktopActionTypes.GET_TOP_ERRORS_COLLECTION_FAILURE:
       return set('getTopErrorCollectionStatus', EntityStatus.loadingFailure, state);
+
+    case DesktopActionTypes.GET_UNKNOWN_DESKTOP_DURATION_COUNTS:
+      return set('getUnknownDesktopDurationCountsStatus', EntityStatus.loading, state);
+
+    case DesktopActionTypes.GET_UNKNOWN_DESKTOP_DURATION_COUNTS_SUCCESS:
+      return pipe(
+        set('getUnknownDesktopDurationCountsStatus', EntityStatus.loadingSuccess),
+        set('unknownDesktopDurationCounts', action.payload))(state);
+
+    case DesktopActionTypes.GET_UNKNOWN_DESKTOP_DURATION_COUNTS_FAILURE:
+      return set('getUnknownDesktopDurationCountsStatus', EntityStatus.loadingFailure, state);
 
     default:
       return state;
