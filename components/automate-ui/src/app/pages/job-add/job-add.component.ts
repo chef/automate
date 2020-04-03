@@ -268,11 +268,11 @@ export class JobAddComponent implements OnDestroy {
 
     if (end.include) {
       ruleOpts['until'] = new Date(Date.UTC(
-          parseInt(end.datetime.year, 10),
-          parseInt(end.datetime.month, 10),
-          parseInt(end.datetime.date, 10),
-          parseInt(end.datetime.hour, 10),
-          parseInt(end.datetime.minute, 10)
+        parseInt(end.datetime.year, 10),
+        parseInt(end.datetime.month, 10),
+        parseInt(end.datetime.date, 10),
+        parseInt(end.datetime.hour, 10),
+        parseInt(end.datetime.minute, 10)
       ));
     }
 
