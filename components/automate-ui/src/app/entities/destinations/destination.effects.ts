@@ -9,6 +9,7 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
+  DestinationSuccessPayload,
   GetDestinationsSuccess,
   GetDestinationsSuccessPayload,
   GetDestinationsFailure,
@@ -84,7 +85,7 @@ export class DestinationEffects {
       ofType(DestinationActionTypes.CREATE),
       mergeMap(({ payload, username, password }: CreateDestination) =>
       this.requests.createDestination( payload, username, password ).pipe(
-        map(() => new CreateDestinationSuccess(payload)),
+        map((resp: DestinationSuccessPayload) => new CreateDestinationSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new CreateDestinationFailure(error))))));
 
@@ -93,7 +94,7 @@ export class DestinationEffects {
       ofType(DestinationActionTypes.CREATE_SUCCESS),
       map(({ payload  }: CreateDestinationSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Created data feed ${payload.name}`
+      message: `Created data feed ${payload}`
     })));
 
   @Effect()

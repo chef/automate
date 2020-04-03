@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { identity, isNil } from 'lodash/fp';
@@ -13,27 +13,41 @@ import { pending, EntityStatus } from 'app/entities/entities';
 import { GetDestination, UpdateDestination } from 'app/entities/destinations/destination.actions';
 import { destinationFromRoute, getStatus, updateStatus } from 'app/entities/destinations/destination.selectors';
 import { Destination } from 'app/entities/destinations/destination.model';
+import { DatafeedService } from 'app/services/data-feed/data-feed.service';
 
 type DestinationTabName = 'details';
+
+enum UrlTestState {
+  Inactive,
+  Loading,
+  Success,
+  Failure
+}
+
+type Modal = 'url';
 
 @Component({
   selector: 'app-data-feed-details',
   templateUrl: './data-feed-details.component.html',
   styleUrls: ['./data-feed-details.component.scss']
 })
-export class DataFeedDetailsComponent implements OnInit {
+export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   public tabValue: DestinationTabName = 'details';
   public destination: Destination;
   private isDestroyed = new Subject<boolean>();
   public updateForm: FormGroup;
   public saveInProgress = false;
+  public testInProgress = false;
   public saveSuccessful = false;
-
+  public urlState = UrlTestState;
+  public hookStatus = UrlTestState.Inactive;
+  public urlStatusModalVisible = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private datafeedService: DatafeedService
   ) {
 
     this.updateForm = fb.group({
@@ -46,7 +60,7 @@ export class DataFeedDetailsComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.pipe(
       select(routeParams),
@@ -67,7 +81,7 @@ export class DataFeedDetailsComponent implements OnInit {
       .subscribe(([_, destination]) => {
         this.destination = destination;
         this.updateForm.controls.name.setValue(this.destination.name);
-        this.updateForm.controls.url.setValue(this.destination.targetUrl);
+        this.updateForm.controls.url.setValue(this.destination.url);
       });
 
     this.store.pipe(
@@ -83,16 +97,57 @@ export class DataFeedDetailsComponent implements OnInit {
       });
   }
 
-
   public saveDataFeed(): void {
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    const destinationObj = new Destination(undefined, '', '', '');
-    destinationObj.id = this.destination.id;
-    destinationObj.name = this.updateForm.controls['name'].value.trim();
-    destinationObj.targetUrl = this.updateForm.controls['url'].value.trim();
-    destinationObj.targetSecretId = this.destination.targetSecretId;
+    const destinationObj = {
+      id: this.destination.id,
+      name: this.updateForm.controls['name'].value.trim(),
+      url: this.updateForm.controls['url'].value.trim(),
+      secret: this.destination.secret
+    }
+    
     this.store.dispatch(new UpdateDestination({ destination: destinationObj }));
+    this.destination = destinationObj;
+  }
+
+  public sendTestForDataFeedUrl(): void {
+    this.testInProgress = true;
+    this.hookStatus = UrlTestState.Loading;
+    const targetUrl: string =  this.updateForm.controls['url'].value;
+    if (targetUrl) {
+      this.datafeedService.testDestinationWithNoCreds(targetUrl)
+        .subscribe(
+          () => this.revealUrlStatus(UrlTestState.Success),
+          () => this.revealUrlStatus(UrlTestState.Failure)
+        );
+    }
+    this.testInProgress = false;
+  }
+
+  private revealUrlStatus(status: UrlTestState) {
+    this.hookStatus = status;
+    this.openModal('url');
+  }
+
+  public openModal(type: Modal): void {
+    switch (type) {
+      case 'url':
+        this.urlStatusModalVisible = true;
+        return;
+      default:
+        return;
+    }
+  }
+
+  public closeModal(type: Modal): void {
+    switch (type) {
+      case 'url':
+        this.urlStatusModalVisible = false;
+        return;
+      default:
+        return;
+    }
   }
 
   public get nameCtrl(): FormControl {
@@ -103,4 +158,8 @@ export class DataFeedDetailsComponent implements OnInit {
     return <FormControl>this.updateForm.controls.url;
   }
 
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
+  }
 }

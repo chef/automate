@@ -64,20 +64,20 @@ export class GetDestinationFailure implements Action {
 }
 
 export interface CreateDesinationPayload {
-  id?: number;
+  id?: string;
   name: string;
   url: string;
-  secret_id: string;
+  secret?: string;
 }
 
 export class CreateDestination implements Action {
   readonly type = DestinationActionTypes.CREATE;
-  constructor(public payload: Destination, public username: string, public password: string ) { }
+  constructor(public payload: CreateDesinationPayload, public username: string, public password: string ) { }
 }
 
 export class CreateDestinationSuccess implements Action {
   readonly type = DestinationActionTypes.CREATE_SUCCESS;
-  constructor(public payload: Destination) { }
+  constructor(public payload) { }
 }
 
 export class CreateDestinationFailure implements Action {
@@ -87,12 +87,12 @@ export class CreateDestinationFailure implements Action {
 
 export class DeleteDestination implements Action {
   readonly type = DestinationActionTypes.DELETE;
-  constructor(public payload: { id: number, name: string }) { }
+  constructor(public payload: { id: string, name: string }) { }
 }
 
 export class DeleteDestinationSuccess implements Action {
   readonly type = DestinationActionTypes.DELETE_SUCCESS;
-  constructor(public payload: { id: number, name: string } ) { }
+  constructor(public payload: { id: string, name: string } ) { }
 }
 
 export class DeleteDestinationFailure implements Action {
