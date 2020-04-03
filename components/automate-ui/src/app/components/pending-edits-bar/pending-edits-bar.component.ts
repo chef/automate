@@ -62,9 +62,10 @@ export class PendingEditsBarComponent implements OnDestroy {
 
   public updateDisplay() {
     this.layoutFacade.layout.userNotifications.pendingEdits =
-      this.projectsHaveStagedChanges
-      || this.updateProjectsCancelled
-      || this.updateProjectsFailed;
+      this.isAuthorized &&
+      (this.projectsHaveStagedChanges
+        || this.updateProjectsCancelled
+        || this.updateProjectsFailed);
     this.layoutFacade.updateDisplay();
   }
 
@@ -96,8 +97,11 @@ export class PendingEditsBarComponent implements OnDestroy {
   }
 
   get isBarHidden() {
-    return !this.isAuthorized
-      || !this.layoutFacade.layout.userNotifications.pendingEdits
+    // NB: All visibility factors must be embedded in these two properties
+    // so the layoutFacade can correctly compensate for the bar's presence/absence.
+    // That is why, for example, introspection is done in this code-behind
+    // instead of just using an <app-authorized> in the template.
+    return !this.layoutFacade.layout.userNotifications.pendingEdits
       || this.layoutFacade.layout.userNotifications.updatesProcessing;
   }
 }
