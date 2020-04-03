@@ -214,7 +214,7 @@ var integrityBackupShowCmd = &cobra.Command{
 var integrityBackupValidateCmd = &cobra.Command{
 	Use:   "validate [ID IDN]",
 	Short: "validate the shared object integrity",
-	Long:  "Validate the shared object integrity. Arguments are assumed to be backup ID's that you wish to validate, if left empty it will validate all snapshots",
+	Long:  "Validate the shared object integrity. If one or more snapshot IDs is not given all snapshots will be validated",
 	RunE:  runValidateBackupIntegrity,
 }
 
