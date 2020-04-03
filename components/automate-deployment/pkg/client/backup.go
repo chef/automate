@@ -264,8 +264,10 @@ func BackupIntegrityShow(conTimeout, reqTimeout time.Duration) (*api.BackupInteg
 	return res, err
 }
 
-// ValidateBackupIntegrity makes a gRPC request to the deployment-service and returns
-// the backup integrity status
+// ValidateBackupIntegrity makes a gRPC request to the deployment-service
+// and validates the backups that match the associated backup task IDs. If
+// no backup task IDs are provided all backups will be validated. It returns
+// the updated backup integrity status.
 func ValidateBackupIntegrity(conTimeout, reqTimeout time.Duration, ids []*api.BackupTask) (*api.ValidateBackupIntegrityResponse, error) {
 	con, ctx, cancel, err := newCon(conTimeout, reqTimeout)
 	defer cancel()

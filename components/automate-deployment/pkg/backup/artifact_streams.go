@@ -443,8 +443,8 @@ func NewCountingStream(stream ArtifactStream) CountingStream {
 	}
 }
 
-// ReplayableStream is a stream that consumes a stream to a file and allows
-// it to be replayed several times
+// ReplayableStream is a stream that consumes a stream to that caches a stream
+// and allows it to be replayed over again after the Reset() function is called.
 type ReplayableStream interface {
 	ArtifactStream
 	Reset() error
