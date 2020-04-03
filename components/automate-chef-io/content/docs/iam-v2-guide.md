@@ -87,7 +87,7 @@ See the end of this section for a [complete JSON policy example]({{< relref "iam
 ```
 
 The `name` field is for human consumption. When you want to refer to the policy in commands, you will need to know the policy's ID.
-So let us give this policy the ID value: `team-managers-devops`.
+Let us give this policy the ID value: `team-managers-devops`.
 
 ```json
   "id": "team-managers-devops",
