@@ -41,3 +41,7 @@ message Runs {
   // Latest (in history) run information to return for the runs list.
   string end = 5;
 }
+
+message MissingNodeDurationCounts {
+  repeated string durations = 1;
+}
