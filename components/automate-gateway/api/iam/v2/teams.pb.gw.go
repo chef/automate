@@ -467,15 +467,15 @@ func request_Teams_GetTeamsForMember_0(ctx context.Context, marshaler runtime.Ma
 		_   = err
 	)
 
-	val, ok = pathParams["id"]
+	val, ok = pathParams["membership_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "membership_id")
 	}
 
-	protoReq.Id, err = runtime.String(val)
+	protoReq.MembershipId, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "membership_id", err)
 	}
 
 	msg, err := client.GetTeamsForMember(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -494,15 +494,15 @@ func local_request_Teams_GetTeamsForMember_0(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["id"]
+	val, ok = pathParams["membership_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "membership_id")
 	}
 
-	protoReq.Id, err = runtime.String(val)
+	protoReq.MembershipId, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "membership_id", err)
 	}
 
 	msg, err := server.GetTeamsForMember(ctx, &protoReq)
@@ -936,7 +936,7 @@ var (
 
 	pattern_Teams_RemoveTeamMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2", "teams", "id", "users"}, "remove", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Teams_GetTeamsForMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2", "users", "id", "teams"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Teams_GetTeamsForMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2", "users", "membership_id", "teams"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

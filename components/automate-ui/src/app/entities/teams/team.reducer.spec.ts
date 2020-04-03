@@ -294,7 +294,7 @@ describe('teamStatusEntityReducer', () => {
     const teamId = team.id;
     const payload: TeamUserMgmtPayload = {
       id: teamId,
-      user_ids: [
+      membership_ids: [
         faker.random.uuid(),
         faker.random.uuid()
       ]
@@ -328,7 +328,7 @@ describe('teamStatusEntityReducer', () => {
         ];
         const payload: TeamUserMgmtPayload = {
           id: faker.random.uuid(),
-          user_ids: userIDArray
+          membership_ids: userIDArray
         };
         const action = new AddTeamUsersSuccess(payload);
         const initUserIDs = cloneDeep(state.userIDs);
@@ -353,7 +353,7 @@ describe('teamStatusEntityReducer', () => {
     const teamId = team.id;
     const payload: TeamUserMgmtPayload = {
       id: teamId,
-      user_ids: [
+      membership_ids: [
         faker.random.uuid()
       ]
     };
@@ -384,7 +384,7 @@ describe('teamStatusEntityReducer', () => {
       it('removes users from the payload to the state for ' + description, () => {
         const payload: TeamUserMgmtPayload = {
           id: faker.random.uuid(),
-          user_ids: usersToRemove
+          membership_ids: usersToRemove
         };
         const action = new RemoveTeamUsersSuccess(payload);
         const initUserIDs = cloneDeep(state.userIDs);
@@ -416,7 +416,7 @@ describe('teamStatusEntityReducer', () => {
   function genTeamUserMgmtPayload(teamId?: string): TeamUserMgmtPayload {
     return {
       id: teamId || faker.random.uuid(),
-      user_ids: [faker.random.uuid(), faker.random.uuid(), faker.random.uuid()]
+      membership_ids: [faker.random.uuid(), faker.random.uuid(), faker.random.uuid()]
     };
   }
 

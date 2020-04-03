@@ -218,7 +218,7 @@ control 'iam-legacy-access-control-1' do
               http_method: 'POST',
               user: user,
               request_headers: { "Content-type": "application/json" },
-              request_body: { user_ids: ['some_user', 'another_user'] }.to_json,
+              request_body: { membership_ids: ['some_user', 'another_user'] }.to_json,
             ).http_status == 403
 
           ).to eq(expect_403_for_admin_only_apis)
@@ -231,7 +231,7 @@ control 'iam-legacy-access-control-1' do
               http_method: 'POST',
               user: user,
               request_headers: { "Content-type": "application/json" },
-              request_body: { user_ids: ['some_user', 'another_user'] }.to_json,
+              request_body: { membership_ids: ['some_user', 'another_user'] }.to_json,
             ).http_status == 403
 
           ).to eq(expect_403_for_admin_only_apis)

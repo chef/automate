@@ -16,7 +16,7 @@ export interface TeamResponse {
 }
 
 export interface UsersResponse {
-  user_ids: string[];
+  membership_ids: string[];
 }
 
 @Injectable()

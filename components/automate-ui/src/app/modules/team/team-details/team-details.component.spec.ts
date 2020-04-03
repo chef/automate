@@ -133,7 +133,7 @@ describe('TeamDetailsComponent', () => {
     beforeEach(() => {
       store.dispatch(new GetTeamSuccess(someTeam));
       store.dispatch(new GetTeamUsersSuccess({
-        user_ids: []
+        membership_ids: []
       }));
       fixture.detectChanges();
     });

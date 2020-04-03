@@ -43,23 +43,23 @@ message DeleteTeamResp {
 
 message AddTeamMembersResp {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-        example: { value: '{"user_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
+        example: { value: '{"membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
     };
-    repeated string user_ids = 1;
+    repeated string membership_ids = 1;
 }
 
 message GetTeamMembershipResp {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-        example: { value: '{"user_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
+        example: { value: '{"membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
     };
-    repeated string user_ids = 1;
+    repeated string membership_ids = 1;
 }
 
 message RemoveTeamMembersResp {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-        example: { value: '{"user_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
+        example: { value: '{"membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
     };
-    repeated string user_ids = 1;
+    repeated string membership_ids = 1;
 }
 
 message GetTeamsForMemberResp {
