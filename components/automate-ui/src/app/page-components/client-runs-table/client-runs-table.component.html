@@ -7,39 +7,39 @@
 <chef-table class="node-list">
   <caption class="visually-hidden">Node List Table with Node States</caption>
   <chef-table-header>
-    <chef-table-row>
-      <chef-table-header-cell *ngIf="canDeleteNodes" class="delete" scope="col">
+    <chef-table-row slim>
+      <chef-table-header-cell  *ngIf="canDeleteNodes" class="delete" scope="col">
         <chef-checkbox class="delete-checkbox header"
         [checked]="deletable_control.numberOfDeletableNodes() > 0 && deletable_control.areAllNodesSelected()"
         (change)="deletable_control.selectAllNodesForDelete($event.detail)"
         [disabled]="!deletable_control.deletableNodesNonEmpty()"
         [indeterminate]="deletable_control.isAllSelectionOfNodesIndeterminate()"> </chef-checkbox>
       </chef-table-header-cell>
-      <chef-table-header-cell scope="col" class="node-name sort" (click)="onToggleSort('name')">
+      <chef-table-header-cell  scope="col" class="node-name sort" (click)="onToggleSort('name')">
         Node Name <i class="sort-icon {{sortIcon('name')}}"></i>
       </chef-table-header-cell>
-      <chef-table-header-cell scope="col" class="check-in sort" (click)="onToggleSort('checkin')" [hidden]="!columns.check_in">
+      <chef-table-header-cell  scope="col" class="check-in sort" (click)="onToggleSort('checkin')" [hidden]="!columns.check_in">
         Check-in<i class="sort-icon {{sortIcon('checkin')}}"></i>
       </chef-table-header-cell>
-      <chef-table-header-cell scope="col" class="sort" (click)="onToggleSort('uptime_seconds')" [hidden]="!columns.uptime">
+      <chef-table-header-cell  scope="col" class="sort" (click)="onToggleSort('uptime_seconds')" [hidden]="!columns.uptime">
         Uptime<i class="sort-icon {{sortIcon('uptime_seconds')}}"></i>
       </chef-table-header-cell>
-      <chef-table-header-cell scope="col" class="sort" (click)="onToggleSort('platform')" [hidden]="!columns.platform">
+      <chef-table-header-cell  scope="col" class="sort" (click)="onToggleSort('platform')" [hidden]="!columns.platform">
         Platform<i class="sort-icon {{sortIcon('platform')}}"></i>
       </chef-table-header-cell>
-      <chef-table-header-cell scope="col" *ngIf="displayEnvironmentNodes" class="sort node-environment" (click)="onToggleSort('environment')" [hidden]="!columns.environment">
+      <chef-table-header-cell  scope="col" *ngIf="displayEnvironmentNodes" class="sort node-environment" (click)="onToggleSort('environment')" [hidden]="!columns.environment">
         Environment<i class="sort-icon {{sortIcon('environment')}}"></i>
       </chef-table-header-cell>
-      <chef-table-header-cell scope="col" *ngIf="displayPolicyNodes" class="sort" (click)="onToggleSort('policy_group')" [hidden]="!columns.policy_group">
+      <chef-table-header-cell  scope="col" *ngIf="displayPolicyNodes" class="sort" (click)="onToggleSort('policy_group')" [hidden]="!columns.policy_group">
         Policy Group<i class="sort-icon {{sortIcon('policy_group')}}"></i>
       </chef-table-header-cell>
-      <chef-table-header-cell scope="col"  class="sort" (click)="onToggleSort('chef_version')" [hidden]="!columns.chef_version">
+      <chef-table-header-cell  scope="col"  class="sort" (click)="onToggleSort('chef_version')" [hidden]="!columns.chef_version">
         Client Version<i class="sort-icon {{sortIcon('chef_version')}}"></i>
       </chef-table-header-cell>
-      <chef-table-header-cell scope="col"  class="sort" (click)="onToggleSort('deprecations_count')" [hidden]="!columns.deprecations_count">
+      <chef-table-header-cell  scope="col"  class="sort" (click)="onToggleSort('deprecations_count')" [hidden]="!columns.deprecations_count">
         Deprecations<i class="sort-icon {{sortIcon('deprecations_count')}}"></i>
       </chef-table-header-cell>
-      <chef-table-header-cell class="view-more column-dropdown">
+      <chef-table-header-cell  class="view-more column-dropdown">
         <chef-button tertiary class="column-dropdown-toggle" (click)="toggleColumnDropdown()">
           <chef-icon>settings</chef-icon>
         </chef-button>
@@ -73,7 +73,7 @@
   </chef-table-header>
   <chef-table-body>
     <ng-container *ngFor="let node of nodes; index as i" >
-      <chef-table-row *ngIf=node.hasRuns tabindex="0" class="row">
+      <chef-table-row slim *ngIf=node.hasRuns tabindex="0" class="row">
         <chef-table-cell  *ngIf="canDeleteNodes" class="{{node.status}} delete">
           <chef-checkbox *ngIf="deletable_control.isNodeDeletable(node)" class="delete-checkbox row"
             [checked]="deletable_control.isNodeSelected(node)"

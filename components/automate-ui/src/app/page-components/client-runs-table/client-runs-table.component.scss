@@ -15,19 +15,6 @@ a, a:visited {
   text-decoration: none;
 }
 
-// Note - these are defaults for a 'slim' table
-chef-table-header-cell,
-chef-table-cell {
-  padding: 0 1em;
-  flex-direction: row;
-  min-width: 0;
-  flex-basis: 0;
-  flex-grow: 1;
-  align-items: center;
-  justify-content: flex-start;
-  font-size: 14px;
-}
-
 chef-table-header-cell,
 chef-table-cell {
   line-height: 1.2;

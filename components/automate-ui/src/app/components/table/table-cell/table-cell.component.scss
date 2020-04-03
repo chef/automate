@@ -29,3 +29,16 @@
   border-right: 1px solid $chef-grey;
   border-radius: 0 $global-radius $global-radius 0;
 }
+
+[slim] {
+  :host {
+    padding: 0 1em;
+    flex-direction: row;
+    min-width: 0;
+    flex-basis: 0;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 14px;
+  }
+}
