@@ -3,12 +3,14 @@ import { interval as observableInterval, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { get } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ProjectService } from 'app/entities/projects/project.service';
 import { Project } from 'app/entities/projects/project.model';
 import { allProjects } from 'app/entities/projects/project.selectors';
 import { ApplyRulesStatus } from 'app/entities/projects/project.reducer';
+import { allPerms } from 'app/entities/userperms/userperms.selectors';
 
 @Component({
   selector: 'app-pending-edits-bar',
@@ -22,28 +24,36 @@ export class PendingEditsBarComponent implements OnDestroy {
   private projectsHaveStagedChanges = false;
   public updateProjectsFailed = false;
   private updateProjectsCancelled = false;
+  private isAuthorized = false;
 
   constructor(
     public layoutFacade: LayoutFacadeService,
     private store: Store<NgrxStateAtom>,
     public projects: ProjectService
-    ) {
-      this.projects.getApplyRulesStatus();
-      this.store.select(allProjects).pipe(
-        takeUntil(this.isDestroyed)
-      ).subscribe((projectList: Project[]) => {
+  ) {
+    this.projects.getApplyRulesStatus();
+
+    this.store.select(allProjects)
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe((projectList: Project[]) => {
         this.projectsHaveStagedChanges = projectList.some(p => p.status === 'EDITS_PENDING');
         this.updateDisplay();
       });
 
-      this.projects.applyRulesStatus$
+    this.projects.applyRulesStatus$
       .pipe(takeUntil(this.isDestroyed))
       .subscribe(({ failed, cancelled }: ApplyRulesStatus) => {
         this.updateProjectsFailed = failed;
         this.updateProjectsCancelled = cancelled;
         this.updateDisplay();
       });
-    }
+
+    this.store.select(allPerms)
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe(perms =>
+        this.isAuthorized = get(['/iam/v2/projects', 'get'], perms)
+      );
+  }
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
@@ -86,7 +96,8 @@ export class PendingEditsBarComponent implements OnDestroy {
   }
 
   get isBarHidden() {
-    return !this.layoutFacade.layout.userNotifications.pendingEdits
+    return !this.isAuthorized
+      || !this.layoutFacade.layout.userNotifications.pendingEdits
       || this.layoutFacade.layout.userNotifications.updatesProcessing;
   }
 }
