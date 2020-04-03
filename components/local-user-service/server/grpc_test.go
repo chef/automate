@@ -552,13 +552,13 @@ func TestUsersGRPCInternalErrors(t *testing.T) {
 	})
 }
 
-func newTeamsMock(t *testing.T) (*grpctest.Server, *teams_api.TeamsV2ServerMock) {
+func newTeamsMock(t *testing.T) (*grpctest.Server, *teams_api.TeamsServerMock) {
 	t.Helper()
 	certs := helpers.LoadDevCerts(t, "teams-service")
-	mockTeams := teams_api.NewTeamsV2ServerMock()
+	mockTeams := teams_api.NewTeamsServerMock()
 	connFactory := secureconn.NewFactory(*certs)
 	g := connFactory.NewServer()
-	teams_api.RegisterTeamsV2Server(g, mockTeams)
+	teams_api.RegisterTeamsServer(g, mockTeams)
 	teams := grpctest.NewServer(g)
 	return teams, mockTeams
 }

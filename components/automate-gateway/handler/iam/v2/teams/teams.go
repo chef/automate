@@ -12,10 +12,10 @@ import (
 )
 
 type Server struct {
-	client teams.TeamsV2Client
+	client teams.TeamsClient
 }
 
-func NewServer(client teams.TeamsV2Client) *Server {
+func NewServer(client teams.TeamsClient) *Server {
 	return &Server{
 		client: client,
 	}

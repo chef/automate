@@ -1074,10 +1074,3 @@ func cleanupOrg(ctx context.Context, t *testing.T, cl infra_proxy.InfraProxyClie
 	_, err := cl.DeleteOrg(context.Background(), &deleteReq)
 	require.NoError(t, err)
 }
-
-func cleanupServer(ctx context.Context, t *testing.T, cl infra_proxy.InfraProxyClient, serverID string) {
-	t.Helper()
-	deleteReq := request.DeleteServer{Id: serverID}
-	_, err := cl.DeleteServer(ctx, &deleteReq)
-	require.NoError(t, err)
-}

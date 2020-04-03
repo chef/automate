@@ -13,10 +13,10 @@ export interface DesktopEntityState {
 }
 
 export const desktopEntityInitialState: DesktopEntityState = {
-  dailyCheckInCountCollection: { buckets: []},
+  dailyCheckInCountCollection: { buckets: [], updated: new Date(0)},
   getDailyCheckInTimeSeriesStatus: EntityStatus.notLoaded,
   selectedDaysAgo: 3,
-  topErrorCollection: {items: []},
+  topErrorCollection: {items: [], updated: new Date(0)},
   getTopErrorCollectionStatus: EntityStatus.notLoaded
 };
 

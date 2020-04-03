@@ -347,3 +347,23 @@ input {
   text-align: center;
   top: -2px;
 }
+
+// mat-select dropdown menu
+
+[panelClass="chef-dropdown"] {
+  height: 45px;
+  background-color: $chef-white;
+  padding: 1em;
+  font-size: 14px;
+  border: 1px solid $chef-light-grey;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border 0.4s ease;
+
+  &:focus,
+  &:active {
+    border-color: $chef-primary-bright;
+    outline: none;
+  }
+}

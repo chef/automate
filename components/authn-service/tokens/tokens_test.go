@@ -327,7 +327,7 @@ func testUpdateTokenNotFound(ctx context.Context, t *testing.T, ta tokens.Storag
 
 func insertProjectsIntoNewContext(projects []string) context.Context {
 	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
-		[]string{}, projects, "resource", "action", "pol"))
+		[]string{}, projects, "resource", "action"))
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,

@@ -90,6 +90,25 @@ func (a *InfraProxyServer) GetCookbookAffectedNodes(ctx context.Context, r *gwre
 	}, nil
 }
 
+// GetCookbookFileContent get the nodes using cookbook
+func (a *InfraProxyServer) GetCookbookFileContent(ctx context.Context, r *gwreq.CookbookFileContent) (*gwres.CookbookFileContent, error) {
+
+	req := &infra_req.CookbookFileContent{
+		OrgId:   r.OrgId,
+		Name:    r.Name,
+		Version: r.Version,
+		Url:     r.Url,
+	}
+	res, err := a.client.GetCookbookFileContent(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.CookbookFileContent{
+		Content: res.GetContent(),
+	}, nil
+}
+
 func fromUpstreamCookbookVersion(t *infra_res.CookbookVersion) *gwres.CookbookVersion {
 	return &gwres.CookbookVersion{
 		Name:    t.GetName(),

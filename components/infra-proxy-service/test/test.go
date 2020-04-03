@@ -132,7 +132,7 @@ func ResetState(ctx context.Context, t *testing.T, serviceRef *service.Service) 
 // InsertProjectsIntoNewContext insert the projects into context.
 func InsertProjectsIntoNewContext(projects []string) context.Context {
 	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
-		[]string{}, projects, "resource", "action", "pol"))
+		[]string{}, projects, "resource", "action"))
 }
 
 // DefaultMockPurgeFunc is the authz default mock purge function.

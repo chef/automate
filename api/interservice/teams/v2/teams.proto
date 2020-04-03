@@ -149,7 +149,7 @@ message PurgeUserMembershipResp {
     repeated string ids = 1;
 }
 
-service TeamsV2 {
+service Teams {
   rpc GetTeam (GetTeamReq) returns (GetTeamResp) {};
   rpc ListTeams (ListTeamsReq) returns (ListTeamsResp) {};
   rpc CreateTeam (CreateTeamReq) returns (CreateTeamResp) {};

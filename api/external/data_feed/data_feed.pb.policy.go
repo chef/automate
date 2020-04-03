@@ -33,6 +33,8 @@ func init() {
 		if m, ok := input.(*UpdateDestinationRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
+				case "id":
+					return m.Id
 				case "name":
 					return m.Name
 				case "url":

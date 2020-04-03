@@ -102,8 +102,7 @@ func init() {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "string"
           },
           {
             "name": "body",
@@ -284,8 +283,7 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "name": {
           "type": "string"

@@ -57,7 +57,7 @@ service DatafeedService {
 			body: "*"
   	};
 	  option (chef.automate.api.policy) = {
-		  resource: "datafeed:destination/{id}"
+		  resource: "datafeed:destination:{id}"
 		  action: "update"
 	  };
 		option (chef.automate.api.iam.policy) = {
@@ -128,7 +128,7 @@ message DeleteDestinationResponse {
 }
 
 message UpdateDestinationRequest {	
-  int64  id		= 1;
+  string  id    = 1;
   string name   = 2;
   string url    = 3;
   string secret = 4;

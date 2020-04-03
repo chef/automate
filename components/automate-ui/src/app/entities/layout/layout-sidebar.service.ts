@@ -119,7 +119,7 @@ export class LayoutSidebarService {
         }],
         settings: [
           {
-            name: 'Node Management',
+            name: 'General Settings',
             items: [
               {
                 name: 'Notifications',
@@ -139,6 +139,19 @@ export class LayoutSidebarService {
                 visible$: new BehaviorSubject(this.ServiceNowFeatureFlagOn)
               },
               {
+                name: 'Data Lifecycle',
+                icon: 'storage',
+                route: '/settings/data-lifecycle',
+                authorized: {
+                  anyOf: ['/retention/nodes/status', 'get']
+                }
+              }
+            ]
+          },
+          {
+            name: 'Node Management',
+            items: [
+              {
                 name: 'Node Integrations',
                 icon: 'settings_input_component',
                 route: '/settings/node-integrations',
@@ -153,14 +166,6 @@ export class LayoutSidebarService {
                 route: '/settings/node-credentials',
                 authorized: {
                   anyOf: ['/secrets/search', 'post']
-                }
-              },
-              {
-                name: 'Node Lifecycle',
-                icon: 'storage',
-                route: '/settings/node-lifecycle',
-                authorized: {
-                  anyOf: ['/retention/nodes/status', 'get']
                 }
               }
             ]

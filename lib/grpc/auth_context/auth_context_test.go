@@ -23,12 +23,11 @@ func TestRoundTrippingThroughContext(t *testing.T) {
 			defer cancel()
 
 			auth := auth_context.FromContext(auth_context.NewContext(ctx, tc,
-				[]string{"projects"}, "res", "act", "v999"))
+				[]string{"projects"}, "res", "act"))
 			assert.ElementsMatch(t, tc, auth.Subjects)
 			assert.Equal(t, []string{"projects"}, auth.Projects)
 			assert.Equal(t, "res", auth.Resource)
 			assert.Equal(t, "act", auth.Action)
-			assert.Equal(t, "v999", auth.PolicyVersion)
 		})
 	}
 }
@@ -45,7 +44,7 @@ func TestOutgoingMetadata(t *testing.T) {
 				"action":   []string{"act"},
 				"subjects": nil,
 				"projects": []string{"projects"},
-				"policy":   []string{"v999"}},
+			},
 		},
 		"one subject": {
 			[]string{"user:local:alice"},
@@ -54,7 +53,7 @@ func TestOutgoingMetadata(t *testing.T) {
 				"action":   []string{"act"},
 				"subjects": []string{"user:local:alice"},
 				"projects": []string{"projects"},
-				"policy":   []string{"v999"}},
+			},
 		},
 		"two subjects": {
 			[]string{"user:local:alice", "team:local:admins"},
@@ -63,7 +62,7 @@ func TestOutgoingMetadata(t *testing.T) {
 				"resource": []string{"res"},
 				"action":   []string{"act"},
 				"projects": []string{"projects"},
-				"policy":   []string{"v999"}},
+			},
 		},
 		"one subject with spaces": {
 			[]string{"user:local:alice schmidt"},
@@ -72,14 +71,14 @@ func TestOutgoingMetadata(t *testing.T) {
 				"resource": []string{"res"},
 				"action":   []string{"act"},
 				"projects": []string{"projects"},
-				"policy":   []string{"v999"}},
+			},
 		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-			ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx, tc.input, []string{"projects"}, "res", "act", "v999"))
+			ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx, tc.input, []string{"projects"}, "res", "act"))
 			md, ok := metadata.FromOutgoingContext(ctx)
 			require.True(t, ok)
 			assert.Equal(t, tc.expected, md)
@@ -104,7 +103,7 @@ func TestProjectsFromIncomingContext(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
-			gatewayContext := auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx, []string{}, tc.input, "res", "act", "v999"))
+			gatewayContext := auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx, []string{}, tc.input, "res", "act"))
 			projects, err := auth_context.ProjectsFromIncomingContext(gatewayContext)
 			require.NoError(t, err)
 			assert.Equal(t, tc.input, projects)
@@ -123,7 +122,7 @@ func TestRoundTripMetadata(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 			ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx,
-				tc, []string{"projects"}, "res", "act", "v999"))
+				tc, []string{"projects"}, "res", "act"))
 			md, ok := metadata.FromOutgoingContext(ctx)
 			require.True(t, ok)
 			ctx = metadata.NewIncomingContext(ctx, md)
@@ -131,7 +130,6 @@ func TestRoundTripMetadata(t *testing.T) {
 			assert.ElementsMatch(t, tc, auth.Subjects)
 			assert.Equal(t, "res", auth.Resource)
 			assert.Equal(t, "act", auth.Action)
-			assert.Equal(t, "v999", auth.PolicyVersion)
 		})
 	}
 }

@@ -1,5 +1,6 @@
 export interface DailyCheckInCountCollection {
   buckets: DailyCheckInCount[];
+  updated: Date;
 }
 
 export interface DailyCheckInCount {
@@ -16,6 +17,7 @@ export interface DayPercentage {
 
 export interface TopErrorsCollection {
   items: TopErrorsItem[];
+  updated: Date;
 }
 
 export interface TopErrorsItem {

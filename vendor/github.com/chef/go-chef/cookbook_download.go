@@ -62,6 +62,12 @@ func (c *CookbookService) DownloadTo(name, version, localDir string) error {
 	return nil
 }
 
+// DownloadAt is a deprecated alias for DownloadTo
+func (c *CookbookService) DownloadAt(name, version, localDir string) error {
+	err := c.DownloadTo(name, version, localDir)
+	return err
+}
+
 // downloadCookbookItems downloads all the provided cookbook items into the provided
 // local path, it also ensures that the provided directory exists by creating it
 func (c *CookbookService) downloadCookbookItems(items []CookbookItem, itemType, localPath string) error {
