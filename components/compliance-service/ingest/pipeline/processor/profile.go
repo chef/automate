@@ -1,10 +1,14 @@
 package processor
 
 import (
+	"strings"
+
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/ptypes/struct"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -76,28 +80,37 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 							continue
 						}
 						repProfile.Name = esProfile.Name
-						repProfile.Copyright = esProfile.Copyright
-						repProfile.CopyrightEmail = esProfile.CopyrightEmail
 
 						esControlsHash := make(map[string]relaxting.ESInspecControl, len(esProfile.Controls))
 						for _, esControl := range esProfile.Controls {
 							esControlsHash[esControl.ID] = esControl
 						}
-
 						for _, repControl := range repProfile.Controls {
 							if val, ok := esControlsHash[repControl.Id]; ok {
 								repControl.Title = val.Title
 								repControl.Impact = val.Impact
 								//repControl.Refs = val.Refs
-								//repControl.Tags = val.Tags
-								//  waiver data
+
+								var controlTags structpb.Struct
+								err := (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(val.Tags), &controlTags)
+								if err == nil {
+									repControl.Tags = &controlTags
+								}
+								var controlRefs structpb.Struct
+								err = (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(val.Refs), &controlRefs)
+								if err == nil {
+									//repControl.Refs = &controlRefs
+									logrus.Debugf("!!! %s controlRefs=%+v", repControl.Id, controlRefs)
+								} else {
+									logrus.Debugf("!!! %s didn't work for controlRefs=%+v", repControl.Id, controlRefs)
+								}
+
 							} else {
 								grpcErr := status.Errorf(codes.Internal, "Unable to find control '%s' in ES profile '%s' (%s)", repControl.Id, repProfile.Title, repProfile.Sha256)
 								msg.FinishProcessingCompliance(grpcErr)
 								continue
 							}
 						}
-						//logrus.Debugf("!!!3 updated repProfile %+v", repProfile)
 					}
 				}
 			}

@@ -180,18 +180,12 @@ func (backend *ESClient) GetProfilesMissingMetadata(profileIDs []string) (map[st
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"took",
 		"name",
-		"license",
-		"supports",
-		"maintainer",
-		"copyright",
-		"copyright_email",
-		"summary",
 		"depends",
 		"controls.id",
+		"controls.impact",
 		"controls.title",
 		"controls.tags",
 		"controls.refs",
-		"controls.waiver_data",
 	)
 
 	searchSource := elastic.NewSearchSource().
@@ -237,6 +231,7 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 	index := mapping.IndexTimeseriesFmt(endTime)
 	data.DailyLatest = true
 	data.ReportID = id
+	logrus.Debugf("!!!2 insertInspecSummary %+v", *data)
 	// Add the summary document to the compliance timeseries index using the specified report id as document id
 	_, err := backend.client.Index().
 		Index(index).

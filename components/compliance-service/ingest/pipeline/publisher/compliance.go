@@ -54,6 +54,7 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 					logrus.Debugf("storeCompliance: meta for profile %s already exists, no need to insert", profile.Sha256)
 				}
 			}
+			logrus.Debugf("!!!1 insertInspecSummary %+v", msg.InspecSummary)
 			errChannels = append(errChannels, insertInspecSummary(msg, client))
 			errChannels = append(errChannels, insertInspecReport(msg, client))
 
@@ -121,18 +122,8 @@ func insertInspecProfile(msg message.Compliance, profile *relaxting.ESInspecProf
 			"profile_id": profile.Sha256,
 		}).Debug("Ingesting inspec_profile")
 		start := time.Now()
-		profileExists, err := client.ProfileExists(profile.Sha256)
-		if err == nil {
-			if !profileExists {
-				logrus.Debugf("Profile %s does not yet exist, will push this one into ES", profile.Sha256)
 
-				// Ingest Profile
-				err = client.InsertInspecProfile(msg.Ctx, profile)
-			} else {
-				logrus.Debugf("Profile %s exists therefore will not be posted to ES", profile.Sha256)
-			}
-		}
-
+		err := client.InsertInspecProfile(msg.Ctx, profile)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{"error": err.Error()}).Error("Unable to ingest inspec_profile object")
 			out <- err
