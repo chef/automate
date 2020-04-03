@@ -1,8 +1,10 @@
 package processor
 
 import (
+	"fmt"
 	"strings"
 
+	"github.com/chef/automate/components/automate-gateway/gateway"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
@@ -86,25 +88,15 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 							esControlsHash[esControl.ID] = esControl
 						}
 						for _, repControl := range repProfile.Controls {
-							if val, ok := esControlsHash[repControl.Id]; ok {
-								repControl.Title = val.Title
-								repControl.Impact = val.Impact
-								//repControl.Refs = val.Refs
+							if esControl, ok := esControlsHash[repControl.Id]; ok {
+								repControl.Title = esControl.Title
 
 								var controlTags structpb.Struct
-								err := (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(val.Tags), &controlTags)
+								err := (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(esControl.Tags), &controlTags)
 								if err == nil {
 									repControl.Tags = &controlTags
 								}
-								var controlRefs structpb.Struct
-								err = (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(val.Refs), &controlRefs)
-								if err == nil {
-									//repControl.Refs = &controlRefs
-									logrus.Debugf("!!! %s controlRefs=%+v", repControl.Id, controlRefs)
-								} else {
-									logrus.Debugf("!!! %s didn't work for controlRefs=%+v", repControl.Id, controlRefs)
-								}
-
+								repControl.Refs = gateway.GetStructArray("data", []byte(fmt.Sprintf(`{"data":%s}`, esControl.Refs)))
 							} else {
 								grpcErr := status.Errorf(codes.Internal, "Unable to find control '%s' in ES profile '%s' (%s)", repControl.Id, repProfile.Title, repProfile.Sha256)
 								msg.FinishProcessingCompliance(grpcErr)

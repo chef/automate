@@ -103,6 +103,7 @@ func ComplianceSummary(in <-chan message.Compliance) <-chan message.Compliance {
 			msg.InspecSummary.Platform.Full = fmt.Sprintf("%s %s", msg.Report.Platform.Name, msg.Report.Platform.Release)
 			msg.InspecSummary.InSpecVersion = msg.Report.Version
 			msg.InspecSummary.Statistics.Duration = msg.Report.Statistics.Duration
+
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "profiles": msg.InspecSummary.Profiles}).Debug("Processed Compliance Summary")
 			out <- msg
 		}

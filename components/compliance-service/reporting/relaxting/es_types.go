@@ -37,7 +37,6 @@ type ESInSpecSummary struct {
 	SourceFQDN       string   `json:"source_fqdn"`
 	ChefTags         []string `json:"chef_tags"`
 	Projects         []string `json:"projects"`
-	IPAddress        string   `json:"ipaddress"`
 }
 
 // Used to unmarshal report documents stored in comp-r-* ElasticSearch indices

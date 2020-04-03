@@ -54,7 +54,6 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 					logrus.Debugf("storeCompliance: meta for profile %s already exists, no need to insert", profile.Sha256)
 				}
 			}
-			logrus.Debugf("!!!1 insertInspecSummary %+v", msg.InspecSummary)
 			errChannels = append(errChannels, insertInspecSummary(msg, client))
 			errChannels = append(errChannels, insertInspecReport(msg, client))
 

@@ -284,7 +284,7 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 	reports := make([]*reportingapi.Report, 0)
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
 		for _, hit := range searchResult.Hits.Hits {
-			item := ESInSpecSummary{}
+			item := ESInSpecReport{}
 			if hit.Source != nil {
 				err := json.Unmarshal(*hit.Source, &item)
 				if err == nil {
@@ -295,7 +295,7 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 						NodeId:    item.NodeID,
 						NodeName:  item.NodeName,
 						EndTime:   timestamp,
-						Ipaddress: item.IPAddress,
+						Ipaddress: *item.IPAddress,
 					}
 
 					var controlSummary reporting.NodeControlSummary
