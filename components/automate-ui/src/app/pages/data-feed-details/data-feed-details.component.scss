@@ -67,8 +67,51 @@ section {
     padding-left: 12px;
   }
 
-  div#save {
-    display: flex;
-    align-items: center;
+  chef-button {
+    margin-left: 15px;
+  }
+}
+
+chef-modal {
+  #{--modal-width}: 500px;
+
+  .status-modal {
+    text-align: center;
+
+    chef-button {
+      margin-top: 20px;
+    }
+  }
+}
+
+.status-icon {
+  margin: 0 auto 10px;
+  padding: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+
+  &.failure {
+    background: $chef-critical;
+  }
+
+  &.success {
+    background: $chef-success;
+  }
+
+  & > chef-icon {
+    color: $chef-white;
+  }
+}
+
+.status-heading {
+  text-align: center;
+
+  &.failure {
+    color: $chef-critical;
+  }
+
+  &.success {
+    color: $chef-success;
   }
 }

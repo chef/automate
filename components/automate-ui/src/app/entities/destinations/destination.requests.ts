@@ -4,7 +4,8 @@ import { of as observableOf, Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { environment } from 'environments/environment';
 import { compact, concat } from 'lodash';
-import { Destination } from '../../pages/data-feed/destination';
+import { Destination } from './destination.model';
+import { CreateDesinationPayload } from './destination.actions';
 
 export interface DestinationsResponse {
   destinations: Destination[];
@@ -45,32 +46,31 @@ export class DestinationRequests {
 
   public getDestination(id: string): Observable<Destination> {
     return this.http.get<DestinationResponse>(this.joinToDatafeedUrl(['destination', id]))
-    .pipe(map((destinationsJson: DestinationResponse) =>
-    Destination.fromResponse(destinationsJson)));
+    .pipe(map((destinationsJson: DestinationResponse) => destinationsJson.destination));
   }
 
-  public createDestination(destinationData: Destination,
+  public createDestination(destinationData: CreateDesinationPayload,
     targetUsername: string, targetPassword: string):
     Observable<DestinationResponse> {
     return this.createSecret(destinationData, targetUsername, targetPassword)
       .pipe(mergeMap((secretId: string) => {
-        destinationData.targetSecretId = secretId;
+        destinationData.secret = secretId;
         return this.http.post<DestinationResponse>(
-          this.joinToDatafeedUrl(['destination']), destinationData.toRequest());
+          this.joinToDatafeedUrl(['destination']), destinationData);
       }));
   }
 
   public updateDestination(destination: Destination): Observable<DestinationResponse> {
     return this.http.patch<DestinationResponse>(encodeURI(
-      this.joinToDatafeedUrl(['destination', destination.id.toString()])), destination.toRequest());
+      this.joinToDatafeedUrl(['destination', destination.id.toString()])), destination);
   }
 
-  public deleteDestination(id: number): Observable<DestinationResponse> {
+  public deleteDestination(id: string): Observable<DestinationResponse> {
     return this.http.delete<DestinationResponse>(encodeURI(
       this.joinToDatafeedUrl(['destination', id.toString()])));
   }
 
-  private createSecret(destination: Destination, targetUsername: string,
+  private createSecret(destination: CreateDesinationPayload, targetUsername: string,
     targetPassword: string): Observable<string> {
     if ( targetUsername.length > 0 || targetPassword.length > 0 ) {
       const secret = this.newSecret('', destination.name, targetUsername, targetPassword);

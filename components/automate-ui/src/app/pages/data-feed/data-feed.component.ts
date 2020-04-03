@@ -14,7 +14,7 @@ import { Destination } from '../../entities/destinations/destination.model';
 import {
   allDestinations, getStatus, saveStatus, saveError } from 'app/entities/destinations/destination.selectors';
 import { CreateDestination, GetDestinations, DeleteDestination } from 'app/entities/destinations/destination.actions';
-import { ChefSorters } from 'app/helpers/auth/sorter';
+// import { ChefSorters } from 'app/helpers/auth/sorter';
 import { DatafeedService } from 'app/services/data-feed/data-feed.service';
 
 enum UrlTestState {
@@ -54,8 +54,7 @@ export class DatafeedComponent implements OnInit, OnDestroy {
 
     this.loading$ = store.pipe(select(getStatus), map(loading));
     this.sortedDestinations$ = store.pipe(
-      select(allDestinations),
-      map(destinations => ChefSorters.naturalSort(destinations, 'name')));
+      select(allDestinations));
     this.createDataFeedForm = this.fb.group({
       // Must stay in sync with error checks in create-data-feed-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -120,9 +119,10 @@ export class DatafeedComponent implements OnInit, OnDestroy {
 
   public createDataFeed(): void {
     this.creatingDataFeed = true;
-    const destinationObj = new Destination(undefined, '', '', '');
-    destinationObj.name = this.createDataFeedForm.controls['name'].value.trim();
-    destinationObj.targetUrl = this.createDataFeedForm.controls['url'].value.trim();
+    const destinationObj = {
+      name: this.createDataFeedForm.controls['name'].value.trim(),
+      url: this.createDataFeedForm.controls['url'].value.trim()
+    }
     const username: string = this.createDataFeedForm.controls['username'].value.trim();
     const password: string = this.createDataFeedForm.controls['password'].value.trim();
     this.store.dispatch(new CreateDestination(destinationObj, username, password));
