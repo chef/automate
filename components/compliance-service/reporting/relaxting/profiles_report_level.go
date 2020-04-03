@@ -96,7 +96,7 @@ func (depth *ReportDepth) getProfileMinsFromNodesResults(
 	logrus.Debugf("Done with statusMap=%+v", statusMap)
 	logrus.Debugf("Done with statusMap['something']=%+v", statusMap["passed"])
 	counts := &reportingapi.ProfileCounts{
-		Total:   int32(statusMap["failed"]+statusMap["passed"]+statusMap["skipped"]) + int32(statusMap["waived"]),
+		Total:   int32(statusMap["failed"] + statusMap["passed"] + statusMap["skipped"] + statusMap["waived"]),
 		Failed:  int32(statusMap["failed"]),
 		Passed:  int32(statusMap["passed"]),
 		Skipped: int32(statusMap["skipped"]),

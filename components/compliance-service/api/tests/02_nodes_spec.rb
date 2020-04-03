@@ -652,7 +652,7 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 1,
+        "total" => 2,
         "totalFailed" => 1,
         "totalPassed" => 1
     }.to_json
@@ -716,7 +716,7 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 1,
+        "total" => 5,
         "totalFailed" => 3,
         "totalPassed" => 1,
         "totalSkipped" => 1

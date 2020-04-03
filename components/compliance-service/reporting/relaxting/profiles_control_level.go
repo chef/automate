@@ -114,7 +114,7 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 			//let's keep track of the counts even if they're not in the filter so that we may know that they're there for UI chicklets
 			statusMap[profileStatus]++
 			counts = &reportingapi.ProfileCounts{
-				Total:   int32(statusMap["failed"] + statusMap["passed"] + statusMap["skipped"]),
+				Total:   int32(statusMap["failed"] + statusMap["passed"] + statusMap["skipped"] + statusMap["waived"]),
 				Failed:  int32(statusMap["failed"]),
 				Passed:  int32(statusMap["passed"]),
 				Skipped: int32(statusMap["skipped"]),
