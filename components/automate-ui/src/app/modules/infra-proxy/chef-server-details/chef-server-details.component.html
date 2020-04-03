@@ -91,9 +91,9 @@
           <div id="button-bar">
             <chef-button [disabled]="isLoading || !updateServerForm.valid || !updateServerForm.dirty"
               primary inline (click)="saveServer()">                
-            <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
-            <span *ngIf="saving">Saving...</span>
-            <span *ngIf="!saving">Save</span></chef-button>
+            <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
+            <span *ngIf="saveInProgress">Saving...</span>
+            <span *ngIf="!saveInProgress">Save</span></chef-button>
             <span id="saved-note" *ngIf="saveSuccessful && !updateServerForm.dirty">All changes saved.</span>
           </div>
         </form>
