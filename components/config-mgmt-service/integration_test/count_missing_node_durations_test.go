@@ -96,7 +96,6 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 				},
 			},
 		},
-
 		{
 			description: "days: no nodes are missing after 3 days",
 			nodes: []iBackend.Node{
@@ -187,6 +186,99 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "returned order same as requested order ascending",
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().AddDate(0, -4, 0),
+				},
+			},
+			durations: []string{"3d", "1w", "2w", "1M", "3M"},
+			expectedResponse: []*response.CountedDuration{
+				{
+					Duration: "3d",
+					Count:    1,
+				},
+				{
+					Duration: "1w",
+					Count:    1,
+				},
+				{
+					Duration: "2w",
+					Count:    1,
+				},
+				{
+					Duration: "1M",
+					Count:    1,
+				},
+				{
+					Duration: "3M",
+					Count:    1,
+				},
+			},
+		},
+		{
+			description: "returned order same as requested order descending",
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().AddDate(0, -4, 0),
+				},
+			},
+			durations: []string{"3M", "1M", "2w", "1w", "3d"},
+			expectedResponse: []*response.CountedDuration{
+				{
+					Duration: "3M",
+					Count:    1,
+				},
+				{
+					Duration: "1M",
+					Count:    1,
+				},
+				{
+					Duration: "2w",
+					Count:    1,
+				},
+				{
+					Duration: "1w",
+					Count:    1,
+				},
+				{
+					Duration: "3d",
+					Count:    1,
+				},
+			},
+		},
+		{
+			description: "returned order same as requested order random",
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().AddDate(0, -4, 0),
+				},
+			},
+			durations: []string{"3M", "3d", "2w", "1w", "1M"},
+			expectedResponse: []*response.CountedDuration{
+				{
+					Duration: "3M",
+					Count:    1,
+				},
+				{
+					Duration: "3d",
+					Count:    1,
+				},
+				{
+					Duration: "2w",
+					Count:    1,
+				},
+				{
+					Duration: "1w",
+					Count:    1,
+				},
+				{
+					Duration: "1M",
+					Count:    1,
+				},
+			},
+		},
 	}
 
 	for _, testCase := range cases {
@@ -207,22 +299,12 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 			require.NoError(t, err)
 
 			assert.Equal(t, len(testCase.expectedResponse), len(actualResponse.CountedDurations))
-			for _, expected := range testCase.expectedResponse {
-				actualFound, found := findMatchingCountedDurations(expected, actualResponse.CountedDurations)
+			for index, expected := range testCase.expectedResponse {
+				actual := actualResponse.CountedDurations[index]
 
-				require.Truef(t, found, "Did not find expected duration %s", expected.Duration)
-				assert.Equal(t, expected.Count, actualFound.Count)
+				assert.Equal(t, expected.Duration, actual.Duration)
+				assert.Equal(t, expected.Count, actual.Count)
 			}
 		})
 	}
-}
-
-func findMatchingCountedDurations(needle *response.CountedDuration,
-	haystack []*response.CountedDuration) (*response.CountedDuration, bool) {
-	for _, hay := range haystack {
-		if needle.Duration == hay.Duration {
-			return hay, true
-		}
-	}
-	return nil, false
 }

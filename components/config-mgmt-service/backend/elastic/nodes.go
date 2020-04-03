@@ -427,14 +427,11 @@ func (es Backend) GetErrors(size int32, filters map[string][]string) ([]*backend
 
 func (es Backend) MissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
 	var (
-		aggTag    = "date_range"
+		aggTag    = "MissingNodeDurationCounts"
 		mainQuery = elastic.NewBoolQuery()
 	)
 
-	// This is using the custom_search_aggs_bucket_date_range because it need to set the missing option
-	dateRangeAgg := NewDateRangeAggregation().Field(backend.CheckIn).
-		Format("yyyy-MM-dd'T'HH:mm:ssZ").
-		Missing(time.Time{}.Format(time.RFC3339)) // count all nodes that do not have a create date
+	dateRangeAgg := elastic.NewDateRangeAggregation().Field(backend.CheckIn)
 
 	for _, duration := range durations {
 		dateRangeAgg.AddUnboundedFromWithKey(duration, "now-"+duration)
@@ -470,14 +467,20 @@ func (es Backend) MissingNodeDurationCounts(durations []string) ([]backend.Count
 	}
 
 	countedDurations := make([]backend.CountedDuration, len(rangeAggRes.Buckets))
-
-	// reversing the order
-	lastIndex := len(rangeAggRes.Buckets) - 1
-	for index := range rangeAggRes.Buckets {
-		responseIndex := lastIndex - index
-		countedDurations[responseIndex].Count = int32(rangeAggRes.Buckets[index].DocCount)
-		countedDurations[responseIndex].Duration = rangeAggRes.Buckets[index].Key
+	for index, duration := range durations {
+		countedDurations[index].Count = findMatchingDurationCount(duration, rangeAggRes.Buckets)
+		countedDurations[index].Duration = duration
 	}
 
 	return countedDurations, nil
+}
+
+func findMatchingDurationCount(key string,
+	buckets []*elastic.AggregationBucketRangeItem) int32 {
+	for _, bucket := range buckets {
+		if key == bucket.Key {
+			return int32(bucket.DocCount)
+		}
+	}
+	return 0
 }
