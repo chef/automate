@@ -4,7 +4,7 @@
 [isVisible]="canDeleteNodes"
 (deleteNodes)="onDeleteNodes($event)">
 </app-deletable-node-control>
-<chef-table class="node-list">
+<chef-table-new class="node-list">
   <caption class="visually-hidden">Node List Table with Node States</caption>
   <chef-table-header>
     <chef-table-row slim>
@@ -182,7 +182,7 @@
       </chef-table-row>
     </ng-container>
   </chef-table-body>
-</chef-table>
+</chef-table-new>
 
 <app-page-picker
   [total]="totalNodes"
