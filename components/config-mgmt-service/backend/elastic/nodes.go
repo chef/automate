@@ -427,9 +427,12 @@ func (es Backend) GetErrors(size int32, filters map[string][]string) ([]*backend
 
 func (es Backend) MissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
 	var (
-		aggTag    = "MissingNodeDurationCounts"
-		mainQuery = elastic.NewBoolQuery()
+		aggTag = "MissingNodeDurationCounts"
 	)
+	filters := map[string][]string{
+		"exists": []string{"true"},
+	}
+	mainQuery := newBoolQueryFromFilters(filters)
 
 	dateRangeAgg := elastic.NewDateRangeAggregation().Field(backend.CheckIn)
 

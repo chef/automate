@@ -279,6 +279,43 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "All nodes",
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now(),
+				},
+				{
+					Checkin: time.Now().AddDate(0, -4, 0),
+				},
+			},
+			durations: []string{"0h"},
+			expectedResponse: []*response.CountedDuration{
+				{
+					Duration: "0h",
+					Count:    2,
+				},
+			},
+		},
+		{
+			description: "Exclude deleted nodes",
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now(),
+					Exists:  false,
+				},
+				{
+					Checkin: time.Now().AddDate(0, -4, 0),
+				},
+			},
+			durations: []string{"0h"},
+			expectedResponse: []*response.CountedDuration{
+				{
+					Duration: "0h",
+					Count:    2,
+				},
+			},
+		},
 	}
 
 	for _, testCase := range cases {
@@ -306,5 +343,49 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 				assert.Equal(t, expected.Count, actual.Count)
 			}
 		})
+	}
+}
+
+func TestMissingNodeRangeCountsExcludeDeletedNodes(t *testing.T) {
+
+	// Get all nodes. There should only be one
+	expectedResponse := []*response.CountedDuration{
+		{
+			Duration: "0h",
+			Count:    1,
+		},
+	}
+
+	// Add two nodes one deleted and one not
+	nodes := []iBackend.Node{
+		{
+			Checkin: time.Now(),
+			Exists:  false,
+		},
+		{
+			Checkin: time.Now().AddDate(0, -4, 0),
+			Exists:  true,
+		},
+	}
+
+	for index := range nodes {
+		nodeID := newUUID()
+		nodes[index].NodeInfo.EntityUuid = nodeID
+		nodes[index].NodeName = strconv.Itoa(index)
+	}
+
+	suite.IngestNodes(nodes)
+	defer suite.DeleteAllDocuments()
+
+	actualResponse, err := cfgmgmt.MissingNodeDurationCounts(context.Background(),
+		&request.MissingNodeDurationCounts{Durations: []string{"0h"}})
+	require.NoError(t, err)
+
+	assert.Equal(t, len(expectedResponse), len(actualResponse.CountedDurations))
+	for index, expected := range expectedResponse {
+		actual := actualResponse.CountedDurations[index]
+
+		assert.Equal(t, expected.Duration, actual.Duration)
+		assert.Equal(t, expected.Count, actual.Count)
 	}
 }
