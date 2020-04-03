@@ -269,7 +269,7 @@ export class JobEditComponent implements OnDestroy {
           const rule = RRule.parseString(job.recurrence);
           const hasUntil = !!rule.until;
           const hasRepeat = !!rule.interval;
-          const start = moment.utc(rule.dtstart);
+          const start = moment(rule.dtstart);
 
           scheduleGroup.get('start.datetime').setValue({
             month: start.month(),
@@ -280,7 +280,7 @@ export class JobEditComponent implements OnDestroy {
           });
 
           if (hasUntil) {
-            const end = moment.utc(rule.until);
+            const end = moment(rule.until);
             scheduleGroup.get('end.include').setValue(hasUntil);
             scheduleGroup.get('end.datetime').setValue({
               month: end.month(),
