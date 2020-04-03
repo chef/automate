@@ -59,7 +59,7 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	defer res.Body.Close()
+	defer res.Body.Close() // nolint: errcheck
 
 	return &response.Roles{
 		Roles: fromAPIToListRoles(result),
@@ -86,7 +86,7 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	defer res1.Body.Close()
+	defer res1.Body.Close() // nolint: errcheck
 
 	if result.Total == 0 {
 		return nil, status.Error(codes.Internal, err.Error())

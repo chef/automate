@@ -115,7 +115,7 @@ func (s *Server) GetCookbookFileContent(ctx context.Context, req *request.Cookbo
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "unable to fetch: %s", err.Error())
 	}
-	defer res.Body.Close()
+	defer res.Body.Close() // nolint: errcheck
 
 	return &response.CookbookFileContent{
 		Content: writer.String(),
