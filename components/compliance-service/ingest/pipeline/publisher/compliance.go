@@ -48,8 +48,10 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 			errChannels := make([]<-chan error, 0)
 			for _, profile := range msg.InspecProfiles {
 				// Only add the profile to the metadata store if it's missing
-				if _, ok := msg.Shared.EsProfilesMissingMeta[profile.Sha256]; !ok {
+				if _, ok := msg.Shared.EsProfilesMissingMeta[profile.Sha256]; ok {
 					errChannels = append(errChannels, insertInspecProfile(msg, profile, client))
+				} else {
+					logrus.Debugf("storeCompliance: meta for profile %s already exists, no need to insert", profile.Sha256)
 				}
 			}
 			errChannels = append(errChannels, insertInspecSummary(msg, client))

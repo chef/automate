@@ -74,8 +74,9 @@ type ESInSpecReport struct {
 	ChefTags         []string `json:"chef_tags"`
 	// Elastic won't accept empty string for a field of data type 'ip'. Defining IPAddress
 	// as pointer so we can assign null to it when we get a report without an IP
-	IPAddress *string `json:"ipaddress"`
-	FQDN      string  `json:"fqdn"`
+	IPAddress    *string `json:"ipaddress"`
+	FQDN         string  `json:"fqdn"`
+	RunTimeLimit float32 `json:"run_time_limit"`
 }
 
 type ESInSpecSummaryProfile struct {

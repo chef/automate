@@ -4,6 +4,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
+	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -32,13 +33,14 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 
 			for i, profile := range msg.Report.Profiles {
 				reportProfilesShas[i] = profile.Sha256
-				reportProfilesShasMissingMetaArr = append(reportProfilesShasMissingMetaArr, profile.Sha256)
 				if profile.Name == "" {
+					reportProfilesShasMissingMetaArr = append(reportProfilesShasMissingMetaArr, profile.Sha256)
 					reportProfilesShasMissingMetaMap[profile.Sha256] = profile.Title
 				}
 			}
 
 			esProfilesMissingMeta, err := client.ProfilesMissing(reportProfilesShas)
+
 			if err != nil {
 				grpcErr := status.Errorf(codes.Internal, "Unable to find profiles missing meta in the backend: %s", err)
 				msg.FinishProcessingCompliance(grpcErr)
@@ -65,11 +67,10 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 					msg.FinishProcessingCompliance(grpcErr)
 					continue
 				}
-
 				for _, repProfile := range msg.Report.Profiles {
 					if repProfile.Name == "" {
 						esProfile := esProfilesForMissingMeta[repProfile.Sha256]
-						if esProfile != nil {
+						if esProfile == nil {
 							grpcErr := status.Errorf(codes.Internal, "Unable to find profile '%s' metadata in the profiles store.", repProfile.Sha256)
 							msg.FinishProcessingCompliance(grpcErr)
 							continue
@@ -77,7 +78,26 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 						repProfile.Name = esProfile.Name
 						repProfile.Copyright = esProfile.Copyright
 						repProfile.CopyrightEmail = esProfile.CopyrightEmail
-						logrus.Debugf("!!!!!!!!!!!!!!!!! updated repProfile %+v", repProfile)
+
+						esControlsHash := make(map[string]relaxting.ESInspecControl, len(esProfile.Controls))
+						for _, esControl := range esProfile.Controls {
+							esControlsHash[esControl.ID] = esControl
+						}
+
+						for _, repControl := range repProfile.Controls {
+							if val, ok := esControlsHash[repControl.Id]; ok {
+								repControl.Title = val.Title
+								repControl.Impact = val.Impact
+								//repControl.Refs = val.Refs
+								//repControl.Tags = val.Tags
+								//  waiver data
+							} else {
+								grpcErr := status.Errorf(codes.Internal, "Unable to find control '%s' in ES profile '%s' (%s)", repControl.Id, repProfile.Title, repProfile.Sha256)
+								msg.FinishProcessingCompliance(grpcErr)
+								continue
+							}
+						}
+						//logrus.Debugf("!!!3 updated repProfile %+v", repProfile)
 					}
 				}
 			}

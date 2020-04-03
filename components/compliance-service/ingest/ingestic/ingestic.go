@@ -128,10 +128,7 @@ func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []st
 	idsQuery.Ids(allHashes...)
 	esIndex := relaxting.CompProfilesIndex
 
-	fsc := elastic.NewFetchSourceContext(true).Include(
-		"took",
-		"version",
-	)
+	fsc := elastic.NewFetchSourceContext(false)
 
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
@@ -168,6 +165,7 @@ func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []st
 		}
 	}
 
+	logrus.Debugf("ProfilesMissing returning missingHashes: %v\n", missingHashes)
 	return missingHashes, nil
 }
 
@@ -175,10 +173,9 @@ func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []st
 // reports being ingested without profile metadata information
 func (backend *ESClient) GetProfilesMissingMetadata(profileIDs []string) (map[string]*relaxting.ESInspecProfile, error) {
 	esProfilesMeta := make(map[string]*relaxting.ESInspecProfile, 0)
-	esIndex := relaxting.CompProfilesIndex
-
 	idsQuery := elastic.NewIdsQuery(mappings.DocType)
 	idsQuery.Ids(profileIDs...)
+	esIndex := relaxting.CompProfilesIndex
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"took",
@@ -222,6 +219,8 @@ func (backend *ESClient) GetProfilesMissingMetadata(profileIDs []string) (map[st
 			return esProfilesMeta, errors.Wrap(err, "GetProfilesMissingMetadata unable to get results")
 		}
 		if results.TotalHits() > 0 && len(results.Hits.Hits) > 0 {
+			logrus.Debugf("GetProfilesMissingMetadata got %d profiles in %d milliseconds\n", results.TotalHits(), results.TookInMillis)
+
 			for _, hit := range results.Hits.Hits {
 				esProfile := &relaxting.ESInspecProfile{}
 				if err := json.Unmarshal(*hit.Source, &esProfile); err != nil {
@@ -238,7 +237,6 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 	index := mapping.IndexTimeseriesFmt(endTime)
 	data.DailyLatest = true
 	data.ReportID = id
-	logrus.Debugf("***SSSSSSS*** Inserting InsertInspecSummary data for node %s: %+v", (*data).NodeName, *data)
 	// Add the summary document to the compliance timeseries index using the specified report id as document id
 	_, err := backend.client.Index().
 		Index(index).
@@ -260,8 +258,6 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	index := mapping.IndexTimeseriesFmt(endTime)
 	data.DailyLatest = true
 	data.ReportID = id
-
-	logrus.Debugf("***RRRRRRRRR*** InsertInspecReport data for node %s: %+v", (*data).NodeName, *data)
 	// Add the report document to the compliance timeseries index using the specified report id as document id
 	_, err := backend.client.Index().
 		Index(index).
@@ -279,7 +275,6 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 
 func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxting.ESInspecProfile) error {
 	mapping := mappings.ComplianceProfiles
-	logrus.Debugf("***PPPPPPPPP** InsertInspecProfile data for profile %s: %+v", (*data).Name, *data)
 	err := backend.addDataToIndexWithID(ctx, mapping, data.Sha256, data)
 	return err
 }

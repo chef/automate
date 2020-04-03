@@ -36,4 +36,5 @@ message Report {
 	string fqdn = 38;
 	repeated chef.automate.domain.compliance.common.Kv tags = 39;
 	string automate_manager_id = 40;
+	float run_time_limit = 41;
 }
