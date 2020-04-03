@@ -25,7 +25,7 @@ type AffectedNodes struct {
 	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty" toml:"org_id,omitempty" mapstructure:"org_id,omitempty"`
 	// ID of the Server.
 	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty" toml:"server_id,omitempty" mapstructure:"server_id,omitempty"`
-	// Type of the chef object (e.g. 'cookbooks', 'roles', etc).
+	// Type of the chef object (e.g. 'cookbooks', 'roles', 'chef_environment').
 	ChefType string `protobuf:"bytes,3,opt,name=chef_type,json=chefType,proto3" json:"chef_type,omitempty" toml:"chef_type,omitempty" mapstructure:"chef_type,omitempty"`
 	// Name of the chef object.
 	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`

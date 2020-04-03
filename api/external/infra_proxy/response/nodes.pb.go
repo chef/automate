@@ -21,7 +21,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type AffectedNodes struct {
-	// List of the nodes which are affected by the resource (e.g. 'cookbooks', 'roles').
+	// List of the nodes which are affected by the chef object.
 	Nodes                []*NodeAttribute `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`

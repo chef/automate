@@ -20,15 +20,25 @@ func (s *Server) GetAffectedNodes(ctx context.Context, req *request.AffectedNode
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	res, err := c.FetchAffectedNodes(ctx, req.ChefType, req.Name, req.Version)
+	res, err := c.fetchAffectedNodes(ctx, req.ChefType, req.Name, req.Version)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
 
 	return &response.AffectedNodes{
 		Nodes: fromSearchAPIToAffectedNodes(*res),
 	}, nil
 }
 
-// FetchAffectedNodes get the nodes used by chef object
-func (c *ChefClient) FetchAffectedNodes(ctx context.Context, chefType, name, version string) (*chef.SearchResult, error) {
+// fetchAffectedNodes get the nodes used by chef object
+// URL is being constructed based on the chefType, name, and version
+// chefType: should be one of the cookbooks, roles and chef_environment value
+// For cookbooks: it would be 'cookbooks_COOKBOOK_NAME_version:COOKBOOK_VERSION'
+// For other chef objects
+// roles: it would be 'roles:ROLE_NAME'
+// environments: it would be 'chef_environment:ENVIRONMENT_NAME'
+// policyfiles: it would be 'chef_environment:POLICY_FILES_GROUP_NAME'
+func (c *ChefClient) fetchAffectedNodes(ctx context.Context, chefType, name, version string) (*chef.SearchResult, error) {
 	query := map[string]interface{}{
 		"name":             []string{"name"},
 		"platform":         []string{"platform"},
@@ -38,6 +48,7 @@ func (c *ChefClient) FetchAffectedNodes(ctx context.Context, chefType, name, ver
 		"uptime":           []string{"uptime"},
 		"ohai_time":        []string{"ohai_time"},
 	}
+
 	var url string
 	if version != "" {
 		url = fmt.Sprintf("%s_%s_version:%s", chefType, name, version)

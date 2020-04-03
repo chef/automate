@@ -360,7 +360,7 @@ func init() {
           },
           {
             "name": "chef_type",
-            "description": "Type of the chef object (e.g. 'cookbooks', 'roles', etc).",
+            "description": "Type of the chef object (e.g. 'cookbooks', 'roles', 'chef_environment').",
             "in": "path",
             "required": true,
             "type": "string"
@@ -963,7 +963,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NodeAttribute"
           },
-          "description": "List of the nodes which are affected by the resource (e.g. 'cookbooks', 'roles')."
+          "description": "List of the nodes which are affected by the chef object."
         }
       }
     },
