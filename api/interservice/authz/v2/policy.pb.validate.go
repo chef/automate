@@ -203,12 +203,7 @@ func (m *CreatePolicyReq) Validate() error {
 		}
 	}
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		return CreatePolicyReqValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-	}
+	// no validation rules for Name
 
 	_CreatePolicyReq_Members_Unique := make(map[string]struct{}, len(m.GetMembers()))
 
@@ -909,12 +904,7 @@ func (m *UpdatePolicyReq) Validate() error {
 
 	}
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		return UpdatePolicyReqValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-	}
+	// no validation rules for Name
 
 	_UpdatePolicyReq_Projects_Unique := make(map[string]struct{}, len(m.GetProjects()))
 
@@ -1856,12 +1846,7 @@ func (m *UpdateRoleReq) Validate() error {
 		}
 	}
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		return UpdateRoleReqValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-	}
+	// no validation rules for Name
 
 	if len(m.GetActions()) < 1 {
 		return UpdateRoleReqValidationError{
@@ -2649,12 +2634,7 @@ func (m *CreateRoleReq) Validate() error {
 		}
 	}
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		return CreateRoleReqValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-	}
+	// no validation rules for Name
 
 	if len(m.GetActions()) < 1 {
 		return CreateRoleReqValidationError{
