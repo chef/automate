@@ -91,22 +91,31 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(getAllCookbooksForOrgStatus),
-      this.store.select(orgFromRoute),
-      this.store.select(allCookbooks)
+      this.store.select(orgFromRoute)
     ]).pipe(
-        filter(([getOrgSt, getCookbooksSt, _orgState, _allCookbooksState]) =>
-          getOrgSt === EntityStatus.loadingSuccess &&
-          getCookbooksSt === EntityStatus.loadingSuccess),
-        filter(([_getOrgSt, _getCookbooksSt, orgState, allCookbooksState]) =>
-          !isNil(orgState) && !isNil(allCookbooksState)),
+        filter(([getOrgSt, _orgState]) =>
+          getOrgSt === EntityStatus.loadingSuccess),
+        filter(([_getOrgSt, orgState]) =>
+          !isNil(orgState)),
         takeUntil(this.isDestroyed)
-      ).subscribe(([_getOrgSt, _getCookbooksSt, orgState, allCookbooksState]) => {
+      ).subscribe(([_getOrgSt, orgState]) => {
         this.org = { ...orgState };
-        this.cookbooks = allCookbooksState;
         this.updateOrgForm.controls['name'].setValue(this.org.name);
         this.updateOrgForm.controls['admin_user'].setValue(this.org.admin_user);
         this.updateOrgForm.controls['admin_key'].setValue(this.org.admin_key);
+      });
+
+    combineLatest([
+      this.store.select(getAllCookbooksForOrgStatus),
+      this.store.select(allCookbooks)
+    ]).pipe(
+        filter(([getCookbooksSt, _allCookbooksState]) =>
+          getCookbooksSt === EntityStatus.loadingSuccess),
+        filter(([_getCookbooksSt, allCookbooksState]) =>
+          !isNil(allCookbooksState)),
+        takeUntil(this.isDestroyed)
+      ).subscribe(([ _getCookbooksSt, allCookbooksState]) => {
+        this.cookbooks = allCookbooksState;
       });
   }
 
@@ -118,8 +127,15 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
   saveOrg(): void {
     this.saveSuccessful = false;
     this.saving = true;
+    const updatedOrg = {
+      id: this.org.id,
+      server_id: this.org.server_id,
+      name: this.updateOrgForm.controls.name.value.trim(),
+      admin_user: this.updateOrgForm.controls.admin_user.value.trim(),
+      admin_key: this.updateOrgForm.controls.admin_key.value
+    };
     this.store.dispatch(new UpdateOrg({
-      org: this.org
+      org: updatedOrg
     }));
 
     const pendingSave = new Subject<boolean>();
