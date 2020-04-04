@@ -66,14 +66,18 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 
 			// If one of the profiles coming in is missing the metadata, we pull the metadata from the backend for it to complement the report
 			if len(reportProfilesShasMissingMetaArr) > 0 {
-				// Pull the profiles metadata from the backend
+				// Pull the minimum required profiles metadata from the backend
 				esProfilesForMissingMeta, err := client.GetProfilesMissingMetadata(reportProfilesShasMissingMetaArr)
 				if err != nil {
 					grpcErr := status.Errorf(codes.Internal, "Unable to get the profiles missing metadata: %s", err)
 					msg.FinishProcessingCompliance(grpcErr)
 					continue
 				}
+
+				// Loop through all report profiles to find the ones missing metadata
 				for _, repProfile := range msg.Report.Profiles {
+					// With profile 'name' being a require property, a profile missing it indicates that metadata stripping has
+					// occurred. We need to complement it now with backend data to ensure a complete ingestion
 					if repProfile.Name == "" {
 						esProfile := esProfilesForMissingMeta[repProfile.Sha256]
 						if esProfile == nil {
@@ -81,22 +85,28 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 							msg.FinishProcessingCompliance(grpcErr)
 							continue
 						}
+
 						repProfile.Name = esProfile.Name
 
 						esControlsHash := make(map[string]relaxting.ESInspecControl, len(esProfile.Controls))
 						for _, esControl := range esProfile.Controls {
 							esControlsHash[esControl.ID] = esControl
 						}
+
+						// Complement report controls with metadata from ElasticSearch
 						for _, repControl := range repProfile.Controls {
 							if esControl, ok := esControlsHash[repControl.Id]; ok {
 								repControl.Title = esControl.Title
+								repControl.Impact = esControl.Impact
 
 								var controlTags structpb.Struct
 								err := (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(esControl.Tags), &controlTags)
 								if err == nil {
 									repControl.Tags = &controlTags
 								}
+
 								repControl.Refs = gateway.GetStructArray("data", []byte(fmt.Sprintf(`{"data":%s}`, esControl.Refs)))
+								// repControl.Refs = gateway.GetStructArray("", []byte(esControl.Refs))
 							} else {
 								grpcErr := status.Errorf(codes.Internal, "Unable to find control '%s' in ES profile '%s' (%s)", repControl.Id, repProfile.Title, repProfile.Sha256)
 								msg.FinishProcessingCompliance(grpcErr)
