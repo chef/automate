@@ -72,24 +72,6 @@ func (a *InfraProxyServer) GetCookbook(ctx context.Context, r *gwreq.Cookbook) (
 	}, nil
 }
 
-// GetCookbookAffectedNodes get the nodes using cookbook
-func (a *InfraProxyServer) GetCookbookAffectedNodes(ctx context.Context, r *gwreq.Cookbook) (*gwres.CookbookAffectedNodes, error) {
-
-	req := &infra_req.Cookbook{
-		OrgId:   r.OrgId,
-		Name:    r.Name,
-		Version: r.Version,
-	}
-	res, err := a.client.GetCookbookAffectedNodes(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-
-	return &gwres.CookbookAffectedNodes{
-		Nodes: parseNodeAttributeFromRes(res.Nodes),
-	}, nil
-}
-
 // GetCookbookFileContent get the nodes using cookbook
 func (a *InfraProxyServer) GetCookbookFileContent(ctx context.Context, r *gwreq.CookbookFileContent) (*gwres.CookbookFileContent, error) {
 
@@ -178,22 +160,4 @@ func parseCookbookAccess(cc *infra_res.CookbookAccess) *gwres.CookbookAccess {
 		Update: cc.Grant,
 		Delete: cc.Delete,
 	}
-}
-
-func parseNodeAttributeFromRes(nodes []*infra_res.NodeAttribute) []*gwres.NodeAttribute {
-	nl := make([]*gwres.NodeAttribute, len(nodes))
-
-	for i, node := range nodes {
-		nl[i] = &gwres.NodeAttribute{
-			Name:        node.Name,
-			CheckIn:     node.CheckIn,
-			ChefGuid:    node.ChefGuid,
-			Environment: node.Environment,
-			Platform:    node.Platform,
-			PolicyGroup: node.PolicyGroup,
-			Uptime:      node.Uptime,
-		}
-	}
-
-	return nl
 }

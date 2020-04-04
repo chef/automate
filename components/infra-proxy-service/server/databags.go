@@ -16,13 +16,13 @@ import (
 // GetDataBags get data bags list
 func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*response.DataBags, error) {
 
-	client, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
 	if req.Name != "" {
-		dataBags, err := client.DataBags.ListItems(req.Name)
+		dataBags, err := c.client.DataBags.ListItems(req.Name)
 		if err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
@@ -33,7 +33,7 @@ func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*respo
 
 	}
 
-	dataBags, err := client.DataBags.List()
+	dataBags, err := c.client.DataBags.List()
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -45,12 +45,12 @@ func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*respo
 
 // GetDataBagItem get data bag
 func (s *Server) GetDataBagItem(ctx context.Context, req *request.DataBag) (*response.DataBag, error) {
-	client, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	ic, err := client.DataBags.GetItem(req.Name, req.Item)
+	ic, err := c.client.DataBags.GetItem(req.Name, req.Item)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}

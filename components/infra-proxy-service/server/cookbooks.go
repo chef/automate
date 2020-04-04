@@ -3,9 +3,7 @@ package server
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"sort"
-	"strconv"
 
 	chef "github.com/chef/go-chef"
 	"google.golang.org/grpc/codes"
@@ -15,26 +13,15 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
-// NodeAttribute attributes of the node
-type NodeAttribute struct {
-	Name            string `json:"name"`
-	ChefGUID        string `json:"chef_guid"`
-	CheckIn         string `json:"checkin"`
-	ChefEnvironment string `json:"chef_environment"`
-	Platform        string `json:"platform"`
-	PolicyGroup     string `json:"policy_group"`
-	Uptime          string `json:"uptime"`
-}
-
 // GetCookbooks get cookbooks list
 func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*response.Cookbooks, error) {
 
-	client, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	cookbookList, err := client.Cookbooks.List()
+	cookbookList, err := c.client.Cookbooks.List()
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -47,18 +34,17 @@ func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*res
 // GetCookbooksAvailableVersions get cookbooks list with all available versions
 func (s *Server) GetCookbooksAvailableVersions(ctx context.Context, req *request.CookbooksAvailableVersions) (*response.CookbooksAvailableVersions, error) {
 
-	client, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
 	numVersions := req.NumVersions
-
 	if numVersions == "" {
 		numVersions = "all"
 	}
 
-	cookbookList, err := client.Cookbooks.ListAvailableVersions(numVersions)
+	cookbookList, err := c.client.Cookbooks.ListAvailableVersions(numVersions)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -71,9 +57,9 @@ func (s *Server) GetCookbooksAvailableVersions(ctx context.Context, req *request
 // GetCookbook get cookbook detail
 func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*response.Cookbook, error) {
 
-	client, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
 	if req.Name == "" {
@@ -82,12 +68,11 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 	}
 
 	version := req.Version
-
 	if version == "" {
 		version = "_latest"
 	}
 
-	cookbook, err := client.Cookbooks.GetVersion(req.Name, version)
+	cookbook, err := c.client.Cookbooks.GetVersion(req.Name, version)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -113,50 +98,24 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 	}, nil
 }
 
-// GetCookbookAffectedNodes get the nodes using cookbook
-func (s *Server) GetCookbookAffectedNodes(ctx context.Context, req *request.Cookbook) (*response.CookbookAffectedNodes, error) {
-
-	query := map[string]interface{}{
-		"name":             []string{"name"},
-		"platform":         []string{"platform"},
-		"chef_environment": []string{"chef_environment"},
-		"policy_group":     []string{"policy_group"},
-		"chef_guid":        []string{"chef_guid"},
-		"uptime":           []string{"uptime"},
-		"ohai_time":        []string{"ohai_time"},
-	}
-
-	client, err := s.createClient(ctx, req.OrgId)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
-	}
-
-	res, err := client.Search.PartialExec("node", fmt.Sprintf("cookbooks_%s_version:%s", req.Name, req.Version), query)
-
-	return &response.CookbookAffectedNodes{
-		Nodes: fromSearchAPIToCookbookNodes(res),
-	}, nil
-}
-
 // GetCookbookFileContent get the data file content of the cookbook
 func (s *Server) GetCookbookFileContent(ctx context.Context, req *request.CookbookFileContent) (*response.CookbookFileContent, error) {
 	var writer bytes.Buffer
-	client, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	clientReq, err := client.NewRequest("GET", req.Url, nil)
+	clientReq, err := c.client.NewRequest("GET", req.Url, nil)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "client request error: %s", err.Error())
 	}
 	clientReq.Header.Set("Accept", "text/plain")
-
-	res, err := client.Do(clientReq, &writer)
+	res, err := c.client.Do(clientReq, &writer)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "unable to fetch: %s", err.Error())
 	}
-	defer res.Body.Close()
+	defer res.Body.Close() // nolint: errcheck
 
 	return &response.CookbookFileContent{
 		Content: writer.String(),
@@ -204,7 +163,6 @@ func fromAPIToListCookbooks(al chef.CookbookListResult) []*response.CookbookVers
 	cl := make([]*response.CookbookVersion, len(al))
 
 	index := 0
-
 	for k, v := range al {
 		cl[index] = &response.CookbookVersion{
 			Name:    k,
@@ -245,58 +203,4 @@ func fromAPIToListAvailableCookbooks(al chef.CookbookListResult) []*response.Coo
 	})
 
 	return cl
-}
-
-func fromSearchAPIToCookbookNodes(sr chef.SearchResult) []*response.NodeAttribute {
-	results := make([]*response.NodeAttribute, len(sr.Rows))
-	index := 0
-	for _, element := range sr.Rows {
-		node := getNodeAttributeFromRes(element)
-		results[index] = &response.NodeAttribute{
-			Name:        node.Name,
-			CheckIn:     node.CheckIn,
-			ChefGuid:    node.ChefGUID,
-			Environment: node.ChefEnvironment,
-			Platform:    node.Platform,
-			PolicyGroup: node.PolicyGroup,
-			Uptime:      node.Uptime,
-		}
-		index++
-	}
-
-	return results
-}
-
-func getNodeAttributeFromRes(data interface{}) NodeAttribute {
-	m := data.(map[string]interface{})["data"].(map[string]interface{})
-	node := NodeAttribute{}
-	if name, ok := m["name"].(string); ok {
-		node.Name = name
-	}
-
-	if checkin, ok := m["ohai_time"].(float64); ok {
-		node.CheckIn = strconv.FormatFloat(checkin, 'E', -1, 64)
-	}
-
-	if chefGUID, ok := m["chef_guid"].(string); ok {
-		node.ChefGUID = chefGUID
-	}
-
-	if environment, ok := m["chef_environment"].(string); ok {
-		node.ChefEnvironment = environment
-	}
-
-	if platform, ok := m["platform"].(string); ok {
-		node.Platform = platform
-	}
-
-	if policyGroup, ok := m["policy_group"].(string); ok {
-		node.PolicyGroup = policyGroup
-	}
-
-	if uptime, ok := m["uptime"].(string); ok {
-		node.Uptime = uptime
-	}
-
-	return node
 }
