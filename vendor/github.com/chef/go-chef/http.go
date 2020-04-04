@@ -59,6 +59,8 @@ type Client struct {
 	Universe         *UniverseService
 	UpdatedSince     *UpdatedSinceService
 	Users            *UserService
+	Policies         *PolicyService
+	PolicyGroups     *PolicyGroupService
 }
 
 // Config contains the configuration options for a chef client. This structure is used primarily in the NewClient() constructor in order to setup a proper client object
@@ -185,6 +187,8 @@ func NewClient(cfg *Config) (*Client, error) {
 	c.UpdatedSince = &UpdatedSinceService{client: c}
 	c.Universe = &UniverseService{client: c}
 	c.Users = &UserService{client: c}
+	c.Policies = &PolicyService{client: c}
+	c.PolicyGroups = &PolicyGroupService{client: c}
 	return c, nil
 }
 

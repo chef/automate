@@ -13,6 +13,7 @@ import "api/external/infra_proxy/request/clients.proto";
 import "api/external/infra_proxy/request/databags.proto";
 import "api/external/infra_proxy/request/environments.proto";
 import "api/external/infra_proxy/request/nodes.proto";
+import "api/external/infra_proxy/request/policyfiles.proto";
 
 import "api/external/infra_proxy/response/orgs.proto";
 import "api/external/infra_proxy/response/servers.proto";
@@ -22,6 +23,7 @@ import "api/external/infra_proxy/response/clients.proto";
 import "api/external/infra_proxy/response/databags.proto";
 import "api/external/infra_proxy/response/environments.proto";
 import "api/external/infra_proxy/response/nodes.proto";
+import "api/external/infra_proxy/response/policyfiles.proto";
 
 import "api/external/common/version/version.proto";
 
@@ -224,5 +226,20 @@ service InfraProxy {
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
     option (chef.automate.api.iam.policy).action = "infra:infraServerOrgNodes:get";
+  };
+
+  rpc GetPolicyfiles (infra_proxy.request.Policyfiles) returns (infra_proxy.response.Policyfiles) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/policyfiles";
+    option (chef.automate.api.policy).resource = "infra:infaServers:{server_id}:orgs:{org_id}/policyfiles";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:infaServers:{server_id}:orgs:{org_id}:policyfiles";
+    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgPolicyfiles:list";
+  };
+  rpc GetPolicyfile (infra_proxy.request.Policyfile) returns (infra_proxy.response.Policyfile) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}";
+    option (chef.automate.api.policy).resource = "infra:infaServers:{server_id}:orgs:{org_id}/policyfiles";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:infaServers:{server_id}:orgs:{org_id}:policyfiles";
+    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgPolicyfiles:get";
   };
 }

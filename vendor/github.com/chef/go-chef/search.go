@@ -47,7 +47,7 @@ func (q SearchQuery) Do(client *Client) (res SearchResult, err error) {
 	return
 }
 
-// DoPartial will execute the search query on the client with partal mapping
+// DoPartial will execute the search query on the client with partial mapping
 func (q SearchQuery) DoPartial(client *Client, params map[string]interface{}) (res SearchResult, err error) {
 	fullUrl := fmt.Sprintf("search/%s", q)
 

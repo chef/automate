@@ -417,4 +417,38 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetPolicyfiles", "infra:infaServers:{server_id}:orgs:{org_id}:policyfiles", "infra:infraServerOrgPolicyfiles:list", "GET", "/infra/servers/{server_id}/orgs/{org_id}/policyfiles", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.Policyfiles); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetPolicyfile", "infra:infaServers:{server_id}:orgs:{org_id}:policyfiles", "infra:infraServerOrgPolicyfiles:get", "GET", "/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.Policyfile); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				case "revision_id":
+					return m.RevisionId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }

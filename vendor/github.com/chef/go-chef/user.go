@@ -82,7 +82,7 @@ func (e *UserService) VerboseList(filters ...string) (userlist map[string]UserVe
 
 // Create Creates a User on the chef server
 // /users POST
-//  201 =  sucesss
+//  201 =  success
 //  400 - invalid  (missing display_name, email,( password or external) among other things)
 //        username must be lower case without spaces
 //  403 - unauthorized
@@ -116,7 +116,7 @@ func (e *UserService) Delete(name string) (err error) {
 // /users/USERNAME GET
 // 200 - got it
 // 401 - not authenticated
-// 403 - not authorizated
+// 403 - not authorized
 // 404 - user doesn't exist
 //
 // Chef API docs: https://docs.chef.io/api_chef_server.html#users-name
@@ -130,7 +130,7 @@ func (e *UserService) Get(name string) (user User, err error) {
 // /users/USERNAME PUT
 // 200 - updated
 // 401 - not authenticated
-// 403 - not authorizated
+// 403 - not authorized
 // 404 - user doesn't exist
 // 409 - new user name is already in use
 //
@@ -146,7 +146,7 @@ func (e *UserService) Update(name string, user User) (userUpdate UserResult, err
 // /users/USERNAME/keys GET
 // 200 - successful
 // 401 - not authenticated
-// 403 - not authorizated
+// 403 - not authorized
 // 404 - user doesn't exist
 //
 // Chef API docs: https://docs.chef.io/api_chef_server/#usersuserkeys
@@ -160,7 +160,7 @@ func (e *UserService) ListUserKeys(name string) (userkeys []UserKeyItem, err err
 // /users/USERNAME/keys POST
 // 201 - created
 // 401 - not authenticated
-// 403 - not authorizated
+// 403 - not authorized
 // 404 - user doesn't exist
 // 409 - new name is already in use
 //
@@ -176,7 +176,7 @@ func (e *UserService) AddUserKey(name string, keyadd UserKey) (userkey UserKeyIt
 // /users/USERNAME/keys/KEYNAME DELETE
 // 200 - successful
 // 401 - not authenticated
-// 403 - not authorizated
+// 403 - not authorized
 // 404 - user doesn't exist
 //
 // Chef API docs: https://docs.chef.io/api_chef_server/#usersuserkeys
@@ -190,7 +190,7 @@ func (e *UserService) DeleteUserKey(username string, keyname string) (userkey Us
 // /users/USERNAME/keys/KEYNAME GET
 // 200 - successful
 // 401 - not authenticated
-// 403 - not authorizated
+// 403 - not authorized
 // 404 - user doesn't exist
 //
 // Chef API docs: https://docs.chef.io/api_chef_server/#usersuserkeys
@@ -204,13 +204,13 @@ func (e *UserService) GetUserKey(username string, keyname string) (userkey UserK
 // /users/USERNAME/keys/KEYNAME PUT
 // 200 - successful
 // 401 - not authenticated
-// 403 - not authorizated
+// 403 - not authorized
 // 404 - user doesn't exist
 //
 // Chef API docs: https://docs.chef.io/api_chef_server/#usersuserkeys
-func (e *UserService) UpdateUserKey(username string, keyname string, keyupd UserKey) (userkey UserKey, err error) {
+func (e *UserService) UpdateUserKey(username string, keyname string, keyUp UserKey) (userkey UserKey, err error) {
 	url := fmt.Sprintf("users/%s/keys/%s", username, keyname)
-	body, err := JSONReader(keyupd)
+	body, err := JSONReader(keyUp)
 	err = e.client.magicRequestDecoder("PUT", url, body, &userkey)
 	return
 }

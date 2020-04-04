@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package chef.automate.domain.infra_proxy.response;
+option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
+
+message Policyfiles {
+    // List of policy files.
+    repeated PolicyfileListItem policies = 1;
+}
+
+message PolicyfileListItem {
+    // Name of the policy file.
+    string name = 1;
+    // Revision ID of the policy file.
+    string revision_id = 3;
+    // Policy group of the policy file.
+    string policy_group = 2;
+}
+
+message Policyfile {
+    // Name of the policy file.
+    string name = 1;
+    // Name of the policy group.
+    string policy_group = 2;
+    // Revision Id of the policy.
+    string revision_id = 3;
+    // Run list associated with the policy.
+    repeated string run_list = 4;
+    // Included policy lock files.
+    IncludedPolicyLocks included_policy_locks = 5;
+    // Named the run list associated with the policy.
+    repeated NamedRunList named_run_list = 6;
+    // Stringified json of the default attributes.
+    string default_attributes = 7;
+    // Stringified json of the override attributes.
+    string override_attributes = 8;
+    // Solution dependencies of the policy file.
+	string solution_dependencies = 9;
+}
+
+message IncludedPolicyLocks {
+    // Name of the included policy file. 
+    string name = 1;
+    // Revision id of the included policy file.
+    string revision_id = 2;
+    // Source options of the included policy file.
+    SourceOptions source_options = 3;
+}
+
+message SourceOptions {
+    // Path of the source options.
+    string path = 1;
+}
+
+message NamedRunList {
+    // Name of the run list.
+    string name = 1;
+    // Run list associated with the policy.
+    repeated string run_list = 2;
+}

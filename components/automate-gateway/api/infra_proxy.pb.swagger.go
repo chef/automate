@@ -777,6 +777,84 @@ func init() {
         ]
       }
     },
+    "/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
+      "get": {
+        "operationId": "GetPolicyfiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Policyfiles"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Id of the Server.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Id of the Org.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
+      "get": {
+        "operationId": "GetPolicyfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Policyfile"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Id of the Server.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Id of the Org.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Name of the policy file.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "revision_id",
+            "description": "Revision ID of the policy file.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
         "operationId": "GetRoles",
@@ -1413,6 +1491,39 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.IncludedPolicyLocks": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the included policy file."
+        },
+        "revision_id": {
+          "type": "string",
+          "description": "Revision id of the included policy file."
+        },
+        "source_options": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SourceOptions",
+          "description": "Source options of the included policy file."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.NamedRunList": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the run list."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Run list associated with the policy."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.NodeAttribute": {
       "type": "object",
       "properties": {
@@ -1469,6 +1580,82 @@ func init() {
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Policyfile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the policy file."
+        },
+        "policy_group": {
+          "type": "string",
+          "description": "Name of the policy group."
+        },
+        "revision_id": {
+          "type": "string",
+          "description": "Revision Id of the policy."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Run list associated with the policy."
+        },
+        "included_policy_locks": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.IncludedPolicyLocks",
+          "description": "Included policy lock files."
+        },
+        "named_run_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NamedRunList"
+          },
+          "description": "Named the run list associated with the policy."
+        },
+        "default_attributes": {
+          "type": "string",
+          "description": "Stringified json of the default attributes."
+        },
+        "override_attributes": {
+          "type": "string",
+          "description": "Stringified json of the override attributes."
+        },
+        "solution_dependencies": {
+          "type": "string",
+          "description": "Solution dependencies of the policy file."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.PolicyfileListItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the policy file."
+        },
+        "revision_id": {
+          "type": "string",
+          "description": "Revision ID of the policy file."
+        },
+        "policy_group": {
+          "type": "string",
+          "description": "Policy group of the policy file."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Policyfiles": {
+      "type": "object",
+      "properties": {
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileListItem"
+          },
+          "description": "List of policy files."
         }
       }
     },
@@ -1597,6 +1784,15 @@ func init() {
         "orgs_count": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.SourceOptions": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path of the source options."
         }
       }
     },
