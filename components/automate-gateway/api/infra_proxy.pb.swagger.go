@@ -332,7 +332,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}/{version}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}": {
       "get": {
         "operationId": "GetAffectedNodes",
         "responses": {
@@ -375,8 +375,8 @@ func init() {
           {
             "name": "version",
             "description": "Version of the chef object.",
-            "in": "path",
-            "required": true,
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],

@@ -1941,6 +1941,10 @@ func local_request_InfraProxy_GetEnvironment_0(ctx context.Context, marshaler ru
 
 }
 
+var (
+	filter_InfraProxy_GetAffectedNodes_0 = &utilities.DoubleArray{Encoding: map[string]int{"server_id": 0, "org_id": 1, "chef_type": 2, "name": 3}, Base: []int{1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 2, 3, 4, 5}}
+)
+
 func request_InfraProxy_GetAffectedNodes_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.AffectedNodes
 	var metadata runtime.ServerMetadata
@@ -1996,15 +2000,11 @@ func request_InfraProxy_GetAffectedNodes_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
 	}
 
-	val, ok = pathParams["version"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "version")
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-
-	protoReq.Version, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version", err)
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_InfraProxy_GetAffectedNodes_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.GetAffectedNodes(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -2067,15 +2067,8 @@ func local_request_InfraProxy_GetAffectedNodes_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
 	}
 
-	val, ok = pathParams["version"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "version")
-	}
-
-	protoReq.Version, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "version", err)
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_InfraProxy_GetAffectedNodes_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.GetAffectedNodes(ctx, &protoReq)
@@ -3223,7 +3216,7 @@ var (
 
 	pattern_InfraProxy_GetEnvironment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "environments", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetAffectedNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"infra", "servers", "server_id", "orgs", "org_id", "affected-nodes", "chef_type", "name", "version"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetAffectedNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"infra", "servers", "server_id", "orgs", "org_id", "affected-nodes", "chef_type", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
