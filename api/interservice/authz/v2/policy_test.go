@@ -670,17 +670,6 @@ func TestValidationCreateRole(t *testing.T) {
 			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"test"},
 		},
-		"empty Name": &v2.CreateRoleReq{
-			Id:       "test",
-			Name:     "",
-			Actions:  []string{"cfgmgmt:nodes:*"},
-			Projects: []string{"test"},
-		},
-		"missing Name": &v2.CreateRoleReq{
-			Id:       "test",
-			Actions:  []string{"cfgmgmt:nodes:*"},
-			Projects: []string{"test"},
-		},
 		"ID contains invalid characters": &v2.CreateRoleReq{
 			Id:       "invalid~~~",
 			Name:     "this is valid ~ fun characters",
