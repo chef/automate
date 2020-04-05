@@ -26,18 +26,18 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 	}
 
 	if req.AdminUser == "" {
-		s.service.Logger.Debug("incomplete create org request: missing org admin_user")
-		return nil, status.Error(codes.InvalidArgument, "must supply org admin_user")
+		s.service.Logger.Debug("incomplete create org request: missing org admin user")
+		return nil, status.Error(codes.InvalidArgument, "must supply org admin user")
 	}
 
 	if req.AdminKey == "" {
-		s.service.Logger.Debug("incomplete create org request: missing org admin_key")
-		return nil, status.Error(codes.InvalidArgument, "must supply org admin_key")
+		s.service.Logger.Debug("incomplete create org request: missing org admin key")
+		return nil, status.Error(codes.InvalidArgument, "must supply org admin key")
 	}
 
 	if req.ServerId == "" {
-		s.service.Logger.Debug("incomplete create org request: missing server id")
-		return nil, status.Error(codes.InvalidArgument, "must supply server id")
+		s.service.Logger.Debug("incomplete create org request: missing server ID")
+		return nil, status.Error(codes.InvalidArgument, "must supply server ID")
 	}
 
 	newSecret := &secrets.Secret{
@@ -71,7 +71,7 @@ func (s *Server) GetOrgs(ctx context.Context, req *request.GetOrgs) (*response.G
 
 	serverID, err := uuid.FromString(req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org server_id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org server ID: %s", err.Error())
 	}
 
 	orgsList, err := s.service.Storage.GetOrgs(ctx, serverID)
@@ -91,7 +91,7 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 
 	UUID, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
 	org, err := s.service.Storage.GetOrg(ctx, UUID)
@@ -123,7 +123,7 @@ func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*
 
 	serverID, err := uuid.FromString(req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org server_id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org server ID: %s", err.Error())
 	}
 
 	org, err := s.service.Storage.GetOrgByName(ctx, req.Name, serverID)
@@ -149,7 +149,7 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 
 	UUID, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
 	org, err := s.service.Storage.DeleteOrg(ctx, UUID)
@@ -173,25 +173,25 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 	defer cancel()
 
 	if req.Id == "" {
-		s.service.Logger.Debug("incomplete update org request: missing org id")
-		return nil, status.Error(codes.InvalidArgument, "must supply org id")
+		s.service.Logger.Debug("incomplete update org request: missing org ID")
+		return nil, status.Error(codes.InvalidArgument, "must supply org ID")
 	}
 	if req.Name == "" {
 		s.service.Logger.Debug("incomplete update org request: missing org name")
 		return nil, status.Error(codes.InvalidArgument, "must supply org name")
 	}
 	if req.AdminUser == "" {
-		s.service.Logger.Debug("incomplete update org request: missing org admin_user")
-		return nil, status.Error(codes.InvalidArgument, "must supply org admin_user")
+		s.service.Logger.Debug("incomplete update org request: missing org admin user")
+		return nil, status.Error(codes.InvalidArgument, "must supply org admin user")
 	}
 	if req.ServerId == "" {
-		s.service.Logger.Debug("incomplete update org request: missing server id")
-		return nil, status.Error(codes.InvalidArgument, "must supply server id")
+		s.service.Logger.Debug("incomplete update org request: missing server ID")
+		return nil, status.Error(codes.InvalidArgument, "must supply server ID")
 	}
 
 	ID, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
 	org, err := s.service.Storage.EditOrg(ctx, storage.Org{
