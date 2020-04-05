@@ -17,9 +17,9 @@ func TestValidate(t *testing.T) {
 
 	// These are the cases return simple error instances
 	fails := map[string][]string{
-		"password is empty or all whitespace":                              {"", "        "},
-		"password does not contain enough distinct characters (minimum 3)": {"aaaaaaaaaa", "ababababababa"},
-		"password is too short (must be at least 8 characters)":            {"foo", "short"},
+		"a password is required and must contain at least one non-whitespace character": {"", "        "},
+		"password does not contain enough distinct characters (minimum 3)":              {"aaaaaaaaaa", "ababababababa"},
+		"password is too short (must be at least 8 characters)":                         {"foo", "short"},
 	}
 	passes := []string{
 		"password",

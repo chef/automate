@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"regexp"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/pkg/errors"
@@ -21,6 +22,8 @@ import (
 	"github.com/chef/automate/lib/tracing"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
+
+var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
 // NewGRPCServer returns a server that provides our services: clients, users,
 // and authentication requests.
@@ -104,6 +107,11 @@ func (s *Server) GetUser(ctx context.Context, req *local_user.Email) (*local_use
 func (s *Server) CreateUser(ctx context.Context, req *local_user.CreateUserReq) (*local_user.User, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
+
+	err := validateUserInputs(req.Name, req.Email)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := s.validator.Validate(req.Password); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, constants.PasswordValidationErrorFormat, err)
@@ -190,6 +198,11 @@ func (s *Server) UpdateSelf(ctx context.Context, req *local_user.UpdateSelfReq) 
 	},
 	}
 
+	err := validateUserInputs(req.Name, req.Email)
+	if err != nil {
+		return nil, err
+	}
+
 	if req.Password != "" {
 		if req.PreviousPassword == "" {
 			return nil, status.Error(codes.InvalidArgument,
@@ -238,6 +251,11 @@ func (s *Server) UpdateUser(ctx context.Context, req *local_user.UpdateUserReq) 
 	},
 	}
 
+	err := validateUserInputs(req.Name, req.Email)
+	if err != nil {
+		return nil, err
+	}
+
 	// Update hash if we want a new password, otherwise pass empty hash to dex.
 	if req.Password != "" {
 		updatedHash, err := s.validateAndHashPassword(ctx, req.Password)
@@ -254,6 +272,18 @@ func (s *Server) UpdateUser(ctx context.Context, req *local_user.UpdateUserReq) 
 	}
 
 	return toUserResp(us), nil
+}
+
+func validateUserInputs(name, email string) error {
+	if emptyOrWhitespaceOnlyRE.MatchString(name) {
+		return status.Error(codes.InvalidArgument,
+			"a user name is required and must contain at least one non-whitespace character")
+	}
+	if emptyOrWhitespaceOnlyRE.MatchString(email) {
+		return status.Error(codes.InvalidArgument,
+			"a user email is required and must contain at least one non-whitespace character")
+	}
+	return nil
 }
 
 func (s *Server) validateAndHashPassword(_ context.Context, password string) ([]byte, error) {

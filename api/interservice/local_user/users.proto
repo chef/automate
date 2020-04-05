@@ -24,7 +24,7 @@ message CreateUserReq {
   string id = 1;
 
   // forbid empty strings
-  string name = 2 [(validate.rules).string.min_len = 1];
+  string name = 2;
 
   // Note: we're explicitly more strict than email (RFC 1034), although PGV
   // knows how to validate an email address using
@@ -57,7 +57,7 @@ message UpdateUserReq {
   // email (aka username) via update, but leaving it in since 1) it doesn't hurt and
   // 2) keep it consistent if we allow it in the future.
   string email = 2 [(validate.rules).string.pattern = "^[[:alnum:]_.+@-]+$"];
-  string name = 3 [(validate.rules).string.min_len = 1];
+  string name = 3;
 
   // Note: for UpdateUserReq, the password is optional
   string password = 4;
@@ -67,7 +67,7 @@ message UpdateUserReq {
 message UpdateSelfReq {
   string id = 1 [(validate.rules).string.min_len = 1];
   string email = 2 [(validate.rules).string.pattern = "^[[:alnum:]_.+@-]+$"];
-  string name = 3 [(validate.rules).string.min_len = 1];
+  string name = 3;
 
   // Note: for UpdateSelfReq, the password and previous_password are optional,
   // but if passed, they must both be passed.
