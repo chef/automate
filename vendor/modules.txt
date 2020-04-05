@@ -100,7 +100,7 @@ github.com/census-instrumentation/opencensus-proto/gen-go/resource/v1
 github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1
 # github.com/cespare/xxhash/v2 v2.1.1
 github.com/cespare/xxhash/v2
-# github.com/chef/go-chef v0.4.1-0.20200403221625-4ab727f0c909
+# github.com/chef/go-chef v0.4.1-0.20200409082755-21937e140680
 github.com/chef/go-chef
 # github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816
 github.com/chef/toml

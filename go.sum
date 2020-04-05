@@ -86,8 +86,8 @@ github.com/census-instrumentation/opencensus-proto v0.2.1 h1:glEXhBS5PSLLv4IXzLA
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash/v2 v2.1.1 h1:6MnRN8NT7+YBpUIWxHtefFZOKTAPgGjpQSxqLNn0+qY=
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
-github.com/chef/go-chef v0.4.1-0.20200403221625-4ab727f0c909 h1:w4nQ2WaWsgHfVeAiGd8Mgii6gC9lJ/4MBQoxMcynOUo=
-github.com/chef/go-chef v0.4.1-0.20200403221625-4ab727f0c909/go.mod h1:t2ibR+UF8MM+ZYLRPoM+NwZeu4mc9zaDqsdKGVzf9io=
+github.com/chef/go-chef v0.4.1-0.20200409082755-21937e140680 h1:kUjMr0sRALGAcFFJtJz0yv2Ge9TS0+zQshwQUltge8s=
+github.com/chef/go-chef v0.4.1-0.20200409082755-21937e140680/go.mod h1:t2ibR+UF8MM+ZYLRPoM+NwZeu4mc9zaDqsdKGVzf9io=
 github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816 h1:FA3vWzOqbxQIowYe4AbsdC18JCZzLQc7xQ86FrCxLmw=
 github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816/go.mod h1:WzupinluQEwU43AC1/UZItixzo5R849ewfPDB2ZMDDg=
 github.com/circonus-labs/circonus-gometrics v2.3.1+incompatible/go.mod h1:nmEj6Dob7S7YxXgwXpfOuvO54S+tGdZdw9fuRZt25Ag=

@@ -14,12 +14,12 @@ import (
 // GetPolicyfiles get policy files list
 func (s *Server) GetPolicyfiles(ctx context.Context, req *request.Policyfiles) (*response.Policyfiles, error) {
 
-	client, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	policyGroups, err := client.PolicyGroups.List()
+	policyGroups, err := c.client.PolicyGroups.List()
 
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -32,12 +32,12 @@ func (s *Server) GetPolicyfiles(ctx context.Context, req *request.Policyfiles) (
 
 // GetPolicyfile get the policy file
 func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*response.Policyfile, error) {
-	client, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	policy, err := client.Policies.GetRevisionDetails(req.Name, req.RevisionId)
+	policy, err := c.client.Policies.GetRevisionDetails(req.Name, req.RevisionId)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
