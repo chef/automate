@@ -56,10 +56,12 @@ func validateRuleInputs(id string,
 	projectID string, name string, ruleType RuleType, conditions []Condition) error {
 
 	if emptyOrWhitespaceOnlyRE.MatchString(id) {
-		return errors.New("a rule id must contain non-whitespace characters")
+		return errors.New(
+			"a rule id is required and must contain at least one non-whitespace character")
 	}
 	if emptyOrWhitespaceOnlyRE.MatchString(name) {
-		return errors.New("a rule name must contain non-whitespace characters")
+		return errors.New(
+			"a rule name is required and must contain at least one non-whitespace character")
 	}
 	if emptyOrWhitespaceOnlyRE.MatchString(projectID) {
 		return errors.New("a rule id must have an associated project_id")

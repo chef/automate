@@ -52,10 +52,12 @@ func NewProject(
 
 func validateProjectInputs(id string, name string) error {
 	if emptyOrWhitespaceOnlyRE.MatchString(name) {
-		return errors.New("a project name must contain non-whitespace characters")
+		return errors.New(
+			"a project name is required and must contain at least one non-whitespace character")
 	}
 	if emptyOrWhitespaceOnlyRE.MatchString(id) {
-		return errors.New("a project id must contain non-whitespace characters")
+		return errors.New(
+			"a project id is required and must contain at least one non-whitespace character")
 	}
 	return nil
 }

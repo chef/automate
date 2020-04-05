@@ -70,10 +70,12 @@ func NewUpdateRole(id string, name string, actions []string, projects []string) 
 
 func validateRoleInputs(id string, name string, actions []string, projects []string) error {
 	if emptyOrWhitespaceOnlyRE.MatchString(id) {
-		return errors.New("a role id must contain non-whitespace characters")
+		return errors.New(
+			"a role id is required and must contain at least one non-whitespace character")
 	}
 	if emptyOrWhitespaceOnlyRE.MatchString(name) {
-		return errors.New("a role name must contain non-whitespace characters")
+		return errors.New(
+			"a role name is required and must contain at least one non-whitespace character")
 	}
 	if len(actions) == 0 {
 		return errors.New("a role must contain at least one action")
