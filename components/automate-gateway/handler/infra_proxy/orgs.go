@@ -77,7 +77,6 @@ func (a *InfraProxyServer) UpdateOrg(ctx context.Context, r *gwreq.UpdateOrg) (*
 		Id:        r.Id,
 		Name:      r.Name,
 		AdminUser: r.AdminUser,
-		AdminKey:  r.AdminKey,
 		ServerId:  r.ServerId,
 		Projects:  r.Projects,
 	}
@@ -109,17 +108,21 @@ func fromUpstreamOrg(t *infra_res.Org) *gwres.Org {
 		Id:        t.GetId(),
 		Name:      t.GetName(),
 		AdminUser: t.GetAdminUser(),
-		AdminKey:  t.GetAdminKey(),
 		ServerId:  t.GetServerId(),
 		Projects:  t.GetProjects(),
 	}
 }
 
-func fromUpstreamOrgs(orgs []*infra_res.Org) []*gwres.Org {
-	ts := make([]*gwres.Org, len(orgs))
+func fromUpstreamOrgs(orgs []*infra_res.OrgListItem) []*gwres.OrgListItem {
+	ts := make([]*gwres.OrgListItem, len(orgs))
 
 	for i, org := range orgs {
-		ts[i] = fromUpstreamOrg(org)
+		ts[i] = &gwres.OrgListItem{
+			Id:        org.GetId(),
+			Name:      org.GetName(),
+			AdminUser: org.GetAdminUser(),
+			ServerId:  org.GetServerId(),
+		}
 	}
 
 	return ts

@@ -40,9 +40,9 @@ func (p *postgres) insertOrg(ctx context.Context,
 	err = p.db.QueryRowContext(ctx,
 		`INSERT INTO orgs (id, name, admin_user, admin_key, server_id, projects, created_at, updated_at)
 		VALUES (uuid_generate_v4(), $1, $2, $3, $4, $5, now(), now())
-		RETURNING id, name, admin_user, admin_key, server_id, projects, created_at, updated_at`,
+		RETURNING id, name, admin_user, server_id, projects, created_at, updated_at`,
 		name, adminUser, adminKey, serverID, pq.Array(projects)).
-		Scan(&org.ID, &org.Name, &org.AdminUser, &org.AdminKey, &org.ServerId, pq.Array(&org.Projects), &org.CreatedAt, &org.UpdatedAt)
+		Scan(&org.ID, &org.Name, &org.AdminUser, &org.ServerId, pq.Array(&org.Projects), &org.CreatedAt, &org.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
 	}
@@ -150,11 +150,11 @@ func (p *postgres) EditOrg(ctx context.Context, org storage.Org) (storage.Org, e
 	var o storage.Org
 	err = tx.QueryRowContext(ctx,
 		`UPDATE orgs
-		SET name = $2, admin_user = $3, admin_key = $4, projects = $5, updated_at = now()
-		WHERE id = $1 AND projects_match(projects, $6::TEXT[])
-		RETURNING id, name, admin_user, admin_key, server_id, projects, created_at, updated_at;`,
-		org.ID, org.Name, org.AdminUser, org.AdminKey, pq.Array(org.Projects), pq.Array(projectsFilter)).
-		Scan(&o.ID, &o.Name, &o.AdminUser, &o.AdminKey, &o.ServerId, pq.Array(&o.Projects), &o.CreatedAt, &o.UpdatedAt)
+		SET name = $2, admin_user = $3, projects = $4, updated_at = now()
+		WHERE id = $1 AND projects_match(projects, $5::TEXT[])
+		RETURNING id, name, admin_user, server_id, projects, created_at, updated_at;`,
+		org.ID, org.Name, org.AdminUser, pq.Array(org.Projects), pq.Array(projectsFilter)).
+		Scan(&o.ID, &o.Name, &o.AdminUser, &o.ServerId, pq.Array(&o.Projects), &o.CreatedAt, &o.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
 	}
@@ -175,7 +175,7 @@ func (p *postgres) GetOrgs(ctx context.Context, serverID uuid.UUID) ([]storage.O
 
 	var orgs []storage.Org
 	rows, err := p.db.QueryContext(ctx,
-		`SELECT o.id, o.name, o.admin_user, o.admin_key, o.server_id, o.projects, o.updated_at, o.created_at
+		`SELECT o.id, o.name, o.admin_user, o.server_id
 		FROM orgs o
 		WHERE o.server_id = $1 AND projects_match(o.projects, $2::TEXT[])`,
 		serverID, pq.Array(projectsFilter))
@@ -190,8 +190,7 @@ func (p *postgres) GetOrgs(ctx context.Context, serverID uuid.UUID) ([]storage.O
 
 	for rows.Next() {
 		org := storage.Org{}
-		if err := rows.Scan(&org.ID, &org.Name, &org.AdminUser, &org.AdminKey, &org.ServerId,
-			pq.Array(&org.Projects), &org.CreatedAt, &org.UpdatedAt); err != nil {
+		if err := rows.Scan(&org.ID, &org.Name, &org.AdminUser, &org.ServerId); err != nil {
 			return nil, err // TODO: don't fail it all? handle this more gracefully?
 		}
 		orgs = append(orgs, org)

@@ -99,17 +99,12 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 		return nil, service.ParseStorageError(err, req, "org")
 	}
 
-	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.AdminKey})
-	if err != nil {
-		return nil, err
-	}
-
 	return &response.GetOrg{
 		Org: &response.Org{
 			Id:        org.ID.String(),
 			Name:      org.Name,
 			AdminUser: org.AdminUser,
-			AdminKey:  GetOrgAdminKeyFrom(secret),
+			AdminKey:  org.AdminKey,
 			ServerId:  org.ServerId,
 			Projects:  org.Projects,
 		},
@@ -136,17 +131,12 @@ func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*
 		return nil, service.ParseStorageError(err, req, "org")
 	}
 
-	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.AdminKey})
-	if err != nil {
-		return nil, err
-	}
-
 	return &response.GetOrg{
 		Org: &response.Org{
 			Id:        org.ID.String(),
 			Name:      org.Name,
 			AdminUser: org.AdminUser,
-			AdminKey:  GetOrgAdminKeyFrom(secret),
+			AdminKey:  org.AdminKey,
 			ServerId:  org.ServerId,
 		},
 	}, nil
@@ -177,7 +167,7 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 	}, nil
 }
 
-// UpdateOrg updates an org in the db via post
+// UpdateOrg updates an org in the db via PUT
 func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*response.UpdateOrg, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -194,57 +184,23 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		s.service.Logger.Debug("incomplete update org request: missing org admin_user")
 		return nil, status.Error(codes.InvalidArgument, "must supply org admin_user")
 	}
-	if req.AdminKey == "" {
-		s.service.Logger.Debug("incomplete update org request: missing org admin_key")
-		return nil, status.Error(codes.InvalidArgument, "must supply org admin_key")
-	}
 	if req.ServerId == "" {
 		s.service.Logger.Debug("incomplete update org request: missing server id")
 		return nil, status.Error(codes.InvalidArgument, "must supply server id")
 	}
 
-	id, err := uuid.FromString(req.Id)
+	ID, err := uuid.FromString(req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
 	}
 
-	oldOrg, err := s.service.Storage.GetOrg(ctx, id)
-	if err != nil {
-		return nil, service.ParseStorageError(err, req, "org")
-	}
-
-	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: oldOrg.AdminKey})
-	if err != nil {
-		return nil, err
-	}
-
-	rawAdminKey := req.AdminKey
-
-	newSecret := &secrets.Secret{
-		Id:   secret.GetId(),
-		Name: "infra-proxy-service-admin-key",
-		Type: "ssh",
-		Data: []*query.Kv{
-			{Key: "username", Value: req.AdminUser},
-			{Key: "key", Value: rawAdminKey},
-		},
-	}
-
-	_, err = s.service.Secrets.Update(ctx, newSecret)
-	if err != nil {
-		return nil, err
-	}
-
-	orgStruct := storage.Org{
-		ID:        id,
+	org, err := s.service.Storage.EditOrg(ctx, storage.Org{
+		ID:        ID,
 		Name:      req.Name,
 		AdminUser: req.AdminUser,
-		AdminKey:  oldOrg.AdminKey,
 		ServerId:  req.ServerId,
 		Projects:  req.Projects,
-	}
-
-	org, err := s.service.Storage.EditOrg(ctx, orgStruct)
+	})
 	if err != nil {
 		return nil, service.ParseStorageError(err, req, "org")
 	}
@@ -254,7 +210,6 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 			Id:        org.ID.String(),
 			Name:      org.Name,
 			AdminUser: org.AdminUser,
-			AdminKey:  rawAdminKey,
 			ServerId:  org.ServerId,
 			Projects:  org.Projects,
 		},
@@ -267,18 +222,22 @@ func fromStorageOrg(s storage.Org) *response.Org {
 		Id:        s.ID.String(),
 		Name:      s.Name,
 		AdminUser: s.AdminUser,
-		AdminKey:  s.AdminKey,
 		ServerId:  s.ServerId,
 		Projects:  s.Projects,
 	}
 }
 
 // Create a response.OrgsList from an array of storage.Org
-func fromStorageToListOrgs(sl []storage.Org) []*response.Org {
-	tl := make([]*response.Org, len(sl))
+func fromStorageToListOrgs(sl []storage.Org) []*response.OrgListItem {
+	tl := make([]*response.OrgListItem, len(sl))
 
 	for i, org := range sl {
-		tl[i] = fromStorageOrg(org)
+		tl[i] = &response.OrgListItem{
+			Id:        org.ID.String(),
+			Name:      org.Name,
+			AdminUser: org.AdminUser,
+			ServerId:  org.ServerId,
+		}
 	}
 
 	return tl

@@ -166,8 +166,6 @@ func init() {
 					return m.Name
 				case "admin_user":
 					return m.AdminUser
-				case "admin_key":
-					return m.AdminKey
 				case "server_id":
 					return m.ServerId
 				default:

@@ -168,6 +168,7 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -190,6 +191,7 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -222,12 +224,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "ID of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -250,12 +254,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "ID of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -278,12 +284,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "ID of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -316,12 +324,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Name of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -882,22 +892,27 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the Org."
         },
         "admin_user": {
-          "type": "string"
+          "type": "string",
+          "description": "Admin user of the Org."
         },
         "admin_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Admin Key of the Org."
         },
         "server_id": {
-          "type": "string"
+          "type": "string",
+          "description": "ID of the Server."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Projects of the Org."
         }
       }
     },
@@ -922,25 +937,27 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "ID of the Org."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the Org."
         },
         "admin_user": {
-          "type": "string"
-        },
-        "admin_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Admin user of the Org."
         },
         "server_id": {
-          "type": "string"
+          "type": "string",
+          "description": "ID of the server."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Projects under which org is being associated."
         }
       }
     },
@@ -1244,7 +1261,8 @@ func init() {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "title": "Org detail"
         }
       }
     },
@@ -1290,7 +1308,8 @@ func init() {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "title": "Org detail"
         }
       }
     },
@@ -1379,7 +1398,8 @@ func init() {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "title": "Org detail"
         }
       }
     },
@@ -1389,8 +1409,9 @@ func init() {
         "orgs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
-          }
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.OrgListItem"
+          },
+          "description": "List of the org item."
         }
       }
     },
@@ -1450,25 +1471,48 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "ID of the Org."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the Org."
         },
         "admin_user": {
-          "type": "string"
-        },
-        "admin_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Admin user of the Org."
         },
         "server_id": {
-          "type": "string"
+          "type": "string",
+          "description": "ID of the Server."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Projects under which org is being associated."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.OrgListItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of the Org."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the Org."
+        },
+        "admin_user": {
+          "type": "string",
+          "description": "Admin user of the Org."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "ID of the Server."
         }
       }
     },
@@ -1604,7 +1648,8 @@ func init() {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "title": "Org detail"
         }
       }
     },
