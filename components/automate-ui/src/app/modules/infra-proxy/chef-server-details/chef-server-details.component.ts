@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
@@ -139,9 +139,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       );
     });
 
-    this.store.pipe(select(updateStatus),
-    takeUntil(this.isDestroyed),
-    filter(state => this.saveInProgress && !pending(state)))
+    this.store.select(updateStatus).pipe(
+      takeUntil(this.isDestroyed),
+      filter(state => this.saveInProgress && !pending(state)))
     .subscribe((state) => {
       this.saveInProgress = false;
       this.saveSuccessful = (state === EntityStatus.loadingSuccess);
