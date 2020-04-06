@@ -118,8 +118,7 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
         this.cookbooks = allCookbooksState;
       });
 
-      this.store.pipe(
-        select(updateStatus),
+      this.store.select(updateStatus).pipe(
         takeUntil(this.isDestroyed),
         filter(state => this.saveInProgress && !pending(state)))
         .subscribe((state) => {
