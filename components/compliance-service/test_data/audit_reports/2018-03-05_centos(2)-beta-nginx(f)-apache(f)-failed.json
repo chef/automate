@@ -29,8 +29,7 @@
     {
       "version": "2.1.0",
       "sha256": "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
-      "title": "DevSec Nginx Baseline"
-      ],
+      "title": "DevSec Nginx Baseline",
       "attributes": [],
       "controls": [
         {
