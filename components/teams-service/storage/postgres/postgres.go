@@ -7,6 +7,8 @@ import (
 
 	"github.com/lib/pq" // adapter for database/sql
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/teams-service/storage"
@@ -96,11 +98,13 @@ func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 func (p *postgres) validateTeamInputs(ctx context.Context,
 	name string, description string, oldProjects, updatedProjects []string, isUpdateRequest bool) error {
 	if emptyOrWhitespaceOnlyRE.MatchString(name) {
-		return errors.New(
+		return status.Error(
+			codes.InvalidArgument,
 			"a team id is required and must contain at least one non-whitespace character")
 	}
 	if emptyOrWhitespaceOnlyRE.MatchString(description) {
-		return errors.New(
+		return status.Error(
+			codes.InvalidArgument,
 			"a team name is required and must contain at least one non-whitespace character")
 	}
 	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{

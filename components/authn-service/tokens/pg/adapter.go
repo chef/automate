@@ -8,6 +8,8 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -50,7 +52,8 @@ func (a *adapter) CreateTokenWithValue(ctx context.Context,
 func (a *adapter) validateTokenInputs(ctx context.Context,
 	description string, oldProjects, updatedProjects []string, isUpdateRequest bool) error {
 	if emptyOrWhitespaceOnlyRE.MatchString(description) {
-		return errors.New(
+		return status.Error(
+			codes.InvalidArgument,
 			"a token name is required and must contain at least one non-whitespace character")
 	}
 
