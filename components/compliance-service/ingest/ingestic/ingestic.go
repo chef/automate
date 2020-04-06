@@ -100,7 +100,7 @@ func (backend *ESClient) createStore(ctx context.Context, indexName string, mapp
 	return error
 }
 
-//ProfileExists returns true if profile exists already in ES.. false if not
+// ProfileExists returns true if profile exists already in ES.. false if not
 func (backend *ESClient) ProfileExists(hash string) (bool, error) {
 	idsQuery := elastic.NewIdsQuery(mappings.DocType)
 	idsQuery.Ids(hash)
@@ -118,6 +118,56 @@ func (backend *ESClient) ProfileExists(hash string) (bool, error) {
 	logrus.Debugf("ProfileExists got %d profiles in %d milliseconds\n", searchResult.TotalHits(), searchResult.TookInMillis)
 
 	return searchResult.TotalHits() > 0, nil
+}
+
+// ProfilesMissing takes an array of profile sha256 IDs and returns back
+// the ones that are missing from the profiles metadata index
+func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []string, err error) {
+	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery.Ids(allHashes...)
+	esIndex := relaxting.CompProfilesIndex
+
+	fsc := elastic.NewFetchSourceContext(true).Include(
+		"took",
+		"version",
+	)
+
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(idsQuery).
+		Size(1000)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrap(err, "ProfilesMissing unable to get Source")
+	}
+	relaxting.LogQueryPartMin(esIndex, source, "ProfilesMissing query searchSource")
+
+	searchResult, err := backend.client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		Do(context.Background())
+
+	if err != nil {
+		return missingHashes, errors.Wrap(err, "ProfilesMissing unable to complete search")
+	}
+
+	logrus.Debugf("ProfilesMissing got %d meta profiles in %d milliseconds\n", searchResult.TotalHits(), searchResult.TookInMillis)
+	existingHashes := make(map[string]struct{}, searchResult.TotalHits())
+
+	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+		for _, hit := range searchResult.Hits.Hits {
+			existingHashes[hit.Id] = struct{}{}
+		}
+	}
+
+	for _, oneHash := range allHashes {
+		if _, ok := existingHashes[oneHash]; !ok {
+			missingHashes = append(missingHashes, oneHash)
+		}
+	}
+
+	return missingHashes, nil
 }
 
 func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, endTime time.Time, data *relaxting.ESInSpecSummary) error {
