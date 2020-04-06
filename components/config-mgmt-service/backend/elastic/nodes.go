@@ -425,7 +425,7 @@ func (es Backend) GetErrors(size int32, filters map[string][]string) ([]*backend
 	return chefErrs, nil
 }
 
-func (es Backend) MissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
+func (es Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
 	var (
 		aggTag = "MissingNodeDurationCounts"
 	)

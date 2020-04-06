@@ -142,7 +142,7 @@ service ConfigMgmt {
   };
 
   /*
-  MissingNodeDurationCounts
+  GetMissingNodeDurationCounts
 
   Returns a count of missing nodes for the provided durations.
 
@@ -151,7 +151,7 @@ service ConfigMgmt {
   infra:nodes:list
   ```
   */
-  rpc MissingNodeDurationCounts(cfgmgmt.request.MissingNodeDurationCounts) returns (cfgmgmt.response.MissingNodeDurationCounts) {
+  rpc GetMissingNodeDurationCounts(cfgmgmt.request.MissingNodeDurationCounts) returns (cfgmgmt.response.MissingNodeDurationCounts) {
     option (google.api.http).get =  "/cfgmgmt/stats/missing_node_duration_counts";
     option (chef.automate.api.policy).resource = "cfgmgmt:stats:missing_node_duration_counts";
     option (chef.automate.api.policy).action = "read";

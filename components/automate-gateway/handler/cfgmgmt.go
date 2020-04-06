@@ -134,7 +134,7 @@ func (s *CfgMgmtServer) GetErrors(ctx context.Context, request *cfgReq.Errors) (
 	return s.cfgMgmtClient.GetErrors(ctx, request)
 }
 
-func (s *CfgMgmtServer) MissingNodeDurationCounts(ctx context.Context,
+func (s *CfgMgmtServer) GetMissingNodeDurationCounts(ctx context.Context,
 	request *cfgReq.MissingNodeDurationCounts) (*cfgRes.MissingNodeDurationCounts, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),
@@ -145,7 +145,7 @@ func (s *CfgMgmtServer) MissingNodeDurationCounts(ctx context.Context,
 		Durations: request.Durations,
 	}
 
-	response, err := s.cfgMgmtClient.MissingNodeDurationCounts(ctx, cfgMgmtRequest)
+	response, err := s.cfgMgmtClient.GetMissingNodeDurationCounts(ctx, cfgMgmtRequest)
 	if err != nil {
 		return &cfgRes.MissingNodeDurationCounts{}, err
 	}

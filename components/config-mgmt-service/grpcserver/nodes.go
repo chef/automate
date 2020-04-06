@@ -358,7 +358,7 @@ func (s *CfgMgmtServer) GetErrors(ctx context.Context, req *extReq.Errors) (*ext
 	return &res, nil
 }
 
-func (s *CfgMgmtServer) MissingNodeDurationCounts(
+func (s *CfgMgmtServer) GetMissingNodeDurationCounts(
 	ctx context.Context,
 	request *pRequest.MissingNodeDurationCounts) (*interserviceResp.MissingNodeDurationCounts, error) {
 	if !ValidDurations(request.Durations) {
@@ -366,7 +366,7 @@ func (s *CfgMgmtServer) MissingNodeDurationCounts(
 			status.Errorf(codes.InvalidArgument, "Parameter 'durations' are incorrect")
 	}
 
-	countedDurations, err := s.client.MissingNodeDurationCounts(request.Durations)
+	countedDurations, err := s.client.GetMissingNodeDurationCounts(request.Durations)
 	if err != nil {
 		return &interserviceResp.MissingNodeDurationCounts{}, status.Errorf(codes.Internal, err.Error())
 	}

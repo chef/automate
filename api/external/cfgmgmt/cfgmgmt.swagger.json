@@ -369,9 +369,9 @@
     },
     "/cfgmgmt/stats/missing_node_duration_counts": {
       "get": {
-        "summary": "MissingNodeDurationCounts",
+        "summary": "GetMissingNodeDurationCounts",
         "description": "Returns a count of missing nodes for the provided durations.\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
-        "operationId": "MissingNodeDurationCounts",
+        "operationId": "GetMissingNodeDurationCounts",
         "responses": {
           "200": {
             "description": "A successful response.",

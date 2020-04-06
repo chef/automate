@@ -66,7 +66,7 @@ type Client interface {
 	GetDeletedCountsTimeSeries(time.Time, time.Time, map[string][]string) ([]CountPeroid, error)
 	GetCreateCountsTimeSeries(time.Time, time.Time, map[string][]string) ([]CountPeroid, error)
 	GetErrors(int32, map[string][]string) ([]*ChefErrorCount, error)
-	MissingNodeDurationCounts(durations []string) ([]CountedDuration, error)
+	GetMissingNodeDurationCounts(durations []string) ([]CountedDuration, error)
 }
 
 // Types that we consume from the ingest-service

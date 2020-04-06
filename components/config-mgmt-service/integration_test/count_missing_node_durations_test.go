@@ -331,7 +331,7 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 			suite.IngestNodes(testCase.nodes)
 			defer suite.DeleteAllDocuments()
 
-			actualResponse, err := cfgmgmt.MissingNodeDurationCounts(context.Background(),
+			actualResponse, err := cfgmgmt.GetMissingNodeDurationCounts(context.Background(),
 				&request.MissingNodeDurationCounts{Durations: testCase.durations})
 			require.NoError(t, err)
 

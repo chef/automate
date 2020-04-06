@@ -47,5 +47,5 @@ service CfgMgmt {
 	rpc ReportExport(chef.automate.domain.cfgmgmt.request.ReportExport) returns (stream chef.automate.domain.cfgmgmt.response.ReportExportData);
 	rpc GetCheckInCountsTimeSeries(chef.automate.domain.cfgmgmt.request.CheckInCountsTimeSeries) returns (chef.automate.domain.cfgmgmt.response.CheckInCountsTimeSeries);
 	rpc GetErrors(chef.automate.api.cfgmgmt.request.Errors) returns (chef.automate.api.cfgmgmt.response.Errors);
-	rpc MissingNodeDurationCounts(chef.automate.domain.cfgmgmt.request.MissingNodeDurationCounts) returns (chef.automate.domain.cfgmgmt.response.MissingNodeDurationCounts);
+	rpc GetMissingNodeDurationCounts(chef.automate.domain.cfgmgmt.request.MissingNodeDurationCounts) returns (chef.automate.domain.cfgmgmt.response.MissingNodeDurationCounts);
 }

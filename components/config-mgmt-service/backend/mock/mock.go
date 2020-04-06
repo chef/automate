@@ -195,6 +195,6 @@ func (m Backend) GetErrors(int32, map[string][]string) ([]*backend.ChefErrorCoun
 	return nil, nil
 }
 
-func (m Backend) MissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
+func (m Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
 	return nil, nil
 }
