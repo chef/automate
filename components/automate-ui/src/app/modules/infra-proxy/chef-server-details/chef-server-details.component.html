@@ -47,7 +47,7 @@
           <chef-form-field id="update-name">
             <label>
                 <span class="label">Name <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="name" type="text" autocomplete="off"
+              <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
                 data-cy="update-chefServer-name">
             </label>
             <chef-error
@@ -58,7 +58,7 @@
           <chef-form-field id="update-description">
             <label>
               <span class="label">Description <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="description" type="text" autocomplete="off"
+              <input chefInput formControlName="description" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
                 data-cy="update-chefServer-description">
             </label>
             <chef-error
@@ -69,7 +69,7 @@
           <chef-form-field id="update-fqdn">
             <label>
               <span class="label">FQDN <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="fqdn" type="text" autocomplete="off"
+              <input chefInput formControlName="fqdn" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
                 data-cy="update-chefServer-fqdn">
             </label>
             <chef-error
@@ -80,7 +80,7 @@
           <chef-form-field id="update-ip_address">    
             <label>
               <span class="label">IP Address <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="ip_address" type="text" autocomplete="off"
+              <input chefInput formControlName="ip_address" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
                 data-cy="update-chefServer-ip_address">
             </label>
             <chef-error
