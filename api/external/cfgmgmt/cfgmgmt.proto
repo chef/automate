@@ -99,6 +99,14 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
 
+  rpc TestRpc (cfgmgmt.request.NodesCounts) returns (cfgmgmt.response.NodesCounts) {
+    option (google.api.http).get = "/cfgmgmt/test";
+    option (chef.automate.api.policy).resource = "cfgmgmt:stats:node_counts";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+
   /*
   GetRunsCounts
 

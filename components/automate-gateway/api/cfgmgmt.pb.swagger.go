@@ -501,6 +501,35 @@ func init() {
         ]
       }
     },
+    "/cfgmgmt/test": {
+      "get": {
+        "operationId": "TestRpc",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodesCounts"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "description": "List of filters to be applied to the node count results.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/cfgmgmt/version": {
       "get": {
         "operationId": "GetVersion",
