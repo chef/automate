@@ -3,7 +3,7 @@
   "node_uuid": "9b9f4e51-b049-4b10-9555-10578916e222",
   "report_uuid": "bb93e1b2-36d6-439e-ac70-cccccccccc15",
   "job_uuid": "74a54a28-c628-4f82-86df-3333333333355",
-  "node_name": "RedHat(2)-beta-nginx(f)-apache(s)-failed",
+  "node_name": "RedHat(2)-beta-apache(s)-should-not-be-ingested",
   "environment": "DevSec Prod beta",
   "roles": ["base_linux", "apache_linux", "nginx-hardening-prod", "dot.role"],
   "recipes": ["apache_extras", "apache_extras::harden", "java::default", "nagios::fix"],

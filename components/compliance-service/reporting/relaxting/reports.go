@@ -291,11 +291,14 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 					t := item.EndTime.Round(1 * time.Second)
 					timestamp, _ := ptypes.TimestampProto(t)
 					report := reportingapi.Report{
-						Id:        hit.Id,
-						NodeId:    item.NodeID,
-						NodeName:  item.NodeName,
-						EndTime:   timestamp,
-						Ipaddress: *item.IPAddress,
+						Id:       hit.Id,
+						NodeId:   item.NodeID,
+						NodeName: item.NodeName,
+						EndTime:  timestamp,
+					}
+
+					if item.IPAddress != nil {
+						report.Ipaddress = *item.IPAddress
 					}
 
 					var controlSummary reporting.NodeControlSummary
