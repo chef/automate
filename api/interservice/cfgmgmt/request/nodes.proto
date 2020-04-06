@@ -30,3 +30,7 @@ message Runs {
   string start = 4;
   string end = 5;
 }
+
+message MissingNodeDurationCounts {
+  repeated string durations = 1;
+}

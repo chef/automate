@@ -2,6 +2,7 @@ package grpcserver
 
 import (
 	"context"
+	"regexp"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -247,6 +248,41 @@ func (s *CfgMgmtServer) GetAttributes(
 		AutomaticValueCount: int32(attribute.AutomaticValueCount),
 		AllValueCount:       int32(attribute.AllValueCount),
 	}, nil
+}
+
+func (s *CfgMgmtServer) GetMissingNodeDurationCounts(
+	ctx context.Context,
+	request *pRequest.MissingNodeDurationCounts) (*interserviceResp.MissingNodeDurationCounts, error) {
+	if !ValidDurations(request.Durations) {
+		return &interserviceResp.MissingNodeDurationCounts{},
+			status.Errorf(codes.InvalidArgument, "Parameter 'durations' are incorrect")
+	}
+
+	countedDurations, err := s.client.GetMissingNodeDurationCounts(request.Durations)
+	if err != nil {
+		return &interserviceResp.MissingNodeDurationCounts{}, status.Errorf(codes.Internal, err.Error())
+	}
+
+	responseCountedDurations := make([]*interserviceResp.CountedDuration, len(countedDurations))
+	for index := range countedDurations {
+		responseCountedDurations[index] = &interserviceResp.CountedDuration{
+			Duration: countedDurations[index].Duration,
+			Count:    countedDurations[index].Count,
+		}
+	}
+
+	return &interserviceResp.MissingNodeDurationCounts{CountedDurations: responseCountedDurations}, nil
+}
+
+func ValidDurations(durations []string) bool {
+	re := regexp.MustCompile(`^\d+[hdwM]$`)
+	for _, duration := range durations {
+		if !re.MatchString(duration) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // backendNodeArrayToMessageArray Casts a 'Backend Node Array' into a 'Proto Message Array'
