@@ -235,3 +235,12 @@ message VersionedCookbook {
   // Version of the cookbook.
 	string version = 2;
 }
+
+message MissingNodeDurationCounts {
+  repeated CountedDuration counted_durations = 1;
+}
+
+message CountedDuration {
+  string duration = 1;
+  int32 count = 2;
+}

@@ -424,3 +424,66 @@ func (es Backend) GetErrors(size int32, filters map[string][]string) ([]*backend
 
 	return chefErrs, nil
 }
+
+func (es Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
+	var (
+		aggTag = "MissingNodeDurationCounts"
+	)
+	filters := map[string][]string{
+		"exists": []string{"true"},
+	}
+	mainQuery := newBoolQueryFromFilters(filters)
+
+	dateRangeAgg := elastic.NewDateRangeAggregation().Field(backend.CheckIn)
+
+	for _, duration := range durations {
+		dateRangeAgg.AddUnboundedFromWithKey(duration, "now-"+duration)
+	}
+
+	searchResult, err := es.client.Search().
+		Index(IndexNodeState).
+		Query(mainQuery).
+		Aggregation(aggTag, dateRangeAgg).
+		Do(context.Background())
+	if err != nil {
+		return []backend.CountedDuration{}, err
+	}
+
+	rangeAggRes, found := searchResult.Aggregations.Range(aggTag)
+	if !found {
+		// This case is if there are no nodes for all the durations
+		// We are creating the buckets manually with zero count
+		countedDurations := make([]backend.CountedDuration, len(durations))
+		for index, duration := range durations {
+			countedDurations[index] = backend.CountedDuration{
+				Duration: duration,
+				Count:    0,
+			}
+		}
+		return countedDurations, nil
+	}
+
+	if len(rangeAggRes.Buckets) != len(durations) {
+		return []backend.CountedDuration{}, errors.NewBackendError(
+			"The number of buckets found is incorrect expected %d actual %d",
+			len(durations), len(rangeAggRes.Buckets))
+	}
+
+	countedDurations := make([]backend.CountedDuration, len(rangeAggRes.Buckets))
+	for index, duration := range durations {
+		countedDurations[index].Count = findMatchingDurationCount(duration, rangeAggRes.Buckets)
+		countedDurations[index].Duration = duration
+	}
+
+	return countedDurations, nil
+}
+
+func findMatchingDurationCount(key string,
+	buckets []*elastic.AggregationBucketRangeItem) int32 {
+	for _, bucket := range buckets {
+		if key == bucket.Key {
+			return int32(bucket.DocCount)
+		}
+	}
+	return 0
+}

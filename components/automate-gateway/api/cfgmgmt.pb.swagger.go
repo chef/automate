@@ -370,6 +370,35 @@ func init() {
         ]
       }
     },
+    "/cfgmgmt/stats/missing_node_duration_counts": {
+      "get": {
+        "summary": "GetMissingNodeDurationCounts\nReturns a count of missing nodes for the provided durations.\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetMissingNodeDurationCounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.MissingNodeDurationCounts"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "durations",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/cfgmgmt/stats/node_counts": {
       "get": {
         "summary": "GetNodesCounts",
@@ -587,6 +616,18 @@ func init() {
         }
       }
     },
+    "chef.automate.api.cfgmgmt.response.CountedDuration": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "chef.automate.api.cfgmgmt.response.Deprecation": {
       "type": "object",
       "properties": {
@@ -661,6 +702,17 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunList"
           },
           "description": "Intentionally blank."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.MissingNodeDurationCounts": {
+      "type": "object",
+      "properties": {
+        "counted_durations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CountedDuration"
+          }
         }
       }
     },
