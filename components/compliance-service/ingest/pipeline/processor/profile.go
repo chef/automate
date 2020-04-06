@@ -47,8 +47,9 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 
 			esProfilesMissingMeta, err := client.ProfilesMissing(reportProfilesShas)
 
+			var grpcErr error
 			if err != nil {
-				grpcErr := status.Errorf(codes.Internal, "Unable to find profiles missing meta in the backend: %s", err)
+				grpcErr = status.Errorf(codes.Internal, "Unable to find profiles missing meta in the backend: %s", err)
 				msg.FinishProcessingCompliance(grpcErr)
 				continue
 			}
@@ -57,11 +58,18 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 			for _, esMissingSha := range esProfilesMissingMeta {
 				msg.Shared.EsProfilesMissingMeta[esMissingSha] = struct{}{}
 				if reportProfilesShasMissingMetaMap[esMissingSha] != "" {
-					grpcErr := status.Errorf(codes.Internal, "Ingesting report '%s' is not possible because profile '%s' with id '%s' does "+
+					grpcErr = status.Errorf(codes.Internal, "Ingesting report '%s' is not possible because profile '%s' with id '%s' does "+
 						"not have the metadata known to the backend.", msg.Report.ReportUuid, reportProfilesShasMissingMetaMap[esMissingSha], esMissingSha)
-					msg.FinishProcessingCompliance(grpcErr)
-					continue
+					// Now 'break' from the esProfilesMissingMeta loop and 'continue' to the next message from the 'in' channel
+					break
 				}
+			}
+
+			if grpcErr != nil {
+				// 'continue' to the next message from the 'in' channel
+				// FinishProcessingCompliance can only be called once for a msg as it closes the Done channel
+				msg.FinishProcessingCompliance(grpcErr)
+				continue
 			}
 
 			// If one of the profiles coming in is missing the metadata, we pull the metadata from the backend for it to complement the report
@@ -69,7 +77,7 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 				// Pull the minimum required profiles metadata from the backend
 				esProfilesForMissingMeta, err := client.GetProfilesMissingMetadata(reportProfilesShasMissingMetaArr)
 				if err != nil {
-					grpcErr := status.Errorf(codes.Internal, "Unable to get the profiles missing metadata: %s", err)
+					grpcErr = status.Errorf(codes.Internal, "Unable to get the profiles missing metadata: %s", err)
 					msg.FinishProcessingCompliance(grpcErr)
 					continue
 				}
@@ -81,9 +89,8 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 					if repProfile.Name == "" {
 						esProfile := esProfilesForMissingMeta[repProfile.Sha256]
 						if esProfile == nil {
-							grpcErr := status.Errorf(codes.Internal, "Unable to find profile '%s' metadata in the profiles store.", repProfile.Sha256)
-							msg.FinishProcessingCompliance(grpcErr)
-							continue
+							grpcErr = status.Errorf(codes.Internal, "Unable to find profile '%s' metadata in the profiles store.", repProfile.Sha256)
+							break
 						}
 
 						repProfile.Name = esProfile.Name
@@ -108,19 +115,25 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 								repControl.Refs = gateway.GetStructArray("data", []byte(fmt.Sprintf(`{"data":%s}`, esControl.Refs)))
 								// repControl.Refs = gateway.GetStructArray("", []byte(esControl.Refs))
 							} else {
-								grpcErr := status.Errorf(codes.Internal, "Unable to find control '%s' in ES profile '%s' (%s)", repControl.Id, repProfile.Title, repProfile.Sha256)
-								msg.FinishProcessingCompliance(grpcErr)
-								continue
+								grpcErr = status.Errorf(codes.Internal, "Unable to find control '%s' in ES profile '%s' (%s)", repControl.Id, repProfile.Title, repProfile.Sha256)
+								break
 							}
 						}
+						if grpcErr != nil {
+							break
+						}
 					}
+				}
+				if grpcErr != nil {
+					msg.FinishProcessingCompliance(grpcErr)
+					continue
 				}
 			}
 
 			msg.InspecProfiles, err = compliance.ProfilesFromReport(msg.Report.Profiles)
 
 			if err != nil {
-				grpcErr := status.Errorf(codes.Internal, "Unable to parse profiles from report: %s", err)
+				grpcErr = status.Errorf(codes.Internal, "Unable to parse profiles from report: %s", err)
 				msg.FinishProcessingCompliance(grpcErr)
 				continue
 			}
