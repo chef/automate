@@ -57,6 +57,8 @@ func init() {
     },
     "/compliance/profiles/metasearch": {
       "post": {
+        "summary": "Check if one or multiple profiles exist in the metadata database.",
+        "description": "The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend\ndoesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.\nThis is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:profiles:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "MetaSearch",
         "responses": {
           "200": {
@@ -426,7 +428,8 @@ func init() {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "An array of profile sha256 IDs that are missing from the backend metadata store."
         }
       }
     },
@@ -686,7 +689,8 @@ func init() {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "An array of profile sha256 IDs."
         }
       }
     },
