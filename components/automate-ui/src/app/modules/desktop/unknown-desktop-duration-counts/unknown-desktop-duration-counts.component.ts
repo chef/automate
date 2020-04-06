@@ -42,4 +42,21 @@ export class UnknownDesktopDurationCountsComponent  implements OnInit, OnDestroy
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
+
+  // Make this more general once we don't have hard coded durations.
+  formatDuration(duration: string): string {
+    switch (duration) {
+      case '1M':
+        return 'Over a month';
+      case '2w':
+        return '2 Weeks';
+      case '1w':
+        return '1 Week';
+      case '3d':
+        return '3 Days';
+
+      default:
+        return duration;
+    }
+  }
 }

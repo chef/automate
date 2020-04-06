@@ -92,25 +92,8 @@ export class DesktopRequests {
   private createCountedDurationItem(item: RespCountedDurationItem): CountedDurationItem {
     return {
       count: item.count,
-      duration: this.convertDurationToLabel(item.duration)
+      duration: item.duration
     };
-  }
-
-  private convertDurationToLabel(respDuration: string): string {
-    switch (respDuration) {
-      case '1M':
-        return 'Over a month';
-      case '2w':
-        return '2 Weeks';
-      case '1w':
-        return '1 Week';
-      case '3d':
-        return '3 Days';
-
-      default:
-        return respDuration;
-    }
-    return respDuration;
   }
 
   private createTopErrorCollection(respTopNodeErrors: RespTopNodeErrors): TopErrorsCollection {

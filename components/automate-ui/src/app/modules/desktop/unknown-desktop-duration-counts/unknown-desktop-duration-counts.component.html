@@ -7,7 +7,7 @@
       <table>
         <tbody>
           <tr *ngFor="let items of countedDurationItems">
-            <td>{{ items.duration }}</td>
+            <td>{{ formatDuration(items.duration) }}</td>
             <td>{{ items.count }}</td>
             <td></td>
           </tr>
