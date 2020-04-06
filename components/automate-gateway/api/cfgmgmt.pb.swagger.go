@@ -503,7 +503,7 @@ func init() {
     },
     "/cfgmgmt/test": {
       "get": {
-        "operationId": "TestRpc",
+        "operationId": "Test2Rpc",
         "responses": {
           "200": {
             "description": "A successful response.",
