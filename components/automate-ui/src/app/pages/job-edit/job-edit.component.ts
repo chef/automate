@@ -333,29 +333,30 @@ export class JobEditComponent implements OnDestroy {
   }
 
   public recurrenceFrom(schedule) {
+
     if (!schedule.include) {
       return '';
     }
 
     const {start, end, repeat} = schedule;
     const ruleOpts = {
-      dtstart: new Date(
+      dtstart: new Date(Date.UTC(
         parseInt(start.datetime.year, 10),
         parseInt(start.datetime.month, 10),
         parseInt(start.datetime.date, 10),
         parseInt(start.datetime.hour, 10),
         parseInt(start.datetime.minute, 10)
-      )
+      ))
     };
 
     if (end.include) {
-      ruleOpts['until'] = new Date(
+      ruleOpts['until'] = new Date(Date.UTC(
         parseInt(end.datetime.year, 10),
         parseInt(end.datetime.month, 10),
         parseInt(end.datetime.date, 10),
         parseInt(end.datetime.hour, 10),
         parseInt(end.datetime.minute, 10)
-      );
+      ));
     }
 
     if (repeat.include) {

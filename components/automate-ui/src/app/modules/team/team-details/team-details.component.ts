@@ -211,7 +211,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   removeUser(user: User): void {
     this.store.dispatch(new RemoveTeamUsers(<TeamUserMgmtPayload>{
       id: this.teamId,
-      user_ids: [user.membership_id]
+      membership_ids: [user.membership_id]
     }));
   }
 

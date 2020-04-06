@@ -52,7 +52,7 @@ control 'local-user-migration-2' do
       expect(admins_team.http_status).to eq(200)
 
       [admin_membership_id, test_admin_membership_id].each do |id| 
-        expect(admins_team.parsed_response_body[:user_ids]).to include(id)
+        expect(admins_team.parsed_response_body[:membership_ids]).to include(id)
       end
     end
   end

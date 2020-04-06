@@ -99,21 +99,27 @@ func (a *Server) DeleteTeam(ctx context.Context, r *gwreq.DeleteTeamReq) (*gwres
 	}, nil
 }
 
-// GetTeamMembership returns an array of userIDs for a team
+// GetTeamMembership returns an array of users' membership_ids for a team
 func (a *Server) GetTeamMembership(ctx context.Context,
 	r *gwreq.GetTeamMembershipReq) (*gwres.GetTeamMembershipResp, error) {
 
 	res, err := a.client.GetTeamMembership(ctx, (*teams.GetTeamMembershipReq)(r))
-	return (*gwres.GetTeamMembershipResp)(res), err
+	if err != nil {
+		return nil, err
+	}
+	return &gwres.GetTeamMembershipResp{
+		MembershipIds: res.UserIds,
+	}, err
 }
 
-// AddTeamMembers adds the specified userIDs to the existing membership of a team
+// AddTeamMembers adds the specified users to the existing membership of a team
+// given their membership_ids
 func (a *Server) AddTeamMembers(ctx context.Context,
 	r *gwreq.AddTeamMembersReq) (*gwres.AddTeamMembersResp, error) {
 
 	req := &teams.AddTeamMembersReq{
 		Id:      r.Id,
-		UserIds: r.UserIds,
+		UserIds: r.MembershipIds,
 	}
 
 	res, err := a.client.AddTeamMembers(ctx, req)
@@ -121,17 +127,18 @@ func (a *Server) AddTeamMembers(ctx context.Context,
 		return nil, err
 	}
 	return &gwres.AddTeamMembersResp{
-		UserIds: res.UserIds,
+		MembershipIds: res.UserIds,
 	}, nil
 }
 
-// RemoveTeamMembers deletes the specified userIDs from the existing membership of a team
+// RemoveTeamMembers deletes users from the existing membership of a team given their
+// membership_ids
 func (a *Server) RemoveTeamMembers(ctx context.Context,
 	r *gwreq.RemoveTeamMembersReq) (*gwres.RemoveTeamMembersResp, error) {
 
 	req := &teams.RemoveTeamMembersReq{
 		Id:      r.Id,
-		UserIds: r.UserIds,
+		UserIds: r.MembershipIds,
 	}
 
 	res, err := a.client.RemoveTeamMembers(ctx, req)
@@ -139,7 +146,7 @@ func (a *Server) RemoveTeamMembers(ctx context.Context,
 		return nil, err
 	}
 	return &gwres.RemoveTeamMembersResp{
-		UserIds: res.UserIds,
+		MembershipIds: res.UserIds,
 	}, nil
 }
 
@@ -147,7 +154,7 @@ func (a *Server) RemoveTeamMembers(ctx context.Context,
 func (a *Server) GetTeamsForMember(ctx context.Context,
 	r *gwreq.GetTeamsForMemberReq) (*gwres.GetTeamsForMemberResp, error) {
 
-	res, err := a.client.GetTeamsForMember(ctx, &teams.GetTeamsForMemberReq{UserId: r.Id})
+	res, err := a.client.GetTeamsForMember(ctx, &teams.GetTeamsForMemberReq{UserId: r.MembershipId})
 	if err != nil {
 		return nil, err
 	}

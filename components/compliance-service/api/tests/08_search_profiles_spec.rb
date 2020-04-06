@@ -205,7 +205,8 @@ describe File.basename(__FILE__) do
             }
         ],
         "counts" => {
-            "total" => 2,
+            "total" => 3,
+            "failed" => 1,
             "skipped" => 2
         }
     }

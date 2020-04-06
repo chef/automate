@@ -122,7 +122,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
     const userIDs = Object.values(this.usersToAdd).map((user: User) => user.membership_id);
     this.store.dispatch(new AddTeamUsers({
       id: this.teamId,
-      user_ids: userIDs
+      membership_ids: userIDs
     }));
   }
 

@@ -213,7 +213,7 @@ func init() {
         "x-code-samples": [
           {
             "lang": "JSON",
-            "source": "{user_ids: [\"527ed96f-2ecb-4f8f-abd7-0bf6511459ac\", \"987c8475-5747-4f9b-a766-c337f73965ae\"]}"
+            "source": "{membership_ids: [\"527ed96f-2ecb-4f8f-abd7-0bf6511459ac\", \"987c8475-5747-4f9b-a766-c337f73965ae\"]}"
           }
         ]
       }
@@ -253,12 +253,12 @@ func init() {
         "x-code-samples": [
           {
             "lang": "JSON",
-            "source": "{user_ids: [\"527ed96f-2ecb-4f8f-abd7-0bf6511459ac\", \"987c8475-5747-4f9b-a766-c337f73965ae\"]}"
+            "source": "{membership_ids: [\"527ed96f-2ecb-4f8f-abd7-0bf6511459ac\", \"987c8475-5747-4f9b-a766-c337f73965ae\"]}"
           }
         ]
       }
     },
-    "/iam/v2/users/{id}/teams": {
+    "/iam/v2/users/{membership_id}/teams": {
       "get": {
         "summary": "Gets team membership for a user",
         "description": "Lists all local teams for a specific user. You must use their membership_id in the request URL.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:userTeams:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -273,7 +273,7 @@ func init() {
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "membership_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -289,7 +289,7 @@ func init() {
     "chef.automate.api.iam.v2.AddTeamMembersReq": {
       "type": "object",
       "example": {
-        "user_ids": [
+        "membership_ids": [
           "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
           "353a62d4-85fa-4423-b12a-f6608a562ae9"
         ]
@@ -298,7 +298,7 @@ func init() {
         "id": {
           "type": "string"
         },
-        "user_ids": {
+        "membership_ids": {
           "type": "array",
           "items": {
             "type": "string"
@@ -307,19 +307,19 @@ func init() {
       },
       "required": [
         "id",
-        "user_ids"
+        "membership_ids"
       ]
     },
     "chef.automate.api.iam.v2.AddTeamMembersResp": {
       "type": "object",
       "example": {
-        "user_ids": [
+        "membership_ids": [
           "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
           "353a62d4-85fa-4423-b12a-f6608a562ae9"
         ]
       },
       "properties": {
-        "user_ids": {
+        "membership_ids": {
           "type": "array",
           "items": {
             "type": "string"
@@ -395,13 +395,13 @@ func init() {
     "chef.automate.api.iam.v2.GetTeamMembershipResp": {
       "type": "object",
       "example": {
-        "user_ids": [
+        "membership_ids": [
           "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
           "353a62d4-85fa-4423-b12a-f6608a562ae9"
         ]
       },
       "properties": {
-        "user_ids": {
+        "membership_ids": {
           "type": "array",
           "items": {
             "type": "string"
@@ -490,7 +490,7 @@ func init() {
     "chef.automate.api.iam.v2.RemoveTeamMembersReq": {
       "type": "object",
       "example": {
-        "user_ids": [
+        "membership_ids": [
           "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
           "353a62d4-85fa-4423-b12a-f6608a562ae9"
         ]
@@ -499,7 +499,7 @@ func init() {
         "id": {
           "type": "string"
         },
-        "user_ids": {
+        "membership_ids": {
           "type": "array",
           "items": {
             "type": "string"
@@ -508,19 +508,19 @@ func init() {
       },
       "required": [
         "id",
-        "user_ids"
+        "membership_ids"
       ]
     },
     "chef.automate.api.iam.v2.RemoveTeamMembersResp": {
       "type": "object",
       "example": {
-        "user_ids": [
+        "membership_ids": [
           "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
           "353a62d4-85fa-4423-b12a-f6608a562ae9"
         ]
       },
       "properties": {
-        "user_ids": {
+        "membership_ids": {
           "type": "array",
           "items": {
             "type": "string"

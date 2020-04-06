@@ -12,6 +12,7 @@ import "api/external/infra_proxy/request/roles.proto";
 import "api/external/infra_proxy/request/clients.proto";
 import "api/external/infra_proxy/request/databags.proto";
 import "api/external/infra_proxy/request/environments.proto";
+import "api/external/infra_proxy/request/nodes.proto";
 
 import "api/external/infra_proxy/response/orgs.proto";
 import "api/external/infra_proxy/response/servers.proto";
@@ -20,6 +21,7 @@ import "api/external/infra_proxy/response/roles.proto";
 import "api/external/infra_proxy/response/clients.proto";
 import "api/external/infra_proxy/response/databags.proto";
 import "api/external/infra_proxy/response/environments.proto";
+import "api/external/infra_proxy/response/nodes.proto";
 
 import "api/external/common/version/version.proto";
 
@@ -148,13 +150,6 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
     option (chef.automate.api.iam.policy).action = "infra:infraServerOrgCookbooks:get";
   };
-  rpc GetCookbookAffectedNodes (infra_proxy.request.Cookbook) returns (infra_proxy.response.CookbookAffectedNodes) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/affected-nodes";
-    option (chef.automate.api.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}/cookbooks";
-    option (chef.automate.api.policy).action = "read";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgCookbooks:get";
-  };
   rpc GetCookbookFileContent (infra_proxy.request.CookbookFileContent) returns (infra_proxy.response.CookbookFileContent) {
     option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content";
     option (chef.automate.api.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}/cookbooks";
@@ -216,10 +211,18 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).action = "infra:infraServerOrgEnvironments:list";
   };
   rpc GetEnvironment (infra_proxy.request.Environment) returns (infra_proxy.response.Environment) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/environment/{name}";
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
     option (chef.automate.api.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}/environments";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
     option (chef.automate.api.iam.policy).action = "infra:infraServerOrgEnvironments:get";
+  };
+
+  rpc GetAffectedNodes (infra_proxy.request.AffectedNodes) returns (infra_proxy.response.AffectedNodes) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}";
+    option (chef.automate.api.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}/affected-nodes";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgNodes:get";
   };
 }

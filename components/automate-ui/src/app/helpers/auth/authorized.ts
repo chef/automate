@@ -22,7 +22,7 @@ import { allPerms } from 'app/entities/userperms/userperms.selectors';
 export interface CheckObj {
   endpoint: string;
   verb: string;
-  paramList: string | string[];
+  paramList?: string | string[];
 }
 
 export class AuthorizedChecker {

@@ -39,7 +39,7 @@ export interface GetTeamsSuccessPayload {
 }
 
 export interface GetTeamUsersSuccessPayload {
-  user_ids: string[];
+  membership_ids: string[];
 }
 
 export class GetTeamsSuccess implements Action {
@@ -149,7 +149,7 @@ export class DeleteTeamFailure implements Action {
 
 export interface TeamUserMgmtPayload {
   id: string;
-  user_ids: string[];
+  membership_ids: string[];
 }
 export class AddTeamUsers implements Action {
   readonly type = TeamActionTypes.ADD_USERS;

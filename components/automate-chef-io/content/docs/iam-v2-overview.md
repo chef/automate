@@ -14,7 +14,7 @@ toc = true
 This documentation covers Chef Automate's IAM feature in release 20200326170928 and later.
 {{< /info >}}
 
-Chef Automate's Identity and Access Managment (IAM) allows direct management of policy members from Chef Automate in the browser.
+Chef Automate's Identity and Access Management (IAM) allows direct management of policy members from Chef Automate in the browser.
 IAM supports the projects feature, which allow for filtering and segregation of your data amongst your user base.
 IAM policies allow you to use multiple permissions, distinguish policy membership from policy definition for fine-grained control, and include roles for role-based access control.
 
@@ -138,7 +138,7 @@ Set up IAM projects using the following steps:
 2. Create or edit IAM policy statements to restrict permissions to specific projects as needed.
    *Every* statement must either name specific projects, specify the wildcard (`*`), which denotes all projects, or specify as `(unassigned)`, which provides permissions on objects without projects.
    By default, any pre-upgrade previous policies are automatically set up with that wildcard, so they apply to all projects.
-3. [Assign resources to projects]({{< relref "iam-v2-overview.md#assigning-resources-to-projects" >}}).
+3. [Assign teams or tokens to projects]({{< relref "iam-v2-guide.md#assigning-teams-and-tokens-to-projects" >}}).
 4. Select the projects to filter in the UI.
    After creating projects, use the **global project filter** in the top navigation to select one or more projects for viewing.
    No selection displays all resources for which you have permission.
@@ -211,5 +211,5 @@ Property               | Description
 -----------------------|------------
 Event Attribute        | Chef Organization or Chef Server
 Node Attribute         | Chef Organization, Chef Server, Environment, Chef Role, Chef Tag, Chef Policy Name, or Chef Policy Group
-Operator               | equals of member of
+Operator               | equals or member of
 Values                 | list of one or more values to match on the specified attribute

@@ -229,7 +229,7 @@ service Teams {
 								fields {
 									key: "source";
 									value {
-                    string_value: '{user_ids: ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "987c8475-5747-4f9b-a766-c337f73965ae"]}';
+                    string_value: '{membership_ids: ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "987c8475-5747-4f9b-a766-c337f73965ae"]}';
                   }
 								}
 							}
@@ -279,7 +279,7 @@ service Teams {
 								fields {
 									key: "source";
 									value {
-                    string_value: '{user_ids: ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "987c8475-5747-4f9b-a766-c337f73965ae"]}';
+                    string_value: '{membership_ids: ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "987c8475-5747-4f9b-a766-c337f73965ae"]}';
                   }
 								}
 							}
@@ -313,11 +313,11 @@ service Teams {
       tags: "teams";
     };
     option (google.api.http) = {
-      get: "/iam/v2/users/{id}/teams"
+      get: "/iam/v2/users/{membership_id}/teams"
     };
-    option (chef.automate.api.policy).resource = "auth:users:{id}:teams";
+    option (chef.automate.api.policy).resource = "auth:users:{membership_id}:teams";
     option (chef.automate.api.policy).action = "read";
-    option (chef.automate.api.iam.policy).resource = "iam:users:{id}:teams";
+    option (chef.automate.api.iam.policy).resource = "iam:users:{membership_id}:teams";
     option (chef.automate.api.iam.policy).action = "iam:userTeams:get";
   };
 }

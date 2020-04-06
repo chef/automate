@@ -74,7 +74,7 @@ func (es Backend) GetRun(runID string, endTime time.Time) (backend.Run, error) {
 
 // GetDeletedCountsTimeSeries - creates a daily time series of the total amount of nodes that have
 // been deleted within or before the time range. The time series is between the startTime and endTime provided.
-// The startTime and endTime must atleast be 24 hours apart. When greater than 24 hours, it must be in
+// The startTime and endTime must at least be 24 hours apart. When greater than 24 hours, it must be in
 // multiples 24 hour blocks.
 // A node is deleted if exists = false. The time the node was deleted is the "timestamp"
 func (es Backend) GetDeletedCountsTimeSeries(
@@ -89,12 +89,12 @@ func (es Backend) GetDeletedCountsTimeSeries(
 	copiedFilters["exists"] = []string{"false"}
 	mainQuery := newBoolQueryFromFilters(copiedFilters)
 
-	deletedNodePeroids := make([]backend.CountPeroid, getNumberOf24hBetween(startTime, endTime))
+	deletedNodePeriods := make([]backend.CountPeroid, getNumberOf24hBetween(startTime, endTime))
 
 	dateRangeAgg := elastic.NewDateRangeAggregation().Field(backend.Timestamp).
 		Format("yyyy-MM-dd'T'HH:mm:ssZ")
 
-	for index := 0; index < len(deletedNodePeroids); index++ {
+	for index := 0; index < len(deletedNodePeriods); index++ {
 		end := startTime.Add(time.Hour * 24 *
 			time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
 
@@ -114,34 +114,34 @@ func (es Backend) GetDeletedCountsTimeSeries(
 	if !found {
 		// This case is if there are no runs for the entire range of the time series
 		// We are creating the buckets manually with zero check-ins
-		for index := 0; index < len(deletedNodePeroids); index++ {
-			deletedNodePeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
-			deletedNodePeroids[index].End = startTime.Add(time.Hour * 24 *
+		for index := 0; index < len(deletedNodePeriods); index++ {
+			deletedNodePeriods[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
+			deletedNodePeriods[index].End = startTime.Add(time.Hour * 24 *
 				time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
-			deletedNodePeroids[index].Count = 0
+			deletedNodePeriods[index].Count = 0
 		}
-		return deletedNodePeroids, nil
+		return deletedNodePeriods, nil
 	}
 
-	if len(rangeAggRes.Buckets) != len(deletedNodePeroids) {
+	if len(rangeAggRes.Buckets) != len(deletedNodePeriods) {
 		return []backend.CountPeroid{}, errors.NewBackendError(
 			"The number of buckets found is incorrect expected %d actual %d",
-			len(deletedNodePeroids), len(rangeAggRes.Buckets))
+			len(deletedNodePeriods), len(rangeAggRes.Buckets))
 	}
 
 	for index, bucket := range rangeAggRes.Buckets {
-		deletedNodePeroids[index].Count = int(bucket.DocCount)
-		deletedNodePeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
-		deletedNodePeroids[index].End = startTime.Add(time.Hour * 24 *
+		deletedNodePeriods[index].Count = int(bucket.DocCount)
+		deletedNodePeriods[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
+		deletedNodePeriods[index].End = startTime.Add(time.Hour * 24 *
 			time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
 	}
 
-	return deletedNodePeroids, nil
+	return deletedNodePeriods, nil
 }
 
 // GetCreateCountsTimeSeries - creates a daily time series of the total amount of nodes that have
 // been created within or before the time range. The time series is between the startTime and endTime provided.
-// The startTime and endTime must atleast be 24 hours apart. When greater than 24 hours, it must be in
+// The startTime and endTime must at least be 24 hours apart. When greater than 24 hours, it must be in
 // multiples 24 hour blocks.
 func (es Backend) GetCreateCountsTimeSeries(startTime, endTime time.Time,
 	filters map[string][]string) ([]backend.CountPeroid, error) {
@@ -150,14 +150,14 @@ func (es Backend) GetCreateCountsTimeSeries(startTime, endTime time.Time,
 		mainQuery = newBoolQueryFromFilters(filters)
 	)
 
-	createNodePeroids := make([]backend.CountPeroid, getNumberOf24hBetween(startTime, endTime))
+	createNodePeriods := make([]backend.CountPeroid, getNumberOf24hBetween(startTime, endTime))
 
 	// This is using the custom_search_aggs_bucket_date_range because it need to set the missing option
 	dateRangeAgg := NewDateRangeAggregation().Field(backend.Created).
 		Format("yyyy-MM-dd'T'HH:mm:ssZ").
 		Missing(time.Time{}.Format(time.RFC3339)) // count all nodes that do not have a create date
 
-	for index := 0; index < len(createNodePeroids); index++ {
+	for index := 0; index < len(createNodePeriods); index++ {
 		to := startTime.Add(time.Hour * 24 *
 			time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
 
@@ -177,34 +177,34 @@ func (es Backend) GetCreateCountsTimeSeries(startTime, endTime time.Time,
 	if !found {
 		// This case is if there are no runs for the entire range of the time series
 		// We are creating the buckets manually with zero check-ins
-		for index := 0; index < len(createNodePeroids); index++ {
-			createNodePeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
-			createNodePeroids[index].End = startTime.Add(time.Hour * 24 *
+		for index := 0; index < len(createNodePeriods); index++ {
+			createNodePeriods[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
+			createNodePeriods[index].End = startTime.Add(time.Hour * 24 *
 				time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
-			createNodePeroids[index].Count = 0
+			createNodePeriods[index].Count = 0
 		}
-		return createNodePeroids, nil
+		return createNodePeriods, nil
 	}
 
-	if len(rangeAggRes.Buckets) != len(createNodePeroids) {
+	if len(rangeAggRes.Buckets) != len(createNodePeriods) {
 		return []backend.CountPeroid{}, errors.NewBackendError(
 			"The number of buckets found is incorrect expected %d actual %d",
-			len(createNodePeroids), len(rangeAggRes.Buckets))
+			len(createNodePeriods), len(rangeAggRes.Buckets))
 	}
 
 	for index, bucket := range rangeAggRes.Buckets {
-		createNodePeroids[index].Count = int(bucket.DocCount)
-		createNodePeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
-		createNodePeroids[index].End = startTime.Add(time.Hour * 24 *
+		createNodePeriods[index].Count = int(bucket.DocCount)
+		createNodePeriods[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
+		createNodePeriods[index].End = startTime.Add(time.Hour * 24 *
 			time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
 	}
 
-	return createNodePeroids, nil
+	return createNodePeriods, nil
 }
 
 // GetCheckinCountsTimeSeries create a daily time series of unique nodes that have reported a runs
 // between the startTime and endTime provided.
-// The startTime and endTime must atleast be 24 hours apart. When greater than 24 hours, it must be in
+// The startTime and endTime must at least be 24 hours apart. When greater than 24 hours, it must be in
 // multiples 24 hour blocks.
 func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 	filters map[string][]string) ([]backend.CountPeroid, error) {
@@ -239,40 +239,40 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 		return []backend.CountPeroid{}, err
 	}
 
-	checkInPeroids := make([]backend.CountPeroid, getNumberOf24hBetween(startTime, endTime))
+	checkInPeriods := make([]backend.CountPeroid, getNumberOf24hBetween(startTime, endTime))
 	dateHistoRes, found := searchResult.Aggregations.DateHistogram(dateHistoTag)
 	if !found {
 		// This case is if there are no runs for the entire range of the time series
 		// We are creating the buckets manually with zero check-ins
-		for index := 0; index < len(checkInPeroids); index++ {
-			checkInPeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
-			checkInPeroids[index].End = startTime.Add(time.Hour * 24 *
+		for index := 0; index < len(checkInPeriods); index++ {
+			checkInPeriods[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
+			checkInPeriods[index].End = startTime.Add(time.Hour * 24 *
 				time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
-			checkInPeroids[index].Count = 0
+			checkInPeriods[index].Count = 0
 		}
-		return checkInPeroids, nil
+		return checkInPeriods, nil
 	}
 
-	if len(dateHistoRes.Buckets) != len(checkInPeroids) {
+	if len(dateHistoRes.Buckets) != len(checkInPeriods) {
 		return []backend.CountPeroid{}, errors.NewBackendError(
 			"The number of buckets found is incorrect expected %d actual %d",
-			len(checkInPeroids), len(dateHistoRes.Buckets))
+			len(checkInPeriods), len(dateHistoRes.Buckets))
 	}
 
 	for index, bucket := range dateHistoRes.Buckets {
 		item, found := bucket.Aggregations.Cardinality(nodeID)
 		if found {
-			checkInPeroids[index].Count = int(*item.Value)
+			checkInPeriods[index].Count = int(*item.Value)
 		} else {
-			checkInPeroids[index].Count = 0
+			checkInPeriods[index].Count = 0
 		}
 
-		checkInPeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
-		checkInPeroids[index].End = startTime.Add(time.Hour * 24 *
+		checkInPeriods[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
+		checkInPeriods[index].End = startTime.Add(time.Hour * 24 *
 			time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
 	}
 
-	return checkInPeroids, nil
+	return checkInPeriods, nil
 }
 
 // GetRunsCounts returns a RunsCounts object that contains the number of success, failure, total runs for a node

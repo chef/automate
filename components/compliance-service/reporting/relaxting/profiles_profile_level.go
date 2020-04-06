@@ -80,11 +80,12 @@ func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 						int32(*sumSkipped.Value), int32(*sumWaived.Value))
 				}
 
+				//let's keep track of the counts even if they're not in the filter so that we may know that they're there for UI chicklets
+				statusMap[profileStatus]++
+
 				if len(statusFilters) > 0 && !stringutils.SliceContains(statusFilters, profileStatus) {
 					continue
 				}
-
-				statusMap[profileStatus]++
 
 				summary := reporting.ProfileMin{
 					Name:   profileName,
@@ -98,7 +99,7 @@ func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 	logrus.Debugf("%s Done with statusMap=%+v", myName, statusMap)
 	logrus.Debugf("%s Done with statusMap['something']=%+v", myName, statusMap["passed"])
 	counts := &reportingapi.ProfileCounts{
-		Total:   int32(statusMap["failed"] + statusMap["passed"] + statusMap["skipped"]),
+		Total:   int32(statusMap["failed"] + statusMap["passed"] + statusMap["skipped"] + statusMap["waived"]),
 		Failed:  int32(statusMap["failed"]),
 		Passed:  int32(statusMap["passed"]),
 		Skipped: int32(statusMap["skipped"]),

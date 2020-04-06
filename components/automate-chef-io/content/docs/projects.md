@@ -61,7 +61,7 @@ To change the name of a project, navigate to _Projects_ in the **Settings** tab 
 
 The _Project List_ page displays the status of project ingest rules (*No rules*, *Edits pending*, or *Applied*).
 
-If a project has pending edits from changes to ingest rules, then all projects must be updated for those pending edits to take effect. The update background process can take up to 12 hours if there is a lot of historical data. 
+If a project has pending edits from changes to ingest rules, then all projects must be updated for those pending edits to take effect. Updating projects will apply all pending edits and move ingested resources into the correct projects. This background process can take a few minutes for systems with a limited number of nodes, and **several days** for systems with a large number of nodes. 
 
 All changes will be applied together when you update projects. To update projects navigate to _Projects_ in the **Settings** tab and use the **Update Projects** button.
 

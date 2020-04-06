@@ -14,7 +14,7 @@ import (
 // normal range aggregation is that the from and to values can be expressed
 // in Date Math expressions, and it is also possible to specify a
 // date format by which the from and to response fields will be returned.
-// Note that this aggregration includes the from value and excludes the to
+// Note that this aggregation includes the from value and excludes the to
 // value for each range.
 // See: https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-aggregations-bucket-daterange-aggregation.html
 type DateRangeAggregation struct {
