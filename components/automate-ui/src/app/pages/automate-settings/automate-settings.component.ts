@@ -390,7 +390,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     let formThreshold, formUnit;
 
     switch (job.name) {
-      case InfraJobName.MissingNodes: {
+      case InfraJobName.MissingNodesForDeletion: {
         this.handleDisable(this.clientRunsRemoveData, job.disabled);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.clientRunsRemoveData.patchValue({
@@ -401,7 +401,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       }
       break;
 
-      case InfraJobName.MissingNodesForDeletion: {
+      case InfraJobName.MissingNodes: {
         this.handleDisable(this.clientRunsLabelMissing, job.disabled);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.clientRunsLabelMissing.patchValue({
