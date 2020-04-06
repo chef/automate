@@ -128,7 +128,7 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
           if (this.saveSuccessful) {
             this.updateOrgForm.markAsPristine();
           }
-        });  
+        });
 
   }
 
