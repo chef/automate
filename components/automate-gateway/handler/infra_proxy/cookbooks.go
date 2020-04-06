@@ -24,22 +24,23 @@ func (a *InfraProxyServer) GetCookbooks(ctx context.Context, r *gwreq.Cookbooks)
 	}, nil
 }
 
-// GetCookbooksAvailableVersions fetches an array of existing cookbooks
-func (a *InfraProxyServer) GetCookbooksAvailableVersions(ctx context.Context, r *gwreq.CookbooksAvailableVersions) (*gwres.CookbooksAvailableVersions, error) {
-	req := &infra_req.CookbooksAvailableVersions{
+// GetCookbookVersions fetches an array of existing cookbook versions
+func (a *InfraProxyServer) GetCookbookVersions(ctx context.Context, r *gwreq.CookbookVersions) (*gwres.CookbookVersions, error) {
+	req := &infra_req.CookbookVersions{
 		OrgId: r.OrgId,
+		Name:  r.Name,
 	}
-	res, err := a.client.GetCookbooksAvailableVersions(ctx, req)
+	res, err := a.client.GetCookbookVersions(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 
-	return &gwres.CookbooksAvailableVersions{
-		Cookbooks: fromUpstreamCookbooksAvailableVersions(res.Cookbooks),
+	return &gwres.CookbookVersions{
+		Versions: res.GetVersions(),
 	}, nil
 }
 
-// GetCookbook fetches an array of existing cookbooks
+// GetCookbook fetches the detail of existing cookbook
 func (a *InfraProxyServer) GetCookbook(ctx context.Context, r *gwreq.Cookbook) (*gwres.Cookbook, error) {
 	req := &infra_req.Cookbook{
 		OrgId:   r.OrgId,
@@ -91,38 +92,14 @@ func (a *InfraProxyServer) GetCookbookFileContent(ctx context.Context, r *gwreq.
 	}, nil
 }
 
-func fromUpstreamCookbookVersion(t *infra_res.CookbookVersion) *gwres.CookbookVersion {
-	return &gwres.CookbookVersion{
-		Name:    t.GetName(),
-		Version: t.GetVersion(),
-	}
-}
-
-func fromUpstreamCookbookVersions(t *infra_res.CookbookAllVersion) *gwres.CookbookAllVersion {
-	return &gwres.CookbookAllVersion{
-		Name:           t.GetName(),
-		CurrentVersion: t.GetCurrentVersion(),
-		Versions:       t.GetVersions(),
-	}
-}
-
 func fromUpstreamCookbooks(cookbooks []*infra_res.CookbookVersion) []*gwres.CookbookVersion {
 	ts := make([]*gwres.CookbookVersion, len(cookbooks))
-
 	for i, cookbook := range cookbooks {
-		ts[i] = fromUpstreamCookbookVersion(cookbook)
+		ts[i] = &gwres.CookbookVersion{
+			Name:    cookbook.GetName(),
+			Version: cookbook.GetVersion(),
+		}
 	}
-
-	return ts
-}
-
-func fromUpstreamCookbooksAvailableVersions(cookbooks []*infra_res.CookbookAllVersion) []*gwres.CookbookAllVersion {
-	ts := make([]*gwres.CookbookAllVersion, len(cookbooks))
-
-	for i, cookbook := range cookbooks {
-		ts[i] = fromUpstreamCookbookVersions(cookbook)
-	}
-
 	return ts
 }
 

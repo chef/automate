@@ -40,7 +40,7 @@ service InfraProxy {
     rpc GetOrgByName (chef.automate.domain.infra_proxy.request.GetOrgByName) returns (chef.automate.domain.infra_proxy.response.GetOrg) {};
 
     rpc GetCookbooks (chef.automate.domain.infra_proxy.request.Cookbooks) returns (chef.automate.domain.infra_proxy.response.Cookbooks) {};
-    rpc GetCookbooksAvailableVersions (chef.automate.domain.infra_proxy.request.CookbooksAvailableVersions) returns (chef.automate.domain.infra_proxy.response.CookbooksAvailableVersions) {};
+    rpc GetCookbookVersions (chef.automate.domain.infra_proxy.request.CookbookVersions) returns (chef.automate.domain.infra_proxy.response.CookbookVersions) {};
     rpc GetCookbook  (chef.automate.domain.infra_proxy.request.Cookbook) returns (chef.automate.domain.infra_proxy.response.Cookbook) {};
     rpc GetCookbookFileContent (chef.automate.domain.infra_proxy.request.CookbookFileContent) returns (chef.automate.domain.infra_proxy.response.CookbookFileContent) {};
     
