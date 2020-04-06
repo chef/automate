@@ -1233,6 +1233,7 @@ func (m *VersionedCookbook) GetVersion() string {
 }
 
 type MissingNodeDurationCounts struct {
+	// List of counted durations
 	CountedDurations     []*CountedDuration `protobuf:"bytes,1,rep,name=counted_durations,json=countedDurations,proto3" json:"counted_durations,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
@@ -1272,7 +1273,9 @@ func (m *MissingNodeDurationCounts) GetCountedDurations() []*CountedDuration {
 }
 
 type CountedDuration struct {
-	Duration             string   `protobuf:"bytes,1,opt,name=duration,proto3" json:"duration,omitempty"`
+	// Duration of the count. Example '3d'
+	Duration string `protobuf:"bytes,1,opt,name=duration,proto3" json:"duration,omitempty"`
+	// The number of nodes for this duration
 	Count                int32    `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

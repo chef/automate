@@ -197,7 +197,14 @@ type ConfigMgmtClient interface {
 	GetCheckInCountsTimeSeries(ctx context.Context, in *request.CheckInCountsTimeSeries, opts ...grpc.CallOption) (*response.CheckInCountsTimeSeries, error)
 	//
 	//GetMissingNodeDurationCounts
+	//
 	//Returns a count of missing nodes for the provided durations.
+	//
+	//Example:
+	//```
+	//cfgmgmt/stats/missing_node_duration_counts?durations=3d&durations=1w&durations=2w&durations=1M&durations=3M
+	//```
+	//
 	//Authorization Action:
 	//```
 	//infra:nodes:list
@@ -495,7 +502,14 @@ type ConfigMgmtServer interface {
 	GetCheckInCountsTimeSeries(context.Context, *request.CheckInCountsTimeSeries) (*response.CheckInCountsTimeSeries, error)
 	//
 	//GetMissingNodeDurationCounts
+	//
 	//Returns a count of missing nodes for the provided durations.
+	//
+	//Example:
+	//```
+	//cfgmgmt/stats/missing_node_duration_counts?durations=3d&durations=1w&durations=2w&durations=1M&durations=3M
+	//```
+	//
 	//Authorization Action:
 	//```
 	//infra:nodes:list
