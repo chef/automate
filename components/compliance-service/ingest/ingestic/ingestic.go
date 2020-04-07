@@ -180,12 +180,10 @@ func (backend *ESClient) GetProfilesMissingMetadata(profileIDs []string) (map[st
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"took",
 		"name",
-		"depends",
 		"controls.id",
 		"controls.impact",
 		"controls.title",
 		"controls.tags",
-		"controls.refs",
 	)
 
 	searchSource := elastic.NewSearchSource().

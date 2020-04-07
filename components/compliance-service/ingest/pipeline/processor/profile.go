@@ -1,10 +1,8 @@
 package processor
 
 import (
-	"fmt"
 	"strings"
 
-	"github.com/chef/automate/components/automate-gateway/gateway"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
@@ -111,9 +109,6 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 								if err == nil {
 									repControl.Tags = &controlTags
 								}
-
-								repControl.Refs = gateway.GetStructArray("data", []byte(fmt.Sprintf(`{"data":%s}`, esControl.Refs)))
-								// repControl.Refs = gateway.GetStructArray("", []byte(esControl.Refs))
 							} else {
 								grpcErr = status.Errorf(codes.Internal, "Unable to find control '%s' in ES profile '%s' (%s)", repControl.Id, repProfile.Title, repProfile.Sha256)
 								break
