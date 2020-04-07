@@ -271,6 +271,10 @@ exceptions:
       reason: Exception made by Chef Legal
     - name: core/nss-myhostname
       reason: Exception made by Chef Legal
+    - name: core/binutils
+      reason: (rc) dep of core/bundler. Exception made by Stephen Delano, 4/23/20
+    - name: core/perl
+      reason: (rc) dep of core/git, used by Workflow and sqitch. Exception made by Stephen Delano, 4/23/20
 
   ruby:
     - name: highline
