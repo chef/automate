@@ -271,8 +271,8 @@ describe('AutomateSettingsComponent', () => {
 
     using([
       // Client Runs
-      ['clientRunsRemoveData', genInjestJob('infra', 'missing_nodes', '5m', false)],
-      ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes_for_deletion', '6h', false)]
+      ['clientRunsRemoveData', genInjestJob('infra', 'missing_nodes_for_deletion', '5m', false)],
+      ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes', '6h', false)]
     ], function (formName: string, job: IngestJob) {
       it(`when updating ${formName} form,
             the form data is extracted from the non-nested form`, () => {
@@ -327,8 +327,8 @@ describe('AutomateSettingsComponent', () => {
 
     using([
       // Client Runs
-      ['clientRunsRemoveData', genInjestJob('infra', 'missing_nodes', '5m', true)],
-      ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes_for_deletion', '6h', true)]
+      ['clientRunsRemoveData', genInjestJob('infra', 'missing_nodes_for_deletion', '5m', true)],
+      ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes', '6h', true)]
     ], function (formName: string, job: IngestJob) {
       it(`when ${formName} form is saved as disabled, unit and threshold are undefined
             because they are not present in the non-nested form anymore`, () => {
