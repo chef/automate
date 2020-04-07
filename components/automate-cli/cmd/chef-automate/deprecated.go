@@ -10,7 +10,7 @@ import (
 
 func newAdminTokenCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:    "admin-token NAME",
+		Use:    "admin-token",
 		Short:  "[deprecated] Chef Automate IAM v1 admin token create",
 		RunE:   runAdminTokenCmd,
 		Hidden: true,
