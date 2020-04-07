@@ -1,28 +1,26 @@
 @import "~styles/variables";
 
 .jobs-list-table {
-  chef-table-header-cell {
+  chef-table-header-cell,
+  chef-table-cell {
+    display: flex;
     flex-flow: row nowrap;
     align-items: center;
   }
 
   chef-table-cell {
-    flex-basis: 0;
-    flex-grow: 1;
-
-    display: flex;
-    justify-content: center;
+    justify-content: flex-start;
 
     &:last-child {
-      flex-flow: row nowrap;
-      align-items: center;
       justify-content: flex-end;
+
+    }
+
+    chef-button {
+      margin: -.5em 0 -.5em .5em;
     }
   }
 
-  chef-button {
-    margin: -.5em 0 -.5em .5em;
-  }
 
   .new-row {
     font-size: 14px;
