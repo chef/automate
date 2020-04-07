@@ -244,10 +244,11 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
   });
 
-  describe('handleOptionChange()', () => {
+  describe('handleOptionChange() for single option', () => {
     beforeEach(() => {
       component.editableOptions = genOptions([false]);
       component.optionsEdited = false;
+      expect(component.editableOptions[0].checked).toEqual(false);
       component.handleOptionChange({ detail: true }, 'Project 1');
     });
 
@@ -256,6 +257,30 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
 
     it('marks the list of options as edited', () => {
+      expect(component.optionsEdited).toEqual(true);
+    });
+  });
+
+  describe('handleOptionChange() for multiple options', () => {
+    beforeEach(() => {
+      component.editableOptions = genOptions([false, false, true, true, false]);
+      component.optionsEdited = false;
+    });
+
+    it('updates an unchecked value to the emitted value', () => {
+      expect(component.editableOptions[1].checked).toEqual(false);
+      component.handleOptionChange({ detail: true }, 'Project 2');
+      expect(component.editableOptions[1].checked).toEqual(true);
+    });
+
+     it('updates a checked value to the emitted value', () => {
+      expect(component.editableOptions[2].checked).toEqual(true);
+      component.handleOptionChange({ detail: false }, 'Project 3');
+      expect(component.editableOptions[2].checked).toEqual(false);
+    });
+
+    it('marks the list of options as edited', () => {
+      component.handleOptionChange({ detail: true }, 'Project 1');
       expect(component.optionsEdited).toEqual(true);
     });
   });
