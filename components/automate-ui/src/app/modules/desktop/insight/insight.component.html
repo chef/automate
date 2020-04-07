@@ -1,0 +1,31 @@
+<div class="content-container" *ngIf="visible">
+  <div class="container">
+    <main>
+      <button (click)="close()" id="x">X</button>
+      <div class="page-title">Insight</div>
+
+      <table>
+        <thead>
+          <tr >
+            <th class="table-title">DESKTOP NAME</th>
+            <th class="table-title">LAST CHECK-IN TIME</th>
+            <th class="table-title">PLATFORM</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let node of nodes">
+            <td>{{ node.name }}</td>
+            <td><chef-icon>{{ node.status | chefStatusIcon }}</chef-icon> {{ node.checkin | timeFromNow }}</td>
+            <td>{{ node.platform }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <app-page-picker
+      [total]="totalNodes"
+      [perPage]="pageSize"
+      [page]="currentPage"
+      (pageChanged)="onPageChange($event)">
+    </app-page-picker>
+    </main>
+  </div>
+</div>

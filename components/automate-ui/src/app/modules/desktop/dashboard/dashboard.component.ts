@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { map, filter } from 'rxjs/operators';
 import { last, reverse } from 'lodash/fp';
@@ -11,17 +11,23 @@ import {
   GetTopErrorsCollection,
   GetUnknownDesktopDurationCounts
 } from 'app/entities/desktop/desktop.actions';
-
+import {
+  UpdateNodeFilters
+} from 'app/entities/client-runs/client-runs.actions';
 import {
   dailyCheckInCountCollection,
   getSelectedDaysAgo,
   topErrorsCollection,
   unknownDesktopDurationCounts
 } from 'app/entities/desktop/desktop.selectors';
-
+import {
+  clientRunsNodes,
+  clientRunsState
+} from 'app/entities/client-runs/client-runs.selectors';
 import {
   DailyCheckInCount, DailyCheckInCountCollection, DayPercentage, TopErrorsItem, CountedDurationItem
 } from 'app/entities/desktop/desktop.model';
+import { Node, NodeFilter } from 'app/entities/client-runs/client-runs.model';
 
 @Component({
   selector: 'app-desktop-dashboard',
@@ -44,17 +50,34 @@ export class DashboardComponent implements OnInit {
   public topErrorsUpdated$: Observable<Date>;
   public unknownDesktopCountedDurationItems$: Observable<CountedDurationItem[]>;
   public unknownDesktopCountedDurationUpdated$: Observable<Date>;
+  public clientRunsNodes$: Observable<Node[]>;
+  public totalNodeCount$: Observable<number>;
+  public insightVisible = true;
+  public nodeFilter: NodeFilter;
 
   constructor(
     private store: Store<NgrxStateAtom>
   ) { }
 
   ngOnInit() {
+    this.nodeFilter = {
+      page: 1,
+      pageSize: 10,
+      sortDirection: 'ASC',
+      sortField: 'name'
+    };
+
     this.store.dispatch(new GetDailyCheckInTimeSeries());
     this.store.dispatch(new GetTopErrorsCollection());
     this.store.dispatch(new GetUnknownDesktopDurationCounts());
+    this.store.dispatch(new UpdateNodeFilters({filters: this.nodeFilter}));
 
     this.selectedDaysAgo$ = this.store.select(getSelectedDaysAgo);
+
+    this.clientRunsNodes$ = this.store.select(clientRunsNodes);
+
+    this.totalNodeCount$ = this.store.select(createSelector(
+      clientRunsState, (state) => state.nodeCount.total));
 
     this.checkInCountCollection$ = this.store.select(dailyCheckInCountCollection).pipe(
       filter(collection => collection.buckets.length > 0));
@@ -128,5 +151,14 @@ export class DashboardComponent implements OnInit {
 
   handleDaysAgoChange(daysAgo: number) {
     this.store.dispatch(new SetDaysAgoSelected({daysAgo}));
+  }
+
+  insightClose() {
+    this.insightVisible = false;
+  }
+
+  public onPageChange(pageNumber: number) {
+    this.nodeFilter.page = pageNumber;
+    this.store.dispatch(new UpdateNodeFilters({filters: this.nodeFilter}));
   }
 }

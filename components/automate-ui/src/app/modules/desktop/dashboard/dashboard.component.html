@@ -1,6 +1,15 @@
 <div class="content-container">
   <div class="container">
     <main>
+      <app-insight
+        [visible] = "insightVisible"
+        [nodes] = "clientRunsNodes$ | async"
+        [totalNodes] = "totalNodeCount$ | async"
+        [currentPage] = "nodeFilter.page"
+        [pageSize] = "nodeFilter.pageSize"
+        (pageChange)="onPageChange($event)"
+        (closed)="insightClose()">
+      </app-insight>
       <app-daily-check-in
         [unknownPercentage] = "unknownPercentage$ | async"
         [checkedInPercentage] = "checkedInPercentage$ | async"
