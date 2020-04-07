@@ -317,7 +317,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       spyOn(component.onSelection, 'emit');
       spyOn(component.onOptionChange, 'emit');
       component.dropdownActive = true;
-      component.optionsEdited = true;
+      component.optionsEdited = false;
       component.editableOptions = genOptions([false, true, true, false, true]);
       expect(component.editableOptions.some(o => o.checked)).toEqual(true);
       component.handleClearSelection();
@@ -329,7 +329,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       expect(component.dropdownActive).toEqual(true);
     });
 
-    it('does not disable the "Apply Changes" button', () => {
+    it('enables the "Apply Changes" button', () => {
       expect(component.optionsEdited).toEqual(true);
     });
 
