@@ -1,5 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
+import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { ProjectsFilterDropdownComponent } from './projects-filter-dropdown.component';
 
 describe('ProjectsFilterDropdownComponent', () => {
@@ -98,20 +100,7 @@ describe('ProjectsFilterDropdownComponent', () => {
   describe('dropdown', () => {
     beforeEach(() => {
       component.dropdownActive = true;
-      component.editableOptions = [
-        {
-          value: 'project-1',
-          label: 'Project 1',
-          type: 'CUSTOM',
-          checked: false
-        },
-        {
-          value: 'project-2',
-          label: 'Project 2',
-          type: 'CUSTOM',
-          checked: true
-        }
-      ];
+      component.editableOptions = genOptions([false, true]);
       // need filteredOptions in order for elements to be displayed in the UI
       component.filteredOptions = component.editableOptions;
       fixture.detectChanges();
@@ -187,20 +176,7 @@ describe('ProjectsFilterDropdownComponent', () => {
 
   describe('resetOptions()', () => {
     beforeEach(() => {
-      component.options = [
-        {
-          value: 'project-1',
-          label: 'Project 1',
-          type: 'CUSTOM',
-          checked: false
-        },
-        {
-          value: 'project-2',
-          label: 'Project 2',
-          type: 'CUSTOM',
-          checked: true
-        }
-      ];
+      component.options = genOptions([false, true]);
       component.editableOptions = [];
       component.optionsEdited = true;
 
@@ -220,20 +196,7 @@ describe('ProjectsFilterDropdownComponent', () => {
   describe('handleLabelClick()', () => {
     describe('when more than one option is available', () => {
       beforeEach(() => {
-        component.editableOptions = [
-          {
-            value: 'project-1',
-            label: 'Project 1',
-            type: 'CUSTOM',
-            checked: false
-          },
-          {
-            value: 'project-2',
-            label: 'Project 2',
-            type: 'CUSTOM',
-            checked: false
-          }
-        ];
+        component.editableOptions = genOptions([false, false]);
         component.dropdownActive = false;
         spyOn(component, 'resetOptions');
 
@@ -251,14 +214,7 @@ describe('ProjectsFilterDropdownComponent', () => {
 
     describe('when only one option is available', () => {
       beforeEach(() => {
-        component.editableOptions = [
-          {
-            value: 'project-1',
-            label: 'Project 1',
-            type: 'CUSTOM',
-            checked: false
-          }
-        ];
+        component.editableOptions = genOptions([false]);
         component.dropdownActive = false;
         spyOn(component, 'resetOptions');
 
@@ -290,14 +246,7 @@ describe('ProjectsFilterDropdownComponent', () => {
 
   describe('handleOptionChange()', () => {
     beforeEach(() => {
-      component.editableOptions = [
-        {
-          value: 'project-1',
-          label: 'Project 1',
-          type: 'CUSTOM',
-          checked: false
-        }
-      ];
+      component.editableOptions = genOptions([false]);
       component.optionsEdited = false;
       component.handleOptionChange({ detail: true }, 'Project 1');
     });
@@ -374,3 +323,17 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
   });
 });
+
+function genOptions(checkedItems: boolean[]): ProjectsFilterOption[] {
+  const options: ProjectsFilterOption[] = [];
+  for (let i = 0; i < checkedItems.length; i++) {
+    options.push(
+      {
+        value: `project-${i + 1}`,
+        label: `Project ${i + 1}`,
+        type: 'CUSTOM',
+        checked: checkedItems[i]
+      });
+  }
+  return options;
+}
