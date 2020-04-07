@@ -1,6 +1,15 @@
 <div class="content-container">
   <div class="container">
     <main>
+      <app-insight
+        [visible] = "insightVisible"
+        [desktops] = "desktops$ | async"
+        [totalDesktops] = "totalDesktopCount$ | async"
+        [pageSize] = "pageSize$ | async"
+        [currentPage] = "currentPage$ | async"
+        (pageChange)="onPageChange($event)"
+        (closed)="insightClose()">
+      </app-insight>
       <app-daily-check-in
         [unknownPercentage] = "unknownPercentage$ | async"
         [checkedInPercentage] = "checkedInPercentage$ | async"

@@ -1,4 +1,4 @@
-import { catchError, mergeMap, map } from 'rxjs/operators';
+import { catchError, mergeMap, map, withLatestFrom, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of, combineLatest } from 'rxjs';
@@ -15,7 +15,12 @@ import {
   GetTopErrorsCollectionFailure,
   GetUnknownDesktopDurationCounts,
   GetUnknownDesktopDurationCountsSuccess,
-  GetUnknownDesktopDurationCountsFailure
+  GetUnknownDesktopDurationCountsFailure,
+  GetDesktops,
+  GetDesktopsSuccess,
+  GetDesktopsFailure,
+  GetDesktopsTotalSuccess,
+  GetDesktopsTotalFailure
 } from './desktop.actions';
 import { DesktopRequests } from './desktop.requests';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -103,4 +108,50 @@ export class DesktopEffects {
         message: `Could not get unknown desktop duration counts errors: ${msg || error}`
       });
     }));
+
+  @Effect()
+  getDesktops$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_DESKTOPS),
+    withLatestFrom(this.store$),
+    switchMap(([_action, storeState]) =>
+      this.requests.getDesktops(storeState.desktops.getDesktopsFilter).pipe(
+        map(desktops => new GetDesktopsSuccess( desktops )),
+      catchError((error) => of(new GetDesktopsFailure(error))))
+    ));
+
+  @Effect()
+  getDesktopsFailure$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_DESKTOPS_FAILURE),
+    map(({ payload: { error } }: GetDesktopsFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get desktops errors: ${msg || error}`
+      });
+    }));
+
+  @Effect()
+  getDesktopsTotal$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_DESKTOPS_TOTAL),
+    mergeMap((_action) =>
+      this.requests.getDesktopsTotal().pipe(
+        map(total => new GetDesktopsTotalSuccess( total )),
+      catchError((error) => of(new GetDesktopsTotalFailure(error))))
+    ));
+
+  @Effect()
+  getDesktopsTotalFailure$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_DESKTOPS_TOTAL_FAILURE),
+    map(({ payload: { error } }: GetDesktopsTotalFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get desktops total errors: ${msg || error}`
+      });
+    }));
+
+  @Effect()
+  updateDesktopFilterCurrentPage$ = this.actions$.pipe(
+      ofType(DesktopActionTypes.UPDATE_DESKTOPS_FILTER_CURRENT_PAGE),
+      mergeMap(() => [ new GetDesktops() ]));
 }

@@ -12,6 +12,7 @@ import { TopErrorsComponent } from './top-errors/top-errors.component';
 import {
   UnknownDesktopDurationCountsComponent
 } from './unknown-desktop-duration-counts/unknown-desktop-duration-counts.component';
+import { InsightComponent } from './insight/insight.component';
 import { DesktopRoutingModule } from './desktop-routing.module';
 
 @NgModule({
@@ -28,14 +29,16 @@ import { DesktopRoutingModule } from './desktop-routing.module';
     DashboardComponent,
     CheckInTimeSeriesComponent,
     TopErrorsComponent,
-    UnknownDesktopDurationCountsComponent
+    UnknownDesktopDurationCountsComponent,
+    InsightComponent
   ],
   declarations: [
     DailyCheckInComponent,
     DashboardComponent,
     CheckInTimeSeriesComponent,
     TopErrorsComponent,
-    UnknownDesktopDurationCountsComponent
+    UnknownDesktopDurationCountsComponent,
+    InsightComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

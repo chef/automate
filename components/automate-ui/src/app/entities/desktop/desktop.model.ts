@@ -35,3 +35,20 @@ export interface CountedDurationItem {
   duration: string;
   count: number;
 }
+
+export interface Desktop {
+  id: string;
+  name: string;
+  status: string;
+  checkin: Date;
+  uptimeSeconds: number;
+  platform: string;
+  chefVersion: string;
+}
+
+export interface Filter {
+  currentPage: number;
+  pageSize: number;
+  sortingField: string;
+  sortingOrder: string;
+}
