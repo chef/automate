@@ -387,7 +387,7 @@ func TestDataCollectorGetStructIfExistsWhenFieldIsSomethingElseReturnEmptyStruct
 	pbStruct := getStructIfExists("data", bytes)
 	assert.Equal(t, expectedDataField, pbStruct)
 
-	// For an 'Array' you can't use 'getStructIfExists()' you must use 'GetStructArray()'
+	// For an 'Array' you can't use 'getStructIfExists()' you must use 'getStructArray()'
 	bytes = []byte(`{"data":[{"id":"1"},{"id":"1"}]}`)
 	pbStruct = getStructIfExists("data", bytes)
 	assert.Equal(t, expectedDataField, pbStruct)
@@ -405,7 +405,7 @@ func TestDataCollectorGetStructIfExistsWhenFieldIsSomethingElseReturnEmptyStruct
 
 func TestDataCollectorGetStructArrayWhenTheArrayAreObjects(t *testing.T) {
 	bytes := []byte(`{"data":[{"id":"1"},{"id":"2"}]}`)
-	arrayStruct := GetStructArray("data", bytes)
+	arrayStruct := getStructArray("data", bytes)
 
 	expectedDataField := []*structpb.Struct{
 		&structpb.Struct{
@@ -425,7 +425,7 @@ func TestDataCollectorGetStructArrayWhenTheArrayAreObjects(t *testing.T) {
 
 func TestDataCollectorGetStructArrayWhenTheArrayAreStrings(t *testing.T) {
 	bytes := []byte(`{"data":["{\"id\":\"1\"}","{\"id\":\"2\"}"]}`)
-	arrayStruct := GetStructArray("data", bytes)
+	arrayStruct := getStructArray("data", bytes)
 
 	expectedDataField := []*structpb.Struct{
 		&structpb.Struct{

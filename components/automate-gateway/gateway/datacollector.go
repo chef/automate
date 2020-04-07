@@ -405,7 +405,7 @@ func getError(body []byte) *ingestProto.Error {
 		if err == nil {
 			description = &ingestProto.Description{
 				Title:    getStringIfExists("title", descBytes),
-				Sections: GetStructArray("sections", descBytes),
+				Sections: getStructArray("sections", descBytes),
 			}
 		}
 		var (
@@ -612,7 +612,7 @@ func getInspecControls(profile []byte) []*inspecEvent.Control {
 				Desc:           getStringIfExists("desc", control),
 				SourceLocation: getInspecSourceLocation(control),
 				WaiverData:     getInspecControlWaiverData(control),
-				Refs:           GetStructArray("refs", control),
+				Refs:           getStructArray("refs", control),
 				Tags:           getStructIfExists("tags", control),
 				Results:        getInspecResults(control),
 			}
@@ -670,7 +670,7 @@ func getInspecControlWaiverData(control []byte) *inspecEvent.WaiverData {
 	return dataToReturn
 }
 
-func GetStructArray(fieldName string, body []byte) []*structpb.Struct {
+func getStructArray(fieldName string, body []byte) []*structpb.Struct {
 	pStructs := make([]*structpb.Struct, 0)
 	// TODO (tc): Seems like we should check if the json fails to parse?
 	// nolint: errcheck
