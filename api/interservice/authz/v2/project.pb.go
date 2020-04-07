@@ -182,6 +182,7 @@ func (m *Project) GetStatus() string {
 type CreateProjectReq struct {
 	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
 	Id                   string   `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
+	SkipPolicies         bool     `protobuf:"varint,3,opt,name=skip_policies,json=skipPolicies,proto3" json:"skip_policies,omitempty" toml:"skip_policies,omitempty" mapstructure:"skip_policies,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -224,6 +225,13 @@ func (m *CreateProjectReq) GetId() string {
 		return m.Id
 	}
 	return ""
+}
+
+func (m *CreateProjectReq) GetSkipPolicies() bool {
+	if m != nil {
+		return m.SkipPolicies
+	}
+	return false
 }
 
 type CreateProjectResp struct {
