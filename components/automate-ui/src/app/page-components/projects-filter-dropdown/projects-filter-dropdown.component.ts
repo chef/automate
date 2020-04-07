@@ -77,8 +77,9 @@ export class ProjectsFilterDropdownComponent {
   }
 
   handleClearSelection() {
-    // uncheck all the options
-    this.editableOptions.map(option => option.checked = false);
+    // TODO: Should ideally set to true only when some projects were selected upon opening
+    this.optionsEdited = true; // mark as edited
+    this.editableOptions.map(option => option.checked = false); // uncheck all the options
   }
 
   handleArrowUp(event: KeyboardEvent) {
