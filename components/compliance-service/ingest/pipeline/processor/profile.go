@@ -28,8 +28,6 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processing Compliance Profile")
 			var err error
 
-			msg.Report.Profiles = compliance.FixInheritedProfiles(msg.Report.Profiles)
-
 			reportProfilesShas := make([]string, len(msg.Report.Profiles))
 			reportProfilesShasMissingMetaMap := make(map[string]string, 0)
 			reportProfilesShasMissingMetaArr := make([]string, 0)
@@ -132,6 +130,9 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 				msg.FinishProcessingCompliance(grpcErr)
 				continue
 			}
+
+			msg.Report.Profiles = compliance.FixInheritedProfiles(msg.Report.Profiles)
+
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processed Compliance Profile")
 			out <- msg
 		}
