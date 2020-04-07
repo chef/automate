@@ -31,7 +31,20 @@
     margin-right: 1em;
   }
 
-  chef-td:last-child {
+  chef-table-header-cell {
+    flex-flow: row nowrap;
+    align-items: center;
+
+    .toggle-sort {
+      border: none;
+      padding: unset;
+      margin: unset;
+      font-family: muli;
+      font-weight: bold;
+    }
+  }
+
+  chef-table-cell:last-child {
     justify-content: flex-end;
   }
 }

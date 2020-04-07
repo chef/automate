@@ -27,27 +27,31 @@
         </chef-toolbar>
 
         <app-authorized [anyOf]="['/datafeed/destinations', 'post']">
-          <chef-table *ngIf="(destinations$ | async)?.length > 0" id="destinations-list">
-            <chef-tr>
-              <chef-th class="sort" (click)="toggleSort('name')">
-                <div class="text-and-sort-icons">
-                  <span>Name</span>
-                  <chef-icon aria-hidden="true" id="{{sortIcon('name')}}" class="sort-icon">arrow_drop_up</chef-icon>
-                </div>
-              </chef-th>
-            </chef-tr>
-            <chef-tr tabindex="0" *ngFor="let destination of destinations$ | async |
+          <chef-table-new *ngIf="(destinations$ | async)?.length > 0" id="destinations-list">
+            <chef-table-header>
+              <chef-table-row>
+                <chef-table-header-cell class="sort">
+                  <button class="toggle-sort" (click)="toggleSort('name')">
+                    <span>Name</span>
+                    <chef-icon aria-hidden="true" id="{{sortIcon('name')}}" class="sort-icon">arrow_drop_up</chef-icon>
+                  </button>
+                </chef-table-header-cell>
+              </chef-table-row>
+            </chef-table-header>
+            <chef-table-body>
+            <chef-table-row tabindex="0" *ngFor="let destination of destinations$ | async |
               slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
-              <chef-td>
+              <chef-table-cell>
                   <a [routerLink]="['/settings/data-feed/form', destination.id]">{{ destination.name }}</a>
-                </chef-td>
-              <chef-td class="actions three-dot-column">
+                </chef-table-cell>
+              <chef-table-cell class="actions three-dot-column">
                 <mat-select panelClass="chef-control-menu">
                   <mat-option (onSelectionChange)="deleteDestination(destination)">Delete Destination</mat-option>
                 </mat-select>
-              </chef-td>
-            </chef-tr>
-          </chef-table>
+              </chef-table-cell>
+            </chef-table-row>
+            </chef-table-body>
+          </chef-table-new>
 
         </app-authorized>
 
