@@ -23,3 +23,8 @@ export const topErrorsCollection = createSelector(
   desktopState,
   (state) => state.topErrorCollection
 );
+
+export const unknownDesktopDurationCounts = createSelector(
+  desktopState,
+  (state) => state.unknownDesktopDurationCounts
+);

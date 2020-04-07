@@ -1,0 +1,19 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <div class="page-title">Unknown Duration</div>
+      <div class="update-time">Updated {{ lastUpdatedMessage }}</div>
+
+      <table>
+        <tbody>
+          <tr *ngFor="let items of countedDurationItems">
+            <td>{{ formatDuration(items.duration) }}</td>
+            <td>{{ items.count }}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+    </main>
+  </div>
+</div>

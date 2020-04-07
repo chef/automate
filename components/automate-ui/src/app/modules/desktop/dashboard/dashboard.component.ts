@@ -8,17 +8,19 @@ import { last, reverse } from 'lodash/fp';
 import {
   GetDailyCheckInTimeSeries,
   SetDaysAgoSelected,
-  GetTopErrorsCollection
+  GetTopErrorsCollection,
+  GetUnknownDesktopDurationCounts
 } from 'app/entities/desktop/desktop.actions';
 
 import {
   dailyCheckInCountCollection,
   getSelectedDaysAgo,
-  topErrorsCollection
+  topErrorsCollection,
+  unknownDesktopDurationCounts
 } from 'app/entities/desktop/desktop.selectors';
 
 import {
-  DailyCheckInCount, DailyCheckInCountCollection, DayPercentage, TopErrorsItem
+  DailyCheckInCount, DailyCheckInCountCollection, DayPercentage, TopErrorsItem, CountedDurationItem
 } from 'app/entities/desktop/desktop.model';
 
 @Component({
@@ -40,6 +42,8 @@ export class DashboardComponent implements OnInit {
   public topErrorsItems$: Observable<TopErrorsItem[]>;
   public checkInCountCollectedUpdated$: Observable<Date>;
   public topErrorsUpdated$: Observable<Date>;
+  public unknownDesktopCountedDurationItems$: Observable<CountedDurationItem[]>;
+  public unknownDesktopCountedDurationUpdated$: Observable<Date>;
 
   constructor(
     private store: Store<NgrxStateAtom>
@@ -48,6 +52,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.store.dispatch(new GetDailyCheckInTimeSeries());
     this.store.dispatch(new GetTopErrorsCollection());
+    this.store.dispatch(new GetUnknownDesktopDurationCounts());
 
     this.selectedDaysAgo$ = this.store.select(getSelectedDaysAgo);
 
@@ -109,6 +114,15 @@ export class DashboardComponent implements OnInit {
 
     this.topErrorsUpdated$ = this.store.select(topErrorsCollection).pipe(
       map(collection => collection.updated)
+    );
+
+    this.unknownDesktopCountedDurationItems$ = this.store.select(unknownDesktopDurationCounts).pipe(
+      map(counts => counts.items)
+    );
+
+    this.unknownDesktopCountedDurationUpdated$ =
+      this.store.select(unknownDesktopDurationCounts).pipe(
+      map(counts => counts.updated)
     );
   }
 

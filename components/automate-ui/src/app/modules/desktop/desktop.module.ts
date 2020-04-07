@@ -9,7 +9,9 @@ import { DailyCheckInComponent } from './daily-check-in/daily-check-in.component
 import { CheckInTimeSeriesComponent } from './check-in-time-series/check-in-time-series.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { TopErrorsComponent } from './top-errors/top-errors.component';
-
+import {
+  UnknownDesktopDurationCountsComponent
+} from './unknown-desktop-duration-counts/unknown-desktop-duration-counts.component';
 import { DesktopRoutingModule } from './desktop-routing.module';
 
 @NgModule({
@@ -25,13 +27,15 @@ import { DesktopRoutingModule } from './desktop-routing.module';
     DailyCheckInComponent,
     DashboardComponent,
     CheckInTimeSeriesComponent,
-    TopErrorsComponent
+    TopErrorsComponent,
+    UnknownDesktopDurationCountsComponent
   ],
   declarations: [
     DailyCheckInComponent,
     DashboardComponent,
     CheckInTimeSeriesComponent,
-    TopErrorsComponent
+    TopErrorsComponent,
+    UnknownDesktopDurationCountsComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
