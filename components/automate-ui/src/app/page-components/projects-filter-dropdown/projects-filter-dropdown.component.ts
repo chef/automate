@@ -63,11 +63,9 @@ export class ProjectsFilterDropdownComponent {
   }
 
   handleOptionChange(event, label) {
-    this.editableOptions.find(option => {
-      if (option.label === label) {
-        option.checked = event.detail; // provides the new state of the checkbox
-      }
-    });
+    // sets the new state of the specific checkbox
+    this.editableOptions
+      .find(option => option.label === label).checked = event.detail;
     this.optionsEdited = true;
   }
 
