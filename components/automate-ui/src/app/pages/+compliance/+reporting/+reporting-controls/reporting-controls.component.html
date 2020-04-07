@@ -28,7 +28,7 @@
           {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
         </chef-table-cell>
         <chef-table-cell>{{ control.end_time | timeFromNow }}</chef-table-cell>
-        <chef-table-cell class="node-details" *ngIf="control.control_summary as summary">
+        <chef-table-cell class="node-status" *ngIf="control.control_summary as summary">
           <span class="control-result" [ngClass]="{'failed': summary.failed.total > 0}">
             <chef-icon>report_problem</chef-icon>
             <span>{{ summary.failed.total | number }}</span>
