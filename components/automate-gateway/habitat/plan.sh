@@ -12,6 +12,7 @@ pkg_deps=(
   core/cacerts # communicate with license service over HTTPS
   core/curl
   core/jq-static
+  core/glibc # zoneinfo
   chef/mlsa
 )
 pkg_exports=(

@@ -239,7 +239,7 @@ function build() {
   if [ -z "$hab_build" ]; then
     exit_with "Hab build binary not found. Verify the 'build' wrapper inside the studio." 22
   else
-    HAB_FEAT_IGNORE_LOCAL=true HAB_BLDR_CHANNEL=dev $hab_build "$@"
+    HAB_FEAT_IGNORE_LOCAL=true HAB_BLDR_CHANNEL=${HAB_BLDR_CHANNEL:-dev} $hab_build "$@"
   fi
 }
 

@@ -10,6 +10,7 @@ pkg_license=('Chef-MLSA')
 pkg_upstream_url="http://github.com/chef/automate/components/event-feed-service"
 pkg_deps=(
   chef/mlsa
+  core/glibc # for zoneinfo
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
 )
 pkg_exports=(
