@@ -249,12 +249,7 @@ func (m *CreateUserReq) Validate() error {
 
 	// no validation rules for Id
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		return CreateUserReqValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-	}
+	// no validation rules for Name
 
 	if !_CreateUserReq_Email_Pattern.MatchString(m.GetEmail()) {
 		return CreateUserReqValidationError{
@@ -346,12 +341,7 @@ func (m *UpdateUserReq) Validate() error {
 		}
 	}
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		return UpdateUserReqValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-	}
+	// no validation rules for Name
 
 	// no validation rules for Password
 
@@ -436,12 +426,7 @@ func (m *UpdateSelfReq) Validate() error {
 		}
 	}
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		return UpdateSelfReqValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-	}
+	// no validation rules for Name
 
 	// no validation rules for Password
 

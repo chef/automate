@@ -409,12 +409,7 @@ func (m *UpdateTeamReq) Validate() error {
 		}
 	}
 
-	if !_UpdateTeamReq_Name_Pattern.MatchString(m.GetName()) {
-		return UpdateTeamReqValidationError{
-			field:  "Name",
-			reason: "value does not match regex pattern \"\\\\S\"",
-		}
-	}
+	// no validation rules for Name
 
 	_UpdateTeamReq_Projects_Unique := make(map[string]struct{}, len(m.GetProjects()))
 
@@ -497,8 +492,6 @@ var _ interface {
 } = UpdateTeamReqValidationError{}
 
 var _UpdateTeamReq_Id_Pattern = regexp.MustCompile("\\S")
-
-var _UpdateTeamReq_Name_Pattern = regexp.MustCompile("\\S")
 
 var _UpdateTeamReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
@@ -741,12 +734,7 @@ func (m *CreateTeamReq) Validate() error {
 		}
 	}
 
-	if !_CreateTeamReq_Name_Pattern.MatchString(m.GetName()) {
-		return CreateTeamReqValidationError{
-			field:  "Name",
-			reason: "value does not match regex pattern \"\\\\S\"",
-		}
-	}
+	// no validation rules for Name
 
 	_CreateTeamReq_Projects_Unique := make(map[string]struct{}, len(m.GetProjects()))
 
@@ -829,8 +817,6 @@ var _ interface {
 } = CreateTeamReqValidationError{}
 
 var _CreateTeamReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
-
-var _CreateTeamReq_Name_Pattern = regexp.MustCompile("\\S")
 
 var _CreateTeamReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
