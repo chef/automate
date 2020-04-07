@@ -335,6 +335,47 @@ func TestServers(t *testing.T) {
 			assert.Equal(t, len(serverListBefore.Servers)-1, len(serverListAfter.Servers))
 		})
 
+		t.Run("when the server exists with orgs, raise server can not be deleted error", func(t *testing.T) {
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
+				Name:        "chef-infra-server1",
+				Description: "Chef infra server",
+				Fqdn:        "domain1.com",
+				IpAddress:   "10.0.0.1",
+			})
+			require.NoError(t, err)
+			require.NotNil(t, resp1)
+
+			respOrg, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  resp1.Server.Id,
+				Projects:  []string{},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, respOrg)
+
+			serverListBefore, err := cl.GetServers(ctx, &request.GetServers{})
+			require.NoError(t, err)
+			assert.Equal(t, 1, len(serverListBefore.Servers))
+
+			resp, err2 := cl.DeleteServer(ctx, &request.DeleteServer{Id: resp1.Server.Id})
+			require.Error(t, err2)
+			require.Nil(t, resp)
+			grpctest.AssertCode(t, codes.FailedPrecondition, err2)
+
+			serverListAfter, err3 := cl.GetServers(ctx, &request.GetServers{})
+			require.NoError(t, err3)
+			assert.Equal(t, len(serverListBefore.Servers), len(serverListAfter.Servers))
+
+			cleanupOrg(ctx, t, cl, respOrg.Org.Id)
+			cleanupServer(ctx, t, cl, resp1.Server.Id)
+		})
+
 		t.Run("when the server ID for the server to delete is empty, raise an invalid argument error", func(t *testing.T) {
 			resp, err := cl.GetServer(ctx, &request.GetServer{
 				Id: "",

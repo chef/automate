@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"strings"
 
 	"github.com/lib/pq" // adapter for database/sql
 	"github.com/pkg/errors"
@@ -59,10 +60,16 @@ func parsePQError(e *pq.Error) error {
 	case "unique_violation":
 		return storage.ErrConflict
 	case "foreign_key_violation":
-		// in this piece of code, a foreign key violation means the server the org
-		// should be added to doesn't exist; a "not found" seems like an OK
-		// approximation for now
-		return storage.ErrNotFound
+		// In this piece of code, a foreign key violation means the server the org
+		// should be added to doesn't exist.
+		// The only way to distinguish this violation by comparing the server_id key in Error detail.
+		// DETAIL:  Key (server_id)=(2e831dec-f25c-4fde-aef6-8f68ea366251) is not present in table "servers".
+		if strings.Contains(e.Detail, "(server_id)") {
+			return storage.ErrForeignKeyViolation
+		}
+		// Marking other foreign key violations as a record can not be deleted.
+		// DETAIL: Key (id)=(2e831dec-f25c-4fde-aef6-8f68ea36625f) is still referenced from table "orgs".
+		return storage.ErrCannotDelete
 	}
 
 	return e

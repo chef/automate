@@ -56,7 +56,7 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 
 	org, err := s.service.Storage.StoreOrg(ctx, req.Name, req.AdminUser, secretID.GetId(), req.ServerId, req.Projects)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req.Name, "org")
+		return nil, service.ParseStorageError(err, req, "org")
 	}
 
 	return &response.CreateOrg{
@@ -76,7 +76,7 @@ func (s *Server) GetOrgs(ctx context.Context, req *request.GetOrgs) (*response.G
 
 	orgsList, err := s.service.Storage.GetOrgs(ctx, serverID)
 	if err != nil {
-		return nil, service.ParseStorageError(err, "", "org")
+		return nil, service.ParseStorageError(err, req, "org")
 	}
 
 	return &response.GetOrgs{
@@ -96,7 +96,7 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 
 	org, err := s.service.Storage.GetOrg(ctx, UUID)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req.Id, "org")
+		return nil, service.ParseStorageError(err, req, "org")
 	}
 
 	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.AdminKey})
@@ -133,7 +133,7 @@ func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*
 
 	org, err := s.service.Storage.GetOrgByName(ctx, req.Name, serverID)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req.Name, "org")
+		return nil, service.ParseStorageError(err, req, "org")
 	}
 
 	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.AdminKey})
@@ -164,7 +164,7 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 
 	org, err := s.service.Storage.DeleteOrg(ctx, UUID)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req.Id, "org")
+		return nil, service.ParseStorageError(err, req, "org")
 	}
 
 	_, err = s.service.Secrets.Delete(ctx, &secrets.Id{Id: org.AdminKey})
@@ -210,7 +210,7 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 
 	oldOrg, err := s.service.Storage.GetOrg(ctx, id)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req.Id, "org")
+		return nil, service.ParseStorageError(err, req, "org")
 	}
 
 	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: oldOrg.AdminKey})
@@ -246,7 +246,7 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 
 	org, err := s.service.Storage.EditOrg(ctx, orgStruct)
 	if err != nil {
-		return nil, service.ParseStorageError(err, id, "org")
+		return nil, service.ParseStorageError(err, req, "org")
 	}
 
 	return &response.UpdateOrg{
