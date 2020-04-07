@@ -83,11 +83,8 @@ export class ProjectsFilterDropdownComponent {
   }
 
   handleClearSelection() {
-    this.dropdownActive = false;
-    this.optionsEdited = false;
-    // uncheck all the options and then save
+    // uncheck all the options
     this.editableOptions.map(option => option.checked = false);
-    this.onSelection.emit(this.editableOptions);
   }
 
   handleArrowUp(event: KeyboardEvent) {
