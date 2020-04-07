@@ -342,9 +342,11 @@ func (p *Server) ListRoles(
 // CreateProject creates a new project.
 func (p *Server) CreateProject(
 	ctx context.Context, in *pb_req.CreateProjectReq) (*pb_resp.CreateProjectResp, error) {
+
 	resp, err := p.projects.CreateProject(ctx, &authz.CreateProjectReq{
-		Id:   in.Id,
-		Name: in.Name,
+		Id:          in.Id,
+		Name:        in.Name,
+		SkipPolicies: in.SkipPolicies,
 	})
 	if err != nil {
 		return nil, err
