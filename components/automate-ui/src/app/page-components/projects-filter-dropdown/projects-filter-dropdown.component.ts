@@ -44,12 +44,8 @@ export class ProjectsFilterDropdownComponent {
   }
 
   handleFilterKeyUp(filterValue: string): void {
-    this.filteredOptions = this.filterOptions(filterValue);
-  }
-
-  filterOptions(value: string): ProjectsFilterOption[] {
-    return this.editableOptions.filter(option =>
-      option.label.toLowerCase().indexOf(value.toLowerCase()) > -1);
+    this.filteredOptions = this.editableOptions
+      .filter(option => option.label.toLowerCase().indexOf(filterValue.toLowerCase()) > -1);
   }
 
   handleLabelClick() {
