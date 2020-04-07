@@ -370,6 +370,37 @@ func init() {
         ]
       }
     },
+    "/cfgmgmt/stats/missing_node_duration_counts": {
+      "get": {
+        "summary": "GetMissingNodeDurationCounts",
+        "description": "Returns a count of missing nodes for the provided durations.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/missing_node_duration_counts?durations=3d\u0026durations=1w\u0026durations=2w\u0026durations=1M\u0026durations=3M\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetMissingNodeDurationCounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.MissingNodeDurationCounts"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "durations",
+            "description": "A valid duration is any number zero or greater with one of these characters 'h', 'd', 'w', or 'M'. \n'h' is hours\n'd' is days\n'w' is weeks\n'M' is months\nExamples '12h', '3d', and '1M'.\nWill contain one or many.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/cfgmgmt/stats/node_counts": {
       "get": {
         "summary": "GetNodesCounts",
@@ -587,6 +618,20 @@ func init() {
         }
       }
     },
+    "chef.automate.api.cfgmgmt.response.CountedDuration": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "string",
+          "title": "Duration of the count. Example '3d'"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The number of nodes for this duration"
+        }
+      }
+    },
     "chef.automate.api.cfgmgmt.response.Deprecation": {
       "type": "object",
       "properties": {
@@ -661,6 +706,18 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunList"
           },
           "description": "Intentionally blank."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.MissingNodeDurationCounts": {
+      "type": "object",
+      "properties": {
+        "counted_durations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CountedDuration"
+          },
+          "title": "List of counted durations"
         }
       }
     },

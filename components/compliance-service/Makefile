@@ -115,7 +115,7 @@ generate-ruby-grpc-secrets-service:
 
 proto:
 	@printf "\n===> ${blue}Generating compliance-service protos${reset}\n"
-	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component compliance-service'
+	cd ../../ && hab studio run 'source .studiorc; compile_all_protobuf_components'
 
 gateway-proto:
 	@printf "\n===> ${blue}Generating automate-gateway protos${reset}\n"

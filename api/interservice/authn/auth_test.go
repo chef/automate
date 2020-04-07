@@ -16,73 +16,90 @@ func TestGeneratedProtobufUpToDate(t *testing.T) {
 func TestValidationCreateTokenID(t *testing.T) {
 	negativeCases := map[string]*authn.CreateTokenReq{
 		"with uppercase characters": &authn.CreateTokenReq{
-			Id:       "TestID",
-			Projects: []string{"project1", "project2"},
+			Id:          "TestID",
+			Description: "description",
+			Projects:    []string{"project1", "project2"},
 		},
 		"with non-dash characters": &authn.CreateTokenReq{
-			Id:       "test#space",
-			Projects: []string{"project1", "project2"},
+			Id:          "test#space",
+			Description: "description",
+			Projects:    []string{"project1", "project2"},
 		},
 		"with spaces": &authn.CreateTokenReq{
-			Id:       "test space",
-			Projects: []string{"project1", "project2"},
+			Id:          "test space",
+			Description: "description",
+			Projects:    []string{"project1", "project2"},
 		},
 		"whitespace projects list": &authn.CreateTokenReq{
-			Id:       "valid-id",
-			Projects: []string{"     ", "test"},
+			Id:          "valid-id",
+			Description: "description",
+			Projects:    []string{"     ", "test"},
 		},
 		"repeated projects in list": &authn.CreateTokenReq{
-			Id:       "valid-id",
-			Projects: []string{"repeat", "repeat"},
+			Id:          "valid-id",
+			Description: "description",
+			Projects:    []string{"repeat", "repeat"},
 		},
 		"project has invalid characters": &authn.CreateTokenReq{
-			Id:       "valid-id",
-			Projects: []string{"valid", "wrong~"},
+			Id:          "valid-id",
+			Description: "description",
+			Projects:    []string{"valid", "wrong~"},
 		},
 		"project has spaces": &authn.CreateTokenReq{
-			Id:       "valid-id",
-			Projects: []string{"valid", "wrong space"},
+			Id:          "valid-id",
+			Description: "description",
+			Projects:    []string{"valid", "wrong space"},
 		},
 		"project is too long": &authn.CreateTokenReq{
-			Id:       "valid-id",
-			Projects: []string{"much-too-long-longest-word-in-english-pneumonoultramicroscopicsilicovolcanoconiosis", "valid"},
+			Id:          "valid-id",
+			Description: "description",
+			Projects:    []string{"much-too-long-longest-word-in-english-pneumonoultramicroscopicsilicovolcanoconiosis", "valid"},
 		},
 	}
 	positiveCases := map[string]*authn.CreateTokenReq{
 		"projects are missing": &authn.CreateTokenReq{
-			Id: "valid-id",
+			Id:          "valid-id",
+			Description: "description",
 		},
 		"underscore in IDs": &authn.CreateTokenReq{
-			Id:       "valid_id",
-			Projects: []string{"project_1", "project_2"},
+			Id:          "valid_id",
+			Description: "description",
+			Projects:    []string{"project_1", "project_2"},
 		},
 		"with no characters": &authn.CreateTokenReq{
-			Id:       "",
-			Projects: []string{"project1", "project2"},
+			Id:          "",
+			Description: "description",
+			Projects:    []string{"project1", "project2"},
 		},
 		"with ID all lowercase": &authn.CreateTokenReq{
-			Id:       "test",
-			Projects: []string{"project1", "project2"},
+			Id:          "test",
+			Description: "description",
+			Projects:    []string{"project1", "project2"},
 		},
 		"with ID that has dashes": &authn.CreateTokenReq{
-			Id:       "-test-with-dashes-",
-			Projects: []string{"project1", "project2"},
+			Id:          "-test-with-dashes-",
+			Description: "description",
+			Projects:    []string{"project1", "project2"},
 		},
 		"with ID that has dashes and numbers": &authn.CreateTokenReq{
-			Id:       "1-test-with-1-and-dashes-0",
-			Projects: []string{"project1", "project2"},
+			Id:          "1-test-with-1-and-dashes-0",
+			Description: "description",
+			Projects:    []string{"project1", "project2"},
 		},
 		"with ID that has only numbers": &authn.CreateTokenReq{
-			Id:       "1235",
-			Projects: []string{"project1", "project2"},
+			Id:          "1235",
+			Description: "description",
+			Projects:    []string{"project1", "project2"},
 		},
 		"with a single project": &authn.CreateTokenReq{
-			Id:       "1235",
-			Projects: []string{"project1"},
+			Id:          "1235",
+			Description: "description",
+			Projects:    []string{"project1"},
 		},
 		"projects are empty": &authn.CreateTokenReq{
-			Id:       "valid-id",
-			Projects: []string{},
+			Id:          "valid-id",
+			Description: "description",
+			Projects:    []string{},
 		},
 	}
 

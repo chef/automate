@@ -134,6 +134,35 @@ func (s *CfgMgmtServer) GetErrors(ctx context.Context, request *cfgReq.Errors) (
 	return s.cfgMgmtClient.GetErrors(ctx, request)
 }
 
+func (s *CfgMgmtServer) GetMissingNodeDurationCounts(ctx context.Context,
+	request *cfgReq.MissingNodeDurationCounts) (*cfgRes.MissingNodeDurationCounts, error) {
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	cfgMgmtRequest := &cmsReq.MissingNodeDurationCounts{
+		Durations: request.Durations,
+	}
+
+	response, err := s.cfgMgmtClient.GetMissingNodeDurationCounts(ctx, cfgMgmtRequest)
+	if err != nil {
+		return &cfgRes.MissingNodeDurationCounts{}, err
+	}
+
+	responseCountedDurations := make([]*cfgRes.CountedDuration, len(response.CountedDurations))
+	for index := range response.CountedDurations {
+		responseCountedDurations[index] = &cfgRes.CountedDuration{
+			Duration: response.CountedDurations[index].Duration,
+			Count:    response.CountedDurations[index].Count,
+		}
+	}
+
+	return &cfgRes.MissingNodeDurationCounts{
+		CountedDurations: responseCountedDurations,
+	}, nil
+}
+
 func (s *CfgMgmtServer) GetAttributes(ctx context.Context, request *cfgReq.Node) (*cfgRes.NodeAttribute, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),

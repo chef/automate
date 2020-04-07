@@ -55,6 +55,32 @@ func init() {
         ]
       }
     },
+    "/compliance/profiles/metasearch": {
+      "post": {
+        "operationId": "MetaSearch",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Missing"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Sha256"
+            }
+          }
+        ],
+        "tags": [
+          "ProfilesService"
+        ]
+      }
+    },
     "/compliance/profiles/read/{owner}/{name}/version/{version}": {
       "get": {
         "summary": "Show an installed profile",
@@ -393,6 +419,17 @@ func init() {
       },
       "description": "Metadata about the profile."
     },
+    "chef.automate.api.compliance.profiles.v1.Missing": {
+      "type": "object",
+      "properties": {
+        "missing_sha256": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "chef.automate.api.compliance.profiles.v1.Option": {
       "type": "object",
       "properties": {
@@ -639,6 +676,17 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "Count of controls in the profile."
+        }
+      }
+    },
+    "chef.automate.api.compliance.profiles.v1.Sha256": {
+      "type": "object",
+      "properties": {
+        "sha256": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

@@ -142,6 +142,28 @@ service ProfilesService {
 			action: "compliance:profiles:list"
 		};
 	};
+	rpc MetaSearch(Sha256) returns (Missing) {
+        option (google.api.http) = {
+                post: "/compliance/profiles/metasearch"
+                body: "*"
+        };
+        option (chef.automate.api.policy) = {
+            resource: "compliance:profiles"
+            action: "search"
+        };
+        option (chef.automate.api.iam.policy) = {
+            resource: "compliance:profiles"
+            action: "compliance:profiles:list"
+        };
+	};
+}
+
+message Sha256 {
+	repeated string sha256 = 1;
+}
+
+message Missing {
+	repeated string missing_sha256 = 1;
 }
 
 message ProfilePostRequest {

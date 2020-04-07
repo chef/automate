@@ -18,6 +18,7 @@ import (
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/api/profiles/conversion"
 	"github.com/chef/automate/components/compliance-service/config"
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	dbstore "github.com/chef/automate/components/compliance-service/profiles/db"
 	"github.com/chef/automate/components/compliance-service/profiles/market"
@@ -29,6 +30,7 @@ import (
 // PGProfileServer implements the profile store GRPC interface
 type PGProfileServer struct {
 	es           *relaxting.ES2Backend
+	esClient     *ingestic.ESClient
 	profiles     *config.Profiles
 	store        *dbstore.Store
 	eventsClient automate_event.EventServiceClient
@@ -266,6 +268,22 @@ func (srv *PGProfileServer) ReadTar(in *profiles.ProfileDetails, stream profiles
 		return status.Error(codes.Internal, "we could not find the requested profile")
 	}
 	return nil
+}
+
+// Check the existance of profile IDs(sha256) in the comp-*-profiles ES index
+func (srv *PGProfileServer) MetaSearch(ctx context.Context, profileSha256 *profiles.Sha256) (*profiles.Missing, error) {
+	logrus.Debugf("Checking if profiles with sha256 IDs %v are already stored in ElasticSearch", profileSha256.Sha256)
+
+	profilesMetaMissing, err := srv.esClient.ProfilesMissing(profileSha256.Sha256)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	exists := profiles.Missing{
+		MissingSha256: profilesMetaMissing,
+	}
+
+	return &exists, nil
 }
 
 // Delete never deletes a profile, it only deletes the associations

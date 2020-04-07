@@ -31,7 +31,7 @@ func (p *Policy) Scan(src interface{}) error {
 	return json.Unmarshal(source, p)
 }
 
-// NewPolicy is a factory for creating a Statement storage object that also does
+// NewPolicy is a factory for creating a Policy storage object that also does
 // validation around what a valid policy is in terms of our storage layer.
 func NewPolicy(
 	id string,
@@ -42,14 +42,7 @@ func NewPolicy(
 	projects []string,
 ) (Policy, error) {
 
-	if id == "" {
-		return Policy{}, storage_errors.NewMissingFieldError("id")
-	}
-	if name == "" {
-		return Policy{}, storage_errors.NewMissingFieldError("name")
-	}
-
-	err := ValidateProjects(projects)
+	err := validatePolicyInputs(id, name, projects)
 	if err != nil {
 		return Policy{}, err
 	}
@@ -62,4 +55,20 @@ func NewPolicy(
 		Statements: statements,
 		Projects:   projects,
 	}, nil
+}
+
+func validatePolicyInputs(id string, name string, projects []string) error {
+	if emptyOrWhitespaceOnlyRE.MatchString(id) {
+		return errors.New(
+			"a policy id is required and must contain at least one non-whitespace character")
+	}
+	if emptyOrWhitespaceOnlyRE.MatchString(name) {
+		return errors.New(
+			"a policy name is required and must contain at least one non-whitespace character")
+	}
+	err := ValidateProjects(projects)
+	if err != nil {
+		return err
+	}
+	return nil
 }

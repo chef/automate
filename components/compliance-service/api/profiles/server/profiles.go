@@ -7,16 +7,19 @@ import (
 	statusserver "github.com/chef/automate/components/compliance-service/api/status/server"
 	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	dbstore "github.com/chef/automate/components/compliance-service/profiles/db"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
 
 // New creates a new server
-func New(db *pgdb.DB, es *relaxting.ES2Backend, profiles *config.Profiles,
+func New(db *pgdb.DB, esBackend *relaxting.ES2Backend, esClient *ingestic.ESClient, profiles *config.Profiles,
 	eventsClient automate_event.EventServiceClient, statusSrv *statusserver.Server) *PGProfileServer {
+
 	srv := &PGProfileServer{
 		profiles:     profiles,
-		es:           es,
+		es:           esBackend,
+		esClient:     esClient,
 		store:        &dbstore.Store{DB: db},
 		eventsClient: eventsClient,
 	}

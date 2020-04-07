@@ -388,4 +388,19 @@ describe File.basename(__FILE__) do
     assert_equal 1, res.size
     assert_kind_of Profiles::ProfileData, res.first
   end
+
+  it "checks for missing profile metadata" do
+    res = GRPC profiles, :meta_search, Profiles::Sha256.new(sha256: ['123456'])
+    assert_equal ['123456'], res.missing_sha256
+  end
+
+  it "checks for an existing profile metadata" do
+    res = GRPC profiles, :meta_search, Profiles::Sha256.new(sha256: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8'])
+    assert_equal [], res.missing_sha256
+  end
+
+  it "checks for both an existing and missing profile metadata" do
+    res = GRPC profiles, :meta_search, Profiles::Sha256.new(sha256: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8', '123456'])
+    assert_equal ['123456'], res.missing_sha256
+  end
 end

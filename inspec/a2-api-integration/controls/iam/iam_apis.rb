@@ -223,7 +223,12 @@ control 'iam-api-1' do
         response = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}")
         expect(response.http_status).to eq 404
 
-        response = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}", http_method: 'PUT')
+        response = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}",
+          http_method: 'PUT',
+          request_body: {
+            name: "any-non-empty-value",
+          }.to_json
+        )
         expect(response.http_status).to eq 404
 
         response = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}", http_method: 'DELETE')

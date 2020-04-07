@@ -3,10 +3,13 @@ package pg
 import (
 	"context"
 	"database/sql"
+	"regexp"
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -14,6 +17,8 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
+
+var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
 func (a *adapter) CreateToken(ctx context.Context,
 	id, description string, active bool, projects []string) (*tokens.Token, error) {
@@ -36,8 +41,33 @@ func (a *adapter) CreateTokenWithValue(ctx context.Context,
 		}
 		id = uid.String()
 	}
+	err := a.validateTokenInputs(ctx, description, []string{}, projects, false)
+	if err != nil {
+		return nil, err
+	}
 
-	return a.insertToken(ctx, id, description, value, active, projects, true)
+	return a.insertToken(ctx, id, description, value, active, projects)
+}
+
+func (a *adapter) validateTokenInputs(ctx context.Context,
+	description string, oldProjects, updatedProjects []string, isUpdateRequest bool) error {
+	if emptyOrWhitespaceOnlyRE.MatchString(description) {
+		return status.Error(
+			codes.InvalidArgument,
+			"a token name is required and must contain at least one non-whitespace character")
+	}
+
+	_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+		OldProjects:     oldProjects,
+		NewProjects:     updatedProjects,
+		IsUpdateRequest: isUpdateRequest,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (a *adapter) CreateLegacyTokenWithValue(ctx context.Context, value string) (*tokens.Token, error) {
@@ -50,7 +80,7 @@ func (a *adapter) CreateLegacyTokenWithValue(ctx context.Context, value string) 
 		return nil, err
 	}
 
-	return a.insertToken(ctx, id.String(), tokens.LegacyTokenDescription, value, true, []string{}, false)
+	return a.insertToken(ctx, id.String(), tokens.LegacyTokenDescription, value, true, []string{})
 }
 
 // PurgeProject removes a project from every token it exists in
@@ -72,27 +102,12 @@ func (a *adapter) ResetToV1(ctx context.Context) error {
 }
 
 func (a *adapter) insertToken(ctx context.Context,
-	id string, description string, value string, active bool, projects []string, isLegacyToken bool) (*tokens.Token, error) {
+	id string, description string, value string, active bool, projects []string) (*tokens.Token, error) {
 
 	t := tokens.Token{}
 	// ensure we do not pass null projects to db and break the not null constraint
 	if projects == nil {
 		projects = []string{}
-	}
-
-	// we do not wish to validate projects for the A1 legacy token case
-	// since that is an internal DB call kicked off as part of the server startup code
-	// with no subjects
-	if isLegacyToken {
-		_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-			Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-			OldProjects:     []string{},
-			NewProjects:     projects,
-			IsUpdateRequest: false,
-		})
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	err := a.db.QueryRowContext(ctx,
@@ -138,31 +153,17 @@ func (a *adapter) UpdateToken(ctx context.Context,
 		return nil, processSQLError(err, "fetch projects for update")
 	}
 
-	_, err = a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-		OldProjects:     originalProjects,
-		NewProjects:     updatedProjects,
-		IsUpdateRequest: true,
-	})
+	err = a.validateTokenInputs(ctx, description, originalProjects, updatedProjects, true)
 	if err != nil {
 		return nil, err
 	}
 
-	if description != "" {
-		row = tx.QueryRowContext(ctx,
-			`UPDATE chef_authn_tokens cat
+	row = tx.QueryRowContext(ctx,
+		`UPDATE chef_authn_tokens cat
 			SET active=$2, description=$3, project_ids=$4, updated=NOW()
 			WHERE id=$1 AND projects_match(cat.project_ids, $5::TEXT[])
 			RETURNING id, description, value, active, project_ids, created, updated`,
-			id, active, description, pq.Array(updatedProjects), pq.Array(projectsFilter))
-	} else {
-		row = tx.QueryRowContext(ctx,
-			`UPDATE chef_authn_tokens cat
-			SET active=$2, project_ids=$3, updated=NOW()
-			WHERE id=$1 AND projects_match(cat.project_ids, $4::TEXT[])
-			RETURNING id, description, value, active, project_ids, created, updated`,
-			id, active, pq.Array(updatedProjects), pq.Array(projectsFilter))
-	}
+		id, active, description, pq.Array(updatedProjects), pq.Array(projectsFilter))
 	err = row.Scan(
 		&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated)
 	if err != nil {

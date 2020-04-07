@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
@@ -51,10 +51,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public modalType: string;
   private id: string;
   public saveSuccessful = false;
-
+  public saveInProgress = false;
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
-  public saving = false;
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -139,6 +138,17 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.store.dispatch(new GetServer({ id: this.id })
       );
     });
+
+    this.store.select(updateStatus).pipe(
+      takeUntil(this.isDestroyed),
+      filter(state => this.saveInProgress && !pending(state)))
+    .subscribe((state) => {
+      this.saveInProgress = false;
+      this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+      if (this.saveSuccessful) {
+        this.updateServerForm.markAsPristine();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -196,7 +206,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   saveServer(): void {
     this.saveSuccessful = false;
-    this.saving = true;
+    this.saveInProgress = true;
     const updatedServer = {
       id: this.server.id,
       name: this.updateServerForm.controls.name.value.trim(),
@@ -205,16 +215,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       ip_address: this.updateServerForm.controls.ip_address.value.trim()
     };
     this.store.dispatch(new UpdateServer({server: updatedServer}));
-    this.store.pipe(select(updateStatus),
-      takeUntil(this.isDestroyed),
-      filter(state => this.saving && !pending(state)))
-      .subscribe((state) => {
-        this.saving = false;
-        this.saveSuccessful = (state === EntityStatus.loadingSuccess);
-        if (this.saveSuccessful) {
-          this.updateServerForm.markAsPristine();
-        }
-      });
   }
 
 }

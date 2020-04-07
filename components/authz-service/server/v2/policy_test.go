@@ -1600,7 +1600,7 @@ func TestCreateRole(t *testing.T) {
 
 			assert.Equal(t, 0, store.ItemCount())
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
-			assert.Regexp(t, "role-id.*role must contain at least one action", err.Error())
+			assert.Regexp(t, "CreateRoleReq.Actions.*must contain at least 1 item", err.Error())
 		},
 		"fails with InvalidArgument with no id": func(t *testing.T) {
 			req := api_v2.CreateRoleReq{
