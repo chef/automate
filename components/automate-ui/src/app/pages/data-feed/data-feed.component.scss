@@ -32,14 +32,12 @@
   }
 
   chef-table-header-cell {
-    flex-flow: row nowrap;
-    align-items: center;
-
     .toggle-sort {
+      display: flex;
+      align-self: flex-start;
       background: transparent;
-      border: none;
+      border: 1px solid transparent; // gives an even outline when focused
       padding: unset;
-      margin: unset;
       font-family: muli;
       font-weight: bold;
     }
