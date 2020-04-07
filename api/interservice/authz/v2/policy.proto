@@ -46,7 +46,7 @@ message CreatePolicyReq {
 }
 
 message DeletePolicyReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
 }
 
 message DeletePolicyResp {}
@@ -87,13 +87,13 @@ message ListPoliciesResp {
 }
 
 message GetPolicyReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
 }
 
 // Note that update does not accept a type since
 // users can only create custom type policies.
 message UpdatePolicyReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
     repeated string members = 2 [(validate.rules).repeated = {
         unique: true,
         items: {
@@ -115,7 +115,7 @@ message UpdatePolicyReq {
 }
 
 message ReplacePolicyMembersReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
     repeated string members = 2 [(validate.rules).repeated = {
         unique: true,
         items: {
@@ -131,7 +131,7 @@ message ReplacePolicyMembersResp {
 }
 
 message AddPolicyMembersReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
     repeated string members = 2 [(validate.rules).repeated = {
         min_items: 1,
         unique: true,
@@ -169,12 +169,12 @@ message ListRolesResp {
 }
 
 message DeleteRoleReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
 }
 message DeleteRoleResp {}
 
 message UpdateRoleReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
     string name = 2;
     repeated string actions = 3
     [(validate.rules).repeated = {
@@ -198,14 +198,14 @@ message UpdateRoleReq {
 }
 
 message ListPolicyMembersReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
 }
 message ListPolicyMembersResp {
     repeated string members = 1;
 }
 
 message RemovePolicyMembersReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
     repeated string members = 2 [(validate.rules).repeated = {
         min_items: 1,
         unique: true,
@@ -237,7 +237,7 @@ message ResetToV1Req {}
 message ResetToV1Resp {}
 
 message GetRoleReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
 }
 
 message CreateRoleReq {
