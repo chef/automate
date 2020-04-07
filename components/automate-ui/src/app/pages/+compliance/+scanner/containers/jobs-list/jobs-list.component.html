@@ -1,47 +1,47 @@
-<chef-table class="jobs-list-table" (sort-toggled)="onSortToggled($event)">
-  <chef-thead>
-    <chef-tr>
-      <chef-th>
+<chef-table-new class="jobs-list-table" (sort-toggled)="onSortToggled($event)">
+  <chef-table-header>
+    <chef-table-row>
+      <chef-table-header-cell>
         Job
         <chef-sort-toggle sort="name" [order]="orderFor('name')"></chef-sort-toggle>
-      </chef-th>
-      <chef-th>
+      </chef-table-header-cell>
+      <chef-table-header-cell>
         Nodes
-      </chef-th>
-      <chef-th>
+      </chef-table-header-cell>
+      <chef-table-header-cell>
         Last Scan
         <chef-sort-toggle sort="end_time" [order]="orderFor('end_time')"></chef-sort-toggle>
-      </chef-th>
-      <chef-th>
+      </chef-table-header-cell>
+      <chef-table-header-cell>
         Status
         <chef-sort-toggle sort="status" [order]="orderFor('status')"></chef-sort-toggle>
-      </chef-th>
-      <chef-th></chef-th>
-    </chef-tr>
-  </chef-thead>
+      </chef-table-header-cell>
+      <chef-table-header-cell></chef-table-header-cell>
+    </chef-table-row>
+  </chef-table-header>
 
   <chef-loading-spinner *ngIf="jobsList.loading" size="100"></chef-loading-spinner>
 
-  <chef-tbody *ngIf="!jobsList.loading">
+  <chef-table-body *ngIf="!jobsList.loading">
     <app-authorized [allOf]="['/compliance/scanner/jobs', 'post']">
-      <chef-tr class="empty new-row">
+      <chef-table-row class="empty new-row">
         <span class="cta">Create a new scan job with nodes and profiles</span>
         <span class="action">
           <chef-button primary [routerLink]="['/jobs/add']">Create Scan Job</chef-button>
         </span>
-      </chef-tr>
+      </chef-table-row>
     </app-authorized>
-    <chef-tr *ngFor="let job of jobsList.items; trackBy: trackBy;">
-      <chef-td *ngIf="isJobReport(job)">
+    <chef-table-row *ngFor="let job of jobsList.items; trackBy: trackBy;">
+      <chef-table-cell *ngIf="isJobReport(job)">
         {{ job.name }}
-      </chef-td>
-      <chef-td *ngIf="!isJobReport(job)">
+      </chef-table-cell>
+      <chef-table-cell *ngIf="!isJobReport(job)">
         <a [routerLink]="['/compliance', 'scan-jobs', 'jobs', job.id, 'scans']">{{ job.name }}</a>
-      </chef-td>
-      <chef-td>{{ displayNodeCount(job.node_count | number, job.recurrence) }}</chef-td>
-      <chef-td>{{ timeFromNow(job.end_time) }}</chef-td>
-      <chef-td>{{ job.status }}</chef-td>
-      <chef-td>
+      </chef-table-cell>
+      <chef-table-cell>{{ displayNodeCount(job.node_count | number, job.recurrence) }}</chef-table-cell>
+      <chef-table-cell>{{ timeFromNow(job.end_time) }}</chef-table-cell>
+      <chef-table-cell>{{ job.status }}</chef-table-cell>
+      <chef-table-cell>
         <chef-button secondary
           *ngIf="job.status === 'completed' && job.recurrence === ''"
           (click)="viewReport(job.id, job.end_time)">
@@ -60,10 +60,10 @@
         <chef-button label="delete" secondary caution (click)="promptDeleteJob(job)">
           <chef-icon>delete</chef-icon>
         </chef-button>
-      </chef-td>
-    </chef-tr>
-  </chef-tbody>
-</chef-table>
+      </chef-table-cell>
+    </chef-table-row>
+  </chef-table-body>
+</chef-table-new>
 
 <app-page-picker
   class="jobs-list-paging"

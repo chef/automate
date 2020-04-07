@@ -1,12 +1,28 @@
 @import "~styles/variables";
 
 .jobs-list-table {
-  .new-row {
-    font-size: 14px;
+  chef-table-header-cell {
+    // flex-direction: row;
+    // align-items: center;
   }
 
-  chef-td:last-child {
-    justify-content: flex-end;
+  chef-table-cell {
+    // display: flex;
+    // justify-content: center;
+
+    &:last-child {
+      // flex-direction: row;
+      // align-items: center;
+      // justify-content: flex-end;
+    }
+  }
+
+  // chef-button {
+  //   // max-height: 32px; // button is stretched when cell is two lines tall
+  // }
+
+  .new-row {
+    font-size: 14px;
   }
 
   chef-loading-spinner {
