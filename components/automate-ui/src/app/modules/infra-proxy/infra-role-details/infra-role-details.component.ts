@@ -48,7 +48,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     css: {
       // Optional
       expand_class: 'fa fa-plus',
-      collapse_class: 'fa fa-minus',
+      collapse_class: 'fa fa-minus'
     },
     columns: [
       {
