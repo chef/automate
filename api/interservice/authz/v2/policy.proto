@@ -35,14 +35,7 @@ message CreatePolicyReq {
         }
        }];
     repeated Statement statements = 4 [(validate.rules).repeated.min_items = 1];
-    repeated string projects = 5 [(validate.rules).repeated = {
-        unique: true,
-        items: {
-            string: {
-                pattern: "^[a-z0-9-_]{1,64}$"
-            }
-        }
-       }];
+    repeated string projects = 5 [(validate.rules).repeated.unique = true];
 }
 
 message DeletePolicyReq {
@@ -70,14 +63,7 @@ message Statement {
 
     // references
     string role = 4 [(validate.rules).string.pattern = "^$|^[a-z0-9-_]{1,64}$"];
-    repeated string projects = 5 [(validate.rules).repeated = {
-        unique: true,
-        items: {
-            string: {
-                pattern: "^[*]$|^\\(unassigned\\)$|^[a-z0-9-_]{1,64}$"
-            }
-        }
-       }];
+    repeated string projects = 5 [(validate.rules).repeated.unique = true];
 }
 
 message ListPoliciesReq {}
@@ -104,14 +90,7 @@ message UpdatePolicyReq {
        }];
     repeated Statement statements = 3 [(validate.rules).repeated.min_items = 1];
     string name = 8;
-    repeated string projects = 9 [(validate.rules).repeated = {
-        unique: true,
-        items: {
-            string: {
-                pattern: "^[a-z0-9-_]{1,64}$"
-            }
-        }
-       }];
+    repeated string projects = 9 [(validate.rules).repeated.unique = true];
 }
 
 message ReplacePolicyMembersReq {
@@ -187,14 +166,7 @@ message UpdateRoleReq {
           }
       }
      }];
-     repeated string projects = 4 [(validate.rules).repeated = {
-        unique: true,
-        items: {
-            string: {
-                pattern: "^[a-z0-9-_]{1,64}$"
-            }
-        }
-       }];
+     repeated string projects = 4 [(validate.rules).repeated.unique = true];
 }
 
 message ListPolicyMembersReq {
@@ -254,14 +226,7 @@ message CreateRoleReq {
             }
         }
        }];
-    repeated string projects = 4 [(validate.rules).repeated = {
-        unique: true,
-        items: {
-            string: {
-                pattern: "^[a-z0-9-_]{1,64}$"
-            }
-        }
-       }];
+    repeated string projects = 4 [(validate.rules).repeated.unique = true];
 }
 
 message PurgeSubjectFromPoliciesReq {

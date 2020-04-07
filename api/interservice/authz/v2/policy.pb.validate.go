@@ -264,13 +264,7 @@ func (m *CreatePolicyReq) Validate() error {
 			_CreatePolicyReq_Projects_Unique[item] = struct{}{}
 		}
 
-		if !_CreatePolicyReq_Projects_Pattern.MatchString(item) {
-			return CreatePolicyReqValidationError{
-				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-			}
-		}
-
+		// no validation rules for Projects[idx]
 	}
 
 	return nil
@@ -333,8 +327,6 @@ var _ interface {
 var _CreatePolicyReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 var _CreatePolicyReq_Members_Pattern = regexp.MustCompile("^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$")
-
-var _CreatePolicyReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on DeletePolicyReq with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -544,13 +536,7 @@ func (m *Statement) Validate() error {
 			_Statement_Projects_Unique[item] = struct{}{}
 		}
 
-		if !_Statement_Projects_Pattern.MatchString(item) {
-			return StatementValidationError{
-				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[*]$|^\\\\(unassigned\\\\)$|^[a-z0-9-_]{1,64}$\"",
-			}
-		}
-
+		// no validation rules for Projects[idx]
 	}
 
 	return nil
@@ -615,8 +601,6 @@ var _Statement_Resources_Pattern = regexp.MustCompile("^[a-z][^:*]*(?::[^:*]+)*(
 var _Statement_Actions_Pattern = regexp.MustCompile("^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$")
 
 var _Statement_Role_Pattern = regexp.MustCompile("^$|^[a-z0-9-_]{1,64}$")
-
-var _Statement_Projects_Pattern = regexp.MustCompile("^[*]$|^\\(unassigned\\)$|^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on ListPoliciesReq with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -901,13 +885,7 @@ func (m *UpdatePolicyReq) Validate() error {
 			_UpdatePolicyReq_Projects_Unique[item] = struct{}{}
 		}
 
-		if !_UpdatePolicyReq_Projects_Pattern.MatchString(item) {
-			return UpdatePolicyReqValidationError{
-				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-			}
-		}
-
+		// no validation rules for Projects[idx]
 	}
 
 	return nil
@@ -968,8 +946,6 @@ var _ interface {
 } = UpdatePolicyReqValidationError{}
 
 var _UpdatePolicyReq_Members_Pattern = regexp.MustCompile("^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$")
-
-var _UpdatePolicyReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on ReplacePolicyMembersReq with the rules
 // defined in the proto definition for this message. If any rules are
@@ -1845,13 +1821,7 @@ func (m *UpdateRoleReq) Validate() error {
 			_UpdateRoleReq_Projects_Unique[item] = struct{}{}
 		}
 
-		if !_UpdateRoleReq_Projects_Pattern.MatchString(item) {
-			return UpdateRoleReqValidationError{
-				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-			}
-		}
-
+		// no validation rules for Projects[idx]
 	}
 
 	return nil
@@ -1912,8 +1882,6 @@ var _ interface {
 } = UpdateRoleReqValidationError{}
 
 var _UpdateRoleReq_Actions_Pattern = regexp.MustCompile("^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$")
-
-var _UpdateRoleReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on ListPolicyMembersReq with the rules
 // defined in the proto definition for this message. If any rules are
@@ -2610,13 +2578,7 @@ func (m *CreateRoleReq) Validate() error {
 			_CreateRoleReq_Projects_Unique[item] = struct{}{}
 		}
 
-		if !_CreateRoleReq_Projects_Pattern.MatchString(item) {
-			return CreateRoleReqValidationError{
-				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-			}
-		}
-
+		// no validation rules for Projects[idx]
 	}
 
 	return nil
@@ -2679,8 +2641,6 @@ var _ interface {
 var _CreateRoleReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 var _CreateRoleReq_Actions_Pattern = regexp.MustCompile("^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$")
-
-var _CreateRoleReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on PurgeSubjectFromPoliciesReq with the
 // rules defined in the proto definition for this message. If any rules are
