@@ -874,7 +874,9 @@ func init() {
 	proto.RegisterType((*BulkDeleteResponse)(nil), "chef.automate.api.nodes.v1.BulkDeleteResponse")
 }
 
-func init() { proto.RegisterFile("api/external/nodes/nodes.proto", fileDescriptor_36a1516efcb16aeb) }
+func init() {
+	proto.RegisterFile("api/external/nodes/nodes.proto", fileDescriptor_36a1516efcb16aeb)
+}
 
 var fileDescriptor_36a1516efcb16aeb = []byte{
 	// 1563 bytes of a gzipped FileDescriptorProto

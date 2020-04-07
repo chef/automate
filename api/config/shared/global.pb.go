@@ -1785,7 +1785,9 @@ func init() {
 	proto.RegisterType((*Log)(nil), "chef.automate.infra.config.Log")
 }
 
-func init() { proto.RegisterFile("api/config/shared/global.proto", fileDescriptor_e801c226ad1654b6) }
+func init() {
+	proto.RegisterFile("api/config/shared/global.proto", fileDescriptor_e801c226ad1654b6)
+}
 
 var fileDescriptor_e801c226ad1654b6 = []byte{
 	// 1698 bytes of a gzipped FileDescriptorProto

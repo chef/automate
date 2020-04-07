@@ -151,7 +151,9 @@ func init() {
 	proto.RegisterType((*FrontendTLSCredential)(nil), "chef.automate.infra.config.FrontendTLSCredential")
 }
 
-func init() { proto.RegisterFile("api/config/shared/tls.proto", fileDescriptor_2fbee6a658298948) }
+func init() {
+	proto.RegisterFile("api/config/shared/tls.proto", fileDescriptor_2fbee6a658298948)
+}
 
 var fileDescriptor_2fbee6a658298948 = []byte{
 	// 278 bytes of a gzipped FileDescriptorProto
