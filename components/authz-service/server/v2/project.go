@@ -123,7 +123,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 		return nil, status.Errorf(codes.InvalidArgument,
 			"creating project with ID %q: %s", req.Id, err.Error())
 	}
-	resp, err := s.store.CreateProject(ctx, &p, true)
+	resp, err := s.store.CreateProject(ctx, &p,req.SkipPolicies)
 	switch err {
 	case nil: // continue
 	case storage_errors.ErrConflict:

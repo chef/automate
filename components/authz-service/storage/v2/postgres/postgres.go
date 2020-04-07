@@ -1455,7 +1455,7 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 /* * * * * * * * * * * * * * * * * *   PROJECTS  * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-func (p *pg) CreateProject(ctx context.Context, project *v2.Project, addPolicies bool) (*v2.Project, error) {
+func (p *pg) CreateProject(ctx context.Context, project *v2.Project, skipPolicies bool) (*v2.Project, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -1493,7 +1493,7 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project, addPolicies
 		return nil, p.processError(err)
 	}
 
-	if addPolicies {
+	if !skipPolicies {
 		if err := p.addSupportPolicies(ctx, project, tx); err != nil {
 			return nil, p.processError(err)
 		}
