@@ -29,17 +29,14 @@ pkg_binds_optional=(
   [authn-service]="port"
   [notifications-service]="port"
 )
-inspec_release="chef/inspec/4.18.104/20200407121143"
+inspec_release="chef/inspec/4.18.104/20200421173550"
 pkg_deps=(
-  core/bash
-  core/grpcurl              # Used in habitat/hooks/health_check
-  core/jq-static            # Used in habitat/hooks/health_check
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
-  # WARNING: Update with care. The chef/inspec is managed with Expeditor.
-
-  # See .expeditor/update-inspec-version.sh for details
   "${inspec_release}"
   chef/mlsa
+  core/grpcurl              # Used in habitat/hooks/health_check
+  core/jq-static            # Used in habitat/hooks/health_check
+  core/bash
 )
 
 if [[ -n "$AUTOMATE_OSS_BUILD" ]]; then
