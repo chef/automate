@@ -31,7 +31,19 @@
     margin-right: 1em;
   }
 
-  chef-td {
+  chef-table-header-cell {
+    .toggle-sort {
+      display: flex;
+      align-self: flex-start;
+      background: transparent;
+      border: 1px solid transparent; // gives an even outline when focused
+      padding: unset;
+      font-family: muli;
+      font-weight: bold;
+    }
+  }
+
+  chef-table-cell {
     display: flex;
     flex-direction: row;
 
@@ -41,7 +53,7 @@
     }
   }
 
-  chef-td:last-child {
+  chef-table-cell:last-child {
     justify-content: flex-end;
   }
 }

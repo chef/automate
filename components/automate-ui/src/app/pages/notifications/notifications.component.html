@@ -24,34 +24,37 @@
           </app-authorized>
         </chef-toolbar>
         <app-authorized [anyOf]="['/notifications/rules', 'get']">
-          <chef-table *ngIf="(rules$ | async)?.length > 0" id="notifications-list">
-            <chef-tr>
-              <chef-th class="sort" (click)="toggleSort('node_name')">
-                <div class="text-and-sort-icons">
-                  <span>Notification Name</span>
-                  <chef-icon aria-hidden="true" id="{{sortIcon('node_name')}}" class="sort-icon">arrow_drop_up</chef-icon>
-                </div>
-              </chef-th>
-              <chef-th>Alert Type</chef-th>
-              <chef-th aria-hidden="true" class="three-dot-column"></chef-th>
-            </chef-tr>
+          <chef-table-new *ngIf="(rules$ | async)?.length > 0" id="notifications-list">
+            <chef-table-header>
+              <chef-table-row>
+                <chef-table-header-cell class="sort">
+                  <button class="toggle-sort" (click)="toggleSort('node_name')">Notification Name
+                    <chef-icon aria-hidden="true" id="{{sortIcon('node_name')}}" class="sort-icon">arrow_drop_up</chef-icon>
+                  </button>
+                </chef-table-header-cell>
+                <chef-table-header-cell>Alert Type</chef-table-header-cell>
+                <chef-table-header-cell aria-hidden="true" class="three-dot-column"></chef-table-header-cell>
+              </chef-table-row>
+            </chef-table-header>
 
-            <chef-tr tabindex="0" *ngFor="let rule of rules$ | async |
+            <chef-table-body>
+            <chef-table-row tabindex="0" *ngFor="let rule of rules$ | async |
               slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
-              <chef-td class="{{rule.targetType}}">
+              <chef-table-cell class="{{rule.targetType}}">
                 <img src="assets/img/logo-{{rule.targetType}}.svg" alt="{{rule.targetType}} logo" />
                 <a [routerLink]="['/settings/notifications/form', rule.id]">{{ rule.name }}</a>
-              </chef-td>
-              <chef-td>
+              </chef-table-cell>
+              <chef-table-cell>
                 {{rule.AlertTypeLabels[rule.ruleType]}}
-              </chef-td>
-              <chef-td class="actions three-dot-column">
+              </chef-table-cell>
+              <chef-table-cell class="actions three-dot-column">
                 <mat-select panelClass="chef-control-menu">
                   <mat-option (onSelectionChange)="deleteRule(rule)">Delete Notification</mat-option>
                 </mat-select>
-              </chef-td>
-            </chef-tr>
-          </chef-table>
+              </chef-table-cell>
+            </chef-table-row>
+            </chef-table-body>
+          </chef-table-new>
         </app-authorized>
 
         <app-page-picker
