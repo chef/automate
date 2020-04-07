@@ -27,7 +27,7 @@ func runAdminTokenCmd(cmd *cobra.Command, args []string) error {
 	name := args[0]
 
 	writer.Failf("The admin-token command is deprecated. "+
-		"To make an admin token in IAM V2, run:\n\nchef-automate iam token create %s --admin", name)
+		"Use, run:\n\nchef-automate iam token create %s --admin", name)
 	os.Exit(1)
 	return nil
 }
