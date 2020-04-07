@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -8,7 +8,7 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { routeParams, routeURL } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
-import { EntityStatus, loading, allLoaded } from 'app/entities/entities';
+import { EntityStatus, allLoaded, pending } from 'app/entities/entities';
 import { Org } from 'app/entities/orgs/org.model';
 import {
   getStatus, updateStatus, orgFromRoute
@@ -34,7 +34,7 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
   public sortedCookbooks$: Observable<Cookbook[]>;
   private isDestroyed = new Subject<boolean>();
   public saveSuccessful = false;
-  public saving = false;
+  public saveInProgress = false;
   public isLoading = true;
   public url: string;
   public serverId;
@@ -46,7 +46,13 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
     private router: Router
-  ) { }
+  ) {
+    this.updateOrgForm = this.fb.group({
+      name: new FormControl({value: ''}, [Validators.required]),
+      admin_user: new FormControl({value: ''}, [Validators.required]),
+      admin_key: new FormControl({value: ''}, [Validators.required])
+    });
+   }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
@@ -56,12 +62,6 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
       this.url = url;
       const [, fragment] = url.split('#');
       this.tabValue = (fragment === 'details') ? 'details' : 'cookbooks';
-    });
-
-    this.updateOrgForm = this.fb.group({
-      name: ['', [Validators.required]],
-      admin_user: ['', [Validators.required]],
-      admin_key: ['', [Validators.required]]
     });
 
     combineLatest([
@@ -117,6 +117,18 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
       ).subscribe(([ _getCookbooksSt, allCookbooksState]) => {
         this.cookbooks = allCookbooksState;
       });
+
+      this.store.select(updateStatus).pipe(
+        takeUntil(this.isDestroyed),
+        filter(state => this.saveInProgress && !pending(state)))
+        .subscribe((state) => {
+          this.saveInProgress = false;
+          this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+          if (this.saveSuccessful) {
+            this.updateOrgForm.markAsPristine();
+          }
+        });
+
   }
 
   onSelectedTab(event: { target: { value: OrgTabName } }) {
@@ -126,36 +138,13 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
 
   saveOrg(): void {
     this.saveSuccessful = false;
-    this.saving = true;
-    const updatedOrg = {
-      id: this.org.id,
-      server_id: this.org.server_id,
-      name: this.updateOrgForm.controls.name.value.trim(),
-      admin_user: this.updateOrgForm.controls.admin_user.value.trim(),
-      admin_key: this.updateOrgForm.controls.admin_key.value
-    };
+    this.saveInProgress = true;
+    const name: string = this.updateOrgForm.controls.name.value.trim();
+    const admin_user: string = this.updateOrgForm.controls.admin_user.value.trim();
+    const admin_key: string = this.updateOrgForm.controls.admin_key.value.trim();
     this.store.dispatch(new UpdateOrg({
-      org: updatedOrg
+      org: {...this.org, name, admin_user, admin_key}
     }));
-
-    const pendingSave = new Subject<boolean>();
-    this.store.select(updateStatus).pipe(
-      filter(identity),
-      takeUntil(pendingSave))
-      .subscribe((state) => {
-        if (!loading(state)) {
-          pendingSave.next(true);
-          pendingSave.complete();
-          this.saving = false;
-          this.saveSuccessful = (state === EntityStatus.loadingSuccess);
-          if (this.saveSuccessful) {
-            this.updateOrgForm.markAsPristine();
-          }
-          this.updateOrgForm.controls['name'].setValue(this.org.name);
-          this.updateOrgForm.controls['admin_user'].setValue(this.org.admin_user);
-          this.updateOrgForm.controls['admin_key'].setValue(this.org.admin_key);
-        }
-      });
   }
 
   ngOnDestroy(): void {
