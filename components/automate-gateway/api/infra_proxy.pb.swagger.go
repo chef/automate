@@ -465,12 +465,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the Server",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "ID of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -481,34 +483,37 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/num_versions": {
+    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
       "get": {
-        "operationId": "GetCookbooksAvailableVersions",
+        "operationId": "GetCookbookVersions",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbooksAvailableVersions"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookVersions"
             }
           }
         },
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "ID of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "num_versions",
-            "in": "query",
-            "required": false,
+            "name": "name",
+            "description": "Name of the cookbook.",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
@@ -531,24 +536,28 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "ID of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Name of the cookbook.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "version",
+            "description": "Version of the cookbook.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1135,23 +1144,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.response.CookbookAllVersion": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "current_version": {
-          "type": "string"
-        },
-        "versions": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "chef.automate.api.infra_proxy.response.CookbookFileContent": {
       "type": "object",
       "properties": {
@@ -1211,10 +1203,24 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the cookbook."
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "Version of the cookbook."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.CookbookVersions": {
+      "type": "object",
+      "properties": {
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of all versions avaiable for cookbook."
         }
       }
     },
@@ -1225,18 +1231,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookVersion"
-          }
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.response.CookbooksAvailableVersions": {
-      "type": "object",
-      "properties": {
-        "cookbooks": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookAllVersion"
-          }
+          },
+          "description": "List of cookbooks with name and version."
         }
       }
     },

@@ -31,26 +31,21 @@ func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*res
 	}, nil
 }
 
-// GetCookbooksAvailableVersions get cookbooks list with all available versions
-func (s *Server) GetCookbooksAvailableVersions(ctx context.Context, req *request.CookbooksAvailableVersions) (*response.CookbooksAvailableVersions, error) {
+// GetCookbookVersions get cookbook with all available versions
+func (s *Server) GetCookbookVersions(ctx context.Context, req *request.CookbookVersions) (*response.CookbookVersions, error) {
 
 	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	numVersions := req.NumVersions
-	if numVersions == "" {
-		numVersions = "all"
-	}
-
-	cookbookList, err := c.client.Cookbooks.ListAvailableVersions(numVersions)
+	cookbook, err := c.client.Cookbooks.GetAvailableVersions(req.Name, "")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	return &response.CookbooksAvailableVersions{
-		Cookbooks: fromAPIToListAvailableCookbooks(cookbookList),
+	return &response.CookbookVersions{
+		Versions: fromAPICookbookVersionToVersions(cookbook[req.Name].Versions),
 	}, nil
 }
 
@@ -178,29 +173,11 @@ func fromAPIToListCookbooks(al chef.CookbookListResult) []*response.CookbookVers
 	return cl
 }
 
-// fromAPIToListAvailableCookbooks a response.Cookbooks from a struct of CookbookListResult
-func fromAPIToListAvailableCookbooks(al chef.CookbookListResult) []*response.CookbookAllVersion {
-	cl := make([]*response.CookbookAllVersion, len(al))
-
-	index := 0
-	for k, v := range al {
-		versions := make([]string, len(v.Versions))
-
-		for i, c := range v.Versions {
-			versions[i] = c.Version
-		}
-
-		cl[index] = &response.CookbookAllVersion{
-			Name:           k,
-			CurrentVersion: v.Versions[0].Version,
-			Versions:       versions,
-		}
-		index++
+func fromAPICookbookVersionToVersions(cl []chef.CookbookVersion) []string {
+	vs := make([]string, len(cl))
+	for i, item := range cl {
+		vs[i] = item.Version
 	}
 
-	sort.Slice(cl, func(i, j int) bool {
-		return cl[i].Name < cl[j].Name
-	})
-
-	return cl
+	return vs
 }
