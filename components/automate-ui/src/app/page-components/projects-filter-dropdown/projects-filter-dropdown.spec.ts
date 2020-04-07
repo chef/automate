@@ -289,6 +289,7 @@ describe('ProjectsFilterDropdownComponent', () => {
   describe('handleApplySelection()', () => {
     beforeEach(() => {
       spyOn(component.onSelection, 'emit');
+      spyOn(component.onOptionChange, 'emit');
       component.dropdownActive = true;
       component.optionsEdited = true;
       component.handleApplySelection();
@@ -304,6 +305,44 @@ describe('ProjectsFilterDropdownComponent', () => {
 
     it('emits "onSelection" event with list of updated options', () => {
       expect(component.onSelection.emit).toHaveBeenCalledWith(component.editableOptions);
+    });
+
+    it('emits "onOptionChange" event with list of updated options', () => {
+      expect(component.onOptionChange.emit).toHaveBeenCalledWith(component.editableOptions);
+    });
+  });
+
+  describe('handleClearSelection()', () => {
+    beforeEach(() => {
+      spyOn(component.onSelection, 'emit');
+      spyOn(component.onOptionChange, 'emit');
+      component.dropdownActive = true;
+      component.optionsEdited = true;
+      component.editableOptions = genOptions([false, true, true, false, true]);
+      expect(component.editableOptions.some(o => o.checked)).toEqual(true);
+      component.handleClearSelection();
+    });
+
+    // Note: most of these would be phantom tests (see https://bit.ly/2UPrprX)
+    // except for the fact presence of the tests for handleApplySelection above.
+    it('does not hide the dropdown', () => {
+      expect(component.dropdownActive).toEqual(true);
+    });
+
+    it('does not disable the "Apply Changes" button', () => {
+      expect(component.optionsEdited).toEqual(true);
+    });
+
+    it('does not emit "onSelection" event', () => {
+      expect(component.onSelection.emit).not.toHaveBeenCalled();
+    });
+
+    it('does not emit "onOptionChange" event', () => {
+      expect(component.onOptionChange.emit).not.toHaveBeenCalled();
+    });
+
+    it('clears all checked options', () => {
+      expect(component.editableOptions.some(o => o.checked)).toEqual(false);
     });
   });
 
