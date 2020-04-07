@@ -3,8 +3,11 @@
 .reporting-controls-table {
   margin: 2em 35px 0;
 
-  chef-th,
-  chef-td {
+  chef-table-header-cell,
+  chef-table-cell {
+    display: flex;
+    justify-content: center;
+
     &:first-child {
       flex-grow: 2;
       word-break: break-all;
@@ -16,6 +19,11 @@
 
     &:last-child {
       justify-content: flex-end;
+    }
+
+    &.node-status {
+      flex-direction: row;
+      justify-content: flex-start;
     }
   }
 

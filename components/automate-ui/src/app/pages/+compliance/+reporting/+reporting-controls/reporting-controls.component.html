@@ -7,28 +7,28 @@
 </div>
 
 <ng-container *ngIf="!reportData.controlsListEmpty">
-  <chef-table class="reporting-controls-table">
-    <chef-thead>
-      <chef-tr>
-        <chef-th>Control Name</chef-th>
-        <chef-th>Profile</chef-th>
-        <chef-th>Impact</chef-th>
-        <chef-th>Last Scan</chef-th>
-        <chef-th>Node Status</chef-th>
-        <chef-th class="three-dot-column"></chef-th>
-      </chef-tr>
-    </chef-thead>
-    <chef-tbody *ngIf="!reportData.controlsListLoading">
-      <chef-tr *ngFor="let control of reportData.controlsList.items">
-        <chef-td>
+  <chef-table-new class="reporting-controls-table">
+    <chef-table-header>
+      <chef-table-row>
+        <chef-table-header-cell>Control Name</chef-table-header-cell>
+        <chef-table-header-cell>Profile</chef-table-header-cell>
+        <chef-table-header-cell>Impact</chef-table-header-cell>
+        <chef-table-header-cell>Last Scan</chef-table-header-cell>
+        <chef-table-header-cell>Node Status</chef-table-header-cell>
+        <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
+      </chef-table-row>
+    </chef-table-header>
+    <chef-table-body *ngIf="!reportData.controlsListLoading">
+      <chef-table-row *ngFor="let control of reportData.controlsList.items">
+        <chef-table-cell>
           <span><strong>{{ control.id }}:</strong> {{ control.title }}</span>
-        </chef-td>
-        <chef-td>{{ control.profile.title }}, {{ control.profile.version }}</chef-td>
-        <chef-td class="impact-status" [ngClass]="impactStatus(control)">
+        </chef-table-cell>
+        <chef-table-cell>{{ control.profile.title }}, {{ control.profile.version }}</chef-table-cell>
+        <chef-table-cell class="impact-status" [ngClass]="impactStatus(control)">
           {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
-        </chef-td>
-        <chef-td>{{ control.end_time | timeFromNow }}</chef-td>
-        <chef-td *ngIf="control.control_summary as summary">
+        </chef-table-cell>
+        <chef-table-cell>{{ control.end_time | timeFromNow }}</chef-table-cell>
+        <chef-table-cell class="node-details" *ngIf="control.control_summary as summary">
           <span class="control-result" [ngClass]="{'failed': summary.failed.total > 0}">
             <chef-icon>report_problem</chef-icon>
             <span>{{ summary.failed.total | number }}</span>
@@ -74,17 +74,17 @@
             </chef-tooltip>
             <span>{{ summary.waived.total | number }}</span>
           </span>
-        </chef-td>
-        <chef-td class="actions-cell three-dot-column">
+        </chef-table-cell>
+        <chef-table-cell class="actions-cell three-dot-column">
           <mat-select panelClass="chef-control-menu">
             <mat-option *ngIf="!hasFilter(control)" (onSelectionChange)="addFilter(control)">Add Filter</mat-option>
             <mat-option *ngIf="hasFilter(control)" (onSelectionChange)="removeFilter(control)">Remove Filter</mat-option>
           </mat-select>
-        </chef-td>
-      </chef-tr>
-    </chef-tbody>
+        </chef-table-cell>
+      </chef-table-row>
+    </chef-table-body>
     <chef-loading-spinner *ngIf="reportData.controlsListLoading" size="100"></chef-loading-spinner>
-  </chef-table>
+  </chef-table-new>
 
   <p class="item-count-warning" *ngIf="!reportData.controlsListLoading && reportData.controlsList.total === 100">
     This query result set is too large to process. We have limited this list to 100 items for speed. Try filtering down your list.
