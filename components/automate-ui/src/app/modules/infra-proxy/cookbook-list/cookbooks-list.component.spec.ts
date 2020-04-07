@@ -35,6 +35,7 @@ describe('CookbooksListComponent', () => {
         MockComponent({ selector: 'chef-table-header-cell' }),
         MockComponent({ selector: 'chef-table-cell' }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         CookbooksListComponent
       ],
       providers: [
