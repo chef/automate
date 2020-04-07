@@ -427,7 +427,11 @@ describe File.basename(__FILE__) do
       assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, n, 'last_contact'))
       n.scan_data.end_time = Google::Protobuf::Timestamp.new()
       n.scan_data.id = "some-id"
+      if n.connection_error.is_a?(String) && n.connection_error.include?("No such container: cc_pggggggggg (Docker::Error::NotFoundError)")
+        n.connection_error = "No such container: cc_pggggggggg. (TRUNCATED IN TESTS)"
+      end
     }
+
     expected_nodes = {
       "nodes": [
         {
@@ -491,7 +495,7 @@ describe File.basename(__FILE__) do
           "managerIds": [
             "e69dc612-7e67-43f2-9b19-256afd385820"
           ],
-          "connectionError": "unknown error\n\nUnknown inspec error for cc_pggggggggg: exit status 1\n\nSTDERR: /hab/pkgs/chef/inspec/4.18.51/20191211220937/lib/gems/docker-api-1.34.2/lib/docker/connection.rb:46:in `rescue in request': No such container: cc_pggggggggg (Docker::Error::NotFoundError)\n\tfrom /hab/pkgs/chef/inspec/4.18.51/2019121122093 [truncated for length]",
+          "connectionError": "No such container: cc_pggggggggg. (TRUNCATED IN TESTS)",
           "runData": {},
           "scanData": {
             "id": "some-id",
