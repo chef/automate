@@ -44,7 +44,7 @@ require (
 	github.com/gofrs/uuid v2.1.0+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.3.1
-	github.com/golang/protobuf v1.3.3
+	github.com/golang/protobuf v1.3.5
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/handlers v1.3.0 // indirect
 	github.com/gorilla/mux v1.6.1
