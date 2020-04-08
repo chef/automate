@@ -102,7 +102,6 @@ describe('ProjectsFilterDropdownComponent', () => {
     beforeEach(() => {
       component.dropdownActive = true;
       component.editableOptions = genOptions([false, true]);
-      // need filteredOptions in order for elements to be displayed in the UI
       component.filteredOptions = component.editableOptions;
       fixture.detectChanges();
     });
@@ -318,32 +317,72 @@ describe('ProjectsFilterDropdownComponent', () => {
       spyOn(component.onOptionChange, 'emit');
       component.dropdownActive = true;
       component.optionsEdited = false;
-      component.editableOptions = genOptions([false, true, true, false, true]);
+      component.options = genOptions([false, true, true, false, true]);
+      component.resetOptions();
       expect(component.editableOptions.some(o => o.checked)).toEqual(true);
-      component.handleClearSelection();
     });
 
     // Note: most of these would be phantom tests (see https://bit.ly/2UPrprX)
     // except for the fact presence of the tests for handleApplySelection above.
     it('does not hide the dropdown', () => {
+      component.handleClearSelection();
       expect(component.dropdownActive).toEqual(true);
     });
 
     it('enables the "Apply Changes" button', () => {
+      component.handleClearSelection();
       expect(component.optionsEdited).toEqual(true);
     });
 
     it('does not emit "onSelection" event', () => {
+      component.handleClearSelection();
       expect(component.onSelection.emit).not.toHaveBeenCalled();
     });
 
     it('does not emit "onOptionChange" event', () => {
+      component.handleClearSelection();
       expect(component.onOptionChange.emit).not.toHaveBeenCalled();
     });
 
-    it('clears all checked options', () => {
+    it('clears all checked options with no filter applied', () => {
+      component.handleClearSelection();
       expect(component.editableOptions.some(o => o.checked)).toEqual(false);
     });
+
+    using([
+      ['matching some', 'proj', 4, 3], // cleared 4 selected by filter; 3 out of 7 remain
+      ['no filter', '', 7, 0],
+      ['matching all', '-', 7, 0],
+      ['matching none', 'non-match', 0, 7]
+    ], function (
+        description: string,
+        filter: string,
+        resultCheckedWithFilterBeforeClearing: number,
+      resultCheckedAfterRemovingFilter: number) {
+        it(`when filtered with ${description}, clears only filtered items`, () => {
+          component.options = genOptionsWithId([
+            ['proj-one', true],
+            ['proj-three', true],
+            ['other-one', true],
+            ['other-two', true],
+            ['proj-two', true],
+            ['other-three', true],
+            ['proj-four', true]
+          ]);
+          component.resetOptions();
+          component.handleFilterKeyUp(filter);
+          expect(component.filteredSelectedCount)
+            .toEqual(resultCheckedWithFilterBeforeClearing.toString());
+
+          component.handleClearSelection();
+          expect(component.filteredSelectedCount).toEqual('0');
+
+          component.handleFilterKeyUp('');
+          expect(component.filteredSelectedCount)
+            .toEqual(resultCheckedAfterRemovingFilter.toString());
+        });
+    });
+
   });
 
   describe('handleArrowUp()', () => {
