@@ -156,3 +156,15 @@
   max-height: 365px;
   overflow-x: scroll;
 }
+
+// animation
+.pf-clear-selection {
+  visibility: hidden;
+  opacity: 0;
+  transition: .25s;
+
+  &.active {
+    visibility: visible;
+    opacity: 1
+  }
+}
