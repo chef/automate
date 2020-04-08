@@ -423,6 +423,106 @@ describe('ProjectsFilterDropdownComponent', () => {
       });
     });
   });
+
+  describe('filteredSelectedCount', () => {
+    beforeEach(() => {
+      component.dropdownActive = true;
+    });
+    describe('with no filters applied', () => {
+      it('reports none selected with no projects', () => {
+        component.editableOptions = genOptions([]);
+        component.filteredOptions = component.editableOptions;
+        expect(component.filteredSelectedCount).toEqual('0');
+      });
+
+      it('reports one selected with one project, checked', () => {
+        component.editableOptions = genOptions([true]);
+        component.filteredOptions = component.editableOptions;
+        expect(component.filteredSelectedCount).toEqual('1');
+      });
+
+      it('reports none selected with one project, unchecked', () => {
+        component.editableOptions = genOptions([false]);
+        component.filteredOptions = component.editableOptions;
+        expect(component.filteredSelectedCount).toEqual('0');
+      });
+
+      it('reports none selected with multiple projects, none checked', () => {
+        component.editableOptions = genOptions([false, false, false]);
+        component.filteredOptions = component.editableOptions;
+        expect(component.filteredSelectedCount).toEqual('0');
+      });
+
+      it('reports two selected with multiple projects, two checked', () => {
+        component.editableOptions = genOptions([false, true, true]);
+        component.filteredOptions = component.editableOptions;
+        expect(component.filteredSelectedCount).toEqual('2');
+      });
+
+      using([
+        ['at threshold', 99, '99'],
+        ['one above threshold', 100, '99+'],
+        ['well above threshold', 150, '99+']
+      ], function (description: string, count: number, result: string) {
+        it(`${description} ($count projects checked) reports ${result}`, () => {
+          component.editableOptions = genManyOptions(count);
+          component.filteredOptions = component.editableOptions;
+          expect(component.filteredSelectedCount).toEqual(result);
+        });
+      });
+    });
+
+    describe('with filters', () => {
+
+      // test all combinations of the two inputs (checked and matched) for single project
+      using([
+        [true, 'match', 1, 1],
+        [false, 'match', 0, 0],
+        [true, 'non-match', 1, 0],
+        [false, 'non-match', 0, 0]
+      ], function (checked: boolean, filter: string, beforeCount: number, afterCount: number) {
+        it(`matched (${'match'.includes(filter)}) and a single project checked (${checked}),`
+          + ` reports count of ${afterCount}`, () => {
+            component.options = genOptionsWithId([
+              ['match', checked]
+            ]);
+            component.resetOptions();
+            expect(component.filteredSelectedCount).toEqual(beforeCount.toString());
+
+            component.handleFilterKeyUp(filter);
+
+            expect(component.filteredSelectedCount).toEqual(afterCount.toString());
+          });
+      });
+
+      using([
+        ['no filter', '', 3],
+        ['matching all', '-', 3],
+        ['matching some', 'proj', 2],
+        ['matching some with none checked', '-three', 0],
+        ['matching none', 'non-match', 0]
+      ], function (description: string, filter: string, afterCount: number) {
+        it(`and multiple projects, filter ${description} reports correct count`, () => {
+          component.options = genOptionsWithId([
+            ['proj-one', true],
+            ['proj-three', false],
+            ['other-one', false],
+            ['other-two', true],
+            ['proj-two', false],
+            ['other-three', false],
+            ['proj-four', true]
+          ]);
+          component.resetOptions();
+
+          component.handleFilterKeyUp(filter);
+
+          expect(component.filteredSelectedCount).toEqual(afterCount.toString());
+        });
+      });
+    });
+
+  });
+
 });
 
 function genOptions(checkedItems: boolean[]): ProjectsFilterOption[] {
@@ -434,6 +534,20 @@ function genOptions(checkedItems: boolean[]): ProjectsFilterOption[] {
         label: `Project ${i + 1}`,
         type: 'CUSTOM',
         checked: checkedItems[i]
+      });
+  }
+  return options;
+}
+
+function genManyOptions(count: number): ProjectsFilterOption[] {
+  const options: ProjectsFilterOption[] = [];
+  for (let i = 0; i < count; i++) {
+    options.push(
+      {
+        value: `project-${i + 1}`,
+        label: `Project ${i + 1}`,
+        type: 'CUSTOM',
+        checked: true
       });
   }
   return options;
