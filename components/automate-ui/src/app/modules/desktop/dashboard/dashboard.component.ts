@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { map, filter } from 'rxjs/operators';
 import { last, reverse } from 'lodash/fp';
@@ -28,6 +28,7 @@ import {
   DailyCheckInCount, DailyCheckInCountCollection, DayPercentage,
   TopErrorsItem, CountedDurationItem, Desktop
 } from 'app/entities/desktop/desktop.model';
+import { Node, NodeFilter } from 'app/entities/client-runs/client-runs.model';
 
 @Component({
   selector: 'app-desktop-dashboard',
@@ -61,6 +62,13 @@ export class DashboardComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.nodeFilter = {
+      page: 1,
+      pageSize: 10,
+      sortDirection: 'ASC',
+      sortField: 'name'
+    };
+
     this.store.dispatch(new GetDailyCheckInTimeSeries());
     this.store.dispatch(new GetTopErrorsCollection());
     this.store.dispatch(new GetUnknownDesktopDurationCounts());
