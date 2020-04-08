@@ -31,7 +31,7 @@
     margin-right: 1em;
   }
 
-  chef-td {
+  chef-table-cell {
     display: flex;
     flex-direction: row;
 
@@ -41,7 +41,7 @@
     }
   }
 
-  chef-td:last-child {
+  chef-table-cell:last-child {
     justify-content: flex-end;
   }
 }
