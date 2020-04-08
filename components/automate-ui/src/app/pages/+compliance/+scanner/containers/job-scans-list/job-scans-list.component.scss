@@ -5,11 +5,7 @@
 }
 
 .jobs-list-table {
-  .new-row {
-    font-size: 14px;
-  }
-
-  chef-td:last-child {
+  chef-table-cell:last-child {
     justify-content: flex-end;
   }
 }
