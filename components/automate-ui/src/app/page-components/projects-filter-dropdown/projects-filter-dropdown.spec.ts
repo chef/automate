@@ -417,10 +417,10 @@ describe('ProjectsFilterDropdownComponent', () => {
       ['superset', 'proj-one-plus-one', 0],
       ['everything', '-', 7]
     ], function (description: string, filter: string, count: number) {
-    it(`with ${description} filter displays ${count} matching options`, () => {
-      component.handleFilterKeyUp(filter);
-      expect(component.filteredOptions.length).toEqual(count);
-    });
+      it(`with ${description} filter displays ${count} matching options`, () => {
+        component.handleFilterKeyUp(filter);
+        expect(component.filteredOptions.length).toEqual(count);
+      });
     });
   });
 });
