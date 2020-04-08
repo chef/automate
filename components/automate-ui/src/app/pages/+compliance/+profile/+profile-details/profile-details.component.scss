@@ -54,12 +54,12 @@ chef-page-header {
 }
 
 .controls-table {
-  margin: 2em 35px;
+  padding: 2em 35px;
 
-  chef-th,
-  chef-td {
+  chef-table-header-cell,
+  chef-table-cell {
     &:first-child {
-      flex-grow: 5;
+      flex-basis: 500%;
       word-break: break-all;
 
       strong {
@@ -69,7 +69,17 @@ chef-page-header {
 
     &:last-child {
       justify-content: flex-end;
+
+      chef-button {
+        margin: 0;
+      }
     }
+  }
+
+  chef-table-cell {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
   }
 
   .control-detail {
