@@ -70,6 +70,10 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     this.createForm.controls.projects.setValue(projectsSelected);
   }
 
+  updatePolicyCheckbox(event): void {
+    this.createForm.controls.addPolicies.setValue(event);
+  }
+
   dropdownDisabled(): boolean {
     return Object.values(this.projects).length === 0;
   }

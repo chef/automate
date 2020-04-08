@@ -28,10 +28,10 @@ export class ProjectRequests {
     return this.http.get<ProjectSuccessPayload>(`${env.iam_url}/projects/${id}`);
   }
 
-  public createProject(id: string, name: string): Observable<ProjectSuccessPayload> {
+  public createProject(id: string, name: string, skip: boolean): Observable<ProjectSuccessPayload> {
     return this.http.post<ProjectSuccessPayload>(
       `${env.iam_url}/projects`,
-      { id, name });
+      { id: id, name: name, skip_policies: skip });
   }
 
   public deleteProject(id: string): Observable<{}> {

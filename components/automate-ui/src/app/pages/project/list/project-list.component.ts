@@ -54,7 +54,8 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', Validators.required],
       id: ['',
-        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
+      addPolicies: [true]
     });
   }
 
@@ -140,7 +141,12 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.creatingProject = true;
     const project = {
       id: this.createProjectForm.controls['id'].value,
-      name: this.createProjectForm.controls['name'].value.trim()
+      name: this.createProjectForm.controls['name'].value.trim(),
+      // we present the checkbox as "check this to add policies",
+      // but the API actually accepts a flag to skip policy creation
+      // since we want the default behavior to always add the policies.
+      // so, we pass on the opposite of the checkbox value to the API
+      skip: !this.createProjectForm.controls['addPolicies'].value
     };
     this.store.dispatch(new CreateProject(project));
   }
@@ -158,6 +164,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   resetCreateModal(): void {
     this.creatingProject = false;
     this.createProjectForm.reset();
+    this.createProjectForm.controls.addPolicies.setValue(true);
     this.conflictErrorEvent.emit(false);
   }
 

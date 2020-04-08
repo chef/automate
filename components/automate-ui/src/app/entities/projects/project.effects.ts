@@ -101,10 +101,11 @@ export class ProjectEffects {
   @Effect()
   createProject$ = this.actions$.pipe(
       ofType(ProjectActionTypes.CREATE),
-      mergeMap(({ payload: { id, name } }: CreateProject) =>
-      this.requests.createProject(id, name).pipe(
-        map((resp: ProjectSuccessPayload) => new CreateProjectSuccess(resp)),
-        catchError((error: HttpErrorResponse) => observableOf(new CreateProjectFailure(error))))));
+      mergeMap(({ payload: { id, name, skip } }: CreateProject) =>
+        this.requests.createProject(id, name, skip).pipe(
+          map((resp: ProjectSuccessPayload) => new CreateProjectSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new CreateProjectFailure(error))))));
 
   @Effect()
   createProjectSuccess$ = this.actions$.pipe(

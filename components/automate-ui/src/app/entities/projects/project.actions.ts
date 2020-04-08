@@ -83,7 +83,7 @@ export class GetProjectFailure implements Action {
 
 export class CreateProject implements Action {
   readonly type = ProjectActionTypes.CREATE;
-  constructor(public payload: {id: string, name: string}) { }
+  constructor(public payload: {id: string, name: string, skip: boolean}) { }
 }
 
 export class CreateProjectSuccess implements Action {
