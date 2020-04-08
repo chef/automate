@@ -161,10 +161,11 @@
 .pf-clear-selection {
   visibility: hidden;
   opacity: 0;
-  transition: .25s;
+  transition: .2s ease-in;
 
   &.active {
     visibility: visible;
-    opacity: 1
+    opacity: 1;
+    transition: .25s ease-out;
   }
 }
