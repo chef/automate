@@ -1,12 +1,12 @@
 @import "~styles/variables";
 
 .reporting-controls-table {
-  margin: 2em 35px 0;
+  padding: 2em 35px 0;
 
-  chef-th,
-  chef-td {
+  chef-table-header-cell,
+  chef-table-cell {
     &:first-child {
-      flex-grow: 2;
+      flex-basis: 200%;
       word-break: break-all;
 
       strong {
@@ -17,6 +17,12 @@
     &:last-child {
       justify-content: flex-end;
     }
+  }
+
+  chef-table-cell {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
   }
 
   .control-result {
