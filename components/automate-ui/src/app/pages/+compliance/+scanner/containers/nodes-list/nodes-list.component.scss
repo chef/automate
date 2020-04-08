@@ -73,6 +73,20 @@
 }
 
 .nodes-list-table {
+  chef-table-cell {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+
+    &:last-child {
+      justify-content: flex-end;
+    }
+  
+    chef-button {
+      margin: 0 0 0 7px;
+    }
+  }
+
   .new-row {
     font-size: 14px;
   }

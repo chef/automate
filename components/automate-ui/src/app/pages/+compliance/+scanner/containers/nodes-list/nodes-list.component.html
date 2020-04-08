@@ -28,33 +28,33 @@
   </chef-option>
 </chef-phat-radio>
 
-<chef-table class="nodes-list-table" (sort-toggled)="onSortToggled($event)">
-  <chef-thead>
-    <chef-tr>
-      <chef-th>
+<chef-table-new class="nodes-list-table" (sort-toggled)="onSortToggled($event)">
+  <chef-table-header>
+    <chef-table-row>
+      <chef-table-header-cell>
         Node
         <chef-sort-toggle sort="name" [order]="orderFor('name')"></chef-sort-toggle>
-      </chef-th>
-      <chef-th>
+      </chef-table-header-cell>
+      <chef-table-header-cell>
         Platform
         <chef-sort-toggle sort="platform" [order]="orderFor('platform')"></chef-sort-toggle>
-      </chef-th>
-      <chef-th>
+      </chef-table-header-cell>
+      <chef-table-header-cell>
         Status
         <chef-sort-toggle sort="status" [order]="orderFor('status')"></chef-sort-toggle>
-      </chef-th>
-      <chef-th>
+      </chef-table-header-cell>
+      <chef-table-header-cell>
         Manager
         <chef-sort-toggle sort="manager" [order]="orderFor('manager')"></chef-sort-toggle>
-      </chef-th>
-      <chef-th></chef-th>
-    </chef-tr>
-  </chef-thead>
+      </chef-table-header-cell>
+      <chef-table-header-cell></chef-table-header-cell>
+    </chef-table-row>
+  </chef-table-header>
 
   <chef-loading-spinner *ngIf="nodesList.loading" size="100"></chef-loading-spinner>
 
-  <chef-tbody *ngIf="!nodesList.loading">
-    <chef-tr class="empty new-row">
+  <chef-table-body *ngIf="!nodesList.loading">
+    <chef-table-row class="empty new-row">
       <span class="cta">Add new nodes to scan</span>
       <span class="action">
         <chef-button primary
@@ -62,19 +62,19 @@
           Add Nodes
         </chef-button>
       </span>
-    </chef-tr>
-    <chef-tr *ngFor="let node of nodesList.items; index as i; trackBy: trackBy;">
-      <chef-td>{{ node.name }}</chef-td>
-      <chef-td>{{ node.platform }} {{ node.platform_version }}</chef-td>
-      <chef-td>
+    </chef-table-row>
+    <chef-table-row *ngFor="let node of nodesList.items; index as i; trackBy: trackBy;">
+      <chef-table-cell>{{ node.name }}</chef-table-cell>
+      <chef-table-cell>{{ node.platform }} {{ node.platform_version }}</chef-table-cell>
+      <chef-table-cell>
         <chef-button [attr.id]="'rerun'+i" class="rerun-btn" tertiary (click)="rerunNode(node)">
           <chef-icon>cached</chef-icon>
         </chef-button>
         <chef-tooltip [attr.for]="'rerun'+i">Check connection</chef-tooltip>
         {{ node.status }}
-      </chef-td>
-      <chef-td>{{ node.manager }}</chef-td>
-      <chef-td>
+      </chef-table-cell>
+      <chef-table-cell>{{ node.manager }}</chef-table-cell>
+      <chef-table-cell>
         <chef-button secondary caution
           *ngIf="node.status === 'unreachable'"
           (click)="onNodeResultsShow(node.id)">
@@ -87,10 +87,10 @@
         <chef-button label="delete" secondary caution (click)="deleteNode(node)">
           <chef-icon>delete</chef-icon>
         </chef-button>
-      </chef-td>
-    </chef-tr>
-  </chef-tbody>
-</chef-table>
+      </chef-table-cell>
+    </chef-table-row>
+  </chef-table-body>
+</chef-table-new>
 
 <app-page-picker
   class="nodes-list-paging"

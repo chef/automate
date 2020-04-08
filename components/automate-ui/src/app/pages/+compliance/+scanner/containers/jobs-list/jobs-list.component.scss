@@ -1,13 +1,30 @@
 @import "~styles/variables";
 
 .jobs-list-table {
-  .new-row {
-    font-size: 14px;
+
+  chef-table-cell {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+
+    &:last-child {
+      justify-content: flex-end;
+
+      chef-button {
+        margin: -.5em 0 -.5em .5em;
+      }
+    }
+    
+    &.new-row {
+      font-size: 14px;
+    }
+
+    .job-cell {
+      flex-basis: 200%;
+    }
+
   }
 
-  chef-td:last-child {
-    justify-content: flex-end;
-  }
 
   chef-loading-spinner {
     display: block;
