@@ -83,16 +83,17 @@
 }
 
 .reporting-nodes-table {
-  margin: 2em 35px 0;
+  padding: 2em 35px 0;
 
-  chef-th,
-  chef-td {
+  chef-table-header-cell,
+  chef-table-cell {
+
     chef-button {
       white-space: nowrap;
     }
 
     &:first-child {
-      flex-grow: 2;
+      flex-basis: 200%;
 
       .status-icon {
         margin-right: 1em;
