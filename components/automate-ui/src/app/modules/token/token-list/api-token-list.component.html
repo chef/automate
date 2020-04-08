@@ -44,7 +44,7 @@
               <chef-table-header-cell>Name</chef-table-header-cell>
               <chef-table-header-cell>ID</chef-table-header-cell>
               <chef-table-header-cell>Projects</chef-table-header-cell>
-              <chef-table-header-cell>Created Date</chef-table-header-cell>
+              <chef-table-header-cell class="created-date">Created Date</chef-table-header-cell>
               <chef-table-header-cell>Status</chef-table-header-cell>
               <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
             </chef-table-row>
@@ -60,7 +60,7 @@
                 <span *ngIf="token.projects.length === 1">{{ token.projects[0] }}</span>
                 <span *ngIf="token.projects.length > 1">{{ token.projects.length }} projects</span>
               </chef-table-cell>
-              <chef-table-cell>{{ token.created_at | datetime: RFC2822 }}</chef-table-cell>
+              <chef-table-cell class="created-date">{{ token.created_at | datetime: RFC2822 }}</chef-table-cell>
               <chef-table-cell>
                 <ng-container *ngIf="token.active">Active</ng-container>
                 <ng-container *ngIf="!token.active">Inactive</ng-container>
