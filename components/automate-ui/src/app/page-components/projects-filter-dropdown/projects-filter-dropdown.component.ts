@@ -43,6 +43,11 @@ export class ProjectsFilterDropdownComponent {
     }
   }
 
+  get filteredSelectedCount(): string {
+    const count = this.filteredOptions.filter(option => option.checked).length;
+    return count > 99 ? '99+' : count.toString();
+  }
+
   handleFilterKeyUp(filterValue: string): void {
     this.filteredOptions = this.editableOptions
       .filter(option => option.label.toLowerCase().indexOf(filterValue.toLowerCase()) > -1);

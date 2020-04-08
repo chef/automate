@@ -423,6 +423,59 @@ describe('ProjectsFilterDropdownComponent', () => {
       });
     });
   });
+
+  describe('filteredSelectedCount', () => {
+    beforeEach(() => {
+      component.dropdownActive = true;
+    });
+    it('reports none selected with no projects', () => {
+      component.editableOptions = genOptions([]);
+      component.filteredOptions = component.editableOptions;
+      expect(component.filteredSelectedCount).toEqual('0');
+    });
+
+    it('reports one selected with one project, checked', () => {
+      component.editableOptions = genOptions([true]);
+      component.filteredOptions = component.editableOptions;
+      expect(component.filteredSelectedCount).toEqual('1');
+    });
+
+    it('reports none selected with one project, unchecked', () => {
+      component.editableOptions = genOptions([true]);
+      component.filteredOptions = component.editableOptions;
+      expect(component.filteredSelectedCount).toEqual('1');
+    });
+
+    it('reports none selected with multiple projects, none checked', () => {
+      component.editableOptions = genOptions([false, false, false]);
+      component.filteredOptions = component.editableOptions;
+      expect(component.filteredSelectedCount).toEqual('0');
+    });
+
+    it('reports two selected with multiple projects, two checked', () => {
+      component.editableOptions = genOptions([false, true, true]);
+      component.filteredOptions = component.editableOptions;
+      expect(component.filteredSelectedCount).toEqual('2');
+    });
+
+    it('reports count of checked and filtered projects', () => {
+      component.editableOptions = genOptionsWithId([
+        ['proj-one', true],
+        ['proj-three', false],
+        ['other-one', false],
+        ['other-two', true],
+        ['proj-two', false],
+        ['other-three', false],
+        ['proj-four', true]
+      ]);
+      component.filteredOptions = component.editableOptions;
+      expect(component.filteredSelectedCount).toEqual('3');
+      component.handleFilterKeyUp('proj');
+      expect(component.filteredSelectedCount).toEqual('2');
+    });
+
+  });
+
 });
 
 function genOptions(checkedItems: boolean[]): ProjectsFilterOption[] {
