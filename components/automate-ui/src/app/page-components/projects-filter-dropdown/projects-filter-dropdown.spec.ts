@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
+import { using } from 'app/testing/spec-helpers';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { ProjectsFilterDropdownComponent } from './projects-filter-dropdown.component';
 
@@ -347,6 +348,42 @@ describe('ProjectsFilterDropdownComponent', () => {
       expect(nextElementSibling.focus).toHaveBeenCalled();
     });
   });
+
+  describe('filteredOptions', () => {
+    beforeEach(() => {
+      component.dropdownActive = true;
+      component.options = genOptionsWithId([
+        ['proj-one', true],
+        ['proj-three', false],
+        ['other-one', false],
+        ['other-two', true],
+        ['proj-two', false],
+        ['other-three', false],
+        ['proj-four', false]
+      ]);
+      component.resetOptions();
+    });
+
+    it('with no filter displays all options', () => {
+      expect(component.filteredOptions.length).toEqual(7);
+    });
+
+    using([
+      ['prefix', 'proj', 4],
+      ['mid-value', 'her', 3],
+      ['suffix', 'two', 2],
+      ['empty string', '', 7],
+      ['whitespace', ' ', 0],
+      ['exact match', 'proj-one', 1],
+      ['superset', 'proj-one-plus-one', 0],
+      ['everything', '-', 7]
+    ], function (description: string, filter: string, count: number) {
+      it(`with ${description} filter displays ${count} matching options`, () => {
+        component.handleFilterKeyUp(filter);
+        expect(component.filteredOptions.length).toEqual(count);
+      });
+    });
+  });
 });
 
 function genOptions(checkedItems: boolean[]): ProjectsFilterOption[] {
@@ -360,5 +397,18 @@ function genOptions(checkedItems: boolean[]): ProjectsFilterOption[] {
         checked: checkedItems[i]
       });
   }
+  return options;
+}
+
+function genOptionsWithId(checkedItems: [string, boolean][]): ProjectsFilterOption[] {
+  const options: ProjectsFilterOption[] = [];
+  checkedItems.forEach(([id, checked]) =>
+    options.push({
+        value: id,
+        label: id,
+        type: 'CUSTOM',
+        checked
+    })
+  );
   return options;
 }
