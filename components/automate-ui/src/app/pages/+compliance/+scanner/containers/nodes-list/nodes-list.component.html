@@ -31,7 +31,7 @@
 <chef-table-new class="nodes-list-table" (sort-toggled)="onSortToggled($event)">
   <chef-table-header>
     <chef-table-row>
-      <chef-table-header-cell>
+      <chef-table-header-cell class="node-column">
         Node
         <chef-sort-toggle sort="name" [order]="orderFor('name')"></chef-sort-toggle>
       </chef-table-header-cell>
@@ -64,7 +64,7 @@
       </span>
     </chef-table-row>
     <chef-table-row *ngFor="let node of nodesList.items; index as i; trackBy: trackBy;">
-      <chef-table-cell>{{ node.name }}</chef-table-cell>
+      <chef-table-cell class="node-column">{{ node.name }}</chef-table-cell>
       <chef-table-cell>{{ node.platform }} {{ node.platform_version }}</chef-table-cell>
       <chef-table-cell>
         <chef-button [attr.id]="'rerun'+i" class="rerun-btn" tertiary (click)="rerunNode(node)">

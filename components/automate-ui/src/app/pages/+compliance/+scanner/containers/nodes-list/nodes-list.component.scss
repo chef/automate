@@ -83,10 +83,13 @@
     }
   
     chef-button {
-      margin: 0 0 0 7px;
+      margin: -.5em 0 -.5em .5em;
     }
   }
-
+  
+  .node-column {
+    flex-basis: 200%;
+  }
   .new-row {
     font-size: 14px;
   }
