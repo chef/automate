@@ -43,21 +43,21 @@
     </chef-option>
   </chef-phat-radio>
 
-  <chef-table class="reporting-profiles-table" (sort-toggled)="onProfilesListSortToggled($event)">
-    <chef-thead>
-      <chef-tr>
-        <chef-th class="title-cell">
+  <chef-table-new class="reporting-profiles-table" (sort-toggled)="onProfilesListSortToggled($event)">
+    <chef-table-header>
+      <chef-table-row>
+        <chef-table-header-cell class="title-cell">
           Profiles
           <chef-sort-toggle sort="title" [order]="orderFor('title')"></chef-sort-toggle>
-        </chef-th>
-        <chef-th class="version-cell">Version</chef-th>
-        <chef-th class="identifier-cell">Identifier</chef-th>
-        <chef-th class="actions-cell three-dot-column"></chef-th>
-      </chef-tr>
-    </chef-thead>
-    <chef-tbody *ngIf="!reportData.profilesListLoading">
-      <chef-tr *ngFor="let profile of filteredProfiles(reportData.profilesList.items)">
-        <chef-td class="title-cell">
+        </chef-table-header-cell>
+        <chef-table-header-cell class="version-cell">Version</chef-table-header-cell>
+        <chef-table-header-cell class="identifier-cell">Identifier</chef-table-header-cell>
+        <chef-table-header-cell class="actions-cell three-dot-column"></chef-table-header-cell>
+      </chef-table-row>
+    </chef-table-header>
+    <chef-table-body *ngIf="!reportData.profilesListLoading">
+      <chef-table-row *ngFor="let profile of filteredProfiles(reportData.profilesList.items)">
+        <chef-table-cell class="title-cell">
           <!-- Material Icon Font -->
           <chef-icon *ngIf="profile.status !== 'waived'" class="status-icon" [ngClass]="profile.status">
             {{ statusIcon(profile.status) }}
@@ -65,20 +65,20 @@
           <!-- Custom Waived Icon -->
           <div *ngIf="profile.status === 'waived'" class="waived-icon"></div>
           <a [routerLink]="['/compliance/reports/profiles', profile.id]">{{ profile.title }}</a>
-        </chef-td>
-        <chef-td class="version-cell">{{ profile.version }}</chef-td>
-        <chef-td class="identifier-cell">{{ user }}/{{ profile.name }}</chef-td>
-        <chef-td class="actions-cell three-dot-column">
+        </chef-table-cell>
+        <chef-table-cell class="version-cell">{{ profile.version }}</chef-table-cell>
+        <chef-table-cell class="identifier-cell">{{ user }}/{{ profile.name }}</chef-table-cell>
+        <chef-table-cell class="actions-cell three-dot-column">
           <mat-select panelClass="chef-control-menu">
             <mat-option *ngIf="!hasFilter(profile)" (onSelectionChange)="addFilter(profile)">Add Filter</mat-option>
             <mat-option *ngIf="hasFilter(profile)" (onSelectionChange)="removeFilter(profile)">Remove Filter</mat-option>
             <mat-option (onSelectionChange)="displayScanResults(profile)">Scan Results</mat-option>
           </mat-select>
-        </chef-td>
-      </chef-tr>
-    </chef-tbody>
+        </chef-table-cell>
+      </chef-table-row>
+    </chef-table-body>
     <chef-loading-spinner *ngIf="reportData.profilesListLoading" size="100"></chef-loading-spinner>
-  </chef-table>
+  </chef-table-new>
 
   <app-page-picker
     class="reporting-profiles-paging"

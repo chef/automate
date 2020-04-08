@@ -83,16 +83,16 @@
 }
 
 .reporting-profiles-table {
-  margin: 2em 35px 0;
+  padding: 2em 35px 0;
 
-  chef-th,
-  chef-td {
+  chef-table-header-cell,
+  chef-table-cell {
     chef-button {
       white-space: nowrap;
     }
 
     &.title-cell {
-      flex-basis: 40%;
+      flex-basis: 160%;
 
       chef-icon, .waived-icon {
         margin-right: 1em;
@@ -100,15 +100,11 @@
     }
 
     &.version-cell {
-      flex-basis: 15%;
-    }
-
-    &.identifier-cell {
-      flex-basis: 25%;
+      flex-basis: 60%;
     }
 
     &.actions-cell {
-      flex-basis: 20%;
+      flex-basis: 80%;
       justify-content: flex-end;
     }
   }
