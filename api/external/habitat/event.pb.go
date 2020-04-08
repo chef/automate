@@ -563,7 +563,9 @@ func init() {
 	proto.RegisterType((*HealthCheckEvent)(nil), "chef.habitat.supervisor.event.HealthCheckEvent")
 }
 
-func init() { proto.RegisterFile("api/external/habitat/event.proto", fileDescriptor_aae8161563bea85d) }
+func init() {
+	proto.RegisterFile("api/external/habitat/event.proto", fileDescriptor_aae8161563bea85d)
+}
 
 var fileDescriptor_aae8161563bea85d = []byte{
 	// 779 bytes of a gzipped FileDescriptorProto
