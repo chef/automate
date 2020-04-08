@@ -14,17 +14,16 @@
         margin: -.5em 0 -.5em .5em;
       }
     }
-    
-    &.new-row {
-      font-size: 14px;
-    }
-
-    .job-cell {
-      flex-basis: 200%;
-    }
 
   }
+  
+  .job-cell {
+    flex-basis: 200%;
+  }
 
+  .new-row {
+    font-size: 14px;
+  }
 
   chef-loading-spinner {
     display: block;
