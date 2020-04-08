@@ -39,13 +39,18 @@ func (s *Server) GetCookbookVersions(ctx context.Context, req *request.CookbookV
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	cookbook, err := c.client.Cookbooks.GetAvailableVersions(req.Name, "")
+	res, err := c.client.Cookbooks.GetAvailableVersions(req.Name, "")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
+	cookbook, success := res[req.Name]
+	if !success {
+		return nil, status.Errorf(codes.Internal, "unable to fetch cookbook versions for %s", req.Name)
+	}
 	return &response.CookbookVersions{
-		Versions: fromAPICookbookVersionToVersions(cookbook[req.Name].Versions),
+		Name:     req.Name,
+		Versions: fromAPICookbookVersionToVersions(cookbook.Versions),
 	}, nil
 }
 
