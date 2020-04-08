@@ -97,12 +97,12 @@ describe('NotificationsComponent', () => {
     it ('shows only the table', () => {
       const listViewElement = fixture.debugElement.query(By.css(listId));
       const cardViewElement = fixture.debugElement.query(By.css(cardId));
-      expect(listViewElement.name).toBe('chef-table');
+      expect(listViewElement.name).toBe('chef-table-new');
       expect(cardViewElement).toBeNull();
     });
 
     it('shows expected item count', () => {
-      const tableBody = getElementByCss(`${listId} chef-tr`);
+      const tableBody = getElementByCss(`${listId} chef-table-row`);
       expect(tableBody.children.length).toBe(rules.length + 1);
     });
 
