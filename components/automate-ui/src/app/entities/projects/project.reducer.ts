@@ -91,7 +91,7 @@ export function projectEntityReducer(
       return pipe(
         set(CREATE_STATUS, EntityStatus.loadingSuccess),
         unset(CREATE_ERROR)
-      )(projectEntityAdapter.addOne(action.payload.project, state)) as ProjectEntityState;
+      )(projectEntityAdapter.addOne(action.payload.resp.project, state)) as ProjectEntityState;
 
     case ProjectActionTypes.CREATE_FAILURE:
       return pipe(

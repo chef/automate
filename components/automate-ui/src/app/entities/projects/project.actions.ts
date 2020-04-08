@@ -88,7 +88,7 @@ export class CreateProject implements Action {
 
 export class CreateProjectSuccess implements Action {
   readonly type = ProjectActionTypes.CREATE_SUCCESS;
-  constructor(public payload: ProjectSuccessPayload) { }
+  constructor(public payload: {resp: ProjectSuccessPayload, skip: boolean}) { }
 }
 
 export class CreateProjectFailure implements Action {
