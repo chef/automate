@@ -94,13 +94,13 @@ describe('DatafeedComponent', () => {
     it ('shows only the table', () => {
       const listViewElement = fixture.debugElement.query(By.css(listId));
       const cardViewElement = fixture.debugElement.query(By.css(cardId));
-      expect(listViewElement.name).toBe('chef-table');
+      expect(listViewElement.name).toBe('chef-table-new');
       expect(cardViewElement).toBeNull();
     });
 
     it('shows expected item count', () => {
-      const tableBody = getElementByCss(`${listId}`);
-      expect(tableBody.children.length).toBe(destinations.length + 1);
+      const tableBody = getElementByCss(`${listId} chef-table-body`);
+      expect(tableBody.children.length).toBe(destinations.length);
     });
 
   });
