@@ -2,6 +2,7 @@ import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { reduce } from 'lodash/fp';
 import { DailyCheckInCountCollection, DailyCheckInCount,
   TopErrorsCollection, TopErrorsItem,
   CountedDurationCollection, CountedDurationItem, Desktop, Filter } from './desktop.model';
@@ -102,10 +103,13 @@ export class DesktopRequests {
       map((res) => res.map((respDesktop: RespDesktop) => this.createDesktop(respDesktop))));
   }
 
-  public getDesktopsTotal(): Observable<number> {
+  public getDesktopsTotal(filter: Filter): Observable<number> {
     const url = `${CONFIG_MGMT_URL}/stats/node_counts`;
+    const options = {
+      params: this.buildURLSearchParams(filter)
+    };
 
-    return this.http.get<RespDesktopCount>(url).pipe(map((res) => res.total));
+    return this.http.get<RespDesktopCount>(url, options).pipe(map((res) => res.total));
   }
 
   private createDesktop(respDesktop: RespDesktop): Desktop {
@@ -133,6 +137,13 @@ export class DesktopRequests {
 
   private buildURLSearchParams(filter: Filter): HttpParams {
     let searchParam = new HttpParams();
+
+    if (filter.terms.length > 0) {
+      searchParam = reduce((param, term) => {
+        const filterParam = `${encodeURIComponent(term.type)}:${encodeURIComponent(term.value)}`;
+        return param.append('filter', filterParam);
+      }, searchParam, filter.terms);
+    }
 
     searchParam = searchParam.append('pagination.page', filter.currentPage.toString());
 

@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChange } from '@angular/core';
+import { Component, Input, Output, OnInit, OnDestroy, OnChanges,
+  SimpleChange, EventEmitter } from '@angular/core';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
@@ -16,6 +17,7 @@ export class TopErrorsComponent  implements OnInit, OnDestroy, OnChanges  {
 
   @Input() topErrorsItems: TopErrorsItem[];
   @Input() lastUpdated: Date;
+  @Output() errorSelected: EventEmitter<TopErrorsItem> = new EventEmitter();
 
   private isDestroyed = new Subject<boolean>();
   public lastUpdatedMessage = '-';
@@ -41,5 +43,9 @@ export class TopErrorsComponent  implements OnInit, OnDestroy, OnChanges  {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  public onItemClicked(item: TopErrorsItem) {
+    this.errorSelected.emit(item);
   }
 }

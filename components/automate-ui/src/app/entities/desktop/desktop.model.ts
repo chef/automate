@@ -51,4 +51,10 @@ export interface Filter {
   pageSize: number;
   sortingField: string;
   sortingOrder: string;
+  terms: TermFilter[];
+}
+
+export interface TermFilter {
+  type: string;
+  value: string;
 }

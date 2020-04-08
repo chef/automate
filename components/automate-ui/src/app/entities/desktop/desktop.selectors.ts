@@ -48,3 +48,8 @@ export const desktopsPageSize = createSelector(
   desktopState,
   (state) => state.getDesktopsFilter.pageSize
 );
+
+export const desktopsFilterTerms = createSelector(
+  desktopState,
+  (state) => state.getDesktopsFilter.terms
+);

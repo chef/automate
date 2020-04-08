@@ -2,7 +2,7 @@ import { Action } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { DailyCheckInCountCollection,
-  TopErrorsCollection, CountedDurationCollection, Desktop } from './desktop.model';
+  TopErrorsCollection, CountedDurationCollection, Desktop, TermFilter } from './desktop.model';
 
 export enum DesktopActionTypes {
   GET_DAILY_CHECK_IN_TIME_SERIES              = 'DESKTOP::GET::DAILY_CHECK_IN_TIME_SERIES',
@@ -21,7 +21,10 @@ export enum DesktopActionTypes {
   GET_DESKTOPS_TOTAL                          = 'DESKTOP::GET::DESKTOPS_TOTAL',
   GET_DESKTOPS_TOTAL_SUCCESS                  = 'DESKTOP::GET::DESKTOPS_TOTAL::SUCCESS',
   GET_DESKTOPS_TOTAL_FAILURE                  = 'DESKTOP::GET::DESKTOPS_TOTAL::FAILURE',
-  UPDATE_DESKTOPS_FILTER_CURRENT_PAGE         = 'DESKTOP::UPDATE::DESKTOPS_FILTER_CURRENT_PAGE'
+  UPDATE_DESKTOPS_FILTER_CURRENT_PAGE         = 'DESKTOP::UPDATE::DESKTOPS_FILTER_CURRENT_PAGE',
+  ADD_DESKTOPS_FILTER_TERM                    = 'DESKTOP::ADD::DESKTOPS_FILTER_TERM',
+  UPDATE_DESKTOPS_FILTER_TERMS                = 'DESKTOP::UPDATE::DESKTOPS_FILTER_TERMS',
+  REMOVE_DESKTOPS_FILTER_TERM                 = 'DESKTOP::REMOVE::DESKTOPS_FILTER_TERM'
 }
 
 export class SetDaysAgoSelected implements Action {
@@ -104,6 +107,21 @@ export class UpdateDesktopFilterCurrentPage implements Action {
   constructor(public payload: { page: number}) { }
 }
 
+export class AddDesktopFilterTerm implements Action {
+  readonly type = DesktopActionTypes.ADD_DESKTOPS_FILTER_TERM;
+  constructor(public payload: { term: TermFilter}) { }
+}
+
+export class UpdateDesktopFilterTerm implements Action {
+  readonly type = DesktopActionTypes.UPDATE_DESKTOPS_FILTER_TERMS;
+  constructor(public payload: { terms: TermFilter[]}) { }
+}
+
+export class RemoveDesktopFilterTerm implements Action {
+  readonly type = DesktopActionTypes.REMOVE_DESKTOPS_FILTER_TERM;
+  constructor(public payload: { term: TermFilter}) { }
+}
+
 export type DesktopActions =
   | SetDaysAgoSelected
   | GetDailyCheckInTimeSeries
@@ -121,4 +139,7 @@ export type DesktopActions =
   | GetDesktopsTotal
   | GetDesktopsTotalSuccess
   | GetDesktopsTotalFailure
-  | UpdateDesktopFilterCurrentPage;
+  | UpdateDesktopFilterCurrentPage
+  | AddDesktopFilterTerm
+  | UpdateDesktopFilterTerm
+  | RemoveDesktopFilterTerm;

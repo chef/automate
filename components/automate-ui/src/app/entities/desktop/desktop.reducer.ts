@@ -1,9 +1,9 @@
-import { set, pipe } from 'lodash/fp';
+import { set, pipe, concat, remove } from 'lodash/fp';
 
 import { EntityStatus } from '../entities';
 import { DesktopActionTypes, DesktopActions } from './desktop.actions';
 import { DailyCheckInCountCollection, TopErrorsCollection,
-  CountedDurationCollection, Desktop, Filter } from './desktop.model';
+  CountedDurationCollection, Desktop, Filter, TermFilter } from './desktop.model';
 
 export interface DesktopEntityState {
   dailyCheckInCountCollection: DailyCheckInCountCollection;
@@ -32,7 +32,13 @@ export const desktopEntityInitialState: DesktopEntityState = {
   getDesktopsStatus: EntityStatus.notLoaded,
   desktopsTotal: 0,
   getDesktopsTotalStatus: EntityStatus.notLoaded,
-  getDesktopsFilter: { currentPage: 1, pageSize: 10, sortingField: 'name', sortingOrder: 'ASC'}
+  getDesktopsFilter: {
+    currentPage: 1,
+    pageSize: 10,
+    sortingField: 'name',
+    sortingOrder: 'ASC',
+    terms: []
+  }
 };
 
 export function userEntityReducer(state: DesktopEntityState = desktopEntityInitialState,
@@ -99,6 +105,28 @@ export function userEntityReducer(state: DesktopEntityState = desktopEntityIniti
 
     case DesktopActionTypes.UPDATE_DESKTOPS_FILTER_CURRENT_PAGE:
       return set('getDesktopsFilter.currentPage', action.payload.page)(state);
+
+    case DesktopActionTypes.ADD_DESKTOPS_FILTER_TERM:
+      return pipe(
+        set('getDesktopsFilter.terms',
+          concat(state.getDesktopsFilter.terms, [action.payload.term])),
+        set('getDesktopsFilter.currentPage', 1)
+      )(state);
+
+    case DesktopActionTypes.UPDATE_DESKTOPS_FILTER_TERMS:
+      return pipe(
+        set('getDesktopsFilter.terms', action.payload.terms ),
+        set('getDesktopsFilter.currentPage', 1)
+      )(state);
+
+    case DesktopActionTypes.REMOVE_DESKTOPS_FILTER_TERM:
+      return pipe(
+        set('getDesktopsFilter.terms',
+          remove<TermFilter>((term) =>
+            term.type === action.payload.term.type,
+            state.getDesktopsFilter.terms)),
+        set('getDesktopsFilter.currentPage', 1)
+      )(state);
 
     default:
       return state;

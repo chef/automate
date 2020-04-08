@@ -4,6 +4,14 @@
       <button (click)="close()" id="x">X</button>
       <div class="page-title">Insight</div>
 
+      <ul>
+        <li *ngFor="let term of termFilters">
+          <button (click)="termFilterClicked(term)" id="filter-item">
+            {{term.type}}: {{term.value}}
+          </button>
+        </li>
+      </ul>
+      <div>Total: {{totalDesktops}}</div>
       <table>
         <thead>
           <tr >

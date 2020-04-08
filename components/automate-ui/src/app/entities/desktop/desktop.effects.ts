@@ -19,6 +19,7 @@ import {
   GetDesktops,
   GetDesktopsSuccess,
   GetDesktopsFailure,
+  GetDesktopsTotal,
   GetDesktopsTotalSuccess,
   GetDesktopsTotalFailure
 } from './desktop.actions';
@@ -133,8 +134,9 @@ export class DesktopEffects {
   @Effect()
   getDesktopsTotal$ = this.actions$.pipe(
     ofType(DesktopActionTypes.GET_DESKTOPS_TOTAL),
-    mergeMap((_action) =>
-      this.requests.getDesktopsTotal().pipe(
+    withLatestFrom(this.store$),
+    switchMap(([_action, storeState]) =>
+      this.requests.getDesktopsTotal(storeState.desktops.getDesktopsFilter).pipe(
         map(total => new GetDesktopsTotalSuccess( total )),
       catchError((error) => of(new GetDesktopsTotalFailure(error))))
     ));
@@ -154,4 +156,19 @@ export class DesktopEffects {
   updateDesktopFilterCurrentPage$ = this.actions$.pipe(
       ofType(DesktopActionTypes.UPDATE_DESKTOPS_FILTER_CURRENT_PAGE),
       mergeMap(() => [ new GetDesktops() ]));
+
+  @Effect()
+  addDesktopFilterTerm$ = this.actions$.pipe(
+      ofType(DesktopActionTypes.ADD_DESKTOPS_FILTER_TERM),
+      mergeMap(() => [ new GetDesktops(), new GetDesktopsTotal() ]));
+
+  @Effect()
+  updateDesktopFilterTerms$ = this.actions$.pipe(
+      ofType(DesktopActionTypes.UPDATE_DESKTOPS_FILTER_TERMS),
+      mergeMap(() => [ new GetDesktops(), new GetDesktopsTotal() ]));
+
+  @Effect()
+  removeDesktopFilterTerms$ = this.actions$.pipe(
+      ofType(DesktopActionTypes.REMOVE_DESKTOPS_FILTER_TERM),
+      mergeMap(() => [ new GetDesktops(), new GetDesktopsTotal() ]));
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Store, createSelector } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { map, filter } from 'rxjs/operators';
 import { last, reverse } from 'lodash/fp';
@@ -12,7 +12,9 @@ import {
   GetUnknownDesktopDurationCounts,
   GetDesktops,
   GetDesktopsTotal,
-  UpdateDesktopFilterCurrentPage
+  UpdateDesktopFilterCurrentPage,
+  UpdateDesktopFilterTerm,
+  RemoveDesktopFilterTerm
 } from 'app/entities/desktop/desktop.actions';
 import {
   dailyCheckInCountCollection,
@@ -22,13 +24,13 @@ import {
   desktops,
   desktopsTotal,
   desktopsCurrentPage,
-  desktopsPageSize
+  desktopsPageSize,
+  desktopsFilterTerms
 } from 'app/entities/desktop/desktop.selectors';
 import {
   DailyCheckInCount, DailyCheckInCountCollection, DayPercentage,
-  TopErrorsItem, CountedDurationItem, Desktop
+  TopErrorsItem, CountedDurationItem, Desktop, TermFilter
 } from 'app/entities/desktop/desktop.model';
-import { Node, NodeFilter } from 'app/entities/client-runs/client-runs.model';
 
 @Component({
   selector: 'app-desktop-dashboard',
@@ -55,25 +57,21 @@ export class DashboardComponent implements OnInit {
   public totalDesktopCount$: Observable<number>;
   public currentPage$: Observable<number>;
   public pageSize$: Observable<number>;
-  public insightVisible = true;
+  public termFilters$: Observable<TermFilter[]>;
+  public insightVisible = false;
 
   constructor(
     private store: Store<NgrxStateAtom>
   ) { }
 
   ngOnInit() {
-    this.nodeFilter = {
-      page: 1,
-      pageSize: 10,
-      sortDirection: 'ASC',
-      sortField: 'name'
-    };
-
     this.store.dispatch(new GetDailyCheckInTimeSeries());
     this.store.dispatch(new GetTopErrorsCollection());
     this.store.dispatch(new GetUnknownDesktopDurationCounts());
     this.store.dispatch(new GetDesktops());
     this.store.dispatch(new GetDesktopsTotal());
+
+    this.termFilters$ = this.store.select(desktopsFilterTerms);
 
     this.pageSize$ = this.store.select(desktopsPageSize);
 
@@ -164,5 +162,17 @@ export class DashboardComponent implements OnInit {
 
   public onPageChange(pageNumber: number) {
     this.store.dispatch(new UpdateDesktopFilterCurrentPage({page: pageNumber}));
+  }
+
+  public onErrorSelected(errorItem: TopErrorsItem): void {
+    const terms = [
+      { type: 'error_message', value: errorItem.message },
+      { type: 'error_type', value: errorItem.type }];
+    this.store.dispatch(new UpdateDesktopFilterTerm({ terms }));
+    this.insightVisible = true;
+  }
+
+  public ontermFilterSelected(term: TermFilter): void {
+    this.store.dispatch(new RemoveDesktopFilterTerm({ term }));
   }
 }
