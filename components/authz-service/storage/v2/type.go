@@ -2,26 +2,8 @@ package v2
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
-
-	"github.com/pkg/errors"
-
-	constants "github.com/chef/automate/components/authz-service/constants"
 )
-
-func ValidateProjects(projects []string) error {
-	for _, project := range projects {
-		if project == constants.UnassignedProjectID {
-			return errors.Errorf("%q cannot explicitly be set. "+
-				"If you wish to create an object in %q, you should pass no projects on creation.",
-				constants.UnassignedProjectID, constants.UnassignedProjectID)
-		}
-	}
-	return nil
-}
-
-var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
 // Type is an enum to denote custom or chef-managed policy.
 type Type int

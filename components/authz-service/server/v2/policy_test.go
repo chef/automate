@@ -559,7 +559,7 @@ func TestDeletePolicy(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when ID is not valid", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
-			req := api_v2.DeletePolicyReq{Id: "no spacess"}
+			req := api_v2.DeletePolicyReq{Id: " "}
 
 			_, err := cl.DeletePolicy(ctx, &req)
 
@@ -794,7 +794,7 @@ func TestListPolicyMembers(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when ID is not valid", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
-			req := api_v2.ListPolicyMembersReq{Id: "no spaces"}
+			req := api_v2.ListPolicyMembersReq{Id: "    "}
 
 			resp, err := cl.ListPolicyMembers(ctx, &req)
 
@@ -881,8 +881,8 @@ func TestGetPolicy(t *testing.T) {
 			require.Nil(t, pol)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		}},
-		{"fails with InvalidArgument when ID isn't valid", func(t *testing.T) {
-			req := api_v2.GetPolicyReq{Id: "no spaces"}
+		{"fails with InvalidArgument when ID is whitespace", func(t *testing.T) {
+			req := api_v2.GetPolicyReq{Id: "     "}
 
 			pol, err := cl.GetPolicy(ctx, &req)
 
@@ -940,7 +940,7 @@ func TestUpdatePolicy(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when ID is invalid", func(t *testing.T) {
 			req := api_v2.UpdatePolicyReq{
-				Id:         "no spaces",
+				Id:         "      ",
 				Name:       "testPolicy1",
 				Statements: testStatement,
 			}
@@ -1174,7 +1174,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 
 			require.Nil(t, pol)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
-			assert.Regexp(t, "invalid ReplacePolicyMembersReq.Id: value does not match regex pattern", err.Error())
+			assert.Regexp(t, "rpc error: code = InvalidArgument desc = a policy id is required and must contain at least one non-whitespace character", err.Error())
 		}},
 		{"fails with NotFound when policy not found", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
@@ -1286,7 +1286,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 			pol, err := cl.RemovePolicyMembers(ctx, &req)
 			require.Nil(t, pol)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
-			assert.Regexp(t, "invalid RemovePolicyMembersReq.Id: value does not match regex pattern", err.Error())
+			assert.Regexp(t, "rpc error: code = InvalidArgument desc = a policy id is required and must contain at least one non-whitespace character", err.Error())
 		}},
 		{"fails with NotFound when policy not found", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
@@ -1427,7 +1427,7 @@ func TestAddPolicyMembers(t *testing.T) {
 
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
-			assert.Regexp(t, "invalid AddPolicyMembersReq.Id: value does not match regex pattern", err.Error())
+			assert.Regexp(t, "rpc error: code = InvalidArgument desc = a policy id is required and must contain at least one non-whitespace character", err.Error())
 		}},
 		{"fails with NotFound when policy not found", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
@@ -1728,9 +1728,9 @@ func TestUpdateRole(t *testing.T) {
 			require.Nil(t, role)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		},
-		"fails with InvalidArgument when ID is invalid": func(t *testing.T) {
+		"fails with InvalidArgument when ID is whitespace": func(t *testing.T) {
 			req := api_v2.UpdateRoleReq{
-				Id:       "no spaces",
+				Id:       "    ",
 				Name:     "name",
 				Actions:  []string{"foo:bar:baz"},
 				Projects: []string{},
@@ -1927,10 +1927,9 @@ func TestDeleteRole(t *testing.T) {
 
 			grpctest.AssertCode(t, codes.NotFound, err)
 		},
-		"fails with InvalidArgument when ID is not permissable": func(t *testing.T) {
-			// "*" is not a permitted role name per the regex validation
+		"fails with InvalidArgument when ID is all whitespace": func(t *testing.T) {
 			req := api_v2.DeleteRoleReq{
-				Id: "*",
+				Id: "   ",
 			}
 
 			_, err := cl.DeleteRole(ctx, &req)
