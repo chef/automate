@@ -45,22 +45,22 @@
 
           <chef-loading-spinner *ngIf="loading(managerStatus$ | async)" size='50'></chef-loading-spinner>
 
-        <chef-tbody>
+        <chef-table-body>
           <chef-table-row *ngFor="let manager of managers$ | async">
-            <chef-td>
+            <chef-table-cell>
               <a class="link" [routerLink]="['/settings/node-integrations', manager.id]">{{ manager.name }}</a>
-            </chef-td>
-            <chef-td>{{ manager.type }}</chef-td>
-            <chef-td class="column-date">{{ manager.date_added | datetime: RFC2822 }}</chef-td>
-            <chef-td>{{ manager.status }}</chef-td>
-            <chef-td class="three-dot-column">
+            </chef-table-cell>
+            <chef-table-cell>{{ manager.type }}</chef-table-cell>
+            <chef-table-cell class="column-date">{{ manager.date_added | datetime: RFC2822 }}</chef-table-cell>
+            <chef-table-cell>{{ manager.status }}</chef-table-cell>
+            <chef-table-cell class="three-dot-column">
               <mat-select panelClass="chef-control-menu">
                 <mat-option (onSelectionChange)="handleEdit(manager.id)">Edit Integration</mat-option>
                 <mat-option (onSelectionChange)="handleDelete($event, manager.id)">Delete Integration</mat-option>
               </mat-select>
-            </chef-td>
+            </chef-table-cell>
           </chef-table-row>
-        </chef-tbody>
+        </chef-table-body>
       </chef-table-new>
 
       </div>
