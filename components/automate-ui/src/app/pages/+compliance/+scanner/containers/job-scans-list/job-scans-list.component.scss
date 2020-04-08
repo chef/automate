@@ -5,8 +5,16 @@
 }
 
 .jobs-list-table {
+  chef-table-cell {
+    display: flex;
+  }
   chef-table-cell:last-child {
+    flex-flow: row nowrap;
     justify-content: flex-end;
+
+    chef-button {
+      margin: -.5em 0 -.5em .5em;
+    }
   }
 }
 
