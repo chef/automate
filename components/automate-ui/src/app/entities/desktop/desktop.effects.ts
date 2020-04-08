@@ -171,4 +171,9 @@ export class DesktopEffects {
   removeDesktopFilterTerms$ = this.actions$.pipe(
       ofType(DesktopActionTypes.REMOVE_DESKTOPS_FILTER_TERM),
       mergeMap(() => [ new GetDesktops(), new GetDesktopsTotal() ]));
+
+  @Effect()
+  updateDesktopSortTerm$ = this.actions$.pipe(
+      ofType(DesktopActionTypes.UPDATE_DESKTOPS_SORT_TERM),
+      mergeMap(() => [ new GetDesktops() ]));
 }

@@ -14,7 +14,8 @@ import {
   GetDesktopsTotal,
   UpdateDesktopFilterCurrentPage,
   UpdateDesktopFilterTerm,
-  RemoveDesktopFilterTerm
+  RemoveDesktopFilterTerm,
+  UpdateDesktopSortTerm
 } from 'app/entities/desktop/desktop.actions';
 import {
   dailyCheckInCountCollection,
@@ -29,7 +30,7 @@ import {
 } from 'app/entities/desktop/desktop.selectors';
 import {
   DailyCheckInCount, DailyCheckInCountCollection, DayPercentage,
-  TopErrorsItem, CountedDurationItem, Desktop, TermFilter
+  TopErrorsItem, CountedDurationItem, Desktop, TermFilter, Terms
 } from 'app/entities/desktop/desktop.model';
 
 @Component({
@@ -166,13 +167,31 @@ export class DashboardComponent implements OnInit {
 
   public onErrorSelected(errorItem: TopErrorsItem): void {
     const terms = [
-      { type: 'error_message', value: errorItem.message },
-      { type: 'error_type', value: errorItem.type }];
+      { type: Terms.ErrorMessage, value: errorItem.message },
+      { type: Terms.ErrorType, value: errorItem.type }];
     this.store.dispatch(new UpdateDesktopFilterTerm({ terms }));
     this.insightVisible = true;
   }
 
-  public ontermFilterSelected(term: TermFilter): void {
+  public onTermFilterSelected(term: TermFilter): void {
     this.store.dispatch(new RemoveDesktopFilterTerm({ term }));
+  }
+
+  public onSortChange(insightField: string): void {
+    const term = this.getTerm(insightField);
+    this.store.dispatch(new UpdateDesktopSortTerm({ term }));
+  }
+
+  private getTerm(field: string): string {
+    switch (field) {
+      case 'name':
+        return Terms.DesktopName;
+      case 'check-in':
+        return Terms.CheckInTime;
+      case 'platform':
+        return Terms.Platform;
+      default:
+        return field;
+    }
   }
 }

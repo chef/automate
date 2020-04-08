@@ -24,7 +24,8 @@ export enum DesktopActionTypes {
   UPDATE_DESKTOPS_FILTER_CURRENT_PAGE         = 'DESKTOP::UPDATE::DESKTOPS_FILTER_CURRENT_PAGE',
   ADD_DESKTOPS_FILTER_TERM                    = 'DESKTOP::ADD::DESKTOPS_FILTER_TERM',
   UPDATE_DESKTOPS_FILTER_TERMS                = 'DESKTOP::UPDATE::DESKTOPS_FILTER_TERMS',
-  REMOVE_DESKTOPS_FILTER_TERM                 = 'DESKTOP::REMOVE::DESKTOPS_FILTER_TERM'
+  REMOVE_DESKTOPS_FILTER_TERM                 = 'DESKTOP::REMOVE::DESKTOPS_FILTER_TERM',
+  UPDATE_DESKTOPS_SORT_TERM                   = 'DESKTOP::UPDATE::DESKTOPS_SORT_TERM'
 }
 
 export class SetDaysAgoSelected implements Action {
@@ -122,6 +123,11 @@ export class RemoveDesktopFilterTerm implements Action {
   constructor(public payload: { term: TermFilter}) { }
 }
 
+export class UpdateDesktopSortTerm implements Action {
+  readonly type = DesktopActionTypes.UPDATE_DESKTOPS_SORT_TERM;
+  constructor(public payload: { term: string }) { }
+}
+
 export type DesktopActions =
   | SetDaysAgoSelected
   | GetDailyCheckInTimeSeries
@@ -142,4 +148,5 @@ export type DesktopActions =
   | UpdateDesktopFilterCurrentPage
   | AddDesktopFilterTerm
   | UpdateDesktopFilterTerm
-  | RemoveDesktopFilterTerm;
+  | RemoveDesktopFilterTerm
+  | UpdateDesktopSortTerm;

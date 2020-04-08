@@ -9,8 +9,9 @@
         [currentPage] = "currentPage$ | async"
         [termFilters] = "termFilters$ | async"
         (pageChange)="onPageChange($event)"
-        (termFilterSelected)="ontermFilterSelected($event)"
-        (closed)="insightClose()">
+        (termFilterSelected)="onTermFilterSelected($event)"
+        (closed)="insightClose()"
+        (sortChange)="onSortChange($event)">
       </app-insight>
       <app-top-errors
         [topErrorsItems] = "topErrorsItems$ | async"

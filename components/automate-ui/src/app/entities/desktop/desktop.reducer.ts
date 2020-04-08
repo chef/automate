@@ -3,7 +3,7 @@ import { set, pipe, concat, remove } from 'lodash/fp';
 import { EntityStatus } from '../entities';
 import { DesktopActionTypes, DesktopActions } from './desktop.actions';
 import { DailyCheckInCountCollection, TopErrorsCollection,
-  CountedDurationCollection, Desktop, Filter, TermFilter } from './desktop.model';
+  CountedDurationCollection, Desktop, Filter, TermFilter, SortOrder, Terms } from './desktop.model';
 
 export interface DesktopEntityState {
   dailyCheckInCountCollection: DailyCheckInCountCollection;
@@ -35,13 +35,13 @@ export const desktopEntityInitialState: DesktopEntityState = {
   getDesktopsFilter: {
     currentPage: 1,
     pageSize: 10,
-    sortingField: 'name',
-    sortingOrder: 'ASC',
+    sortingField: Terms.DesktopName,
+    sortingOrder: SortOrder.Ascending,
     terms: []
   }
 };
 
-export function userEntityReducer(state: DesktopEntityState = desktopEntityInitialState,
+export function desktopEntityReducer(state: DesktopEntityState = desktopEntityInitialState,
   action: DesktopActions) {
 
   switch (action.type) {
@@ -126,6 +126,19 @@ export function userEntityReducer(state: DesktopEntityState = desktopEntityIniti
             term.type === action.payload.term.type,
             state.getDesktopsFilter.terms)),
         set('getDesktopsFilter.currentPage', 1)
+      )(state);
+
+    case DesktopActionTypes.UPDATE_DESKTOPS_SORT_TERM:
+      let order = SortOrder.Ascending;
+      if (action.payload.term === state.getDesktopsFilter.sortingField) {
+        if (state.getDesktopsFilter.sortingOrder === SortOrder.Ascending) {
+          order = SortOrder.Descending;
+        }
+      }
+
+      return pipe(
+        set('getDesktopsFilter.sortingField', action.payload.term),
+        set('getDesktopsFilter.sortingOrder', order)
       )(state);
 
     default:

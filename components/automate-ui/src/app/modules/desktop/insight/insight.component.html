@@ -15,9 +15,9 @@
       <table>
         <thead>
           <tr >
-            <th class="table-title">DESKTOP NAME</th>
-            <th class="table-title">LAST CHECK-IN TIME</th>
-            <th class="table-title">PLATFORM</th>
+            <th (click)="sortOn('name')" class="table-title">DESKTOP NAME</th>
+            <th (click)="sortOn('check-in')" class="table-title">LAST CHECK-IN TIME</th>
+            <th (click)="sortOn('platform')" class="table-title">PLATFORM</th>
           </tr>
         </thead>
         <tbody>

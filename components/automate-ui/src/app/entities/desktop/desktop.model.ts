@@ -1,3 +1,16 @@
+export enum Terms {
+  DesktopName = 'name',
+  Platform = 'platform',
+  CheckInTime = 'checkin',
+  ErrorMessage = 'error_message',
+  ErrorType = 'error_type'
+}
+
+export enum SortOrder {
+  Ascending = 'ASC',
+  Descending = 'DESC'
+}
+
 export interface DailyCheckInCountCollection {
   buckets: DailyCheckInCount[];
   updated: Date;

@@ -18,6 +18,8 @@ export class InsightComponent {
   @Output() closed: EventEmitter<any> = new EventEmitter();
   @Output() pageChange: EventEmitter<number> = new EventEmitter();
   @Output() termFilterSelected: EventEmitter<TermFilter> = new EventEmitter();
+  // Returns 'name', 'check-in', or 'platform'
+  @Output() sortChange: EventEmitter<string> = new EventEmitter();
 
   constructor() { }
 
@@ -31,5 +33,9 @@ export class InsightComponent {
 
   public termFilterClicked(term: TermFilter): void {
     this.termFilterSelected.emit(term);
+  }
+
+  public sortOn(fieldName: string): void {
+    this.sortChange.emit(fieldName);
   }
 }
