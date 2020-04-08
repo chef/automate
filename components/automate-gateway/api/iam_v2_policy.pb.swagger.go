@@ -356,7 +356,7 @@ func init() {
       },
       "post": {
         "summary": "Creates a project",
-        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.\n\nWhen a project is created, the system also creates three policies associated with the new project, \none for each of the following rules: editor, viewer, and project owner.\nYou can optionally pass the ` + "`" + `skip_policies` + "`" + ` flag set to true to skip the creation of these policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.\n\nWhen a project is created, the system also creates three policies associated with the new project, \none for each of the following roles: editor, viewer, and project owner.\nYou can optionally pass the ` + "`" + `skip_policies` + "`" + ` flag set to true to skip the creation of these policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateProject",
         "responses": {
           "200": {
