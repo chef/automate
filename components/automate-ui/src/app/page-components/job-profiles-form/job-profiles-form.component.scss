@@ -1,3 +1,8 @@
-[type="checkbox"] {
-  margin-right: 1em;
+.checkbox-cell {
+  flex-basis: 5%;
+  overflow: visible;
+}
+
+.name-cell {
+  flex-basis: 150%;
 }
