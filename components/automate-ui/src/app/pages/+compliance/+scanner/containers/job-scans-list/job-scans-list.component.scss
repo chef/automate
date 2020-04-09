@@ -7,13 +7,16 @@
 .jobs-list-table {
   chef-table-cell {
     display: flex;
-  }
-  chef-table-cell:last-child {
-    flex-flow: row nowrap;
-    justify-content: flex-end;
+    justify-content: center;
 
-    chef-button {
-      margin: -.5em 0 -.5em .5em;
+    &:last-child {
+      flex-flow: row nowrap;
+      justify-content: flex-end;
+      align-items: center;
+  
+      chef-button {
+        margin: -.5em 0 -.5em .5em;
+      }
     }
   }
 }
