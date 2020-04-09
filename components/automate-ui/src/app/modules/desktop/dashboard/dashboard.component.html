@@ -1,6 +1,23 @@
 <div class="content-container">
   <div class="container">
     <main>
+      <app-insight
+        [visible] = "insightVisible"
+        [desktops] = "desktops$ | async"
+        [totalDesktops] = "totalDesktopCount$ | async"
+        [pageSize] = "pageSize$ | async"
+        [currentPage] = "currentPage$ | async"
+        [termFilters] = "termFilters$ | async"
+        (pageChange)="onPageChange($event)"
+        (termFilterSelected)="onTermFilterSelected($event)"
+        (closed)="insightClose()"
+        (sortChange)="onSortChange($event)">
+      </app-insight>
+      <app-top-errors
+        [topErrorsItems] = "topErrorsItems$ | async"
+        [lastUpdated] = "topErrorsUpdated$ | async"
+        (errorSelected)="onErrorSelected($event)">
+      </app-top-errors>
       <app-daily-check-in
         [unknownPercentage] = "unknownPercentage$ | async"
         [checkedInPercentage] = "checkedInPercentage$ | async"
@@ -15,10 +32,6 @@
         [lastUpdated] = "checkInCountCollectedUpdated$ | async"
         (daysAgoChanged)="handleDaysAgoChange($event)">
       </app-check-in-time-series>
-      <app-top-errors
-        [topErrorsItems] = "topErrorsItems$ | async"
-        [lastUpdated] = "topErrorsUpdated$ | async">
-      </app-top-errors>
       <app-unknown-desktop-duration-counts
         [countedDurationItems] = "unknownDesktopCountedDurationItems$ | async"
         [lastUpdated] = "unknownDesktopCountedDurationUpdated$ | async">

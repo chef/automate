@@ -1,3 +1,16 @@
+export enum Terms {
+  DesktopName = 'name',
+  Platform = 'platform',
+  CheckInTime = 'checkin',
+  ErrorMessage = 'error_message',
+  ErrorType = 'error_type'
+}
+
+export enum SortOrder {
+  Ascending = 'ASC',
+  Descending = 'DESC'
+}
+
 export interface DailyCheckInCountCollection {
   buckets: DailyCheckInCount[];
   updated: Date;
@@ -34,4 +47,27 @@ export interface CountedDurationCollection {
 export interface CountedDurationItem {
   duration: string;
   count: number;
+}
+
+export interface Desktop {
+  id: string;
+  name: string;
+  status: string;
+  checkin: Date;
+  uptimeSeconds: number;
+  platform: string;
+  chefVersion: string;
+}
+
+export interface Filter {
+  currentPage: number;
+  pageSize: number;
+  sortingField: string;
+  sortingOrder: string;
+  terms: TermFilter[];
+}
+
+export interface TermFilter {
+  type: string;
+  value: string;
 }

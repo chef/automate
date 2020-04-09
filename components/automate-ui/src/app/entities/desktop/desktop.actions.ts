@@ -2,7 +2,7 @@ import { Action } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { DailyCheckInCountCollection,
-  TopErrorsCollection, CountedDurationCollection } from './desktop.model';
+  TopErrorsCollection, CountedDurationCollection, Desktop, TermFilter } from './desktop.model';
 
 export enum DesktopActionTypes {
   GET_DAILY_CHECK_IN_TIME_SERIES              = 'DESKTOP::GET::DAILY_CHECK_IN_TIME_SERIES',
@@ -14,7 +14,18 @@ export enum DesktopActionTypes {
   GET_TOP_ERRORS_COLLECTION_FAILURE           = 'DESKTOP::GET::TOP_ERRORS_COLLECTION::FAILURE',
   GET_UNKNOWN_DESKTOP_DURATION_COUNTS         = 'DESKTOP::GET::UNKNOWN_DESKTOP_DURATION_COUNT',
   GET_UNKNOWN_DESKTOP_DURATION_COUNTS_SUCCESS = 'DESKTOP::GET::UNKNOWN_DESKTOP_DURATION_COUNT::SUCCESS',
-  GET_UNKNOWN_DESKTOP_DURATION_COUNTS_FAILURE = 'DESKTOP::GET::UNKNOWN_DESKTOP_DURATION_COUNT::FAILURE'
+  GET_UNKNOWN_DESKTOP_DURATION_COUNTS_FAILURE = 'DESKTOP::GET::UNKNOWN_DESKTOP_DURATION_COUNT::FAILURE',
+  GET_DESKTOPS                                = 'DESKTOP::GET::DESKTOPS',
+  GET_DESKTOPS_SUCCESS                        = 'DESKTOP::GET::DESKTOPS::SUCCESS',
+  GET_DESKTOPS_FAILURE                        = 'DESKTOP::GET::DESKTOPS::FAILURE',
+  GET_DESKTOPS_TOTAL                          = 'DESKTOP::GET::DESKTOPS_TOTAL',
+  GET_DESKTOPS_TOTAL_SUCCESS                  = 'DESKTOP::GET::DESKTOPS_TOTAL::SUCCESS',
+  GET_DESKTOPS_TOTAL_FAILURE                  = 'DESKTOP::GET::DESKTOPS_TOTAL::FAILURE',
+  UPDATE_DESKTOPS_FILTER_CURRENT_PAGE         = 'DESKTOP::UPDATE::DESKTOPS_FILTER_CURRENT_PAGE',
+  ADD_DESKTOPS_FILTER_TERM                    = 'DESKTOP::ADD::DESKTOPS_FILTER_TERM',
+  UPDATE_DESKTOPS_FILTER_TERMS                = 'DESKTOP::UPDATE::DESKTOPS_FILTER_TERMS',
+  REMOVE_DESKTOPS_FILTER_TERM                 = 'DESKTOP::REMOVE::DESKTOPS_FILTER_TERM',
+  UPDATE_DESKTOPS_SORT_TERM                   = 'DESKTOP::UPDATE::DESKTOPS_SORT_TERM'
 }
 
 export class SetDaysAgoSelected implements Action {
@@ -64,6 +75,59 @@ export class GetUnknownDesktopDurationCountsFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class GetDesktops implements Action {
+  readonly type = DesktopActionTypes.GET_DESKTOPS;
+}
+
+export class GetDesktopsSuccess implements Action {
+  readonly type = DesktopActionTypes.GET_DESKTOPS_SUCCESS;
+  constructor(public payload: Desktop[]) { }
+}
+
+export class GetDesktopsFailure implements Action {
+  readonly type = DesktopActionTypes.GET_DESKTOPS_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
+export class GetDesktopsTotal implements Action {
+  readonly type = DesktopActionTypes.GET_DESKTOPS_TOTAL;
+}
+
+export class GetDesktopsTotalSuccess implements Action {
+  readonly type = DesktopActionTypes.GET_DESKTOPS_TOTAL_SUCCESS;
+  constructor(public payload: number) { }
+}
+
+export class GetDesktopsTotalFailure implements Action {
+  readonly type = DesktopActionTypes.GET_DESKTOPS_TOTAL_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
+export class UpdateDesktopFilterCurrentPage implements Action {
+  readonly type = DesktopActionTypes.UPDATE_DESKTOPS_FILTER_CURRENT_PAGE;
+  constructor(public payload: { page: number}) { }
+}
+
+export class AddDesktopFilterTerm implements Action {
+  readonly type = DesktopActionTypes.ADD_DESKTOPS_FILTER_TERM;
+  constructor(public payload: { term: TermFilter}) { }
+}
+
+export class UpdateDesktopFilterTerm implements Action {
+  readonly type = DesktopActionTypes.UPDATE_DESKTOPS_FILTER_TERMS;
+  constructor(public payload: { terms: TermFilter[]}) { }
+}
+
+export class RemoveDesktopFilterTerm implements Action {
+  readonly type = DesktopActionTypes.REMOVE_DESKTOPS_FILTER_TERM;
+  constructor(public payload: { term: TermFilter}) { }
+}
+
+export class UpdateDesktopSortTerm implements Action {
+  readonly type = DesktopActionTypes.UPDATE_DESKTOPS_SORT_TERM;
+  constructor(public payload: { term: string }) { }
+}
+
 export type DesktopActions =
   | SetDaysAgoSelected
   | GetDailyCheckInTimeSeries
@@ -74,4 +138,15 @@ export type DesktopActions =
   | GetTopErrorsCollectionFailure
   | GetUnknownDesktopDurationCounts
   | GetUnknownDesktopDurationCountsSuccess
-  | GetUnknownDesktopDurationCountsFailure;
+  | GetUnknownDesktopDurationCountsFailure
+  | GetDesktops
+  | GetDesktopsSuccess
+  | GetDesktopsFailure
+  | GetDesktopsTotal
+  | GetDesktopsTotalSuccess
+  | GetDesktopsTotalFailure
+  | UpdateDesktopFilterCurrentPage
+  | AddDesktopFilterTerm
+  | UpdateDesktopFilterTerm
+  | RemoveDesktopFilterTerm
+  | UpdateDesktopSortTerm;

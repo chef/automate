@@ -9,18 +9,28 @@ import {
   GetDailyCheckInTimeSeries,
   SetDaysAgoSelected,
   GetTopErrorsCollection,
-  GetUnknownDesktopDurationCounts
+  GetUnknownDesktopDurationCounts,
+  GetDesktops,
+  GetDesktopsTotal,
+  UpdateDesktopFilterCurrentPage,
+  UpdateDesktopFilterTerm,
+  RemoveDesktopFilterTerm,
+  UpdateDesktopSortTerm
 } from 'app/entities/desktop/desktop.actions';
-
 import {
   dailyCheckInCountCollection,
   getSelectedDaysAgo,
   topErrorsCollection,
-  unknownDesktopDurationCounts
+  unknownDesktopDurationCounts,
+  desktops,
+  desktopsTotal,
+  desktopsCurrentPage,
+  desktopsPageSize,
+  desktopsFilterTerms
 } from 'app/entities/desktop/desktop.selectors';
-
 import {
-  DailyCheckInCount, DailyCheckInCountCollection, DayPercentage, TopErrorsItem, CountedDurationItem
+  DailyCheckInCount, DailyCheckInCountCollection, DayPercentage,
+  TopErrorsItem, CountedDurationItem, Desktop, TermFilter, Terms
 } from 'app/entities/desktop/desktop.model';
 
 @Component({
@@ -44,6 +54,12 @@ export class DashboardComponent implements OnInit {
   public topErrorsUpdated$: Observable<Date>;
   public unknownDesktopCountedDurationItems$: Observable<CountedDurationItem[]>;
   public unknownDesktopCountedDurationUpdated$: Observable<Date>;
+  public desktops$: Observable<Desktop[]>;
+  public totalDesktopCount$: Observable<number>;
+  public currentPage$: Observable<number>;
+  public pageSize$: Observable<number>;
+  public termFilters$: Observable<TermFilter[]>;
+  public insightVisible = false;
 
   constructor(
     private store: Store<NgrxStateAtom>
@@ -53,8 +69,19 @@ export class DashboardComponent implements OnInit {
     this.store.dispatch(new GetDailyCheckInTimeSeries());
     this.store.dispatch(new GetTopErrorsCollection());
     this.store.dispatch(new GetUnknownDesktopDurationCounts());
+    this.store.dispatch(new GetDesktops());
+    this.store.dispatch(new GetDesktopsTotal());
 
+    this.termFilters$ = this.store.select(desktopsFilterTerms);
+
+    this.pageSize$ = this.store.select(desktopsPageSize);
+
+    this.currentPage$ = this.store.select(desktopsCurrentPage);
     this.selectedDaysAgo$ = this.store.select(getSelectedDaysAgo);
+
+    this.desktops$ = this.store.select(desktops);
+
+    this.totalDesktopCount$ = this.store.select(desktopsTotal);
 
     this.checkInCountCollection$ = this.store.select(dailyCheckInCountCollection).pipe(
       filter(collection => collection.buckets.length > 0));
@@ -128,5 +155,43 @@ export class DashboardComponent implements OnInit {
 
   handleDaysAgoChange(daysAgo: number) {
     this.store.dispatch(new SetDaysAgoSelected({daysAgo}));
+  }
+
+  insightClose() {
+    this.insightVisible = false;
+  }
+
+  public onPageChange(pageNumber: number) {
+    this.store.dispatch(new UpdateDesktopFilterCurrentPage({page: pageNumber}));
+  }
+
+  public onErrorSelected(errorItem: TopErrorsItem): void {
+    const terms = [
+      { type: Terms.ErrorMessage, value: errorItem.message },
+      { type: Terms.ErrorType, value: errorItem.type }];
+    this.store.dispatch(new UpdateDesktopFilterTerm({ terms }));
+    this.insightVisible = true;
+  }
+
+  public onTermFilterSelected(term: TermFilter): void {
+    this.store.dispatch(new RemoveDesktopFilterTerm({ term }));
+  }
+
+  public onSortChange(insightField: string): void {
+    const term = this.getTerm(insightField);
+    this.store.dispatch(new UpdateDesktopSortTerm({ term }));
+  }
+
+  private getTerm(field: string): string {
+    switch (field) {
+      case 'name':
+        return Terms.DesktopName;
+      case 'check-in':
+        return Terms.CheckInTime;
+      case 'platform':
+        return Terms.Platform;
+      default:
+        return field;
+    }
   }
 }
