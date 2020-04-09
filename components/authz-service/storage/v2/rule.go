@@ -37,7 +37,7 @@ func (p *Rule) Scan(src interface{}) error {
 func NewRule(id string, projectID string, name string,
 	ruleType RuleType, conditions []Condition) (Rule, error) {
 
-	err := validateRuleInputs(id, projectID, name, ruleType, conditions)
+	err := validateConditionsForType(ruleType, conditions)
 	if err != nil {
 		return Rule{}, err
 	}
@@ -52,24 +52,7 @@ func NewRule(id string, projectID string, name string,
 	}, nil
 }
 
-func validateRuleInputs(id string,
-	projectID string, name string, ruleType RuleType, conditions []Condition) error {
-
-	if emptyOrWhitespaceOnlyRE.MatchString(id) {
-		return errors.New(
-			"a rule id is required and must contain at least one non-whitespace character")
-	}
-	if emptyOrWhitespaceOnlyRE.MatchString(name) {
-		return errors.New(
-			"a rule name is required and must contain at least one non-whitespace character")
-	}
-	if emptyOrWhitespaceOnlyRE.MatchString(projectID) {
-		return errors.New("a rule id must have an associated project_id")
-	}
-	if len(conditions) == 0 {
-		return errors.New("a rule must contain at least one condition")
-	}
-
+func validateConditionsForType(ruleType RuleType, conditions []Condition) error {
 	for _, condition := range conditions {
 		if err := attributeAllowed(ruleType, condition.Attribute); err != nil {
 			return err
