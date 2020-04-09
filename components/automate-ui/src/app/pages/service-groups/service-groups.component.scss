@@ -74,11 +74,8 @@ chef-alert {
   justify-content: left;
 }
 
-// Table list styles
-.service-group-list {
-  border-collapse: separate;
-  border-spacing: 0;
-  width: 100%;
+chef-table-row {
+  cursor: pointer;
 }
 
 chef-table-header-cell,
@@ -90,6 +87,12 @@ chef-table-cell {
 
   &.health {
     max-width: 110px;
+    display: flex;
+    flex-flow: row nowrap;
+
+    .chart-container {
+      align-self: center;
+    }
   }
 
   &.service-group {
@@ -135,8 +138,7 @@ chef-table-cell {
   }
 }
 
-chef-td {
-  padding: 1em;
+chef-table-cell {
 
   &>a {
     display: flex;
@@ -214,8 +216,8 @@ chef-td {
   }
 }
 
-chef-tr.sg-row {
-  > chef-td:first-child {
+chef-table-row.sg-row {
+  > chef-table-cell:first-child {
     &::before {
       content: '';
       position: absolute;
@@ -252,7 +254,7 @@ chef-tr.sg-row {
 
   &:hover,
   &.selected {
-    > chef-td:first-child::before {
+    > chef-table-cell:first-child::before {
       width: 7px;
     }
   }
@@ -273,7 +275,7 @@ chef-tr.sg-row {
       content: '';
     }
 
-    > chef-td {
+    > chef-table-cell {
       background: #F2F8FD;
     }
   }
