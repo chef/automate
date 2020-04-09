@@ -1602,6 +1602,51 @@ func TestCreateRole(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Regexp(t, "CreateRoleReq.Actions.*must contain at least 1 item", err.Error())
 		},
+		"fails with InvalidArgument with invalid project": func(t *testing.T) {
+			req := api_v2.CreateRoleReq{
+				Id:       "role-id",
+				Name:     "roleName",
+				Actions:  []string{"infra:some:action"},
+				Projects: []string{constants.UnassignedProjectID},
+			}
+
+			resp, err := cl.CreateRole(ctx, &req)
+
+			require.Nil(t, resp)
+
+			assert.Equal(t, 0, store.ItemCount())
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		},
+		"fails with InvalidArgument with no name": func(t *testing.T) {
+			req := api_v2.CreateRoleReq{
+				Id:       "valid",
+				Name:     "",
+				Actions:  []string{"infra:some:action"},
+				Projects: []string{},
+			}
+
+			resp, err := cl.CreateRole(ctx, &req)
+			require.Nil(t, resp)
+
+			assert.Equal(t, 0, store.ItemCount())
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Regexp(t, "a role name is required and must contain", err.Error())
+		},
+		"fails with InvalidArgument with blank name": func(t *testing.T) {
+			req := api_v2.CreateRoleReq{
+				Id:       "valid",
+				Name:     "     ",
+				Actions:  []string{"infra:some:action"},
+				Projects: []string{},
+			}
+
+			resp, err := cl.CreateRole(ctx, &req)
+			require.Nil(t, resp)
+
+			assert.Equal(t, 0, store.ItemCount())
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Regexp(t, "a role name is required and must contain", err.Error())
+		},
 		"fails with InvalidArgument with no id": func(t *testing.T) {
 			req := api_v2.CreateRoleReq{
 				Name:     "roleName",

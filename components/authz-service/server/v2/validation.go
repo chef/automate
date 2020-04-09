@@ -33,6 +33,10 @@ func validateID(id, resourceName string) error {
 
 func validateProjects(projects []string) error {
 	for _, project := range projects {
+		if emptyOrWhitespaceOnlyRE.MatchString(project) {
+			e := fmt.Sprintf("projects must contain at least one non-whitespace character")
+			return errors.New(e)
+		}
 		if project == constants.UnassignedProjectID {
 			return errors.Errorf("%q cannot explicitly be set. "+
 				"If you wish to create an object in %q, you should pass no projects on creation.",

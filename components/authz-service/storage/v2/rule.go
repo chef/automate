@@ -53,6 +53,9 @@ func NewRule(id string, projectID string, name string,
 }
 
 func validateConditionsForType(ruleType RuleType, conditions []Condition) error {
+	if len(conditions) == 0 {
+		return errors.New("at least one condition is required")
+	}
 	for _, condition := range conditions {
 		if err := attributeAllowed(ruleType, condition.Attribute); err != nil {
 			return err

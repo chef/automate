@@ -306,7 +306,7 @@ func TestDeleteProject(t *testing.T) {
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: "no spaces allowed"})
+			resp, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: "     "})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
