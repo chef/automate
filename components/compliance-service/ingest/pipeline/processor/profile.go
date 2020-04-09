@@ -21,7 +21,6 @@ func ComplianceProfile(client *ingestic.ESClient) message.CompliancePipe {
 }
 
 func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) <-chan message.Compliance {
-	//ctx := context.Background()
 	out := make(chan message.Compliance, 100)
 	go func() {
 		for msg := range in {
@@ -91,6 +90,7 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 
 						repProfile.Name = esProfile.Name
 
+						// Making a hash with the controls coming from ElasticSearch for quicker lookup below
 						esControlsHash := make(map[string]relaxting.ESInspecControl, len(esProfile.Controls))
 						for _, esControl := range esProfile.Controls {
 							esControlsHash[esControl.ID] = esControl
