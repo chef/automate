@@ -334,6 +334,18 @@ describe('ProjectsFilterDropdownComponent', () => {
       expect(component.optionsEdited).toEqual(true);
     });
 
+    it('hides the "Clear Selection" button', () => {
+      fixture.detectChanges();
+      let button: HTMLElement = fixture.nativeElement.querySelector('#projects-filter-clear-selection');
+      expect(button.classList.contains('active')).toEqual(true);
+
+      component.handleClearSelection();
+      fixture.detectChanges();
+
+      button = fixture.nativeElement.querySelector('#projects-filter-clear-selection');
+      expect(button.classList.contains('active')).toEqual(false);
+    });
+
     it('does not emit "onSelection" event', () => {
       component.handleClearSelection();
       expect(component.onSelection.emit).not.toHaveBeenCalled();
@@ -561,6 +573,88 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
 
   });
+
+  describe('"Clear Selection" button', () => {
+    beforeEach(() => {
+      component.dropdownActive = true;
+    });
+    it('becomes visible after no projects checked and then checking one project', () => {
+      component.options = genOptionsWithId([
+        ['proj-one', false],
+        ['proj-two', false],
+        ['proj-three', false]
+      ]);
+      component.resetOptions();
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(false);
+
+      component.handleOptionChange({ detail: true }, 'proj-three');
+      fixture.detectChanges();
+
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(true);
+    });
+
+    it('becomes hidden after unchecking the last checked project', () => {
+      component.options = genOptionsWithId([
+        ['proj-one', true],
+        ['proj-two', true],
+        ['proj-three', false]
+      ]);
+      component.resetOptions();
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(true);
+
+      component.handleOptionChange({ detail: false }, 'proj-one');
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(true);
+
+      component.handleOptionChange({ detail: false }, 'proj-two');
+      fixture.detectChanges();
+
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(false);
+    });
+
+    it('becomes visible after loosening filter to reveal some checked projects', () => {
+      component.options = genOptionsWithId([
+        ['proj-one', true],
+        ['filtered-one', false],
+        ['proj-two', true],
+        ['filtered-two', false],
+        ['proj-three', false]
+      ]);
+      component.resetOptions();
+      component.handleFilterKeyUp('filtered');
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(false);
+
+      component.handleFilterKeyUp('');
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(true);
+    });
+
+    it('becomes hidden after tightening filter to hide all checked projects', () => {
+      component.options = genOptionsWithId([
+        ['proj-one', true],
+        ['filtered-one', false],
+        ['proj-two', true],
+        ['filtered-two', false],
+        ['proj-three', false]
+      ]);
+      component.resetOptions();
+      component.handleFilterKeyUp('proj');
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(true);
+
+      component.handleFilterKeyUp('filtered');
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(false);
+      });
+  });
+
+  function hasClass(selector: string, cssClass: string): boolean {
+    const element: HTMLElement = fixture.nativeElement.querySelector(selector);
+    return element.classList.contains(cssClass);
+  }
 
 });
 
