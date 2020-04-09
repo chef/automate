@@ -36,6 +36,7 @@ func (a *InfraProxyServer) GetCookbookVersions(ctx context.Context, r *gwreq.Coo
 	}
 
 	return &gwres.CookbookVersions{
+		Name:     res.GetName(),
 		Versions: res.GetVersions(),
 	}, nil
 }

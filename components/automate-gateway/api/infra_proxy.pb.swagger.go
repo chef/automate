@@ -1215,6 +1215,10 @@ func init() {
     "chef.automate.api.infra_proxy.response.CookbookVersions": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the cookbook."
+        },
         "versions": {
           "type": "array",
           "items": {
