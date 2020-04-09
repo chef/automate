@@ -15,9 +15,12 @@ a, a:visited {
   text-decoration: none;
 }
 
-chef-th,
-chef-td {
-  line-height: 1.2;
+chef-table-header-cell,
+chef-table-cell {
+  // line-height: 1.2;
+  &[hidden] {
+    display: none;
+  }
 
   &.sort:hover {
     cursor: pointer;
@@ -33,7 +36,7 @@ chef-td {
   }
 
   &.node-name {
-    flex-basis: 24%;
+    flex-basis: 240%;
   }
 
   &.check-in {
@@ -42,7 +45,7 @@ chef-td {
 
   &.node-environment {
     white-space: normal;
-    width: 15%;
+    width: 120%;
   }
 
   &.has-runs {
@@ -54,11 +57,15 @@ chef-td {
 
   &.view-more {
     max-width: 60px;
+    
+    chef-button {
+      margin: -.5em 0;
+    }
   }
 }
 
-chef-td {
-  padding: 1em;
+chef-table-cell {
+  // padding: 1em;
 
   &.has-runs {
     & > a {
@@ -78,8 +85,8 @@ chef-td {
   }
 }
 
-chef-tr.row {
-  & > chef-td:first-child:before {
+chef-table-row.row {
+  & > chef-table-cell:first-child:before {
     content: '';
     position: absolute;
     top: 0;
@@ -92,15 +99,15 @@ chef-tr.row {
     border-bottom-left-radius: $global-radius;
   }
 
-  &:hover > chef-td:first-child:before {
+  &:hover > chef-table-cell:first-child:before {
     width: 7px;
   }
 
-  & > chef-td.failure:first-child:before {
+  & > chef-table-cell.failure:first-child:before {
     background: $chef-critical;
   }
 
-  & > chef-td.missing:first-child:before {
+  & > chef-table-cell.missing:first-child:before {
     background: $chef-dark-grey;
   }
 }
