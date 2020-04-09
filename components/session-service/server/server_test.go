@@ -16,7 +16,6 @@ import (
 	"github.com/alexedwards/scs"
 	"github.com/alexedwards/scs/stores/memstore"
 	go_oidc "github.com/coreos/go-oidc"
-	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -663,50 +662,6 @@ func TestCallbackHandler(t *testing.T) {
 			require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 			require.Empty(t, resp.Cookies(), "no cookie was given")
 		},
-
-		`GET /callback?code=X&state=Y, referred by builder, stores code in tokenCache & redirects with state and code`: func(t *testing.T) {
-			code := "randomstringcode"
-			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
-			relayState := "relaaay"
-			clientState := "/nodes"
-			redirectURI := "builder.test"
-			sessionData := struct {
-				RS bool   `json:"relay_state_relaaay"`
-				CS string `json:"client_state"`
-				RU string `json:"redirect_uri"`
-			}{RS: true, CS: clientState, RU: redirectURI}
-			if err := addSessionDataToStore(ms, sessionID, sessionData, nil); err != nil {
-				t.Fatal(err)
-			}
-
-			newIDToken := "newIdTokenTest"
-			t1 := oauth2.Token{}
-			t2 := t1.WithExtra(map[string]interface{}{"id_token": newIDToken})
-			s.setTestToken(t2, nil)
-			s.setTokenInMap(code, t2, nil)
-
-			r := httptest.NewRequest("GET", fmt.Sprintf("/callback?code=%s&state=%s", code, relayState), nil)
-			r.AddCookie(&http.Cookie{Name: "session", Value: sessionID})
-
-			w := httptest.NewRecorder()
-			hdlr.ServeHTTP(w, r)
-			resp := w.Result()
-
-			token, found := s.tokenCache.Get(code)
-			require.True(t, found)
-			require.Equal(t, token, t2)
-
-			require.Equal(t, http.StatusSeeOther, resp.StatusCode)
-			require.Contains(t, resp.Header.Get("Location"), redirectURI)
-
-			hasNoCookieWithSessionID(t, resp, sessionID)
-			hasCookieRemovingAnySessionIDs(t, resp)
-			hasCookieWithSecureSessionSettings(t, resp)
-
-			_, exists, err := ms.Find(sessionID)
-			require.NoError(t, err)
-			require.False(t, exists)
-		},
 	}
 
 	for name, tc := range cases {
@@ -742,7 +697,7 @@ func TestTokenHandler(t *testing.T) {
 
 	cases := map[string]func(*testing.T){
 
-		`POST /token with code that matches an access token that's stored in tokenCache`: func(t *testing.T) {
+		`POST /token with code that matches, do exchange`: func(t *testing.T) {
 			code := "testing"
 			newIDToken := "ey.xyz"
 			sessionData := struct {
@@ -756,8 +711,7 @@ func TestTokenHandler(t *testing.T) {
 
 			t1 := oauth2.Token{}
 			t2 := t1.WithExtra(map[string]interface{}{"id_token": newIDToken})
-			s.setTestToken(t2, nil)
-			s.setTokenInMap(code, t2, nil)
+			s.setTestTokenWithCode(code, t2, nil)
 
 			r := newTokenRequest(code)
 
@@ -771,7 +725,7 @@ func TestTokenHandler(t *testing.T) {
 			require.JSONEq(t, fmt.Sprintf(`{"access_token": %q}`, newIDToken), string(body))
 		},
 
-		`POST /token with code that doesn't match tokenCache errors out`: func(t *testing.T) {
+		`POST /token with code that doesn't match errors out`: func(t *testing.T) {
 			code := "testing2"
 			newIDToken := "ey.xyz"
 			sessionData := sessionData(relayState, clientState)
@@ -781,7 +735,7 @@ func TestTokenHandler(t *testing.T) {
 
 			t1 := oauth2.Token{}
 			t2 := t1.WithExtra(map[string]interface{}{"id_token": newIDToken})
-			s.setTestToken(t2, nil)
+			s.setTestTokenWithCode("wrongcode", t2, nil)
 
 			r := newTokenRequest(code)
 
@@ -792,7 +746,7 @@ func TestTokenHandler(t *testing.T) {
 			require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 			body, err := ioutil.ReadAll(resp.Body)
 			require.NoError(t, err)
-			require.Equal(t, "failed to get token\n", string(body))
+			require.Contains(t, string(body), "failed to get token")
 		},
 
 		`POST /token with an access token that has no id token errors out`: func(t *testing.T) {
@@ -803,8 +757,7 @@ func TestTokenHandler(t *testing.T) {
 			}
 
 			t1 := &oauth2.Token{}
-			s.setTestToken(t1, nil)
-			s.setTokenInMap(code, t1, nil)
+			s.setTestTokenWithCode(code, t1, nil)
 
 			r := newTokenRequest(code)
 
@@ -1139,7 +1092,6 @@ func newTestServer(t *testing.T, store scs.Store) *Server {
 		signInURL:  u,
 		bldrClient: getBldrStruct(t),
 		client:     &testOAuth2Config{token: &oauth2.Token{}},
-		tokenCache: cache.New(1*time.Minute, 5*time.Minute),
 	}
 	s.initHandlers()
 
@@ -1161,8 +1113,12 @@ func (s *Server) setTestToken(token *oauth2.Token, err error) {
 	s.client = &testOAuth2Config{token: token, err: err, idToken: &go_oidc.IDToken{}}
 }
 
-func (s *Server) setTokenInMap(code string, token *oauth2.Token, err error) {
-	s.tokenCache.Set(code, token, cache.DefaultExpiration)
+func (s *Server) setTestTokenWithCode(code string, token *oauth2.Token, err error) {
+	s.client = &testOAuth2Config{
+		code:  code,
+		token: token, err: err,
+		idToken: &go_oidc.IDToken{},
+	}
 }
 
 func (s *Server) setTestIDToken(idToken *go_oidc.IDToken, err error) {
@@ -1173,13 +1129,17 @@ type testOAuth2Config struct {
 	token   *oauth2.Token
 	err     error
 	idToken *go_oidc.IDToken
+	code    string
 }
 
 func (x *testOAuth2Config) TokenSource(context.Context, *oauth2.Token) oauth2.TokenSource {
 	return x
 }
 
-func (x *testOAuth2Config) Exchange(context.Context, string) (*oauth2.Token, error) {
+func (x *testOAuth2Config) Exchange(ctx context.Context, code string) (*oauth2.Token, error) {
+	if x.code != "" && code != x.code && x.err == nil {
+		return nil, errors.New("wrong code")
+	}
 	return x.token, x.err
 }
 

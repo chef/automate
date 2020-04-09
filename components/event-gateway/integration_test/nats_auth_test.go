@@ -173,7 +173,7 @@ func getNewToken(t *testing.T, authorizedAction string) string {
 	authnClient := authn.NewTokensMgmtClient(authnConnection)
 
 	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx,
-		[]string{"tls:service:deployment-service:internal"}, []string{}, "res", "act", "v2.1"))
+		[]string{"tls:service:deployment-service:internal"}, []string{}, "res", "act"))
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
 		Description: "token for event-service integration test",
 		Active:      true,

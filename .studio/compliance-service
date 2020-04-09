@@ -96,3 +96,20 @@ function load_compliance_reports() {
     ./send_to_data_collector.sh https://a2-dev.test "$(get_admin_token)"
     popd &> /dev/null
 }
+
+document "load_scan_jobs" <<DOC
+  Loads scan jobs.
+DOC
+function load_scan_jobs() {
+  FILE=./dev/secrets-env.sh
+  if [ ! -e "$FILE" ]; then
+    echo "secrets file not found; pls run the get_secrets script"
+  else
+    # shellcheck disable=SC1091
+    source dev/secrets-env.sh
+    pushd dev-docs/adding-data &> /dev/null
+    install_if_missing core/go go
+    go run add_scanjobs.go
+    popd &> /dev/null
+  fi
+}

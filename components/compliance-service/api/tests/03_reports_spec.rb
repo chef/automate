@@ -577,9 +577,31 @@ describe File.basename(__FILE__) do
               "waived" => {},
               "total" => 18
             }
+          },
+          {
+            "controls" => {
+              "failed" => {
+                "major" => 2,
+                "total" => 2
+              },
+              "passed" => {
+                "total" => 3
+              },
+              "skipped" => {
+                "total" => 13
+              },
+              "total" => 18,
+              "waived" => {}
+            },
+            "endTime" => "2018-03-05T07:02:02Z",
+            "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
+            "ipaddress" => "10.3.4.5",
+            "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
+            "nodeName" => "centos-beta",
+            "status" => "failed"
           }
         ],
-        "total" => 2
+        "total" => 3
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 

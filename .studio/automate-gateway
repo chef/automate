@@ -89,7 +89,7 @@ document "gateway_get" <<DOC
 
   Example: Send a GET Request to $GATEWAY_URL/version using a specific token
   --------------------------------------------------------------------------
-  # gateway_get "/version" "$TOKEN"
+  # gateway_get "/version" "$token"
 DOC
 function gateway_get() {
   install_if_missing core/curl curl >/dev/null 2>&1
@@ -286,6 +286,7 @@ function send_chef_data_raw() {
   install_if_missing core/curl curl
 
   local endpoint=$1
+  local token=$2
   if [[ "$1" == "legacy" ]]; then
     endpoint="${GATEWAY_URL}/events/data-collector"
   elif [[ "$1" == "lb" ]]; then
@@ -293,10 +294,16 @@ function send_chef_data_raw() {
   elif [[ "$1x" == "x" ]]; then
     endpoint="${GATEWAY_URL}/ingest/events/chef/run"
   else
-    endpoint="${GATEWAY_URL}$1"
+    endpoint="$1"
   fi
 
-  curl -f --insecure -H "api-token: $(get_api_token)" \
+  if [[ "$2x" == "x" ]]; then
+    token=$(get_api_token)
+  else
+    token=$2
+  fi
+
+  curl -f --insecure -H "api-token: ${token}" \
   --data "@-" "${endpoint}"
 }
 

@@ -100,11 +100,11 @@ func AddUserToTeam(ctx context.Context,
 		return false, wrapUnexpectedError(err, "Failed to check team membership")
 	}
 
-	addUser := !stringutils.SliceContains(getUsersResp.UserIds, membershipID)
+	addUser := !stringutils.SliceContains(getUsersResp.MembershipIds, membershipID)
 	if addUser && !dryRun {
 		_, err := apiClient.TeamsClient().AddTeamMembers(ctx, &iam_req.AddTeamMembersReq{
-			Id:      teamID,
-			UserIds: []string{membershipID},
+			Id:            teamID,
+			MembershipIds: []string{membershipID},
 		})
 		if err != nil {
 			return false, wrapUnexpectedError(err, "Failed to add user to team")

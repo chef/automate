@@ -139,7 +139,7 @@ func TestFetchLocalTeamsInAuthenticate(t *testing.T) {
 func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 	ctx := context.Background()
 
-	mockTeams := teams_api.NewTeamsV2ServerMock()
+	mockTeams := teams_api.NewTeamsServerMock()
 	teams := newTeamService(t, mockTeams)
 	defer teams.Close()
 
@@ -240,7 +240,7 @@ func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 func TestNoTeamsLookupForNonLocalUsersInAuthenticate(t *testing.T) {
 	ctx := context.Background()
 
-	mockTeams := teams_api.NewTeamsV2ServerMock()
+	mockTeams := teams_api.NewTeamsServerMock()
 	teams := newTeamService(t, mockTeams)
 	defer teams.Close()
 
@@ -314,13 +314,13 @@ func containsTeam(team string) checkFunc {
 
 // mini-factories
 
-func newTeamService(t *testing.T, m *teams_api.TeamsV2ServerMock) *grpctest.Server {
+func newTeamService(t *testing.T, m *teams_api.TeamsServerMock) *grpctest.Server {
 	t.Helper()
 
 	serviceCerts := helpers.LoadDevCerts(t, "teams-service")
 	connFactory := secureconn.NewFactory(*serviceCerts)
 	g := connFactory.NewServer()
-	teams_api.RegisterTeamsV2Server(g, m)
+	teams_api.RegisterTeamsServer(g, m)
 	return grpctest.NewServer(g)
 }
 

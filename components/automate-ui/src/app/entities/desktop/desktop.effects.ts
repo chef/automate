@@ -1,4 +1,4 @@
-import { catchError, mergeMap, map } from 'rxjs/operators';
+import { catchError, mergeMap, map, withLatestFrom, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of, combineLatest } from 'rxjs';
@@ -12,7 +12,16 @@ import {
   DesktopActionTypes,
   GetTopErrorsCollection,
   GetTopErrorsCollectionSuccess,
-  GetTopErrorsCollectionFailure
+  GetTopErrorsCollectionFailure,
+  GetUnknownDesktopDurationCounts,
+  GetUnknownDesktopDurationCountsSuccess,
+  GetUnknownDesktopDurationCountsFailure,
+  GetDesktops,
+  GetDesktopsSuccess,
+  GetDesktopsFailure,
+  GetDesktopsTotal,
+  GetDesktopsTotalSuccess,
+  GetDesktopsTotalFailure
 } from './desktop.actions';
 import { DesktopRequests } from './desktop.requests';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -78,4 +87,93 @@ export class DesktopEffects {
         message: `Could not get top errors: ${msg || error}`
       });
     }));
+
+  @Effect()
+  getUnknownDesktopDurationCounts$ =
+    this.actions$.pipe(ofType<GetUnknownDesktopDurationCounts>(
+      DesktopActionTypes.GET_UNKNOWN_DESKTOP_DURATION_COUNTS),
+      mergeMap((_action) =>
+        this.requests.getUnknownDesktopDurationCounts().pipe(
+          map(countedDurationCollection =>
+        new GetUnknownDesktopDurationCountsSuccess(countedDurationCollection)),
+        catchError((error) => of(new GetUnknownDesktopDurationCountsFailure(error)))))
+    );
+
+  @Effect()
+  getUnknownDesktopDurationCountsFailure$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_UNKNOWN_DESKTOP_DURATION_COUNTS_FAILURE),
+    map(({ payload: { error } }: GetUnknownDesktopDurationCountsFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get unknown desktop duration counts errors: ${msg || error}`
+      });
+    }));
+
+  @Effect()
+  getDesktops$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_DESKTOPS),
+    withLatestFrom(this.store$),
+    switchMap(([_action, storeState]) =>
+      this.requests.getDesktops(storeState.desktops.getDesktopsFilter).pipe(
+        map(desktops => new GetDesktopsSuccess( desktops )),
+      catchError((error) => of(new GetDesktopsFailure(error))))
+    ));
+
+  @Effect()
+  getDesktopsFailure$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_DESKTOPS_FAILURE),
+    map(({ payload: { error } }: GetDesktopsFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get desktops errors: ${msg || error}`
+      });
+    }));
+
+  @Effect()
+  getDesktopsTotal$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_DESKTOPS_TOTAL),
+    withLatestFrom(this.store$),
+    switchMap(([_action, storeState]) =>
+      this.requests.getDesktopsTotal(storeState.desktops.getDesktopsFilter).pipe(
+        map(total => new GetDesktopsTotalSuccess( total )),
+      catchError((error) => of(new GetDesktopsTotalFailure(error))))
+    ));
+
+  @Effect()
+  getDesktopsTotalFailure$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_DESKTOPS_TOTAL_FAILURE),
+    map(({ payload: { error } }: GetDesktopsTotalFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get desktops total errors: ${msg || error}`
+      });
+    }));
+
+  @Effect()
+  updateDesktopFilterCurrentPage$ = this.actions$.pipe(
+      ofType(DesktopActionTypes.UPDATE_DESKTOPS_FILTER_CURRENT_PAGE),
+      mergeMap(() => [ new GetDesktops() ]));
+
+  @Effect()
+  addDesktopFilterTerm$ = this.actions$.pipe(
+      ofType(DesktopActionTypes.ADD_DESKTOPS_FILTER_TERM),
+      mergeMap(() => [ new GetDesktops(), new GetDesktopsTotal() ]));
+
+  @Effect()
+  updateDesktopFilterTerms$ = this.actions$.pipe(
+      ofType(DesktopActionTypes.UPDATE_DESKTOPS_FILTER_TERMS),
+      mergeMap(() => [ new GetDesktops(), new GetDesktopsTotal() ]));
+
+  @Effect()
+  removeDesktopFilterTerms$ = this.actions$.pipe(
+      ofType(DesktopActionTypes.REMOVE_DESKTOPS_FILTER_TERM),
+      mergeMap(() => [ new GetDesktops(), new GetDesktopsTotal() ]));
+
+  @Effect()
+  updateDesktopSortTerm$ = this.actions$.pipe(
+      ofType(DesktopActionTypes.UPDATE_DESKTOPS_SORT_TERM),
+      mergeMap(() => [ new GetDesktops() ]));
 }

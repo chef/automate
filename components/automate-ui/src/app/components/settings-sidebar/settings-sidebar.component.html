@@ -15,7 +15,7 @@
         icon="vpn_key" iconRotation="90">Node Credentials</chef-sidebar-entry>
     </app-authorized>
     <app-authorized #lifecycle [anyOf]="['/retention/nodes/status', 'get']">
-      <chef-sidebar-entry route="/settings/node-lifecycle" icon="storage">Node Lifecycle</chef-sidebar-entry>
+      <chef-sidebar-entry route="/settings/data-lifecycle" icon="storage">Data Lifecycle</chef-sidebar-entry>
     </app-authorized>
 
     <div class="group" *ngIf="users.visible || teams.visible || tokens.visible">Identity</div>

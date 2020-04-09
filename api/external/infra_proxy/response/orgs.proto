@@ -29,4 +29,5 @@ message Org {
     string admin_user = 3;
     string admin_key = 4;
     string server_id = 5;
+    repeated string projects = 6;
 }

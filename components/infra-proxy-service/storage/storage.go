@@ -20,7 +20,7 @@ type Storage interface {
 	GetOrg(context.Context, uuid.UUID) (Org, error)
 	GetOrgByName(ctx context.Context, orgName string, serverID uuid.UUID) (Org, error)
 	GetOrgs(context.Context, uuid.UUID) ([]Org, error)
-	StoreOrg(ctx context.Context, name string, adminUser string, adminKey string, serverID string) (Org, error)
+	StoreOrg(ctx context.Context, name string, adminUser string, adminKey string, serverID string, projects []string) (Org, error)
 	DeleteOrg(context.Context, uuid.UUID) (Org, error)
 	EditOrg(context.Context, Org) (Org, error)
 }
@@ -50,6 +50,7 @@ type Org struct {
 	AdminUser string
 	AdminKey  string
 	ServerId  string
+	Projects  []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

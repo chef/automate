@@ -503,5 +503,5 @@ func (nm *NodeManagerMock) SearchManagerNodes(ctx context.Context, in *manager.N
 
 func contextWithProjects(projects []string) context.Context {
 	ctx := context.Background()
-	return auth_context.NewContext(ctx, []string{}, projects, "", "", "")
+	return auth_context.NewContext(ctx, []string{}, projects, "", "")
 }

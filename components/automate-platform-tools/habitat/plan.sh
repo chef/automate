@@ -8,9 +8,6 @@ pkg_version="0.1.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 pkg_upstream_url="https://www.chef.io/automate"
-pkg_deps=(
-  core/glibc
-)
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
 scaffolding_no_platform=true # Don't inject automate platform scaffolding

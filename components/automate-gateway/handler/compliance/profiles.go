@@ -83,3 +83,16 @@ func (a *Profiles) List(ctx context.Context, in *profiles.Query) (*profiles.Prof
 	}
 	return out, nil
 }
+
+func (a *Profiles) MetaSearch(ctx context.Context, in *profiles.Sha256) (*profiles.Missing, error) {
+	inDomain := &profileService.Sha256{}
+	out := &profiles.Missing{}
+	f := func() (proto.Message, error) {
+		return a.client.MetaSearch(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}

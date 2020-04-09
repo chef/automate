@@ -14,9 +14,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// BuildChefRun Builds the publishers
-func BuildCompliance(client *ingestic.ESClient, numberOfPublishers int) message.CompliancePipe {
-	logrus.Debugf("BuildCompliance started with numberOfPublishers = %d", numberOfPublishers)
+// StoreCompliance uses the publishers to save the data in ElasticSearch
+func StoreCompliance(client *ingestic.ESClient, numberOfPublishers int) message.CompliancePipe {
+	logrus.Debugf("StoreCompliance started with numberOfPublishers = %d", numberOfPublishers)
 	return func(in <-chan message.Compliance) <-chan message.Compliance {
 		out := make(chan message.Compliance, 100)
 
@@ -46,11 +46,16 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Publishing Compliance Report")
 
 			errChannels := make([]<-chan error, 0)
+			for _, profile := range msg.InspecProfiles {
+				// Only add the profile to the metadata store if it's missing
+				if _, ok := msg.Shared.EsProfilesMissingMeta[profile.Sha256]; ok {
+					errChannels = append(errChannels, insertInspecProfile(msg, profile, client))
+				} else {
+					logrus.Debugf("storeCompliance: meta for profile %s already exists, no need to insert", profile.Sha256)
+				}
+			}
 			errChannels = append(errChannels, insertInspecSummary(msg, client))
 			errChannels = append(errChannels, insertInspecReport(msg, client))
-			for _, profile := range msg.InspecProfiles {
-				errChannels = append(errChannels, insertInspecProfile(msg, profile, client))
-			}
 
 			for err := range merge(errChannels...) {
 				if err != nil {
@@ -116,18 +121,8 @@ func insertInspecProfile(msg message.Compliance, profile *relaxting.ESInspecProf
 			"profile_id": profile.Sha256,
 		}).Debug("Ingesting inspec_profile")
 		start := time.Now()
-		profileExists, err := client.ProfileExists(profile.Sha256)
-		if err == nil {
-			if !profileExists {
-				logrus.Debugf("Profile %s does not yet exist, will push this one into ES", profile.Sha256)
 
-				// Ingest Profile
-				err = client.InsertInspecProfile(msg.Ctx, profile)
-			} else {
-				logrus.Debugf("Profile %s exists therefore will not be posted to ES", profile.Sha256)
-			}
-		}
-
+		err := client.InsertInspecProfile(msg.Ctx, profile)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{"error": err.Error()}).Error("Unable to ingest inspec_profile object")
 			out <- err

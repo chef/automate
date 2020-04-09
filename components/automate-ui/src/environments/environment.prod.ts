@@ -16,7 +16,7 @@ export const environment = {
   profiles_url: '/api/v0/profiles',
   compliance_url: '/api/v0/compliance',
   config_mgmt_url: '/api/v0/cfgmgmt',
-  retention_url: '/api/v0/retention',
+  retention_url: '/api/v0/data-lifecycle',
   ingest_url: '/api/v0/ingest',
   infra_proxy_url: '/api/v0/infra',
   deployment_url: '/api/v0/deployment',

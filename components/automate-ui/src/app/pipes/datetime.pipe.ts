@@ -11,7 +11,7 @@ import * as moment from 'moment';
 })
 export class DatetimePipe implements PipeTransform {
 
-  public transform(value: moment.Moment | string, formatStr: string): string {
+  public transform(value: moment.Moment | Date | string, formatStr: string): string {
     const datetime = moment.isMoment(value) ? value : moment.utc(value);
     return datetime.format(formatStr);
   }

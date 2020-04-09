@@ -26,14 +26,15 @@ yml2json() {
   ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' "$1"
 }
 
-echo "Checking if Golang license fallbacks/exceptions are needed"
-license_scout=$(yml2json .license_scout.yml)
-for d in $(jq -ner --argjson data "$license_scout" '$data | (.fallbacks, .exceptions) | (.golang // [])[].name'); do
-    if [[ ! -d "vendor/$d" ]]; then
-        echo "dependency \"$d\" not required anymore"
-        exit 1
-    fi
-done
+# TODO(ssd) 2020-04-08: Re-enable after we fix https://github.com/chef/license_scout/pull/233
+# echo "Checking if Golang license fallbacks/exceptions are needed"
+# license_scout=$(yml2json .license_scout.yml)
+# for d in $(jq -ner --argjson data "$license_scout" '$data | (.fallbacks, .exceptions) | (.golang // [])[].name'); do
+#     if [[ ! -d "vendor/$d" ]]; then
+#         echo "dependency \"$d\" not required anymore"
+#         exit 1
+#     fi
+# done
 
 echo "Checking for up-to-date bldr config"
 go run ./tools/bldr-config-gen
@@ -59,7 +60,7 @@ shellcheck -s bash -ax \
 # help, choose one of the violations excluded here and fix all
 # instances of it.
 shellcheck -s bash -ax \
-  -e SC2012,SC2034,SC2046,SC2086,SC2119,SC2120,SC2124,SC2128,SC2154,SC2164,SC2181,SC2207 \
+  -e SC2012,SC2086,SC2128,SC2164,SC2181,SC2207 \
   .studiorc .studio/*
 
 echo "Checking for possible credentials in the source code"

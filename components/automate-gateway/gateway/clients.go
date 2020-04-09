@@ -97,7 +97,7 @@ type ClientsFactory interface {
 	AuthorizationClient() (iam_v2.AuthorizationClient, error)
 	PoliciesClient() (iam_v2.PoliciesClient, error)
 	ProjectsClient() (iam_v2.ProjectsClient, error)
-	TeamsClient() (teams.TeamsV2Client, error)
+	TeamsClient() (teams.TeamsClient, error)
 	TokensMgmtClient() (authn.TokensMgmtClient, error)
 	UsersMgmtClient() (local_user.UsersMgmtClient, error)
 	Notifier() (notifier.Notifier, error)
@@ -275,12 +275,12 @@ func (c *clientsFactory) ProjectsClient() (iam_v2.ProjectsClient, error) {
 
 // TeamsClient returns a client for the Teams Mgmt service.
 // It requires the `teams` endpoint to be configured
-func (c *clientsFactory) TeamsClient() (teams.TeamsV2Client, error) {
+func (c *clientsFactory) TeamsClient() (teams.TeamsClient, error) {
 	conn, err := c.connectionByName("teams-service")
 	if err != nil {
 		return nil, err
 	}
-	return teams.NewTeamsV2Client(conn), nil
+	return teams.NewTeamsClient(conn), nil
 }
 
 // TokensMgmtClient returns a client for the Tokens Mgmt service.

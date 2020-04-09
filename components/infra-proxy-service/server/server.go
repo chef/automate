@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	grpc_s "github.com/chef/automate/api/interservice/infra_proxy/service"
-	v1 "github.com/chef/automate/components/infra-proxy-service/server/v1"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/tracing"
@@ -28,7 +27,7 @@ func NewGRPCServer(s *service.Service) *grpc.Server {
 		),
 	)
 	health.RegisterHealthServer(g, health.NewService())
-	grpc_s.RegisterInfraProxyServer(g, v1.NewServer(s))
+	grpc_s.RegisterInfraProxyServer(g, NewServer(s))
 	reflection.Register(g)
 	return g
 }

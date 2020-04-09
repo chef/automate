@@ -49,7 +49,7 @@ Note that you could also add users directly to policies without the intermediate
 
 #### Create Users
 
-Follow the instructions on [Creating Users]({{< relref "users.md#manage-local-users-from-the-ui" >}}) to:
+Follow the instructions on [Creating Users]({{< relref "users.md#creating-local-users" >}}) to:
 
 * Create a local user with the username `test_viewer`.
 * Create a local user with the username `test_editor`.
@@ -59,7 +59,7 @@ Follow the instructions on [Creating Users]({{< relref "users.md#manage-local-us
 Select `Teams` from the left navigation of the **Settings** tab.
 Three teams are provided by default: `admins`, `viewers`, and `editors`.
 
-Follow the instructions for [Adding Users to a Team]({{< relref "teams.md#adding-users-to-a-team" >}}) to:
+Follow the instructions for [Adding Users to a Team]({{< relref "teams.md#adding-local-users-to-teams" >}}) to:
 
 * Add the user `test_viewer` to the Chef-managed `viewers` team.
 * Add the user `test_editor` to the Chef-managed `editors` team.
@@ -87,7 +87,7 @@ See the end of this section for a [complete JSON policy example]({{< relref "iam
 ```
 
 The `name` field is for human consumption. When you want to refer to the policy in commands, you will need to know the policy's ID.
-So let us give this policy the ID value: `team-managers-devops`.
+Let us give this policy the ID value: `team-managers-devops`.
 
 ```json
   "id": "team-managers-devops",
@@ -115,7 +115,7 @@ The statement allows us to specify the `actions` a user is permitted to take upo
 The `projects` field on a statement is an array that may contain more than one existing project, a wildcard `*` to indicate permission to resources in _any project_, or `(unassigned)` to indicate permission to resources that have not been assigned to a project.
 
 Note that the `projects` property in statements designates permission for the resources within the statement (here, that is `iam:users` and `iam:teams`), _not_ for the policy itself, and _cannot_ be left empty.
-For more about projects, see [Projects in the IAM Guide]({{< relref "iam-v2-guide.md#projects" >}} documentation.
+For more about projects, see [Projects in the IAM Guide]({{< relref "iam-v2-guide.md#projects" >}}) documentation.
 
 In this case, we only need a single statement providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_ that have been assigned to the project `project-devops`.
 
@@ -162,7 +162,7 @@ In this case, we only need a single statement providing access to the _get_, _li
 }
 ```
 
-Save your JSON file and refer to the [IAM Policies API reference](https://automate.chef.io/docs/api/#tag/Policies) to send that policy data to Chef Automate.
+Save your JSON file and refer to the [IAM Policies API reference](https://automate.chef.io/docs/api/#tag/policies) to send that policy data to Chef Automate.
 
 ### Policy Membership
 
@@ -248,17 +248,15 @@ Policy Name                      | Policy ID                        | Associated
 
 These policies are discussed in more detail in [Project Policies]({{< relref "iam-v2-guide.md#project-policies" >}}).
 
-#### Assigning Resources to Projects
+#### Assigning Teams and Tokens to Projects
 
-Projects can be assigned to Automate-created resources on creation or update.
+Projects can be assigned to Automate-created teams or tokens on creation or update.
 
 To assign a team to projects, select a team from the _Teams_ list, then select **Details**.
 Likewise, to assign a token to projects, select a token from the API tokens list, then select **Details**.
 In either case, you can select projects from the projects dropdown to assign.
 
 You may also assign teams and tokens to projects on creation. In the creation modal, select any projects to which the new resource should belong.
-
-Presently, policies and roles can only be assigned to projects using the command line, not the browser. Users cannot be assigned to projects from the browser or the command line.
 
 If you would like to delegate ownership of a project to another user so that they may assign resources, you will want to make that user a [Project Owner]({{< relref "iam-v2-guide.md#project-owners" >}}) of that project.
 
@@ -267,7 +265,7 @@ If you would like to delegate ownership of a project to another user so that the
 While Automate's local teams and tokens can be directly assigned to a project, ingested resources must be assigned to projects using ingest rules.
 
 Project ingest rules are used to associate ingested resources with projects within Automate. An ingest rule contains conditions that determine if an ingested resource should be moved into the rule's project.
-Each condition contains an attribute, operator, and value. See [IAM Project Rules API reference](https://automate.chef.io/docs/api/#tag/Project_rules) for details on how to manage project rules.
+Each condition contains an attribute, operator, and value. See [IAM Project Rules API reference](https://automate.chef.io/docs/api/#tag/rules) for details on how to manage project rules.
 
 In this example, after [creating a project]({{< relref "iam-v2-guide.md#creating-a-project" >}}) with the ID `project-devops`, you will add an ingest rule to this new project.
 You will update projects to apply this new project rule, causing all matching ingested resources to be associated with `project-devops`.
@@ -405,10 +403,4 @@ This command resets the local `admin` user's password and ensures that the user 
 
 ```bash
   chef-automate iam admin-access restore <your new password here>
-```
-
-Generate a new token and add that token as a new member of the Chef-managed `Administrator` policy.
-
-```bash
-  chef-automate iam token create <your token name here> --admin
 ```

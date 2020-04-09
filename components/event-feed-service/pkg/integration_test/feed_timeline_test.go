@@ -51,7 +51,7 @@ func TestEventStringsNormalRequest(t *testing.T) {
 
 	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	printFeedTimeline(feedTimeline, request)
 
@@ -195,7 +195,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
 			func(t *testing.T) {
 				res, err := testSuite.feedClient.GetFeedTimeline(ctx, &test.request)
-				if assert.Nil(t, err) {
+				if assert.NoError(t, err) {
 					for _, line := range res.ActionLines {
 						if line.Action == verb {
 
@@ -246,7 +246,7 @@ func TestEventStringsDayZoneActionsRequest(t *testing.T) {
 
 	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	totalItems := 0
 	for _, line := range feedTimeline.ActionLines {
@@ -315,7 +315,7 @@ func TestEventStringsVaryingBucketsSizeRequest(t *testing.T) {
 
 		feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		totalItems := 0
 		for _, line := range feedTimeline.ActionLines {
 			assert.Equal(t, numberOfBuckets, len(line.Slots), "with bucket size: %d", bucketSize)
@@ -354,7 +354,7 @@ func TestEventStringsVaryingBucketsSizeNoActionsRequest(t *testing.T) {
 
 		feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		totalItems := 0
 		for _, line := range feedTimeline.ActionLines {
 			assert.Equal(t, numberOfBuckets, len(line.Slots), "with bucket size: %d", bucketSize)
@@ -466,7 +466,7 @@ func TestEventStringsThreeDayThreeActionsRequest(t *testing.T) {
 
 	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	totalItems := 0
 	for _, line := range feedTimeline.ActionLines {
@@ -608,7 +608,7 @@ func TestEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T) {
 
 	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	totalItems := 0
 	for _, line := range feedTimeline.ActionLines {
@@ -684,7 +684,7 @@ func TestEventStringsDayOneActionsOutsideOfRequest(t *testing.T) {
 
 	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	totalItems := 0
 	for _, line := range feedTimeline.ActionLines {
@@ -730,7 +730,7 @@ func TestEventStringsDayRequest(t *testing.T) {
 
 	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	totalItems := 0
 	for _, line := range feedTimeline.ActionLines {
@@ -1228,7 +1228,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 
 	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	totalItems := 0
 	for _, line := range feedTimeline.ActionLines {
 		assert.Equal(t, numberOfBuckets, len(line.Slots))

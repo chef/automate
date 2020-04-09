@@ -1,22 +1,31 @@
-# Adding data to event feed
+# ADDING DATA TO YOUR DEV ENV
+
+## Adding data to event feed
 
 from hab studio:
 
 `chef_load_actions`
 
-# Adding nodes to populate client runs
+## Adding nodes to populate client runs
 
 from hab studio:
 
-`chef_load_nodes` 
+option one: `chef_load_nodes` 
 
-# Adding services to apps page
+option two: 
+to load infra nodes with failed runs:
+```
+for _ in {1..500} ; do   m=$((RANDOM % 4));   n=$((RANDOM % 25));   generate_chef_run_failure_example |     jq --arg msg "Error $n occurred" --arg type "Chef::ExampleError$m" '.error.message = $msg | .error.class = $type' |     send_chef_data_raw https://A2-URL $TOKEN; done
+```
+_note: play with the args to generate more varied data_
+
+## Adding services to apps page
 
 from hab studio:
 
 `applications_populate_database` 
 
-# Adding nodes to populate compliance reporting
+## Adding nodes to populate compliance reporting
 
 from hab studio:
 
@@ -27,33 +36,17 @@ option two: `chef_load_compliance_nodes` runs the above command with the followi
 
 option three: `load_compliance_reports` will send the reports located in `components/compliance-service/test-data/audit-reports` to your dev enironment. these reports are populated with fields such as chef_server, organization, policy_name. these reports are especially useful when you need to test searchbar functionality for multiple search fields or resource scoped access ingest match rules.
 
-if you need to add reports to a non-dev-env instance, you can use the following command, which loads the same data that the above `load_compliance_reports` command loads: `components/compliance-service/test_data/audit_reports/send_to_data_collector.sh https://a2-url token_value`
+## Adding nodes to populate the nodes and scan jobs pages
 
+from hab studio:
 
-# Adding nodes to populate the nodes and scan jobs pages
+run `load_scan_jobs`
 
-option 1:
-if you don't care if the nodes are reachable and scan jobs are successful, do the following:
-- create an ssh or winrm credential in your Automate GUI at `a2-url/settings/node-credentials` with fake data
-- create a node in your Automate GUI at `a2-url/compliance/scan-jobs/nodes/add` with host `fake-localhost` and attach your fake credential 
-- ensure you've installed a profile or two in your Automate GUI under `a2-url/compliance/compliance-profiles`
-- create a scan job at `a2-url/jobs/add` using the profile and node 
-
-option 2:
-this should give you some reachable nodes and successful scan jobs, and some unreachable nodes/unsuccessful jobs:
-ensure you have `jq` installed locally (`brew install jq`)
-get a token for the api call: `get_admin_token` from within the studio is the quickest way
-get the secrets: run `cat dev/secrets-env.sh` - if there's nothing there, run `CHEF_USERNAME=username scripts/get_secrets.sh`
-
-_note: this should be run on your local system, not from within the studio. you will need to be on the vpn_
-`source dev/secrets-env.sh`
-`A2_URL='https://a2-dev.test' A2_TOKEN='token_val' components/compliance-service/scripts/create-pg-data.sh`
-
-# Adding profiles
+## Adding profiles
 
 this should be done by downloading profiles from the "Available" tab under the Compliance->Profiles
 
-# Adding cloud integrations
+## Adding cloud integrations
 
 AWS:
  - use the `okta_aws` functionality to get your temporary aws credentials (see details here)[https://chefio.atlassian.net/wiki/spaces/ENG/pages/94259373/SOP-001+-+Gaining+access+to+okta+AWS+accounts+via+the+AWS+API#SOP-001-GainingaccesstooktaAWSaccountsviatheAWSAPI-Step1:Installokta_aws]
@@ -77,7 +70,7 @@ _Note: to add an ec2 integration for aws, change type from "aws-api" to "aws-ec2
 
 If testing in an instance running in AWS, you can use the "read creds from cloud env" option to make things easier.
 
-# Adding data to infra views
+## Adding data to infra views
 
 from hab studio:
 
@@ -89,7 +82,10 @@ By default, 50 records of the infra servers and orgs will be added with the pref
 option two: `infra_service_load_sample_data -N 100 -S infra-server -O infra-org`
 100 records of the infra servers and orgs will be added, modify the numbers on each of those options to meet your needs.
 
-# Deleting data
+option three: look through the pinned items in slack channel #automate-infra-views and follow the instructions there (works against running chef server)
+
+----------------------------------------------------------------------------------
+# DELETING DATA
 
 to delete the postgres data:
 
@@ -99,3 +95,35 @@ to delete the postgres data:
 to delete the elasticsearch data:
 
 `curl -s http://localhost:10141/_cat/indices/comp*?h=i | while read compliance_index; do curl -X DELETE http://localhost:10141/$compliance_index; done`
+
+
+----------------------------------------------------------------------------------
+# ADDING DATA TO NON-DEV-ENV AUTOMATE 
+we don't have hab studio when we're trying to load data into a built instance of automate, so we have to do things a bit differently.
+
+## Adding data to event feed
+TBD
+
+## Adding services to apps page
+TBD
+
+## Adding nodes to populate client runs
+from your hab studio:
+```
+for _ in {1..500} ; do   m=$((RANDOM % 4));   n=$((RANDOM % 25));   generate_chef_run_failure_example |     jq --arg msg "Error $n occurred" --arg type "Chef::ExampleError$m" '.error.message = $msg | .error.class = $type' |     send_chef_data_raw https://A2-URL $TOKEN; done
+```
+_note: play with the args to generate more varied data_
+
+## Adding nodes to populate compliance reporting
+`components/compliance-service/test_data/audit_reports/send_to_data_collector.sh https://a2-url token_value`
+
+## Profiles, cloud integrations
+same instructions as dev env
+
+## Scan jobs
+create a credential with your chef AD username and your key (~/.ssh/id_rsa)
+create a node with fqdn `localhost`, attach the credential (https://a2-url/compliance/scan-jobs/nodes/add)
+create a scan job using that node and profiles installed
+
+## Adding data to infra views
+use the credentials pinned in the #automate-infra-views slack channel to add a chef server and then org via the ui, at a2-url/infrastructure/chef-servers

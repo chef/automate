@@ -41,24 +41,24 @@ func TestTeamsGRPC(t *testing.T) {
 
 	if migrationConfig == nil {
 		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil)
-		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
+		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsClient(conn), close)
 	} else {
 		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx,
 			t, l, migrationConfig)
-		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
+		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsClient(conn), close)
 
 		// If ciMode, run in-memory AND PG
 		// else just run PG.
 		if os.Getenv("CI") == "true, *authz.SubjectPurgeServerMock" {
 			serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil)
-			runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
+			runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsClient(conn), close)
 		}
 	}
 }
 
 func runAllServerTests(
 	t *testing.T, serv *Server, serviceRef *service.Service,
-	authzMock *authz.SubjectPurgeServerMock, cl teams.TeamsV2Client, close func()) {
+	authzMock *authz.SubjectPurgeServerMock, cl teams.TeamsClient, close func()) {
 
 	t.Helper()
 	defer close()
@@ -1768,14 +1768,14 @@ func runAllServerTests(
 	})
 }
 
-func cleanupTeam(ctx context.Context, t *testing.T, cl teams.TeamsV2Client, teamID string) {
+func cleanupTeam(ctx context.Context, t *testing.T, cl teams.TeamsClient, teamID string) {
 	t.Helper()
 	deleteReq := teams.DeleteTeamReq{Id: teamID}
 	_, err := cl.DeleteTeam(ctx, &deleteReq)
 	require.NoError(t, err)
 }
 
-func cleanupTeamV2(t *testing.T, cl teams.TeamsV2Client, teamName string) {
+func cleanupTeamV2(t *testing.T, cl teams.TeamsClient, teamName string) {
 	t.Helper()
 
 	deleteReq := teams.DeleteTeamReq{Id: teamName}
@@ -1829,7 +1829,7 @@ func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
 	}
 	grpcServ := serviceRef.ConnFactory.NewServer(tracing.GlobalServerInterceptor())
 	v2Server := NewServer(serviceRef)
-	teams.RegisterTeamsV2Server(grpcServ, v2Server)
+	teams.RegisterTeamsServer(grpcServ, v2Server)
 
 	resetState(ctx, t, serviceRef)
 
@@ -1873,5 +1873,5 @@ func defaultValidateProjectAssignmentFunc(context.Context,
 
 func insertProjectsIntoNewContext(projects []string) context.Context {
 	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
-		[]string{}, projects, "resource", "action", "pol"))
+		[]string{}, projects, "resource", "action"))
 }

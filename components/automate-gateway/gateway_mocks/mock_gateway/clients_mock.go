@@ -207,10 +207,10 @@ func (mr *MockClientsFactoryMockRecorder) ProjectsClient() *gomock.Call {
 }
 
 // TeamsClient mocks base method
-func (m *MockClientsFactory) TeamsClient() (v20.TeamsV2Client, error) {
+func (m *MockClientsFactory) TeamsClient() (v20.TeamsClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TeamsClient")
-	ret0, _ := ret[0].(v20.TeamsV2Client)
+	ret0, _ := ret[0].(v20.TeamsClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

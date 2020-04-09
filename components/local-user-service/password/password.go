@@ -15,7 +15,9 @@ type Validator struct {
 // EmptyError is returned if the validated password is empty or all whitespace.
 type EmptyError struct{}
 
-func (*EmptyError) Error() string { return "password is empty or all whitespace" }
+func (*EmptyError) Error() string {
+	return "a password is required and must contain at least one non-whitespace character"
+}
 
 // TooShortError is returned if the password is shorter than the required number
 // of chars.

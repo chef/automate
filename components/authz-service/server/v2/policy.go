@@ -454,7 +454,7 @@ func (s *policyServer) UpdateRole(
 
 	storageRole, err := storage.NewUpdateRole(req.Id, req.Name, req.Actions, req.Projects)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "parse policy with ID %q: %s", req.Id, err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "parse role with ID %q: %s", req.Id, err.Error())
 	}
 
 	roleInternal, err := s.store.UpdateRole(ctx, storageRole)

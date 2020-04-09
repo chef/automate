@@ -11,4 +11,5 @@ tls:
 pg_url: "postgresql://postgres@127.0.0.1:5432/infra_proxy_test?sslmode=disable"
 database: infra_proxy_test
 migrations-path: storage/postgres/migration/sql/
+authz-address: "0.0.0.0:10130"
 secrets-address: "0.0.0.0:10131"

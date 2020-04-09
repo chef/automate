@@ -21,7 +21,9 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Cookbooks struct {
-	OrgId                string   `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
+	// ID of the Org.
+	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
+	// ID of the Server
 	ServerId             string   `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -67,65 +69,72 @@ func (m *Cookbooks) GetServerId() string {
 	return ""
 }
 
-type CookbooksAvailableVersions struct {
-	OrgId                string   `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
-	ServerId             string   `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	NumVersions          string   `protobuf:"bytes,3,opt,name=num_versions,json=numVersions,proto3" json:"num_versions,omitempty"`
+type CookbookVersions struct {
+	// ID of the Org.
+	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
+	// ID of the Server.
+	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	// Name of the cookbook.
+	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *CookbooksAvailableVersions) Reset()         { *m = CookbooksAvailableVersions{} }
-func (m *CookbooksAvailableVersions) String() string { return proto.CompactTextString(m) }
-func (*CookbooksAvailableVersions) ProtoMessage()    {}
-func (*CookbooksAvailableVersions) Descriptor() ([]byte, []int) {
+func (m *CookbookVersions) Reset()         { *m = CookbookVersions{} }
+func (m *CookbookVersions) String() string { return proto.CompactTextString(m) }
+func (*CookbookVersions) ProtoMessage()    {}
+func (*CookbookVersions) Descriptor() ([]byte, []int) {
 	return fileDescriptor_334f5d297dde2e18, []int{1}
 }
 
-func (m *CookbooksAvailableVersions) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CookbooksAvailableVersions.Unmarshal(m, b)
+func (m *CookbookVersions) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CookbookVersions.Unmarshal(m, b)
 }
-func (m *CookbooksAvailableVersions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CookbooksAvailableVersions.Marshal(b, m, deterministic)
+func (m *CookbookVersions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CookbookVersions.Marshal(b, m, deterministic)
 }
-func (m *CookbooksAvailableVersions) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CookbooksAvailableVersions.Merge(m, src)
+func (m *CookbookVersions) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CookbookVersions.Merge(m, src)
 }
-func (m *CookbooksAvailableVersions) XXX_Size() int {
-	return xxx_messageInfo_CookbooksAvailableVersions.Size(m)
+func (m *CookbookVersions) XXX_Size() int {
+	return xxx_messageInfo_CookbookVersions.Size(m)
 }
-func (m *CookbooksAvailableVersions) XXX_DiscardUnknown() {
-	xxx_messageInfo_CookbooksAvailableVersions.DiscardUnknown(m)
+func (m *CookbookVersions) XXX_DiscardUnknown() {
+	xxx_messageInfo_CookbookVersions.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_CookbooksAvailableVersions proto.InternalMessageInfo
+var xxx_messageInfo_CookbookVersions proto.InternalMessageInfo
 
-func (m *CookbooksAvailableVersions) GetOrgId() string {
+func (m *CookbookVersions) GetOrgId() string {
 	if m != nil {
 		return m.OrgId
 	}
 	return ""
 }
 
-func (m *CookbooksAvailableVersions) GetServerId() string {
+func (m *CookbookVersions) GetServerId() string {
 	if m != nil {
 		return m.ServerId
 	}
 	return ""
 }
 
-func (m *CookbooksAvailableVersions) GetNumVersions() string {
+func (m *CookbookVersions) GetName() string {
 	if m != nil {
-		return m.NumVersions
+		return m.Name
 	}
 	return ""
 }
 
 type Cookbook struct {
-	OrgId                string   `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
-	ServerId             string   `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// ID of the Org.
+	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
+	// ID of the Server.
+	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	// Name of the cookbook.
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// Version of the cookbook.
 	Version              string   `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -185,10 +194,87 @@ func (m *Cookbook) GetVersion() string {
 	return ""
 }
 
+type CookbookFileContent struct {
+	// ID of the org.
+	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
+	// ID of the server.
+	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	// Name of the cookbook.
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// Version of the cookbook.
+	Version string `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	// Cookbook data file URL.
+	Url                  string   `protobuf:"bytes,5,opt,name=url,proto3" json:"url,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CookbookFileContent) Reset()         { *m = CookbookFileContent{} }
+func (m *CookbookFileContent) String() string { return proto.CompactTextString(m) }
+func (*CookbookFileContent) ProtoMessage()    {}
+func (*CookbookFileContent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_334f5d297dde2e18, []int{3}
+}
+
+func (m *CookbookFileContent) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CookbookFileContent.Unmarshal(m, b)
+}
+func (m *CookbookFileContent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CookbookFileContent.Marshal(b, m, deterministic)
+}
+func (m *CookbookFileContent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CookbookFileContent.Merge(m, src)
+}
+func (m *CookbookFileContent) XXX_Size() int {
+	return xxx_messageInfo_CookbookFileContent.Size(m)
+}
+func (m *CookbookFileContent) XXX_DiscardUnknown() {
+	xxx_messageInfo_CookbookFileContent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CookbookFileContent proto.InternalMessageInfo
+
+func (m *CookbookFileContent) GetOrgId() string {
+	if m != nil {
+		return m.OrgId
+	}
+	return ""
+}
+
+func (m *CookbookFileContent) GetServerId() string {
+	if m != nil {
+		return m.ServerId
+	}
+	return ""
+}
+
+func (m *CookbookFileContent) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *CookbookFileContent) GetVersion() string {
+	if m != nil {
+		return m.Version
+	}
+	return ""
+}
+
+func (m *CookbookFileContent) GetUrl() string {
+	if m != nil {
+		return m.Url
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*Cookbooks)(nil), "chef.automate.api.infra_proxy.request.Cookbooks")
-	proto.RegisterType((*CookbooksAvailableVersions)(nil), "chef.automate.api.infra_proxy.request.CookbooksAvailableVersions")
+	proto.RegisterType((*CookbookVersions)(nil), "chef.automate.api.infra_proxy.request.CookbookVersions")
 	proto.RegisterType((*Cookbook)(nil), "chef.automate.api.infra_proxy.request.Cookbook")
+	proto.RegisterType((*CookbookFileContent)(nil), "chef.automate.api.infra_proxy.request.CookbookFileContent")
 }
 
 func init() {
@@ -196,21 +282,22 @@ func init() {
 }
 
 var fileDescriptor_334f5d297dde2e18 = []byte{
-	// 248 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x91, 0xb1, 0x4b, 0xc4, 0x30,
-	0x18, 0xc5, 0x39, 0x3d, 0xcf, 0x6b, 0x74, 0x0a, 0x08, 0x45, 0x17, 0x2d, 0x08, 0x4e, 0x89, 0xe0,
-	0x24, 0x0e, 0xa2, 0x4e, 0xb7, 0x3a, 0x38, 0xb8, 0x94, 0xb4, 0xfd, 0xae, 0x17, 0xae, 0xc9, 0x57,
-	0xbf, 0x24, 0xe5, 0xfc, 0xef, 0xe5, 0x62, 0x23, 0x6e, 0x07, 0xdd, 0x92, 0xef, 0xf1, 0x7e, 0x0f,
-	0xde, 0x63, 0xf7, 0xaa, 0xd7, 0x12, 0x76, 0x1e, 0xc8, 0xaa, 0x4e, 0x6a, 0xbb, 0x26, 0x55, 0xf6,
-	0x84, 0xbb, 0x6f, 0x49, 0xf0, 0x15, 0xc0, 0x79, 0x59, 0x23, 0x6e, 0x2b, 0xc4, 0xad, 0x13, 0x3d,
-	0xa1, 0x47, 0x7e, 0x5b, 0x6f, 0x60, 0x2d, 0x54, 0xf0, 0x68, 0x94, 0x07, 0xa1, 0x7a, 0x2d, 0xfe,
-	0xd9, 0xc4, 0x68, 0x2b, 0x9e, 0x59, 0xf6, 0x96, 0x9c, 0xfc, 0x82, 0x2d, 0x90, 0xda, 0x52, 0x37,
-	0xf9, 0xec, 0x7a, 0x76, 0x97, 0xbd, 0x9f, 0x20, 0xb5, 0xab, 0x86, 0x5f, 0xb1, 0xcc, 0x01, 0x0d,
-	0x40, 0x7b, 0xe5, 0x28, 0x2a, 0xcb, 0xdf, 0xc3, 0xaa, 0x29, 0x1c, 0xbb, 0xfc, 0x03, 0xbc, 0x0c,
-	0x4a, 0x77, 0xaa, 0xea, 0xe0, 0x03, 0xc8, 0x69, 0xb4, 0x93, 0x88, 0xfc, 0x86, 0x9d, 0xdb, 0x60,
-	0xca, 0x61, 0x64, 0xe4, 0xc7, 0x51, 0x3f, 0xb3, 0xc1, 0x24, 0x6c, 0xd1, 0xb1, 0x65, 0x0a, 0x9d,
-	0x14, 0xc1, 0xd9, 0xdc, 0x2a, 0x03, 0x23, 0x3a, 0xbe, 0x79, 0xce, 0x4e, 0xc7, 0xc8, 0x7c, 0x1e,
-	0xcf, 0xe9, 0xfb, 0xfa, 0xf4, 0xf9, 0xd8, 0x6a, 0xbf, 0x09, 0x95, 0xa8, 0xd1, 0xc8, 0x7d, 0xaf,
-	0x32, 0xf5, 0x2a, 0x0f, 0xed, 0x52, 0x2d, 0xe2, 0x1c, 0x0f, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff,
-	0x6c, 0x86, 0xa5, 0x98, 0xc2, 0x01, 0x00, 0x00,
+	// 258 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x92, 0xcf, 0x4a, 0xc3, 0x40,
+	0x10, 0x87, 0x89, 0xfd, 0x63, 0x33, 0xa7, 0xb2, 0x22, 0x2c, 0x78, 0x91, 0x80, 0xe0, 0x69, 0x57,
+	0xf0, 0x24, 0x1e, 0x04, 0x0b, 0x42, 0xaf, 0x1e, 0x3c, 0xf4, 0x52, 0x36, 0xc9, 0x34, 0x5d, 0x9a,
+	0xec, 0xc4, 0xc9, 0xa6, 0xd4, 0x47, 0xf0, 0xad, 0x25, 0x5b, 0x17, 0xbc, 0x09, 0x62, 0x6f, 0xb3,
+	0xdf, 0xf0, 0xfb, 0x66, 0x61, 0x06, 0xee, 0x4c, 0x6b, 0x35, 0x1e, 0x3c, 0xb2, 0x33, 0xb5, 0xb6,
+	0x6e, 0xc3, 0x66, 0xdd, 0x32, 0x1d, 0x3e, 0x34, 0xe3, 0x7b, 0x8f, 0x9d, 0xd7, 0x05, 0xd1, 0x2e,
+	0x27, 0xda, 0x75, 0xaa, 0x65, 0xf2, 0x24, 0x6e, 0x8a, 0x2d, 0x6e, 0x94, 0xe9, 0x3d, 0x35, 0xc6,
+	0xa3, 0x32, 0xad, 0x55, 0x3f, 0x62, 0xea, 0x3b, 0x96, 0x3d, 0x41, 0xba, 0x88, 0x49, 0x71, 0x09,
+	0x53, 0xe2, 0x6a, 0x6d, 0x4b, 0x99, 0x5c, 0x27, 0xb7, 0xe9, 0xeb, 0x84, 0xb8, 0x5a, 0x96, 0xe2,
+	0x0a, 0xd2, 0x0e, 0x79, 0x8f, 0x3c, 0x74, 0xce, 0x42, 0x67, 0x76, 0x04, 0xcb, 0x32, 0x5b, 0xc1,
+	0x3c, 0x0a, 0xde, 0x90, 0x3b, 0x4b, 0xee, 0x4f, 0x1e, 0x21, 0x60, 0xec, 0x4c, 0x83, 0x72, 0x14,
+	0x78, 0xa8, 0xb3, 0x1a, 0x66, 0xd1, 0xfd, 0x5f, 0x4e, 0x21, 0xe1, 0x7c, 0x7f, 0xfc, 0xa7, 0x1c,
+	0x07, 0x1c, 0x9f, 0xd9, 0x67, 0x02, 0x17, 0x71, 0xdc, 0x8b, 0xad, 0x71, 0x41, 0xce, 0xa3, 0xf3,
+	0xa7, 0x9f, 0x2c, 0xe6, 0x30, 0xea, 0xb9, 0x96, 0x93, 0x40, 0x87, 0xf2, 0xf9, 0x71, 0xf5, 0x50,
+	0x59, 0xbf, 0xed, 0x73, 0x55, 0x50, 0xa3, 0x87, 0x55, 0xea, 0xb8, 0x4a, 0xfd, 0xdb, 0x29, 0xe4,
+	0xd3, 0x70, 0x01, 0xf7, 0x5f, 0x01, 0x00, 0x00, 0xff, 0xff, 0xbd, 0xdf, 0xa6, 0x7a, 0x35, 0x02,
+	0x00, 0x00,
 }

@@ -4,16 +4,27 @@ package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
 
 message Cookbooks {
+    // List of cookbooks with name and version.
     repeated CookbookVersion cookbooks = 1;
 }
 
-message CookbooksAvailableVersions {
-    repeated CookbookAllVersion cookbooks = 1;
+message CookbookVersions {
+    // Name of the cookbook.
+    string name = 1;
+    // List of all versions avaiable for cookbook.
+    repeated string versions = 2;
+}
+
+message CookbookFileContent {
+    // Cookbook data file content.
+    string content = 1;
 }
 
 message CookbookVersion {
+    // Name of the cookbook.
     string name = 1;
-    string version  = 2;
+    // Version of the cookbook.
+    string version = 2;
 }
 
 message Cookbook {
@@ -60,25 +71,4 @@ message CookbookAccess {
 	bool grant  = 3;
 	bool update = 4;
 	bool delete = 5;
-}
-
-message CookbookAllVersion {
-    string name              = 1;
-    string current_version   = 2;
-    repeated string versions = 3;
-}
-
-message CookbookAffectedNodes {
-    repeated NodeAttribute nodes = 1;
-}
-
-message NodeAttribute {
-    string name         = 1;
-    string chef_guid    = 2;
-    string url          = 3;
-    string check_in     = 4;
-    string uptime       = 5;
-    string platform     = 6;
-    string environment  = 7;
-    string policy_group = 8;
 }

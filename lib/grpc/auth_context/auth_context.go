@@ -36,23 +36,21 @@ var (
 
 // Properties is a container for metadata available from the context.
 type Properties struct {
-	Subjects      []string
-	Projects      []string
-	Resource      string
-	Action        string
-	PolicyVersion string
+	Subjects []string
+	Projects []string
+	Resource string
+	Action   string
 }
 
 // NewContext returns a new `context.Context` that holds a reference
 // to the provided properties
 func NewContext(ctx context.Context, subs []string, projects []string,
-	res, act, pol string) context.Context {
+	res, act string) context.Context {
 
 	ctx = context.WithValue(ctx, subjectsKey, subs)
 	ctx = context.WithValue(ctx, projectsKey, projects)
 	ctx = context.WithValue(ctx, resourceKey, res)
 	ctx = context.WithValue(ctx, actionKey, act)
-	ctx = context.WithValue(ctx, policyKey, pol)
 	return ctx
 }
 
@@ -65,7 +63,6 @@ func NewOutgoingContext(ctx context.Context) context.Context {
 		"projects": auth.Projects,
 		"resource": {auth.Resource},
 		"action":   {auth.Action},
-		"policy":   {auth.PolicyVersion},
 	}
 	return metadata.NewOutgoingContext(ctx, md)
 }
@@ -118,7 +115,7 @@ func ContextWithoutProjects(ctx context.Context) context.Context {
 // or `nil` or "" if a piece of the information could not be found.
 func FromContext(ctx context.Context) *Properties {
 	var subs, projs []string
-	var res, act, pol string
+	var res, act string
 	if s, ok := ctx.Value(subjectsKey).([]string); ok {
 		subs = s
 	}
@@ -131,15 +128,11 @@ func FromContext(ctx context.Context) *Properties {
 	if a, ok := ctx.Value(actionKey).(string); ok {
 		act = a
 	}
-	if p, ok := ctx.Value(policyKey).(string); ok {
-		pol = p
-	}
 	return &Properties{
-		Subjects:      subs,
-		Resource:      res,
-		Action:        act,
-		PolicyVersion: pol,
-		Projects:      projs,
+		Subjects: subs,
+		Resource: res,
+		Action:   act,
+		Projects: projs,
 	}
 }
 
@@ -163,15 +156,6 @@ func ProjectsFromIncomingContext(ctx context.Context) ([]string, error) {
 	return authProps.Projects, nil
 }
 
-// PolicyVersion returns the auth policy version associated with `ctx`,
-// or "" if it could not be found.
-func PolicyVersion(ctx context.Context) (pol string) {
-	if p, ok := ctx.Value(policyKey).(string); ok {
-		pol = p
-	}
-	return
-}
-
 // AllProjectsRequested takes in the project filter list
 // and returns true if the list is a single entry of *.
 func AllProjectsRequested(projectsFilter []string) bool {
@@ -181,7 +165,7 @@ func AllProjectsRequested(projectsFilter []string) bool {
 // FromIncomingMetadata translates auth info provided by GRPC metadata into
 // auth_context's representation, to be retrieved via auth_context.FromContext.
 func FromIncomingMetadata(ctx context.Context) context.Context {
-	var res, act, pol string
+	var res, act string
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return ctx
@@ -194,8 +178,5 @@ func FromIncomingMetadata(ctx context.Context) context.Context {
 	if a, ok := md["action"]; ok && len(a) > 0 {
 		act = a[0]
 	}
-	if p, ok := md["policy"]; ok && len(p) > 0 {
-		pol = p[0]
-	}
-	return NewContext(ctx, subs, projs, res, act, pol)
+	return NewContext(ctx, subs, projs, res, act)
 }

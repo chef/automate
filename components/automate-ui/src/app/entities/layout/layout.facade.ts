@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { filter, first } from 'rxjs/operators';
+import { identity } from 'lodash/fp';
 
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { AuthorizedChecker } from 'app/helpers/auth/authorized';
+import { GetProjects } from 'app/entities/projects/project.actions';
 import { LayoutSidebarService } from './layout-sidebar.service';
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';
 import { sidebar,  showPageLoading } from './layout.selectors';
 import { ShowPageLoading } from './layout.actions';
 
-import { GetProjects } from 'app/entities/projects/project.actions';
 
 // Important! These must match components/automate-ui/src/styles/_variables.scss
 enum Height {
@@ -53,15 +57,24 @@ export class LayoutFacadeService {
   public contentHeight = `calc(100% - ${Height.Navigation}px)`;
   public sidebar$: Observable<MenuItemGroup[]>;
   public showPageLoading$: Observable<boolean>;
+  private authorizedChecker: AuthorizedChecker;
 
   constructor(
+    fullStore: Store<NgrxStateAtom>,
     private store: Store<fromLayout.LayoutEntityState>,
     private layoutSidebarService: LayoutSidebarService
   ) {
     this.sidebar$ = store.select(sidebar);
     this.showPageLoading$ = store.select(showPageLoading);
     this.updateDisplay();
-    this.store.dispatch(new GetProjects());
+
+    this.authorizedChecker = new AuthorizedChecker(fullStore);
+    this.authorizedChecker.setPermissions([{ endpoint: '/iam/v2/projects', verb: 'get' }], []);
+    this.authorizedChecker.isAuthorized$
+      .pipe(filter(identity), first())
+      .subscribe(
+        // wait for permission and, if it comes at all, fire exactly once
+        () => this.store.dispatch(new GetProjects()));
   }
 
   getContentStyle(): any {

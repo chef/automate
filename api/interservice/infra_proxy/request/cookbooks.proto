@@ -4,19 +4,41 @@ package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
 
 message Cookbooks {
+    // ID of the Org.
     string org_id = 1;
+    // ID of the Server
     string server_id = 2;
 }
 
-message CookbooksAvailableVersions {
+message CookbookVersions {
+    // ID of the Org.
     string org_id = 1;
+    // ID of the Server.
     string server_id = 2;
-    string num_versions = 3;
+    // Name of the cookbook.
+    string name = 3;
 }
 
 message Cookbook {
+    // ID of the Org.
     string org_id = 1;
+    // ID of the Server.
     string server_id = 2;
+    // Name of the cookbook.
     string name = 3;
+    // Version of the cookbook.
     string version = 4;
+}
+
+message CookbookFileContent {
+    // ID of the org.
+    string org_id = 1;
+    // ID of the server.
+    string server_id = 2;
+    // Name of the cookbook.
+    string name = 3;
+    // Version of the cookbook.
+    string version = 4;
+    // Cookbook data file URL.
+    string url = 5;
 }

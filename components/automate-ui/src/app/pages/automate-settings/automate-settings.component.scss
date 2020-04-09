@@ -1,35 +1,89 @@
 @import "~styles/variables";
 
-chef-td {
-  &.description {
-    flex-basis: 45%;
-  }
+.container {
+  background-color: $chef-white;
 
-  &.input {
-    flex: none;
+  main {
+    background-color: $chef-white;
   }
 }
 
-input {
-  width: 60px;
-  height: 100%;
+h2 {
+  font-size: 16px;
+  font-weight: 600;
 }
 
-chef-select {
-  width: 120px;
+.group-section {
+  margin-bottom: 30px;
+
+  chef-button {
+    margin: 0;
+  }
+
+  .checkbox-row {
+    display: flex;
+
+    input {
+      width: 60px;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    &+.checkbox-row {
+      margin-top: 12px;
+
+      &.secondary-row {
+        margin-left: 69px;
+      }
+    }
+
+
+    .checkbox-container {
+      margin-top: 12px;
+    }
+
+    chef-checkbox {
+      margin-right: 8px;
+      font-size: 17px;
+    }
+  }
 }
 
-.center {
-  margin: auto;
-  padding: 10px;
-  width: 10%;
+.chef-input {
+  margin: 0 8px;
+
+  &.ng-invalid {
+    border: 1px solid $chef-critical;
+  }
 }
 
 chef-checkbox {
-  font-size: 17px;
-  width: 110px;
-
   ::ng-deep .mat-checkbox-layout {
     padding-bottom: 0;
+  }
+}
+
+mat-form-field {
+  margin: 0 8px 0 0;
+  width: 120px;
+
+  ::ng-deep .mat-form-field-wrapper {
+    padding-bottom: 0;
+  }
+
+  ::ng-deep .mat-form-field-infix {
+    padding: 0;
+    border-top: 0;
+  }
+
+  ::ng-deep .mat-select-disabled {
+    background-color: $chef-light-grey;
+    opacity: 0.5;
+
+    .mat-select-value {
+      color: rgb(84, 84, 84);
+    }
   }
 }

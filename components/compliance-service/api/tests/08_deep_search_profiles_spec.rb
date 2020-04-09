@@ -373,7 +373,7 @@ describe File.basename(__FILE__) do
         ],
         page: 1, per_page: 2)
     expected_data = {
-      "counts" => { "waived" => 1 },
+      "counts" => { "total" => 1, "waived" => 1 },
       "profiles" => [
           {
             "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",

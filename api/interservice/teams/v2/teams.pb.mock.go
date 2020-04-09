@@ -10,24 +10,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// verify that the mock satisfies the TeamsV2Server interface (at compile time)
-var _ TeamsV2Server = &TeamsV2ServerMock{}
+// verify that the mock satisfies the TeamsServer interface (at compile time)
+var _ TeamsServer = &TeamsServerMock{}
 
-// NewTeamsV2ServerMock gives you a fresh instance of TeamsV2ServerMock.
-func NewTeamsV2ServerMock() *TeamsV2ServerMock {
-	return &TeamsV2ServerMock{validateRequests: true}
+// NewTeamsServerMock gives you a fresh instance of TeamsServerMock.
+func NewTeamsServerMock() *TeamsServerMock {
+	return &TeamsServerMock{validateRequests: true}
 }
 
-// NewTeamsV2ServerMockWithoutValidation gives you a fresh instance of
-// TeamsV2ServerMock which does not attempt to validate requests before passing
+// NewTeamsServerMockWithoutValidation gives you a fresh instance of
+// TeamsServerMock which does not attempt to validate requests before passing
 // them to their respective '*Func'.
-func NewTeamsV2ServerMockWithoutValidation() *TeamsV2ServerMock {
-	return &TeamsV2ServerMock{}
+func NewTeamsServerMockWithoutValidation() *TeamsServerMock {
+	return &TeamsServerMock{}
 }
 
-// TeamsV2ServerMock is the mock-what-you-want struct that stubs all not-overridden
+// TeamsServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
-type TeamsV2ServerMock struct {
+type TeamsServerMock struct {
 	validateRequests        bool
 	GetTeamFunc             func(context.Context, *GetTeamReq) (*GetTeamResp, error)
 	ListTeamsFunc           func(context.Context, *ListTeamsReq) (*ListTeamsResp, error)
@@ -41,7 +41,7 @@ type TeamsV2ServerMock struct {
 	PurgeUserMembershipFunc func(context.Context, *PurgeUserMembershipReq) (*PurgeUserMembershipResp, error)
 }
 
-func (m *TeamsV2ServerMock) GetTeam(ctx context.Context, req *GetTeamReq) (*GetTeamResp, error) {
+func (m *TeamsServerMock) GetTeam(ctx context.Context, req *GetTeamReq) (*GetTeamResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -53,7 +53,7 @@ func (m *TeamsV2ServerMock) GetTeam(ctx context.Context, req *GetTeamReq) (*GetT
 	return nil, status.Error(codes.Internal, "mock: 'GetTeam' not implemented")
 }
 
-func (m *TeamsV2ServerMock) ListTeams(ctx context.Context, req *ListTeamsReq) (*ListTeamsResp, error) {
+func (m *TeamsServerMock) ListTeams(ctx context.Context, req *ListTeamsReq) (*ListTeamsResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -65,7 +65,7 @@ func (m *TeamsV2ServerMock) ListTeams(ctx context.Context, req *ListTeamsReq) (*
 	return nil, status.Error(codes.Internal, "mock: 'ListTeams' not implemented")
 }
 
-func (m *TeamsV2ServerMock) CreateTeam(ctx context.Context, req *CreateTeamReq) (*CreateTeamResp, error) {
+func (m *TeamsServerMock) CreateTeam(ctx context.Context, req *CreateTeamReq) (*CreateTeamResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -77,7 +77,7 @@ func (m *TeamsV2ServerMock) CreateTeam(ctx context.Context, req *CreateTeamReq) 
 	return nil, status.Error(codes.Internal, "mock: 'CreateTeam' not implemented")
 }
 
-func (m *TeamsV2ServerMock) UpdateTeam(ctx context.Context, req *UpdateTeamReq) (*UpdateTeamResp, error) {
+func (m *TeamsServerMock) UpdateTeam(ctx context.Context, req *UpdateTeamReq) (*UpdateTeamResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -89,7 +89,7 @@ func (m *TeamsV2ServerMock) UpdateTeam(ctx context.Context, req *UpdateTeamReq) 
 	return nil, status.Error(codes.Internal, "mock: 'UpdateTeam' not implemented")
 }
 
-func (m *TeamsV2ServerMock) DeleteTeam(ctx context.Context, req *DeleteTeamReq) (*DeleteTeamResp, error) {
+func (m *TeamsServerMock) DeleteTeam(ctx context.Context, req *DeleteTeamReq) (*DeleteTeamResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -101,7 +101,7 @@ func (m *TeamsV2ServerMock) DeleteTeam(ctx context.Context, req *DeleteTeamReq) 
 	return nil, status.Error(codes.Internal, "mock: 'DeleteTeam' not implemented")
 }
 
-func (m *TeamsV2ServerMock) AddTeamMembers(ctx context.Context, req *AddTeamMembersReq) (*AddTeamMembersResp, error) {
+func (m *TeamsServerMock) AddTeamMembers(ctx context.Context, req *AddTeamMembersReq) (*AddTeamMembersResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -113,7 +113,7 @@ func (m *TeamsV2ServerMock) AddTeamMembers(ctx context.Context, req *AddTeamMemb
 	return nil, status.Error(codes.Internal, "mock: 'AddTeamMembers' not implemented")
 }
 
-func (m *TeamsV2ServerMock) RemoveTeamMembers(ctx context.Context, req *RemoveTeamMembersReq) (*RemoveTeamMembersResp, error) {
+func (m *TeamsServerMock) RemoveTeamMembers(ctx context.Context, req *RemoveTeamMembersReq) (*RemoveTeamMembersResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -125,7 +125,7 @@ func (m *TeamsV2ServerMock) RemoveTeamMembers(ctx context.Context, req *RemoveTe
 	return nil, status.Error(codes.Internal, "mock: 'RemoveTeamMembers' not implemented")
 }
 
-func (m *TeamsV2ServerMock) GetTeamsForMember(ctx context.Context, req *GetTeamsForMemberReq) (*GetTeamsForMemberResp, error) {
+func (m *TeamsServerMock) GetTeamsForMember(ctx context.Context, req *GetTeamsForMemberReq) (*GetTeamsForMemberResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -137,7 +137,7 @@ func (m *TeamsV2ServerMock) GetTeamsForMember(ctx context.Context, req *GetTeams
 	return nil, status.Error(codes.Internal, "mock: 'GetTeamsForMember' not implemented")
 }
 
-func (m *TeamsV2ServerMock) GetTeamMembership(ctx context.Context, req *GetTeamMembershipReq) (*GetTeamMembershipResp, error) {
+func (m *TeamsServerMock) GetTeamMembership(ctx context.Context, req *GetTeamMembershipReq) (*GetTeamMembershipResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -149,7 +149,7 @@ func (m *TeamsV2ServerMock) GetTeamMembership(ctx context.Context, req *GetTeamM
 	return nil, status.Error(codes.Internal, "mock: 'GetTeamMembership' not implemented")
 }
 
-func (m *TeamsV2ServerMock) PurgeUserMembership(ctx context.Context, req *PurgeUserMembershipReq) (*PurgeUserMembershipResp, error) {
+func (m *TeamsServerMock) PurgeUserMembership(ctx context.Context, req *PurgeUserMembershipReq) (*PurgeUserMembershipResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -162,7 +162,7 @@ func (m *TeamsV2ServerMock) PurgeUserMembership(ctx context.Context, req *PurgeU
 }
 
 // Reset resets all overridden functions
-func (m *TeamsV2ServerMock) Reset() {
+func (m *TeamsServerMock) Reset() {
 	m.GetTeamFunc = nil
 	m.ListTeamsFunc = nil
 	m.CreateTeamFunc = nil

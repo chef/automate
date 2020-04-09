@@ -10,61 +10,189 @@
       </chef-notification>
 
       <chef-page-header>
-        <chef-heading>Node Lifecycle</chef-heading>
-        <chef-subheading>Control the lifecycle of nodes.</chef-subheading>
+        <chef-heading>Data Lifecycle</chef-heading>
+        <chef-subheading>Manage the retention of events, service groups, Chef Client runs, compliance reports and scans in Chef Automate.</chef-subheading>
       </chef-page-header>
 
       <div class="page-body">
-        <chef-table>
-          <chef-tbody>
-            <chef-tr [formGroup]="missingNodesForm">
-              <chef-td><b>Missing Nodes</b></chef-td>
-              <chef-td class="description">If no Chef Client runs have completed in the specified window, nodes will be marked as "Missing".</chef-td>
-              <chef-td class="input">
-                <chef-checkbox
-                  [checked]="missingNodesForm.value.disable"
-                  (change)="patchDisableValue(missingNodesForm, $event.detail)">
-                  Never mark
-                </chef-checkbox>
-              </chef-td>
-              <chef-td class="input">
-                <input chefInput formControlName="threshold"/>
-              </chef-td>
-              <chef-td class="input">
-                <chef-select ngDefaultControl formControlName="unit" (change)="patchUnitValue(missingNodesForm, $event)">
-                  <chef-option value='m' [selected]="isUnitValue(missingNodesForm,'m')">Minutes</chef-option>
-                  <chef-option value='h' [selected]="isUnitValue(missingNodesForm,'h')">Hours</chef-option>
-                  <chef-option value='d' [selected]="isUnitValue(missingNodesForm,'d')">Days</chef-option>
-                </chef-select>
-              </chef-td>
-            </chef-tr>
-            <chef-tr [formGroup]="deleteMissingNodesForm">
-              <chef-td><b>Delete Missing Nodes</b></chef-td>
-              <chef-td class="description">Nodes set to missing will be removed at this interval.</chef-td>
-              <chef-td class="input">
-                <chef-checkbox
-                  [checked]="deleteMissingNodesForm.value.disable"
-                  (change)="patchDisableValue(deleteMissingNodesForm, $event.detail)">
-                  Never delete
-                </chef-checkbox>
-              </chef-td>
-              <chef-td class="input">
-                <input chefInput formControlName="threshold"/>
-              </chef-td>
-              <chef-td class="input">
-                <chef-select ngDefaultControl formControlName="unit" (change)="patchUnitValue(deleteMissingNodesForm, $event)">
-                  <chef-option value='m' [selected]="isUnitValue(deleteMissingNodesForm,'m')">Minutes</chef-option>
-                  <chef-option value='h' [selected]="isUnitValue(deleteMissingNodesForm,'h')">Hours</chef-option>
-                  <chef-option value='d' [selected]="isUnitValue(deleteMissingNodesForm,'d')">Days</chef-option>
-                </chef-select>
-              </chef-td>
-            </chef-tr>
-          </chef-tbody>
-        </chef-table>
 
-        <div class="center">
-          <chef-button primary [disabled]="noChanges()" (click)="applyChanges()">Apply Changes</chef-button>
+        <div class="group-section">
+          <chef-button primary [disabled]="(!automateSettingsForm.dirty || !automateSettingsForm.valid) || saving" (click)="applyChanges()">
+            <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
+            <span *ngIf="!saving">Save Changes</span>
+            <span *ngIf="saving">Saving...</span>
+          </chef-button>
         </div>
+
+        <div class="group-section">
+          <h2>Event Feed</h2>
+          <div class="checkbox-row" [formGroup]="eventFeedRemoveData">
+            <div class="checkbox-container">
+              <chef-checkbox
+                [checked]="!eventFeedRemoveData.value.disabled"
+                (change)="handleFormActivation(eventFeedRemoveData, $event.detail)">
+              </chef-checkbox>
+            </div>
+            <p>Remove event feed data after
+              <input chefInput formControlName="threshold" type="number" min="0" 
+                (keydown)="preventNegatives($event.key)"/>days
+            </p>
+          </div>
+
+          <div class="checkbox-row" [formGroup]="eventFeedServerActions">
+            <div class="checkbox-container">
+              <chef-checkbox
+                [checked]="!eventFeedServerActions.value.disabled"
+                (change)="handleFormActivation(eventFeedServerActions, $event.detail)">
+              </chef-checkbox>
+            </div>
+            <p>Remove Chef Server actions after
+              <input chefInput type="number" min="0" formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)"/>days
+            </p>
+          </div>
+        </div>
+
+        <div class="group-section">
+          <h2>Service Groups</h2>
+          <div class="checkbox-row" [formGroup]="serviceGroupNoHealthChecks">
+            <div class="checkbox-container">
+              <chef-tooltip follow position="top" for='service-group-no-health'>
+                Changing this setting in the UI is not supported.
+              </chef-tooltip>
+              <span id="service-group-no-health">
+                <chef-checkbox
+                [checked]="!serviceGroupNoHealthChecks.value.disabled"
+                disabled="true">
+                <!-- this is currently not changeable by the user in the UI -->
+                </chef-checkbox>
+              </span>
+            </div>
+
+            <p>When no health check reports have been received for a service in
+              <input chefInput type="number" min="0" formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)" />
+              <mat-form-field appearance="none">
+                <mat-select panelClass="chef-dropdown" formControlName="unit">
+                  <mat-option value="m">minutes</mat-option>
+                  <mat-option value="h">hours</mat-option>
+                  <mat-option value="d">days</mat-option>
+                </mat-select>
+              </mat-form-field>
+              , label the service as disconnected</p>
+          </div>
+          
+          <div class="checkbox-row secondary-row" [formGroup]="serviceGroupRemoveServices">
+            <div class="checkbox-container">
+              <chef-tooltip follow position="top" for='service-group-remove-services'>
+                Changing this setting in the UI is not supported.
+              </chef-tooltip>
+              <span id="service-group-remove-services">
+                <chef-checkbox
+                [checked]="!serviceGroupRemoveServices.value.disabled"
+                (change)="handleFormActivation(serviceGroupRemoveServices, $event.detail)"
+                disabled="true">
+                <!-- this is currently not changeable by the user in the UI -->
+                </chef-checkbox>
+              </span>
+            </div>
+            <p>Remove services labeled as disconnected after
+              <input chefInput type="number" min="0" formControlName="threshold"
+                (keydown)="preventNegatives($event.key)" />
+              <mat-form-field appearance="none">
+                <mat-select panelClass="chef-dropdown" formControlName="unit">
+                  <mat-option value="m">minutes</mat-option>
+                  <mat-option value="h">hours</mat-option>
+                  <mat-option value="d">days</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </p>
+          </div>
+        </div>
+
+        <div class="group-section">
+          <h2>Client Runs</h2>
+          <div class="checkbox-row" [formGroup]="clientRunsRemoveData">
+            <div class="checkbox-container">
+              <chef-checkbox
+              [checked]="!clientRunsRemoveData.value.disabled"
+              (change)="handleFormActivation(clientRunsRemoveData, $event.detail)">
+              </chef-checkbox>
+            </div>
+            <p>Remove data for Chef Client runs after
+              <input chefInput type="number" min="0" formControlName="threshold"
+                (keydown)="preventNegatives($event.key)" />days
+            </p>
+          </div>
+
+          <div class="checkbox-row" [formGroup]="clientRunsLabelMissing">
+            <div class="checkbox-container">
+              <chef-checkbox
+              [checked]="!clientRunsLabelMissing.value.disabled"
+              (change)="handleFormActivation(clientRunsLabelMissing, $event.detail)">
+              </chef-checkbox>
+            </div>
+          
+            <p>When no Chef Client run data has been received from a node in
+              <input chefInput 
+                type="number" 
+                min="0" 
+                formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)" />
+              <mat-form-field appearance="none">
+                <mat-select panelClass="chef-dropdown" formControlName="unit">
+                  <mat-option value="m">minutes</mat-option>
+                  <mat-option value="h">hours</mat-option>
+                  <mat-option value="d">days</mat-option>
+                </mat-select>
+              </mat-form-field>
+              , label the node as missing
+            </p>
+          </div>
+
+          <div class="checkbox-row secondary-row" [formGroup]="clientRunsRemoveNodes">
+            <div class="checkbox-container">
+              <chef-checkbox
+              [checked]="!clientRunsRemoveNodes.value.disabled"
+              (change)="handleFormActivation(clientRunsRemoveNodes, $event.detail)">
+              </chef-checkbox>
+            </div>
+            <p>Remove nodes labeled as missing after
+              <input chefInput type="number" min="0" formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)" />days
+            </p>
+          </div>
+        </div>
+
+        <div class="group-section">
+          <h2>Compliance</h2>
+          <div class="checkbox-row" [formGroup]="complianceRemoveReports">
+            <div class="checkbox-container">
+              <chef-checkbox
+              [checked]="!complianceRemoveReports.value.disabled"
+              (change)="handleFormActivation(complianceRemoveReports, $event.detail)">
+              </chef-checkbox>
+            </div>
+            <p>Remove compliance reports after
+              <input chefInput type="number" min="0" formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)" />days
+            </p>
+          </div>
+
+          <div class="checkbox-row" [formGroup]="complianceRemoveScans">
+            <div class="checkbox-container">
+              <chef-checkbox
+              [checked]="!complianceRemoveScans.value.disabled"
+              (change)="handleFormActivation(complianceRemoveScans, $event.detail)">
+              </chef-checkbox>
+            </div>
+            <p>Remove compliance scans after
+              <input chefInput type="number" min="0" formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)" />days
+            </p>
+          </div>
+        </div>
+
       </div>
     </main>
   </div>

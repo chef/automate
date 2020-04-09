@@ -22,7 +22,7 @@ type DataBagCreateResult struct {
 }
 
 // DataBagListResult is the list of data bags returned by chef-api when listing
-// http://docs.getchef.com/api_chef_server.html#data
+// https://docs.chef.io/api_chef_server/#data
 type DataBagListResult map[string]string
 
 // String makes DataBagListResult implement the string result
@@ -34,7 +34,7 @@ func (d DataBagListResult) String() (out string) {
 }
 
 // List returns a list of databags on the server
-//   Chef API Docs: http://docs.getchef.com/api_chef_server.html#id18
+//   Chef API Docs: https://docs.chef.io/api_chef_server/#get-19
 func (d *DataBagService) List() (data *DataBagListResult, err error) {
 	path := fmt.Sprintf("data")
 	err = d.client.magicRequestDecoder("GET", path, nil, &data)
@@ -42,7 +42,7 @@ func (d *DataBagService) List() (data *DataBagListResult, err error) {
 }
 
 // Create adds a data bag to the server
-//   Chef API Docs: http://docs.getchef.com/api_chef_server.html#id19
+//   Chef API Docs: https://docs.chef.io/api_chef_server/#post-7
 func (d *DataBagService) Create(databag *DataBag) (result *DataBagCreateResult, err error) {
 	body, err := JSONReader(databag)
 	if err != nil {
@@ -54,7 +54,7 @@ func (d *DataBagService) Create(databag *DataBag) (result *DataBagCreateResult, 
 }
 
 // Delete removes a data bag from the server
-//   Chef API Docs: ????????????????
+//   Chef API Docs: https://docs.chef.io/api_chef_server/#delete-7
 func (d *DataBagService) Delete(name string) (result *DataBag, err error) {
 	path := fmt.Sprintf("data/%s", name)
 	err = d.client.magicRequestDecoder("DELETE", path, nil, &result)
@@ -62,7 +62,7 @@ func (d *DataBagService) Delete(name string) (result *DataBag, err error) {
 }
 
 // ListItems gets a list of the items in a data bag.
-//   Chef API Docs: http://docs.getchef.com/api_chef_server.html#id20
+//   Chef API Docs: https://docs.chef.io/api_chef_server/#get-20
 func (d *DataBagService) ListItems(name string) (data *DataBagListResult, err error) {
 	path := fmt.Sprintf("data/%s", name)
 	err = d.client.magicRequestDecoder("GET", path, nil, &data)
@@ -70,7 +70,7 @@ func (d *DataBagService) ListItems(name string) (data *DataBagListResult, err er
 }
 
 // CreateItem adds an item to a data bag
-//   Chef API Docs: http://docs.getchef.com/api_chef_server.html#id21
+//   Chef API Docs: https://docs.chef.io/api_chef_server/#post-8
 func (d *DataBagService) CreateItem(databagName string, databagItem DataBagItem) (err error) {
 	body, err := JSONReader(databagItem)
 	if err != nil {
@@ -81,24 +81,24 @@ func (d *DataBagService) CreateItem(databagName string, databagItem DataBagItem)
 }
 
 // DeleteItem deletes an item from a data bag
-//   Chef API Docs: http://docs.getchef.com/api_chef_server.html#id22
-func (d *DataBagService) DeleteItem(databagName, databagItem string) (err error) {
+//   Chef API Docs: https://docs.chef.io/api_chef_server/#delete-8
+func (d *DataBagService) DeleteItem(databagName string, databagItem string) (err error) {
 	path := fmt.Sprintf("data/%s/%s", databagName, databagItem)
 	err = d.client.magicRequestDecoder("DELETE", path, nil, nil)
 	return
 }
 
 // GetItem gets an item from a data bag
-//   Chef API Docs: http://docs.getchef.com/api_chef_server.html#id23
-func (d *DataBagService) GetItem(databagName, databagItem string) (item DataBagItem, err error) {
+//   Chef API Docs: https://docs.chef.io/api_chef_server/#get-21
+func (d *DataBagService) GetItem(databagName string, databagItem string) (item DataBagItem, err error) {
 	path := fmt.Sprintf("data/%s/%s", databagName, databagItem)
 	err = d.client.magicRequestDecoder("GET", path, nil, &item)
 	return
 }
 
 // UpdateItem updates an item in a data bag
-//    Chef API Docs: http://docs.getchef.com/api_chef_server.html#id24
-func (d *DataBagService) UpdateItem(databagName, databagItemId string, databagItem DataBagItem) (err error) {
+//    Chef API Docs: https://docs.chef.io/api_chef_server/#put-6
+func (d *DataBagService) UpdateItem(databagName string, databagItemId string, databagItem DataBagItem) (err error) {
 	body, err := JSONReader(databagItem)
 	if err != nil {
 		return

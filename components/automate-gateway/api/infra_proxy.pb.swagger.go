@@ -332,6 +332,59 @@ func init() {
         ]
       }
     },
+    "/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}": {
+      "get": {
+        "operationId": "GetAffectedNodes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AffectedNodes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "ID of the Server.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "ID of the Org.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "chef_type",
+            "description": "Type of the chef object (e.g. 'cookbooks', 'roles', 'chef_environment').",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Name of the chef object.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "description": "Version of the chef object.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/infra/servers/{server_id}/orgs/{org_id}/clients": {
       "get": {
         "operationId": "GetClients",
@@ -412,12 +465,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the Server",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "ID of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -428,34 +483,37 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/num_versions": {
+    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
       "get": {
-        "operationId": "GetCookbooksAvailableVersions",
+        "operationId": "GetCookbookVersions",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbooksAvailableVersions"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookVersions"
             }
           }
         },
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "ID of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "num_versions",
-            "in": "query",
-            "required": false,
+            "name": "name",
+            "description": "Name of the cookbook.",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
@@ -478,24 +536,28 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "ID of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Name of the cookbook.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "version",
+            "description": "Version of the cookbook.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -506,40 +568,51 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/affected-nodes": {
+    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
       "get": {
-        "operationId": "GetCookbookAffectedNodes",
+        "operationId": "GetCookbookFileContent",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookAffectedNodes"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookFileContent"
             }
           }
         },
         "parameters": [
           {
             "name": "server_id",
+            "description": "ID of the server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "ID of the org.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Name of the cookbook.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "version",
+            "description": "Version of the cookbook.",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "url",
+            "description": "Cookbook data file URL.",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -633,7 +706,39 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/environment/{name}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/environments": {
+      "get": {
+        "operationId": "GetEnvironments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environments"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Id of the Server.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Id of the Org.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
       "get": {
         "operationId": "GetEnvironment",
         "responses": {
@@ -662,38 +767,6 @@ func init() {
           {
             "name": "name",
             "description": "Name of the environment.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "InfraProxy"
-        ]
-      }
-    },
-    "/infra/servers/{server_id}/orgs/{org_id}/environments": {
-      "get": {
-        "operationId": "GetEnvironments",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environments"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "server_id",
-            "description": "Id of the Server.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "org_id",
-            "description": "Id of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -819,6 +892,12 @@ func init() {
         },
         "server_id": {
           "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -856,6 +935,12 @@ func init() {
         },
         "server_id": {
           "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -876,6 +961,18 @@ func init() {
         },
         "ip_address": {
           "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.AffectedNodes": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NodeAttribute"
+          },
+          "description": "List of the nodes which are affected by the chef object."
         }
       }
     },
@@ -1047,31 +1144,12 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.response.CookbookAffectedNodes": {
+    "chef.automate.api.infra_proxy.response.CookbookFileContent": {
       "type": "object",
       "properties": {
-        "nodes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NodeAttribute"
-          }
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.response.CookbookAllVersion": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "current_version": {
-          "type": "string"
-        },
-        "versions": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "content": {
+          "type": "string",
+          "description": "Cookbook data file content."
         }
       }
     },
@@ -1125,10 +1203,28 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the cookbook."
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "Version of the cookbook."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.CookbookVersions": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the cookbook."
+        },
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of all versions avaiable for cookbook."
         }
       }
     },
@@ -1139,18 +1235,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookVersion"
-          }
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.response.CookbooksAvailableVersions": {
-      "type": "object",
-      "properties": {
-        "cookbooks": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookAllVersion"
-          }
+          },
+          "description": "List of cookbooks with name and version."
         }
       }
     },
@@ -1273,6 +1359,22 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.ExpandedRunList": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of the run list collection."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.RunList"
+          },
+          "description": "List of the run list."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.GetOrg": {
       "type": "object",
       "properties": {
@@ -1314,29 +1416,33 @@ func init() {
     "chef.automate.api.infra_proxy.response.NodeAttribute": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of the node."
+        },
         "name": {
-          "type": "string"
-        },
-        "chef_guid": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the node."
         },
         "check_in": {
-          "type": "string"
+          "type": "string",
+          "description": "Last checked in of the node."
         },
         "uptime": {
-          "type": "string"
+          "type": "string",
+          "description": "Uptime of the node."
         },
         "platform": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the platform of the node."
         },
         "environment": {
-          "type": "string"
+          "type": "string",
+          "description": "Environment name of the node."
         },
         "policy_group": {
-          "type": "string"
+          "type": "string",
+          "description": "Policy group name of the node."
         }
       }
     },
@@ -1357,6 +1463,12 @@ func init() {
         },
         "server_id": {
           "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1364,22 +1476,42 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the role."
         },
         "chef_type": {
-          "type": "string"
+          "type": "string",
+          "description": "Type of the chef object."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "description": "Descrption of the role."
+        },
+        "default_attributes": {
+          "type": "string",
+          "description": "Stringified json of the default attributes."
+        },
+        "override_attributes": {
+          "type": "string",
+          "description": "Stringified json of the override attributes."
+        },
+        "json_class": {
+          "type": "string",
+          "description": "Json class name."
         },
         "run_list": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Run list for the role."
         },
-        "json_class": {
-          "type": "string"
+        "expanded_run_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
+          },
+          "description": "List of expanded run list for the role."
         }
       }
     },
@@ -1387,7 +1519,19 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the role."
+        },
+        "description": {
+          "type": "string",
+          "description": "Desscription of the role."
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Environment for the role."
         }
       }
     },
@@ -1398,7 +1542,37 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.RoleListItem"
-          }
+          },
+          "description": "List of the roles item."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.RunList": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of run list item (e.g. 'recipe')."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of run list item."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of run list item."
+        },
+        "skipped": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean denoting whether or not the run list item was skipped."
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.RunList"
+          },
+          "description": "List of the run list."
         }
       }
     },

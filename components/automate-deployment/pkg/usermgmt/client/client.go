@@ -15,7 +15,7 @@ import (
 )
 
 type userMgmtClient struct {
-	teamsClient      teams.TeamsV2Client
+	teamsClient      teams.TeamsClient
 	localUsersClient local_user.UsersMgmtClient
 }
 
@@ -44,7 +44,7 @@ func NewUserMgmtClient(ctx context.Context, factory *secureconn.Factory,
 	if err != nil {
 		return nil, err
 	}
-	teamsClient := teams.NewTeamsV2Client(teamsConnection)
+	teamsClient := teams.NewTeamsClient(teamsConnection)
 
 	return &userMgmtClient{
 		teamsClient:      teamsClient,

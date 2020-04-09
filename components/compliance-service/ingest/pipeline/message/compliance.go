@@ -23,10 +23,11 @@ type Compliance struct {
 	Done           chan<- error
 
 	Shared struct {
-		PerProfileSums []relaxting.ESInSpecSummaryProfile
-		AllProfileSums *reportingTypes.NodeControlSummary
-		EndTime        time.Time
-		Status         string
+		PerProfileSums        []relaxting.ESInSpecSummaryProfile
+		AllProfileSums        *reportingTypes.NodeControlSummary
+		EsProfilesMissingMeta map[string]interface{}
+		EndTime               time.Time
+		Status                string
 	}
 }
 

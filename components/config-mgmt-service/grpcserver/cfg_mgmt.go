@@ -140,7 +140,7 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 			"daysAgo needs to be greater than zero")
 	}
 
-	// default to provide a time serise for the past 24 hours
+	// default to provide a time series for the past 24 hours
 	if daysAgo == 0 {
 		daysAgo = 1
 	}
@@ -168,7 +168,7 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 	if len(checkinTimeseries) != len(deleteTimeseries) &&
 		len(checkinTimeseries) != len(createTimeseries) {
 		return &response.CheckInCountsTimeSeries{}, errors.GrpcErrorf(codes.Internal,
-			"time series bucket lenghts do not match %d, %d, %d", len(checkinTimeseries),
+			"time series bucket lengths do not match %d, %d, %d", len(checkinTimeseries),
 			len(deleteTimeseries), len(createTimeseries))
 	}
 

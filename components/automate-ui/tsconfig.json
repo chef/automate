@@ -23,6 +23,19 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
+  "angularCompilerOptions": {
+    "strictInjectionParameters": true,
+    "strictInputTypes": false,
+    "strictNullInputTypes": true,
+    "strictAttributeTypes": true,
+    "strictSafeNavigationTypes": true,
+    "strictDomLocalRefTypes": false,
+    "strictOutputEventTypes": false,
+    "strictDomEventTypes": false,
+    "strictContextGenerics": true,
+    "strictLiteralTypes": true,
+    "fullTemplateTypeCheck": true
+  },
   "exclude": [
     "**/node_modules/*",
     "dist/*",

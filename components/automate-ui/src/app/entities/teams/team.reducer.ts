@@ -64,7 +64,7 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
     case TeamActionTypes.GET_USERS_SUCCESS: {
       return pipe(
         set('getUsersStatus', EntityStatus.loadingSuccess),
-        set('userIDs', action.payload.user_ids)
+        set('userIDs', action.payload.membership_ids)
       )(state) as TeamEntityState;
     }
 
@@ -155,7 +155,7 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
       // get the current list and add the newly added user ids
       return pipe(
         set('addUsersStatus', EntityStatus.loadingSuccess),
-        set('userIDs', [...state.userIDs, ...action.payload.user_ids])
+        set('userIDs', [...state.userIDs, ...action.payload.membership_ids])
       )(state) as TeamEntityState;
     }
 
@@ -174,7 +174,7 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
       // get the current list and filter the newly removed user ids
       return pipe(
         set('removeUsersStatus', EntityStatus.loadingSuccess),
-        set('userIDs', difference(get('userIDs', state), action.payload.user_ids))
+        set('userIDs', difference(get('userIDs', state), action.payload.membership_ids))
       )(state) as TeamEntityState;
     }
 

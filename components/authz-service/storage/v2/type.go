@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -19,6 +20,8 @@ func ValidateProjects(projects []string) error {
 	}
 	return nil
 }
+
+var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
 // Type is an enum to denote custom or chef-managed policy.
 type Type int

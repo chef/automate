@@ -106,11 +106,12 @@ func TestTokenGRPC(t *testing.T) {
 
 	upstreamURL, _ := url.Parse("http://internal-lb")
 	tokenID := "e7a41d83-98e7-44a6-b835-d0938752e836"
+	description := "myFavToken"
 	projects := []string{"project-1", "project-2"}
 	mockToken := tokens.Token{
 		ID:          tokenID,
 		Value:       "mysecret",
-		Description: "myfavtoken",
+		Description: description,
 		Active:      true,
 		Projects:    projects,
 	}
@@ -187,11 +188,6 @@ func TestTokenGRPC(t *testing.T) {
 			{
 				Active:      false,
 				Description: "my new favorite",
-				Projects:    []string{"project-1"},
-			},
-			{
-				Active:      true,
-				Description: "", // empty descr
 				Projects:    []string{"project-1", "project-2"},
 			},
 			{
@@ -324,23 +320,23 @@ func TestTokenGRPC(t *testing.T) {
 
 	t.Run("UpdateToken", func(t *testing.T) {
 		t.Run("when token ID is not a UUID4", func(t *testing.T) {
-			// projects are always required but description is not
-			ret, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{Id: "what?", Projects: projects})
+			ret, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{Id: "what?", Description: description, Projects: projects})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, ret)
 		})
 
 		t.Run("when token is not found", func(t *testing.T) {
-			ret, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{Id: "00000000-0000-0000-0000-000000000000", Projects: projects})
+			ret, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{Id: "00000000-0000-0000-0000-000000000000", Description: description, Projects: projects})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, ret)
 		})
 
 		t.Run("when token is updated successfully for active field only", func(t *testing.T) {
 			tok, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{
-				Active:   false,
-				Id:       tokenID,
-				Projects: projects,
+				Active:      false,
+				Id:          tokenID,
+				Description: description,
+				Projects:    projects,
 			})
 			require.NoError(t, err)
 			require.NotNil(t, tok)
@@ -443,13 +439,18 @@ func TestTokenGRPCInternalErrors(t *testing.T) {
 
 	t.Run("CreateToken", func(t *testing.T) {
 		_, err := cl.CreateToken(ctx, &api.CreateTokenReq{
-			Projects: []string{"project1"},
+			Description: "description",
+			Projects:    []string{"project1"},
 		})
 		grpctest.AssertCode(t, codes.Internal, err)
 	})
 
 	t.Run("UpdateToken", func(t *testing.T) {
-		_, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{Id: "00000000-0000-0000-0000-000000000000", Projects: []string{"mock"}})
+		_, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{
+			Id:          "00000000-0000-0000-0000-000000000000",
+			Description: "description",
+			Projects:    []string{"mock"},
+		})
 		grpctest.AssertCode(t, codes.Internal, err)
 	})
 

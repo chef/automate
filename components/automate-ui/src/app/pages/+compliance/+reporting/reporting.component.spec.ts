@@ -16,7 +16,8 @@ import {
   SuggestionsService,
   ReportQueryService,
   ReportDataService,
-  ReportQuery
+  ReportQuery,
+  ReportingSummary
 } from '../shared/reporting';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
@@ -220,9 +221,7 @@ describe('ReportingComponent', () => {
         {type: {name: 'Platform'}, value: { id: 'ubuntu'}}
       ]
     };
-    const reportingSummaryData = {
-      'duration': 49258.00239,
-      'start_date': '2017-06-22T00:21:21Z',
+    const reportingSummaryData: ReportingSummary = {
       'stats': {
         'environments': 15,
         'nodes': 15,

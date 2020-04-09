@@ -4,11 +4,13 @@ import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { interval as observableInterval, of as observableOf, Observable } from 'rxjs';
 import { catchError, mergeMap, map, filter, switchMap, withLatestFrom } from 'rxjs/operators';
+import { get } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
+import { allPerms } from 'app/entities/userperms/userperms.selectors';
 import { ProjectRequests } from './project.requests';
 
 import {
@@ -212,14 +214,16 @@ export class ProjectEffects {
 
   @Effect()
   getDormantApplyRulesStatus$ = observableInterval(1000 * DORMANT_RULE_STATUS_INTERVAL).pipe(
+    withLatestFrom(this.store.select(allPerms)),
     withLatestFrom(this.store.select(applyRulesStatus)),
-    filter(([_, { state }]) =>
+    filter(([[_interval, _allPerms], { state }]) =>
       state === ApplyRulesStatusState.NotRunning
     ),
-    switchMap(() => [
-      new GetProjects(),
-      new GetApplyRulesStatus()
-    ]),
+    switchMap(([[_interval, list], _status]) => {
+      return get(['/iam/v2/projects', 'get'], list) ?
+        [new GetProjects(), new GetApplyRulesStatus()] :
+        [new GetApplyRulesStatus()];
+    }),
     catchError((error: HttpErrorResponse) => observableOf(new GetApplyRulesStatusFailure(error))));
 
   private getRulesStatus$(): () => Observable<ProjectActions> {

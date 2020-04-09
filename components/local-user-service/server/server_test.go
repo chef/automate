@@ -578,12 +578,12 @@ func TestA1RoleMigrationTeamsAPIFailures(t *testing.T) {
 	})
 }
 
-func setupTeamsMock(t *testing.T) (*grpctest.Server, *teams_api.TeamsV2ServerMock) {
+func setupTeamsMock(t *testing.T) (*grpctest.Server, *teams_api.TeamsServerMock) {
 	serviceCertsTS := helpers.LoadDevCerts(t, "teams-service")
-	mockTeams := teams_api.NewTeamsV2ServerMock()
+	mockTeams := teams_api.NewTeamsServerMock()
 	connFactoryTS := secureconn.NewFactory(*serviceCertsTS)
 	gTS := connFactoryTS.NewServer()
-	teams_api.RegisterTeamsV2Server(gTS, mockTeams)
+	teams_api.RegisterTeamsServer(gTS, mockTeams)
 	teams := grpctest.NewServer(gTS)
 	return teams, mockTeams
 }
