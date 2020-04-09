@@ -26,10 +26,10 @@ directories:
   - ./components/automate-prometheus
   - ./components/automate-ui
   - ./components/automate-ui-devproxy
-  # - ./components/automate-workflow-ctl
-  # - ./components/automate-workflow-web
-  # - ./components/automate-workflow-nginx
-  # - ./components/automate-workflow-server
+  - ./components/automate-workflow-ctl
+  - ./components/automate-workflow-web
+  - ./components/automate-workflow-nginx
+  - ./components/automate-workflow-server
   - ./components/backup-gateway
   - ./components/cereal-service
   - ./components/chef-ui-library
@@ -44,8 +44,8 @@ directories:
   - ./components/local-user-service
   - ./components/nodemanager-service
   - ./components/notifications-client
-  # - ./components/notifications-service
-  # - ./components/notifications-service/server
+  - ./components/notifications-service
+  - ./components/notifications-service/server
   - ./components/pg-sidecar-service
   - ./components/release-mgmt-dashboard
   - ./components/secrets-service
