@@ -14,6 +14,12 @@
   &.text-right {
     text-align: right;
   }
+
+  &.align-flex-center {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+  }
 }
 
 :host:first-child {
