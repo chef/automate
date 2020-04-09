@@ -129,7 +129,7 @@ wait-for-compliance-service:
 	$(RUN_GRPCURL_COMPLIANCE_VERSION); \
 	while [ $$? -ne 0 -a $$i -lt $$max_loops ]; do \
 	  printf " * ${yellow}$$i Compliance Service is not running, retrying...${reset}\n"; \
-	  sleep 4; \
+	  sleep 5; \
 	  i=$$(( $$i + 1 )); \
 	  $(RUN_GRPCURL_COMPLIANCE_VERSION); \
 	done; \

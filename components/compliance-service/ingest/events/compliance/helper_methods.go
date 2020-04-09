@@ -136,9 +136,11 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSu
 			}
 
 			stringTags := make([]relaxting.ESInSpecReportControlStringTags, 0)
-			for tKey, tValue := range control.Tags.Fields {
-				if newStringTag := relaxting.StringTagsFromProtoFields(tKey, tValue); newStringTag != nil {
-					stringTags = append(stringTags, *newStringTag)
+			if control.Tags != nil {
+				for tKey, tValue := range control.Tags.Fields {
+					if newStringTag := relaxting.StringTagsFromProtoFields(tKey, tValue); newStringTag != nil {
+						stringTags = append(stringTags, *newStringTag)
+					}
 				}
 			}
 
@@ -319,6 +321,9 @@ func CurrentTime() string {
 
 // structToJson marshals a proto buffer Struct into a json
 func structToJson(obj *structpb.Struct) (string, error) {
+	if obj == nil {
+		return "{}", nil
+	}
 	// TODO: once the json package can marshal pb structs into standard json, move away from jsonpb; https://github.com/golang/protobuf/issues/256
 	jsonBytes, err := (&jsonpb.Marshaler{OrigName: true}).MarshalToString(obj)
 	if err != nil {
@@ -329,12 +334,15 @@ func structToJson(obj *structpb.Struct) (string, error) {
 
 // arrayOfStructToJson marshals an array of proto buffer Structs into a json
 func arrayOfStructToJson(objs []*structpb.Struct) (string, error) {
+	if objs == nil {
+		return "[]", nil
+	}
 	jsonString := "["
 	n := len(objs)
 	for i, obj := range objs {
 		objJson, err := structToJson(obj)
 		if err != nil {
-			return "", fmt.Errorf("Error marshalling pbstruct to json: %s", err)
+			return "", fmt.Errorf("Error marshalling array pbstruct to json: %s", err)
 		}
 		jsonString += objJson
 		if i < n-1 {

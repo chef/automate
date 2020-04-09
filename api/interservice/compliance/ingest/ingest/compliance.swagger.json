@@ -152,6 +152,10 @@
         },
         "automate_manager_id": {
           "type": "string"
+        },
+        "run_time_limit": {
+          "type": "number",
+          "format": "float"
         }
       }
     },

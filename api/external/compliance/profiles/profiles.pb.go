@@ -54,6 +54,7 @@ func (Query_OrderType) EnumDescriptor() ([]byte, []int) {
 }
 
 type Sha256 struct {
+	// An array of profile sha256 IDs.
 	Sha256               []string `protobuf:"bytes,1,rep,name=sha256,proto3" json:"sha256,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -93,6 +94,7 @@ func (m *Sha256) GetSha256() []string {
 }
 
 type Missing struct {
+	// An array of profile sha256 IDs that are missing from the backend metadata store.
 	MissingSha256        []string `protobuf:"bytes,1,rep,name=missing_sha256,json=missingSha256,proto3" json:"missing_sha256,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1885,6 +1887,17 @@ type ProfilesServiceClient interface {
 	//compliance:profiles:list
 	//```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Profiles, error)
+	//
+	//Check if one or multiple profiles exist in the metadata database.
+	//
+	//The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend
+	//doesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.
+	//This is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.
+	//
+	//Authorization Action:
+	//```
+	//compliance:profiles:list
+	//```
 	MetaSearch(ctx context.Context, in *Sha256, opts ...grpc.CallOption) (*Missing, error)
 }
 
@@ -2081,6 +2094,17 @@ type ProfilesServiceServer interface {
 	//compliance:profiles:list
 	//```
 	List(context.Context, *Query) (*Profiles, error)
+	//
+	//Check if one or multiple profiles exist in the metadata database.
+	//
+	//The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend
+	//doesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.
+	//This is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.
+	//
+	//Authorization Action:
+	//```
+	//compliance:profiles:list
+	//```
 	MetaSearch(context.Context, *Sha256) (*Missing, error)
 }
 
