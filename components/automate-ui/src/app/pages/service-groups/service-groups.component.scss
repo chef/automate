@@ -81,8 +81,8 @@ chef-alert {
   width: 100%;
 }
 
-chef-th,
-chef-td {
+chef-table-header-cell,
+chef-table-cell {
 
   &.sort:hover {
     cursor: pointer;
