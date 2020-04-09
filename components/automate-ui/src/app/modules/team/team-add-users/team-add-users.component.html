@@ -30,30 +30,30 @@
         </div>
       </div>
       <div id="inner-container">
-        <chef-table>
-          <chef-thead>
-            <chef-tr>
-              <chef-th class="checkbox-row"></chef-th>
-              <chef-th>Name</chef-th>
-              <chef-th>Username</chef-th>
-            </chef-tr>
-          </chef-thead>
-          <chef-tbody>
-            <chef-tr *ngFor="let user of usersNotFiltered()">
-              <chef-td class="checkbox-row">
+        <chef-table-new>
+          <chef-table-header>
+            <chef-table-row>
+              <chef-table-header-cell class="checkbox-row"></chef-table-header-cell>
+              <chef-table-header-cell>Name</chef-table-header-cell>
+              <chef-table-header-cell>Username</chef-table-header-cell>
+            </chef-table-row>
+          </chef-table-header>
+          <chef-table-body>
+            <chef-table-row *ngFor="let user of usersNotFiltered()">
+              <chef-table-cell class="checkbox-row">
                 <chef-checkbox (change)="addOrRemoveQueuedUser($event.detail, user)" [checked]="isUserChecked(user)"></chef-checkbox>
-              </chef-td>
-              <chef-td>
+              </chef-table-cell>
+              <chef-table-cell>
                 <a [routerLink]="['/settings', 'users', user.id]" target="_blank">
                   {{ user.name }}
                 </a>
-              </chef-td>
-              <chef-td>
+              </chef-table-cell>
+              <chef-table-cell>
                 {{ user.id }}
-              </chef-td>
-            </chef-tr>
-          </chef-tbody>
-        </chef-table>
+              </chef-table-cell>
+            </chef-table-row>
+          </chef-table-body>
+        </chef-table-new>
       </div>
     </div>
   </div>
