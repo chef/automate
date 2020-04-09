@@ -26,10 +26,10 @@ directories:
   - ./components/automate-prometheus
   - ./components/automate-ui
   - ./components/automate-ui-devproxy
-  - ./components/automate-workflow-ctl
-  - ./components/automate-workflow-web
-  - ./components/automate-workflow-nginx
-  - ./components/automate-workflow-server
+  # - ./components/automate-workflow-ctl
+  # - ./components/automate-workflow-web
+  # - ./components/automate-workflow-nginx
+  # - ./components/automate-workflow-server
   - ./components/backup-gateway
   - ./components/cereal-service
   - ./components/chef-ui-library
@@ -44,8 +44,8 @@ directories:
   - ./components/local-user-service
   - ./components/nodemanager-service
   - ./components/notifications-client
-  - ./components/notifications-service
-  - ./components/notifications-service/server
+  # - ./components/notifications-service
+  # - ./components/notifications-service/server
   - ./components/pg-sidecar-service
   - ./components/release-mgmt-dashboard
   - ./components/secrets-service
@@ -90,64 +90,18 @@ allowed_licenses:
 
 fallbacks:
   golang:
-    # TODO(ssd) 2020-04-08: Many of these fallbacks are for
-    # dependencies that don't actually exist in the
-    # system. Re-evaluate after
-    # https://github.com/chef/license_scout/pull/233
-    - name: bazil.org/fuse
-      license_id: BSD-3-Clause
-      license_content: https://raw.githubusercontent.com/bazil/fuse/master/LICENSE
-    - name: github.com/BurntSushi/xgb
-      license_id: BSD-3-Clause
-      license_content: https://raw.githubusercontent.com/BurntSushi/xgb/master/LICENSE
-    - name: github.com/bmizerany/assert
-      license_id: Unknown
-    - name: github.com/gonum/blas
-      license_id: BSD-3-Clause
-      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
-    - name: github.com/gonum/floats
-      license_id: BSD-3-Clause
-      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
-    - name: github.com/gonum/internal
-      license_id: BSD-3-Clause
-      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
-    - name: github.com/gonum/lapack
-      license_id: BSD-3-Clause
-      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
-    - name: github.com/gonum/matrix
-      license_id: BSD-3-Clause
-      license_content: https://raw.githubusercontent.com/gonum/gonum/master/LICENSE
-    - name: github.com/julienschmidt/httprouter
-      license_id: BSD-3-Clause
-      license_content: https://raw.githubusercontent.com/julienschmidt/httprouter/master/LICENSE
     - name: github.com/kevinburke/go-bindata
       license_id: CC0-1.0
       license_content: https://raw.githubusercontent.com/kevinburke/go-bindata/master/LICENSE
-    - name: github.com/kr/logfmt
+    - name: github.com/Masterminds/squirrel
       license_id: MIT
-      license_content: https://raw.githubusercontent.com/kr/logfmt/master/Readme
-    - name: github.com/pascaldekloe/goe
-      license_id: CC0-1.0
-      license_content: https://raw.githubusercontent.com/pascaldekloe/goe/master/LICENSE
-    - name: github.com/russross/blackfriday
-      license_id: BSD-2-Clause
-      license_content: https://raw.githubusercontent.com/russross/blackfriday/master/LICENSE.txt
-    - name: github.com/smartystreets/assertions
+      license_content: https://github.com/Masterminds/squirrel/blob/master/LICENSE.txt
+    - name: github.com/fatih/color
       license_id: MIT
-      license_content: https://raw.githubusercontent.com/smartystreets/assertions/master/LICENSE.md
-    - name: github.com/smartystreets/goconvey
+      license_content: https://github.com/fatih/color/blob/master/LICENSE.md
+    - name: gopkg.in/segmentio/analytics-go.v3
       license_id: MIT
-      license_content: https://raw.githubusercontent.com/smartystreets/goconvey/master/LICENSE.md
-    - name: github.com/ziutek/mymysql
-      license_id: BSD-3-Clause
-      license_content: https://raw.githubusercontent.com/ziutek/mymysql/master/LICENSE
-    - name: gopkg.in/check.v1
-      license_id: BSD-2-Clause
-      license_content: https://raw.githubusercontent.com/go-check/check/v1/LICENSE
-    - name: gopkg.in/tomb.v1
-      license_id: BSD-3-Clause
-      license_content: https://raw.githubusercontent.com/go-tomb/tomb/v1/LICENSE
-    # NOTE(ssd) 2020-04-08: Previous TODO comment ends here :D.
+      license_content: https://github.com/segmentio/analytics-go/blob/v3.1.0/License.md
     - name: github.com/ghodss/yaml
       license_id: MIT
       license_content: https://raw.githubusercontent.com/ghodss/yaml/master/LICENSE
