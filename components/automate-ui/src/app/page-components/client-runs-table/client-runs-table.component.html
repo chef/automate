@@ -154,10 +154,10 @@
               There is no client run data available for this node
             </chef-tooltip>
         </chef-table-cell>
-        <chef-table-cell [hidden]="!columns.uptime align-flex-center">
+        <chef-table-cell [hidden]="!columns.uptime" class="align-flex-center">
             --
         </chef-table-cell>
-        <chef-table-cell [hidden]="!columns.platform align-flex-center">
+        <chef-table-cell [hidden]="!columns.platform" class="align-flex-center">
             {{node.platform}}
         </chef-table-cell>
         <chef-table-cell *ngIf="displayEnvironmentNodes" class="node-environment align-flex-center" [hidden]="!columns.environment">
