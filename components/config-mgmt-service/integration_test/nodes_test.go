@@ -3,6 +3,7 @@ package integration_test
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -141,6 +142,96 @@ func TestNodesWithSorting(t *testing.T) {
 			assert.Nil(t, err)
 			assert.Equal(t, expected, res)
 		})
+}
+
+func TestGetNodesErrorType(t *testing.T) {
+
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     request.Nodes
+		expected    []string
+	}{
+		{
+			description: "Matching only 2 of the three nodes",
+			nodes: []iBackend.Node{
+				{
+					ErrorType: "Chef_ErrorType_2",
+				},
+				{
+					ErrorType: "Chef_ErrorType_1",
+				},
+				{
+					ErrorType: "Chef_ErrorType_2",
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"error_type:Chef_ErrorType_2"},
+			},
+			expected: []string{"node-0", "node-2"},
+		},
+		{
+			description: "Matching all nodes",
+			nodes: []iBackend.Node{
+				{
+					ErrorType: "Chef_ErrorType_1",
+				},
+				{
+					ErrorType: "Chef_ErrorType_1",
+				},
+				{
+					ErrorType: "Chef_ErrorType_1",
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"error_type:Chef_ErrorType_1"},
+			},
+			expected: []string{"node-0", "node-1", "node-2"},
+		},
+		{
+			description: "Matching no nodes",
+			nodes: []iBackend.Node{
+				{
+					ErrorType: "Chef_ErrorType_1",
+				},
+				{
+					ErrorType: "Chef_ErrorType_1",
+				},
+				{
+					ErrorType: "Chef_ErrorType_1",
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"error_type:Chef_ErrorType_2"},
+			},
+			expected: []string{},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Node filter error type: %s", test.description), func(t *testing.T) {
+
+			// Adding required node data
+			for index := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.NodeName = "node-" + strconv.Itoa(index)
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add node with project
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+
+			// call GetNodes
+			res, err := cfgmgmt.GetNodes(context.Background(), &test.request)
+			assert.NoError(t, err)
+
+			names := getFieldValues(res, "name")
+
+			// Test what nodes are returned.
+			assert.ElementsMatch(t, test.expected, names)
+		})
+	}
 }
 
 func TestGetNodesRegexWithExactSameField(t *testing.T) {
