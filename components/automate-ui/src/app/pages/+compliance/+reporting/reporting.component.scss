@@ -198,12 +198,21 @@ chef-subheading {
       font-size: 14px;
 
       &:first-child {
-        // padding-right: 2em;
         border-right: 1px solid $chef-grey;
+
+        tr {
+          td {
+            padding-right: 2.25em;
+          }
+        }
       }
 
       &:last-child {
-        padding-left: 2em;
+        tr {
+          th {
+            padding-left: 2.25em;
+          }
+        }
       }
 
       tr {
@@ -218,13 +227,11 @@ chef-subheading {
         }
 
         th {
-          padding-left: 1em;
           text-align: left;
         }
 
         td {
           flex-grow: 2;
-          padding-right: 1em;
         }
 
         chef-icon {
