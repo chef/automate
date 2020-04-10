@@ -30,18 +30,20 @@ chef-page-header {
     width: 50%;
   }
 
-  chef-table {
-    chef-tr {
+  table {
+    font-size: 14px;
+
+    tr {
       margin: 0;
 
-      chef-th,
-      chef-td {
+      th,
+      td {
         padding: 0.25em 0;
         border: none;
         background-color: transparent;
       }
 
-      chef-td {
+      td {
         flex-grow: 3;
       }
 
