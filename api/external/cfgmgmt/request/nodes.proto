@@ -43,6 +43,28 @@ message Runs {
   string end = 5;
 }
 
+message NodeExport {
+  // Filters to apply to the request for nodes list.
+  repeated string filter = 1;
+  // Sorting parameters to apply to the returned node list.
+  common.query.Sorting sorting = 2;
+  // File type, either JSON or CSV.
+  string output_type = 3;
+}
+
+message ReportExport {
+  // Filters to apply to the request for node report list.
+  repeated string filter                = 1;
+  // File type, either JSON or CSV.
+  string output_type                    = 2;
+  // The node ID of the reports
+  string node_id                        = 3;
+  // Earliest (in history) run information to return for the runs list.
+  google.protobuf.Timestamp start       = 4;
+  // Latest (in history) run information to return for the runs list.
+  google.protobuf.Timestamp end         = 5;
+}
+
 message MissingNodeDurationCounts {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
     json_schema: {

@@ -12,7 +12,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ExportData"
+              "$ref": "#/definitions/chef.automate.api.common.ExportData"
             }
           }
         },
@@ -44,7 +44,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ExportData"
+              "$ref": "#/definitions/chef.automate.api.common.ExportData"
             }
           }
         },

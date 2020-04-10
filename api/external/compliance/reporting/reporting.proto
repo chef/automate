@@ -9,6 +9,7 @@ import "google/protobuf/empty.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
 import "api/external/common/version/version.proto";
+import "api/external/common/response.proto";
 
 // for option (chef.automate.api.policy)
 import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
@@ -227,9 +228,9 @@ service ReportingService {
 		};
 	};
 
-	rpc Export(Query) returns (stream ExportData) {};
+	rpc Export(Query) returns (stream chef.automate.api.common.ExportData) {};
 
-	rpc ExportNode(Query) returns (stream ExportData) {};
+	rpc ExportNode(Query) returns (stream chef.automate.api.common.ExportData) {};
 
 	/*
 	Fetch a node
@@ -385,11 +386,6 @@ message ControlItems {
 
 message TimeQuery {
 	google.protobuf.Timestamp start_time = 1;
-}
-
-message ExportData {
-	// Exported reports in JSON or CSV.
-	bytes content = 1;
 }
 
 message Id {

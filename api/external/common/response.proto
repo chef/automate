@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package chef.automate.api.common;
+option go_package = "github.com/chef/automate/api/external/common";
+
+message ExportData {
+	// Exported reports in JSON or CSV.
+	bytes content = 1;
+}
