@@ -55,7 +55,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', Validators.required],
       id: ['',
-        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(48)]],
       addPolicies: [true]
     });
   }
