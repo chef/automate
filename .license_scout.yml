@@ -200,9 +200,6 @@ fallbacks:
       license_content: https://raw.githubusercontent.com/ruby/net-telnet/master/LICENSE.txt
 
 exceptions:
-  golang:
-    - name: github.com/bmizerany/assert
-      reason: Not actually used, bug in license_scout
   habitat:
     - name: chef/mlsa
       reason: Chef MLSA licensed
