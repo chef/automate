@@ -40,9 +40,15 @@
               <chef-option *ngFor="let list of idList" [value]="list">{{ list }}</chef-option>
             </chef-select>
           </div>
-          <div>
+          <div *ngIf="hasRun_List">
             <app-treetable [tree]="arrayOfNodesTree" [options]="treeOptions"></app-treetable>
           </div>
+          <div *ngIf="!hasRun_List" class="center">
+            <p>Run list details are not available for the <b>{{env_id}}</b> environment.</p>
+          </div>
+        </div>
+        <div *ngIf="!show" class="center">
+          <p>Expanded run list not availble for the role <b>{{role?.name}}</b>.</p>
         </div>
       </section>
       <section class="page-body" *ngIf="tabValue === 'attributes'">
