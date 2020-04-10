@@ -227,12 +227,12 @@ chef-tooltip[for='skipped-count'] {
 }
 
 .controls-table {
-  margin: 2em 35px;
+  padding: 2em 35px;
 
-  chef-th,
-  chef-td {
+  chef-table-header-cell,
+  chef-table-cell {
     &:first-child {
-      flex-grow: 5;
+      flex-basis: 500%;
       word-break: break-all;
 
       .status-icon {
@@ -249,6 +249,7 @@ chef-tooltip[for='skipped-count'] {
     }
 
     chef-button {
+      margin: -.5em 0 -.5em;
       white-space: nowrap;
     }
   }
