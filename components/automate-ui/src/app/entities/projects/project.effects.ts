@@ -101,27 +101,25 @@ export class ProjectEffects {
   @Effect()
   createProject$ = this.actions$.pipe(
       ofType(ProjectActionTypes.CREATE),
-      mergeMap(({ payload: { id, name, skip } }: CreateProject) =>
-        this.requests.createProject(id, name, skip).pipe(
-          map((resp: ProjectSuccessPayload) => new CreateProjectSuccess({resp, skip})),
+      mergeMap(({ payload }: CreateProject) =>
+        this.requests.createProject(payload.id, payload.name, payload.skip_policies).pipe(
+          map((resp: ProjectSuccessPayload) => {
+            const skip_policies = payload.skip_policies;
+            return new CreateProjectSuccess({resp, skip_policies});
+          }),
           catchError((error: HttpErrorResponse) =>
             observableOf(new CreateProjectFailure(error))))));
 
   @Effect()
   createProjectSuccess$ = this.actions$.pipe(
       ofType(ProjectActionTypes.CREATE_SUCCESS),
-      map(({ payload: { resp, skip } }: CreateProjectSuccess) => {
-        if (skip) {
-          return new CreateNotification({
-            type: Type.info,
-            message: `Created project ${resp.project.id}.`
-          });
-        } else {
-          return new CreateNotification({
-            type: Type.info,
-            message: `Created project ${resp.project.id} and associated policies.`
-          });
-        }
+      map(({ payload: { resp, skip_policies } }: CreateProjectSuccess) => {
+        return new CreateNotification({
+          type: Type.info,
+          message: skip_policies
+            ? `Created project ${resp.project.id}.`
+            : `Created project ${resp.project.id} and associated policies.`
+        });
     }));
 
   @Effect()

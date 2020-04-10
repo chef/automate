@@ -24,7 +24,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Input() createProjectModal = false;
   @Input() assignableProjects: Project[] = [];
   @Input() createForm: FormGroup; // NB: The form must contain 'name' and 'id' fields
-  @Input() resetCheckboxEvent: EventEmitter<any>;
+  @Input() resetCheckboxEvent: EventEmitter<null>;
   @Input() conflictErrorEvent: EventEmitter<boolean>; // TC: This element assumes 'id' is the
                                                       // only create field that can conflict.
   @Output() close = new EventEmitter();
@@ -81,7 +81,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     this.createForm.controls.projects.setValue(projectsSelected);
   }
 
-  updatePolicyCheckbox(event): void {
+  updatePolicyCheckbox(event: boolean): void {
     this.addPolicies = event;
     this.createForm.controls.addPolicies.setValue(this.addPolicies);
   }
