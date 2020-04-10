@@ -12,6 +12,7 @@ import { InfraRoleDetailsComponent } from './infra-role-details/infra-role-detai
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
 import { AngularTreeGridModule } from 'angular-tree-grid';
+import { TreetableModule } from './treetable/treetable.module';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { AngularTreeGridModule } from 'angular-tree-grid';
     ChefComponentsModule,
     ChefPipesModule,
     AngularTreeGridModule,
+    TreetableModule,
     FormsModule,
     ReactiveFormsModule
   ],

@@ -3,6 +3,8 @@ export interface InfraRole {
   chef_type: string;
   description: string;
   json_class: string;
+  default_attributes: string;ss
+  override_attributes: string;
   run_list: string[];
   expanded_run_list: ExpandList[];
 }
@@ -16,6 +18,11 @@ export interface Lists {
   type: string;
   name: string;
   version: string;
-  skipped: string;
-  children: string[];
+  children: Lists[];
+}
+
+export interface ChildLists {
+  type: string;
+  name: string;
+  version: string;
 }
