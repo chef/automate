@@ -38,8 +38,6 @@ describe('TeamManagementComponent', () => {
                         inputs: ['disabled', 'routerLink'] }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),

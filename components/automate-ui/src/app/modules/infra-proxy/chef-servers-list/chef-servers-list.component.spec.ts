@@ -30,8 +30,6 @@ describe('ChefServersListComponent', () => {
         outputs: ['close', 'deleteClicked'] }),
         MockComponent({ selector: 'chef-button',
                 inputs: ['disabled', 'routerLink'] }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),

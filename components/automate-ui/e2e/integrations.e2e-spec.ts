@@ -67,9 +67,9 @@ describe('Integrations', () => {
     it('displays list of integrations', () => {
       browser.get('/settings/node-integrations');
 
-      const list = $('chef-table');
-      const nameColumn = list.$$('chef-tbody chef-tr:not(.new-row)').map(row => {
-        return row.$('chef-td:first-child').getText();
+      const list = $('chef-table-new');
+      const nameColumn = list.$$('chef-table-body chef-table-row:not(.new-row)').map(row => {
+        return row.$('chef-table-cell:first-child').getText();
       });
 
       expect(list.isDisplayed()).toEqual(true);
@@ -83,7 +83,7 @@ describe('Integrations', () => {
       it('has a link to detail view', () => {
         browser.get('/settings/node-integrations');
 
-        const listItem = $$('chef-tbody chef-tr').first();
+        const listItem = $$('chef-table-body chef-table-row').first();
         const link = listItem.element(by.css('.link'));
 
         expect(link.isDisplayed()).toEqual(true);
@@ -95,8 +95,8 @@ describe('Integrations', () => {
       it('has control menu (delete button)', () => {
         browser.get('/settings/node-integrations');
 
-        const listItem = $$('chef-tbody chef-tr:not(.new-row)').filter(row => {
-          return row.$('chef-td:first-child').getText().then(text => {
+        const listItem = $$('chef-table-body chef-table-row:not(.new-row)').filter(row => {
+          return row.$('chef-table-cell:first-child').getText().then(text => {
             return text !== 'Automate';
           });
         }).first();
@@ -379,8 +379,8 @@ describe('Integrations', () => {
 
     it('displays a list of nodes belonging to the nodemanager', () => {
       const list = $('#manager-nodes-list');
-      const nameColumn = list.$$('chef-tbody chef-tr').map(row => {
-        return row.$('chef-td:nth-child(2)').getText();
+      const nameColumn = list.$$('chef-table-body chef-table-row').map(row => {
+        return row.$('chef-table-cell:nth-child(2)').getText();
       });
 
       expect(list.isDisplayed()).toEqual(true);

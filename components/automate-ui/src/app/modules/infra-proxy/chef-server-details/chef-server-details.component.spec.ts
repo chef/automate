@@ -27,8 +27,6 @@ describe('ChefServerDetailsComponent', () => {
         MockComponent({ selector: 'chef-button',
           inputs: ['disabled', 'routerLink'] }),
         MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),
