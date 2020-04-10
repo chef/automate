@@ -99,7 +99,7 @@ func NewProjectsServer(
 
 func (s *ProjectState) GetProject(ctx context.Context,
 	req *api.GetProjectReq) (*api.GetProjectResp, error) {
-	err := validateID(req.Id, "project")
+	err := confirmRequiredID(req.Id, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -123,7 +123,7 @@ func (s *ProjectState) GetProject(ctx context.Context,
 
 func (s *ProjectState) CreateProject(ctx context.Context,
 	req *api.CreateProjectReq) (*api.CreateProjectResp, error) {
-	err := validateEmptyOrWhiteSpaceOnly(req.Name, "name", "project")
+	err := confirmRequiredField(req.Name, "name", "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -161,7 +161,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 func (s *ProjectState) UpdateProject(ctx context.Context,
 	req *api.UpdateProjectReq) (*api.UpdateProjectResp, error) {
 
-	err := validateIDandName(req.Id, req.Name, "project")
+	err := confirmRequiredIDandName(req.Id, req.Name, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -350,7 +350,7 @@ func (s *ProjectState) ListProjectsForIntrospection(
 func (s *ProjectState) DeleteProject(ctx context.Context,
 	req *api.DeleteProjectReq) (*api.DeleteProjectResp, error) {
 
-	err := validateID(req.Id, "project")
+	err := confirmRequiredID(req.Id, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -465,11 +465,11 @@ func (s *ProjectState) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (
 }
 
 func (s *ProjectState) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
-	err := validateID(req.Id, "rule")
+	err := confirmRequiredID(req.Id, "rule")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
-	err = validateEmptyOrWhiteSpaceOnly(req.ProjectId, "project_id", "rule")
+	err = confirmRequiredField(req.ProjectId, "project_id", "rule")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -525,7 +525,7 @@ func (s *ProjectState) listRulesWithFunction(ctx context.Context, req *api.ListR
 }
 
 func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
-	err := validateID(req.Id, "project")
+	err := confirmRequiredID(req.Id, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -561,7 +561,7 @@ func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRul
 }
 
 func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {
-	err := validateID(req.Id, "rule")
+	err := confirmRequiredID(req.Id, "rule")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -802,11 +802,11 @@ func fromAPIType(t api.ProjectRuleTypes) (storage.RuleType, error) {
 func (s *ProjectState) prepareStorageRule(inID, projectID, name string,
 	inType api.ProjectRuleTypes, inConditions []*api.Condition) (*storage.Rule, error) {
 
-	err := validateIDandName(inID, name, "rule")
+	err := confirmRequiredIDandName(inID, name, "rule")
 	if err != nil {
 		return nil, err
 	}
-	err = validateEmptyOrWhiteSpaceOnly(projectID, "project_id", "rule")
+	err = confirmRequiredField(projectID, "project_id", "rule")
 	if err != nil {
 		return nil, err
 	}

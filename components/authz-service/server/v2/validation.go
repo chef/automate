@@ -10,16 +10,16 @@ import (
 
 var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
-func validateIDandName(id, name, resourceName string) error {
-	err := validateEmptyOrWhiteSpaceOnly(id, "id", resourceName)
+func confirmRequiredIDandName(id, name, resourceName string) error {
+	err := confirmRequiredField(id, "id", resourceName)
 	if err != nil {
 		return err
 	}
-	err = validateEmptyOrWhiteSpaceOnly(name, "name", resourceName)
+	err = confirmRequiredField(name, "name", resourceName)
 	return err
 }
 
-func validateEmptyOrWhiteSpaceOnly(field, fieldName, resourceName string) error {
+func confirmRequiredField(field, fieldName, resourceName string) error {
 	if emptyOrWhitespaceOnlyRE.MatchString(field) {
 		e := fmt.Sprintf("a %s %s is required and must contain at least one non-whitespace character", resourceName, fieldName)
 		return errors.New(e)
@@ -27,8 +27,8 @@ func validateEmptyOrWhiteSpaceOnly(field, fieldName, resourceName string) error 
 	return nil
 }
 
-func validateID(id, resourceName string) error {
-	return validateEmptyOrWhiteSpaceOnly(id, "id", resourceName)
+func confirmRequiredID(id, resourceName string) error {
+	return confirmRequiredField(id, "id", resourceName)
 }
 
 func validateProjects(projects []string) error {

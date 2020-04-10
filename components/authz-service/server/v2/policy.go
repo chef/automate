@@ -165,7 +165,7 @@ func (s *policyServer) GetPolicy(
 	ctx context.Context,
 	req *api.GetPolicyReq) (*api.Policy, error) {
 
-	err := validateID(req.Id, "policy")
+	err := confirmRequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "cannot get policy")
 	}
@@ -186,7 +186,7 @@ func (s *policyServer) DeletePolicy(
 	ctx context.Context,
 	req *api.DeletePolicyReq) (*api.DeletePolicyResp, error) {
 
-	err := validateID(req.Id, "policy")
+	err := confirmRequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -208,7 +208,7 @@ func (s *policyServer) UpdatePolicy(
 	ctx context.Context,
 	req *api.UpdatePolicyReq) (*api.Policy, error) {
 
-	err := validateIDandName(req.Id, req.Name, "policy")
+	err := confirmRequiredIDandName(req.Id, req.Name, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -269,7 +269,7 @@ func (s *policyServer) ListPolicyMembers(
 	ctx context.Context,
 	req *api.ListPolicyMembersReq) (*api.ListPolicyMembersResp, error) {
 
-	err := validateID(req.Id, "policy")
+	err := confirmRequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -293,7 +293,7 @@ func (s *policyServer) AddPolicyMembers(
 	ctx context.Context,
 	req *api.AddPolicyMembersReq) (*api.AddPolicyMembersResp, error) {
 
-	err := validateID(req.Id, "policy")
+	err := confirmRequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -323,7 +323,7 @@ func (s *policyServer) ReplacePolicyMembers(
 	ctx context.Context,
 	req *api.ReplacePolicyMembersReq) (*api.ReplacePolicyMembersResp, error) {
 
-	err := validateID(req.Id, "policy")
+	err := confirmRequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -352,7 +352,7 @@ func (s *policyServer) ReplacePolicyMembers(
 func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 	req *api.RemovePolicyMembersReq) (*api.RemovePolicyMembersResp, error) {
 
-	err := validateID(req.Id, "policy")
+	err := confirmRequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -396,7 +396,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 func (s *policyServer) CreateRole(
 	ctx context.Context,
 	req *api.CreateRoleReq) (*api.Role, error) {
-	err := validateEmptyOrWhiteSpaceOnly(req.Name, "name", "role")
+	err := confirmRequiredField(req.Name, "name", "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -462,7 +462,7 @@ func (s *policyServer) GetRole(
 	ctx context.Context,
 	req *api.GetRoleReq) (*api.Role, error) {
 
-	err := validateID(req.Id, "role")
+	err := confirmRequiredID(req.Id, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -483,7 +483,7 @@ func (s *policyServer) DeleteRole(
 	ctx context.Context,
 	req *api.DeleteRoleReq) (*api.DeleteRoleResp, error) {
 
-	err := validateID(req.Id, "role")
+	err := confirmRequiredID(req.Id, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -505,7 +505,7 @@ func (s *policyServer) UpdateRole(
 	ctx context.Context,
 	req *api.UpdateRoleReq) (*api.Role, error) {
 
-	err := validateIDandName(req.Id, req.Name, "role")
+	err := confirmRequiredIDandName(req.Id, req.Name, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -607,7 +607,7 @@ func (s *policyServer) policyFromAPI(
 	statementsToAttach []*api.Statement,
 	inProjects []string) (storage.Policy, error) {
 
-	err := validateIDandName(ID, name, "policy")
+	err := confirmRequiredIDandName(ID, name, "policy")
 	if err != nil {
 		return storage.Policy{}, err
 	}
