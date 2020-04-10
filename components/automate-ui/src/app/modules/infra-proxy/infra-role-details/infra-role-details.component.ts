@@ -9,9 +9,12 @@ import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 import { infaRoleFromRoute } from 'app/entities/infra-roles/infra-role-details.selectors';
 import { GetRole } from 'app/entities/infra-roles/infra-role.action';
-import { InfraRole, ExpandList,
-  ChildLists, Lists } from 'app/entities/infra-roles/infra-role.model';
+import {
+  InfraRole, ExpandList,
+  ChildLists, Lists
+} from 'app/entities/infra-roles/infra-role.model';
 import { Node, Options } from '../treetable/models';
+
 export type InfraRoleTabName = 'runList' | 'attributes';
 
 
@@ -37,6 +40,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   public data: any = [];
   public env_id = '_default';
   public idList: any = [];
+  public hasRun_List = true;
   public childNodes: Node<ChildLists>[] = [];
   private isDestroyed = new Subject<boolean>();
   arrayOfNodesTree: Node<ChildLists>[];
@@ -87,14 +91,13 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       this.expandedList = role.expanded_run_list;
       this.runList = this.role.run_list;
       this.idList = [];
-      for (let i = 0; i < this.expandedList.length; i++) {
-        this.idList.push(
-          this.expandedList[i].id
-        );
-      }
-
       if (this.expandedList && this.expandedList.length) {
         this.show = true;
+        for (let i = 0; i < this.expandedList.length; i++) {
+          this.idList.push(
+            this.expandedList[i].id
+          );
+        }
         if (this.tabValue === 'runList') {
           this.treeNodes(this.expandedList, this.env_id);
         }
@@ -118,13 +121,14 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       if (expandedList[i].id === li) {
         this.expandRunList = expandedList[i].run_list;
         if (this.expandRunList && this.expandRunList.length) {
+          this.hasRun_List = true;
           for (let j = 0; j < this.expandRunList.length; j++) {
             const nodes: Node<ChildLists>[] = [];
             this.arrayOfNodesTree.push({
               value: {
                 name: this.expandRunList[j].name,
                 version: this.expandRunList[j].version === ''
-                ? '...' : this.expandRunList[j].version,
+                  ? '...' : this.expandRunList[j].version,
                 type: this.expandRunList[j].type
               },
               children:
@@ -132,12 +136,12 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
                   this.childNode(this.expandRunList[j].children, nodes) : []
             });
           }
-
+        } else {
+          this.hasRun_List = false;
         }
       }
     }
     this.show = true;
-
   }
 
   childNode(child: Lists[], nodes: Node<ChildLists>[]) {
@@ -146,7 +150,8 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       nodes.push({
         value: {
           name: child[i].name,
-          version: child[i].version,
+          version: child[i].version === ''
+            ? '...' : child[i].version,
           type: child[i].type
         },
         children:
@@ -156,6 +161,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     }
     return nodes;
   }
+
   onSelectedTab(event: { target: { value: InfraRoleTabName } }) {
     this.tabValue = event.target.value;
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
