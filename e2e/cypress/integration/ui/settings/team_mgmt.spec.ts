@@ -23,7 +23,8 @@ describe('team management', () => {
         url: '/apis/iam/v2/projects',
         body: {
           id: project1ID,
-          name: project1Name
+          name: project1Name,
+          skip_policies: true
         }
       });
       cy.request({
@@ -32,7 +33,8 @@ describe('team management', () => {
         url: '/apis/iam/v2/projects',
         body: {
           id: project2ID,
-          name: project2Name
+          name: project2Name,
+          skip_policies: true
         }
       });
 
