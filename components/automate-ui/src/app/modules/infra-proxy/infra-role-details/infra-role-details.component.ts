@@ -9,9 +9,10 @@ import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 import { infaRoleFromRoute } from 'app/entities/infra-roles/infra-role-details.selectors';
 import { GetRole } from 'app/entities/infra-roles/infra-role.action';
-import { InfraRole, ExpandList, Lists } from 'app/entities/infra-roles/infra-role.model';
-
-export type InfraRoleTabName = 'runList';
+import { InfraRole, ExpandList,
+  ChildLists, Lists } from 'app/entities/infra-roles/infra-role.model';
+import { Node, Options } from '../treetable/models';
+export type InfraRoleTabName = 'runList' | 'attributes';
 
 
 @Component({
@@ -31,48 +32,17 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   public name;
   public runList: string[];
   public expandedList: ExpandList[] = [];
-  public idList: any = [];
   public expandRunList: Lists[] = [];
   public show = false;
   public data: any = [];
-  public id = '_default';
-
+  public env_id = '_default';
+  public idList: any = [];
+  public childNodes: Node<ChildLists>[] = [];
   private isDestroyed = new Subject<boolean>();
-
+  arrayOfNodesTree: Node<ChildLists>[];
   roleDetailsLoading = true;
-
-  configs: any = {
-    id_field: 'id',
-    parent_id_field: 'parent',
-    parent_display_field: 'name',
-    css: {
-      // Optional
-      expand_class: 'fa fa-plus',
-      collapse_class: 'fa fa-minus'
-    },
-    columns: [
-      {
-        name: 'name',
-        header: '',
-        width: '50px'
-      },
-      {
-        name: 'version',
-        header: 'Version',
-        width: '50px',
-        renderer: function(value) {
-          return value ? value : 'N/A';
-        }
-      },
-      {
-        name: 'type',
-        header: 'Type',
-        width: '50px',
-        renderer: function(value) {
-          return value ? value : 'N/A';
-        }
-      }
-    ]
+  treeOptions: Options<ChildLists> = {
+    capitalisedHeader: true
   };
 
   constructor(
@@ -82,15 +52,16 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.data = [];
+    this.arrayOfNodesTree = [];
+    this.childNodes = [];
     this.idList = [];
-
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
-    .subscribe((url: string) => {
-      this.url = url;
-      this.tabValue =  'runList';
-    });
+      .subscribe((url: string) => {
+        this.url = url;
+        const [, fragment] = url.split('#');
+        this.tabValue = (fragment === 'attributes') ? 'attributes' : 'runList';
+      });
 
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
@@ -114,57 +85,77 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       this.show = true;
       this.role = role;
       this.expandedList = role.expanded_run_list;
-
       this.runList = this.role.run_list;
-      for ( let i = 0; i < this.expandedList.length; i++ ) {
-        this.idList.push({
-          id: this.expandedList[i].id
-        });
+      this.idList = [];
+      for (let i = 0; i < this.expandedList.length; i++) {
+        this.idList.push(
+          this.expandedList[i].id
+        );
       }
 
       if (this.expandedList && this.expandedList.length) {
         this.show = true;
-        this.treeNodes( this.expandedList, this.id);
+        if (this.tabValue === 'runList') {
+          this.treeNodes(this.expandedList, this.env_id);
+        }
+
       } else {
         this.show = false;
       }
+
       this.roleDetailsLoading = false;
     });
   }
 
-  selectChangeHandler (id: string) {
-    const selectedId = id;
-    this.treeNodes( this.expandedList, selectedId);
+  selectChangeHandler(id) {
+    this.env_id = id;
+    this.treeNodes(this.expandedList, this.env_id);
   }
 
-  treeNodes( expandedList: ExpandList[], li: string) {
-    this.data = [];
-    for ( let i = -0; i < expandedList.length; i++ ) {
-      if ( expandedList[i].id === li ) {
+  treeNodes(expandedList: ExpandList[], li: string) {
+    this.arrayOfNodesTree = [];
+    for (let i = -0; i < expandedList.length; i++) {
+      if (expandedList[i].id === li) {
         this.expandRunList = expandedList[i].run_list;
         if (this.expandRunList && this.expandRunList.length) {
-          for ( let j = 0; j < this.expandRunList.length; j++ ) {
-            this.data.push({
-              id: j + 1,
-              name: this.expandRunList[j].name,
-              version: this.expandRunList[j].version,
-              type: this.expandRunList[j].type,
-              parent: 0
+          for (let j = 0; j < this.expandRunList.length; j++) {
+            const nodes: Node<ChildLists>[] = [];
+            this.arrayOfNodesTree.push({
+              value: {
+                name: this.expandRunList[j].name,
+                version: this.expandRunList[j].version === ''
+                ? '...' : this.expandRunList[j].version,
+                type: this.expandRunList[j].type
+              },
+              children:
+                this.expandRunList[j].children && this.expandRunList[j].children.length ?
+                  this.childNode(this.expandRunList[j].children, nodes) : []
             });
           }
-        } else {
-          this.data.push({
-            id: 1,
-            name: 'N/A',
-            version: 'N/A',
-            type: 'N/A',
-            parent: 0
-          });
+
         }
       }
     }
+    this.show = true;
+
   }
 
+  childNode(child: Lists[], nodes: Node<ChildLists>[]) {
+    const childNodes: Node<ChildLists>[] = [];
+    for (let i = 0; i < child.length; i++) {
+      nodes.push({
+        value: {
+          name: child[i].name,
+          version: child[i].version,
+          type: child[i].type
+        },
+        children:
+          child[i].children && child[i].children.length ?
+            this.childNode(child[i].children, childNodes) : []
+      });
+    }
+    return nodes;
+  }
   onSelectedTab(event: { target: { value: InfraRoleTabName } }) {
     this.tabValue = event.target.value;
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
