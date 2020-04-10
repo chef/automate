@@ -465,13 +465,9 @@ func (s *ProjectState) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (
 }
 
 func (s *ProjectState) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
-	err := confirmRequiredID(req.Id, "rule")
+	err := confirmRequiredFieldsForRule(req.Id, req.ProjectId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	}
-	err = confirmRequiredField(req.ProjectId, "project_id", "rule")
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, err
 	}
 	resp, err := s.store.GetStagedOrAppliedRule(ctx, req.ProjectId, req.Id)
 	switch err {
@@ -561,9 +557,9 @@ func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRul
 }
 
 func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {
-	err := confirmRequiredID(req.Id, "rule")
+	err := confirmRequiredFieldsForRule(req.Id, req.ProjectId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, err
 	}
 
 	err = s.store.DeleteRule(ctx, req.ProjectId, req.Id)
@@ -580,6 +576,18 @@ func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (
 		return nil, status.Errorf(codes.Internal,
 			"error deleting rule with ID %q: %s", req.Id, err.Error())
 	}
+}
+
+func confirmRequiredFieldsForRule(id, project_id string) error {
+	err := confirmRequiredID(id, "rule")
+	if err != nil {
+		return status.Errorf(codes.InvalidArgument, err.Error())
+	}
+	err = confirmRequiredField(project_id, "project_id", "rule")
+	if err != nil {
+		return status.Errorf(codes.InvalidArgument, err.Error())
+	}
+	return nil
 }
 
 func (s *ProjectState) validateProjectDelete(ctx context.Context, projectID string) error {
