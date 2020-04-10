@@ -113,7 +113,7 @@
                   <a [routerLink]="['/infrastructure','chef-servers', serverId, 'org', OrgId, 'roles', role.name]">{{ role.name }}</a>
                 </chef-table-cell>
                 <chef-table-cell>{{ role.description == '' ?  'N/A' : role.description }}</chef-table-cell>
-                <chef-table-cell>{{ role.environments }}</chef-table-cell>
+                <chef-table-cell>{{ role.environments.join(", ") }}</chef-table-cell>
               </chef-table-row>
             </chef-table-body>
           </chef-table-new>
