@@ -208,7 +208,7 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string, srcBucket B
 		return ArtifactRepoSnapshotMetadata{}, ErrSnapshotExists
 	}
 
-	artifactsInRepo := repo.ListAssumedArtifacts(ctx)
+	artifactsInRepo := repo.ListArtifactsFromSnapshots(ctx)
 	defer logClose(artifactsInRepo, "failed to close artifact list stream")
 
 	uploadIterator, err := newUploadSnapshotArtifactIterator(ctx, srcBucket, requiredArtifacts, artifactsInRepo)
@@ -318,7 +318,7 @@ func (repo *ArtifactRepo) Remove(ctx context.Context, name string) error {
 	}
 
 	// Get the artifacts in all the snapshots excluding the one we're trying to delete
-	remainingSnapshotsFiles := repo.ListAssumedArtifacts(ctx, name)
+	remainingSnapshotsFiles := repo.ListArtifactsFromSnapshots(ctx, name)
 	defer logClose(remainingSnapshotsFiles, "failed to close artifact list stream")
 
 	// Remove artifacts from the snapshot we're trying to exist which exist in other
@@ -330,12 +330,12 @@ func (repo *ArtifactRepo) Remove(ctx context.Context, name string) error {
 	return bulkDeleter.Delete(ctx, filesToDelete)
 }
 
-// ListAssumedArtifacts aggregates all the required artifacts from all snapshots
+// ListArtifactsFromSnapshots aggregates all the required artifacts from all snapshots
 // and returns a stream. It is presumed to be much cheaper to scan every snapshot
 // metadata file and aggregate the artifacts rather than list every object that
 // is currently in the repo. The downside of course is that we aren't sure that
 // such objects exist.
-func (repo *ArtifactRepo) ListAssumedArtifacts(ctx context.Context, excludedSnapshots ...string) ArtifactStream {
+func (repo *ArtifactRepo) ListArtifactsFromSnapshots(ctx context.Context, excludedSnapshots ...string) ArtifactStream {
 	var lastMergedStream ArtifactStream
 
 	// Merge as we go in order to avoid running out of file descriptors and/or stack
@@ -485,7 +485,7 @@ func (repo *ArtifactRepo) ValidateSnapshotIntegrity(ctx context.Context, filters
 
 		missing := Sub(snapshotStream, replayableArtifactsStream)
 
-		if err = repo.updateSnapshotIntegrityMetadata(ctx, integrityMetadata, snapshotName, missing); err != nil {
+		if err = integrityMetadata.update(ctx, snapshotName, missing); err != nil {
 			return err
 		}
 	}
@@ -503,30 +503,20 @@ func NewArtifactRepoIntegrityMetadata() *ArtifactRepoIntegrityMetadata {
 	}
 }
 
-type ArtifactRepoSnapshotIntegrityMetadata struct {
-	LastVerified string   `json:"last_verified"`
-	Missing      []string `json:"missing"`
-	Corrupted    bool     `json:"corrupted"`
-}
-
-func NewArtifactRepoSnapshotIntegrityMetadata() ArtifactRepoSnapshotIntegrityMetadata {
-	return ArtifactRepoSnapshotIntegrityMetadata{
-		Missing: []string{},
-	}
-}
-
-// updateSnapshotIntegrityMetadata consumes a missing artifact stream for a given
-// snapshot and pdates an in memory repo integrity metadata with a new snapshot
-// integrity metadata result.
-func (repo *ArtifactRepo) updateSnapshotIntegrityMetadata(
+// update consumes a missing artifact stream for a given snapshot and updates
+// an in memory repo integrity metadata with a new snapshot integrity metadata result.
+func (meta *ArtifactRepoIntegrityMetadata) update(
 	ctx context.Context,
-	currentMetadata *ArtifactRepoIntegrityMetadata,
 	snapshotName string,
 	missingArtifacts ArtifactStream) error {
 
 	defer logClose(missingArtifacts, "close missing stream")
 
-	metadata, exists := currentMetadata.Snapshots[snapshotName]
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	metadata, exists := meta.Snapshots[snapshotName]
 	if !exists {
 		metadata = NewArtifactRepoSnapshotIntegrityMetadata()
 	} else {
@@ -552,9 +542,21 @@ func (repo *ArtifactRepo) updateSnapshotIntegrityMetadata(
 		}
 	}
 
-	currentMetadata.Snapshots[snapshotName] = metadata
+	meta.Snapshots[snapshotName] = metadata
 
 	return nil
+}
+
+type ArtifactRepoSnapshotIntegrityMetadata struct {
+	LastVerified string   `json:"last_verified"`
+	Missing      []string `json:"missing"`
+	Corrupted    bool     `json:"corrupted"`
+}
+
+func NewArtifactRepoSnapshotIntegrityMetadata() ArtifactRepoSnapshotIntegrityMetadata {
+	return ArtifactRepoSnapshotIntegrityMetadata{
+		Missing: []string{},
+	}
 }
 
 func (repo *ArtifactRepo) removeFromSnapshotIntegrity(ctx context.Context, name string) error {

@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -550,9 +549,7 @@ func NewBucketObjectNameStream(ctx context.Context, bucket Bucket, pathPrefix st
 	}
 	names := []string{}
 	for _, obj := range objects {
-		if filepath.Ext(obj.Name) == ".hart" {
-			names = append(names, obj.Name)
-		}
+		names = append(names, obj.Name)
 	}
 
 	sort.Strings(names)
