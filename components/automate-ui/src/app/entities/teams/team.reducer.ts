@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { difference, get, pipe, set } from 'lodash/fp';
+import { pipe, set } from 'lodash/fp';
 
 import { EntityStatus } from '../entities';
 import { TeamActionTypes, TeamActions } from './team.actions';
@@ -171,10 +171,10 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
     }
 
     case TeamActionTypes.REMOVE_USERS_SUCCESS: {
-      // get the current list and filter the newly removed user ids
+      // returns the full list sans the removed users
       return pipe(
         set('removeUsersStatus', EntityStatus.loadingSuccess),
-        set('userIDs', difference(get('userIDs', state), action.payload.membership_ids))
+        set('userIDs', action.payload.membership_ids)
       )(state) as TeamEntityState;
     }
 
