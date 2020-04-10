@@ -44,7 +44,6 @@ import { PendingEditsBarComponent } from './pending-edits-bar/pending-edits-bar.
 import { ProcessProgressBarComponent } from './process-progress-bar/process-progress-bar.component';
 import { ProjectsDropdownComponent } from './projects-dropdown/projects-dropdown.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
-import { SidebarNoShadeComponent } from './sidebar-no-shade/sidebar-no-shade.component';
 import { SidebarEntryComponent } from './sidebar-entry/sidebar-entry.component';
 import { TabComponent } from './tab/tab.component';
 import { TabsComponent } from './tabs/tabs.component';
@@ -101,7 +100,6 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     ProcessProgressBarComponent,
     ProjectsDropdownComponent,
     SidebarComponent,
-    SidebarNoShadeComponent,
     SidebarEntryComponent,
     TabComponent,
     TabsComponent,
@@ -143,7 +141,6 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     ProcessProgressBarComponent,
     ProjectsDropdownComponent,
     SidebarComponent,
-    SidebarNoShadeComponent,
     SidebarEntryComponent,
     TabComponent,
     TabsComponent,
