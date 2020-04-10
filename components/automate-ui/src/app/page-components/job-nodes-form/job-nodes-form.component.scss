@@ -69,6 +69,10 @@
 
     chef-table-new {
       margin-top: 0.5em;
+
+      chef-table-cell {
+        border-radius: $chef-border-radius;
+      }
     }
   }
 
