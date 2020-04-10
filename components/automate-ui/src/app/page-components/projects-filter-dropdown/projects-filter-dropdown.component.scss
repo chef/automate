@@ -64,7 +64,7 @@
 }
 
 .dropdown {
-  width: 295px;
+  width: 326px;
   right: -10px;
   border: 1px solid $chef-grey;
   font-size: 14px;
@@ -99,6 +99,7 @@
 
     .button-container { // adjust for 8px global margin on buttons
       display: flex;
+      justify-content: flex-start;
       padding: calc(14px - 8px);
       padding-bottom: 0;
     }
@@ -154,4 +155,17 @@
 #drop-list {
   max-height: 365px;
   overflow-x: scroll;
+}
+
+// animation
+.pf-clear-selection {
+  visibility: hidden;
+  opacity: 0;
+  transition: .2s ease-in;
+
+  &.active {
+    visibility: visible;
+    opacity: 1;
+    transition: .25s ease-out;
+  }
 }
