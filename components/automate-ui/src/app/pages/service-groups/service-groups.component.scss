@@ -86,9 +86,9 @@ chef-table-cell {
   }
 
   &.health {
-    max-width: 110px;
     display: flex;
     flex-flow: row nowrap;
+    max-width: 110px;
 
     .chart-container {
       align-self: center;
