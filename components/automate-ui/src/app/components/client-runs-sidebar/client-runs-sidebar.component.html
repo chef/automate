@@ -1,8 +1,0 @@
-<chef-sidebar>
-  <div class="nav-items">
-    <div class="group">Infrastructure</div>
-    <chef-sidebar-entry route="/infrastructure/client-runs" icon="storage">Client Runs</chef-sidebar-entry>
-    <chef-sidebar-entry *ngIf="isWorkflowEnabled$ | async" route="/workflow" icon="local_shipping">Workflow</chef-sidebar-entry>
-    <chef-sidebar-entry route="/infrastructure/chef-servers" icon="storage">Chef Servers</chef-sidebar-entry>
-  </div>
-</chef-sidebar>
