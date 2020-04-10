@@ -26,25 +26,59 @@ message Policyfile {
     string revision_id = 3;
     // Run list associated with the policy.
     repeated string run_list = 4;
-    // Included policy lock files.
-    IncludedPolicyLocks included_policy_locks = 5;
     // Named the run list associated with the policy.
-    repeated NamedRunList named_run_list = 6;
+    repeated NamedRunList named_run_list = 5;
+    // Included policy locks files.
+    repeated IncludedPolicyLock included_policy_locks = 6;
+    // List of cookbook locks under this policy.
+    repeated CookbookLock cookbook_locks = 7;
     // Stringified json of the default attributes.
-    string default_attributes = 7;
+    string default_attributes = 8;
     // Stringified json of the override attributes.
-    string override_attributes = 8;
-    // Solution dependencies of the policy file.
-	string solution_dependencies = 9;
+    string override_attributes = 9;
 }
 
-message IncludedPolicyLocks {
+message IncludedPolicyLock {
     // Name of the included policy file. 
     string name = 1;
     // Revision id of the included policy file.
     string revision_id = 2;
     // Source options of the included policy file.
     SourceOptions source_options = 3;
+}
+
+message CookbookLock {
+    // Name of the cookbook.
+    string name = 1;
+    // Version of the cookbook.
+    string version = 2;
+    // Identifier for the cookbook.
+    string identifier = 3;
+    // Decimal number identifier for the cookbook.
+    string dotted_identifier = 4;
+    // Source of the cookbook.
+    string source = 5;
+    // Cache key for the cookbook.
+    string cache_key = 6;
+    // SCM detail
+    SCMDetail SCMDetail = 7;
+    // Source path of the cookbook.
+    SourceOptions source_options = 8;
+}
+
+message SCMDetail {
+    // Name of the SCM.
+    string name = 1;
+    // Remote location of the SCM.
+    string remote = 2;
+    // Revision detail for the SCM.
+    string revision = 3;
+    // Boolean that denotes whether or not the working tree is cleaned. 
+    bool working_tree_clean = 4;
+    // Published info of the source.
+    bool published = 5;
+    // List of the synchronized remote branches. 
+    repeated string synchronized_remote_branches = 6;
 }
 
 message SourceOptions {

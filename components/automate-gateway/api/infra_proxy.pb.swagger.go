@@ -1251,6 +1251,43 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.CookbookLock": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the cookbook."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the cookbook."
+        },
+        "identifier": {
+          "type": "string",
+          "description": "Identifier for the cookbook."
+        },
+        "dotted_identifier": {
+          "type": "string",
+          "description": "Decimal number identifier for the cookbook."
+        },
+        "source": {
+          "type": "string",
+          "description": "Source of the cookbook."
+        },
+        "cache_key": {
+          "type": "string",
+          "description": "Cache key for the cookbook."
+        },
+        "SCMDetail": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SCMDetail",
+          "title": "SCM detail"
+        },
+        "source_options": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SourceOptions",
+          "description": "Source path of the cookbook."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.CookbookMeta": {
       "type": "object",
       "properties": {
@@ -1491,7 +1528,7 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.response.IncludedPolicyLocks": {
+    "chef.automate.api.infra_proxy.response.IncludedPolicyLock": {
       "type": "object",
       "properties": {
         "name": {
@@ -1605,16 +1642,26 @@ func init() {
           },
           "description": "Run list associated with the policy."
         },
-        "included_policy_locks": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.IncludedPolicyLocks",
-          "description": "Included policy lock files."
-        },
         "named_run_list": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NamedRunList"
           },
           "description": "Named the run list associated with the policy."
+        },
+        "included_policy_locks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.IncludedPolicyLock"
+          },
+          "description": "Included policy locks files."
+        },
+        "cookbook_locks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookLock"
+          },
+          "description": "List of cookbook locks under this policy."
         },
         "default_attributes": {
           "type": "string",
@@ -1623,10 +1670,6 @@ func init() {
         "override_attributes": {
           "type": "string",
           "description": "Stringified json of the override attributes."
-        },
-        "solution_dependencies": {
-          "type": "string",
-          "description": "Solution dependencies of the policy file."
         }
       }
     },
@@ -1760,6 +1803,40 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.RunList"
           },
           "description": "List of the run list."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.SCMDetail": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the SCM."
+        },
+        "remote": {
+          "type": "string",
+          "description": "Remote location of the SCM."
+        },
+        "revision": {
+          "type": "string",
+          "description": "Revision detail for the SCM."
+        },
+        "working_tree_clean": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean that denotes whether or not the working tree is cleaned."
+        },
+        "published": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Published info of the source."
+        },
+        "synchronized_remote_branches": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of the synchronized remote branches."
         }
       }
     },

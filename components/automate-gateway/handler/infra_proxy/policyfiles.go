@@ -38,9 +38,14 @@ func (a *InfraProxyServer) GetPolicyfile(ctx context.Context, r *gwreq.Policyfil
 	}
 
 	return &gwres.Policyfile{
-		Name:       res.GetName(),
-		RevisionId: res.GetRevisionId(),
-		RunList:    res.GetRunList(),
+		Name:                res.GetName(),
+		RevisionId:          res.GetRevisionId(),
+		RunList:             res.GetRunList(),
+		NamedRunList:        fromUpstreamNamedRunList(res.GetNamedRunList()),
+		IncludedPolicyLocks: fromUpstreamIncludedPolicyLocks(res.GetIncludedPolicyLocks()),
+		CookbookLocks:       fromUpstreamCookbookLocks(res.GetCookbookLocks()),
+		DefaultAttributes:   res.GetDefaultAttributes(),
+		OverrideAttributes:  res.GetOverrideAttributes(),
 	}, nil
 }
 
@@ -56,4 +61,57 @@ func fromUpstreamPolicyfiles(policies []*infra_res.PolicyfileListItem) []*gwres.
 	}
 
 	return ts
+}
+
+func fromUpstreamNamedRunList(nRunList []*infra_res.NamedRunList) []*gwres.NamedRunList {
+	nr := make([]*gwres.NamedRunList, len(nRunList))
+	for i, r := range nRunList {
+		nr[i] = &gwres.NamedRunList{
+			Name:    r.GetName(),
+			RunList: r.GetRunList(),
+		}
+	}
+	return nr
+}
+
+func fromUpstreamIncludedPolicyLocks(pLocks []*infra_res.IncludedPolicyLock) []*gwres.IncludedPolicyLock {
+	pl := make([]*gwres.IncludedPolicyLock, len(pLocks))
+	for i, p := range pLocks {
+		pl[i] = &gwres.IncludedPolicyLock{
+			Name:       p.GetName(),
+			RevisionId: p.GetRevisionId(),
+			SourceOptions: &gwres.SourceOptions{
+				Path: p.SourceOptions.GetPath(),
+			},
+		}
+	}
+
+	return pl
+}
+
+func fromUpstreamCookbookLocks(cLocks []*infra_res.CookbookLock) []*gwres.CookbookLock {
+	cl := make([]*gwres.CookbookLock, len(cLocks))
+	for i, cb := range cLocks {
+		cl[i] = &gwres.CookbookLock{
+			Name:             cb.GetName(),
+			Version:          cb.GetVersion(),
+			Identifier:       cb.GetIdentifier(),
+			DottedIdentifier: cb.GetDottedIdentifier(),
+			Source:           cb.GetSource(),
+			CacheKey:         cb.GetCacheKey(),
+			SCMDetail: &gwres.SCMDetail{
+				Name:                       cb.GetSCMDetail().GetName(),
+				Remote:                     cb.GetSCMDetail().GetRemote(),
+				Revision:                   cb.GetSCMDetail().GetRevision(),
+				WorkingTreeClean:           cb.GetSCMDetail().GetWorkingTreeClean(),
+				Published:                  cb.GetSCMDetail().GetPublished(),
+				SynchronizedRemoteBranches: cb.GetSCMDetail().GetSynchronizedRemoteBranches(),
+			},
+			SourceOptions: &gwres.SourceOptions{
+				Path: cb.SourceOptions.GetPath(),
+			},
+		}
+	}
+
+	return cl
 }
