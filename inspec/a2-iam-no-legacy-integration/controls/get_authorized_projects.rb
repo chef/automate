@@ -14,9 +14,9 @@ control 'iam-global-projects-filter-1' do
     PROJECT_ID_2 = "inspec-custom-project-2-#{Time.now.utc.to_i}"
     PROJECT_ID_3 = "inspec-custom-project-3-#{Time.now.utc.to_i}"
 
-    PROJECT_1 = { id: PROJECT_ID_1, name: "Test Project 1" }
-    PROJECT_2 = { id: PROJECT_ID_2, name: "Test Project 2" }
-    PROJECT_3 = { id: PROJECT_ID_3, name: "Test Project 3" }
+    PROJECT_1 = { id: PROJECT_ID_1, name: "Test Project 1", skip_policies: true }
+    PROJECT_2 = { id: PROJECT_ID_2, name: "Test Project 2", skip_policies: true }
+    PROJECT_3 = { id: PROJECT_ID_3, name: "Test Project 3", skip_policies: true }
     PROJECTS = [ PROJECT_1, PROJECT_2, PROJECT_3 ]
     UNASSIGNED = { id: UNASSIGNED_PROJECT_ID, name: UNASSIGNED_PROJECT_NAME }
 

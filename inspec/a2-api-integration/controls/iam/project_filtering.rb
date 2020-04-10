@@ -40,11 +40,13 @@ control 'iam-project-filtering-1' do
 
   CUSTOM_PROJECT_1 = {
           id: CUSTOM_PROJECT_ID_1,
-          name: "Test Project 1"
+          name: "Test Project 1",
+          skip_policies: true
   }
   CUSTOM_PROJECT_2 = {
           id: CUSTOM_PROJECT_ID_2,
-          name: "Test Project 2"
+          name: "Test Project 2",
+          skip_policies: true
   }
 
   Projects = [ CUSTOM_PROJECT_1, CUSTOM_PROJECT_2 ]

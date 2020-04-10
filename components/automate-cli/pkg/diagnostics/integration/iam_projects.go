@@ -15,7 +15,8 @@ import (
 const createProjectTemplate = `
 {
 	"id":"{{ .ID }}",
-	"name":"{{ .ID }} test project"
+	"name":"{{ .ID }} test project",
+	"skip_policies":true
 }
 `
 

@@ -325,7 +325,8 @@ control 'iam-legacy-access-control-1' do
         let(:test_object) do
           {
             'id': "inspec_test_project-#{TIMESTAMP}",
-            'name': 'This project was created by inspec tests. DELETE ME.'
+            'name': 'This project was created by inspec tests. DELETE ME.',
+            'skip_policies': true
           }
         end
 
