@@ -14,56 +14,56 @@
 
         <div class="metadata">
           <chef-card>
-            <chef-table>
-              <chef-tr>
-                <chef-th>
+            <table>
+              <tr>
+                <th>
                   Version
-                </chef-th>
-                <chef-td>{{ profile.version }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td>{{ profile.version }}</td>
+              </tr>
+              <tr>
+                <th>
                   Maintainer
-                </chef-th>
-                <chef-td>{{ profile.maintainer }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td>{{ profile.maintainer }}</td>
+              </tr>
+              <tr>
+                <th>
                   License
-                </chef-th>
-                <chef-td>{{ profile.license }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td>{{ profile.license }}</td>
+              </tr>
+              <tr>
+                <th>
                   Platform
-                </chef-th>
-                <chef-td>{{ displaySupports(profile.supports) }}</chef-td>
-              </chef-tr>
-            </chef-table>
+                </th>
+                <td>{{ displaySupports(profile.supports) }}</td>
+              </tr>
+            </table>
           </chef-card>
         </div>
 
-        <chef-table class="controls-table">
-          <chef-thead>
-            <chef-tr>
-              <chef-th>{{ controls.length }} Controls</chef-th>
-              <chef-th>Impact</chef-th>
-              <chef-th>Test Results</chef-th>
-              <chef-th></chef-th>
-            </chef-tr>
-          </chef-thead>
-          <chef-tbody>
-            <chef-tr *ngFor="let control of controls">
-              <chef-td>
+        <chef-table-new class="controls-table">
+          <chef-table-header>
+            <chef-table-row>
+              <chef-table-header-cell>{{ controls.length }} Controls</chef-table-header-cell>
+              <chef-table-header-cell>Impact</chef-table-header-cell>
+              <chef-table-header-cell>Test Results</chef-table-header-cell>
+              <chef-table-header-cell></chef-table-header-cell>
+            </chef-table-row>
+          </chef-table-header>
+          <chef-table-body>
+            <chef-table-row *ngFor="let control of controls">
+              <chef-table-cell class="align-flex-center">
                 <chef-icon class="status-icon" [ngClass]="statusClass(control)">
                   {{ statusIcon(statusClass(control)) }}
                 </chef-icon>
                 <span><strong>{{ control.control }}:</strong> {{ control.title }}</span>
-              </chef-td>
-              <chef-td class="impact-status" [ngClass]="impactStatus(control)">
+              </chef-table-cell>
+              <chef-table-cell class="impact-status align-flex-center" [ngClass]="impactStatus(control)">
                 {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
-              </chef-td>
-              <chef-td>
+              </chef-table-cell>
+              <chef-table-cell class="align-flex-center">
                 <span class="control-result" [ngClass]="{'failed': control.failed > 0}">
                   <chef-icon>report_problem</chef-icon>
                   <span>{{ control.failed | number }}</span>
@@ -80,15 +80,15 @@
                   <div class="waived-icon"></div>
                   <span>{{ control.waived | number }}</span>
                 </span>
-              </chef-td>
-              <chef-td>
+              </chef-table-cell>
+              <chef-table-cell class="align-flex-center">
                 <chef-button secondary (click)="onControlClick(control.control)">
                   Scan Results
                 </chef-button>
-              </chef-td>
-            </chef-tr>
-          </chef-tbody>
-        </chef-table>
+              </chef-table-cell>
+            </chef-table-row>
+          </chef-table-body>
+        </chef-table-new>
 
         <chef-scroll-top></chef-scroll-top>
       </ng-container>
