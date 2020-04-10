@@ -362,7 +362,7 @@ type PoliciesClient interface {
 	//
 	//When a project is created, the system also creates three policies associated with the new project,
 	//one for each of the following roles: editor, viewer, and project owner.
-	//You can optionally pass the `skip_policies` flag set to true to skip the creation of these policies.
+	//You can optionally pass the `skip_policies` flag set to `true` to skip the creation of these policies.
 	//
 	//Authorization Action:
 	//```
@@ -815,7 +815,7 @@ type PoliciesServer interface {
 	//
 	//When a project is created, the system also creates three policies associated with the new project,
 	//one for each of the following roles: editor, viewer, and project owner.
-	//You can optionally pass the `skip_policies` flag set to true to skip the creation of these policies.
+	//You can optionally pass the `skip_policies` flag set to `true` to skip the creation of these policies.
 	//
 	//Authorization Action:
 	//```
