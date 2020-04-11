@@ -1482,6 +1482,10 @@ func init() {
           "type": "string",
           "description": "Admin user of the Org."
         },
+        "credential_id": {
+          "type": "string",
+          "description": "Admin Key scrects-service credential ID for the Org."
+        },
         "server_id": {
           "type": "string",
           "description": "ID of the Server."

@@ -105,11 +105,12 @@ func (a *InfraProxyServer) DeleteOrg(ctx context.Context, r *gwreq.DeleteOrg) (*
 
 func fromUpstreamOrg(t *infra_res.Org) *gwres.Org {
 	return &gwres.Org{
-		Id:        t.GetId(),
-		Name:      t.GetName(),
-		AdminUser: t.GetAdminUser(),
-		ServerId:  t.GetServerId(),
-		Projects:  t.GetProjects(),
+		Id:           t.GetId(),
+		Name:         t.GetName(),
+		AdminUser:    t.GetAdminUser(),
+		CredentialId: t.GetCredentialId(),
+		ServerId:     t.GetServerId(),
+		Projects:     t.GetProjects(),
 	}
 }
 

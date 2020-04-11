@@ -101,12 +101,12 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 
 	return &response.GetOrg{
 		Org: &response.Org{
-			Id:        org.ID.String(),
-			Name:      org.Name,
-			AdminUser: org.AdminUser,
-			AdminKey:  org.AdminKey,
-			ServerId:  org.ServerId,
-			Projects:  org.Projects,
+			Id:           org.ID.String(),
+			Name:         org.Name,
+			AdminUser:    org.AdminUser,
+			CredentialId: org.CredentialID,
+			ServerId:     org.ServerID,
+			Projects:     org.Projects,
 		},
 	}, nil
 }
@@ -133,11 +133,11 @@ func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*
 
 	return &response.GetOrg{
 		Org: &response.Org{
-			Id:        org.ID.String(),
-			Name:      org.Name,
-			AdminUser: org.AdminUser,
-			AdminKey:  org.AdminKey,
-			ServerId:  org.ServerId,
+			Id:           org.ID.String(),
+			Name:         org.Name,
+			AdminUser:    org.AdminUser,
+			CredentialId: org.CredentialID,
+			ServerId:     org.ServerID,
 		},
 	}, nil
 }
@@ -157,7 +157,7 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 		return nil, service.ParseStorageError(err, req, "org")
 	}
 
-	_, err = s.service.Secrets.Delete(ctx, &secrets.Id{Id: org.AdminKey})
+	_, err = s.service.Secrets.Delete(ctx, &secrets.Id{Id: org.CredentialID})
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		ID:        ID,
 		Name:      req.Name,
 		AdminUser: req.AdminUser,
-		ServerId:  req.ServerId,
+		ServerID:  req.ServerId,
 		Projects:  req.Projects,
 	})
 	if err != nil {
@@ -210,7 +210,7 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 			Id:        org.ID.String(),
 			Name:      org.Name,
 			AdminUser: org.AdminUser,
-			ServerId:  org.ServerId,
+			ServerId:  org.ServerID,
 			Projects:  org.Projects,
 		},
 	}, nil
@@ -222,7 +222,7 @@ func fromStorageOrg(s storage.Org) *response.Org {
 		Id:        s.ID.String(),
 		Name:      s.Name,
 		AdminUser: s.AdminUser,
-		ServerId:  s.ServerId,
+		ServerId:  s.ServerID,
 		Projects:  s.Projects,
 	}
 }
@@ -236,7 +236,7 @@ func fromStorageToListOrgs(sl []storage.Org) []*response.OrgListItem {
 			Id:        org.ID.String(),
 			Name:      org.Name,
 			AdminUser: org.AdminUser,
-			ServerId:  org.ServerId,
+			ServerId:  org.ServerID,
 		}
 	}
 

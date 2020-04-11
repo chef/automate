@@ -46,8 +46,10 @@ message Org {
     string name = 2;
     // Admin user of the Org.
     string admin_user = 3;
+    // Admin Key scrects-service credential ID for the Org.
+    string credential_id = 4;
     // ID of the Server.
-    string server_id = 4;
+    string server_id = 5;
     // Projects under which org is being associated.
-    repeated string projects = 5;
+    repeated string projects = 6;
 }
