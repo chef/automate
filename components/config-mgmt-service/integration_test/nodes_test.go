@@ -234,6 +234,71 @@ func TestGetNodesErrorType(t *testing.T) {
 	}
 }
 
+func TestGetNodesStartEndDateTimeFilter(t *testing.T) {
+
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     request.Nodes
+		expected    []string
+	}{
+		{
+			description: "one of three nodes",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node1",
+					},
+					Checkin: time.Now().AddDate(0, 0, -5),
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node2",
+					},
+					Checkin: time.Now().AddDate(0, 0, -1),
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node3",
+					},
+					Checkin: time.Now().AddDate(0, 0, -5),
+				},
+			},
+			request: request.Nodes{
+				Start: time.Now().AddDate(0, 0, -4).Format(time.RFC3339),
+				End:   time.Now().Format(time.RFC3339),
+			},
+			expected: []string{"node2"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Node date filter: %s", test.description), func(t *testing.T) {
+
+			// Adding required node data
+			for index := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add node with project
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+
+			t.Logf("start: %s end: %s", test.request.Start, test.request.End)
+
+			// call GetNodes
+			res, err := cfgmgmt.GetNodes(context.Background(), &test.request)
+			assert.NoError(t, err)
+
+			names := getFieldValues(res, "name")
+
+			// Test what nodes are returned.
+			assert.ElementsMatch(t, test.expected, names)
+		})
+	}
+}
+
 func TestGetNodesRegexWithExactSameField(t *testing.T) {
 
 	cases := []struct {

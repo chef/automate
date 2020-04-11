@@ -43,7 +43,7 @@ func (m Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCount
 }
 
 func (m Backend) GetNodes(page int, perPage int, sf string,
-	asc bool, filters map[string][]string) ([]backend.Node, error) {
+	asc bool, filters map[string][]string, startDate, endDate string) ([]backend.Node, error) {
 	var nodes []backend.Node
 	n := *new(backend.Node)
 	n.NodeName = "mock"

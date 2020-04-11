@@ -16,6 +16,8 @@ message Nodes {
   repeated string filter = 1;
   Pagination pagination = 2;
   Sorting sorting = 3;
+  string start = 4;
+  string end = 5;
 }
 
 message Node {
