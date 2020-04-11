@@ -71,9 +71,9 @@ export class LayoutFacadeService {
     this.authorizedChecker = new AuthorizedChecker(fullStore);
     this.authorizedChecker.setPermissions([{ endpoint: '/iam/v2/projects', verb: 'get' }], []);
     this.authorizedChecker.isAuthorized$
+      // wait for permission and, if it comes at all, fire exactly once
       .pipe(filter(identity), first())
       .subscribe(
-        // wait for permission and, if it comes at all, fire exactly once
         () => this.store.dispatch(new GetProjects()));
   }
 
