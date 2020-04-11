@@ -176,9 +176,6 @@ import {
 } from './page-components/select-list-item/select-list-item.component';
 import { ServiceGroupsComponent } from './pages/service-groups/service-groups.component';
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
-import {
-  SidebarSelectListComponent
-} from './page-components/sidebar-select-list/sidebar-select-list.component';
 import { SigninComponent } from './pages/signin/signin.component';
 import {
   ServicesSidebarComponent
@@ -243,7 +240,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ServiceGroupsComponent,
     ServicesSidebarComponent,
     SettingsLandingComponent,
-    SidebarSelectListComponent,
     SigninComponent,
     TelemetryCheckboxComponent,
     UIComponent,
