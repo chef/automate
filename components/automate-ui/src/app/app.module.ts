@@ -62,7 +62,6 @@ import { ProjectsFilterService } from './services/projects-filter/projects-filte
 import { RulesService } from './services/rules/rules.service';
 import { RunHistoryStore } from './services/run-history-store/run-history.store';
 import { SessionStorageService } from './services/storage/sessionstorage.service';
-import { SidebarService } from './services/sidebar/sidebar.service';
 import { TelemetryService } from './services/telemetry/telemetry.service';
 
 // Requests
@@ -325,7 +324,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     OrgRequests,
     ServiceGroupsRequests,
     SessionStorageService,
-    SidebarService,
     TeamRequests,
     TelemetryService,
     UserPermsRequests,

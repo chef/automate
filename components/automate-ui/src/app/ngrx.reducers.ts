@@ -4,7 +4,6 @@ import { set, get, pipe, map } from 'lodash/fp';
 import * as credentials from './pages/+compliance/+credentials/credentials.state';
 import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
-import * as sidebar from './services/sidebar/sidebar.reducer';
 import * as projectsFilter from './services/projects-filter/projects-filter.reducer';
 import * as apiToken from './entities/api-tokens/api-token.reducer';
 import * as automateSettings from './entities/automate-settings/automate-settings.reducer';
@@ -43,7 +42,6 @@ export interface NgrxStateAtom {
   event_feed: eventFeed.EventFeedState;
   router: RouterReducerState;
   scanner: scanner.ScannerState;
-  sidebar: sidebar.SidebarState;
   layout: layout.LayoutEntityState;
   projectsFilter: projectsFilter.ProjectsFilterState;
 
@@ -152,7 +150,6 @@ export const defaultInitialState = {
   credentials: credentials.initialState,
   event_feed: eventFeed.initialState,
   scanner: scanner.initialState,
-  sidebar: sidebar.initialState,
   layout: layout.InitialState,
   projectsFilter: projectsFilter.projectsFilterInitialState,
 
@@ -195,7 +192,6 @@ export const ngrxReducers = {
   router: routerReducer,
   event_feed: eventFeed.eventFeedReducer,
   projectsFilter: projectsFilter.projectsFilterReducer,
-  sidebar: sidebar.sidebarReducer,
   layout: layout.layoutEntityReducer,
 
   // UI State
