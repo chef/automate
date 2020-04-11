@@ -100,14 +100,7 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 	}
 
 	return &response.GetOrg{
-		Org: &response.Org{
-			Id:           org.ID.String(),
-			Name:         org.Name,
-			AdminUser:    org.AdminUser,
-			CredentialId: org.CredentialID,
-			ServerId:     org.ServerID,
-			Projects:     org.Projects,
-		},
+		Org: fromStorageOrg(org),
 	}, nil
 }
 
@@ -132,13 +125,7 @@ func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*
 	}
 
 	return &response.GetOrg{
-		Org: &response.Org{
-			Id:           org.ID.String(),
-			Name:         org.Name,
-			AdminUser:    org.AdminUser,
-			CredentialId: org.CredentialID,
-			ServerId:     org.ServerID,
-		},
+		Org: fromStorageOrg(org),
 	}, nil
 }
 
@@ -206,24 +193,19 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 	}
 
 	return &response.UpdateOrg{
-		Org: &response.Org{
-			Id:        org.ID.String(),
-			Name:      org.Name,
-			AdminUser: org.AdminUser,
-			ServerId:  org.ServerID,
-			Projects:  org.Projects,
-		},
+		Org: fromStorageOrg(org),
 	}, nil
 }
 
 // Create a response.Org from a storage.Org
 func fromStorageOrg(s storage.Org) *response.Org {
 	return &response.Org{
-		Id:        s.ID.String(),
-		Name:      s.Name,
-		AdminUser: s.AdminUser,
-		ServerId:  s.ServerID,
-		Projects:  s.Projects,
+		Id:           s.ID.String(),
+		Name:         s.Name,
+		AdminUser:    s.AdminUser,
+		CredentialId: s.CredentialID,
+		ServerId:     s.ServerID,
+		Projects:     s.Projects,
 	}
 }
 

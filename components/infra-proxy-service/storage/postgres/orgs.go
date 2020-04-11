@@ -152,9 +152,9 @@ func (p *postgres) EditOrg(ctx context.Context, org storage.Org) (storage.Org, e
 		`UPDATE orgs
 		SET name = $2, admin_user = $3, projects = $4, updated_at = now()
 		WHERE id = $1 AND projects_match(projects, $5::TEXT[])
-		RETURNING id, name, admin_user, server_id, projects, created_at, updated_at;`,
+		RETURNING id, name, admin_user, credential_id, server_id, projects, created_at, updated_at;`,
 		org.ID, org.Name, org.AdminUser, pq.Array(org.Projects), pq.Array(projectsFilter)).
-		Scan(&o.ID, &o.Name, &o.AdminUser, &o.ServerID, pq.Array(&o.Projects), &o.CreatedAt, &o.UpdatedAt)
+		Scan(&o.ID, &o.Name, &o.AdminUser, &o.CredentialID, &o.ServerID, pq.Array(&o.Projects), &o.CreatedAt, &o.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
 	}
