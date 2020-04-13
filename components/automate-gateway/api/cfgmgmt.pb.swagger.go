@@ -115,6 +115,20 @@ func init() {
               "DESC"
             ],
             "default": "ASC"
+          },
+          {
+            "name": "start",
+            "description": "Earliest most recent check-in node information to return.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end",
+            "description": "Latest most recent check-in node information to return.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
