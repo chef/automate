@@ -32,7 +32,9 @@ export class CookbookEffects {
       mergeMap(({ payload: { server_id, org_id } }: GetCookbooksForOrg) =>
         this.requests.getCookbooksForOrgs(server_id, org_id).pipe(
           map((resp: CookbooksSuccessPayload) => new GetCookbooksSuccess(resp)),
-          catchError((error: HttpErrorResponse) => observableOf(new GetCookbooksFailure(error))))));
+          catchError(
+            (error: HttpErrorResponse) => observableOf(new GetCookbooksFailure(error)
+            )))));
 
   @Effect()
   getCookbooksFailure$ = this.actions$.pipe(

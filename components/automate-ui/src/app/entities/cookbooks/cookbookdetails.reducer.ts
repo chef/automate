@@ -12,9 +12,10 @@ export interface CookbookDetailsEntityState extends EntityState<CookbookDetails>
 
 const GET_STATUS = 'getStatus';
 
-export const cookbookDetailsEntityAdapter: EntityAdapter<CookbookDetails> = createEntityAdapter<CookbookDetails>({
-  selectId: (cookbookdetails: CookbookDetails) => cookbookdetails.name
-});
+export const cookbookDetailsEntityAdapter:
+  EntityAdapter<CookbookDetails> = createEntityAdapter<CookbookDetails>({
+    selectId: (cookbookdetails: CookbookDetails) => cookbookdetails.name
+  });
 
 export const CookbookDetailsEntityInitialState: CookbookDetailsEntityState =
   cookbookDetailsEntityAdapter.getInitialState(<CookbookDetailsEntityState>{
@@ -30,7 +31,7 @@ export function cookbookDetailsEntityReducer(
       return set(GET_STATUS, EntityStatus.loading, cookbookDetailsEntityAdapter.removeAll(state));
 
     case CookbookDetailsActionTypes.GET_SUCCESS:
-      return set(GET_STATUS, EntityStatus.loadingSuccess, 
+      return set(GET_STATUS, EntityStatus.loadingSuccess,
         cookbookDetailsEntityAdapter.addOne(action.payload, state));
 
     case CookbookDetailsActionTypes.GET_FAILURE:
@@ -41,5 +42,5 @@ export function cookbookDetailsEntityReducer(
   }
 }
 
-export const getEntityById = (name: string) => 
+export const getEntityById = (name: string) =>
 (state: CookbookDetailsEntityState) => state.entities[name];

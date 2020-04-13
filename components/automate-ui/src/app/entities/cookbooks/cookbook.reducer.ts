@@ -31,7 +31,7 @@ export function cookbookEntityReducer(
     case CookbookActionTypes.GET_ALL_SUCCESS:
       return pipe(
         set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
-        (cookbookEntityAdapter.addAll(action.payload.cookbooks, state)) as CookbookEntityState;
+        (cookbookEntityAdapter.setAll(action.payload.cookbooks, state)) as CookbookEntityState;
 
     case CookbookActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);

@@ -27,21 +27,25 @@ export class CookbookDetailsEffects {
 
   @Effect()
   getCookbooksForOrgs$ = this.actions$.pipe(
-      ofType(CookbookDetailsActionTypes.GET),
-      mergeMap(({ payload: { server_id, org_id, cookbook_name, cookbook_version } }: GetCookbookDetailsForVersion) =>
-        this.requests.getCookbookDetailsForVersion(server_id, org_id, cookbook_name, cookbook_version).pipe(
+    ofType(CookbookDetailsActionTypes.GET),
+    mergeMap(({ payload: { server_id, org_id, cookbook_name, cookbook_version } }
+      : GetCookbookDetailsForVersion) => this.requests
+        .getCookbookDetailsForVersion(server_id, org_id, cookbook_name, cookbook_version)
+        .pipe(
           map((resp) => new GetCookbookDetailsSuccess(resp)),
-          catchError((error: HttpErrorResponse) => observableOf(new GetCookbookDetailsFailure(error))))));
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new GetCookbookDetailsFailure(error))
+          ))));
 
   @Effect()
   getCookbooksFailure$ = this.actions$.pipe(
-      ofType(CookbookDetailsActionTypes.GET_FAILURE),
-      map(({ payload }: GetCookbookDetailsFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not get cookbook details: ${msg || payload.error}`
-        });
-      }));
+    ofType(CookbookDetailsActionTypes.GET_FAILURE),
+    map(({ payload }: GetCookbookDetailsFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get cookbook details: ${msg || payload.error}`
+      });
+    }));
 
 }

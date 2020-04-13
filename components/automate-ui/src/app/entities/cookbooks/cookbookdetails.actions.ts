@@ -16,7 +16,12 @@ export interface CookbookDetailsSuccessPayload {
 export class GetCookbookDetailsForVersion implements Action {
   readonly type = CookbookDetailsActionTypes.GET;
 
-  constructor(public payload: { server_id: string, org_id: string, cookbook_name: string, cookbook_version: string }) { }
+  constructor(public payload: {
+    server_id: string,
+    org_id: string,
+    cookbook_name: string,
+    cookbook_version: string
+  }) { }
 }
 
 export class GetCookbookDetailsSuccess implements Action {

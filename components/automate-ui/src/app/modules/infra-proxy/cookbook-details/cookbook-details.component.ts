@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 // import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -27,7 +27,7 @@ export type CookbookDetailsTab = 'details' | 'content';
   templateUrl: './cookbook-details.component.html',
   styleUrls: ['./cookbook-details.component.scss']
 })
-export class CookbookDetailsComponent implements OnInit {
+export class CookbookDetailsComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
   public cookbooks: Cookbook;
@@ -96,27 +96,34 @@ export class CookbookDetailsComponent implements OnInit {
             server_id: server_id,
             org_id: org_id,
             cookbook_name: this.cookbooks.name,
-            cookbook_version: this.cookbooks.current_version
+            cookbook_version: this.cookbooks.version
           }));
-          this.onCookbookVersionChange(this.serverId, this.orgId, this.cookbooks.name, this.cookbooks.current_version);
+          this.onCookbookVersionChange(
+            this.serverId, this.orgId,
+            this.cookbooks.name,
+            this.cookbooks.version
+          );
       });
   }
 
-  public onCookbookVersionChange(server_id:string, org_id:string, cookbook_name:string, cookbook_version:string): void {
+  public onCookbookVersionChange(
+    server_id: string,
+    org_id: string, cookbook_name: string,
+    cookbook_version: string): void {
     combineLatest([
       this.store.select(getAllCookbooksDetailsForVersionStatus),
       this.store.select(allCookbookDetails)
     ]).pipe().subscribe(([_getCookbooksSt, allCookbooksState]) => {
         this.cookbookDetails = allCookbooksState[0];
         this.readFile = allCookbooksState[0]?.root_files.find(data => data.name === 'README.md');
-        if(this.readFile) {
+        if ( this.readFile ) {
           this.readFileUrl = encodeURIComponent(this.readFile?.url);
           this.http.get(
             `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${cookbook_version}/file-content?url=${this.readFileUrl}`).subscribe
             (fileContent => {
               this.readFileContent = fileContent;
             });
-        }        
+        }
       });
   }
 

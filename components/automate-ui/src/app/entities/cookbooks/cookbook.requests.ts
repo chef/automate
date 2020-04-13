@@ -12,7 +12,7 @@ export class CookbookRequests {
   public getCookbooksForOrgs(server_id: string, org_id: string):
   Observable<CookbooksSuccessPayload> {
     return this.http.get<CookbooksSuccessPayload>(
-      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/num_versions`);
+      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks`);
   }
 
 }

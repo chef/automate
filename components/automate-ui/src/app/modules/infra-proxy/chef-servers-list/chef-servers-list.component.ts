@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { Regex } from 'app/helpers/auth/regex';
 import { Observable, Subject, combineLatest } from 'rxjs';
@@ -38,11 +38,12 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.loading$ = store.pipe(select(getStatus), map(loading));
+    this.loading$ = store.select(getStatus).pipe(map(loading));
 
-    this.sortedChefServers$ = store.pipe(
-      select(allServers),
-      map(servers => ChefSorters.naturalSort(servers, 'name')));
+    this.sortedChefServers$ = store.select(allServers)
+    .pipe(
+      map(servers => ChefSorters.naturalSort(servers, 'name')
+      ));
 
     this.createChefServerForm = this.fb.group({
       // Must stay in sync with error checks in create-chef-server-modal.component.html
@@ -62,8 +63,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     this.store.dispatch(new GetServers());
-    this.store.pipe(
-      select(saveStatus),
+    this.store.select(saveStatus)
+    .pipe(
       takeUntil(this.isDestroyed),
       filter(state => this.createModalVisible && !pending(state)))
       .subscribe(state => {

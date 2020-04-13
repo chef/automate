@@ -9,12 +9,12 @@
         </chef-breadcrumbs>
         <chef-page-header>
           <chef-heading>{{ cookbooks?.name }}</chef-heading>
-          <div class="version-dropdown">
+          <!-- <div class="version-dropdown">
             <label>Version</label>
             <chef-select *ngIf="cookbooks?.versions">
               <chef-option *ngFor="let version of cookbooks?.versions" [value]="version">{{ version }}</chef-option>
             </chef-select>
-          </div>
+          </div> -->
           <chef-tab-selector [value]="tabValue">
             <chef-option value='details' data-cy="content-tab">Details</chef-option>
             <!-- <chef-option value='content' data-cy="content-tab">Content</chef-option> -->
