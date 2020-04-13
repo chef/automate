@@ -321,8 +321,7 @@ describe('ProfilesOverviewComponent', () => {
 
   describe('onDestroy', () => {
     it('removes the loader screen', () => {
-      component.layoutFacade.ShowPageLoading(true);
-      spyOn(component.layoutFacade, 'ShowPageLoading')
+      spyOn(component.layoutFacade, 'ShowPageLoading');
 
       component.ngOnDestroy();
       expect(component.layoutFacade.ShowPageLoading).toHaveBeenCalledWith(false);
