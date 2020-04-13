@@ -67,7 +67,7 @@ describe('Integrations', () => {
     it('displays list of integrations', () => {
       browser.get('/settings/node-integrations');
 
-      const list = $('chef-table-new');
+      const list = $('chef-table');
       const nameColumn = list.$$('chef-table-body chef-table-row:not(.new-row)').map(row => {
         return row.$('chef-table-cell:first-child').getText();
       });

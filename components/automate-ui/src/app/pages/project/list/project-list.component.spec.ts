@@ -77,7 +77,7 @@ describe('ProjectListComponent', () => {
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-table-new' }),
+        MockComponent({ selector: 'chef-table' }),
         MockComponent({ selector: 'chef-table-header' }),
         MockComponent({ selector: 'chef-table-body' }),
         MockComponent({ selector: 'chef-table-row' }),
@@ -121,7 +121,7 @@ describe('ProjectListComponent', () => {
     it('displays project data', () => {
       store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       fixture.detectChanges();
-      expect(element).toContainPath('chef-table-new');
+      expect(element).toContainPath('chef-table');
       component.sortedProjects$.subscribe(results => {
         expect(results.length).toBe(projectList.length);
         projectList.forEach(p => {

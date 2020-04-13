@@ -497,13 +497,13 @@ describe('Job Add', () => {
       });
 
       it('lists available profiles', () => {
-        const profiles = $$('chef-table-new chef-table-body chef-table-row');
+        const profiles = $$('chef-table chef-table-body chef-table-row');
 
         expect(profiles.count()).toEqual(1);
       });
 
       it('requires selecting one or more profiles', () => {
-        const profile = $$('chef-table-new chef-table-body chef-table-row').first();
+        const profile = $$('chef-table chef-table-body chef-table-row').first();
         const toggle = profile.$('input[type="checkbox"]');
         const nextButton = element(by.cssContainingText('chef-button', 'Next'));
         const buttonEnabled = () => nextButton.getAttribute('disabled').then(val => val === null);

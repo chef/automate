@@ -24,7 +24,7 @@
           </app-authorized>
         </chef-toolbar>
         <app-authorized [anyOf]="['/notifications/rules', 'get']">
-          <chef-table-new *ngIf="(rules$ | async)?.length > 0" id="notifications-list">
+          <chef-table *ngIf="(rules$ | async)?.length > 0" id="notifications-list">
             <chef-table-header>
               <chef-table-row>
                 <chef-table-header-cell class="sort" tabindex="0" 
@@ -58,7 +58,7 @@
                 </chef-table-cell>
               </chef-table-row>
             </chef-table-body>
-          </chef-table-new>
+          </chef-table>
         </app-authorized>
 
         <app-page-picker

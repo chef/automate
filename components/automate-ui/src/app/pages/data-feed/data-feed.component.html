@@ -27,7 +27,7 @@
         </chef-toolbar>
 
         <app-authorized [anyOf]="['/datafeed/destinations', 'post']">
-          <chef-table-new *ngIf="(destinations$ | async)?.length > 0" id="destinations-list">
+          <chef-table *ngIf="(destinations$ | async)?.length > 0" id="destinations-list">
             <chef-table-header>
               <chef-table-row>
                 <chef-table-header-cell class="sort" tabindex="0" role="button"
@@ -53,7 +53,7 @@
                 </chef-table-cell>
               </chef-table-row>
             </chef-table-body>
-          </chef-table-new>
+          </chef-table>
 
         </app-authorized>
 

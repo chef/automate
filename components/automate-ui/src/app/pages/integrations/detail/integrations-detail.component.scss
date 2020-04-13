@@ -19,7 +19,7 @@ chef-page-header {
 }
 
 .page-body {
-  chef-table-new#manager-nodes-list {
+  chef-table#manager-nodes-list {
     chef-table-header-cell:first-child,
     chef-table-cell:first-child {
       flex-grow: 5%;

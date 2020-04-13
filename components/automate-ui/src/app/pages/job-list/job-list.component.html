@@ -4,7 +4,7 @@
     <span class="strong display5">Add a new job to scan for compliance or modify an existing job</span>
   </header>
 
-  <chef-table-new (sort-toggled)="handleSortToggle($event)">
+  <chef-table (sort-toggled)="handleSortToggle($event)">
     <chef-table-header>
       <chef-table-row>
         <chef-table-header-cell>
@@ -42,6 +42,6 @@
         <chef-table-cell>{{ job.end_time | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</chef-table-cell>
       </chef-table-row>
     </chef-table-body>
-  </chef-table-new>
+  </chef-table>
 
 </main>

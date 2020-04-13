@@ -7,7 +7,7 @@
 </div>
 
 <ng-container *ngIf="!reportData.controlsListEmpty">
-  <chef-table-new class="reporting-controls-table">
+  <chef-table class="reporting-controls-table">
     <chef-table-header>
       <chef-table-row>
         <chef-table-header-cell>Control Name</chef-table-header-cell>
@@ -84,7 +84,7 @@
       </chef-table-row>
     </chef-table-body>
     <chef-loading-spinner *ngIf="reportData.controlsListLoading" size="100"></chef-loading-spinner>
-  </chef-table-new>
+  </chef-table>
 
   <p class="item-count-warning" *ngIf="!reportData.controlsListLoading && reportData.controlsList.total === 100">
     This query result set is too large to process. We have limited this list to 100 items for speed. Try filtering down your list.

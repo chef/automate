@@ -94,7 +94,7 @@ describe('DatafeedComponent', () => {
     it ('shows only the table', () => {
       const listViewElement = fixture.debugElement.query(By.css(listId));
       const cardViewElement = fixture.debugElement.query(By.css(cardId));
-      expect(listViewElement.name).toBe('chef-table-new');
+      expect(listViewElement.name).toBe('chef-table');
       expect(cardViewElement).toBeNull();
     });
 

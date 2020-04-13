@@ -22,7 +22,7 @@ describe('PolicyAddMembersComponent', () => {
                 MockComponent({ selector: 'chef-error'}),
                 MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
                 MockComponent({ selector: 'chef-input'}),
-                MockComponent({ selector: 'chef-table-new' }),
+                MockComponent({ selector: 'chef-table' }),
                 MockComponent({ selector: 'chef-table-header' }),
                 MockComponent({ selector: 'chef-table-row' }),
                 MockComponent({ selector: 'chef-table-header-cell' }),

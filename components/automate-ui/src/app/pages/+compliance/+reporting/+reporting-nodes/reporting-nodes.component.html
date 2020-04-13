@@ -43,7 +43,7 @@
     </chef-option>
   </chef-phat-radio>
 
-  <chef-table-new class="reporting-nodes-table" (sort-toggled)="onNodesListSortToggled($event)">
+  <chef-table class="reporting-nodes-table" (sort-toggled)="onNodesListSortToggled($event)">
     <chef-table-header>
       <chef-table-row>
         <chef-table-header-cell>
@@ -111,7 +111,7 @@
       </chef-table-row>
     </chef-table-body>
     <chef-loading-spinner *ngIf="reportData.nodesListLoading" size="100"></chef-loading-spinner>
-  </chef-table-new>
+  </chef-table>
 
   <app-page-picker
     class="reporting-nodes-paging"

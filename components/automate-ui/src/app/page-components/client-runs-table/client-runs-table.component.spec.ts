@@ -476,9 +476,9 @@ describe('ClientRunsTable', () => {
       it('should render a table', () => {
         fixture.detectChanges();
         expect(
-          element.nativeElement.querySelector('chef-table-new > chef-table-header')).not.toBe(null);
+          element.nativeElement.querySelector('chef-table > chef-table-header')).not.toBe(null);
         expect(
-          element.nativeElement.querySelector('chef-table-new > chef-table-body')).not.toBe(null);
+          element.nativeElement.querySelector('chef-table > chef-table-body')).not.toBe(null);
       });
     });
 
@@ -494,7 +494,7 @@ describe('ClientRunsTable', () => {
         fixture.detectChanges();
 
         expect(element.nativeElement
-          .querySelectorAll('chef-table-new > chef-table-body > chef-table-row').length).toBe(4);
+          .querySelectorAll('chef-table > chef-table-body > chef-table-row').length).toBe(4);
       });
     });
 

@@ -29,7 +29,7 @@ describe('PolicyListComponent', () => {
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-table-new' }),
+        MockComponent({ selector: 'chef-table' }),
         MockComponent({ selector: 'chef-table-body' }),
         MockComponent({ selector: 'chef-table-cell' }),
         MockComponent({ selector: 'chef-table-header-cell' }),
