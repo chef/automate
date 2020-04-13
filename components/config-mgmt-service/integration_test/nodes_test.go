@@ -270,6 +270,116 @@ func TestGetNodesStartEndDateTimeFilter(t *testing.T) {
 			},
 			expected: []string{"node2"},
 		},
+		{
+			description: "no start end filters out one node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node1",
+					},
+					Checkin: time.Now().AddDate(0, 0, -3),
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node2",
+					},
+					Checkin: time.Now(),
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node3",
+					},
+					Checkin: time.Now().AddDate(0, 0, -5),
+				},
+			},
+			request: request.Nodes{
+				End: time.Now().AddDate(0, 0, -1).Format(time.RFC3339),
+			},
+			expected: []string{"node1", "node3"},
+		},
+		{
+			description: "no end, start filters out one node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node1",
+					},
+					Checkin: time.Now().AddDate(0, 0, -4),
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node2",
+					},
+					Checkin: time.Now(),
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node3",
+					},
+					Checkin: time.Now().AddDate(0, 0, -1),
+				},
+			},
+			request: request.Nodes{
+				Start: time.Now().AddDate(0, 0, -3).Format(time.RFC3339),
+			},
+			expected: []string{"node2", "node3"},
+		},
+		{
+			description: "filters out all nodes",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node1",
+					},
+					Checkin: time.Now().AddDate(0, 0, -5),
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node2",
+					},
+					Checkin: time.Now(),
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node3",
+					},
+					Checkin: time.Now().AddDate(0, 0, -1),
+				},
+			},
+			request: request.Nodes{
+				Start: time.Now().AddDate(0, 0, -4).Format(time.RFC3339),
+				End:   time.Now().AddDate(0, 0, -3).Format(time.RFC3339),
+			},
+			expected: []string{},
+		},
+		{
+			description: "filters out no nodes",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node1",
+					},
+					Checkin: time.Now().AddDate(0, 0, -5),
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node2",
+					},
+					Checkin: time.Now().AddDate(0, 0, -2),
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "node3",
+					},
+					Checkin: time.Now().AddDate(0, 0, -1),
+				},
+			},
+			request: request.Nodes{
+				Start: time.Now().AddDate(0, 0, -6).Format(time.RFC3339),
+				End:   time.Now().Format(time.RFC3339),
+			},
+			expected: []string{"node1", "node2", "node3"},
+		},
 	}
 
 	for _, test := range cases {
