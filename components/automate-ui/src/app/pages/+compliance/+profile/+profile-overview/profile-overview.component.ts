@@ -282,6 +282,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.layoutFacade.ShowPageLoading(false);
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
