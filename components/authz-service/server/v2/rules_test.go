@@ -227,7 +227,7 @@ func TestUpdateRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
-		{"if the rule id is all whitespace, returns 'invalid argument'", func(t *testing.T) {
+		{"if the rule id is whitespace, returns 'invalid argument'", func(t *testing.T) {
 			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
 				Id:         "    ",
 				Name:       "any name",
