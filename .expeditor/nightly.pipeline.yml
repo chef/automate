@@ -9,7 +9,7 @@ steps:
   - label: build
     command:
       - scripts/verify_build.sh
-    timeout_in_minutes: 45
+    timeout_in_minutes: 60
     env:
       BUILD_ALL: true
       ALLOW_LOCAL_PACKAGES: true
