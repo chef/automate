@@ -1798,6 +1798,19 @@ func TestUpdateRole(t *testing.T) {
 			require.Nil(t, role)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		},
+		"fails with InvalidArgument when name is whitespace": func(t *testing.T) {
+			req := api_v2.UpdateRoleReq{
+				Id:       existingRoleId,
+				Actions:  []string{"foo:bar:baz"},
+				Projects: []string{},
+				Name:     "      ",
+			}
+
+			role, err := cl.UpdateRole(ctx, &req)
+
+			require.Nil(t, role)
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		},
 		"fails with InvalidArgument when missing role actions": func(t *testing.T) {
 			req := api_v2.UpdateRoleReq{
 				Id:       existingRoleId,
@@ -1972,7 +1985,7 @@ func TestDeleteRole(t *testing.T) {
 
 			grpctest.AssertCode(t, codes.NotFound, err)
 		},
-		"fails with InvalidArgument when ID is all whitespace": func(t *testing.T) {
+		"fails with InvalidArgument when ID is whitespace": func(t *testing.T) {
 			req := api_v2.DeleteRoleReq{
 				Id: "   ",
 			}
@@ -2122,6 +2135,19 @@ func TestGetRole(t *testing.T) {
 			nonExistentId := "fake-id"
 			req := api_v2.GetRoleReq{
 				Id: nonExistentId,
+			}
+
+			role, err := cl.GetRole(ctx, &req)
+
+			require.Nil(t, role)
+			grpctest.AssertCode(t, codes.NotFound, err)
+		}},
+		{"fails with NotFound when ID has capital letters", func(t *testing.T) {
+			storedRole, _ := addSomeRolesToStore(t, store, prng)
+			uppercasedID := strings.Title(storedRole.ID)
+
+			req := api_v2.GetRoleReq{
+				Id: uppercasedID,
 			}
 
 			role, err := cl.GetRole(ctx, &req)

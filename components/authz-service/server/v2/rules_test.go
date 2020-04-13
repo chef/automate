@@ -74,7 +74,7 @@ func TestCreateRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
-		{"if the passed rule project id is empty spaces, returns 'invalid argument'", func(t *testing.T) {
+		{"if the passed rule project id is whitespace, returns 'invalid argument'", func(t *testing.T) {
 			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
 				Id:         "     ",
 				Name:       "any name",
@@ -480,8 +480,8 @@ func TestGetRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
-		{"if the rule id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "no spaces allowed"})
+		{"if the rule id is whitespace, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "    "})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
