@@ -179,6 +179,8 @@ func (m *Project) GetStatus() string {
 	return ""
 }
 
+// Projects, unlike all other resources allowing 64 characters,
+// are restricted to 48 because the id serves as a base for generated policies and teams.
 type CreateProjectReq struct {
 	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
 	Id                   string   `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
