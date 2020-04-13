@@ -1,18 +1,23 @@
-interface CreateProject {
-  id: string;
-  name: string;
-}
+import { Project } from '../../../support/types';
 
 describe('global projects filter', () => {
-  const proj1 = <CreateProject>
-    { id: 'cypress-project-1', name: 'Cypress Project 1 ' + Cypress.moment().format('MMDDYYhhmm') };
-  const proj2 = <CreateProject>
-    { id: 'cypress-project-2', name: 'Cypress Project 2 ' + Cypress.moment().format('MMDDYYhhmm')};
-  const proj3 = <CreateProject>
-    { id: 'cypress-project-3', name: 'Cypress Project 3 ' + Cypress.moment().format('MMDDYYhhmm') };
-  // TODO uncomment with non-admin test
-  // const pol_id = "cypress-policy"
-  // const nonAdminUsername = "nonadmin"
+  const proj1: Project = {
+    id: `cypress-project-1-${Cypress.moment().format('MMDDYYhhmm')}`,
+    name: 'Cypress Project 1',
+    skip_policies: true
+  };
+  const proj2: Project = {
+    id: `cypress-project-2-${Cypress.moment().format('MMDDYYhhmm')}`,
+    name: 'Cypress Project 2',
+    skip_policies: true
+  };
+  const proj3: Project = {
+    id: `cypress-project-3-${Cypress.moment().format('MMDDYYhhmm')}`,
+    name: 'Cypress Project 3',
+    skip_policies: true
+   };
+  const pol_id = `cypress-policy-${Cypress.moment().format('MMDDYYhhmm')}`;
+  const nonAdminUsername = `nonadmin-${Cypress.moment().format('MMDDYYhhmm')}`;
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -21,9 +26,9 @@ describe('global projects filter', () => {
       createProject(admin.id_token, proj1);
       createProject(admin.id_token, proj2);
       createProject(admin.id_token, proj3);
-      // TODO uncomment with non-admin test/ move up project creation
-      // cy.createUser(admin.id_token, nonAdminUsername)
-      // cy.createPolicy(admin.id_token, pol_id, nonAdminUsername, [proj1, proj2])
+
+      createUser(admin.id_token, nonAdminUsername);
+      createPolicy(admin.id_token, pol_id, nonAdminUsername, [proj1.id, proj2.id]);
       cy.logout();
     });
   });
@@ -38,7 +43,18 @@ describe('global projects filter', () => {
     allowedProjects.forEach(project => {
       cy.get('#projects-filter-dropdown').contains(project);
     });
+  });
+
+  it('shows only allowed projects for non-admin', () => {
     cy.logout();
+    cy.login('/settings', nonAdminUsername);
+    cy.get('chef-sidebar');
+    const allowedProjects = [proj1.name, proj2.name];
+
+    cy.get('.dropdown-label').click();
+    allowedProjects.forEach(project => {
+      cy.get('#projects-filter-dropdown').contains(project);
+    });
   });
 });
 
@@ -74,7 +90,7 @@ function createUser(id_token: string, username: string): void {
   });
 }
 
-function createPolicy(id_token: string, id: string, username: string, projects: string): void {
+function createPolicy(id_token: string, id: string, username: string, projects: string[]): void {
   cy.request({
     auth: { bearer: id_token },
     method: 'POST',
@@ -97,7 +113,7 @@ function createPolicy(id_token: string, id: string, username: string, projects: 
   });
 }
 
-function createProject(id_token: string, project: CreateProject): void {
+function createProject(id_token: string, project: Project): void {
   cy.request({
     auth: { bearer: id_token },
     method: 'POST',

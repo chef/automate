@@ -356,7 +356,7 @@ func init() {
       },
       "post": {
         "summary": "Creates a project",
-        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.\n\nWhen a project is created, the system also creates three policies associated with the new project, \none for each of the following roles: editor, viewer, and project owner.\nYou can optionally pass the ` + "`" + `skip_policies` + "`" + ` flag set to ` + "`" + `true` + "`" + ` to skip the creation of these policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateProject",
         "responses": {
           "200": {
@@ -382,7 +382,7 @@ func init() {
         "x-code-samples": [
           {
             "lang": "JSON",
-            "source": "{\"name\": \"My Custom Project\", \"id\": \"custom-project\"}"
+            "source": "{\"name\": \"My Custom Project\", \"id\": \"custom-project\", \"skip_policies\": true}"
           }
         ]
       }
@@ -766,7 +766,8 @@ func init() {
       "type": "object",
       "example": {
         "name": "My Custom Project",
-        "id": "custom-project"
+        "id": "custom-project",
+        "skip_policies": true
       },
       "properties": {
         "id": {
@@ -776,6 +777,11 @@ func init() {
         "name": {
           "type": "string",
           "description": "Name for the new project."
+        },
+        "skip_policies": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean flag to skip adding policies associated with the project. Set to false by default."
         }
       },
       "required": [

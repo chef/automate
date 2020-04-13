@@ -30,6 +30,12 @@ export enum ProjectActionTypes {
   GET_APPLY_RULES_STATUS_FAILURE = 'PROJECT::GET_APPLY_RULES_STATUS::FAILURE'
 }
 
+export interface ProjectPayload {
+  id: string;
+  name: string;
+  skip_policies: boolean;
+}
+
 export interface ProjectSuccessPayload {
   project: Project;
 }
@@ -83,12 +89,12 @@ export class GetProjectFailure implements Action {
 
 export class CreateProject implements Action {
   readonly type = ProjectActionTypes.CREATE;
-  constructor(public payload: {id: string, name: string}) { }
+  constructor(public payload: ProjectPayload) { }
 }
 
 export class CreateProjectSuccess implements Action {
   readonly type = ProjectActionTypes.CREATE_SUCCESS;
-  constructor(public payload: ProjectSuccessPayload) { }
+  constructor(public payload: {resp: ProjectSuccessPayload, skip_policies: boolean}) { }
 }
 
 export class CreateProjectFailure implements Action {

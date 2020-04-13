@@ -1,12 +1,29 @@
 // must match automate-ui/src/entities/policies/policy.model.ts
 export type IAMType = 'CHEF_MANAGED' | 'CUSTOM';
 
+export interface Policy {
+  id: string;
+  name: string;
+  type: IAMType;
+  members: string[];
+  statements?: Statement[];
+}
+
+export interface Statement {
+  effect: 'ALLOW' | 'DENY';
+  role?: string;
+  actions?: string[];
+  resources?: string[];
+}
+
 // must match automate-ui/src/entities/projects/project.model.ts
 export interface Project {
   id: string;
   name: string;
-  type: IAMType;
-  status: ProjectStatus;
+  skip_policies?: boolean;
+  // only returned by the API
+  type?: IAMType;
+  status?: ProjectStatus;
 }
 
 export class ProjectConstants {
@@ -24,12 +41,13 @@ export type RuleType = 'NODE' | 'EVENT';
 export type ConditionOperator = 'MEMBER_OF' | 'EQUALS';
 
 export interface Rule {
-  id?: string;
-  project_id?: string;
+  id: string;
+  project_id: string;
   name: string;
   type: RuleType;
-  status: RuleStatus;
   conditions: Condition[];
+  // only returned by API
+  status?: RuleStatus;
 }
 
 export interface Condition {
@@ -37,4 +55,3 @@ export interface Condition {
   operator: ConditionOperator;
   values: string[];
 }
-

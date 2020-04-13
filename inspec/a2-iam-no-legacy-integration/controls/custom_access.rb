@@ -47,7 +47,8 @@ control 'iam-custom-access-1' do
         http_method: 'POST',
         request_body: {
           id: PROJECT_1_ID,
-          name: PROJECT_1_ID
+          name: PROJECT_1_ID,
+          skip_policies: true
         }.to_json
       )
       expect(create_project_resp.http_status).to eq 200
@@ -57,7 +58,8 @@ control 'iam-custom-access-1' do
         http_method: 'POST',
         request_body: {
           id: PROJECT_2_ID,
-          name: PROJECT_2_ID
+          name: PROJECT_2_ID,
+          skip_policies: true
         }.to_json
       )
       expect(create_project_2_resp.http_status).to eq 200

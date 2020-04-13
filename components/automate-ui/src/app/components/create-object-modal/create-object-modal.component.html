@@ -45,7 +45,7 @@
           </chef-toolbar>
         </div>
         <div class="checkbox-margin" *ngIf="createProjectModal">
-          <chef-checkbox checked="true" disabled="true">
+          <chef-checkbox (change)="updatePolicyCheckbox($event.detail)" [checked]="addPolicies">
             Also create owner, editor, and viewer policies for this project.
           </chef-checkbox>
         </div>

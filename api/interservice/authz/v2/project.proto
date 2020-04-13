@@ -17,6 +17,7 @@ message Project {
 message CreateProjectReq {
     string name = 1;
     string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    bool skip_policies = 3;
 }
 
 message CreateProjectResp {

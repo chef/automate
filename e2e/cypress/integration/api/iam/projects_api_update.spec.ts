@@ -23,15 +23,13 @@ describe('project update re-tagging', () => {
       project: {
         id: nodeOrgProjectID,
         name: 'project org',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-org',
         name: 'rule CHEF_ORGANIZATION',
         type: 'NODE',
         project_id: nodeOrgProjectID,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -45,15 +43,13 @@ describe('project update re-tagging', () => {
       project: {
         id: nodeServerProjectID,
         name: 'project chef server',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-chef-server',
         name: 'rule CHEF_SERVER',
         type: 'NODE',
         project_id: nodeServerProjectID,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_SERVER',
@@ -67,15 +63,13 @@ describe('project update re-tagging', () => {
       project: {
         id: nodeEnvProjectID,
         name: 'project environment',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-environment',
         name: 'rule ENVIRONMENT',
         type: 'NODE',
         project_id: nodeEnvProjectID,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'ENVIRONMENT',
@@ -89,15 +83,13 @@ describe('project update re-tagging', () => {
       project: {
         id: nodePolGroupProjectID,
         name: 'project policy group',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-policy-group',
         name: 'rule CHEF_POLICY_GROUP',
         type: 'NODE',
         project_id: nodePolGroupProjectID,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_POLICY_GROUP',
@@ -111,15 +103,13 @@ describe('project update re-tagging', () => {
       project: {
         id: nodePolNameProjectID,
         name: 'project policy name',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-policy-name',
         name: 'rule CHEF_POLICY_NAME',
         type: 'NODE',
         project_id: nodePolNameProjectID,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_POLICY_NAME',
@@ -133,15 +123,13 @@ describe('project update re-tagging', () => {
       project: {
         id: nodeRoleProjectID,
         name: 'project role',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-role',
         name: 'rule CHEF_ROLE',
         type: 'NODE',
         project_id: nodeRoleProjectID,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ROLE',
@@ -155,15 +143,13 @@ describe('project update re-tagging', () => {
       project: {
         id: nodeTagProjectID,
         name: 'project tag',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-tag',
         name: 'rule CHEF_TAG',
         type: 'NODE',
         project_id: nodeTagProjectID,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_TAG',
@@ -183,15 +169,13 @@ describe('project update re-tagging', () => {
       project: {
         id: eventOrgProjectID,
         name: 'project org',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'event-rule-org',
         name: 'rule CHEF_ORGANIZATION',
         type: 'EVENT',
         project_id: eventOrgProjectID,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -205,15 +189,13 @@ describe('project update re-tagging', () => {
       project: {
         id: eventServerProjectID,
         name: 'project chef server',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'event-rule-chef-server',
         name: 'rule CHEF_SERVER',
         type: 'EVENT',
         project_id: eventServerProjectID,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_SERVER',

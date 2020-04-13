@@ -61,7 +61,8 @@ control 'iam-chef-managed-access-1' do
         http_method: 'POST',
         request_body: {
           id: PROJECT_ID,
-          name: PROJECT_ID
+          name: PROJECT_ID,
+          skip_policies: false
         }.to_json
       )
       expect(create_project_resp.http_status).to eq 200

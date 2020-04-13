@@ -31,7 +31,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: project_id,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -40,7 +41,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: project_id_2,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -427,7 +429,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: project_id,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -436,7 +439,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: project_id_2,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -704,7 +708,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: custom_project_id,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -730,7 +735,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: id,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -788,7 +794,8 @@ control 'iam-api-1' do
          http_method: 'POST',
          request_body: {
            id: custom_project_id,
-           name: "display name !#$#"
+           name: "display name !#$#",
+           skip_policies: true
          }.to_json
        )
        expect(resp.http_status).to eq 200
@@ -914,7 +921,8 @@ control 'iam-api-1' do
           http_method: 'POST',
           request_body: {
             id: custom_project_id_2,
-            name: "display name !#$#"
+            name: "display name !#$#",
+            skip_policies: true
           }.to_json
         )
         expect(resp.http_status).to eq 200
@@ -923,7 +931,8 @@ control 'iam-api-1' do
           http_method: 'POST',
           request_body: {
             id: custom_project_id,
-            name: "display name !#$#"
+            name: "display name !#$#",
+            skip_policies: true
           }.to_json
         )
         expect(resp.http_status).to eq 200

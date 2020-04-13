@@ -28,6 +28,7 @@ import (
 	memstore_v2 "github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/authz/project_purge"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/test/helpers"
@@ -104,44 +105,48 @@ func TestUpdateProject(t *testing.T) {
 
 func TestCreateProject(t *testing.T) {
 	ctx := context.Background()
-	cl, store, cleanup := setupProjects(t)
-	defer cleanup()
+	projCl, polCl, testDB, store, _ := testhelpers.SetupProjectsAndRulesWithDB(t)
+	defer testDB.CloseDB(t)
+	defer store.Close()
+
+	id, name := "my-foo", "my foo"
 
 	cases := []struct {
 		desc string
 		f    func(*testing.T)
 	}{
 		{"if the project data is invalid, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.CreateProject(ctx, &api.CreateProjectReq{Id: "empty-name", Name: ""})
+			resp, err := projCl.CreateProject(ctx, &api.CreateProjectReq{Id: "empty-name", Name: "", SkipPolicies: true})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is empty, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.CreateProject(ctx, &api.CreateProjectReq{Id: "", Name: "empty-id"})
+			resp, err := projCl.CreateProject(ctx, &api.CreateProjectReq{Id: "", Name: "empty-id", SkipPolicies: true})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.CreateProject(ctx, &api.CreateProjectReq{Id: "no spaces", Name: "any name"})
+			resp, err := projCl.CreateProject(ctx, &api.CreateProjectReq{Id: "no spaces", Name: "any name", SkipPolicies: true})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project with that id already exists, returns 'already exists'", func(t *testing.T) {
-			id := "foo-project"
-			addProjectToStore(t, store, id, "my foo project", storage.ChefManaged)
+			_, err := projCl.CreateProject(ctx, &api.CreateProjectReq{Id: id, Name: "my foo project", SkipPolicies: true})
+			require.NoError(t, err)
 
-			resp, err := cl.CreateProject(ctx, &api.CreateProjectReq{Id: id, Name: "my other foo"})
+			resp, err := projCl.CreateProject(ctx, &api.CreateProjectReq{Id: id, Name: "my other foo", SkipPolicies: true})
 			grpctest.AssertCode(t, codes.AlreadyExists, err)
 			assert.Nil(t, resp)
 		}},
 		{"does not create project if project limit surpassed", func(t *testing.T) {
-			for i := 1; i <= projectLimitForTesting; i++ {
+			for i := 1; i <= constants.DefaultProjectLimit; i++ {
 				projectID := "my-id-" + strconv.Itoa(i)
 				project := &api.CreateProjectReq{
-					Id:   projectID,
-					Name: "name-" + strconv.Itoa(i),
+					Id:           projectID,
+					Name:         "name-" + strconv.Itoa(i),
+					SkipPolicies: true,
 				}
-				_, err := cl.CreateProject(ctx, project)
+				_, err := projCl.CreateProject(ctx, project)
 				require.NoError(t, err)
 			}
 
@@ -149,19 +154,75 @@ func TestCreateProject(t *testing.T) {
 				Id:   "my-id-" + strconv.Itoa(projectLimitForTesting+1),
 				Name: "name-" + strconv.Itoa(projectLimitForTesting+1),
 			}
-			resp, err := cl.CreateProject(ctx, oneProjectTooMany)
+			resp, err := projCl.CreateProject(ctx, oneProjectTooMany)
 			assert.Nil(t, resp)
 			grpctest.AssertCode(t, codes.FailedPrecondition, err)
 		}},
 		{"if the project was successfully created, returns hydrated project", func(t *testing.T) {
-			id, name := "my-foo", "my foo"
-			resp, err := cl.CreateProject(ctx, &api.CreateProjectReq{Id: id, Name: name})
+			resp, err := projCl.CreateProject(ctx, &api.CreateProjectReq{Id: id, Name: name, SkipPolicies: true})
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			require.NotNil(t, resp.Project)
 			assert.Equal(t, id, resp.Project.GetId())
 			assert.Equal(t, name, resp.Project.GetName())
 			assert.Equal(t, api.Type_CUSTOM, resp.Project.GetType())
+		}},
+		{"if the skipPolicies flag is unset, creates the associated project policies by default", func(t *testing.T) {
+			ctx = auth_context.NewOutgoingContext(auth_context.NewContext(context.Background(),
+				[]string{SuperuserSubject}, []string{}, "*", "*"))
+			err := createSystemRoles(ctx, polCl)
+			require.NoError(t, err)
+
+			resp, err := projCl.CreateProject(ctx, &api.CreateProjectReq{Id: id, Name: name})
+			require.NoError(t, err)
+			require.NotNil(t, resp.Project)
+
+			editorResp, err := polCl.GetPolicy(ctx, &api.GetPolicyReq{Id: fmt.Sprintf("%s-project-editors", id)})
+			require.NoError(t, err)
+			require.NotNil(t, editorResp)
+
+			viewerResp, err := polCl.GetPolicy(ctx, &api.GetPolicyReq{Id: fmt.Sprintf("%s-project-viewers", id)})
+			require.NoError(t, err)
+			require.NotNil(t, viewerResp)
+
+			ownerResp, err := polCl.GetPolicy(ctx, &api.GetPolicyReq{Id: fmt.Sprintf("%s-project-owners", id)})
+			require.NoError(t, err)
+			require.NotNil(t, ownerResp)
+		}},
+		{"if the skipPolicies flag is set to false, creates the associated project policies", func(t *testing.T) {
+			ctx = auth_context.NewOutgoingContext(auth_context.NewContext(context.Background(),
+				[]string{SuperuserSubject}, []string{}, "*", "*"))
+			err := createSystemRoles(ctx, polCl)
+			require.NoError(t, err)
+
+			resp, err := projCl.CreateProject(ctx, &api.CreateProjectReq{Id: id, Name: name, SkipPolicies: false})
+			require.NoError(t, err)
+			require.NotNil(t, resp.Project)
+
+			editorResp, err := polCl.GetPolicy(ctx, &api.GetPolicyReq{Id: fmt.Sprintf("%s-project-editors", id)})
+			require.NoError(t, err)
+			require.NotNil(t, editorResp)
+
+			viewerResp, err := polCl.GetPolicy(ctx, &api.GetPolicyReq{Id: fmt.Sprintf("%s-project-viewers", id)})
+			require.NoError(t, err)
+			require.NotNil(t, viewerResp)
+
+			ownerResp, err := polCl.GetPolicy(ctx, &api.GetPolicyReq{Id: fmt.Sprintf("%s-project-owners", id)})
+			require.NoError(t, err)
+			require.NotNil(t, ownerResp)
+		}},
+		{"if the skipPolicies flag is set to true, does not create the associated project policies", func(t *testing.T) {
+			_, err := projCl.CreateProject(ctx, &api.CreateProjectReq{Id: id, Name: name, SkipPolicies: true})
+			require.NoError(t, err)
+
+			_, err = polCl.GetPolicy(ctx, &api.GetPolicyReq{Id: fmt.Sprintf("%s-project-editors", id)})
+			grpctest.AssertCode(t, codes.NotFound, err)
+
+			_, err = polCl.GetPolicy(ctx, &api.GetPolicyReq{Id: fmt.Sprintf("%s-project-viewers", id)})
+			grpctest.AssertCode(t, codes.NotFound, err)
+
+			_, err = polCl.GetPolicy(ctx, &api.GetPolicyReq{Id: fmt.Sprintf("%s-project-owners", id)})
+			grpctest.AssertCode(t, codes.NotFound, err)
 		}},
 	}
 
@@ -171,7 +232,8 @@ func TestCreateProject(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		store.Flush()
+		err := store.Reset(ctx)
+		require.NoError(t, err)
 	}
 }
 

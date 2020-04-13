@@ -7,15 +7,13 @@ describe('projects API', () => {
   const projectWithOrgRule: Project = {
     id: `${cypressPrefix}-project1-${Cypress.moment().format('MMDDYYhhmm')}`,
     name: 'Test Avengers Project',
-    type: 'CUSTOM',
-    status: 'NO_RULES'
+    skip_policies: true
   };
 
   const projectWithServerRule: Project = {
     id: `${cypressPrefix}-project2-${Cypress.moment().format('MMDDYYhhmm')}`,
     name: 'Test X-men Project',
-    type: 'CUSTOM',
-    status: 'NO_RULES'
+    skip_policies: true
   };
 
   const orgRule: Rule = {
@@ -23,7 +21,6 @@ describe('projects API', () => {
     name: 'first rule of avengers project',
     type: 'NODE',
     project_id: projectWithOrgRule.id,
-    status: 'STAGED',
     conditions: [
       {
         attribute: 'CHEF_ORGANIZATION',
@@ -38,7 +35,6 @@ describe('projects API', () => {
     name: 'first rule of xmen project',
     type: 'NODE',
     project_id: projectWithServerRule.id,
-    status: 'STAGED',
     conditions: [
       {
         attribute: 'CHEF_SERVER',
@@ -569,7 +565,8 @@ function waitUntilProjectNotInGraveyard(projectID: string, attempts: number): vo
     failOnStatusCode: false,
     body: {
       id: projectID,
-      name: 'can we create yet'
+      name: 'can we create yet',
+      skip_policies: true
     }
   }).then((response) => {
     if (response.status === 409) {

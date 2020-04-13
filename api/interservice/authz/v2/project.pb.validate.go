@@ -122,6 +122,8 @@ func (m *CreateProjectReq) Validate() error {
 		}
 	}
 
+	// no validation rules for SkipPolicies
+
 	return nil
 }
 

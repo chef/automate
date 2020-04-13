@@ -26,15 +26,13 @@ describe('Ingestion project tagging', () => {
       project: {
         id: `${cypressPrefix}-project-org-${now}`,
         name: 'project org',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-org',
         name: 'rule CHEF_ORGANIZATION',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-org-${now}`,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -48,15 +46,13 @@ describe('Ingestion project tagging', () => {
       project: {
         id: `${cypressPrefix}-project-chef-server-${now}`,
         name: 'project chef server',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-chef-server',
         name: 'rule CHEF_SERVER',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-chef-server-${now}`,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_SERVER',
@@ -70,15 +66,13 @@ describe('Ingestion project tagging', () => {
       project: {
         id: `${cypressPrefix}-project-environment-${now}`,
         name: 'project environment',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-environment',
         name: 'rule ENVIRONMENT',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-environment-${now}`,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'ENVIRONMENT',
@@ -92,8 +86,7 @@ describe('Ingestion project tagging', () => {
       project: {
         id: `${cypressPrefix}-project-policy-group-${now}`,
         name: 'project policy group',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-policy-group',
@@ -101,7 +94,6 @@ describe('Ingestion project tagging', () => {
         type: 'NODE',
         project_id:
         `${cypressPrefix}-project-policy-group-${now}`,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_POLICY_GROUP',
@@ -115,15 +107,13 @@ describe('Ingestion project tagging', () => {
       project: {
         id: `${cypressPrefix}-project-policy-name-${now}`,
         name: 'project policy name',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-policy-name',
         name: 'rule CHEF_POLICY_NAME',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-policy-name-${now}`,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_POLICY_NAME',
@@ -137,15 +127,13 @@ describe('Ingestion project tagging', () => {
       project: {
         id: `${cypressPrefix}-project-role-${now}`,
         name: 'project role',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-role',
         name: 'rule CHEF_ROLE',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-role-${now}`,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ROLE',
@@ -159,15 +147,13 @@ describe('Ingestion project tagging', () => {
       project: {
         id: `${cypressPrefix}-project-tag-${now}`,
         name: 'project tag',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'rule-tag',
         name: 'rule CHEF_TAG',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-tag-${now}`,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_TAG',
@@ -184,15 +170,13 @@ describe('Ingestion project tagging', () => {
       project: {
         id: `${cypressPrefix}-event-project-org-${now}`,
         name: 'event project org',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'event-rule-org',
         name: 'Chef Organization',
         type: 'EVENT',
         project_id: `${cypressPrefix}-event-project-org-${now}`,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -206,15 +190,13 @@ describe('Ingestion project tagging', () => {
       project: {
         id: `${cypressPrefix}-event-project-chef-server-${now}`,
         name: 'event project chef server',
-        type: 'CUSTOM',
-        status: 'NO_RULES'
+        skip_policies: true
       },
       rule: {
         id: 'event-rule-chef-server',
         name: 'Chef Server',
         type: 'EVENT',
         project_id: `${cypressPrefix}-event-project-chef-server-${now}`,
-        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_SERVER',

@@ -42,7 +42,8 @@ describe('assigning projects', () => {
         failOnStatusCode: false,
         body: {
           id: id,
-          name: id
+          name: id,
+          skip_policies: true
         }
       }).then((resp) => {
         expect(resp.status).to.be.oneOf([200, 409]);
