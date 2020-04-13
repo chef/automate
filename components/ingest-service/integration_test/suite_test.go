@@ -128,7 +128,7 @@ func (s *Suite) GlobalTeardown() {
 func (s *Suite) GetNode(id string) (cfgBackend.Node, error) {
 	filterMap := make(map[string][]string, 0)
 	filterMap["entity_uuid"] = []string{id}
-	nodes, err := s.cfgmgmt.GetNodes(1, 1, "node_name", true, filterMap)
+	nodes, err := s.cfgmgmt.GetNodes(1, 1, "node_name", true, filterMap, "", "")
 	if err != nil {
 		return cfgBackend.Node{}, err
 	}
@@ -147,7 +147,7 @@ func (s *Suite) GetNode(id string) (cfgBackend.Node, error) {
 // GetNodes retrives X Chef Nodes
 func (s *Suite) GetNodes(x int) ([]cfgBackend.Node, error) {
 	filterMap := make(map[string][]string, 0)
-	return s.cfgmgmt.GetNodes(1, x, "node_name", true, filterMap)
+	return s.cfgmgmt.GetNodes(1, x, "node_name", true, filterMap, "", "")
 }
 
 // GetActions retrives X Chef Actions
