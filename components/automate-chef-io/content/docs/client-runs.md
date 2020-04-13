@@ -1,6 +1,6 @@
 +++
 title = "Client Runs"
-description = "Chef Client Run Status"
+description = "Chef Infra Client Runs"
 date = 2018-03-26T16:01:58-07:00
 draft = false
 bref = ""
@@ -10,11 +10,11 @@ toc = true
 ## Overview
 
 The _Client Runs_ page shows all nodes connected to Chef Automate, either directly or via a Chef Infra Server proxy. 
-Nodes appear in this view after a Chef Client run has executed.
+Nodes appear in this view after a Chef Infra Client run has executed.
 
-## Chef Client Run Status Overview
+## Chef Infra Client Run Status Overview
 
-The Chef Client Run Status chart displays a summary of node statuses: failed, successful, or missing, as well as the total node count.
+The Chef Infra Client Run Status chart displays a summary of node statuses: failed, successful, or missing, as well as the total node count.
 The chart changes as you select filters.
 
 ![Client Runs Overview](/images/docs/client-runs.png)
@@ -22,9 +22,9 @@ The chart changes as you select filters.
 ## Node List Table
 
 The node list table shows all nodes connected to Chef Automate. 
-Filter the node list table by selecting any of the status tabs below the **Chef Client Run Status** box.
+Filter the node list table by selecting any of the status tabs below the **Chef Infra Client Run Status** box.
 Sort the nodes listed on the table by selecting the arrows to the right of the column headers: _Node Name_, _Check-In_, _Uptime_, _Platform_, _Environment_ or _Policy Group_.
-Selecting an entry in this table will take you to a _Node details_ page with more information about the Chef Client runs associated with this node.
+Selecting an entry in this table will take you to a _Node details_ page with more information about the Chef Infra Client runs associated with this node.
 
 A node may be present in this table without any associated run history.
 This situation happens when data retention settings erase the most recent run history for such a node.
@@ -50,7 +50,7 @@ Use the search bar to discover the node attributes by attribute name, key name, 
 The search results show by highlighting matching attributes. Use the _default_, _normal_, _override_, and _automatic_ buttons beneath the search bar to filter attributes by to these categories.
 Learn more about [attributes](https://docs.chef.io/attributes/).
 
-When looking at a failed Chef Client run, select **View Error Log** at the top of the page to open a window showing the error message and backtrace. 
+When looking at a failed Chef Infra Client run, select **View Error Log** at the top of the page to open a window showing the error message and backtrace. 
 Use the downloaded button to save the error message.
 
 Selecting a node from the node list table opens the _Node details_ page with the most recent information about that node.
@@ -58,7 +58,7 @@ Selecting a node from the node list table opens the _Node details_ page with the
 To look at past run data, select **Run History** on the upper right of the page, which opens a side panel containing historical run data. 
 You can filter this data by using the Run Status icons and Date Range selections.
 
-Node history data supports up to three months of Chef Client run information.
+Node history data supports up to three months of Chef Infra Client run information.
 Scroll through the node history using the pagination buttons at the bottom of the side panel. 
 Use the **X** button at the top of the panel to close the side panel.
 
@@ -122,7 +122,7 @@ Configure the timing for labeling nodes as missing and then deleting them from [
 
 ### Deleting Missing Nodes
 
-Admins and users with the relevant permissions defined in access policies can delete missing nodes from the Chef Client Runs page.
+Admins and users with the relevant permissions defined in access policies can delete missing nodes from the Chef Infra Client Runs page.
 You cannot delete active nodes.
 
 To delete one or more missing nodes, tick the checkbox to the left of the node name, and then select the red **Delete** button above the table header.
