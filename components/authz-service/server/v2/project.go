@@ -818,6 +818,9 @@ func (s *ProjectState) prepareStorageRule(inID, projectID, name string,
 	if err != nil {
 		return nil, err
 	}
+	if len(inConditions) == 0 {
+		return nil, errors.New("at least one condition is required")
+	}
 
 	ruleType, err := fromAPIType(inType)
 	if err != nil {
