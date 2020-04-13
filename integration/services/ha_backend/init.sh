@@ -148,7 +148,7 @@ password = "$ha_admin_pg_password"
 enable = true
 
 [esgateway.v1.sys.service]
-host = ""
+host = "0.0.0.0"
 DOC
 
     for try in {1..8}; do
