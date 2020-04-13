@@ -123,7 +123,7 @@ func (s *ProjectState) GetProject(ctx context.Context,
 
 func (s *ProjectState) CreateProject(ctx context.Context,
 	req *api.CreateProjectReq) (*api.CreateProjectResp, error) {
-	err := confirmRequiredField(req.Name, "name", "project")
+	err := confirmRequiredName(req.Name, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -583,7 +583,7 @@ func confirmRequiredFieldsForRule(id, project_id string) error {
 	if err != nil {
 		return status.Errorf(codes.InvalidArgument, err.Error())
 	}
-	err = confirmRequiredField(project_id, "project_id", "rule")
+	err = confirmRequiredProjectID(project_id, "rule")
 	if err != nil {
 		return status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -814,7 +814,7 @@ func (s *ProjectState) prepareStorageRule(inID, projectID, name string,
 	if err != nil {
 		return nil, err
 	}
-	err = confirmRequiredField(projectID, "project_id", "rule")
+	err = confirmRequiredProjectID(projectID, "rule")
 	if err != nil {
 		return nil, err
 	}

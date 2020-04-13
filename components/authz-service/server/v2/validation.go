@@ -11,11 +11,11 @@ import (
 var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
 func confirmRequiredIDandName(id, name, resourceName string) error {
-	err := confirmRequiredField(id, "id", resourceName)
+	err := confirmRequiredID(id, resourceName)
 	if err != nil {
 		return err
 	}
-	err = confirmRequiredField(name, "name", resourceName)
+	err = confirmRequiredName(name, resourceName)
 	return err
 }
 
@@ -29,6 +29,34 @@ func confirmRequiredField(field, fieldName, resourceName string) error {
 
 func confirmRequiredID(id, resourceName string) error {
 	return confirmRequiredField(id, "id", resourceName)
+}
+
+func confirmRequiredName(name, resourceName string) error {
+	return confirmRequiredField(name, "name", resourceName)
+}
+
+func confirmRequiredProjectID(projectID, resourceName string) error {
+	return confirmRequiredField(projectID, "project_id", resourceName)
+}
+
+func validateRequiredFieldsAndProjects(id string, name string, projectIDs []string, resourceName string) error {
+	err := confirmRequiredIDandName(id, name, resourceName)
+	if err != nil {
+		return err
+	}
+	err = validateProjects(projectIDs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func validateRequiredFieldsAndProjectsForPolicy(id string, name string, projectIDs []string) error {
+	return validateRequiredFieldsAndProjects(id, name, projectIDs, "policy")
+}
+
+func validateRequiredFieldsAndProjectsForRole(id string, name string, projectIDs []string) error {
+	return validateRequiredFieldsAndProjects(id, name, projectIDs, "role")
 }
 
 func validateProjects(projects []string) error {

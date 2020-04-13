@@ -94,6 +94,10 @@ func (s *policyServer) CreatePolicy(
 	req *api.CreatePolicyReq) (*api.Policy, error) {
 
 	// API requests always create custom policies.
+	err := validateRequiredFieldsAndProjectsForPolicy(req.Id, req.Name, req.Projects)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
 
 	pol, err := s.policyFromAPI(
 		req.Id,
@@ -208,7 +212,7 @@ func (s *policyServer) UpdatePolicy(
 	ctx context.Context,
 	req *api.UpdatePolicyReq) (*api.Policy, error) {
 
-	err := confirmRequiredIDandName(req.Id, req.Name, "policy")
+	err := validateRequiredFieldsAndProjectsForPolicy(req.Id, req.Name, req.Projects)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -396,13 +400,9 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 func (s *policyServer) CreateRole(
 	ctx context.Context,
 	req *api.CreateRoleReq) (*api.Role, error) {
-	err := confirmRequiredField(req.Name, "name", "role")
+	err := validateRequiredFieldsAndProjectsForRole(req.Id, req.Name, req.Projects)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	}
-	err = validateProjects(req.Projects)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "error parsing role %q: %s", req.Id, err.Error())
 	}
 
 	storageRole, err := storage.NewRole(req.Id, req.Name, storage.Custom, req.Actions, req.Projects)
@@ -505,7 +505,7 @@ func (s *policyServer) UpdateRole(
 	ctx context.Context,
 	req *api.UpdateRoleReq) (*api.Role, error) {
 
-	err := confirmRequiredIDandName(req.Id, req.Name, "role")
+	err := validateRequiredFieldsAndProjectsForRole(req.Id, req.Name, req.Projects)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -606,16 +606,6 @@ func (s *policyServer) policyFromAPI(
 	membersToAttach []string,
 	statementsToAttach []*api.Statement,
 	inProjects []string) (storage.Policy, error) {
-
-	err := confirmRequiredIDandName(ID, name, "policy")
-	if err != nil {
-		return storage.Policy{}, err
-	}
-
-	err = validateProjects(inProjects)
-	if err != nil {
-		return storage.Policy{}, err
-	}
 
 	statements := make([]storage.Statement, len(statementsToAttach))
 	for i, statement := range statementsToAttach {
