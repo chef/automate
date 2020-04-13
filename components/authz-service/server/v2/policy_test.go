@@ -1174,7 +1174,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 
 			require.Nil(t, pol)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
-			assert.Regexp(t, "rpc error: code = InvalidArgument desc = a policy id is required and must contain at least one non-whitespace character", err.Error())
+			assert.Regexp(t, "InvalidArgument.*policy id is required.*must contain at least one non-whitespace character", err.Error())
 		}},
 		{"fails with NotFound when policy not found", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
