@@ -1,7 +1,6 @@
 package backup
 
 import (
-	"bytes"
 	"compress/gzip"
 	"context"
 	"crypto/sha256"
@@ -607,7 +606,7 @@ func mergeIntoFile(a ArtifactStream, b ArtifactStream) (ArtifactStream, error) {
 
 // openGzipFile returns an artifact stream of an uncrompressed gzip file, the
 // file contents checkum, and any error encountered.
-func (repo *ArtifactRepo) openGzipFile(ctx context.Context, name string) (ArtifactStream, string, error) {
+func (repo *ArtifactRepo) openGzipFile(ctx context.Context, name string) (*os.File, string, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -649,18 +648,22 @@ func (repo *ArtifactRepo) openGzipFile(ctx context.Context, name string) (Artifa
 		return nil, "", err
 	}
 
-	return NewLineReaderStream(tmpFile), checksum, nil
+	return tmpFile, checksum, nil
 }
 
 func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (ArtifactStream, string, error) {
-	return repo.openGzipFile(ctx, toSnapshotName(name))
+	tmpFile, checksum, err := repo.openGzipFile(ctx, toSnapshotName(name))
+	if err != nil {
+		return nil, checksum, err
+	}
+	return NewLineReaderStream(tmpFile), checksum, err
 }
 
 // ReadSnapshotIntegrityMetadata reads the snapshot integrity metadata file
 func (repo *ArtifactRepo) ReadSnapshotIntegrityMetadata(ctx context.Context) (*ArtifactRepoIntegrityMetadata, error) {
 	metadata := NewArtifactRepoIntegrityMetadata()
 
-	metadataStream, _, err := repo.openGzipFile(ctx, SnapshotIntegrityMetadataFileName)
+	metadataFile, _, err := repo.openGzipFile(ctx, SnapshotIntegrityMetadataFileName)
 	if err != nil {
 		if IsNotExist(err) {
 			return metadata, nil
@@ -668,16 +671,13 @@ func (repo *ArtifactRepo) ReadSnapshotIntegrityMetadata(ctx context.Context) (*A
 
 		return nil, err
 	}
+	defer logClose(metadataFile, "failed to close metadata file")
 
-	buff := &bytes.Buffer{}
-	writer := NewLoggingStream(metadataStream, buff)
-	defer logClose(writer, "failed to logging stream")
-
-	if err := ConsumeStream(writer); err != nil {
+	if err := json.NewDecoder(metadataFile).Decode(metadata); err != nil {
 		return nil, err
 	}
 
-	return metadata, json.Unmarshal(buff.Bytes(), metadata)
+	return metadata, nil
 }
 
 func (repo *ArtifactRepo) writeSnapshotIntegrityMetadata(ctx context.Context, metadata *ArtifactRepoIntegrityMetadata) error {
