@@ -8,13 +8,23 @@ import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
+import { Regex } from 'app/helpers/auth/regex';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeURL, routeState } from 'app/route.selectors';
 import { EntityStatus, pending } from 'app/entities/entities';
 import { User } from 'app/entities/users/user.model';
-import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
+import {
+  ProjectChecked,
+  ProjectCheckedMap
+} from 'app/components/projects-dropdown/projects-dropdown.component';
+import { GetProjects } from 'app/entities/projects/project.actions';
+import {
+  allProjects,
+  getAllStatus as getAllProjectStatus
+} from 'app/entities/projects/project.selectors';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 import {
   teamFromRoute,
   teamUsers,
@@ -26,21 +36,9 @@ import { Team } from 'app/entities/teams/team.model';
 import {
   GetTeam,
   GetTeamUsers,
-  TeamUserMgmtPayload,
   RemoveTeamUsers,
   UpdateTeam
 } from 'app/entities/teams/team.actions';
-import {
-  ProjectChecked,
-  ProjectCheckedMap
-} from 'app/components/projects-dropdown/projects-dropdown.component';
-
-import { GetProjects } from 'app/entities/projects/project.actions';
-import {
-  allProjects,
-  getAllStatus as getAllProjectStatus
-} from 'app/entities/projects/project.selectors';
-import { ProjectConstants } from 'app/entities/projects/project.model';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -209,7 +207,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   removeUser(user: User): void {
-    this.store.dispatch(new RemoveTeamUsers(<TeamUserMgmtPayload>{
+    this.store.dispatch(new RemoveTeamUsers({
       id: this.teamId,
       membership_ids: [user.membership_id]
     }));

@@ -3,7 +3,7 @@ import { cloneDeep, difference, keys, times } from 'lodash/fp';
 import * as faker from 'faker';
 
 import { using } from 'app/testing/spec-helpers';
-import { EntityStatus } from '../entities';
+import { EntityStatus } from 'app/entities/entities';
 import {
   teamEntityReducer,
   TeamEntityInitialState,
@@ -317,10 +317,10 @@ describe('teamStatusEntityReducer', () => {
     });
 
     using([
-      [initialState, 'initial state', 0],
-      [genArbitraryState(), 'non-initial state', 0],
-      [genStateWithUserIDs(2), 'when there are already user IDs', 2]
-    ], function (state: TeamEntityState, description: string, _initialUserIdLength: number) {
+      [initialState, 'initial state'],
+      [genArbitraryState(), 'non-initial state'],
+      [genStateWithUserIDs(2), 'when there are already user IDs']
+    ], function (state: TeamEntityState, description: string) {
       it('adds users from the payload to the state for ' + description, () => {
         const userIDArray = [
           faker.random.uuid(),
@@ -374,23 +374,23 @@ describe('teamStatusEntityReducer', () => {
     });
 
     const multipleState = genStateWithUserIDs(4);
-    const usersToRemoveMultiple = multipleState.userIDs.slice(0, 1);
     using([
-      [initialState, 'initial state with no inputs', 0, []],
-      [genArbitraryState(), 'non-initial state', 0, [faker.random.uuid()]],
-      [multipleState, 'when there are already user IDs', 4, usersToRemoveMultiple]
-    ], function (state: TeamEntityState, description: string,
-        _initialUserIdLength: number, usersToRemove: string[]) {
-      it('removes users from the payload to the state for ' + description, () => {
+      [initialState, 'for initial state with no inputs returns initial state', []],
+      [genArbitraryState(), 'for non-present user returns initial state', [faker.random.uuid()]],
+      [multipleState, 'removes single user from team',  multipleState.userIDs[0]],
+      [multipleState, 'removes multiple users from team',  multipleState.userIDs.slice(0, 2)],
+      [multipleState, 'removes all users from team',  multipleState.userIDs]
+    ], function (state: TeamEntityState, description: string, usersToRemove: string[]) {
+      it(description, () => {
+        const resultingUsers = difference(state.userIDs, usersToRemove);
         const payload: TeamUserMgmtPayload = {
           id: faker.random.uuid(),
-          membership_ids: usersToRemove
+          membership_ids: resultingUsers
         };
         const action = new RemoveTeamUsersSuccess(payload);
-        const initUserIDs = cloneDeep(state.userIDs);
 
         const { userIDs } = teamEntityReducer(state, action);
-        expect(userIDs).toEqual(difference(initUserIDs, usersToRemove));
+        expect(userIDs).toEqual(resultingUsers);
       });
     });
   });
