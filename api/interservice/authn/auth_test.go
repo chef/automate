@@ -55,6 +55,11 @@ func TestValidationCreateTokenID(t *testing.T) {
 			Name:     "name",
 			Projects: []string{"much-too-long-longest-word-in-english-pneumonoultramicroscopicsilicovolcanoconiosis", "valid"},
 		},
+		"with no characters": &authn.CreateTokenReq{
+			Id:       "",
+			Name:     "name",
+			Projects: []string{"project1", "project2"},
+		},
 	}
 	positiveCases := map[string]*authn.CreateTokenReq{
 		"projects are missing": &authn.CreateTokenReq{
@@ -65,11 +70,6 @@ func TestValidationCreateTokenID(t *testing.T) {
 			Id:       "valid_id",
 			Name:     "name",
 			Projects: []string{"project_1", "project_2"},
-		},
-		"with no characters": &authn.CreateTokenReq{
-			Id:       "",
-			Name:     "name",
-			Projects: []string{"project1", "project2"},
 		},
 		"with ID all lowercase": &authn.CreateTokenReq{
 			Id:       "test",
