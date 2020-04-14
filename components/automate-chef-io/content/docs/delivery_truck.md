@@ -262,7 +262,7 @@ A project application is a useful way to promote projects by using a set of attr
 ### Configure Project Application
 
 Project applications are defined in the **publish.rb** recipe in a **build-cookbook** using the `define_project_application` helper method, and then in the **deploy.rb** recipe using the `get_project_application` method.
-The publish phase happens at the end of the build stage. It is at this point where the project application version is pinned, uploaded to the Chef server as a data bag item, and then used through the remaining stages.
+The publish phase happens at the end of the build stage. It is at this point where the project application version is pinned, uploaded to the Chef Infra Server as a data bag item, and then used through the remaining stages.
 
 The `define_project_application` helper method is available from the **delivery-sugar** cookbook, which is a dependency of the **delivery-truck** cookbook. This helper is available when the **publish.rb** recipe has `include_recipe 'delivery-truck::publish'` defined.
 
@@ -455,7 +455,7 @@ Automate-backed cookbook projects.
 ### Prerequisites
 
 * Ensure you have a private Supermarket installed, setup, and running. See [Install Private Supermarket](/install_supermarket.html) for more information.
-* Ensure you have a Chef server with the Chef Identity authentication/authorization service configured, a Chef Automate server setup that references your private Supermarket, and at least one Chef Automate build node/runner installed, setup, and running. See [Install Chef Automate](/install_chef_automate.html) and [Chef Identity](/install_supermarket.html#chef-identity.html) for more information.
+* Ensure you have a Chef Infra Server with the Chef Identity authentication/authorization service configured, a Chef Automate server setup that references your private Supermarket, and at least one Chef Automate build node/runner installed, setup, and running. See [Install Chef Automate](/install_chef_automate.html) and [Chef Identity](/install_supermarket.html#chef-identity.html) for more information.
 * Ensure you have created a project in Chef Automate. Follow these instructions to [Set Up Projects](/delivery_build_cookbook.html#set-up-projects).
 * Ensure you have [ChefDK](https://downloads.chef.io/chefdk/) installed on your workstation.
 
@@ -463,7 +463,7 @@ Automate-backed cookbook projects.
 
 To use **delivery-truck** and its dependency, **delivery-sugar**, you must
 first share them with a private Supermarket that is authenticated with
-your Chef server.
+your Chef Infra Server.
 
 1. From a workstation, create a cookbooks directory, `$COOKBOOKS_DIR`:
 
