@@ -157,6 +157,12 @@ func (s *CfgMgmtServer) GetNodes(
 		return nodes, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
+	// Date Range
+	if !params.ValidateDateTimeRange(request.GetStart(), request.GetEnd()) {
+		return nodes, status.Errorf(codes.InvalidArgument,
+			"Invalid start/end time. (format: YYYY-MM-DD'T'HH:mm:ssZ)")
+	}
+
 	filters, err = filterByProjects(ctx, filters)
 	if err != nil {
 		return nodes, status.Errorf(codes.Internal, err.Error())
@@ -169,7 +175,11 @@ func (s *CfgMgmtServer) GetNodes(
 	sortField, sortAsc := request.GetSorting().GetParameters()
 
 	// TODO: (@afiune) should we change the backend to understand int32 instead?
-	bNodes, err := s.client.GetNodes(int(page), int(pageSize), sortField, sortAsc, filters)
+	bNodes, err := s.client.GetNodes(int(page), int(pageSize), sortField, sortAsc, filters,
+		request.GetStart(),
+		request.GetEnd(),
+	)
+
 	if err != nil {
 		return nodes, status.Errorf(codes.Internal, err.Error())
 	}

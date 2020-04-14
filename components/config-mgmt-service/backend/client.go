@@ -19,8 +19,8 @@ import (
 type Client interface {
 	// @params (nodeid, filters)
 	NodeExists(nodeID string, projectFilters map[string][]string) (bool, error)
-	// @params (page, perPage, sortField, ascending, filters)
-	GetNodes(int, int, string, bool, map[string][]string) ([]Node, error)
+	// @params (page, perPage, sortField, ascending, filters, startDate, endDate)
+	GetNodes(int, int, string, bool, map[string][]string, string, string) ([]Node, error)
 	// @params (filters)
 	GetNodesCounts(map[string][]string) (NodesCounts, error)
 	// @params (node_id, page, per_page, filters, start, end)
