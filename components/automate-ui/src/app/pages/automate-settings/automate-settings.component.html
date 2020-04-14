@@ -11,7 +11,7 @@
 
       <chef-page-header>
         <chef-heading>Data Lifecycle</chef-heading>
-        <chef-subheading>Manage the retention of events, service groups, Chef Client runs, compliance reports and scans in Chef Automate.</chef-subheading>
+        <chef-subheading>Manage the retention of events, service groups, Chef Infra Client runs, compliance reports and scans in Chef Automate.</chef-subheading>
       </chef-page-header>
 
       <div class="page-body">
@@ -119,7 +119,7 @@
               (change)="handleFormActivation(clientRunsRemoveData, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove data for Chef Client runs after
+            <p>Remove data for Chef Infra Client runs after
               <input chefInput type="number" min="0" formControlName="threshold"
                 (keydown)="preventNegatives($event.key)" />days
             </p>
@@ -133,7 +133,7 @@
               </chef-checkbox>
             </div>
           
-            <p>When no Chef Client run data has been received from a node in
+            <p>When no Chef Infra Client run data has been received from a node in
               <input chefInput 
                 type="number" 
                 min="0" 

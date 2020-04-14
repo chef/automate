@@ -19,7 +19,7 @@ export interface RuleInterface {
 export class Rule implements RuleInterface {
 
   AlertTypeLabels = {
-    CCRFailure: 'Chef client run failures',
+    CCRFailure: 'Chef Infra Client run failures',
     ComplianceFailure: 'InSpec scan failures'
   };
 

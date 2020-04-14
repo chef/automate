@@ -70,7 +70,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     },
     {
       type: 'chef_version',
-      text: 'Chef Client Version',
+      text: 'Chef Infra Client Version',
       allowWildcards: true
     },
     {

@@ -103,7 +103,7 @@ While we've taken care to make the migration process as smooth as possible, this
 
 The Chef Automate 2 migration process puts your Chef Automate 1 installation into maintenance mode, shuts it down, and starts Chef Automate 2. During the downtime, the migration process takes a backup of your Chef Automate 1 data and exports some of its data to a local snapshot, which is imported into Chef Automate 2.
 
-To minimize this downtime, we recommended that you create an online backup of Chef Automate 1 just prior to the upgrade. Historical information such as Chef Client run data and compliance scan data is backed up incrementally, which means that the upgrade only needs to transfer data that has been added since the last backup.
+To minimize this downtime, we recommended that you create an online backup of Chef Automate 1 just prior to the upgrade. Historical information such as Chef Infra Client run data and compliance scan data is backed up incrementally, which means that the upgrade only needs to transfer data that has been added since the last backup.
 
 By default, the Chef Automate 2 upgrade process will not proceed if your Chef Automate 1 installation does not have backups configured. Invoke the migration using the `--skip-backup-check` flag to avoid this check.
 

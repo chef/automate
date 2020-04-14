@@ -109,7 +109,7 @@ Setting the value to `cookbook` creates an incident for the failed cookbook. All
 
 ![CCR Failed Cookbook Description](/images/docs/SNOW_Failed_Cookbook.png)
 
-The associated client runs are shown on the 'Chef Client runs' tab of the incident.
+The associated client runs are shown on the 'Chef Infra Client runs' tab of the incident.
 
 Setting the value to `node` creates an incident for each failed node. All failing Chef Infra Client runs for a node are associated with the corresponding incident. The short description of the incident will indicate the failed node:
 

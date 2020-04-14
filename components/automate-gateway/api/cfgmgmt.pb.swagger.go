@@ -17,7 +17,7 @@ func init() {
     "/cfgmgmt/errors": {
       "get": {
         "summary": "GetErrors",
-        "description": "Returns a list of the most common errors reported for infra nodes' most recent Chef Client runs.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetErrors",
         "responses": {
           "200": {

@@ -288,7 +288,7 @@ type ConfigMgmtClient interface {
 	//
 	//GetErrors
 	//
-	//Returns a list of the most common errors reported for infra nodes' most recent Chef Client runs.
+	//Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.
 	//
 	//Authorization Action:
 	//```
@@ -659,7 +659,7 @@ type ConfigMgmtServer interface {
 	//
 	//GetErrors
 	//
-	//Returns a list of the most common errors reported for infra nodes' most recent Chef Client runs.
+	//Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.
 	//
 	//Authorization Action:
 	//```

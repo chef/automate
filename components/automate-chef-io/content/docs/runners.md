@@ -20,7 +20,7 @@ Chef Automate's workflow engine automatically creates phase jobs as project code
 
 ## Prerequisites
 
-* Workflow runners for Chef Automate 2 require the latest version of [ChefDK](https://downloads.chef.io/chefdk/3.7.23), which includes Chef Client 14.10. The runners will not function unless upgraded.
+* Workflow runners for Chef Automate 2 require the latest version of [ChefDK](https://downloads.chef.io/chefdk/3.7.23), which includes Chef Infra Client 14.10. The runners will not function unless upgraded.
 * Cookbooks used with Workflow for Chef Automate must be upgraded to work with Chef 14.10 or newer.
 * Chef Automate requires either the latest version of [ChefDK](https://downloads.chef.io/chefdk/3.7.23), which includes the `delivery-cli` that supports Workflow.
 
