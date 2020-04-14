@@ -13,7 +13,7 @@ export const {
 
 export const infraRoleStatus = createSelector(
   infraRoleState,
-  (state) => state.status
+  (state) => state.role
 );
 
 export const getStatus = createSelector(
