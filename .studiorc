@@ -10,23 +10,6 @@ GOLANGCILINTVERSION=1.21.0
 # TODO(ssd) 2019-11-19: https://github.com/habitat-sh/habitat/issues/7219
 unset SSL_CERT_FILE
 
-# shellcheck disable=1090
-if [ -d "${STUDIO_COMMON:-}" ]; then
-  echo "STUDIO_COMMON override in effect; using $STUDIO_COMMON, not chef/studio-common habitat package"
-  source "$STUDIO_COMMON/bin/studio-common"
-else
-  hab pkg install chef/studio-common
-  source "$(hab pkg path chef/studio-common)/bin/studio-common"
-fi
-
-# Install busybox-static so script evaluations (e.g. #!/bin/bash) will work
-# This ensures normal linux studios work like Docker studios
-log_line "Install busybox-static & bash hart packages"
-hab pkg install core/busybox-static >/dev/null
-hab pkg binlink -d /bin core/busybox-static >/dev/null
-hab pkg install core/bash >/dev/null
-hab pkg binlink -d /bin/ -f core/bash >/dev/null
-
 # TODO (tc) Let's get rid of this hard-coded config long-term.
 # Elasticsearch
 # TODO (tc) This should be https once certs are added, at which point
@@ -66,7 +49,6 @@ setup_gobin() {
     export GOBIN
     mkdir -p "$GOBIN"
 }
-
 setup_gobin
 
 # Make 'go installed' binaries available in the PATH
@@ -86,6 +68,25 @@ export CHEF_DEV_ENVIRONMENT=true
 
 # minimal(fast) hart compression level for dev
 export HAB_HART_COMPRESSION_LEVEL=0
+
+mkdir -p /tmp/docs /tmp/aliases
+# Source all the files available in the .studio directory of the /src directory
+# Only if the '.studio/' directory exists and it is not empty
+if ls -A /src/.studio &>/dev/null; then
+  for file in /src/.studio/*; do
+    # shellcheck disable=SC1090
+    source "$file"
+  done
+  source_msg="$source_msg and your local .studio folder";
+fi
+
+# Install busybox-static so script evaluations (e.g. #!/bin/bash) will work
+# This ensures normal linux studios work like Docker studios
+log_line "Install busybox-static & bash hart packages"
+hab pkg install core/busybox-static >/dev/null
+hab pkg binlink -d /bin core/busybox-static >/dev/null
+hab pkg install core/bash >/dev/null
+hab pkg binlink -d /bin/ -f core/bash >/dev/null
 
 getting_started << GETTING_STARTED
 
@@ -211,6 +212,31 @@ check_if_deployinate_started() {
 # ```
 # export HAB_STUDIO_SECRET_GITHUB_TOKEN=secret
 # ```
+document "generate_netrc_config" <<DOC
+  Create a .netrc file that can be used to authenticate against GitHub.
+  Some projects require access to private GitHub repositories. The recommended
+  pattern is for projects to use the git+https protocol in conjunction with a
+  .netrc file.
+  Requirements:
+  => Habitat 0.54.0 or greater installed
+  => Specify 'HAB_STUDIO_SECRET_GITHUB_TOKEN' in your shell environment (outside the studio)
+  To learn more about .netrc files, you can check out the following documentation:
+    https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html
+DOC
+generate_netrc_config() {
+  if [[ -z "$GITHUB_TOKEN" ]]; then
+    warn "Unable to configure ~/.netrc in the studio."
+    warn ""
+    warn "Missing the environment variable: HAB_STUDIO_SECRET_GITHUB_TOKEN"
+    warn "Without this variable, you will be unable to access private GitHub repositories."
+    warn ""
+    warn "Verify that you have this variable exported before entering the studio:"
+    warn "export HAB_STUDIO_SECRET_GITHUB_TOKEN=[your-secret-token]"
+  else
+    echo -e "machine github.com\\n  login $GITHUB_TOKEN" >> ~/.netrc
+    chmod 0600 ~/.netrc
+  fi
+}
 generate_netrc_config
 
 # Prepare the environment to run our services
