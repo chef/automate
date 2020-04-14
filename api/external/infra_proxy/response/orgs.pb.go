@@ -294,11 +294,11 @@ type Org struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Admin user of the Org.
 	AdminUser string `protobuf:"bytes,3,opt,name=admin_user,json=adminUser,proto3" json:"admin_user,omitempty"`
-	// Admin Key scrects-service credential ID for the Org.
+	// Admin key secrets-service credential ID for the Org.
 	CredentialId string `protobuf:"bytes,4,opt,name=credential_id,json=credentialId,proto3" json:"credential_id,omitempty"`
 	// ID of the Server.
 	ServerId string `protobuf:"bytes,5,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	// Projects under which org is being associated.
+	// List of projects this organization belongs to. May be empty.
 	Projects             []string `protobuf:"bytes,6,rep,name=projects,proto3" json:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

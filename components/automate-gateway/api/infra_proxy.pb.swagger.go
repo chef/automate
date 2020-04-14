@@ -901,7 +901,7 @@ func init() {
         },
         "admin_key": {
           "type": "string",
-          "description": "Admin Key of the Org."
+          "description": "Admin key of the Org."
         },
         "server_id": {
           "type": "string",
@@ -912,7 +912,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "Projects of the Org."
+          "description": "List of projects this organization belongs to. May be empty."
         }
       }
     },
@@ -957,7 +957,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "Projects under which org is being associated."
+          "description": "List of projects this organization belongs to. May be empty."
         }
       }
     },
@@ -1484,7 +1484,7 @@ func init() {
         },
         "credential_id": {
           "type": "string",
-          "description": "Admin Key scrects-service credential ID for the Org."
+          "description": "Admin key secrets-service credential ID for the Org."
         },
         "server_id": {
           "type": "string",
@@ -1495,7 +1495,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "Projects under which org is being associated."
+          "description": "List of projects this organization belongs to. May be empty."
         }
       }
     },

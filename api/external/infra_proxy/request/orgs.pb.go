@@ -25,11 +25,11 @@ type CreateOrg struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Admin user of the Org.
 	AdminUser string `protobuf:"bytes,2,opt,name=admin_user,json=adminUser,proto3" json:"admin_user,omitempty"`
-	// Admin Key of the Org.
+	// Admin key of the Org.
 	AdminKey string `protobuf:"bytes,3,opt,name=admin_key,json=adminKey,proto3" json:"admin_key,omitempty"`
 	// ID of the Server.
 	ServerId string `protobuf:"bytes,4,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	// Projects of the Org.
+	// List of projects this organization belongs to. May be empty.
 	Projects             []string `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -105,7 +105,7 @@ type UpdateOrg struct {
 	AdminUser string `protobuf:"bytes,3,opt,name=admin_user,json=adminUser,proto3" json:"admin_user,omitempty"`
 	// ID of the server.
 	ServerId string `protobuf:"bytes,4,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	// Projects under which org is being associated.
+	// List of projects this organization belongs to. May be empty.
 	Projects             []string `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

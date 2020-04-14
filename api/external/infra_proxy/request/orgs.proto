@@ -8,11 +8,11 @@ message CreateOrg {
     string name = 1;
     // Admin user of the Org.
     string admin_user = 2;
-    // Admin Key of the Org.
+    // Admin key of the Org.
     string admin_key = 3;
     // ID of the Server.
     string server_id = 4;
-    // Projects of the Org.
+    // List of projects this organization belongs to. May be empty.
     repeated string projects = 5;
 }
 
@@ -25,7 +25,7 @@ message UpdateOrg {
     string admin_user = 3;
     // ID of the server.
     string server_id = 4;
-    // Projects under which org is being associated.
+    // List of projects this organization belongs to. May be empty.
     repeated string projects = 5;
 }
 
