@@ -11,7 +11,7 @@
           <chef-heading>{{ cookbookName }}</chef-heading>
           <div class="version-dropdown">
             <label>Version</label>
-            <chef-select *ngIf="cookbook?.versions" (change)="onCookbookVersionChange(serverId, orgId, cookbookName, $event.target.value)">
+            <chef-select *ngIf="cookbook?.versions" (change)="handleCookbookVersionChange(serverId, orgId, cookbookName, $event)">
               <chef-option *ngFor="let version of cookbook.versions" [value]="version">{{ version }}</chef-option>
             </chef-select>
           </div>
@@ -20,6 +20,7 @@
           </chef-tab-selector>
         </chef-page-header>
         <section class="page-body">
+          <chef-loading-spinner *ngIf="cookbookDetailsLoading" size="50"></chef-loading-spinner>
           <chef-markdown *ngIf="readFileContent" [text]="readFileContent.content"></chef-markdown>
         </section>
       </main>

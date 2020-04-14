@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { HttpClient } from '@angular/common/http';
 import { environment as env } from 'environments/environment';
-import { Observable, Subject, combineLatest } from 'rxjs';
+import { Subject, combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeURL, routeParams } from 'app/route.selectors';
@@ -25,12 +25,8 @@ export type CookbookDetailsTab = 'details' | 'content';
   styleUrls: ['./cookbook-details.component.scss']
 })
 export class CookbookDetailsComponent implements OnInit, OnDestroy {
-  public loading$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
   public cookbook: CookbookVersions;
-  public saveSuccessful = false;
-  public saving = false;
-  public isLoading = true;
   public url: string;
   public serverId: string;
   public orgId: string;
@@ -40,6 +36,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
   public readFile: RootFiles;
   public readFileUrl: string;
   public readFileContent;
+  public cookbookDetailsLoading = true;
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
@@ -56,7 +53,8 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
             cookbook_version: this.cookbook.versions[0]
           }));
           this.onCookbookVersionChange(
-            this.serverId, this.orgId,
+            this.serverId,
+            this.orgId,
             this.cookbook.name,
             this.cookbook.versions[0]
           );
@@ -110,9 +108,21 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
             `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${cookbook_version}/file-content?url=${this.readFileUrl}`).subscribe
             (fileContent => {
               this.readFileContent = fileContent;
+              this.cookbookDetailsLoading = false;
             });
         }
       });
+  }
+
+  public handleCookbookVersionChange(
+    server_id: string,
+    org_id: string,
+    cookbook_name: string,
+    event
+    ): void {
+    this.readFileContent = '';
+    this.cookbookDetailsLoading = true;
+    this.onCookbookVersionChange(server_id, org_id, cookbook_name, event.target.value);
   }
 
   ngOnDestroy(): void {
