@@ -1,7 +1,7 @@
 import { eventExist, uuidv4 } from '../../../support/helpers';
 import { Rule, Project } from '../../../support/types';
 
-const nodeStart = Cypress.moment().utc().subtract(3, 'day').startOf('day').format()
+const nodeStart = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
 const nodeEnd = Cypress.moment().utc().endOf('day').format();
 const eventStart = Cypress.moment().utc().subtract(3, 'day').valueOf().toString();
 const eventEnd = Cypress.moment().utc().endOf('day').valueOf().toString();
@@ -212,38 +212,40 @@ describe('Ingestion project tagging', () => {
     cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
     // create the projects with one node rule each
-    projectsWithNodeRules.forEach(project => {
+    projectsWithNodeRules.forEach(projectWithRule => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
         url: '/apis/iam/v2/projects',
-        body: project.project
+        body: projectWithRule.project
       }).then((response) => {
-        expect(response.body.project.id).to.eq(project.project.id);
+        expect(response.body.project.id).to.eq(projectWithRule.project.id);
       });
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
-        url: `/apis/iam/v2/projects/${project.rule.project_id}/rules`,
-        body: project.rule
+        url: `/apis/iam/v2/projects/${projectWithRule.rule.project_id}/rules`,
+        body: projectWithRule.rule
       });
     });
 
     // create the projects with one event rule each
-    projectsWithEventRules.forEach(project => {
+    projectsWithEventRules.forEach(projectWithRule => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
         url: '/apis/iam/v2/projects',
-        body: project.project
+        body: projectWithRule.project
+      }).then((response) => {
+        expect(response.body.project.id).to.eq(projectWithRule.project.id);
       });
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
-        url: `/apis/iam/v2/projects/${project.rule.project_id}/rules`,
-        body: project.rule
+        url: `/apis/iam/v2/projects/${projectWithRule.rule.project_id}/rules`,
+        body: projectWithRule.rule
       });
     });
 
