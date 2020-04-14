@@ -378,16 +378,22 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 func customPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 	name := fmt.Sprintf("%s (custom)", pol.ID.String())
 
+	resource, err := convertV1Resource(pol.Resource)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not derive v2 resource")
+	}
+	// in the case of most policies with single term resources (i.e. a container policy
+	// like 'cfgmgmt'), there is no v2 equivalent resource
+	// so the policy should be skipped
+	if resource == "" {
+		return nil, nil
+	}
+
 	// TODO: If we encounter an unknown action can we just be less permissive with a warning?
 	// AKA just use []string{"*"} instead of failing the migration?
 	action, err := convertV1Action(pol.Action, pol.Resource)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not derive v2 action")
-	}
-
-	resource, err := convertV1Resource(pol.Resource)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not derive v2 resource")
 	}
 
 	// Note: v1 only had (custom) allow policies
@@ -426,6 +432,11 @@ func convertV1Resource(resource string) (string, error) {
 
 	if len(terms) == 1 && terms[0] == "*" {
 		return "*", nil
+	}
+
+	singleTermsToMigrate := []string{"nodes", "events", "license", "nodemanagers", "service_groups"}
+	if len(terms) == 1 && !includes(singleTermsToMigrate, terms[0]) {
+		return "", nil
 	}
 
 	switch terms[0] {
@@ -501,6 +512,11 @@ func convertV1Resource(resource string) (string, error) {
 }
 
 func convertV1Cfgmgmt(terms []string) (string, error) {
+	if len(terms) == 1 {
+		// skip?
+		return "", nil
+	}
+
 	if terms[1] == "stats" {
 		return "infra:nodes", nil
 	}
@@ -637,4 +653,13 @@ func convertV1Action(action string, resource string) ([]string, error) {
 		// chance that the user created a policy where they mistyped an action name?
 		return nil, fmt.Errorf("could not parse V1 action: %s", action)
 	}
+}
+
+func includes(terms []string, termToCheck string) bool {
+	for _, term := range terms {
+		if term == termToCheck {
+			return true
+		}
+	}
+	return false
 }

@@ -199,6 +199,89 @@ func TestMigrateToV2(t *testing.T) {
 	}
 }
 
+func TestSingleTermResourceMigration(t *testing.T) {
+	ctx := context.Background()
+	db, err := setupDB(ctx, t)
+	require.NoError(t, err, "setup db")
+
+	cases := map[string]func(*testing.T){
+		"policies with the single term resource that granted permissions on v1 are migrated": func(t *testing.T) {
+			singleTermResources := []string{
+				"nodes",
+				"events",
+				"license",
+				"nodemanagers",
+				"service_groups",
+			}
+			nodesPolID, eventsPolID, licPolID := genUUID(t).String(), genUUID(t).String(), genUUID(t).String()
+			nodeManID, svcGroupPol := genUUID(t).String(), genUUID(t).String()
+
+			policyIDs := []string{nodesPolID, eventsPolID, licPolID, nodeManID, svcGroupPol}
+
+			for i, resource := range singleTermResources {
+				_, err := storePolicy(ctx, db, policyIDs[i], "*", []string{"user:ldap:bob"}, resource, "allow")
+				require.NoError(t, err)
+			}
+
+			err = MigrateToV2(ctx, db, true)
+			require.NoError(t, err)
+
+			migratedResources := []string{
+				"infra:nodes",
+				"event:events",
+				"system:license",
+				"infra:nodeManagers",
+				"applications:serviceGroups",
+			}
+			for j, id := range policyIDs {
+				migratedPol, err := queryTestPolicy(ctx, id, db)
+				require.NoError(t, err)
+				require.NotNil(t, migratedPol)
+
+				statement := migratedPol.Statements[0]
+				assert.Equal(t, []string{migratedResources[j]}, statement.Resources)
+			}
+		},
+		"any other policies with a single term resource are skipped": func(t *testing.T) {
+			singleTermResources := []string{
+				"auth",
+				"service_info",
+				"users",
+				"auth_introspection",
+				"cfgmgmt",
+				"compliance",
+				"ingest",
+				"secrets",
+				"telemetry",
+				"notifications",
+			}
+
+			policyIDs := make([]string, len(singleTermResources))
+			for i, resource := range singleTermResources {
+				id := genUUID(t).String()
+				policyIDs[i] = id
+
+				_, err := storePolicy(ctx, db, id, "*", []string{"user:ldap:bob"}, resource, "allow")
+				require.NoError(t, err)
+			}
+
+			err = MigrateToV2(ctx, db, true)
+			require.NoError(t, err)
+
+			for _, id := range policyIDs {
+				migratedPol, err := queryTestPolicy(ctx, id, db)
+				require.Error(t, err)
+				require.Nil(t, migratedPol)
+			}
+		},
+	}
+
+	for desc, test := range cases {
+		flush(t, db)
+		t.Run(desc, test)
+	}
+}
+
 func setupDB(ctx context.Context, t *testing.T) (*sql.DB, error) {
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for postgres storage")
