@@ -243,6 +243,7 @@ func TestMigrateToV2(t *testing.T) {
 				"secrets",
 				"telemetry",
 				"notifications",
+				"not_real_resource",
 			}
 
 			policyIDs := make([]string, len(singleTermResources))
