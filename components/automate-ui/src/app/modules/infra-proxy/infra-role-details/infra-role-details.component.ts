@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
@@ -14,7 +14,7 @@ import {
   ChildLists, Lists, RoleAttributes
 } from 'app/entities/infra-roles/infra-role.model';
 import { Node, Options } from '../treetable/models';
-import { JsonTreeableComponent as Treeable} from './../json-treeable/json-treeable.component'
+import { JsonTreeableComponent as Treeable } from './../json-treeable/json-treeable.component';
 
 export type InfraRoleTabName = 'runList' | 'attributes';
 
@@ -55,7 +55,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   });
 
   public selectedAttrs: any;
-  public selected_level = 'all'
+  public selected_level = 'all';
 
   // precedence levels
   public default_attributes = 'default_attributes';
@@ -68,8 +68,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
-    private layoutFacade: LayoutFacadeService,
-    private changeDetectorRef: ChangeDetectorRef
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit() {
@@ -108,7 +107,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       this.expandedList = role.expanded_run_list;
       this.runList = this.role.run_list;
       this.idList = [];
-      this.attributes = new RoleAttributes(this.role)
+      this.attributes = new RoleAttributes(this.role);
       if (this.expandedList && this.expandedList.length) {
         this.show = true;
         for (let i = 0; i < this.expandedList.length; i++) {
@@ -123,7 +122,6 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       } else {
         this.show = false;
       }
-      this.changeDetectorRef.markForCheck();
       setTimeout(() => this.filter(this.selected_level), 10);
       this.roleDetailsLoading = false;
     });
@@ -133,7 +131,6 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   filter(precedence_level: string): void {
     this.selected_level = precedence_level;
     this.selectedAttrs = this.retrieve(precedence_level);
-    this.changeDetectorRef.markForCheck();
   }
 
   // retrieve attributes based on their level of precedence
@@ -209,7 +206,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   onSelectedTab(event: { target: { value: InfraRoleTabName } }) {
     this.tabValue = event.target.value;
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
-    this.filter(this.selected_level)
+    this.filter(this.selected_level);
   }
 
   ngOnDestroy(): void {
