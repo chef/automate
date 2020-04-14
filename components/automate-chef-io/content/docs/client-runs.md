@@ -145,7 +145,7 @@ chef-automate infrastructure node-delete 3f2a2830-0ef3-474a-a835-3a7dd25361fe
 To delete nodes using the REST API, use the `"https://automate-url/api/v0/ingest/events/chef/nodedelete"` endpoint to delete a single node, or the `"https://automate-url/api/v0/ingest/events/chef/node-multiple-deletes"` endpoint to delete multiple nodes.
 
 Identify your node or nodes with either the _node\_id_ --which is the UUID of the node as it appears in Chef Automate--or the combination of _node name_, _organization name_, and _service hostname_.
-The _service hostname_ is the `fqdn` of your Chef Server, or the `localhost` of chef-solo nodes.
+The _service hostname_ is the `fqdn` of your Chef Infra Server, or the `localhost` of chef-solo nodes.
 
 #### Request for deleting a node using the _node\_id_
 
