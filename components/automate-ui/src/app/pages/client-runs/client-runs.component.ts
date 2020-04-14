@@ -74,13 +74,13 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
       allowWildcards: true
     },
     {
-      type: 'organization',
-      text: 'Chef Organization',
+      type: 'chef_server',
+      text: 'Chef Infra Server',
       allowWildcards: true
     },
     {
-      type: 'chef_server',
-      text: 'Chef Server',
+      type: 'organization',
+      text: 'Chef Organization',
       allowWildcards: true
     },
     {

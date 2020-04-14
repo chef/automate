@@ -256,7 +256,7 @@ type ConfigMgmtClient interface {
 	//
 	//GetSourceFqdns
 	//
-	//Returns a list of all chef servers associated with nodes that have checked in to Automate.
+	//Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.
 	//
 	//Authorization Action:
 	//```
@@ -627,7 +627,7 @@ type ConfigMgmtServer interface {
 	//
 	//GetSourceFqdns
 	//
-	//Returns a list of all chef servers associated with nodes that have checked in to Automate.
+	//Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.
 	//
 	//Authorization Action:
 	//```

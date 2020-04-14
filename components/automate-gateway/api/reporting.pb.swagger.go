@@ -1066,7 +1066,7 @@ func init() {
         },
         "chef_server": {
           "type": "string",
-          "description": "The Chef Server that manages the node making the report."
+          "description": "The Chef Infra Server that manages the node making the report."
         },
         "chef_organization": {
           "type": "string",

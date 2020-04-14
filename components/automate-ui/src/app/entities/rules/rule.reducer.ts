@@ -34,7 +34,7 @@ export const ruleAttributes: RuleTypeMappedObject = {
     },
     {
       key: 'CHEF_SERVER',
-      value: 'Chef Server'
+      value: 'Chef Infra Server'
     },
     {
       key: 'ENVIRONMENT',
@@ -64,7 +64,7 @@ export const ruleAttributes: RuleTypeMappedObject = {
     },
     {
       key: 'CHEF_SERVER',
-      value: 'Chef Server'
+      value: 'Chef Infra Server'
     }
   ]
 };

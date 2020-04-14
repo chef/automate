@@ -34,7 +34,7 @@ Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job s
 
 ### Event Feed
 
-The event feed data lifecycle settings allow you to remove all event feed data and chef server actions after a set amount of days.
+The event feed data lifecycle settings allow you to remove all event feed data and Chef Infra Server actions after a set amount of days.
 The default is to remove event feed data after 7 days, and Chef Infra Server actions after 30 days.
 
 ### Service Groups

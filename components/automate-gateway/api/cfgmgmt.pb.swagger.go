@@ -313,7 +313,7 @@ func init() {
     "/cfgmgmt/source_fqdns": {
       "get": {
         "summary": "GetSourceFqdns",
-        "description": "Returns a list of all chef servers associated with nodes that have checked in to Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetSourceFqdns",
         "responses": {
           "200": {
