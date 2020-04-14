@@ -5,7 +5,7 @@ import { RoleActionTypes, RoleActions } from './infra-role.action';
 import { InfraRole } from './infra-role.model';
 
 export interface InfraRoleDetailsEntityState extends EntityState<InfraRole> {
-  status: EntityStatus;
+  role: EntityStatus;
   getStatus: EntityStatus;
 }
 
