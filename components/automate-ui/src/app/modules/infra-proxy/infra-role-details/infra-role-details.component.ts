@@ -10,8 +10,8 @@ import { identity } from 'lodash/fp';
 import { infaRoleFromRoute } from 'app/entities/infra-roles/infra-role-details.selectors';
 import { GetRole } from 'app/entities/infra-roles/infra-role.action';
 import {
-  InfraRole, ExpandList,
-  ChildLists, Lists, RoleAttributes
+  InfraRole, ExpandedList,
+  ChildList, List, RoleAttributes
 } from 'app/entities/infra-roles/infra-role.model';
 import { Node, Options } from '../treetable/models';
 import { JsonTreeableComponent as Treeable } from './../json-treeable/json-treeable.component';
@@ -34,18 +34,18 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   public OrgId;
   public name;
   public runList: string[];
-  public expandedList: ExpandList[] = [];
-  public expandRunList: Lists[] = [];
+  public expandedList: ExpandedList[] = [];
+  public expandRunList: List[] = [];
   public show = false;
   public data: any = [];
   public env_id = '_default';
   public idList: any = [];
   public hasRun_List = true;
-  public childNodes: Node<ChildLists>[] = [];
+  public childNodes: Node<ChildList>[] = [];
   private isDestroyed = new Subject<boolean>();
-  arrayOfNodesTree: Node<ChildLists>[];
+  arrayOfNodesTree: Node<ChildList>[];
   roleDetailsLoading = true;
-  treeOptions: Options<ChildLists> = {
+  treeOptions: Options<ChildList> = {
     capitalisedHeader: true
   };
 
@@ -156,7 +156,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     this.treeNodes(this.expandedList, this.env_id);
   }
 
-  treeNodes(expandedList: ExpandList[], li: string) {
+  treeNodes(expandedList: ExpandedList[], li: string) {
     this.arrayOfNodesTree = [];
     for (let i = -0; i < expandedList.length; i++) {
       if (expandedList[i].id === li) {
@@ -164,7 +164,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
         if (this.expandRunList && this.expandRunList.length) {
           this.hasRun_List = true;
           for (let j = 0; j < this.expandRunList.length; j++) {
-            const nodes: Node<ChildLists>[] = [];
+            const nodes: Node<ChildList>[] = [];
             this.arrayOfNodesTree.push({
               value: {
                 name: this.expandRunList[j].name,
@@ -185,8 +185,8 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     this.show = true;
   }
 
-  childNode(child: Lists[], nodes: Node<ChildLists>[]) {
-    const childNodes: Node<ChildLists>[] = [];
+  childNode(child: List[], nodes: Node<ChildList>[]) {
+    const childNodes: Node<ChildList>[] = [];
     for (let i = 0; i < child.length; i++) {
       nodes.push({
         value: {
