@@ -43,7 +43,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.layoutFacade.ShowPageLoading(true);
     const id: string = this.route.snapshot.params['id'];
     const reportQuery = this.reportQuery.getReportQuery();
-    this.returnParams = this.formatReturnUrl(reportQuery);
+    this.returnParams = this.formatReturnparams(reportQuery);
     reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
 
     this.statsService.getReports(reportQuery, {sort: 'latest_report.end_time', order: 'DESC'})
@@ -183,7 +183,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     return moment(timestamp).fromNow();
   }
 
-  private formatReturnUrl(reportQuery): any { // return type is a url
+  private formatReturnparams(reportQuery): any { // return type is a url
     const structuredFilters = {};
     reportQuery.filters.map(filter => {
       return structuredFilters[filter.type.name] = filter.value.text;
@@ -194,6 +194,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
     const today = new Date();
     const isToday = moment(today).diff(endDate, 'days') === 0;
+
     if (isEmpty(structuredFilters) && isToday ) {
       return {};
     } else {
