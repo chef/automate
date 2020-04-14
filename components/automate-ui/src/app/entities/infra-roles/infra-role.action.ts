@@ -15,7 +15,7 @@ export interface RolesSuccessPayload {
   roles: InfraRole[];
 }
 
-export class GetRolesForOrg implements Action {
+export class GetRoles implements Action {
   readonly type = RoleActionTypes.GET_ALL;
   constructor(public payload: { server_id: string, org_id: string }) { }
 }
@@ -46,7 +46,7 @@ export class GetRoleFailure implements Action {
 }
 
 export type RoleActions =
-  | GetRolesForOrg
+  | GetRoles
   | GetRolesSuccess
   | GetRolesFailure
   | GetRole

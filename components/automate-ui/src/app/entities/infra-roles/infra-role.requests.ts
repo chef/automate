@@ -11,7 +11,7 @@ export class InfraRoleRequests {
   constructor(private http: HttpClient) { }
 
   // tslint:disable-next-line: max-line-length
-  public getRolesForOrgs(server_id: string, org_id: string): Observable<RolesSuccessPayload> {
+  public getRoles(server_id: string, org_id: string): Observable<RolesSuccessPayload> {
     return this.http.get<RolesSuccessPayload>(
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles`);
   }

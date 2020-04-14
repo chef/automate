@@ -8,22 +8,22 @@ export interface InfraRole {
   default_attributes: string;
   override_attributes: string;
   run_list: string[];
-  expanded_run_list: ExpandList[];
+  expanded_run_list: ExpandedList[];
 }
 
-export interface ExpandList {
+export interface ExpandedList {
   id: string;
-  run_list: Lists[];
+  run_list: List[];
 }
 
-export interface Lists {
+export interface List {
   type: string;
   name: string;
   version: string;
-  children: Lists[];
+  children: List[];
 }
 
-export interface ChildLists {
+export interface ChildList {
   type: string;
   name: string;
   version: string;

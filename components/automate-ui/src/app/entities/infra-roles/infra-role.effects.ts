@@ -7,7 +7,7 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
-  GetRolesForOrg,
+  GetRoles,
   GetRolesSuccess,
   RolesSuccessPayload,
   GetRolesFailure,
@@ -29,8 +29,8 @@ export class InfraRoleEffects {
   @Effect()
   getRolesForOrgs$ = this.actions$.pipe(
       ofType(RoleActionTypes.GET_ALL),
-      mergeMap(({ payload: { server_id, org_id } }: GetRolesForOrg) =>
-        this.requests.getRolesForOrgs(server_id, org_id).pipe(
+      mergeMap(({ payload: { server_id, org_id } }: GetRoles) =>
+        this.requests.getRoles(server_id, org_id).pipe(
           map((resp: RolesSuccessPayload) => new GetRolesSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetRolesFailure(error))))));
 
