@@ -3,7 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"strings"
+	"regexp"
 
 	"github.com/lib/pq" // adapter for database/sql
 	"github.com/pkg/errors"
@@ -64,7 +64,7 @@ func parsePQError(e *pq.Error) error {
 		// should be added to doesn't exist.
 		// The only way to distinguish this violation by comparing the server_id key in Error detail.
 		// DETAIL:  Key (server_id)=(2e831dec-f25c-4fde-aef6-8f68ea366251) is not present in table "servers".
-		if strings.Contains(e.Detail, "(server_id)") {
+		if regexp.MustCompile(`\(server_id\).*is not present.*table.*\"servers\"`).MatchString(e.Detail) {
 			return storage.ErrForeignKeyViolation
 		}
 		// Marking other foreign key violations as a record can not be deleted.

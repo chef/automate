@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -235,11 +236,13 @@ func TestServers(t *testing.T) {
 		})
 
 		t.Run("when the server does not exist, return server not found", func(t *testing.T) {
+			serverID := "97e01ea1-976e-4626-88c8-43345c5d934f"
 			resp, err := cl.GetServer(ctx, &request.GetServer{
-				Id: "97e01ea1-976e-4626-88c8-43345c5d934f",
+				Id: serverID,
 			})
 
 			require.Nil(t, resp)
+			require.Contains(t, err.Error(), fmt.Sprintf("no server found with ID \"%s\"", serverID))
 			grpctest.AssertCode(t, codes.NotFound, err)
 		})
 
@@ -366,6 +369,7 @@ func TestServers(t *testing.T) {
 			resp, err2 := cl.DeleteServer(ctx, &request.DeleteServer{Id: resp1.Server.Id})
 			require.Error(t, err2)
 			require.Nil(t, resp)
+			assert.Regexp(t, "cannot delete server.*still has organizations attached", err2.Error())
 			grpctest.AssertCode(t, codes.FailedPrecondition, err2)
 
 			serverListAfter, err3 := cl.GetServers(ctx, &request.GetServers{})
