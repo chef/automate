@@ -67,7 +67,7 @@ func TestGenerateAdminToken(t *testing.T) {
 			return &authz_v2.Policy{}, nil
 		}
 
-		req := &api.GenerateAdminTokenRequest{Name: testName}
+		req := &api.GenerateAdminTokenRequest{Description: testName}
 		resp, err := generateAdminToken(ctx, req, connFactory, authnServer.URL, authzServer.URL)
 		require.NoError(t, err)
 		require.NotNil(t, resp)
@@ -96,7 +96,7 @@ func TestGenerateAdminToken(t *testing.T) {
 			return nil, status.Error(codes.AlreadyExists, "policy with id \"diagnostics-admin-token\" already exists")
 		}
 
-		req := &api.GenerateAdminTokenRequest{Name: testName}
+		req := &api.GenerateAdminTokenRequest{Description: testName}
 		resp, err := generateAdminToken(ctx, req, connFactory, authnServer.URL, authzServer.URL)
 		require.NoError(t, err)
 		require.NotNil(t, resp)
@@ -134,7 +134,7 @@ func TestGenerateAdminToken(t *testing.T) {
 		}
 
 		req := &api.GenerateAdminTokenRequest{
-			Name: testName,
+			Description: testName,
 		}
 
 		resp, err := generateAdminToken(ctx, req, connFactory, authnServer.URL, authzServer.URL)
