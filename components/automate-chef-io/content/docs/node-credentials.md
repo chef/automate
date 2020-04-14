@@ -9,14 +9,14 @@ toc = true
 [menu]
   [menu.docs]
     parent = "settings"
-    weight = 30
+    weight = 40
 +++
 
 The Chef Automate Credentials page allows you to add, edit, and delete ``SSH``, ``WinRm``, and ``Sudo`` credentials for remotely access to your nodes.
 
 To manage your credentials, navigate to the _Node Credentials_ page from the **Settings** tab.
 
-![Node Lifecycle](/images/docs/node-credentials.png)
+![Node Credentials](/images/docs/node-credentials.png)
 
 Adding SSH, WinRM, and Sudo credentials is the first step for using the Chef Automate Compliance Scanner. After adding credentials, you'll be able to add nodes and create scan jobs.
 

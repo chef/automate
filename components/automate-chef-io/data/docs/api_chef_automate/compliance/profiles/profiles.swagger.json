@@ -52,6 +52,34 @@
         ]
       }
     },
+    "/compliance/profiles/metasearch": {
+      "post": {
+        "summary": "Check if one or multiple profiles exist in the metadata database.",
+        "description": "The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend\ndoesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.\nThis is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.\n\nAuthorization Action:\n```\ncompliance:profiles:list\n```",
+        "operationId": "MetaSearch",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Missing"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Sha256"
+            }
+          }
+        ],
+        "tags": [
+          "ProfilesService"
+        ]
+      }
+    },
     "/compliance/profiles/read/{owner}/{name}/version/{version}": {
       "get": {
         "summary": "Show an installed profile",
@@ -390,6 +418,18 @@
       },
       "description": "Metadata about the profile."
     },
+    "chef.automate.api.compliance.profiles.v1.Missing": {
+      "type": "object",
+      "properties": {
+        "missing_sha256": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "An array of profile sha256 IDs that are missing from the backend metadata store."
+        }
+      }
+    },
     "chef.automate.api.compliance.profiles.v1.Option": {
       "type": "object",
       "properties": {
@@ -636,6 +676,18 @@
           "type": "integer",
           "format": "int32",
           "description": "Count of controls in the profile."
+        }
+      }
+    },
+    "chef.automate.api.compliance.profiles.v1.Sha256": {
+      "type": "object",
+      "properties": {
+        "sha256": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "An array of profile sha256 IDs."
         }
       }
     },

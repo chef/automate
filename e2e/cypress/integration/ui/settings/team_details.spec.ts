@@ -41,7 +41,8 @@ describe('team details', () => {
         url: '/apis/iam/v2/projects',
         body: {
           id: project1ID,
-          name: project1Name
+          name: project1Name,
+          skip_policies: true
         }
       });
 
@@ -51,7 +52,8 @@ describe('team details', () => {
         url: '/apis/iam/v2/projects',
         body: {
           id: project2ID,
-          name: project2Name
+          name: project2Name,
+          skip_policies: true
         }
       });
 
@@ -69,7 +71,7 @@ describe('team details', () => {
           method: 'POST',
           url: `/apis/iam/v2/teams/${teamID}/users:add`,
           body: {
-            user_ids: [userMembershipID]
+            membership_ids: [userMembershipID]
           }
         });
 

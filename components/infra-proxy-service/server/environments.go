@@ -16,12 +16,12 @@ import (
 // GetEnvironments get environments list
 func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments) (*response.Environments, error) {
 
-	client, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	environments, err := client.Environments.List()
+	environments, err := c.client.Environments.List()
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -33,12 +33,12 @@ func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments)
 
 // GetEnvironment get data bag
 func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
-	client, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	en, err := client.Environments.Get(req.Name)
+	en, err := c.client.Environments.Get(req.Name)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}

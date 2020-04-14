@@ -67,6 +67,12 @@ describe('project management', () => {
     cy.get('[data-cy=id-label]').should('not.be.visible');
     cy.get('#id-input').should('have.value', projectID);
 
+    cy.get('app-create-object-modal chef-checkbox')
+      .should('have.attr', 'aria-checked', 'true');
+
+    // don't create associated project policies
+    cy.get('app-create-object-modal chef-checkbox').click();
+
     cy.get('[data-cy=save-button]').click();
     cy.get('app-project-list chef-modal').should('not.be.visible');
     cy.get('#main-content-wrapper').scrollTo('top');
@@ -75,6 +81,15 @@ describe('project management', () => {
     cy.contains(projectID).should('exist');
 
     cy.url().should('include', '/settings/projects');
+  });
+
+  it('addPolicies checkbox is always checked on modal open', () => {
+    cy.get('[data-cy=create-project]').contains('Create Project').click();
+
+    cy.get('app-create-object-modal chef-checkbox')
+      .should('have.attr', 'aria-checked', 'true');
+
+    cy.get('app-create-object-modal chef-button').contains('Cancel').click();
   });
 
   it('can open the new project\'s details page', () => {

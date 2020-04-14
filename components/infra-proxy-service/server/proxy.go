@@ -22,8 +22,13 @@ type ChefConfig struct {
 	BaseURL string
 }
 
+// ChefClient type definition for the chef client
+type ChefClient struct {
+	client *chef.Client
+}
+
 // NewChefClient is an infra-proxy server
-func NewChefClient(config *ChefConfig) (*chef.Client, error) {
+func NewChefClient(config *ChefConfig) (*ChefClient, error) {
 
 	// build a client
 	client, err := chef.NewClient(&chef.Config{
@@ -37,16 +42,16 @@ func NewChefClient(config *ChefConfig) (*chef.Client, error) {
 		return nil, errors.Wrap(err, err.Error())
 	}
 
-	return client, nil
+	return &ChefClient{client: client}, nil
 }
 
-func (s *Server) createClient(ctx context.Context, orgID string) (*chef.Client, error) {
+func (s *Server) createClient(ctx context.Context, orgID string) (*ChefClient, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	UUID, err := uuid.FromString(orgID)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
 	// TODO: Call GetOrgByName in order to avoid separate query to fetch infra server detail

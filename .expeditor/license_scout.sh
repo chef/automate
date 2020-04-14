@@ -46,6 +46,9 @@ pushd components/automate-workflow-ctl/
   bundle install
 popd
 
+echo "--- Installing Go dependencies"
+go mod download
+
 echo "+++ Running License Scout"
 # a bug requires the use of `--format csv` but the
 # format of the generated manifest is still json

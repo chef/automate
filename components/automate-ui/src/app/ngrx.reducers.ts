@@ -225,7 +225,7 @@ export const ngrxReducers = {
   orgs: orgEntity.orgEntityReducer,
   serviceGroups: serviceGroups.serviceGroupsEntityReducer,
   teams: teamEntity.teamEntityReducer,
-  desktops: desktopEntity.userEntityReducer,
+  desktops: desktopEntity.desktopEntityReducer,
   userperms: permEntity.permEntityReducer,
   users: userEntity.userEntityReducer,
   userSelf: userSelfEntity.userSelfEntityReducer

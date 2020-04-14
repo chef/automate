@@ -122,6 +122,8 @@ func (m *CreateProjectReq) Validate() error {
 		}
 	}
 
+	// no validation rules for SkipPolicies
+
 	return nil
 }
 
@@ -1667,12 +1669,7 @@ func (m *CreateRuleReq) Validate() error {
 		}
 	}
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		return CreateRuleReqValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-	}
+	// no validation rules for Name
 
 	// no validation rules for Type
 
@@ -1856,12 +1853,7 @@ func (m *UpdateRuleReq) Validate() error {
 		}
 	}
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		return UpdateRuleReqValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-	}
+	// no validation rules for Name
 
 	// no validation rules for Type
 

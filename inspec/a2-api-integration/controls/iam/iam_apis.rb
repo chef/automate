@@ -31,7 +31,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: project_id,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -40,7 +41,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: project_id_2,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -223,7 +225,12 @@ control 'iam-api-1' do
         response = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}")
         expect(response.http_status).to eq 404
 
-        response = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}", http_method: 'PUT')
+        response = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}",
+          http_method: 'PUT',
+          request_body: {
+            name: "any-non-empty-value",
+          }.to_json
+        )
         expect(response.http_status).to eq 404
 
         response = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}", http_method: 'DELETE')
@@ -422,7 +429,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: project_id,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -431,7 +439,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: project_id_2,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -510,6 +519,7 @@ control 'iam-api-1' do
       expect(resp.parsed_response_body[:team][:name]).to eq "inspec test team updated"
     end
 
+    # Membership APIs take the membership id of the user in order to add the user
     it "POST (add) and POST (remove) team members responds properly to happy path inputs" do
       user_id_1 = "83a2fe1f-0793-4cbe-9b4b-737a9316a515"
       user_id_2 = "93a2fe1f-0793-4cbe-9b4b-737a9316a515"
@@ -517,29 +527,29 @@ control 'iam-api-1' do
       resp = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}/users:add",
         http_method: 'POST',
         request_body: {
-          user_ids: users,
+          membership_ids: users,
         }.to_json
       )
       expect(resp.http_status).to eq 200
-      expect(resp.parsed_response_body[:user_ids].length).to eq 2
-      expect(resp.parsed_response_body[:user_ids]).to cmp(users)
+      expect(resp.parsed_response_body[:membership_ids].length).to eq 2
+      expect(resp.parsed_response_body[:membership_ids]).to cmp(users)
 
       resp = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}/users")
       expect(resp.http_status).to eq 200
-      expect(resp.parsed_response_body[:user_ids].length).to eq 2
+      expect(resp.parsed_response_body[:membership_ids].length).to eq 2
 
       resp = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}/users:remove",
         http_method: 'POST',
         request_body: {
-          user_ids: [user_id_2],
+          membership_ids: [user_id_2],
         }.to_json
       )
       expect(resp.http_status).to eq 200
-      expect(resp.parsed_response_body[:user_ids].length).to eq 1
+      expect(resp.parsed_response_body[:membership_ids].length).to eq 1
 
       resp = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}/users")
       expect(resp.http_status).to eq 200
-      expect(resp.parsed_response_body[:user_ids]).to eq [user_id_1]
+      expect(resp.parsed_response_body[:membership_ids]).to eq [user_id_1]
     end
 
     it "GET teams-for-user responds properly to happy path inputs" do
@@ -547,11 +557,11 @@ control 'iam-api-1' do
       resp = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}/users:add",
         http_method: 'POST',
         request_body: {
-          user_ids: [user],
+          membership_ids: [user],
         }.to_json
       )
       expect(resp.http_status).to eq 200
-      expect(resp.parsed_response_body[:user_ids]).to eq([user])
+      expect(resp.parsed_response_body[:membership_ids]).to eq([user])
 
       resp = automate_api_request("/apis/iam/v2/users/#{user}/teams")
       expect(resp.http_status).to eq 200
@@ -562,15 +572,15 @@ control 'iam-api-1' do
       resp = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}/users:add",
         http_method: 'POST',
         request_body: {
-          user_ids: [user],
+          membership_ids: [user],
         }.to_json
       )
       expect(resp.http_status).to eq 200
-      expect(resp.parsed_response_body[:user_ids]).to eq([user])
+      expect(resp.parsed_response_body[:membership_ids]).to eq([user])
 
       resp = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}/users")
       expect(resp.http_status).to eq 200
-      expect(resp.parsed_response_body[:user_ids]).to eq([user])
+      expect(resp.parsed_response_body[:membership_ids]).to eq([user])
     end
 
     it "DELETE team succeeds with a valid id" do
@@ -698,7 +708,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: custom_project_id,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -724,7 +735,8 @@ control 'iam-api-1' do
         http_method: 'POST',
         request_body: {
           id: id,
-          name: "display name !#$#"
+          name: "display name !#$#",
+          skip_policies: true
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -782,7 +794,8 @@ control 'iam-api-1' do
          http_method: 'POST',
          request_body: {
            id: custom_project_id,
-           name: "display name !#$#"
+           name: "display name !#$#",
+           skip_policies: true
          }.to_json
        )
        expect(resp.http_status).to eq 200
@@ -908,7 +921,8 @@ control 'iam-api-1' do
           http_method: 'POST',
           request_body: {
             id: custom_project_id_2,
-            name: "display name !#$#"
+            name: "display name !#$#",
+            skip_policies: true
           }.to_json
         )
         expect(resp.http_status).to eq 200
@@ -917,7 +931,8 @@ control 'iam-api-1' do
           http_method: 'POST',
           request_body: {
             id: custom_project_id,
-            name: "display name !#$#"
+            name: "display name !#$#",
+            skip_policies: true
           }.to_json
         )
         expect(resp.http_status).to eq 200

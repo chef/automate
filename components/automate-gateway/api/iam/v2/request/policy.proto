@@ -183,12 +183,14 @@ message CreateProjectReq {
     json_schema: {
       required: ["id", "name"]
     },
-    example: { value: '{"name": "My Custom Project", "id": "custom-project"}'}
+    example: { value: '{"name": "My Custom Project", "id": "custom-project", "skip_policies": true}'}
   };
   // Unique ID. Cannot be changed.
   string id = 1;
   // Name for the new project.
   string name = 2;
+  // Boolean flag to skip adding policies associated with the project. Set to false by default.
+  bool skip_policies = 3;
 }
 
 message UpdateProjectReq {

@@ -100,20 +100,6 @@ func TestUpdateTeamReq(t *testing.T) {
 			Name:     "name of my team",
 			Projects: []string{"test"},
 		},
-		"empty Name": &v2.UpdateTeamReq{
-			Id:       "test",
-			Name:     "",
-			Projects: []string{"test"},
-		},
-		"whitespace Name": &v2.UpdateTeamReq{
-			Id:       "test",
-			Name:     "          ",
-			Projects: []string{"test"},
-		},
-		"missing Name": &v2.UpdateTeamReq{
-			Id:       "test",
-			Projects: []string{"test"},
-		},
 		"missing Name, ID, and Projects": &v2.UpdateTeamReq{},
 		"whitespace projects list": &v2.UpdateTeamReq{
 			Id:       "this-is-valid-1",
@@ -192,20 +178,6 @@ func TestCreateTeamReq(t *testing.T) {
 		},
 		"missing ID": &v2.CreateTeamReq{
 			Name:     "name of my team",
-			Projects: []string{"test"},
-		},
-		"empty Name": &v2.CreateTeamReq{
-			Id:       "test",
-			Name:     "",
-			Projects: []string{"test"},
-		},
-		"whitespace Name": &v2.CreateTeamReq{
-			Id:       "test",
-			Name:     "          ",
-			Projects: []string{"test"},
-		},
-		"missing Name": &v2.CreateTeamReq{
-			Id:       "test",
 			Projects: []string{"test"},
 		},
 		"missing Name, ID, and projects": &v2.CreateTeamReq{},

@@ -293,6 +293,7 @@ func ParseBytesToComplianceReport(body []byte) *complianceEvent.Report {
 		ChefTags:         getStringArray("chef_tags", body),
 		Ipaddress:        getStringIfExists("ipaddress", body),
 		Fqdn:             getStringIfExists("fqdn", body),
+		RunTimeLimit:     getFloat32IfExists("run_time_limit", body),
 	}
 }
 

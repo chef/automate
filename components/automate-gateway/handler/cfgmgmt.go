@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	// Cfgmgmt Request/Response definitions
+	cfgService "github.com/chef/automate/api/external/cfgmgmt"
 	cfgReq "github.com/chef/automate/api/external/cfgmgmt/request"
 	cfgRes "github.com/chef/automate/api/external/cfgmgmt/response"
 
@@ -132,6 +133,35 @@ func (s *CfgMgmtServer) GetErrors(ctx context.Context, request *cfgReq.Errors) (
 	}).Debug("rpc call")
 
 	return s.cfgMgmtClient.GetErrors(ctx, request)
+}
+
+func (s *CfgMgmtServer) GetMissingNodeDurationCounts(ctx context.Context,
+	request *cfgReq.MissingNodeDurationCounts) (*cfgRes.MissingNodeDurationCounts, error) {
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	cfgMgmtRequest := &cmsReq.MissingNodeDurationCounts{
+		Durations: request.Durations,
+	}
+
+	response, err := s.cfgMgmtClient.GetMissingNodeDurationCounts(ctx, cfgMgmtRequest)
+	if err != nil {
+		return &cfgRes.MissingNodeDurationCounts{}, err
+	}
+
+	responseCountedDurations := make([]*cfgRes.CountedDuration, len(response.CountedDurations))
+	for index := range response.CountedDurations {
+		responseCountedDurations[index] = &cfgRes.CountedDuration{
+			Duration: response.CountedDurations[index].Duration,
+			Count:    response.CountedDurations[index].Count,
+		}
+	}
+
+	return &cfgRes.MissingNodeDurationCounts{
+		CountedDurations: responseCountedDurations,
+	}, nil
 }
 
 func (s *CfgMgmtServer) GetAttributes(ctx context.Context, request *cfgReq.Node) (*cfgRes.NodeAttribute, error) {
@@ -303,6 +333,16 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context, request *sharedReq.S
 	}
 
 	return s.cfgMgmtClient.GetSuggestions(ctx, &sugRequest)
+}
+
+func (a *CfgMgmtServer) NodeExport(*cfgReq.NodeExport, cfgService.ConfigMgmt_NodeExportServer) error {
+	// Please see components/automate-gateway/services.go configMgmtNodeExportHandler for implementation
+	return nil
+}
+
+func (a *CfgMgmtServer) ReportExport(*cfgReq.ReportExport, cfgService.ConfigMgmt_ReportExportServer) error {
+	// Please see components/automate-gateway/services.go configMgmtReportExportHandler for implementation
+	return nil
 }
 
 func toResponseRun(run *cmsRes.Run) *cfgRes.Run {

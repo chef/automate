@@ -2,17 +2,18 @@ package ingestic
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"time"
-
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	project_update_lib "github.com/chef/automate/lib/authz"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 type ESClient struct {
@@ -100,7 +101,7 @@ func (backend *ESClient) createStore(ctx context.Context, indexName string, mapp
 	return error
 }
 
-//ProfileExists returns true if profile exists already in ES.. false if not
+// ProfileExists returns true if profile exists already in ES.. false if not
 func (backend *ESClient) ProfileExists(hash string) (bool, error) {
 	idsQuery := elastic.NewIdsQuery(mappings.DocType)
 	idsQuery.Ids(hash)
@@ -120,12 +121,114 @@ func (backend *ESClient) ProfileExists(hash string) (bool, error) {
 	return searchResult.TotalHits() > 0, nil
 }
 
+// ProfilesMissing takes an array of profile sha256 IDs and returns back
+// the ones that are missing from the profiles metadata index
+func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []string, err error) {
+	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery.Ids(allHashes...)
+	esIndex := relaxting.CompProfilesIndex
+
+	fsc := elastic.NewFetchSourceContext(false)
+
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(idsQuery).
+		Size(1000)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrap(err, "ProfilesMissing unable to get Source")
+	}
+	relaxting.LogQueryPartMin(esIndex, source, "ProfilesMissing query searchSource")
+
+	searchResult, err := backend.client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		Do(context.Background())
+
+	if err != nil {
+		return missingHashes, errors.Wrap(err, "ProfilesMissing unable to complete search")
+	}
+
+	logrus.Debugf("ProfilesMissing got %d meta profiles in %d milliseconds\n", searchResult.TotalHits(), searchResult.TookInMillis)
+	existingHashes := make(map[string]struct{}, searchResult.TotalHits())
+
+	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+		for _, hit := range searchResult.Hits.Hits {
+			existingHashes[hit.Id] = struct{}{}
+		}
+	}
+
+	for _, oneHash := range allHashes {
+		if _, ok := existingHashes[oneHash]; !ok {
+			missingHashes = append(missingHashes, oneHash)
+		}
+	}
+
+	logrus.Debugf("ProfilesMissing returning missingHashes: %v\n", missingHashes)
+	return missingHashes, nil
+}
+
+// Internal helper method to get profile meta information to complement
+// reports being ingested without profile metadata information
+func (backend *ESClient) GetProfilesMissingMetadata(profileIDs []string) (map[string]*relaxting.ESInspecProfile, error) {
+	esProfilesMeta := make(map[string]*relaxting.ESInspecProfile, 0)
+	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery.Ids(profileIDs...)
+	esIndex := relaxting.CompProfilesIndex
+
+	fsc := elastic.NewFetchSourceContext(true).Include(
+		"took",
+		"name",
+		"controls.id",
+		"controls.impact",
+		"controls.title",
+		"controls.tags",
+	)
+
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(idsQuery).
+		Size(10)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return esProfilesMeta, errors.Wrap(err, "GetProfilesMissingMetadata unable to get Source")
+	}
+	relaxting.LogQueryPartMin(esIndex, source, "GetProfilesMissingMetadata query searchSource")
+
+	scroll := backend.client.Scroll().
+		Index(esIndex).
+		SearchSource(searchSource)
+
+	for {
+		results, err := scroll.Do(context.Background())
+		//LogQueryPartMin(results, "GetProfilesMissingMetadata query results")
+		if err == io.EOF {
+			return esProfilesMeta, nil // all results retrieved
+		}
+		if err != nil {
+			return esProfilesMeta, errors.Wrap(err, "GetProfilesMissingMetadata unable to get results")
+		}
+		if results.TotalHits() > 0 && len(results.Hits.Hits) > 0 {
+			logrus.Debugf("GetProfilesMissingMetadata got %d profiles in %d milliseconds\n", results.TotalHits(), results.TookInMillis)
+
+			for _, hit := range results.Hits.Hits {
+				esProfile := &relaxting.ESInspecProfile{}
+				if err := json.Unmarshal(*hit.Source, &esProfile); err != nil {
+					logrus.Errorf("GetProfilesMissingMetadata unmarshal error: %s", err.Error())
+				}
+				esProfilesMeta[hit.Id] = esProfile
+			}
+		}
+	}
+}
+
 func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, endTime time.Time, data *relaxting.ESInSpecSummary) error {
 	mapping := mappings.ComplianceSumDate
 	index := mapping.IndexTimeseriesFmt(endTime)
 	data.DailyLatest = true
 	data.ReportID = id
-
 	// Add the summary document to the compliance timeseries index using the specified report id as document id
 	_, err := backend.client.Index().
 		Index(index).
@@ -147,7 +250,6 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	index := mapping.IndexTimeseriesFmt(endTime)
 	data.DailyLatest = true
 	data.ReportID = id
-
 	// Add the report document to the compliance timeseries index using the specified report id as document id
 	_, err := backend.client.Index().
 		Index(index).

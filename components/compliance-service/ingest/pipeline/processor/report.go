@@ -45,6 +45,7 @@ func ComplianceReport(in <-chan message.Compliance) <-chan message.Compliance {
 				SourceFQDN:       msg.Report.SourceFqdn,
 				ChefTags:         msg.Report.ChefTags,
 				FQDN:             msg.Report.Fqdn,
+				RunTimeLimit:     msg.Report.RunTimeLimit,
 			}
 
 			copyOfIpAddress := msg.Report.Ipaddress

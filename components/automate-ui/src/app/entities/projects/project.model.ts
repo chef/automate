@@ -6,6 +6,7 @@ export interface Project {
   name: string;
   type: IAMType;
   status: ProjectStatus;
+  skip_policies?: boolean;
 }
 
 export class ProjectConstants {

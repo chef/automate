@@ -43,13 +43,14 @@ export class ProjectsFilterDropdownComponent {
     }
   }
 
-  handleFilterKeyUp(filterValue: string): void {
-    this.filteredOptions = this.filterOptions(filterValue);
+  get filteredSelectedCount(): string {
+    const count = this.filteredOptions.filter(option => option.checked).length;
+    return count > 99 ? '99+' : count.toString();
   }
 
-  filterOptions(value: string): ProjectsFilterOption[] {
-    return this.editableOptions.filter(option =>
-      option.label.toLowerCase().indexOf(value.toLowerCase()) > -1);
+  handleFilterKeyUp(filterValue: string): void {
+    this.filteredOptions = this.editableOptions
+      .filter(option => option.label.toLowerCase().indexOf(filterValue.toLowerCase()) > -1);
   }
 
   handleLabelClick() {
@@ -67,11 +68,9 @@ export class ProjectsFilterDropdownComponent {
   }
 
   handleOptionChange(event, label) {
-    this.editableOptions.find(option => {
-      if (option.label === label) {
-        option.checked = event.detail; // provides the new state of the checkbox
-      }
-    });
+    // sets the new state of the specific checkbox
+    this.editableOptions
+      .find(option => option.label === label).checked = event.detail;
     this.optionsEdited = true;
   }
 
@@ -83,11 +82,14 @@ export class ProjectsFilterDropdownComponent {
   }
 
   handleClearSelection() {
-    this.dropdownActive = false;
-    this.optionsEdited = false;
-    // uncheck all the options and then save
-    this.editableOptions.map(option => option.checked = false);
-    this.onSelection.emit(this.editableOptions);
+    // TODO: Should ideally set to true only when some projects were selected upon opening
+    this.optionsEdited = true; // mark as edited
+
+    // clear only entries visible by current filter
+    // TODO: Micro-optimization: use a hash to convert this O(n^2) to O(n).
+    this.editableOptions
+      .filter(option => this.filteredOptions.find(o => o.label === option.label))
+      .map(option => option.checked = false);
   }
 
   handleArrowUp(event: KeyboardEvent) {

@@ -2,24 +2,42 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import {
+  JobSchedulerStatus,
   IngestJob,
-  IngestJobs,
-  JobSchedulerStatus
+  JobCategories
 } from 'app/entities/automate-settings/automate-settings.model';
 
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { AutomateSettingsComponent } from './automate-settings.component';
 
+import { using } from 'app/testing/spec-helpers';
+
 let mockJobSchedulerStatus: JobSchedulerStatus = null;
 
 class MockTelemetryService {
   track() { }
 }
+
+// A reusable list of all the form names
+const ALL_FORMS = [
+  'eventFeedRemoveData',
+  'eventFeedServerActions',
+  'serviceGroupNoHealthChecks',
+  'serviceGroupRemoveServices',
+  'clientRunsRemoveData',
+  'clientRunsLabelMissing',
+  'clientRunsRemoveNodes',
+  'complianceRemoveReports',
+  'complianceRemoveScans'
+];
 
 describe('AutomateSettingsComponent', () => {
   let component: AutomateSettingsComponent;
@@ -28,6 +46,11 @@ describe('AutomateSettingsComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        BrowserAnimationsModule,
         HttpClientTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
@@ -63,21 +86,40 @@ describe('AutomateSettingsComponent', () => {
   it('sets defaults for all form groups', () => {
     expect(component.automateSettingsForm).not.toEqual(null);
     expect(component.automateSettingsForm instanceof FormGroup).toBe(true);
-    expect(Object.keys(component.automateSettingsForm.controls)).toEqual([
-      'eventFeed',
-      'clientRuns',
-      'complianceData',
-      'missingNodes',
-      'deleteMissingNodes'
-    ]);
+    expect(Object.keys(component.automateSettingsForm.controls)).toEqual(ALL_FORMS);
   });
 
-  describe('patchDisableValue(form, value)', () => {
-    it('updates the value of the disable control from the provided form', () => {
-      expect(component.clientRunsForm.value.disable).toEqual(false);
-      component.patchDisableValue(component.clientRunsForm, true);
-      expect(component.clientRunsForm.value.disable).toEqual(true);
+  describe('handleFormActivation()', () => {
+
+    using(ALL_FORMS
+        // Service Groups are not currently uncheckable through the UI
+        .filter( form => !['serviceGroupNoHealthChecks', 'serviceGroupRemoveServices']
+        .includes(form)),
+        function( form: string) {
+      it(`deactivates the associated ${form} form`, () => {
+        expect(component[form].value.disabled).toEqual(false);
+        component.handleFormActivation(component[form], false);
+        expect(component[form].value.disabled).toEqual(true);
+        expect(component[form].get('unit').disabled).toBe(true);
+        expect(component[form].get('threshold').disabled).toBe(true);
+      });
     });
+
+    using(ALL_FORMS
+        // Service Groups are not currently uncheckable through the UI
+        .filter( form => !['serviceGroupsNoHealthChecks', 'serviceGroupRemoveServices']
+        .includes(form)),
+        function (form: string) {
+          it(`activates the associated ${form} form`, () => {
+        component[form].patchValue({disabled: true}); // Deactivate form to start
+        expect(component[form].value.disabled).toEqual(true);
+        component.handleFormActivation(component[form], true);
+        expect(component[form].value.disabled).toEqual(false);
+        expect(component[form].get('unit').disabled).toBe(false);
+        expect(component[form].get('threshold').disabled).toBe(false);
+      });
+    });
+
   });
 
   describe('when jobSchedulerStatus is null', () => {
@@ -88,78 +130,230 @@ describe('AutomateSettingsComponent', () => {
     });
   });
 
-  describe('noChanges()', () => {
-    it('reports if there has been any changes to the form', () => {
-      component.ngOnInit();
-      expect(component.noChanges()).toEqual(true);
-      component.patchDisableValue(component.deleteMissingNodesForm, true);
-      expect(component.noChanges()).toEqual(false);
-    });
-  });
-
   describe('when jobSchedulerStatus is set', () => {
     beforeAll(() => {
-      const jobMissingNodes: IngestJob = {
-        running: false,
-        name: IngestJobs.MissingNodes,
-        threshold: '60m',
-        every: '1h'
+      const eventFeedRemoveData: IngestJob = {
+        name: 'periodic_purge',
+        category: JobCategories.EventFeed,
+        disabled: true,
+        threshold: '',
+        purge_policies: {
+          elasticsearch: [
+            {
+              name: 'feed',
+              older_than_days: 53,
+              disabled: false
+            }
+          ]
+        }
       };
-      const jobMissingNodesForDeletion: IngestJob = {
-        running: true,
-        name: IngestJobs.MissingNodesForDeletion,
-        threshold: '24h',
-        every: '60m'
+
+      const infraNestedForms: IngestJob = {
+        name: 'periodic_purge_timeseries',
+        category: JobCategories.Infra,
+        disabled: false,
+        threshold: '',
+        purge_policies: {
+          elasticsearch: [
+            {
+              name: 'actions',
+              older_than_days: 22, // default is 30, since disabled
+              disabled: true       // is true older than should be null
+            },
+            {
+              name: 'converge-history',
+              older_than_days: 12,
+              disabled: false
+            }
+          ]
+        }
       };
-      mockJobSchedulerStatus = new JobSchedulerStatus(true, [
-        jobMissingNodes,
-        jobMissingNodesForDeletion
+
+      const complianceForms: IngestJob = {
+        category: JobCategories.Compliance,
+        name: 'periodic_purge',
+        threshold: '',
+        disabled: true,
+        purge_policies: {
+          elasticsearch: [
+            {
+              name: 'compliance-reports',
+              older_than_days: 105,
+              disabled: false
+            },
+            {
+              name: 'compliance-scans',
+              older_than_days: 92,
+              disabled: false
+            }
+          ]
+        }
+      };
+
+      const clientRunsRemoveData: IngestJob = {
+        category: JobCategories.Infra,
+        name: 'missing_nodes',
+        disabled : false,
+        threshold : '7d'
+      };
+
+      const clientRunsLabelMissing: IngestJob = {
+        category: JobCategories.Infra,
+        name: 'missing_nodes_for_deletion',
+        disabled: false,
+        threshold: '14m'
+      };
+
+      mockJobSchedulerStatus = new JobSchedulerStatus([
+        eventFeedRemoveData,
+        infraNestedForms,
+        clientRunsRemoveData,
+        clientRunsLabelMissing,
+        complianceForms
       ]);
     });
 
-    it('updates the "missingNodes" form group correctly', () => {
-      component.updateForm(mockJobSchedulerStatus);
+    function genInjestJob(category: string, name: string, threshold: string, disabled: boolean) {
+      return { category, name, threshold, disabled };
+    }
 
-      const missingNodesValues = component.automateSettingsForm
-        .controls.missingNodes.value;
 
-      expect(missingNodesValues.disable).toEqual(true);
-      expect(missingNodesValues.threshold).toEqual('60');
-      expect(missingNodesValues.unit).toEqual('m');
+    function genNestedIngestJob(category: string, name: string, nested_name: string,
+                                threshold: number, disabled: boolean) {
+      return {
+        name,
+        category,
+        purge_policies: {
+          elasticsearch: [
+            {
+              name: nested_name,
+              older_than_days: threshold,
+              disabled
+            }
+          ]
+        }
+      };
+    }
+
+    using([
+      // Event Feed
+      ['eventFeedRemoveData', 'feed',
+          genNestedIngestJob('event_feed', 'periodic_purge', 'feed', 1, false)],
+      ['eventFeedServerActions', 'actions',
+          genNestedIngestJob('infra', 'periodic_purge_timeseries', 'actions', 2, false)],
+
+      // Services --> not yet enabled
+      // ['serviceGroupNoHealthChecks'],
+      // ['serviceGroupRemoveServices'],
+
+      // Client Runs
+      ['clientRunsRemoveNodes', 'converge-history',
+          genNestedIngestJob('infra', 'periodic_purge_timeseries', 'converge-history', 7, false)],
+
+        // Compliance
+      ['complianceRemoveReports', 'compliance-reports',
+          genNestedIngestJob('compliance', 'periodic_purge', 'compliance-reports', 8, false)],
+      ['complianceRemoveScans', 'compliance-scans',
+          genNestedIngestJob('compliance', 'periodic_purge', 'compliance-scans', 9, false)]
+    ], function(formName: string, nestedName: string, job: IngestJob) {
+      it(`when updating ${formName} form,
+            the form data is extracted from the nested form`, () => {
+        const thisJobScheduler = new JobSchedulerStatus([job]);
+        component.updateForm(thisJobScheduler);
+
+        const newFormValues = component[formName].value;
+        const jobData = job.purge_policies.elasticsearch.find(item => item.name === nestedName);
+
+        expect(newFormValues.threshold).toEqual(jobData.older_than_days);
+        expect(newFormValues.disabled).toEqual(jobData.disabled);
+      });
     });
 
-    it('updates the "deleteMissingNodes" form group correctly', () => {
-      component.updateForm(mockJobSchedulerStatus);
+    using([
+      // Client Runs
+      ['clientRunsRemoveData', genInjestJob('infra', 'missing_nodes_for_deletion', '5m', false)],
+      ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes', '6h', false)]
+    ], function (formName: string, job: IngestJob) {
+      it(`when updating ${formName} form,
+            the form data is extracted from the non-nested form`, () => {
+        const thisJobScheduler = new JobSchedulerStatus([job]);
+        component.updateForm(thisJobScheduler);
 
-      const deleteMssingNodesValues = component.automateSettingsForm
-        .controls.deleteMissingNodes.value;
+        const newFormValues = component[formName].value;
 
-      expect(deleteMssingNodesValues.disable).toEqual(false);
-      expect(deleteMssingNodesValues.threshold).toEqual('24');
-      expect(deleteMssingNodesValues.unit).toEqual('h');
+        // non-nested threshold is stored differently, so we need to separate it
+        // into threshold and unit first.
+        const [jobThreshold, jobUnit] = [job.threshold.slice(0, job.threshold.length - 1),
+                                        job.threshold.slice(-1)];
+        expect(newFormValues.threshold).toEqual(jobThreshold);
+        expect(newFormValues.unit).toEqual(jobUnit);
+        expect(newFormValues.disabled).toEqual(job.disabled);
+      });
     });
 
-    it('does not updates the "eventFeed" form group', () => {
-      component.updateForm(mockJobSchedulerStatus);
+    using([
+      // Event Feed
+      ['eventFeedRemoveData', 'feed',
+        genNestedIngestJob('event_feed', 'periodic_purge', 'feed', 1, true)],
+      ['eventFeedServerActions', 'actions',
+        genNestedIngestJob('infra', 'periodic_purge_timeseries', 'actions', 2, true)],
 
-      const eventFeedValues = component.automateSettingsForm
-        .controls.eventFeed.value;
+      // Services --> not yet enabled
+      // ['serviceGroupNoHealthChecks'],
+      // ['serviceGroupRemoveServices'],
 
-      // These are the defaults
-      expect(eventFeedValues.disable).toEqual(false);
-      expect(eventFeedValues.threshold).toEqual('');
-      expect(eventFeedValues.unit).toEqual('d');
+      // Client Runs
+      ['clientRunsRemoveNodes', 'converge-history',
+        genNestedIngestJob('infra', 'periodic_purge_timeseries', 'converge-history', 7, true)],
+
+      // Compliance
+      ['complianceRemoveReports', 'compliance-reports',
+        genNestedIngestJob('compliance', 'periodic_purge', 'compliance-reports', 8, true)],
+      ['complianceRemoveScans', 'compliance-scans',
+        genNestedIngestJob('compliance', 'periodic_purge', 'compliance-scans', 9, true)]
+    ], function (formName: string, nestedName: string, job: IngestJob) {
+        it(`when ${formName} form is saved as disabled, threshold is undefined
+            because it is not present in the nested form anymore`, () => {
+        const thisJobScheduler = new JobSchedulerStatus([job]);
+        component.updateForm(thisJobScheduler);
+
+        const newFormValues = component[formName].value;
+        const jobData = job.purge_policies.elasticsearch.find(item => item.name === nestedName);
+
+        expect(newFormValues.threshold).toEqual(undefined);
+        expect(newFormValues.disabled).toEqual(jobData.disabled);
+      });
     });
+
+    using([
+      // Client Runs
+      ['clientRunsRemoveData', genInjestJob('infra', 'missing_nodes_for_deletion', '5m', true)],
+      ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes', '6h', true)]
+    ], function (formName: string, job: IngestJob) {
+      it(`when ${formName} form is saved as disabled, unit and threshold are undefined
+            because they are not present in the non-nested form anymore`, () => {
+        const thisJobScheduler = new JobSchedulerStatus([job]);
+        component.updateForm(thisJobScheduler);
+
+        const newFormValues = component[formName].value;
+
+        expect(newFormValues.threshold).toEqual(undefined);
+        expect(newFormValues.unit).toEqual(undefined);
+        expect(newFormValues.disabled).toEqual(job.disabled);
+      });
+    });
+
+
 
     describe('when user applyChanges()', () => {
       it('saves settings', () => {
         component.updateForm(mockJobSchedulerStatus);
         component.applyChanges();
-        expect(component.formChanged).toEqual(false);
+
+        // expect(component.notificationVisible).toBe(true);
         expect(component.notificationType).toEqual('info');
         expect(component.notificationMessage)
-          .toEqual('All settings have been updated successfully');
-        expect(component.notificationVisible).toEqual(true);
+        .toEqual('Settings saved.');
       });
 
       xdescribe('and there is an error', () => {
@@ -172,6 +366,8 @@ describe('AutomateSettingsComponent', () => {
           expect(component.notificationVisible).toEqual(true);
         });
       });
+
     });
+
   });
 });

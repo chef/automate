@@ -480,7 +480,9 @@ func init() {
 	proto.RegisterType((*Config_PGS_Cfg)(nil), "chef.automate.platform.Config.PGS.Cfg")
 }
 
-func init() { proto.RegisterFile("api/config/platform/config.proto", fileDescriptor_25ddc2266b5b89e1) }
+func init() {
+	proto.RegisterFile("api/config/platform/config.proto", fileDescriptor_25ddc2266b5b89e1)
+}
 
 var fileDescriptor_25ddc2266b5b89e1 = []byte{
 	// 485 bytes of a gzipped FileDescriptorProto

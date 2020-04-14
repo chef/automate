@@ -16,7 +16,7 @@ import { ProjectService } from 'app/entities/projects/project.service';
 import {
   allProjects, getAllStatus, createStatus, createError
 } from 'app/entities/projects/project.selectors';
-import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/projects/project.actions';
+import { GetProjects, CreateProject, DeleteProject, ProjectPayload  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
 import { ChefKeyboardEvent } from 'app/types/material-types';
@@ -35,6 +35,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public createProjectForm: FormGroup;
   public creatingProject = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
+  public resetCheckboxEvent = new EventEmitter();
   private isDestroyed = new Subject<boolean>();
 
   public statusLabel: Record<ProjectStatus, string> = {
@@ -54,7 +55,8 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', Validators.required],
       id: ['',
-        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(48)]],
+      addPolicies: [true]
     });
   }
 
@@ -138,9 +140,14 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
   public createProject(): void {
     this.creatingProject = true;
-    const project = {
+    const project: ProjectPayload = {
       id: this.createProjectForm.controls['id'].value,
-      name: this.createProjectForm.controls['name'].value.trim()
+      name: this.createProjectForm.controls['name'].value.trim(),
+      // we present the checkbox as "check this to add policies",
+      // but the API actually accepts a flag to skip policy creation
+      // since we want the default behavior to always add the policies.
+      // so, we pass on the opposite of the checkbox value to the API
+      skip_policies: !this.createProjectForm.controls['addPolicies'].value
     };
     this.store.dispatch(new CreateProject(project));
   }
@@ -158,6 +165,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   resetCreateModal(): void {
     this.creatingProject = false;
     this.createProjectForm.reset();
+    this.resetCheckboxEvent.emit();
     this.conflictErrorEvent.emit(false);
   }
 

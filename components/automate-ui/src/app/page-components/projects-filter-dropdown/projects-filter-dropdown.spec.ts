@@ -1,5 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
+import { using } from 'app/testing/spec-helpers';
+import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { ProjectsFilterDropdownComponent } from './projects-filter-dropdown.component';
 
 describe('ProjectsFilterDropdownComponent', () => {
@@ -98,21 +101,7 @@ describe('ProjectsFilterDropdownComponent', () => {
   describe('dropdown', () => {
     beforeEach(() => {
       component.dropdownActive = true;
-      component.editableOptions = [
-        {
-          value: 'project-1',
-          label: 'Project 1',
-          type: 'CUSTOM',
-          checked: false
-        },
-        {
-          value: 'project-2',
-          label: 'Project 2',
-          type: 'CUSTOM',
-          checked: true
-        }
-      ];
-      // need filteredOptions in order for elements to be displayed in the UI
+      component.editableOptions = genOptions([false, true]);
       component.filteredOptions = component.editableOptions;
       fixture.detectChanges();
     });
@@ -187,20 +176,7 @@ describe('ProjectsFilterDropdownComponent', () => {
 
   describe('resetOptions()', () => {
     beforeEach(() => {
-      component.options = [
-        {
-          value: 'project-1',
-          label: 'Project 1',
-          type: 'CUSTOM',
-          checked: false
-        },
-        {
-          value: 'project-2',
-          label: 'Project 2',
-          type: 'CUSTOM',
-          checked: true
-        }
-      ];
+      component.options = genOptions([false, true]);
       component.editableOptions = [];
       component.optionsEdited = true;
 
@@ -220,20 +196,7 @@ describe('ProjectsFilterDropdownComponent', () => {
   describe('handleLabelClick()', () => {
     describe('when more than one option is available', () => {
       beforeEach(() => {
-        component.editableOptions = [
-          {
-            value: 'project-1',
-            label: 'Project 1',
-            type: 'CUSTOM',
-            checked: false
-          },
-          {
-            value: 'project-2',
-            label: 'Project 2',
-            type: 'CUSTOM',
-            checked: false
-          }
-        ];
+        component.editableOptions = genOptions([false, false]);
         component.dropdownActive = false;
         spyOn(component, 'resetOptions');
 
@@ -251,14 +214,7 @@ describe('ProjectsFilterDropdownComponent', () => {
 
     describe('when only one option is available', () => {
       beforeEach(() => {
-        component.editableOptions = [
-          {
-            value: 'project-1',
-            label: 'Project 1',
-            type: 'CUSTOM',
-            checked: false
-          }
-        ];
+        component.editableOptions = genOptions([false]);
         component.dropdownActive = false;
         spyOn(component, 'resetOptions');
 
@@ -288,17 +244,11 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
   });
 
-  describe('handleOptionChange()', () => {
+  describe('handleOptionChange() for single option', () => {
     beforeEach(() => {
-      component.editableOptions = [
-        {
-          value: 'project-1',
-          label: 'Project 1',
-          type: 'CUSTOM',
-          checked: false
-        }
-      ];
+      component.editableOptions = genOptions([false]);
       component.optionsEdited = false;
+      expect(component.editableOptions[0].checked).toEqual(false);
       component.handleOptionChange({ detail: true }, 'Project 1');
     });
 
@@ -311,9 +261,34 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
   });
 
+  describe('handleOptionChange() for multiple options', () => {
+    beforeEach(() => {
+      component.editableOptions = genOptions([false, false, true, true, false]);
+      component.optionsEdited = false;
+    });
+
+    it('updates an unchecked value to the emitted value', () => {
+      expect(component.editableOptions[1].checked).toEqual(false);
+      component.handleOptionChange({ detail: true }, 'Project 2');
+      expect(component.editableOptions[1].checked).toEqual(true);
+    });
+
+     it('updates a checked value to the emitted value', () => {
+      expect(component.editableOptions[2].checked).toEqual(true);
+      component.handleOptionChange({ detail: false }, 'Project 3');
+      expect(component.editableOptions[2].checked).toEqual(false);
+    });
+
+    it('marks the list of options as edited', () => {
+      component.handleOptionChange({ detail: true }, 'Project 1');
+      expect(component.optionsEdited).toEqual(true);
+    });
+  });
+
   describe('handleApplySelection()', () => {
     beforeEach(() => {
       spyOn(component.onSelection, 'emit');
+      spyOn(component.onOptionChange, 'emit');
       component.dropdownActive = true;
       component.optionsEdited = true;
       component.handleApplySelection();
@@ -330,6 +305,96 @@ describe('ProjectsFilterDropdownComponent', () => {
     it('emits "onSelection" event with list of updated options', () => {
       expect(component.onSelection.emit).toHaveBeenCalledWith(component.editableOptions);
     });
+
+    it('emits "onOptionChange" event with list of updated options', () => {
+      expect(component.onOptionChange.emit).toHaveBeenCalledWith(component.editableOptions);
+    });
+  });
+
+  describe('handleClearSelection()', () => {
+    beforeEach(() => {
+      spyOn(component.onSelection, 'emit');
+      spyOn(component.onOptionChange, 'emit');
+      component.dropdownActive = true;
+      component.optionsEdited = false;
+      component.options = genOptions([false, true, true, false, true]);
+      component.resetOptions();
+      expect(component.editableOptions.some(o => o.checked)).toEqual(true);
+    });
+
+    // Note: most of these would be phantom tests (see https://bit.ly/2UPrprX)
+    // except for the fact presence of the tests for handleApplySelection above.
+    it('does not hide the dropdown', () => {
+      component.handleClearSelection();
+      expect(component.dropdownActive).toEqual(true);
+    });
+
+    it('enables the "Apply Changes" button', () => {
+      component.handleClearSelection();
+      expect(component.optionsEdited).toEqual(true);
+    });
+
+    it('hides the "Clear Selection" button', () => {
+      fixture.detectChanges();
+      let button: HTMLElement = fixture.nativeElement.querySelector('#projects-filter-clear-selection');
+      expect(button.classList.contains('active')).toEqual(true);
+
+      component.handleClearSelection();
+      fixture.detectChanges();
+
+      button = fixture.nativeElement.querySelector('#projects-filter-clear-selection');
+      expect(button.classList.contains('active')).toEqual(false);
+    });
+
+    it('does not emit "onSelection" event', () => {
+      component.handleClearSelection();
+      expect(component.onSelection.emit).not.toHaveBeenCalled();
+    });
+
+    it('does not emit "onOptionChange" event', () => {
+      component.handleClearSelection();
+      expect(component.onOptionChange.emit).not.toHaveBeenCalled();
+    });
+
+    it('clears all checked options with no filter applied', () => {
+      component.handleClearSelection();
+      expect(component.editableOptions.some(o => o.checked)).toEqual(false);
+    });
+
+    using([
+      ['matching some', 'proj', 4, 3], // cleared 4 selected by filter; 3 out of 7 remain
+      ['no filter', '', 7, 0],
+      ['matching all', '-', 7, 0],
+      ['matching none', 'non-match', 0, 7]
+    ], function (
+        description: string,
+        filter: string,
+        resultCheckedWithFilterBeforeClearing: number,
+      resultCheckedAfterRemovingFilter: number) {
+        it(`when filtered with ${description}, clears only filtered items`, () => {
+          component.options = genOptionsWithId([
+            ['proj-one', true],
+            ['proj-three', true],
+            ['other-one', true],
+            ['other-two', true],
+            ['proj-two', true],
+            ['other-three', true],
+            ['proj-four', true]
+          ]);
+          component.resetOptions();
+          component.handleFilterKeyUp(filter);
+          expect(component.filteredSelectedCount)
+            .toEqual(resultCheckedWithFilterBeforeClearing.toString());
+
+          component.handleClearSelection();
+          expect(component.filteredSelectedCount).toEqual('0');
+
+          component.handleFilterKeyUp('');
+          expect(component.filteredSelectedCount)
+            .toEqual(resultCheckedAfterRemovingFilter.toString());
+        });
+    });
+
   });
 
   describe('handleArrowUp()', () => {
@@ -373,4 +438,263 @@ describe('ProjectsFilterDropdownComponent', () => {
       expect(nextElementSibling.focus).toHaveBeenCalled();
     });
   });
+
+  describe('filteredOptions', () => {
+    beforeEach(() => {
+      component.dropdownActive = true;
+      component.options = genOptionsWithId([
+        ['proj-one', true],
+        ['proj-three', false],
+        ['other-one', false],
+        ['other-two', true],
+        ['proj-two', false],
+        ['other-three', false],
+        ['proj-four', false]
+      ]);
+      component.resetOptions();
+    });
+
+    it('with no filter displays all options', () => {
+      expect(component.filteredOptions.length).toEqual(7);
+    });
+
+    using([
+      ['prefix', 'proj', 4],
+      ['mid-value', 'her', 3],
+      ['suffix', 'two', 2],
+      ['empty string', '', 7],
+      ['whitespace', ' ', 0],
+      ['exact match', 'proj-one', 1],
+      ['superset', 'proj-one-plus-one', 0],
+      ['everything', '-', 7]
+    ], function (description: string, filter: string, count: number) {
+      it(`with ${description} filter displays ${count} matching options`, () => {
+        component.handleFilterKeyUp(filter);
+        expect(component.filteredOptions.length).toEqual(count);
+      });
+    });
+  });
+
+  describe('filteredSelectedCount', () => {
+    beforeEach(() => {
+      component.dropdownActive = true;
+    });
+    describe('with no filters applied', () => {
+      it('reports none selected with no projects', () => {
+        component.editableOptions = genOptions([]);
+        component.filteredOptions = component.editableOptions;
+        expect(component.filteredSelectedCount).toEqual('0');
+      });
+
+      it('reports one selected with one project, checked', () => {
+        component.editableOptions = genOptions([true]);
+        component.filteredOptions = component.editableOptions;
+        expect(component.filteredSelectedCount).toEqual('1');
+      });
+
+      it('reports none selected with one project, unchecked', () => {
+        component.editableOptions = genOptions([false]);
+        component.filteredOptions = component.editableOptions;
+        expect(component.filteredSelectedCount).toEqual('0');
+      });
+
+      it('reports none selected with multiple projects, none checked', () => {
+        component.editableOptions = genOptions([false, false, false]);
+        component.filteredOptions = component.editableOptions;
+        expect(component.filteredSelectedCount).toEqual('0');
+      });
+
+      it('reports two selected with multiple projects, two checked', () => {
+        component.editableOptions = genOptions([false, true, true]);
+        component.filteredOptions = component.editableOptions;
+        expect(component.filteredSelectedCount).toEqual('2');
+      });
+
+      using([
+        ['at threshold', 99, '99'],
+        ['one above threshold', 100, '99+'],
+        ['well above threshold', 150, '99+']
+      ], function (description: string, count: number, result: string) {
+        it(`${description} ($count projects checked) reports ${result}`, () => {
+          component.editableOptions = genManyOptions(count);
+          component.filteredOptions = component.editableOptions;
+          expect(component.filteredSelectedCount).toEqual(result);
+        });
+      });
+    });
+
+    describe('with filters', () => {
+
+      // test all combinations of the two inputs (checked and matched) for single project
+      using([
+        [true, 'match', 1, 1],
+        [false, 'match', 0, 0],
+        [true, 'non-match', 1, 0],
+        [false, 'non-match', 0, 0]
+      ], function (checked: boolean, filter: string, beforeCount: number, afterCount: number) {
+        it(`matched (${'match'.includes(filter)}) and a single project checked (${checked}),`
+          + ` reports count of ${afterCount}`, () => {
+            component.options = genOptionsWithId([
+              ['match', checked]
+            ]);
+            component.resetOptions();
+            expect(component.filteredSelectedCount).toEqual(beforeCount.toString());
+
+            component.handleFilterKeyUp(filter);
+
+            expect(component.filteredSelectedCount).toEqual(afterCount.toString());
+          });
+      });
+
+      using([
+        ['no filter', '', 3],
+        ['matching all', '-', 3],
+        ['matching some', 'proj', 2],
+        ['matching some with none checked', '-three', 0],
+        ['matching none', 'non-match', 0]
+      ], function (description: string, filter: string, afterCount: number) {
+        it(`and multiple projects, filter ${description} reports correct count`, () => {
+          component.options = genOptionsWithId([
+            ['proj-one', true],
+            ['proj-three', false],
+            ['other-one', false],
+            ['other-two', true],
+            ['proj-two', false],
+            ['other-three', false],
+            ['proj-four', true]
+          ]);
+          component.resetOptions();
+
+          component.handleFilterKeyUp(filter);
+
+          expect(component.filteredSelectedCount).toEqual(afterCount.toString());
+        });
+      });
+    });
+
+  });
+
+  describe('"Clear Selection" button', () => {
+    beforeEach(() => {
+      component.dropdownActive = true;
+    });
+    it('becomes visible after no projects checked and then checking one project', () => {
+      component.options = genOptionsWithId([
+        ['proj-one', false],
+        ['proj-two', false],
+        ['proj-three', false]
+      ]);
+      component.resetOptions();
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(false);
+
+      component.handleOptionChange({ detail: true }, 'proj-three');
+      fixture.detectChanges();
+
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(true);
+    });
+
+    it('becomes hidden after unchecking the last checked project', () => {
+      component.options = genOptionsWithId([
+        ['proj-one', true],
+        ['proj-two', true],
+        ['proj-three', false]
+      ]);
+      component.resetOptions();
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(true);
+
+      component.handleOptionChange({ detail: false }, 'proj-one');
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(true);
+
+      component.handleOptionChange({ detail: false }, 'proj-two');
+      fixture.detectChanges();
+
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(false);
+    });
+
+    it('becomes visible after loosening filter to reveal some checked projects', () => {
+      component.options = genOptionsWithId([
+        ['proj-one', true],
+        ['filtered-one', false],
+        ['proj-two', true],
+        ['filtered-two', false],
+        ['proj-three', false]
+      ]);
+      component.resetOptions();
+      component.handleFilterKeyUp('filtered');
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(false);
+
+      component.handleFilterKeyUp('');
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(true);
+    });
+
+    it('becomes hidden after tightening filter to hide all checked projects', () => {
+      component.options = genOptionsWithId([
+        ['proj-one', true],
+        ['filtered-one', false],
+        ['proj-two', true],
+        ['filtered-two', false],
+        ['proj-three', false]
+      ]);
+      component.resetOptions();
+      component.handleFilterKeyUp('proj');
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(true);
+
+      component.handleFilterKeyUp('filtered');
+      fixture.detectChanges();
+      expect(hasClass('#projects-filter-clear-selection', 'active')).toEqual(false);
+      });
+  });
+
+  function hasClass(selector: string, cssClass: string): boolean {
+    const element: HTMLElement = fixture.nativeElement.querySelector(selector);
+    return element.classList.contains(cssClass);
+  }
+
 });
+
+function genOptions(checkedItems: boolean[]): ProjectsFilterOption[] {
+  const options: ProjectsFilterOption[] = [];
+  for (let i = 0; i < checkedItems.length; i++) {
+    options.push(
+      {
+        value: `project-${i + 1}`,
+        label: `Project ${i + 1}`,
+        type: 'CUSTOM',
+        checked: checkedItems[i]
+      });
+  }
+  return options;
+}
+
+function genManyOptions(count: number): ProjectsFilterOption[] {
+  const options: ProjectsFilterOption[] = [];
+  for (let i = 0; i < count; i++) {
+    options.push(
+      {
+        value: `project-${i + 1}`,
+        label: `Project ${i + 1}`,
+        type: 'CUSTOM',
+        checked: true
+      });
+  }
+  return options;
+}
+
+function genOptionsWithId(checkedItems: [string, boolean][]): ProjectsFilterOption[] {
+  const options: ProjectsFilterOption[] = [];
+  checkedItems.forEach(([id, checked]) =>
+    options.push({
+        value: id,
+        label: id,
+        type: 'CUSTOM',
+        checked
+    })
+  );
+  return options;
+}

@@ -150,7 +150,7 @@ Add the following to your config.toml:
 # Uncomment and fill out if using external elasticsearch with SSL and/or basic auth
 # [global.v1.external.elasticsearch.auth]
 #   scheme = "basic_auth"
-# [global.v1.external.elasticsearch.basic_auth]
+# [global.v1.external.elasticsearch.auth.basic_auth]
 #   username = "<admin username>"
 #   password = "<admin password>"
 # [global.v1.external.elasticsearch.ssl]

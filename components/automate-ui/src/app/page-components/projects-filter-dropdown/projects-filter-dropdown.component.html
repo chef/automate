@@ -18,7 +18,7 @@
 
         <div class="dropdown-content">
           <!-- @TODO turn this into reusable Filter Input component -->
-          <input 
+          <input
             chefInput
             type="text"
             (keyup)="handleFilterKeyUp($event.target.value)"
@@ -35,7 +35,9 @@
           <chef-button
           tertiary
           id="projects-filter-clear-selection"
-          (click)="handleClearSelection()">Clear Selection</chef-button>
+          class="pf-clear-selection"
+          [class.active]="filteredSelectedCount !== '0'" 
+          (click)="handleClearSelection()">Clear Selection ({{filteredSelectedCount}})</chef-button>
         </div>
 
         <div id="drop-list" class="dropdown-content">

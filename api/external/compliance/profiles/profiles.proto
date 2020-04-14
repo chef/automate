@@ -142,6 +142,43 @@ service ProfilesService {
 			action: "compliance:profiles:list"
 		};
 	};
+
+	/*
+	Check if one or multiple profiles exist in the metadata database.
+
+	The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend
+	doesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.
+	This is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.
+
+	Authorization Action:
+	```
+	compliance:profiles:list
+	```
+	*/
+	rpc MetaSearch(Sha256) returns (Missing) {
+        option (google.api.http) = {
+                post: "/compliance/profiles/metasearch"
+                body: "*"
+        };
+        option (chef.automate.api.policy) = {
+            resource: "compliance:profiles"
+            action: "search"
+        };
+        option (chef.automate.api.iam.policy) = {
+            resource: "compliance:profiles"
+            action: "compliance:profiles:list"
+        };
+	};
+}
+
+message Sha256 {
+	// An array of profile sha256 IDs.
+	repeated string sha256 = 1;
+}
+
+message Missing {
+	// An array of profile sha256 IDs that are missing from the backend metadata store.
+	repeated string missing_sha256 = 1;
 }
 
 message ProfilePostRequest {

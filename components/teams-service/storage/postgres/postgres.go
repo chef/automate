@@ -3,9 +3,12 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"regexp"
 
 	"github.com/lib/pq" // adapter for database/sql
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/teams-service/storage"
@@ -15,6 +18,8 @@ import (
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
+
+var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
 // WARNING
 // TODO (tc): The storage interface is still using V1 verbiage, so
@@ -77,14 +82,8 @@ func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 	if len(projects) == 0 {
 		projects = []string{}
 	}
-	// will only return an error if authz is in v2.1 mode
-	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-		Subjects:    auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-		OldProjects: []string{},
-		NewProjects: projects,
-	})
+	err := p.validateTeamInputs(ctx, name, description, []string{}, projects, false)
 	if err != nil {
-		// return error unaltered because it's already a GRPC status code
 		return storage.Team{}, err
 	}
 
@@ -94,6 +93,31 @@ func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 	}
 
 	return team, nil
+}
+
+func (p *postgres) validateTeamInputs(ctx context.Context,
+	name string, description string, oldProjects, updatedProjects []string, isUpdateRequest bool) error {
+	if emptyOrWhitespaceOnlyRE.MatchString(name) {
+		return status.Error(
+			codes.InvalidArgument,
+			"a team id is required and must contain at least one non-whitespace character")
+	}
+	if emptyOrWhitespaceOnlyRE.MatchString(description) {
+		return status.Error(
+			codes.InvalidArgument,
+			"a team name is required and must contain at least one non-whitespace character")
+	}
+	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+		OldProjects:     oldProjects,
+		NewProjects:     updatedProjects,
+		IsUpdateRequest: isUpdateRequest,
+	})
+	if err != nil {
+		// return error unaltered because it's already a GRPC status code
+		return err
+	}
+	return nil
 }
 
 func (p *postgres) insertTeam(ctx context.Context,
@@ -219,15 +243,8 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 		return storage.Team{}, p.processError(err)
 	}
 
-	// will only return an error if authz is in v2.1 mode
-	_, err = p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-		OldProjects:     oldProjects,
-		NewProjects:     updatedProjects,
-		IsUpdateRequest: true,
-	})
+	err = p.validateTeamInputs(ctx, teamName, teamDescription, oldProjects, updatedProjects, true)
 	if err != nil {
-		// return error unaltered because it's already a GRPC status code
 		return storage.Team{}, err
 	}
 

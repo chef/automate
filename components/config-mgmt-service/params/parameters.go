@@ -90,6 +90,8 @@ func ConvertParamToNodeStateBackendLowerFilter(parameter string) string {
 		return backend.ChefTags + ".lower"
 	case "error", backend.ErrorMessage:
 		return backend.ErrorMessage + ".lower"
+	case "error_type", backend.ErrorType:
+		return backend.ErrorType + ".lower"
 	case "chef_server", "source_fqdn", backend.ChefServer:
 		return backend.ChefServer + ".lower"
 	case "environment", backend.Environment:

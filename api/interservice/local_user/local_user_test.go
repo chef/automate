@@ -23,11 +23,6 @@ func TestValidation(t *testing.T) {
 			Email:    "!",
 			Password: "letmein!",
 		},
-		"empty name in create req": &local_user.CreateUserReq{
-			Name:     "",
-			Email:    "e@o",
-			Password: "letmein!",
-		},
 		"empty update": &local_user.UpdateUserReq{},
 		"empty name in update": &local_user.UpdateUserReq{
 			Name:     "",

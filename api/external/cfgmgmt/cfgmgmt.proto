@@ -17,6 +17,9 @@ import "api/external/cfgmgmt/response/errors.proto";
 
 import "api/external/common/query/parameters.proto";
 import "api/external/common/version/version.proto";
+import "api/external/common/response.proto";
+
+import "api/external/compliance/reporting/reporting.proto";
 
 import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
@@ -136,6 +139,29 @@ service ConfigMgmt {
   rpc GetCheckInCountsTimeSeries(cfgmgmt.request.CheckInCountsTimeSeries) returns (cfgmgmt.response.CheckInCountsTimeSeries) {
     option (google.api.http).get =  "/cfgmgmt/stats/checkin_counts_timeseries";
     option (chef.automate.api.policy).resource = "cfgmgmt:stats:checkin_counts_timeseries";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+
+  /*
+  GetMissingNodeDurationCounts
+
+  Returns a count of missing nodes for the provided durations.
+
+  Example:
+  ```
+  cfgmgmt/stats/missing_node_duration_counts?durations=3d&durations=1w&durations=2w&durations=1M&durations=3M
+  ```
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc GetMissingNodeDurationCounts(cfgmgmt.request.MissingNodeDurationCounts) returns (cfgmgmt.response.MissingNodeDurationCounts) {
+    option (google.api.http).get =  "/cfgmgmt/stats/missing_node_duration_counts";
+    option (chef.automate.api.policy).resource = "cfgmgmt:stats:missing_node_duration_counts";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
@@ -288,4 +314,8 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }
+
+  rpc NodeExport(cfgmgmt.request.NodeExport) returns (stream chef.automate.api.common.ExportData) {};
+
+  rpc ReportExport(cfgmgmt.request.ReportExport) returns (stream chef.automate.api.common.ExportData) {};
 }

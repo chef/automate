@@ -90,6 +90,18 @@ allowed_licenses:
 
 fallbacks:
   golang:
+    - name: github.com/kevinburke/go-bindata
+      license_id: CC0-1.0
+      license_content: https://raw.githubusercontent.com/kevinburke/go-bindata/master/LICENSE
+    - name: github.com/Masterminds/squirrel
+      license_id: MIT
+      license_content: https://github.com/Masterminds/squirrel/blob/master/LICENSE.txt
+    - name: github.com/fatih/color
+      license_id: MIT
+      license_content: https://github.com/fatih/color/blob/master/LICENSE.md
+    - name: gopkg.in/segmentio/analytics-go.v3
+      license_id: MIT
+      license_content: https://github.com/segmentio/analytics-go/blob/v3.1.0/License.md
     - name: github.com/ghodss/yaml
       license_id: MIT
       license_content: https://raw.githubusercontent.com/ghodss/yaml/master/LICENSE
@@ -188,6 +200,9 @@ fallbacks:
       license_content: https://raw.githubusercontent.com/ruby/net-telnet/master/LICENSE.txt
 
 exceptions:
+  golang:
+    - name: github.com/bmizerany/assert
+      reason: Not actually used, bug in license_scout
   habitat:
     - name: chef/mlsa
       reason: Chef MLSA licensed

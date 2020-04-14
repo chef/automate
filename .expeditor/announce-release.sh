@@ -28,15 +28,8 @@ As always, we welcome your feedback and invite you to contact us directly or sha
 EOH
 )
 
-# category 9 is "Chef Release Announcements": https://discourse.chef.io/c/chef-release
-
-curl -X POST https://discourse.chef.io/posts \
-  -H "Content-Type: multipart/form-data" \
-  -F "api_username=chef-ci" \
-  -F "api_key=$DISCOURSE_API_TOKEN" \
-  -F "category=9" \
-  -F "title=$topic_title" \
-  -F "raw=$topic_body"
+# Use Expeditor's built in Bash helper to post our message: https://git.io/JvxPm
+post_discourse_release_announcement "$topic_title" "$topic_body"
 
 # Cleanup
 rm manifest.json

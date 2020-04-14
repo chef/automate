@@ -25,7 +25,7 @@ message Role {
 
 message CreatePolicyReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
-    string name = 2 [(validate.rules).string.min_len = 1];
+    string name = 2;
     repeated string members = 3 [(validate.rules).repeated = {
         unique: true,
         items: {
@@ -133,6 +133,7 @@ message ReplacePolicyMembersResp {
 message AddPolicyMembersReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
     repeated string members = 2 [(validate.rules).repeated = {
+        min_items: 1,
         unique: true,
         items: {
             string: {
@@ -168,16 +169,16 @@ message ListRolesResp {
 }
 
 message DeleteRoleReq {
-    string id = 1
-    [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
 }
 message DeleteRoleResp {}
 
 message UpdateRoleReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
-    string name = 2 [(validate.rules).string.pattern = "\\S"];
+    string name = 2;
     repeated string actions = 3
     [(validate.rules).repeated = {
+      min_items: 1,
       unique: true,
       // this RE means:  * OR *:verb OR svc:type:verb OR svc:* OR svc:*:verb OR svc:type:*
       items: {
@@ -206,6 +207,7 @@ message ListPolicyMembersResp {
 message RemovePolicyMembersReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
     repeated string members = 2 [(validate.rules).repeated = {
+        min_items: 1,
         unique: true,
         items: {
             string: {
@@ -239,12 +241,11 @@ message GetRoleReq {
 }
 
 message CreateRoleReq {
-    string id = 1
-      [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
-    string name = 2
-      [(validate.rules).string.pattern = "\\S"];;
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string name = 2;
     repeated string actions = 3
       [(validate.rules).repeated = {
+        min_items: 1,
         unique: true,
         // this RE means:  * OR *:verb OR svc:type:verb OR svc:* OR svc:*:verb OR svc:type:*
         items: {

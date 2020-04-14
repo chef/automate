@@ -1,16 +1,20 @@
+import { Policy, Project } from '../../../support/types';
+
 const defaultAdminReq = {
   headers: {}, // must fill in before use
   url: '/apis/iam/v2/policies'
 };
 const cypressPrefix = 'test-policies-api';
 const now = Cypress.moment().format('MMDDYYhhmm');
-const project1 = {
-    id: `${cypressPrefix}-project1-${now}`,
-    name: 'Test Project 1'
+const project1: Project = {
+  id: `${cypressPrefix}-project1-${now}`,
+  name: 'Test Project 1',
+  skip_policies: true
 };
-const project2 = {
-    id: `${cypressPrefix}-project2-${now}`,
-    name: 'Test Project 2'
+const project2: Project = {
+  id: `${cypressPrefix}-project2-${now}`,
+  name: 'Test Project 2',
+  skip_policies: true
 };
 const policyID = `${cypressPrefix}-policy-${now}`;
 const policyName = `${cypressPrefix} policy ${now}`;
@@ -21,21 +25,6 @@ const chefManagedPolicyIDs = [
   'viewer-access',
   'ingest-access'
 ];
-
-interface Policy {
-  id: string;
-  name: string;
-  members: string[];
-  statements: Statement[];
-  projects: string[];
-}
-
-interface Statement {
-  effect: string;
-  actions: string[];
-  projects: string[];
-}
-
 
 describe('policies API', () => {
 

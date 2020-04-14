@@ -39,6 +39,7 @@ var (
 	ChefTags           string = "chef_tags"
 	Project            string = "projects"
 	ErrorMessage       string = "error_message"
+	ErrorType          string = "error_type"
 	ChefServer         string = NodeFieldToJson("SourceFqdn")
 	EntityTypeName     string = "entity_type"
 	RunEndTime         string = "end_time"

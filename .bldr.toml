@@ -2145,12 +2145,6 @@ paths = [
   "components/automate-minio/*"
 ]
 
-[automate-openssl11]
-plan_path = "components/automate-openssl11"
-paths = [
-  "components/automate-openssl11/*"
-]
-
 [automate-builder-memcached]
 plan_path = "components/automate-builder-memcached"
 paths = [

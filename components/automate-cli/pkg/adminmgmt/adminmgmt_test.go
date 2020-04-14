@@ -252,7 +252,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 				return nil, errors.New("unexpected arguments")
 			}
 			return &iam_resp.GetTeamMembershipResp{
-				UserIds: []string{"1", userID, "3"},
+				MembershipIds: []string{"1", userID, "3"},
 			}, nil
 		}
 
@@ -277,7 +277,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 				return nil, errors.New("unexpected arguments")
 			}
 			return &iam_resp.GetTeamMembershipResp{
-				UserIds: []string{"1", "3"},
+				MembershipIds: []string{"1", "3"},
 			}, nil
 		}
 
@@ -285,11 +285,11 @@ func TestAddAdminUserToTeam(t *testing.T) {
 			serverMocks.TeamsMock.AddTeamMembersFunc = func(
 				_ context.Context, req *iam_req.AddTeamMembersReq) (*iam_resp.AddTeamMembersResp, error) {
 
-				if teamsID != req.Id || len(req.UserIds) != 1 || userID != req.UserIds[0] {
+				if teamsID != req.Id || len(req.MembershipIds) != 1 || userID != req.MembershipIds[0] {
 					return nil, errors.New("unexpected arguments")
 				}
 				return &iam_resp.AddTeamMembersResp{
-					UserIds: req.UserIds,
+					MembershipIds: req.MembershipIds,
 				}, nil
 			}
 
@@ -302,7 +302,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 			serverMocks.TeamsMock.AddTeamMembersFunc = func(
 				_ context.Context, req *iam_req.AddTeamMembersReq) (*iam_resp.AddTeamMembersResp, error) {
 
-				if teamsID != req.Id || len(req.UserIds) != 1 || userID != req.UserIds[0] {
+				if teamsID != req.Id || len(req.MembershipIds) != 1 || userID != req.MembershipIds[0] {
 					return &iam_resp.AddTeamMembersResp{}, nil // unexpected arguments
 				}
 				return nil, status.Error(codes.Internal, "unexpected error")

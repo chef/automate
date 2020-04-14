@@ -543,6 +543,9 @@ var ComplianceRepDate = Mapping{
 					"type": "keyword",
 					"doc_values": false,
 					"ignore_above": 256
+				},
+				"run_time_limit": {
+				  "type": "double"
 				}
       }
     }
