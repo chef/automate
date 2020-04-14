@@ -63,16 +63,16 @@ export class ReportingComponent implements OnInit, OnDestroy {
   // Query search bar
   availableFilterTypes = [
     {
-      'name': 'organization',
-      'title': 'Chef Organization',
-      'description': 'Add the organization to filter this report to a specific organization',
-      'placeholder': 'Chef Organization'
-    },
-    {
       'name': 'chef_server',
       'title': 'Chef Infra Server',
       'description': '',
       'placeholder': 'Chef Infra Server'
+    },
+    {
+      'name': 'organization',
+      'title': 'Chef Organization',
+      'description': 'Add the organization to filter this report to a specific organization',
+      'placeholder': 'Chef Organization'
     },
     {
       'name': 'chef_tags',
