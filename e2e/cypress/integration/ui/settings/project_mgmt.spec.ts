@@ -50,7 +50,7 @@ describe('project management', () => {
       expect(response.status).to.equal(200);
       response.body.projects.map((project: Project) => project.id)
         .forEach((id: string) => {
-          cy.get('chef-table-new chef-table-cell').contains(id);
+          cy.get('chef-table chef-table-cell').contains(id);
         });
     });
   });

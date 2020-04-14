@@ -10,7 +10,7 @@ describe('token management', () => {
   const tokenID1 = `${cypressPrefix}-id-1-${now}`;
   const tokenID2 = `${cypressPrefix}-id-2-${now}`;
   const tokenID3 = `${cypressPrefix}-token-3-${now}`;
-  const tokensTable = 'app-api-tokens chef-table-new';
+  const tokensTable = 'app-api-tokens chef-table';
 
   before(() => {
     cy.adminLogin('/settings/tokens').then(() => {
@@ -68,9 +68,9 @@ describe('token management', () => {
     cy.get(`${tokensTable} chef-table-cell`).contains(tokenName1);
     cy.get(`${tokensTable} chef-table-cell`).contains(tokenName2);
 
-    cy.get('chef-table-new chef-table-cell').contains(tokenName1).parent()
+    cy.get('chef-table chef-table-cell').contains(tokenName1).parent()
       .get('chef-table-cell').contains('Active');
-    cy.get('chef-table-new chef-table-cell').contains(tokenName2).parent()
+    cy.get('chef-table chef-table-cell').contains(tokenName2).parent()
       .get('chef-table-cell').contains('Inactive');
   });
 
