@@ -21,15 +21,15 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type CreateOrg struct {
-	// Name of the Org.
+	// Name of the chef organization.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Admin user of the Org.
+	// Admin user of the chef organization.
 	AdminUser string `protobuf:"bytes,2,opt,name=admin_user,json=adminUser,proto3" json:"admin_user,omitempty"`
-	// Admin key of the Org.
+	// Admin key of the chef organization.
 	AdminKey string `protobuf:"bytes,3,opt,name=admin_key,json=adminKey,proto3" json:"admin_key,omitempty"`
-	// ID of the Server.
+	// ID of the chef infra server.
 	ServerId string `protobuf:"bytes,4,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	// List of projects this organization belongs to. May be empty.
+	// List of projects this chef organization belongs to. May be empty.
 	Projects             []string `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -97,15 +97,15 @@ func (m *CreateOrg) GetProjects() []string {
 }
 
 type UpdateOrg struct {
-	// ID of the Org.
+	// ID of the chef organization.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Name of the Org.
+	// Name of the chef organization.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Admin user of the Org.
+	// Admin user of the chef organization.
 	AdminUser string `protobuf:"bytes,3,opt,name=admin_user,json=adminUser,proto3" json:"admin_user,omitempty"`
-	// ID of the server.
+	// ID of the chef infra server.
 	ServerId string `protobuf:"bytes,4,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	// List of projects this organization belongs to. May be empty.
+	// List of projects this chef organization belongs to. May be empty.
 	Projects             []string `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -173,9 +173,9 @@ func (m *UpdateOrg) GetProjects() []string {
 }
 
 type DeleteOrg struct {
-	// ID of the Org.
+	// ID of the chef organization.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// ID of the Server.
+	// ID of the chef infra server.
 	ServerId             string   `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -222,7 +222,7 @@ func (m *DeleteOrg) GetServerId() string {
 }
 
 type GetOrgs struct {
-	// ID of the Server.
+	// ID of the chef infra server.
 	ServerId             string   `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -262,9 +262,9 @@ func (m *GetOrgs) GetServerId() string {
 }
 
 type GetOrg struct {
-	// ID of the Org.
+	// ID of the chef organization.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// ID of the Server.
+	// ID of the chef infra server.
 	ServerId             string   `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -311,9 +311,9 @@ func (m *GetOrg) GetServerId() string {
 }
 
 type GetOrgByName struct {
-	// Name of the Org.
+	// Name of the chef organization.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// ID of the Server.
+	// ID of the chef infra server.
 	ServerId             string   `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

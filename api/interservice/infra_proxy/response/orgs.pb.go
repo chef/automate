@@ -21,7 +21,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type CreateOrg struct {
-	// Org detail
+	// Chef organization detail
 	Org                  *Org     `protobuf:"bytes,1,opt,name=org,proto3" json:"org,omitempty" toml:"org,omitempty" mapstructure:"org,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -61,7 +61,7 @@ func (m *CreateOrg) GetOrg() *Org {
 }
 
 type DeleteOrg struct {
-	// Org detail
+	// Chef organization detail
 	Org                  *Org     `protobuf:"bytes,1,opt,name=org,proto3" json:"org,omitempty" toml:"org,omitempty" mapstructure:"org,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -101,7 +101,7 @@ func (m *DeleteOrg) GetOrg() *Org {
 }
 
 type UpdateOrg struct {
-	// Org detail
+	// Chef organization detail
 	Org                  *Org     `protobuf:"bytes,1,opt,name=org,proto3" json:"org,omitempty" toml:"org,omitempty" mapstructure:"org,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -141,7 +141,7 @@ func (m *UpdateOrg) GetOrg() *Org {
 }
 
 type GetOrgs struct {
-	// List of the org item.
+	// List of the chef organization.
 	Orgs                 []*OrgListItem `protobuf:"bytes,1,rep,name=orgs,proto3" json:"orgs,omitempty" toml:"orgs,omitempty" mapstructure:"orgs,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte         `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -181,7 +181,7 @@ func (m *GetOrgs) GetOrgs() []*OrgListItem {
 }
 
 type GetOrg struct {
-	// Org detail
+	// Chef organization detail
 	Org                  *Org     `protobuf:"bytes,1,opt,name=org,proto3" json:"org,omitempty" toml:"org,omitempty" mapstructure:"org,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -221,13 +221,13 @@ func (m *GetOrg) GetOrg() *Org {
 }
 
 type OrgListItem struct {
-	// ID of the Org.
+	// ID of the chef organization.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
-	// Name of the Org.
+	// Name of the chef organization.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
-	// Admin user of the Org.
+	// Admin user of the chef organization.
 	AdminUser string `protobuf:"bytes,3,opt,name=admin_user,json=adminUser,proto3" json:"admin_user,omitempty" toml:"admin_user,omitempty" mapstructure:"admin_user,omitempty"`
-	// ID of the Server.
+	// ID of the chef infra server.
 	ServerId             string   `protobuf:"bytes,4,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty" toml:"server_id,omitempty" mapstructure:"server_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -288,17 +288,17 @@ func (m *OrgListItem) GetServerId() string {
 }
 
 type Org struct {
-	// ID of the Org.
+	// ID of the chef organization.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
-	// Name of the Org.
+	// Name of the chef organization.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
-	// Admin user of the Org.
+	// Admin user of the chef organization.
 	AdminUser string `protobuf:"bytes,3,opt,name=admin_user,json=adminUser,proto3" json:"admin_user,omitempty" toml:"admin_user,omitempty" mapstructure:"admin_user,omitempty"`
-	// Admin key secrets-service credential ID for the Org.
+	// Admin key secrets-service credential ID for the chef organization.
 	CredentialId string `protobuf:"bytes,4,opt,name=credential_id,json=credentialId,proto3" json:"credential_id,omitempty" toml:"credential_id,omitempty" mapstructure:"credential_id,omitempty"`
-	// ID of the Server.
+	// ID of the chef infra server.
 	ServerId string `protobuf:"bytes,5,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty" toml:"server_id,omitempty" mapstructure:"server_id,omitempty"`
-	// List of projects this organization belongs to. May be empty.
+	// List of projects this chef organization belongs to. May be empty.
 	Projects             []string `protobuf:"bytes,6,rep,name=projects,proto3" json:"projects,omitempty" toml:"projects,omitempty" mapstructure:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
