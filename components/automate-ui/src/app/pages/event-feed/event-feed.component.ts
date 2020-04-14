@@ -73,7 +73,7 @@ export class EventFeedComponent implements OnInit, OnDestroy {
     },
     {
       type: 'chef_server',
-      text: 'Chef Server',
+      text: 'Chef Infra Server',
       allowWildcards: false
     },
     {

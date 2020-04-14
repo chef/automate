@@ -70,9 +70,9 @@ export class ReportingComponent implements OnInit, OnDestroy {
     },
     {
       'name': 'chef_server',
-      'title': 'Chef Server',
+      'title': 'Chef Infra Server',
       'description': '',
-      'placeholder': 'Chef Server'
+      'placeholder': 'Chef Infra Server'
     },
     {
       'name': 'chef_tags',
