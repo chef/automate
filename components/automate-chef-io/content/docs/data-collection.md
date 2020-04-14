@@ -35,7 +35,6 @@ There are two steps to getting data collection running in Chef Automate:
 ### Porting the Existing Chef Automate 1 Data Collector Token to Chef Automate 2
 
 If you are migrating from Chef Automate 1, you probably have already deployed a data collector token on either your Chef Infra Servers or your Chef Infra Clients.
-
 To re-use your existing data collector token from your Chef Automate 1 installation, you need to perform the configuration change outlined here.
 
 For this process, you need the existing token (let's call it `A1_DC_TOKEN`), and access to the machine running the `chef-automate` CLI client.
@@ -67,7 +66,6 @@ When logged in with admin permissions, you will also find your added token in
 Now that you have a valid API token, you'll need to
 [update your Chef Infra Server data collector configuration]({{< relref "#configure-your-chef-server-to-send-data-to-chef-automate" >}})
 if you are using a Chef Infra Server. Otherwise, you must
-
 [configure your Chef Infra Clients to send data directly to Chef Automate]({{< relref "#configure-your-chef-client-to-send-data-to-chef-automate-without-chef-server" >}}).
 
 ## Configure your Chef Infra Server to Send Data to Chef Automate
