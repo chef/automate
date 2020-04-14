@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { takeUntil } from 'rxjs/operators';
+import { isEmpty } from 'lodash';
 
 @Component({
   selector: 'app-reporting-node',
@@ -183,17 +184,23 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   }
 
   private formatReturnUrl(reportQuery): any { // return type is a url
-    const endDate = reportQuery.endDate
-      ? moment(reportQuery.endDate).format(DateTime.REPORT_DATE) : '';
-
     const structuredFilters = {};
     reportQuery.filters.map(filter => {
       return structuredFilters[filter.type.name] = filter.value.text;
     });
 
-    return {
+    const endDate = reportQuery.endDate
+      ? moment(reportQuery.endDate).format(DateTime.REPORT_DATE) : '';
+
+    const today = new Date();
+    const isToday = moment(today).diff(endDate, 'days') === 0;
+    if (isEmpty(structuredFilters) && isToday ) {
+      return {};
+    } else {
+      return {
         end_time: endDate,
         ...structuredFilters
         };
+    }
   }
 }
