@@ -48,17 +48,23 @@
           </div>
         </div>
         <div *ngIf="!show" class="center">
-          <p>Expanded run list not availble for the role <b>{{role?.name}}</b>.</p>
+          <p>Expanded run list not available for the role <b>{{role?.name}}</b>.</p>
         </div>
       </section>
       <section class="page-body" *ngIf="tabValue === 'attributes'">
         <chef-loading-spinner *ngIf="roleDetailsLoading" size="50"></chef-loading-spinner>
-        <section id="json-bg">
-          <p>Default Attributes</p>
-          <chef-snippet [code]="role?.default_attributes" lang="json"></chef-snippet>
-          <p>Override Attributes</p>
-          <chef-snippet [code]="role?.override_attributes" lang="json"></chef-snippet>
-        </section>
+        <div class="expand-collapse">
+          <span class="action" (click)="tree.expand()">
+            <chef-icon>add_circle</chef-icon>
+            <span>Expand All</span>
+          </span>
+          <span class="separator">|</span>
+          <span class="action" (click)="tree.collapse()">
+            <chef-icon>remove_circle</chef-icon>
+            <span>Collapse All</span>
+          </span>
+        </div>
+        <app-json-treeable class="json-tree-container" #tree [json]="selectedAttrs"></app-json-treeable>
       </section>
     </main>
   </div>
