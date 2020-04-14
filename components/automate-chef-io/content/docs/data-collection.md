@@ -34,11 +34,8 @@ There are two steps to getting data collection running in Chef Automate:
 
 ### Porting the Existing Chef Automate 1 Data Collector Token to Chef Automate 2
 
-<<<<<<< HEAD
 If you are migrating from Chef Automate 1, you probably have already deployed a data collector token on either your Chef Infra Servers or your Chef Infra Clients.
-=======
-If you are migrating from Chef Automate 1, you probably have already deployed a data collector token on either your Chef Servers or your Chef Infra Clients.
->>>>>>> updated static docs
+
 To re-use your existing data collector token from your Chef Automate 1 installation, you need to perform the configuration change outlined here.
 
 For this process, you need the existing token (let's call it `A1_DC_TOKEN`), and access to the machine running the `chef-automate` CLI client.
@@ -68,13 +65,9 @@ When logged in with admin permissions, you will also find your added token in
 > Legacy data collector token ported from A1
 
 Now that you have a valid API token, you'll need to
-<<<<<<< HEAD
 [update your Chef Infra Server data collector configuration]({{< relref "#configure-your-chef-server-to-send-data-to-chef-automate" >}})
 if you are using a Chef Infra Server. Otherwise, you must
-=======
-[update your Chef Server data collector configuration]({{< relref "#configure-your-chef-server-to-send-data-to-chef-automate" >}})
-if you are using a Chef Server. Otherwise, you must
->>>>>>> updated static docs
+
 [configure your Chef Infra Clients to send data directly to Chef Automate]({{< relref "#configure-your-chef-client-to-send-data-to-chef-automate-without-chef-server" >}}).
 
 ## Configure your Chef Infra Server to Send Data to Chef Automate
@@ -83,11 +76,7 @@ if you are using a Chef Server. Otherwise, you must
 
 In addition to forwarding Chef run data to Chef Automate, Chef Infra Server will send messages to Chef Automate whenever an action is taken on a Chef Infra Server object, such as when a cookbook is uploaded to the Chef Infra Server or when a user edits a role.
 
-<<<<<<< HEAD
 In order to have Chef Infra Server send run data from connected Chef Infra Clients, set the data collection proxy attribute to `true`.
-=======
-In order to have Chef Server send run data from connected Chef Infra Clients, set the data collection proxy attribute to `true`.
->>>>>>> updated static docs
 
 ### Setting Up Data Collection on Chef Infra Server Versions 12.14 and Higher
 
@@ -139,15 +128,10 @@ To apply the changes, run:
 chef-server-ctl reconfigure
 ```
 
-<<<<<<< HEAD
 ### Setting Up Chef Infra Client to Send Compliance Scan Data Through the Chef Infra Server to Chef Automate
 
 Now that the Chef Infra Server is configured for data collection, you can also enable Compliance Scanning
-=======
-### Setting Up Chef Infra Client to Send Compliance Scan Data Through the Chef Server to Chef Automate
 
-Now that the Chef Server is configured for data collection, you can also enable Compliance Scanning
->>>>>>> updated static docs
 on your Chef Infra Clients via the [Audit Cookbook](https://github.com/chef-cookbooks/audit).
 
 * Set the following attributes for the audit cookbook:
@@ -223,15 +207,10 @@ When this attribute is unspecified, the default behavior is as follows:
 
 When this attribute is specified, the supplied string will be sent as the ``Host`` header on all requests. This may be required for some third-party Elasticsearch offerings. -->
 
-<<<<<<< HEAD
 ## Configure your Chef Infra Client to Send Data to Chef Automate without Chef Infra Server
 
 If you do not use a Chef Infra Server in your environment (if you only use `chef-solo`, for example), you
-=======
-## Configure your Chef Infra Client to Send Data to Chef Automate without Chef Server
 
-If you do not use a Chef Server in your environment (if you only use `chef-solo`, for example), you
->>>>>>> updated static docs
 can configure your Chef Infra Clients to send their run data to Chef Automate directly by performing the following:
 
 1. Add Chef Automate SSL certificate to `trusted_certs` directory.
@@ -263,11 +242,7 @@ server.
 
 The data collector functionality is used by the Chef Infra Client to send node
 and converge data to Chef Automate. This feature works for Chef Infra Client, as well as both the default
-<<<<<<< HEAD
 and legacy modes of `chef-solo`.
-=======
-and legacy modes of Chef solo.
->>>>>>> updated static docs
 
 To send node, converge, and compliance data to Chef Automate, modify
 your Chef config (that is `client.rb`, `solo.rb`, or add an additional
@@ -315,10 +290,6 @@ Chef Automate. Please see the audit cookbook for an
 ## Troubleshooting: My Data Does Not Show Up in the User Interface
 
 Organizations without associated nodes will not show up on the Chef Automate _Nodes_ page. A node
-<<<<<<< HEAD
 is not associated with automate until a Chef Infra Client run has completed. This is also true for roles,
-=======
-is not associated with automate until a Chef Infra Client Run has completed. This is also true for roles,
->>>>>>> updated static docs
 cookbooks, recipes, attributes, resources, node names, and environments but does not highlight them
 in the UI. This is designed to keep the UI focused on the nodes in your cluster.
