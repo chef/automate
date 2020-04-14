@@ -63,7 +63,7 @@ export class NodeRollupComponent implements OnInit, OnChanges {
   label(name: string): string {
     switch (name) {
       case 'success':
-        return 'Successful Nodes';
+        return 'Updated Nodes';
       case 'failure':
         return 'Failed Nodes';
       case 'missing':

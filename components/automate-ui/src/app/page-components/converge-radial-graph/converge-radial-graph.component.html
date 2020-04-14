@@ -16,7 +16,7 @@ after the async onInit function runs -->
       </div>
 
       <div class="display5">
-        Passed Nodes
+        Updated Nodes
         <div class="success">{{ count.success }}</div>
       </div>
 
@@ -37,7 +37,7 @@ after the async onInit function runs -->
         <span slot="innerText">{{label}}</span>
         <chef-data-point [value]="count.missing" class="missing">{{count.missing}} Missing</chef-data-point>
         <chef-data-point [value]="count.failure" class="failed">{{count.failure}} Failed</chef-data-point>
-        <chef-data-point [value]="count.success" class="success">{{count.success}} Successful</chef-data-point>
+        <chef-data-point [value]="count.success" class="success">{{count.success}} Updated</chef-data-point>
       </chef-radial-chart>
     </div>
   </div>
