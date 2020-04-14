@@ -20,7 +20,7 @@ import {
   allCookbooks,
   getAllStatus as getAllCookbooksForOrgStatus
 } from 'app/entities/cookbooks/cookbook.selectors';
-import { GetRolesForOrg } from 'app/entities/infra-roles/infra-role.action';
+import { GetRoles } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import {
   allInfraRoles,
@@ -102,7 +102,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetCookbooksForOrg({
         server_id: server_id, org_id: org_id
       }));
-      this.store.dispatch(new GetRolesForOrg({
+      this.store.dispatch(new GetRoles({
         server_id: server_id, org_id: org_id
       }));
     });
