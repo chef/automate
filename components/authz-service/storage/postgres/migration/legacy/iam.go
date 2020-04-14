@@ -434,12 +434,7 @@ func convertV1Resource(resource string) (string, error) {
 		return "*", nil
 	}
 
-	// these are the single-term resources that match an endpoint's v1 policy annotation
-	// (i.e. the node APIs in api/external/nodes/nodes.proto use the resource "nodes")
-	// all other single-term resources are not actually enforcing any permissions on v1
-	// and therefore can be skipped
-	singleTermsToMigrate := []string{"nodes", "events", "license", "nodemanagers", "service_groups"}
-	if len(terms) == 1 && !includes(singleTermsToMigrate, terms[0]) {
+	if len(terms) == 1 && !singleTermToMigrate(terms[0]) {
 		return "", nil
 	}
 
@@ -654,8 +649,14 @@ func convertV1Action(action string, resource string) ([]string, error) {
 	}
 }
 
-func includes(terms []string, termToCheck string) bool {
-	for _, term := range terms {
+func singleTermToMigrate(termToCheck string) bool {
+	// these are the single-term resources that match an endpoint's v1 policy annotation
+	// (i.e. the node APIs in api/external/nodes/nodes.proto use the resource "nodes")
+	// all other single-term resources are not actually enforcing any permissions on v1
+	// and therefore can be skipped
+	singleTermsToMigrate := []string{"nodes", "events", "license", "nodemanagers", "service_groups"}
+
+	for _, term := range singleTermsToMigrate {
 		if term == termToCheck {
 			return true
 		}
