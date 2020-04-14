@@ -1286,7 +1286,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 			pol, err := cl.RemovePolicyMembers(ctx, &req)
 			require.Nil(t, pol)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
-			assert.Regexp(t, "rpc error: code = InvalidArgument desc = a policy id is required and must contain at least one non-whitespace character", err.Error())
+			assert.Regexp(t, "InvalidArgument.*policy id is required.*must contain at least one non-whitespace character", err.Error())
 		}},
 		{"fails with NotFound when policy not found", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
@@ -1427,7 +1427,7 @@ func TestAddPolicyMembers(t *testing.T) {
 
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
-			assert.Regexp(t, "rpc error: code = InvalidArgument desc = a policy id is required and must contain at least one non-whitespace character", err.Error())
+			assert.Regexp(t, "InvalidArgument.*policy id is required.*must contain at least one non-whitespace character", err.Error())
 		}},
 		{"fails with NotFound when policy not found", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
@@ -1630,7 +1630,7 @@ func TestCreateRole(t *testing.T) {
 
 			assert.Equal(t, 0, store.ItemCount())
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
-			assert.Regexp(t, "a role name is required and must contain", err.Error())
+			assert.Regexp(t, "InvalidArgument.*role name is required.*must contain at least one non-whitespace character", err.Error())
 		},
 		"fails with InvalidArgument with blank name": func(t *testing.T) {
 			req := api_v2.CreateRoleReq{
@@ -1645,7 +1645,7 @@ func TestCreateRole(t *testing.T) {
 
 			assert.Equal(t, 0, store.ItemCount())
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
-			assert.Regexp(t, "a role name is required and must contain", err.Error())
+			assert.Regexp(t, "InvalidArgument.*role name is required.*must contain at least one non-whitespace character", err.Error())
 		},
 		"fails with InvalidArgument with no id": func(t *testing.T) {
 			req := api_v2.CreateRoleReq{

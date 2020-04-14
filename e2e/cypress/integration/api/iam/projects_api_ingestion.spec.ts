@@ -1,14 +1,14 @@
 import { eventExist, uuidv4 } from '../../../support/helpers';
 import { Rule, Project } from '../../../support/types';
 
-const nodeStart = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
+const nodeStart = Cypress.moment().utc().subtract(3, 'day').startOf('day').format()
 const nodeEnd = Cypress.moment().utc().endOf('day').format();
 const eventStart = Cypress.moment().utc().subtract(3, 'day').valueOf().toString();
 const eventEnd = Cypress.moment().utc().endOf('day').valueOf().toString();
 const now = Cypress.moment().format('MMDDYYhhmm');
 
 describe('Ingestion project tagging', () => {
-  const cypressPrefix = 'test-ingestion-projects';
+  const cypressPrefix = 'tst-ingest-projects';
   const complianceNodeId = uuidv4();
   const clientRunsNodeId = uuidv4();
   const reportId = uuidv4();
@@ -24,7 +24,7 @@ describe('Ingestion project tagging', () => {
   const projectsWithNodeRules: ProjectAndRule[] = [
     {
       project: {
-        id: `${cypressPrefix}-project-org-${now}`,
+        id: `${cypressPrefix}-proj-org-${now}`,
         name: 'project org',
         skip_policies: true
       },
@@ -32,7 +32,7 @@ describe('Ingestion project tagging', () => {
         id: 'rule-org',
         name: 'rule CHEF_ORGANIZATION',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-org-${now}`,
+        project_id: `${cypressPrefix}-proj-org-${now}`,
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -168,7 +168,7 @@ describe('Ingestion project tagging', () => {
   const projectsWithEventRules = [
     {
       project: {
-        id: `${cypressPrefix}-event-project-org-${now}`,
+        id: `${cypressPrefix}-event-proj-org-${now}`,
         name: 'event project org',
         skip_policies: true
       },
@@ -176,7 +176,7 @@ describe('Ingestion project tagging', () => {
         id: 'event-rule-org',
         name: 'Chef Organization',
         type: 'EVENT',
-        project_id: `${cypressPrefix}-event-project-org-${now}`,
+        project_id: `${cypressPrefix}-event-proj-org-${now}`,
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -218,6 +218,8 @@ describe('Ingestion project tagging', () => {
         method: 'POST',
         url: '/apis/iam/v2/projects',
         body: project.project
+      }).then((response) => {
+        expect(response.body.project.id).to.eq(project.project.id);
       });
 
       cy.request({
