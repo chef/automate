@@ -22,6 +22,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   showScanHistory = false;
   reportLoading = false;
   RFC2822 = DateTime.RFC2822;
+  returnParams: {};
 
   openControls = {};
 
@@ -41,13 +42,14 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.layoutFacade.ShowPageLoading(true);
     const id: string = this.route.snapshot.params['id'];
     const reportQuery = this.reportQuery.getReportQuery();
+    this.returnParams = this.formatReturnUrl(reportQuery);
     reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
 
     this.statsService.getReports(reportQuery, {sort: 'latest_report.end_time', order: 'DESC'})
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe(reports => {
-        this.reports = reports;
-        const queryForReport = this.reportQuery.getReportQueryForReport(reports[0]);
+    .pipe(takeUntil(this.isDestroyed))
+    .subscribe(reports => {
+      this.reports = reports;
+      const queryForReport = this.reportQuery.getReportQueryForReport(reports[0]);
         this.statsService.getSingleReport(reports[0].id, queryForReport)
           .pipe(takeUntil(this.isDestroyed))
           .subscribe(data => {
@@ -178,5 +180,20 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
   formatDaysAgo(timestamp) {
     return moment(timestamp).fromNow();
+  }
+
+  private formatReturnUrl(reportQuery): any { // return type is a url
+    const endDate = reportQuery.endDate
+      ? moment(reportQuery.endDate).format(DateTime.REPORT_DATE) : '';
+
+    const structuredFilters = {};
+    reportQuery.filters.map(filter => {
+      return structuredFilters[filter.type.name] = filter.value.text;
+    });
+
+    return {
+        end_time: endDate,
+        ...structuredFilters
+        };
   }
 }
