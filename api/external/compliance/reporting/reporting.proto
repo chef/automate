@@ -503,7 +503,7 @@ message Report {
 	string ipaddress = 13;
 	// The FQDN (fully qualified domain name) of the node making the report.
 	string fqdn = 14;
-	// The Chef Server that manages the node making the report.
+	// The Chef Infra Server that manages the node making the report.
 	string chef_server = 15;
 	// The Organization the node belongs to.
 	string chef_organization = 16;

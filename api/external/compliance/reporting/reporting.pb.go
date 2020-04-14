@@ -909,7 +909,7 @@ type Report struct {
 	Ipaddress string `protobuf:"bytes,13,opt,name=ipaddress,proto3" json:"ipaddress,omitempty"`
 	// The FQDN (fully qualified domain name) of the node making the report.
 	Fqdn string `protobuf:"bytes,14,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
-	// The Chef Server that manages the node making the report.
+	// The Chef Infra Server that manages the node making the report.
 	ChefServer string `protobuf:"bytes,15,opt,name=chef_server,json=chefServer,proto3" json:"chef_server,omitempty"`
 	// The Organization the node belongs to.
 	ChefOrganization string `protobuf:"bytes,16,opt,name=chef_organization,json=chefOrganization,proto3" json:"chef_organization,omitempty"`
