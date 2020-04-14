@@ -96,6 +96,16 @@ type CountPeroid struct {
 	Count int
 }
 
+type FieldCount struct {
+	Terms []TermCount
+	Field string
+}
+
+type TermCount struct {
+	Term  string
+	Count int
+}
+
 type InventoryNode struct {
 	EntityUUID       string     `json:"entity_uuid"`
 	OrganizationName string     `json:"organization_name"`

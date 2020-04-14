@@ -271,6 +271,97 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 	return ns, nil
 }
 
+// GetNodesCounts - get the number of successful, failure, and missing nodes
+// {
+// 	"aggregations":{
+// 		 "counts":{
+// 				"aggregations":{
+// 					 "platform":{
+// 							"terms":{
+// 								 "field":"platform"
+// 							}
+// 					 }
+// 				},
+// 				"filter":{
+// 					 "bool":{
+// 							"filter":{
+// 								 "bool":{
+// 										"should":{
+// 											 "terms":{
+// 													"exists":[
+// 														 "true"
+// 													]
+// 											 }
+// 										}
+// 								 }
+// 							}
+// 					 }
+// 				}
+// 		 }
+// 	}
+// }
+func (es Backend) GetNodesFieldTypes(filters map[string][]string,
+	searchTerms []string) ([]backend.FieldCount, error) {
+	var aggregationTerm = "counts"
+
+	localFilters := map[string][]string{}
+	for index, element := range filters {
+		localFilters[index] = element
+	}
+
+	localFilters["exists"] = []string{"true"}
+
+	boolQuery := newBoolQueryFromFilters(localFilters)
+
+	filterAgg := elastic.NewFilterAggregation().
+		Filter(boolQuery)
+
+	for _, searchTerm := range searchTerms {
+		filterAgg = filterAgg.SubAggregation(searchTerm,
+			elastic.NewTermsAggregation().Field(searchTerm))
+	}
+
+	searchSource := elastic.NewSearchSource().
+		Aggregation(aggregationTerm, filterAgg)
+
+	searchResult, err := es.client.Search().
+		SearchSource(searchSource).
+		Index(IndexNodeState).
+		Do(context.Background())
+
+	if err != nil {
+		return []backend.FieldCount{}, err
+	}
+
+	if searchResult.TotalHits() == 0 {
+		return []backend.FieldCount{}, nil
+	}
+
+	statusResult, found := searchResult.Aggregations.Terms(aggregationTerm)
+	if !found {
+		return []backend.FieldCount{},
+			errors.NewBackendError("Aggregation term '%s' not found", aggregationTerm)
+	}
+
+	fieldCountCollection := make([]backend.FieldCount, len(searchTerms))
+	for index, searchTerm := range searchTerms {
+		statusCounts, found := statusResult.Aggregations.Terms(searchTerm)
+		if !found {
+			return nil, errors.NewBackendError("Aggregation term '%s' not found", searchTerm)
+		}
+
+		terms := make([]backend.TermCount, len(statusCounts.Buckets))
+		for indexTerm, bucket := range statusCounts.Buckets {
+			terms[indexTerm].Count = int(bucket.DocCount)
+			terms[indexTerm].Term = bucket.Key.(string)
+		}
+		fieldCountCollection[index].Terms = terms
+		fieldCountCollection[index].Field = searchTerm
+	}
+
+	return fieldCountCollection, nil
+}
+
 // GetAttribute Get request for the attribute using the Doc ID
 func (es Backend) GetAttribute(nodeID string) (backend.NodeAttribute, error) {
 	var nodeAttribute backend.NodeAttribute
