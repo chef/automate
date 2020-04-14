@@ -215,7 +215,7 @@ check_if_deployinate_started() {
 document "generate_netrc_config" <<DOC
   Create a .netrc file that can be used to authenticate against GitHub.
   Some projects require access to private GitHub repositories. The recommended
-  pattern is for projects to use the git+https protocol in conjuction with a
+  pattern is for projects to use the git+https protocol in conjunction with a
   .netrc file.
   Requirements:
   => Habitat 0.54.0 or greater installed

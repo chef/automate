@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This is a helper function that allows use to document functions inline with the
-# code, but also make that documentation available to end user in the studio.
+# code, but also make that documentation available to the end user in the studio.
 #
 # The first line of the document will show up when the user runs 'describe'.
 # The full content will appear when the user runs 'describe <function>'
@@ -28,12 +28,12 @@ add_alias() {
 # This function allows the user to learn more about the studio.
 #
 #   1. Passing no argument will print out a list of all documented functions
-#   2. Passing the name of a function will print out that functions documentation
+#   2. Passing the name of a function will print out that function's documentation
 describe() {
   if [[ -z "${CI:-}" ]]; then
     echo
     if [[ -z "$1" ]]; then
-      echo "The following functions are available for your use in this studio:"
+      echo "Available functions:"
       echo
       for file in /tmp/docs/*
       do
@@ -126,7 +126,7 @@ document "wait_or_fail_for_svc_to_load" <<DOC
   Helper function to wait for a Habitat service (hab svc) to be loaded by the Habitat Supervisor.
   @(arg:1) PKG_IDENT A Habitat package identifier (ex: core/redis)
   @(arg:2) Number of seconds to wait before returning 1. (default: 60 seconds)
-  @(arg:3) Wheter or not this process runs silently
+  @(arg:3) Whether or not this process runs silently.
 DOC
 wait_or_fail_for_svc_to_load() {
   local SECONDS_WAITING=${2:-60}
@@ -147,10 +147,10 @@ wait_or_fail_for_svc_to_load() {
 }
 
 document "wait_or_fail_for_port_to_listen" <<DOC
-  Wait for a port to be listening. If the port is not found in the set amount of time this helper returns 1.
+  Wait for a port to be listening. Returns 1 if the port is not found in the set amount of time.
   @(arg:1) Port to wait for to be listening
   @(arg:2) Number of seconds to wait before returning 1. (default: 60 seconds)
-  @(arg:3) Wheter or not this process runs silently
+  @(arg:3) Whether or not this process runs silently.
   Example: Wait for a service to start listening on port 1234 for 1 minute (defaults)
   ---------------------------------------------
   wait_or_fail_for_port_to_listen 1234
@@ -177,7 +177,7 @@ wait_or_fail_for_port_to_listen() {
 }
 
 document "wait_for_ok_response" <<DOC
-  Wait a set amount of time for the provided URL to response with status code (200).
+  Wait a set amount of time for the provided URL to respond with status code (200).
   If the time expires then this helper returns 1
   @(arg:1) URL to curl
   @(arg:2) Number of seconds to wait before returning 1. (default: 60 seconds)
@@ -203,7 +203,7 @@ wait_for_ok_response() {
     if [[ $response -eq $code ]]; then
       break
     else
-      log_line "Waiting for '$url' to response OK ($code). [Got:$response] ($(yellow "$COUNTER of $SECONDS_TO_WAIT"))"
+      log_line "Waiting for '$url' to respond OK ($code). [Got:$response] ($(yellow "$COUNTER of $SECONDS_TO_WAIT"))"
       sleep 1
       (( COUNTER=COUNTER+1 ))
     fi
@@ -219,7 +219,7 @@ document "install_go_tool" <<DOC
   @(arg:*) The array of packages you wish to install.
   The default behavior is to install go tools with 'go install -v -mod=vendor'
 
-  To install tools using not included in the vendor you'll either need to
+  To install tools not included in the vendor directory, you'll either need to
   include them and revendor or unset GO_LDFLAGS so that we don't use the
   module vendor directory when installing the binary to the GOBIN directory.
 DOC
@@ -251,7 +251,7 @@ compile_go_protobuf() {
   local rc
   proto_script="${1:-scripts/grpc.sh}"
 
-  # Verify that the script exist and it is an executable
+  # Verify that the script exists and is executable.
   if [[ -x $proto_script ]]; then
     install_if_missing core/protobuf-cpp protoc
     install_go_tool github.com/golang/protobuf/protoc-gen-go
