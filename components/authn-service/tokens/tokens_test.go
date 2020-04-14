@@ -187,7 +187,7 @@ func testGetTokenIDWithValueNotFound(ctx context.Context, t *testing.T, ta token
 
 func testGetTokenIDWithValue(ctx context.Context, t *testing.T, ta tokens.Storage) {
 	expectedID := "id0"
-	expectedTok, err := ta.CreateToken(ctx, expectedID, "description", true, []string{"project-1"})
+	expectedTok, err := ta.CreateToken(ctx, expectedID, "name", true, []string{"project-1"})
 	require.NoError(t, err)
 
 	tokID, err := ta.GetTokenIDWithValue(ctx, expectedTok.Value)
@@ -290,7 +290,7 @@ func testUpdateTokenActiveOnly(ctx context.Context, t *testing.T, ta tokens.Stor
 	tok, err := ta.UpdateToken(ctx, id, desc, false, projs)
 	assert.NoError(t, err)
 	assert.NotNil(t, tok)
-	assert.Equal(t, tok0.Description, tok.Description)
+	assert.Equal(t, tok0.Name, tok.Name)
 	assert.Equal(t, false, tok.Active)
 	assert.Equal(t, tok0.Created, tok.Created)
 	assert.True(t, tok.Updated.After(tok.Created))
@@ -308,7 +308,7 @@ func testUpdateTokenUpdatesAll(ctx context.Context, t *testing.T, ta tokens.Stor
 	require.NoError(t, err)
 
 	updatedTok, err := ta.GetToken(ctx, id)
-	assert.Equal(t, newDesc, updatedTok.Description)
+	assert.Equal(t, newDesc, updatedTok.Name)
 	assert.Equal(t, false, updatedTok.Active)
 	assert.Equal(t, tok.Created, updatedTok.Created)
 	assert.True(t, tok.Updated.After(tok.Created))

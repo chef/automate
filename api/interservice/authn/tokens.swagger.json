@@ -24,7 +24,7 @@
         "id": {
           "type": "string"
         },
-        "description": {
+        "name": {
           "type": "string"
         },
         "value": {

@@ -60,24 +60,24 @@ func (m *mock) GetToken(ctx context.Context, id string) (*tokens.Token, error) {
 	return nil, &tokens.NotFoundError{}
 }
 
-func (m *mock) CreateToken(_ context.Context, id, description string,
+func (m *mock) CreateToken(_ context.Context, id, name string,
 	active bool, projects []string) (*tokens.Token, error) {
 
 	if id == "" {
 		id = uuid.Must(uuid.NewV4()).String()
 	}
-	return m.createTokenWithValue(mockToken(id), description, active, id, projects)
+	return m.createTokenWithValue(mockToken(id), name, active, id, projects)
 }
 
 func (m *mock) CreateTokenWithValue(_ context.Context,
-	id, value, description string, active bool, projects []string) (*tokens.Token, error) {
+	id, value, name string, active bool, projects []string) (*tokens.Token, error) {
 	if id == "" {
 		id = uuid.Must(uuid.NewV4()).String()
 	}
 	if err := tutil.IsValidToken(value); err != nil {
 		return nil, err
 	}
-	return m.createTokenWithValue(value, description, active, id, projects)
+	return m.createTokenWithValue(value, name, active, id, projects)
 }
 
 func (m *mock) CreateLegacyTokenWithValue(_ context.Context, value string) (*tokens.Token, error) {
@@ -89,7 +89,7 @@ func (m *mock) CreateLegacyTokenWithValue(_ context.Context, value string) (*tok
 }
 
 func (m *mock) createTokenWithValue(value string,
-	description string, active bool, id string, projects []string) (*tokens.Token, error) {
+	name string, active bool, id string, projects []string) (*tokens.Token, error) {
 
 	if len(projects) == 0 {
 		projects = []string{}
@@ -98,13 +98,13 @@ func (m *mock) createTokenWithValue(value string,
 	now := time.Now().UTC()
 
 	tNew := tokens.Token{
-		Description: description,
-		Value:       value,
-		Active:      active,
-		Created:     now,
-		Updated:     now,
-		ID:          id,
-		Projects:    projects,
+		Name:     name,
+		Value:    value,
+		Active:   active,
+		Created:  now,
+		Updated:  now,
+		ID:       id,
+		Projects: projects,
 	}
 
 	m.tokens = append(m.tokens, &tNew)
@@ -136,7 +136,7 @@ func (m *mock) PurgeProject(ctx context.Context, projectID string) error {
 				break
 			}
 		}
-		_, err := m.UpdateToken(ctx, tok.ID, tok.Description, tok.Active, tok.Projects)
+		_, err := m.UpdateToken(ctx, tok.ID, tok.Name, tok.Active, tok.Projects)
 		if err != nil {
 			return err
 		}
@@ -146,7 +146,7 @@ func (m *mock) PurgeProject(ctx context.Context, projectID string) error {
 
 func (m *mock) ResetToV1(ctx context.Context) error {
 	for _, tok := range m.tokens {
-		_, err := m.UpdateToken(ctx, tok.ID, tok.Description, tok.Active, []string{})
+		_, err := m.UpdateToken(ctx, tok.ID, tok.Name, tok.Active, []string{})
 		if err != nil {
 			return err
 		}
@@ -155,7 +155,7 @@ func (m *mock) ResetToV1(ctx context.Context) error {
 }
 
 func (m *mock) UpdateToken(ctx context.Context,
-	id, description string,
+	id, name string,
 	active bool,
 	projects []string) (*tokens.Token, error) {
 
@@ -175,8 +175,8 @@ func (m *mock) UpdateToken(ctx context.Context,
 		if t.ID == id {
 			t.Active = active
 			t.Updated = now
-			if description != "" {
-				t.Description = description
+			if name != "" {
+				t.Name = name
 			}
 			if len(projects) != 0 {
 				t.Projects = projects

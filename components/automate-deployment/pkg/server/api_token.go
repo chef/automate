@@ -63,8 +63,8 @@ func generateAdminToken(ctx context.Context,
 	authzV2Client := authz_v2.NewPoliciesClient(authzConnection)
 
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
-		Description: req.Description,
-		Active:      true,
+		Name:   req.Name,
+		Active: true,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "create API token")
