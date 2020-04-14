@@ -26,6 +26,13 @@ const chefManagedPolicyIDs = [
   'ingest-access'
 ];
 
+const chefCustomPolicyIDs = [
+  'compliance-access',
+  'compliance-editor-access'
+];
+
+const totalChefCreatedPolicyCount = chefManagedPolicyIDs.length + chefCustomPolicyIDs.length;
+
 describe('policies API', () => {
 
   before(() => {
@@ -118,7 +125,7 @@ describe('policies API', () => {
           url: '/apis/iam/v2/policies'
         }).then((response) => {
           expect(response.status).to.equal(200);
-          expect(response.body.policies.length).to.equal(chefManagedPolicyIDs.length + 1);
+          expect(response.body.policies.length).to.equal(totalChefCreatedPolicyCount + 1);
 
           const policyIDs = response.body.policies.map((pol: Policy) => pol.id);
 
