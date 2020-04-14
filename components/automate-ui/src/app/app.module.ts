@@ -68,6 +68,7 @@ import { ApiTokenRequests } from './entities/api-tokens/api-token.requests';
 import { AutomateSettingsRequests } from './entities/automate-settings/automate-settings.requests';
 import { CookbookRequests } from './entities/cookbooks/cookbook.requests';
 import { CookbookDetailsRequests } from './entities/cookbooks/cookbookdetails.requests';
+import { CookbookVersionsRequests } from './entities/cookbooks/cookbookversions.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
@@ -286,6 +287,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ClientRunsRequests,
     CookbookRequests,
     CookbookDetailsRequests,
+    CookbookVersionsRequests,
     CredentialRequests,
     DesktopRequests,
     DestinationRequests,
