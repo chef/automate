@@ -16,7 +16,7 @@ The guitar strings and improved query language help you drill into infrastructur
 
 ![Guitar Strings](/images/docs/guitar-strings.png)
 
-The event guitar strings is a timeline representing Chef Server and Compliance events. The events are separated into create, update and delete. Blue circles show create events, red circles show delete events, and purple diamonds show update events. The icons inside of the shapes represent different types of events, and a multi-event icon denotes a case where multiple events happened within the same 4-hour window. Hovering over the icon shows a text box summarizing the events for that 4-hour window.
+The event guitar strings is a timeline representing Chef Infra Server and Compliance events. The events are separated into create, update and delete. Blue circles show create events, red circles show delete events, and purple diamonds show update events. The icons inside of the shapes represent different types of events, and a multi-event icon denotes a case where multiple events happened within the same 4-hour window. Hovering over the icon shows a text box summarizing the events for that 4-hour window.
 
 ## Icon legend
 

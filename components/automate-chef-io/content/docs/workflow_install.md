@@ -22,7 +22,7 @@ Create a system which is accessible from your Automate 2.0 environment via SSH.
 This will have a minimum of three machines:
 
 * Automate With Workflow - 8GB RAM recommended
-* Chef Server - 8GB RAM recommended
+* Chef Infra Server - 8GB RAM recommended
 * Workflow Runner - 20GB disk space recommended
 
 ## Backup
@@ -58,13 +58,13 @@ Migration of Workflow data must happen during your upgrade to Chef Automate 2.
     automate-ctl create-enterprise my-enterprise-name --ssh-pub-key-file=/hab/svc/automate-workflow-server/var/etc/builder_key.pub
     ```
 
-### Build a Standalone Chef Server
+### Build a Standalone Chef Infra Server
 
-Create a standalone Chef server following the [standalone server installation](https://docs.chef.io/install_server/#standalone).
+Create a standalone Chef Infra Server following the [standalone server installation](https://docs.chef.io/install_server/#standalone).
 
-Then, on the Chef server:
+Then, on the Chef Infra Server:
 
-1. Create a 'workflow' user on the Chef Server:
+1. Create a 'workflow' user on the Chef Infra Server:
 
     ```shell
     sudo chef-server-ctl user-create workflow workflow user ops@some.domain.com workflow
@@ -72,13 +72,13 @@ Then, on the Chef server:
 
 2. Creating a user in previous step displays a private key to stdout. Copy this content and and save it on the **Chef Automate** server as: `/hab/svc/automate-workflow-server/var/etc/delivery.pem`
 
-3. If this is a new Chef Server, create an organization on the chef server with:
+3. If this is a new Chef Infra Server, create an organization on the Chef Infra Server with:
 
     ```shell
     `sudo chef-server-ctl org-create workflow workflow
     ```
 
-4. Add the 'workflow' user as an admin to the Chef Server organization that you created when setting up your Chef Server:
+4. Add the 'workflow' user as an admin to the Chef Infra Server organization that you created when setting up your Chef Infra Server:
 
     ```shell
     sudo chef-server-ctl org-user-add my-chef-org workflow --admin
@@ -86,7 +86,7 @@ Then, on the Chef server:
 
 ### Configure the Chef Automate Server
 
-1. Set up your Chef Automate server to communicate with your Chef Server by creating a `workflow.toml`:
+1. Set up your Chef Automate server to communicate with your Chef Infra Server by creating a `workflow.toml`:
 
     ```toml
     [workflow.v1.sys.chef_server]
@@ -95,7 +95,7 @@ Then, on the Chef server:
     chef_user = "workflow"
     ```
 
-    The FQDN saved in the `workflow.toml` on the Chef Automate Server must match the FQDN of the Chef Server (find it by entering `hostname --fqdn` into your Chef Server terminal) or you will have SSL certificate failures later in this process.
+    The FQDN saved in the `workflow.toml` on the Chef Automate Server must match the FQDN of the Chef Infra Server (find it by entering `hostname --fqdn` into your Chef Infra Server terminal) or you will have SSL certificate failures later in this process.
 
     For example, if running `hostname --fqdn` from your Automate server command line returns `automate-test`, then that hostname will need to be in the local dns configuration on your workstation.
 
@@ -162,7 +162,7 @@ Selecting **Workflow** opens the legacy Workflow screen.
     ```
 
 4. Copy the SSH public key from the `/hab/svc/automate-workflow-server/var/etc/builder_key.pub` file that was made during the enterprise creation step on the Automate server to the `/home/workflow/.ssh/authorized_keys` file on the new VM.
-5. Confirm the hostname and IP addresses of the Chef Automate server and the Chef servers in `/etc/hosts`
+5. Confirm the hostname and IP addresses of the Chef Automate server and the Chef Infra Servers in `/etc/hosts`
 
     For example, `/etc/hosts` would contain lines like:
 

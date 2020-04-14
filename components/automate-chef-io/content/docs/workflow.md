@@ -23,7 +23,7 @@ local workstation, through automated tests, and out into production.
 
 Chef Automate handles many types of software systems. Use it to:
 
-* Upload new and updated cookbooks to the Chef server that manages your infrastructure and applications
+* Upload new and updated cookbooks to the Chef Infra Server that manages your infrastructure and applications
 * Publish new and updated cookbooks to a Chef Supermarket installation
 * Release source code or build artifacts to a repository such as GitHub
 * Push build artifacts to production servers in real time
@@ -139,7 +139,7 @@ during Verify.
 The Build stage concludes with the publish phase. The purpose of the
 publish phase is to assemble one or more potentially releasable
 artifacts and make them available to the remaining stages of the
-pipeline. You can, for example, publish to a Chef server, to Chef
+pipeline. You can, for example, publish to a Chef Infra Server, to Chef
 Supermarket, and to JFrog Artifactory.
 
 If the pipeline succeeds in generating and publishing the artifacts,
@@ -258,7 +258,7 @@ all the way out to production or not. There are four phases in
 Acceptance:
 
 Provision
-: Provision infrastructure needed to test the artifact(s). Examples include instantiating new infrastructure with Chef provisioning (or another API-accessible mechanism) and manipulating Chef server environments to designate the nodes used by the current stage. Of course, what executes in any phase is up to you and determined by the project's build cookbook.
+: Provision infrastructure needed to test the artifact(s). Examples include instantiating new infrastructure with Chef provisioning (or another API-accessible mechanism) and manipulating Chef Infra Server environments to designate the nodes used by the current stage. Of course, what executes in any phase is up to you and determined by the project's build cookbook.
 
 Deploy
 : Deploy the artifacts published in the Build stage to the
@@ -336,8 +336,8 @@ Automate installation.
 
 ![](/images/docs/automate_architecture_workflow.png)
 
-The build cookbook, hosted on the Chef server, determines what happens
-during each phase job. Runners, under control of the Chef server, run
+The build cookbook, hosted on the Chef Infra Server, determines what happens
+during each phase job. Runners, under control of the Chef Infra Server, run
 the phase jobs. It's a good idea to have at least three runners so that
 the lint, syntax and unit phases can run in parallel.
 
@@ -386,8 +386,8 @@ cookbook makes it easy to customize your pipeline's build cookbook for
 the environments you want to use for each stage of the pipeline.
 
 Currently, Chef Automate manages cookbook version and application
-attribute version pins using environment objects of the Chef server. The
-names of the environments in the Chef server correspond to the stages of
+attribute version pins using environment objects of the Chef Infra Server. The
+names of the environments in the Chef Infra Server correspond to the stages of
 a pipeline. (This doesn't mean, however, that the nodes that
 participate in a given stage need to remain fixed over time.)
 

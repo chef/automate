@@ -7,7 +7,9 @@ bref = ""
 toc = true
 +++
 
-The _Client Runs_ page shows all nodes connected to Chef Automate, either directly or via a Chef Server proxy. 
+## Overview
+
+The _Client Runs_ page shows all nodes connected to Chef Automate, either directly or via a Chef Infra Server proxy. 
 Nodes appear in this view after a Chef Client run has executed.
 
 ## Chef Client Run Status Overview
@@ -27,8 +29,9 @@ Selecting an entry in this table will take you to a _Node details_ page with mor
 A node may be present in this table without any associated run history.
 This situation happens when data retention settings erase the most recent run history for such a node.
 In this case, a **no data** icon appears and you will be unable to view any node details.
-The node remains listed as a missing node until deleted from Chef Automate.
-Chef Automate automatically removes any nodes deleted from the Chef Server.
+
+The node remains listed as a missing node until it is deleted from Automate.
+Automate automatically removes any modes deleted from the Chef Infra Server.
 
 ## Node Details
 
@@ -74,10 +77,10 @@ To save a search, select **Share** to the right of the search bar, and copy the 
 : Search for an attribute key, this will not search across attribute values.
 
 [Chef Organization](https://docs.chef.io/server_orgs/)
-: A Chef Server organization name.
+: A Chef Infra Server organization name.
 
-[Chef Server](https://docs.chef.io/server_overview/)
-: A Chef Server URL.
+[Chef Infra Server](https://docs.chef.io/server_overview/)
+: A Chef Infra Server URL.
 
 [Cookbook](https://docs.chef.io/cookbooks/)
 : A cookbook name.
@@ -140,6 +143,7 @@ chef-automate infrastructure node-delete 3f2a2830-0ef3-474a-a835-3a7dd25361fe
 ```
 
 To delete nodes using the REST API, use the `"https://automate-url/api/v0/ingest/events/chef/nodedelete"` endpoint to delete a single node, or the `"https://automate-url/api/v0/ingest/events/chef/node-multiple-deletes"` endpoint to delete multiple nodes.
+
 Identify your node or nodes with either the _node\_id_ --which is the UUID of the node as it appears in Chef Automate--or the combination of _node name_, _organization name_, and _service hostname_.
 The _service hostname_ is the `fqdn` of your Chef Server, or the `localhost` of chef-solo nodes.
 
