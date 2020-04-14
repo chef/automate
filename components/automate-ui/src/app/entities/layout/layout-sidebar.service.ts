@@ -268,9 +268,6 @@ export class LayoutSidebarService {
       }
     }
 
-    // For sidebars, we are constraining <app-authorized> attributes:
-    // 1. You cannot use `not`.
-
     public updateSidebars(sidebarName?: string): void {
       this.populateSidebar();
       this.activeSidebar = sidebarName || this.activeSidebar;

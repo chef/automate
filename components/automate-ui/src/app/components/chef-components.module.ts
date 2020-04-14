@@ -16,7 +16,6 @@ import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ChefNotificationsComponent } from './notifications/notifications.component';
-import { ClientRunsSidebarComponent } from './client-runs-sidebar/client-runs-sidebar.component';
 import { ConfirmApplyStartModalComponent } from './confirm-apply-start-modal/confirm-apply-start-modal.component';
 import { ConfirmApplyStopModalComponent } from './confirm-apply-stop-modal/confirm-apply-stop-modal.component';
 import { CreateObjectModalComponent } from './create-object-modal/create-object-modal.component';
@@ -44,9 +43,7 @@ import { PagePickerComponent } from './page-picker/page-picker.component';
 import { PendingEditsBarComponent } from './pending-edits-bar/pending-edits-bar.component';
 import { ProcessProgressBarComponent } from './process-progress-bar/process-progress-bar.component';
 import { ProjectsDropdownComponent } from './projects-dropdown/projects-dropdown.component';
-import { SettingsSidebarComponent } from './settings-sidebar/settings-sidebar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
-import { SidebarNoShadeComponent } from './sidebar-no-shade/sidebar-no-shade.component';
 import { SidebarEntryComponent } from './sidebar-entry/sidebar-entry.component';
 import { TabComponent } from './tab/tab.component';
 import { TabsComponent } from './tabs/tabs.component';
@@ -86,7 +83,6 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbComponent,
     CalendarComponent,
     ChefNotificationsComponent,
-    ClientRunsSidebarComponent,
     ConfirmApplyStartModalComponent,
     ConfirmApplyStopModalComponent,
     CreateObjectModalComponent,
@@ -103,9 +99,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     PendingEditsBarComponent,
     ProcessProgressBarComponent,
     ProjectsDropdownComponent,
-    SettingsSidebarComponent,
     SidebarComponent,
-    SidebarNoShadeComponent,
     SidebarEntryComponent,
     TabComponent,
     TabsComponent,
@@ -127,7 +121,6 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbComponent,
     CalendarComponent,
     ChefNotificationsComponent,
-    ClientRunsSidebarComponent,
     ConfirmApplyStartModalComponent,
     ConfirmApplyStopModalComponent,
     CreateObjectModalComponent,
@@ -147,9 +140,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     PendingEditsBarComponent,
     ProcessProgressBarComponent,
     ProjectsDropdownComponent,
-    SettingsSidebarComponent,
     SidebarComponent,
-    SidebarNoShadeComponent,
     SidebarEntryComponent,
     TabComponent,
     TabsComponent,

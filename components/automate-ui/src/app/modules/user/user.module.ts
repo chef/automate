@@ -8,7 +8,6 @@ import { UserDetailsComponent } from './user-details/user-details.component';
 import { UserManagementComponent } from './user-management/user-management.component';
 import { UserTableComponent } from './user-table/user-table.component';
 import { UserDetailsNonAdminResolve } from './user-details/user-details.resolver';
-import { UserProfileSidebarComponent } from './user-profile-sidebar/user-profile-sidebar.component';
 
 import { UserRoutingModule } from './user-routing.module';
 
@@ -28,8 +27,7 @@ import { UserRoutingModule } from './user-routing.module';
   declarations: [
     UserDetailsComponent,
     UserManagementComponent,
-    UserTableComponent,
-    UserProfileSidebarComponent
+    UserTableComponent
   ],
   providers: [
     UserDetailsNonAdminResolve

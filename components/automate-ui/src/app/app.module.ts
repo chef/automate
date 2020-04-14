@@ -62,7 +62,6 @@ import { ProjectsFilterService } from './services/projects-filter/projects-filte
 import { RulesService } from './services/rules/rules.service';
 import { RunHistoryStore } from './services/run-history-store/run-history.store';
 import { SessionStorageService } from './services/storage/sessionstorage.service';
-import { SidebarService } from './services/sidebar/sidebar.service';
 import { TelemetryService } from './services/telemetry/telemetry.service';
 
 // Requests
@@ -123,9 +122,6 @@ import {
   EventFeedGuitarStringsComponent
 } from './page-components/event-feed-guitar-strings/event-feed-guitar-strings.component';
 import {
-  EventFeedSidebarComponent
-} from './page-components/event-feed-sidebar/event-feed-sidebar.component';
-import {
   EventFeedTableComponent
 } from './page-components/event-feed-table/event-feed-table.component';
 import { EventIconComponent } from './page-components/event-icon/event-icon.component';
@@ -180,9 +176,6 @@ import {
 } from './page-components/select-list-item/select-list-item.component';
 import { ServiceGroupsComponent } from './pages/service-groups/service-groups.component';
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
-import {
-  SidebarSelectListComponent
-} from './page-components/sidebar-select-list/sidebar-select-list.component';
 import { SigninComponent } from './pages/signin/signin.component';
 import {
   ServicesSidebarComponent
@@ -213,7 +206,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     DeltaViewerComponent,
     EventFeedComponent,
     EventFeedGuitarStringsComponent,
-    EventFeedSidebarComponent,
     EventFeedTableComponent,
     EventIconComponent,
     FeatureFlagsComponent,
@@ -248,7 +240,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ServiceGroupsComponent,
     ServicesSidebarComponent,
     SettingsLandingComponent,
-    SidebarSelectListComponent,
     SigninComponent,
     TelemetryCheckboxComponent,
     UIComponent,
@@ -329,7 +320,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     OrgRequests,
     ServiceGroupsRequests,
     SessionStorageService,
-    SidebarService,
     TeamRequests,
     TelemetryService,
     UserPermsRequests,

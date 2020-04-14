@@ -1,22 +1,24 @@
-import { TestBed } from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA, DebugElement, Component, Input } from '@angular/core';
-import { RouterTestingModule } from '@angular/router/testing';
-import { ClientRunsTableComponent } from './client-runs-table.component';
-import { ChefPipesModule } from '../../pipes/chef-pipes.module';
-import { MockComponent } from 'ng2-mock-component';
-import { By } from '@angular/platform-browser';
-import { DeletableNodeControlComponent
-} from '../deletable-node-control/deletable-node-control.component';
 import {
-  Node
-} from '../../entities/client-runs/client-runs.model';
-import { StoreModule } from '@ngrx/store';
-import { runtimeChecks } from 'app/ngrx.reducers';
-import * as sidebar from '../../services/sidebar/sidebar.reducer';
-import {
+  CUSTOM_ELEMENTS_SCHEMA,
+  DebugElement,
+  Component,
+  Input,
   SimpleChanges,
   SimpleChange
 } from '@angular/core';
+import { By } from '@angular/platform-browser';
+import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+
+import { StoreModule } from '@ngrx/store';
+import { MockComponent } from 'ng2-mock-component';
+
+import { runtimeChecks } from 'app/ngrx.reducers';
+import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
+import { Node } from 'app/entities/client-runs/client-runs.model';
+import { DeletableNodeControlComponent
+} from '../deletable-node-control/deletable-node-control.component';
+import { ClientRunsTableComponent } from './client-runs-table.component';
 
 @Component({
   selector: 'app-authorized',
@@ -128,7 +130,6 @@ describe('ClientRunsTable', () => {
           RouterTestingModule,
           ChefPipesModule,
           StoreModule.forRoot({
-            sidebar: sidebar.sidebarReducer
           }, { runtimeChecks })
         ],
         declarations: [
@@ -230,7 +231,6 @@ describe('ClientRunsTable', () => {
           RouterTestingModule,
           ChefPipesModule,
           StoreModule.forRoot({
-            sidebar: sidebar.sidebarReducer
           }, { runtimeChecks })
         ],
         declarations: [
