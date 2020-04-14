@@ -371,7 +371,7 @@ To create a project that contains all Effortless Infra nodes, create a ingest ru
 
 ![](/images/docs/effortless-project-rule.png)
 
-The above rule matches on a node's Chef Infra Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Server` attribute as `localhost`. 
+The above rule matches on a node's Chef Infra Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Infra Server` attribute as `localhost`. 
 
 If desired, create subgroups of Effortless Infra nodes by adding a second condition that matches a specific `Chef Policy Name`.
 
