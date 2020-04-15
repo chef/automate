@@ -1774,6 +1774,205 @@ func runAllServerTests(
 			cleanupTeamV2(t, cl, initResp.Team.Id)
 		})
 	})
+
+	t.Run("PurgeUserMembership", func(t *testing.T) {
+		resetState(context.Background(), t, serviceRef)
+
+		t.Run("when user id is not passed, returns InvalidArgument error", func(t *testing.T) {
+			ctx := context.Background()
+			req := &teams.PurgeUserMembershipReq{
+				UserId: "",
+			}
+
+			resp, err := cl.PurgeUserMembership(ctx, req)
+
+			require.Nil(t, resp)
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+
+		tests := map[string]struct {
+			userToPurge             string
+			initialTeamsAndMembers  map[string][]string
+			expectedTeamsAndMembers map[string][]string
+			expectedUpdatedTeamIDs  map[string]bool
+		}{
+			"when is only the admins team": {
+				userToPurge:            "f2f5300c-48dc-4633-8ac8-2bcf814e7b8a",
+				initialTeamsAndMembers: map[string][]string{},
+				expectedTeamsAndMembers: map[string][]string{
+					storage.AdminsTeamName: {},
+				},
+				expectedUpdatedTeamIDs: map[string]bool{},
+			},
+			`when there are multiple teams and the purged user
+				is a member of one of them, only one team should be updated`: {
+				userToPurge: "2041bad7-8ae4-418b-9e66-6af87838ab97",
+				initialTeamsAndMembers: map[string][]string{
+					"team1": {
+						"2041bad7-8ae4-418b-9e66-6af87838ab97",
+						"2041bad8-8ae4-418b-9e66-6af87838ab97",
+						"2041bad9-8ae4-418b-9e66-6af87838ab97",
+					},
+					"team2": {
+						"c34d1891-907e-4677-bc90-458c9e94f772",
+						"c34d1892-907e-4677-bc90-458c9e94f772",
+						"c34d1893-907e-4677-bc90-458c9e94f772",
+					},
+				},
+				expectedTeamsAndMembers: map[string][]string{
+					storage.AdminsTeamName: {},
+					"team1": {
+						"2041bad8-8ae4-418b-9e66-6af87838ab97",
+						"2041bad9-8ae4-418b-9e66-6af87838ab97",
+					},
+					"team2": {
+						"c34d1891-907e-4677-bc90-458c9e94f772",
+						"c34d1892-907e-4677-bc90-458c9e94f772",
+						"c34d1893-907e-4677-bc90-458c9e94f772",
+					},
+				},
+				expectedUpdatedTeamIDs: map[string]bool{"team1": true},
+			},
+			`when there is only one team besides the admins team and the deleted user is a member
+				the team should be updated`: {
+				userToPurge: "2041bad8-8ae4-418b-9e66-6af87838ab97",
+				initialTeamsAndMembers: map[string][]string{
+					"team1": {
+						"2041bad7-8ae4-418b-9e66-6af87838ab97",
+						"2041bad8-8ae4-418b-9e66-6af87838ab97",
+						"2041bad9-8ae4-418b-9e66-6af87838ab97",
+					},
+				},
+				expectedTeamsAndMembers: map[string][]string{
+					storage.AdminsTeamName: {},
+					"team1": {
+						"2041bad7-8ae4-418b-9e66-6af87838ab97",
+						"2041bad9-8ae4-418b-9e66-6af87838ab97",
+					},
+				},
+				expectedUpdatedTeamIDs: map[string]bool{"team1": true},
+			},
+			`when there are multiple teams and the purged user
+				is a member of both, both teams should be updated`: {
+				userToPurge: "2041bad9-8ae4-418b-9e66-6af87838ab97",
+				initialTeamsAndMembers: map[string][]string{
+					"team1": {
+						"2041bad7-8ae4-418b-9e66-6af87838ab97",
+						"2041bad8-8ae4-418b-9e66-6af87838ab97",
+						"2041bad9-8ae4-418b-9e66-6af87838ab97",
+					},
+					"team2": {
+						"c34d1891-907e-4677-bc90-458c9e94f772",
+						"c34d1892-907e-4677-bc90-458c9e94f772",
+						"c34d1893-907e-4677-bc90-458c9e94f772",
+						"2041bad9-8ae4-418b-9e66-6af87838ab97",
+					},
+				},
+				expectedTeamsAndMembers: map[string][]string{
+					storage.AdminsTeamName: {},
+					"team1": {
+						"2041bad7-8ae4-418b-9e66-6af87838ab97",
+						"2041bad8-8ae4-418b-9e66-6af87838ab97",
+					},
+					"team2": {
+						"c34d1891-907e-4677-bc90-458c9e94f772",
+						"c34d1892-907e-4677-bc90-458c9e94f772",
+						"c34d1893-907e-4677-bc90-458c9e94f772",
+					},
+				},
+				expectedUpdatedTeamIDs: map[string]bool{"team1": true, "team2": true},
+			},
+			`when there are multiple teams and the purged user
+				is a member of none, neither team should be updated`: {
+				userToPurge: "d989bca0-4535-444c-8300-24bec6aa446e",
+				initialTeamsAndMembers: map[string][]string{
+					"team1": {
+						"f6d4e661-15a7-4514-b1a4-60a00becde58",
+						"f6d4e662-15a7-4514-b1a4-60a00becde58",
+						"f6d4e663-15a7-4514-b1a4-60a00becde58",
+					},
+					"team2": {
+						"e7dedee5-7942-49a7-8735-f24421224f40",
+						"e7dedee6-7942-49a7-8735-f24421224f40",
+						"e7dedee7-7942-49a7-8735-f24421224f40",
+					},
+				},
+				expectedTeamsAndMembers: map[string][]string{
+					storage.AdminsTeamName: {},
+					"team1": {
+						"f6d4e661-15a7-4514-b1a4-60a00becde58",
+						"f6d4e662-15a7-4514-b1a4-60a00becde58",
+						"f6d4e663-15a7-4514-b1a4-60a00becde58",
+					},
+					"team2": {
+						"e7dedee5-7942-49a7-8735-f24421224f40",
+						"e7dedee6-7942-49a7-8735-f24421224f40",
+						"e7dedee7-7942-49a7-8735-f24421224f40",
+					},
+				},
+				expectedUpdatedTeamIDs: map[string]bool{},
+			},
+		}
+		for desc, test := range tests {
+			t.Run(desc, func(t *testing.T) {
+				ctx := context.Background()
+				var expectedResponseIds []string
+				var allCreatedIds []string
+				for team, members := range test.initialTeamsAndMembers {
+					createReq := &teams.CreateTeamReq{
+						Name: "ignored",
+						Id:   team,
+					}
+					resp, err := cl.CreateTeam(ctx, createReq)
+					require.NoError(t, err)
+
+					addReq := &teams.AddTeamMembersReq{
+						Id:      resp.GetTeam().GetId(),
+						UserIds: members,
+					}
+					_, err = cl.AddTeamMembers(ctx, addReq)
+					require.NoError(t, err)
+
+					allCreatedIds = append(allCreatedIds, resp.GetTeam().GetId())
+					if _, isExpectedInResponse := test.expectedUpdatedTeamIDs[team]; isExpectedInResponse {
+						expectedResponseIds = append(expectedResponseIds, resp.GetTeam().GetId())
+					}
+				}
+
+				req := &teams.PurgeUserMembershipReq{
+					UserId: test.userToPurge,
+				}
+				resp, err := cl.PurgeUserMembership(ctx, req)
+
+				// Check that IDs of updated teams returned by API
+				// match what we expected.
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				assert.ElementsMatch(t, expectedResponseIds, resp.Ids)
+
+				// Check that user membership was properly updated
+				finalTeamsState, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
+				require.NoError(t, err)
+				for _, team := range finalTeamsState.GetTeams() {
+					expectedTeamMembers, found := test.expectedTeamsAndMembers[team.Name]
+					require.Equal(t, found, true)
+					assert.NotNil(t, expectedTeamMembers)
+					usersReq := &teams.GetTeamMembershipReq{
+						Id: team.Id,
+					}
+					usersResp, err := cl.GetTeamMembership(ctx, usersReq)
+					require.NoError(t, err)
+					assert.ElementsMatch(t, expectedTeamMembers, usersResp.UserIds)
+				}
+
+				// Cleanup
+				for _, teamID := range allCreatedIds {
+					cleanupTeam(ctx, t, cl, teamID)
+				}
+			})
+		}
+	})
+
 }
 
 func cleanupTeam(ctx context.Context, t *testing.T, cl teams.TeamsClient, teamID string) {
