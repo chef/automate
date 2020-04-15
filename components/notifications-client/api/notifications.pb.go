@@ -5,10 +5,9 @@ package api
 
 import (
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
 	_ "github.com/golang/protobuf/ptypes/struct"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1430,7 +1429,9 @@ func init() {
 	proto.RegisterType((*Event)(nil), "notifications.Event")
 }
 
-func init() { proto.RegisterFile("notifications.proto", fileDescriptor_fbc3de4cce73c76f) }
+func init() {
+	proto.RegisterFile("notifications.proto", fileDescriptor_fbc3de4cce73c76f)
+}
 
 var fileDescriptor_fbc3de4cce73c76f = []byte{
 	// 1349 bytes of a gzipped FileDescriptorProto
