@@ -28,26 +28,22 @@ func reportProjectTagger(in <-chan message.Compliance, authzClient iam_v2.Projec
 		bundleSize := 0
 		var projectRulesCollection map[string]*iam_v2.ProjectRules
 		for msg := range in {
-			if isScanJob(msg) {
-				bundleSize--
+			if bundleSize <= 0 {
+				bundleSize = len(in)
+				logrus.WithFields(logrus.Fields{
+					"message_id": msg.Report.ReportUuid,
+					"bundleSize": bundleSize,
+				}).Debug("BundleProjectTagging - Update Project rules")
+				projectRulesCollection = getProjectRulesFromAuthz(msg.Ctx, authzClient)
 			} else {
-				if bundleSize <= 0 {
-					bundleSize = len(in)
-					logrus.WithFields(logrus.Fields{
-						"message_id": msg.Report.ReportUuid,
-						"bundleSize": bundleSize,
-					}).Debug("BundleProjectTagging - Update Project rules")
-					projectRulesCollection = getProjectRulesFromAuthz(msg.Ctx, authzClient)
-				} else {
-					// Skip
-					bundleSize--
-				}
-
-				projectTags := findMatchingProjects(msg.InspecReport, projectRulesCollection)
-
-				msg.InspecReport.Projects = projectTags
-				msg.InspecSummary.Projects = projectTags
+				// Skip
+				bundleSize--
 			}
+
+			projectTags := findMatchingProjects(msg.InspecReport, projectRulesCollection)
+
+			msg.InspecReport.Projects = projectTags
+			msg.InspecSummary.Projects = projectTags
 
 			out <- msg
 		}
