@@ -41,8 +41,4 @@
 
 .scanner-body {
   margin: $content-container-padding;
-
-  ::ng-deep chef-td:last-child {
-    justify-content: flex-end;
-  }
 }
