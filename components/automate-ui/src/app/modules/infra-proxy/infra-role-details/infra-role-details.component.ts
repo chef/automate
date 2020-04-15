@@ -158,7 +158,6 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     } else {
       this.show = false;
     }
-
   }
 
   // 1. According to the environment ID getting the array.
