@@ -82,6 +82,7 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
     return `mat-elevation-z${this.options.elevation}`;
   }
 
+  // A given element `el` is marked visible if every node between it and the root is expanded.
   onNodeClick(clickedNode: TreeTableNode<T>): void {
     clickedNode.isExpanded = !clickedNode.isExpanded;
     this.treeTable.forEach(el => {
