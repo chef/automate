@@ -274,11 +274,16 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 // GetNodesCounts - get the number of successful, failure, and missing nodes
 // {
 // 	"aggregations":{
-// 		 "counts":{
+// 		 "outer":{
 // 				"aggregations":{
 // 					 "platform":{
 // 							"terms":{
 // 								 "field":"platform"
+// 							}
+// 					 },
+// 					 "status":{
+// 							"terms":{
+// 								 "field":"status"
 // 							}
 // 					 }
 // 				},
@@ -300,21 +305,27 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 // 		 }
 // 	}
 // }
-func (es Backend) GetNodesFieldTypes(filters map[string][]string,
-	searchTerms []string) ([]backend.FieldCount, error) {
-	var aggregationTerm = "counts"
+func (es Backend) GetNodesFieldValueCounts(filters map[string][]string,
+	searchTerms []string, startDate, endDate string) ([]backend.FieldCount, error) {
+	var aggregationTerm = "outer"
 
 	localFilters := map[string][]string{}
 	for index, element := range filters {
 		localFilters[index] = element
 	}
 
-	localFilters["exists"] = []string{"true"}
+	localFilters[backend.ExistsTag] = []string{"true"}
 
-	boolQuery := newBoolQueryFromFilters(localFilters)
+	mainQuery := newBoolQueryFromFilters(localFilters)
+
+	rangeQuery, ok := newRangeQuery(startDate, endDate, NodeCheckin)
+
+	if ok {
+		mainQuery = mainQuery.Must(rangeQuery)
+	}
 
 	filterAgg := elastic.NewFilterAggregation().
-		Filter(boolQuery)
+		Filter(mainQuery)
 
 	for _, searchTerm := range searchTerms {
 		filterAgg = filterAgg.SubAggregation(searchTerm,
@@ -328,13 +339,18 @@ func (es Backend) GetNodesFieldTypes(filters map[string][]string,
 		SearchSource(searchSource).
 		Index(IndexNodeState).
 		Do(context.Background())
-
 	if err != nil {
 		return []backend.FieldCount{}, err
 	}
 
+	// no nodes found
 	if searchResult.TotalHits() == 0 {
-		return []backend.FieldCount{}, nil
+		fieldCountCollection := make([]backend.FieldCount, len(searchTerms))
+		for index, searchTerm := range searchTerms {
+			fieldCountCollection[index].Terms = []backend.TermCount{}
+			fieldCountCollection[index].Field = searchTerm
+		}
+		return fieldCountCollection, nil
 	}
 
 	statusResult, found := searchResult.Aggregations.Terms(aggregationTerm)

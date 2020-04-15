@@ -128,3 +128,17 @@ message CountedDuration {
   string duration = 1;
   int32 count = 2;
 }
+
+message NodesFieldValueCounts {
+  repeated FieldCount fields = 1;
+}
+
+message FieldCount {
+	repeated TermCount terms = 1;
+	string field = 2;
+}
+
+message TermCount {
+	string term = 1;
+	int32 count = 2;
+}

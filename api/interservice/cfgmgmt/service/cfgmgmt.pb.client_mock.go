@@ -300,6 +300,26 @@ func (mr *MockCfgMgmtClientMockRecorder) GetNodesCounts(arg0, arg1 interface{}, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodesCounts", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetNodesCounts), varargs...)
 }
 
+// GetNodesFieldValueCounts mocks base method
+func (m *MockCfgMgmtClient) GetNodesFieldValueCounts(arg0 context.Context, arg1 *request0.NodesFieldValueCounts, arg2 ...grpc.CallOption) (*response0.NodesFieldValueCounts, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetNodesFieldValueCounts", varargs...)
+	ret0, _ := ret[0].(*response0.NodesFieldValueCounts)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNodesFieldValueCounts indicates an expected call of GetNodesFieldValueCounts
+func (mr *MockCfgMgmtClientMockRecorder) GetNodesFieldValueCounts(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodesFieldValueCounts", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetNodesFieldValueCounts), varargs...)
+}
+
 // GetOrganizations mocks base method
 func (m *MockCfgMgmtClient) GetOrganizations(arg0 context.Context, arg1 *request0.Organizations, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
 	m.ctrl.T.Helper()
@@ -942,6 +962,21 @@ func (m *MockCfgMgmtServer) GetNodesCounts(arg0 context.Context, arg1 *request0.
 func (mr *MockCfgMgmtServerMockRecorder) GetNodesCounts(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodesCounts", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetNodesCounts), arg0, arg1)
+}
+
+// GetNodesFieldValueCounts mocks base method
+func (m *MockCfgMgmtServer) GetNodesFieldValueCounts(arg0 context.Context, arg1 *request0.NodesFieldValueCounts) (*response0.NodesFieldValueCounts, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNodesFieldValueCounts", arg0, arg1)
+	ret0, _ := ret[0].(*response0.NodesFieldValueCounts)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNodesFieldValueCounts indicates an expected call of GetNodesFieldValueCounts
+func (mr *MockCfgMgmtServerMockRecorder) GetNodesFieldValueCounts(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodesFieldValueCounts", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetNodesFieldValueCounts), arg0, arg1)
 }
 
 // GetOrganizations mocks base method

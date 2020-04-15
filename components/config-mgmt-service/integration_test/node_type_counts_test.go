@@ -3,6 +3,7 @@ package integration_test
 import (
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
@@ -15,11 +16,13 @@ func TestNodeFieldValueCounts(t *testing.T) {
 		description      string
 		searchTerms      []string
 		filter           map[string][]string
+		start            string
+		end              string
 		nodes            []iBackend.Node
 		expectedResponse []backend.FieldCount
 	}{
 		{
-			description: "three same platform",
+			description: "Two fields with two different values for each",
 			searchTerms: []string{"platform", "status"},
 			nodes: []iBackend.Node{
 				{
@@ -70,6 +73,218 @@ func TestNodeFieldValueCounts(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "Status filter with platform value counts",
+			searchTerms: []string{"platform"},
+			filter: map[string][]string{
+				"status": {"failure"},
+			},
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "windows",
+						Status:   "failure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "linux",
+						Status:   "failure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "redhat",
+						Status:   "successful",
+					},
+				},
+			},
+			expectedResponse: []backend.FieldCount{
+				{
+					Field: "platform",
+					Terms: []backend.TermCount{
+						{
+							Term:  "windows",
+							Count: 1,
+						},
+						{
+							Term:  "linux",
+							Count: 1,
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "filtering on the same field counting values for",
+			searchTerms: []string{"platform"},
+			filter: map[string][]string{
+				"platform": {"windows"},
+			},
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "windows",
+						Status:   "failure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "linux",
+						Status:   "failure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "redhat",
+						Status:   "successful",
+					},
+				},
+			},
+			expectedResponse: []backend.FieldCount{
+				{
+					Field: "platform",
+					Terms: []backend.TermCount{
+						{
+							Term:  "windows",
+							Count: 1,
+						},
+						{
+							Term:  "linux",
+							Count: 1,
+						},
+						{
+							Term:  "redhat",
+							Count: 1,
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "No nodes",
+			searchTerms: []string{"platform"},
+			nodes:       []iBackend.Node{},
+			expectedResponse: []backend.FieldCount{
+				{
+					Field: "platform",
+					Terms: []backend.TermCount{},
+				},
+			},
+		},
+		{
+			description: "Start Date filter",
+			searchTerms: []string{"platform"},
+			start:       time.Now().Add(-time.Hour * 24).Format(time.RFC3339),
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().Add(-time.Hour * 12),
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "windows",
+					},
+				},
+				{
+					Checkin: time.Now().AddDate(0, 0, -3),
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "redhat",
+					},
+				},
+				{
+					Checkin: time.Now().AddDate(0, 0, -4),
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "ubuntu",
+					},
+				},
+			},
+			expectedResponse: []backend.FieldCount{
+				{
+					Field: "platform",
+					Terms: []backend.TermCount{
+						{
+							Term:  "windows",
+							Count: 1,
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "End Date filter",
+			searchTerms: []string{"platform"},
+			end:         time.Now().Add(-time.Hour * 24).Format(time.RFC3339),
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().Add(-time.Hour * 12),
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "windows",
+					},
+				},
+				{
+					Checkin: time.Now().AddDate(0, 0, -3),
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "redhat",
+					},
+				},
+				{
+					Checkin: time.Now().AddDate(0, 0, -4),
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "ubuntu",
+					},
+				},
+			},
+			expectedResponse: []backend.FieldCount{
+				{
+					Field: "platform",
+					Terms: []backend.TermCount{
+						{
+							Term:  "redhat",
+							Count: 1,
+						},
+						{
+							Term:  "ubuntu",
+							Count: 1,
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "Start and End Date filter",
+			searchTerms: []string{"platform"},
+			start:       time.Now().Add(-time.Hour * 24 * 5).Format(time.RFC3339),
+			end:         time.Now().Add(-time.Hour * 24).Format(time.RFC3339),
+			nodes: []iBackend.Node{
+				{
+					Checkin: time.Now().Add(-time.Hour * 12),
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "windows",
+					},
+				},
+				{
+					Checkin: time.Now().AddDate(0, 0, -3),
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "redhat",
+					},
+				},
+				{
+					Checkin: time.Now().AddDate(0, 0, -14),
+					NodeInfo: iBackend.NodeInfo{
+						Platform: "ubuntu",
+					},
+				},
+			},
+			expectedResponse: []backend.FieldCount{
+				{
+					Field: "platform",
+					Terms: []backend.TermCount{
+						{
+							Term:  "redhat",
+							Count: 1,
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, testCase := range cases {
@@ -89,7 +304,8 @@ func TestNodeFieldValueCounts(t *testing.T) {
 				testCase.filter = map[string][]string{}
 			}
 
-			actualResponse, err := esBackend.GetNodesFieldTypes(testCase.filter, testCase.searchTerms)
+			actualResponse, err := esBackend.GetNodesFieldValueCounts(testCase.filter,
+				testCase.searchTerms, testCase.start, testCase.end)
 			require.NoError(t, err)
 
 			require.Equal(t, len(testCase.expectedResponse), len(actualResponse))
@@ -100,7 +316,8 @@ func TestNodeFieldValueCounts(t *testing.T) {
 
 				expectedTerms := testCase.expectedResponse[index].Terms
 				actualTerms := actualResponse[index].Terms
-				require.Equal(t, len(expectedTerms), len(actualTerms))
+				require.Equal(t, len(expectedTerms), len(actualTerms),
+					"field term lengths for %q do not match", testCase.searchTerms[index])
 
 				for _, term := range expectedTerms {
 					count, found := find(term.Term, actualTerms)
@@ -111,6 +328,37 @@ func TestNodeFieldValueCounts(t *testing.T) {
 		})
 	}
 }
+
+// func TestNodeFieldValueCountsError(t *testing.T) {
+// 	cases := []struct {
+// 		description string
+// 		searchTerms []string
+// 		filter      map[string][]string
+// 		start       string
+// 		end         string
+// 	}{
+// 		{
+// 			description: "Start date is after End Date filter",
+// 			searchTerms: []string{"platform"},
+// 			start:       time.Now().Add(-time.Hour * 24).Format(time.RFC3339),
+// 			end:         time.Now().Add(-time.Hour * 24 * 5).Format(time.RFC3339),
+// 		},
+// 	}
+
+// 	for _, testCase := range cases {
+// 		t.Run(testCase.description, func(t *testing.T) {
+
+// 			if testCase.filter == nil {
+// 				testCase.filter = map[string][]string{}
+// 			}
+
+// 			// call rpc function
+// 			_, err := esBackend.GetNodesFieldValueCounts(testCase.filter,
+// 				testCase.searchTerms, testCase.start, testCase.end)
+// 			require.Error(t, err)
+// 		})
+// 	}
+// }
 
 func find(needle string, haystack []backend.TermCount) (int, bool) {
 	for _, term := range haystack {

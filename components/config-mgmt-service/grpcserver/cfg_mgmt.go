@@ -297,6 +297,12 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context,
 	return toResponseRun(run, getNodes.nodes[0])
 }
 
+func (s *CfgMgmtServer) GetNodesFieldValueCounts(ctx context.Context,
+	request *request.NodesFieldValueCounts) (*response.NodesFieldValueCounts, error) {
+
+	return &response.NodesFieldValueCounts{}, nil
+}
+
 func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,
 	request *request.Suggestion) (*gpStruct.ListValue, error) {
 	var (

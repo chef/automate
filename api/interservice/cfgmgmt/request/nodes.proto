@@ -28,11 +28,17 @@ message Runs {
   string node_id = 1;
   repeated string filter = 2;
   Pagination pagination = 3;
-  // TODO: (@afiune) Should we standardize these parameters as well?
   string start = 4;
   string end = 5;
 }
 
 message MissingNodeDurationCounts {
   repeated string durations = 1;
+}
+
+message NodesFieldValueCounts {
+  repeated string searchTerms = 1;
+  repeated string filter = 2;
+  string start = 3;
+  string end = 4;
 }
