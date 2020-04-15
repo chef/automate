@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	uuid "github.com/chef/automate/lib/uuid4"
 	"github.com/gofrs/uuid"
 	natsc "github.com/nats-io/nats.go"
 	stan "github.com/nats-io/stan.go"
@@ -175,9 +176,10 @@ func getNewToken(t *testing.T, authorizedAction string) string {
 	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx,
 		[]string{"tls:service:deployment-service:internal"}, []string{}, "res", "act"))
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
-		Description: "token for event-service integration test",
-		Active:      true,
-		Projects:    []string{},
+		Id:       uuid.Must(uuid.NewV4()).String(),
+		Name:     "token for event-service integration test",
+		Active:   true,
+		Projects: []string{},
 	})
 	require.NoError(t, err)
 
