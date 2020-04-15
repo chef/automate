@@ -34,7 +34,7 @@
             <label>
             <span class="label">Name <span aria-hidden="true">*</span></span>
             <input chefInput formControlName="name" type="text" autocomplete="off"
-              data-cy="update-org-name">
+              data-cy="update-org-name" [resetOrigin]="saveSuccessful">
             </label>
             <chef-error
               *ngIf="(updateOrgForm.get('name').hasError('required') || updateOrgForm.get('name').hasError('pattern')) && updateOrgForm.get('name').dirty">
@@ -45,7 +45,7 @@
             <label>
             <span class="label">Admin User <span aria-hidden="true">*</span></span>
             <input chefInput formControlName="admin_user" type="text" autocomplete="off"
-              data-cy="update-Org-admin-user">
+              data-cy="update-Org-admin-user" [resetOrigin]="saveSuccessful">
             </label>
             <chef-error
               *ngIf="(updateOrgForm.get('admin_user').hasError('required') || updateOrgForm.get('admin_user').hasError('pattern')) && updateOrgForm.get('admin_user').dirty">
