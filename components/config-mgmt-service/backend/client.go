@@ -67,6 +67,8 @@ type Client interface {
 	GetCreateCountsTimeSeries(time.Time, time.Time, map[string][]string) ([]CountPeroid, error)
 	GetErrors(int32, map[string][]string) ([]*ChefErrorCount, error)
 	GetMissingNodeDurationCounts(durations []string) ([]CountedDuration, error)
+	GetNodesFieldValueCounts(filters map[string][]string, searchTerms []string, startDate,
+		endDate string) ([]FieldCount, error)
 }
 
 // Types that we consume from the ingest-service

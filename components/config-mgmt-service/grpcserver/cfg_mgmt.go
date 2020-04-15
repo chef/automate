@@ -298,9 +298,42 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context,
 }
 
 func (s *CfgMgmtServer) GetNodesFieldValueCounts(ctx context.Context,
-	request *request.NodesFieldValueCounts) (*response.NodesFieldValueCounts, error) {
+	req *request.NodesFieldValueCounts) (*response.NodesFieldValueCounts, error) {
 
-	return &response.NodesFieldValueCounts{}, nil
+	filters, err := stringutils.FormatFiltersWithKeyConverter(req.Filter,
+		params.ConvertParamToNodeStateBackendLowerFilter)
+
+	// Date Range
+	if !params.ValidateDateTimeRange(req.GetStart(), req.GetEnd()) {
+		return &response.NodesFieldValueCounts{}, status.Errorf(codes.InvalidArgument,
+			"Invalid start/end time. (format: YYYY-MM-DD'T'HH:mm:ssZ)")
+	}
+
+	fieldCounts, err := s.client.GetNodesFieldValueCounts(filters,
+		req.SearchTerms, req.Start, req.End)
+	if err != nil {
+		return &response.NodesFieldValueCounts{}, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
+	fields := make([]*response.FieldCount, len(fieldCounts))
+	for index := range fieldCounts {
+		terms := make([]*response.TermCount, len(fieldCounts[index].Terms))
+		for termIndex, term := range fieldCounts[index].Terms {
+			terms[termIndex] = &response.TermCount{
+				Count: int32(term.Count),
+				Term:  term.Term,
+			}
+		}
+
+		fields[index] = &response.FieldCount{
+			Field: fieldCounts[index].Field,
+			Terms: terms,
+		}
+	}
+
+	return &response.NodesFieldValueCounts{
+		Fields: fields,
+	}, nil
 }
 
 func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,

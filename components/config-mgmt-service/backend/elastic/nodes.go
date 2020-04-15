@@ -542,7 +542,7 @@ func (es Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.Co
 		aggTag = "MissingNodeDurationCounts"
 	)
 	filters := map[string][]string{
-		"exists": []string{"true"},
+		"exists": {"true"},
 	}
 	mainQuery := newBoolQueryFromFilters(filters)
 
