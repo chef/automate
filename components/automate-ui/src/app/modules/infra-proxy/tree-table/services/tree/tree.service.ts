@@ -8,6 +8,8 @@ import { pipe } from 'fp-ts/lib/pipeable';
 @Injectable({
   providedIn: 'root'
 })
+
+// referenced from https://www.npmjs.com/package/ng-material-treetable
 export class TreeService {
 
   /**
