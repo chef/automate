@@ -74,9 +74,6 @@
 
 .nodes-list-table {
   chef-table-cell {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
 
     &:last-child {
       justify-content: flex-end;
