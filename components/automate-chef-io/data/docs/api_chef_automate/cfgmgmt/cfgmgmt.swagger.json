@@ -14,7 +14,7 @@
     "/cfgmgmt/errors": {
       "get": {
         "summary": "GetErrors",
-        "description": "Returns a list of the most common errors reported for infra nodes' most recent Chef Client runs.\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
+        "description": "Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
         "operationId": "GetErrors",
         "responses": {
           "200": {
@@ -112,6 +112,20 @@
               "DESC"
             ],
             "default": "ASC"
+          },
+          {
+            "name": "start",
+            "description": "Earliest most recent check-in node information to return.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end",
+            "description": "Latest most recent check-in node information to return.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
