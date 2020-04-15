@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	uuid "github.com/chef/automate/lib/uuid4"
 	"github.com/gofrs/uuid"
 	natsc "github.com/nats-io/nats.go"
 	stan "github.com/nats-io/stan.go"
