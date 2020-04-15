@@ -24,7 +24,7 @@ func (a *InfraProxyServer) GetEnvironments(ctx context.Context, r *gwreq.Environ
 	}, nil
 }
 
-// GetEnvironment fetch a infra role
+// GetEnvironment fetches the environment details
 func (a *InfraProxyServer) GetEnvironment(ctx context.Context, r *gwreq.Environment) (*gwres.Environment, error) {
 	req := &infra_req.Environment{
 		OrgId: r.OrgId,

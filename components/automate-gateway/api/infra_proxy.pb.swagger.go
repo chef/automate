@@ -635,14 +635,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "Id of the Server.",
+            "description": "ID of the chef infra server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "Id of the Org.",
+            "description": "ID of the chef organization.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -674,14 +674,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "Id of the Server.",
+            "description": "ID of the chef infra server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "Id of the Org.",
+            "description": "ID of the chef organization.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -720,14 +720,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "Id of the Server.",
+            "description": "ID of the chef infra server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "Id of the Org.",
+            "description": "ID of the chef organization.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -752,14 +752,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "Id of the Server.",
+            "description": "ID of the chef infra server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "Id of the Org.",
+            "description": "ID of the chef organization.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1307,7 +1307,7 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the Environment."
+          "description": "Name of the environment."
         },
         "chef_type": {
           "type": "string",
@@ -1343,7 +1343,7 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the Environment."
+          "description": "Name of the environment."
         }
       }
     },
@@ -1355,7 +1355,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.EnvironmentListItem"
           },
-          "description": "List of the EnvironmentListItem."
+          "description": "List of the environments."
         }
       }
     },

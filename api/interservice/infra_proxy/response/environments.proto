@@ -4,17 +4,17 @@ package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
 
 message Environments {
-    // List of the EnvironmentListItem.
+    // List of the environments.
     repeated EnvironmentListItem environments = 1;
 }
 
 message EnvironmentListItem {
-    // Name of the Environment.
+    // Name of the environment.
     string name = 1;
 }
 
 message Environment {
-    // Name of the Environment.
+    // Name of the environment.
     string name = 1;
     // Type of the object.
     string chef_type = 2;

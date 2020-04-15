@@ -24,7 +24,7 @@ func (a *InfraProxyServer) GetRoles(ctx context.Context, r *gwreq.Roles) (*gwres
 	}, nil
 }
 
-// GetRole fetch a infra role
+// GetRole fetches an infra role details
 func (a *InfraProxyServer) GetRole(ctx context.Context, r *gwreq.Role) (*gwres.Role, error) {
 	req := &infra_req.Role{
 		OrgId: r.OrgId,

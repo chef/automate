@@ -21,9 +21,9 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type DataBags struct {
-	// Id of the Org.
+	// ID of the chef organization.
 	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
-	// Id of the Server.
+	// ID of the chef infra server.
 	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	// Name of the data bag.
 	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
@@ -79,9 +79,9 @@ func (m *DataBags) GetName() string {
 }
 
 type DataBag struct {
-	// Id of the Org.
+	// ID of the chef organization.
 	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
-	// Id of the Server.
+	// ID of the chef infra server.
 	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	// Name of the data bag.
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`

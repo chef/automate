@@ -21,7 +21,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Environments struct {
-	// List of the EnvironmentListItem.
+	// List of the environments.
 	Environments         []*EnvironmentListItem `protobuf:"bytes,1,rep,name=environments,proto3" json:"environments,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
 	XXX_unrecognized     []byte                 `json:"-"`
@@ -61,7 +61,7 @@ func (m *Environments) GetEnvironments() []*EnvironmentListItem {
 }
 
 type EnvironmentListItem struct {
-	// Name of the Environment.
+	// Name of the environment.
 	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -101,7 +101,7 @@ func (m *EnvironmentListItem) GetName() string {
 }
 
 type Environment struct {
-	// Name of the Environment.
+	// Name of the environment.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Type of the object.
 	ChefType string `protobuf:"bytes,2,opt,name=chef_type,json=chefType,proto3" json:"chef_type,omitempty"`
