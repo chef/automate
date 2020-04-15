@@ -5,14 +5,14 @@ import { RoleActionTypes, RoleActions } from './infra-role.action';
 import { InfraRole } from './infra-role.model';
 
 export interface InfraRoleEntityState extends EntityState<InfraRole> {
-  status: EntityStatus;
+  rolesStatus: EntityStatus;
   getAllStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
 
 export const infraRoleEntityAdapter: EntityAdapter<InfraRole> = createEntityAdapter<InfraRole>({
-  selectId: (infrarole: InfraRole) => infrarole.name
+  selectId: (infraRole: InfraRole) => infraRole.name
 });
 
 export const InfraRoleEntityInitialState: InfraRoleEntityState =

@@ -123,10 +123,8 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
       this.store.select(getStatus),
       this.store.select(orgFromRoute)
     ]).pipe(
-      filter(([getOrgSt, _orgState]) =>
-        getOrgSt === EntityStatus.loadingSuccess),
-      filter(([_getOrgSt, orgState]) =>
-        !isNil(orgState)),
+      filter(([getOrgSt, orgState]) => getOrgSt ===
+        EntityStatus.loadingSuccess && !isNil(orgState)),
       takeUntil(this.isDestroyed)
     ).subscribe(([_getOrgSt, orgState]) => {
       this.org = { ...orgState };

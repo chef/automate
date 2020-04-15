@@ -7,14 +7,14 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { routeParams, routeURL } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
-import { infaRoleFromRoute } from 'app/entities/infra-roles/infra-role-details.selectors';
+import { infraRoleFromRoute } from 'app/entities/infra-roles/infra-role-details.selectors';
 import { GetRole } from 'app/entities/infra-roles/infra-role.action';
 import {
   InfraRole, ExpandedList,
   ChildList, List, RoleAttributes
 } from 'app/entities/infra-roles/infra-role.model';
-import { Node, Options } from '../treetable/models';
-import { JsonTreeableComponent as Treeable } from './../json-treeable/json-treeable.component';
+import { Node, Options } from '../tree-table/models';
+import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
 
 export type InfraRoleTabName = 'runList' | 'attributes';
 
@@ -31,11 +31,11 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   public modalType: string;
   public serverId;
-  public OrgId;
+  public orgId;
   public name;
   public runList: string[];
   public expandedList: ExpandedList[] = [];
-  public expandRunList: List[] = [];
+  public expandedRunList: List[] = [];
   public show = false;
   public data: any = [];
   public env_id = '_default';
@@ -49,7 +49,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     capitalisedHeader: true
   };
 
-  public attributes: RoleAttributes = new RoleAttributes({
+  public attributes = new RoleAttributes({
     default_attributes: '',
     override_attributes: ''
   });
@@ -62,8 +62,8 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   public override_attributes = 'override_attributes';
   public all = 'all';
 
-  @ViewChild(Treeable, { static: true })
-  tree: Treeable;
+  @ViewChild(JsonTreeTable, { static: true })
+  tree: JsonTreeTable;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -91,14 +91,14 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(([server_id, org_id, name]: string[]) => {
       this.serverId = server_id;
-      this.OrgId = org_id;
+      this.orgId = org_id;
       this.name = name;
       this.store.dispatch(new GetRole({
         server_id: server_id, org_id: org_id, name: name
       }));
     });
 
-    this.store.select(infaRoleFromRoute).pipe(
+    this.store.select(infraRoleFromRoute).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(role => {
@@ -134,7 +134,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   }
 
   // retrieve attributes based on their level of precedence
-  retrieve(level: string): any {
+  retrieve(level: string): string | Object {
     switch (level) {
       case this.all: {
         return this.attributes.all;
@@ -151,7 +151,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectChangeHandler(id) {
+  selectChangeHandler(id): void {
     this.env_id = id;
     this.treeNodes(this.expandedList, this.env_id);
   }
@@ -160,21 +160,21 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     this.arrayOfNodesTree = [];
     for (let i = -0; i < expandedList.length; i++) {
       if (expandedList[i].id === li) {
-        this.expandRunList = expandedList[i].run_list;
-        if (this.expandRunList && this.expandRunList.length) {
+        this.expandedRunList = expandedList[i].run_list;
+        if (this.expandedRunList && this.expandedRunList.length) {
           this.hasRun_List = true;
-          for (let j = 0; j < this.expandRunList.length; j++) {
+          for (let j = 0; j < this.expandedRunList.length; j++) {
             const nodes: Node<ChildList>[] = [];
             this.arrayOfNodesTree.push({
               value: {
-                name: this.expandRunList[j].name,
-                version: this.expandRunList[j].version === ''
-                  ? '...' : this.expandRunList[j].version,
-                type: this.expandRunList[j].type
+                name: this.expandedRunList[j].name,
+                version: this.expandedRunList[j].version === ''
+                  ? '...' : this.expandedRunList[j].version,
+                type: this.expandedRunList[j].type
               },
               children:
-                this.expandRunList[j].children && this.expandRunList[j].children.length ?
-                  this.childNode(this.expandRunList[j].children, nodes) : []
+                this.expandedRunList[j].children && this.expandedRunList[j].children.length ?
+                  this.childNode(this.expandedRunList[j].children, nodes) : []
             });
           }
         } else {

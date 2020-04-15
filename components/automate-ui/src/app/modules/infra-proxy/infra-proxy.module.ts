@@ -11,8 +11,8 @@ import { OrgDetailsComponent } from './org-details/org-details.component';
 import { InfraRoleDetailsComponent } from './infra-role-details/infra-role-details.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
-import { TreetableModule } from './treetable/treetable.module';
-import { JsonTreeableComponent } from './json-treeable/json-treeable.component';
+import { TreeTableModule } from './tree-table/tree-table.module';
+import { JsonTreeTableComponent } from './json-tree-table/json-tree-table.component';
 
 @NgModule({
   declarations: [
@@ -22,14 +22,14 @@ import { JsonTreeableComponent } from './json-treeable/json-treeable.component';
     InfraRoleDetailsComponent,
     CreateChefServerModalComponent,
     CreateOrgModalComponent,
-    JsonTreeableComponent
+    JsonTreeTableComponent
   ],
   imports: [
     CommonModule,
     AppRoutingModule,
     ChefComponentsModule,
     ChefPipesModule,
-    TreetableModule,
+    TreeTableModule,
     FormsModule,
     ReactiveFormsModule
   ],
