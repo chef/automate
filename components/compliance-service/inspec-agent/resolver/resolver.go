@@ -776,7 +776,9 @@ func convertNodeTcToInspecTc(tc *nodes.TargetConfig) (inspec.TargetConfig, error
 
 func (r *Resolver) resolveStaticJobInfo(job *jobs.Job, node *nodes.Node, tc inspec.TargetConfig, id string) types.InspecJob {
 	env := pgdb.FindKeyValue(node.Tags, "environment").Value
-
+	if len(env) == 0 {
+		env = pgdb.FindKeyValue(node.Tags, "Environment").Value
+	}
 	agentJob := types.InspecJob{
 		InspecBaseJob: types.InspecBaseJob{
 			JobID:    job.Id,
