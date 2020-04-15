@@ -23,8 +23,11 @@ interface ReportSummary {
   end_time: string;
 }
 
+// ReturnParams can either be an empty object or filled with filters
+// It is used for populating Reporting-node and Reporting profile
+// Breadcrumb link
 export interface ReturnParams {
-  end_time?: string;
+  [ReportingFilterTypes.END_TIME]?: string;
   [ReportingFilterTypes.CHEF_SERVER]?: string;
   [ReportingFilterTypes.CHEF_TAGS]?: string;
   [ReportingFilterTypes.CONTROL_ID]?: string;
@@ -117,7 +120,7 @@ export class ReportQueryService {
     return this.idToTitle.get(type + '-' + id);
   }
 
-  formatReturnParams(): ReturnParams { // needs a return type
+  formatReturnParams(): ReturnParams {
     const reportQuery = this.getReportQuery();
 
     const structuredFilters = {};
