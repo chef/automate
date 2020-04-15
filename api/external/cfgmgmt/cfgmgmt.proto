@@ -19,6 +19,7 @@ import "api/external/common/query/parameters.proto";
 import "api/external/common/version/version.proto";
 import "api/external/common/response.proto";
 
+
 import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
@@ -231,7 +232,7 @@ service ConfigMgmt {
   /*
   GetSourceFqdns
 
-  Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.
+  Returns a list of all chef servers associated with nodes that have checked in to Automate.
 
 	Authorization Action:
 	```
@@ -298,7 +299,7 @@ service ConfigMgmt {
   /*
   GetErrors
 
-  Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.
+  Returns a list of the most common errors reported for infra nodes' most recent Chef Client runs.
 
   Authorization Action:
   ```
@@ -312,8 +313,4 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }
-
-  rpc NodeExport(cfgmgmt.request.NodeExport) returns (stream chef.automate.api.common.ExportData) {};
-
-  rpc ReportExport(cfgmgmt.request.ReportExport) returns (stream chef.automate.api.common.ExportData) {};
 }

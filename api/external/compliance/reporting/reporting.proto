@@ -18,14 +18,13 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service ReportingService {
 	/*
-	List reports
+	List Reports
 
 	Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	Supports pagination, filtering, and sorting.
 	Limited to 10k results.
 
-	Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
-	latest_report.end_time, latest_report.status, node_name
+	Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 
 	Example:
 	```
@@ -60,7 +59,7 @@ service ReportingService {
 	};
 
 	/*
-	List report IDs
+	List Report IDs
 
 	List all IDs for the latest report for each node, with optional filtering.
 	Supports filtering, but not pagination or sorting.
@@ -89,7 +88,7 @@ service ReportingService {
 	};
 
 	/*
-	List controls
+	List Controls
 
 	Lists controls from the last run, with optional filtering.
 	Supports filtering, but not pagination or sorting.
@@ -116,7 +115,7 @@ service ReportingService {
 	};
 
 	/*
-	Fetch a report
+	Fetch Report by ID
 
 	Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id`, or `profile_name` is not allowed.
@@ -143,7 +142,7 @@ service ReportingService {
 	};
 
 	/*
-	List suggestions
+	List Reporting Suggestions
 
 	Get suggestions for compliance reporting resources based on matching text substrings.
 	Supports filtering, but not pagination or sorting.
@@ -202,7 +201,7 @@ service ReportingService {
 	};
 
 	/*
-	List profiles
+	List Profiles
 
 	List all profiles in use, with optional filtering.
 	Supports pagination, filtering, and sorting.
@@ -233,7 +232,7 @@ service ReportingService {
 	rpc ExportNode(Query) returns (stream chef.automate.api.common.ExportData) {};
 
 	/*
-	Fetch a node
+	Fetch Node by ID
 
 	Fetch a specific node by ID.
 	Supports filtering by profile or control.
@@ -259,7 +258,7 @@ service ReportingService {
 	};
 
 	/*
-	List nodes
+	List Nodes
 
 	List all nodes, with optional filtering, pagination, and sorting.
 	Limited to 10k results.
@@ -503,7 +502,7 @@ message Report {
 	string ipaddress = 13;
 	// The FQDN (fully qualified domain name) of the node making the report.
 	string fqdn = 14;
-	// The Chef Infra Server that manages the node making the report.
+	// The Chef Server that manages the node making the report.
 	string chef_server = 15;
 	// The Organization the node belongs to.
 	string chef_organization = 16;

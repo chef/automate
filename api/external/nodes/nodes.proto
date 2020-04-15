@@ -16,9 +16,9 @@ import "api/external/common/query/parameters.proto";
 
 service NodesService {
 	/*
-	Create a node
+	Create a Node
 
-	Creates a node and adds it to the Automate node manager.
+	Creates a node and adds it to the Chef Automate node manager.
 	Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
 	Useful for creating nodes for the purpose of running compliance scan jobs.
 
@@ -60,7 +60,7 @@ service NodesService {
 	};
 
 	/*
-	Read a node
+	List Node Details
 
 	Returns the details for a node given the node ID.
 
@@ -84,7 +84,7 @@ service NodesService {
 	};
 
 	/*
-	Update a node
+	Update Node
 
 	This PUT operation overwrites ALL node details and requires the complete set of node details,
 	consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
@@ -111,7 +111,7 @@ service NodesService {
 	};
 
 	/*
-	Delete a node
+	Delete a Node
 
 	Deletes the node with the node ID.
 
@@ -135,7 +135,7 @@ service NodesService {
 	};
 
 	/*
-	Bulk delete by ID
+	Bulk Delete Nodes by ID
 
 	Deletes a set of nodes given a list of IDs.
 	Invalid IDs will be ignored.
@@ -161,11 +161,11 @@ service NodesService {
 	};
 
 	/*
-	List and filter nodes
+	List and Filter Nodes
 
 	Makes a list of nodes.
 	Supports filtering, pagination, and sorting.
-	Adding a filter narrows the list of nodes only those that match the filter or filters.
+	Adding a filter narrows the list of nodes to only those that match the filter or filters.
 	Supported filters:
 	account_id, last_contact, manager_id, manager_type, name, platform_name,
 	platform_release, region, source_id, state, statechange_timerange, status,
@@ -206,10 +206,9 @@ service NodesService {
 	};
 
 	/*
-	Node status
+	List Node Status
 
-	Use this to run an `inspec detect` job on the node, which updates the status to reflect
-	that the node is reachable or unreachable.
+	Use this to run an `inspec detect` job on the node, which updates the status to reflect that the node is reachable or unreachable.
 
 	Authorization Action:
 	```
@@ -231,7 +230,7 @@ service NodesService {
 	};
 
 	/*
-	Bulk delete nodes
+	Bulk Delete Nodes by Filter
 
 	Deletes a set of nodes that match a filter.
 	Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
@@ -265,10 +264,10 @@ service NodesService {
 	};
 
 	/*
-	Bulk create nodes
+	Bulk Create Nodes
 
 	Creates multiple nodes from a list of node data.
-	Hosts field is required. Multiple hosts may be defined in this field.
+	`hosts` field is required. Multiple hosts may be defined in this field.
 
 	Example:
 	```
