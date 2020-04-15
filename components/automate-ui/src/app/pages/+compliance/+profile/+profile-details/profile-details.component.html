@@ -106,14 +106,14 @@
           <chef-table-body>
             <ng-container *ngFor="let control of profile.controls">
               <chef-table-row>
-                <chef-table-cell class="align-flex-center">
+                <chef-table-cell >
                   <span><strong>{{ control.id }}:</strong> {{ control.title }}</span>
                 </chef-table-cell>
-                <chef-table-cell class="align-flex-center" [ngClass]="impactStatus(control)">
+                <chef-table-cell  [ngClass]="impactStatus(control)">
                   {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
                 </chef-table-cell>
-                <chef-table-cell class="align-flex-center">{{ testCount(control) }}</chef-table-cell>
-                <chef-table-cell class="align-flex-center">
+                <chef-table-cell >{{ testCount(control) }}</chef-table-cell>
+                <chef-table-cell >
                   <chef-button secondary (click)="toggleControl(control)">
                     <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
                     <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>

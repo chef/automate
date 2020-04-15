@@ -6,13 +6,9 @@
 
 .jobs-list-table {
   chef-table-cell {
-    display: flex;
-    justify-content: center;
 
     &:last-child {
-      flex-flow: row nowrap;
       justify-content: flex-end;
-      align-items: center;
 
       chef-button {
         margin: -.5em 0 -.5em .5em;

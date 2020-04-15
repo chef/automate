@@ -74,35 +74,35 @@
   <chef-table-body>
     <ng-container *ngFor="let node of nodes; index as i" >
       <chef-table-row *ngIf=node.hasRuns tabindex="0" class="row">
-        <chef-table-cell  *ngIf="canDeleteNodes" class="{{node.status}} delete align-flex-center">
+        <chef-table-cell  *ngIf="canDeleteNodes" class="{{node.status}} delete ">
           <chef-checkbox *ngIf="deletable_control.isNodeDeletable(node)" class="delete-checkbox row"
             [checked]="deletable_control.isNodeSelected(node)"
             (change)="deletable_control.selectNodeForDelete($event.detail, node)">
           </chef-checkbox>
           <div *ngIf="!deletable_control.isNodeDeletable(node)" class="empty-checkbox"></div>
         </chef-table-cell>
-        <chef-table-cell class="{{node.status}} node-name has-runs align-flex-center">
+        <chef-table-cell class="{{node.status}} node-name has-runs ">
           <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
             <span class="visually-hidden">Node Status {{node.status}}</span>
             <chef-icon>{{ node.status | chefStatusIcon }}</chef-icon> {{node.name}}
           </a>
         </chef-table-cell>
-        <chef-table-cell class="check-in has-runs align-flex-center" [hidden]="!columns.check_in">
+        <chef-table-cell class="check-in has-runs " [hidden]="!columns.check_in">
           <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
             {{node.checkin | timeFromNow}}
           </a>
         </chef-table-cell>
-        <chef-table-cell class="has-runs align-flex-center" [hidden]="!columns.uptime">
+        <chef-table-cell class="has-runs " [hidden]="!columns.uptime">
           <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
             {{node.uptime_seconds | timeDuration:'seconds'}}
           </a>
         </chef-table-cell>
-        <chef-table-cell class="has-runs align-flex-center" [hidden]="!columns.platform">
+        <chef-table-cell class="has-runs " [hidden]="!columns.platform">
           <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
             {{node.platform}}
           </a>
         </chef-table-cell>
-        <chef-table-cell *ngIf="displayEnvironmentNodes" class="node-environment has-runs align-flex-center" [hidden]="!columns.environment">
+        <chef-table-cell *ngIf="displayEnvironmentNodes" class="node-environment has-runs " [hidden]="!columns.environment">
           <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
             <ng-container *ngIf="!node.policy_group">
               {{node.environment || "- -"}}
@@ -112,22 +112,22 @@
             </ng-container>
           </a>
         </chef-table-cell>
-        <chef-table-cell *ngIf="displayPolicyNodes" class="has-runs align-flex-center" [hidden]="!columns.policy_group">
+        <chef-table-cell *ngIf="displayPolicyNodes" class="has-runs " [hidden]="!columns.policy_group">
           <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
             {{node.policy_group || "- -"}}
           </a>
         </chef-table-cell>
-        <chef-table-cell class="has-runs align-flex-center" [hidden]="!columns.chef_version">
+        <chef-table-cell class="has-runs " [hidden]="!columns.chef_version">
           <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
             {{node.chefVersion}}
           </a>
         </chef-table-cell>
-        <chef-table-cell class="has-runs align-flex-center" [hidden]="!columns.deprecations_count">
+        <chef-table-cell class="has-runs " [hidden]="!columns.deprecations_count">
           <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
             {{node.deprecationsCount || "0"}}
           </a>
         </chef-table-cell>
-        <chef-table-cell class="has-runs view-more align-flex-center">
+        <chef-table-cell class="has-runs view-more ">
           <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
             <chef-button secondary aria-label="More Information">
               <chef-icon>navigate_next</chef-icon>
@@ -136,17 +136,17 @@
         </chef-table-cell>
       </chef-table-row>
       <chef-table-row *ngIf=!node.hasRuns >
-        <chef-table-cell *ngIf="canDeleteNodes" class="delete align-flex-center">
+        <chef-table-cell *ngIf="canDeleteNodes" class="delete ">
           <chef-checkbox *ngIf="deletable_control.isNodeDeletable(node)" class="delete-checkbox row"
             [checked]="deletable_control.isNodeSelected(node)"
             (change)="deletable_control.selectNodeForDelete($event.detail, node)">
           </chef-checkbox>
           <div *ngIf="!deletable_control.isNodeDeletable(node)" class="empty-checkbox"></div>
         </chef-table-cell>
-        <chef-table-cell class="{{node.status}} node-name align-flex-center">
+        <chef-table-cell class="{{node.status}} node-name ">
           <chef-icon>{{ node.status | chefStatusIcon }}</chef-icon> {{node.name}}
         </chef-table-cell>
-        <chef-table-cell class="check-in align-flex-center" [hidden]="!columns.check_in">
+        <chef-table-cell class="check-in " [hidden]="!columns.check_in">
             <span class="no-data">
               No data <chef-icon id='tooltip{{i}}'>info_outline</chef-icon>
             </span>
@@ -154,13 +154,13 @@
               There is no client run data available for this node
             </chef-tooltip>
         </chef-table-cell>
-        <chef-table-cell [hidden]="!columns.uptime" class="align-flex-center">
+        <chef-table-cell [hidden]="!columns.uptime" >
             --
         </chef-table-cell>
-        <chef-table-cell [hidden]="!columns.platform" class="align-flex-center">
+        <chef-table-cell [hidden]="!columns.platform" >
             {{node.platform}}
         </chef-table-cell>
-        <chef-table-cell *ngIf="displayEnvironmentNodes" class="node-environment align-flex-center" [hidden]="!columns.environment">
+        <chef-table-cell *ngIf="displayEnvironmentNodes" class="node-environment " [hidden]="!columns.environment">
             <ng-container *ngIf="!node.policy_group">
               {{node.environment || "- -"}}
             </ng-container>
@@ -168,16 +168,16 @@
               - -
             </ng-container>
         </chef-table-cell>
-        <chef-table-cell *ngIf="displayPolicyNodes" [hidden]="!columns.policy_group" class="align-flex-center">
+        <chef-table-cell *ngIf="displayPolicyNodes" [hidden]="!columns.policy_group" >
             {{node.policy_group || "- -"}}
         </chef-table-cell>
-        <chef-table-cell [hidden]="!columns.chef_version" class="align-flex-center">
+        <chef-table-cell [hidden]="!columns.chef_version" >
           {{node.chefVersion}}
         </chef-table-cell>
-        <chef-table-cell [hidden]="!columns.deprecations_count" class="align-flex-center">
+        <chef-table-cell [hidden]="!columns.deprecations_count" >
           {{node.deprecationsCount || "0" }}
         </chef-table-cell>
-        <chef-table-cell class="view-more align-flex-center">
+        <chef-table-cell class="view-more ">
         </chef-table-cell>
       </chef-table-row>
     </ng-container>

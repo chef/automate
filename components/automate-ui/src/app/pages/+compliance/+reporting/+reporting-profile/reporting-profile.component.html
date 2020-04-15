@@ -54,16 +54,16 @@
           </chef-table-header>
           <chef-table-body>
             <chef-table-row *ngFor="let control of controls">
-              <chef-table-cell class="align-flex-center">
+              <chef-table-cell >
                 <chef-icon class="status-icon" [ngClass]="statusClass(control)">
                   {{ statusIcon(statusClass(control)) }}
                 </chef-icon>
                 <span><strong>{{ control.control }}:</strong> {{ control.title }}</span>
               </chef-table-cell>
-              <chef-table-cell class="impact-status align-flex-center" [ngClass]="impactStatus(control)">
+              <chef-table-cell class="impact-status " [ngClass]="impactStatus(control)">
                 {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
               </chef-table-cell>
-              <chef-table-cell class="align-flex-center">
+              <chef-table-cell >
                 <span class="control-result" [ngClass]="{'failed': control.failed > 0}">
                   <chef-icon>report_problem</chef-icon>
                   <span>{{ control.failed | number }}</span>
@@ -81,7 +81,7 @@
                   <span>{{ control.waived | number }}</span>
                 </span>
               </chef-table-cell>
-              <chef-table-cell class="align-flex-center">
+              <chef-table-cell >
                 <chef-button secondary (click)="onControlClick(control.control)">
                   Scan Results
                 </chef-button>

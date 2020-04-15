@@ -20,15 +20,15 @@
     </chef-table-header>
     <chef-table-body *ngIf="!reportData.controlsListLoading">
       <chef-table-row *ngFor="let control of reportData.controlsList.items">
-        <chef-table-cell class="align-flex-center">
+        <chef-table-cell >
           <span><strong>{{ control.id }}:</strong> {{ control.title }}</span>
         </chef-table-cell>
-        <chef-table-cell class="align-flex-center">{{ control.profile.title }}, {{ control.profile.version }}</chef-table-cell>
-        <chef-table-cell class="impact-status align-flex-center" [ngClass]="impactStatus(control)">
+        <chef-table-cell >{{ control.profile.title }}, {{ control.profile.version }}</chef-table-cell>
+        <chef-table-cell class="impact-status " [ngClass]="impactStatus(control)">
           {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
         </chef-table-cell>
-        <chef-table-cell class="align-flex-center">{{ control.end_time | timeFromNow }}</chef-table-cell>
-        <chef-table-cell class="node-status align-flex-center" *ngIf="control.control_summary as summary">
+        <chef-table-cell >{{ control.end_time | timeFromNow }}</chef-table-cell>
+        <chef-table-cell class="node-status " *ngIf="control.control_summary as summary">
           <span class="control-result" [ngClass]="{'failed': summary.failed.total > 0}">
             <chef-icon>report_problem</chef-icon>
             <span>{{ summary.failed.total | number }}</span>
@@ -75,7 +75,7 @@
             <span>{{ summary.waived.total | number }}</span>
           </span>
         </chef-table-cell>
-        <chef-table-cell class="actions-cell align-flex-center three-dot-column">
+        <chef-table-cell class="actions-cell  three-dot-column">
           <mat-select panelClass="chef-control-menu">
             <mat-option *ngIf="!hasFilter(control)" (onSelectionChange)="addFilter(control)">Add Filter</mat-option>
             <mat-option *ngIf="hasFilter(control)" (onSelectionChange)="removeFilter(control)">Remove Filter</mat-option>

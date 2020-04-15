@@ -38,13 +38,13 @@
           </chef-table-header>
           <chef-table-body>
             <chef-table-row *ngFor= "let server of sortedChefServers$ | async">
-              <chef-table-cell class="align-flex-center">
+              <chef-table-cell >
                 <a [routerLink]="['/infrastructure/chef-servers', server.id]">{{ server.name }}</a>
               </chef-table-cell>
-              <chef-table-cell  class="align-flex-center">{{ server.fqdn }}</chef-table-cell>
-              <chef-table-cell  class="align-flex-center">{{ server.ip_address }}</chef-table-cell>
-              <chef-table-cell  class="align-flex-center">{{ server.description }}</chef-table-cell>
-              <chef-table-cell  class="align-flex-center">{{ server.orgs_count }}</chef-table-cell>
+              <chef-table-cell  >{{ server.fqdn }}</chef-table-cell>
+              <chef-table-cell  >{{ server.ip_address }}</chef-table-cell>
+              <chef-table-cell  >{{ server.description }}</chef-table-cell>
+              <chef-table-cell  >{{ server.orgs_count }}</chef-table-cell>
               <chef-table-cell class="three-dot-column">
                 <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
                   <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="remove-server">Remove Chef Server</mat-option>

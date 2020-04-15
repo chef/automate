@@ -122,15 +122,15 @@
                 </span>
               </chef-table-row>
               <chef-table-row *ngFor="let profile of filteredProfiles">
-                <chef-table-cell class="align-flex-center">
+                <chef-table-cell >
                   <a
                     [routerLink]="['/compliance/compliance-profiles/profile-details']"
                     [queryParams]="{name: profile.name, version: profile.version, owner: user}">
                     {{ profile.title }}
                   </a>
                 </chef-table-cell>
-                <chef-table-cell class="align-flex-center">{{ profile.version }}</chef-table-cell>
-                <chef-table-cell class="align-flex-center">
+                <chef-table-cell >{{ profile.version }}</chef-table-cell>
+                <chef-table-cell >
                   <chef-clipboard value="{{ user }}/{{ profile.name }}"></chef-clipboard>
                   {{ user }}/{{ profile.name }}
                 </chef-table-cell>
