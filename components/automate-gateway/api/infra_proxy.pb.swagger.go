@@ -1811,15 +1811,15 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the SCM."
+          "description": "Name of the scm."
         },
         "remote": {
           "type": "string",
-          "description": "Remote location of the SCM."
+          "description": "Remote location of the scm."
         },
         "revision": {
           "type": "string",
-          "description": "Revision detail for the SCM."
+          "description": "Revision detail for the scm."
         },
         "working_tree_clean": {
           "type": "boolean",

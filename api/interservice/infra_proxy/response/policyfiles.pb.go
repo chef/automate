@@ -392,11 +392,11 @@ func (m *CookbookLock) GetSourceOptions() *SourceOptions {
 }
 
 type SCMDetail struct {
-	// Name of the SCM.
+	// Name of the scm.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
-	// Remote location of the SCM.
+	// Remote location of the scm.
 	Remote string `protobuf:"bytes,2,opt,name=remote,proto3" json:"remote,omitempty" toml:"remote,omitempty" mapstructure:"remote,omitempty"`
-	// Revision detail for the SCM.
+	// Revision detail for the scm.
 	Revision string `protobuf:"bytes,3,opt,name=revision,proto3" json:"revision,omitempty" toml:"revision,omitempty" mapstructure:"revision,omitempty"`
 	// Boolean that denotes whether or not the working tree is cleaned.
 	WorkingTreeClean bool `protobuf:"varint,4,opt,name=working_tree_clean,json=workingTreeClean,proto3" json:"working_tree_clean,omitempty" toml:"working_tree_clean,omitempty" mapstructure:"working_tree_clean,omitempty"`

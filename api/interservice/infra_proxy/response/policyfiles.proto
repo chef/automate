@@ -67,11 +67,11 @@ message CookbookLock {
 }
 
 message SCMDetail {
-    // Name of the SCM.
+    // Name of the scm.
     string name = 1;
-    // Remote location of the SCM.
+    // Remote location of the scm.
     string remote = 2;
-    // Revision detail for the SCM.
+    // Revision detail for the scm.
     string revision = 3;
     // Boolean that denotes whether or not the working tree is cleaned. 
     bool working_tree_clean = 4;
