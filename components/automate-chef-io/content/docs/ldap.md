@@ -35,8 +35,7 @@ However, switching between either of those configurations and a SAML configurati
 require you to adjust the [IAM]({{< relref "iam-v2-overview.md" >}}) policy membership.
 
 {{< info >}}
-Users who sign in via SAML will have a session time of 24 hours before needing to sign in again.
-Local, MSAD, and LDAP users will have their Chef Automate sessions refreshed while their Chef Automate UI browser window remains open or until they sign out directly.
+Local, MSAD, and LDAP users will have their Chef Automate sessions refreshed while their Chef Automate browser window remains open or until they sign out directly.
 {{< /info >}}
 
 ## Supported Identity Management Systems
