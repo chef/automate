@@ -31,33 +31,57 @@ import {
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { pickBy } from 'lodash/fp';
 import { FilterC } from './types';
+import { FilterTypes } from './reporting.model';
+
+// export enum FilterTypes {
+//     CHEF_SERVER = 'chef_server',
+//     CHEF_TAGS = 'chef_tags',
+//     CONTROL_ID = 'control_id',
+//     CONTROL_NAME = 'control_name',
+//     CONTROL_TAG_KEY = 'control_tag_key',
+//     ENVIRONMENT = 'environment',
+//     INSPEC_VERSION = 'inspec_version',
+//     JOB_ID = 'job_id',
+//     NODE_ID = 'node_id',
+//     NODE_NAME = 'node_name',
+//     ORGANIZATION = 'organization',
+//     PLATFORM_WITH_VERSION = 'platform_with_version',
+//     POLICY_GROUP = 'policy_group',
+//     POLICY_NAME = 'policy_name',
+//     PROFILE_ID = 'profile_id',
+//     PROFILE_WITH_VERSION = 'profile_with_version',
+//     PROFILE_NAME = 'profile_name',
+//     RECIPE = 'recipe',
+//     ROLE = 'role'
+// }
 
 @Component({
   templateUrl: './reporting.component.html',
   styleUrls: ['./reporting.component.scss'],
   providers: [SuggestionsService]
 })
+
 export class ReportingComponent implements OnInit, OnDestroy {
   allowedURLFilterTypes = [
-    'chef_server',
-    'chef_tags',
-    'control_id',
-    'control_name',
-    'control_tag_key',
-    'environment',
-    'inspec_version',
-    'job_id',
-    'node_id',
-    'node_name',
-    'organization',
-    'platform_with_version',
-    'policy_group',
-    'policy_name',
-    'profile_id',
-    'profile_with_version',
-    'profile_name',
-    'recipe',
-    'role'
+    FilterTypes.CHEF_SERVER,
+    FilterTypes.CHEF_TAGS,
+    FilterTypes.CONTROL_ID,
+    FilterTypes.CONTROL_NAME,
+    FilterTypes.CONTROL_TAG_KEY,
+    FilterTypes.ENVIRONMENT,
+    FilterTypes.INSPEC_VERSION,
+    FilterTypes.JOB_ID,
+    FilterTypes.NODE_ID,
+    FilterTypes.NODE_NAME,
+    FilterTypes.ORGANIZATION,
+    FilterTypes.PLATFORM_WITH_VERSION,
+    FilterTypes.POLICY_GROUP,
+    FilterTypes.POLICY_NAME,
+    FilterTypes.PROFILE_ID,
+    FilterTypes.PROFILE_WITH_VERSION,
+    FilterTypes.PROFILE_NAME,
+    FilterTypes.RECIPE,
+    FilterTypes.ROLE
   ];
 
   // Query search bar

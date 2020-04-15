@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StatsService } from '../../shared/reporting/stats.service';
 import { Subject } from 'rxjs';
-import { ReportQueryService } from '../../shared/reporting/report-query.service';
+import { ReportQueryService, ReturnParams } from '../../shared/reporting/report-query.service';
 import * as moment from 'moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
@@ -23,7 +23,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   showScanHistory = false;
   reportLoading = false;
   RFC2822 = DateTime.RFC2822;
-  returnParams: {}; // needs types
+  returnParams: ReturnParams = {};
 
   openControls = {};
 

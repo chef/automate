@@ -5,6 +5,8 @@ import { FilterC } from '../../+reporting/types';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { isEmpty } from 'lodash';
 
+import { FilterTypes } from '../../+reporting/reporting.model';
+
 export interface ReportQuery {
   startDate: moment.Moment;
   endDate: moment.Moment;
@@ -19,6 +21,29 @@ interface TimeIntervals {
 
 interface ReportSummary {
   end_time: string;
+}
+
+export interface ReturnParams {
+  end_time?: string;
+  [FilterTypes.CHEF_SERVER]?: string;
+  [FilterTypes.CHEF_TAGS]?: string;
+  [FilterTypes.CONTROL_ID]?: string;
+  [FilterTypes.CONTROL_NAME]?: string;
+  [FilterTypes.CONTROL_TAG_KEY]?: string;
+  [FilterTypes.ENVIRONMENT]?: string;
+  [FilterTypes.INSPEC_VERSION]?: string;
+  [FilterTypes.JOB_ID]?: string;
+  [FilterTypes.NODE_ID]?: string;
+  [FilterTypes.NODE_NAME]?: string;
+  [FilterTypes.ORGANIZATION]?: string;
+  [FilterTypes.PLATFORM_WITH_VERSION]?: string;
+  [FilterTypes.POLICY_GROUP]?: string;
+  [FilterTypes.POLICY_NAME]?: string;
+  [FilterTypes.PROFILE_ID]?: string;
+  [FilterTypes.PROFILE_WITH_VERSION]?: string;
+  [FilterTypes.PROFILE_NAME]?: string;
+  [FilterTypes.RECIPE]?: string;
+  [FilterTypes.ROLE]?: string;
 }
 
 @Injectable()
@@ -92,7 +117,7 @@ export class ReportQueryService {
     return this.idToTitle.get(type + '-' + id);
   }
 
-  formatReturnParams(): any { // needs a return type
+  formatReturnParams(): ReturnParams { // needs a return type
     const reportQuery = this.getReportQuery();
 
     const structuredFilters = {};

@@ -7,7 +7,7 @@ import { map, takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StatsService } from '../../shared/reporting/stats.service';
-import { ReportQueryService, ReportQuery } from '../../shared/reporting/report-query.service';
+import { ReportQueryService, ReportQuery, ReturnParams } from '../../shared/reporting/report-query.service';
 import { ScanResultsService } from '../../shared/reporting/scan-results.service';
 import { paginationOverride } from '../shared';
 import * as moment from 'moment';
@@ -25,7 +25,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   displayScanResultsSidebar = false;
   showLoadingIcon = false;
   statusFilter = 'all';
-  returnParams = {}; // needs type
+  returnParams: ReturnParams = {};
 
   openControls: any = {};
 
