@@ -1,3 +1,6 @@
+package deployment
+
+const configTemplate = `
 # This is a default Chef Automate configuration file. You can run
 # 'chef-automate deploy' with this config file and it should
 # successfully create a new Chef Automate instance with default settings.
@@ -57,3 +60,4 @@
 #
 [elasticsearch.v1.sys.runtime]
   heapsize = "{{ .ESHeapSize }}"
+`

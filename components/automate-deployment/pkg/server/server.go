@@ -335,7 +335,7 @@ func (s *server) buildDesiredState() (*converge.DesiredState, error) {
 			}
 
 			// This code is responsible for determining a service's binds and bind modes
-			// from `services.AllBinds`, which is populated from the binds.txt asset file
+			// from `services.AllBinds`, which is populated from assets.BindData
 			//
 			// This design is based on the following reasoning:
 			//

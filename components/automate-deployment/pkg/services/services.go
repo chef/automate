@@ -169,11 +169,9 @@ func BinlinksForPackage(pkgName string) []string {
 
 // loadServiceBinds parses the bindings for the services
 func loadServiceBinds() bind.Binds {
-	data := assets.MustAsset("data/binds.txt")
-
-	b, err := bind.ParseData(data)
+	b, err := bind.ParseData([]byte(assets.BindData))
 	if err != nil {
-		panic(errors.Wrap(err, "binds.txt is not parsable"))
+		panic(errors.Wrap(err, "assets.BindData is not parsable"))
 	}
 	return b
 }

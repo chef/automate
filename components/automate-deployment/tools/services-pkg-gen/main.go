@@ -3,11 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"path"
 	"text/template"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/assets"
 	"github.com/chef/automate/components/automate-deployment/pkg/bind"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/lib/product"
@@ -50,13 +49,8 @@ func removeDeploymentServiceFromCollections(collections []*product.Collection) {
 
 }
 
-func sortPackages(packages []*product.Package, bindsPath string) []*product.Package {
-	bindData, err := ioutil.ReadFile(bindsPath)
-	if err != nil {
-		fatal("failed to read bind data", err)
-	}
-
-	binds, err := bind.ParseData(bindData)
+func sortPackages(packages []*product.Package) []*product.Package {
+	binds, err := bind.ParseData([]byte(assets.BindData))
 	if err != nil {
 		fatal("failed to parse bind data", err)
 	}
@@ -82,15 +76,13 @@ func sortPackages(packages []*product.Package, bindsPath string) []*product.Pack
 
 func main() {
 	repoRoot := os.Args[1]
-	bindsPath := path.Join(repoRoot, "components/automate-deployment/pkg/assets/data/binds.txt")
-
 	metadata, err := product.Parse(repoRoot)
 	if err != nil {
 		panic(err)
 	}
 
 	packages := removeDeploymentServiceFromPackages(metadata.Packages)
-	metadata.Packages = sortPackages(packages, bindsPath)
+	metadata.Packages = sortPackages(packages)
 	removeDeploymentServiceFromCollections(metadata.Collections)
 
 	outStruct := product.Metadata{
