@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
-import { TreetableComponent } from './component/treetable.component';
+import { TreeTableComponent } from './component/tree-table.component';
 export { Node, Options } from './models';
 
 @NgModule({
   declarations: [
-    TreetableComponent
+    TreeTableComponent
   ],
   imports: [
     CommonModule,
@@ -15,7 +15,7 @@ export { Node, Options } from './models';
     MatIconModule
   ],
   exports: [
-    TreetableComponent
+    TreeTableComponent
   ]
 })
-export class TreetableModule { }
+export class TreeTableModule { }

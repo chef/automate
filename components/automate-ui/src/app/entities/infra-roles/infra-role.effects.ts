@@ -27,7 +27,7 @@ export class InfraRoleEffects {
   ) { }
 
   @Effect()
-  getRolesForOrgs$ = this.actions$.pipe(
+  getRoles$ = this.actions$.pipe(
       ofType(RoleActionTypes.GET_ALL),
       mergeMap(({ payload: { server_id, org_id } }: GetRoles) =>
         this.requests.getRoles(server_id, org_id).pipe(
@@ -41,7 +41,7 @@ export class InfraRoleEffects {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,
-          message: `Could not get roles: ${msg || payload.error}`
+          message: `Could not get infra roles: ${msg || payload.error}`
         });
       }));
 
@@ -60,7 +60,7 @@ export class InfraRoleEffects {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,
-          message: `Could not get role: ${msg || payload.error}`
+          message: `Could not get infra role: ${msg || payload.error}`
         });
       }));
 

@@ -4,7 +4,7 @@
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'org', OrgId]">Roles</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'org', orgId]">Roles</chef-breadcrumb>
          {{role?.name}}
       </chef-breadcrumbs>
       <chef-page-header>
@@ -41,13 +41,13 @@
             </chef-select>
           </div>
           <div *ngIf="hasRun_List">
-            <app-treetable [tree]="arrayOfNodesTree" [options]="treeOptions"></app-treetable>
+            <app-tree-table [tree]="arrayOfNodesTree" [options]="treeOptions"></app-tree-table>
           </div>
           <div *ngIf="!hasRun_List" class="center">
             <p>Run list details are not available for the <b>{{env_id}}</b> environment.</p>
           </div>
         </div>
-        <div *ngIf="!show" class="center">
+        <div *ngIf="!show && !roleDetailsLoading" class="center">
           <p>Expanded run list not available for the role <b>{{role?.name}}</b>.</p>
         </div>
       </section>
@@ -64,7 +64,7 @@
             <span>Collapse All</span>
           </span>
         </div>
-        <app-json-treeable class="json-tree-container" #tree [json]="selectedAttrs"></app-json-treeable>
+        <app-json-tree-table class="json-tree-container" #tree [json]="selectedAttrs"></app-json-tree-table>
       </section>
     </main>
   </div>
