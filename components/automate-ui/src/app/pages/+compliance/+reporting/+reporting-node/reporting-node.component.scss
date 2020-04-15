@@ -232,6 +232,8 @@ chef-tooltip[for='skipped-count'] {
   chef-table-header-cell,
   chef-table-cell {
     &:first-child {
+      // flex-basis here is applied agaist the individual cell
+      // so in this case 500% is equivalent to 5x the normal size.
       flex-basis: 500%;
       word-break: break-all;
 
