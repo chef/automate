@@ -37,9 +37,8 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   public expandedList: ExpandedList[] = [];
   public expandedRunList: List[] = [];
   public show = false;
-  public data: any = [];
   public env_id = '_default';
-  public idList: any = [];
+  public idList: string[] = [];
   public hasRun_List = true;
   public childNodes: Node<ChildList>[] = [];
   private isDestroyed = new Subject<boolean>();
@@ -108,20 +107,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       this.runList = this.role.run_list;
       this.idList = [];
       this.attributes = new RoleAttributes(this.role);
-      if (this.expandedList && this.expandedList.length) {
-        this.show = true;
-        for (let i = 0; i < this.expandedList.length; i++) {
-          this.idList.push(
-            this.expandedList[i].id
-          );
-        }
-        if (this.tabValue === 'runList') {
-          this.treeNodes(this.expandedList, this.env_id);
-        }
-
-      } else {
-        this.show = false;
-      }
+      this.getRunListTree(this.expandedList);
       setTimeout(() => this.filter(this.selected_level), 10);
       this.roleDetailsLoading = false;
     });
@@ -156,15 +142,35 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     this.treeNodes(this.expandedList, this.env_id);
   }
 
+  // get the tree according to selected dropdown
+  getRunListTree(expandedList: ExpandedList[]) {
+    if (expandedList && expandedList.length) {
+      this.show = true;
+      for (let i = 0; i < expandedList.length; i++) {
+        this.idList.push(
+          expandedList[i].id
+        );
+      }
+      if (this.tabValue === 'runList') {
+        this.treeNodes(expandedList, this.env_id);
+      }
+
+    } else {
+      this.show = false;
+    }
+
+  }
+
+  // 1. According to the environment ID getting the array.
+  // 2. Then Convert our Particular Array data with parent, child nodes as tree structure.
   treeNodes(expandedList: ExpandedList[], li: string) {
     this.arrayOfNodesTree = [];
-    for (let i = -0; i < expandedList.length; i++) {
+    for (let i = 0; i < expandedList.length; i++) {
       if (expandedList[i].id === li) {
         this.expandedRunList = expandedList[i].run_list;
         if (this.expandedRunList && this.expandedRunList.length) {
           this.hasRun_List = true;
           for (let j = 0; j < this.expandedRunList.length; j++) {
-            const nodes: Node<ChildList>[] = [];
             this.arrayOfNodesTree.push({
               value: {
                 name: this.expandedRunList[j].name,
@@ -174,7 +180,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
               },
               children:
                 this.expandedRunList[j].children && this.expandedRunList[j].children.length ?
-                  this.childNode(this.expandedRunList[j].children, nodes) : []
+                  this.childNode(this.expandedRunList[j].children, []) : []
             });
           }
         } else {
