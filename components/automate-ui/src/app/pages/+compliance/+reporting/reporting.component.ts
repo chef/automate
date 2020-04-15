@@ -26,13 +26,12 @@ import {
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { saveAs } from 'file-saver';
 import {
-  Chicklet
+  Chicklet,
+  ReportingFilterTypes
 } from '../../../types/types';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { pickBy } from 'lodash/fp';
 import { FilterC } from './types';
-
-import { FilterTypes } from './reporting.model';
 
 
 @Component({
@@ -43,25 +42,25 @@ import { FilterTypes } from './reporting.model';
 
 export class ReportingComponent implements OnInit, OnDestroy {
   allowedURLFilterTypes = [
-    FilterTypes.CHEF_SERVER,
-    FilterTypes.CHEF_TAGS,
-    FilterTypes.CONTROL_ID,
-    FilterTypes.CONTROL_NAME,
-    FilterTypes.CONTROL_TAG_KEY,
-    FilterTypes.ENVIRONMENT,
-    FilterTypes.INSPEC_VERSION,
-    FilterTypes.JOB_ID,
-    FilterTypes.NODE_ID,
-    FilterTypes.NODE_NAME,
-    FilterTypes.ORGANIZATION,
-    FilterTypes.PLATFORM_WITH_VERSION,
-    FilterTypes.POLICY_GROUP,
-    FilterTypes.POLICY_NAME,
-    FilterTypes.PROFILE_ID,
-    FilterTypes.PROFILE_WITH_VERSION,
-    FilterTypes.PROFILE_NAME,
-    FilterTypes.RECIPE,
-    FilterTypes.ROLE
+    ReportingFilterTypes.CHEF_SERVER,
+    ReportingFilterTypes.CHEF_TAGS,
+    ReportingFilterTypes.CONTROL_ID,
+    ReportingFilterTypes.CONTROL_NAME,
+    ReportingFilterTypes.CONTROL_TAG_KEY,
+    ReportingFilterTypes.ENVIRONMENT,
+    ReportingFilterTypes.INSPEC_VERSION,
+    ReportingFilterTypes.JOB_ID,
+    ReportingFilterTypes.NODE_ID,
+    ReportingFilterTypes.NODE_NAME,
+    ReportingFilterTypes.ORGANIZATION,
+    ReportingFilterTypes.PLATFORM_WITH_VERSION,
+    ReportingFilterTypes.POLICY_GROUP,
+    ReportingFilterTypes.POLICY_NAME,
+    ReportingFilterTypes.PROFILE_ID,
+    ReportingFilterTypes.PROFILE_WITH_VERSION,
+    ReportingFilterTypes.PROFILE_NAME,
+    ReportingFilterTypes.RECIPE,
+    ReportingFilterTypes.ROLE
   ];
 
   // Query search bar
@@ -394,7 +393,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   onFiltersClear(_event) {
     const queryParams = {...this.route.snapshot.queryParams};
 
-    const filteredParams = pickBy((_value, key) => {
+    const filteredParams = pickBy((_value, key: ReportingFilterTypes) => {
 
       // Only handles control_tag filters
       if (key.includes('control_tag')) {
@@ -464,7 +463,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
     reportQuery.filters = urlFilters.filter(
       (urlParm: Chicklet) => this.isTypeControlTag(urlParm.type)
-        || this.allowedURLFilterTypes.indexOf(urlParm.type) >= 0)
+        || this.allowedURLFilterTypes.indexOf(urlParm.type as ReportingFilterTypes) >= 0)
       .map((urlParm: Chicklet) => {
         return { type: { name: urlParm.type }, value: { text: urlParm.text } };
       });

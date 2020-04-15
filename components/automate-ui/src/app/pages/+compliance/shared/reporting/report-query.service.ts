@@ -5,7 +5,7 @@ import { FilterC } from '../../+reporting/types';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { isEmpty } from 'lodash';
 
-import { FilterTypes } from '../../+reporting/reporting.model';
+import { ReportingFilterTypes } from 'app/types/types';
 
 export interface ReportQuery {
   startDate: moment.Moment;
@@ -25,25 +25,25 @@ interface ReportSummary {
 
 export interface ReturnParams {
   end_time?: string;
-  [FilterTypes.CHEF_SERVER]?: string;
-  [FilterTypes.CHEF_TAGS]?: string;
-  [FilterTypes.CONTROL_ID]?: string;
-  [FilterTypes.CONTROL_NAME]?: string;
-  [FilterTypes.CONTROL_TAG_KEY]?: string;
-  [FilterTypes.ENVIRONMENT]?: string;
-  [FilterTypes.INSPEC_VERSION]?: string;
-  [FilterTypes.JOB_ID]?: string;
-  [FilterTypes.NODE_ID]?: string;
-  [FilterTypes.NODE_NAME]?: string;
-  [FilterTypes.ORGANIZATION]?: string;
-  [FilterTypes.PLATFORM_WITH_VERSION]?: string;
-  [FilterTypes.POLICY_GROUP]?: string;
-  [FilterTypes.POLICY_NAME]?: string;
-  [FilterTypes.PROFILE_ID]?: string;
-  [FilterTypes.PROFILE_WITH_VERSION]?: string;
-  [FilterTypes.PROFILE_NAME]?: string;
-  [FilterTypes.RECIPE]?: string;
-  [FilterTypes.ROLE]?: string;
+  [ReportingFilterTypes.CHEF_SERVER]?: string;
+  [ReportingFilterTypes.CHEF_TAGS]?: string;
+  [ReportingFilterTypes.CONTROL_ID]?: string;
+  [ReportingFilterTypes.CONTROL_NAME]?: string;
+  [ReportingFilterTypes.CONTROL_TAG_KEY]?: string;
+  [ReportingFilterTypes.ENVIRONMENT]?: string;
+  [ReportingFilterTypes.INSPEC_VERSION]?: string;
+  [ReportingFilterTypes.JOB_ID]?: string;
+  [ReportingFilterTypes.NODE_ID]?: string;
+  [ReportingFilterTypes.NODE_NAME]?: string;
+  [ReportingFilterTypes.ORGANIZATION]?: string;
+  [ReportingFilterTypes.PLATFORM_WITH_VERSION]?: string;
+  [ReportingFilterTypes.POLICY_GROUP]?: string;
+  [ReportingFilterTypes.POLICY_NAME]?: string;
+  [ReportingFilterTypes.PROFILE_ID]?: string;
+  [ReportingFilterTypes.PROFILE_WITH_VERSION]?: string;
+  [ReportingFilterTypes.PROFILE_NAME]?: string;
+  [ReportingFilterTypes.RECIPE]?: string;
+  [ReportingFilterTypes.ROLE]?: string;
 }
 
 @Injectable()
