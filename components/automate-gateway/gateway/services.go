@@ -820,7 +820,7 @@ func init() {
 	// - There is nothing special about the "streaming::" notation; it just needs to be
 	//   the same notation used in an introspection path in the front-end.
 	policy.MapMethodTo("UNUSED_METHOD", "compliance:profiles", "compliance:profiles:create", "POST", "streaming::/compliance/profiles",
-		func(unexpandedResource string, input interface{}) string { return unexpandedResource })
+		func(unexpandedResource string, _ interface{}) string { return unexpandedResource })
 }
 
 func (s *Server) authRequest(r *http.Request, resource, action string) (context.Context, error) {
@@ -872,12 +872,15 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 
 	projects := auth_context.ProjectsFromMetadata(md)
 
-	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resource, action, projects)
+	newCtx, authorized, err := s.authorizer.IsAuthorized(ctx, subjects, resource, action, projects)
 	if err != nil {
+		// any error is handled as "permission denied" at the call sites, with the error text returned
 		return nil, errors.Wrap(err, "authz-service error")
 	}
-
-	// err is nil if authorization succeeded
-	// Note: if we need all the auth info, use auth_context.NewOutgoingContext
-	return auth_context.NewOutgoingProjectsContext(authzResp.Ctx()), authzResp.Err()
+	if authorized {
+		// Note: if we need all the auth info, use auth_context.NewOutgoingContext
+		return auth_context.NewOutgoingProjectsContext(newCtx), nil
+	}
+	return nil, errors.Errorf("subjects %v are not permitted to do action %v to resource %v in projects %v",
+		subjects, action, resource, projects)
 }

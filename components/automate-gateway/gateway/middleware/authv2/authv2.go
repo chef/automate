@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -20,9 +21,7 @@ type client struct {
 	client authz.AuthorizationClient
 }
 
-// Note(sr): The Handle method is V2-only code. We can do anything here -- deal
-// with incoming project headers, inject headers for downstream, etc.
-
+// Handle takes care of authorization in the gRPC middleware
 func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter []string,
 	req interface{},
 ) (context.Context, error) {
@@ -82,21 +81,9 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 	return auth_context.NewContext(ctx, subjects, projects, resource, action), nil
 }
 
-type resp struct {
-	ctx        context.Context
-	authorized bool
-}
-
-func (r *resp) Ctx() context.Context {
-	return r.ctx
-}
-
-func (r *resp) GetAuthorized() bool {
-	return r.authorized
-}
-
+// IsAuthorized takes care of HTTP authorization in the custom HTTP handlers
 func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, action string,
-	projectsToFilter []string) (middleware.AuthorizationResponse, error) {
+	projectsToFilter []string) (context.Context, bool, error) {
 	log := ctxlogrus.Extract(ctx)
 	filteredResp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
 		Subjects:       subjects,
@@ -106,21 +93,21 @@ func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, 
 	})
 	if err != nil {
 		if status.Convert(err).Code() == codes.FailedPrecondition {
-			return nil, err
+			return nil, false, err
 		}
 		log.WithError(err).Error("error authorizing request")
-		return nil, status.Errorf(codes.PermissionDenied,
-			"error authorizing action %q on resource %q for members %q: %s",
+		// something went wrong in some unexpected way -- we'll "fail shut", i.e., deny authorization
+		return nil, false, errors.Errorf("error authorizing action %q on resource %q for members %q: %s",
 			action, resource, subjects, err.Error())
 	}
 	projects := filteredResp.Projects
 
-	return &resp{
-		ctx:        auth_context.NewContext(ctx, subjects, projects, resource, action),
-		authorized: len(projects) != 0,
-	}, nil
+	return auth_context.NewContext(ctx, subjects, projects, resource, action),
+		len(projects) != 0,
+		nil
 }
 
+// FilterAuthorizedPairs drives authz introspection
 func (c *client) FilterAuthorizedPairs(ctx context.Context, subjects []string, inputPairs []*pairs.Pair,
 ) ([]*pairs.Pair, error) {
 	pairsV2 := make([]*authz.Pair, len(inputPairs))

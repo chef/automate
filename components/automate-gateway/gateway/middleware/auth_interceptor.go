@@ -18,7 +18,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/pairs"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/service_authn"
 )
@@ -35,60 +34,6 @@ func NewAuthInterceptor(
 	authz GRPCAuthorizationHandler,
 ) AuthorizationInterceptor {
 	return &authInterceptor{authn: authn, authz: authz}
-}
-
-type SwitchingAuthorizationHandler interface {
-	GRPCAuthorizationHandler
-	SwitchingFilterHandler
-	IsAuthorized(ctx context.Context, subjects []string,
-		resource, action string, projects []string) (AnnotatedAuthorizationResponse, error)
-}
-
-type SwitchingFilterHandler interface {
-	FilterAuthorizedPairs(ctx context.Context, subjects []string,
-		mapByResourceAndAction map[pairs.Pair][]string,
-		methodsInfo map[string]pairs.Info,
-	) (*FilterPairsResponse, error)
-}
-
-type FilterPairsResponse struct {
-	Pairs                  []*pairs.Pair
-	MethodsInfo            map[string]pairs.Info
-	MapByResourceAndAction map[pairs.Pair][]string
-}
-
-type FilterProjectsResponse struct {
-	Projects               []string
-	MethodsInfo            map[string]pairs.Info
-	MapByResourceAndAction map[pairs.Pair][]string
-}
-
-type GRPCAuthorizationHandler interface {
-	Handle(ctx context.Context, subjects []string, projects []string, req interface{}) (context.Context, error)
-}
-
-type HTTPAuthorizationHandler interface {
-	IsAuthorized(ctx context.Context, subjects []string, resource, action string, projects []string) (AuthorizationResponse, error)
-}
-
-type IntrospectionHandler interface {
-	FilterAuthorizedPairs(ctx context.Context, subjects []string, pairs []*pairs.Pair) ([]*pairs.Pair, error)
-}
-
-type AuthorizationHandler interface {
-	HTTPAuthorizationHandler
-	GRPCAuthorizationHandler
-	IntrospectionHandler
-}
-
-type AuthorizationResponse interface {
-	Ctx() context.Context
-	GetAuthorized() bool
-}
-
-type AnnotatedAuthorizationResponse interface {
-	AuthorizationResponse
-	Err() error
 }
 
 type authInterceptor struct {

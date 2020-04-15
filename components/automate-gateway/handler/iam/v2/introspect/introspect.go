@@ -29,18 +29,18 @@ import (
 
 // AuthzServer is the server interface
 type AuthzServer struct {
-	client        authz.AuthorizationClient // now only needed for GetVersion
-	filterHandler middleware.SwitchingFilterHandler
+	client               authz.AuthorizationClient // now only needed for GetVersion
+	introspectionHandler middleware.IntrospectionHandler
 }
 
 // NewServer creates a server with its client
 func NewServer(
 	client authz.AuthorizationClient,
-	filterHandler middleware.SwitchingFilterHandler,
+	IntrospectionHandler middleware.IntrospectionHandler,
 ) *AuthzServer {
 	return &AuthzServer{
-		client:        client,
-		filterHandler: filterHandler,
+		client:               client,
+		introspectionHandler: IntrospectionHandler,
 	}
 }
 
@@ -232,13 +232,15 @@ func (a *AuthzServer) getAllowedMap(
 	// Fetches the id of the current user PLUS the team ids for that user
 	subjects := auth_context.FromContext(ctx).Subjects
 
-	resp, err := a.filterHandler.FilterAuthorizedPairs(ctx, subjects, mapByResourceAndAction, methodsInfo)
+	inputPairs := pairs.GetKeys(mapByResourceAndAction)
+
+	filteredPairs, err := a.introspectionHandler.FilterAuthorizedPairs(ctx, subjects, inputPairs)
 	if err != nil {
 		log.WithError(err).Debug("Error on client.FilterAuthorizedPairs")
 		return nil, err
 	}
 	endpointMap, err := pairs.GetEndpointMapFromResponse(
-		resp.Pairs, resp.MethodsInfo, resp.MapByResourceAndAction, true)
+		filteredPairs, methodsInfo, mapByResourceAndAction, true)
 	if err != nil {
 		log.WithError(err).Debug("Error on pairs.GetEndpointMapFromResponse")
 		return nil, err

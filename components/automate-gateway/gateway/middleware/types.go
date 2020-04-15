@@ -1,7 +1,11 @@
 package middleware
 
 import (
+	"context"
+
 	"google.golang.org/grpc"
+
+	"github.com/chef/automate/components/automate-gateway/api/iam/v2/pairs"
 )
 
 // AuthorizationInterceptor abstracts the common logic that can be used for both
@@ -13,4 +17,41 @@ type AuthorizationInterceptor interface {
 
 type DeploymentCertAuthOnly interface {
 	MustUseDeploymentCertAuth()
+}
+
+type FilterHandler interface {
+	FilterAuthorizedPairs(ctx context.Context, subjects []string,
+		mapByResourceAndAction map[pairs.Pair][]string,
+		methodsInfo map[string]pairs.Info,
+	) (*FilterPairsResponse, error)
+}
+
+type FilterPairsResponse struct {
+	Pairs                  []*pairs.Pair
+	MethodsInfo            map[string]pairs.Info
+	MapByResourceAndAction map[pairs.Pair][]string
+}
+
+type FilterProjectsResponse struct {
+	Projects               []string
+	MethodsInfo            map[string]pairs.Info
+	MapByResourceAndAction map[pairs.Pair][]string
+}
+
+type GRPCAuthorizationHandler interface {
+	Handle(ctx context.Context, subjects []string, projects []string, req interface{}) (context.Context, error)
+}
+
+type HTTPAuthorizationHandler interface {
+	IsAuthorized(ctx context.Context, subjects []string, resource, action string, projects []string) (context.Context, bool, error)
+}
+
+type IntrospectionHandler interface {
+	FilterAuthorizedPairs(ctx context.Context, subjects []string, pairs []*pairs.Pair) ([]*pairs.Pair, error)
+}
+
+type AuthorizationHandler interface {
+	HTTPAuthorizationHandler
+	GRPCAuthorizationHandler
+	IntrospectionHandler
 }

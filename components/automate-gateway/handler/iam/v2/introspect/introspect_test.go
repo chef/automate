@@ -12,7 +12,6 @@ import (
 	"github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
 	"github.com/chef/automate/components/automate-gateway/handler/iam/v2/introspect"
-	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -257,5 +256,5 @@ func testServerAndHandler(t *testing.T) (
 		s,
 		introspect.NewServer(
 			nil,
-			authorizer.NewAuthorizer(authv2.AuthorizationHandler(client)))
+			authv2.AuthorizationHandler(client))
 }
