@@ -95,7 +95,9 @@ func init() {
 	proto.RegisterType((*VersionResponse)(nil), "notifications.VersionResponse")
 }
 
-func init() { proto.RegisterFile("health.proto", fileDescriptor_fdbebe66dda7cb29) }
+func init() {
+	proto.RegisterFile("health.proto", fileDescriptor_fdbebe66dda7cb29)
+}
 
 var fileDescriptor_fdbebe66dda7cb29 = []byte{
 	// 111 bytes of a gzipped FileDescriptorProto

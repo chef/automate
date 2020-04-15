@@ -208,7 +208,9 @@ func init() {
 	proto.RegisterType((*Entitlement)(nil), "license.Entitlement")
 }
 
-func init() { proto.RegisterFile("lib/license/license.proto", fileDescriptor_1d88e617a98a96bd) }
+func init() {
+	proto.RegisterFile("lib/license/license.proto", fileDescriptor_1d88e617a98a96bd)
+}
 
 var fileDescriptor_1d88e617a98a96bd = []byte{
 	// 381 bytes of a gzipped FileDescriptorProto

@@ -1429,7 +1429,9 @@ func init() {
 	proto.RegisterType((*Event)(nil), "notifications.Event")
 }
 
-func init() { proto.RegisterFile("notifications.proto", fileDescriptor_fbc3de4cce73c76f) }
+func init() {
+	proto.RegisterFile("notifications.proto", fileDescriptor_fbc3de4cce73c76f)
+}
 
 var fileDescriptor_fbc3de4cce73c76f = []byte{
 	// 1349 bytes of a gzipped FileDescriptorProto
