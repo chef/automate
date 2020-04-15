@@ -21,8 +21,7 @@ func confirmRequiredIDandName(id, name, resourceName string) error {
 
 func confirmRequiredField(field, fieldName, resourceName string) error {
 	if emptyOrWhitespaceOnlyRE.MatchString(field) {
-		e := fmt.Sprintf("a %s %s is required and must contain at least one non-whitespace character", resourceName, fieldName)
-		return errors.New(e)
+		return fmt.Errorf("a %s %s is required and must contain at least one non-whitespace character", resourceName, fieldName)
 	}
 	return nil
 }
