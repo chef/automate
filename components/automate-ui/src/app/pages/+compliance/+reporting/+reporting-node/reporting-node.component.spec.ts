@@ -60,6 +60,7 @@ describe('ReportingNodeComponent', () => {
         [ {id: '123'}, {id: '456'} ]));
       spyOn(statsService, 'getSingleReport').and.returnValue(observableOf(
         { node_name: 'teal' } ));
+      spyOn(reportQueryService, 'formatReturnParams');
       component.ngOnInit();
     });
 
@@ -76,10 +77,6 @@ describe('ReportingNodeComponent', () => {
       expect(component.activeReport).toEqual({ id: '123', node_name: 'teal' });
     });
     it('calls formatReturnParams to set the reports breadcrumb href', () => {
-      component.ngOnInit();
-      spyOn(reportQueryService, 'formatReturnParams');
-      fixture.detectChanges();
-
       expect(reportQueryService.formatReturnParams).toHaveBeenCalled();
     });
   });
