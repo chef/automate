@@ -31,6 +31,7 @@ const chefCustomPolicyIDs = [
   'compliance-editor-access'
 ];
 
+// All policyIDs must stay in sync with what is in the authz DB (check migration files).
 const totalChefCreatedPolicyCount = chefManagedPolicyIDs.length + chefCustomPolicyIDs.length;
 
 describe('policies API', () => {
