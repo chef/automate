@@ -7,10 +7,7 @@ document "clean_all_compiled_protos" <<DOC
   Delete all the files with extensions matching '*pb*go' in the repo (except in vendor/)
 DOC
 function clean_all_compiled_protos() {
-  install_if_missing core/git git
-
-  find /src/{api,components,lib} -name '*pb*go' -exec rm '{}' \; 
-  git clean -fdx
+  find /src/{api,components,lib} -name '*pb*go' -exec rm '{}' \;
 }
 
 document "bootstrap_proto_compilers" <<DOC
