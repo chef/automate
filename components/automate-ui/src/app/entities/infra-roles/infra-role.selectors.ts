@@ -3,7 +3,7 @@ import { InfraRoleEntityState, infraRoleEntityAdapter } from './infra-role.reduc
 import { routeParams } from 'app/route.selectors';
 import { find } from 'lodash/fp';
 
-export const infraRoleState = createFeatureSelector<InfraRoleEntityState>('infraroles');
+export const infraRoleState = createFeatureSelector<InfraRoleEntityState>('infraRoles');
 export const {
   selectAll: allInfraRoles,
   selectEntities: roleEntities
@@ -11,7 +11,7 @@ export const {
 
 export const infraRoleStatus = createSelector(
   infraRoleState,
-  (state) => state.status
+  (state) => state.rolesStatus
 );
 
 export const getAllStatus = createSelector(
@@ -19,7 +19,7 @@ export const getAllStatus = createSelector(
   (state) => state.getAllStatus
 );
 
-export const infaRoleFromRoute = createSelector(
+export const infraRoleFromRoute = createSelector(
   roleEntities,
   routeParams,
   (state, { name }) => find({ name }, state)

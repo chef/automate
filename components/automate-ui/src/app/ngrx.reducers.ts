@@ -60,8 +60,8 @@ export interface NgrxStateAtom {
   automateSettings: automateSettings.AutomateSettingsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
-  infraroles: infraRoleEntity.InfraRoleEntityState;
-  infraroledetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
+  infraRoles: infraRoleEntity.InfraRoleEntityState;
+  infraRoleDetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
@@ -170,8 +170,8 @@ export const defaultInitialState = {
   automateSettings: automateSettings.AutomateSettingsEntityInitialState,
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
-  infraroles: infraRoleEntity.InfraRoleEntityInitialState,
-  infraroledetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
+  infraRoles: infraRoleEntity.InfraRoleEntityInitialState,
+  infraRoleDetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
   licenseStatus: license.LicenseStatusEntityInitialState,
   managers: manager.ManagerEntityInitialState,
@@ -213,8 +213,8 @@ export const ngrxReducers = {
   automateSettings: automateSettings.automateSettingsEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
-  infraroles: infraRoleEntity.infraRoleEntityReducer,
-  infraroledetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
+  infraRoles: infraRoleEntity.infraRoleEntityReducer,
+  infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
   credentialEntity: credential.credentialReducer,
   jobs: jobEntity.jobEntityReducer,
   managers: manager.managerEntityReducer,

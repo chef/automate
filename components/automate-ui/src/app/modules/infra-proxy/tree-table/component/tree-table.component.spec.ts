@@ -1,18 +1,18 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { TreetableComponent } from './treetable.component';
+import { TreeTableComponent } from './tree-table.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { mockSearchableTree } from '../mocks/mockSearchableTree';
 import * as _ from 'lodash';
 
-describe('TreetableComponent', () => {
-  let component: TreetableComponent<any>;
-  let fixture: ComponentFixture<TreetableComponent<any>>;
+describe('TreeTableComponent', () => {
+  let component: TreeTableComponent<any>;
+  let fixture: ComponentFixture<TreeTableComponent<any>>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        TreetableComponent
+        TreeTableComponent
       ],
       imports: [
         MatTableModule,
@@ -23,7 +23,7 @@ describe('TreetableComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TreetableComponent);
+    fixture = TestBed.createComponent(TreeTableComponent);
     component = fixture.componentInstance;
     component.tree = _.cloneDeep(mockSearchableTree);
     fixture.detectChanges();

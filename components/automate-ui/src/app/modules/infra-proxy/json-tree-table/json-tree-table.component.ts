@@ -1,13 +1,11 @@
 import { Component, Input, ElementRef, OnChanges } from '@angular/core';
-import * as jsonTree from '../../../../app/page-components/json-tree/vendor/json-tree';
+import * as jsonTree from 'app/page-components/json-tree/vendor/json-tree';
 
-// TODO:eng-ex: This might do better as a service or module.
-//              Unclear because there is styling on the javascript but no template.
 @Component({
-  selector: 'app-json-treeable',
+  selector: 'app-json-tree-table',
   template: '<div id="tree-container"></div>'
 })
-export class JsonTreeableComponent implements OnChanges {
+export class JsonTreeTableComponent implements OnChanges {
 
   @Input() json: Object;
   tree: any;
@@ -39,9 +37,8 @@ export class JsonTreeableComponent implements OnChanges {
       let p = node.parentNode;
 
       while (p) {
-        const o = p;
-        parents.push(o);
-        p = o.parentNode;
+        parents.push(p);
+        p = p.parentNode;
       }
 
       return parents;
@@ -62,7 +59,6 @@ export class JsonTreeableComponent implements OnChanges {
 
       resultCount = nodes.length;
     }
-
     return resultCount;
   }
 
@@ -102,5 +98,4 @@ export class JsonTreeableComponent implements OnChanges {
       return s.replace(/"/g, '');
     }
   }
-
 }

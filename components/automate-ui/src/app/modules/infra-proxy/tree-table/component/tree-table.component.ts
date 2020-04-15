@@ -18,11 +18,11 @@ import * as O from 'fp-ts/lib/Option';
 import { pipe } from 'fp-ts/lib/pipeable';
 
 @Component({
-  selector: 'app-treetable',
-  templateUrl: './treetable.component.html',
-  styleUrls: ['./treetable.component.scss']
+  selector: 'app-tree-table',
+  templateUrl: './tree-table.component.html',
+  styleUrls: ['./tree-table.component.scss']
 })
-export class TreetableComponent<T> implements OnInit, OnChanges {
+export class TreeTableComponent<T> implements OnInit, OnChanges {
   @Input() tree: Node<T> | Node<T>[];
   @Input() options: Options<T> = {};
   @Output() nodeClicked: Subject<TreeTableNode<T>> = new Subject();
@@ -42,8 +42,8 @@ export class TreetableComponent<T> implements OnInit, OnChanges {
     const customOrderValidator =
     this.validatorService.validateCustomOrder(this.tree[0], this.options.customColumnOrder);
     if (this.options.customColumnOrder && !customOrderValidator.valid) {
-      throw new Error(`
-        Properties ${customOrderValidator.xor.map(x => `'${x}'`).join(', ')} incorrect or missing in customColumnOrder`
+      throw new Error(
+        `Properties ${customOrderValidator.xor.map(x => `'${x}'`).join(', ')} incorrect or missing in customColumnOrder`
       );
     }
     this.displayedColumns = this.options.customColumnOrder
