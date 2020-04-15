@@ -15,8 +15,7 @@ func confirmRequiredIDandName(id, name, resourceName string) error {
 	if err != nil {
 		return err
 	}
-	err = confirmRequiredName(name, resourceName)
-	return err
+	return confirmRequiredName(name, resourceName)
 }
 
 func confirmRequiredField(field, fieldName, resourceName string) error {
@@ -43,11 +42,7 @@ func validateRequiredFieldsAndProjects(id string, name string, projectIDs []stri
 	if err != nil {
 		return err
 	}
-	err = validateProjects(projectIDs)
-	if err != nil {
-		return err
-	}
-	return nil
+	return validateProjects(projectIDs)
 }
 
 func validateRequiredFieldsAndProjectsForPolicy(id string, name string, projectIDs []string) error {
