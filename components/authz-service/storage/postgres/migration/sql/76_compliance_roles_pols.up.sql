@@ -1,7 +1,7 @@
 DO $$
 BEGIN
     IF
-        (NOT EXISTS(SELECT id FROM iam_policies WHERE id IN ('compliance-access', 'compliance-editor-access')))
+        (NOT EXISTS(SELECT id FROM iam_policies WHERE id IN ('compliance-viewer-access', 'compliance-editor-access')))
         AND (NOT EXISTS(SELECT id FROM iam_roles WHERE id IN ('compliance-viewer', 'compliance-editor')))
     THEN
         INSERT INTO iam_roles (id, name, type, actions)
@@ -11,12 +11,12 @@ BEGIN
             VALUES ('compliance-editor', 'Compliance Editor', 'custom', '{compliance:*}');
 
         INSERT INTO iam_policies (id, name, type)
-            VALUES ('compliance-access', 'Compliance Viewers', 'custom');
+            VALUES ('compliance-viewer-access', 'Compliance Viewers', 'custom');
 
         INSERT INTO iam_policies (id, name, type)
             VALUES ('compliance-editor-access', 'Compliance Editors', 'custom');
 
-        PERFORM insert_iam_statement_into_policy('compliance-access', 'allow', '{}', '{*}', 'compliance-viewer', '{~~ALL-PROJECTS~~}');
+        PERFORM insert_iam_statement_into_policy('compliance-viewer-access', 'allow', '{}', '{*}', 'compliance-viewer', '{~~ALL-PROJECTS~~}');
 
         PERFORM insert_iam_statement_into_policy('compliance-editor-access', 'allow', '{}', '{*}', 'compliance-editor', '{~~ALL-PROJECTS~~}');
     END IF;
