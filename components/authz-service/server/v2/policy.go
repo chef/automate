@@ -96,7 +96,7 @@ func (s *policyServer) CreatePolicy(
 	// API requests always create custom policies.
 	err := validateRequiredFieldsAndProjectsForPolicy(req.Id, req.Name, req.Projects)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	pol, err := s.policyFromAPI(
