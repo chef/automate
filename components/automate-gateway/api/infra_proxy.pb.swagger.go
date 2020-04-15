@@ -791,14 +791,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "Id of the Server.",
+            "description": "ID of the chef infra server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "Id of the Org.",
+            "description": "ID of the chef organization.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -823,14 +823,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "Id of the Server.",
+            "description": "ID of the chef infra server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "Id of the Org.",
+            "description": "ID of the chef organization.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1537,7 +1537,7 @@ func init() {
         },
         "revision_id": {
           "type": "string",
-          "description": "Revision id of the included policy file."
+          "description": "Revision ID of the included policy file."
         },
         "source_options": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SourceOptions",
@@ -1633,7 +1633,7 @@ func init() {
         },
         "revision_id": {
           "type": "string",
-          "description": "Revision Id of the policy."
+          "description": "Revision ID of the policy."
         },
         "run_list": {
           "type": "array",

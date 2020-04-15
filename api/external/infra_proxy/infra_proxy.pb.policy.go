@@ -417,7 +417,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetPolicyfiles", "infra:infaServers:{server_id}:orgs:{org_id}:policyfiles", "infra:infraServerOrgPolicyfiles:list", "GET", "/infra/servers/{server_id}/orgs/{org_id}/policyfiles", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetPolicyfiles", "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles", "infra:infraServerOrgPolicyfiles:list", "GET", "/infra/servers/{server_id}/orgs/{org_id}/policyfiles", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Policyfiles); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -432,7 +432,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetPolicyfile", "infra:infaServers:{server_id}:orgs:{org_id}:policyfiles", "infra:infraServerOrgPolicyfiles:get", "GET", "/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetPolicyfile", "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles", "infra:infraServerOrgPolicyfiles:get", "GET", "/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Policyfile); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

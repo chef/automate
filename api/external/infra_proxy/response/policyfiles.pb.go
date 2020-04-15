@@ -123,7 +123,7 @@ type Policyfile struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Name of the policy group.
 	PolicyGroup string `protobuf:"bytes,2,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty"`
-	// Revision Id of the policy.
+	// Revision ID of the policy.
 	RevisionId string `protobuf:"bytes,3,opt,name=revision_id,json=revisionId,proto3" json:"revision_id,omitempty"`
 	// Run list associated with the policy.
 	RunList []string `protobuf:"bytes,4,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`
@@ -233,7 +233,7 @@ func (m *Policyfile) GetOverrideAttributes() string {
 type IncludedPolicyLock struct {
 	// Name of the included policy file.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Revision id of the included policy file.
+	// Revision ID of the included policy file.
 	RevisionId string `protobuf:"bytes,2,opt,name=revision_id,json=revisionId,proto3" json:"revision_id,omitempty"`
 	// Source options of the included policy file.
 	SourceOptions        *SourceOptions `protobuf:"bytes,3,opt,name=source_options,json=sourceOptions,proto3" json:"source_options,omitempty"`

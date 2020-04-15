@@ -22,7 +22,7 @@ message Policyfile {
     string name = 1;
     // Name of the policy group.
     string policy_group = 2;
-    // Revision Id of the policy.
+    // Revision ID of the policy.
     string revision_id = 3;
     // Run list associated with the policy.
     repeated string run_list = 4;
@@ -41,7 +41,7 @@ message Policyfile {
 message IncludedPolicyLock {
     // Name of the included policy file. 
     string name = 1;
-    // Revision id of the included policy file.
+    // Revision ID of the included policy file.
     string revision_id = 2;
     // Source options of the included policy file.
     SourceOptions source_options = 3;

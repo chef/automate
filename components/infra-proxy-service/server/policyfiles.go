@@ -12,7 +12,7 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
-// GetPolicyfiles get policy files list
+// GetPolicyfiles gets a list of all policy files
 func (s *Server) GetPolicyfiles(ctx context.Context, req *request.Policyfiles) (*response.Policyfiles, error) {
 
 	c, err := s.createClient(ctx, req.OrgId)
@@ -31,7 +31,7 @@ func (s *Server) GetPolicyfiles(ctx context.Context, req *request.Policyfiles) (
 	}, nil
 }
 
-// GetPolicyfile get the policy file
+// GetPolicyfile gets a policy file
 func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*response.Policyfile, error) {
 	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
@@ -66,7 +66,7 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 
 }
 
-// fromAPIToListPolicyfile a response Policyfile from a struct of policies list
+// fromAPIToListPolicyfiles gets a response PolicyFile from a struct of policies list
 func fromAPIToListPolicyfiles(list chef.PolicyGroupGetResponse) []*response.PolicyfileListItem {
 	var policies []*response.PolicyfileListItem
 
