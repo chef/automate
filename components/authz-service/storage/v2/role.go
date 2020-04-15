@@ -33,12 +33,6 @@ func (p *Role) Scan(src interface{}) error {
 // NewRole is a factory for creating a Role storage object that also does
 // validation around what a valid role is in terms of our storage layer.
 func NewRole(id string, name string, typeVal Type, actions []string, projects []string) (*Role, error) {
-
-	err := validateRoleInputs(id, name, actions, projects)
-	if err != nil {
-		return nil, err
-	}
-
 	role := &Role{
 		ID:       id,
 		Name:     name,
@@ -52,12 +46,6 @@ func NewRole(id string, name string, typeVal Type, actions []string, projects []
 
 // NewUpdateRole is a factory for modifying an existing role.
 func NewUpdateRole(id string, name string, actions []string, projects []string) (*Role, error) {
-
-	err := validateRoleInputs(id, name, actions, projects)
-	if err != nil {
-		return nil, err
-	}
-
 	role := &Role{
 		ID:       id,
 		Name:     name,
@@ -66,23 +54,4 @@ func NewUpdateRole(id string, name string, actions []string, projects []string) 
 	}
 
 	return role, nil
-}
-
-func validateRoleInputs(id string, name string, actions []string, projects []string) error {
-	if emptyOrWhitespaceOnlyRE.MatchString(id) {
-		return errors.New(
-			"a role id is required and must contain at least one non-whitespace character")
-	}
-	if emptyOrWhitespaceOnlyRE.MatchString(name) {
-		return errors.New(
-			"a role name is required and must contain at least one non-whitespace character")
-	}
-	if len(actions) == 0 {
-		return errors.New("a role must contain at least one action")
-	}
-	err := ValidateProjects(projects)
-	if err != nil {
-		return err
-	}
-	return nil
 }

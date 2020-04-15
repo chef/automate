@@ -118,7 +118,7 @@ func (m *CreateProjectReq) Validate() error {
 	if !_CreateProjectReq_Id_Pattern.MatchString(m.GetId()) {
 		return CreateProjectReqValidationError{
 			field:  "Id",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
+			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,48}$\"",
 		}
 	}
 
@@ -181,7 +181,7 @@ var _ interface {
 	ErrorName() string
 } = CreateProjectReqValidationError{}
 
-var _CreateProjectReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
+var _CreateProjectReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,48}$")
 
 // Validate checks the field values on CreateProjectResp with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -268,12 +268,7 @@ func (m *GetProjectReq) Validate() error {
 		return nil
 	}
 
-	if !_GetProjectReq_Id_Pattern.MatchString(m.GetId()) {
-		return GetProjectReqValidationError{
-			field:  "Id",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-		}
-	}
+	// no validation rules for Id
 
 	return nil
 }
@@ -331,8 +326,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetProjectReqValidationError{}
-
-var _GetProjectReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on GetProjectResp with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -564,12 +557,7 @@ func (m *UpdateProjectReq) Validate() error {
 
 	// no validation rules for Name
 
-	if !_UpdateProjectReq_Id_Pattern.MatchString(m.GetId()) {
-		return UpdateProjectReqValidationError{
-			field:  "Id",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-		}
-	}
+	// no validation rules for Id
 
 	return nil
 }
@@ -627,8 +615,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpdateProjectReqValidationError{}
-
-var _UpdateProjectReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on UpdateProjectResp with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -715,12 +701,7 @@ func (m *DeleteProjectReq) Validate() error {
 		return nil
 	}
 
-	if !_DeleteProjectReq_Id_Pattern.MatchString(m.GetId()) {
-		return DeleteProjectReqValidationError{
-			field:  "Id",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-		}
-	}
+	// no validation rules for Id
 
 	return nil
 }
@@ -778,8 +759,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteProjectReqValidationError{}
-
-var _DeleteProjectReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on DeleteProjectResp with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -1662,12 +1641,7 @@ func (m *CreateRuleReq) Validate() error {
 		}
 	}
 
-	if !_CreateRuleReq_ProjectId_Pattern.MatchString(m.GetProjectId()) {
-		return CreateRuleReqValidationError{
-			field:  "ProjectId",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-		}
-	}
+	// no validation rules for ProjectId
 
 	// no validation rules for Name
 
@@ -1754,8 +1728,6 @@ var _ interface {
 
 var _CreateRuleReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
-var _CreateRuleReq_ProjectId_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
-
 // Validate checks the field values on CreateRuleResp with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -1839,19 +1811,9 @@ func (m *UpdateRuleReq) Validate() error {
 		return nil
 	}
 
-	if !_UpdateRuleReq_Id_Pattern.MatchString(m.GetId()) {
-		return UpdateRuleReqValidationError{
-			field:  "Id",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-		}
-	}
+	// no validation rules for Id
 
-	if !_UpdateRuleReq_ProjectId_Pattern.MatchString(m.GetProjectId()) {
-		return UpdateRuleReqValidationError{
-			field:  "ProjectId",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-		}
-	}
+	// no validation rules for ProjectId
 
 	// no validation rules for Name
 
@@ -1936,10 +1898,6 @@ var _ interface {
 	ErrorName() string
 } = UpdateRuleReqValidationError{}
 
-var _UpdateRuleReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
-
-var _UpdateRuleReq_ProjectId_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
-
 // Validate checks the field values on UpdateRuleResp with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -2022,19 +1980,9 @@ func (m *GetRuleReq) Validate() error {
 		return nil
 	}
 
-	if !_GetRuleReq_Id_Pattern.MatchString(m.GetId()) {
-		return GetRuleReqValidationError{
-			field:  "Id",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-		}
-	}
+	// no validation rules for Id
 
-	if !_GetRuleReq_ProjectId_Pattern.MatchString(m.GetProjectId()) {
-		return GetRuleReqValidationError{
-			field:  "ProjectId",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-		}
-	}
+	// no validation rules for ProjectId
 
 	return nil
 }
@@ -2092,10 +2040,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetRuleReqValidationError{}
-
-var _GetRuleReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
-
-var _GetRuleReq_ProjectId_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on GetRuleResp with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -2327,12 +2271,7 @@ func (m *ListRulesForProjectReq) Validate() error {
 		return nil
 	}
 
-	if !_ListRulesForProjectReq_Id_Pattern.MatchString(m.GetId()) {
-		return ListRulesForProjectReqValidationError{
-			field:  "Id",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-		}
-	}
+	// no validation rules for Id
 
 	return nil
 }
@@ -2392,8 +2331,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListRulesForProjectReqValidationError{}
-
-var _ListRulesForProjectReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on ListRulesForProjectResp with the rules
 // defined in the proto definition for this message. If any rules are
@@ -2487,19 +2424,9 @@ func (m *DeleteRuleReq) Validate() error {
 		return nil
 	}
 
-	if !_DeleteRuleReq_Id_Pattern.MatchString(m.GetId()) {
-		return DeleteRuleReqValidationError{
-			field:  "Id",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-		}
-	}
+	// no validation rules for Id
 
-	if !_DeleteRuleReq_ProjectId_Pattern.MatchString(m.GetProjectId()) {
-		return DeleteRuleReqValidationError{
-			field:  "ProjectId",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
-		}
-	}
+	// no validation rules for ProjectId
 
 	return nil
 }
@@ -2557,10 +2484,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteRuleReqValidationError{}
-
-var _DeleteRuleReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
-
-var _DeleteRuleReq_ProjectId_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on DeleteRuleResp with the rules defined in
 // the proto definition for this message. If any rules are violated, an error

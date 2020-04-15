@@ -787,7 +787,7 @@ control 'iam-api-1' do
     end
 
     context "when there are no rules but the project exists" do
-      custom_project_id = "inspec-custom-project-rules-test-#{TIMESTAMP}"
+      custom_project_id = "inspec-project-rules-#{TIMESTAMP}"
 
       before(:all) do
         resp = automate_api_request("/apis/iam/v2/projects",
@@ -868,8 +868,8 @@ control 'iam-api-1' do
     end
 
     context "when there are multiple rules for multiple projects" do
-      custom_project_id = "inspec-custom-project-multiple-projects-test-1-#{TIMESTAMP}"
-      custom_project_id_2 = "inspec-custom-project-multiple-projects-test-2-#{TIMESTAMP}"
+      custom_project_id = "inspec-project-mult-projects-#{TIMESTAMP}"
+      custom_project_id_2 = "inspec-project-mult-projects-2-#{TIMESTAMP}"
 
       CUSTOM_RULE_1 = {
         id: "custom-rule-1-#{TIMESTAMP}",
@@ -957,7 +957,7 @@ control 'iam-api-1' do
       end
 
       after(:all) do
-        resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE[:project_id]}/rules/#{CUSTOM_RULE[:id]}", http_method: 'DELETE')
+        resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE_1[:project_id]}/rules/#{CUSTOM_RULE_1[:id]}", http_method: 'DELETE')
         expect(resp.http_status.to_s).to match(/200|404/)
 
         resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE_2[:project_id]}/rules/#{CUSTOM_RULE_2[:id]}", http_method: 'DELETE')

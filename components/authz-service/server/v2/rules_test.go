@@ -74,9 +74,9 @@ func TestCreateRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
-		{"if the passed rule project id is invalid, returns 'invalid argument'", func(t *testing.T) {
+		{"if the passed rule project id is whitespace, returns 'invalid argument'", func(t *testing.T) {
 			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
-				Id:         "any-name",
+				Id:         "     ",
 				Name:       "any name",
 				ProjectId:  "foo bar",
 				Conditions: apiConditions,
@@ -227,9 +227,9 @@ func TestUpdateRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
-		{"if the rule id is invalid, returns 'invalid argument'", func(t *testing.T) {
+		{"if the rule id is whitespace, returns 'invalid argument'", func(t *testing.T) {
 			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
-				Id:         "no spaces",
+				Id:         "    ",
 				Name:       "any name",
 				ProjectId:  "foo",
 				Conditions: apiConditions,
@@ -480,8 +480,8 @@ func TestGetRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
-		{"if the rule id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "no spaces allowed"})
+		{"if the rule id is whitespace, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "    "})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
@@ -778,8 +778,8 @@ func TestDeleteRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
-		{"if the rule id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: "no spaces allowed"})
+		{"if the rule id is whitespace, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: "   "})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},

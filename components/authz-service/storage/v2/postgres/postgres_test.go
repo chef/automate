@@ -3138,12 +3138,6 @@ func TestCreateRule(t *testing.T) {
 			_, err = storage.NewRule("new-rule", projID, "name", storage.Event, []storage.Condition{condition})
 			assert.Error(t, err)
 		},
-		"creating a rule with no conditions returns an error": func(t *testing.T) {
-			projID := "project-1"
-			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
-			_, err := storage.NewRule("new-id-1", projID, "name", storage.Node, []storage.Condition{})
-			assert.Error(t, err)
-		},
 		"creating a condition with zero entries for the 'equals' operator returns an error": func(t *testing.T) {
 			condition1, err := storage.NewCondition([]string{}, storage.ChefServer, storage.Equals)
 			assert.Equal(t, storage.Condition{}, condition1)
