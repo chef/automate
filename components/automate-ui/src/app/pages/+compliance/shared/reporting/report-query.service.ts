@@ -3,9 +3,9 @@ import { BehaviorSubject } from 'rxjs';
 import * as moment from 'moment';
 import { FilterC } from '../../+reporting/types';
 import { DateTime } from 'app/helpers/datetime/datetime';
+import { ReportingFilterTypes } from 'app/types/types';
 import { isEmpty } from 'lodash';
 
-import { ReportingFilterTypes } from 'app/types/types';
 
 export interface ReportQuery {
   startDate: moment.Moment;
