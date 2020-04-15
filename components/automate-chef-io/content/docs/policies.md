@@ -24,7 +24,7 @@ Permission for the `iam:policies` action is required to interact with policies. 
 
 ### Custom Policies
 
-*Custom* policies are policies that you create for your own needs. You can add, edit, and delete policy statements in your custom policies.
+*Custom* policies are policies that you create for your own needs. You can add, edit, and delete policy statements in your custom policies. Chef Automate ships with two additional custom policies users find helpful, Compliance Viewers and Compliance Editors, that can be modified like other custom policies.
 
 ## Managing Policies
 

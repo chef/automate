@@ -32,7 +32,15 @@ Ingest        | Ingest data into the system
 
 ### Custom Roles
 
-Custom roles are roles that can be changed by anyone with the permission for `iam:roles:update`.
+Custom roles are roles that can be changed by anyone with the permission for `iam:roles:update`. In
+addition to the Chef-managed roles above, Chef Automate includes two custom roles.
+
+Role              | Description
+------------------|------------
+Compliance Viewer |Viewer for compliance resources
+Compliance Editor |Editor for compliance resources
+
+Like other custom roles, these can be modified.
 
 ## Managing Roles
 
