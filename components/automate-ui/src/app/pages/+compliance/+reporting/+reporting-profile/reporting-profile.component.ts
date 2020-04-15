@@ -13,8 +13,6 @@ import { paginationOverride } from '../shared';
 import * as moment from 'moment';
 import { FilterC } from '../../+reporting/types';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { DateTime } from 'app/helpers/datetime/datetime';
-import { isEmpty } from 'lodash';
 
 @Component({
   selector: 'app-reporting-profile',
@@ -59,7 +57,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
       .subscribe(([filters, params]: [ReportQuery, any]) =>
         this.onFilterParamsChange(filters, params));
 
-    this.returnParams = this.formatReturnParams();
+    this.returnParams = this.reportQueryService.formatReturnParams();
   }
 
   fetchProfile(id, reportQuery: ReportQuery) {
@@ -235,33 +233,5 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
 
   formatDaysAgo(timestamp) {
     return moment(timestamp).fromNow();
-  }
-
-  private formatReturnParams(): any { // needs a return type
-    const reportQuery = this.reportQueryService.getReportQuery();
-
-    const structuredFilters = {};
-    reportQuery.filters.map(filter => {
-      return structuredFilters[filter.type.name] = filter.value.text;
-    });
-
-    const today = new Date();
-    const endDate = reportQuery.endDate
-      ? moment(reportQuery.endDate).format(DateTime.REPORT_DATE)
-      : moment(today).format(DateTime.REPORT_DATE);
-
-    // Check if today is the end date
-    const isToday = moment(today).diff(endDate, 'days') === 0;
-
-    // With no filters when the date it today, we don't want
-    // to add any parameters to the URL.
-    if (isEmpty(structuredFilters) && isToday) {
-      return {};
-    } else {
-      return {
-        end_time: endDate,
-        ...structuredFilters
-      };
-    }
   }
 }

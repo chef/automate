@@ -2,12 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StatsService } from '../../shared/reporting/stats.service';
 import { Subject } from 'rxjs';
-import { ReportQueryService, ReportQuery } from '../../shared/reporting/report-query.service';
+import { ReportQueryService } from '../../shared/reporting/report-query.service';
 import * as moment from 'moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { takeUntil } from 'rxjs/operators';
-import { isEmpty } from 'lodash';
 
 @Component({
   selector: 'app-reporting-node',
@@ -42,9 +41,9 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.reportLoading = true;
     this.layoutFacade.ShowPageLoading(true);
+    this.returnParams = this.reportQueryService.formatReturnParams();
     const id: string = this.route.snapshot.params['id'];
     const reportQuery = this.reportQueryService.getReportQuery();
-    this.returnParams = this.formatReturnparams(reportQuery);
     reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
 
     this.statsService.getReports(reportQuery, {sort: 'latest_report.end_time', order: 'DESC'})
@@ -182,31 +181,5 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
   formatDaysAgo(timestamp) {
     return moment(timestamp).fromNow();
-  }
-
-  private formatReturnparams(reportQuery: ReportQuery): any { // needs a return type
-    const structuredFilters = {};
-    reportQuery.filters.map(filter => {
-      return structuredFilters[filter.type.name] = filter.value.text;
-    });
-
-    const today = new Date();
-    const endDate = reportQuery.endDate
-      ? moment(reportQuery.endDate).format(DateTime.REPORT_DATE)
-      : moment(today).format(DateTime.REPORT_DATE);
-
-    // Check if today is the end date
-    const isToday = moment(today).diff(endDate, 'days') === 0;
-
-    // With no filters when the date it today, we don't want
-    // to add any parameters to the URL.
-    if (isEmpty(structuredFilters) && isToday ) {
-      return {};
-    } else {
-      return {
-        end_time: endDate,
-        ...structuredFilters
-        };
-    }
   }
 }

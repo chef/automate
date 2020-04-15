@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as moment from 'moment';
 import { FilterC } from '../../+reporting/types';
+import { DateTime } from 'app/helpers/datetime/datetime';
+import { isEmpty } from 'lodash';
 
 export interface ReportQuery {
   startDate: moment.Moment;
@@ -88,5 +90,33 @@ export class ReportQueryService {
 
   getFilterTitle(type: string, id: string): string {
     return this.idToTitle.get(type + '-' + id);
+  }
+
+  formatReturnParams(): any { // needs a return type
+    const reportQuery = this.getReportQuery();
+
+    const structuredFilters = {};
+    reportQuery.filters.map(filter => {
+      return structuredFilters[filter.type.name] = filter.value.text;
+    });
+
+    const today = moment().utc();
+    const endDate = reportQuery.endDate
+      ? moment(reportQuery.endDate).format(DateTime.REPORT_DATE)
+      : today.format(DateTime.REPORT_DATE);
+
+    // Check if today is the end date
+    const isToday = today.diff(endDate, 'days') === 0;
+
+    // With no filters when the date it today, we don't want
+    // to add any parameters to the URL.
+    if (isEmpty(structuredFilters) && isToday) {
+      return {};
+    } else {
+      return {
+        end_time: endDate,
+        ...structuredFilters
+      };
+    }
   }
 }
