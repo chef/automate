@@ -70,6 +70,7 @@ export class TreeService {
    * @param node the node we want to calculate the depth of
   */
 
+  // Returns -1 if the node is not in the tree; otherwise returns the length of the node's path.
   getNodeDepth<T, K extends SearchableNode<T>>(root: K, node: K): number {
     return pipe(this.searchById(root, node.id), O.fold(() => -1, n => n.pathToRoot.length));
   }
