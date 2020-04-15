@@ -144,7 +144,7 @@ function compile_all_protobuf_components() {
   install_if_missing core/git git
   # Note 2019/02/05 (sr): "api" doesn't fit in the folder structure, so it's
   # added to the list manually, same goes for "api/config".
-  components=($(git ls-files '*/scripts/grpc.sh' | awk -F/ '!/api/{print $2}') "api" "config")
+  components=($(git ls-files '*/scripts/grpc.sh' | awk -F/ '!/api/{print $2}') "config" "api")
   for component in "${components[@]}"; do
     log_line "Compiling protobuf files for ${YELLOW}'$component'${NC}"
     if ! compile_go_protobuf_component "$component"; then
