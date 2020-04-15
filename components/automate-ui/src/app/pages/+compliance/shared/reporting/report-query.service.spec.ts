@@ -51,7 +51,9 @@ describe('ReportQueryService', () => {
 
   describe('formatReturnParams', () => {
     it('returns empty object when there are no filters and date is today ', () => {
-      // service.formatReturnParams
-    })
+      service.formatReturnParams();
+
+      expect(service.formatReturnParams()).toEqual({});
+    });
   });
 });

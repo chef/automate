@@ -41,6 +41,16 @@ describe('ReportingNodesComponent', () => {
     reportQueryService = TestBed.inject(ReportQueryService);
   });
 
+  describe('ngOnInit()', () => {
+    it('calls formatReturnParams to set the reports breadcrumb href', () => {
+      component.ngOnInit();
+      spyOn(reportQueryService, 'formatReturnParams');
+      fixture.detectChanges();
+
+      expect(reportQueryService.formatReturnParams).toHaveBeenCalled();
+    });
+  });
+
   describe('addProfileStatus', () => {
     describe('if there are any failures', () => {
       const data = {items: [
