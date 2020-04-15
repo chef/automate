@@ -13,7 +13,7 @@ const GET_STATUS = 'getStatus';
 
 export const infraRoleDetailsEntityAdapter: EntityAdapter<InfraRole> =
 createEntityAdapter<InfraRole>({
-  selectId: (infrarole: InfraRole) => infrarole.name
+  selectId: (infraRole: InfraRole) => infraRole.name
 });
 
 export const InfraRoleEntityInitialState: InfraRoleDetailsEntityState =
