@@ -31,29 +31,9 @@ import {
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { pickBy } from 'lodash/fp';
 import { FilterC } from './types';
+
 import { FilterTypes } from './reporting.model';
 
-// export enum FilterTypes {
-//     CHEF_SERVER = 'chef_server',
-//     CHEF_TAGS = 'chef_tags',
-//     CONTROL_ID = 'control_id',
-//     CONTROL_NAME = 'control_name',
-//     CONTROL_TAG_KEY = 'control_tag_key',
-//     ENVIRONMENT = 'environment',
-//     INSPEC_VERSION = 'inspec_version',
-//     JOB_ID = 'job_id',
-//     NODE_ID = 'node_id',
-//     NODE_NAME = 'node_name',
-//     ORGANIZATION = 'organization',
-//     PLATFORM_WITH_VERSION = 'platform_with_version',
-//     POLICY_GROUP = 'policy_group',
-//     POLICY_NAME = 'policy_name',
-//     PROFILE_ID = 'profile_id',
-//     PROFILE_WITH_VERSION = 'profile_with_version',
-//     PROFILE_NAME = 'profile_name',
-//     RECIPE = 'recipe',
-//     ROLE = 'role'
-// }
 
 @Component({
   templateUrl: './reporting.component.html',
