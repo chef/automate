@@ -100,7 +100,8 @@ export class ReportQueryService {
       return structuredFilters[filter.type.name] = filter.value.text;
     });
 
-    const today = moment().utc();
+    const today = moment().utc()
+                      .startOf('day').add(12, 'hours'); // must sync with initial end Date
     const endDate = reportQuery.endDate
       ? moment(reportQuery.endDate).format(DateTime.REPORT_DATE)
       : today.format(DateTime.REPORT_DATE);

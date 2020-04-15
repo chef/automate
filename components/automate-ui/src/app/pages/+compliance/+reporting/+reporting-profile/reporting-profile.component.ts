@@ -43,6 +43,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.showLoadingIcon = true;
     this.layoutFacade.ShowPageLoading(true);
+    this.returnParams = this.reportQueryService.formatReturnParams();
 
     const id = this.route.snapshot.params['id'];
     this.fetchProfile(id, this.reportQueryService.getReportQuery()).pipe(
@@ -57,7 +58,6 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
       .subscribe(([filters, params]: [ReportQuery, any]) =>
         this.onFilterParamsChange(filters, params));
 
-    this.returnParams = this.reportQueryService.formatReturnParams();
   }
 
   fetchProfile(id, reportQuery: ReportQuery) {
