@@ -27,7 +27,7 @@ const chefManagedPolicyIDs = [
 ];
 
 const chefCustomPolicyIDs = [
-  'compliance-access',
+  'compliance-viewer-access',
   'compliance-editor-access'
 ];
 
@@ -133,6 +133,11 @@ describe('policies API', () => {
           chefManagedPolicyIDs.forEach(id => {
             expect(policyIDs).include(id);
           });
+
+          chefCustomPolicyIDs.forEach(id => {
+            expect(policyIDs).include(id);
+          });
+
           expect(policyIDs).to.include(policyID);
         });
       });
