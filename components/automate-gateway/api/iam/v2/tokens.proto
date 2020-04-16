@@ -66,8 +66,6 @@ service Tokens {
       post: "/iam/v2/tokens"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "auth:tokens";
-    option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:tokens";
     option (chef.automate.api.iam.policy).action = "iam:tokens:create";
   };
@@ -86,8 +84,6 @@ service Tokens {
     option (google.api.http) = {
       get: "/iam/v2/tokens/{id}"
     };
-    option (chef.automate.api.policy).resource = "auth:tokens:{id}";
-    option (chef.automate.api.policy).action = "get";
     option (chef.automate.api.iam.policy).resource = "iam:tokens:{id}";
     option (chef.automate.api.iam.policy).action = "iam:tokens:get";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -138,8 +134,6 @@ service Tokens {
       put: "/iam/v2/tokens/{id}"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "auth:tokens:{id}";
-    option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:tokens:{id}";
     option (chef.automate.api.iam.policy).action = "iam:tokens:update";
   };
@@ -158,8 +152,6 @@ service Tokens {
     option (google.api.http) = {
       delete: "/iam/v2/tokens/{id}"
     };
-    option (chef.automate.api.policy).resource = "auth:tokens:{id}";
-    option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:tokens:{id}";
     option (chef.automate.api.iam.policy).action = "iam:tokens:delete";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -181,8 +173,6 @@ service Tokens {
     option (google.api.http) = {
       get: "/iam/v2/tokens"
     };
-    option (chef.automate.api.policy).resource = "auth:tokens";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:tokens";
     option (chef.automate.api.iam.policy).action = "iam:tokens:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -192,8 +182,6 @@ service Tokens {
   // Expose on GRPC API only so we don't expose this to the enduser.
   // Just want to be able to trigger this via automate-cli.
   rpc ResetAllTokenProjects (ResetAllTokenProjectsReq) returns (ResetAllTokenProjectsResp) {
-    option (chef.automate.api.policy).resource = "auth:tokens";
-    option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:tokens";
     option (chef.automate.api.iam.policy).action = "iam:tokens:update";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {

@@ -16,24 +16,18 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 service Authorization {
   rpc IntrospectAll (IntrospectAllReq) returns (IntrospectResp) {
     option (google.api.http).get = "/iam/v2/introspect";
-    option (chef.automate.api.policy).resource = "auth_introspection:introspect_all";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:introspect";
     option (chef.automate.api.iam.policy).action = "iam:introspect:getAll";
     };
   rpc IntrospectSome (IntrospectSomeReq) returns (IntrospectResp) {
     option (google.api.http).post = "/iam/v2/introspect_some";
     option (google.api.http).body = "*";
-    option (chef.automate.api.policy).resource = "auth_introspection:introspect_some";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:introspect";
     option (chef.automate.api.iam.policy).action = "iam:introspect:getSome";
     };
   rpc Introspect (IntrospectReq) returns (IntrospectResp) {
     option (google.api.http).post = "/iam/v2/introspect";
     option (google.api.http).body = "*";
-    option (chef.automate.api.policy).resource = "auth_introspection:introspect";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:introspect";
     option (chef.automate.api.iam.policy).action = "iam:introspect:get";
     };

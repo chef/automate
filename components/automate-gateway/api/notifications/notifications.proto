@@ -116,8 +116,6 @@ service Notifications {
       post: "/notifications/rules"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "notifications:rules";
-    option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "notifications:rules";
     option (chef.automate.api.iam.policy).action = "notifications:notifyRules:create";
   };
@@ -126,8 +124,6 @@ service Notifications {
     option (google.api.http) = {
       delete: "/notifications/rules/{id}"
     };
-    option (chef.automate.api.policy).resource = "notifications:rules:{id}";
-    option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "notifications:rules:{id}";
     option (chef.automate.api.iam.policy).action = "notifications:notifyRules:delete";
   };
@@ -137,8 +133,6 @@ service Notifications {
       put: "/notifications/rules/{id}"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "notifications:rules:{id}";
-    option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "notifications:rules:{id}";
     option (chef.automate.api.iam.policy).action = "notifications:notifyRules:update";
   };
@@ -147,8 +141,6 @@ service Notifications {
     option (google.api.http) = {
       get: "/notifications/rules/{id}"
     };
-    option (chef.automate.api.policy).resource = "notifications:rules:{id}";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "notifications:rules:{id}";
     option (chef.automate.api.iam.policy).action = "notifications:notifyRules:get";
   };
@@ -157,8 +149,6 @@ service Notifications {
     option (google.api.http) = {
       get: "/notifications/rules"
     };
-    option (chef.automate.api.policy).resource = "notifications:rules";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "notifications:rules";
     option (chef.automate.api.iam.policy).action = "notifications:notifyRules:list";
   };
@@ -170,8 +160,6 @@ service Notifications {
     };
     // this call is used to test a notification rule being created
     // so the resource mapping matches AddRule
-    option (chef.automate.api.policy).resource = "notifications:rules";
-    option (chef.automate.api.policy).action = "validate";
     option (chef.automate.api.iam.policy).resource = "notifications:rules";
     option (chef.automate.api.iam.policy).action = "notifications:notifyRules:validate";
   }
@@ -180,8 +168,6 @@ service Notifications {
     option (google.api.http) = {
       get: "/notifications/version"
     };
-    option (chef.automate.api.policy).resource = "service_info:version";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
   };

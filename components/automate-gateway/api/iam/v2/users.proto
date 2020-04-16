@@ -58,8 +58,6 @@ service Users {
       post: "/iam/v2/users"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "auth:users";
-    option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:users";
     option (chef.automate.api.iam.policy).action = "iam:users:create";
   };
@@ -81,8 +79,6 @@ service Users {
     option (google.api.http) = {
       get: "/iam/v2/users"
     };
-    option (chef.automate.api.policy).resource = "auth:users";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:users";
     option (chef.automate.api.iam.policy).action = "iam:users:list";
   };
@@ -104,8 +100,6 @@ service Users {
     option (google.api.http) = {
       get: "/iam/v2/users/{id}"
     };
-    option (chef.automate.api.policy).resource = "auth:users:{id}";
-    option (chef.automate.api.policy).action = "get";
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}";
     option (chef.automate.api.iam.policy).action = "iam:users:get";
   };
@@ -127,8 +121,6 @@ service Users {
     option (google.api.http) = {
       delete: "/iam/v2/users/{id}"
     };
-    option (chef.automate.api.policy).resource = "auth:users:{id}";
-    option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}";
     option (chef.automate.api.iam.policy).action = "iam:users:delete";
   };
@@ -174,8 +166,6 @@ service Users {
       put: "/iam/v2/users/{id}"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "auth:users:{id}";
-    option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}";
     option (chef.automate.api.iam.policy).action = "iam:users:update";
   };
@@ -224,8 +214,6 @@ service Users {
     };
     // The users namespace, as opposed for auth:users, is for actions users
     // are allowed to perform on themselves by default without admin permissions.
-    option (chef.automate.api.policy).resource = "users:{id}";
-    option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:usersSelf:{id}";
     option (chef.automate.api.iam.policy).action = "iam:usersSelf:update";
   };

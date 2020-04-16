@@ -21,8 +21,6 @@ service DataLifecycle {
 	// GetStatus returns the aggregate status across all data lifecycle jobs
 	rpc GetStatus(GetStatusRequest) returns (GetStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/status";
-		option (chef.automate.api.policy).resource = "dataLifecycle:status";
-		option (chef.automate.api.policy).action = "read";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:status";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:status:get";
 	};
@@ -33,8 +31,6 @@ service DataLifecycle {
 			put: "/data-lifecycle/config";
 			body: "*";
 		};
-		option (chef.automate.api.policy).resource = "dataLifecycle:config";
-		option (chef.automate.api.policy).action = "update";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:config";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:config:update";
 	};
@@ -45,8 +41,6 @@ service DataLifecycle {
 			post: "/data-lifecycle/run";
 			body: "*";
 		};
-		option (chef.automate.api.policy).resource = "dataLifecycle:run";
-		option (chef.automate.api.policy).action = "create";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:run";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:run:create";
 	};
@@ -58,8 +52,6 @@ service DataLifecycle {
 	// GetInfraStatus returns the infra job scheduler status
 	rpc GetInfraStatus(GetInfraStatusRequest) returns (GetInfraStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/infra/status";
-		option (chef.automate.api.policy).resource = "dataLifecyle:infra:status";
-		option (chef.automate.api.policy).action = "read";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:infra:status";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:infra:get";
 	};
@@ -70,8 +62,6 @@ service DataLifecycle {
 			post: "/data-lifecycle/infra/run";
 			body: "*";
 		};
-		option (chef.automate.api.policy).resource = "dataLifecycle:infra:run";
-		option (chef.automate.api.policy).action = "create";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:infra:run";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:infra:create";
 	};
@@ -82,8 +72,6 @@ service DataLifecycle {
 			put: "/data-lifecycle/infra/config";
 			body: "*"
 		};
-		option (chef.automate.api.policy).resource = "dataLifecycle:infra:config";
-		option (chef.automate.api.policy).action = "update";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:infra:config";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:infra:update";
 	};
@@ -93,8 +81,6 @@ service DataLifecycle {
 	//
 	rpc GetServicesStatus(GetServicesStatusRequest) returns (GetServicesStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/services/status";
-		option (chef.automate.api.policy).resource = "dataLifecyle:services:status";
-		option (chef.automate.api.policy).action = "read";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:services:status";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:services:get";
 	};
@@ -104,8 +90,6 @@ service DataLifecycle {
 			post: "/data-lifecycle/services/run";
 			body: "*";
 		};
-		option (chef.automate.api.policy).resource = "dataLifecycle:services:run";
-		option (chef.automate.api.policy).action = "create";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:services:run";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:services:create";
 	};
@@ -115,8 +99,6 @@ service DataLifecycle {
 			put: "/data-lifecycle/services/config";
 			body: "*"
 		};
-		option (chef.automate.api.policy).resource = "dataLifecycle:services:config";
-		option (chef.automate.api.policy).action = "update";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:services:config";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:services:update";
 	};
@@ -128,8 +110,6 @@ service DataLifecycle {
 	// GetEventFeedStatus returns the event feed job scheduler status
 	rpc GetEventFeedStatus(GetEventFeedStatusRequest) returns (GetEventFeedStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/event-feed/status";
-		option (chef.automate.api.policy).resource = "dataLifecyle:eventFeed:status";
-		option (chef.automate.api.policy).action = "read";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:eventFeed:status";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:eventFeed:get";
 	};
@@ -140,8 +120,6 @@ service DataLifecycle {
 			post: "/data-lifecycle/event-feed/run";
 			body: "*";
 		};
-		option (chef.automate.api.policy).resource = "dataLifecycle:eventFeed:run";
-		option (chef.automate.api.policy).action = "create";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:eventFeed:run";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:eventFeed:create";
 	};
@@ -152,8 +130,6 @@ service DataLifecycle {
 			put: "/data-lifecycle/event-feed/config";
 			body: "*"
 		};
-		option (chef.automate.api.policy).resource = "dataLifecycle:eventFeed:config";
-		option (chef.automate.api.policy).action = "update";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:eventFeed:config";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:eventFeed:update";
 	};
@@ -165,8 +141,6 @@ service DataLifecycle {
 	// GetComplianceStatus returns the compliance job scheduler status
 	rpc GetComplianceStatus(GetComplianceStatusRequest) returns (GetComplianceStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/compliance/status";
-		option (chef.automate.api.policy).resource = "dataLifecyle:compliance:status";
-		option (chef.automate.api.policy).action = "read";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:compliance:status";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:compliance:get";
 	};
@@ -177,8 +151,6 @@ service DataLifecycle {
 			post: "/data-lifecycle/compliance/run";
 			body: "*";
 		};
-		option (chef.automate.api.policy).resource = "dataLifecycle:compliance:run";
-		option (chef.automate.api.policy).action = "create";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:compliance:run";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:compliance:create";
 	};
@@ -189,8 +161,6 @@ service DataLifecycle {
 			put: "/data-lifecycle/compliance/config";
 			body: "*"
 		};
-		option (chef.automate.api.policy).resource = "dataLifecycle:compliance:config";
-		option (chef.automate.api.policy).action = "update";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:compliance:config";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:compliance:update";
 	};

@@ -15,8 +15,6 @@ import "api/external/ingest/request/job_scheduler.proto";
 service JobScheduler {
   rpc GetStatusJobScheduler (ingest.request.GetStatusJobScheduler) returns (ingest.response.JobSchedulerStatus) {
     option (google.api.http).get = "/retention/nodes/status";
-    option (chef.automate.api.policy).resource = "cfgmgmt:scheduler:job:status";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "retention:nodes";
     option (chef.automate.api.iam.policy).action = "retention:nodes:get";
   };
@@ -24,8 +22,6 @@ service JobScheduler {
   rpc ConfigureNodesMissingScheduler (ingest.request.SchedulerConfig) returns (ingest.response.ConfigureNodesMissingScheduler) {
     option (google.api.http).post = "/retention/nodes/missing-nodes/config";
     option (google.api.http).body = "*";
-    option (chef.automate.api.policy).resource = "cfgmgmt:scheduler:missing-nodes";
-    option (chef.automate.api.policy).action = "configure";
     option (chef.automate.api.iam.policy).resource = "retention:nodes";
     option (chef.automate.api.iam.policy).action = "retention:nodes:update";
   };
@@ -33,8 +29,6 @@ service JobScheduler {
   rpc ConfigureDeleteNodesScheduler (ingest.request.SchedulerConfig) returns (ingest.response.ConfigureDeleteNodesScheduler) {
     option (google.api.http).post = "/retention/nodes/delete-nodes/config";
     option (google.api.http).body = "*";
-    option (chef.automate.api.policy).resource = "cfgmgmt:scheduler:delete-nodes";
-    option (chef.automate.api.policy).action = "configure";
     option (chef.automate.api.iam.policy).resource = "retention:nodes";
     option (chef.automate.api.iam.policy).action = "retention:nodes:update";
   };
@@ -42,8 +36,6 @@ service JobScheduler {
   rpc ConfigureMissingNodesForDeletionScheduler (ingest.request.SchedulerConfig) returns (ingest.response.ConfigureMissingNodesForDeletionScheduler) {
     option (google.api.http).post = "/retention/nodes/missing-nodes-deletion/config";
     option (google.api.http).body = "*";
-    option (chef.automate.api.policy).resource = "cfgmgmt:scheduler:missing-nodes-deletion";
-    option (chef.automate.api.policy).action = "configure";
     option (chef.automate.api.iam.policy).resource = "retention:nodes";
     option (chef.automate.api.iam.policy).action = "retention:nodes:update";
   };

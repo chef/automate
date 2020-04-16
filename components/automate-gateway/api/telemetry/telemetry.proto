@@ -13,8 +13,6 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 service Telemetry {
   rpc GetTelemetryConfiguration (TelemetryRequest) returns (TelemetryResponse) {
     option (google.api.http).get = "/telemetry/config";
-    option (chef.automate.api.policy).resource = "telemetry:config";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "system:config";
     option (chef.automate.api.iam.policy).action = "system:telemetryConfig:get";
   };

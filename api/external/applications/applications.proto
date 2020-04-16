@@ -59,8 +59,6 @@ service ApplicationsService {
   */
   rpc GetServiceGroupsHealthCounts(ServiceGroupsHealthCountsReq) returns (HealthCounts) {
     option (google.api.http).get = "/applications/service_groups_health_counts";
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "list";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -80,8 +78,6 @@ service ApplicationsService {
   */
   rpc GetServices(ServicesReq) returns (ServicesRes) {
     option (google.api.http).get = "/applications/services";
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "list";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -100,8 +96,6 @@ service ApplicationsService {
   ```
   */
   rpc FindServices(ServicesReq) returns (stream Service) {
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "list";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -124,8 +118,6 @@ service ApplicationsService {
   */
   rpc GetServicesDistinctValues(ServicesDistinctValuesReq) returns (ServicesDistinctValuesRes) {
     option (google.api.http).get = "/applications/services-distinct-values";
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "list";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -151,8 +143,6 @@ service ApplicationsService {
   */
   rpc GetServicesBySG(ServicesBySGReq) returns (ServicesBySGRes) {
     option (google.api.http).get = "/applications/service-groups/{service_group_id}";
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "list";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -174,8 +164,6 @@ service ApplicationsService {
   */
   rpc GetServicesStats(ServicesStatsReq) returns (ServicesStatsRes) {
     option (google.api.http).get = "/applications/stats";
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "list";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -198,8 +186,6 @@ service ApplicationsService {
   */
   rpc GetDisconnectedServices(DisconnectedServicesReq) returns (ServicesRes ) {
     option (google.api.http).get = "/applications/disconnected_services";
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "list";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -224,8 +210,6 @@ service ApplicationsService {
       post: "/applications/delete_disconnected_services"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -247,8 +231,6 @@ service ApplicationsService {
       post: "/applications/delete_services_by_id"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -267,8 +249,6 @@ service ApplicationsService {
   */
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get = "/applications/version";
-    option (chef.automate.api.policy).resource = "service_info:version";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -290,8 +270,6 @@ service ApplicationsService {
   rpc GetDisconnectedServicesConfig(GetDisconnectedServicesConfigReq) returns (PeriodicMandatoryJobConfig) {
     option (google.api.http).get = "/retention/service_groups/disconnected_services/config";
 
-    option (chef.automate.api.policy).resource = "service_groups:scheduler:disconnected_services";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
     option (chef.automate.api.iam.policy).action = "retention:serviceGroups:get";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -324,8 +302,6 @@ service ApplicationsService {
       body: "*"
     };
 
-    option (chef.automate.api.policy).resource = "service_groups:scheduler:disconnected_services";
-    option (chef.automate.api.policy).action = "configure";
     option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
     option (chef.automate.api.iam.policy).action = "retention:serviceGroups:update";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -348,8 +324,6 @@ service ApplicationsService {
   rpc GetDeleteDisconnectedServicesConfig(GetDeleteDisconnectedServicesConfigReq) returns (PeriodicJobConfig) {
     option (google.api.http).get = "/retention/service_groups/delete_disconnected_services/config";
 
-    option (chef.automate.api.policy).resource = "service_groups:scheduler:delete_disconnected_services";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
     option (chef.automate.api.iam.policy).action = "retention:serviceGroups:get";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -383,8 +357,6 @@ service ApplicationsService {
       body: "*"
     };
 
-    option (chef.automate.api.policy).resource = "service_groups:scheduler:delete_disconnected_services";
-    option (chef.automate.api.policy).action = "configure";
     option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
     option (chef.automate.api.iam.policy).action = "retention:serviceGroups:update";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
