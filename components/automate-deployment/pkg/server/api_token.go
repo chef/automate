@@ -65,7 +65,7 @@ func generateAdminToken(ctx context.Context,
 
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
 		Id:     uuid.Must(uuid.NewV4()).String(),
-		Name:   req.Description,
+		Name:   req.Name,
 		Active: true,
 	})
 	if err != nil {
