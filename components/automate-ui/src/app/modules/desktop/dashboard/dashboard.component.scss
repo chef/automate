@@ -1,2 +1,94 @@
 @import "~styles/variables";
 
+:host {
+  display: block;
+  height: 100%;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.scrollable {
+  overflow: auto;
+}
+
+app-top-errors,
+app-daily-check-in,
+app-check-in-time-series,
+app-unknown-desktop-duration-counts,
+app-insight {
+  display: block;
+  padding: 1rem;
+  background: $chef-white;
+  border: 1px solid $chef-grey;
+  border-radius: $global-radius;
+  margin: 1rem 0;
+  height: calc(100% - 2rem);
+}
+
+app-unknown-desktop-duration-counts {
+  margin-bottom: 2rem;
+}
+
+.insight-visible {
+  app-top-errors,
+  app-daily-check-in,
+  app-check-in-time-series,
+  app-unknown-desktop-duration-counts,
+  app-insight {
+    height: auto;
+  }
+
+  app-insight {
+    margin: 2rem 0;
+  }
+}
+
+chef-heading::ng-deep {
+  display: block;
+  margin-top: 3rem;
+
+  .page-title {
+    display: flex;
+    align-items: center;
+    margin: 0;
+
+    chef-icon {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+#grid-overlay {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+
+  .bx--row {
+    height: 100%;
+  }
+
+  .bx--col {
+    height: 100%;
+    background: rgba(0, 50, 200, 0.2);
+    outline: 1px solid rgba(0, 50, 200, 0.4);
+    position: relative;
+
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 1rem;
+      bottom: 0;
+      left: 1rem;
+      background: rgba(0, 50, 200, 0.2);
+      outline: 1px solid rgba(0, 50, 200, 0.4);
+    }
+  }
+}

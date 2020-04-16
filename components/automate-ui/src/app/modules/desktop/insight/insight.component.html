@@ -1,39 +1,34 @@
-<div class="content-container" *ngIf="visible">
-  <div class="container">
-    <main>
-      <button (click)="close()" id="x">X</button>
-      <div class="page-title">Insight</div>
-
-      <ul>
-        <li *ngFor="let term of termFilters">
-          <button (click)="termFilterClicked(term)" id="filter-item">
-            {{term.type}}: {{term.value}}
-          </button>
-        </li>
-      </ul>
-      <div>Total: {{totalDesktops}}</div>
-      <table>
-        <thead>
-          <tr >
-            <th (click)="sortOn('name')" class="table-title">DESKTOP NAME</th>
-            <th (click)="sortOn('check-in')" class="table-title">LAST CHECK-IN TIME</th>
-            <th (click)="sortOn('platform')" class="table-title">PLATFORM</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let desktop of desktops">
-            <td>{{ desktop.name }}</td>
-            <td><chef-icon>{{ desktop.status | chefStatusIcon }}</chef-icon> {{ desktop.checkin | timeFromNow }}</td>
-            <td>{{ desktop.platform }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <app-page-picker
-        [total]="totalDesktops"
-        [perPage]="pageSize"
-        [page]="currentPage"
-        (pageChanged)="onPageChange($event)">
-      </app-page-picker>
-    </main>
-  </div>
+<div class="content-container">
+  <button (click)="close()" id="x">X</button>
+  <div class="page-title">Insight</div>
+  <ul>
+    <li *ngFor="let term of termFilters">
+      <button (click)="termFilterClicked(term)" id="filter-item">
+        {{term.type}}: {{term.value}}
+      </button>
+    </li>
+  </ul>
+  <div>Total: {{totalDesktops}}</div>
+  <table>
+    <thead>
+      <tr >
+        <th (click)="sortOn('name')" class="table-title">DESKTOP NAME</th>
+        <th (click)="sortOn('check-in')" class="table-title">LAST CHECK-IN TIME</th>
+        <th (click)="sortOn('platform')" class="table-title">PLATFORM</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let desktop of desktops">
+        <td>{{ desktop.name }}</td>
+        <td><chef-icon>{{ desktop.status | chefStatusIcon }}</chef-icon> {{ desktop.checkin | timeFromNow }}</td>
+        <td>{{ desktop.platform }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <app-page-picker
+    [total]="totalDesktops"
+    [perPage]="pageSize"
+    [page]="currentPage"
+    (pageChanged)="onPageChange($event)">
+  </app-page-picker>
 </div>

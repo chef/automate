@@ -1,25 +1,19 @@
 <div class="content-container">
-  <div class="container">
-    <main>
-      <div class="page-title">Top 10 Errors</div>
-      <div class="update-time">Updated {{ lastUpdatedMessage }}</div>
-
-      <table>
-        <thead>
-          <tr >
-            <th>Error Message</th>
-            <th>Number of Desktops</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let topErrorsItem of topErrorsItems">
-            <td (click)="onItemClicked(topErrorsItem)">{{topErrorsItem.type}}: {{ topErrorsItem.message }}</td>
-            <td>{{ topErrorsItem.count }}</td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
-
-    </main>
-  </div>
+  <div class="page-title">Top 10 Errors</div>
+  <div class="update-time">Updated {{ lastUpdatedMessage }}</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Error Message</th>
+        <th>Number of Desktops</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let topErrorsItem of topErrorsItems">
+        <td (click)="onItemClicked(topErrorsItem)">{{topErrorsItem.type}}: {{ topErrorsItem.message }}</td>
+        <td>{{ topErrorsItem.count }}</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </div>
