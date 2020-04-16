@@ -1,4 +1,4 @@
-import { merge, endsWith, replace } from 'lodash';
+import { merge } from 'lodash';
 import * as moment from 'moment';
 
 export type Status = 'success' | 'failure' | 'missing' | 'skipped';
