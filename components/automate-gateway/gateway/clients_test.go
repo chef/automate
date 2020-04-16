@@ -52,7 +52,7 @@ func TestExpandEndpoints(t *testing.T) {
 		c := ClientConfig{
 			NullBackendSock: "/tmp/backend.sock",
 			Endpoints: map[string]ConnectionOptions{
-				grpcService: ConnectionOptions{
+				grpcService: {
 					Target: "127.0.0.1:1111",
 					Secure: true,
 				},
@@ -178,5 +178,6 @@ func TestDialWithNoEndpointsAndNullBackendSock(t *testing.T) {
 	_, err = f.TokensMgmtClient()
 	require.NoError(t, err)
 	_, err = f.UsersMgmtClient()
+	require.NoError(t, err)
 	require.NoError(t, f.Close())
 }

@@ -41,7 +41,6 @@ import (
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_eventfeed "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
-	pb_authz "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	pb_iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 	pb_legacy "github.com/chef/automate/components/automate-gateway/api/legacy"
@@ -174,7 +173,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create client for authzV2 service")
 	}
-	pb_authz.RegisterAuthorizationServer(grpcServer,
+	pb_iam.RegisterAuthorizationServer(grpcServer,
 		handler_introspect.NewServer(authzClient, s.authorizer))
 
 	policiesClient, err := clients.PoliciesClient()
@@ -485,14 +484,14 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 	var profileOwner, profileName, profileVersion string
 
 	url := r.URL.Path
-	splitUrl := strings.Split(url, "/")
-	if len(splitUrl) > 4 {
-		profileOwner = splitUrl[3]
-		profileName = splitUrl[4]
+	splitURL := strings.Split(url, "/")
+	if len(splitURL) > 4 {
+		profileOwner = splitURL[3]
+		profileName = splitURL[4]
 	}
-	if len(splitUrl) > 6 {
-		if splitUrl[5] == "version" {
-			profileVersion = splitUrl[6]
+	if len(splitURL) > 6 {
+		if splitURL[5] == "version" {
+			profileVersion = splitURL[6]
 		}
 	}
 
@@ -811,7 +810,6 @@ func (s *Server) DeploymentStatusHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	return
 }
 
 func init() {
