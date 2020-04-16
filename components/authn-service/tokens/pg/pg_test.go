@@ -218,13 +218,13 @@ func TestGetToken(t *testing.T) {
 	//DB time and Golang time are rounded differently
 	tme := time.Now().UTC().Round(time.Second)
 	tok := tokens.Token{
-		ID:          "coolest-token-on-the-block",
-		Description: "Cool Token",
-		Active:      true,
-		Value:       "secret-encoded-token-value",
-		Created:     tme,
-		Updated:     tme,
-		Projects:    []string{},
+		ID:       "coolest-token-on-the-block",
+		Name:     "Cool Token",
+		Active:   true,
+		Value:    "secret-encoded-token-value",
+		Created:  tme,
+		Updated:  tme,
+		Projects: []string{},
 	}
 
 	t.Run("standard cases", func(t *testing.T) {
@@ -277,40 +277,40 @@ func TestGetTokens(t *testing.T) {
 	tme := time.Now().UTC().Round(time.Second)
 	testTokens := []*tokens.Token{
 		{
-			ID:          "Uncool-token",
-			Description: "Uncool Token",
-			Active:      true,
-			Value:       "abcd",
-			Created:     tme,
-			Updated:     tme,
-			Projects:    []string{"project9"},
+			ID:       "Uncool-token",
+			Name:     "Uncool Token",
+			Active:   true,
+			Value:    "abcd",
+			Created:  tme,
+			Updated:  tme,
+			Projects: []string{"project9"},
 		},
 		{
-			ID:          "cool-token",
-			Description: "Cool Token",
-			Active:      true,
-			Value:       "secret-encoded-token-value",
-			Created:     tme,
-			Updated:     tme,
-			Projects:    []string{"project1", "project2"},
+			ID:       "cool-token",
+			Name:     "Cool Token",
+			Active:   true,
+			Value:    "secret-encoded-token-value",
+			Created:  tme,
+			Updated:  tme,
+			Projects: []string{"project1", "project2"},
 		},
 		{
-			ID:          "also-cool-token",
-			Description: "Also Cool Token",
-			Active:      true,
-			Value:       "other",
-			Created:     tme,
-			Updated:     tme,
-			Projects:    []string{"project1"},
+			ID:       "also-cool-token",
+			Name:     "Also Cool Token",
+			Active:   true,
+			Value:    "other",
+			Created:  tme,
+			Updated:  tme,
+			Projects: []string{"project1"},
 		},
 		{
-			ID:          "token-with-no-project",
-			Description: "TokenX",
-			Active:      true,
-			Value:       "andanother",
-			Created:     tme,
-			Updated:     tme,
-			Projects:    []string{},
+			ID:       "token-with-no-project",
+			Name:     "TokenX",
+			Active:   true,
+			Value:    "andanother",
+			Created:  tme,
+			Updated:  tme,
+			Projects: []string{},
 		},
 	}
 
@@ -412,20 +412,20 @@ func TestGetTokenIDWithValue(t *testing.T) {
 
 	tokens := []*tokens.Token{
 		{
-			ID:          "Uncool-token",
-			Description: "Uncool Token",
-			Active:      true,
-			Value:       "abcd",
-			Created:     ti,
-			Updated:     ti,
+			ID:      "Uncool-token",
+			Name:    "Uncool Token",
+			Active:  true,
+			Value:   "abcd",
+			Created: ti,
+			Updated: ti,
 		},
 		{
-			ID:          "cool-token",
-			Description: "Cool Token",
-			Active:      true,
-			Value:       "secret-encoded-token-value",
-			Created:     ti,
-			Updated:     ti,
+			ID:      "cool-token",
+			Name:    "Cool Token",
+			Active:  true,
+			Value:   "secret-encoded-token-value",
+			Created: ti,
+			Updated: ti,
 		},
 	}
 	insertToken(t, db, *tokens[0])
@@ -464,7 +464,7 @@ func TestCreateToken(t *testing.T) {
 			assert.NotNil(value)
 
 			assert.Equal(id, tok.ID)
-			assert.Equal(desc, tok.Description)
+			assert.Equal(desc, tok.Name)
 			assert.Equal(active, tok.Active)
 			assert.WithinDuration(time.Now(), tok.Created, time.Second)
 			assert.WithinDuration(time.Now(), tok.Updated, time.Second)
@@ -485,7 +485,7 @@ func TestCreateToken(t *testing.T) {
 			assert.NotNil(value)
 
 			assert.Equal(id, tok.ID)
-			assert.Equal(desc, tok.Description)
+			assert.Equal(desc, tok.Name)
 			assert.Equal(active, tok.Active)
 			assert.WithinDuration(time.Now(), tok.Created, time.Second)
 			assert.WithinDuration(time.Now(), tok.Updated, time.Second)
@@ -503,19 +503,19 @@ func TestResetToV1(t *testing.T) {
 	ctx := context.Background()
 	store, db := setup(t)
 	assert := assert.New(t)
-	description := "Test Token Description"
+	name := "Test Token Name"
 
 	reset(t, db)
 	t.Run("every project is removed from every token", func(*testing.T) {
-		resp1, err := store.CreateToken(ctx, "test1", description, true, []string{})
+		resp1, err := store.CreateToken(ctx, "test1", name, true, []string{})
 		assert.NoError(err, "failed to store token1")
 		assert.ElementsMatch([]string{}, resp1.Projects)
 
-		resp2, err := store.CreateToken(ctx, "test2", description, true, []string{"proj1"})
+		resp2, err := store.CreateToken(ctx, "test2", name, true, []string{"proj1"})
 		assert.NoError(err, "failed to store token2")
 		assert.ElementsMatch([]string{"proj1"}, resp2.Projects)
 
-		resp3, err := store.CreateToken(ctx, "test3", description, true, []string{"proj1", "proj2"})
+		resp3, err := store.CreateToken(ctx, "test3", name, true, []string{"proj1", "proj2"})
 		assert.NoError(err, "failed to store token3")
 		assert.ElementsMatch([]string{"proj1", "proj2"}, resp3.Projects)
 
@@ -535,14 +535,14 @@ func TestPurgeProject(t *testing.T) {
 	ctx := context.Background()
 	store, db := setup(t)
 	assert := assert.New(t)
-	description := "Test Token Description"
+	name := "Test Token Name"
 	projectToPurge := "projectToPurge"
 
 	cases := map[string]func(*testing.T){
 		"when the token is unassigned, the token remains unassigned": func(t *testing.T) {
 			id := "unassigned"
 			projects := []string{}
-			resp, err := store.CreateToken(ctx, id, description, true, projects)
+			resp, err := store.CreateToken(ctx, id, name, true, projects)
 			assert.NoError(err, "failed to store token")
 			assert.ElementsMatch(projects, resp.Projects)
 
@@ -556,7 +556,7 @@ func TestPurgeProject(t *testing.T) {
 		"when the token only has the project to purge, the token becomes unassigned": func(t *testing.T) {
 			id := "projectToPurge_only"
 			projects := []string{projectToPurge}
-			resp, err := store.CreateToken(ctx, id, description, true, projects)
+			resp, err := store.CreateToken(ctx, id, name, true, projects)
 			assert.NoError(err, "failed to store token")
 			assert.ElementsMatch(projects, resp.Projects)
 
@@ -570,7 +570,7 @@ func TestPurgeProject(t *testing.T) {
 		"when the token only has projects other than the one to purge, the token's projects do not change": func(t *testing.T) {
 			id := "other_projects"
 			projects := []string{"otherproject", "otherproject2"}
-			resp, err := store.CreateToken(ctx, id, description, true, projects)
+			resp, err := store.CreateToken(ctx, id, name, true, projects)
 			assert.NoError(err, "failed to store token")
 			assert.ElementsMatch(projects, resp.Projects)
 
@@ -584,7 +584,7 @@ func TestPurgeProject(t *testing.T) {
 		"when the token has multiple projects including the one to purge, only that project is removed from the token": func(t *testing.T) {
 			id := "projectToPurge_and_others"
 			projects := []string{"otherproject", projectToPurge, "otherproject2"}
-			resp, err := store.CreateToken(ctx, id, description, true, projects)
+			resp, err := store.CreateToken(ctx, id, name, true, projects)
 			assert.NoError(err, "failed to store token")
 			assert.ElementsMatch(projects, resp.Projects)
 
@@ -598,25 +598,25 @@ func TestPurgeProject(t *testing.T) {
 		"when there are multiple tokens, some with, some without the project to purge": func(t *testing.T) {
 			id1 := "other_projects"
 			projects1 := []string{"otherproject", "otherproject2"}
-			resp1, err := store.CreateToken(ctx, id1, description, true, projects1)
+			resp1, err := store.CreateToken(ctx, id1, name, true, projects1)
 			assert.NoError(err, "failed to store token1")
 			assert.ElementsMatch(projects1, resp1.Projects)
 
 			id2 := "unassigned"
 			projects2 := []string{}
-			resp2, err := store.CreateToken(ctx, id2, description, true, projects2)
+			resp2, err := store.CreateToken(ctx, id2, name, true, projects2)
 			assert.NoError(err, "failed to store token2")
 			assert.ElementsMatch(projects2, resp2.Projects)
 
 			id3 := "projectToPurge_and_others"
 			projects3 := []string{"otherproject", projectToPurge, "otherproject2"}
-			resp3, err := store.CreateToken(ctx, id3, description, true, projects3)
+			resp3, err := store.CreateToken(ctx, id3, name, true, projects3)
 			assert.NoError(err, "failed to store token3")
 			assert.ElementsMatch(projects3, resp3.Projects)
 
 			id4 := "projectToPurge_only"
 			projects4 := []string{projectToPurge}
-			resp4, err := store.CreateToken(ctx, id4, description, true, projects4)
+			resp4, err := store.CreateToken(ctx, id4, name, true, projects4)
 			assert.NoError(err, "failed to store token4")
 			assert.ElementsMatch(projects4, resp4.Projects)
 
@@ -665,7 +665,7 @@ func TestCreateTokenWithValue(t *testing.T) {
 
 	assertCount(t, db, 1, id)
 	assert.Equal(id, tok.ID)
-	assert.Equal(desc, tok.Description)
+	assert.Equal(desc, tok.Name)
 	assert.Equal(active, tok.Active)
 	assert.WithinDuration(time.Now(), tok.Created, time.Second)
 	assert.WithinDuration(time.Now(), tok.Updated, time.Second)
@@ -681,22 +681,22 @@ func TestUpdateToken(t *testing.T) {
 				//DB time and Golang time are rounded differently
 				tme := time.Now().UTC().Round(time.Second)
 				tok := tokens.Token{
-					ID:          "coolest-token-on-the-block",
-					Description: "Cool Token",
-					Active:      true,
-					Value:       "secret-encoded-token-value",
-					Created:     tme,
-					Updated:     tme,
-					Projects:    []string{},
+					ID:       "coolest-token-on-the-block",
+					Name:     "Cool Token",
+					Active:   true,
+					Value:    "secret-encoded-token-value",
+					Created:  tme,
+					Updated:  tme,
+					Projects: []string{},
 				}
 				updatedTok := tokens.Token{
-					ID:          tok.ID,
-					Description: "THE coolest token on the block!",
-					Active:      false,
-					Value:       tok.Value,
-					Created:     tok.Created,
-					Updated:     tok.Updated,
-					Projects:    []string{"project-ABC", "project-XYZ"},
+					ID:       tok.ID,
+					Name:     "THE coolest token on the block!",
+					Active:   false,
+					Value:    tok.Value,
+					Created:  tok.Created,
+					Updated:  tok.Updated,
+					Projects: []string{"project-ABC", "project-XYZ"},
 				}
 
 				t.Run(name+" (fields updated)", func(t *testing.T) {
@@ -707,7 +707,7 @@ func TestUpdateToken(t *testing.T) {
 					ctx := insertProjectsIntoNewContext(test.projectFilter)
 
 					resp, err := store.UpdateToken(
-						ctx, tok.ID, updatedTok.Description, updatedTok.Active, updatedTok.Projects)
+						ctx, tok.ID, updatedTok.Name, updatedTok.Active, updatedTok.Projects)
 
 					if expectedSuccess {
 						assert.NoError(err)
@@ -729,7 +729,7 @@ func TestUpdateToken(t *testing.T) {
 					insertToken(t, db, tok)
 					ctx := insertProjectsIntoNewContext(test.projectFilter)
 
-					resp, err := store.UpdateToken(ctx, tok.ID, tok.Description, tok.Active, tok.Projects)
+					resp, err := store.UpdateToken(ctx, tok.ID, tok.Name, tok.Active, tok.Projects)
 
 					if expectedSuccess {
 						assert.NoError(err)
@@ -752,13 +752,13 @@ func TestUpdateToken(t *testing.T) {
 			//DB time and Golang time are rounded differently
 			tme := time.Now().UTC().Round(time.Second)
 			tok := tokens.Token{
-				ID:          "coolest-token-on-the-block",
-				Description: "Cool Token",
-				Active:      true,
-				Value:       "secret-encoded-token-value",
-				Created:     tme,
-				Updated:     tme,
-				Projects:    []string{},
+				ID:       "coolest-token-on-the-block",
+				Name:     "Cool Token",
+				Active:   true,
+				Value:    "secret-encoded-token-value",
+				Created:  tme,
+				Updated:  tme,
+				Projects: []string{},
 			}
 			updatedDesc := "THE coolest token on the block!"
 			updatedActive := false
@@ -786,11 +786,11 @@ func TestDeleteToken(t *testing.T) {
 	store, db := setup(t)
 
 	tok := tokens.Token{
-		ID:          "coolest-token-on-the-block",
-		Description: "Cool Token",
-		Active:      true,
-		Value:       "secret-encoded-token-value",
-		Projects:    []string{},
+		ID:       "coolest-token-on-the-block",
+		Name:     "Cool Token",
+		Active:   true,
+		Value:    "secret-encoded-token-value",
+		Projects: []string{},
 	}
 
 	t.Run("standard cases", func(t *testing.T) {
@@ -841,9 +841,9 @@ func insertToken(t *testing.T, db *sql.DB, tok tokens.Token) {
 		tok.Projects = []string{}
 	}
 	_, err := db.Exec(`INSERT INTO chef_authn_tokens
-    (id, description, active, value, project_ids, created, updated)
+    	(id, name, active, value, project_ids, created, updated)
 		values ($1, $2, $3, $4, $5, $6, $7)`,
-		tok.ID, tok.Description, tok.Active, tok.Value, pq.Array(tok.Projects),
+		tok.ID, tok.Name, tok.Active, tok.Value, pq.Array(tok.Projects),
 		tok.Created, tok.Updated)
 	require.NoError(t, err)
 	assertCount(t, db, 1, tok.ID)

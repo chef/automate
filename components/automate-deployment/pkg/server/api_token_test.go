@@ -42,14 +42,14 @@ func TestGenerateAdminToken(t *testing.T) {
 
 	testTokenString := "some-token"
 	testID := "some-guid"
-	testDescription := "some description of our admin token"
+	testName := "some name of our admin token"
 
 	t.Run("when API token and v2 policy creation succeed", func(t *testing.T) {
 		mockAuthN.CreateTokenFunc = func(
 			_ context.Context, req *authn.CreateTokenReq) (*authn.Token, error) {
 
 			assert.True(t, req.Active)
-			assert.Equal(t, testDescription, req.Description)
+			assert.Equal(t, testName, req.Name)
 
 			return &authn.Token{
 				Value: testTokenString,
@@ -67,7 +67,7 @@ func TestGenerateAdminToken(t *testing.T) {
 			return &authz_v2.Policy{}, nil
 		}
 
-		req := &api.GenerateAdminTokenRequest{Description: testDescription}
+		req := &api.GenerateAdminTokenRequest{Name: testName}
 		resp, err := generateAdminToken(ctx, req, connFactory, authnServer.URL, authzServer.URL)
 		require.NoError(t, err)
 		require.NotNil(t, resp)
@@ -78,7 +78,7 @@ func TestGenerateAdminToken(t *testing.T) {
 			_ context.Context, req *authn.CreateTokenReq) (*authn.Token, error) {
 
 			assert.True(t, req.Active)
-			assert.Equal(t, testDescription, req.Description)
+			assert.Equal(t, testName, req.Name)
 
 			return &authn.Token{
 				Value: testTokenString,
@@ -96,7 +96,7 @@ func TestGenerateAdminToken(t *testing.T) {
 			return nil, status.Error(codes.AlreadyExists, "policy with id \"diagnostics-admin-token\" already exists")
 		}
 
-		req := &api.GenerateAdminTokenRequest{Description: testDescription}
+		req := &api.GenerateAdminTokenRequest{Name: testName}
 		resp, err := generateAdminToken(ctx, req, connFactory, authnServer.URL, authzServer.URL)
 		require.NoError(t, err)
 		require.NotNil(t, resp)
@@ -107,7 +107,7 @@ func TestGenerateAdminToken(t *testing.T) {
 			_ context.Context, req *authn.CreateTokenReq) (*authn.Token, error) {
 
 			assert.True(t, req.Active)
-			assert.Equal(t, testDescription, req.Description)
+			assert.Equal(t, testName, req.Name)
 
 			return &authn.Token{
 				Value: testTokenString,
@@ -134,7 +134,7 @@ func TestGenerateAdminToken(t *testing.T) {
 		}
 
 		req := &api.GenerateAdminTokenRequest{
-			Description: testDescription,
+			Name: testName,
 		}
 
 		resp, err := generateAdminToken(ctx, req, connFactory, authnServer.URL, authzServer.URL)

@@ -14,3 +14,4 @@
 - [`12_add_filter_function_for_token_projects.up.sql`](12_add_filter_function_for_token_projects.up.sql)
 - [`13_add_db_id_column_to_tokens.up.sql`](13_add_db_id_column_to_tokens.up.sql)
 - [`14_drop_all_projects.up.sql`](14_drop_all_projects.up.sql)
+- [`15_v2_update.up.sql`](15_v2_update.up.sql)

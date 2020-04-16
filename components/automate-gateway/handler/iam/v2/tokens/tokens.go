@@ -32,19 +32,19 @@ func (s *Server) CreateToken(
 	var token *authn.Token
 	if in.Value != "" {
 		req := &authn.CreateTokenWithValueReq{
-			Id:          in.Id,
-			Description: in.Name,
-			Active:      active,
-			Value:       in.Value,
-			Projects:    in.Projects,
+			Id:       in.Id,
+			Name:     in.Name,
+			Active:   active,
+			Value:    in.Value,
+			Projects: in.Projects,
 		}
 		token, err = s.client.CreateTokenWithValue(ctx, req)
 	} else {
 		token, err = s.client.CreateToken(ctx, &authn.CreateTokenReq{
-			Id:          in.Id,
-			Description: in.Name,
-			Active:      active,
-			Projects:    in.Projects,
+			Id:       in.Id,
+			Name:     in.Name,
+			Active:   active,
+			Projects: in.Projects,
 		})
 	}
 
@@ -79,10 +79,10 @@ func (s *Server) UpdateToken(
 	}
 
 	resp, err := s.client.UpdateToken(ctx, &authn.UpdateTokenReq{
-		Id:          req.Id,
-		Description: req.Name,
-		Active:      active,
-		Projects:    req.Projects,
+		Id:       req.Id,
+		Name:     req.Name,
+		Active:   active,
+		Projects: req.Projects,
 	})
 	if err != nil {
 		return nil, err
@@ -126,12 +126,11 @@ func (s *Server) ResetAllTokenProjects(
 	return &pb_resp.ResetAllTokenProjectsResp{}, nil
 }
 
-// Maps the IAMV2 token (name, id) to original token model (id, description).
-// Value returned from internal auth service
+// Maps internal type to gateway type
 func convert(token *authn.Token) *pb_common.Token {
 	return &pb_common.Token{
 		Id:        token.Id,
-		Name:      token.Description,
+		Name:      token.Name,
 		Active:    token.Active,
 		Value:     token.Value,
 		CreatedAt: token.Created,

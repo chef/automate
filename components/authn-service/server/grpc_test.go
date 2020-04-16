@@ -106,14 +106,14 @@ func TestTokenGRPC(t *testing.T) {
 
 	upstreamURL, _ := url.Parse("http://internal-lb")
 	tokenID := "e7a41d83-98e7-44a6-b835-d0938752e836"
-	description := "myFavToken"
+	name := "myFavToken"
 	projects := []string{"project-1", "project-2"}
 	mockToken := tokens.Token{
-		ID:          tokenID,
-		Value:       "mysecret",
-		Description: description,
-		Active:      true,
-		Projects:    projects,
+		ID:       tokenID,
+		Value:    "mysecret",
+		Name:     name,
+		Active:   true,
+		Projects: projects,
 	}
 
 	serviceCerts := helpers.LoadDevCerts(t, "authn-service")
@@ -171,8 +171,8 @@ func TestTokenGRPC(t *testing.T) {
 			if tok.Value != mockToken.Value {
 				t.Errorf("expected value %q, got %q", mockToken.Value, tok.Value)
 			}
-			if tok.Description != mockToken.Description {
-				t.Errorf("expected description %q, got %q", mockToken.Description, tok.Description)
+			if tok.Name != mockToken.Name {
+				t.Errorf("expected name %q, got %q", mockToken.Name, tok.Name)
 			}
 			if tok.Active != mockToken.Active {
 				t.Errorf("expected active %v, got %v", mockToken.Active, tok.Active)
@@ -186,14 +186,16 @@ func TestTokenGRPC(t *testing.T) {
 	t.Run("CreateToken", func(t *testing.T) {
 		reqs := []api.CreateTokenReq{
 			{
-				Active:      false,
-				Description: "my new favorite",
-				Projects:    []string{"project-1", "project-2"},
+				Active:   false,
+				Name:     "my new favorite",
+				Projects: []string{"project-1", "project-2"},
+				Id:       "new-id-1",
 			},
 			{
-				Active:      true,
-				Description: "my cool token",
-				Projects:    []string{}, // empty projects
+				Active:   true,
+				Name:     "my cool token",
+				Projects: []string{}, // empty projects
+				Id:       "new-id-2",
 			},
 		}
 		for n, req := range reqs {
@@ -219,8 +221,8 @@ func TestTokenGRPC(t *testing.T) {
 				} else if _, err := time.Parse(time.RFC3339, tok.Updated); err != nil {
 					t.Errorf("failed to parse 'updated': %q", err)
 				}
-				if tok.Description != req.Description {
-					t.Errorf("expected description %q, got %q", req.Description, tok.Description)
+				if tok.Name != req.Name {
+					t.Errorf("expected name %q, got %q", req.Name, tok.Name)
 				}
 				if tok.Active != req.Active {
 					t.Errorf("expected active %v, got %v", req.Active, tok.Active)
@@ -231,19 +233,28 @@ func TestTokenGRPC(t *testing.T) {
 
 		t.Run("CreateToken with no projects succeeds", func(t *testing.T) {
 			tok, err := cl.CreateToken(ctx, &api.CreateTokenReq{
-				Active:      true,
-				Description: "my new real favorite",
+				Active: true,
+				Name:   "my new real favorite",
+				Id:     "create-test-id",
 				// no projects
 			})
 			require.NoError(t, err)
 			require.NotNil(t, tok)
 
-			assert.Equal(t, "my new real favorite", tok.Description)
+			assert.Equal(t, "my new real favorite", tok.Name)
 			assert.Equal(t, true, tok.Active)
 			// the database returns an empty array which we test in pg_test.go
 			// but here go coerces that empty array into a nil array
 			// https://programming.guide/go/nil-slice-vs-empty-slice.html
 			assert.Equal(t, []string(nil), tok.Projects)
+		})
+
+		t.Run("CreateToken with no id fails", func(t *testing.T) {
+			_, err := cl.CreateToken(ctx, &api.CreateTokenReq{
+				Name:     "name",
+				Projects: []string{"project1"},
+			})
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 	})
 
@@ -256,9 +267,10 @@ func TestTokenGRPC(t *testing.T) {
 
 		t.Run("when token is found", func(t *testing.T) {
 			tok, err := cl.CreateToken(ctx, &api.CreateTokenReq{
-				Active:      false,
-				Description: "my new favorite",
-				Projects:    []string{"project1"},
+				Active:   false,
+				Name:     "my new favorite",
+				Projects: []string{"project1"},
+				Id:       "delete-test-id",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, tok)
@@ -295,9 +307,10 @@ func TestTokenGRPC(t *testing.T) {
 
 		t.Run("when token is found but the policy purge fails", func(t *testing.T) {
 			tok, err := cl.CreateToken(ctx, &api.CreateTokenReq{
-				Active:      false,
-				Description: "my new favorite",
-				Projects:    []string{"project1"},
+				Active:   false,
+				Name:     "my new favorite",
+				Projects: []string{"project1"},
+				Id:       "delete-test-id",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, tok)
@@ -320,28 +333,28 @@ func TestTokenGRPC(t *testing.T) {
 
 	t.Run("UpdateToken", func(t *testing.T) {
 		t.Run("when token ID is not a UUID4", func(t *testing.T) {
-			ret, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{Id: "what?", Description: description, Projects: projects})
+			ret, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{Id: "what?", Name: name, Projects: projects})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, ret)
 		})
 
 		t.Run("when token is not found", func(t *testing.T) {
-			ret, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{Id: "00000000-0000-0000-0000-000000000000", Description: description, Projects: projects})
+			ret, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{Id: "00000000-0000-0000-0000-000000000000", Name: name, Projects: projects})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, ret)
 		})
 
 		t.Run("when token is updated successfully for active field only", func(t *testing.T) {
 			tok, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{
-				Active:      false,
-				Id:          tokenID,
-				Description: description,
-				Projects:    projects,
+				Active:   false,
+				Id:       tokenID,
+				Name:     name,
+				Projects: projects,
 			})
 			require.NoError(t, err)
 			require.NotNil(t, tok)
 
-			assert.Equal(t, mockToken.Description, tok.Description)
+			assert.Equal(t, mockToken.Name, tok.Name)
 			assert.Equal(t, mockToken.Projects, tok.Projects)
 
 			updated, err := time.Parse(time.RFC3339, tok.Updated)
@@ -358,35 +371,35 @@ func TestTokenGRPC(t *testing.T) {
 		})
 
 		t.Run("when no projects are passed request succeeds", func(t *testing.T) {
-			desc := "A Description"
+			desc := "A Name"
 			tok, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{
-				Active:      false,
-				Id:          tokenID,
-				Description: desc,
+				Active: false,
+				Id:     tokenID,
+				Name:   desc,
 			})
 
 			require.NoError(t, err)
 			require.NotNil(t, tok)
 
-			assert.Equal(t, desc, tok.Description)
+			assert.Equal(t, desc, tok.Name)
 			assert.Equal(t, false, tok.Active)
 			assert.Equal(t, tokenID, tok.Id)
 			assert.Equal(t, 0, len(tok.Projects))
 		})
 
 		t.Run("when token is updated successfully for all fields", func(t *testing.T) {
-			newDesc := "New Description"
+			newDesc := "New Name"
 			projects := append(projects, "new-project")
 			tok, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{
-				Active:      false,
-				Id:          tokenID,
-				Description: newDesc,
-				Projects:    projects,
+				Active:   false,
+				Id:       tokenID,
+				Name:     newDesc,
+				Projects: projects,
 			})
 			require.NoError(t, err)
 			require.NotNil(t, tok)
 
-			assert.Equal(t, newDesc, tok.Description)
+			assert.Equal(t, newDesc, tok.Name)
 			assert.ElementsMatch(t, projects, tok.Projects)
 
 			updated, err := time.Parse(time.RFC3339, tok.Updated)
@@ -439,17 +452,18 @@ func TestTokenGRPCInternalErrors(t *testing.T) {
 
 	t.Run("CreateToken", func(t *testing.T) {
 		_, err := cl.CreateToken(ctx, &api.CreateTokenReq{
-			Description: "description",
-			Projects:    []string{"project1"},
+			Name:     "name",
+			Projects: []string{"project1"},
+			Id:       "some-id",
 		})
 		grpctest.AssertCode(t, codes.Internal, err)
 	})
 
 	t.Run("UpdateToken", func(t *testing.T) {
 		_, err := cl.UpdateToken(ctx, &api.UpdateTokenReq{
-			Id:          "00000000-0000-0000-0000-000000000000",
-			Description: "description",
-			Projects:    []string{"mock"},
+			Id:       "00000000-0000-0000-0000-000000000000",
+			Name:     "name",
+			Projects: []string{"mock"},
 		})
 		grpctest.AssertCode(t, codes.Internal, err)
 	})
