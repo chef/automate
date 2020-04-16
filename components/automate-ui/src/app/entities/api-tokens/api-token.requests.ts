@@ -39,9 +39,9 @@ export class ApiTokenRequests {
 
   // Note: toggleActive takes the EXISTING value in `active`, and will take care
   // of flipping it.
-  public toggleActive(id: string, active: boolean): Observable<TokenPayloadResponse> {
+  public toggleActive(id: string, name: string, active: boolean): Observable<TokenPayloadResponse> {
     return this.http.put<TokenPayloadResponse>(`${env.iam_url}/tokens/${id}`,
-      { active: !active });
+      { name, active: !active });
   }
 
   public delete(id: string): Observable<Object> {
