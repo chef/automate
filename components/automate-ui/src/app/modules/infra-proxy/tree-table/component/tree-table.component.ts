@@ -28,7 +28,7 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
   @Output() nodeClicked: Subject<TreeTableNode<T>> = new Subject();
   private searchableTree: SearchableNode<T>[];
   private treeTable: TreeTableNode<T>[];
-  treeDepth = 5;
+  steps = 5;
   displayedColumns: string[];
   dataSource: MatTableDataSource<TreeTableNode<T>>;
   constructor(
@@ -75,8 +75,10 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
     return new MatTableDataSource(this.treeTable.filter(x => x.isVisible));
   }
 
-  formatIndentation(node: TreeTableNode<T>, step: number = this.treeDepth): string {
-    return '&nbsp;'.repeat(node.depth * step);
+  formatIndentStyle(node: TreeTableNode<T>, step: number = this.steps) {
+    return {
+      'margin-left': (node.depth * step * step).toString() + 'px'
+    };
   }
 
   formatElevation(): string {

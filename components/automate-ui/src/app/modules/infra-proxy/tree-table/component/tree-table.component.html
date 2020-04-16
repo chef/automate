@@ -7,7 +7,7 @@
       <td mat-cell *matCellDef="let element" [ngClass]="{'vertical-separator': options.verticalSeparator}">
         <div *ngIf="isFirst">
           <div class="value-cell">
-            <div [innerHTML]="formatIndentation(element)"></div>
+            <div [ngStyle]="formatIndentStyle(element)"></div>
             <mat-icon [ngStyle]="{'visibility': element.children.length ? 'visible' : 'hidden'}" (click)="onNodeClick(element)">
               {{element.isExpanded ? 'remove' : 'add'}}
             </mat-icon>
