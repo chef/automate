@@ -37,27 +37,10 @@ func NewProject(
 	typeVal Type,
 	status ProjectRulesStatus) (Project, error) {
 
-	err := validateProjectInputs(id, name)
-	if err != nil {
-		return Project{}, err
-	}
-
 	return Project{
 		ID:     id,
 		Name:   name,
 		Type:   typeVal,
 		Status: status.String(),
 	}, nil
-}
-
-func validateProjectInputs(id string, name string) error {
-	if emptyOrWhitespaceOnlyRE.MatchString(name) {
-		return errors.New(
-			"a project name is required and must contain at least one non-whitespace character")
-	}
-	if emptyOrWhitespaceOnlyRE.MatchString(id) {
-		return errors.New(
-			"a project id is required and must contain at least one non-whitespace character")
-	}
-	return nil
 }

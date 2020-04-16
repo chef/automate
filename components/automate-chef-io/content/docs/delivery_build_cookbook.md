@@ -16,7 +16,7 @@ Workflow is a legacy feature for Chef Automate, which was designed for managing 
 Workflow is available in Chef Automate for existing users. If you are not already using Workflow, but are interested in the solution it offers, please contact your sales or success representative for support with continuous integration pipelines.
 {{< /warning >}}
 
-Chef Automate uses the Chef Client to run recipes for each phase in a
+Chef Automate uses the Chef Infra Client to run recipes for each phase in a
 build pipeline. The phases are grouped into different stages.
 
 The following illustration shows the phases of each pipeline stage.
@@ -36,9 +36,9 @@ a project. A **build-cookbook** should be initially configured to use the
 may be modified as necessary. The **build-cookbook** is effectively a
 wrapper cookbook for the **delivery-truck** cookbook.
 
-A build node is configured through two isolated Chef Client runs: First, the
-**default.rb** recipe is run by the Chef Client as the root user, after
-which the phase-specific recipe is run by the Chef Client as the build
+A build node is configured through two isolated Chef Infra Client runs: First, the
+**default.rb** recipe is run by the Chef Infra Client as the root user, after
+which the phase-specific recipe is run by the Chef Infra Client as the build
 user (`dbuild`). For example, during the unit phase the first run is the
 **default.rb** file, and then the second is the **unit.rb** file.
 
@@ -46,7 +46,7 @@ The following recipes should be configured to include the corresponding
 **delivery-truck** recipe as a dependency:
 
 default.rb
-: Use the **default.rb** recipe to configure a project on a build node. This recipe is run by the Chef Client as the root user and is a standard default recipe. The Chef Client may use this recipe to configure this project on any node, whether or not it's part of a Chef Automate pipeline.
+: Use the **default.rb** recipe to configure a project on a build node. This recipe is run by the Chef Infra Client as the root user and is a standard default recipe. The Chef Infra Client may use this recipe to configure this project on any node, whether or not it's part of a Chef Automate pipeline.
 
 deploy.rb
 : Use the **deploy.rb** recipe to define how artifacts are published to one (or more) nodes after they are built successfully. The contents of this recipe are project-specific.

@@ -1,6 +1,6 @@
 +++
 title = "Notifications"
-description = "Notifications for Inspec compliance scans and Chef client runs."
+description = "Notifications for Inspec compliance scans and Chef Infra Client runs."
 date = 2018-05-18T13:19:02-07:00
 draft = false
 bref = ""
@@ -33,7 +33,7 @@ To add a Slack notification for Chef Automate:
 1. Select **Create Notification**.
 1. Select **Slack**.
 1. Enter a unique notification name.
-1. Select the failure type to be notified on from the drop-down menu. Current options are chef client run or InSpec scan
+1. Select the failure type to be notified on from the drop-down menu. Current options are Chef Infra Client run or InSpec scan
 1. Get your Slack webhook address by using the **What's this?** link, which opens an external Slack site.
 1. On the Slack page, select a channel or user for the notification. Slack will create the new webhook and then provide a webhook URL for you to copy. After entering a recipient, use the **Add Incoming WebHooks Integration** button.
 1. Copy the URL, return to the Chef Automate page, paste the URL into the _Notifications_ form.
@@ -67,7 +67,7 @@ To add a webhook notification for Chef Automate:
 1. Select **Create Notification**.
 1. Select **Webhooks**.
 1. Enter a unique notification name.
-1. Select the failure type to be notified on from the drop-down menu. Current options are chef client run or InSpec scan
+1. Select the failure type to be notified on from the drop-down menu. Current options are Chef Infra Client run or InSpec scan
 1. Enter the webhook URL the notification should be sent to.
 1. Use the **Send Test** button to try out your webhook notification.
 1. Use the **Save Notification** button to create the webhook notification.

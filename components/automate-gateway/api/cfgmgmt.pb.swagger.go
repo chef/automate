@@ -17,7 +17,7 @@ func init() {
     "/cfgmgmt/errors": {
       "get": {
         "summary": "GetErrors",
-        "description": "Returns a list of the most common errors reported for infra nodes' most recent Chef Client runs.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetErrors",
         "responses": {
           "200": {
@@ -56,7 +56,7 @@ func init() {
     "/cfgmgmt/nodes": {
       "get": {
         "summary": "GetNodes",
-        "description": "Returns a list of infra nodes that have checked in to Automate. \nAdding a filter makes a list of all nodes that meet the filter criteria. \nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns a list of infra nodes that have checked in to Automate.\nAdding a filter makes a list of all nodes that meet the filter criteria.\nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetNodes",
         "responses": {
           "200": {
@@ -115,6 +115,20 @@ func init() {
               "DESC"
             ],
             "default": "ASC"
+          },
+          {
+            "name": "start",
+            "description": "Earliest most recent check-in node information to return.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end",
+            "description": "Latest most recent check-in node information to return.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -152,7 +166,7 @@ func init() {
     "/cfgmgmt/nodes/{node_id}/runs": {
       "get": {
         "summary": "GetRuns",
-        "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node ID. \nSupports pagination.\nAccepts a ` + "`" + `start` + "`" + ` parameter to denote start date for the list and a filter of type ` + "`" + `status` + "`" + `.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node ID.\nSupports pagination.\nAccepts a ` + "`" + `start` + "`" + ` parameter to denote start date for the list and a filter of type ` + "`" + `status` + "`" + `.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetRuns",
         "responses": {
           "200": {
@@ -286,7 +300,7 @@ func init() {
     "/cfgmgmt/policy_revision/{revision_id}": {
       "get": {
         "summary": "GetPolicyCookbooks",
-        "description": "Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID. \nPolicy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.\nPolicy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetPolicyCookbooks",
         "responses": {
           "200": {
@@ -313,7 +327,7 @@ func init() {
     "/cfgmgmt/source_fqdns": {
       "get": {
         "summary": "GetSourceFqdns",
-        "description": "Returns a list of all chef servers associated with nodes that have checked in to Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetSourceFqdns",
         "responses": {
           "200": {

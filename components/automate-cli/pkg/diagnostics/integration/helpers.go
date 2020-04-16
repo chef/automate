@@ -13,7 +13,7 @@ import (
 // TimestampName returns a name with a timestamp
 func TimestampName() string {
 	ts := time.Now()
-	return "integration-diagnostic-" + ts.Format("20060102150405")
+	return "diagnostic-" + ts.Format("20060102150405")
 }
 
 // Password returns a random password

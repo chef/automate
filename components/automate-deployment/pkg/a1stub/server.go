@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path"
 	"regexp"
 	"sort"
 	"strings"
@@ -41,11 +40,11 @@ const reindexEs2ChunkSize = 100
 const ChefServerNginxStoppedSentinel = "/var/opt/opscode/a1stub_stopped_nginx"
 
 func setupCerts() error {
-	err := assetTmpfile("data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crt", &tlsCertPath)
+	err := assetTmpfile("ChefAutomateUpgradeFromv1SelfTest.crt", []byte(assets.ChefAutomateUpgradeFromV1SelfTestCRT), &tlsCertPath)
 	if err != nil {
 		return err
 	}
-	return assetTmpfile("data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key", &tlsKeyPath)
+	return assetTmpfile("ChefAutomateUpgradeFromv1SelfTest.key", []byte(assets.ChefAutomateUpgradeFromV1SelfTestKEY), &tlsKeyPath)
 }
 
 func cleanupCerts() {
@@ -57,15 +56,13 @@ func cleanupCerts() {
 	}
 }
 
-func assetTmpfile(assetPath string, tmpPath *string) error {
-	bytes := assets.MustAsset(assetPath)
-	tmpfile, err := ioutil.TempFile("", path.Base(assetPath))
+func assetTmpfile(assetName string, content []byte, tmpPath *string) error {
+	tmpfile, err := ioutil.TempFile("", assetName)
 	if err != nil {
 		return err
 	}
 	*tmpPath = tmpfile.Name()
-
-	return ioutil.WriteFile(tmpfile.Name(), bytes, os.ModePerm)
+	return ioutil.WriteFile(tmpfile.Name(), content, os.ModePerm)
 }
 
 func serveA1API() {

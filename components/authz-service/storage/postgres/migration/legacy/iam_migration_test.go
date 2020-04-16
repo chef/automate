@@ -191,11 +191,87 @@ func TestMigrateToV2(t *testing.T) {
 			err = deletePol(ctx, db, valPolID.String())
 			require.NoError(t, err)
 		},
+		"policies with the single term resource that granted permissions on v1 are migrated": func(t *testing.T) {
+			singleTermResources := []string{
+				"nodes",
+				"events",
+				"license",
+				"nodemanagers",
+				"service_groups",
+			}
+			nodesPolID, eventsPolID, licPolID := genUUID(t).String(), genUUID(t).String(), genUUID(t).String()
+			nodeManID, svcGroupPol := genUUID(t).String(), genUUID(t).String()
+
+			policyIDs := []string{nodesPolID, eventsPolID, licPolID, nodeManID, svcGroupPol}
+
+			for i, resource := range singleTermResources {
+				_, err := storePolicy(ctx, db, policyIDs[i], "*", []string{"user:ldap:bob"}, resource, "allow")
+				require.NoError(t, err)
+			}
+
+			err = MigrateToV2(ctx, db, true)
+			require.NoError(t, err)
+
+			migratedResources := []string{
+				"infra:nodes",
+				"event:events",
+				"system:license",
+				"infra:nodeManagers",
+				"applications:serviceGroups",
+			}
+			for j, id := range policyIDs {
+				migratedPol, err := queryTestPolicy(ctx, id, db)
+				require.NoError(t, err)
+				require.NotNil(t, migratedPol)
+
+				statement := migratedPol.Statements[0]
+				assert.Equal(t, []string{migratedResources[j]}, statement.Resources)
+
+				err = deletePol(ctx, db, id)
+				require.NoError(t, err)
+			}
+		},
+		"any other policies with a single term resource are skipped": func(t *testing.T) {
+			singleTermResources := []string{
+				"auth",
+				"service_info",
+				"users",
+				"auth_introspection",
+				"cfgmgmt",
+				"compliance",
+				"ingest",
+				"secrets",
+				"telemetry",
+				"notifications",
+				"not_real_resource",
+			}
+
+			policyIDs := make([]string, len(singleTermResources))
+			for i, resource := range singleTermResources {
+				id := genUUID(t).String()
+				policyIDs[i] = id
+
+				_, err := storePolicy(ctx, db, id, "*", []string{"user:ldap:bob"}, resource, "allow")
+				require.NoError(t, err)
+			}
+
+			err = MigrateToV2(ctx, db, true)
+			require.NoError(t, err)
+
+			for _, id := range policyIDs {
+				migratedPol, err := queryTestPolicy(ctx, id, db)
+				assert.Error(t, err)
+				assert.Nil(t, migratedPol)
+
+				err = deletePol(ctx, db, id)
+				require.NoError(t, err)
+			}
+		},
 	}
 
 	for desc, test := range cases {
-		flush(t, db)
 		t.Run(desc, test)
+		flush(t, db)
 	}
 }
 
@@ -340,6 +416,8 @@ func queryRole(ctx context.Context, db *sql.DB, id string) (*v2Role, error) {
 }
 
 func flush(t *testing.T, db *sql.DB) {
+	// we don't delete v1 policies so we can preserve the v1 default policies
+	// across tests
 	_, err := db.Exec(`DELETE FROM iam_policies CASCADE;
 		DELETE FROM iam_members CASCADE;
 		DELETE FROM iam_roles CASCADE;

@@ -107,6 +107,8 @@ func (s *CfgMgmtServer) GetNodes(ctx context.Context, request *cfgReq.Nodes) (*g
 	// (@afiune) Maybe it is not a bad idea to re-use ONLY the messages?
 	nodesRequest := cmsReq.Nodes{
 		Filter: request.GetFilter(),
+		Start:  request.Start,
+		End:    request.End,
 	}
 
 	if request.GetPagination() != nil {

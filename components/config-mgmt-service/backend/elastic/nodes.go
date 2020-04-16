@@ -191,23 +191,28 @@ func (es Backend) GetNodesPageByCursor(ctx context.Context, start time.Time,
 //   }
 // }
 func (es Backend) GetNodes(page int, perPage int, sortField string,
-	ascending bool, filters map[string][]string) ([]backend.Node, error) {
+	ascending bool, filters map[string][]string, startDate, endDate string) ([]backend.Node, error) {
 	// Decrement one to the page since we must start from zero
-	page = page - 1
-	start := perPage * page
+	startPage := perPage * (page - 1)
 
 	// Adding the exists = true filter to the list of filters, because nodes
 	// have documents that persist in elasticsearch to hold historical data
 	// even after the node no longer exists
 	filters["exists"] = []string{"true"}
 
-	filtersQuery := newBoolQueryFromFilters(filters)
+	mainQuery := newBoolQueryFromFilters(filters)
+
+	rangeQuery, ok := newRangeQuery(startDate, endDate, NodeCheckin)
+
+	if ok {
+		mainQuery = mainQuery.Must(rangeQuery)
+	}
 
 	searchResult, err := es.client.Search().
-		Query(filtersQuery).
+		Query(mainQuery).
 		Index(IndexNodeState).
-		Sort(sortField, ascending). // sort by 'sortField', in 'ascending' [true, false]
-		From(start).Size(perPage).  // take documents from {start} to {perPage}
+		Sort(sortField, ascending).    // sort by 'sortField', in 'ascending' [true, false]
+		From(startPage).Size(perPage). // take documents from {start} to {perPage}
 		Do(context.Background())
 	// Return an error if the search was not successful
 	if err != nil {

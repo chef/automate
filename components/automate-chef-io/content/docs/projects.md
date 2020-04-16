@@ -48,8 +48,8 @@ A condition consists of these properties:
 
 Property               | Description
 -----------------------|------------
-Event Attribute        | Chef Organization or Chef Server
-Node Attribute         | Chef Organization, Chef Server, Environment, Chef Role, Chef Tag, Chef Policy Name, or Chef Policy Group
+Event Attribute        | Chef Organization or Chef Infra Server
+Node Attribute         | Chef Organization, Chef Infra Server, Environment, Chef Role, Chef Tag, Chef Policy Name, or Chef Policy Group
 Operator               | equals of member of
 Values                 | list of one or more values to match on the specified attribute
 

@@ -168,7 +168,7 @@ func loadRawExamples() {
 	}
 	for _, r := range runs {
 		// load chef_run json into memory, so that we do not count the json generation
-		content, err := ioutil.ReadFile(fmt.Sprintf("%s", r))
+		content, err := ioutil.ReadFile(r)
 		if err != nil {
 			panic(err)
 		}

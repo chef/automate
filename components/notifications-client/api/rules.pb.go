@@ -5,9 +5,8 @@ package api
 
 import (
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1083,7 +1082,9 @@ func init() {
 	proto.RegisterType((*RuleListResponse)(nil), "notifications.RuleListResponse")
 }
 
-func init() { proto.RegisterFile("rules.proto", fileDescriptor_8e722d3e922f0937) }
+func init() {
+	proto.RegisterFile("rules.proto", fileDescriptor_8e722d3e922f0937)
+}
 
 var fileDescriptor_8e722d3e922f0937 = []byte{
 	// 862 bytes of a gzipped FileDescriptorProto

@@ -35,6 +35,7 @@ const (
 	ActionFieldID        = "id"
 	NodeFieldID          = "entity_uuid"
 	RunFieldID           = "run_id"
+	NodeCheckin          = "checkin"
 	SuggestionSize       = 10
 	SuggestionQuerySize  = 100
 )

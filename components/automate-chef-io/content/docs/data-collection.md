@@ -21,7 +21,7 @@ There are two steps to getting data collection running in Chef Automate:
 
 1. You must first have an API token. You have two options:
 
-  * An API Token can [be created from scratch]({{< relref "api-tokens.md#creating-a-standard-api-token" >}}).
+  * [Create a new API Token]({{< relref "api-tokens.md#creating-api-tokens" >}}).
   * Or you can [use your existing data collector token]({{< relref "#existing-data-collector-token-setup" >}}) if you are migrating from Chef Automate 1.
 
 1. Once you have an API token, you can either:
@@ -92,7 +92,7 @@ Next, configure the Chef Infra Server for data collection forwarding by adding t
 
 ```ruby
 data_collector['root_url'] = 'https://{{< example_fqdn "automate" >}}/data-collector/v0/'
-# Add for chef client run forwarding
+# Add for Chef Infra Client run forwarding
 data_collector['proxy'] = true
 # Add for compliance scanning
 profiles['root_url'] = 'https://{{< example_fqdn "automate" >}}'
@@ -113,7 +113,7 @@ For Chef Infra Server versions between 12.11 and 12.13, simply add the `root_url
 ```ruby
 data_collector['root_url'] = 'https://{{< example_fqdn "automate" >}}/data-collector/v0/'
 data_collector['token'] = '<API_TOKEN_FROM_STEP_1>'
-# Add for chef client run forwarding
+# Add for Chef Infra Client run forwarding
 data_collector['proxy']= true
 # Add for compliance scanning
 profiles['root_url'] = 'https://{{< example_fqdn "automate" >}}'
@@ -129,6 +129,7 @@ chef-server-ctl reconfigure
 ### Setting Up Chef Infra Client to Send Compliance Scan Data Through the Chef Infra Server to Chef Automate
 
 Now that the Chef Infra Server is configured for data collection, you can also enable Compliance Scanning
+
 on your Chef Infra Clients via the [Audit Cookbook](https://github.com/chef-cookbooks/audit).
 
 * Set the following attributes for the audit cookbook:
@@ -207,6 +208,7 @@ When this attribute is specified, the supplied string will be sent as the ``Host
 ## Configure your Chef Infra Client to Send Data to Chef Automate without Chef Infra Server
 
 If you do not use a Chef Infra Server in your environment (if you only use `chef-solo`, for example), you
+
 can configure your Chef Infra Clients to send their run data to Chef Automate directly by performing the following:
 
 1. Add Chef Automate SSL certificate to `trusted_certs` directory.
@@ -279,7 +281,7 @@ Chef Automate. Please see the audit cookbook for an
 
 | Configuration                     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Options                        | Default |
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ------- |
-| `data_collector.mode`             | The mode in which the data collector is allowed to operate. This can be used to run data collector only when running as Chef solo but not when using Chef client.                                                                                                                                                                                                                                                                                                                                         | `:solo`, `:client`, or `:both` | `:both` |
+| `data_collector.mode`             | The mode in which the data collector is allowed to operate. This can be used to run data collector only when running as Chef solo but not when using Chef Infra Client.                                                                                                                                                                                                                                                                                                                                         | `:solo`, `:client`, or `:both` | `:both` |
 | `data_collector.raise_on_failure` | When the data collector cannot send the "starting a run" message to the data collector server, the data collector will be disabled for that run. In some situations, such as highly-regulated environments, it may be more reasonable to Prevents data collection when the data collector cannot send the "starting a run" message to the data collector server. In these situations, setting this value to `true` will cause the Chef run to raise an exception before starting any converge activities. | `true`, `false`                | `false` |
 | `data_collector.organization`     | A user-supplied organization string that can be sent in payloads generated by the data collector when Chef is run in Solo mode. This allows users to associate their Solo nodes with faux organizations without the nodes being connected to an actual Chef Infra Server.                                                                                                                                                                                                                                       | `string`                       | `none`  |
 
