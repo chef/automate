@@ -71,7 +71,7 @@ Once this step is done, the `test_viewer` and `test_editor` users may log in wit
 
 ### Creating Custom Policies
 
-The Chef-managed policies give you a starting-point for permissions.
+The Chef-managed policies give you a starting point for permissions.
 You may want to write more fine-grained policies, tailored to the demands of your organization.
 Defining your own policies must be done from the command line.
 
