@@ -22,6 +22,8 @@
           <div role="menuitem" class="nav-link"><a routerLink="/compliance" routerLinkActive="active" tabindex="0">Compliance</a></div>
         </app-authorized>
 
+        <div role="menuitem" class="nav-link"><a routerLink="/desktop" routerLinkActive="active" tabindex="0">Desktop</a></div>
+
         <app-authorized
           [anyOf]="[['/api/v0/datafeed/destinations', 'post'], ['/api/v0/notifications/rules', 'get'], ['/api/v0/secrets/search', 'post'],
             ['/api/v0/nodemanagers/search', 'post'], ['/api/v0/retention/nodes/status', 'get'],
