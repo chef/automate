@@ -8,7 +8,6 @@ import { Desktop, TermFilter } from 'app/entities/desktop/desktop.model';
 })
 export class InsightComponent {
 
-  @Input() visible = false;
   @Input() desktops: Desktop[];
   @Input() currentPage: number;
   @Input() pageSize: number;
