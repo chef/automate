@@ -240,9 +240,7 @@ Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, en
   })
   .then((resp: Cypress.ObjectLike) => {
     // to avoid getting stuck in an infinite loop
-    if (maxRetries === 0) {
-      return;
-    }
+    expect(maxRetries, `Looking for compliance node with ID ${nodeId}`).to.not.be.equal(0);
     if (resp.body.nodes && resp.body.nodes.length > 0 && resp.body.nodes[0].id === nodeId ) {
       return;
     }
