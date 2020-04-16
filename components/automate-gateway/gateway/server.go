@@ -164,8 +164,6 @@ func (s *Server) Start() error {
 func (s *Server) loadConnFactory() {
 	s.logger.Debug("loading gRPC connection factory")
 	s.connFactory = secureconn.NewFactory(*s.Config.ServiceCerts, secureconn.DisableDebugServer())
-
-	return
 }
 
 func (s *Server) loadClients() error {
@@ -183,8 +181,6 @@ func (s *Server) loadServiceCerts() {
 
 	s.serviceKeyPair = s.Config.ServiceCerts.ServiceKeyPair
 	s.rootCerts = s.Config.ServiceCerts.NewCertPool()
-
-	return
 }
 
 func (s *Server) setLogLevel() {
@@ -194,8 +190,6 @@ func (s *Server) setLogLevel() {
 		l = log.InfoLevel
 	}
 	log.SetLevel(l)
-
-	return
 }
 
 func (s *Server) loadAuthorizer() error {
@@ -232,7 +226,6 @@ func (s *Server) startNullBackendServer() error {
 		if err != nil {
 			s.errC <- errors.Wrap(err, "serve null backend")
 		}
-		return
 	}()
 
 	return nil
@@ -243,8 +236,6 @@ func (s *Server) stopNullBackendServer() {
 
 	s.nullBackendServer.GracefulStop()
 	_ = os.Remove(s.Config.GrpcClients.NullBackendSock)
-
-	return
 }
 
 func (s *Server) startSignalHandler() error {
@@ -317,7 +308,6 @@ func (s *Server) startGRPCServer() error {
 		if err != nil {
 			s.errC <- errors.Wrap(err, "serve gRPC")
 		}
-		return
 	}()
 
 	return nil
@@ -326,8 +316,6 @@ func (s *Server) startGRPCServer() error {
 func (s *Server) stopGRPCServer() {
 	s.logger.Info("stopping gRPC server")
 	s.grpcServer.GracefulStop()
-
-	return
 }
 
 func (s *Server) startHTTPServer() error {
@@ -356,7 +344,6 @@ func (s *Server) startHTTPServer() error {
 	s.httpMuxConnCancel = func() {
 		cancelUnversioned()
 		cancelVersioned()
-		return
 	}
 	mux.Handle("/apis/", http.StripPrefix("/apis", prettifier(versionedMux)))
 
@@ -477,7 +464,6 @@ func (s *Server) startHTTPServer() error {
 		if err != nil {
 			s.errC <- errors.Wrap(err, "serve HTTPS")
 		}
-		return
 	}()
 
 	return nil

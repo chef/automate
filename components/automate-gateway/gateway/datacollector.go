@@ -16,7 +16,6 @@ import (
 	"github.com/buger/jsonparser"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
-	protobufStruct "github.com/golang/protobuf/ptypes/struct"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	log "github.com/sirupsen/logrus"
@@ -366,18 +365,18 @@ func getResources(body []byte) []*ingestProto.Resource {
 
 // The ignore_failure field is either a string or a boolean.
 // Defaults to false.
-func getIgnoreFailureValue(resource []byte) *protobufStruct.Value {
+func getIgnoreFailureValue(resource []byte) *structpb.Value {
 	fieldString, err := jsonparser.GetString(resource, "ignore_failure")
 	if err == nil {
-		return &protobufStruct.Value{
-			Kind: &protobufStruct.Value_StringValue{
+		return &structpb.Value{
+			Kind: &structpb.Value_StringValue{
 				StringValue: fieldString,
 			},
 		}
 	}
 
-	return &protobufStruct.Value{
-		Kind: &protobufStruct.Value_BoolValue{
+	return &structpb.Value{
+		Kind: &structpb.Value_BoolValue{
 			BoolValue: getBoolIfExists("ignore_failure", resource),
 		},
 	}
