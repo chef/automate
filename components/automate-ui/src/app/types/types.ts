@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import { merge, endsWith, replace } from 'lodash';
 import * as moment from 'moment';
 
 export type Status = 'success' | 'failure' | 'missing' | 'skipped';
@@ -628,10 +628,15 @@ export class GuitarStringItem {
         label = name;
     }
 
-    label = count > 1 ? label + 's' : label;
+    // Pluralize the event label type if necessary
+    if (count > 1) {
+      label = label === 'policy' ? 'policies' : label + 's';
+    }
+
     return label;
   }
 }
+
 
 export class GuitarStringCollection {
   strings: GuitarString[];
