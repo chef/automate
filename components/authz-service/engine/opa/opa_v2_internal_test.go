@@ -123,7 +123,7 @@ func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 
 	policies, roles := v2BaselinePoliciesAndRoles()
 
-	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+	s.store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policies,
 		"roles":    roles,
 	})
@@ -214,7 +214,7 @@ func BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies(b *testing.B)
 
 	for _, policyCount := range policyCounts {
 		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
 		})
@@ -256,7 +256,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingPolicies(b *testing.B) {
 	for _, policyCount := range policyCounts {
 		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
 
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
 		})
@@ -301,7 +301,7 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
 	for _, policyCount := range policyCounts {
 		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
 
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
 		})
@@ -346,7 +346,7 @@ func BenchmarkAuthorizedProjectPreparedQueryWithIncreasingRoles(b *testing.B) {
 
 	for _, roleCount := range roleCounts {
 		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
 		})
@@ -385,7 +385,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingRoles(b *testing.B) {
 
 	for _, roleCount := range roleCounts {
 		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
 		})
@@ -428,7 +428,7 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingRoles(b *testing.B) {
 
 	for _, roleCount := range roleCounts {
 		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
 		})
@@ -474,7 +474,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingProjects(b *testing.B) {
 
 		_, roleMap := v2BaselinePoliciesAndRoles()
 
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policyMap,
 			"roles":    roleMap,
 		})
@@ -520,7 +520,7 @@ func BenchmarkFilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
 
 		_, roleMap := v2BaselinePoliciesAndRoles()
 
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policyMap,
 			"roles":    roleMap,
 		})
@@ -562,7 +562,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingSubjects(b *testing.B) {
 	roleCount := 10
 
 	policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
-	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+	s.store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policies,
 		"roles":    roles,
 	})
@@ -613,7 +613,7 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects(b *testing.B) {
 	roleCount := 10
 
 	policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
-	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+	s.store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policies,
 		"roles":    roles,
 	})
@@ -692,7 +692,7 @@ func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
 		}
 	}
 
-	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+	s.store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policies,
 		"roles":    roles,
 	})
@@ -717,7 +717,7 @@ func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
 		pol["members"] = []string{member}
 
 		// refresh store to reflect policies with the subject as a member
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
 		})
