@@ -97,27 +97,32 @@ Both types of policies allow for membership modification.
 
 A role is a named list of actions.
 This list provides the benefit of *encapsulation*.
-A policy statement only needs the role's name, and the policy is not burdened by all the details.
+A policy statement needs only the role's name, and the policy is not burdened by all the details.
 Also, the list offers *reusability* as you can apply the role to any statement that needs it.
-
-Chef Automate has five default roles.
-To see the actions comprising the roles, see [Chef-managed Roles]({{< relref "api/#tag/roles" >}}).
-
-Role          | Description
---------------|------------
-Viewer        | **View** everything in the system *except* IAM
-Editor        | **Do** everything in the system *except* IAM and license application
-Owner         | **Do** everything in the system *including* IAM
-Project Owner | Editor + **view** and **assign** projects
-Ingest        | Ingest data into the system
 
 Just like policies, roles are either *Chef-managed* or *Custom* types.
 Default Chef-managed roles cannot change, like Chef-managed policies.
-You can use these default Chef-managed roles in your policies, or create your custom roles for more customized permissions.
+
+Chef Automate includes five *Chef-managed* roles and two *Custom* roles by default.
+You can edit these Custom roles, *Compliance Viewer* and *Compliance Editor*.
+To see the actions comprising the roles, see [Chef-managed Roles]({{< relref "api/#tag/roles" >}}).
+
+Role              |Type          |Description
+------------------|--------------|------------------------------
+Viewer            |Chef-managed  |**View** everything in the system *except* IAM
+Editor            |Chef-managed  |**Do** everything in the system *except* IAM and license application
+Owner             |Chef-managed  |**Do** everything in the system *including* IAM
+Project Owner     |Chef-managed  |Editor + **view** and **assign** projects
+Ingest            |Chef-managed  |Ingest data into the system
+Compliance Viewer |Custom        |Viewer for compliance resources
+Compliance Editor |Custom        |Editor for compliance resources
+
+You can use these default Chef-created roles in your policies, or create more custom roles for further customized permissions.
 You can later edit any roles you create.
 
-Chef Automate also ships with default policies that leverage these default roles.
-The default policies are Viewers, Editors, Administrator, and Ingest.
+Chef Automate also ships with policies that leverage these roles.
+Those Chef-managed policies are Viewers, Editors, Administrator, and Ingest.
+The custom policies are Compliance Viewers and Compliance Editors.
 
 ## Working with Projects
 
