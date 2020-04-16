@@ -1,5 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
@@ -7,26 +8,58 @@ import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { InfraRoleDetailsComponent } from './infra-role-details.component';
 import { MockComponent } from 'ng2-mock-component';
+import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
+import { RoleAttributes } from 'app/entities/infra-roles/infra-role.model';
+
+class MockAttributesService {
+  nullRoleAttributes = new RoleAttributes({
+    default_attributes: '',
+    override_attributes: ''
+  });
+
+  fetch() {
+    return Promise.resolve(
+      new RoleAttributes({
+        default_attributes: '{\"my-cookbook\": {\"port\": 80, \"code\": {\"location\": \"github\"}}}',
+        override_attributes: '{}'
+      })
+    );
+  }
+}
 
 describe('InfraRoleDetailsComponent', () => {
   let component: InfraRoleDetailsComponent;
   let fixture: ComponentFixture<InfraRoleDetailsComponent>;
+  let element;
+  const role = {
+      'name': 'starter',
+      'chef_type': 'role',
+      'description': 'An example Chef role',
+      'default_attributes': '{\"my-cookbook\": {\"port\": 80, \"code\": {\"location\": \"github\"}}}',
+      'override_attributes': '{}',
+      'json_class': 'Chef::Role',
+      'run_list': [],
+      'expanded_run_list': []
+    };
+
+  const retrieve_default = {
+    'my-cookbook': {
+      port: 80,
+      code: {
+        location: 'github'
+      }
+    }
+  };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({
-          selector: 'app-create-org-modal',
-          inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
-          outputs: ['close', 'createClicked']
-          }),
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         MockComponent({ selector: 'chef-button',
           inputs: ['disabled', 'routerLink'] }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
@@ -41,11 +74,15 @@ describe('InfraRoleDetailsComponent', () => {
         MockComponent({ selector: 'chef-table-header-cell' }),
         MockComponent({ selector: 'chef-table-cell' }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        InfraRoleDetailsComponent
+        MockComponent({ selector: 'chef-tab-selector',
+          inputs: ['value', 'routerLink', 'fragment']
+        }),
+        InfraRoleDetailsComponent,
+        JsonTreeTable
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        MockAttributesService
       ],
       imports: [
         FormsModule,
@@ -61,7 +98,9 @@ describe('InfraRoleDetailsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(InfraRoleDetailsComponent);
     component = fixture.componentInstance;
+    element = fixture.debugElement;
     fixture.detectChanges();
+    component.attributes = new RoleAttributes(role);
   });
 
   it('should be created', () => {
@@ -72,4 +111,33 @@ describe('InfraRoleDetailsComponent', () => {
     expect(component.tabValue).toBe('runList');
   });
 
+  it('show run_list section when run_list tab is selected', () => {
+    component.onSelectedTab({ target: { value: 'runList' } });
+    expect(component.tabValue).toBe('runList');
+  });
+
+  it('show attributes section when attributes tab is selected', () => {
+    component.onSelectedTab({ target: { value: 'attributes' } });
+    expect(component.tabValue).toBe('attributes');
+  });
+
+  describe('empty state', () => {
+    it('run_list array should be empty', () => {
+      expect(component.arrayOfNodesTree.length).toEqual(0);
+    });
+  });
+
+  describe('AttributesComponent', () => {
+    it('renders the attributes component correctly', () => {
+      expect(element.query(By.css('.jsontree_value_object'))).toBeNull();
+    });
+
+    it('fetches attributes and returns a NodeAttributes object', async(() => {
+      fixture.whenStable().then(() => {
+        expect(component.retrieve('default_attributes')).toEqual(retrieve_default);
+      });
+    }));
+  });
+
+  // Tree-table specs covered in './tree-table/services/tree/tree.service.spec.ts'
 });
