@@ -11,7 +11,7 @@ import (
 	request0 "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	response0 "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	gomock "github.com/golang/mock/gomock"
-	struct0 "github.com/golang/protobuf/ptypes/struct"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	grpc "google.golang.org/grpc"
 	metadata "google.golang.org/grpc/metadata"
 	reflect "reflect"
@@ -261,14 +261,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetNodeRun(arg0, arg1 interface{}, arg2
 }
 
 // GetNodes mocks base method
-func (m *MockCfgMgmtClient) GetNodes(arg0 context.Context, arg1 *request0.Nodes, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtClient) GetNodes(arg0 context.Context, arg1 *request0.Nodes, arg2 ...grpc.CallOption) (*structpb.ListValue, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetNodes", varargs...)
-	ret0, _ := ret[0].(*struct0.ListValue)
+	ret0, _ := ret[0].(*structpb.ListValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -301,14 +301,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetNodesCounts(arg0, arg1 interface{}, 
 }
 
 // GetOrganizations mocks base method
-func (m *MockCfgMgmtClient) GetOrganizations(arg0 context.Context, arg1 *request0.Organizations, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtClient) GetOrganizations(arg0 context.Context, arg1 *request0.Organizations, arg2 ...grpc.CallOption) (*structpb.ListValue, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetOrganizations", varargs...)
-	ret0, _ := ret[0].(*struct0.ListValue)
+	ret0, _ := ret[0].(*structpb.ListValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -341,14 +341,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetPolicyCookbooks(arg0, arg1 interface
 }
 
 // GetRuns mocks base method
-func (m *MockCfgMgmtClient) GetRuns(arg0 context.Context, arg1 *request0.Runs, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtClient) GetRuns(arg0 context.Context, arg1 *request0.Runs, arg2 ...grpc.CallOption) (*structpb.ListValue, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetRuns", varargs...)
-	ret0, _ := ret[0].(*struct0.ListValue)
+	ret0, _ := ret[0].(*structpb.ListValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -381,14 +381,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetRunsCounts(arg0, arg1 interface{}, a
 }
 
 // GetSourceFqdns mocks base method
-func (m *MockCfgMgmtClient) GetSourceFqdns(arg0 context.Context, arg1 *request0.SourceFQDNS, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtClient) GetSourceFqdns(arg0 context.Context, arg1 *request0.SourceFQDNS, arg2 ...grpc.CallOption) (*structpb.ListValue, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetSourceFqdns", varargs...)
-	ret0, _ := ret[0].(*struct0.ListValue)
+	ret0, _ := ret[0].(*structpb.ListValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -401,14 +401,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetSourceFqdns(arg0, arg1 interface{}, 
 }
 
 // GetSuggestions mocks base method
-func (m *MockCfgMgmtClient) GetSuggestions(arg0 context.Context, arg1 *request0.Suggestion, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtClient) GetSuggestions(arg0 context.Context, arg1 *request0.Suggestion, arg2 ...grpc.CallOption) (*structpb.ListValue, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetSuggestions", varargs...)
-	ret0, _ := ret[0].(*struct0.ListValue)
+	ret0, _ := ret[0].(*structpb.ListValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -915,10 +915,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetNodeRun(arg0, arg1 interface{}) *gom
 }
 
 // GetNodes mocks base method
-func (m *MockCfgMgmtServer) GetNodes(arg0 context.Context, arg1 *request0.Nodes) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtServer) GetNodes(arg0 context.Context, arg1 *request0.Nodes) (*structpb.ListValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNodes", arg0, arg1)
-	ret0, _ := ret[0].(*struct0.ListValue)
+	ret0, _ := ret[0].(*structpb.ListValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -945,10 +945,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetNodesCounts(arg0, arg1 interface{}) 
 }
 
 // GetOrganizations mocks base method
-func (m *MockCfgMgmtServer) GetOrganizations(arg0 context.Context, arg1 *request0.Organizations) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtServer) GetOrganizations(arg0 context.Context, arg1 *request0.Organizations) (*structpb.ListValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOrganizations", arg0, arg1)
-	ret0, _ := ret[0].(*struct0.ListValue)
+	ret0, _ := ret[0].(*structpb.ListValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -975,10 +975,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetPolicyCookbooks(arg0, arg1 interface
 }
 
 // GetRuns mocks base method
-func (m *MockCfgMgmtServer) GetRuns(arg0 context.Context, arg1 *request0.Runs) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtServer) GetRuns(arg0 context.Context, arg1 *request0.Runs) (*structpb.ListValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRuns", arg0, arg1)
-	ret0, _ := ret[0].(*struct0.ListValue)
+	ret0, _ := ret[0].(*structpb.ListValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1005,10 +1005,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetRunsCounts(arg0, arg1 interface{}) *
 }
 
 // GetSourceFqdns mocks base method
-func (m *MockCfgMgmtServer) GetSourceFqdns(arg0 context.Context, arg1 *request0.SourceFQDNS) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtServer) GetSourceFqdns(arg0 context.Context, arg1 *request0.SourceFQDNS) (*structpb.ListValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSourceFqdns", arg0, arg1)
-	ret0, _ := ret[0].(*struct0.ListValue)
+	ret0, _ := ret[0].(*structpb.ListValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1020,10 +1020,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetSourceFqdns(arg0, arg1 interface{}) 
 }
 
 // GetSuggestions mocks base method
-func (m *MockCfgMgmtServer) GetSuggestions(arg0 context.Context, arg1 *request0.Suggestion) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtServer) GetSuggestions(arg0 context.Context, arg1 *request0.Suggestion) (*structpb.ListValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSuggestions", arg0, arg1)
-	ret0, _ := ret[0].(*struct0.ListValue)
+	ret0, _ := ret[0].(*structpb.ListValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

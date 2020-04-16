@@ -43,7 +43,7 @@ require (
 	github.com/gocarina/gocsv v0.0.0-20170928100509-7099e67763c2
 	github.com/gofrs/uuid v2.1.0+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
-	github.com/golang/mock v1.3.1
+	github.com/golang/mock v1.4.3
 	github.com/golang/protobuf v1.3.5
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/handlers v1.3.0 // indirect
@@ -121,6 +121,7 @@ require (
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
 	golang.org/x/sys v0.0.0-20200212091648-12a6c2dcc1e4 // indirect
 	golang.org/x/text v0.3.2
+	golang.org/x/tools v0.0.0-20200416061724-5744cfde56ed // indirect
 	google.golang.org/api v0.9.0
 	google.golang.org/genproto v0.0.0-20200211111953-2dc5924e3898
 	google.golang.org/grpc v1.27.1
