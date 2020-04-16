@@ -16,7 +16,7 @@ func init() {
   "paths": {
     "/cfgmgmt/errors": {
       "get": {
-        "summary": "GetErrors",
+        "summary": "List Errors",
         "description": "Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetErrors",
         "responses": {
@@ -55,8 +55,13 @@ func init() {
     },
     "/cfgmgmt/nodes": {
       "get": {
+<<<<<<< HEAD
         "summary": "GetNodes",
         "description": "Returns a list of infra nodes that have checked in to Automate.\nAdding a filter makes a list of all nodes that meet the filter criteria.\nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+=======
+        "summary": "List Checked-in Nodes",
+        "description": "Returns a list of infra nodes that have checked in to Automate. \nAdding a filter makes a list of all nodes that meet the filter criteria. \nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+>>>>>>> First attempt at adding API request examples
         "operationId": "GetNodes",
         "responses": {
           "200": {
@@ -138,7 +143,7 @@ func init() {
     },
     "/cfgmgmt/nodes/{node_id}/attribute": {
       "get": {
-        "summary": "GetAttributes",
+        "summary": "List Attributes",
         "description": "Returns the latest reported attributes for the provided node ID.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetAttributes",
         "responses": {
@@ -165,8 +170,13 @@ func init() {
     },
     "/cfgmgmt/nodes/{node_id}/runs": {
       "get": {
+<<<<<<< HEAD
         "summary": "GetRuns",
         "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node ID.\nSupports pagination.\nAccepts a ` + "`" + `start` + "`" + ` parameter to denote start date for the list and a filter of type ` + "`" + `status` + "`" + `.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+=======
+        "summary": "List Run Details",
+        "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node ID. \nSupports pagination.\nAccepts a ` + "`" + `start` + "`" + ` parameter to denote start date for the list and a filter of type ` + "`" + `status` + "`" + `.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+>>>>>>> First attempt at adding API request examples
         "operationId": "GetRuns",
         "responses": {
           "200": {
@@ -236,7 +246,7 @@ func init() {
     },
     "/cfgmgmt/nodes/{node_id}/runs/{run_id}": {
       "get": {
-        "summary": "GetNodeRun",
+        "summary": "List Node Run",
         "description": "Returns the infra run report for the provided node ID and run ID.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetNodeRun",
         "responses": {
@@ -278,7 +288,7 @@ func init() {
     },
     "/cfgmgmt/organizations": {
       "get": {
-        "summary": "GetOrganizations",
+        "summary": "List Organizations",
         "description": "Returns a list of all organizations associated with nodes that have checked in to Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetOrganizations",
         "responses": {
@@ -299,8 +309,13 @@ func init() {
     },
     "/cfgmgmt/policy_revision/{revision_id}": {
       "get": {
+<<<<<<< HEAD
         "summary": "GetPolicyCookbooks",
         "description": "Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.\nPolicy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+=======
+        "summary": "List Policy Cookbooks",
+        "description": "Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID. \nPolicy revision IDs are sent with an infra run report and identifies which instance of a policy the node used for this run.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+>>>>>>> First attempt at adding API request examples
         "operationId": "GetPolicyCookbooks",
         "responses": {
           "200": {
@@ -326,7 +341,7 @@ func init() {
     },
     "/cfgmgmt/source_fqdns": {
       "get": {
-        "summary": "GetSourceFqdns",
+        "summary": "List Associated Chef Infra Servers",
         "description": "Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetSourceFqdns",
         "responses": {
@@ -347,8 +362,8 @@ func init() {
     },
     "/cfgmgmt/stats/checkin_counts_timeseries": {
       "get": {
-        "summary": "GetCheckinCountsTimeSeries",
-        "description": "Returns a daily time series of unique node check-ins for the number of days requested.\nIf days ago value is empty, api will return the default 1 day ago results.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "List Node Checkins",
+        "description": "Returns a daily time series of unique node check-ins for the number of days requested.\nIf ` + "`" + `days ago` + "`" + ` value is empty, API will return the default 1 day ago results.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetCheckInCountsTimeSeries",
         "responses": {
           "200": {
@@ -386,7 +401,7 @@ func init() {
     },
     "/cfgmgmt/stats/missing_node_duration_counts": {
       "get": {
-        "summary": "GetMissingNodeDurationCounts",
+        "summary": "List Missing Nodes Count",
         "description": "Returns a count of missing nodes for the provided durations.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/missing_node_duration_counts?durations=3d\u0026durations=1w\u0026durations=2w\u0026durations=1M\u0026durations=3M\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetMissingNodeDurationCounts",
         "responses": {
@@ -400,7 +415,7 @@ func init() {
         "parameters": [
           {
             "name": "durations",
-            "description": "A valid duration is any number zero or greater with one of these characters 'h', 'd', 'w', or 'M'. \n'h' is hours\n'd' is days\n'w' is weeks\n'M' is months\nExamples '12h', '3d', and '1M'.\nWill contain one or many.",
+            "description": "A valid duration is any number zero or greater with one of these characters 'h', 'd', 'w', or 'M'. \n'h' is hours\n'd' is days\n'w' is weeks\n'M' is months\nWill contain one or many.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -417,7 +432,7 @@ func init() {
     },
     "/cfgmgmt/stats/node_counts": {
       "get": {
-        "summary": "GetNodesCounts",
+        "summary": "List Node Status Count",
         "description": "Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.\nSupports filtering.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/node_counts?filter=name:mySO*\u0026filter=platform:ubun*\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetNodesCounts",
         "responses": {
@@ -448,8 +463,8 @@ func init() {
     },
     "/cfgmgmt/stats/run_counts": {
       "get": {
-        "summary": "GetRunsCounts",
-        "description": "Returns totals for failed and successful runs given a ` + "`" + `node_id` + "`" + `.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd\u0026start=2019-11-02\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "List Run Status Totals",
+        "description": "Returns totals for failed and successful runs when given a ` + "`" + `node_id` + "`" + `.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd\u0026start=2019-11-02\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetRunsCounts",
         "responses": {
           "200": {
@@ -500,8 +515,8 @@ func init() {
     },
     "/cfgmgmt/suggestions": {
       "get": {
-        "summary": "GetSuggestions",
-        "description": "Returns possible filter values given a valid ` + "`" + `type` + "`" + ` parameter. All values returned until two or more\ncharacters are provided for the ` + "`" + `text` + "`" + ` parameter.\nSupports wildcard (* and ?).\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/suggestions?type=environment\u0026text=_d\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "List Filter Suggestions",
+        "description": "Returns possible filter values given a valid ` + "`" + `type` + "`" + ` parameter. All values returned until two or more characters are provided for the ` + "`" + `text` + "`" + ` parameter.\nSupports wildcard (* and ?).\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/suggestions?type=environment\u0026text=_d\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetSuggestions",
         "responses": {
           "200": {

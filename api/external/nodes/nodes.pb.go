@@ -993,9 +993,9 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NodesServiceClient interface {
 	//
-	//Create a node
+	//Create a Node
 	//
-	//Creates a node and adds it to the Automate node manager.
+	//Creates a node and adds it to the Chef Automate node manager.
 	//Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
 	//Useful for creating nodes for the purpose of running compliance scan jobs.
 	//
@@ -1022,7 +1022,7 @@ type NodesServiceClient interface {
 	//```
 	Create(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Id, error)
 	//
-	//Read a node
+	//List Node Details
 	//
 	//Returns the details for a node given the node ID.
 	//
@@ -1032,7 +1032,7 @@ type NodesServiceClient interface {
 	//```
 	Read(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
 	//
-	//Update a node
+	//Update Node
 	//
 	//This PUT operation overwrites ALL node details and requires the complete set of node details,
 	//consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
@@ -1044,7 +1044,7 @@ type NodesServiceClient interface {
 	//```
 	Update(ctx context.Context, in *Node, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
-	//Delete a node
+	//Delete a Node
 	//
 	//Deletes the node with the node ID.
 	//
@@ -1054,7 +1054,7 @@ type NodesServiceClient interface {
 	//```
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
-	//Bulk delete by ID
+	//Bulk Delete Nodes by ID
 	//
 	//Deletes a set of nodes given a list of IDs.
 	//Invalid IDs will be ignored.
@@ -1065,11 +1065,11 @@ type NodesServiceClient interface {
 	//```
 	BulkDeleteById(ctx context.Context, in *Ids, opts ...grpc.CallOption) (*BulkDeleteResponse, error)
 	//
-	//List and filter nodes
+	//List and Filter Nodes
 	//
 	//Makes a list of nodes.
 	//Supports filtering, pagination, and sorting.
-	//Adding a filter narrows the list of nodes only those that match the filter or filters.
+	//Adding a filter narrows the list of nodes to only those that match the filter or filters.
 	//Supported filters:
 	//account_id, last_contact, manager_id, manager_type, name, platform_name,
 	//platform_release, region, source_id, state, statechange_timerange, status,
@@ -1095,10 +1095,9 @@ type NodesServiceClient interface {
 	//```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Nodes, error)
 	//
-	//Node status
+	//List Node Status
 	//
-	//Use this to run an `inspec detect` job on the node, which updates the status to reflect
-	//that the node is reachable or unreachable.
+	//Use this to run an `inspec detect` job on the node, which updates the status to reflect that the node is reachable or unreachable.
 	//
 	//Authorization Action:
 	//```
@@ -1106,7 +1105,7 @@ type NodesServiceClient interface {
 	//```
 	Rerun(ctx context.Context, in *Id, opts ...grpc.CallOption) (*RerunResponse, error)
 	//
-	//Bulk delete nodes
+	//Bulk Delete Nodes by Filter
 	//
 	//Deletes a set of nodes that match a filter.
 	//Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
@@ -1125,10 +1124,10 @@ type NodesServiceClient interface {
 	//```
 	BulkDelete(ctx context.Context, in *Query, opts ...grpc.CallOption) (*BulkDeleteResponse, error)
 	//
-	//Bulk create nodes
+	//Bulk Create Nodes
 	//
 	//Creates multiple nodes from a list of node data.
-	//Hosts field is required. Multiple hosts may be defined in this field.
+	//`hosts` field is required. Multiple hosts may be defined in this field.
 	//
 	//Example:
 	//```
@@ -1246,9 +1245,9 @@ func (c *nodesServiceClient) BulkCreate(ctx context.Context, in *Nodes, opts ...
 // NodesServiceServer is the server API for NodesService service.
 type NodesServiceServer interface {
 	//
-	//Create a node
+	//Create a Node
 	//
-	//Creates a node and adds it to the Automate node manager.
+	//Creates a node and adds it to the Chef Automate node manager.
 	//Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
 	//Useful for creating nodes for the purpose of running compliance scan jobs.
 	//
@@ -1275,7 +1274,7 @@ type NodesServiceServer interface {
 	//```
 	Create(context.Context, *Node) (*Id, error)
 	//
-	//Read a node
+	//List Node Details
 	//
 	//Returns the details for a node given the node ID.
 	//
@@ -1285,7 +1284,7 @@ type NodesServiceServer interface {
 	//```
 	Read(context.Context, *Id) (*Node, error)
 	//
-	//Update a node
+	//Update Node
 	//
 	//This PUT operation overwrites ALL node details and requires the complete set of node details,
 	//consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
@@ -1297,7 +1296,7 @@ type NodesServiceServer interface {
 	//```
 	Update(context.Context, *Node) (*empty.Empty, error)
 	//
-	//Delete a node
+	//Delete a Node
 	//
 	//Deletes the node with the node ID.
 	//
@@ -1307,7 +1306,7 @@ type NodesServiceServer interface {
 	//```
 	Delete(context.Context, *Id) (*empty.Empty, error)
 	//
-	//Bulk delete by ID
+	//Bulk Delete Nodes by ID
 	//
 	//Deletes a set of nodes given a list of IDs.
 	//Invalid IDs will be ignored.
@@ -1318,11 +1317,11 @@ type NodesServiceServer interface {
 	//```
 	BulkDeleteById(context.Context, *Ids) (*BulkDeleteResponse, error)
 	//
-	//List and filter nodes
+	//List and Filter Nodes
 	//
 	//Makes a list of nodes.
 	//Supports filtering, pagination, and sorting.
-	//Adding a filter narrows the list of nodes only those that match the filter or filters.
+	//Adding a filter narrows the list of nodes to only those that match the filter or filters.
 	//Supported filters:
 	//account_id, last_contact, manager_id, manager_type, name, platform_name,
 	//platform_release, region, source_id, state, statechange_timerange, status,
@@ -1348,10 +1347,9 @@ type NodesServiceServer interface {
 	//```
 	List(context.Context, *Query) (*Nodes, error)
 	//
-	//Node status
+	//List Node Status
 	//
-	//Use this to run an `inspec detect` job on the node, which updates the status to reflect
-	//that the node is reachable or unreachable.
+	//Use this to run an `inspec detect` job on the node, which updates the status to reflect that the node is reachable or unreachable.
 	//
 	//Authorization Action:
 	//```
@@ -1359,7 +1357,7 @@ type NodesServiceServer interface {
 	//```
 	Rerun(context.Context, *Id) (*RerunResponse, error)
 	//
-	//Bulk delete nodes
+	//Bulk Delete Nodes by Filter
 	//
 	//Deletes a set of nodes that match a filter.
 	//Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
@@ -1378,10 +1376,10 @@ type NodesServiceServer interface {
 	//```
 	BulkDelete(context.Context, *Query) (*BulkDeleteResponse, error)
 	//
-	//Bulk create nodes
+	//Bulk Create Nodes
 	//
 	//Creates multiple nodes from a list of node data.
-	//Hosts field is required. Multiple hosts may be defined in this field.
+	//`hosts` field is required. Multiple hosts may be defined in this field.
 	//
 	//Example:
 	//```

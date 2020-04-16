@@ -17,14 +17,9 @@ import "api/external/cfgmgmt/response/errors.proto";
 
 import "api/external/common/query/parameters.proto";
 import "api/external/common/version/version.proto";
-<<<<<<< HEAD
-import "api/external/common/response.proto";
-
-=======
 import "api/external/common/response.proto";	
 
 import "api/external/compliance/reporting/reporting.proto";
->>>>>>> cfgmgmt fixes and syncing
 
 import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
