@@ -23,9 +23,9 @@ interface ReportSummary {
   end_time: string;
 }
 
-// ReturnParams can either be an empty object or filled with filters
-// It is used for populating Reporting-node and Reporting profile
-// Breadcrumb link
+// ReturnParams can either be an empty object or filled with filters.
+// It is used for populating Reporting-node and Reporting-profile
+// Breadcrumb links
 export interface ReturnParams {
   [ReportingFilterTypes.END_TIME]?: string;
   [ReportingFilterTypes.CHEF_SERVER]?: string;
@@ -123,13 +123,13 @@ export class ReportQueryService {
   formatReturnParams(): ReturnParams {
     const reportQuery = this.getReportQuery();
 
-    const structuredFilters = {};
+    const structuredFilters: { [ReportingFilterTypes: string]: string } = {};
     reportQuery.filters.map(filter => {
-      return structuredFilters[filter.type.name] = filter.value.text;
+      return structuredFilters[filter.type.name] = filter.value.id;
     });
 
     const today = moment().utc()
-                      .startOf('day').add(12, 'hours'); // must sync with initial end Date
+                      .startOf('day').add(12, 'hours'); // Must sync with initial end date
     const endDate = reportQuery.endDate
       ? moment(reportQuery.endDate).format(DateTime.REPORT_DATE)
       : today.format(DateTime.REPORT_DATE);
@@ -137,15 +137,12 @@ export class ReportQueryService {
     // Check if today is the end date
     const isToday = today.diff(endDate, 'days') === 0;
 
-    // With no filters when the date it today, we don't want
+    // With no filters when the date is today, we don't want
     // to add any parameters to the URL.
     if (isEmpty(structuredFilters) && isToday) {
       return {};
     } else {
-      return {
-        end_time: endDate,
-        ...structuredFilters
-      };
+      return {...structuredFilters, end_time: endDate};
     }
   }
 }

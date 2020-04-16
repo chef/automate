@@ -28,7 +28,7 @@ import { saveAs } from 'file-saver';
 import {
   Chicklet,
   ReportingFilterTypes
-} from '../../../types/types';
+} from 'app/types/types';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { pickBy } from 'lodash/fp';
 import { FilterC } from './types';

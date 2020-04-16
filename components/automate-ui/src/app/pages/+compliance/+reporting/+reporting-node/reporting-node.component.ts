@@ -51,14 +51,14 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     .subscribe(reports => {
       this.reports = reports;
       const queryForReport = this.reportQueryService.getReportQueryForReport(reports[0]);
-        this.statsService.getSingleReport(reports[0].id, queryForReport)
-          .pipe(takeUntil(this.isDestroyed))
-          .subscribe(data => {
-            this.reportLoading = false;
-            this.layoutFacade.ShowPageLoading(false);
-            this.activeReport = Object.assign(reports[0], data);
-          });
-      });
+      this.statsService.getSingleReport(reports[0].id, queryForReport)
+        .pipe(takeUntil(this.isDestroyed))
+        .subscribe(data => {
+          this.reportLoading = false;
+          this.layoutFacade.ShowPageLoading(false);
+          this.activeReport = Object.assign(reports[0], data);
+        });
+    });
   }
 
   ngOnDestroy() {
