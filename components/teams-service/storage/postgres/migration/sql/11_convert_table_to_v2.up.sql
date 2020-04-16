@@ -14,3 +14,16 @@ ALTER TABLE teams ADD CONSTRAINT teams_id_key UNIQUE (id);
 -- under IAM v1, team descriptions were human-readable names
 -- under IAM v2, the name field serves this purpose
 ALTER TABLE teams RENAME COLUMN description TO name;
+
+-- add helper for team db_id lookup
+CREATE OR REPLACE FUNCTION team_db_id (_id text)
+    RETURNS INTEGER
+    AS $$
+    SELECT
+        db_id
+    FROM
+        teams
+    WHERE
+        id = _id;
+$$
+LANGUAGE SQL;
