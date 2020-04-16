@@ -272,7 +272,7 @@ const routes: Routes = [
       ]
     },
     {
-      path: 'dashboards/desktop',
+      path: 'desktop',
       loadChildren: () => import('./modules/desktop/desktop.module').then(m => m.DesktopModule)
     },
     {
