@@ -8,6 +8,7 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { DailyCheckInComponent } from './daily-check-in/daily-check-in.component';
 import { CheckInTimeSeriesComponent } from './check-in-time-series/check-in-time-series.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { DesktopDetailComponent } from './desktop-detail/desktop-detail.component';
 import { TopErrorsComponent } from './top-errors/top-errors.component';
 import {
   UnknownDesktopDurationCountsComponent
@@ -35,6 +36,7 @@ import { DesktopRoutingModule } from './desktop-routing.module';
   declarations: [
     DailyCheckInComponent,
     DashboardComponent,
+    DesktopDetailComponent,
     CheckInTimeSeriesComponent,
     TopErrorsComponent,
     UnknownDesktopDurationCountsComponent,

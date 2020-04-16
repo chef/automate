@@ -1,9 +1,9 @@
 @import "~styles/variables";
+@import "@carbon/layout/scss/layout";
 
 .page-title {
   color: var(--chef-primary-dark);
   margin-top: 0;
-  margin-bottom: 12px;
   font-weight: inherit;
   font-style: inherit;
   font-size: 18px;
@@ -18,19 +18,58 @@
   font-size: 10px;
 }
 
-.content-container {
-  margin: 10px;
-  padding: 10px;
-  font-family: Muli;
-  font-size: 13px;
-  font-weight: 100;
-  width: 500px;
-  background-color: $chef-med-grey;
-  border: 1px solid $chef-blue-medium;
-  border-radius: 4px;
+app-chart-progress-bar {
+  margin: $spacing-07 0 $spacing-09 0;
 }
 
-.item {
-  margin: 8px;
-  padding: 3px;
+chef-phat-radio {
+  display: flex;
+
+  @include carbon--breakpoint-down(md) {
+    flex-direction: column;
+
+    chef-option {
+      margin: 0 0 $spacing-03 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  chef-option {
+    flex: 1;
+    display: flex;
+    height: auto;
+    width: auto;
+    box-shadow: none;
+    border: 1px solid $chef-grey;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &::before {
+      display: none;
+    }
+
+    .title {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .total {
+      font-size: 32px;
+      font-weight: bold;
+
+      &::after {
+        content: 'Desktop';
+        padding-left: 4px;
+        font-size: 12px;
+        font-weight: normal;
+        text-transform: uppercase;
+      }
+    }
+  }
 }

@@ -2,6 +2,7 @@ import { Component, Input, Output, OnInit, OnDestroy, OnChanges,
   SimpleChange, EventEmitter } from '@angular/core';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { maxBy } from 'lodash/fp';
 import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
 
 import {
@@ -43,6 +44,10 @@ export class TopErrorsComponent  implements OnInit, OnDestroy, OnChanges  {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  get topErrorsItemsMax() {
+    return maxBy('count', this.topErrorsItems);
   }
 
   public onItemClicked(item: TopErrorsItem) {

@@ -1,41 +1,98 @@
 <div class="content-container">
-  <div class="container">
-    <main>
-      <app-insight
-        [visible] = "insightVisible"
-        [desktops] = "desktops$ | async"
-        [totalDesktops] = "totalDesktopCount$ | async"
-        [pageSize] = "pageSize$ | async"
-        [currentPage] = "currentPage$ | async"
-        [termFilters] = "termFilters$ | async"
-        (pageChange)="onPageChange($event)"
-        (termFilterSelected)="onTermFilterSelected($event)"
-        (closed)="insightClose()"
-        (sortChange)="onSortChange($event)">
-      </app-insight>
-      <app-top-errors
-        [topErrorsItems] = "topErrorsItems$ | async"
-        [lastUpdated] = "topErrorsUpdated$ | async"
-        (errorSelected)="onErrorSelected($event)">
-      </app-top-errors>
-      <app-daily-check-in
-        [unknownPercentage] = "unknownPercentage$ | async"
-        [checkedInPercentage] = "checkedInPercentage$ | async"
-        [totalCount] = "totalCount$ | async"
-        [unknownCount] = "unknownCount$ | async"
-        [lastUpdated] = "checkInCountCollectedUpdated$ | async"
-        [checkedInCount] = "checkedInCount$ | async">
-      </app-daily-check-in>
-      <app-check-in-time-series
-        [days] = "days$ | async"
-        [selectedDaysAgo] = "selectedDaysAgo$ | async"
-        [lastUpdated] = "checkInCountCollectedUpdated$ | async"
-        (daysAgoChanged)="handleDaysAgoChange($event)">
-      </app-check-in-time-series>
-      <app-unknown-desktop-duration-counts
-        [countedDurationItems] = "unknownDesktopCountedDurationItems$ | async"
-        [lastUpdated] = "unknownDesktopCountedDurationUpdated$ | async">
-      </app-unknown-desktop-duration-counts>
-    </main>
+  <div
+    class="dashboard-grid"
+    [ngClass]="{
+      'desktop-list-visible': desktopListVisible,
+      'desktop-list-fullscreened': desktopListFullscreened,
+      'desktop-detail-visible': desktopDetailVisible,
+      'desktop-detail-fullscreened': desktopDetailFullscreened
+    }">
+    <div class="dashboard-grid-row">
+      <div
+        *ngIf="!desktopListFullscreened && !desktopDetailVisible"
+        class="dashboard-overview-column">
+        <div class="dashboard-overview-grid">
+          <div class="dashboard-overview-row">
+            <div class="dashboard-overview-header">
+              <chef-heading>
+                <chef-icon>dashboard</chef-icon> Desktop Management Dashboard
+              </chef-heading>
+            </div>
+          </div>
+          <div class="dashboard-overview-row">
+            <div class="dashboard-overview-col">
+              <app-daily-check-in
+                [unknownPercentage]="unknownPercentage$ | async"
+                [checkedInPercentage]="checkedInPercentage$ | async"
+                [totalCount]="totalCount$ | async"
+                [unknownCount]="unknownCount$ | async"
+                [lastUpdated]="checkInCountCollectedUpdated$ | async"
+                [checkedInCount]="checkedInCount$ | async">
+              </app-daily-check-in>
+            </div>
+            <div class="dashboard-overview-col">
+              <app-check-in-time-series
+                [days]="days$ | async"
+                [selectedDaysAgo]="selectedDaysAgo$ | async"
+                [lastUpdated]="checkInCountCollectedUpdated$ | async"
+                (daysAgoChanged)="handleDaysAgoChange($event)">
+              </app-check-in-time-series>
+            </div>
+          </div>
+          <div class="dashboard-overview-row">
+            <div class="dashboard-overview-col">
+              <app-unknown-desktop-duration-counts
+                [countedDurationItems]="unknownDesktopCountedDurationItems$ | async"
+                [lastUpdated]="unknownDesktopCountedDurationUpdated$ | async"
+                (durationSelected)="onDurationSelected($event)">
+              </app-unknown-desktop-duration-counts>
+            </div>
+            <div class="dashboard-overview-col">
+              <app-top-errors
+                [topErrorsItems]="topErrorsItems$ | async"
+                [lastUpdated]="topErrorsUpdated$ | async"
+                (errorSelected)="onErrorSelected($event)">
+              </app-top-errors>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        *ngIf="desktopListVisible && !desktopDetailFullscreened"
+        class="dashboard-list-column">
+        <app-insight
+          [desktops]="desktops$ | async"
+          [selectedDesktop]="selectedDesktop"
+          [totalDesktops]="totalDesktopCount$ | async"
+          [pageSize]="pageSize$ | async"
+          [currentPage]="currentPage$ | async"
+          [termFilters]="termFilters$ | async"
+          [fullscreened]="desktopListFullscreened"
+          (pageChange)="onPageChange($event)"
+          (termFilterSelected)="onTermFilterSelected($event)"
+          (desktopSelected)="onDesktopSelected($event)"
+          (closed)="onDesktopListClose()"
+          (fullscreenToggled)="onDesktopListFullscreen()"
+          (sortChange)="onSortChange($event)">
+        </app-insight>
+      </div>
+      <div
+        *ngIf="desktopDetailVisible && !desktopListFullscreened"
+        class="dashboard-detail-column">
+        <app-desktop-detail
+          [desktop]="selectedDesktop"
+          [totalDesktops]="totalDesktopCount$ | async"
+          [pageSize]="pageSize$ | async"
+          [currentPage]="currentPage$ | async"
+          [termFilters]="termFilters$ | async"
+          [fullscreened]="desktopDetailFullscreened"
+          (pageChange)="onPageChange($event)"
+          (termFilterSelected)="onTermFilterSelected($event)"
+          (closed)="onDesktopDetailClose()"
+          (fullscreenToggled)="onDesktopDetailFullscreen()"
+          (sortChange)="onSortChange($event)">
+        </app-desktop-detail>
+      </div>
+    </div>
   </div>
 </div>
