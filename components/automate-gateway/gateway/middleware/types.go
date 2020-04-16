@@ -19,25 +19,6 @@ type DeploymentCertAuthOnly interface {
 	MustUseDeploymentCertAuth()
 }
 
-type FilterHandler interface {
-	FilterAuthorizedPairs(ctx context.Context, subjects []string,
-		mapByResourceAndAction map[pairs.Pair][]string,
-		methodsInfo map[string]pairs.Info,
-	) (*FilterPairsResponse, error)
-}
-
-type FilterPairsResponse struct {
-	Pairs                  []*pairs.Pair
-	MethodsInfo            map[string]pairs.Info
-	MapByResourceAndAction map[pairs.Pair][]string
-}
-
-type FilterProjectsResponse struct {
-	Projects               []string
-	MethodsInfo            map[string]pairs.Info
-	MapByResourceAndAction map[pairs.Pair][]string
-}
-
 type GRPCAuthorizationHandler interface {
 	Handle(ctx context.Context, subjects []string, projects []string, req interface{}) (context.Context, error)
 }
