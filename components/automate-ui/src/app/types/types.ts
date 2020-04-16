@@ -848,6 +848,7 @@ export enum ReportingFilterTypes {
   CONTROL_ID = 'control_id',
   CONTROL_NAME = 'control_name',
   CONTROL_TAG_KEY = 'control_tag_key',
+  CONTROL_TAG_VALUE = 'control_tag_value',
   ENVIRONMENT = 'environment',
   INSPEC_VERSION = 'inspec_version',
   JOB_ID = 'job_id',
