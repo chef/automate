@@ -115,8 +115,8 @@ export class ApiTokenEffects {
 
   @Effect()
   toggleToken$ = this.actions$.pipe(ofType<ToggleTokenActive>(ApiTokenActionTypes.TOGGLE),
-    mergeMap(({ payload: { id, active } }: ToggleTokenActive) =>
-      this.requests.toggleActive(id, active).pipe(
+    mergeMap(({ payload: { id, name, active } }: ToggleTokenActive) =>
+      this.requests.toggleActive(id, name, active).pipe(
         map(resp => new ToggleTokenActiveSuccess(resp.token)),
         catchError((error: HttpErrorResponse) => of(new ToggleTokenActiveFailure(error))))
     ));
