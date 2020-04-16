@@ -41,7 +41,7 @@ func (s *Server) GetTeam(ctx context.Context, req *teams.GetTeamReq) (*teams.Get
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	team, err := s.service.Storage.GetTeamByName(ctx, req.Id)
+	team, err := s.service.Storage.GetTeam(ctx, req.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
@@ -75,7 +75,7 @@ func (s *Server) CreateTeam(ctx context.Context,
 
 	var team storage.Team
 	var err error
-	if team, err = s.service.Storage.StoreTeamWithProjects(ctx, req.Id, req.Name, req.Projects); err != nil {
+	if team, err = s.service.Storage.StoreTeam(ctx, req.Id, req.Name, req.Projects); err != nil {
 		// if the error is already a GRPC status code, return that directly.
 		if _, ok := status.FromError(err); ok {
 			return nil, err
@@ -96,14 +96,12 @@ func (s *Server) DeleteTeam(ctx context.Context, req *teams.DeleteTeamReq) (*tea
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	// TODO (tc): The storage interface is still using V1 verbiage, so
-	// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
-	team, err := s.service.Storage.DeleteTeamByName(ctx, req.Id)
+	team, err := s.service.Storage.DeleteTeam(ctx, req.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
 
-	teamSubject := "team:local:" + team.Name
+	teamSubject := "team:local:" + team.ID
 	_, err = s.service.AuthzClient.PurgeSubjectFromPolicies(ctx, &authz.PurgeSubjectFromPoliciesReq{
 		Subject: teamSubject,
 	})
@@ -122,9 +120,7 @@ func (s *Server) UpdateTeam(ctx context.Context, req *teams.UpdateTeamReq) (*tea
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	// TODO (tc): The storage interface is still using V1 verbiage, so
-	// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
-	team, err := s.service.Storage.EditTeamByName(ctx, req.Id, req.Name, req.Projects)
+	team, err := s.service.Storage.EditTeam(ctx, req.Id, req.Name, req.Projects)
 	if err != nil {
 		// if the error is already a GRPC status code, return that directly.
 		if _, ok := status.FromError(err); ok {
@@ -145,28 +141,18 @@ func (s *Server) AddTeamMembers(ctx context.Context,
 	if len(req.UserIds) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "missing user IDs")
 	}
-	// TODO (tc): The storage interface is still using V1 verbiage, so
-	// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
-	//
-	// Fetch the UUID since that's what the membership table uses.
-	// Will fail the request here if the user in question is filtered by projects.
-	teamForUUID, err := s.service.Storage.GetTeamByName(ctx, req.Id)
-	if err != nil {
-		return nil, service.ParseStorageError(err, req.Id, "team")
-	}
-	teamUUID := teamForUUID.ID
 
-	_, err = s.service.Storage.AddUsers(ctx, teamUUID, req.UserIds)
+	_, err := s.service.Storage.AddUsers(ctx, req.Id, req.UserIds)
 	if err != nil && err != storage.ErrConflict {
-		return nil, service.ParseStorageError(err, teamUUID, "user")
+		return nil, service.ParseStorageError(err, req.Id, "user")
 	}
 
 	// TODO (tc): Get the updated set of user membership for the team since
 	// that is not what is returned from AddUsers for some reason
 	// (can refactor on V1 deprecation).
-	userIDs, err := s.service.Storage.GetUserIDsForTeam(ctx, teamUUID)
+	userIDs, err := s.service.Storage.GetUserIDsForTeam(ctx, req.Id)
 	if err != nil {
-		return nil, service.ParseStorageError(err, teamUUID, "team")
+		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
 
 	return &teams.AddTeamMembersResp{
@@ -178,28 +164,18 @@ func (s *Server) AddTeamMembers(ctx context.Context,
 func (s *Server) RemoveTeamMembers(ctx context.Context,
 	req *teams.RemoveTeamMembersReq) (*teams.RemoveTeamMembersResp, error) {
 
-	// TODO (tc): The storage interface is still using V1 verbiage, so
-	// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
-	//
-	// Fetch the UUID since that's what the membership table uses.
-	// Will fail the request here if the user in question is filtered by projects.
-	teamForUUID, err := s.service.Storage.GetTeamByName(ctx, req.Id)
+	_, err := s.service.Storage.RemoveUsers(ctx, req.Id, req.UserIds)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
-	teamUUID := teamForUUID.ID
 
-	_, err = s.service.Storage.RemoveUsers(ctx, teamUUID, req.UserIds)
-	if err != nil {
-		return nil, service.ParseStorageError(err, teamUUID, "team")
-	}
-
+	// TODO do this TODO
 	// TODO (tc): Get the updated set of user membership for the team since
 	// that is not what is returned from RemoveUsers for some reason
 	// (can refactor on V1 deprecation).
-	userIDs, err := s.service.Storage.GetUserIDsForTeam(ctx, teamUUID)
+	userIDs, err := s.service.Storage.GetUserIDsForTeam(ctx, req.Id)
 	if err != nil {
-		return nil, service.ParseStorageError(err, teamUUID, "team")
+		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
 
 	return &teams.RemoveTeamMembersResp{
@@ -227,17 +203,7 @@ func (s *Server) GetTeamsForMember(
 func (s *Server) GetTeamMembership(ctx context.Context,
 	req *teams.GetTeamMembershipReq) (*teams.GetTeamMembershipResp, error) {
 
-	// TODO (tc): The storage interface is still using V1 verbiage, so
-	// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
-	//
-	// Fetch the UUID since that's what the membership table uses.
-	teamForUUID, err := s.service.Storage.GetTeamByName(ctx, req.Id)
-	if err != nil {
-		return nil, service.ParseStorageError(err, req.Id, "team")
-	}
-	teamUUID := teamForUUID.ID
-
-	userIDs, err := s.service.Storage.GetUserIDsForTeam(ctx, teamUUID)
+	userIDs, err := s.service.Storage.GetUserIDsForTeam(ctx, req.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
@@ -258,14 +224,9 @@ func (s *Server) PurgeUserMembership(ctx context.Context,
 		return nil, status.Error(codes.InvalidArgument, "invalid userId")
 	}
 
-	teamUUIDs, err := s.service.Storage.PurgeUserMembership(ctx, req.UserId)
+	teamIDs, err := s.service.Storage.PurgeUserMembership(ctx, req.UserId)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.UserId, "user")
-	}
-
-	teamIDs := make([]string, len(teamUUIDs))
-	for i, teamUUID := range teamUUIDs {
-		teamIDs[i] = teamUUID.String()
 	}
 
 	return &teams.PurgeUserMembershipResp{
@@ -275,8 +236,8 @@ func (s *Server) PurgeUserMembership(ctx context.Context,
 
 func fromStorage(s storage.Team) *teams.Team {
 	return &teams.Team{
-		Id:       s.Name,
-		Name:     s.Description,
+		Id:       s.ID,
+		Name:     s.Name,
 		Projects: s.Projects,
 	}
 }
