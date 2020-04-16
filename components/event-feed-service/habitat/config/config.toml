@@ -14,11 +14,7 @@ root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
 
 [elasticsearch]
 {{~#eachAlive bind.automate-es-gateway.members as |member|}}
-{{~#if member.cfg.http-host}}
-url = "http://{{member.sys.ip}}:{{member.cfg.http-port}}"
-{{else}}
 url = "http://127.0.0.1:{{member.cfg.http-port}}"
-{{~/if}}
 {{~/eachAlive}}
 
 [elasticsearch_sidecar]

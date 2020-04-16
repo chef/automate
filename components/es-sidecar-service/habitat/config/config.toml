@@ -17,11 +17,7 @@ log_level = "{{cfg.log.level}}"
 # Elasticsearch
 {{~#eachAlive bind.automate-es-gateway.members as |gwmember|}}
   {{~#if @last}}
-    {{~#if gwmember.cfg.http-host}}
-elasticsearch_url = "http://{{gwmember.sys.ip}}:{{gwmember.cfg.http-port}}"
-    {{else}}
 elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
-    {{~/if}}
   {{~/if}}
 {{~/eachAlive}}
 
