@@ -41,10 +41,6 @@ service StatsService {
 			post: "/compliance/reporting/stats/summary"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:stats:summary"
-			action: "read"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:stats:summary"
 			action: "compliance:reportSummary:get"
@@ -82,10 +78,6 @@ service StatsService {
 			post: "/compliance/reporting/stats/trend"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:stats:trend"
-			action: "read"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:stats:trend"
 			action: "compliance:reportTrend:get"
@@ -122,10 +114,6 @@ service StatsService {
 			post: "/compliance/reporting/stats/profiles"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:stats:profiles"
-			action: "read"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:stats:profiles"
 			action: "compliance:reportProfiles:get"
@@ -160,10 +148,6 @@ service StatsService {
 		option (google.api.http) = {
 			post: "/compliance/reporting/stats/failures"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:stats:failures"
-			action: "read"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:stats:failures"

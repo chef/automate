@@ -35,10 +35,6 @@ service ApplicationsService {
   */
   rpc GetServiceGroups(ServiceGroupsReq) returns (ServiceGroups) {
     option (google.api.http).get = "/applications/service-groups";
-    option (chef.automate.api.policy) = {
-      resource: "service_groups"
-      action: "list"
-    };
     option (chef.automate.api.iam.policy) = {
       resource: "applications:serviceGroups"
       action: "applications:serviceGroups:list"

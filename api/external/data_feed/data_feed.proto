@@ -16,10 +16,6 @@ service DatafeedService {
 		  post: "/datafeed/destination"
 		  body: "*"
 	  };
-	  option (chef.automate.api.policy) = {
-		  resource: "datafeed:destination"
-		  action: "add"
-	  };
 	  option (chef.automate.api.iam.policy) = {
 		  resource: "datafeed:destination"
 		  action: "datafeed:destination:add"
@@ -29,10 +25,6 @@ service DatafeedService {
 		option (google.api.http) = {
 			get: "/datafeed/destination/{id}"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "datafeed:destination:{id}"
-			action: "read"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "datafeed:destination:{id}"
 			action: "datafeed:destination:get"
@@ -41,10 +33,6 @@ service DatafeedService {
   rpc DeleteDestination(DeleteDestinationRequest) returns (DeleteDestinationResponse){
 		option (google.api.http) = {
 			delete: "/datafeed/destination/{id}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "destination:destination:{id}"
-			action: "delete"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "destination:destination:{id}"
@@ -56,10 +44,6 @@ service DatafeedService {
 			patch: "/datafeed/destination/{id}"
 			body: "*"
   	};
-	  option (chef.automate.api.policy) = {
-		  resource: "datafeed:destination:{id}"
-		  action: "update"
-	  };
 		option (chef.automate.api.iam.policy) = {
 			resource: "datafeed:destination:{id}"
 			action: "datafeed:destination:update"
@@ -70,10 +54,6 @@ service DatafeedService {
 			post: "/datafeed/destinations"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "datafeed:destinations"
-			action: "list"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "datafeed:destinations"
 			action: "datafeed:destinations:list"
@@ -83,10 +63,6 @@ service DatafeedService {
 		option (google.api.http) = {
 			post: "/datafeed/destinations/test"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "datafeed:destinations:test"
-			action: "test"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "datafeed:destinations:test"

@@ -34,10 +34,6 @@ service NodeManagerService {
 			post: "/nodemanagers"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "nodemanagers"
-			action: "create"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodeManagers"
 			action: "infra:nodeManagers:create"
@@ -58,10 +54,6 @@ service NodeManagerService {
 	rpc Read(Id) returns (NodeManager) {
 		option (google.api.http) = {
 			get: "/nodemanagers/id/{id}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "nodemanagers:{id}"
-			action: "read"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodeManagers:{id}"
@@ -86,10 +78,6 @@ service NodeManagerService {
 			put: "/nodemanagers/id/{id}"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "nodemanagers:{id}"
-			action: "update"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodeManagers:{id}"
 			action: "infra:nodeManagers:update"
@@ -112,10 +100,6 @@ service NodeManagerService {
 		option (google.api.http) = {
 			delete: "/nodemanagers/id/{id}"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "nodemanagers:{id}"
-			action: "delete"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodeManagers:{id}"
 			action: "infra:nodeManagers:delete"
@@ -136,10 +120,6 @@ service NodeManagerService {
 	rpc DeleteWithNodes(Id) returns (Ids) {
 		option (google.api.http) = {
 			delete: "/nodemanagers/id/{id}/with-nodes"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "nodemanagers:{id}"
-			action: "delete"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodeManagers:{id}"
@@ -162,10 +142,6 @@ service NodeManagerService {
 		option (google.api.http) = {
 			delete: "/nodemanagers/id/{id}/with-node-state/stopped"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "nodemanagers:{id}"
-			action: "delete"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodeManagers:{id}"
 			action: "infra:nodeManagers:delete"
@@ -186,10 +162,6 @@ service NodeManagerService {
 	rpc DeleteWithNodeStateTerminated(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			delete: "/nodemanagers/id/{id}/with-node-state/terminated"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "nodemanagers:{id}"
-			action: "delete"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodeManagers:{id}"
@@ -217,10 +189,6 @@ service NodeManagerService {
 			post: "/nodemanagers/search"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "nodemanagers"
-			action: "list"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodeManagers"
 			action: "infra:nodeManagers:list"
@@ -243,10 +211,6 @@ service NodeManagerService {
 		option (google.api.http) = {
 			post: "/nodemanagers/id/{node_manager_id}/search-fields"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "nodemanagers:{node_manager_id}:fields"
-			action: "search"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodeManagers:{node_manager_id}:fields"
@@ -271,10 +235,6 @@ service NodeManagerService {
 			post: "/nodemanagers/id/{node_manager_id}/search-nodes"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "nodemanagers:{node_manager_id}:nodes"
-			action: "search"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodeManagers:{node_manager_id}:nodes"
 			action: "infra:nodeManagers:list"
@@ -297,10 +257,6 @@ service NodeManagerService {
 		option (google.api.http) = {
 			post: "/nodemanagers/rerun/id/{id}"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "nodemanagers:{id}:nodes"
-			action: "rerun"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodeManagers:{id}:nodes"

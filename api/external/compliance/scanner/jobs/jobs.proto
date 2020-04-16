@@ -56,10 +56,6 @@ service JobsService {
 			post: "/compliance/scanner/jobs"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:scanner:jobs"
-			action: "create"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:scanner:jobs"
 			action: "compliance:scannerJobs:create"
@@ -80,10 +76,6 @@ service JobsService {
 	rpc Read(Id) returns (Job) {
 		option (google.api.http) = {
 			get: "/compliance/scanner/jobs/id/{id}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:scanner:jobs:{id}"
-			action: "read"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:scanner:jobs:{id}"
@@ -109,10 +101,6 @@ service JobsService {
 			put: "/compliance/scanner/jobs/id/{id}"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:scanner:jobs:{id}"
-			action: "update"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:scanner:jobs:{id}"
 			action: "compliance:scannerJobs:update"
@@ -133,10 +121,6 @@ service JobsService {
 	rpc Delete(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			delete: "/compliance/scanner/jobs/id/{id}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:scanner:jobs:{id}"
-			action: "delete"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:scanner:jobs:{id}"
@@ -177,10 +161,6 @@ service JobsService {
 			post: "/compliance/scanner/jobs/search"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:scanner:jobs"
-			action: "search"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:scanner:jobs"
 			action: "compliance:scannerJobs:list"
@@ -202,10 +182,6 @@ service JobsService {
 	rpc Rerun(Id) returns (RerunResponse) {
 		option (google.api.http) = {
 			get: "/compliance/scanner/jobs/rerun/id/{id}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:scanner:jobs:{id}"
-			action: "rerun"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:scanner:jobs:{id}"

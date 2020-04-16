@@ -49,10 +49,6 @@ service NodesService {
 			post: "/nodes"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "nodes"
-			action: "create"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes"
 			action: "infra:nodes:create"
@@ -72,10 +68,6 @@ service NodesService {
 	rpc Read(Id) returns (Node) {
 		option (google.api.http) = {
 			get: "/nodes/id/{id}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "nodes:{id}"
-			action: "read"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes:{id}"
@@ -100,10 +92,6 @@ service NodesService {
 			put: "/nodes/id/{id}"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "nodes:{id}"
-			action: "update"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes:{id}"
 			action: "infra:nodes:update"
@@ -123,10 +111,6 @@ service NodesService {
 	rpc Delete(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			delete: "/nodes/id/{id}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "nodes:{id}"
-			action: "delete"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes:{id}"
@@ -149,10 +133,6 @@ service NodesService {
 		option (google.api.http) = {
 			post: "/nodes/delete/ids"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "nodes"
-			action: "delete"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes"
@@ -195,10 +175,6 @@ service NodesService {
 			post: "/nodes/search"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "nodes"
-			action: "list"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes"
 			action: "infra:nodes:list"
@@ -219,10 +195,6 @@ service NodesService {
 	rpc Rerun(Id) returns (RerunResponse) {
 		option (google.api.http) = {
 			get: "/nodes/rerun/id/{id}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "nodes:{id}"
-			action: "rerun"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes:{id}"
@@ -253,10 +225,6 @@ service NodesService {
 		option (google.api.http) = {
 			post: "/nodes/delete"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "nodes"
-			action: "delete"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes"
@@ -296,10 +264,6 @@ service NodesService {
 		option (google.api.http) = {
 			post: "/nodes/bulk-create"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "nodes"
-			action: "create"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes"

@@ -31,10 +31,6 @@ service ProfilesService {
 		option (google.api.http) = {
 			get: "/compliance/profiles/read/{owner}/{name}/version/{version}"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:profiles:storage:{owner}"
-			action: "read"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:profiles:{owner}"
 			action: "compliance:profiles:get"
@@ -57,10 +53,6 @@ service ProfilesService {
 	rpc ReadFromMarket (ProfileDetails) returns (Profile) {
 		option (google.api.http) = {
 			get: "/compliance/market/read/{name}/version/{version}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:profiles:market"
-			action: "read"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:profiles:market"
@@ -87,10 +79,6 @@ service ProfilesService {
 	rpc Delete (ProfileDetails) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 				delete: "/compliance/profiles/{owner}/{name}/version/{version}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:profiles:{owner}"
-			action: "delete"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:profiles:{owner}"
@@ -133,10 +121,6 @@ service ProfilesService {
 				post: "/compliance/profiles/search"
 				body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:profiles"
-			action: "search"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:profiles"
 			action: "compliance:profiles:list"
@@ -159,10 +143,6 @@ service ProfilesService {
         option (google.api.http) = {
                 post: "/compliance/profiles/metasearch"
                 body: "*"
-        };
-        option (chef.automate.api.policy) = {
-            resource: "compliance:profiles"
-            action: "search"
         };
         option (chef.automate.api.iam.policy) = {
             resource: "compliance:profiles"

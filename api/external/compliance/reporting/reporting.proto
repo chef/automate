@@ -49,10 +49,6 @@ service ReportingService {
 			post: "/compliance/reporting/reports"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:reports"
-			action: "search"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:reports"
 			action: "compliance:reports:list"
@@ -78,10 +74,6 @@ service ReportingService {
 			post: "/compliance/reporting/report-ids"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:report-ids"
-			action: "search"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:report-ids"
 			action: "compliance:reportids:list"
@@ -105,10 +97,6 @@ service ReportingService {
 			post: "/compliance/reporting/controls"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:controls"
-			action: "search"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:control"
 			action: "compliance:controlItems:list"
@@ -131,10 +119,6 @@ service ReportingService {
 		option (google.api.http) = {
 			post: "/compliance/reporting/reports/id/{id}"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:reports:{id}"
-			action: "read"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:reports:{id}"
@@ -191,10 +175,6 @@ service ReportingService {
 			post: "/compliance/reporting/suggestions"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:suggestions"
-			action: "search"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:suggestions"
 			action: "compliance:reportSuggestions:list"
@@ -217,10 +197,6 @@ service ReportingService {
 		option (google.api.http) = {
 			post: "/compliance/reporting/profiles"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:profiles"
-			action: "search"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:profiles"
@@ -247,10 +223,6 @@ service ReportingService {
 	rpc ReadNode(Id) returns (Node) {
 		option (google.api.http) = {
 			get: "/compliance/reporting/nodes/id/{id}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:nodes:{id}"
-			action: "read"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:nodes:{id}"
@@ -298,10 +270,6 @@ service ReportingService {
 			post: "/compliance/reporting/nodes/search"
 			body: "*"
 		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:nodes"
-			action: "search"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:nodes"
 			action: "compliance:reportNodes:list"
@@ -311,10 +279,6 @@ service ReportingService {
 	rpc GetVersion(google.protobuf.Empty) returns (common.version.VersionInfo) {
 		option (google.api.http) = {
 			get: "/compliance/reporting/version"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:version"
-			action: "read"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "system:service:version"
@@ -326,10 +290,6 @@ service ReportingService {
 	};
 
 	rpc LicenseUsageNodes(TimeQuery) returns (Reports) {
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:licenseusage"
-			action: "list"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:licenseusage"
 			action: "compliance:reportingLicenseUsage:list"
