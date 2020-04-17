@@ -44,7 +44,7 @@ func (t testAuthzHandler) Handle(ctx context.Context, subjects []string, project
 	}
 	// Notes:
 	// * The real implementation of `Handle` is currently in
-	// gateway/middleware/authv2/authv2.go (assuming iamv2); it uses this same
+	// gateway/middleware/authz/authz.go; it uses this same
 	// auth_context.NewContext() to create the context it returns.
 	// * This test implementation is just hard coding everything because I didn't
 	// need anything more complicated than that. Feel free to modify if that

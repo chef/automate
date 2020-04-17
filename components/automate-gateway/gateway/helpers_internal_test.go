@@ -19,7 +19,7 @@ import (
 	authz "github.com/chef/automate/api/interservice/authz/v2"
 	compliance_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	ingest "github.com/chef/automate/api/interservice/ingest"
-	auth "github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
+	middleware_authz "github.com/chef/automate/components/automate-gateway/gateway/middleware/authz"
 	mock_gateway "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_gateway"
 	"github.com/chef/automate/components/notifications-client/notifier"
 )
@@ -115,7 +115,7 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 
 	gw := New(cfg)
 	gw.clientsFactory = mockClientsFactory
-	gw.authorizer = auth.AuthorizationHandler(mockAuthorizationClient)
+	gw.authorizer = middleware_authz.AuthorizationHandler(mockAuthorizationClient)
 
 	return *gw
 }
