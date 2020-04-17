@@ -476,9 +476,9 @@ describe('ClientRunsTable', () => {
       it('should render a table', () => {
         fixture.detectChanges();
         expect(
-          element.nativeElement.querySelector('chef-table > chef-table-header')).not.toBe(null);
+          element.nativeElement.querySelector('chef-table > chef-thead')).not.toBe(null);
         expect(
-          element.nativeElement.querySelector('chef-table > chef-table-body')).not.toBe(null);
+          element.nativeElement.querySelector('chef-table > chef-tbody')).not.toBe(null);
       });
     });
 
@@ -494,13 +494,13 @@ describe('ClientRunsTable', () => {
         fixture.detectChanges();
 
         expect(element.nativeElement
-          .querySelectorAll('chef-table > chef-table-body > chef-table-row').length).toBe(4);
+          .querySelectorAll('chef-table > chef-tbody > chef-tr').length).toBe(4);
       });
     });
 
     describe('clicking the Node Name heading', () => {
       it('should toggle the list sort', () => {
-        const th = element.nativeElement.querySelector('chef-table-header-cell:nth-child(1)');
+        const th = element.nativeElement.querySelector('chef-th:nth-child(1)');
         fixture.detectChanges();
 
         expect(component.defaultFieldDirection['name']).toBe('ASC');
@@ -518,7 +518,7 @@ describe('ClientRunsTable', () => {
 
     describe('clicking the Check-in heading', () => {
       it('should emit the list sort for Check-in in descending order', () => {
-        const th = element.nativeElement.querySelector('chef-table-header-cell:nth-child(2)');
+        const th = element.nativeElement.querySelector('chef-th:nth-child(2)');
         fixture.detectChanges();
 
         expect(component.defaultFieldDirection['name']).toBe('ASC');
@@ -546,7 +546,7 @@ describe('ClientRunsTable', () => {
         fixture.detectChanges();
         // There are four nodes 8 links per node. The example as on node that
         // has data and the other that does not have data. Therefore there should only be 9 anchors
-        expect(element.nativeElement.querySelectorAll('chef-table-cell > a').length).toBe(9);
+        expect(element.nativeElement.querySelectorAll('chef-td > a').length).toBe(9);
       });
     });
   });

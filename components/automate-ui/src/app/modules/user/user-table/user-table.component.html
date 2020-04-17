@@ -14,30 +14,30 @@
   </chef-toolbar>
   <ng-container *ngIf="showTable">
     <chef-table>
-      <chef-table-header>
-        <chef-table-row>
-          <chef-table-header-cell class="name-column">Display Name</chef-table-header-cell>
-          <chef-table-header-cell class="username-column">Username</chef-table-header-cell>
-          <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
-        </chef-table-row>
-      </chef-table-header>
-      <chef-table-body>
-        <chef-table-row *ngFor="let user of users">
-          <chef-table-cell class="name-column">
+      <chef-thead>
+        <chef-tr>
+          <chef-th class="name-column">Display Name</chef-th>
+          <chef-th class="username-column">Username</chef-th>
+          <chef-th class="three-dot-column"></chef-th>
+        </chef-tr>
+      </chef-thead>
+      <chef-tbody>
+        <chef-tr *ngFor="let user of users">
+          <chef-td class="name-column">
             <a [routerLink]="['/settings', 'users', user.id]">{{ user.name }}</a>
-          </chef-table-cell>
-          <chef-table-cell class="username-column">
+          </chef-td>
+          <chef-td class="username-column">
             {{ user.id }}
-          </chef-table-cell>
-          <chef-table-cell class="three-dot-column">
+          </chef-td>
+          <chef-td class="three-dot-column">
             <!-- <app-authorized [allOf]="['/iam/v2/users/{id}', 'delete', user.id]"> -->
             <mat-select panelClass="chef-control-menu" data-cy="select">
               <mat-option data-cy="delete" (onSelectionChange)="deleteUser($event, user)">{{ removeText }}</mat-option>
             </mat-select>
             <!-- </app-authorized> -->
-          </chef-table-cell>
-        </chef-table-row>
-      </chef-table-body>
+          </chef-td>
+        </chef-tr>
+      </chef-tbody>
     </chef-table>
   </ng-container>
 </app-authorized>

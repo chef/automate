@@ -85,8 +85,8 @@
 .reporting-nodes-table {
   padding: 2em 35px 0;
 
-  chef-table-header-cell,
-  chef-table-cell {
+  chef-th,
+  chef-td {
 
     chef-button {
       white-space: nowrap;

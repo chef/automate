@@ -47,7 +47,7 @@ describe('Nodes page', () => {
     browser.waitForAngularEnabled(false);
     browser.get('/infrastructure/client-runs');
 
-    const node_list = $$('chef-table.node-list chef-table-body chef-table-row');
+    const node_list = $$('chef-table.node-list chef-tbody chef-tr');
 
     expect(node_list.count()).toBe(2);
 

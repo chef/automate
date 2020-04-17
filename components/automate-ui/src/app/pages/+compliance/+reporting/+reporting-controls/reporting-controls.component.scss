@@ -3,8 +3,8 @@
 .reporting-controls-table {
   padding: 2em 35px 0;
 
-  chef-table-header-cell,
-  chef-table-cell {
+  chef-th,
+  chef-td {
     &:first-child {
       flex-basis: 200%;
       word-break: break-all;

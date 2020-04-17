@@ -102,7 +102,7 @@ describe('NotificationsComponent', () => {
     });
 
     it('shows expected item count', () => {
-      const tableBody = getElementByCss(`${listId} chef-table-row`);
+      const tableBody = getElementByCss(`${listId} chef-tr`);
       expect(tableBody.children.length).toBe(rules.length + 1);
     });
 

@@ -131,7 +131,7 @@ chef-page {
 
     #inner-container {
       chef-table {
-        chef-table-body {
+        chef-tbody {
           height: calc(100vh - 350px);
           overflow-y: scroll;
         }

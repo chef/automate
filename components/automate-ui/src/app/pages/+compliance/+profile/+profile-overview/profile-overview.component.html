@@ -55,21 +55,21 @@
               <p id="upload-modal-subtitle">See the <a href="https://www.inspec.io/docs/reference/cli/#archive" target="_blank">Inspec CLI documentation</a> for more info on creating a profile archive.</p>
               <chef-table class="file-upload-list">
                 <ng-container *ngFor="let file of fileUploads; trackBy: trackBy">
-                  <chef-table-row>
-                    <chef-table-cell>
+                  <chef-tr>
+                    <chef-td>
                       <chef-icon class="failed" *ngIf="file.failed">report_problem</chef-icon>
                       <chef-icon class="passed" *ngIf="file.loaded">check_circle</chef-icon>
                       <chef-loading-spinner size="14" *ngIf="file.loading"></chef-loading-spinner>
                       <span>{{ file.name }}</span>
-                    </chef-table-cell>
-                    <chef-table-cell>
+                    </chef-td>
+                    <chef-td>
                       <span *ngIf="file.loading && file.percent < 100" class="upload-percent">{{ file.percent }}%</span>
                       <span *ngIf="file.loading && file.percent === 100" class="upload-percent">Verifying...</span>
                       <chef-button *ngIf="file.failed" caution secondary (click)="toggleUploadResult(file)">
                         <chef-icon>report_problem</chef-icon>
                       </chef-button>
-                    </chef-table-cell>
-                  </chef-table-row>
+                    </chef-td>
+                  </chef-tr>
                   <div class="result-detail" *ngIf="isOpenUploadResult(file)">
                     <pre>{{ file.response }}</pre>
                   </div>
@@ -104,15 +104,15 @@
           <chef-table
             *ngIf="!profilesEmpty && !viewAvailableUpdatesList"
             class="profiles-table installed">
-            <chef-table-header>
-              <chef-table-row>
-                <chef-table-header-cell>Profile</chef-table-header-cell>
-                <chef-table-header-cell>Version</chef-table-header-cell>
-                <chef-table-header-cell>Identifier</chef-table-header-cell>
-              </chef-table-row>
-            </chef-table-header>
-            <chef-table-body *ngIf="!profilesListLoading">
-              <chef-table-row *ngIf="profileUpdatesAvailable.length" class="empty new-row">
+            <chef-thead>
+              <chef-tr>
+                <chef-th>Profile</chef-th>
+                <chef-th>Version</chef-th>
+                <chef-th>Identifier</chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody *ngIf="!profilesListLoading">
+              <chef-tr *ngIf="profileUpdatesAvailable.length" class="empty new-row">
                 <span class="cta">{{ profileUpdatesAvailable.length }} Available Updates</span>
                 <span class="action">
                   <chef-button secondary (click)="showAvailableUpdates()">
@@ -120,22 +120,22 @@
                     <span>View</span>
                   </chef-button>
                 </span>
-              </chef-table-row>
-              <chef-table-row *ngFor="let profile of filteredProfiles">
-                <chef-table-cell >
+              </chef-tr>
+              <chef-tr *ngFor="let profile of filteredProfiles">
+                <chef-td >
                   <a
                     [routerLink]="['/compliance/compliance-profiles/profile-details']"
                     [queryParams]="{name: profile.name, version: profile.version, owner: user}">
                     {{ profile.title }}
                   </a>
-                </chef-table-cell>
-                <chef-table-cell >{{ profile.version }}</chef-table-cell>
-                <chef-table-cell >
+                </chef-td>
+                <chef-td >{{ profile.version }}</chef-td>
+                <chef-td >
                   <chef-clipboard value="{{ user }}/{{ profile.name }}"></chef-clipboard>
                   {{ user }}/{{ profile.name }}
-                </chef-table-cell>
-              </chef-table-row>
-            </chef-table-body>
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
             <chef-loading-spinner *ngIf="profilesListLoading" size="50"></chef-loading-spinner>
           </chef-table>
 
@@ -143,15 +143,15 @@
           <chef-table
             *ngIf="viewAvailableUpdatesList"
             class="profiles-table available">
-            <chef-table-header>
-              <chef-table-row>
-                <chef-table-header-cell>Profile</chef-table-header-cell>
-                <chef-table-header-cell>Version</chef-table-header-cell>
-                <chef-table-header-cell></chef-table-header-cell>
-              </chef-table-row>
-            </chef-table-header>
-            <chef-table-body>
-              <chef-table-row class="empty new-row">
+            <chef-thead>
+              <chef-tr>
+                <chef-th>Profile</chef-th>
+                <chef-th>Version</chef-th>
+                <chef-th></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr class="empty new-row">
                 <span class="cta">Select a profile to preview the update and select "Update" to install it.</span>
                 <span class="action">
                   <chef-button secondary (click)="hideAvailableUpdates()">
@@ -159,54 +159,54 @@
                     <span>Go Back</span>
                   </chef-button>
                 </span>
-              </chef-table-row>
-              <chef-table-row *ngFor="let profile of profileUpdatesAvailable">
-                <chef-table-cell>
+              </chef-tr>
+              <chef-tr *ngFor="let profile of profileUpdatesAvailable">
+                <chef-td>
                   <a
                     [routerLink]="['/compliance/compliance-profiles/profile-details']"
                     [queryParams]="{name: profile.name, version: profile.version}">
                     {{ profile.title }}
                   </a>
-                </chef-table-cell>
-                <chef-table-cell>{{ profile.version }}</chef-table-cell>
-                <chef-table-cell>
+                </chef-td>
+                <chef-td>{{ profile.version }}</chef-td>
+                <chef-td>
                   <chef-button secondary (click)="getProfiles([profile])">
                     Update
                   </chef-button>
-                </chef-table-cell>
-              </chef-table-row>
-            </chef-table-body>
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
           </chef-table>
         </div>
 
         <!-- available profiles tab-->
         <div *ngIf="selectedTab === 'available'">
           <chef-table class="profiles-table available">
-            <chef-table-header>
-              <chef-table-row>
-                <chef-table-header-cell>Profile</chef-table-header-cell>
-                <chef-table-header-cell>Version</chef-table-header-cell>
-                <chef-table-header-cell></chef-table-header-cell>
-              </chef-table-row>
-            </chef-table-header>
-            <chef-table-body *ngIf="!availableListLoading">
-              <chef-table-row *ngFor="let profile of filteredAvailableProfiles">
-                <chef-table-cell>
+            <chef-thead>
+              <chef-tr>
+                <chef-th>Profile</chef-th>
+                <chef-th>Version</chef-th>
+                <chef-th></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody *ngIf="!availableListLoading">
+              <chef-tr *ngFor="let profile of filteredAvailableProfiles">
+                <chef-td>
                   <a
                     [routerLink]="['/compliance/compliance-profiles/profile-details']"
                     [queryParams]="{name: profile.name, version: profile.version}">
                     {{ profile.title }}
                   </a>
-                </chef-table-cell>
-                <chef-table-cell>{{ profile.version }}</chef-table-cell>
-                <chef-table-cell class="text-right">
+                </chef-td>
+                <chef-td>{{ profile.version }}</chef-td>
+                <chef-td class="text-right">
                   <chef-button secondary (click)="getProfiles([profile])">
                     <chef-icon>get_app</chef-icon>
                     <span>Get</span>
                   </chef-button>
-                </chef-table-cell>
-              </chef-table-row>
-            </chef-table-body>
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
             <chef-loading-spinner *ngIf="availableListLoading" size="50"></chef-loading-spinner>
           </chef-table>
         </div>

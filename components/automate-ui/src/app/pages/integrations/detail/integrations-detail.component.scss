@@ -20,8 +20,8 @@ chef-page-header {
 
 .page-body {
   chef-table#manager-nodes-list {
-    chef-table-header-cell:first-child,
-    chef-table-cell:first-child {
+    chef-th:first-child,
+    chef-td:first-child {
       flex-grow: 5%;
       overflow: visible;
     }

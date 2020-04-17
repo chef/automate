@@ -74,12 +74,12 @@ chef-alert {
   justify-content: left;
 }
 
-chef-table-row {
+chef-tr {
   cursor: pointer;
 }
 
-chef-table-header-cell,
-chef-table-cell {
+chef-th,
+chef-td {
 
   &.sort:hover {
     cursor: pointer;
@@ -138,7 +138,7 @@ chef-table-cell {
   }
 }
 
-chef-table-cell {
+chef-td {
 
   &>a {
     display: flex;
@@ -216,8 +216,8 @@ chef-table-cell {
   }
 }
 
-chef-table-row.sg-row {
-  > chef-table-cell:first-child {
+chef-tr.sg-row {
+  > chef-td:first-child {
     &::before {
       content: '';
       position: absolute;
@@ -254,7 +254,7 @@ chef-table-row.sg-row {
 
   &:hover,
   &.selected {
-    > chef-table-cell:first-child::before {
+    > chef-td:first-child::before {
       width: 7px;
     }
   }
@@ -275,7 +275,7 @@ chef-table-row.sg-row {
       content: '';
     }
 
-    > chef-table-cell {
+    > chef-td {
       background: #F2F8FD;
     }
   }

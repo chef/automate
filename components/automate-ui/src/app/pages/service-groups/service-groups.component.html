@@ -70,30 +70,30 @@
     </chef-option>
   </chef-status-filter-group>
   <chef-table class="service-group-list" *ngIf="(serviceGroupsStatus$ | async) === 'loadingSuccess' && (serviceGroupsList$ | async).length !== 0">
-    <chef-table-header>
-        <chef-table-row>
-          <chef-table-header-cell class="health sort" (click)="onToggleSort('percent_ok')">
+    <chef-thead>
+        <chef-tr>
+          <chef-th class="health sort" (click)="onToggleSort('percent_ok')">
             Health <i class="sort-icon {{sortIcon('percent_ok')}}"></i>
-          </chef-table-header-cell>
-          <chef-table-header-cell class="service-group">
+          </chef-th>
+          <chef-th class="service-group">
             Service Group
-          </chef-table-header-cell>
-          <chef-table-header-cell class="package-name sort" (click)="onToggleSort('name')">
+          </chef-th>
+          <chef-th class="package-name sort" (click)="onToggleSort('name')">
             Package <i class="sort-icon {{sortIcon('name')}}"></i>
-          </chef-table-header-cell>
-          <chef-table-header-cell class="release">
+          </chef-th>
+          <chef-th class="release">
             Release
-          </chef-table-header-cell>
-          <chef-table-header-cell class="env sort" (click)="onToggleSort('environment')">
+          </chef-th>
+          <chef-th class="env sort" (click)="onToggleSort('environment')">
             Env <i class="sort-icon {{sortIcon('environment')}}"></i>
-          </chef-table-header-cell>
-          <chef-table-header-cell class="app sort" (click)="onToggleSort('app_name')">
+          </chef-th>
+          <chef-th class="app sort" (click)="onToggleSort('app_name')">
             App <i class="sort-icon {{sortIcon('app_name')}}"></i>
-          </chef-table-header-cell>
-        </chef-table-row>
-    </chef-table-header>
-    <chef-table-body>
-      <chef-table-row
+          </chef-th>
+        </chef-tr>
+    </chef-thead>
+    <chef-tbody>
+      <chef-tr
         tabindex="0"
         class="{{serviceGroups.status}} sg-row"
         [ngClass]="{'selected': (selectedServiceGroupId === serviceGroups.id)}"
@@ -101,7 +101,7 @@
         (keydown.space)="onServiceGroupSelect($event, serviceGroups.id)"
         (keydown.enter)="onServiceGroupSelect($event, serviceGroups.id)"
         *ngFor="let serviceGroups of serviceGroupsList$ | async">
-        <chef-table-cell class="{{serviceGroups.status}} health">
+        <chef-td class="{{serviceGroups.status}} health">
           <div class="chart-container">
             <chef-radial-chart>
               <span slot="innerText">
@@ -124,8 +124,8 @@
             </chef-radial-chart>
           </div>
           <chef-icon class="{{serviceGroups.status}}">{{ serviceGroups.status | serviceStatusIcon }}</chef-icon>
-        </chef-table-cell>
-        <chef-table-cell class="service-group">
+        </chef-td>
+        <chef-td class="service-group">
           <div>{{ serviceGroups.name }}</div>
           <div>
             <b>{{ serviceGroups.services_health_counts.ok }} of {{ serviceGroups.services_health_counts.total }}</b>
@@ -135,14 +135,14 @@
             <img class="disconnect-icon" src="assets/img/icon-disconnected.svg" alt="" aria-hidden />
             <span>{{ serviceGroups.disconnected_count }}</span>
           </div>
-        </chef-table-cell>
-        <chef-table-cell class="package-name">
+        </chef-td>
+        <chef-td class="package-name">
           {{ serviceGroups.package }}
-        </chef-table-cell>
-        <chef-table-cell class="release">
+        </chef-td>
+        <chef-td class="release">
           {{ serviceGroups.release }}
-        </chef-table-cell>
-        <chef-table-cell class="env">
+        </chef-td>
+        <chef-td class="env">
           <!-- if environment is empty, display a badge -->
           <chef-badge no-data warning
             id="warning-env-tooltip"
@@ -151,8 +151,8 @@
 
           <!-- else, display the environment name -->
           <div *ngIf="serviceGroups.environment !== ''">{{ serviceGroups.environment }}</div>
-        </chef-table-cell>
-        <chef-table-cell class="app">
+        </chef-td>
+        <chef-td class="app">
           <!-- if application is empty, display a badge -->
           <chef-badge no-data warning
             id="warning-app-tooltip"
@@ -161,9 +161,9 @@
 
           <!-- else, display the application name -->
           <div *ngIf="serviceGroups.application !== ''">{{ serviceGroups.application }}</div>
-        </chef-table-cell>
-      </chef-table-row>
-    </chef-table-body>
+        </chef-td>
+      </chef-tr>
+    </chef-tbody>
   </chef-table>
   <app-page-picker
     [total]="totalServiceGroups"

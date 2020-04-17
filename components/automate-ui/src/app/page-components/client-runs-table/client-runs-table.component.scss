@@ -15,8 +15,8 @@ a, a:visited {
   text-decoration: none;
 }
 
-chef-table-header-cell,
-chef-table-cell {
+chef-th,
+chef-td {
 
   &[hidden] {
     display: none;
@@ -36,7 +36,7 @@ chef-table-cell {
   }
 
   &.node-name {
-    flex-basis: 240%;
+    flex-basis: 24%;
   }
 
   &.check-in {
@@ -45,7 +45,7 @@ chef-table-cell {
 
   &.node-environment {
     white-space: normal;
-    width: 120%;
+    width: 12%;
   }
 
   &.has-runs {
@@ -64,7 +64,7 @@ chef-table-cell {
   }
 }
 
-chef-table-cell {
+chef-td {
 
   &.has-runs {
     & > a {
@@ -84,8 +84,8 @@ chef-table-cell {
   }
 }
 
-chef-table-row.row {
-  & > chef-table-cell:first-child:before {
+chef-tr.row {
+  & > chef-td:first-child:before {
     content: '';
     position: absolute;
     top: 0;
@@ -98,15 +98,15 @@ chef-table-row.row {
     border-bottom-left-radius: $global-radius;
   }
 
-  &:hover > chef-table-cell:first-child:before {
+  &:hover > chef-td:first-child:before {
     width: 7px;
   }
 
-  & > chef-table-cell.failure:first-child:before {
+  & > chef-td.failure:first-child:before {
     background: $chef-critical;
   }
 
-  & > chef-table-cell.missing:first-child:before {
+  & > chef-td.missing:first-child:before {
     background: $chef-dark-grey;
   }
 }

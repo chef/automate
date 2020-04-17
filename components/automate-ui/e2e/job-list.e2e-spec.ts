@@ -96,8 +96,8 @@ describe('Job List', () => {
   });
 
   it('has a list of jobs', () => {
-    const nameColumn = list.$$('chef-table-body chef-table-row:not(.new-row)').map(row => {
-      return row.$('chef-table-cell:first-child').getText();
+    const nameColumn = list.$$('chef-tbody chef-tr:not(.new-row)').map(row => {
+      return row.$('chef-td:first-child').getText();
     });
 
     expect(list.isDisplayed()).toEqual(true);
@@ -108,7 +108,7 @@ describe('Job List', () => {
   });
 
   describe('clicking delete job button', () => {
-    const listItem = list.$$('chef-table-body chef-table-row:not(.new-row)').first();
+    const listItem = list.$$('chef-tbody chef-tr:not(.new-row)').first();
     const deleteBtn = listItem.$('chef-button[label="delete"]');
     const deletePrompt = $('#delete-prompt');
 
@@ -122,7 +122,7 @@ describe('Job List', () => {
   });
 
   describe('delete confirmation prompt', () => {
-    const listItem = list.$$('chef-table-body chef-table-row:not(.new-row)').first();
+    const listItem = list.$$('chef-tbody chef-tr:not(.new-row)').first();
     const deleteBtn = listItem.$('chef-button[label="delete"]');
 
     const deletePrompt = $('#delete-prompt');
@@ -222,8 +222,8 @@ describe('Job List', () => {
       });
 
       it('deletes the job', () => {
-        const nameColumn = list.$$('chef-table-body chef-table-row:not(.new-row)').map(row => {
-          return row.$('chef-table-cell:first-child').getText();
+        const nameColumn = list.$$('chef-tbody chef-tr:not(.new-row)').map(row => {
+          return row.$('chef-td:first-child').getText();
         });
 
         expect(list.isDisplayed()).toEqual(true);

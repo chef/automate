@@ -95,37 +95,37 @@
         </div>
 
         <chef-table class="controls-table">
-          <chef-table-header>
-            <chef-table-row>
-              <chef-table-header-cell>{{ profile.controls.length }} Controls</chef-table-header-cell>
-              <chef-table-header-cell>Impact</chef-table-header-cell>
-              <chef-table-header-cell>Total Tests</chef-table-header-cell>
-              <chef-table-header-cell></chef-table-header-cell>
-            </chef-table-row>
-          </chef-table-header>
-          <chef-table-body>
+          <chef-thead>
+            <chef-tr>
+              <chef-th>{{ profile.controls.length }} Controls</chef-th>
+              <chef-th>Impact</chef-th>
+              <chef-th>Total Tests</chef-th>
+              <chef-th></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
             <ng-container *ngFor="let control of profile.controls">
-              <chef-table-row>
-                <chef-table-cell >
+              <chef-tr>
+                <chef-td >
                   <span><strong>{{ control.id }}:</strong> {{ control.title }}</span>
-                </chef-table-cell>
-                <chef-table-cell  [ngClass]="impactStatus(control)">
+                </chef-td>
+                <chef-td  [ngClass]="impactStatus(control)">
                   {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
-                </chef-table-cell>
-                <chef-table-cell >{{ testCount(control) }}</chef-table-cell>
-                <chef-table-cell >
+                </chef-td>
+                <chef-td >{{ testCount(control) }}</chef-td>
+                <chef-td >
                   <chef-button secondary (click)="toggleControl(control)">
                     <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
                     <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>
                   </chef-button>
-                </chef-table-cell>
-              </chef-table-row>
+                </chef-td>
+              </chef-tr>
               <div class="control-detail" *ngIf="isOpenControl(control)">
                 <p *ngIf="control.desc.length">{{ control.desc }}</p>
                 <chef-snippet [code]="control.code" lang="ruby"></chef-snippet>
               </div>
             </ng-container>
-          </chef-table-body>
+          </chef-tbody>
         </chef-table>
 
         <chef-scroll-top></chef-scroll-top>

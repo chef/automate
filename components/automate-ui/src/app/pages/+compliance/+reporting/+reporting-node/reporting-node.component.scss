@@ -229,8 +229,8 @@ chef-tooltip[for='skipped-count'] {
 .controls-table {
   padding: 2em 35px;
 
-  chef-table-header-cell,
-  chef-table-cell {
+  chef-th,
+  chef-td {
     &:first-child {
       // this flex-basis is applied agaist the individual cell
       // so in this case 500% is equivalent to 5x the normal size.

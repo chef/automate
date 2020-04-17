@@ -99,7 +99,7 @@ describe('DatafeedComponent', () => {
     });
 
     it('shows expected item count', () => {
-      const tableBody = getElementByCss(`${listId} chef-table-body`);
+      const tableBody = getElementByCss(`${listId} chef-tbody`);
       expect(tableBody.children.length).toBe(destinations.length);
     });
 

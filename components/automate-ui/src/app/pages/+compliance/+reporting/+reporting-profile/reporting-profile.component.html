@@ -44,26 +44,26 @@
         </div>
 
         <chef-table class="controls-table">
-          <chef-table-header>
-            <chef-table-row>
-              <chef-table-header-cell>{{ controls.length }} Controls</chef-table-header-cell>
-              <chef-table-header-cell>Impact</chef-table-header-cell>
-              <chef-table-header-cell>Test Results</chef-table-header-cell>
-              <chef-table-header-cell></chef-table-header-cell>
-            </chef-table-row>
-          </chef-table-header>
-          <chef-table-body>
-            <chef-table-row *ngFor="let control of controls">
-              <chef-table-cell >
+          <chef-thead>
+            <chef-tr>
+              <chef-th>{{ controls.length }} Controls</chef-th>
+              <chef-th>Impact</chef-th>
+              <chef-th>Test Results</chef-th>
+              <chef-th></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let control of controls">
+              <chef-td >
                 <chef-icon class="status-icon" [ngClass]="statusClass(control)">
                   {{ statusIcon(statusClass(control)) }}
                 </chef-icon>
                 <span><strong>{{ control.control }}:</strong> {{ control.title }}</span>
-              </chef-table-cell>
-              <chef-table-cell class="impact-status " [ngClass]="impactStatus(control)">
+              </chef-td>
+              <chef-td class="impact-status " [ngClass]="impactStatus(control)">
                 {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
-              </chef-table-cell>
-              <chef-table-cell >
+              </chef-td>
+              <chef-td >
                 <span class="control-result" [ngClass]="{'failed': control.failed > 0}">
                   <chef-icon>report_problem</chef-icon>
                   <span>{{ control.failed | number }}</span>
@@ -80,14 +80,14 @@
                   <div class="waived-icon"></div>
                   <span>{{ control.waived | number }}</span>
                 </span>
-              </chef-table-cell>
-              <chef-table-cell >
+              </chef-td>
+              <chef-td >
                 <chef-button secondary (click)="onControlClick(control.control)">
                   Scan Results
                 </chef-button>
-              </chef-table-cell>
-            </chef-table-row>
-          </chef-table-body>
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
         </chef-table>
 
         <chef-scroll-top></chef-scroll-top>

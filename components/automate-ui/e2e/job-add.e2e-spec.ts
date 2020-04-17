@@ -345,7 +345,7 @@ describe('Job Add', () => {
 
         it('has a preview list of nodes', () => {
           const list = manager.$('.manager-nodes-preview');
-          const listItems = list.$$('chef-table-row');
+          const listItems = list.$$('chef-tr');
 
           browser.wait(EC.presenceOf(listItems.first()), 500, 'Loading indicator should go away');
 
@@ -375,7 +375,7 @@ describe('Job Add', () => {
 
         it('has a preview list of nodes', () => {
           const list = manager.$('.manager-nodes-preview');
-          const listItems = list.$$('chef-table-row');
+          const listItems = list.$$('chef-tr');
 
           browser.wait(EC.presenceOf(listItems.first()), 500, 'Loading indicator should go away');
 
@@ -394,7 +394,7 @@ describe('Job Add', () => {
           manager.$('input[type="checkbox"]').click();
 
           const list = manager.$('.manager-nodes-preview');
-          const listItems = list.$$('chef-table-row');
+          const listItems = list.$$('chef-tr');
 
           browser.wait(EC.presenceOf(listItems.first()), 500, 'Loading indicator should go away');
 
@@ -426,7 +426,7 @@ describe('Job Add', () => {
 
         it('has a preview list of nodes', () => {
           const list = manager.$('.manager-nodes-preview');
-          const listItems = list.$$('chef-table-row');
+          const listItems = list.$$('chef-tr');
 
           browser.wait(EC.presenceOf(listItems.first()), 500, 'Loading indicator should go away');
 
@@ -445,7 +445,7 @@ describe('Job Add', () => {
           manager.$('input[type="checkbox"]').click();
 
           const list = manager.$('.manager-nodes-preview');
-          const listItems = list.$$('chef-table-row');
+          const listItems = list.$$('chef-tr');
 
           browser.wait(EC.presenceOf(listItems.first()), 500, 'Loading indicator should go away');
 
@@ -477,7 +477,7 @@ describe('Job Add', () => {
 
         it('has a preview list of nodes', () => {
           const list = manager.$('.manager-nodes-preview');
-          const listItems = list.$$('chef-table-row');
+          const listItems = list.$$('chef-tr');
 
           browser.wait(EC.presenceOf(listItems.first()), 500, 'Loading indicator should go away');
 
@@ -497,13 +497,13 @@ describe('Job Add', () => {
       });
 
       it('lists available profiles', () => {
-        const profiles = $$('chef-table chef-table-body chef-table-row');
+        const profiles = $$('chef-table chef-tbody chef-tr');
 
         expect(profiles.count()).toEqual(1);
       });
 
       it('requires selecting one or more profiles', () => {
-        const profile = $$('chef-table chef-table-body chef-table-row').first();
+        const profile = $$('chef-table chef-tbody chef-tr').first();
         const toggle = profile.$('input[type="checkbox"]');
         const nextButton = element(by.cssContainingText('chef-button', 'Next'));
         const buttonEnabled = () => nextButton.getAttribute('disabled').then(val => val === null);
