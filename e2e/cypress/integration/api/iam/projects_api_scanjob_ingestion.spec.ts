@@ -22,26 +22,25 @@ describe('ScanJob Ingestion project tagging', () => {
   }
 
   const projectWithNodeRules: ProjectAndRule = {
-      project: {
-        id: projectId,
-        name: 'project environment',
-        skip_policies: true
-      },
-      rule: {
-        id: 'rule-environment-3',
-        name: 'rule ENVIRONMENT',
-        type: 'NODE',
-        project_id: projectId,
-        conditions: [
-          {
-            attribute: 'ENVIRONMENT',
-            operator: 'EQUALS',
-            values: [environment]
-          }
-        ]
-      }
-    };
-
+    project: {
+      id: projectId,
+      name: 'project environment',
+      skip_policies: true
+    },
+    rule: {
+      id: 'rule-environment-3',
+      name: 'rule ENVIRONMENT',
+      type: 'NODE',
+      project_id: projectId,
+      conditions: [
+        {
+          attribute: 'ENVIRONMENT',
+          operator: 'EQUALS',
+          values: [environment]
+        }
+      ]
+    }
+  };
 
   before(() => {
     cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
@@ -65,8 +64,6 @@ describe('ScanJob Ingestion project tagging', () => {
   });
 
   after(() => {
-    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-
     // Delete the created secret
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -142,10 +139,6 @@ describe('ScanJob Ingestion project tagging', () => {
         }
       });
     });
-
-    // wait for secret to be delete
-    // wait for node to be delete
-    // wait for scan job to be delete
   });
 
   it('when a project has a rule that matches a node\'s environment' +
@@ -212,9 +205,8 @@ describe('ScanJob Ingestion project tagging', () => {
             'retries': 1,
             'node_selectors': []
           }
-        }).then((createJobResponse: Cypress.ObjectLike) => {
-          const scanJobId = createJobResponse.body.id;
-          // wait for the report to be ingested
+        }).then(() => {
+          // wait for the scan job to run and the report to be ingested
           cy.waitForComplianceNode(nodeID, nodeStart, nodeEnd, 100);
 
           // Ensure the compliance node is tagged with the correct project
@@ -222,7 +214,7 @@ describe('ScanJob Ingestion project tagging', () => {
           cy.request({
             headers: {
               'api-token': Cypress.env('ADMIN_TOKEN'),
-              projects: ['*']// [projectWithNodeRules.project.id]
+              projects: [projectWithNodeRules.project.id]
             },
             method: 'POST',
             url: '/api/v0/compliance/reporting/nodes/search',
