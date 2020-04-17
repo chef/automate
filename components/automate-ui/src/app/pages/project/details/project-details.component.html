@@ -61,36 +61,36 @@
             </app-authorized>
           </chef-toolbar>
           <app-authorized [allOf]="['/iam/v2/projects', 'get']">
-            <chef-table-new id="project-rules-table">
-              <chef-table-header>
-                <chef-table-row>
-                  <chef-table-header-cell>Name</chef-table-header-cell>
-                  <chef-table-header-cell>ID</chef-table-header-cell>
-                  <chef-table-header-cell>Resource Type</chef-table-header-cell>
-                  <chef-table-header-cell>Conditions</chef-table-header-cell>
-                  <chef-table-header-cell>Edits</chef-table-header-cell>
-                  <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
-                </chef-table-row>
-              </chef-table-header>
-              <chef-table-body>
-                <chef-table-row *ngFor="let rule of rules">
-                  <chef-table-cell>
+            <chef-table id="project-rules-table">
+              <chef-thead>
+                <chef-tr>
+                  <chef-th>Name</chef-th>
+                  <chef-th>ID</chef-th>
+                  <chef-th>Resource Type</chef-th>
+                  <chef-th>Conditions</chef-th>
+                  <chef-th>Edits</chef-th>
+                  <chef-th class="three-dot-column"></chef-th>
+                </chef-tr>
+              </chef-thead>
+              <chef-tbody>
+                <chef-tr *ngFor="let rule of rules">
+                  <chef-td>
                     <a [routerLink]="['/settings', 'projects', project?.id, 'rules', rule.id]">{{ rule.name }}</a>
-                  </chef-table-cell>
-                  <chef-table-cell>{{ rule.id }}</chef-table-cell>
-                  <chef-table-cell>{{ rule.type | titlecase }}</chef-table-cell>
-                  <chef-table-cell>{{ rule.conditions.length | pluralize : 'condition' : 'conditions' }}</chef-table-cell>
-                  <chef-table-cell>{{ getEditStatus(rule) }}</chef-table-cell>
-                  <chef-table-cell class="three-dot-column">
+                  </chef-td>
+                  <chef-td>{{ rule.id }}</chef-td>
+                  <chef-td>{{ rule.type | titlecase }}</chef-td>
+                  <chef-td>{{ rule.conditions.length | pluralize : 'condition' : 'conditions' }}</chef-td>
+                  <chef-td>{{ getEditStatus(rule) }}</chef-td>
+                  <chef-td class="three-dot-column">
                     <app-authorized [allOf]="['/iam/v2/projects/{id}', 'delete', project?.id]">
                       <mat-select panelClass="chef-control-menu">
                         <mat-option *ngIf="showDeleteRule()" class="delete-rule" (onSelectionChange)="startRuleDelete(rule)" data-cy="delete-rule">Delete Rule</mat-option>
                       </mat-select>
                     </app-authorized>
-                  </chef-table-cell>
-                </chef-table-row>
-              </chef-table-body>
-            </chef-table-new>
+                  </chef-td>
+                </chef-tr>
+              </chef-tbody>
+            </chef-table>
           </app-authorized>
         </ng-container>
         <ng-container *ngIf="showNoRulesMessage()">

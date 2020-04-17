@@ -74,11 +74,8 @@ chef-alert {
   justify-content: left;
 }
 
-// Table list styles
-.service-group-list {
-  border-collapse: separate;
-  border-spacing: 0;
-  width: 100%;
+chef-tr {
+  cursor: pointer;
 }
 
 chef-th,
@@ -89,7 +86,13 @@ chef-td {
   }
 
   &.health {
+    display: flex;
+    flex-flow: row nowrap;
     max-width: 110px;
+
+    .chart-container {
+      align-self: center;
+    }
   }
 
   &.service-group {
@@ -136,7 +139,6 @@ chef-td {
 }
 
 chef-td {
-  padding: 1em;
 
   &>a {
     display: flex;

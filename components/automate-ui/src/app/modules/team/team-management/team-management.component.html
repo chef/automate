@@ -35,36 +35,36 @@
               </app-authorized>
             </chef-toolbar>
             <div id="table-container">
-              <chef-table-new>
-                <chef-table-header>
-                  <chef-table-row>
-                    <chef-table-header-cell class="id-column">Name</chef-table-header-cell>
-                    <chef-table-header-cell class="name-column">ID</chef-table-header-cell>
-                    <chef-table-header-cell class="projects-column">Projects</chef-table-header-cell>
-                    <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
-                  </chef-table-row>
-                </chef-table-header>
-                <chef-table-body>
-                  <chef-table-row *ngFor="let team of sortedTeams$ | async">
-                    <chef-table-cell class="id-column">
+              <chef-table>
+                <chef-thead>
+                  <chef-tr>
+                    <chef-th class="id-column">Name</chef-th>
+                    <chef-th class="name-column">ID</chef-th>
+                    <chef-th class="projects-column">Projects</chef-th>
+                    <chef-th class="three-dot-column"></chef-th>
+                  </chef-tr>
+                </chef-thead>
+                <chef-tbody>
+                  <chef-tr *ngFor="let team of sortedTeams$ | async">
+                    <chef-td class="id-column">
                       <a [routerLink]="['/settings/teams', team.id]">{{ team.name }}</a>
-                    </chef-table-cell>
-                    <chef-table-cell class="name-column">{{ team.id }}</chef-table-cell>
-                    <chef-table-cell class="projects-column">
+                    </chef-td>
+                    <chef-td class="name-column">{{ team.id }}</chef-td>
+                    <chef-td class="projects-column">
                       <ng-container *ngIf="team.projects.length === 0">{{ unassigned }}</ng-container>
                       <ng-container *ngIf="team.projects.length === 1">{{ team.projects[0] }}</ng-container>
                       <ng-container *ngIf="team.projects.length > 1">{{ team.projects.length }} projects</ng-container>
-                    </chef-table-cell>
-                    <chef-table-cell class="three-dot-column">
+                    </chef-td>
+                    <chef-td class="three-dot-column">
                       <!-- <app-authorized [allOf]="['/iam/v2/teams/{id}', 'delete', team.id]"> -->
                       <mat-select panelClass="chef-control-menu">
                         <mat-option (onSelectionChange)="startTeamDelete($event, team)">Delete Team</mat-option>
                       </mat-select>
                       <!-- <app-authorized -->
-                    </chef-table-cell>
-                  </chef-table-row>
-                </chef-table-body>
-              </chef-table-new>
+                    </chef-td>
+                  </chef-tr>
+                </chef-tbody>
+              </chef-table>
             </div>
           </section>
         </ng-container>

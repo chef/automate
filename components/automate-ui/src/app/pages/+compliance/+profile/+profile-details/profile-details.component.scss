@@ -30,18 +30,21 @@ chef-page-header {
     width: 50%;
   }
 
-  chef-table {
-    chef-tr {
+  table {
+    font-size: 14px;
+
+    tr {
       margin: 0;
 
-      chef-th,
-      chef-td {
+      th,
+      td {
         padding: 0.25em 0;
         border: none;
         background-color: transparent;
+        text-align: left;
       }
 
-      chef-td {
+      td {
         flex-grow: 3;
       }
 
@@ -54,12 +57,12 @@ chef-page-header {
 }
 
 .controls-table {
-  margin: 2em 35px;
+  padding: 2em 35px;
 
   chef-th,
   chef-td {
     &:first-child {
-      flex-grow: 5;
+      flex-basis: 500%;
       word-break: break-all;
 
       strong {
@@ -69,6 +72,10 @@ chef-page-header {
 
     &:last-child {
       justify-content: flex-end;
+
+      chef-button {
+        margin: 0;
+      }
     }
   }
 

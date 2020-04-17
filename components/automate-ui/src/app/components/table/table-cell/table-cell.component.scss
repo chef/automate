@@ -1,15 +1,15 @@
 @import '../table.component';
 
 :host {
-  display: inline-block;
-  padding: $size_16;
-  vertical-align: middle;
-  text-align: left;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 14px;
   font-size: 14px;
   border-bottom: 1px solid $chef-grey;
   border-top: 1px solid $chef-grey;
   overflow: hidden;
-  text-overflow: ellipsis;
 
   &.text-right {
     text-align: right;

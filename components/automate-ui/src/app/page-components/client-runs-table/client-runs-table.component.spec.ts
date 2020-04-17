@@ -475,8 +475,10 @@ describe('ClientRunsTable', () => {
     describe('initialization', () => {
       it('should render a table', () => {
         fixture.detectChanges();
-        expect(element.nativeElement.querySelector('chef-table > chef-thead')).not.toBe(null);
-        expect(element.nativeElement.querySelector('chef-table > chef-tbody')).not.toBe(null);
+        expect(
+          element.nativeElement.querySelector('chef-table > chef-thead')).not.toBe(null);
+        expect(
+          element.nativeElement.querySelector('chef-table > chef-tbody')).not.toBe(null);
       });
     });
 
@@ -491,8 +493,8 @@ describe('ClientRunsTable', () => {
 
         fixture.detectChanges();
 
-        expect(element.nativeElement.querySelectorAll('chef-table > chef-tbody > chef-tr').length)
-          .toBe(4);
+        expect(element.nativeElement
+          .querySelectorAll('chef-table > chef-tbody > chef-tr').length).toBe(4);
       });
     });
 

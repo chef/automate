@@ -17,7 +17,10 @@ a, a:visited {
 
 chef-th,
 chef-td {
-  line-height: 1.2;
+
+  &[hidden] {
+    display: none;
+  }
 
   &.sort:hover {
     cursor: pointer;
@@ -33,7 +36,7 @@ chef-td {
   }
 
   &.node-name {
-    flex-basis: 24%;
+    flex-basis: 240%;
   }
 
   &.check-in {
@@ -42,7 +45,6 @@ chef-td {
 
   &.node-environment {
     white-space: normal;
-    width: 15%;
   }
 
   &.has-runs {
@@ -54,11 +56,14 @@ chef-td {
 
   &.view-more {
     max-width: 60px;
+
+    chef-button {
+      margin: -.5em 0;
+    }
   }
 }
 
 chef-td {
-  padding: 1em;
 
   &.has-runs {
     & > a {

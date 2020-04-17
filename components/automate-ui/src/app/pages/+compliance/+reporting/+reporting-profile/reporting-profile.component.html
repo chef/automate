@@ -14,32 +14,32 @@
 
         <div class="metadata">
           <chef-card>
-            <chef-table>
-              <chef-tr>
-                <chef-th>
+            <table>
+              <tr>
+                <th>
                   Version
-                </chef-th>
-                <chef-td>{{ profile.version }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td>{{ profile.version }}</td>
+              </tr>
+              <tr>
+                <th>
                   Maintainer
-                </chef-th>
-                <chef-td>{{ profile.maintainer }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td>{{ profile.maintainer }}</td>
+              </tr>
+              <tr>
+                <th>
                   License
-                </chef-th>
-                <chef-td>{{ profile.license }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td>{{ profile.license }}</td>
+              </tr>
+              <tr>
+                <th>
                   Platform
-                </chef-th>
-                <chef-td>{{ displaySupports(profile.supports) }}</chef-td>
-              </chef-tr>
-            </chef-table>
+                </th>
+                <td>{{ displaySupports(profile.supports) }}</td>
+              </tr>
+            </table>
           </chef-card>
         </div>
 
@@ -54,16 +54,16 @@
           </chef-thead>
           <chef-tbody>
             <chef-tr *ngFor="let control of controls">
-              <chef-td>
+              <chef-td >
                 <chef-icon class="status-icon" [ngClass]="statusClass(control)">
                   {{ statusIcon(statusClass(control)) }}
                 </chef-icon>
                 <span><strong>{{ control.control }}:</strong> {{ control.title }}</span>
               </chef-td>
-              <chef-td class="impact-status" [ngClass]="impactStatus(control)">
+              <chef-td class="impact-status " [ngClass]="impactStatus(control)">
                 {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
               </chef-td>
-              <chef-td>
+              <chef-td >
                 <span class="control-result" [ngClass]="{'failed': control.failed > 0}">
                   <chef-icon>report_problem</chef-icon>
                   <span>{{ control.failed | number }}</span>
@@ -81,7 +81,7 @@
                   <span>{{ control.waived | number }}</span>
                 </span>
               </chef-td>
-              <chef-td>
+              <chef-td >
                 <chef-button secondary (click)="onControlClick(control.control)">
                   Scan Results
                 </chef-button>

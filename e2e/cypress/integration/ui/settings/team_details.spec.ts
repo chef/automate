@@ -104,10 +104,10 @@ describe('team details', () => {
   context('when the team has users', () => {
     it('displays team users', () => {
       cy.get('chef-option').contains('Users');
-      cy.get('app-user-table chef-table-header-cell').contains('Name');
-      cy.get('app-user-table chef-table-header-cell').contains('Username');
-      cy.get('app-user-table chef-table-cell').contains(userID);
-      cy.get('app-user-table chef-table-cell').contains(userName);
+      cy.get('app-user-table chef-th').contains('Name');
+      cy.get('app-user-table chef-th').contains('Username');
+      cy.get('app-user-table chef-td').contains(userID);
+      cy.get('app-user-table chef-td').contains(userName);
     });
   });
 

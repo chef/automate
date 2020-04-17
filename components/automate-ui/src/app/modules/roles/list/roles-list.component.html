@@ -18,32 +18,32 @@
       </chef-page-header>
       <section class="page-body">
         <app-authorized [allOf]="['/iam/v2/roles', 'get']">
-          <chef-table-new>
-            <chef-table-header>
-              <chef-table-row>
-                <chef-table-header-cell>Name</chef-table-header-cell>
-                <chef-table-header-cell></chef-table-header-cell>
-                <chef-table-header-cell>Type</chef-table-header-cell>
-                <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
-              </chef-table-row>
-            </chef-table-header>
-            <chef-table-body>
-              <chef-table-row *ngFor="let role of sortedRoles$ | async">
-                  <chef-table-cell>
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th>Name</chef-th>
+                <chef-th></chef-th>
+                <chef-th>Type</chef-th>
+                <chef-th class="three-dot-column"></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr *ngFor="let role of sortedRoles$ | async">
+                  <chef-td>
                     <a [routerLink]="['/settings/roles', role.id]">{{ role.name }}</a>
-                  </chef-table-cell>
-                  <chef-table-cell></chef-table-cell>
-                  <chef-table-cell>{{ role.type | iamType }}</chef-table-cell>
-                  <chef-table-cell class="three-dot-column">
+                  </chef-td>
+                  <chef-td></chef-td>
+                  <chef-td>{{ role.type | iamType }}</chef-td>
+                  <chef-td class="three-dot-column">
                     <!-- <app-authorized [allOf]="[`/iam/v2/roles/{id}`, 'delete', role.id]"> -->
                     <mat-select panelClass="chef-control-menu" *ngIf="(role.type | iamType).toLowerCase() === 'custom'">
                       <mat-option data-cy="delete" (onSelectionChange)="startRoleDelete($event, role)">Delete Role</mat-option>
                     </mat-select>
                     <!-- </app-authorized> -->
-                  </chef-table-cell>
-              </chef-table-row>
-            </chef-table-body>
-          </chef-table-new>
+                  </chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
         </app-authorized>
       </section>
     </main>

@@ -58,39 +58,39 @@
 
         <div class="metadata">
           <chef-card>
-            <chef-table>
-              <chef-tr>
-                <chef-th>
+            <table>
+              <tr>
+                <th>
                   Status
-                </chef-th>
-                <chef-td *ngIf="isAvailable">Available</chef-td>
-                <chef-td *ngIf="isInstalled">Installed</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td *ngIf="isAvailable">Available</td>
+                <td *ngIf="isInstalled">Installed</td>
+              </tr>
+              <tr>
+                <th>
                   Version
-                </chef-th>
-                <chef-td>{{ profile.version }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td>{{ profile.version }}</td>
+              </tr>
+              <tr>
+                <th>
                   Maintainer
-                </chef-th>
-                <chef-td>{{ profile.maintainer }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td>{{ profile.maintainer }}</td>
+              </tr>
+              <tr>
+                <th>
                   License
-                </chef-th>
-                <chef-td>{{ profile.license }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td>{{ profile.license }}</td>
+              </tr>
+              <tr>
+                <th>
                   Platform
-                </chef-th>
-                <chef-td>{{ displaySupports(profile.supports) }}</chef-td>
-              </chef-tr>
-            </chef-table>
+                </th>
+                <td>{{ displaySupports(profile.supports) }}</td>
+              </tr>
+            </table>
           </chef-card>
         </div>
 
@@ -106,14 +106,14 @@
           <chef-tbody>
             <ng-container *ngFor="let control of profile.controls">
               <chef-tr>
-                <chef-td>
+                <chef-td >
                   <span><strong>{{ control.id }}:</strong> {{ control.title }}</span>
                 </chef-td>
-                <chef-td [ngClass]="impactStatus(control)">
+                <chef-td  [ngClass]="impactStatus(control)">
                   {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
                 </chef-td>
-                <chef-td>{{ testCount(control) }}</chef-td>
-                <chef-td>
+                <chef-td >{{ testCount(control) }}</chef-td>
+                <chef-td >
                   <chef-button secondary (click)="toggleControl(control)">
                     <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
                     <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>
