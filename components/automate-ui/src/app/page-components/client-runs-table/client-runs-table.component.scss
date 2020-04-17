@@ -36,7 +36,7 @@ chef-td {
   }
 
   &.node-name {
-    flex-basis: 24%;
+    flex-basis: 240%;
   }
 
   &.check-in {
@@ -45,7 +45,6 @@ chef-td {
 
   &.node-environment {
     white-space: normal;
-    width: 12%;
   }
 
   &.has-runs {
