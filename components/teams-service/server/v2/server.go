@@ -142,7 +142,13 @@ func (s *Server) AddTeamMembers(ctx context.Context,
 		return nil, status.Error(codes.InvalidArgument, "missing user IDs")
 	}
 
-	_, err := s.service.Storage.AddUsers(ctx, req.Id, req.UserIds)
+	// verify team exists and isn't filtered out by the project filter
+	_, err := s.service.Storage.GetTeam(ctx, req.Id)
+	if err != nil {
+		return nil, service.ParseStorageError(err, req.Id, "team")
+	}
+
+	_, err = s.service.Storage.AddUsers(ctx, req.Id, req.UserIds)
 	if err != nil && err != storage.ErrConflict {
 		return nil, service.ParseStorageError(err, req.Id, "user")
 	}
@@ -164,7 +170,13 @@ func (s *Server) AddTeamMembers(ctx context.Context,
 func (s *Server) RemoveTeamMembers(ctx context.Context,
 	req *teams.RemoveTeamMembersReq) (*teams.RemoveTeamMembersResp, error) {
 
-	_, err := s.service.Storage.RemoveUsers(ctx, req.Id, req.UserIds)
+	// verify team exists and isn't filtered out by the project filter
+	_, err := s.service.Storage.GetTeam(ctx, req.Id)
+	if err != nil {
+		return nil, service.ParseStorageError(err, req.Id, "team")
+	}
+
+	_, err = s.service.Storage.RemoveUsers(ctx, req.Id, req.UserIds)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
@@ -202,6 +214,12 @@ func (s *Server) GetTeamsForMember(
 // GetTeamMembership fetches a list of member ids associated with a team
 func (s *Server) GetTeamMembership(ctx context.Context,
 	req *teams.GetTeamMembershipReq) (*teams.GetTeamMembershipResp, error) {
+
+	// verify team exists and isn't filtered out by the project filter
+	_, err := s.service.Storage.GetTeam(ctx, req.Id)
+	if err != nil {
+		return nil, service.ParseStorageError(err, req.Id, "team")
+	}
 
 	userIDs, err := s.service.Storage.GetUserIDsForTeam(ctx, req.Id)
 	if err != nil {

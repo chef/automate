@@ -125,7 +125,7 @@ func (p *postgres) insertTeam(ctx context.Context,
 func (p *postgres) getTeam(ctx context.Context, q querier, id string) (storage.Team, error) {
 	var t storage.Team
 	err := q.QueryRowContext(ctx,
-		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at
+		`SELECT t.id, t.name, t.projects, t.updated_at, t.created_at
 		FROM teams t
 		WHERE t.db_id=team_db_id($1)`, id).
 		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
@@ -307,7 +307,7 @@ func (p *postgres) GetTeam(ctx context.Context, id string) (storage.Team, error)
 	err = p.db.QueryRowContext(ctx,
 		`SELECT t.id, t.name, t.projects, t.updated_at, t.created_at
 		FROM teams t
-		WHERE t.id = $1 AND projects_match(t.projects, $2::TEXT[]);`,
+		WHERE t.id = $1 AND projects_match(t.projects, $2::TEXT[])`,
 		id, pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
@@ -327,7 +327,7 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]st
 		)
 		UPDATE teams SET updated_at=NOW()
 		WHERE db_id in (SELECT * FROM moved_row_ids)
-		RETURNING id;`, userID)
+		RETURNING id`, userID)
 
 	if err != nil {
 		return nil, p.processError(err)

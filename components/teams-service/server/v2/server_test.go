@@ -116,7 +116,7 @@ func runAllServerTests(
 			assert.Equal(t, initResp.Team.Id, resp.Team.Id)
 			assert.Equal(t, initResp.Team.Name, resp.Team.Name)
 
-			cleanupTeamV2(t, cl, initResp.Team.Id)
+			cleanupTeam(t, cl, initResp.Team.Id)
 		})
 	})
 
@@ -145,8 +145,8 @@ func runAllServerTests(
 			assert.Contains(t, list.Teams, resp2.Team)
 			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(list.Teams))
 
-			cleanupTeamV2(t, cl, resp1.Team.Id)
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp1.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when the list is successfully returned and filtered by projects", func(t *testing.T) {
@@ -171,8 +171,8 @@ func runAllServerTests(
 			assert.Contains(t, list.Teams, resp1.Team)
 			assert.Equal(t, 1, len(list.Teams))
 
-			cleanupTeamV2(t, cl, resp1.Team.Id)
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp1.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when the list is successfully returned and filtered by *", func(t *testing.T) {
@@ -198,8 +198,8 @@ func runAllServerTests(
 			assert.Contains(t, list.Teams, resp2.Team)
 			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(list.Teams))
 
-			cleanupTeamV2(t, cl, resp1.Team.Id)
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp1.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when the list is successfully returned and filtered by (unassigned)", func(t *testing.T) {
@@ -223,8 +223,8 @@ func runAllServerTests(
 			assert.Contains(t, list.Teams, resp1.Team)
 			assert.Equal(t, 1+len(storage.NonDeletableTeams), len(list.Teams))
 
-			cleanupTeamV2(t, cl, resp1.Team.Id)
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp1.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when there is only the non-deletable teams", func(t *testing.T) {
@@ -253,7 +253,7 @@ func runAllServerTests(
 			assert.Equal(t, req.Id, team.Id)
 			assert.Equal(t, req.Name, team.Name)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when no projects are passed", func(t *testing.T) {
@@ -271,7 +271,7 @@ func runAllServerTests(
 			assert.Equal(t, req.Name, team.Name)
 			assert.Equal(t, 0, len(team.Projects))
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when the team exists", func(t *testing.T) {
@@ -290,7 +290,7 @@ func runAllServerTests(
 			assert.Nil(t, resp2)
 			grpctest.AssertCode(t, codes.AlreadyExists, err)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 	})
 
@@ -340,7 +340,7 @@ func runAllServerTests(
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
 
 			authzMock.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when an existing team is deleted and is in the project filter", func(t *testing.T) {
@@ -387,7 +387,7 @@ func runAllServerTests(
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
 
 			authzMock.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when an existing team is deleted and the project filter is *", func(t *testing.T) {
@@ -434,7 +434,7 @@ func runAllServerTests(
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
 
 			authzMock.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when an existing team is deleted and the project filter is (unassigned)", func(t *testing.T) {
@@ -481,7 +481,7 @@ func runAllServerTests(
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
 
 			authzMock.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when an existing team is filtered by projects return NotFound", func(t *testing.T) {
@@ -512,8 +512,8 @@ func runAllServerTests(
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err2)
 
-			cleanupTeamV2(t, cl, resp1.Team.Id)
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp1.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when an existing team is deleted but the deletion of their policy membership fails", func(t *testing.T) {
@@ -551,7 +551,7 @@ func runAllServerTests(
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
 
 			authzMock.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when the team to delete is not found", func(t *testing.T) {
@@ -610,7 +610,7 @@ func runAllServerTests(
 			}
 			assert.Equal(t, newName, updatedTeam.Name)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when a valid team update request is submitted with the project filter", func(t *testing.T) {
@@ -649,7 +649,7 @@ func runAllServerTests(
 			}
 			assert.Equal(t, newName, updatedTeam.Name)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when a valid team update request is submitted with the project filter of *", func(t *testing.T) {
@@ -688,7 +688,7 @@ func runAllServerTests(
 			}
 			assert.Equal(t, newName, updatedTeam.Name)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when a valid team update request is submitted with the project filter of (unassigned)", func(t *testing.T) {
@@ -727,7 +727,7 @@ func runAllServerTests(
 			}
 			assert.Equal(t, newName, updatedTeam.Name)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when a valid team update request is submitted but is excluded by the project filter", func(t *testing.T) {
@@ -751,7 +751,7 @@ func runAllServerTests(
 			require.Nil(t, updatedTeamResp)
 			grpctest.AssertCode(t, codes.NotFound, err)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when the team exists but all projects are removed", func(t *testing.T) {
@@ -779,7 +779,7 @@ func runAllServerTests(
 			assert.Equal(t, req.Name, team.Name)
 			assert.Equal(t, 0, len(team.Projects))
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when team to update does not exist", func(t *testing.T) {
@@ -824,7 +824,7 @@ func runAllServerTests(
 					require.NoError(t, err)
 
 					addReq := &teams.AddTeamMembersReq{
-						Id:      resp.GetTeam().GetId(),
+						Id:      req.Id,
 						UserIds: test.users,
 					}
 
@@ -837,7 +837,7 @@ func runAllServerTests(
 					assert.Equal(t, len(addReq.UserIds), len(resp2.UserIds))
 					assert.ElementsMatch(t, addReq.UserIds, resp2.UserIds)
 
-					cleanupTeamV2(t, cl, resp.Team.Id)
+					cleanupTeam(t, cl, resp.Team.Id)
 				})
 			}
 		})
@@ -880,7 +880,7 @@ func runAllServerTests(
 					assert.Equal(t, len(addReq.UserIds), len(resp2.UserIds))
 					assert.ElementsMatch(t, addReq.UserIds, resp2.UserIds)
 
-					cleanupTeamV2(t, cl, resp.Team.Id)
+					cleanupTeam(t, cl, resp.Team.Id)
 				})
 			}
 		})
@@ -923,7 +923,7 @@ func runAllServerTests(
 					assert.Equal(t, len(addReq.UserIds), len(resp2.UserIds))
 					assert.ElementsMatch(t, addReq.UserIds, resp2.UserIds)
 
-					cleanupTeamV2(t, cl, resp.Team.Id)
+					cleanupTeam(t, cl, resp.Team.Id)
 				})
 			}
 		})
@@ -966,12 +966,12 @@ func runAllServerTests(
 					assert.Equal(t, len(addReq.UserIds), len(resp2.UserIds))
 					assert.ElementsMatch(t, addReq.UserIds, resp2.UserIds)
 
-					cleanupTeamV2(t, cl, resp.Team.Id)
+					cleanupTeam(t, cl, resp.Team.Id)
 				})
 			}
 		})
 
-		t.Run("fails to adds user with NotFound when a project filter that excludes the team", func(t *testing.T) {
+		t.Run("fails to add user with NotFound when a project filter that excludes the team", func(t *testing.T) {
 			tests := []struct {
 				users []string
 				desc  string
@@ -1007,7 +1007,7 @@ func runAllServerTests(
 					require.Nil(t, resp2)
 					grpctest.AssertCode(t, codes.NotFound, err)
 
-					cleanupTeamV2(t, cl, resp.Team.Id)
+					cleanupTeam(t, cl, resp.Team.Id)
 				})
 			}
 		})
@@ -1040,7 +1040,7 @@ func runAllServerTests(
 			assert.Equal(t, len(users), len(resp2.UserIds))
 			assert.ElementsMatch(t, users, resp2.UserIds)
 
-			cleanupTeamV2(t, cl, createTeam.Team.Id)
+			cleanupTeam(t, cl, createTeam.Team.Id)
 		})
 		t.Run("when team does not exist, returns Not Found error", func(t *testing.T) {
 			ctx := context.Background()
@@ -1113,7 +1113,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 			assert.Equal(t, 0, len(resp.UserIds))
 
-			cleanupTeamV2(t, cl, createTeam.Team.Id)
+			cleanupTeam(t, cl, createTeam.Team.Id)
 		})
 
 		t.Run("when team exists with a project filter", func(t *testing.T) {
@@ -1147,7 +1147,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 			assert.Equal(t, 1, len(removeResp.UserIds))
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when team exists with a project filter of *", func(t *testing.T) {
@@ -1181,7 +1181,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 			assert.Equal(t, 1, len(removeResp.UserIds))
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when team exists with a project filter of (unassigned)", func(t *testing.T) {
@@ -1215,7 +1215,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 			assert.Equal(t, 1, len(removeResp.UserIds))
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when team exists with a project filter that excludes the team", func(t *testing.T) {
@@ -1249,7 +1249,7 @@ func runAllServerTests(
 			require.Nil(t, removeResp)
 			grpctest.AssertCode(t, codes.NotFound, err)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 
 		tests := map[string]struct {
@@ -1315,7 +1315,7 @@ func runAllServerTests(
 				require.NoError(t, err)
 				assert.Equal(t, test.expectedLengthRemaining, len(removeResp.UserIds))
 
-				cleanupTeamV2(t, cl, resp.Team.Id)
+				cleanupTeam(t, cl, resp.Team.Id)
 			})
 		}
 	})
@@ -1386,9 +1386,9 @@ func runAllServerTests(
 			assert.Contains(t, fetchedTeamIDs, resp.Team.Id)
 			assert.Contains(t, fetchedTeamIDs, resp3.Team.Id)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
-			cleanupTeamV2(t, cl, resp2.Team.Id)
-			cleanupTeamV2(t, cl, resp3.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp3.Team.Id)
 		})
 
 		t.Run("when valid member id provided with a project filter of *, returns array of all teams", func(t *testing.T) {
@@ -1441,8 +1441,8 @@ func runAllServerTests(
 			assert.Contains(t, fetchedTeamIDs, resp.Team.Id)
 			assert.Contains(t, fetchedTeamIDs, resp2.Team.Id)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when valid member id provided with a project filter of (unassigned), "+
@@ -1507,9 +1507,9 @@ func runAllServerTests(
 			assert.Contains(t, fetchedTeamIDs, resp.Team.Id)
 			assert.Contains(t, fetchedTeamIDs, resp3.Team.Id)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
-			cleanupTeamV2(t, cl, resp2.Team.Id)
-			cleanupTeamV2(t, cl, resp3.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp3.Team.Id)
 		})
 
 		t.Run("when valid member id and project filter provided, returns array of teams", func(t *testing.T) {
@@ -1562,8 +1562,8 @@ func runAllServerTests(
 			assert.Contains(t, fetchedTeamIDs, resp.Team.Id)
 			assert.Contains(t, fetchedTeamIDs, resp2.Team.Id)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
-			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when user id does not exist on any teams, returns empty array", func(t *testing.T) {
@@ -1586,7 +1586,7 @@ func runAllServerTests(
 			require.NotNil(t, fetchedData)
 			assert.Empty(t, fetchedData.Teams)
 
-			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeam(t, cl, resp.Team.Id)
 		})
 	})
 
@@ -1596,7 +1596,7 @@ func runAllServerTests(
 		t.Run("when the team does not exist", func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := cl.GetTeamMembership(ctx, &teams.GetTeamMembershipReq{
-				Id: "test-team",
+				Id: "not-found",
 			})
 
 			require.Nil(t, resp)
@@ -1620,7 +1620,7 @@ func runAllServerTests(
 			require.NotNil(t, resp)
 			assert.Equal(t, 0, len(resp.UserIds))
 
-			cleanupTeamV2(t, cl, initResp.Team.Id)
+			cleanupTeam(t, cl, initResp.Team.Id)
 		})
 
 		t.Run("when the team exists with members", func(t *testing.T) {
@@ -1649,7 +1649,7 @@ func runAllServerTests(
 			assert.Equal(t, len(users), len(resp.UserIds))
 			assert.ElementsMatch(t, users, resp.UserIds)
 
-			cleanupTeamV2(t, cl, initResp.Team.Id)
+			cleanupTeam(t, cl, initResp.Team.Id)
 		})
 
 		t.Run("when the team exists with members and is in the project filter", func(t *testing.T) {
@@ -1680,7 +1680,7 @@ func runAllServerTests(
 			assert.Equal(t, len(users), len(resp.UserIds))
 			assert.ElementsMatch(t, users, resp.UserIds)
 
-			cleanupTeamV2(t, cl, initResp.Team.Id)
+			cleanupTeam(t, cl, initResp.Team.Id)
 		})
 
 		t.Run("when the team exists with members and the project filter is *", func(t *testing.T) {
@@ -1711,7 +1711,7 @@ func runAllServerTests(
 			assert.Equal(t, len(users), len(resp.UserIds))
 			assert.ElementsMatch(t, users, resp.UserIds)
 
-			cleanupTeamV2(t, cl, initResp.Team.Id)
+			cleanupTeam(t, cl, initResp.Team.Id)
 		})
 
 		t.Run("when the team exists with members and the project filter is (unassigned)", func(t *testing.T) {
@@ -1742,7 +1742,7 @@ func runAllServerTests(
 			assert.Equal(t, len(users), len(resp.UserIds))
 			assert.ElementsMatch(t, users, resp.UserIds)
 
-			cleanupTeamV2(t, cl, initResp.Team.Id)
+			cleanupTeam(t, cl, initResp.Team.Id)
 		})
 
 		t.Run("when the team exists with members and the project filter is excludes the team", func(t *testing.T) {
@@ -1771,7 +1771,7 @@ func runAllServerTests(
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err)
 
-			cleanupTeamV2(t, cl, initResp.Team.Id)
+			cleanupTeam(t, cl, initResp.Team.Id)
 		})
 	})
 
@@ -1927,13 +1927,13 @@ func runAllServerTests(
 					require.NoError(t, err)
 
 					addReq := &teams.AddTeamMembersReq{
-						Id:      resp.GetTeam().GetId(),
+						Id:      createReq.Id,
 						UserIds: members,
 					}
 					_, err = cl.AddTeamMembers(ctx, addReq)
 					require.NoError(t, err)
 
-					allCreatedIds = append(allCreatedIds, resp.GetTeam().GetId())
+					allCreatedIds = append(allCreatedIds, createReq.Id)
 					if _, isExpectedInResponse := test.expectedUpdatedTeamIDs[team]; isExpectedInResponse {
 						expectedResponseIds = append(expectedResponseIds, resp.GetTeam().GetId())
 					}
@@ -1954,7 +1954,7 @@ func runAllServerTests(
 				finalTeamsState, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 				require.NoError(t, err)
 				for _, team := range finalTeamsState.GetTeams() {
-					expectedTeamMembers, found := test.expectedTeamsAndMembers[team.Name]
+					expectedTeamMembers, found := test.expectedTeamsAndMembers[team.Id]
 					require.Equal(t, found, true)
 					assert.NotNil(t, expectedTeamMembers)
 					usersReq := &teams.GetTeamMembershipReq{
@@ -1967,7 +1967,7 @@ func runAllServerTests(
 
 				// Cleanup
 				for _, teamID := range allCreatedIds {
-					cleanupTeam(ctx, t, cl, teamID)
+					cleanupTeam(t, cl, teamID)
 				}
 			})
 		}
@@ -1975,17 +1975,10 @@ func runAllServerTests(
 
 }
 
-func cleanupTeam(ctx context.Context, t *testing.T, cl teams.TeamsClient, teamID string) {
-	t.Helper()
-	deleteReq := teams.DeleteTeamReq{Id: teamID}
-	_, err := cl.DeleteTeam(ctx, &deleteReq)
-	require.NoError(t, err)
-}
-
-func cleanupTeamV2(t *testing.T, cl teams.TeamsClient, teamName string) {
+func cleanupTeam(t *testing.T, cl teams.TeamsClient, id string) {
 	t.Helper()
 
-	deleteReq := teams.DeleteTeamReq{Id: teamName}
+	deleteReq := teams.DeleteTeamReq{Id: id}
 	_, err := cl.DeleteTeam(context.Background(), &deleteReq)
 	require.NoError(t, err)
 }
