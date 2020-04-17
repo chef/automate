@@ -1,11 +1,12 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import * as d3 from 'd3';
 
 @Component({
   selector: 'app-line-graph',
-  templateUrl: './line-graph.component.html'
+  templateUrl: './line-graph.component.html',
+  styleUrls: ['./line-graph.component.scss']
 })
-export class LineGraphComponent implements OnInit {
+export class LineGraphComponent implements AfterViewInit {
 
   constructor() {}
 
@@ -16,13 +17,12 @@ export class LineGraphComponent implements OnInit {
   @Input() vbWidth = 900;
   @Input() vbHeight = 300;
 
+  @ViewChild('chart')
+  private chartContainer: ElementRef;
 
-  // get viewBox() {
-  //   return `0 0 ${this.vbWidth} ${this.vbHeight}`;
-  // }
 
-  ngOnInit() {
-    this.print();
+  ngAfterViewInit() {
+    this.createChart();
   }
 
   get scaleX() {
@@ -34,7 +34,7 @@ export class LineGraphComponent implements OnInit {
   get scaleY() {
     return d3.scaleLinear()
         .domain([Math.min(...this.data), Math.max(...this.data)]) // incoming data [min, max]
-        .range([0, 500]); // specifies pixel value used to draw the graph
+        .range([500, 0]); // specifies pixel value used to draw the graph
   }
 
   // this function generates the svg line path format
@@ -52,8 +52,19 @@ export class LineGraphComponent implements OnInit {
                         // scaleX and y need to gets functions in order to pass in
   }
 
-  print() {
-    console.log(this.generator(this.tuples()));
+  createChart() {
+    const element = this.chartContainer.nativeElement;
+
+    const svg = d3.select(element).append('svg')
+      .attr('width', 500)
+      .attr('height', 500);
+
+    const data = this.tuples();
+    const path = svg.append('path');
+    const line = this.generator(data);
+
+    path.attr('d', line);
+
   }
 
 }
