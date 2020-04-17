@@ -203,7 +203,8 @@ describe('Admin pages', () => {
 
       ['Delete Policy'].forEach((item, index) => {
         it(`when clicked, shows ${item}`, () => {
-          waitForElement('chef-table chef-tbody chef-tr:nth-child(2) mat-select .mat-select-trigger')
+          waitForElement(
+            'chef-table chef-tbody chef-tr:nth-child(2) mat-select .mat-select-trigger')
             .then(controlButton => {
               browser.wait(EC.elementToBeClickable(controlButton));
               controlButton.click().then(() => {
