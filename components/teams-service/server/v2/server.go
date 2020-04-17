@@ -181,7 +181,6 @@ func (s *Server) RemoveTeamMembers(ctx context.Context,
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
 
-	// TODO do this TODO
 	// TODO (tc): Get the updated set of user membership for the team since
 	// that is not what is returned from RemoveUsers for some reason
 	// (can refactor on V1 deprecation).

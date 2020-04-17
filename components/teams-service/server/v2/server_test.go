@@ -65,10 +65,15 @@ func runAllServerTests(
 	defer close()
 
 	t.Run("GetVersion", func(t *testing.T) {
+		expected := &version.VersionInfo{
+			Name:    "teams-service",
+			Version: "unknown",
+			Sha:     "unknown",
+			Built:   "unknown",
+		}
 		resp, err := cl.GetVersion(context.Background(), &version.VersionInfoRequest{})
 		require.NoError(t, err)
-		// Version is injected via linker flags that we don't set during tests
-		require.Equal(t, "unknown", resp.Version)
+		assert.Equal(t, expected, resp)
 	})
 
 	t.Run("GetTeam", func(t *testing.T) {
