@@ -635,21 +635,21 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "ID of the chef organization.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "description": "Name of the data bag.",
+            "description": "Data bag name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -674,28 +674,28 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "ID of the chef organization.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "description": "Name of the data bag.",
+            "description": "Data bag name.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "item",
-            "description": "Name of the data bag item.",
+            "description": "Data bag item name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -720,14 +720,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "ID of the chef organization.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -752,21 +752,21 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "ID of the chef organization.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "description": "Name of the environment.",
+            "description": "Environment name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1261,7 +1261,7 @@ func init() {
       "properties": {
         "data": {
           "type": "string",
-          "description": "Stringified json of the data bag item."
+          "description": "Stringified json of data bag item."
         }
       }
     },
@@ -1270,7 +1270,7 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the data bag item."
+          "description": "Data bag item name."
         }
       }
     },
@@ -1282,7 +1282,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBagListItem"
           },
-          "description": "List of data bags item."
+          "description": "Data bags item list."
         }
       }
     },
@@ -1307,26 +1307,26 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the environment."
+          "description": "Environment name."
         },
         "chef_type": {
           "type": "string",
-          "description": "Type of the object."
+          "description": "Object type."
         },
         "description": {
           "type": "string",
-          "description": "Description of the node."
+          "description": "Node description."
         },
         "json_class": {
           "type": "string",
-          "description": "Name of the class."
+          "description": "Class name."
         },
         "cookbook_versions": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "title": "List of versioned cookbooks"
+          "description": "Versioned cookbooks list."
         },
         "default_attributes": {
           "type": "string",
@@ -1343,7 +1343,7 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the environment."
+          "description": "Environment name."
         }
       }
     },
@@ -1355,7 +1355,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.EnvironmentListItem"
           },
-          "description": "List of the environments."
+          "description": "Environments list."
         }
       }
     },

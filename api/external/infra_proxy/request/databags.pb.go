@@ -21,11 +21,11 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type DataBags struct {
-	// ID of the chef organization.
+	// Chef organization ID.
 	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
-	// ID of the chef infra server.
+	// Chef Infra Server ID.
 	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	// Name of the data bag.
+	// Data bag name.
 	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -79,13 +79,13 @@ func (m *DataBags) GetName() string {
 }
 
 type DataBag struct {
-	// ID of the chef organization.
+	// Chef organization ID.
 	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
-	// ID of the chef infra server.
+	// Chef Infra Server ID.
 	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	// Name of the data bag.
+	// Data bag name.
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	// Name of the data bag item.
+	// Data bag item name.
 	Item                 string   `protobuf:"bytes,4,opt,name=item,proto3" json:"item,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

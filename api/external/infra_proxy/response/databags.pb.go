@@ -21,7 +21,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type DataBags struct {
-	// List of data bags item.
+	// Data bags item list.
 	DataBags             []*DataBagListItem `protobuf:"bytes,2,rep,name=data_bags,json=dataBags,proto3" json:"data_bags,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
@@ -61,7 +61,7 @@ func (m *DataBags) GetDataBags() []*DataBagListItem {
 }
 
 type DataBagListItem struct {
-	// Name of the data bag item.
+	// Data bag item name.
 	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -101,7 +101,7 @@ func (m *DataBagListItem) GetName() string {
 }
 
 type DataBag struct {
-	// Stringified json of the data bag item.
+	// Stringified json of data bag item.
 	Data                 string   `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
