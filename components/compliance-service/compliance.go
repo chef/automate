@@ -157,9 +157,14 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		logrus.Fatalf("could not connect to elasticsearch: %v", err)
 	}
 
+	var authzProjectsClient iam_v2.ProjectsClient
 	eventClient := getEventConnection(connFactory, conf.EventConfig.Endpoint)
 	notifier := getNotificationsConnection(connFactory, conf.Notifications.Target)
-	authzProjectsClient := createAuthzProjectsClient(connFactory, conf.Authz.Endpoint)
+	if os.Getenv("RUN_MODE") != "test" {
+		authzProjectsClient = createAuthzProjectsClient(connFactory, conf.Authz.Endpoint)
+	} else {
+		logrus.Infof("not getting authz client; env var RUN_MODE found. value is 'test' ")
+	}
 	nodeManagerServiceClient := getManagerConnection(connFactory, conf.Manager.Endpoint)
 	ingesticESClient := ingestic.NewESClient(esClient)
 	ingesticESClient.InitializeStore(context.Background())
@@ -321,14 +326,6 @@ func getNotificationsConnection(connectionFactory *secureconn.Factory,
 func createAuthzProjectsClient(connectionFactory *secureconn.Factory,
 	authzEndpoint string) iam_v2.ProjectsClient {
 	if authzEndpoint == "" || authzEndpoint == ":0" {
-		if os.Getenv("RUN_MODE") == "test" {
-			logrus.Infof("using mock ProjectsClient")
-			// If any other rpc function other than the ListRulesForAllProjects is used the process will fail.
-			mockProjectsClient := iam_v2.NewMockProjectsClient(gomock.NewController(nil))
-			mockProjectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
-				&iam_v2.ListRulesForAllProjectsResp{}, nil)
-			return mockProjectsClient
-		}
 		logrus.Fatal("authzEndpoint cannot be empty or Dial will get stuck")
 	}
 

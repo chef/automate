@@ -23,6 +23,10 @@ func BundleReportProjectTagger(authzClient iam_v2.ProjectsClient) message.Compli
 // currently in the queue. The 'bundleSize' is the number of messages that can use the current project rules from authz.
 // When the bundleSize zero or less we need to refetch the project rules.
 func reportProjectTagger(in <-chan message.Compliance, authzClient iam_v2.ProjectsClient) <-chan message.Compliance {
+	if authzClient == nil {
+		logrus.Error("no authz client found for project tagging; skipping project tagging")
+		return in
+	}
 	out := make(chan message.Compliance, 100)
 	go func() {
 		bundleSize := 0
@@ -53,10 +57,6 @@ func reportProjectTagger(in <-chan message.Compliance, authzClient iam_v2.Projec
 	return out
 }
 
-func isScanJob(msg message.Compliance) bool {
-	return len(msg.InspecReport.JobID) > 0
-}
-
 func getProjectRulesFromAuthz(ctx context.Context, authzClient iam_v2.ProjectsClient) map[string]*iam_v2.ProjectRules {
 	projectsCollection, err := authzClient.ListRulesForAllProjects(ctx, &iam_v2.ListRulesForAllProjectsReq{})
 
@@ -64,7 +64,6 @@ func getProjectRulesFromAuthz(ctx context.Context, authzClient iam_v2.ProjectsCl
 		// If there is an error getting the project rules from authz crash the service.
 		logrus.WithError(err).Fatal("Could not fetch project rules from authz")
 	}
-
 	return projectsCollection.ProjectRules
 }
 
