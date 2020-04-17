@@ -1,9 +1,10 @@
-package authv2
+package authz
 
 import (
 	"context"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -20,9 +21,7 @@ type client struct {
 	client authz.AuthorizationClient
 }
 
-// Note(sr): The Handle method is V2-only code. We can do anything here -- deal
-// with incoming project headers, inject headers for downstream, etc.
-
+// Handle takes care of authorization in the gRPC middleware
 func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter []string,
 	req interface{},
 ) (context.Context, error) {
@@ -82,21 +81,12 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 	return auth_context.NewContext(ctx, subjects, projects, resource, action), nil
 }
 
-type resp struct {
-	ctx        context.Context
-	authorized bool
-}
-
-func (r *resp) Ctx() context.Context {
-	return r.ctx
-}
-
-func (r *resp) GetAuthorized() bool {
-	return r.authorized
-}
-
+// IsAuthorized takes care of HTTP authorization in the custom HTTP handlers
+// It returns a context with the auth data including projects injected, a
+// boolean indicating if authorization was successful (which means there's
+// more than one project returned from the filtering), and an error.
 func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, action string,
-	projectsToFilter []string) (middleware.AuthorizationResponse, error) {
+	projectsToFilter []string) (_ context.Context, authorized bool, _ error) {
 	log := ctxlogrus.Extract(ctx)
 	filteredResp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
 		Subjects:       subjects,
@@ -106,21 +96,37 @@ func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, 
 	})
 	if err != nil {
 		if status.Convert(err).Code() == codes.FailedPrecondition {
-			return nil, err
+			return nil, false, err
 		}
 		log.WithError(err).Error("error authorizing request")
-		return nil, status.Errorf(codes.PermissionDenied,
-			"error authorizing action %q on resource %q for members %q: %s",
+		// something went wrong in some unexpected way -- we'll "fail shut", i.e., deny authorization
+		return nil, false, errors.Errorf("error authorizing action %q on resource %q for members %q: %s",
 			action, resource, subjects, err.Error())
 	}
 	projects := filteredResp.Projects
 
-	return &resp{
-		ctx:        auth_context.NewContext(ctx, subjects, projects, resource, action),
-		authorized: len(projects) != 0,
-	}, nil
+	return auth_context.NewContext(ctx, subjects, projects, resource, action),
+		len(projects) != 0,
+		nil
 }
 
+// FilterAuthorizedPairs drives authz introspection
+// Q: There's no projects here! This can't be right!
+// A(msorens): The short answer to that is introspection is not yet project-aware.
+//    It is on the list of things to do... maybe.
+//    For the current uses of introspection we have been able to get by without projects.
+//    Should the user see this button? ... this page? .. this item in the nav bar?
+//    Where introspection-plus-projects would be needed is, for example, on the Delete
+//    button on individual rows on projects list, tokens list, teams list, etc. We had
+//    actually wired that up using introspection-sans-projects and immediately ran into
+//    performance issues: it is unacceptable to do a separate introspection network call
+//    for each row in a table. So we took that out again for the time being.
+//    You have probably already observed that for non-parameterized introspection it is
+//    now highly optimized, doing a single IntrospectAll call once the front-end cache
+//    is stale enough (I think it invalidates in 60 seconds or so).
+//    The most likely strategy for introducing parameterized introspection back in the
+//    mix is doing a single IntrospectSome passing all the ids on a given list at one
+//    time. And then we need to figure out projects, too.
 func (c *client) FilterAuthorizedPairs(ctx context.Context, subjects []string, inputPairs []*pairs.Pair,
 ) ([]*pairs.Pair, error) {
 	pairsV2 := make([]*authz.Pair, len(inputPairs))
