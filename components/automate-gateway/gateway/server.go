@@ -23,7 +23,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
-	auth "github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
+	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authz"
 	"github.com/chef/automate/components/automate-gateway/pkg/nullbackend"
 	"github.com/chef/automate/lib/grpc/debug/debug_api"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -199,7 +199,7 @@ func (s *Server) loadAuthorizer() error {
 		return errors.Wrap(err, "create authz client")
 	}
 
-	s.authorizer = auth.AuthorizationHandler(authzClient)
+	s.authorizer = authz.AuthorizationHandler(authzClient)
 	return nil
 }
 

@@ -1,4 +1,4 @@
-package authv2
+package authz
 
 import (
 	"context"
@@ -83,7 +83,7 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 
 // IsAuthorized takes care of HTTP authorization in the custom HTTP handlers
 func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, action string,
-	projectsToFilter []string) (context.Context, bool, error) {
+	projectsToFilter []string) (_ context.Context, authorized bool, _ error) {
 	log := ctxlogrus.Extract(ctx)
 	filteredResp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
 		Subjects:       subjects,

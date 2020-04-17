@@ -10,7 +10,7 @@ import (
 	authz "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 	"github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
-	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
+	middleware_authz "github.com/chef/automate/components/automate-gateway/gateway/middleware/authz"
 	"github.com/chef/automate/components/automate-gateway/handler/iam/v2/introspect"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -256,5 +256,5 @@ func testServerAndHandler(t *testing.T) (
 		s,
 		introspect.NewServer(
 			nil,
-			authv2.AuthorizationHandler(client))
+			middleware_authz.AuthorizationHandler(client))
 }
