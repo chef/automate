@@ -18,7 +18,7 @@ describe('CreateObjectModalComponent', () => {
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-checkbox' }),
+        MockComponent({ selector: 'chef-checkbox', inputs: ['checked'] }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-toolbar' }),
         MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
