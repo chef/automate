@@ -4,91 +4,91 @@ package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
 
 message Policyfiles {
-    // List of policy files.
+    // Policyfiles list.
     repeated PolicyfileListItem policies = 1;
 }
 
 message PolicyfileListItem {
-    // Name of the policy file.
+    // Policyfile name.
     string name = 1;
-    // Revision ID of the policy file.
+    // Policyfile revision ID.
     string revision_id = 3;
-    // Policy group of the policy file.
+    // Policyfile policy group.
     string policy_group = 2;
 }
 
 message Policyfile {
-    // Name of the policy file.
+    // Policyfile name.
     string name = 1;
-    // Name of the policy group.
+    // Policy group name.
     string policy_group = 2;
-    // Revision ID of the policy.
+    // Policy revision ID.
     string revision_id = 3;
-    // Run list associated with the policy.
+    // Run-list associated with the policy.
     repeated string run_list = 4;
-    // Named the run list associated with the policy.
+    // Named run-list associated with the policy.
     repeated NamedRunList named_run_list = 5;
     // Included policy locks files.
     repeated IncludedPolicyLock included_policy_locks = 6;
     // List of cookbook locks under this policy.
     repeated CookbookLock cookbook_locks = 7;
-    // Stringified json of the default attributes.
+    // Stringified JSON of the default attributes.
     string default_attributes = 8;
-    // Stringified json of the override attributes.
+    // Stringified JSON of the override attributes.
     string override_attributes = 9;
 }
 
 message IncludedPolicyLock {
-    // Name of the included policy file. 
+    // Included policyfile name. 
     string name = 1;
-    // Revision ID of the included policy file.
+    // Included policyfile revision ID.
     string revision_id = 2;
-    // Source options of the included policy file.
+    // Included policyfile source options.
     SourceOptions source_options = 3;
 }
 
 message CookbookLock {
-    // Name of the cookbook.
+    // Cookbook name.
     string name = 1;
-    // Version of the cookbook.
+    // Cookbook version.
     string version = 2;
-    // Identifier for the cookbook.
+    // Cookbook identifier.
     string identifier = 3;
-    // Decimal number identifier for the cookbook.
+    // Cookbook decimal number identifier.
     string dotted_identifier = 4;
-    // Source of the cookbook.
+    // Cookbook source.
     string source = 5;
-    // Cache key for the cookbook.
+    // Cookbook cache key.
     string cache_key = 6;
-    // SCM detail
+    // SCM detail.
     SCMDetail SCMDetail = 7;
-    // Source path of the cookbook.
+    // Cookbook source path.
     SourceOptions source_options = 8;
 }
 
 message SCMDetail {
-    // Name of the scm.
+    // SCM name.
     string name = 1;
-    // Remote location of the scm.
+    // SCM remote location.
     string remote = 2;
-    // Revision detail for the scm.
+    // SCM revision detail.
     string revision = 3;
-    // Boolean that denotes whether or not the working tree is cleaned. 
+    // Boolean that denotes if the working tree is clean or not. 
     bool working_tree_clean = 4;
-    // Published info of the source.
+    // Source's published info.
     bool published = 5;
-    // List of the synchronized remote branches. 
+    // Synchronized remote branches list. 
     repeated string synchronized_remote_branches = 6;
 }
 
 message SourceOptions {
-    // Path of the source options.
+    // Source options path.
     string path = 1;
 }
 
 message NamedRunList {
-    // Name of the run list.
+    // Run-list name.
     string name = 1;
-    // Run list associated with the policy.
+    // Run-list associated with the policy.
     repeated string run_list = 2;
 }

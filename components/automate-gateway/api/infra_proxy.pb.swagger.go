@@ -791,14 +791,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "ID of the chef organization.",
+            "description": "Chef Organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -823,28 +823,28 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "ID of the chef organization.",
+            "description": "Chef Organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "description": "Name of the policy file.",
+            "description": "Policyfile name.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "revision_id",
-            "description": "Revision ID of the policy file.",
+            "description": "Policyfile revision ID.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1256,35 +1256,35 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the cookbook."
+          "description": "Cookbook name."
         },
         "version": {
           "type": "string",
-          "description": "Version of the cookbook."
+          "description": "Cookbook version."
         },
         "identifier": {
           "type": "string",
-          "description": "Identifier for the cookbook."
+          "description": "Cookbook identifier."
         },
         "dotted_identifier": {
           "type": "string",
-          "description": "Decimal number identifier for the cookbook."
+          "description": "Cookbook decimal number identifier."
         },
         "source": {
           "type": "string",
-          "description": "Source of the cookbook."
+          "description": "Cookbook source."
         },
         "cache_key": {
           "type": "string",
-          "description": "Cache key for the cookbook."
+          "description": "Cookbook cache key."
         },
         "SCMDetail": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SCMDetail",
-          "title": "SCM detail"
+          "description": "SCM detail."
         },
         "source_options": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SourceOptions",
-          "description": "Source path of the cookbook."
+          "description": "Cookbook source path."
         }
       }
     },
@@ -1533,15 +1533,15 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the included policy file."
+          "description": "Included Policyfile name."
         },
         "revision_id": {
           "type": "string",
-          "description": "Revision ID of the included policy file."
+          "description": "Policyfile revision ID."
         },
         "source_options": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SourceOptions",
-          "description": "Source options of the included policy file."
+          "description": "Included policyfile source options."
         }
       }
     },
@@ -1550,7 +1550,7 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the run list."
+          "description": "Run list name."
         },
         "run_list": {
           "type": "array",
@@ -1625,29 +1625,29 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the policy file."
+          "description": "Policyfile name."
         },
         "policy_group": {
           "type": "string",
-          "description": "Name of the policy group."
+          "description": "Policy group name."
         },
         "revision_id": {
           "type": "string",
-          "description": "Revision ID of the policy."
+          "description": "Policy revision ID."
         },
         "run_list": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Run list associated with the policy."
+          "description": "Run-list associated with the policy."
         },
         "named_run_list": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NamedRunList"
           },
-          "description": "Named the run list associated with the policy."
+          "description": "Named run-list associated with the policy."
         },
         "included_policy_locks": {
           "type": "array",
@@ -1665,11 +1665,11 @@ func init() {
         },
         "default_attributes": {
           "type": "string",
-          "description": "Stringified json of the default attributes."
+          "description": "Stringified JSON of the default attributes."
         },
         "override_attributes": {
           "type": "string",
-          "description": "Stringified json of the override attributes."
+          "description": "Stringified JSON of the override attributes."
         }
       }
     },
@@ -1678,15 +1678,15 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the policy file."
+          "description": "Policyfile name."
         },
         "revision_id": {
           "type": "string",
-          "description": "Revision ID of the policy file."
+          "description": "Policyfile Revision ID."
         },
         "policy_group": {
           "type": "string",
-          "description": "Policy group of the policy file."
+          "description": "Policyfile policy group."
         }
       }
     },
@@ -1698,7 +1698,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileListItem"
           },
-          "description": "List of policy files."
+          "description": "Policyfiles list."
         }
       }
     },
@@ -1811,32 +1811,32 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the scm."
+          "description": "SCM name."
         },
         "remote": {
           "type": "string",
-          "description": "Remote location of the scm."
+          "description": "SCM remote location."
         },
         "revision": {
           "type": "string",
-          "description": "Revision detail for the scm."
+          "description": "SCM revision detail."
         },
         "working_tree_clean": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Boolean that denotes whether or not the working tree is cleaned."
+          "description": "Boolean that denotes if the working tree is clean or not."
         },
         "published": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Published info of the source."
+          "description": "Source's published information."
         },
         "synchronized_remote_branches": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "List of the synchronized remote branches."
+          "description": "Synchronized remote branches list."
         }
       }
     },
@@ -1869,7 +1869,7 @@ func init() {
       "properties": {
         "path": {
           "type": "string",
-          "description": "Path of the source options."
+          "description": "Source options path."
         }
       }
     },

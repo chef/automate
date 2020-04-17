@@ -21,7 +21,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Policyfiles struct {
-	// List of policy files.
+	// Policyfiles list.
 	Policies             []*PolicyfileListItem `protobuf:"bytes,1,rep,name=policies,proto3" json:"policies,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_unrecognized     []byte                `json:"-"`
@@ -61,11 +61,11 @@ func (m *Policyfiles) GetPolicies() []*PolicyfileListItem {
 }
 
 type PolicyfileListItem struct {
-	// Name of the policy file.
+	// Policyfile name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Revision ID of the policy file.
+	// Policyfile Revision ID.
 	RevisionId string `protobuf:"bytes,3,opt,name=revision_id,json=revisionId,proto3" json:"revision_id,omitempty"`
-	// Policy group of the policy file.
+	// Policyfile policy group.
 	PolicyGroup          string   `protobuf:"bytes,2,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -119,23 +119,23 @@ func (m *PolicyfileListItem) GetPolicyGroup() string {
 }
 
 type Policyfile struct {
-	// Name of the policy file.
+	// Policyfile name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Name of the policy group.
+	// Policy group name.
 	PolicyGroup string `protobuf:"bytes,2,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty"`
-	// Revision ID of the policy.
+	// Policy revision ID.
 	RevisionId string `protobuf:"bytes,3,opt,name=revision_id,json=revisionId,proto3" json:"revision_id,omitempty"`
-	// Run list associated with the policy.
+	// Run-list associated with the policy.
 	RunList []string `protobuf:"bytes,4,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`
-	// Named the run list associated with the policy.
+	// Named run-list associated with the policy.
 	NamedRunList []*NamedRunList `protobuf:"bytes,5,rep,name=named_run_list,json=namedRunList,proto3" json:"named_run_list,omitempty"`
 	// Included policy locks files.
 	IncludedPolicyLocks []*IncludedPolicyLock `protobuf:"bytes,6,rep,name=included_policy_locks,json=includedPolicyLocks,proto3" json:"included_policy_locks,omitempty"`
 	// List of cookbook locks under this policy.
 	CookbookLocks []*CookbookLock `protobuf:"bytes,7,rep,name=cookbook_locks,json=cookbookLocks,proto3" json:"cookbook_locks,omitempty"`
-	// Stringified json of the default attributes.
+	// Stringified JSON of the default attributes.
 	DefaultAttributes string `protobuf:"bytes,8,opt,name=default_attributes,json=defaultAttributes,proto3" json:"default_attributes,omitempty"`
-	// Stringified json of the override attributes.
+	// Stringified JSON of the override attributes.
 	OverrideAttributes   string   `protobuf:"bytes,9,opt,name=override_attributes,json=overrideAttributes,proto3" json:"override_attributes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -231,11 +231,11 @@ func (m *Policyfile) GetOverrideAttributes() string {
 }
 
 type IncludedPolicyLock struct {
-	// Name of the included policy file.
+	// Included Policyfile name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Revision ID of the included policy file.
+	// Policyfile revision ID.
 	RevisionId string `protobuf:"bytes,2,opt,name=revision_id,json=revisionId,proto3" json:"revision_id,omitempty"`
-	// Source options of the included policy file.
+	// Included policyfile source options.
 	SourceOptions        *SourceOptions `protobuf:"bytes,3,opt,name=source_options,json=sourceOptions,proto3" json:"source_options,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
@@ -289,21 +289,21 @@ func (m *IncludedPolicyLock) GetSourceOptions() *SourceOptions {
 }
 
 type CookbookLock struct {
-	// Name of the cookbook.
+	// Cookbook name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Version of the cookbook.
+	// Cookbook version.
 	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	// Identifier for the cookbook.
+	// Cookbook identifier.
 	Identifier string `protobuf:"bytes,3,opt,name=identifier,proto3" json:"identifier,omitempty"`
-	// Decimal number identifier for the cookbook.
+	// Cookbook decimal number identifier.
 	DottedIdentifier string `protobuf:"bytes,4,opt,name=dotted_identifier,json=dottedIdentifier,proto3" json:"dotted_identifier,omitempty"`
-	// Source of the cookbook.
+	// Cookbook source.
 	Source string `protobuf:"bytes,5,opt,name=source,proto3" json:"source,omitempty"`
-	// Cache key for the cookbook.
+	// Cookbook cache key.
 	CacheKey string `protobuf:"bytes,6,opt,name=cache_key,json=cacheKey,proto3" json:"cache_key,omitempty"`
-	// SCM detail
+	// SCM detail.
 	SCMDetail *SCMDetail `protobuf:"bytes,7,opt,name=SCMDetail,proto3" json:"SCMDetail,omitempty"`
-	// Source path of the cookbook.
+	// Cookbook source path.
 	SourceOptions        *SourceOptions `protobuf:"bytes,8,opt,name=source_options,json=sourceOptions,proto3" json:"source_options,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
@@ -392,17 +392,17 @@ func (m *CookbookLock) GetSourceOptions() *SourceOptions {
 }
 
 type SCMDetail struct {
-	// Name of the scm.
+	// SCM name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Remote location of the scm.
+	// SCM remote location.
 	Remote string `protobuf:"bytes,2,opt,name=remote,proto3" json:"remote,omitempty"`
-	// Revision detail for the scm.
+	// SCM revision detail.
 	Revision string `protobuf:"bytes,3,opt,name=revision,proto3" json:"revision,omitempty"`
-	// Boolean that denotes whether or not the working tree is cleaned.
+	// Boolean that denotes if the working tree is clean or not.
 	WorkingTreeClean bool `protobuf:"varint,4,opt,name=working_tree_clean,json=workingTreeClean,proto3" json:"working_tree_clean,omitempty"`
-	// Published info of the source.
+	// Source's published information.
 	Published bool `protobuf:"varint,5,opt,name=published,proto3" json:"published,omitempty"`
-	// List of the synchronized remote branches.
+	// Synchronized remote branches list.
 	SynchronizedRemoteBranches []string `protobuf:"bytes,6,rep,name=synchronized_remote_branches,json=synchronizedRemoteBranches,proto3" json:"synchronized_remote_branches,omitempty"`
 	XXX_NoUnkeyedLiteral       struct{} `json:"-"`
 	XXX_unrecognized           []byte   `json:"-"`
@@ -477,7 +477,7 @@ func (m *SCMDetail) GetSynchronizedRemoteBranches() []string {
 }
 
 type SourceOptions struct {
-	// Path of the source options.
+	// Source options path.
 	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -517,7 +517,7 @@ func (m *SourceOptions) GetPath() string {
 }
 
 type NamedRunList struct {
-	// Name of the run list.
+	// Run list name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Run list associated with the policy.
 	RunList              []string `protobuf:"bytes,2,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`

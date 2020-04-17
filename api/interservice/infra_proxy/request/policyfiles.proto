@@ -3,20 +3,32 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
 
+import "protoc-gen-swagger/options/annotations.proto";
+
 message Policyfiles {
-    // ID of the chef organization.
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["org_id,server_id"]
+        }
+    };
+    // Chef organization ID.
     string org_id = 1;
-    // ID of the chef infra server.
+    // Chef Infra Server ID.
     string server_id = 2;
 }
 
 message Policyfile {
-    // ID of the chef organization.
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["org_id,server_id,name,revision_id"]
+        }
+    };
+    // Chef organization ID.
     string org_id = 1;
-    // ID of the chef infra server.
+    // Chef Infra Server ID.
     string server_id = 2;
-    // Name of the policy file.
+    // Policyfile name.
     string name = 3;
-    // Revision ID of the policy file.
+    // Policyfile revision ID.
     string revision_id = 4;
 }
