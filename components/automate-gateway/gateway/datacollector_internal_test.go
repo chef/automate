@@ -359,7 +359,7 @@ func TestDataCollectorGetStructIfExistsWhenFieldIsAStringWithScapedChars(t *test
 
 	expectedDataField := &structpb.Struct{
 		Fields: map[string]*structpb.Value{
-			"id": {Kind: &structpb.Value_StringValue{"1"}},
+			"id": {Kind: &structpb.Value_StringValue{StringValue: "1"}},
 		},
 	}
 	assert.Equal(t, expectedDataField, pbStruct)
@@ -371,7 +371,7 @@ func TestDataCollectorGetStructIfExistsWhenFieldIsAJSONObject(t *testing.T) {
 
 	expectedDataField := &structpb.Struct{
 		Fields: map[string]*structpb.Value{
-			"id": {Kind: &structpb.Value_StringValue{"1"}},
+			"id": {Kind: &structpb.Value_StringValue{StringValue: "1"}},
 		},
 	}
 	assert.Equal(t, expectedDataField, pbStruct)
@@ -408,14 +408,14 @@ func TestDataCollectorGetStructArrayWhenTheArrayAreObjects(t *testing.T) {
 	arrayStruct := getStructArray("data", bytes)
 
 	expectedDataField := []*structpb.Struct{
-		&structpb.Struct{
+		{
 			Fields: map[string]*structpb.Value{
-				"id": {Kind: &structpb.Value_StringValue{"1"}},
+				"id": {Kind: &structpb.Value_StringValue{StringValue: "1"}},
 			},
 		},
-		&structpb.Struct{
+		{
 			Fields: map[string]*structpb.Value{
-				"id": {Kind: &structpb.Value_StringValue{"2"}},
+				"id": {Kind: &structpb.Value_StringValue{StringValue: "2"}},
 			},
 		},
 	}
@@ -428,14 +428,14 @@ func TestDataCollectorGetStructArrayWhenTheArrayAreStrings(t *testing.T) {
 	arrayStruct := getStructArray("data", bytes)
 
 	expectedDataField := []*structpb.Struct{
-		&structpb.Struct{
+		{
 			Fields: map[string]*structpb.Value{
-				"id": {Kind: &structpb.Value_StringValue{"1"}},
+				"id": {Kind: &structpb.Value_StringValue{StringValue: "1"}},
 			},
 		},
-		&structpb.Struct{
+		{
 			Fields: map[string]*structpb.Value{
-				"id": {Kind: &structpb.Value_StringValue{"2"}},
+				"id": {Kind: &structpb.Value_StringValue{StringValue: "2"}},
 			},
 		},
 	}

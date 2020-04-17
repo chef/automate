@@ -1,7 +1,7 @@
 import { Component, HostBinding } from '@angular/core';
 
 @Component({
-  selector: 'chef-table-body',
+  selector: 'chef-tbody',
   templateUrl: './table-body.component.html'
 })
 export class TableBodyComponent {

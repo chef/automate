@@ -5,10 +5,9 @@ package license
 
 import (
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -209,7 +208,9 @@ func init() {
 	proto.RegisterType((*Entitlement)(nil), "license.Entitlement")
 }
 
-func init() { proto.RegisterFile("lib/license/license.proto", fileDescriptor_1d88e617a98a96bd) }
+func init() {
+	proto.RegisterFile("lib/license/license.proto", fileDescriptor_1d88e617a98a96bd)
+}
 
 var fileDescriptor_1d88e617a98a96bd = []byte{
 	// 381 bytes of a gzipped FileDescriptorProto

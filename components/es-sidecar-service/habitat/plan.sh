@@ -10,7 +10,7 @@ pkg_license=('Chef-MLSA')
 pkg_upstream_url="http://github.com/chef/automate/components/es-sidecar-service"
 pkg_binds=(
   [automate-elasticsearch]="deprecated_external_es"
-  [automate-es-gateway]="http-port http-host"
+  [automate-es-gateway]="http-port"
 )
 pkg_exports=(
   [port]=service.port

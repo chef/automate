@@ -223,12 +223,12 @@ func (r *Reindexer) listIndicesByName(indices *sortedIndices, list ...string) er
 
 func (r *Reindexer) insightsMigration(srcIndex string) error {
 	log.WithFields(log.Fields{"index-name": srcIndex}).Info("migrating insights index")
-	return r.reindexWithNewMapping(srcIndex, "data/a1_elasticsearch_mappings/insights-template.json")
+	return r.reindexWithNewMapping(srcIndex, assets.A1InsightsIndexMapping)
 }
 
 func (r *Reindexer) complianceMigration(srcIndex string) error {
 	log.WithFields(log.Fields{"index-name": srcIndex}).Info("migrating compliance index")
-	err := r.reindexWithNewMapping(srcIndex, "data/a1_elasticsearch_mappings/compliance-template.json")
+	err := r.reindexWithNewMapping(srcIndex, assets.A1ComplianceIndexMapping)
 	if err != nil {
 		return err
 	}
@@ -239,12 +239,11 @@ func replacementIndexName(oldIndexName string) (newIndexName string) {
 	return fmt.Sprintf("%s-1", oldIndexName)
 }
 
-func (r *Reindexer) reindexWithNewMapping(srcIndex, mappingAssetPath string) error {
+func (r *Reindexer) reindexWithNewMapping(srcIndex, mapping string) error {
 	ctx := context.Background()
 
 	destIndex := replacementIndexName(srcIndex)
-	mapping := assets.MustAsset(mappingAssetPath)
-	_, err := r.es.CreateIndex(destIndex).BodyString(fmt.Sprintf("%s", mapping)).Do(ctx)
+	_, err := r.es.CreateIndex(destIndex).BodyString(mapping).Do(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create destination index '%s' for reindexing '%s'", destIndex, srcIndex)
 	}

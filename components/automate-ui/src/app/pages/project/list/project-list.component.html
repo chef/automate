@@ -16,32 +16,32 @@
             </app-authorized>
           </chef-toolbar>
           <app-authorized [allOf]="['/iam/v2/projects', 'get']">
-            <chef-table-new>
-              <chef-table-header>
-                <chef-table-row>
-                  <chef-table-header-cell>Name</chef-table-header-cell>
-                  <chef-table-header-cell>ID</chef-table-header-cell>
-                  <chef-table-header-cell>Ingest Rules</chef-table-header-cell>
-                  <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
-                </chef-table-row>
-              </chef-table-header>
-              <chef-table-body>
-                <chef-table-row *ngFor="let project of sortedProjects$ | async">
-                  <chef-table-cell>
+            <chef-table>
+              <chef-thead>
+                <chef-tr>
+                  <chef-th>Name</chef-th>
+                  <chef-th>ID</chef-th>
+                  <chef-th>Ingest Rules</chef-th>
+                  <chef-th class="three-dot-column"></chef-th>
+                </chef-tr>
+              </chef-thead>
+              <chef-tbody>
+                <chef-tr *ngFor="let project of sortedProjects$ | async">
+                  <chef-td>
                     <a [routerLink]="['/settings/projects', project.id]" data-cy="project-details">{{ project.name }}</a>
-                  </chef-table-cell>
-                  <chef-table-cell>{{ project.id }}</chef-table-cell>
-                  <chef-table-cell>{{ statusLabel[project.status] }}</chef-table-cell>
-                  <chef-table-cell class="three-dot-column">
+                  </chef-td>
+                  <chef-td>{{ project.id }}</chef-td>
+                  <chef-td>{{ statusLabel[project.status] }}</chef-td>
+                  <chef-td class="three-dot-column">
                     <!-- <app-authorized [allOf]="['/iam/v2/projects/{id}', 'delete', project.id]"> -->
                       <mat-select panelClass="chef-control-menu">
                         <mat-option (onSelectionChange)="startProjectDelete($event, project)" data-cy="delete-project">Delete Project</mat-option>
                       </mat-select>
                     <!-- </app-authorized> -->
-                  </chef-table-cell>
-                </chef-table-row>
-              </chef-table-body>
-            </chef-table-new>
+                  </chef-td>
+                </chef-tr>
+              </chef-tbody>
+            </chef-table>
           </app-authorized>
         </ng-container>
         <ng-container *ngIf="(sortedProjects$ | async)?.length === 0">

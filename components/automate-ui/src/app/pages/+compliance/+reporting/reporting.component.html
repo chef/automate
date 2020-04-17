@@ -70,56 +70,56 @@
             </p>
           </div>
           <div class="summary-body" *ngIf="showSummary">
-            <chef-table>
-              <chef-tr>
-                <chef-th>
+            <table>
+              <tr>
+                <th>
                   Nodes
-                </chef-th>
-                <chef-td>{{ reportData.reportingSummary.stats.nodes | number }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th id="report-date-label">
+                </th>
+                <td>{{ reportData.reportingSummary.stats.nodes | number }}</td>
+              </tr>
+              <tr>
+                <th id="report-date-label">
                   Report Date
                   <chef-tooltip for="report-date-label">Latest information available for everything at this date.</chef-tooltip>
-                </chef-th>
-                <chef-td>{{ endDate$ | async | datetime: ChefDateTime }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td>{{ endDate$ | async | datetime: ChefDateTime }}</td>
+              </tr>
+              <tr>
+                <th>
                   Status
-                </chef-th>
-                <chef-td>{{ reportData.reportingSummary.status | titlecase }}</chef-td>
-              </chef-tr>
-            </chef-table>
-            <chef-table>
-              <chef-tr>
-                <chef-th>
+                </th>
+                <td>{{ reportData.reportingSummary.status | titlecase }}</td>
+              </tr>
+            </table>
+            <table>
+              <tr>
+                <th>
                   Platform
-                </chef-th>
-                <chef-td>
+                </th>
+                <td>
                   {{ reportData.reportingSummary.stats.platforms | number }}
                   {{ reportData.reportingSummary.stats.platforms | i18nPlural: {'=1': 'Platform', 'other': 'Platforms'} }}
-                </chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </td>
+              </tr>
+              <tr>
+                <th>
                   Environment
-                </chef-th>
-                <chef-td>
+                </th>
+                <td>
                   {{ reportData.reportingSummary.stats.environments | number }}
                   {{ reportData.reportingSummary.stats.environments | i18nPlural: {'=1': 'Environment', 'other': 'Environments'} }}
-                </chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </td>
+              </tr>
+              <tr>
+                <th>
                   Profiles
-                </chef-th>
-                <chef-td>
+                </th>
+                <td>
                   {{ reportData.reportingSummary.stats.profiles | number }}
                   {{ reportData.reportingSummary.stats.profiles | i18nPlural: {'=1': 'Profile', 'other': 'Profiles'} }}
-                </chef-td>
-              </chef-tr>
-            </chef-table>
+                </td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>

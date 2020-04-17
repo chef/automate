@@ -14,9 +14,11 @@ message Project {
     string status = 4;
 }
 
+// Projects, unlike all other resources allowing 64 characters,
+// are restricted to 48 because the id serves as a base for generated policies and teams.
 message CreateProjectReq {
     string name = 1;
-    string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,48}$"];
     bool skip_policies = 3;
 }
 
@@ -25,7 +27,7 @@ message CreateProjectResp {
 }
 
 message GetProjectReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
 }
 
 message GetProjectResp {
@@ -40,7 +42,7 @@ message ListProjectsResp {
 
 message UpdateProjectReq {
     string name = 1;
-    string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 2;
 }
 
 message UpdateProjectResp {
@@ -48,7 +50,7 @@ message UpdateProjectResp {
 }
 
 message DeleteProjectReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
 }
 
 message DeleteProjectResp {}
@@ -144,7 +146,7 @@ message Condition {
 // basic validation.
 message CreateRuleReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
-    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string project_id = 2;
     string name = 3;
     ProjectRuleTypes type = 4;
     repeated Condition conditions = 5 [(validate.rules).repeated.min_items = 1];
@@ -155,8 +157,8 @@ message CreateRuleResp {
 }
 
 message UpdateRuleReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
-    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
+    string project_id = 2;
     string name = 3;
     ProjectRuleTypes type = 4;
     repeated Condition conditions = 5 [(validate.rules).repeated.min_items = 1];
@@ -167,8 +169,8 @@ message UpdateRuleResp {
 }
 
 message GetRuleReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
-    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
+    string project_id = 2;
 }
 
 message GetRuleResp {
@@ -184,7 +186,7 @@ message ListRulesResp {
 }
 
 message ListRulesForProjectReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
 }
 
 message ListRulesForProjectResp {
@@ -193,8 +195,8 @@ message ListRulesForProjectResp {
 }
 
 message DeleteRuleReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
-    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string id = 1;
+    string project_id = 2;
 }
 
 message DeleteRuleResp {}

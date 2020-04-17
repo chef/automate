@@ -62,7 +62,8 @@ describe('ProjectListComponent', () => {
         }),
         MockComponent({
           selector: 'app-create-object-modal',
-          inputs: ['creating', 'createForm', 'visible', 'objectNoun', 'conflictErrorEvent', 'createProjectModal'],
+          inputs: ['creating', 'createForm', 'visible', 'objectNoun',
+            'conflictErrorEvent', 'createProjectModal', 'resetCheckboxEvent'],
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({
@@ -77,12 +78,12 @@ describe('ProjectListComponent', () => {
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-table-new' }),
-        MockComponent({ selector: 'chef-table-header' }),
-        MockComponent({ selector: 'chef-table-body' }),
-        MockComponent({ selector: 'chef-table-row' }),
-        MockComponent({ selector: 'chef-table-header-cell' }),
-        MockComponent({ selector: 'chef-table-cell' }),
+        MockComponent({ selector: 'chef-table' }),
+        MockComponent({ selector: 'chef-thead' }),
+        MockComponent({ selector: 'chef-tbody' }),
+        MockComponent({ selector: 'chef-tr' }),
+        MockComponent({ selector: 'chef-th' }),
+        MockComponent({ selector: 'chef-td' }),
         ProjectListComponent
       ],
       imports: [
@@ -121,7 +122,7 @@ describe('ProjectListComponent', () => {
     it('displays project data', () => {
       store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       fixture.detectChanges();
-      expect(element).toContainPath('chef-table-new');
+      expect(element).toContainPath('chef-table');
       component.sortedProjects$.subscribe(results => {
         expect(results.length).toBe(projectList.length);
         projectList.forEach(p => {

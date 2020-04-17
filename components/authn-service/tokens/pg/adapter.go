@@ -21,37 +21,31 @@ import (
 var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
 func (a *adapter) CreateToken(ctx context.Context,
-	id, description string, active bool, projects []string) (*tokens.Token, error) {
+	id, name string, active bool, projects []string) (*tokens.Token, error) {
 	value, err := tutil.GenerateNewToken()
 	if err != nil {
 		return nil, err
 	}
-	return a.CreateTokenWithValue(ctx, id, value, description, active, projects)
+	return a.CreateTokenWithValue(ctx, id, value, name, active, projects)
 }
 
 func (a *adapter) CreateTokenWithValue(ctx context.Context,
-	id, value, description string, active bool, projects []string) (*tokens.Token, error) {
+	id, value, name string, active bool, projects []string) (*tokens.Token, error) {
 	if err := tutil.IsValidToken(value); err != nil {
 		return nil, err
 	}
-	if id == "" {
-		uid, err := uuid.NewV4()
-		if err != nil {
-			return nil, err
-		}
-		id = uid.String()
-	}
-	err := a.validateTokenInputs(ctx, description, []string{}, projects, false)
+
+	err := a.validateTokenInputs(ctx, name, []string{}, projects, false)
 	if err != nil {
 		return nil, err
 	}
 
-	return a.insertToken(ctx, id, description, value, active, projects)
+	return a.insertToken(ctx, id, name, value, active, projects)
 }
 
 func (a *adapter) validateTokenInputs(ctx context.Context,
-	description string, oldProjects, updatedProjects []string, isUpdateRequest bool) error {
-	if emptyOrWhitespaceOnlyRE.MatchString(description) {
+	name string, oldProjects, updatedProjects []string, isUpdateRequest bool) error {
+	if emptyOrWhitespaceOnlyRE.MatchString(name) {
 		return status.Error(
 			codes.InvalidArgument,
 			"a token name is required and must contain at least one non-whitespace character")
@@ -102,7 +96,7 @@ func (a *adapter) ResetToV1(ctx context.Context) error {
 }
 
 func (a *adapter) insertToken(ctx context.Context,
-	id string, description string, value string, active bool, projects []string) (*tokens.Token, error) {
+	id string, name string, value string, active bool, projects []string) (*tokens.Token, error) {
 
 	t := tokens.Token{}
 	// ensure we do not pass null projects to db and break the not null constraint
@@ -111,11 +105,11 @@ func (a *adapter) insertToken(ctx context.Context,
 	}
 
 	err := a.db.QueryRowContext(ctx,
-		`INSERT INTO chef_authn_tokens(id, description, value, active, project_ids, created, updated)
+		`INSERT INTO chef_authn_tokens(id, name, value, active, project_ids, created, updated)
 		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-		RETURNING id, description, value, active, project_ids, created, updated`,
-		id, description, value, active, pq.Array(projects)).
-		Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated)
+		RETURNING id, name, value, active, project_ids, created, updated`,
+		id, name, value, active, pq.Array(projects)).
+		Scan(&t.ID, &t.Name, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated)
 
 	if err != nil {
 		return nil, processSQLError(err, "insert token")
@@ -124,7 +118,7 @@ func (a *adapter) insertToken(ctx context.Context,
 }
 
 func (a *adapter) UpdateToken(ctx context.Context,
-	id, description string, active bool, updatedProjects []string) (*tokens.Token, error) {
+	id, name string, active bool, updatedProjects []string) (*tokens.Token, error) {
 
 	tx, err := a.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -153,19 +147,19 @@ func (a *adapter) UpdateToken(ctx context.Context,
 		return nil, processSQLError(err, "fetch projects for update")
 	}
 
-	err = a.validateTokenInputs(ctx, description, originalProjects, updatedProjects, true)
+	err = a.validateTokenInputs(ctx, name, originalProjects, updatedProjects, true)
 	if err != nil {
 		return nil, err
 	}
 
 	row = tx.QueryRowContext(ctx,
 		`UPDATE chef_authn_tokens cat
-			SET active=$2, description=$3, project_ids=$4, updated=NOW()
+			SET active=$2, name=$3, project_ids=$4, updated=NOW()
 			WHERE id=$1 AND projects_match(cat.project_ids, $5::TEXT[])
-			RETURNING id, description, value, active, project_ids, created, updated`,
-		id, active, description, pq.Array(updatedProjects), pq.Array(projectsFilter))
+			RETURNING id, name, value, active, project_ids, created, updated`,
+		id, active, name, pq.Array(updatedProjects), pq.Array(projectsFilter))
 	err = row.Scan(
-		&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated)
+		&t.ID, &t.Name, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated)
 	if err != nil {
 		return nil, processSQLError(err, "update token")
 	}
@@ -209,12 +203,12 @@ func (a *adapter) GetToken(ctx context.Context, id string) (*tokens.Token, error
 	}
 
 	if err := a.db.QueryRowContext(ctx,
-		`SELECT id, description, value, active, project_ids, created, updated
+		`SELECT id, name, value, active, project_ids, created, updated
 		FROM chef_authn_tokens cat
 		WHERE cat.id=$1
 		AND projects_match(cat.project_ids, $2::TEXT[])`,
 		id, pq.Array(projectsFilter)).
-		Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
+		Scan(&t.ID, &t.Name, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
 		return nil, processSQLError(err, "select token by id")
 	}
 	return &t, nil
@@ -240,7 +234,7 @@ func (a *adapter) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
 
 	ts := []*tokens.Token{}
 	rows, err := a.db.QueryContext(ctx,
-		`SELECT id, description, value, active, project_ids, created, updated
+		`SELECT id, name, value, active, project_ids, created, updated
 		FROM chef_authn_tokens cat
 		WHERE projects_match(cat.project_ids, $1::TEXT[])`,
 		pq.Array(projectsFilter))
@@ -255,7 +249,7 @@ func (a *adapter) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
 
 	for rows.Next() {
 		t := tokens.Token{}
-		if err := rows.Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects),
+		if err := rows.Scan(&t.ID, &t.Name, &t.Value, &t.Active, pq.Array(&t.Projects),
 			&t.Created, &t.Updated); err != nil {
 			return nil, err
 		}

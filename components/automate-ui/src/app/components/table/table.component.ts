@@ -1,7 +1,7 @@
 import { Component, HostBinding } from '@angular/core';
 
 @Component({
-  selector: 'chef-table-new',
+  selector: 'chef-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss']
 })

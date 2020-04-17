@@ -28,25 +28,31 @@
 
         <app-authorized [anyOf]="['/datafeed/destinations', 'post']">
           <chef-table *ngIf="(destinations$ | async)?.length > 0" id="destinations-list">
-            <chef-tr>
-              <chef-th class="sort" (click)="toggleSort('name')">
-                <div class="text-and-sort-icons">
-                  <span>Name</span>
-                  <chef-icon aria-hidden="true" id="{{sortIcon('name')}}" class="sort-icon">arrow_drop_up</chef-icon>
-                </div>
-              </chef-th>
-            </chef-tr>
-            <chef-tr tabindex="0" *ngFor="let destination of destinations$ | async |
-              slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
-              <chef-td>
+            <chef-thead>
+              <chef-tr>
+                <chef-th class="sort" tabindex="0" role="button"
+                  (keyup.enter)="toggleSort('name')"
+                  (click)="toggleSort('name')">
+                  <div class="text-and-sort-icons">
+                    <span>Name</span>
+                    <chef-icon aria-hidden="true" id="{{sortIcon('name')}}" class="sort-icon">arrow_drop_up</chef-icon>
+                  </div>
+                </chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr tabindex="0" *ngFor="let destination of destinations$ | async |
+                slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
+                <chef-td>
                   <a [routerLink]="['/settings/data-feed/form', destination.id]">{{ destination.name }}</a>
                 </chef-td>
-              <chef-td class="actions three-dot-column">
-                <mat-select panelClass="chef-control-menu">
-                  <mat-option (onSelectionChange)="deleteDestination(destination)">Delete Destination</mat-option>
-                </mat-select>
-              </chef-td>
-            </chef-tr>
+                <chef-td class="actions three-dot-column">
+                  <mat-select panelClass="chef-control-menu">
+                    <mat-option (onSelectionChange)="deleteDestination(destination)">Delete Destination</mat-option>
+                  </mat-select>
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
           </chef-table>
 
         </app-authorized>

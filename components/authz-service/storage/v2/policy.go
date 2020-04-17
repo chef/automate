@@ -42,11 +42,6 @@ func NewPolicy(
 	projects []string,
 ) (Policy, error) {
 
-	err := validatePolicyInputs(id, name, projects)
-	if err != nil {
-		return Policy{}, err
-	}
-
 	return Policy{
 		ID:         id,
 		Name:       name,
@@ -55,20 +50,4 @@ func NewPolicy(
 		Statements: statements,
 		Projects:   projects,
 	}, nil
-}
-
-func validatePolicyInputs(id string, name string, projects []string) error {
-	if emptyOrWhitespaceOnlyRE.MatchString(id) {
-		return errors.New(
-			"a policy id is required and must contain at least one non-whitespace character")
-	}
-	if emptyOrWhitespaceOnlyRE.MatchString(name) {
-		return errors.New(
-			"a policy name is required and must contain at least one non-whitespace character")
-	}
-	err := ValidateProjects(projects)
-	if err != nil {
-		return err
-	}
-	return nil
 }

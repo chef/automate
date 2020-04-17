@@ -20,15 +20,15 @@
     </chef-thead>
     <chef-tbody *ngIf="!reportData.controlsListLoading">
       <chef-tr *ngFor="let control of reportData.controlsList.items">
-        <chef-td>
+        <chef-td >
           <span><strong>{{ control.id }}:</strong> {{ control.title }}</span>
         </chef-td>
-        <chef-td>{{ control.profile.title }}, {{ control.profile.version }}</chef-td>
-        <chef-td class="impact-status" [ngClass]="impactStatus(control)">
+        <chef-td >{{ control.profile.title }}, {{ control.profile.version }}</chef-td>
+        <chef-td class="impact-status " [ngClass]="impactStatus(control)">
           {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
         </chef-td>
-        <chef-td>{{ control.end_time | timeFromNow }}</chef-td>
-        <chef-td *ngIf="control.control_summary as summary">
+        <chef-td >{{ control.end_time | timeFromNow }}</chef-td>
+        <chef-td class="node-status " *ngIf="control.control_summary as summary">
           <span class="control-result" [ngClass]="{'failed': summary.failed.total > 0}">
             <chef-icon>report_problem</chef-icon>
             <span>{{ summary.failed.total | number }}</span>
@@ -75,7 +75,7 @@
             <span>{{ summary.waived.total | number }}</span>
           </span>
         </chef-td>
-        <chef-td class="actions-cell three-dot-column">
+        <chef-td class="actions-cell  three-dot-column">
           <mat-select panelClass="chef-control-menu">
             <mat-option *ngIf="!hasFilter(control)" (onSelectionChange)="addFilter(control)">Add Filter</mat-option>
             <mat-option *ngIf="hasFilter(control)" (onSelectionChange)="removeFilter(control)">Remove Filter</mat-option>

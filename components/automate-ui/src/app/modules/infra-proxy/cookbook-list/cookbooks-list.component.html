@@ -78,20 +78,20 @@
             </section>
             <section class="page-body" *ngIf="tabValue === 'cookbooks'">
                 <ng-container>
-                    <chef-table-new>
-                        <chef-table-header>
-                            <chef-table-row>
-                                <chef-table-header-cell>Cookbook Name</chef-table-header-cell>
-                                <chef-table-header-cell>Cookbook Version</chef-table-header-cell>
-                            </chef-table-row>
-                        </chef-table-header>
-                        <chef-table-body>
-                            <chef-table-row *ngFor="let cookbook of cookbooks">
-                                <chef-table-cell>{{ cookbook.name }}</chef-table-cell>
-                                <chef-table-cell>{{ cookbook.version }}</chef-table-cell>
-                            </chef-table-row>
-                        </chef-table-body>
-                    </chef-table-new>
+                    <chef-table>
+                        <chef-thead>
+                            <chef-tr>
+                                <chef-th>Cookbook Name</chef-th>
+                                <chef-th>Cookbook Version</chef-th>
+                            </chef-tr>
+                        </chef-thead>
+                        <chef-tbody>
+                            <chef-tr *ngFor="let cookbook of cookbooks">
+                                <chef-td>{{ cookbook.name }}</chef-td>
+                                <chef-td>{{ cookbook.version }}</chef-td>
+                            </chef-tr>
+                        </chef-tbody>
+                    </chef-table>
                 </ng-container>
             </section>
         </main>

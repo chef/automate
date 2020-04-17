@@ -152,7 +152,7 @@ func TestChefClientAuthn(t *testing.T) {
 
 			var myTokenID string
 			// set up a token to authenticate with
-			resp, err := tokenClient.CreateToken(ctx, &authn.CreateTokenReq{Active: true, Description: "mytoken", Projects: []string{}})
+			resp, err := tokenClient.CreateToken(ctx, &authn.CreateTokenReq{Active: true, Name: "mytoken", Projects: []string{}})
 			if err != nil {
 				t.Fatalf("create token request: %s", err)
 			}

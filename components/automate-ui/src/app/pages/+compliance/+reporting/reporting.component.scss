@@ -192,31 +192,45 @@ chef-subheading {
     padding: 1em;
     background: $chef-white;
 
-    chef-table {
+    table {
       flex-grow: 1;
       flex-basis: 50%;
+      font-size: 14px;
 
       &:first-child {
-        padding-right: 2em;
         border-right: 1px solid $chef-grey;
+
+        tr {
+          td {
+            padding-right: 2.25em;
+          }
+        }
       }
 
       &:last-child {
-        padding-left: 2em;
+        tr {
+          th {
+            padding-left: 2.25em;
+          }
+        }
       }
 
-      chef-tr {
+      tr {
         margin: 0;
 
-        chef-th,
-        chef-td {
+        th,
+        td {
           padding: 0.25em 0;
           border: none;
           background-color: transparent;
           word-break: break-all;
         }
 
-        chef-td {
+        th {
+          text-align: left;
+        }
+
+        td {
           flex-grow: 2;
         }
 

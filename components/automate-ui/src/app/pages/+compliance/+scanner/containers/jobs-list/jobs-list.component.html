@@ -32,16 +32,16 @@
       </chef-tr>
     </app-authorized>
     <chef-tr *ngFor="let job of jobsList.items; trackBy: trackBy;">
-      <chef-td *ngIf="isJobReport(job)">
+      <chef-td  *ngIf="isJobReport(job)">
         {{ job.name }}
       </chef-td>
-      <chef-td *ngIf="!isJobReport(job)">
+      <chef-td  *ngIf="!isJobReport(job)">
         <a [routerLink]="['/compliance', 'scan-jobs', 'jobs', job.id, 'scans']">{{ job.name }}</a>
       </chef-td>
-      <chef-td>{{ displayNodeCount(job.node_count | number, job.recurrence) }}</chef-td>
-      <chef-td>{{ timeFromNow(job.end_time) }}</chef-td>
-      <chef-td>{{ job.status }}</chef-td>
-      <chef-td>
+      <chef-td >{{ displayNodeCount(job.node_count | number, job.recurrence) }}</chef-td>
+      <chef-td >{{ timeFromNow(job.end_time) }}</chef-td>
+      <chef-td >{{ job.status }}</chef-td>
+      <chef-td >
         <chef-button secondary
           *ngIf="job.status === 'completed' && job.recurrence === ''"
           (click)="viewReport(job.id, job.end_time)">

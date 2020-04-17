@@ -67,13 +67,13 @@ export class EventFeedComponent implements OnInit, OnDestroy {
   // The catagories allowed for searching
   categoryTypes: SearchBarCategoryItem[] = [
     {
-      type: 'organization',
-      text: 'Chef Organization',
+      type: 'chef_server',
+      text: 'Chef Infra Server',
       allowWildcards: false
     },
     {
-      type: 'chef_server',
-      text: 'Chef Server',
+      type: 'organization',
+      text: 'Chef Organization',
       allowWildcards: false
     },
     {

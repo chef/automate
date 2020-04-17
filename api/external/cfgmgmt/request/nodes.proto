@@ -14,6 +14,10 @@ message Nodes {
   common.query.Pagination pagination = 2;
   // Sorting parameters to apply to the returned node list.
   common.query.Sorting sorting = 3;
+  // Earliest most recent check-in node information to return.
+  string start = 4;
+  // Latest most recent check-in node information to return.
+  string end = 5;
 }
 
 message Node {

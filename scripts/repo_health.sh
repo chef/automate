@@ -16,7 +16,7 @@ go mod verify
 go mod tidy -v
 git diff --exit-code --ignore-submodules=all # fail if anything's been changed
 
-echo "Checking automate-deployment binds.txt"
+echo "Checking automate-deployment binding data"
 (
   cd ./components/automate-deployment
   make check-bindings
