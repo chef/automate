@@ -10,13 +10,11 @@ describe('ScanJob Ingestion project tagging', () => {
   const projectId = `${cypressPrefix}-projects-${now}`;
   const environment = 'test-env';
   const nodeName = `my-ssh-node-${now}`;
-  const nodeCredName = `test-cred-${now}`;
+  const secretName = `test-cred-${now}`;
+  const scanJobName = `test-scanjob-${now}`;
 
-  // const decoded = 'decoded';
-  // const host = 'host';
-  // const targetUser = 'targetuser';
-  const decoded = atob(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'));
-  const host = Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_HOST');
+  const targetPassword = atob(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'));
+  const targetHost = Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_HOST');
   const targetUser = Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_USER');
 
   interface ProjectAndRule {
@@ -78,7 +76,7 @@ describe('ScanJob Ingestion project tagging', () => {
       body: '{}'
     }).then((response: Cypress.ObjectLike) => {
       response.body.secrets.forEach((secret: any) => {
-        if (secret.name === nodeCredName) {
+        if (secret.name === secretName) {
           cy.request({
             headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
             method: 'DELETE',
@@ -114,32 +112,71 @@ describe('ScanJob Ingestion project tagging', () => {
         }
       });
     });
+
+    // delete scan job
+    cy.request({
+      headers: {
+        projects: ['*'],
+        'api-token': Cypress.env('ADMIN_TOKEN')
+      },
+      method: 'POST',
+      url: '/api/v0/compliance/scanner/jobs/search',
+      body: {
+        filters: [
+          { key: 'job_type', values: ['exec']},
+          { key: 'parent_job', values: ['']}
+        ],
+        page: 1,
+        per_page: 100,
+        sort: 'end_time',
+        order: 'DESC'
+      }
+    }).then((resp: Cypress.ObjectLike) => {
+      resp.body.jobs.forEach((job: any) => {
+        if (job.name === scanJobName ) {
+          cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'DELETE',
+            url: `/api/v0/compliance/scanner/jobs/id/${job.id}`,
+            body: {}
+          });
+        }
+      });
+    });
+
+    // wait for secret to be delete
+    // wait for node to be delete
+    // wait for scan job to be delete
   });
 
   it('when a project has a rule that matches a node\'s environment' +
   ' successfully associates that node with the project', () => {
+
+    // Create a secret
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
       url: '/api/v0/secrets',
       body: {
-        'name': nodeCredName,
+        'name': secretName,
         'type': 'ssh',
         'data': [
           {'key': 'username', 'value': targetUser},
-          {'key': 'password', 'value': decoded}
+          {'key': 'password', 'value': targetPassword}
         ],
         'tags': []
       }
     });
 
+    // get the secret - do I need a secret?
     cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
         url: '/api/v0/secrets/search',
-        body: '{}'
+        body: {}
     }).then((getSecretResponse: Cypress.ObjectLike) => {
       const secretId = getSecretResponse.body.secrets[0].id;
+      // Create a node
       cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'POST',
@@ -149,7 +186,7 @@ describe('ScanJob Ingestion project tagging', () => {
             'manager': 'automate',
             'target_config': {
               'backend': 'ssh',
-              'host': host,
+              'host': targetHost,
               'secrets': [
                 secretId
               ],
@@ -159,48 +196,51 @@ describe('ScanJob Ingestion project tagging', () => {
           }
       }).then((nodeCreateResponse: Cypress.ObjectLike) => {
         const nodeID = nodeCreateResponse.body.id;
+
+        // Create a scan job for that node
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'POST',
           url: '/api/v0/compliance/scanner/jobs',
           body: {
-            'name': 'test job',
+            'name': scanJobName,
             'tags': [],
             'type': 'exec',
             'nodes': [nodeID],
             'profiles': [
-              'https://github.com/dev-sec/linux-baseline/archive/master.tar.gz',
-              'https://github.com/dev-sec/ssh-baseline/archive/master.tar.gz'
+              'https://github.com/dev-sec/linux-baseline/archive/master.tar.gz'
             ],
             'retries': 1,
             'node_selectors': []
           }
         }).then((createJobResponse: Cypress.ObjectLike) => {
-            // wait for the report to be ingested
-            cy.waitForComplianceNode(nodeID, nodeStart, nodeEnd, 10);
-            // Ensure the compliance node is tagged with the correct project
-            // by fetching the node with the expected project filter
-            cy.request({
-              headers: {
-                'api-token': Cypress.env('ADMIN_TOKEN'),
-                projects: [projectWithNodeRules.project.id]
-              },
-              method: 'POST',
-              url: '/api/v0/compliance/reporting/nodes/search',
-              body: {
-                  filters: [
-                    { type: 'start_time', values: [nodeStart]},
-                    { type: 'end_time', values: [nodeEnd]},
-                    { type: 'node_id', values: [nodeID]}
-                  ],
-                  order: 'DESC',
-                  page: 1,
-                  per_page: 100,
-                  sort: 'latest_report.end_time'
-              }
-            }).then((searchCompNodesResponse: Cypress.ObjectLike) => {
-              expect(searchCompNodesResponse.body.nodes).to.have.length(1);
-            });
+          const scanJobId = createJobResponse.body.id;
+          // wait for the report to be ingested
+          cy.waitForComplianceNode(nodeID, nodeStart, nodeEnd, 400);
+
+          // Ensure the compliance node is tagged with the correct project
+          // by fetching the node with the expected project filter
+          cy.request({
+            headers: {
+              'api-token': Cypress.env('ADMIN_TOKEN'),
+              projects: [projectWithNodeRules.project.id]
+            },
+            method: 'POST',
+            url: '/api/v0/compliance/reporting/nodes/search',
+            body: {
+                filters: [
+                  { type: 'start_time', values: [nodeStart]},
+                  { type: 'end_time', values: [nodeEnd]},
+                  { type: 'node_id', values: [nodeID]}
+                ],
+                order: 'DESC',
+                page: 1,
+                per_page: 100,
+                sort: 'latest_report.end_time'
+            }
+          }).then((searchCompNodesResponse: Cypress.ObjectLike) => {
+            expect(searchCompNodesResponse.body.nodes).to.have.length(1);
+          });
         });
       });
     });
