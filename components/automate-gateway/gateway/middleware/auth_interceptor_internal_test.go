@@ -206,7 +206,7 @@ func devCertToEncodedAndPeer(t *testing.T, service string) (string, *peer.Peer) 
 		AuthInfo: credentials.TLSInfo{
 			State: tls.ConnectionState{
 				VerifiedChains: [][]*x509.Certificate{
-					[]*x509.Certificate{x509Cert},
+					{x509Cert},
 				},
 			},
 		},
