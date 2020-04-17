@@ -126,18 +126,18 @@ func (m *memstore) EditTeam(ctx context.Context,
 }
 
 // AddUsers adds an array of user IDs to a team's map of user IDs
-func (m *memstore) AddUsers(ctx context.Context, id string, userIDs []string) (storage.Team, error) {
+func (m *memstore) AddUsers(ctx context.Context, id string, userIDs []string) ([]string, error) {
 	team, teamFound := m.teams[id]
 	if !teamFound {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 	if !projectsIntersect(ctx, team) {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 
 	teamUserIDs, usersFound := m.usersByTeam[id]
 	if !usersFound {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 
 	for _, userID := range userIDs {
@@ -147,23 +147,26 @@ func (m *memstore) AddUsers(ctx context.Context, id string, userIDs []string) (s
 	}
 
 	m.usersByTeam[id] = teamUserIDs
-	return copyTeam(team), nil
+
+	updatedTeamUsers := m.usersByTeam[id]
+
+	return updatedTeamUsers, nil
 }
 
 // RemoveUsers updates team membership by removing all users from a team it can
 // find that are currently members.
-func (m *memstore) RemoveUsers(ctx context.Context, id string, userIDs []string) (storage.Team, error) {
+func (m *memstore) RemoveUsers(ctx context.Context, id string, userIDs []string) ([]string, error) {
 	team, ok := m.teams[id]
 	if !ok {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 	if !projectsIntersect(ctx, team) {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 
 	teamUserIDs, usersFound := m.usersByTeam[id]
 	if !usersFound {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 
 	for _, userID := range userIDs {
@@ -171,7 +174,9 @@ func (m *memstore) RemoveUsers(ctx context.Context, id string, userIDs []string)
 	}
 
 	m.usersByTeam[id] = teamUserIDs
-	return copyTeam(team), nil
+	updatedTeamUsers := m.usersByTeam[id]
+
+	return updatedTeamUsers, nil
 }
 
 // PurgeUserMembership finds all teams the given user is a member of and
