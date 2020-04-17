@@ -58,6 +58,8 @@ func DefaultPGConfig() *ConfigRequest_V1_System_PGConfig {
 	// We use the ExternalCipherSuite to be a bit more permissive
 	// to external monitoring tools.
 	c.SslCiphers = w.String(config.ExternalCipherSuite)
+	c.LogDisconnections = w.String("off")
+	c.ClientMinMessages = w.String("NOTICE")
 	return c
 }
 
