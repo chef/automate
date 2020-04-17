@@ -82,6 +82,9 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 }
 
 // IsAuthorized takes care of HTTP authorization in the custom HTTP handlers
+// It returns a context with the auth data including projects injected, a
+// boolean indicating if authorization was successful (which means there's
+// more than one project returned from the filtering), and an error.
 func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, action string,
 	projectsToFilter []string) (_ context.Context, authorized bool, _ error) {
 	log := ctxlogrus.Extract(ctx)
