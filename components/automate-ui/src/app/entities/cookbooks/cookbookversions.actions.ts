@@ -15,10 +15,6 @@ export class GetCookbookVersions implements Action {
   constructor(public payload: { server_id: string, org_id: string, cookbook_name: string }) { }
 }
 
-// export interface CookbookVersionsSuccessPayload {
-//   cookbookversions: CookbookVersions;
-// }
-
 export class GetCookbookVersionsSuccess implements Action {
   readonly type = CookbookVersionsActionTypes.GET_SUCCESS;
 
