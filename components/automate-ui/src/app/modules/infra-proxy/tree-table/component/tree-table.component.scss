@@ -66,3 +66,33 @@ table.mat-table {
   border: 1px solid;
   border-color: #DFE3E5;
 }
+
+.value-cell {
+  .child-step-1 {
+    padding-left: 15px;
+  }
+
+  .child-step-2 {
+    padding-left: 30px;
+  }
+
+  .child-step-3 {
+    padding-left: 45px;
+  }
+
+  .child-step-4 {
+    padding-left: 60px;
+  }
+
+  .child-step-5 {
+    padding-left: 75px;
+  }
+
+  .child-step-6 {
+    padding-left: 90px;
+  }
+
+  .child-step-7 {
+    padding-left: 105px;
+  }
+}
