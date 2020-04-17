@@ -36,11 +36,11 @@ type AuthzServer struct {
 // NewServer creates a server with its client
 func NewServer(
 	client authz.AuthorizationClient,
-	IntrospectionHandler middleware.IntrospectionHandler,
+	introspectionHandler middleware.IntrospectionHandler,
 ) *AuthzServer {
 	return &AuthzServer{
 		client:               client,
-		introspectionHandler: IntrospectionHandler,
+		introspectionHandler: introspectionHandler,
 	}
 }
 
