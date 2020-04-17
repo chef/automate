@@ -7,6 +7,7 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 
 import { DailyCheckInComponent } from './daily-check-in/daily-check-in.component';
 import { CheckInTimeSeriesComponent } from './check-in-time-series/check-in-time-series.component';
+import { LineGraphComponent } from './check-in-time-series/line-graph.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { TopErrorsComponent } from './top-errors/top-errors.component';
 import {
@@ -28,6 +29,7 @@ import { DesktopRoutingModule } from './desktop-routing.module';
     DailyCheckInComponent,
     DashboardComponent,
     CheckInTimeSeriesComponent,
+    LineGraphComponent,
     TopErrorsComponent,
     UnknownDesktopDurationCountsComponent,
     InsightComponent
@@ -36,6 +38,7 @@ import { DesktopRoutingModule } from './desktop-routing.module';
     DailyCheckInComponent,
     DashboardComponent,
     CheckInTimeSeriesComponent,
+    LineGraphComponent,
     TopErrorsComponent,
     UnknownDesktopDurationCountsComponent,
     InsightComponent
