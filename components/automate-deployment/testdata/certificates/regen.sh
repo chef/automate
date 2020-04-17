@@ -12,6 +12,7 @@ openssl req -x509 \
   -subj "/C=US/ST=WA/L=Seattle/O=Chef/OU=Dev/CN=Chef Automate" \
   -nodes \
   -newkey rsa:4096 \
+  -days 1826 \
   -keyout root.key \
   -out root.crt
 openssl genrsa -out deployment-service.key 4096
