@@ -26,5 +26,5 @@ type BackendError struct {
 
 // NewBackendError - create a new backend error
 func NewBackendError(format string, args ...interface{}) *BackendError {
-	return &BackendError{New(Backend, fmt.Sprint(format, args))}
+	return &BackendError{New(Backend, fmt.Sprintf(format, args...))}
 }

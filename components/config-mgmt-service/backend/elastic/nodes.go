@@ -14,6 +14,7 @@ import (
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
+	"github.com/chef/automate/components/config-mgmt-service/params"
 )
 
 var (
@@ -274,66 +275,78 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 // GetNodesCounts - get the number of successful, failure, and missing nodes
 // {
 // 	"aggregations":{
-// 		 "outer":{
+// 		 "platform":{
 // 				"aggregations":{
-// 					 "platform":{
-// 							"terms":{
-// 								 "field":"platform"
-// 							}
-// 					 },
-// 					 "status":{
-// 							"terms":{
-// 								 "field":"status"
-// 							}
-// 					 }
-// 				},
-// 				"filter":{
-// 					 "bool":{
+// 					 "outer":{
 // 							"filter":{
 // 								 "bool":{
-// 										"should":{
-// 											 "terms":{
-// 													"exists":[
-// 														 "true"
-// 													]
+// 										"filter":{
+// 											 "bool":{
+// 													"should":{
+// 														 "terms":{
+// 																"exists":[
+// 																	 "true"
+// 																]
+// 														 }
+// 													}
+// 											 }
+// 										},
+// 										"must":{
+// 											 "range":{
+// 													"checkin":{
+// 														 "format":"yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ",
+// 														 "from":"2020-04-10T22:05:36Z",
+// 														 "include_lower":true,
+// 														 "include_upper":true,
+// 														 "to":"2020-04-14T22:05:36Z"
+// 													}
 // 											 }
 // 										}
 // 								 }
 // 							}
 // 					 }
+// 				},
+// 				"terms":{
+// 					 "field":"platform"
 // 				}
 // 		 }
 // 	}
 // }
 func (es Backend) GetNodesFieldValueCounts(filters map[string][]string,
 	searchTerms []string, startDate, endDate string) ([]backend.FieldCount, error) {
-	var aggregationTerm = "outer"
+	var aggregationTerm = "inner_filter"
 
-	localFilters := map[string][]string{}
-	for index, element := range filters {
-		localFilters[index] = element
-	}
-
-	localFilters[backend.ExistsTag] = []string{"true"}
-
-	mainQuery := newBoolQueryFromFilters(localFilters)
-
-	rangeQuery, ok := newRangeQuery(startDate, endDate, NodeCheckin)
-
-	if ok {
-		mainQuery = mainQuery.Must(rangeQuery)
-	}
-
-	filterAgg := elastic.NewFilterAggregation().
-		Filter(mainQuery)
-
+	searchSource := elastic.NewSearchSource()
 	for _, searchTerm := range searchTerms {
-		filterAgg = filterAgg.SubAggregation(searchTerm,
-			elastic.NewTermsAggregation().Field(searchTerm))
+		localFilters := map[string][]string{}
+		for index, element := range filters {
+			localFilters[index] = element
+		}
+
+		localFilters[backend.ExistsTag] = []string{"true"}
+
+		delete(localFilters, params.ConvertParamToNodeStateBackendLowerFilter(searchTerm))
+
+		log.Infof("filter %v", localFilters)
+
+		mainQuery := newBoolQueryFromFilters(localFilters)
+
+		rangeQuery, ok := newRangeQuery(startDate, endDate, NodeCheckin)
+
+		if ok {
+			mainQuery = mainQuery.Must(rangeQuery)
+		}
+
+		agg := elastic.NewTermsAggregation().
+			Field(searchTerm).
+			SubAggregation(aggregationTerm,
+				elastic.NewFilterAggregation().Filter(mainQuery))
+
+		searchSource.Aggregation(searchTerm, agg)
 	}
 
-	searchSource := elastic.NewSearchSource().
-		Aggregation(aggregationTerm, filterAgg)
+	source, _ := searchSource.Source()
+	LogQueryPartMin(IndexNodeState, source, "bob")
 
 	searchResult, err := es.client.Search().
 		SearchSource(searchSource).
@@ -342,6 +355,8 @@ func (es Backend) GetNodesFieldValueCounts(filters map[string][]string,
 	if err != nil {
 		return []backend.FieldCount{}, err
 	}
+
+	LogQueryPartMin(IndexNodeState, searchResult.Aggregations, "searchResult aggs")
 
 	// no nodes found
 	if searchResult.TotalHits() == 0 {
@@ -353,29 +368,48 @@ func (es Backend) GetNodesFieldValueCounts(filters map[string][]string,
 		return fieldCountCollection, nil
 	}
 
-	statusResult, found := searchResult.Aggregations.Terms(aggregationTerm)
-	if !found {
-		return []backend.FieldCount{},
-			errors.NewBackendError("Aggregation term '%s' not found", aggregationTerm)
-	}
-
 	fieldCountCollection := make([]backend.FieldCount, len(searchTerms))
 	for index, searchTerm := range searchTerms {
-		statusCounts, found := statusResult.Aggregations.Terms(searchTerm)
+		outerAgg, found := searchResult.Aggregations.Terms(searchTerm)
 		if !found {
-			return nil, errors.NewBackendError("Aggregation term '%s' not found", searchTerm)
+			return nil, errors.NewBackendError("Aggregation term %q not found", searchTerm)
 		}
+		terms := make([]backend.TermCount, 0)
+		for _, bucket := range outerAgg.Buckets {
+			statusCounts, found := bucket.Aggregations.Filter(aggregationTerm)
+			if !found {
+				return []backend.FieldCount{},
+					errors.NewBackendError("Aggregation term %q not found", aggregationTerm)
+			}
 
-		terms := make([]backend.TermCount, len(statusCounts.Buckets))
-		for indexTerm, bucket := range statusCounts.Buckets {
-			terms[indexTerm].Count = int(bucket.DocCount)
-			terms[indexTerm].Term = bucket.Key.(string)
+			// Are all the found values filtered out
+			if statusCounts.DocCount > 0 {
+				terms = append(terms, backend.TermCount{
+					Count: int(statusCounts.DocCount),
+					Term:  bucket.Key.(string),
+				})
+			}
 		}
 		fieldCountCollection[index].Terms = terms
 		fieldCountCollection[index].Field = searchTerm
 	}
 
 	return fieldCountCollection, nil
+}
+
+func LogQueryPartMin(indices string, partToPrint interface{}, name string) {
+	part, err := json.Marshal(partToPrint)
+	if err != nil {
+		log.Errorf("%s", err)
+	}
+	stringPart := string(part)
+	if stringPart == "null" {
+		stringPart = ""
+	} else {
+		stringPart = "\n" + stringPart
+	}
+	log.Infof("\n------------------ %s-(start)--[%s]---------------%s \n------------------ %s-(end)-----------------------------------\n",
+		name, indices, stringPart, name)
 }
 
 // GetAttribute Get request for the attribute using the Doc ID
