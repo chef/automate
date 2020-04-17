@@ -65,20 +65,20 @@ describe('token management', () => {
   });
 
   it('displays the returned tokens info', () => {
-    cy.get(`${tokensTable} chef-table-cell`).contains(tokenName1);
-    cy.get(`${tokensTable} chef-table-cell`).contains(tokenName2);
+    cy.get(`${tokensTable} chef-td`).contains(tokenName1);
+    cy.get(`${tokensTable} chef-td`).contains(tokenName2);
 
-    cy.get('chef-table chef-table-cell').contains(tokenName1).parent()
-      .get('chef-table-cell').contains('Active');
-    cy.get('chef-table chef-table-cell').contains(tokenName2).parent()
-      .get('chef-table-cell').contains('Inactive');
+    cy.get('chef-table chef-td').contains(tokenName1).parent()
+      .get('chef-td').contains('Active');
+    cy.get('chef-table chef-td').contains(tokenName2).parent()
+      .get('chef-td').contains('Inactive');
   });
 
   itFlaky('control menu has all options', () => {
     ['Copy Token', 'Toggle Status', 'Delete Token'].forEach((item, _) => {
-      cy.get('chef-table-body').contains(tokenName1).parent().parent()
+      cy.get('chef-tbody').contains(tokenName1).parent().parent()
         .find('[data-cy=token-control]').as('controlMenu');
-      cy.get('chef-table-body').contains(tokenName1).parent().parent()
+      cy.get('chef-tbody').contains(tokenName1).parent().parent()
         .find('[data-cy=token-control] .mat-select-trigger').as('dropdownTrigger');
 
       cy.get('@dropdownTrigger').should('be.visible')
@@ -90,10 +90,10 @@ describe('token management', () => {
   });
 
   itFlaky('can copy token', () => {
-    cy.get('chef-table-body').contains(tokenName1).parent().parent()
+    cy.get('chef-tbody').contains(tokenName1).parent().parent()
     .find('[data-cy=token-control]').as('controlMenu');
 
-    cy.get('chef-table-body').contains(tokenName1).parent().parent()
+    cy.get('chef-tbody').contains(tokenName1).parent().parent()
       .find('[data-cy=token-control] .mat-select-trigger').as('dropdownTrigger');
 
     cy.get('@dropdownTrigger').should('be.visible')
@@ -106,10 +106,10 @@ describe('token management', () => {
   });
 
   it('can delete token', () => {
-    cy.get('chef-table-body').contains(tokenName1).parent().parent()
+    cy.get('chef-tbody').contains(tokenName1).parent().parent()
       .find('[data-cy=token-control]').as('controlMenu');
 
-    cy.get('chef-table-body').contains(tokenName1).parent().parent()
+    cy.get('chef-tbody').contains(tokenName1).parent().parent()
       .find('[data-cy=token-control] .mat-select-trigger').as('dropdownTrigger');
 
     cy.get('@dropdownTrigger').should('be.visible')
@@ -119,7 +119,7 @@ describe('token management', () => {
 
     cy.get('app-delete-object-modal').find('button').contains('Delete Token')
       .click({force: true});
-    cy.get('chef-table-body').contains(tokenName1).should('not.exist');
+    cy.get('chef-tbody').contains(tokenName1).should('not.exist');
   });
 
   it('can create a new token', () => {
@@ -142,7 +142,7 @@ describe('token management', () => {
   });
 
   it('opens token details', () => {
-    cy.get('chef-table-body').contains(tokenName2).click();
+    cy.get('chef-tbody').contains(tokenName2).click();
     cy.url().should('include', `/settings/tokens/${tokenID2}`);
     cy.contains(tokenName2).should('exist');
     cy.get('h1.page-title').contains(tokenName2);

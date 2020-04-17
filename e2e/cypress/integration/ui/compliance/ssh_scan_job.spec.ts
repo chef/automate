@@ -230,7 +230,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
 
     // ensure that the profile is deleted
     cy.url().should('include', '/compliance/compliance-profiles');
-    cy.get('chef-table-body').should(($b) => {
+    cy.get('chef-tbody').should(($b) => {
       expect($b).not.to.contain('CIS Amazon Linux 2 Benchmark Level 1');
     });
   });
@@ -263,7 +263,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
 
     // ensure that the job is deleted
     cy.url().should('include', '/compliance/scan-jobs/jobs');
-    cy.get('chef-table-body').should(($b) => {
+    cy.get('chef-tbody').should(($b) => {
       expect($b).not.to.contain(jobName);
     });
   });

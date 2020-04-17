@@ -75,17 +75,17 @@ describe('team add users', () => {
   itFlaky('navigates to the team users add page', () => {
     cy.get('chef-page-header h1').contains(`Add Users to ${teamName}`);
 
-    cy.get('chef-table-body chef-table-row').contains(userID);
+    cy.get('chef-tbody chef-tr').contains(userID);
 
     // Assert that there's more than two users: the one we created and admin,
     // that always exists.
-    cy.get('chef-table-body').find('chef-table-row').its('length').should('be.gte', 2);
+    cy.get('chef-tbody').find('chef-tr').its('length').should('be.gte', 2);
 
     cy.get('#page-footer #right-buttons chef-button ng-container').first().contains('Add User');
   });
 
   itFlaky('adds a single user', () => {
-    cy.get('chef-table-body').contains('chef-table-row', userID)
+    cy.get('chef-tbody').contains('chef-tr', userID)
       .find('chef-checkbox').click();
     cy.get('#users-selected').contains('1 user selected');
 
@@ -94,8 +94,8 @@ describe('team add users', () => {
 
     // drops you back on the team details page with user in the team users table
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamID}`);
-    cy.get('chef-table-body').children().should('have.length', 1);
-    cy.get('chef-table-body chef-table-cell a').first().contains(userName);
+    cy.get('chef-tbody').children().should('have.length', 1);
+    cy.get('chef-tbody chef-td a').first().contains(userName);
 
     // remove user from team
     cy.request({
@@ -117,9 +117,9 @@ describe('team add users', () => {
   itFlaky('adds all users then sees empty message on attempting to add more users', () => {
     // Note: we add one user, and there always is an admin user. So,
     // we don't need to care for singular texts here ("Add 1 user" etc).
-    cy.get('chef-table-body').find('chef-table-row').then(rows => {
+    cy.get('chef-tbody').find('chef-tr').then(rows => {
       const userCount = Cypress.$(rows).length;
-      cy.get('chef-table-body chef-checkbox').click({ multiple: true }); // check all checkboxes
+      cy.get('chef-tbody chef-checkbox').click({ multiple: true }); // check all checkboxes
       cy.get('#users-selected').contains(`${userCount} users selected`);
 
       cy.get('#page-footer #right-buttons chef-button')
@@ -128,8 +128,8 @@ describe('team add users', () => {
 
     // drops you back on the team details page with user in the team users table
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamID}`);
-    cy.get('chef-table-body chef-table-cell a').contains(userName);
-    cy.get('chef-table-body chef-table-cell a').contains('Local Administrator');
+    cy.get('chef-tbody chef-td a').contains(userName);
+    cy.get('chef-tbody chef-td a').contains('Local Administrator');
 
     // navigate back to add users and see empty page and message
     cy.get('chef-toolbar chef-button').contains('Add User').click();

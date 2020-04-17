@@ -82,8 +82,8 @@ describe('user management', () => {
     // close notification banner so we can assert the password success notification later
     cy.get('chef-notification.info chef-icon').click();
 
-    cy.get('app-user-table chef-table-cell').contains(username).should('exist');
-    cy.get('app-user-table chef-table-cell').contains(name).should('exist');
+    cy.get('app-user-table chef-td').contains(username).should('exist');
+    cy.get('app-user-table chef-td').contains(name).should('exist');
   });
 
   it('can view and edit user details', () => {
