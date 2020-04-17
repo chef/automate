@@ -42,12 +42,10 @@ func TestGeneratedPolicyUpToDate(t *testing.T) {
 }
 
 func TestAllProtoFilesAnnotated(t *testing.T) {
-	const v1Annotations = "chef.automate.api.policy"
-	const v2Annotations = "chef.automate.api.iam.policy"
+	const annotations = "chef.automate.api.iam.policy"
 	for _, file := range grpctest.FindServiceProtos(t, "components/automate-gateway/api") {
 		t.Run(file, func(t *testing.T) {
-			grpctest.AssertAllProtoMethodsAnnotated(t, file, v1Annotations)
-			grpctest.AssertAllProtoMethodsAnnotated(t, file, v2Annotations)
+			grpctest.AssertAllProtoMethodsAnnotated(t, file, annotations)
 		})
 	}
 }
