@@ -200,7 +200,7 @@ describe('ScanJob Ingestion project tagging', () => {
             'type': 'exec',
             'nodes': [nodeID],
             'profiles': [
-              'https://github.com/dev-sec/linux-baseline/archive/master.tar.gz'
+              'https://github.com/vjeffrey/test-profile/archive/master.tar.gz'
             ],
             'retries': 1,
             'node_selectors': []
