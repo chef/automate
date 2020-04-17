@@ -38,8 +38,8 @@ ${BIN_DIR}:
 
 docs: clean ${BINS} ${GOOS}
 	mkdir -p ${DOCS_PATH}
-	# In the studio, CHEF_DEV_ENVIRONMENT is set to true. This has the
-	# effect that further dev-only commands appear in the output of
+	# In the dev studio, CHEF_DEV_ENVIRONMENT is set to true. This has
+	# the effect that further dev-only commands appear in the output of
 	# chef-automate --help etc. Since it unhides commands, that'll also
 	# have an effect on the documentation data generated.
 	CHEF_DEV_ENVIRONMENT=false bin/${GOOS}/chef-automate dev generate-docs --docs-dir ${DOCS_PATH} --format yaml
