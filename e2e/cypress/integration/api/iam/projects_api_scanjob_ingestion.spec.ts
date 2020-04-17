@@ -1,7 +1,5 @@
 import { Rule, Project } from '../../../support/types';
 
-
-
 describe('ScanJob Ingestion project tagging', () => {
   const cypressPrefix = 'test-sj-ing-proj';
   const nodeStart = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
@@ -13,7 +11,8 @@ describe('ScanJob Ingestion project tagging', () => {
   const secretName = `test-cred-${now}`;
   const scanJobName = `test-scanjob-${now}`;
 
-  const targetPassword = atob(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'));
+  const targetKey = atob(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'))
+    .replace('-----BEGIN RSA PRIVATE KEY----- ', '').replace('-----END RSA PRIVATE KEY----- ', '');
   const targetHost = Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_HOST');
   const targetUser = Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_USER');
 
@@ -162,7 +161,7 @@ describe('ScanJob Ingestion project tagging', () => {
         'type': 'ssh',
         'data': [
           {'key': 'username', 'value': targetUser},
-          {'key': 'password', 'value': targetPassword}
+          {'key': 'key', 'value': targetKey}
         ],
         'tags': []
       }
@@ -216,14 +215,14 @@ describe('ScanJob Ingestion project tagging', () => {
         }).then((createJobResponse: Cypress.ObjectLike) => {
           const scanJobId = createJobResponse.body.id;
           // wait for the report to be ingested
-          cy.waitForComplianceNode(nodeID, nodeStart, nodeEnd, 400);
+          cy.waitForComplianceNode(nodeID, nodeStart, nodeEnd, 100);
 
           // Ensure the compliance node is tagged with the correct project
           // by fetching the node with the expected project filter
           cy.request({
             headers: {
               'api-token': Cypress.env('ADMIN_TOKEN'),
-              projects: [projectWithNodeRules.project.id]
+              projects: ['*']// [projectWithNodeRules.project.id]
             },
             method: 'POST',
             url: '/api/v0/compliance/reporting/nodes/search',
