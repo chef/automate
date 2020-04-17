@@ -20,7 +20,6 @@
   "host": "automate.chef.io",
   "basePath": "/api",
   "schemes": [
-    "http",
     "https"
   ],
   "consumes": [
