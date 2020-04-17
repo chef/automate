@@ -106,7 +106,7 @@ describe('EventFeedGuitarStringsComponent', () => {
     const text = component.getTooltipText(item, item.isMultiple(), guitarString);
 
     expect(text).toBe('<strong>5 nodes</strong>, <strong>9 cookbooks</strong>,' +
-      ' and <strong>7 roles</strong> were created.');
+      ' <strong>7 roles</strong>, and <strong>3 policies</strong> were created.');
   });
 
   describe('GuitarStringDataContainer', () => {
@@ -393,7 +393,8 @@ describe('EventFeedGuitarStringsComponent', () => {
       types = [
         {'name': 'node', 'count': 5},
         {'name': 'cookbook', 'count': 9},
-        {'name': 'role', 'count': 7}
+        {'name': 'role', 'count': 7},
+        {'name': 'policy', 'count': 3}
       ];
     } else {
       types = [
