@@ -6,11 +6,6 @@ option go_package = "github.com/chef/automate/api/interservice/infra_proxy/reque
 import "protoc-gen-swagger/options/annotations.proto";
 
 message Policyfiles {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-        json_schema: {
-          required: ["org_id,server_id"]
-        }
-    };
     // Chef organization ID.
     string org_id = 1;
     // Chef Infra Server ID.
@@ -18,11 +13,6 @@ message Policyfiles {
 }
 
 message Policyfile {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-        json_schema: {
-          required: ["org_id,server_id,name,revision_id"]
-        }
-    };
     // Chef organization ID.
     string org_id = 1;
     // Chef Infra Server ID.
