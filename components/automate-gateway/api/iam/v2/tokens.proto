@@ -63,7 +63,7 @@ service Tokens {
 			}
 		};
     option (google.api.http) = {
-      post: "/iam/v2/tokens"
+      post: "/apis/iam/v2/tokens"
       body: "*"
     };
     option (chef.automate.api.policy).resource = "auth:tokens";
@@ -84,7 +84,7 @@ service Tokens {
   */
   rpc GetToken (GetTokenReq) returns (GetTokenResp) {
     option (google.api.http) = {
-      get: "/iam/v2/tokens/{id}"
+      get: "/apis/iam/v2/tokens/{id}"
     };
     option (chef.automate.api.policy).resource = "auth:tokens:{id}";
     option (chef.automate.api.policy).action = "get";
@@ -135,7 +135,7 @@ service Tokens {
 			}
 		};
     option (google.api.http) = {
-      put: "/iam/v2/tokens/{id}"
+      put: "/apis/iam/v2/tokens/{id}"
       body: "*"
     };
     option (chef.automate.api.policy).resource = "auth:tokens:{id}";
@@ -156,7 +156,7 @@ service Tokens {
   */
   rpc DeleteToken (DeleteTokenReq) returns (DeleteTokenResp) {
     option (google.api.http) = {
-      delete: "/iam/v2/tokens/{id}"
+      delete: "/apis/iam/v2/tokens/{id}"
     };
     option (chef.automate.api.policy).resource = "auth:tokens:{id}";
     option (chef.automate.api.policy).action = "delete";
@@ -179,7 +179,7 @@ service Tokens {
   */
   rpc ListTokens (ListTokensReq) returns (ListTokensResp) {
     option (google.api.http) = {
-      get: "/iam/v2/tokens"
+      get: "/apis/iam/v2/tokens"
     };
     option (chef.automate.api.policy).resource = "auth:tokens";
     option (chef.automate.api.policy).action = "read";

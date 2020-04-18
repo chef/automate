@@ -50,7 +50,7 @@ service Teams {
 			}
 		};
     option (google.api.http) = {
-      post: "/iam/v2/teams"
+      post: "/apis/iam/v2/teams"
       body: "*"
     };
     option (chef.automate.api.policy).resource = "auth:teams";
@@ -74,7 +74,7 @@ service Teams {
       tags: "teams";
     };
     option (google.api.http) = {
-      get: "/iam/v2/teams"
+      get: "/apis/iam/v2/teams"
     };
     option (chef.automate.api.policy).resource = "auth:teams";
     option (chef.automate.api.policy).action = "read";
@@ -97,7 +97,7 @@ service Teams {
       tags: "teams";
     };
     option (google.api.http) = {
-      get: "/iam/v2/teams/{id}"
+      get: "/apis/iam/v2/teams/{id}"
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "read";
@@ -143,7 +143,7 @@ service Teams {
 			}
 		};
     option (google.api.http) = {
-      put: "/iam/v2/teams/{id}"
+      put: "/apis/iam/v2/teams/{id}"
       body: "*"
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
@@ -167,7 +167,7 @@ service Teams {
       tags: "teams";
     };
     option (google.api.http) = {
-      delete: "/iam/v2/teams/{id}"
+      delete: "/apis/iam/v2/teams/{id}"
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "delete";
@@ -190,7 +190,7 @@ service Teams {
       tags: "teams";
     };
     option (google.api.http) = {
-      get: "/iam/v2/teams/{id}/users"
+      get: "/apis/iam/v2/teams/{id}/users"
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}:users";
     option (chef.automate.api.policy).action = "read";
@@ -204,7 +204,7 @@ service Teams {
   Adds a list of users to a local team. Users are added by their membership_id.
   The request currently does not validate that membership_id maps to a real user.
 
-  The membership_id for users can be found via GET /apis/iam/v2/users/<user_id>.
+  The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
 
   Authorization Action:
   ```
@@ -239,7 +239,7 @@ service Teams {
 			}
 		};
     option (google.api.http) = {
-      post: "/iam/v2/teams/{id}/users:add"
+      post: "/apis/iam/v2/teams/{id}/users:add"
       body: "*"
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
@@ -254,7 +254,7 @@ service Teams {
   Removes a list of users from a local team. Users are removed by their membership_id.
   The request currently does not validate that membership_id maps to a real user.
 
-  The membership_id for users can be found via GET /apis/iam/v2/users/<user_id>.
+  The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
 
   Authorization Action:
   ```
@@ -289,7 +289,7 @@ service Teams {
 			}
 		};
     option (google.api.http) = {
-      post: "/iam/v2/teams/{id}/users:remove"
+      post: "/apis/iam/v2/teams/{id}/users:remove"
       body: "*"
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
@@ -313,7 +313,7 @@ service Teams {
       tags: "teams";
     };
     option (google.api.http) = {
-      get: "/iam/v2/users/{membership_id}/teams"
+      get: "/apis/iam/v2/users/{membership_id}/teams"
     };
     option (chef.automate.api.policy).resource = "auth:users:{membership_id}:teams";
     option (chef.automate.api.policy).action = "read";
