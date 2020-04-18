@@ -12,7 +12,8 @@ import (
 // GetDataBags fetches an array of existing data bags
 func (a *InfraProxyServer) GetDataBags(ctx context.Context, r *gwreq.DataBags) (*gwres.DataBags, error) {
 	req := &infra_req.DataBags{
-		OrgId: r.OrgId,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
 	}
 	res, err := a.client.GetDataBags(ctx, req)
 	if err != nil {
@@ -27,8 +28,9 @@ func (a *InfraProxyServer) GetDataBags(ctx context.Context, r *gwreq.DataBags) (
 // GetDataBagItem fetches an infra data bag item details
 func (a *InfraProxyServer) GetDataBagItem(ctx context.Context, r *gwreq.DataBag) (*gwres.DataBag, error) {
 	req := &infra_req.DataBag{
-		OrgId: r.OrgId,
-		Name:  r.Name,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
 	}
 	res, err := a.client.GetDataBagItem(ctx, req)
 	if err != nil {

@@ -27,7 +27,8 @@ func (a *InfraProxyServer) GetOrgs(ctx context.Context, r *gwreq.GetOrgs) (*gwre
 // GetOrg fetches a single org by ID
 func (a *InfraProxyServer) GetOrg(ctx context.Context, r *gwreq.GetOrg) (*gwres.GetOrg, error) {
 	req := &infra_req.GetOrg{
-		Id: r.Id,
+		Id:       r.Id,
+		ServerId: r.ServerId,
 	}
 	res, err := a.client.GetOrg(ctx, req)
 	if err != nil {
@@ -41,6 +42,7 @@ func (a *InfraProxyServer) GetOrg(ctx context.Context, r *gwreq.GetOrg) (*gwres.
 // CreateOrg posts an org upstream
 func (a *InfraProxyServer) CreateOrg(ctx context.Context, r *gwreq.CreateOrg) (*gwres.CreateOrg, error) {
 	req := &infra_req.CreateOrg{
+		Id:        r.Id,
 		Name:      r.Name,
 		AdminUser: r.AdminUser,
 		AdminKey:  r.AdminKey,
@@ -78,7 +80,8 @@ func (a *InfraProxyServer) UpdateOrg(ctx context.Context, r *gwreq.UpdateOrg) (*
 // DeleteOrg deletes an org upstream
 func (a *InfraProxyServer) DeleteOrg(ctx context.Context, r *gwreq.DeleteOrg) (*gwres.DeleteOrg, error) {
 	req := &infra_req.DeleteOrg{
-		Id: r.Id,
+		Id:       r.Id,
+		ServerId: r.ServerId,
 	}
 	res, err := a.client.DeleteOrg(ctx, req)
 	if err != nil {
