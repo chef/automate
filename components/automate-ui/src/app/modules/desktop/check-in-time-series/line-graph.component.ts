@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnChanges } from '@angular/core';
 import * as d3 from 'd3';
 
 @Component({
@@ -6,12 +6,13 @@ import * as d3 from 'd3';
   templateUrl: './line-graph.component.html',
   styleUrls: ['./line-graph.component.scss']
 })
-export class LineGraphComponent implements AfterViewInit {
+export class LineGraphComponent implements AfterViewInit, OnChanges {
 
   constructor() {}
 
-  // @Input() data = [];
-  data: any[] = [ 1, 2, 3, 4, 5, 27, 22, 11, 23, 13, 11, 7, 9, 6, 4 ];
+  @Input() data: any[] = [];
+  // data1: any[] = [ 1, 2, 3, 4, 5, 27, 22, 11, 23, 13, 11, 7, 9, 6, 4 ];
+  private ready = false;
 
   // sizing the chart
   @Input() vbWidth = 900;
@@ -22,7 +23,21 @@ export class LineGraphComponent implements AfterViewInit {
 
 
   ngAfterViewInit() {
+    this.ready = true;
+  }
+
+  ngOnChanges() {
+    if (!this.ready || !this.data) { return; }
+    console.log(this.data);
     this.createChart();
+  }
+
+  get domainY() {
+    const min = 0;
+    const allNums = this.data.map(d => d.percentage);
+    const max = Math.max(...allNums);
+
+    return [min, max];
   }
 
   get scaleX() {
@@ -33,8 +48,8 @@ export class LineGraphComponent implements AfterViewInit {
 
   get scaleY() {
     return d3.scaleLinear()
-        .domain([Math.min(...this.data), Math.max(...this.data)]) // incoming data [min, max]
-        .range([500, 0]); // specifies pixel value used to draw the graph
+      .domain(this.domainY) // incoming data [min, max]
+      .range([500, 0]); // specifies pixel value used to draw the graph
   }
 
   // this function generates the svg line path format
@@ -47,7 +62,7 @@ export class LineGraphComponent implements AfterViewInit {
   // an x and y axis of width/height that we determined in our sizing
   tuples() {
     return this.data
-      .map((data, index) => [index, data])
+      .map((data) => [data.daysago, data.percentage])
       .map(([x, y]) => [this.scaleX(x), this.scaleY(y)]);
                         // scaleX and y need to gets functions in order to pass in
   }
