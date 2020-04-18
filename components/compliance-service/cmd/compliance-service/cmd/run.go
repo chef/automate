@@ -32,6 +32,8 @@ var conf = config.Compliance{
 		AuthnTarget:   "0.0.0.0:10113",
 		AutomateFQDN:  "localhost",
 		TmpDir:        os.Getenv("TMPDIR"),
+		// AuthzHost:     "0.0.0.0",
+		// AuthzPort:     "10130",
 	},
 	ElasticSearch: config.ElasticSearch{},
 	ElasticSearchSidecar: config.ElasticSearchSidecar{
