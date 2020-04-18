@@ -22,7 +22,7 @@ message CreateRuleReq {
   string name = 3;
   // Whether the rule is `STAGED` (not in effect) or `APPLIED` (in effect).
   RuleType type = 4;
-  // Conditions that ingested resources must match to belong to the project. 
+  // Conditions that ingested resources must match to belong to the project.
   // Will contain one or more.
   repeated Condition conditions = 5;
 }
@@ -43,7 +43,7 @@ message UpdateRuleReq {
   // Whether the rule applies to ingested `NODE` or `EVENT resources.
   // Cannot be changed.
   RuleType type = 4;
-  // Conditions that ingested resources must match to belong to the project. 
+  // Conditions that ingested resources must match to belong to the project.
   // Will contain one or more.
   repeated Condition conditions = 5;
 }

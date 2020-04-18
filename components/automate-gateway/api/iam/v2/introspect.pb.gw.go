@@ -288,11 +288,11 @@ func RegisterAuthorizationHandlerClient(ctx context.Context, mux *runtime.ServeM
 }
 
 var (
-	pattern_Authorization_IntrospectAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2", "introspect"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Authorization_IntrospectAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"apis", "iam", "v2", "introspect"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Authorization_IntrospectSome_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2", "introspect_some"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Authorization_IntrospectSome_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"apis", "iam", "v2", "introspect_some"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Authorization_Introspect_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2", "introspect"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Authorization_Introspect_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"apis", "iam", "v2", "introspect"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

@@ -824,21 +824,21 @@ func RegisterRulesHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Rules_CreateRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2", "projects", "project_id", "rules"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Rules_CreateRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"apis", "iam", "v2", "projects", "project_id", "rules"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Rules_UpdateRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"iam", "v2", "projects", "project_id", "rules", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Rules_UpdateRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"apis", "iam", "v2", "projects", "project_id", "rules", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Rules_GetRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"iam", "v2", "projects", "project_id", "rules", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Rules_GetRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"apis", "iam", "v2", "projects", "project_id", "rules", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Rules_ListRulesForProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2", "projects", "id", "rules"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Rules_ListRulesForProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"apis", "iam", "v2", "projects", "id", "rules"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Rules_DeleteRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"iam", "v2", "projects", "project_id", "rules", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Rules_DeleteRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"apis", "iam", "v2", "projects", "project_id", "rules", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Rules_ApplyRulesStart_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2", "apply-rules"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Rules_ApplyRulesStart_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"apis", "iam", "v2", "apply-rules"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Rules_ApplyRulesCancel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2", "apply-rules"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Rules_ApplyRulesCancel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"apis", "iam", "v2", "apply-rules"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Rules_ApplyRulesStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2", "apply-rules"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Rules_ApplyRulesStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"apis", "iam", "v2", "apply-rules"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

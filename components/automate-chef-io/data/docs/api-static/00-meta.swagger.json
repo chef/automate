@@ -18,7 +18,6 @@
     }
   },
   "host": "automate.chef.io",
-  "basePath": "/api/v0",
   "schemes": [
     "https"
   ],

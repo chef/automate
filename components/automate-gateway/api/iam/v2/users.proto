@@ -52,13 +52,13 @@ service Users {
 			}
 		};
     option (google.api.http) = {
-      post: "/iam/v2/users"
+      post: "/apis/iam/v2/users"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "iam:users";
     option (chef.automate.api.iam.policy).action = "iam:users:create";
   };
-  
+
   /*
   List all users
 
@@ -74,7 +74,7 @@ service Users {
       tags: "users";
     };
     option (google.api.http) = {
-      get: "/iam/v2/users"
+      get: "/apis/iam/v2/users"
     };
     option (chef.automate.api.iam.policy).resource = "iam:users";
     option (chef.automate.api.iam.policy).action = "iam:users:list";
@@ -95,7 +95,7 @@ service Users {
       tags: "users";
     };
     option (google.api.http) = {
-      get: "/iam/v2/users/{id}"
+      get: "/apis/iam/v2/users/{id}"
     };
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}";
     option (chef.automate.api.iam.policy).action = "iam:users:get";
@@ -116,7 +116,7 @@ service Users {
       tags: "users";
     };
     option (google.api.http) = {
-      delete: "/iam/v2/users/{id}"
+      delete: "/apis/iam/v2/users/{id}"
     };
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}";
     option (chef.automate.api.iam.policy).action = "iam:users:delete";
@@ -160,7 +160,7 @@ service Users {
 			}
 		};
     option (google.api.http) = {
-      put: "/iam/v2/users/{id}"
+      put: "/apis/iam/v2/users/{id}"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}";
@@ -168,7 +168,7 @@ service Users {
   };
 
   /*
-  Update self (as user) 
+  Update self (as user)
 
   Updates a local user's own name or password.
   If changing the password, both "password" and "previous_password" are required.
@@ -206,7 +206,7 @@ service Users {
 			}
 		};
     option (google.api.http) = {
-      put: "/iam/v2/self/{id}"
+      put: "/apis/iam/v2/self/{id}"
       body: "*"
     };
     // The users namespace, as opposed for auth:users, is for actions users

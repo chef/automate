@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/CreateTeam", "iam:teams", "iam:teams:create", "POST", "/iam/v2/teams", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/CreateTeam", "iam:teams", "iam:teams:create", "POST", "/apis/iam/v2/teams", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreateTeamReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -24,10 +24,10 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/ListTeams", "iam:teams", "iam:teams:list", "GET", "/iam/v2/teams", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/ListTeams", "iam:teams", "iam:teams:list", "GET", "/apis/iam/v2/teams", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/GetTeam", "iam:teams:{id}", "iam:teams:get", "GET", "/iam/v2/teams/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/GetTeam", "iam:teams:{id}", "iam:teams:get", "GET", "/apis/iam/v2/teams/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetTeamReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -40,7 +40,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/UpdateTeam", "iam:teams:{id}", "iam:teams:update", "PUT", "/iam/v2/teams/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/UpdateTeam", "iam:teams:{id}", "iam:teams:update", "PUT", "/apis/iam/v2/teams/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.UpdateTeamReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -55,7 +55,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/DeleteTeam", "iam:teams:{id}", "iam:teams:delete", "DELETE", "/iam/v2/teams/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/DeleteTeam", "iam:teams:{id}", "iam:teams:delete", "DELETE", "/apis/iam/v2/teams/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.DeleteTeamReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -68,7 +68,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/GetTeamMembership", "iam:teams:{id}:users", "iam:teamUsers:list", "GET", "/iam/v2/teams/{id}/users", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/GetTeamMembership", "iam:teams:{id}:users", "iam:teamUsers:list", "GET", "/apis/iam/v2/teams/{id}/users", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetTeamMembershipReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -81,7 +81,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/AddTeamMembers", "iam:teams:{id}", "iam:teamUsers:create", "POST", "/iam/v2/teams/{id}/users:add", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/AddTeamMembers", "iam:teams:{id}", "iam:teamUsers:create", "POST", "/apis/iam/v2/teams/{id}/users:add", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.AddTeamMembersReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -94,7 +94,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/RemoveTeamMembers", "iam:teams:{id}", "iam:teamUsers:delete", "POST", "/iam/v2/teams/{id}/users:remove", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/RemoveTeamMembers", "iam:teams:{id}", "iam:teamUsers:delete", "POST", "/apis/iam/v2/teams/{id}/users:remove", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.RemoveTeamMembersReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -107,7 +107,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/GetTeamsForMember", "iam:users:{membership_id}:teams", "iam:userTeams:get", "GET", "/iam/v2/users/{membership_id}/teams", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/GetTeamsForMember", "iam:users:{membership_id}:teams", "iam:userTeams:get", "GET", "/apis/iam/v2/users/{membership_id}/teams", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetTeamsForMemberReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
