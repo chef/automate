@@ -103,31 +103,6 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 	}, nil
 }
 
-// GetOrgByName takes an org name, server_id and returns an org object
-func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*response.GetOrg, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	if req.Name == "" {
-		s.service.Logger.Debug("incomplete server request: missing org name")
-		return nil, status.Error(codes.InvalidArgument, "must supply org name")
-	}
-
-	serverID, err := uuid.FromString(req.ServerId)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org server ID: %s", err.Error())
-	}
-
-	org, err := s.service.Storage.GetOrgByName(ctx, req.Name, serverID)
-	if err != nil {
-		return nil, service.ParseStorageError(err, req, "org")
-	}
-
-	return &response.GetOrg{
-		Org: fromStorageOrg(org),
-	}, nil
-}
-
 // DeleteOrg deletes an org from the db
 func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*response.DeleteOrg, error) {
 	ctx, cancel := context.WithCancel(ctx)

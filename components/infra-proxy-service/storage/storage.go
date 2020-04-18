@@ -10,15 +10,13 @@ import (
 
 // Storage is the interface provided by our various storage backends.
 type Storage interface {
-	GetServer(context.Context, uuid.UUID) (Server, error)
-	GetServerByName(ctx context.Context, serverName string) (Server, error)
-	GetServers(context.Context) ([]Server, error)
-	StoreServer(ctx context.Context, name string, description string, fqdn string, ipAddress string) (Server, error)
-	DeleteServer(context.Context, uuid.UUID) (Server, error)
-	EditServer(context.Context, Server) (Server, error)
+	GetServer(ctx context.Context, id string) (Server, error)
+	GetServers(ctx context.Context) ([]Server, error)
+	StoreServer(ctx context.Context, id string, name string, fqdn string, ipAddress string) (Server, error)
+	DeleteServer(ctx context.Context, id string) (Server, error)
+	EditServer(ctx context.Context, id string, name string, fqdn string, ipAddress string) (Server, error)
 
 	GetOrg(context.Context, uuid.UUID) (Org, error)
-	GetOrgByName(ctx context.Context, orgName string, serverID uuid.UUID) (Org, error)
 	GetOrgs(context.Context, uuid.UUID) ([]Org, error)
 	StoreOrg(ctx context.Context, name string, adminUser string, credentialID string, serverID string, projects []string) (Org, error)
 	DeleteOrg(context.Context, uuid.UUID) (Org, error)
@@ -33,14 +31,13 @@ type Resetter interface {
 
 // Server is the struct ingested and returned by our backend implementations.
 type Server struct {
-	ID          uuid.UUID
-	Name        string
-	Description string
-	Fqdn        string
-	IpAddress   string
-	OrgsCount   int32
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID        string
+	Name      string
+	Fqdn      string
+	IPAddress string
+	OrgsCount int32
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // Org is the struct ingested and returned by our backend implementations.
