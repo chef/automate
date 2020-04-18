@@ -14,7 +14,7 @@ info:
     Pass the token as part of the API call. For example:
 
     ```
-    curl -s -H "api-token: $TOKEN" https://automate.example.com/api/iam/v2/policies -v
+    curl -s -H "api-token: $TOKEN" https://automate.example.com/apis/iam/v2/policies -v
     ```
 
     To create api tokens with limited permissions, use your admin token to create a standard token. You can then write a policy that exactly defines the API access for the standard token.
