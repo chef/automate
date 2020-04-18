@@ -916,6 +916,10 @@ func init() {
     "chef.automate.api.infra_proxy.request.CreateOrg": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
         "name": {
           "type": "string",
           "description": "Chef organization name."

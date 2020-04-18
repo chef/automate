@@ -60,7 +60,7 @@ func (c *ChefClient) GetRoleList() (RoleListResult, error) {
 // GetRoles get roles list
 func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Roles, error) {
 
-	client, err := s.createClient(ctx, req.OrgId)
+	client, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
@@ -79,7 +79,7 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 // In order to get expanded runlist it required to have all roles if any
 // RunList contains the another Role's RunList.
 func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role, error) {
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}

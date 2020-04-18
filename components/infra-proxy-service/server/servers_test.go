@@ -183,6 +183,7 @@ func TestServers(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			respOrg, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				Id:        "infra-org-id",
 				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
@@ -198,7 +199,7 @@ func TestServers(t *testing.T) {
 			assert.Equal(t, 1, len(list.Servers))
 			assert.EqualValues(t, 1, list.Servers[0].OrgsCount)
 
-			cleanupOrg(ctx, t, cl, respOrg.Org.Id)
+			cleanupOrg(ctx, t, cl, respOrg.Org.Id, respOrg.Org.ServerId)
 			cleanupServer(ctx, t, cl, resp1.Server.Id)
 		})
 	})
@@ -265,6 +266,7 @@ func TestServers(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			respOrg, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				Id:        "infra-org-id",
 				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
@@ -285,7 +287,7 @@ func TestServers(t *testing.T) {
 			assert.Equal(t, resp1.Server.IpAddress, server1.Server.IpAddress)
 			assert.EqualValues(t, 1, server1.Server.OrgsCount)
 
-			cleanupOrg(ctx, t, cl, respOrg.Org.Id)
+			cleanupOrg(ctx, t, cl, respOrg.Org.Id, respOrg.Org.ServerId)
 			cleanupServer(ctx, t, cl, resp1.Server.Id)
 		})
 	})
