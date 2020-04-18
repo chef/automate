@@ -21,9 +21,13 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type CreateServer struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
-	Description          string   `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty" toml:"description,omitempty" mapstructure:"description,omitempty"`
-	Fqdn                 string   `protobuf:"bytes,3,opt,name=fqdn,proto3" json:"fqdn,omitempty" toml:"fqdn,omitempty" mapstructure:"fqdn,omitempty"`
+	// Chef infra server ID.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
+	// Chef infra server name.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+	// Chef infra server FQDN.
+	Fqdn string `protobuf:"bytes,3,opt,name=fqdn,proto3" json:"fqdn,omitempty" toml:"fqdn,omitempty" mapstructure:"fqdn,omitempty"`
+	// Chef infra server IP address.
 	IpAddress            string   `protobuf:"bytes,4,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty" toml:"ip_address,omitempty" mapstructure:"ip_address,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -55,16 +59,16 @@ func (m *CreateServer) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CreateServer proto.InternalMessageInfo
 
-func (m *CreateServer) GetName() string {
+func (m *CreateServer) GetId() string {
 	if m != nil {
-		return m.Name
+		return m.Id
 	}
 	return ""
 }
 
-func (m *CreateServer) GetDescription() string {
+func (m *CreateServer) GetName() string {
 	if m != nil {
-		return m.Description
+		return m.Name
 	}
 	return ""
 }
@@ -84,11 +88,14 @@ func (m *CreateServer) GetIpAddress() string {
 }
 
 type UpdateServer struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
-	Description          string   `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty" toml:"description,omitempty" mapstructure:"description,omitempty"`
-	Fqdn                 string   `protobuf:"bytes,4,opt,name=fqdn,proto3" json:"fqdn,omitempty" toml:"fqdn,omitempty" mapstructure:"fqdn,omitempty"`
-	IpAddress            string   `protobuf:"bytes,5,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty" toml:"ip_address,omitempty" mapstructure:"ip_address,omitempty"`
+	// Chef infra server ID.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
+	// Chef infra server name.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+	// Chef infra server FQDN.
+	Fqdn string `protobuf:"bytes,3,opt,name=fqdn,proto3" json:"fqdn,omitempty" toml:"fqdn,omitempty" mapstructure:"fqdn,omitempty"`
+	// Chef infra server IP address.
+	IpAddress            string   `protobuf:"bytes,4,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty" toml:"ip_address,omitempty" mapstructure:"ip_address,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -133,13 +140,6 @@ func (m *UpdateServer) GetName() string {
 	return ""
 }
 
-func (m *UpdateServer) GetDescription() string {
-	if m != nil {
-		return m.Description
-	}
-	return ""
-}
-
 func (m *UpdateServer) GetFqdn() string {
 	if m != nil {
 		return m.Fqdn
@@ -155,6 +155,7 @@ func (m *UpdateServer) GetIpAddress() string {
 }
 
 type DeleteServer struct {
+	// Chef infra server ID.
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -225,6 +226,7 @@ func (m *GetServers) XXX_DiscardUnknown() {
 var xxx_messageInfo_GetServers proto.InternalMessageInfo
 
 type GetServer struct {
+	// Chef infra server ID.
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -263,52 +265,12 @@ func (m *GetServer) GetId() string {
 	return ""
 }
 
-type GetServerByName struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
-	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
-	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
-}
-
-func (m *GetServerByName) Reset()         { *m = GetServerByName{} }
-func (m *GetServerByName) String() string { return proto.CompactTextString(m) }
-func (*GetServerByName) ProtoMessage()    {}
-func (*GetServerByName) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64390fbabed0d9db, []int{5}
-}
-
-func (m *GetServerByName) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetServerByName.Unmarshal(m, b)
-}
-func (m *GetServerByName) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetServerByName.Marshal(b, m, deterministic)
-}
-func (m *GetServerByName) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetServerByName.Merge(m, src)
-}
-func (m *GetServerByName) XXX_Size() int {
-	return xxx_messageInfo_GetServerByName.Size(m)
-}
-func (m *GetServerByName) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetServerByName.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetServerByName proto.InternalMessageInfo
-
-func (m *GetServerByName) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
 func init() {
 	proto.RegisterType((*CreateServer)(nil), "chef.automate.domain.infra_proxy.request.CreateServer")
 	proto.RegisterType((*UpdateServer)(nil), "chef.automate.domain.infra_proxy.request.UpdateServer")
 	proto.RegisterType((*DeleteServer)(nil), "chef.automate.domain.infra_proxy.request.DeleteServer")
 	proto.RegisterType((*GetServers)(nil), "chef.automate.domain.infra_proxy.request.GetServers")
 	proto.RegisterType((*GetServer)(nil), "chef.automate.domain.infra_proxy.request.GetServer")
-	proto.RegisterType((*GetServerByName)(nil), "chef.automate.domain.infra_proxy.request.GetServerByName")
 }
 
 func init() {
@@ -316,23 +278,20 @@ func init() {
 }
 
 var fileDescriptor_64390fbabed0d9db = []byte{
-	// 282 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x91, 0x41, 0x4b, 0xfc, 0x30,
-	0x10, 0xc5, 0x69, 0xb7, 0xff, 0x3f, 0x74, 0x2c, 0x0a, 0x3d, 0x15, 0x44, 0x59, 0x0a, 0xc2, 0x9e,
-	0x12, 0xd0, 0xb3, 0x88, 0xab, 0xe0, 0xcd, 0x83, 0xe2, 0xc5, 0xcb, 0x92, 0x6d, 0xa6, 0xee, 0x80,
-	0x4d, 0xb2, 0x49, 0xaa, 0xee, 0x27, 0xf0, 0x6b, 0x4b, 0xd3, 0xb5, 0x2e, 0x6a, 0xc1, 0xdb, 0x64,
-	0x5e, 0x5e, 0xde, 0x8f, 0x3c, 0x38, 0x15, 0x86, 0x38, 0x29, 0x8f, 0xd6, 0xa1, 0x7d, 0xa1, 0x0a,
-	0x39, 0xa9, 0xda, 0x8a, 0x85, 0xb1, 0xfa, 0x6d, 0xc3, 0x2d, 0xae, 0x5b, 0x74, 0x9e, 0x77, 0x1a,
-	0x5a, 0xc7, 0x8c, 0xd5, 0x5e, 0xe7, 0xb3, 0x6a, 0x85, 0x35, 0x13, 0xad, 0xd7, 0x8d, 0xf0, 0xc8,
-	0xa4, 0x6e, 0x04, 0x29, 0xb6, 0xe3, 0x63, 0x5b, 0x5f, 0xf9, 0x0a, 0xd9, 0x95, 0x45, 0xe1, 0xf1,
-	0x3e, 0x3c, 0x90, 0xe7, 0x90, 0x28, 0xd1, 0x60, 0x11, 0x4d, 0xa3, 0x59, 0x7a, 0x17, 0xe6, 0x7c,
-	0x0a, 0x7b, 0x12, 0x5d, 0x65, 0xc9, 0x78, 0xd2, 0xaa, 0x88, 0x83, 0xb4, 0xbb, 0xea, 0x5c, 0xf5,
-	0x5a, 0xaa, 0x62, 0xd2, 0xbb, 0xba, 0x39, 0x3f, 0x02, 0x20, 0xb3, 0x10, 0x52, 0x5a, 0x74, 0xae,
-	0x48, 0x82, 0x92, 0x92, 0xb9, 0xec, 0x17, 0xe5, 0x7b, 0x04, 0xd9, 0x83, 0x91, 0x5f, 0xc9, 0xfb,
-	0x10, 0x93, 0xdc, 0xe6, 0xc6, 0x24, 0x07, 0x92, 0x78, 0x9c, 0x64, 0x32, 0x4e, 0x92, 0x8c, 0x92,
-	0xfc, 0xfb, 0x4e, 0x72, 0x0c, 0xd9, 0x35, 0x3e, 0xe3, 0x18, 0x48, 0x99, 0x01, 0xdc, 0xa0, 0xef,
-	0x45, 0x57, 0x1e, 0x42, 0x3a, 0x9c, 0x7e, 0x5c, 0x3d, 0x81, 0x83, 0x41, 0x9c, 0x6f, 0x6e, 0x3b,
-	0xe4, 0x5f, 0x3e, 0x74, 0x7e, 0xf1, 0x78, 0xfe, 0x44, 0x7e, 0xd5, 0x2e, 0x59, 0xa5, 0x1b, 0xde,
-	0x75, 0xc5, 0x3f, 0xbb, 0xe2, 0x7f, 0x69, 0x7b, 0xf9, 0x3f, 0xd4, 0x7c, 0xf6, 0x11, 0x00, 0x00,
-	0xff, 0xff, 0x2d, 0x1b, 0x67, 0x74, 0x1c, 0x02, 0x00, 0x00,
+	// 236 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x91, 0x3f, 0x4b, 0x04, 0x31,
+	0x10, 0xc5, 0xb9, 0xf5, 0x10, 0x76, 0x58, 0x2c, 0x52, 0x2d, 0x88, 0x22, 0x5b, 0x5d, 0x95, 0x80,
+	0xd6, 0x22, 0xfe, 0x01, 0x7b, 0xc5, 0xc6, 0xe6, 0xc8, 0x6d, 0x66, 0xbd, 0x01, 0x37, 0xc9, 0x4d,
+	0x66, 0x45, 0xbf, 0xbd, 0x24, 0xab, 0x22, 0x82, 0x60, 0x63, 0x37, 0xf9, 0xbd, 0xcc, 0x3c, 0x78,
+	0x0f, 0x4e, 0x6d, 0x24, 0x43, 0x5e, 0x90, 0x13, 0xf2, 0x0b, 0xf5, 0x68, 0xc8, 0x0f, 0x6c, 0xd7,
+	0x91, 0xc3, 0xeb, 0x9b, 0x61, 0xdc, 0x4d, 0x98, 0xc4, 0x64, 0x0d, 0x39, 0xe9, 0xc8, 0x41, 0x82,
+	0x5a, 0xf5, 0x5b, 0x1c, 0xb4, 0x9d, 0x24, 0x8c, 0x56, 0x50, 0xbb, 0x30, 0x5a, 0xf2, 0xfa, 0xdb,
+	0x9e, 0xfe, 0xd8, 0xeb, 0x10, 0x9a, 0x6b, 0x46, 0x2b, 0x78, 0x5f, 0x0e, 0xa8, 0x03, 0xa8, 0xc8,
+	0xb5, 0x8b, 0x93, 0xc5, 0xaa, 0xbe, 0xab, 0xc8, 0x29, 0x05, 0x4b, 0x6f, 0x47, 0x6c, 0xab, 0x42,
+	0xca, 0x9c, 0xd9, 0xb0, 0x73, 0xbe, 0xdd, 0x9b, 0x59, 0x9e, 0xd5, 0x11, 0x00, 0xc5, 0xb5, 0x75,
+	0x8e, 0x31, 0xa5, 0x76, 0x59, 0x94, 0x9a, 0xe2, 0xe5, 0x0c, 0xb2, 0xcd, 0x43, 0x74, 0xff, 0x6e,
+	0x73, 0x0c, 0xcd, 0x0d, 0x3e, 0xe3, 0x6f, 0x36, 0x5d, 0x03, 0x70, 0x8b, 0x32, 0x8b, 0xa9, 0x3b,
+	0x84, 0xfa, 0xeb, 0xf5, 0xf3, 0xeb, 0xd5, 0xc5, 0xe3, 0xf9, 0x13, 0xc9, 0x76, 0xda, 0xe8, 0x3e,
+	0x8c, 0x26, 0xe7, 0x69, 0x3e, 0xf3, 0x34, 0x7f, 0x69, 0x64, 0xb3, 0x5f, 0xaa, 0x38, 0x7b, 0x0f,
+	0x00, 0x00, 0xff, 0xff, 0x4b, 0x44, 0xdb, 0x2f, 0xc0, 0x01, 0x00, 0x00,
 }

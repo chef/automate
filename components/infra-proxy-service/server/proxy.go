@@ -66,17 +66,12 @@ func (s *Server) createClient(ctx context.Context, orgID string) (*ChefClient, e
 		return nil, err
 	}
 
-	ServerID, err := uuid.FromString(org.ServerID)
+	server, err := s.service.Storage.GetServer(ctx, org.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid server: %s", err.Error())
+		return nil, service.ParseStorageError(err, org.ServerId, "org")
 	}
 
-	server, err := s.service.Storage.GetServer(ctx, ServerID)
-	if err != nil {
-		return nil, service.ParseStorageError(err, ServerID, "org")
-	}
-
-	baseURL, err := targetURL(server.Fqdn, server.IpAddress, org.Name)
+	baseURL, err := targetURL(server.Fqdn, server.IPAddress, org.Name)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
 	}

@@ -38,21 +38,6 @@ func (a *InfraProxyServer) GetOrg(ctx context.Context, r *gwreq.GetOrg) (*gwres.
 	}, nil
 }
 
-// GetOrgByName fetches a single org by name
-func (a *InfraProxyServer) GetOrgByName(ctx context.Context, r *gwreq.GetOrgByName) (*gwres.GetOrg, error) {
-	req := &infra_req.GetOrgByName{
-		Name:     r.Name,
-		ServerId: r.ServerId,
-	}
-	res, err := a.client.GetOrgByName(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	return &gwres.GetOrg{
-		Org: fromUpstreamOrg(res.Org),
-	}, nil
-}
-
 // CreateOrg posts an org upstream
 func (a *InfraProxyServer) CreateOrg(ctx context.Context, r *gwreq.CreateOrg) (*gwres.CreateOrg, error) {
 	req := &infra_req.CreateOrg{

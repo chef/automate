@@ -4,30 +4,39 @@ package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
 
 message CreateServer {
+    // Chef infra server.
     Server server = 1;
 }
 
 message DeleteServer {
+    // Chef infra server.
     Server server = 1;
 }
 
 message UpdateServer {
+    // Chef infra server.
     Server server = 1;
 }
 
 message GetServers {
+    // Chef infra servers.
     repeated Server servers = 1;
 }
 
 message GetServer {
+    // Chef infra server.
     Server server = 1;
 }
 
 message Server {
+    // Chef infra server ID.
     string id = 1;
+    // Chef infra server name.
     string name = 2;
-    string description = 3;
+    // Chef infra server FQDN.
     string fqdn = 4;
+    // Chef infra server IP address.
     string ip_address = 5;
+    // Chef organizations count associated with chef infra server.
     int32 orgs_count = 6;
 }
