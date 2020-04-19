@@ -15,7 +15,7 @@
     "copy-ui-lib:fonts": "cp -r ../chef-ui-library/dist/collection/assets/fonts/ src/assets/fonts",
     "build": "ng build",
     "build:prod": "npm run build -- --prod",
-    "test": "ng test --watch=false --code-coverage --source-map=false --configuration=no_auth",
+    "test": "/bin/bash -c 'exec 5>&1; t1=$(ng test --watch=false --code-coverage --source-map=false --configuration=no_auth | tee /dev/fd/5; exit ${PIPESTATUS[0]}); if [ $? -ne 0 ]; then exit 1; else echo $t1 | grep 'WARN:' >/dev/null; test $? -ne 0; fi'",
     "test:watch": "ng test --watch=true --browsers='Chrome' --source-map=true --configuration=no_auth",
     "e2e": "ng e2e --no-webdriver-update",
     "lint": "ng lint",
