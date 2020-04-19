@@ -24,7 +24,7 @@ func (a *InfraProxyServer) GetClients(ctx context.Context, r *gwreq.Clients) (*g
 	}, nil
 }
 
-// GetClient fetch a infra client
+// GetClient fetches an infra client details
 func (a *InfraProxyServer) GetClient(ctx context.Context, r *gwreq.Client) (*gwres.Client, error) {
 	req := &infra_req.Client{
 		OrgId: r.OrgId,
