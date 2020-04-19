@@ -321,6 +321,7 @@ func (p *postgres) GetTeam(ctx context.Context, id string) (storage.Team, error)
 // PurgeUserMembership removes all teams_users_associations with the userID provided,
 // returning an array of teamIDs for the teams that initially had the provided user
 func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]string, error) {
+
 	rows, err := p.db.QueryContext(ctx,
 		`WITH moved_row_ids AS (
 			DELETE FROM teams_users_associations
@@ -392,13 +393,17 @@ func (p *postgres) AddUsers(ctx context.Context,
 		`INSERT INTO teams_users_associations (team_db_id, user_id, created_at)
 				SELECT db_id, unnest($2::TEXT[]), now()
 	 			FROM teams
-				WHERE db_id=$1`, dbID, pq.Array(userIDs))
+				WHERE db_id=$1
+				ON CONFLICT ON CONSTRAINT teams_users_pkey
+				DO NOTHING;
+				`, dbID, pq.Array(userIDs))
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
 	row := tx.QueryRowContext(ctx, `UPDATE teams SET updated_at=NOW()
-	WHERE db_id=$1`, dbID)
+	WHERE db_id=$1
+	RETURNING db_id`, dbID)
 	err = row.Scan(&dbID)
 	if err != nil {
 		return nil, p.processError(err)
@@ -429,11 +434,27 @@ func (p *postgres) AddUsers(ctx context.Context,
 // from a different context we should apply project filtering in this function as well.
 // Not doing it to save us a database call since it's not needed currently.
 func (p *postgres) GetUserIDsForTeam(ctx context.Context, id string) ([]string, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	var userIDs []string
+	var dbID int
+
+	err = p.db.QueryRowContext(ctx,
+		`SELECT db_id FROM teams
+		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
+		id, pq.Array(projectsFilter)).
+		Scan(&dbID)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	row := p.db.QueryRowContext(ctx,
-		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=team_db_id($1)`,
-		id)
-	err := row.Scan(pq.Array(&userIDs))
+		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=$1`, dbID)
+	err = row.Scan(pq.Array(&userIDs))
+
 	if err != nil {
 		return nil, p.processError(err)
 	}
