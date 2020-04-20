@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable, combineLatest } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
-import { EntityStatus, allLoaded } from 'app/entities/entities';
+import { EntityStatus } from 'app/entities/entities';
 import { GetCookbooksForOrg } from 'app/entities/cookbooks/cookbook.actions';
 import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
 import {
@@ -24,9 +24,6 @@ export class CookbooksComponent implements OnInit {
   @Input() orgId: string;
 
   public cookbooks: Cookbook[] = [];
-  public loading$: Observable<boolean>;
-  public sortedCookbooks$: Observable<Cookbook[]>;
-  public isLoading = true;
   public cookbooksListLoading = true;
 
   constructor(
@@ -40,12 +37,6 @@ export class CookbooksComponent implements OnInit {
     this.store.dispatch(new GetCookbooksForOrg({
       server_id: this.serverId, org_id: this.orgId
     }));
-
-    combineLatest([
-      this.store.select(getAllCookbooksForOrgStatus)
-    ]).pipe().subscribe(([getCookbooksSt]) => {
-        this.isLoading = !allLoaded([getCookbooksSt]);
-      });
 
     combineLatest([
       this.store.select(getAllCookbooksForOrgStatus),
