@@ -310,7 +310,7 @@ func (s *CfgMgmtServer) GetNodesFieldValueCounts(ctx context.Context,
 	}
 
 	fieldCounts, err := s.client.GetNodesFieldValueCounts(filters,
-		req.SearchTerms, req.Start, req.End)
+		req.Terms, req.Start, req.End)
 	if err != nil {
 		return &response.NodesFieldValueCounts{}, errors.GrpcErrorFromErr(codes.Internal, err)
 	}

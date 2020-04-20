@@ -307,10 +307,10 @@ func (s *CfgMgmtServer) GetNodesFieldValueCounts(ctx context.Context,
 	}).Debug("rpc call")
 
 	cfgMgmtRequest := &cmsReq.NodesFieldValueCounts{
-		SearchTerms: request.SearchTerms,
-		Filter:      request.Filter,
-		Start:       request.Start,
-		End:         request.End,
+		Terms:  request.Terms,
+		Filter: request.Filter,
+		Start:  request.Start,
+		End:    request.End,
 	}
 
 	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodesFieldValueCounts(ctx, cfgMgmtRequest)

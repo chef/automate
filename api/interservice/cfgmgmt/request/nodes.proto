@@ -37,7 +37,7 @@ message MissingNodeDurationCounts {
 }
 
 message NodesFieldValueCounts {
-  repeated string searchTerms = 1;
+  repeated string terms = 1;
   repeated string filter = 2;
   string start = 3;
   string end = 4;

@@ -291,7 +291,7 @@ func init() {
         },
         "parameters": [
           {
-            "name": "searchTerms",
+            "name": "terms",
             "in": "query",
             "required": false,
             "type": "array",
