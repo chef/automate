@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { map, takeUntil, filter } from 'rxjs/operators';
@@ -19,7 +20,6 @@ import {
 import { GetProjects, CreateProject, DeleteProject, ProjectPayload  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
   selector: 'app-project-list',
@@ -120,7 +120,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.messageModalVisible = false;
   }
 
-  public startProjectDelete($event: ChefKeyboardEvent, p: Project): void {
+  public startProjectDelete($event: MatOptionSelectionChange, p: Project): void {
     if ($event.isUserInput) {
       const deletableStates: ProjectStatus[] = ['EDITS_PENDING', 'RULES_APPLIED'];
       if (deletableStates.includes(p.status)) {
