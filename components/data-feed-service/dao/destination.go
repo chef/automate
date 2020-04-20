@@ -46,7 +46,7 @@ func dbToGetDestinationResponse(inDestination *Destination) *datafeed.GetDestina
 	return &newDestination
 }
 
-func (db *DB) AddDestination(destination *datafeed.AddDestinationRequest) (bool, int64, error) {
+func (db *DB) AddDestination(destination *datafeed.AddDestinationRequest) (int64, error) {
 	dbDestination := addToDBDestination(destination)
 	err := Transact(db, func(tx *DBTrans) error {
 		if err := tx.Insert(dbDestination); err != nil {
@@ -56,12 +56,12 @@ func (db *DB) AddDestination(destination *datafeed.AddDestinationRequest) (bool,
 	})
 
 	if err != nil {
-		return false, -1, err
+		return -1, err
 	}
-	return true, dbDestination.ID, err
+	return dbDestination.ID, err
 }
 
-func (db *DB) DeleteDestination(delete *datafeed.DeleteDestinationRequest) (bool, error) {
+func (db *DB) DeleteDestination(delete *datafeed.DeleteDestinationRequest) error {
 	var count int64 = 0
 	var err error
 	err = Transact(db, func(tx *DBTrans) error {
@@ -76,12 +76,12 @@ func (db *DB) DeleteDestination(delete *datafeed.DeleteDestinationRequest) (bool
 	})
 
 	if err != nil {
-		return false, err
+		return err
 	}
-	return true, err
+	return err
 }
 
-func (db *DB) UpdateDestination(destination *datafeed.UpdateDestinationRequest) (bool, error) {
+func (db *DB) UpdateDestination(destination *datafeed.UpdateDestinationRequest) error {
 	dbDestination := updateToDBDestination(destination)
 	var err error
 	var count int64 = 0
@@ -95,9 +95,9 @@ func (db *DB) UpdateDestination(destination *datafeed.UpdateDestinationRequest) 
 		return nil
 	})
 	if err != nil {
-		return false, err
+		return err
 	}
-	return true, err
+	return err
 }
 
 func (db *DB) GetDestination(get *datafeed.GetDestinationRequest) (*datafeed.GetDestinationResponse, error) {

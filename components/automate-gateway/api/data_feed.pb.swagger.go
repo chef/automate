@@ -193,32 +193,42 @@ func init() {
     "chef.automate.api.datafeed.AddDestinationResponse": {
       "type": "object",
       "properties": {
-        "success": {
-          "type": "boolean",
-          "format": "boolean"
-        },
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "string"
         }
       }
     },
     "chef.automate.api.datafeed.DeleteDestinationResponse": {
       "type": "object",
       "properties": {
-        "success": {
-          "type": "boolean",
-          "format": "boolean"
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "string"
         }
       }
     },
     "chef.automate.api.datafeed.GetDestinationResponse": {
       "type": "object",
       "properties": {
-        "success": {
-          "type": "boolean",
-          "format": "boolean"
-        },
         "id": {
           "type": "string",
           "format": "int64"
@@ -299,13 +309,18 @@ func init() {
     "chef.automate.api.datafeed.UpdateDestinationResponse": {
       "type": "object",
       "properties": {
-        "success": {
-          "type": "boolean",
-          "format": "boolean"
-        },
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "string"
         }
       }
     },
