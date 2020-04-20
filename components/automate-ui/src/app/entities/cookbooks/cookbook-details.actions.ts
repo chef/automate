@@ -4,16 +4,16 @@ import { Action } from '@ngrx/store';
 import { CookbookDetails } from './cookbook-details.model';
 
 export enum CookbookDetailsActionTypes {
-  GET = 'COOKBOOKDETAILS::GET',
-  GET_SUCCESS = 'COOKBOOKDETAILS::GET::SUCCESS',
-  GET_FAILURE = 'COOKBOOKDETAILS::GET::FAILURE'
+  GET = 'COOKBOOK_DETAILS::GET',
+  GET_SUCCESS = 'COOKBOOK_DETAILS::GET::SUCCESS',
+  GET_FAILURE = 'COOKBOOK_DETAILS::GET::FAILURE'
 }
 
 export interface CookbookDetailsSuccessPayload {
   cookbookdetails: CookbookDetails;
 }
 
-export class GetCookbookDetailsForVersion implements Action {
+export class GetCookbookDetails implements Action {
   readonly type = CookbookDetailsActionTypes.GET;
 
   constructor(public payload: {
@@ -37,6 +37,6 @@ export class GetCookbookDetailsFailure implements Action {
 }
 
 export type CookbookDetailsActions =
-  | GetCookbookDetailsForVersion
+  | GetCookbookDetails
   | GetCookbookDetailsSuccess
   | GetCookbookDetailsFailure;

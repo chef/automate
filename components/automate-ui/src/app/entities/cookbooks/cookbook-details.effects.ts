@@ -8,7 +8,7 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
-  GetCookbookDetailsForVersion,
+  GetCookbookDetails,
   GetCookbookDetailsSuccess,
   GetCookbookDetailsFailure,
   CookbookDetailsActionTypes
@@ -26,11 +26,11 @@ export class CookbookDetailsEffects {
   ) { }
 
   @Effect()
-  getCookbooksForOrgs$ = this.actions$.pipe(
+  getCookbooksDetails$ = this.actions$.pipe(
     ofType(CookbookDetailsActionTypes.GET),
     mergeMap(({ payload: { server_id, org_id, cookbook_name, cookbook_version } }
-      : GetCookbookDetailsForVersion) => this.requests
-        .getCookbookDetailsForVersion(server_id, org_id, cookbook_name, cookbook_version)
+      : GetCookbookDetails) => this.requests
+        .getCookbookDetails(server_id, org_id, cookbook_name, cookbook_version)
         .pipe(
           map((resp) => new GetCookbookDetailsSuccess(resp)),
           catchError((error: HttpErrorResponse) =>

@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
-// import { CookbookVersionsSuccessPayload } from './cookbookversions.actions';
-import { CookbookVersions } from './cookbookversions.model';
+import { CookbookVersions } from './cookbook-versions.model';
 
 @Injectable()
 export class CookbookVersionsRequests {

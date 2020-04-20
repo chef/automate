@@ -17,7 +17,7 @@ import {
   allCookbookDetails,
   getStatus as getAllCookbooksDetailsForVersionStatus
 } from 'app/entities/cookbooks/cookbook-details.selectors';
-import { GetCookbookDetailsForVersion } from 'app/entities/cookbooks/cookbook-details.actions';
+import { GetCookbookDetails } from 'app/entities/cookbooks/cookbook-details.actions';
 export type CookbookDetailsTab = 'details' | 'content';
 
 @Component({
@@ -82,7 +82,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(([_getCookbookVersionSt, cookbookVersionState]) => {
         this.cookbook = cookbookVersionState[0];
-        this.store.dispatch(new GetCookbookDetailsForVersion({
+        this.store.dispatch(new GetCookbookDetails({
           server_id: this.serverId,
           org_id: this.orgId,
           cookbook_name: this.cookbook.name,

@@ -44,5 +44,5 @@ export function cookbookVersionsEntityReducer(
   }
 }
 
-export const getEntityById = (name: string) =>
-(state: CookbookVersionsEntityState) => state.entities[name];
+export const getEntityById = (id: string) =>
+(state: CookbookVersionsEntityState) => state.entities[id];

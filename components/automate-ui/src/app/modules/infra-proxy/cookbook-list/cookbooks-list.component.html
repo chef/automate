@@ -32,8 +32,8 @@
                     <chef-form-field>
                         <label>
                             <span class="label">Name <span aria-hidden="true">*</span></span>
-                            <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
-                                data-cy="update-org-name">
+                            <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful"
+                                autocomplete="off" data-cy="update-org-name">
                         </label>
                         <chef-error
                             *ngIf="(updateOrgForm.get('name').hasError('required') || updateOrgForm.get('name').hasError('pattern')) && updateOrgForm.get('name').dirty">
@@ -43,8 +43,8 @@
                     <chef-form-field>
                         <label>
                             <span class="label">Admin User <span aria-hidden="true">*</span></span>
-                            <input chefInput formControlName="admin_user" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
-                                data-cy="update-Org-admin-user">
+                            <input chefInput formControlName="admin_user" type="text" [resetOrigin]="saveSuccessful"
+                                autocomplete="off" data-cy="update-Org-admin-user">
                         </label>
                         <chef-error
                             *ngIf="(updateOrgForm.get('admin_user').hasError('required') || updateOrgForm.get('admin_user').hasError('pattern')) && updateOrgForm.get('admin_user').dirty">
@@ -55,7 +55,7 @@
                         <label>
                             <span class="label">Admin Key<span aria-hidden="true">*</span></span>
                             <textarea rows="27" cols="10" chefInput placeholder="-----BEGIN RSA PRIVATE KEY -----"
-                                formControlName="admin_key" data-cy="update-org-admin-key"></textarea>   
+                                formControlName="admin_key" data-cy="update-org-admin-key"></textarea>
                         </label>
                         <chef-error
                             *ngIf="(updateOrgForm.get('admin_key').hasError('required') || updateOrgForm.get('admin_key').hasError('pattern')) && updateOrgForm.get('admin_key').dirty">
@@ -78,22 +78,22 @@
             </section>
             <section class="page-body" *ngIf="tabValue === 'cookbooks'">
                 <ng-container>
-                    <chef-table-new>
-                        <chef-table-header>
-                            <chef-table-row>
-                                <chef-table-header-cell>Cookbook Name</chef-table-header-cell>
-                                <chef-table-header-cell>Cookbook Version</chef-table-header-cell>
-                            </chef-table-row>
-                        </chef-table-header>
-                        <chef-table-body>
-                            <chef-table-row *ngFor="let cookbook of cookbooks">
-                                <chef-table-cell>
+                    <chef-table>
+                        <chef-thead>
+                            <chef-tr>
+                                <chef-th>Cookbook Name</chef-th>
+                                <chef-th>Cookbook Version</chef-th>
+                            </chef-tr>
+                        </chef-thead>
+                        <chef-tbody>
+                            <chef-tr *ngFor="let cookbook of cookbooks">
+                                <chef-td>
                                     <a [routerLink]="['/infrastructure','chef-servers', serverId, 'org', org.id, 'cookbooks', cookbook.name]">{{ cookbook.name }}</a>
-                                </chef-table-cell>
-                                <chef-table-cell>{{ cookbook.version }}</chef-table-cell>
-                            </chef-table-row>
-                        </chef-table-body>
-                    </chef-table-new>
+                                </chef-td>
+                                <chef-td>{{ cookbook.version }}</chef-td>
+                            </chef-tr>
+                        </chef-tbody>
+                    </chef-table>
                 </ng-container>
             </section>
         </main>

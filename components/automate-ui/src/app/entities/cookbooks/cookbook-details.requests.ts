@@ -10,7 +10,7 @@ export class CookbookDetailsRequests {
 
   constructor(private http: HttpClient) { }
 
-  public getCookbookDetailsForVersion(
+  public getCookbookDetails(
     server_id: string, org_id: string, cookbook_name: string, cookbook_version: string):
     Observable<CookbookDetails> {
     return this.http.get<CookbookDetails>(

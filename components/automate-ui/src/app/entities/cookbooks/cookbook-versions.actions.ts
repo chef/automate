@@ -1,12 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
-import { CookbookVersions } from './cookbookversions.model';
+import { CookbookVersions } from './cookbook-versions.model';
 
 export enum CookbookVersionsActionTypes {
-  GET = 'COOKBOOKVERSIONS::GET',
-  GET_SUCCESS = 'COOKBOOKVERSIONS::GET::SUCCESS',
-  GET_FAILURE = 'COOKBOOKVERSIONS::GET_ALL::FAILURE'
+  GET = 'COOKBOOK_VERSIONS::GET',
+  GET_SUCCESS = 'COOKBOOK_VERSIONS::GET::SUCCESS',
+  GET_FAILURE = 'COOKBOOK_VERSIONS::GET_ALL::FAILURE'
 }
 
 export class GetCookbookVersions implements Action {
