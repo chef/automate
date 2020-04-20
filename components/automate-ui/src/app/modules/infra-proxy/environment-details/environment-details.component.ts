@@ -38,7 +38,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   public hasCookbookConstraints = false;
   private isDestroyed = new Subject<boolean>();
   environmentDetailsLoading = true;
-  
+
   public attributes = new EnvironmentAttributes({
     default_attributes: '',
     override_attributes: ''

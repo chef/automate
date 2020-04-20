@@ -65,7 +65,7 @@ export interface NgrxStateAtom {
   infraRoles: infraRoleEntity.InfraRoleEntityState;
   environments: environmentEntity.EnvironmentEntityState;
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
-  environmentDetails: environmentDetailsEntity.EnvironmentDetailsEntityState; 
+  environmentDetails: environmentDetailsEntity.EnvironmentDetailsEntityState;
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
