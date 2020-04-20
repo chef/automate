@@ -1,6 +1,6 @@
-package authz_v2.introspection
+package authz.introspection
 
-import data.authz_v2 as authz
+import data.authz as authz
 import data.common
 import data.policies
 import data.roles

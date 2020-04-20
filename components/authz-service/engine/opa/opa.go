@@ -23,23 +23,19 @@ import (
 
 // State wraps the state of OPA we need to track
 type State struct {
-	log                    logger.Logger
-	store                  storage.Store
-	v2p1Store              storage.Store
-	queries                map[string]ast.Body
-	compiler               *ast.Compiler
-	modules                map[string]*ast.Module
-	partialAuth            rego.PartialResult
-	v2PreparedEvalProjects rego.PreparedEvalQuery
+	log                  logger.Logger
+	store                storage.Store
+	queries              map[string]ast.Body
+	compiler             *ast.Compiler
+	modules              map[string]*ast.Module
+	preparedEvalProjects rego.PreparedEvalQuery
 }
 
 // this needs to match the hardcoded OPA policy document we've put in place
 const (
-	authzQuery              = "data.authz.authorized"
-	filteredPairsQuery      = "data.authz.introspection.authorized_pair[_]"
-	authzProjectsV2Query    = "data.authz_v2.authorized_project[project]"
-	filteredPairsV2Query    = "data.authz_v2.introspection.authorized_pair[_]"
-	filteredProjectsV2Query = "data.authz_v2.introspection.authorized_project"
+	authzProjectsQuery    = "data.authz.authorized_project[project]"
+	filteredPairsQuery    = "data.authz.introspection.authorized_pair[_]"
+	filteredProjectsQuery = "data.authz.introspection.authorized_project"
 )
 
 // OptFunc is the type of functional options to be passed to New()
@@ -48,36 +44,25 @@ type OptFunc func(*State)
 // New initializes a fresh OPA state, using the default, hardcoded OPA policy
 // from policy/authz*.rego unless overridden via an opa.OptFunc.
 func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) {
-	authzQueryParsed, err := ast.ParseBody(authzQuery)
+	authzProjectsQueryParsed, err := ast.ParseBody(authzProjectsQuery)
 	if err != nil {
-		return nil, errors.Wrapf(err, "parse query %q", authzQuery)
+		return nil, errors.Wrapf(err, "parse query %q", authzProjectsQuery)
 	}
 	filteredPairsQueryParsed, err := ast.ParseBody(filteredPairsQuery)
 	if err != nil {
 		return nil, errors.Wrapf(err, "parse query %q", filteredPairsQuery)
 	}
-	authzProjectsV2QueryParsed, err := ast.ParseBody(authzProjectsV2Query)
+	filteredProjectsQueryParsed, err := ast.ParseBody(filteredProjectsQuery)
 	if err != nil {
-		return nil, errors.Wrapf(err, "parse query %q", authzProjectsV2Query)
-	}
-	filteredPairsV2QueryParsed, err := ast.ParseBody(filteredPairsV2Query)
-	if err != nil {
-		return nil, errors.Wrapf(err, "parse query %q", filteredPairsV2Query)
-	}
-	filteredProjectsV2QueryParsed, err := ast.ParseBody(filteredProjectsV2Query)
-	if err != nil {
-		return nil, errors.Wrapf(err, "parse query %q", filteredProjectsV2Query)
+		return nil, errors.Wrapf(err, "parse query %q", filteredProjectsQuery)
 	}
 	s := State{
-		log:       l,
-		store:     inmem.New(),
-		v2p1Store: inmem.New(),
+		log:   l,
+		store: inmem.New(),
 		queries: map[string]ast.Body{
-			authzQuery:              authzQueryParsed,
-			filteredPairsQuery:      filteredPairsQueryParsed,
-			authzProjectsV2Query:    authzProjectsV2QueryParsed,
-			filteredPairsV2Query:    filteredPairsV2QueryParsed,
-			filteredProjectsV2Query: filteredProjectsV2QueryParsed,
+			authzProjectsQuery:    authzProjectsQueryParsed,
+			filteredPairsQuery:    filteredPairsQueryParsed,
+			filteredProjectsQuery: filteredProjectsQueryParsed,
 		},
 	}
 	for _, opt := range opts {
@@ -135,11 +120,11 @@ func (s *State) makeAuthorizedProjectPreparedQuery(ctx context.Context) error {
 	}
 
 	r := rego.New(
-		rego.Store(s.v2p1Store),
+		rego.Store(s.store),
 		rego.Compiler(compiler),
-		rego.ParsedQuery(s.queries[authzProjectsV2Query]),
+		rego.ParsedQuery(s.queries[authzProjectsQuery]),
 		rego.DisableInlining([]string{
-			"data.authz_v2.denied_project",
+			"data.authz.denied_project",
 		}),
 	)
 
@@ -185,7 +170,7 @@ func (s *State) makeAuthorizedProjectPreparedQuery(ctx context.Context) error {
 	}
 
 	r2 := rego.New(
-		rego.Store(s.v2p1Store),
+		rego.Store(s.store),
 		rego.Compiler(compiler),
 		rego.Query("data.__partialauthzv2.authorized_project[project]"),
 	)
@@ -195,7 +180,7 @@ func (s *State) makeAuthorizedProjectPreparedQuery(ctx context.Context) error {
 		return errors.Wrap(err, "prepare query for eval (authorized_project)")
 	}
 
-	s.v2PreparedEvalProjects = query
+	s.preparedEvalProjects = query
 
 	return nil
 }
@@ -216,10 +201,6 @@ func (s *State) newCompiler() (*ast.Compiler, error) {
 // contents.
 func (s *State) DumpData(ctx context.Context) error {
 	return dumpData(ctx, s.store, s.log)
-}
-
-func (s *State) DumpDataV2p1(ctx context.Context) error {
-	return dumpData(ctx, s.v2p1Store, s.log)
 }
 
 func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
@@ -265,7 +246,7 @@ func (s *State) ProjectsAuthorized(
 		[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
 		[2]*ast.Term{ast.NewTerm(ast.String("projects")), ast.NewTerm(projs)},
 	)
-	resultSet, err := s.v2PreparedEvalProjects.Eval(ctx, rego.EvalParsedInput(input))
+	resultSet, err := s.preparedEvalProjects.Eval(ctx, rego.EvalParsedInput(input))
 	if err != nil {
 		return []string{}, &EvaluationError{e: err}
 	}
@@ -286,7 +267,7 @@ func (s *State) FilterAuthorizedPairs(
 		"pairs":    pairs,
 	}
 
-	rs, err := s.evalQuery(ctx, s.queries[filteredPairsV2Query], opaInput, s.v2p1Store)
+	rs, err := s.evalQuery(ctx, s.queries[filteredPairsQuery], opaInput, s.store)
 	if err != nil {
 		return nil, &EvaluationError{e: err}
 	}
@@ -304,8 +285,7 @@ func (s *State) FilterAuthorizedProjects(
 		"subjects": subjects,
 	}
 
-	// NB: V2.1 only, so s.v2p1Store used here
-	rs, err := s.evalQuery(ctx, s.queries[filteredProjectsV2Query], opaInput, s.v2p1Store)
+	rs, err := s.evalQuery(ctx, s.queries[filteredProjectsQuery], opaInput, s.store)
 	if err != nil {
 		return nil, &EvaluationError{e: err}
 	}
@@ -415,11 +395,11 @@ func (s *State) projectsFromPreparedEvalQuery(rs rego.ResultSet) ([]string, erro
 }
 
 // SetPolicies replaces OPA's data with a new set of policies and roles
-// and resets the partial evaluation cache for v2.1
+// and resets the partial evaluation cache
 func (s *State) SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}) error {
-	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+	s.store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policyMap,
 		"roles":    roleMap,
 	})

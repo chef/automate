@@ -30,18 +30,18 @@ NB: Assumes running from this directory; just adjust all paths if you want to st
 Note that the input still uses subjects as the field instead of members.
 
 ```opa
-$ opa run -w authz_v2.rego common.rego policies:../example_v2/policies.json
+$ opa run -w authz.rego common.rego policies:../example_v2/policies.json
 OPA 0.9.2 (commit 9fbff4c3, built at 2018-09-24T16:12:26Z)
 
-> data.authz_v2.authorized
+> data.authz.authorized
 false
 # This matches against an action/resource from a statement in a policy.
-> data.authz_v2.authorized with input as { "subjects": [ "team:local:admins" ], "action": "iam:teams:create", "resource": "iam:teams" }
+> data.authz.authorized with input as { "subjects": [ "team:local:admins" ], "action": "iam:teams:create", "resource": "iam:teams" }
 true
-> data.authz_v2.authorized with input as { "subjects": [ "team:local:admins" ], "action": "iam:teams:create", "resource": "iam:users" }
+> data.authz.authorized with input as { "subjects": [ "team:local:admins" ], "action": "iam:teams:create", "resource": "iam:users" }
 false
 # This matches against an action/resource from a statement in a policy.
-> data.authz_v2.authorized with input as { "subjects": [ "team:local:admins" ], "action": "infra:nodes:delete", "resource": "infra:nodes" }
+> data.authz.authorized with input as { "subjects": [ "team:local:admins" ], "action": "infra:nodes:delete", "resource": "infra:nodes" }
 true
 >
 ```
@@ -57,7 +57,7 @@ $ opa test authz.rego common.rego authz_test.rego
 From the current directory, run V2 unit tests with:
 
 ```console
-$ opa test authz_v2.rego common.rego authz_v2_test.rego
+$ opa test authz.rego common.rego authz_v2_test.rego
 ```
 
 That will print just names of failing tests
@@ -65,7 +65,7 @@ along with a summary of pass/fail results.
 To explicitly show all tests, even if they pass, just add the verbose flag, e.g.:
 
 ```console
-$ opa test -v authz_v2.rego common.rego authz_v2_test.rego
+$ opa test -v authz.rego common.rego authz_v2_test.rego
 ```
 
 ## Using the VSCode Plugin
@@ -86,13 +86,13 @@ First follow the suggested setup on the plugin details page; the following notes
 
 - copy the example dir here: `cp -r ../example_v2 policies`
 - copy one of the input files from that new dir here: `cp policies/input_from_inline.json input.json`
-- open `authz_v2.rego` in VSCode
+- open `authz.rego` in VSCode
 
 (Using `input_from_statement.json` is done in a similar fashion.)
 
-With your cursor in the authz_v2.rego file run `OPA: Evaluate package` to see everything evaluated.
+With your cursor in the authz.rego file run `OPA: Evaluate package` to see everything evaluated.
 A successful setup will yield something like this, showing everything in the `authz_v2` package
-evaluated (which means authz_v2.rego **and** authz_v2_test.rego).
+evaluated (which means authz.rego **and** authz_v2_test.rego).
 
 ```json
 // Evaluated package in 8.229989ms.
@@ -133,7 +133,7 @@ evaluated (which means authz_v2.rego **and** authz_v2_test.rego).
 }
 ```
 
-With just a particular rule name selected in authz_v2.rego (e.g. `allow` or `authorized`)
+With just a particular rule name selected in authz.rego (e.g. `allow` or `authorized`)
 run `OPA: Evaluate selection` to see just that rule evaluated, e.g.:
 
 ```json
