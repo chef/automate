@@ -7,7 +7,7 @@ export const {
   selectEntities: environmentEntities
 } = environmentEntityAdapter.getSelectors(environmentState);
 
-export const infraEnvironmentStatus = createSelector(
+export const environmentStatus = createSelector(
   environmentState,
   (state) => state.environmentsStatus
 );
