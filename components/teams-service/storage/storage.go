@@ -50,15 +50,15 @@ var (
 	// is not allowed to be deleted such as the "admins" team.
 	ErrCannotDelete = errors.New("cannot delete")
 
-	// If this name changes, we need a migration to change the name, see 02_add-deletable-column.up.sql.
-	AdminsTeamName = "admins"
+	// If this id changes, we need a migration to change the id, see 02_add-deletable-column.up.sql.
+	AdminsTeamID = "admins"
 
 	// NonDeletableTeams contains all the teams that are not allowed to be deleted.
-	// If this name changes, we need a migration to add the new team, see 02_add-deletable-column.up.sql.
-	NonDeletableTeams = []string{AdminsTeamName}
+	// If this id changes, we need a migration to add the new team, see 02_add-deletable-column.up.sql.
+	NonDeletableTeams = []string{AdminsTeamID}
 )
 
-// IsTeamDeletable returns whether or not an input team is deletable by name.
-func IsTeamDeletable(teamName string) bool {
-	return !stringutils.SliceContains(NonDeletableTeams, teamName)
+// IsTeamDeletable returns whether or not an input team is deletable by id.
+func IsTeamDeletable(teamID string) bool {
+	return !stringutils.SliceContains(NonDeletableTeams, teamID)
 }

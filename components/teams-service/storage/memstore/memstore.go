@@ -228,7 +228,7 @@ func (m *memstore) teamIncludesUser(teamID string, userID string) bool {
 }
 
 func (m *memstore) EnsureAdminsTeam(ctx context.Context) error {
-	if _, err := m.StoreTeam(ctx, storage.AdminsTeamName, "admins", []string{}); err != nil {
+	if _, err := m.StoreTeam(ctx, storage.AdminsTeamID, "admins", []string{}); err != nil {
 		if err != storage.ErrConflict {
 			return err
 		}

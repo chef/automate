@@ -99,12 +99,12 @@ func runAllServerTests(
 		t.Run("when querying for the admins team", func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := cl.GetTeam(ctx, &teams.GetTeamReq{
-				Id: storage.AdminsTeamName,
+				Id: storage.AdminsTeamID,
 			})
 
 			require.NoError(t, err)
 			require.NotNil(t, resp)
-			assert.Equal(t, storage.AdminsTeamName, resp.Team.Id)
+			assert.Equal(t, storage.AdminsTeamID, resp.Team.Id)
 			assert.Equal(t, "admins",
 				resp.Team.Name)
 		})
@@ -576,7 +576,7 @@ func runAllServerTests(
 
 		t.Run("when attempting to delete a team that is not allowed to be deleted", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := cl.DeleteTeam(ctx, &teams.DeleteTeamReq{Id: storage.AdminsTeamName})
+			resp, err := cl.DeleteTeam(ctx, &teams.DeleteTeamReq{Id: storage.AdminsTeamID})
 
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
@@ -615,7 +615,7 @@ func runAllServerTests(
 
 			require.Equal(t, 2, len(teamsList.Teams))
 			var updatedTeam *teams.Team
-			if teamsList.Teams[0].Id != storage.AdminsTeamName {
+			if teamsList.Teams[0].Id != storage.AdminsTeamID {
 				updatedTeam = teamsList.Teams[0]
 			} else {
 				updatedTeam = teamsList.Teams[1]
@@ -654,7 +654,7 @@ func runAllServerTests(
 
 			require.Equal(t, 2, len(teamsList.Teams))
 			var updatedTeam *teams.Team
-			if teamsList.Teams[0].Id != storage.AdminsTeamName {
+			if teamsList.Teams[0].Id != storage.AdminsTeamID {
 				updatedTeam = teamsList.Teams[0]
 			} else {
 				updatedTeam = teamsList.Teams[1]
@@ -693,7 +693,7 @@ func runAllServerTests(
 
 			require.Equal(t, 2, len(teamsList.Teams))
 			var updatedTeam *teams.Team
-			if teamsList.Teams[0].Id != storage.AdminsTeamName {
+			if teamsList.Teams[0].Id != storage.AdminsTeamID {
 				updatedTeam = teamsList.Teams[0]
 			} else {
 				updatedTeam = teamsList.Teams[1]
@@ -732,7 +732,7 @@ func runAllServerTests(
 
 			require.Equal(t, 2, len(teamsList.Teams))
 			var updatedTeam *teams.Team
-			if teamsList.Teams[0].Id != storage.AdminsTeamName {
+			if teamsList.Teams[0].Id != storage.AdminsTeamID {
 				updatedTeam = teamsList.Teams[0]
 			} else {
 				updatedTeam = teamsList.Teams[1]
@@ -1812,7 +1812,7 @@ func runAllServerTests(
 				userToPurge:            "f2f5300c-48dc-4633-8ac8-2bcf814e7b8a",
 				initialTeamsAndMembers: map[string][]string{},
 				expectedTeamsAndMembers: map[string][]string{
-					storage.AdminsTeamName: {},
+					storage.AdminsTeamID: {},
 				},
 				expectedUpdatedTeamIDs: map[string]bool{},
 			},
@@ -1832,7 +1832,7 @@ func runAllServerTests(
 					},
 				},
 				expectedTeamsAndMembers: map[string][]string{
-					storage.AdminsTeamName: {},
+					storage.AdminsTeamID: {},
 					"team1": {
 						"2041bad8-8ae4-418b-9e66-6af87838ab97",
 						"2041bad9-8ae4-418b-9e66-6af87838ab97",
@@ -1856,7 +1856,7 @@ func runAllServerTests(
 					},
 				},
 				expectedTeamsAndMembers: map[string][]string{
-					storage.AdminsTeamName: {},
+					storage.AdminsTeamID: {},
 					"team1": {
 						"2041bad7-8ae4-418b-9e66-6af87838ab97",
 						"2041bad9-8ae4-418b-9e66-6af87838ab97",
@@ -1881,7 +1881,7 @@ func runAllServerTests(
 					},
 				},
 				expectedTeamsAndMembers: map[string][]string{
-					storage.AdminsTeamName: {},
+					storage.AdminsTeamID: {},
 					"team1": {
 						"2041bad7-8ae4-418b-9e66-6af87838ab97",
 						"2041bad8-8ae4-418b-9e66-6af87838ab97",
@@ -1910,7 +1910,7 @@ func runAllServerTests(
 					},
 				},
 				expectedTeamsAndMembers: map[string][]string{
-					storage.AdminsTeamName: {},
+					storage.AdminsTeamID: {},
 					"team1": {
 						"f6d4e661-15a7-4514-b1a4-60a00becde58",
 						"f6d4e662-15a7-4514-b1a4-60a00becde58",
