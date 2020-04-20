@@ -16,7 +16,7 @@ document "infra_service_load_sample_data" <<DOC
   Hits the create server & org endpoint inside the infra-proxy-service. (CreateServer & CreateOrg)
 
   1. -N No of records Default: 50
-  2. -S Chef infra server name's prefix Default: chef-server
+  2. -S Chef Infra Server name's prefix Default: chef-server
   3. -O Chef organization's name prefix Default: chef-org
 
   Example:
@@ -51,7 +51,7 @@ function infra_service_load_sample_data() {
   
   log_line "Started Loading sample data..."
   log_line "Total number of records: $records"
-  log_line "Chef infra server's name prefix: $server_prefix"
+  log_line "Chef Infra Server's name prefix: $server_prefix"
   log_line "Chef organization's name prefix: $org_prefix"
 
   local ip_address
