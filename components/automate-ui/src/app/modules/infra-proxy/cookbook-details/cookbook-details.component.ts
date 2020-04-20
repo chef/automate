@@ -9,8 +9,8 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { routeURL, routeParams } from 'app/route.selectors';
 import { filter, takeUntil, pluck } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
-import { CookbookVersions } from 'app/entities/cookbooks/cookbookversions.model';
-import { allCookbookVersions, getStatus } from 'app/entities/cookbooks/cookbookversions.selectors';
+import { CookbookVersions } from 'app/entities/cookbooks/cookbook-versions.model';
+import { allCookbookVersions, getStatus } from 'app/entities/cookbooks/cookbook-versions.selectors';
 import { GetCookbookVersions } from 'app/entities/cookbooks/cookbook-versions.actions';
 import { CookbookDetails, RootFiles } from 'app/entities/cookbooks/cookbook-details.model';
 import {
