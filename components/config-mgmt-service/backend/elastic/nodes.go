@@ -273,80 +273,14 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 }
 
 // GetNodesCounts - get the number of successful, failure, and missing nodes
-// {
-// 	"aggregations":{
-// 		 "platform":{
-// 				"aggregations":{
-// 					 "outer":{
-// 							"filter":{
-// 								 "bool":{
-// 										"filter":{
-// 											 "bool":{
-// 													"should":{
-// 														 "terms":{
-// 																"exists":[
-// 																	 "true"
-// 																]
-// 														 }
-// 													}
-// 											 }
-// 										},
-// 										"must":{
-// 											 "range":{
-// 													"checkin":{
-// 														 "format":"yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ",
-// 														 "from":"2020-04-10T22:05:36Z",
-// 														 "include_lower":true,
-// 														 "include_upper":true,
-// 														 "to":"2020-04-14T22:05:36Z"
-// 													}
-// 											 }
-// 										}
-// 								 }
-// 							}
-// 					 }
-// 				},
-// 				"terms":{
-// 					 "field":"platform"
-// 				}
-// 		 }
-// 	}
-// }
 func (es Backend) GetNodesFieldValueCounts(filters map[string][]string,
-	searchTerms []string, startDate, endDate string) ([]backend.FieldCount, error) {
+	fields []string, startDate, endDate string) ([]backend.FieldCount, error) {
 	var aggregationTerm = "inner_filter"
 
-	searchSource := elastic.NewSearchSource()
-	for _, searchTerm := range searchTerms {
-		localFilters := map[string][]string{}
-		for index, element := range filters {
-			localFilters[index] = element
-		}
-
-		localFilters[backend.ExistsTag] = []string{"true"}
-
-		delete(localFilters, params.ConvertParamToNodeStateBackendLowerFilter(searchTerm))
-
-		log.Infof("filter %v", localFilters)
-
-		mainQuery := newBoolQueryFromFilters(localFilters)
-
-		rangeQuery, ok := newRangeQuery(startDate, endDate, NodeCheckin)
-
-		if ok {
-			mainQuery = mainQuery.Must(rangeQuery)
-		}
-
-		agg := elastic.NewTermsAggregation().
-			Field(searchTerm).
-			SubAggregation(aggregationTerm,
-				elastic.NewFilterAggregation().Filter(mainQuery))
-
-		searchSource.Aggregation(searchTerm, agg)
-	}
+	searchSource := createSearchTermAggs(filters, fields, startDate, endDate, aggregationTerm)
 
 	source, _ := searchSource.Source()
-	LogQueryPartMin(IndexNodeState, source, "bob")
+	LogQueryPartMin(IndexNodeState, source, "GetNodesFieldValueCounts request")
 
 	searchResult, err := es.client.Search().
 		SearchSource(searchSource).
@@ -356,20 +290,20 @@ func (es Backend) GetNodesFieldValueCounts(filters map[string][]string,
 		return []backend.FieldCount{}, err
 	}
 
-	LogQueryPartMin(IndexNodeState, searchResult.Aggregations, "searchResult aggs")
+	LogQueryPartMin(IndexNodeState, searchResult.Aggregations, "GetNodesFieldValueCounts response")
 
-	// no nodes found
+	// no matching nodes found
 	if searchResult.TotalHits() == 0 {
-		fieldCountCollection := make([]backend.FieldCount, len(searchTerms))
-		for index, searchTerm := range searchTerms {
+		fieldCountCollection := make([]backend.FieldCount, len(fields))
+		for index, searchTerm := range fields {
 			fieldCountCollection[index].Terms = []backend.TermCount{}
 			fieldCountCollection[index].Field = searchTerm
 		}
 		return fieldCountCollection, nil
 	}
 
-	fieldCountCollection := make([]backend.FieldCount, len(searchTerms))
-	for index, searchTerm := range searchTerms {
+	fieldCountCollection := make([]backend.FieldCount, len(fields))
+	for index, searchTerm := range fields {
 		outerAgg, found := searchResult.Aggregations.Terms(searchTerm)
 		if !found {
 			return nil, errors.NewBackendError("Aggregation term %q not found", searchTerm)
@@ -395,21 +329,6 @@ func (es Backend) GetNodesFieldValueCounts(filters map[string][]string,
 	}
 
 	return fieldCountCollection, nil
-}
-
-func LogQueryPartMin(indices string, partToPrint interface{}, name string) {
-	part, err := json.Marshal(partToPrint)
-	if err != nil {
-		log.Errorf("%s", err)
-	}
-	stringPart := string(part)
-	if stringPart == "null" {
-		stringPart = ""
-	} else {
-		stringPart = "\n" + stringPart
-	}
-	log.Infof("\n------------------ %s-(start)--[%s]---------------%s \n------------------ %s-(end)-----------------------------------\n",
-		name, indices, stringPart, name)
 }
 
 // GetAttribute Get request for the attribute using the Doc ID
@@ -632,4 +551,119 @@ func findMatchingDurationCount(key string,
 		}
 	}
 	return 0
+}
+
+// For each field create an aggregation that counts the number of each distinct value. Apply the
+// filters on each field aggregation separately to allow the removal of the filter for the field being counted.
+// {
+// 	"aggregations":{
+// 		 "platform":{
+// 				"aggregations":{
+// 					 "inner_filter":{
+// 							"filter":{
+// 								 "bool":{
+// 										"filter":[
+// 											 {
+// 													"bool":{
+// 														 "should":{
+// 																"terms":{
+// 																	 "status":[
+// 																			"failure"
+// 																	 ]
+// 																}
+// 														 }
+// 													}
+// 											 },
+// 											 {
+// 													"bool":{
+// 														 "should":{
+// 																"terms":{
+// 																	 "exists":[
+// 																			"true"
+// 																	 ]
+// 																}
+// 														 }
+// 													}
+// 											 }
+// 										]
+// 								 }
+// 							}
+// 					 }
+// 				},
+// 				"terms":{
+// 					 "field":"platform"
+// 				}
+// 		 },
+// 		 "status":{
+// 				"aggregations":{
+// 					 "inner_filter":{
+// 							"filter":{
+// 								 "bool":{
+// 										"filter":[
+// 											 {
+// 													"bool":{
+// 														 "should":{
+// 																"terms":{
+// 																	 "platform.lower":[
+// 																			"windows"
+// 																	 ]
+// 																}
+// 														 }
+// 													}
+// 											 },
+// 											 {
+// 													"bool":{
+// 														 "should":{
+// 																"terms":{
+// 																	 "exists":[
+// 																			"true"
+// 																	 ]
+// 																}
+// 														 }
+// 													}
+// 											 }
+// 										]
+// 								 }
+// 							}
+// 					 }
+// 				},
+// 				"terms":{
+// 					 "field":"status"
+// 				}
+// 		 }
+// 	}
+// }
+func createSearchTermAggs(filters map[string][]string,
+	fields []string, startDate, endDate string, aggregationTerm string) *elastic.SearchSource {
+	searchSource := elastic.NewSearchSource()
+	for _, searchTerm := range fields {
+		// Copy the filters
+		localFilters := map[string][]string{}
+		for index, element := range filters {
+			localFilters[index] = element
+		}
+
+		// We only want to count nodes that are not deleted
+		localFilters[backend.ExistsTag] = []string{"true"}
+
+		// remove the filter for the current search term
+		delete(localFilters, params.ConvertParamToNodeStateBackendLowerFilter(searchTerm))
+
+		mainQuery := newBoolQueryFromFilters(localFilters)
+
+		rangeQuery, ok := newRangeQuery(startDate, endDate, NodeCheckin)
+
+		if ok {
+			mainQuery = mainQuery.Must(rangeQuery)
+		}
+
+		agg := elastic.NewTermsAggregation().
+			Field(searchTerm).
+			SubAggregation(aggregationTerm,
+				elastic.NewFilterAggregation().Filter(mainQuery))
+
+		searchSource = searchSource.Aggregation(searchTerm, agg)
+	}
+
+	return searchSource
 }
