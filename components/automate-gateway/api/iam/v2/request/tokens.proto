@@ -57,4 +57,3 @@ message DeleteTokenReq {
 
 message ListTokensReq {}
 
-message ResetAllTokenProjectsReq {}

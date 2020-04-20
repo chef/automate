@@ -176,13 +176,4 @@ service Tokens {
       tags: "tokens"
     };
   }
-  // Expose on GRPC API only so we don't expose this to the enduser.
-  // Just want to be able to trigger this via automate-cli.
-  rpc ResetAllTokenProjects (ResetAllTokenProjectsReq) returns (ResetAllTokenProjectsResp) {
-    option (chef.automate.api.iam.policy).resource = "iam:tokens";
-    option (chef.automate.api.iam.policy).action = "iam:tokens:update";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-      tags: "hidden";
-    };
-  }
 };
