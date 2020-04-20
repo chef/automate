@@ -117,7 +117,7 @@ message NodeUsage {
 }
 
 message GenerateAdminTokenRequest {
-	string description = 1;
+	string name = 1;
 }
 
 message GenerateAdminTokenResponse {

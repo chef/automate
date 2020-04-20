@@ -99,8 +99,8 @@ describe('DatafeedComponent', () => {
     });
 
     it('shows expected item count', () => {
-      const tableBody = getElementByCss(`${listId}`);
-      expect(tableBody.children.length).toBe(destinations.length + 1);
+      const tableBody = getElementByCss(`${listId} chef-tbody`);
+      expect(tableBody.children.length).toBe(destinations.length);
     });
 
   });

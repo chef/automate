@@ -289,12 +289,12 @@ function configureWith(perms: IndexedEntities<UserPermEntity>): void {
       MockComponent({ selector: 'chef-loading-spinner' }),
       MockComponent({ selector: 'chef-page-header' }),
       MockComponent({ selector: 'chef-subheading' }),
-      MockComponent({ selector: 'chef-table-new' }),
-      MockComponent({ selector: 'chef-table-header' }),
-      MockComponent({ selector: 'chef-table-body' }),
-      MockComponent({ selector: 'chef-table-row' }),
-      MockComponent({ selector: 'chef-table-header-cell' }),
-      MockComponent({ selector: 'chef-table-cell' }),
+      MockComponent({ selector: 'chef-table' }),
+      MockComponent({ selector: 'chef-thead' }),
+      MockComponent({ selector: 'chef-tbody' }),
+      MockComponent({ selector: 'chef-tr' }),
+      MockComponent({ selector: 'chef-th' }),
+      MockComponent({ selector: 'chef-td' }),
       PendingEditsBarComponent
     ],
     imports: [

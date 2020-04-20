@@ -36,12 +36,16 @@ echo-build-data:
 ${BIN_DIR}:
 	mkdir -p ${BIN_DIR}
 
-docs: ${BINS} ${GOOS}
+docs: clean ${BINS} ${GOOS}
 	mkdir -p ${DOCS_PATH}
-	bin/${GOOS}/chef-automate dev generate-docs --docs-dir ${DOCS_PATH} --format yaml
+	# In the dev studio, CHEF_DEV_ENVIRONMENT is set to true. This has
+	# the effect that further dev-only commands appear in the output of
+	# chef-automate --help etc. Since it unhides commands, that'll also
+	# have an effect on the documentation data generated.
+	CHEF_DEV_ENVIRONMENT=false bin/${GOOS}/chef-automate dev generate-docs --docs-dir ${DOCS_PATH} --format yaml
 
 clean:
-	rm -rf bin/*
+	rm -rf bin/* "${DOCS_PATH}"
 
 EXE = chef-automate
 linux: EXTRA_OPTS = CGO_ENABLED=0

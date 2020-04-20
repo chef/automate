@@ -24,7 +24,7 @@ func (a *InfraProxyServer) GetDataBags(ctx context.Context, r *gwreq.DataBags) (
 	}, nil
 }
 
-// GetDataBagItem fetch a infra data bag
+// GetDataBagItem fetches an infra data bag item details
 func (a *InfraProxyServer) GetDataBagItem(ctx context.Context, r *gwreq.DataBag) (*gwres.DataBag, error) {
 	req := &infra_req.DataBag{
 		OrgId: r.OrgId,

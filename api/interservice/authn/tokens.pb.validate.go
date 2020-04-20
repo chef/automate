@@ -44,11 +44,11 @@ func (m *CreateTokenReq) Validate() error {
 	if !_CreateTokenReq_Id_Pattern.MatchString(m.GetId()) {
 		return CreateTokenReqValidationError{
 			field:  "Id",
-			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$|^$\"",
+			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 		}
 	}
 
-	// no validation rules for Description
+	// no validation rules for Name
 
 	// no validation rules for Active
 
@@ -132,7 +132,7 @@ var _ interface {
 	ErrorName() string
 } = CreateTokenReqValidationError{}
 
-var _CreateTokenReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$|^$")
+var _CreateTokenReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 var _CreateTokenReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
@@ -146,7 +146,7 @@ func (m *CreateTokenWithValueReq) Validate() error {
 
 	// no validation rules for Id
 
-	// no validation rules for Description
+	// no validation rules for Name
 
 	// no validation rules for Active
 
@@ -248,7 +248,7 @@ func (m *UpdateTokenReq) Validate() error {
 
 	// no validation rules for Active
 
-	// no validation rules for Description
+	// no validation rules for Name
 
 	_UpdateTokenReq_Projects_Unique := make(map[string]struct{}, len(m.GetProjects()))
 
@@ -341,7 +341,7 @@ func (m *Token) Validate() error {
 
 	// no validation rules for Id
 
-	// no validation rules for Description
+	// no validation rules for Name
 
 	// no validation rules for Value
 

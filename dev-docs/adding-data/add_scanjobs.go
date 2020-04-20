@@ -129,7 +129,9 @@ func main() {
 
 	ec2NodeID, err := gatewayNodesClient.Create(suite.ctx, &gwnodes.Node{
 		Name: targets.Host,
-		Tags: []*query.Kv{},
+		Tags: []*query.Kv{
+			{Key: "environment", Value: "test-env"},
+		},
 		TargetConfig: &gwnodes.TargetConfig{
 			Backend: "ssh",
 			Host:    targets.Host,
@@ -139,7 +141,9 @@ func main() {
 	})
 	ec2NodeID2, err := gatewayNodesClient.Create(suite.ctx, &gwnodes.Node{
 		Name: "inspec-target-rhel7-acceptance.cd.chef.co",
-		Tags: []*query.Kv{},
+		Tags: []*query.Kv{
+			{Key: "environment", Value: "test-env"},
+		},
 		TargetConfig: &gwnodes.TargetConfig{
 			Backend: "ssh",
 			Host:    "inspec-target-rhel7-acceptance.cd.chef.co",
@@ -149,7 +153,9 @@ func main() {
 	})
 	vagrantNodeID, err := gatewayNodesClient.Create(suite.ctx, &gwnodes.Node{
 		Name: "vagrant node - localhost",
-		Tags: []*query.Kv{},
+		Tags: []*query.Kv{
+			{Key: "environment", Value: "test-env-local"},
+		},
 		TargetConfig: &gwnodes.TargetConfig{
 			Backend: "ssh",
 			Host:    "localhost",

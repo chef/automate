@@ -632,21 +632,21 @@
         "parameters": [
           {
             "name": "server_id",
-            "description": "Id of the Server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "Id of the Org.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "description": "Name of the data bag.",
+            "description": "Data bag name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -671,28 +671,28 @@
         "parameters": [
           {
             "name": "server_id",
-            "description": "Id of the Server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "Id of the Org.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "description": "Name of the data bag.",
+            "description": "Data bag name.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "item",
-            "description": "Name of the data bag item.",
+            "description": "Data bag item name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -717,14 +717,14 @@
         "parameters": [
           {
             "name": "server_id",
-            "description": "Id of the Server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "Id of the Org.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -749,21 +749,21 @@
         "parameters": [
           {
             "name": "server_id",
-            "description": "Id of the Server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "Id of the Org.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "description": "Name of the environment.",
+            "description": "Environment name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1258,7 +1258,7 @@
       "properties": {
         "data": {
           "type": "string",
-          "description": "Stringified json of the data bag item."
+          "description": "Stringified json of data bag item."
         }
       }
     },
@@ -1267,7 +1267,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the data bag item."
+          "description": "Data bag item name."
         }
       }
     },
@@ -1279,7 +1279,7 @@
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBagListItem"
           },
-          "description": "List of data bags item."
+          "description": "Data bags item list."
         }
       }
     },
@@ -1304,26 +1304,26 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the Environment."
+          "description": "Environment name."
         },
         "chef_type": {
           "type": "string",
-          "description": "Type of the object."
+          "description": "Object type."
         },
         "description": {
           "type": "string",
-          "description": "Description of the node."
+          "description": "Node description."
         },
         "json_class": {
           "type": "string",
-          "description": "Name of the class."
+          "description": "Class name."
         },
         "cookbook_versions": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "title": "List of versioned cookbooks"
+          "description": "Versioned cookbooks list."
         },
         "default_attributes": {
           "type": "string",
@@ -1340,7 +1340,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the Environment."
+          "description": "Environment name."
         }
       }
     },
@@ -1352,7 +1352,7 @@
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.EnvironmentListItem"
           },
-          "description": "List of the EnvironmentListItem."
+          "description": "Environments list."
         }
       }
     },

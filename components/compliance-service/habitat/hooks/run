@@ -144,12 +144,7 @@ CONFIG="$CONFIG --es-sidecar-address {{member.sys.ip}}:{{member.cfg.port}}"
 
 # Elasticsearch
 {{~#eachAlive bind.automate-es-gateway.members as |member|}}
-{{~#if member.cfg.http-host }}
-addNoProxy {{member.sys.ip}}
-ES_BACKEND="--es-url http://{{member.sys.ip}}:{{member.cfg.http-port}}"
-{{else}}
 ES_BACKEND="--es-url http://127.0.0.1:{{member.cfg.http-port}}"
-{{/if ~}}
 {{~/eachAlive}}
 
 # Bind to cereal

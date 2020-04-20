@@ -34,7 +34,6 @@ pkg_deps=(
 )
 
 pkg_exports=(
-  [http-host]=service.host
   [http-port]=service.port
 )
 

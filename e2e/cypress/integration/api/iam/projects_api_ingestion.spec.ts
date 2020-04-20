@@ -8,7 +8,7 @@ const eventEnd = Cypress.moment().utc().endOf('day').valueOf().toString();
 const now = Cypress.moment().format('MMDDYYhhmm');
 
 describe('Ingestion project tagging', () => {
-  const cypressPrefix = 'test-ingestion-projects';
+  const cypressPrefix = 'ingest-projs';
   const complianceNodeId = uuidv4();
   const clientRunsNodeId = uuidv4();
   const reportId = uuidv4();
@@ -24,7 +24,7 @@ describe('Ingestion project tagging', () => {
   const projectsWithNodeRules: ProjectAndRule[] = [
     {
       project: {
-        id: `${cypressPrefix}-project-org-${now}`,
+        id: `${cypressPrefix}-proj-org-${now}`,
         name: 'project org',
         skip_policies: true
       },
@@ -32,7 +32,7 @@ describe('Ingestion project tagging', () => {
         id: 'rule-org',
         name: 'rule CHEF_ORGANIZATION',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-org-${now}`,
+        project_id: `${cypressPrefix}-proj-org-${now}`,
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -44,7 +44,7 @@ describe('Ingestion project tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-chef-server-${now}`,
+        id: `${cypressPrefix}-proj-chef-server-${now}`,
         name: 'project chef server',
         skip_policies: true
       },
@@ -52,7 +52,7 @@ describe('Ingestion project tagging', () => {
         id: 'rule-chef-server',
         name: 'rule CHEF_SERVER',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-chef-server-${now}`,
+        project_id: `${cypressPrefix}-proj-chef-server-${now}`,
         conditions: [
           {
             attribute: 'CHEF_SERVER',
@@ -64,7 +64,7 @@ describe('Ingestion project tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-environment-${now}`,
+        id: `${cypressPrefix}-proj-environment-${now}`,
         name: 'project environment',
         skip_policies: true
       },
@@ -72,7 +72,7 @@ describe('Ingestion project tagging', () => {
         id: 'rule-environment',
         name: 'rule ENVIRONMENT',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-environment-${now}`,
+        project_id: `${cypressPrefix}-proj-environment-${now}`,
         conditions: [
           {
             attribute: 'ENVIRONMENT',
@@ -84,7 +84,7 @@ describe('Ingestion project tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-policy-group-${now}`,
+        id: `${cypressPrefix}-proj-policy-group-${now}`,
         name: 'project policy group',
         skip_policies: true
       },
@@ -93,7 +93,7 @@ describe('Ingestion project tagging', () => {
         name: 'rule CHEF_POLICY_GROUP',
         type: 'NODE',
         project_id:
-        `${cypressPrefix}-project-policy-group-${now}`,
+        `${cypressPrefix}-proj-policy-group-${now}`,
         conditions: [
           {
             attribute: 'CHEF_POLICY_GROUP',
@@ -105,7 +105,7 @@ describe('Ingestion project tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-policy-name-${now}`,
+        id: `${cypressPrefix}-proj-policy-id-${now}`,
         name: 'project policy name',
         skip_policies: true
       },
@@ -113,7 +113,7 @@ describe('Ingestion project tagging', () => {
         id: 'rule-policy-name',
         name: 'rule CHEF_POLICY_NAME',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-policy-name-${now}`,
+        project_id: `${cypressPrefix}-proj-policy-id-${now}`,
         conditions: [
           {
             attribute: 'CHEF_POLICY_NAME',
@@ -125,7 +125,7 @@ describe('Ingestion project tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-role-${now}`,
+        id: `${cypressPrefix}-proj-role-${now}`,
         name: 'project role',
         skip_policies: true
       },
@@ -133,7 +133,7 @@ describe('Ingestion project tagging', () => {
         id: 'rule-role',
         name: 'rule CHEF_ROLE',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-role-${now}`,
+        project_id: `${cypressPrefix}-proj-role-${now}`,
         conditions: [
           {
             attribute: 'CHEF_ROLE',
@@ -145,7 +145,7 @@ describe('Ingestion project tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-tag-${now}`,
+        id: `${cypressPrefix}-proj-tag-${now}`,
         name: 'project tag',
         skip_policies: true
       },
@@ -153,7 +153,7 @@ describe('Ingestion project tagging', () => {
         id: 'rule-tag',
         name: 'rule CHEF_TAG',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-tag-${now}`,
+        project_id: `${cypressPrefix}-proj-tag-${now}`,
         conditions: [
           {
             attribute: 'CHEF_TAG',
@@ -168,7 +168,7 @@ describe('Ingestion project tagging', () => {
   const projectsWithEventRules = [
     {
       project: {
-        id: `${cypressPrefix}-event-project-org-${now}`,
+        id: `${cypressPrefix}-event-proj-org-${now}`,
         name: 'event project org',
         skip_policies: true
       },
@@ -176,7 +176,7 @@ describe('Ingestion project tagging', () => {
         id: 'event-rule-org',
         name: 'Chef Organization',
         type: 'EVENT',
-        project_id: `${cypressPrefix}-event-project-org-${now}`,
+        project_id: `${cypressPrefix}-event-proj-org-${now}`,
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -188,7 +188,7 @@ describe('Ingestion project tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-event-project-chef-server-${now}`,
+        id: `${cypressPrefix}-event-proj-chef-server-${now}`,
         name: 'event project chef server',
         skip_policies: true
       },
@@ -196,7 +196,7 @@ describe('Ingestion project tagging', () => {
         id: 'event-rule-chef-server',
         name: 'Chef Server',
         type: 'EVENT',
-        project_id: `${cypressPrefix}-event-project-chef-server-${now}`,
+        project_id: `${cypressPrefix}-event-proj-chef-server-${now}`,
         conditions: [
           {
             attribute: 'CHEF_SERVER',
@@ -212,36 +212,40 @@ describe('Ingestion project tagging', () => {
     cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
     // create the projects with one node rule each
-    projectsWithNodeRules.forEach(project => {
+    projectsWithNodeRules.forEach(projectWithRule => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
         url: '/apis/iam/v2/projects',
-        body: project.project
+        body: projectWithRule.project
+      }).then((response) => {
+        expect(response.body.project.id).to.eq(projectWithRule.project.id);
       });
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
-        url: `/apis/iam/v2/projects/${project.rule.project_id}/rules`,
-        body: project.rule
+        url: `/apis/iam/v2/projects/${projectWithRule.rule.project_id}/rules`,
+        body: projectWithRule.rule
       });
     });
 
     // create the projects with one event rule each
-    projectsWithEventRules.forEach(project => {
+    projectsWithEventRules.forEach(projectWithRule => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
         url: '/apis/iam/v2/projects',
-        body: project.project
+        body: projectWithRule.project
+      }).then((response) => {
+        expect(response.body.project.id).to.eq(projectWithRule.project.id);
       });
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
-        url: `/apis/iam/v2/projects/${project.rule.project_id}/rules`,
-        body: project.rule
+        url: `/apis/iam/v2/projects/${projectWithRule.rule.project_id}/rules`,
+        body: projectWithRule.rule
       });
     });
 

@@ -50,7 +50,7 @@ describe('project management', () => {
       expect(response.status).to.equal(200);
       response.body.projects.map((project: Project) => project.id)
         .forEach((id: string) => {
-          cy.get('chef-table-new chef-table-cell').contains(id);
+          cy.get('chef-table chef-td').contains(id);
         });
     });
   });
@@ -136,20 +136,20 @@ describe('project management', () => {
     cy.get('app-project-rules chef-page').should('not.be.visible');
 
     cy.url().should('include', `/settings/projects/${projectID}`);
-    cy.get('app-project-details chef-table-cell').contains(ruleID);
+    cy.get('app-project-details chef-td').contains(ruleID);
     cy.get('app-project-details').contains('Edits are pending');
   });
 
   itFlaky('displays a list of rules for a project', () => {
     ['Name', 'ID', 'Resource Type', 'Conditions', 'Edits'].forEach((header) => {
-      cy.get('app-project-details chef-table-header-cell').contains(header);
+      cy.get('app-project-details chef-th').contains(header);
     });
 
-    cy.get('app-project-details chef-table-cell').contains(ruleID);
-    cy.get('app-project-details chef-table-cell').contains(ruleName);
-    cy.get('app-project-details chef-table-cell').contains('Node');
-    cy.get('app-project-details chef-table-cell').contains('1 condition');
-    cy.get('app-project-details chef-table-cell').contains('Edits pending');
+    cy.get('app-project-details chef-td').contains(ruleID);
+    cy.get('app-project-details chef-td').contains(ruleName);
+    cy.get('app-project-details chef-td').contains('Node');
+    cy.get('app-project-details chef-td').contains('1 condition');
+    cy.get('app-project-details chef-td').contains('Edits pending');
   });
 
   itFlaky('can update a project rule', () => {
@@ -186,8 +186,8 @@ describe('project management', () => {
     cy.get('app-project-rules chef-page').should('not.be.visible');
 
     cy.url().should('include', '/settings/projects');
-    cy.get('app-project-details chef-table-cell').contains(updatedRuleName);
-    cy.get('app-project-details chef-table-cell').contains('2 conditions');
+    cy.get('app-project-details chef-td').contains(updatedRuleName);
+    cy.get('app-project-details chef-td').contains('2 conditions');
     cy.get('app-project-details').contains('Edits are pending');
   });
 
@@ -210,7 +210,7 @@ describe('project management', () => {
     cy.get('app-project-details').contains('Edits are pending');
     cy.get('[data-cy=rules-tab]').click();
 
-    cy.get('app-project-details chef-table-cell').contains(ruleID).parent()
+    cy.get('app-project-details chef-td').contains(ruleID).parent()
       .find('mat-select').as('controlMenu');
     // we throw in a should so cypress retries until introspection allows menu to be shown
     cy.get('@controlMenu').should('be.visible')
@@ -221,7 +221,7 @@ describe('project management', () => {
 
     // since this is a cypress custom project, we know this is the only rule.
     // the empty UI should show up so entire table will be missing.
-    cy.get('app-project-details chef-table-body').should('not.exist');
+    cy.get('app-project-details chef-tbody').should('not.exist');
     cy.get('app-project-details').contains('Edits are pending').should('not.exist');
   });
 
@@ -229,7 +229,7 @@ describe('project management', () => {
   itFlaky('can delete a project', () => {
     cy.get('.breadcrumb').click();
 
-    cy.get('app-project-list chef-table-cell').contains(projectID).parent()
+    cy.get('app-project-list chef-td').contains(projectID).parent()
       .find('mat-select').as('controlMenu');
     cy.get('@controlMenu').click({ force: true });
     cy.get('@controlMenu').find('[data-cy=delete-project]').click({ force: true });
@@ -248,10 +248,10 @@ describe('project management', () => {
       expect(response.status).to.equal(200);
       // no projects are left so we shouldn't render the table at all
       if (response.body.projects.length === 0) {
-        cy.get('app-project-list chef-table-body').should('not.exist');
+        cy.get('app-project-list chef-tbody').should('not.exist');
         // otherwise, check that the projectID is no longer in the table
       } else {
-        cy.get('app-project-list chef-table-body chef-table-cell')
+        cy.get('app-project-list chef-tbody chef-td')
           .contains(projectID).should('not.exist');
       }
     });

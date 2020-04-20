@@ -16,8 +16,6 @@ describe('CookbooksListComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),
@@ -28,12 +26,12 @@ describe('CookbooksListComponent', () => {
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-table-new' }),
-        MockComponent({ selector: 'chef-table-header' }),
-        MockComponent({ selector: 'chef-table-body' }),
-        MockComponent({ selector: 'chef-table-row' }),
-        MockComponent({ selector: 'chef-table-header-cell' }),
-        MockComponent({ selector: 'chef-table-cell' }),
+        MockComponent({ selector: 'chef-table' }),
+        MockComponent({ selector: 'chef-thead' }),
+        MockComponent({ selector: 'chef-tbody' }),
+        MockComponent({ selector: 'chef-tr' }),
+        MockComponent({ selector: 'chef-th' }),
+        MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         CookbooksListComponent

@@ -21,7 +21,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Environments struct {
-	// List of the EnvironmentListItem.
+	// Environments list.
 	Environments         []*EnvironmentListItem `protobuf:"bytes,1,rep,name=environments,proto3" json:"environments,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
 	XXX_unrecognized     []byte                 `json:"-"`
@@ -61,7 +61,7 @@ func (m *Environments) GetEnvironments() []*EnvironmentListItem {
 }
 
 type EnvironmentListItem struct {
-	// Name of the Environment.
+	// Environment name.
 	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -101,15 +101,15 @@ func (m *EnvironmentListItem) GetName() string {
 }
 
 type Environment struct {
-	// Name of the Environment.
+	// Environment name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Type of the object.
+	// Object type.
 	ChefType string `protobuf:"bytes,2,opt,name=chef_type,json=chefType,proto3" json:"chef_type,omitempty"`
-	// Description of the node.
+	// Node description.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	// Name of the class.
+	// Class name.
 	JsonClass string `protobuf:"bytes,5,opt,name=json_class,json=jsonClass,proto3" json:"json_class,omitempty"`
-	// List of versioned cookbooks
+	// Versioned cookbooks list.
 	CookbookVersions []string `protobuf:"bytes,6,rep,name=cookbook_versions,json=cookbookVersions,proto3" json:"cookbook_versions,omitempty"`
 	// Stringified json of the default attributes.
 	DefaultAttributes string `protobuf:"bytes,7,opt,name=default_attributes,json=defaultAttributes,proto3" json:"default_attributes,omitempty"`

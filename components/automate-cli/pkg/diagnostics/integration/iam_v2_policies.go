@@ -127,7 +127,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			// use a specific ID prefix so there are no conflicts with other tests.
 			// different resources can have the same ID
-			id := fmt.Sprintf("iam-policies-v2-%s", TimestampName())
+			id := fmt.Sprintf("iam-v2-%s", TimestampName())
 
 			// generate all the components of the policy
 			tokenInfo, err := CreateToken(tstCtx, id)

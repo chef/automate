@@ -123,4 +123,8 @@ export class LayoutFacadeService {
   showSidebar(sidebarName: string) {
     this.layoutSidebarService.updateSidebars(sidebarName);
   }
+
+  hideSidebar() {
+    this.layout.sidebar.display = false;
+  }
 }

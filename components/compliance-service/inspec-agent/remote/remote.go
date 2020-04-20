@@ -34,8 +34,8 @@ func RunSSMJob(ctx context.Context, ssmJob *types.InspecJob) *inspec.Error {
 		return translateToInspecErr(fmt.Errorf("unable to connect to auth client: aborting job run for job %+v", ssmJob))
 	}
 	token, err := RemoteJobInfo.TokensMgmtClient.CreateToken(ctx, &authn.CreateTokenReq{
-		Description: "token for inspec to report to automate",
-		Active:      true,
+		Name:   "token for inspec to report to automate",
+		Active: true,
 	})
 	if err != nil {
 		logrus.Errorf("unable to create auth token for reporting to automate: %s", err.Error())

@@ -2,13 +2,15 @@
 
 set -e
 
-printf 'GEN: %s\n' components/automate-grpc/protoc-gen-policy/api/*.proto
-protoc -I /src --go_out=logtostderr=true,paths=source_relative:/src \
-  components/automate-grpc/protoc-gen-policy/api/*.proto
+###
+# NOTE: grpc.sh vs. bootstrap_protoc.sh
+###
+# This script compiles all the protos. It is normally what you want. This
+# script is allowed to depend on tools in this repo (e.g.,
+# protoc-gen-a2-config, etc.)
 
-printf 'GEN: %s\n' components/automate-grpc/protoc-gen-policy/iam/*.proto
-protoc -I /src --go_out=logtostderr=true,paths=source_relative:/src \
-  components/automate-grpc/protoc-gen-policy/iam/*.proto
+# shellcheck disable=SC1090
+source "${BASH_SOURCE%/*}/bootstrap_protoc.sh"
 
 printf 'GEN: %s\n' lib/grpc/debug/debug_api/*.proto
 protoc -I /src --go_out=plugins=grpc,paths=source_relative:/src \

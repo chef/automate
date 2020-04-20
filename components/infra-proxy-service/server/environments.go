@@ -31,7 +31,7 @@ func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments)
 	}, nil
 }
 
-// GetEnvironment get data bag
+// GetEnvironment gets the environment details
 func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
 	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {

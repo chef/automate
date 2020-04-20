@@ -3,6 +3,7 @@ package server_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -199,16 +200,18 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
-
+			serverID := "97e01ea1-976e-4626-88c8-43345c5d934f"
 			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
 				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
-				ServerId:  "97e01ea1-976e-4626-88c8-43345c5d934f",
+				ServerId:  serverID,
 				Projects:  []string{},
 			})
 			require.Nil(t, resp)
+			require.Contains(t, err.Error(), fmt.Sprintf("no server found with ID \"%s\"", serverID))
 			grpctest.AssertCode(t, codes.NotFound, err)
+
 		})
 	})
 
@@ -522,11 +525,13 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when the org does not exists, return org not found", func(t *testing.T) {
 			ctx := context.Background()
+			orgID := "97e01ea1-976e-4626-88c8-43345c5d934f"
 			resp, err := cl.GetOrg(ctx, &request.GetOrg{
-				Id: "97e01ea1-976e-4626-88c8-43345c5d934f",
+				Id: orgID,
 			})
 
 			require.Nil(t, resp)
+			require.Contains(t, err.Error(), fmt.Sprintf("no org found with ID \"%s\"", orgID))
 			grpctest.AssertCode(t, codes.NotFound, err)
 		})
 

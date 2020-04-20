@@ -62,12 +62,12 @@ describe('team management', () => {
   describe('no custom initial page state', () => {
     it('lists system teams', () => {
       cy.get('[data-cy=team-create-button]').contains('Create Team');
-      cy.get('#table-container chef-table-header-cell').contains('ID');
-      cy.get('#table-container chef-table-header-cell').contains('Name');
+      cy.get('#table-container chef-th').contains('ID');
+      cy.get('#table-container chef-th').contains('Name');
 
       const systemTeams = ['admins', 'editors', 'viewers'];
       systemTeams.forEach(name => {
-        cy.get('#table-container chef-table-row').contains(name)
+        cy.get('#table-container chef-tr').contains(name)
           .parent().parent().find('mat-select').as('control-menu');
       });
     });

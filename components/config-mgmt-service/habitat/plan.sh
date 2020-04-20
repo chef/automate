@@ -19,7 +19,7 @@ pkg_exports=(
 )
 pkg_exposes=(port)
 pkg_binds=(
-  [automate-es-gateway]="http-port http-host"
+  [automate-es-gateway]="http-port"
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"

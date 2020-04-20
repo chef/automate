@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -235,11 +236,13 @@ func TestServers(t *testing.T) {
 		})
 
 		t.Run("when the server does not exist, return server not found", func(t *testing.T) {
+			serverID := "97e01ea1-976e-4626-88c8-43345c5d934f"
 			resp, err := cl.GetServer(ctx, &request.GetServer{
-				Id: "97e01ea1-976e-4626-88c8-43345c5d934f",
+				Id: serverID,
 			})
 
 			require.Nil(t, resp)
+			require.Contains(t, err.Error(), fmt.Sprintf("no server found with ID \"%s\"", serverID))
 			grpctest.AssertCode(t, codes.NotFound, err)
 		})
 
@@ -333,6 +336,48 @@ func TestServers(t *testing.T) {
 			serverListAfter, err3 := cl.GetServers(ctx, &request.GetServers{})
 			require.NoError(t, err3)
 			assert.Equal(t, len(serverListBefore.Servers)-1, len(serverListAfter.Servers))
+		})
+
+		t.Run("when the server exists with orgs, raise server can not be deleted error", func(t *testing.T) {
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
+				Name:        "chef-infra-server1",
+				Description: "Chef infra server",
+				Fqdn:        "domain1.com",
+				IpAddress:   "10.0.0.1",
+			})
+			require.NoError(t, err)
+			require.NotNil(t, resp1)
+
+			respOrg, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  resp1.Server.Id,
+				Projects:  []string{},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, respOrg)
+
+			serverListBefore, err := cl.GetServers(ctx, &request.GetServers{})
+			require.NoError(t, err)
+			assert.Equal(t, 1, len(serverListBefore.Servers))
+
+			resp, err2 := cl.DeleteServer(ctx, &request.DeleteServer{Id: resp1.Server.Id})
+			require.Error(t, err2)
+			require.Nil(t, resp)
+			assert.Regexp(t, "cannot delete server.*still has organizations attached", err2.Error())
+			grpctest.AssertCode(t, codes.FailedPrecondition, err2)
+
+			serverListAfter, err3 := cl.GetServers(ctx, &request.GetServers{})
+			require.NoError(t, err3)
+			assert.Equal(t, len(serverListBefore.Servers), len(serverListAfter.Servers))
+
+			cleanupOrg(ctx, t, cl, respOrg.Org.Id)
+			cleanupServer(ctx, t, cl, resp1.Server.Id)
 		})
 
 		t.Run("when the server ID for the server to delete is empty, raise an invalid argument error", func(t *testing.T) {

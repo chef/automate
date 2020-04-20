@@ -13,6 +13,7 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	uuid "github.com/chef/automate/lib/uuid4"
 )
 
 // GenerateAdminToken returns a new API token with admin-level
@@ -63,8 +64,9 @@ func generateAdminToken(ctx context.Context,
 	authzV2Client := authz_v2.NewPoliciesClient(authzConnection)
 
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
-		Description: req.Description,
-		Active:      true,
+		Id:     uuid.Must(uuid.NewV4()).String(),
+		Name:   req.Name,
+		Active: true,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "create API token")

@@ -19,8 +19,6 @@ import "api/external/common/query/parameters.proto";
 import "api/external/common/version/version.proto";
 import "api/external/common/response.proto";
 
-import "api/external/compliance/reporting/reporting.proto";
-
 import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
@@ -34,8 +32,8 @@ service ConfigMgmt {
   /*
   GetNodes
 
-  Returns a list of infra nodes that have checked in to Automate. 
-  Adding a filter makes a list of all nodes that meet the filter criteria. 
+  Returns a list of infra nodes that have checked in to Automate.
+  Adding a filter makes a list of all nodes that meet the filter criteria.
   Filters for the same field are ORd together, while filters across different fields are ANDed together.
   Supports pagination, filtering (with wildcard support), and sorting.
 	Limited to 10k results.
@@ -61,7 +59,7 @@ service ConfigMgmt {
   /*
   GetRuns
 
-  Returns a list of run metadata (id, start and end time, and status) for the provided node ID. 
+  Returns a list of run metadata (id, start and end time, and status) for the provided node ID.
   Supports pagination.
   Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 
@@ -281,7 +279,7 @@ service ConfigMgmt {
   /*
   GetPolicyCookbooks
 
-  Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID. 
+  Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.
   Policy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.
 
 	Authorization Action:

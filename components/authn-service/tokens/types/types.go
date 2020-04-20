@@ -16,23 +16,23 @@ const LegacyTokenDescription = "Legacy data collector token ported from A1"
 // Token represents a token we are able to use to authenticate: the ID is arbitrary,
 // the Token will be checked for in incoming requests.
 type Token struct {
-	ID          string
-	Description string
-	Value       string
-	Active      bool
-	Created     time.Time
-	Updated     time.Time
-	Projects    []string
+	ID       string
+	Name     string
+	Value    string
+	Active   bool
+	Created  time.Time
+	Updated  time.Time
+	Projects []string
 }
 
 // Storage is the interface for various adapters
 type Storage interface {
-	CreateToken(ctx context.Context, id, description string, active bool, projects []string) (*Token, error)
-	CreateTokenWithValue(ctx context.Context, id, value, description string,
+	CreateToken(ctx context.Context, id, name string, active bool, projects []string) (*Token, error)
+	CreateTokenWithValue(ctx context.Context, id, value, name string,
 		active bool, projects []string) (*Token, error)
 	CreateLegacyTokenWithValue(ctx context.Context, value string) (*Token, error)
 	DeleteToken(context.Context, string) error
-	UpdateToken(ctx context.Context, id, description string, active bool, projects []string) (*Token, error)
+	UpdateToken(ctx context.Context, id, name string, active bool, projects []string) (*Token, error)
 	GetToken(context.Context, string) (*Token, error)
 	GetTokenIDWithValue(ctx context.Context, value string) (string, error)
 	GetTokens(context.Context) ([]*Token, error)

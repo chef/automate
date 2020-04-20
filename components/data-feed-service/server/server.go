@@ -51,9 +51,8 @@ func NewDatafeedServer(db *dao.DB, config *config.DataFeedConfig, connFactory *s
 // Add a new destination
 func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destination *datafeed.AddDestinationRequest) (*datafeed.AddDestinationResponse, error) {
 	log.Infof("AddDestination %s", destination)
-	response := &datafeed.AddDestinationResponse{Success: false}
-	success, id, err := datafeedServer.db.AddDestination(destination)
-	response.Success = success
+	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret}
+	id, err := datafeedServer.db.AddDestination(destination)
 	response.Id = id
 	if err != nil {
 		return response, errorutils.FormatErrorMsg(err, "")
@@ -140,9 +139,15 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 
 func (datafeedServer *DatafeedServer) DeleteDestination(ctx context.Context, destination *datafeed.DeleteDestinationRequest) (*datafeed.DeleteDestinationResponse, error) {
 	log.Infof("DeleteDestination %s", destination)
-	response := &datafeed.DeleteDestinationResponse{Success: false}
-	success, err := datafeedServer.db.DeleteDestination(destination)
-	response.Success = success
+	fullDestination, err := datafeedServer.GetDestination(ctx, &datafeed.GetDestinationRequest{Id: destination.Id})
+	var response *datafeed.DeleteDestinationResponse
+	if err != nil {
+		log.Warnf("Could not get destination details for delete response id: %d,  err: %s", destination.Id, err)
+	} else {
+		response = &datafeed.DeleteDestinationResponse{Id: fullDestination.Id, Name: fullDestination.Name, Url: fullDestination.Url, Secret: fullDestination.Secret}
+	}
+
+	err = datafeedServer.db.DeleteDestination(destination)
 	if err != nil {
 		return response, errorutils.FormatErrorMsg(err, strconv.FormatInt(destination.Id, 10))
 	}
@@ -171,9 +176,9 @@ func (datafeedServer *DatafeedServer) ListDestinations(ctx context.Context, dest
 
 func (datafeedServer *DatafeedServer) UpdateDestination(ctx context.Context, destination *datafeed.UpdateDestinationRequest) (*datafeed.UpdateDestinationResponse, error) {
 	log.Infof("UpdateDestination %s", destination)
-	response := &datafeed.UpdateDestinationResponse{Success: false}
-	success, err := datafeedServer.db.UpdateDestination(destination)
-	response.Success = success
+	response := &datafeed.UpdateDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret}
+	err := datafeedServer.db.UpdateDestination(destination)
+
 	response.Id, _ = strconv.ParseInt(destination.Id, 10, 64)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")

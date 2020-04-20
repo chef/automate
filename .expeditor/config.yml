@@ -111,6 +111,7 @@ subscriptions:
           only_if_modified:
             - components/automate-cli/cmd/*
             - components/automate-cli/pkg/status/error_codes.go
+            - components/automate-cli/Makefile
             - .expeditor/generate-automate-cli-docs.sh
       - bash:.expeditor/generate-automate-api-docs.sh:
           post_commit: false

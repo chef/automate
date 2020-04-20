@@ -75,7 +75,7 @@ var a2Config = config{
 		{regex: `components/automate-deployment/cmd/chef-server-ctl/secrets.go`},
 		{regex: `components/automate-deployment/pkg/a1stub/test_harness.go`},
 		{regex: `components/automate-deployment/pkg/a1upgrade/a1commands_test.go`},
-		{regex: `components/automate-deployment/pkg/assets/data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key`},
+		{regex: `components/automate-deployment/pkg/assets/assets.go`},
 		{regex: `components/automate-deployment/testdata/hab_responses/all_up.json`},
 		{regex: `components/automate-deployment/tools/upgrade-test-scaffold/upgrade-test-scaffold.go`},
 		{regex: `components/automate-ui/src/app/pages/\+compliance/\+credentials/components/credentials-form.html`},
@@ -88,6 +88,9 @@ var a2Config = config{
 		{regex: `components/compliance-service/generator/vagrant.key`},
 		{regex: `dev/config.toml`},
 		{regex: `lib/grpc/secureconn/testdata/.*\.key`},
+
+		// Test data for cypress; only removing the beg and end of pem key
+		{regex: `e2e/cypress/integration/api/iam/projects_api_scanjob_ingestion.spec.ts`},
 
 		// Test data from workflow
 		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/expired.key`},

@@ -1,14 +1,24 @@
 @import '../table.component';
 
 :host {
-  padding: $size_16;
-  vertical-align: middle;
-  text-align: left;
+  display: flex;
+  padding: 14px;
   font-size: 14px;
   font-weight: 700;
   background-color: $chef-lightest-grey;
   border-bottom: 1px solid $chef-grey;
   border-top: 1px solid $chef-grey;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+
+  // Spacing accounts for chef-toggle-button forcing the header cells to be too tall
+  ::ng-deep chef-sort-toggle {
+    chef-button {
+      margin-top: -6px;
+      margin-bottom: -7px;
+    }
+  }
 }
 
 :host:first-child {

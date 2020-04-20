@@ -17,11 +17,7 @@ log_level = "{{cfg.log.level}}"
 # Elasticsearch
 {{~#eachAlive bind.automate-es-gateway.members as |member|}}
 backend = "elasticsearch"
-{{~#if member.cfg.http-host}}
-elasticsearch-url = "http://{{member.sys.ip}}:{{member.cfg.http-port}}"
-{{else}}
 elasticsearch-url = "http://127.0.0.1:{{member.cfg.http-port}}"
-{{~/if}}
 {{~/eachAlive}}
 
 [tls]

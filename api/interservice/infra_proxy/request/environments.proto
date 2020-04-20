@@ -4,17 +4,17 @@ package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
 
 message Environments {
-    // Id of the Org.
-    string org_id    = 1;
-    // Id of the Server.
+    // ID of the chef organization.
+    string org_id = 1;
+    // ID of the chef infra server.
     string server_id = 2;
 }
 
 message Environment {
-    // Id of the Org.
-    string org_id    = 1;
-    // Id of the Server.
+    // ID of the chef organization.
+    string org_id = 1;
+    // ID of the chef infra server.
     string server_id = 2;
     // Name of the environment.
-    string name      = 3;
+    string name = 3;
 }

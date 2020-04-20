@@ -2,16 +2,16 @@ import { eventExist, uuidv4 } from '../../../support/helpers';
 import { Rule, Project } from '../../../support/types';
 
 describe('project update re-tagging', () => {
-  const cypressPrefix = 'test-project-update';
+  const cypressPrefix = 'proj-update';
   const now = Cypress.moment().format('MMDDYYhhmm');
 
-  const nodeOrgProjectID = `${cypressPrefix}-project-org-${now}`;
-  const nodeServerProjectID = `${cypressPrefix}-project-server-${now}`;
-  const nodeEnvProjectID = `${cypressPrefix}-project-environment-${now}`;
-  const nodePolGroupProjectID = `${cypressPrefix}-project-policy-group-${now}`;
-  const nodePolNameProjectID = `${cypressPrefix}-project-policy-name-${now}`;
-  const nodeRoleProjectID = `${cypressPrefix}-project-role-${now}`;
-  const nodeTagProjectID = `${cypressPrefix}-project-tag-${now}`;
+  const nodeOrgProjectID = `${cypressPrefix}-proj-org-${now}`;
+  const nodeServerProjectID = `${cypressPrefix}-proj-server-${now}`;
+  const nodeEnvProjectID = `${cypressPrefix}-proj-env-${now}`;
+  const nodePolGroupProjectID = `${cypressPrefix}-proj-pol-group-${now}`;
+  const nodePolNameProjectID = `${cypressPrefix}-proj-pol-name-${now}`;
+  const nodeRoleProjectID = `${cypressPrefix}-proj-role-${now}`;
+  const nodeTagProjectID = `${cypressPrefix}-proj-tag-${now}`;
 
   interface ProjectAndRule {
     project: Project;
@@ -161,8 +161,8 @@ describe('project update re-tagging', () => {
     }
   ];
 
-  const eventOrgProjectID = `${cypressPrefix}-project-event-org-${now}`;
-  const eventServerProjectID = `${cypressPrefix}-project-event-server-${now}`;
+  const eventOrgProjectID = `${cypressPrefix}-proj-evt-org-${now}`;
+  const eventServerProjectID = `${cypressPrefix}-proj-evt-server-${now}`;
 
   const projectsWithEventRule = [
     {

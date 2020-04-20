@@ -1,6 +1,8 @@
 package service
 
 import (
+	"reflect"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -41,13 +43,17 @@ func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secu
 }
 
 // ParseStorageError parses common storage errors into a user-readable format.
-func ParseStorageError(err error, id interface{}, noun string) error {
+func ParseStorageError(err error, v interface{}, noun string) error {
 	if err != nil {
 		switch err {
 		case storage.ErrNotFound:
-			return status.Errorf(codes.NotFound, "no %s found with id %q", noun, id)
+			return status.Errorf(codes.NotFound, "no %s found with ID %q", noun, reflect.Indirect(reflect.ValueOf(v)).FieldByName("Id"))
+		case storage.ErrCannotDelete:
+			return status.Errorf(codes.FailedPrecondition, "cannot delete server %q because it still has organizations attached", reflect.Indirect(reflect.ValueOf(v)).FieldByName("Id"))
 		case storage.ErrConflict:
-			return status.Errorf(codes.AlreadyExists, "%s with that name %q already exists", noun, id)
+			return status.Errorf(codes.AlreadyExists, "%s with that name %q already exists", noun, reflect.Indirect(reflect.ValueOf(v)).FieldByName("Name"))
+		case storage.ErrForeignKeyViolation:
+			return status.Errorf(codes.NotFound, "no server found with ID %q", reflect.Indirect(reflect.ValueOf(v)).FieldByName("ServerId"))
 		default:
 			return status.Error(codes.Internal, err.Error())
 		}

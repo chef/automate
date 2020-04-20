@@ -14,8 +14,7 @@ toc = true
 
 {{% warning %}}
 
-Chef Automate will not deploy the Chef Infra Server add-ons Chef Manage
-and Push Jobs Server.
+Chef Automate will not deploy the Chef Infra Server add-ons Chef Manage and Push Jobs Server.
 
 {{% /warning %}}
 
@@ -62,6 +61,8 @@ Install Chef Automate and Chef Infra Server on the same host with this command:
 sudo chef-automate deploy --product automate --product infra-server
 ```
 
+Then, [set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
+
 ### Configuration File Install of Chef Automate and Infra Server
 
 Installing Chef Automate and Chef Infra Server on the same host using a configuration file also requires the use of the Chef Automate CLI.
@@ -88,11 +89,13 @@ Installations require elevated privileges, so run the commands as the superuser 
       sudo chef-automate deploy config.toml
     ```
 
+1. [Set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
+
 ## Install Standalone Chef Infra Server through Chef Automate
 
 Use either a command line interface or a configuration file to install Chef Infra Server through Chef Automate.
 
-Refer to the on Chef Infra Server [hardware requirements](https://docs.chef.io/install_server_pre/) for guidance on memory and number of CPUs.
+Refer to the Chef Infra Server [hardware requirements](https://docs.chef.io/install_server_pre/) for guidance on memory and number of CPUs.
 
 ### Command Line Install of Standalone Chef Infra Server
 
@@ -118,6 +121,8 @@ Installations require elevated privileges, so run the commands as the superuser 
     ```shell
        sudo chef-automate deploy --product infra-server <configuration_file>
     ```
+
+1. [Set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
 
 ### Configuration File Install of Standalone Chef Infra Server
 
@@ -148,3 +153,77 @@ Installations require elevated privileges, so run the commands as the superuser 
     ```shell
       sudo chef-automate deploy config.toml
     ```
+
+1. [Set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
+
+## Use `knife` with Chef Infra Server
+
+The [`knife` command-line utility](https://docs.chef.io/workstation/knife/) provides an interface to interact with a Chef Infra Server from a workstation.
+
+On the Chef Infra Server host:
+
+1. Run the following command to create a user:
+
+    ```shell
+      sudo chef-server-ctl user-create USER_NAME FIRST_NAME LAST_NAME EMAIL 'PASSWORD' --filename USER_NAME.pem
+    ```
+
+    An RSA private key generates automatically and is the chef-validator key.
+    Save this RSA private key to a safe location.
+    The `--filename` option will save the RSA private key to the specified absolute path.
+
+1. Run the following command to create an organization, generate its validator key, and assign the user created in the previous step as an administrator:
+
+    ```shell
+      sudo chef-server-ctl org-create SHORT_NAME 'FULL_ORGANIZATION_NAME' --association_user USER_NAME --filename ORGANIZATION-validator.pem
+    ```
+
+    The short name must begin with a lower-case letter or digit, may contain only lower-case letters, digits, hyphens, and underscores, and must be between 1 and 255 characters. For example: `4thcoffee`.
+
+    The full organization name must begin with a non-white space character and must be between 1 and 1023 characters. For example: `'Fourth Coffee, Inc.'`.
+
+    The `--association_user` option will associate the `USER_NAME` with the `admins` security group on the Chef Infra Server.
+
+    An RSA private key generates automatically and is the chef-validator key.
+    Save this RSA private key to a safe location.
+    The `--filename` option will save the RSA private key to the specified absolute path.
+
+On the workstation:
+
+1. Install [Chef Workstation](https://docs.chef.io/workstation/install_workstation/).
+
+1. Create a Chef repository by using the `chef generate repo` subcommand.
+     For example, create a Chef repository named `chef-repo` by running: 
+     ```shell
+     chef generate repo chef-repo
+     ```
+     Replace `chef-repo` with your desired repository name.
+
+1. Within your named Chef repository, create a `.chef` directory with the `mkdir` command. For example: 
+    ```shell
+      mkdir /chef-repo/.chef
+    ```
+1. Copy `ORGANIZATION-validator.pem` and `USER_NAME.pem` to the `.chef` directory.
+
+1. In the `.chef` directory, create a `config.rb` file that contains:
+
+    ```shell
+      current_dir = File.dirname(__FILE__)
+      log_level                :info
+      log_location             STDOUT
+      node_name                'USER_NAME'
+      client_key               "#{current_dir}/USER_NAME.pem"
+      validation_client_name   'ORGANIZATION-validator'
+      validation_key           "#{current_dir}/ORGANIZATION.pem"
+      chef_server_url          'https://{{< example_fqdn "automate" >}}/organizations/ORGANIZATION'
+      cache_type               'BasicFile'
+      cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
+      cookbook_path            ["#{current_dir}/../cookbooks"]
+    ```
+    If your installation is airgapped, [create a bootstrap
+    template](https://docs.chef.io/install_chef_air_gap/#create-a-bootstrap-template) and
+    [add it](https://docs.chef.io/install_chef_air_gap/#configure-knife) to your `config.rb`.
+
+1. Run `knife ssl fetch` to get the SSL certificates from Chef Infra Server and make them available to `knife`.
+
+For more information on how to set up the workstation, see [the Chef Workstation documentation](https://docs.chef.io/workstation/getting_started/).

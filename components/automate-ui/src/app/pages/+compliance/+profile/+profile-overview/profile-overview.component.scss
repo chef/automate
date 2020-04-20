@@ -37,18 +37,18 @@ chef-loading-spinner {
   }
 
   &.installed {
-    chef-table-header-cell:first-child,
-    chef-table-cell:first-child {
+    chef-th:first-child,
+    chef-td:first-child {
       width: 120%;
     }
 
-    chef-table-cell:last-child {
+    chef-td:last-child {
       chef-button {
         margin: -0.5em 0;
       }
     }
 
-    chef-table-cell {
+    chef-td {
       chef-clipboard {
         margin-left: -0.5em;
 
@@ -62,12 +62,12 @@ chef-loading-spinner {
   }
 
   &.available {
-    chef-table-header-cell:first-child,
-    chef-table-cell:first-child {
+    chef-th:first-child,
+    chef-td:first-child {
       width: 350%;
     }
 
-    chef-table-cell:last-child {
+    chef-td:last-child {
       chef-button {
         margin: -0.5em 0;
         margin-left: auto;
@@ -80,7 +80,7 @@ chef-loading-spinner {
   .file-upload-list {
     margin: 1em 0 -0.5em 0;
 
-    chef-table-cell {
+    chef-td {
       flex-basis: auto;
 
       &:first-child {

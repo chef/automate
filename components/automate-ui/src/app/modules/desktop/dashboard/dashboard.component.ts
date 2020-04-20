@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { map, filter } from 'rxjs/operators';
 import { last, reverse } from 'lodash/fp';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import {
   GetDailyCheckInTimeSeries,
@@ -62,7 +63,8 @@ export class DashboardComponent implements OnInit {
   public insightVisible = false;
 
   constructor(
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit() {
@@ -151,6 +153,8 @@ export class DashboardComponent implements OnInit {
       this.store.select(unknownDesktopDurationCounts).pipe(
       map(counts => counts.updated)
     );
+
+    setTimeout(() => this.layoutFacade.hideSidebar());
   }
 
   handleDaysAgoChange(daysAgo: number) {

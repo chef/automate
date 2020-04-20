@@ -1082,8 +1082,8 @@ func TestBundlerMatchProjectRuleEventRuleType(t *testing.T) {
 	assert.Equal(t, []string{}, processMsg2.InspecSummary.Projects)
 }
 
-// A scan job report should not be tagged.
 // A report is a scan job if it has a JobID.
+// Test that it is also tagged
 func TestBundlerWithScanJobReport(t *testing.T) {
 	inbox := make(chan message.Compliance, 100)
 	testProjectName := "Test"
@@ -1105,9 +1105,6 @@ func TestBundlerWithScanJobReport(t *testing.T) {
 	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
 		&iam_v2.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
-	// {
-	// 	listProjectRulesCount: 0,
-	// 	projectRules:          projectRules}
 	done := make(chan error)
 	ctx := context.Background()
 
@@ -1127,30 +1124,17 @@ func TestBundlerWithScanJobReport(t *testing.T) {
 		Done:          done,
 	}
 
-	report3 := message.Compliance{
-		QueueTime:     time.Now(),
-		InspecReport:  &relaxting.ESInSpecReport{Environment: environmentsName, Roles: []string{}},
-		InspecSummary: &relaxting.ESInSpecSummary{},
-		Ctx:           ctx,
-		Done:          done,
-	}
-
 	inbox <- report1
 	inbox <- report2
-	inbox <- report3
 	close(inbox)
 
 	out := BundleReportProjectTagger(authzClient)(inbox)
 
 	processMsg1 := <-out
-	assert.Equal(t, ([]string)(nil), processMsg1.InspecReport.Projects)
-	assert.Equal(t, ([]string)(nil), processMsg1.InspecSummary.Projects)
+	assert.Equal(t, ([]string{"Test"}), processMsg1.InspecReport.Projects)
+	assert.Equal(t, ([]string{"Test"}), processMsg1.InspecSummary.Projects)
 
 	processMsg2 := <-out
-	assert.Equal(t, ([]string)(nil), processMsg2.InspecReport.Projects)
-	assert.Equal(t, ([]string)(nil), processMsg2.InspecSummary.Projects)
-
-	processMsg3 := <-out
-	assert.Equal(t, []string{testProjectName}, processMsg3.InspecReport.Projects)
-	assert.Equal(t, []string{testProjectName}, processMsg3.InspecSummary.Projects)
+	assert.Equal(t, ([]string{}), processMsg2.InspecReport.Projects)
+	assert.Equal(t, ([]string{}), processMsg2.InspecSummary.Projects)
 }

@@ -167,9 +167,11 @@
             <chef-loading-spinner size="50"></chef-loading-spinner>
           </div>
           <chef-table>
-            <chef-tr *ngFor="let node of previewNodesFor(managerControl.value.id) | async">
-              <chef-td>{{node}}</chef-td>
-            </chef-tr>
+            <chef-tbody>
+              <chef-tr *ngFor="let node of previewNodesFor(managerControl.value.id) | async">
+                <chef-td>{{node}}</chef-td>
+              </chef-tr>
+            </chef-tbody>
           </chef-table>
         </div>
       </div>

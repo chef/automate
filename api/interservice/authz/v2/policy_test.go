@@ -134,29 +134,9 @@ func TestValidationCreatePolicy(t *testing.T) {
 			Statements: []*v2.Statement{&validStatement},
 		},
 		// projects
-		"whitespace projects list": &v2.CreatePolicyReq{
-			Id:         "this-is-valid-1",
-			Projects:   []string{"     ", "test"},
-			Statements: []*v2.Statement{&validStatement},
-		},
 		"repeated projects in list": &v2.CreatePolicyReq{
 			Id:         "this-is-valid-1",
 			Projects:   []string{"repeat", "repeat"},
-			Statements: []*v2.Statement{&validStatement},
-		},
-		"Project has invalid characters": &v2.CreatePolicyReq{
-			Id:         "this-is-valid-1",
-			Projects:   []string{"valid", "wrong~"},
-			Statements: []*v2.Statement{&validStatement},
-		},
-		"Project has spaces": &v2.CreatePolicyReq{
-			Id:         "this-is-valid-1",
-			Projects:   []string{"valid", "wrong space"},
-			Statements: []*v2.Statement{&validStatement},
-		},
-		"project has uppercase characters": &v2.CreatePolicyReq{
-			Id:         "this-is-valid-1",
-			Projects:   []string{"valid", "PROJECT1"},
 			Statements: []*v2.Statement{&validStatement},
 		},
 	}
@@ -682,35 +662,11 @@ func TestValidationCreateRole(t *testing.T) {
 			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"test", "test-2"},
 		},
-		"whitespace projects list": &v2.CreateRoleReq{
-			Id:       "this-is-valid-1",
-			Name:     "name of my team ~ fun characters 1 %",
-			Actions:  []string{"cfgmgmt:nodes:*"},
-			Projects: []string{"     ", "test"},
-		},
 		"repeated projects in list": &v2.CreateRoleReq{
 			Id:       "this-is-valid-1",
 			Name:     "name of my team ~ fun characters 1 %",
 			Actions:  []string{"cfgmgmt:nodes:*"},
 			Projects: []string{"repeat", "repeat"},
-		},
-		"Project has invalid characters": &v2.CreateRoleReq{
-			Id:       "this-is-valid-1",
-			Name:     "name of my team ~ fun characters 1 %",
-			Actions:  []string{"cfgmgmt:nodes:*"},
-			Projects: []string{"valid", "wrong~"},
-		},
-		"Project has spaces": &v2.CreateRoleReq{
-			Id:       "this-is-valid-1",
-			Name:     "name of my team ~ fun characters 1 %",
-			Actions:  []string{"cfgmgmt:nodes:*"},
-			Projects: []string{"valid", "wrong space"},
-		},
-		"project has uppercase characters": &v2.CreateRoleReq{
-			Id:       "this-is-valid-1",
-			Name:     "name of my team ~ fun characters 1 %",
-			Actions:  []string{"cfgmgmt:nodes:*"},
-			Projects: []string{"valid", "PROJECT1"},
 		},
 	}
 

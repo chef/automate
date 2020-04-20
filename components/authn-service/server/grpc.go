@@ -69,7 +69,7 @@ func newTokenAPI(ts tokens.Storage, authzSubjectClient authz.SubjectPurgeClient,
 }
 
 func (a *tokenAPI) CreateToken(ctx context.Context, req *api.CreateTokenReq) (*api.Token, error) {
-	t, err := a.ts.CreateToken(ctx, req.Id, req.Description, req.Active, req.Projects)
+	t, err := a.ts.CreateToken(ctx, req.Id, req.Name, req.Active, req.Projects)
 	if err != nil {
 		// if the error is already a GRPC status code, return that directly.
 		if _, ok := status.FromError(err); ok {
@@ -86,7 +86,7 @@ func (a *tokenAPI) CreateToken(ctx context.Context, req *api.CreateTokenReq) (*a
 
 func (a *tokenAPI) CreateTokenWithValue(
 	ctx context.Context, req *api.CreateTokenWithValueReq) (*api.Token, error) {
-	t, err := a.ts.CreateTokenWithValue(ctx, req.Id, req.Value, req.Description, req.Active, req.Projects)
+	t, err := a.ts.CreateTokenWithValue(ctx, req.Id, req.Value, req.Name, req.Active, req.Projects)
 	if err != nil {
 		// if the error is already a GRPC status code, return that directly.
 		if _, ok := status.FromError(err); ok {
@@ -151,7 +151,7 @@ func (a *tokenAPI) GetTokens(ctx context.Context, req *api.GetTokensReq) (*api.T
 }
 
 func (a *tokenAPI) UpdateToken(ctx context.Context, req *api.UpdateTokenReq) (*api.Token, error) {
-	t, err := a.ts.UpdateToken(ctx, req.Id, req.Description, req.Active, req.Projects)
+	t, err := a.ts.UpdateToken(ctx, req.Id, req.Name, req.Active, req.Projects)
 	if err != nil {
 		// if the error is already a GRPC status code, return that directly.
 		if _, ok := status.FromError(err); ok {
@@ -176,12 +176,12 @@ func (a *tokenAPI) ResetToV1(ctx context.Context, req *api.ResetToV1Req) (*api.R
 
 func toTokenResp(t *tokens.Token) *api.Token {
 	return &api.Token{
-		Id:          t.ID,
-		Active:      t.Active,
-		Value:       t.Value,
-		Description: t.Description,
-		Created:     t.Created.Format(time.RFC3339),
-		Updated:     t.Updated.Format(time.RFC3339),
-		Projects:    t.Projects,
+		Id:       t.ID,
+		Active:   t.Active,
+		Value:    t.Value,
+		Name:     t.Name,
+		Created:  t.Created.Format(time.RFC3339),
+		Updated:  t.Updated.Format(time.RFC3339),
+		Projects: t.Projects,
 	}
 }

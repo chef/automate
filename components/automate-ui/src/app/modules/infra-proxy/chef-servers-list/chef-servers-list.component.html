@@ -25,34 +25,34 @@
         <chef-toolbar>
           <chef-button primary (click)="openCreateModal()">Add Chef Server</chef-button>
         </chef-toolbar>
-        <chef-table-new>
-          <chef-table-header>
-            <chef-table-row>
-              <chef-table-header-cell>Name</chef-table-header-cell>
-              <chef-table-header-cell>FQDN</chef-table-header-cell>
-              <chef-table-header-cell>IP Address</chef-table-header-cell>
-              <chef-table-header-cell>Description</chef-table-header-cell>
-              <chef-table-header-cell>No Of Orgs</chef-table-header-cell>
-              <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
-            </chef-table-row>
-          </chef-table-header>
-          <chef-table-body>
-            <chef-table-row *ngFor= "let server of sortedChefServers$ | async">
-              <chef-table-cell>
+        <chef-table>
+          <chef-thead>
+            <chef-tr>
+              <chef-th>Name</chef-th>
+              <chef-th>FQDN</chef-th>
+              <chef-th>IP Address</chef-th>
+              <chef-th>Description</chef-th>
+              <chef-th>No Of Orgs</chef-th>
+              <chef-th class="three-dot-column"></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor= "let server of sortedChefServers$ | async">
+              <chef-td >
                 <a [routerLink]="['/infrastructure/chef-servers', server.id]">{{ server.name }}</a>
-              </chef-table-cell>
-              <chef-table-cell>{{ server.fqdn }}</chef-table-cell>
-              <chef-table-cell>{{ server.ip_address }}</chef-table-cell>
-              <chef-table-cell>{{ server.description }}</chef-table-cell>
-              <chef-table-cell>{{ server.orgs_count }}</chef-table-cell>
-              <chef-table-cell class="three-dot-column">
+              </chef-td>
+              <chef-td  >{{ server.fqdn }}</chef-td>
+              <chef-td  >{{ server.ip_address }}</chef-td>
+              <chef-td  >{{ server.description }}</chef-td>
+              <chef-td  >{{ server.orgs_count }}</chef-td>
+              <chef-td class="three-dot-column">
                 <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
                   <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="remove-server">Remove Chef Server</mat-option>
                 </mat-select>
-              </chef-table-cell>
-            </chef-table-row>
-          </chef-table-body>
-        </chef-table-new>
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
       </div>
     </main>
   </div>

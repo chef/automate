@@ -38,34 +38,34 @@
         </app-authorized>
       </chef-toolbar>
       <app-authorized [allOf]="['/iam/v2/tokens', 'get']">
-        <chef-table-new *ngIf="(apiTokenCount$ | async) > 0">
-          <chef-table-header>
-            <chef-table-row>
-              <chef-table-header-cell>Name</chef-table-header-cell>
-              <chef-table-header-cell>ID</chef-table-header-cell>
-              <chef-table-header-cell>Projects</chef-table-header-cell>
-              <chef-table-header-cell>Created Date</chef-table-header-cell>
-              <chef-table-header-cell>Status</chef-table-header-cell>
-              <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
-            </chef-table-row>
-          </chef-table-header>
-          <chef-table-body>
-            <chef-table-row *ngFor="let token of sortedApiTokens$ | async">
-              <chef-table-cell>
+        <chef-table *ngIf="(apiTokenCount$ | async) > 0">
+          <chef-thead>
+            <chef-tr>
+              <chef-th>Name</chef-th>
+              <chef-th>ID</chef-th>
+              <chef-th>Projects</chef-th>
+              <chef-th class="created-date">Created Date</chef-th>
+              <chef-th>Status</chef-th>
+              <chef-th class="three-dot-column"></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let token of sortedApiTokens$ | async">
+              <chef-td>
                 <a [routerLink]="['/settings/tokens', token.id]">{{ token.name }}</a>
-              </chef-table-cell>
-              <chef-table-cell>{{ token.id }}</chef-table-cell>
-              <chef-table-cell class="projects-column">
+              </chef-td>
+              <chef-td>{{ token.id }}</chef-td>
+              <chef-td class="projects-column">
                 <span *ngIf="token.projects.length === 0">{{ unassigned }}</span>
                 <span *ngIf="token.projects.length === 1">{{ token.projects[0] }}</span>
                 <span *ngIf="token.projects.length > 1">{{ token.projects.length }} projects</span>
-              </chef-table-cell>
-              <chef-table-cell>{{ token.created_at | datetime: RFC2822 }}</chef-table-cell>
-              <chef-table-cell>
+              </chef-td>
+              <chef-td class="created-date">{{ token.created_at | datetime: RFC2822 }}</chef-td>
+              <chef-td>
                 <ng-container *ngIf="token.active">Active</ng-container>
                 <ng-container *ngIf="!token.active">Inactive</ng-container>
-              </chef-table-cell>
-              <chef-table-cell class="three-dot-column">
+              </chef-td>
+              <chef-td class="three-dot-column">
                 <mat-select panelClass="chef-control-menu" id="menu-{{token.id}}" data-cy="token-control">
                   <mat-option (onSelectionChange)="notifyCopy($event)" data-cy="copy-token">
                     <chef-clipboard plain value={{token.value}} label="Copy Token" icon=""></chef-clipboard>
@@ -77,10 +77,10 @@
                   <mat-option (onSelectionChange)="startTokenDelete($event, token)" data-cy="delete">Delete Token</mat-option>
                   <!-- </app-authorized> -->
                 </mat-select>
-             </chef-table-cell>
-            </chef-table-row>
-          </chef-table-body>
-        </chef-table-new>
+             </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
       </app-authorized>
     </div>
   </main>

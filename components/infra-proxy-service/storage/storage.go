@@ -66,4 +66,7 @@ var (
 
 	// ErrConflict is returned when a server there is a clash of server IDs
 	ErrConflict = errors.New("conflict")
+
+	// ErrForeignKeyViolation is returned when a server ID is not found
+	ErrForeignKeyViolation = errors.New("not found")
 )
