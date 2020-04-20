@@ -9,7 +9,7 @@ export class CookbookRequests {
 
   constructor(private http: HttpClient) { }
 
-  public getCookbooksForOrgs(server_id: string, org_id: string):
+  public getCookbooks(server_id: string, org_id: string):
   Observable<CookbooksSuccessPayload> {
     return this.http.get<CookbooksSuccessPayload>(
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks`);

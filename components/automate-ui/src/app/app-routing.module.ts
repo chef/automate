@@ -252,7 +252,7 @@ const routes: Routes = [
               component: InfraRoleDetailsComponent
             },
             {
-              path: ':id/org/:orgid/cookbooks/:name',
+              path: ':id/org/:orgid/cookbooks/:cookbook_name',
               component: CookbookDetailsComponent
             }
           ]

@@ -10,12 +10,12 @@ import { routeURL, routeParams } from 'app/route.selectors';
 import { filter, takeUntil, pluck } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 import { CookbookVersions } from 'app/entities/cookbooks/cookbook-versions.model';
-import { allCookbookVersions, getStatus } from 'app/entities/cookbooks/cookbook-versions.selectors';
+import { cookbookVersionsFromRoute, getStatus } from 'app/entities/cookbooks/cookbook-versions.selectors';
 import { GetCookbookVersions } from 'app/entities/cookbooks/cookbook-versions.actions';
 import { CookbookDetails, RootFiles } from 'app/entities/cookbooks/cookbook-details.model';
 import {
-  allCookbookDetails,
-  getStatus as getAllCookbooksDetailsForVersionStatus
+  cookbookDetailsFromRoute,
+  getStatus as getAllCookbooksDetailsStatus
 } from 'app/entities/cookbooks/cookbook-details.selectors';
 import { GetCookbookDetails } from 'app/entities/cookbooks/cookbook-details.actions';
 export type CookbookDetailsTab = 'details' | 'content';
@@ -37,7 +37,8 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
   public readFile: RootFiles;
   public readFileUrl: string;
   public readFileContent;
-  public cookbookDetailsLoading = true;
+  public cookbookDetailsLoading = false;
+  public cookbookVersionsLoading = true;
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
@@ -57,7 +58,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('orgid'), filter(identity)),
-      this.store.select(routeParams).pipe(pluck('name'), filter(identity))
+      this.store.select(routeParams).pipe(pluck('cookbook_name'), filter(identity))
     ]).pipe(
       takeUntil(this.isDestroyed)
     ).subscribe(([server_id, org_id, cookbook_name]) => {
@@ -73,15 +74,17 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(allCookbookVersions)
+      this.store.select(cookbookVersionsFromRoute)
     ]).pipe(
       filter(([getCookbookVersionSt, _cookbookVersionState]) =>
-      getCookbookVersionSt === EntityStatus.loadingSuccess),
+        getCookbookVersionSt === EntityStatus.loadingSuccess),
       filter(([_getCookbookVersionSt, cookbookVersionState]) =>
-        !isNil(cookbookVersionState[0])),
+        !isNil(cookbookVersionState)),
       takeUntil(this.isDestroyed))
       .subscribe(([_getCookbookVersionSt, cookbookVersionState]) => {
-        this.cookbook = cookbookVersionState[0];
+        this.cookbookVersionsLoading = false;
+        this.cookbookDetailsLoading = true;
+        this.cookbook = cookbookVersionState;
         this.store.dispatch(new GetCookbookDetails({
           server_id: this.serverId,
           org_id: this.orgId,
@@ -104,27 +107,28 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
     cookbook_version: string
   ): void {
     combineLatest([
-      this.store.select(getAllCookbooksDetailsForVersionStatus),
-      this.store.select(allCookbookDetails)
+      this.store.select(getAllCookbooksDetailsStatus),
+      this.store.select(cookbookDetailsFromRoute)
     ]).pipe(
-      filter(([getCookbooksSt, _allCookbooksState]) =>
-      getCookbooksSt === EntityStatus.loadingSuccess),
-      filter(([_getCookbooksSt, allCookbooksState]) =>
-        !isNil(allCookbooksState[0])),
+      filter(([getCookbooksSt, _cookbookDetailsState]) =>
+        getCookbooksSt === EntityStatus.loadingSuccess),
+      filter(([_getCookbooksSt, cookbookDetailsState]) =>
+        !isNil(cookbookDetailsState)),
       takeUntil(this.isDestroyed))
-      .subscribe(([_getCookbooksSt, allCookbooksState]) => {
-      this.cookbookDetails = allCookbooksState[0];
-      this.readFile = allCookbooksState[0]?.root_files.find(data => data.name === 'README.md');
-      if (this.readFile) {
-        this.readFileUrl = encodeURIComponent(this.readFile?.url);
-        this.http.get(
-          `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${cookbook_version}/file-content?url=${this.readFileUrl}`).subscribe
-          (fileContent => {
-            this.readFileContent = fileContent;
-            this.cookbookDetailsLoading = false;
-          });
-      }
-    });
+      .subscribe(([_getCookbooksSt, cookbookDetailsState]) => {
+        this.cookbookDetails = cookbookDetailsState;
+        this.readFile = cookbookDetailsState?.root_files.find(data => data.name === 'README.md');
+        if (this.readFile) {
+          this.readFileUrl = encodeURIComponent(this.readFile?.url);
+          this.http.get(
+            `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${cookbook_version}/file-content?url=${this.readFileUrl}`)
+            .subscribe
+            (fileContent => {
+              this.readFileContent = fileContent;
+              this.cookbookDetailsLoading = false;
+            });
+        }
+      });
   }
 
   public handleCookbookVersionChange(

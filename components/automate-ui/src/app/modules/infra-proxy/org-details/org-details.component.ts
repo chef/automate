@@ -14,7 +14,7 @@ import {
   getStatus, updateStatus, orgFromRoute
 } from 'app/entities/orgs/org.selectors';
 import { GetOrg, UpdateOrg } from 'app/entities/orgs/org.actions';
-import { GetCookbooksForOrg } from 'app/entities/cookbooks/cookbook.actions';
+import { GetCookbooks } from 'app/entities/cookbooks/cookbook.actions';
 import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
 import {
   allCookbooks,
@@ -101,7 +101,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
       this.serverId = server_id;
       this.OrgId = org_id;
       this.store.dispatch(new GetOrg({ server_id: server_id, id: org_id }));
-      this.store.dispatch(new GetCookbooksForOrg({
+      this.store.dispatch(new GetCookbooks({
         server_id: server_id, org_id: org_id
       }));
       this.store.dispatch(new GetRoles({

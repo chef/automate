@@ -9,7 +9,7 @@ export enum CookbookActionTypes {
   GET_ALL_FAILURE = 'COOKBOOKS::GET_ALL::FAILURE'
 }
 
-export class GetCookbooksForOrg implements Action {
+export class GetCookbooks implements Action {
   readonly type = CookbookActionTypes.GET_ALL;
 
   constructor(public payload: { server_id: string, org_id: string }) { }
@@ -32,6 +32,6 @@ export class GetCookbooksFailure implements Action {
 }
 
 export type CookbookActions =
-  | GetCookbooksForOrg
+  | GetCookbooks
   | GetCookbooksSuccess
   | GetCookbooksFailure;
