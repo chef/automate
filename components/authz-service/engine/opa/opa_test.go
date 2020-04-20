@@ -45,7 +45,7 @@ import (
 // Test cycles are hence faster, since they don't
 // require you to call `go generate ./...` or a Makefile target.
 func TestCompiledInOPAPolicy(t *testing.T) {
-	// authz_v2.rego, common.rego, introspection_v2.rego
+	// authz.rego, common.rego, introspection.rego
 	an := opa.AssetNames()
 	assert.Equal(t, 3, len(an), "expecting 3 assets")
 
@@ -146,7 +146,7 @@ func TestAuthorizedWithStatements(t *testing.T) {
 		},
 	}
 
-	query := "data.authz_v2.authorized"
+	query := "data.authz.authorized"
 
 	for descr, input := range cases {
 		t.Run(descr, func(t *testing.T) {
@@ -275,7 +275,7 @@ func TestAuthorizedProjects(t *testing.T) {
 		},
 	}
 
-	query := "data.authz_v2.authorized_project"
+	query := "data.authz.authorized_project"
 
 	for descr, input := range cases {
 		t.Run(descr, func(t *testing.T) {
@@ -350,7 +350,7 @@ func TestIntrospectionV2(t *testing.T) {
 		},
 	}
 
-	query := "data.authz_v2.introspection.authorized_pair[pair]"
+	query := "data.authz.introspection.authorized_pair[pair]"
 
 	for descr, input := range cases {
 		t.Run(descr, func(t *testing.T) {
@@ -417,8 +417,8 @@ func TestActionsMatching(t *testing.T) {
 				t.Run(stored, func(t *testing.T) {
 
 					// We ask directly for what's used in the definition of
-					// data.authz_v2.has_action: the action_matches(in, stored) function
-					query := fmt.Sprintf("data.authz_v2.action_matches(%q, %q)", in, stored)
+					// data.authz.has_action: the action_matches(in, stored) function
+					query := fmt.Sprintf("data.authz.action_matches(%q, %q)", in, stored)
 					rs := resultSetV2(t, input, strings.NewReader(data), query)
 					if expectedSuccess {
 						require.Equal(t, 1, len(rs))
@@ -507,7 +507,7 @@ func TestSubjectsMatching(t *testing.T) {
 // one or more statements)
 
 // Note: the policy evaluation logic this tests is the same used by
-// data.authz_v2.has_resource[[pol_id, statement_id]]. However, having the exact
+// data.authz.has_resource[[pol_id, statement_id]]. However, having the exact
 // same set of tests for both of those paths, with only the word "action[s]"
 // replaced by "resource[s]" doesn't feel right. Let's take this as another
 // potentially useful way to test our policies, and decide how we want to
@@ -517,7 +517,7 @@ func TestHasAction(t *testing.T) {
 	// same id for the matching policy/statement:
 	polID, statementID := "86d88515-5f41-400d-8c2b-237bad00ff81", "7ae5ea03-eb67-4935-8387-1eafb4dffd78"
 
-	query := "data.authz_v2.has_action[[pol_id, statement_id]]"
+	query := "data.authz.has_action[[pol_id, statement_id]]"
 	expectedBinding := map[string]string{
 		"pol_id":       polID,
 		"statement_id": statementID,
@@ -577,7 +577,7 @@ func TestHasProject(t *testing.T) {
 	project, otherProject := "project-9", "(unassigned)"
 	input := map[string]interface{}{"projects": []string{project}}
 
-	query := "data.authz_v2.has_project[[project, pol_id, statement_id]]"
+	query := "data.authz.has_project[[project, pol_id, statement_id]]"
 	expectedBinding := map[string]string{
 		"project":      project,
 		"pol_id":       polID,
@@ -644,9 +644,9 @@ func resultSetV2(t *testing.T,
 func compilerV2(t *testing.T) *ast.Compiler {
 	t.Helper()
 	return compilerWithModules(t, map[string]string{
-		"authz_v2.rego":         "../opa/policy/authz_v2.rego",
-		"introspection_v2.rego": "../opa/policy/introspection_v2.rego",
-		"common.rego":           "../opa/policy/common.rego",
+		"authz.rego":         "../opa/policy/authz.rego",
+		"introspection.rego": "../opa/policy/introspection.rego",
+		"common.rego":        "../opa/policy/common.rego",
 	})
 }
 

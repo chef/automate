@@ -33,9 +33,9 @@ type State struct {
 
 // this needs to match the hardcoded OPA policy document we've put in place
 const (
-	authzProjectsV2Query    = "data.authz_v2.authorized_project[project]"
-	filteredPairsV2Query    = "data.authz_v2.introspection.authorized_pair[_]"
-	filteredProjectsV2Query = "data.authz_v2.introspection.authorized_project"
+	authzProjectsQuery    = "data.authz.authorized_project[project]"
+	filteredPairsQuery    = "data.authz.introspection.authorized_pair[_]"
+	filteredProjectsQuery = "data.authz.introspection.authorized_project"
 )
 
 // OptFunc is the type of functional options to be passed to New()
@@ -44,25 +44,25 @@ type OptFunc func(*State)
 // New initializes a fresh OPA state, using the default, hardcoded OPA policy
 // from policy/authz*.rego unless overridden via an opa.OptFunc.
 func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) {
-	authzProjectsV2QueryParsed, err := ast.ParseBody(authzProjectsV2Query)
+	authzProjectsQueryParsed, err := ast.ParseBody(authzProjectsQuery)
 	if err != nil {
-		return nil, errors.Wrapf(err, "parse query %q", authzProjectsV2Query)
+		return nil, errors.Wrapf(err, "parse query %q", authzProjectsQuery)
 	}
-	filteredPairsV2QueryParsed, err := ast.ParseBody(filteredPairsV2Query)
+	filteredPairsQueryParsed, err := ast.ParseBody(filteredPairsQuery)
 	if err != nil {
-		return nil, errors.Wrapf(err, "parse query %q", filteredPairsV2Query)
+		return nil, errors.Wrapf(err, "parse query %q", filteredPairsQuery)
 	}
-	filteredProjectsV2QueryParsed, err := ast.ParseBody(filteredProjectsV2Query)
+	filteredProjectsQueryParsed, err := ast.ParseBody(filteredProjectsQuery)
 	if err != nil {
-		return nil, errors.Wrapf(err, "parse query %q", filteredProjectsV2Query)
+		return nil, errors.Wrapf(err, "parse query %q", filteredProjectsQuery)
 	}
 	s := State{
 		log:   l,
 		store: inmem.New(),
 		queries: map[string]ast.Body{
-			authzProjectsV2Query:    authzProjectsV2QueryParsed,
-			filteredPairsV2Query:    filteredPairsV2QueryParsed,
-			filteredProjectsV2Query: filteredProjectsV2QueryParsed,
+			authzProjectsQuery:    authzProjectsQueryParsed,
+			filteredPairsQuery:    filteredPairsQueryParsed,
+			filteredProjectsQuery: filteredProjectsQueryParsed,
 		},
 	}
 	for _, opt := range opts {
@@ -122,9 +122,9 @@ func (s *State) makeAuthorizedProjectPreparedQuery(ctx context.Context) error {
 	r := rego.New(
 		rego.Store(s.store),
 		rego.Compiler(compiler),
-		rego.ParsedQuery(s.queries[authzProjectsV2Query]),
+		rego.ParsedQuery(s.queries[authzProjectsQuery]),
 		rego.DisableInlining([]string{
-			"data.authz_v2.denied_project",
+			"data.authz.denied_project",
 		}),
 	)
 
@@ -267,7 +267,7 @@ func (s *State) FilterAuthorizedPairs(
 		"pairs":    pairs,
 	}
 
-	rs, err := s.evalQuery(ctx, s.queries[filteredPairsV2Query], opaInput, s.store)
+	rs, err := s.evalQuery(ctx, s.queries[filteredPairsQuery], opaInput, s.store)
 	if err != nil {
 		return nil, &EvaluationError{e: err}
 	}
@@ -285,7 +285,7 @@ func (s *State) FilterAuthorizedProjects(
 		"subjects": subjects,
 	}
 
-	rs, err := s.evalQuery(ctx, s.queries[filteredProjectsV2Query], opaInput, s.store)
+	rs, err := s.evalQuery(ctx, s.queries[filteredProjectsQuery], opaInput, s.store)
 	if err != nil {
 		return nil, &EvaluationError{e: err}
 	}
