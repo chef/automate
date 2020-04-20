@@ -79,9 +79,7 @@ export class ProjectsFilterDropdownComponent {
 
     // Check for deep equality against new changes, disabling
     // apply button if changes are not new
-    JSON.stringify(this.initialFilters) === JSON.stringify(this.editableOptions)
-      ? this.optionsEdited = false
-      : this.optionsEdited = true;
+    this.checkInitialEquality();
   }
 
   handleApplySelection() {
@@ -92,14 +90,13 @@ export class ProjectsFilterDropdownComponent {
   }
 
   handleClearSelection() {
-    // TODO: Should ideally set to true only when some projects were selected upon opening
-    this.optionsEdited = true; // mark as edited
-
     // clear only entries visible by current filter
     // TODO: Micro-optimization: use a hash to convert this O(n^2) to O(n).
     this.editableOptions
       .filter(option => this.filteredOptions.find(o => o.label === option.label))
       .map(option => option.checked = false);
+
+    this.checkInitialEquality();
   }
 
   handleArrowUp(event: KeyboardEvent) {
@@ -118,5 +115,13 @@ export class ProjectsFilterDropdownComponent {
     if (element) {
       (element as HTMLElement).focus();
     }
+  }
+
+  checkInitialEquality(): void {
+    // Check for deep equality against new changes, disabling
+    // apply button if changes are not new
+    JSON.stringify(this.initialFilters) === JSON.stringify(this.editableOptions)
+      ? this.optionsEdited = false
+      : this.optionsEdited = true;
   }
 }
