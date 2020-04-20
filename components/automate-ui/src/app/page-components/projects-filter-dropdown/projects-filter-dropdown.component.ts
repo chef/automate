@@ -28,11 +28,12 @@ export class ProjectsFilterDropdownComponent {
   @Output() onSelection = new EventEmitter<ProjectsFilterOption[]>();
   @Output() onOptionChange = new EventEmitter<ProjectsFilterOption[]>();
 
-  lastEdit: ProjectsFilterOption[] = [];
   editableOptions: ProjectsFilterOption[] = [];
   // Filtered options is merely a copy of the editable options
   // so they can be filtered while maintaining the actual options.
   filteredOptions: ProjectsFilterOption[] = [];
+  // InitialFilters holds a copy of the initial state of filtered Options
+  initialFilters: ProjectsFilterOption[] = [];
 
   optionsEdited = false;
 
@@ -41,9 +42,9 @@ export class ProjectsFilterDropdownComponent {
   resetOptions() {
     if (!this.optionsEdited) {
       this.filteredOptions = this.editableOptions = cloneDeep(this.options);
-      // Keep a reference to the initial filteredOptions
-      // in lastEdit to check deep equality when a user unchecks/checks same button
-      this.lastEdit = cloneDeep(this.filteredOptions);
+      // Keep a reference to the filteredOptions in initialFilters
+      // to check deep equality when a user unchecks/checks same button
+      this.initialFilters = cloneDeep(this.filteredOptions);
     }
   }
 
@@ -77,8 +78,8 @@ export class ProjectsFilterDropdownComponent {
       .find(option => option.label === label).checked = event.detail;
 
     // Check for deep equality against new changes, disabling
-    // applly button if changes are not new
-    JSON.stringify(this.lastEdit) === JSON.stringify(this.editableOptions)
+    // apply button if changes are not new
+    JSON.stringify(this.initialFilters) === JSON.stringify(this.editableOptions)
       ? this.optionsEdited = false
       : this.optionsEdited = true;
   }
