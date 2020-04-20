@@ -32,12 +32,12 @@ func (a *adapter) CreateToken(ctx context.Context,
 func (a *adapter) CreateTokenWithValue(ctx context.Context,
 	id, value, name string, active bool, projects []string) (*tokens.Token, error) {
 	if err := tutil.IsValidToken(value); err != nil {
-		return nil, err
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	err := a.validateTokenInputs(ctx, name, []string{}, projects, false)
 	if err != nil {
-		return nil, err
+		return nil, err // already a grpc status
 	}
 
 	return a.insertToken(ctx, id, name, value, active, projects)
