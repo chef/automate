@@ -80,43 +80,43 @@
       <section class="page-body" *ngIf="tabValue === 'cookbooks'">
         <chef-loading-spinner *ngIf="cookbooksListLoading" size="50"></chef-loading-spinner>
         <ng-container  *ngIf="!cookbooksListLoading">
-          <chef-table-new>
-            <chef-table-header>
-              <chef-table-row>
-                <chef-table-header-cell>Cookbook Name</chef-table-header-cell>
-                <chef-table-header-cell>Cookbook Version</chef-table-header-cell>
-              </chef-table-row>
-            </chef-table-header>
-            <chef-table-body>
-              <chef-table-row *ngFor="let cookbook of cookbooks">
-                <chef-table-cell>{{ cookbook.name }}</chef-table-cell>
-                <chef-table-cell>{{ cookbook.version }}</chef-table-cell>
-              </chef-table-row>
-            </chef-table-body>
-          </chef-table-new>
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th>Cookbook Name</chef-th>
+                <chef-th>Cookbook Version</chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr *ngFor="let cookbook of cookbooks">
+                <chef-td>{{ cookbook.name }}</chef-td>
+                <chef-td>{{ cookbook.version }}</chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
         </ng-container>
       </section>
       <section class="page-body" *ngIf="tabValue === 'roles'">
         <chef-loading-spinner *ngIf="rolesListLoading" size="50"></chef-loading-spinner>
         <ng-container *ngIf="!rolesListLoading">
-          <chef-table-new>
-            <chef-table-header>
-              <chef-table-row>
-                <chef-table-header-cell>Role Name</chef-table-header-cell>
-                <chef-table-header-cell>Description</chef-table-header-cell>
-                <chef-table-header-cell>Environments</chef-table-header-cell>
-              </chef-table-row>
-            </chef-table-header>
-            <chef-table-body>
-              <chef-table-row *ngFor="let role of roles">
-                <chef-table-cell>
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th>Role Name</chef-th>
+                <chef-th>Description</chef-th>
+                <chef-th>Environments</chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr *ngFor="let role of roles">
+                <chef-td>
                   <a [routerLink]="['/infrastructure','chef-servers', serverId, 'org', OrgId, 'roles', role.name]">{{ role.name }}</a>
-                </chef-table-cell>
-                <chef-table-cell>{{ role.description == '' ?  'N/A' : role.description }}</chef-table-cell>
-                <chef-table-cell>{{ role.environments.join(", ") }}</chef-table-cell>
-              </chef-table-row>
-            </chef-table-body>
-          </chef-table-new>
+                </chef-td>
+                <chef-td>{{ role.description == '' ?  'N/A' : role.description }}</chef-td>
+                <chef-td>{{ role.environments.join(", ") }}</chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
         </ng-container>
       </section>
     </main>
