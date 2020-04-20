@@ -35,7 +35,6 @@ type TokensMgmtServerMock struct {
 	UpdateTokenFunc          func(context.Context, *UpdateTokenReq) (*Token, error)
 	GetTokenFunc             func(context.Context, *GetTokenReq) (*Token, error)
 	DeleteTokenFunc          func(context.Context, *DeleteTokenReq) (*DeleteTokenResp, error)
-	ResetToV1Func            func(context.Context, *ResetToV1Req) (*ResetToV1Resp, error)
 }
 
 func (m *TokensMgmtServerMock) GetTokens(ctx context.Context, req *GetTokensReq) (*Tokens, error) {
@@ -110,18 +109,6 @@ func (m *TokensMgmtServerMock) DeleteToken(ctx context.Context, req *DeleteToken
 	return nil, status.Error(codes.Internal, "mock: 'DeleteToken' not implemented")
 }
 
-func (m *TokensMgmtServerMock) ResetToV1(ctx context.Context, req *ResetToV1Req) (*ResetToV1Resp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.ResetToV1Func; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'ResetToV1' not implemented")
-}
-
 // Reset resets all overridden functions
 func (m *TokensMgmtServerMock) Reset() {
 	m.GetTokensFunc = nil
@@ -130,5 +117,4 @@ func (m *TokensMgmtServerMock) Reset() {
 	m.UpdateTokenFunc = nil
 	m.GetTokenFunc = nil
 	m.DeleteTokenFunc = nil
-	m.ResetToV1Func = nil
 }

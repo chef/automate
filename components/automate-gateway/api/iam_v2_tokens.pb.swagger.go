@@ -269,9 +269,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.iam.v2.ResetAllTokenProjectsResp": {
-      "type": "object"
-    },
     "chef.automate.api.iam.v2.Token": {
       "type": "object",
       "properties": {
