@@ -118,6 +118,12 @@ Whenever we are provided with information about a scannable node, we run a detec
 curl -sSX GET "https://automate-url/api/v0/nodes/rerun/id/d92b0c26-0c9a-4a04-b694-82fa979b2578"
 ```
 
+### How to Add an Environment Value for Project Assignment
+
+When creating a manually added node, use the 'Environment' tag to assign an environment to the node. `Environment` is the only supported field for project filtering on scan job results.
+![Manual Node With Environment Tag](/images/docs/environment-tag-manual-node.png)
+
+
 ### FAQ
 
 * I scheduled a job to run against my aws-ec2 instances once a day. What happens when I add new instances to the account, or remove some?

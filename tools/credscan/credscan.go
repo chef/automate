@@ -89,6 +89,9 @@ var a2Config = config{
 		{regex: `dev/config.toml`},
 		{regex: `lib/grpc/secureconn/testdata/.*\.key`},
 
+		// Test data for cypress; only removing the beg and end of pem key
+		{regex: `e2e/cypress/integration/api/iam/projects_api_scanjob_ingestion.spec.ts`},
+
 		// Test data from workflow
 		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/expired.key`},
 		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/untrusted.key`},

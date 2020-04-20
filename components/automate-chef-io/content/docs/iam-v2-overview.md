@@ -176,18 +176,16 @@ Resources that do not respect projects will always display and will ignore any a
 
 - API Tokens
 - Ingested Client Run nodes
-- Ingested Compliance nodes
+- Ingested Compliance nodes (including the results of a scan job)
 - Policies
 - Teams
 - Roles
 
 #### Resources that do not respect projects
 
-- Compliance Scan Jobs
 - Compliance Profiles
 - Data Feeds
 - Habitat Services
-- Manually added nodes
 - Node Credentials
 - Node Managers (also called Node Integrations)
 - Notifications
