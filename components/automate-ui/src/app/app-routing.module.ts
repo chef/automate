@@ -7,6 +7,9 @@ import {
 } from './modules/token/token-details/api-token-details.component';
 import { ApiTokenListComponent } from './modules/token/token-list/api-token-list.component';
 import { ApplicationsComponent } from './pages/applications/applications.component';
+import {
+  EnvironmentDetailsComponent
+} from './modules/infra-proxy/environment-details/environment-details.component';
 import { EventFeedComponent } from './pages/event-feed/event-feed.component';
 import { IntegrationsAddComponent } from './pages/integrations/add/integrations-add.component';
 import {
@@ -251,8 +254,12 @@ const routes: Routes = [
               component: OrgDetailsComponent
             },
             {
-            path: ':id/org/:orgid/roles/:name',
+              path: ':id/org/:orgid/roles/:name',
               component: InfraRoleDetailsComponent
+            },
+            {
+              path: ':id/org/:orgid/environments/:name',
+              component: EnvironmentDetailsComponent
             }
           ]
         }

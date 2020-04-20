@@ -11,6 +11,7 @@ import { OrgDetailsComponent } from './org-details/org-details.component';
 import { OrgEditComponent } from './org-edit/org-edit.component';
 import { CookbooksComponent } from './cookbooks/cookbooks.component';
 import { EnvironmentsComponent } from './environments/environments.component';
+import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
 import { InfraRolesComponent } from './infra-roles/infra-roles.component';
 import { InfraRoleDetailsComponent } from './infra-role-details/infra-role-details.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
@@ -27,6 +28,7 @@ import { JsonTreeTableComponent } from './json-tree-table/json-tree-table.compon
     CookbooksComponent,
     InfraRolesComponent,
     EnvironmentsComponent,
+    EnvironmentDetailsComponent,
     InfraRoleDetailsComponent,
     CreateChefServerModalComponent,
     CreateOrgModalComponent,

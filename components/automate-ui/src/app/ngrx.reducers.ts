@@ -13,6 +13,7 @@ import * as desktopEntity from './entities/desktop/desktop.reducer';
 import * as infraRoleEntity from './entities/infra-roles/infra-role.reducer';
 import * as environmentEntity from './entities/environments/environment.reducer';
 import * as infraRoleDetailsEntity from './entities/infra-roles/infra-role-details.reducer';
+import * as environmentDetailsEntity from './entities/environments/environment-details.reducer';
 import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
 import * as integrationsDetail from './pages/integrations/detail/integrations-detail.reducer';
 import * as integrationsEdit from './pages/integrations/edit/integrations-edit.reducer';
@@ -64,6 +65,7 @@ export interface NgrxStateAtom {
   infraRoles: infraRoleEntity.InfraRoleEntityState;
   environments: environmentEntity.EnvironmentEntityState;
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
+  environmentDetails: environmentDetailsEntity.EnvironmentDetailsEntityState; 
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
@@ -175,6 +177,7 @@ export const defaultInitialState = {
   infraRoles: infraRoleEntity.InfraRoleEntityInitialState,
   environments: environmentEntity.EnvironmentEntityInitialState,
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
+  environmentDetails: environmentDetailsEntity.EnvironmentEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
   licenseStatus: license.LicenseStatusEntityInitialState,
   managers: manager.ManagerEntityInitialState,
@@ -219,6 +222,7 @@ export const ngrxReducers = {
   infraRoles: infraRoleEntity.infraRoleEntityReducer,
   environments: environmentEntity.environmentEntityReducer,
   infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
+  environmentDetails: environmentDetailsEntity.environmentDetailsEntityReducer,
   credentialEntity: credential.credentialReducer,
   jobs: jobEntity.jobEntityReducer,
   managers: manager.managerEntityReducer,
