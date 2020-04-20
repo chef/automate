@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrgDetailsComponent } from './org-details.component';
+import { OrgEditComponent } from './org-edit.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
@@ -9,13 +9,15 @@ import { StoreModule } from '@ngrx/store';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
-describe('OrgDetailsComponent', () => {
-  let component: OrgDetailsComponent;
-  let fixture: ComponentFixture<OrgDetailsComponent>;
+describe('OrgEditComponent', () => {
+  let component: OrgEditComponent;
+  let fixture: ComponentFixture<OrgEditComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
+        MockComponent({ selector: 'chef-th' }),
+        MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),
@@ -34,7 +36,7 @@ describe('OrgDetailsComponent', () => {
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        OrgDetailsComponent
+        OrgEditComponent
       ],
       providers: [
         FeatureFlagsService
@@ -51,7 +53,7 @@ describe('OrgDetailsComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OrgDetailsComponent);
+    fixture = TestBed.createComponent(OrgEditComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

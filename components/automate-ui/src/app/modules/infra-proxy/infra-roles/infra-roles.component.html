@@ -1,0 +1,23 @@
+<section class="infra-roles">
+  <chef-loading-spinner *ngIf="rolesListLoading" size="50"></chef-loading-spinner>
+  <ng-container *ngIf="!rolesListLoading">
+    <chef-table>
+      <chef-thead>
+        <chef-tr>
+          <chef-th>Role Name</chef-th>
+          <chef-th>Description</chef-th>
+          <chef-th>Environments</chef-th>
+        </chef-tr>
+      </chef-thead>
+      <chef-tbody>
+        <chef-tr *ngFor="let role of roles">
+          <chef-td>
+            <a [routerLink]="['/infrastructure','chef-servers', serverId, 'org', orgId, 'roles', role.name]">{{ role.name }}</a>
+          </chef-td>
+          <chef-td>{{ role.description == '' ?  'N/A' : role.description }}</chef-td>
+          <chef-td>{{ role.environments.join(", ") }}</chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+  </ng-container>
+</section>

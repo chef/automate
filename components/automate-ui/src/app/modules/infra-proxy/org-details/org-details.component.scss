@@ -17,56 +17,6 @@ chef-toolbar {
   }
 }
 
-chef-tab-selector {
-  chef-option {
-    margin-right: 16px;
-    color: $chef-primary-dark;
-  }
-}
-
-form {
-
-  chef-form-field {
-    width: 300px;
-    margin-bottom: 15px;
-  }
-
-  textarea {
-    height: 200px;
-  }
-
-  input[type="text"]:disabled {
-    opacity: 0.5;
-    background-color: $chef-grey;
-    border: none;
-  }
-
-  #changes-not-allowed {
-    font-size: 12px;
-  }
-
-  #button-bar {
-    margin-top: 15px;
-
-    span#saved-note {
-      display: inline-block;
-      margin-top: 5px;
-      font-size: 12px;
-    }
-
-    chef-button {
-      margin-top: 0;
-      margin-left: 0;
-
-      chef-loading-spinner {
-        position: relative;
-        top: 2px;
-        margin-right: 5px;
-      }
-    }
-  }
-}
-
 thead {
   font-size: 14px;
   letter-spacing: 0.2px;
@@ -111,14 +61,19 @@ chef-table {
   }
 }
 
-chef-loading-spinner {
-  z-index: 199;
-}
-
 .page-body {
+  padding-top: 0;
+
   chef-loading-spinner {
     display: block;
     margin: 100px auto;
     width: 100px;
   }
+}
+
+chef-loading-spinner {
+  display: block;
+  margin: 100px auto;
+  width: 100px;
+  z-index: 199;
 }
