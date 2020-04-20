@@ -86,15 +86,6 @@ func (a *adapter) PurgeProject(ctx context.Context, projectID string) error {
 	return nil
 }
 
-// ResetToV1 removes all projects from every token
-func (a *adapter) ResetToV1(ctx context.Context) error {
-	_, err := a.db.ExecContext(ctx, "UPDATE chef_authn_tokens SET project_ids='{}'")
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (a *adapter) insertToken(ctx context.Context,
 	id string, name string, value string, active bool, projects []string) (*tokens.Token, error) {
 

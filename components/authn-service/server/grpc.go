@@ -166,14 +166,6 @@ func (a *tokenAPI) UpdateToken(ctx context.Context, req *api.UpdateTokenReq) (*a
 	return toTokenResp(t), nil
 }
 
-func (a *tokenAPI) ResetToV1(ctx context.Context, req *api.ResetToV1Req) (*api.ResetToV1Resp, error) {
-	err := a.ts.ResetToV1(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-	return &api.ResetToV1Resp{}, nil
-}
-
 func toTokenResp(t *tokens.Token) *api.Token {
 	return &api.Token{
 		Id:       t.ID,

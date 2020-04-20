@@ -78,5 +78,4 @@ service TokensMgmt {
   rpc UpdateToken (UpdateTokenReq) returns (Token) {};
   rpc GetToken (GetTokenReq) returns (Token) {};
   rpc DeleteToken (DeleteTokenReq) returns (DeleteTokenResp) {};
-  rpc ResetToV1 (ResetToV1Req) returns (ResetToV1Resp) {};
 }
