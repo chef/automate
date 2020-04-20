@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable, combineLatest } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
-import { EntityStatus, allLoaded } from 'app/entities/entities';
+import { EntityStatus } from 'app/entities/entities';
 import { GetRoles } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import {
@@ -25,8 +25,6 @@ export class InfraRolesComponent implements OnInit {
   @Input() orgId: string;
 
   public roles: InfraRole[] = [];
-  public loading$: Observable<boolean>;
-  public isLoading = true;
   public rolesListLoading = true;
 
   constructor(
@@ -40,12 +38,6 @@ export class InfraRolesComponent implements OnInit {
     this.store.dispatch(new GetRoles({
       server_id: this.serverId, org_id: this.orgId
     }));
-
-    combineLatest([
-      this.store.select(getAllRolesForOrgStatus)
-    ]).pipe().subscribe(([getRolesSt]) => {
-        this.isLoading = !allLoaded([getRolesSt]);
-      });
 
     combineLatest([
       this.store.select(getAllRolesForOrgStatus),
