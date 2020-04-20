@@ -297,6 +297,46 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 	}, nil
 }
 
+//GetNodesFieldValueCounts - Get field value counts for a list of fields provided. For each
+// field provided a list of distinct values and their amount is returned.
+func (s *CfgMgmtServer) GetNodesFieldValueCounts(ctx context.Context,
+	request *cfgReq.NodesFieldValueCounts) (*cfgRes.NodesFieldValueCounts, error) {
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	cfgMgmtRequest := &cmsReq.NodesFieldValueCounts{
+		SearchTerms: request.SearchTerms,
+		Filter:      request.Filter,
+		Start:       request.Start,
+		End:         request.End,
+	}
+
+	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodesFieldValueCounts(ctx, cfgMgmtRequest)
+	if err != nil {
+		return &cfgRes.NodesFieldValueCounts{}, err
+	}
+	fields := make([]*cfgRes.FieldCount, len(cfgmgmtResponse.Fields))
+	for index, cfgField := range cfgmgmtResponse.Fields {
+		terms := make([]*cfgRes.TermCount, len(cfgField.Terms))
+		for termIndex, cfgTerm := range cfgField.Terms {
+			terms[termIndex] = &cfgRes.TermCount{
+				Term:  cfgTerm.Term,
+				Count: cfgTerm.Count,
+			}
+		}
+		fields[index] = &cfgRes.FieldCount{
+			Terms: terms,
+			Field: cfgField.Field,
+		}
+	}
+
+	return &cfgRes.NodesFieldValueCounts{
+		Fields: fields,
+	}, nil
+}
+
 // GetNodeRun returns the requested run
 func (s *CfgMgmtServer) GetNodeRun(ctx context.Context, request *cfgReq.NodeRun) (*cfgRes.Run, error) {
 	log.WithFields(log.Fields{

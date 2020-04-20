@@ -276,6 +276,58 @@ func init() {
         ]
       }
     },
+    "/cfgmgmt/nodes_field_value_counts": {
+      "get": {
+        "summary": "GetNodesFieldValueCounts",
+        "description": "Returns a list fields with value counts\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetNodesFieldValueCounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodesFieldValueCounts"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "searchTerms",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/cfgmgmt/organizations": {
       "get": {
         "summary": "GetOrganizations",
@@ -723,6 +775,20 @@ func init() {
         }
       }
     },
+    "chef.automate.api.cfgmgmt.response.FieldCount": {
+      "type": "object",
+      "properties": {
+        "terms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.TermCount"
+          }
+        },
+        "field": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.cfgmgmt.response.MissingNodeDurationCounts": {
       "type": "object",
       "properties": {
@@ -822,6 +888,17 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "Total count of nodes that have been labeled as 'missing' as determined by node lifecycle settings."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.NodesFieldValueCounts": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.FieldCount"
+          }
         }
       }
     },
@@ -1124,6 +1201,18 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "Total count of failed run reports that have landed in Automate for the node."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.TermCount": {
+      "type": "object",
+      "properties": {
+        "term": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

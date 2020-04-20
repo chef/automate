@@ -272,7 +272,8 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 	return ns, nil
 }
 
-// GetNodesCounts - get the number of successful, failure, and missing nodes
+// GetNodesFieldValueCounts - Get field value counts for a list of fields provided. For each
+// field provided a list of distinct values and their amount is returned.
 func (es Backend) GetNodesFieldValueCounts(filters map[string][]string,
 	fields []string, startDate, endDate string) ([]backend.FieldCount, error) {
 	var aggregationTerm = "inner_filter"

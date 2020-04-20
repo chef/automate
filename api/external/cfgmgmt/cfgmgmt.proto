@@ -318,4 +318,22 @@ service ConfigMgmt {
   rpc NodeExport(cfgmgmt.request.NodeExport) returns (stream chef.automate.api.common.ExportData) {};
 
   rpc ReportExport(cfgmgmt.request.ReportExport) returns (stream chef.automate.api.common.ExportData) {};
+
+  /*
+  GetNodesFieldValueCounts
+
+  Returns a list fields with value counts
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc GetNodesFieldValueCounts(cfgmgmt.request.NodesFieldValueCounts) returns (cfgmgmt.response.NodesFieldValueCounts) {
+    option (google.api.http).get = "/cfgmgmt/nodes_field_value_counts";
+    option (chef.automate.api.policy).resource = "cfgmgmt:nodes";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  }
 }
