@@ -1,4 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -14,7 +15,6 @@ import {
 } from 'app/entities/teams/team.actions';
 import { TeamManagementComponent } from './team-management.component';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 
 describe('TeamManagementComponent', () => {
   let component: TeamManagementComponent;
@@ -114,8 +114,7 @@ describe('TeamManagementComponent', () => {
 
   describe('delete team', () => {
     let store: Store<NgrxStateAtom>;
-    const mockChefKeyEvent = new KeyboardEvent('keypress') as ChefKeyboardEvent;
-    mockChefKeyEvent.isUserInput = true;
+    const mockEvent = { isUserInput: true } as MatOptionSelectionChange;
 
     const deleteTeam: Team = {
       guid: 'uuid-1',
@@ -134,7 +133,7 @@ describe('TeamManagementComponent', () => {
     });
 
     it('opens the delete modal', () => {
-      component.startTeamDelete(mockChefKeyEvent, deleteTeam);
+      component.startTeamDelete(mockEvent, deleteTeam);
       fixture.detectChanges();
 
       expect(component.deleteModalVisible).toBe(true);
