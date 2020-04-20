@@ -2,7 +2,7 @@ import { createSelector, createFeatureSelector } from '@ngrx/store';
 import {
   CookbookDetailsEntityState,
   cookbookDetailsEntityAdapter
-} from './cookbookdetails.reducer';
+} from './cookbook-details.reducer';
 import { routeParams } from 'app/route.selectors';
 import { find } from 'lodash/fp';
 

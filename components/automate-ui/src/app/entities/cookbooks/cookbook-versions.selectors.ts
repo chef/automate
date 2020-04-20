@@ -1,5 +1,5 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { CookbookVersionsEntityState, cookbookVersionsEntityAdapter } from './cookbookversions.reducer';
+import { CookbookVersionsEntityState, cookbookVersionsEntityAdapter } from './cookbook-versions.reducer';
 
 export const cookbookVersionsState = createFeatureSelector<CookbookVersionsEntityState>('cookbookVersions');
 

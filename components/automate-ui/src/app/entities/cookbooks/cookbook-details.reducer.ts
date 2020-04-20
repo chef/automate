@@ -2,8 +2,8 @@ import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
-import { CookbookDetailsActionTypes, CookbookDetailsActions } from './cookbookdetails.actions';
-import { CookbookDetails } from './cookbookdetails.model';
+import { CookbookDetailsActionTypes, CookbookDetailsActions } from './cookbook-details.actions';
+import { CookbookDetails } from './cookbook-details.model';
 
 export interface CookbookDetailsEntityState extends EntityState<CookbookDetails> {
   status: EntityStatus;

@@ -12,11 +12,11 @@ import {
   GetCookbookVersionsSuccess,
   GetCookbookVersionsFailure,
   CookbookVersionsActionTypes
-} from './cookbookversions.actions';
+} from './cookbook-versions.actions';
 
 import {
   CookbookVersionsRequests
-} from './cookbookversions.requests';
+} from './cookbook-versions.requests';
 
 @Injectable()
 export class CookbookVersionsEffects {

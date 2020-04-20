@@ -11,13 +11,13 @@ import { filter, takeUntil, pluck } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 import { CookbookVersions } from 'app/entities/cookbooks/cookbookversions.model';
 import { allCookbookVersions, getStatus } from 'app/entities/cookbooks/cookbookversions.selectors';
-import { GetCookbookVersions } from 'app/entities/cookbooks/cookbookversions.actions';
-import { CookbookDetails, RootFiles } from 'app/entities/cookbooks/cookbookdetails.model';
+import { GetCookbookVersions } from 'app/entities/cookbooks/cookbook-versions.actions';
+import { CookbookDetails, RootFiles } from 'app/entities/cookbooks/cookbook-details.model';
 import {
   allCookbookDetails,
   getStatus as getAllCookbooksDetailsForVersionStatus
-} from 'app/entities/cookbooks/cookbookdetails.selectors';
-import { GetCookbookDetailsForVersion } from 'app/entities/cookbooks/cookbookdetails.actions';
+} from 'app/entities/cookbooks/cookbook-details.selectors';
+import { GetCookbookDetailsForVersion } from 'app/entities/cookbooks/cookbook-details.actions';
 export type CookbookDetailsTab = 'details' | 'content';
 
 @Component({

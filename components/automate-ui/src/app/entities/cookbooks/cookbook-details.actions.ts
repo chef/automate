@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
-import { CookbookDetails } from './cookbookdetails.model';
+import { CookbookDetails } from './cookbook-details.model';
 
 export enum CookbookDetailsActionTypes {
   GET = 'COOKBOOKDETAILS::GET',

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 // import { CookbookDetailsSuccessPayload } from './cookbookdetails.actions';
-import { CookbookDetails } from './cookbookdetails.model';
+import { CookbookDetails } from './cookbook-details.model';
 
 @Injectable()
 export class CookbookDetailsRequests {

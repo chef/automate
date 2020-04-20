@@ -12,11 +12,11 @@ import {
   GetCookbookDetailsSuccess,
   GetCookbookDetailsFailure,
   CookbookDetailsActionTypes
-} from './cookbookdetails.actions';
+} from './cookbook-details.actions';
 
 import {
   CookbookDetailsRequests
-} from './cookbookdetails.requests';
+} from './cookbook-details.requests';
 
 @Injectable()
 export class CookbookDetailsEffects {
