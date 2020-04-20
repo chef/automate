@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/external/secrets"
-	auth "github.com/chef/automate/api/interservice/authn"
+	authn "github.com/chef/automate/api/interservice/authn"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
@@ -471,7 +471,7 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Compliance,
 	esr relaxting.ES2Backend, db *pgdb.DB, cerealManager *cereal.Manager) error {
 	var err error
-	var conn, mgrConn, secretsConn, authConn *grpc.ClientConn
+	var conn, mgrConn, secretsConn, authnConn, authzConn *grpc.ClientConn
 	timeoutCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
@@ -551,22 +551,36 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	} else {
 		// get the authn-service connection
 		logrus.Debugf("compliance setup, dialing authn-service(%s)", conf.InspecAgent.AuthnTarget)
-		authConn, err = connFactory.DialContext(timeoutCtx, "authn-service", conf.InspecAgent.AuthnTarget,
+		authnConn, err = connFactory.DialContext(timeoutCtx, "authn-service", conf.InspecAgent.AuthnTarget,
 			grpc.WithBlock())
-		if err != nil || authConn == nil {
+		if err != nil || authnConn == nil {
 			err = errors.New("compliance setup, error grpc dialing to authn aborting...")
 			return err
 		}
 		// get the authn client
-		authClient := auth.NewTokensMgmtClient(authConn)
-		if authClient == nil {
+		authnClient := authn.NewTokensMgmtClient(authnConn)
+		if authnClient == nil {
 			logrus.Errorf("serveGrpc got nil for NewTokensMgmtClient: %s", err)
+			return err
+		}
+		// get authz connection
+		authzConn, err = connFactory.DialContext(timeoutCtx, "authz-service", fmt.Sprintf("%s:%d", conf.Authz.HostBind, conf.Authz.Port),
+			grpc.WithBlock())
+		if err != nil || authzConn == nil {
+			err = errors.New("compliance setup, error grpc dialing to authz aborting...")
+			return err
+		}
+		// get the authz client
+		authzClient := iam_v2.NewPoliciesClient(authzConn)
+		if authzClient == nil {
+			logrus.Errorf("serveGrpc got nil for NewPoliciesClient: %s", err)
 			return err
 		}
 		// in order to execute scan jobs remotely (i.e. on a different server, reporting back out
 		// to automate), we need access to the auth client for a token and the automate fqdn for reporting
 		remote.RemoteJobInfo = remote.RemoteJob{
-			TokensMgmtClient: authClient,
+			PoliciesClient:   authzClient,
+			TokensMgmtClient: authnClient,
 			AutomateFQDN:     conf.InspecAgent.AutomateFQDN,
 		}
 	}
