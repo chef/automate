@@ -36,13 +36,15 @@ service Deployment {
 	rpc SetAutomateConfig (SetAutomateConfigRequest) returns (SetAutomateConfigResponse);
 	rpc DumpDB (DumpDBRequest) returns (stream DumpDBResponse);
 	rpc ManifestVersion (ManifestVersionRequest) returns (ManifestVersionResponse);
-	rpc CreateBackup(CreateBackupRequest) returns(CreateBackupResponse);
-	rpc ListBackups(ListBackupsRequest) returns(ListBackupsResponse);
-	rpc ShowBackup(ShowBackupRequest) returns(ShowBackupResponse);
-	rpc DeleteBackups(DeleteBackupsRequest) returns(DeleteBackupsResponse);
-	rpc RestoreBackup(RestoreBackupRequest) returns(RestoreBackupResponse);
-	rpc BackupStatus(BackupStatusRequest) returns(BackupStatusResponse);
-	rpc CancelBackup(CancelBackupRequest) returns(CancelBackupResponse);
+	rpc CreateBackup(CreateBackupRequest) returns (CreateBackupResponse);
+	rpc ListBackups(ListBackupsRequest) returns (ListBackupsResponse);
+	rpc ShowBackup(ShowBackupRequest) returns (ShowBackupResponse);
+	rpc DeleteBackups(DeleteBackupsRequest) returns (DeleteBackupsResponse);
+	rpc RestoreBackup(RestoreBackupRequest) returns (RestoreBackupResponse);
+	rpc BackupStatus(BackupStatusRequest) returns (BackupStatusResponse);
+	rpc CancelBackup(CancelBackupRequest) returns (CancelBackupResponse);
+	rpc BackupIntegrityShow(BackupIntegrityShowRequest) returns (BackupIntegrityShowResponse);
+	rpc ValidateBackupIntegrity(ValidateBackupIntegrityRequest) returns (ValidateBackupIntegrityResponse);
 	rpc Upgrade(UpgradeRequest) returns (UpgradeResponse);
 	rpc SetLogLevel(SetLogLevelRequest) returns (SetLogLevelResponse);
 	rpc GenerateAdminToken(GenerateAdminTokenRequest) returns (GenerateAdminTokenResponse);
@@ -588,6 +590,26 @@ message DeleteBackupsResponse {
 	BackupDeleteTask delete = 1;
 };
 
+message BackupIntegrityShowRequest{};
+message BackupIntegrityShowResponse{
+	repeated SnapshotIntegrity snapshots = 1;
+};
+
+message SnapshotIntegrity {
+	google.protobuf.Timestamp id = 1;
+	google.protobuf.Timestamp last_verified = 2;
+	repeated string missing = 3;
+	bool corrupted = 4;
+}
+
+message ValidateBackupIntegrityRequest {
+	repeated BackupTask backups = 1;
+};
+
+message ValidateBackupIntegrityResponse {
+	repeated SnapshotIntegrity snapshots = 1;
+};
+
 message RestoreBackupRequest {
 	BackupRestoreTask restore = 1;
 };
@@ -611,6 +633,7 @@ message BackupStatusResponse {
 		SHOW = 5;
 		CANCEL = 6;
 		IDLE = 7;
+		VERIFY_INTEGRITY = 8;
 	}
 };
 

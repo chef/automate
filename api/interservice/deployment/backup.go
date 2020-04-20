@@ -2,6 +2,8 @@ package deployment
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 
 	pbts "github.com/golang/protobuf/ptypes/timestamp"
 
@@ -101,4 +103,65 @@ func NewBackupRestoreTaskFromBackupID(backupID string) (*BackupRestoreTask, erro
 	rt.Backup = bt
 
 	return rt, nil
+}
+
+func formatSnapshotIntegrity(snapshots []*SnapshotIntegrity) string {
+	b := strings.Builder{}
+	fmtStr := "%-16s %-18s %-11s %-17s\n"
+	b.WriteString(fmt.Sprintf(fmtStr, "Backup", "Last Verification", "Corrupted", "Missing Packages"))
+
+	sort.Slice(snapshots, func(i, j int) bool {
+		if snapshots[i].GetId().GetSeconds() < snapshots[j].GetId().GetSeconds() {
+			return true
+		}
+
+		if snapshots[i].GetId().GetSeconds() == snapshots[j].GetId().GetSeconds() {
+			return snapshots[i].GetId().GetNanos() < snapshots[j].GetId().GetNanos()
+		}
+
+		return false
+	})
+
+	for _, snap := range snapshots {
+		id := ""
+		i, err := ptypes.Timestamp(snap.GetId())
+		if err != nil {
+			id = fmt.Sprintf("(%v)", err)
+		} else {
+			id = i.Format(BackupTaskFormat)
+		}
+
+		lvs := ""
+		lv, err := ptypes.Timestamp(snap.GetLastVerified())
+		if err != nil {
+			lvs = fmt.Sprintf("(%v)", err)
+		} else {
+			lvs = lv.Format(BackupTaskFormat)
+		}
+
+		missings := ""
+		if m := snap.GetMissing(); len(m) > 0 {
+			missings = fmt.Sprintf("%d", len(m))
+		}
+
+		corrupteds := ""
+		if snap.GetCorrupted() {
+			corrupteds = "true"
+		}
+
+		b.WriteString(fmt.Sprintf(fmtStr, id, lvs, corrupteds, missings))
+	}
+
+	return b.String()
+
+}
+
+// Format formats the backup intregrity status response
+func (res *BackupIntegrityShowResponse) Format() string {
+	return formatSnapshotIntegrity(res.GetSnapshots())
+}
+
+// Format formats the backup intregrity response
+func (res *ValidateBackupIntegrityResponse) Format() string {
+	return formatSnapshotIntegrity(res.GetSnapshots())
 }

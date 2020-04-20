@@ -179,6 +179,94 @@ func (r *Runner) CreateBackup(ctx context.Context, dep *deployment.Deployment, s
 	return r.backupTask, nil
 }
 
+func (r *Runner) BackupIntegrityShow(ctx context.Context, req *api.BackupIntegrityShowRequest) ([]*api.SnapshotIntegrity, error) {
+	r.infof("Showing backup integrity")
+
+	repo := NewArtifactRepo(r.locationSpec)
+
+	metadata, err := repo.ReadSnapshotIntegrityMetadata(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "reading snapshot integrity metadata file")
+	}
+
+	return r.repoIntegrityMetadataToSnapshotIntegritySlice(metadata)
+}
+
+func (r *Runner) ValidateBackupIntegrity(ctx context.Context, dep *deployment.Deployment, backupTasks []*api.BackupTask) ([]*api.SnapshotIntegrity, error) {
+	r.infof("Validating Backup Integrity")
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	var err error
+
+	r.lockedDeployment = dep
+	defer r.unlockDeployment()
+
+	opts := []FilterSnapshotOpt{}
+	snapshots := []string{}
+
+	if len(backupTasks) > 0 {
+		for _, task := range backupTasks {
+			snapshots = append(snapshots, task.TaskID())
+		}
+
+		opts = append(opts, OnlySnapshots(snapshots))
+	}
+
+	r.runningTask, err = newCancellableTask(api.BackupStatusResponse_VERIFY_INTEGRITY, snapshots, cancel)
+	if err != nil {
+		return nil, errors.Wrap(err, "configuring operation cancellation")
+	}
+	defer r.clearRunningTask()
+
+	logrus.WithField("snapshots", snapshots).Debug("Starting integrity verifier")
+	repo := NewArtifactRepo(r.locationSpec)
+
+	if err = repo.ValidateSnapshotIntegrity(ctx, opts...); err != nil {
+		return nil, errors.Wrap(err, "validating snapshot integrity")
+	}
+
+	metadata, err := repo.ReadSnapshotIntegrityMetadata(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "reading snapshot integrity metadata file")
+	}
+
+	return r.repoIntegrityMetadataToSnapshotIntegritySlice(metadata)
+}
+
+func (r *Runner) repoIntegrityMetadataToSnapshotIntegritySlice(metadata *ArtifactRepoIntegrityMetadata) ([]*api.SnapshotIntegrity, error) {
+	snapshots := []*api.SnapshotIntegrity{}
+	for snapshot, metadata := range metadata.Snapshots {
+		idt, err := time.Parse(api.BackupTaskFormat, snapshot)
+		if err != nil {
+			return nil, errors.Wrapf(err, "parsing snapshot '%s' id", snapshot)
+		}
+		id, err := ptypes.TimestampProto(idt)
+		if err != nil {
+			return nil, errors.Wrapf(err, "parsing snapshot '%s' id", snapshot)
+		}
+
+		lvt, err := time.Parse(api.BackupTaskFormat, metadata.LastVerified)
+		if err != nil {
+			return nil, errors.Wrapf(err, "parsing snapshot '%s' last verified time", snapshot)
+		}
+		lv, err := ptypes.TimestampProto(lvt)
+		if err != nil {
+			return nil, errors.Wrapf(err, "parsing snapshot '%s' last verified time", snapshot)
+		}
+
+		snapshots = append(snapshots, &api.SnapshotIntegrity{
+			Id:           id,
+			LastVerified: lv,
+			Missing:      metadata.Missing,
+			Corrupted:    metadata.Corrupted,
+		})
+	}
+
+	return snapshots, nil
+}
+
 // DeleteBackups deletes one or many Automate Backups
 func (r *Runner) DeleteBackups(ctx context.Context, dep *deployment.Deployment, backupTasks []*api.BackupTask) error {
 	ctx, cancel := context.WithCancel(ctx)

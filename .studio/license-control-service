@@ -6,8 +6,8 @@ document "test_license_control_service" <<DOC
   Lint, vet and test the license control service
 DOC
 function test_license_control_service {
-  install_if_missing core/curl curl;
-  install_if_missing "$(desired_golang_ident)" go;
+  install_if_missing core/curl curl
+  install_go
 
   chef-automate dev deploy-some chef/license-control-service --with-deps
   pushd components/license-control-service >/dev/null || return 1

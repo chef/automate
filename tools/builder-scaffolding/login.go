@@ -39,12 +39,7 @@ func init() {
 		"password", "", "")
 }
 
-func runLogin(c *cobra.Command, args []string) error {
-	username, password, err := getUserCredentials(loginCmdOpts.Username, loginCmdOpts.Password)
-	if err != nil {
-		return err
-	}
-
+func doLogin(username, password string) (string, error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
@@ -52,7 +47,7 @@ func runLogin(c *cobra.Command, args []string) error {
 	}
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 	client := &http.Client{
 		Transport: tr,
@@ -64,7 +59,7 @@ func runLogin(c *cobra.Command, args []string) error {
 
 	baseURL, err := url.Parse(loginCmdOpts.AutomateURL)
 	if err != nil {
-		return err
+		return "", err
 	}
 	newSessionURL, err := endpoint(
 		loginCmdOpts.AutomateURL,
@@ -72,23 +67,23 @@ func runLogin(c *cobra.Command, args []string) error {
 		"client_id=automate-builder-api&redirect_uri=%2Fbldr&response_type=code&scope=openid%20profile%20email&nonce=0",
 	)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	respNewSession, err := client.Get(newSessionURL)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	dexAuthLocation, err := respNewSession.Location()
 	if err != nil {
-		return errors.Wrap(err, "Failed to get dex auth location")
+		return "", errors.Wrap(err, "Failed to get dex auth location")
 	}
 	fixURL(baseURL, dexAuthLocation)
 
 	respDexAuth, err := client.Get(dexAuthLocation.String())
 	if err != nil {
-		return errors.Wrap(err, "Failed to call dex auth location")
+		return "", errors.Wrap(err, "Failed to call dex auth location")
 	}
 
 	var req string
@@ -97,12 +92,12 @@ func runLogin(c *cobra.Command, args []string) error {
 	} else {
 		body, err := ioutil.ReadAll(respDexAuth.Body)
 		if err != nil {
-			return err
+			return "", err
 		}
 		re := regexp.MustCompile(`/dex/auth/local\?req=([^"]+)`)
 		matches := re.FindStringSubmatch(string(body))
 		if len(matches) < 2 {
-			return errors.New("could not find req id")
+			return "", errors.New("could not find req id")
 		}
 		req = matches[1]
 	}
@@ -110,18 +105,18 @@ func runLogin(c *cobra.Command, args []string) error {
 	localLoginURL, err := endpoint(loginCmdOpts.AutomateURL,
 		"/dex/auth/local", fmt.Sprintf("req=%s", req))
 	if err != nil {
-		return err
+		return "", err
 	}
 	form := url.Values{}
 	form.Set("login", username)
 	form.Set("password", password)
 	loginResp, err := client.PostForm(localLoginURL, form)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if loginResp.StatusCode != 303 {
-		return errors.Errorf("received unexpected error code: got %d expected %d",
+		return "", errors.Errorf("received unexpected login error code: got %d expected %d",
 			loginResp.StatusCode, 303)
 	}
 
@@ -130,11 +125,11 @@ func runLogin(c *cobra.Command, args []string) error {
 
 	approvalResp, err := client.Get(approvalLoc.String())
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if approvalResp.StatusCode != 303 {
-		return errors.Errorf("received unexpected error code: got %d expected %d",
+		return "", errors.Errorf("received unexpected approval error code: got %d expected %d",
 			approvalResp.StatusCode, 303)
 	}
 
@@ -143,18 +138,18 @@ func runLogin(c *cobra.Command, args []string) error {
 
 	callbackResp, err := client.Get(callbackLoc.String())
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if callbackResp.StatusCode != 303 {
-		return errors.Errorf("received unexpected error code: got %d expected %d",
+		return "", errors.Errorf("received unexpected callback error code: got %d expected %d",
 			callbackResp.StatusCode, 303)
 	}
 
 	bldrLoc, _ := callbackResp.Location()
 	code := bldrLoc.Query().Get("code")
 	if code == "" {
-		return errors.New("Could not find code")
+		return "", errors.New("Could not find code")
 	}
 
 	bldrAuthenticateURL, err := endpoint(
@@ -162,16 +157,16 @@ func runLogin(c *cobra.Command, args []string) error {
 		fmt.Sprintf("/bldr/v1/authenticate/%s", code),
 		"")
 	if err != nil {
-		return err
+		return "", err
 	}
 	bldrAuthenticateResp, err := client.Get(bldrAuthenticateURL)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if bldrAuthenticateResp.StatusCode != 200 {
-		return errors.Errorf(
-			"received unexpected error code: got %d expected %d",
+		return "", errors.Errorf(
+			"received unexpected bldr auth error code: got %d expected %d",
 			bldrAuthenticateResp.StatusCode,
 			200,
 		)
@@ -182,10 +177,24 @@ func runLogin(c *cobra.Command, args []string) error {
 	}{}
 
 	if err := json.NewDecoder(bldrAuthenticateResp.Body).Decode(&token); err != nil {
+		return "", err
+	}
+
+	return token.Token, nil
+}
+
+func runLogin(c *cobra.Command, args []string) error {
+	username, password, err := getUserCredentials(loginCmdOpts.Username, loginCmdOpts.Password)
+	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%s\n", token.Token)
+	token, err := doLogin(username, password)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%s\n", token)
 	return nil
 }
 
