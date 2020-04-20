@@ -343,7 +343,7 @@ func (s *Server) startHTTPServer() error {
 		cancelUnversioned()
 		cancelVersioned()
 	}
-	mux.Handle("/apis/", http.StripPrefix("/apis", prettifier(versionedMux)))
+	mux.Handle("/apis/", prettifier(versionedMux))
 
 	// custom mux route for data-collector
 	// Note: automate-load-balancer rewrites
