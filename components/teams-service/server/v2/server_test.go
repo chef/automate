@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/chef/automate/api/external/common/version"
+	version_api "github.com/chef/automate/api/external/common/version"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -21,6 +21,7 @@ import (
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/tls/test/helpers"
 	"github.com/chef/automate/lib/tracing"
+	"github.com/chef/automate/lib/version"
 
 	"github.com/chef/automate/components/teams-service/constants"
 	"github.com/chef/automate/components/teams-service/service"
@@ -65,15 +66,21 @@ func runAllServerTests(
 	defer close()
 
 	t.Run("GetVersion", func(t *testing.T) {
-		expected := &version.VersionInfo{
-			Name:    "teams-service",
-			Version: "unknown",
-			Sha:     "unknown",
-			Built:   "unknown",
-		}
-		resp, err := cl.GetVersion(context.Background(), &version.VersionInfoRequest{})
+		version.Version = "20200417212701"
+		version.BuildTime = "20200417212701"
+		version.GitSHA = "eaf1f3553eb64fb9f393366e8ba4ee61e515727e"
+
+		resp, err := cl.GetVersion(context.Background(), &version_api.VersionInfoRequest{})
 		require.NoError(t, err)
-		assert.Equal(t, expected, resp)
+
+		expectedVersion := &version_api.VersionInfo{
+			Name:    "teams-service",
+			Version: "20200417212701",
+			Built:   "20200417212701",
+			Sha:     "eaf1f3553eb64fb9f393366e8ba4ee61e515727e",
+		}
+
+		require.Equal(t, expectedVersion, resp)
 	})
 
 	t.Run("GetTeam", func(t *testing.T) {
