@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable, combineLatest } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { filter } from 'rxjs/operators';
@@ -25,8 +25,6 @@ export class EnvironmentsComponent implements OnInit {
   @Input() orgId: string;
 
   public environments: Environment[] = [];
-  public loading$: Observable<boolean>;
-  public isLoading = true;
   public environmentsListLoading = true;
 
   constructor(
