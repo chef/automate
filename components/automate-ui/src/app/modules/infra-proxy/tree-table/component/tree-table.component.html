@@ -1,4 +1,4 @@
-<table mat-table [dataSource]="dataSource" [ngClass]="formatElevation()">
+<table mat-table [dataSource]="dataSource">
   <div *ngFor="let column of displayedColumns; first as isFirst;">
     <ng-container matColumnDef="{{column}}">
       <th mat-header-cell *matHeaderCellDef [ngClass]="{'vertical-separator': options.verticalSeparator}">
