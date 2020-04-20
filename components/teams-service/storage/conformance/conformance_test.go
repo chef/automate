@@ -25,6 +25,8 @@ import (
 
 type adapterTestFunc func(context.Context, *testing.T, storage.Storage)
 
+var emptyProjectsList []string
+
 // TestStorage tests the memstore storage adapter, via its implemented
 // storage.Storage interface. As soon as we have a second adapter, the tests
 // should loop through both of those adapters for each test against the
@@ -129,7 +131,7 @@ func TestStorage(t *testing.T) {
 
 func testGetTeamByName(ctx context.Context, t *testing.T, s storage.Storage) {
 	id := "test-team"
-	team, err := s.StoreTeam(ctx, id, "team name", []string{})
+	team, err := s.StoreTeam(ctx, id, "team name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to store team")
 
 	users := []string{"one", "two", "three"}
@@ -157,22 +159,22 @@ func testGetTeamByNameNotFound(ctx context.Context, t *testing.T, s storage.Stor
 
 func testGetTeamsForUser(ctx context.Context, t *testing.T, s storage.Storage) {
 	id := "team-1-with-user"
-	team, err := s.StoreTeam(ctx, id, id+" Name", []string{})
+	_, err := s.StoreTeam(ctx, id, id+" Name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to create test team-1-with-user")
 
 	id2 := "team-2-with-user"
-	team2, err := s.StoreTeam(ctx, id2, id2+" Name", []string{})
+	_, err = s.StoreTeam(ctx, id2, id2+" Name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to create test team-2-with-user")
 
 	idWithout := "team-without-user"
-	_, err = s.StoreTeam(ctx, idWithout, idWithout+" Name", []string{})
+	_, err = s.StoreTeam(ctx, idWithout, idWithout+" Name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to create test team-with-user")
 
 	initialUsers := []string{"user-for-team-fetch", "two", "three"}
 
-	team, err = s.AddUsers(ctx, id, initialUsers)
+	team, err := s.AddUsers(ctx, id, initialUsers)
 	require.NoError(t, err, "setup: failed to add users to team-1-with-user")
-	team2, err = s.AddUsers(ctx, id2, initialUsers)
+	team2, err := s.AddUsers(ctx, id2, initialUsers)
 	require.NoError(t, err, "setup: failed to add users to team-2-with-user")
 	_, err = s.AddUsers(ctx, idWithout, []string{"two", "three"})
 	require.NoError(t, err, "setup: failed to add users to test team-without-user")
@@ -188,22 +190,22 @@ func testGetTeamsForUser(ctx context.Context, t *testing.T, s storage.Storage) {
 
 func testPurgeUserMembership(ctx context.Context, t *testing.T, s storage.Storage) {
 	id := "team-1-with-user"
-	team, err := s.StoreTeam(ctx, id, id+" Name", []string{})
+	_, err := s.StoreTeam(ctx, id, id+" Name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to create test team-1-with-user")
 
 	id2 := "team-2-with-user"
-	team2, err := s.StoreTeam(ctx, id2, id2+" Name", []string{})
+	_, err = s.StoreTeam(ctx, id2, id2+" Name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to create test team-2-with-user")
 
 	idWithout := "team-without-user"
-	teamWithout, err := s.StoreTeam(ctx, idWithout, idWithout+" Name", []string{})
+	teamWithout, err := s.StoreTeam(ctx, idWithout, idWithout+" Name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to create test team-with-user")
 
 	initialUsers := []string{"user-id-to-purge", "two", "three"}
 
-	team, err = s.AddUsers(ctx, id, initialUsers)
+	_, err = s.AddUsers(ctx, id, initialUsers)
 	require.NoError(t, err, "setup: failed to add users to team-1-with-user")
-	team2, err = s.AddUsers(ctx, id2, initialUsers)
+	_, err = s.AddUsers(ctx, id2, initialUsers)
 	require.NoError(t, err, "setup: failed to add users to team-2-with-user")
 	teamWithout, err = s.AddUsers(ctx, idWithout, []string{"two", "three"})
 	require.NoError(t, err, "setup: failed to add users to test team-without-user")
@@ -211,9 +213,9 @@ func testPurgeUserMembership(ctx context.Context, t *testing.T, s storage.Storag
 	updatedTeams, err := s.PurgeUserMembership(ctx, "user-id-to-purge")
 	require.NoError(t, err, "purge failed")
 
-	team, err = s.GetTeam(ctx, team.ID)
+	team, err := s.GetTeam(ctx, id)
 	require.NoError(t, err, "setup: failed to fetch team-1-with-user")
-	team2, err = s.GetTeam(ctx, team2.ID)
+	team2, err := s.GetTeam(ctx, id2)
 	require.NoError(t, err, "setup: failed to fetch team-12with-user")
 	teamWithout, err = s.GetTeam(ctx, idWithout)
 	require.NoError(t, err, "setup: failed to fetch test team-without-user")
@@ -248,7 +250,7 @@ func testDeleteTeamNotFound(ctx context.Context, t *testing.T, s storage.Storage
 
 func testDeleteTeam(ctx context.Context, t *testing.T, s storage.Storage) {
 	id := "test-team"
-	team, err := s.StoreTeam(ctx, id, id+" Name", []string{})
+	team, err := s.StoreTeam(ctx, id, id+" Name", emptyProjectsList)
 	require.NoError(t, err, "failed to create test team, as setup for testing delete")
 	require.NotNil(t, team)
 
@@ -266,12 +268,12 @@ func testDeleteTeam(ctx context.Context, t *testing.T, s storage.Storage) {
 
 func testEditTeam(ctx context.Context, t *testing.T, s storage.Storage) {
 	id := "test-team"
-	team, err := s.StoreTeam(ctx, id, id+" Name", []string{})
+	_, err := s.StoreTeam(ctx, id, id+" Name", emptyProjectsList)
 	require.NoError(t, err, "failed to create 'test-team', as setup for testing edit")
 
 	newName := "new name"
 	newProjects := []string{"new-project"}
-	team, err = s.EditTeam(ctx, id, newName, newProjects)
+	team, err := s.EditTeam(ctx, id, newName, newProjects)
 	require.NoError(t, err, "failed to edit the name of existing team with ID %v", id)
 	assert.Equal(t, newName, team.Name,
 		"edit of team ID %s returned success, but the name is incorrect", id)
@@ -290,11 +292,11 @@ func testEditTeam(ctx context.Context, t *testing.T, s storage.Storage) {
 func testEditTeamImmutable(ctx context.Context, t *testing.T, s storage.Storage) {
 	id := "test-team"
 	name := "test team"
-	team, err := s.StoreTeam(ctx, id, name, []string{})
+	_, err := s.StoreTeam(ctx, id, name, emptyProjectsList)
 	require.NoError(t, err, "setup: failed to store team")
 
 	newName := "new name"
-	team, err = s.EditTeam(ctx, id, newName, []string{})
+	team, err := s.EditTeam(ctx, id, newName, emptyProjectsList)
 	require.NoError(t, err, "setup: failed to edit team")
 	require.Equal(t, newName, team.Name, "setup: team name change failed")
 
@@ -311,17 +313,17 @@ func testEditTeamImmutable(ctx context.Context, t *testing.T, s storage.Storage)
 }
 
 func testEditTeamNotFound(ctx context.Context, t *testing.T, s storage.Storage) {
-	_, err := s.EditTeam(ctx, "not-found", "new name", []string{})
+	_, err := s.EditTeam(ctx, "not-found", "new name", emptyProjectsList)
 	assert.Equal(t, storage.ErrNotFound, err)
 }
 
 func testAddUsers(ctx context.Context, t *testing.T, s storage.Storage) {
 	id := "test-team"
-	team, err := s.StoreTeam(ctx, id, id+" Name", []string{})
+	_, err := s.StoreTeam(ctx, id, id+" Name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to create test team")
 
 	users := []string{"one", "two", "three"}
-	team, err = s.AddUsers(ctx, id, users)
+	team, err := s.AddUsers(ctx, id, users)
 	assert.NotNil(t, team)
 
 	userIDs, err := s.GetUserIDsForTeam(ctx, id)
@@ -351,7 +353,7 @@ func testAddUsersNotFound(ctx context.Context, t *testing.T, s storage.Storage) 
 
 func testRemoveUsers(ctx context.Context, t *testing.T, s storage.Storage) {
 	id := "test-team"
-	_, err := s.StoreTeam(ctx, id, id+" Name", []string{})
+	_, err := s.StoreTeam(ctx, id, id+" Name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to create test team")
 
 	one, two, three := "one", "two", "three"
@@ -392,17 +394,18 @@ func testRemoveUsersNotFound(ctx context.Context, t *testing.T, s storage.Storag
 }
 
 func testGetTeam(ctx context.Context, t *testing.T, s storage.Storage) {
-	team, err := s.StoreTeam(ctx, "id", "name", []string{})
+	id := "id"
+	_, err := s.StoreTeam(ctx, id, "name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to store team")
 	one, two, three := "one", "two", "three"
 	users := []string{one, two, three}
-	team, err = s.AddUsers(ctx, team.ID, users)
+	team, err := s.AddUsers(ctx, id, users)
 	require.NoError(t, err, "setup: failed to add users to test team")
-	userIDs, err := s.GetUserIDsForTeam(ctx, team.ID)
+	userIDs, err := s.GetUserIDsForTeam(ctx, id)
 	require.Equal(t, len(users), len(userIDs), "setup: user list size mismatch")
 
-	getTeam, err := s.GetTeam(ctx, team.ID)
-	getTeamUserIDs, err := s.GetUserIDsForTeam(ctx, getTeam.ID)
+	getTeam, err := s.GetTeam(ctx, id)
+	getTeamUserIDs, err := s.GetUserIDsForTeam(ctx, id)
 
 	require.NoError(t, err)
 	// Updated_at has changed because of the added users...
@@ -418,13 +421,14 @@ func testGetTeamNotFound(ctx context.Context, t *testing.T, s storage.Storage) {
 }
 
 func testGetTeamImmutable(ctx context.Context, t *testing.T, s storage.Storage) {
-	team, err := s.StoreTeam(ctx, "id", "name", []string{})
+	id := "id"
+	_, err := s.StoreTeam(ctx, id, "name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to store team")
 	one, two, three := "one", "two", "three"
 	users := []string{one, two, three}
-	team, err = s.AddUsers(ctx, team.ID, users)
+	_, err = s.AddUsers(ctx, id, users)
 	require.NoError(t, err, "setup: failed to add users to test team")
-	userIDs, err := s.GetUserIDsForTeam(ctx, team.ID)
+	userIDs, err := s.GetUserIDsForTeam(ctx, id)
 	require.NoError(t, err)
 	require.Equal(t, len(users), len(userIDs), "setup: user list size mismatch")
 }
@@ -436,7 +440,7 @@ func testGetTeams(ctx context.Context, t *testing.T, s storage.Storage) {
 
 	id := "test-team"
 	name := "Test Team Name"
-	_, err = s.StoreTeam(ctx, id, name, []string{})
+	_, err = s.StoreTeam(ctx, id, name, emptyProjectsList)
 	require.NoError(t, err, "failed to create test team, as setup for testing edit")
 
 	tl, err = s.GetTeams(ctx)
@@ -447,7 +451,7 @@ func testGetTeams(ctx context.Context, t *testing.T, s storage.Storage) {
 func testStoreTeam(ctx context.Context, t *testing.T, s storage.Storage) {
 	id := "test-team"
 	name := "Test Team Name"
-	team, err := s.StoreTeam(ctx, id, name, []string{})
+	team, err := s.StoreTeam(ctx, id, name, emptyProjectsList)
 	require.NoError(t, err, "failed to store team")
 	assert.Equal(t, id, team.ID, "Stored team id mismatch")
 	assert.Equal(t, name, team.Name, "Stored team name mismatch")
@@ -465,12 +469,12 @@ func testStoreTeam(ctx context.Context, t *testing.T, s storage.Storage) {
 func testStoreTeamConflict(ctx context.Context, t *testing.T, s storage.Storage) {
 	id := "test-team"
 	name := "Test Team Name"
-	team, err := s.StoreTeam(ctx, id, name, []string{})
+	team, err := s.StoreTeam(ctx, id, name, emptyProjectsList)
 	require.NoError(t, err, "failed to store id")
 	assert.Equal(t, id, team.ID, "Stored team id mismatch")
 	assert.Equal(t, name, team.Name, "Stored team name mismatch")
 
-	_, err = s.StoreTeam(ctx, id, name, []string{})
+	_, err = s.StoreTeam(ctx, id, name, emptyProjectsList)
 	assert.Error(t, err, "Tried to store a new team with an existing team name '%v', should have gotten an error", name)
 
 	teams, err := s.GetTeams(ctx)
@@ -482,17 +486,16 @@ func testPurgeProjectUnassigned(ctx context.Context, t *testing.T, s storage.Sto
 	id := "test-team"
 	name := "Test Team Name"
 	projectToPurge := "project-to-purge"
-	projects := []string{}
-	resp, err := s.StoreTeam(ctx, id, name, projects)
+	resp, err := s.StoreTeam(ctx, id, name, emptyProjectsList)
 	assert.NoError(t, err, "failed to store team")
-	assert.ElementsMatch(t, projects, resp.Projects)
+	assert.ElementsMatch(t, emptyProjectsList, resp.Projects)
 
 	err = s.PurgeProject(ctx, projectToPurge)
 	assert.NoError(t, err, "failed to purge project")
 
 	purgeCheck, err := s.GetTeam(ctx, id)
 	assert.NoError(t, err, "failed to get team")
-	assert.ElementsMatch(t, []string{}, purgeCheck.Projects)
+	assert.ElementsMatch(t, emptyProjectsList, purgeCheck.Projects)
 }
 
 func testPurgeProjectOnlyProjectToPurge(ctx context.Context, t *testing.T, s storage.Storage) {
@@ -509,7 +512,7 @@ func testPurgeProjectOnlyProjectToPurge(ctx context.Context, t *testing.T, s sto
 
 	purgeCheck, err := s.GetTeam(ctx, id)
 	assert.NoError(t, err, "failed to get team")
-	assert.ElementsMatch(t, []string{}, purgeCheck.Projects)
+	assert.ElementsMatch(t, emptyProjectsList, purgeCheck.Projects)
 }
 
 func testPurgeProjectOtherProjectsExcludingOneToPurge(ctx context.Context, t *testing.T, s storage.Storage) {
@@ -557,10 +560,9 @@ func testPurgeProjectUniversal(ctx context.Context, t *testing.T, s storage.Stor
 	assert.ElementsMatch(t, projects1, resp1.Projects)
 
 	id2 := "unassigned"
-	projects2 := []string{}
-	resp2, err := s.StoreTeam(ctx, id2, name, projects2)
+	resp2, err := s.StoreTeam(ctx, id2, name, emptyProjectsList)
 	assert.NoError(t, err, "failed to store team2")
-	assert.ElementsMatch(t, projects2, resp2.Projects)
+	assert.ElementsMatch(t, emptyProjectsList, resp2.Projects)
 
 	id3 := "project-to-purge_and_others"
 	projects3 := []string{"otherproject", projectToPurge, "otherproject2"}
@@ -584,7 +586,7 @@ func testPurgeProjectUniversal(ctx context.Context, t *testing.T, s storage.Stor
 
 	purgeCheck2, err := s.GetTeam(ctx, id2)
 	assert.NoError(t, err)
-	assert.ElementsMatch(t, projects2, purgeCheck2.Projects)
+	assert.ElementsMatch(t, emptyProjectsList, purgeCheck2.Projects)
 
 	// project removed
 	purgeCheck3, err := s.GetTeam(ctx, id3)
@@ -593,7 +595,7 @@ func testPurgeProjectUniversal(ctx context.Context, t *testing.T, s storage.Stor
 
 	purgeCheck4, err := s.GetTeam(ctx, id4)
 	assert.NoError(t, err)
-	assert.ElementsMatch(t, []string{}, purgeCheck4.Projects)
+	assert.ElementsMatch(t, emptyProjectsList, purgeCheck4.Projects)
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,
