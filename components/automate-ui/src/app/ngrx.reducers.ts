@@ -11,6 +11,7 @@ import * as clientRuns from './entities/client-runs/client-runs.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
 import * as infraRoleEntity from './entities/infra-roles/infra-role.reducer';
+import * as environmentEntity from './entities/environments/environment.reducer';
 import * as infraRoleDetailsEntity from './entities/infra-roles/infra-role-details.reducer';
 import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
 import * as integrationsDetail from './pages/integrations/detail/integrations-detail.reducer';
@@ -61,6 +62,7 @@ export interface NgrxStateAtom {
   clientRunsEntity: clientRuns.ClientRunsEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
   infraRoles: infraRoleEntity.InfraRoleEntityState;
+  environments: environmentEntity.EnvironmentEntityState;
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
@@ -171,6 +173,7 @@ export const defaultInitialState = {
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
   infraRoles: infraRoleEntity.InfraRoleEntityInitialState,
+  environments: environmentEntity.EnvironmentEntityInitialState,
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
   licenseStatus: license.LicenseStatusEntityInitialState,
@@ -214,6 +217,7 @@ export const ngrxReducers = {
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
   infraRoles: infraRoleEntity.infraRoleEntityReducer,
+  environments: environmentEntity.environmentEntityReducer,
   infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
   credentialEntity: credential.credentialReducer,
   jobs: jobEntity.jobEntityReducer,
