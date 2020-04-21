@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -471,5 +472,72 @@ func TestMerge3Streams(t *testing.T) {
 		assert.Equal(t, 1, a.called)
 		assert.Equal(t, 1, b.called)
 		assert.Equal(t, 1, c.called)
+	})
+}
+
+// TestReplayableStream tests that the replayable stream is replayable and that
+// it cleans up the underlying streams and files it uses.
+func TestReplayableStream(t *testing.T) {
+	t.Run("replayable if reset", func(t *testing.T) {
+		contents := []string{"a", "b", "c"}
+		r, err := NewReplayableStream(NewArrayStream(contents))
+		require.NoError(t, err)
+		// Consume, verify, reset, repeat
+		require.Equal(t, contents, consume(t, r))
+		require.NoError(t, r.Reset())
+		require.Equal(t, contents, consume(t, r))
+		require.NoError(t, r.Reset())
+		require.Equal(t, contents, consume(t, r))
+		// Make sure it throws an error when we try to consume it without a reset
+		_, err = r.Next()
+		require.Error(t, err)
+		// Can close twice without error
+		require.NoError(t, r.Close())
+		require.NoError(t, r.Close())
+	})
+
+	t.Run("closes underlying stream", func(t *testing.T) {
+		a := &streamCloserTester{
+			stream: EmptyStream(),
+		}
+		r, err := NewReplayableStream(a)
+		require.NoError(t, err)
+		require.NoError(t, r.Close())
+		require.Equal(t, 1, a.called)
+	})
+
+	t.Run("closes reader stream and cleans up replay file", func(t *testing.T) {
+		contents := []string{"a", "b", "c"}
+		a := &streamCloserTester{
+			stream: NewArrayStream(contents),
+		}
+		// Manually compose the replay stream so that we can verify it closes things
+		replayFile, err := ioutil.TempFile("", "replay-test")
+		require.NoError(t, err)
+		r := &replayableStream{
+			replayFile:  replayFile,
+			writeStream: NewLoggingStream(a, replayFile),
+		}
+		consume(t, r)
+		require.NoError(t, r.Close())
+		require.Equal(t, 1, a.called)
+		_, err = os.Stat(replayFile.Name())
+		require.True(t, os.IsNotExist(err))
+	})
+
+	t.Run("always consumes source stream entirely before replay", func(t *testing.T) {
+		contents := []string{"a", "b", "c"}
+		r, err := NewReplayableStream(NewArrayStream(contents))
+		require.NoError(t, err)
+		// Consume some, reset, consume all and expect replay to have all
+		res, err := r.Next()
+		require.NoError(t, err)
+		require.Equal(t, "a", res)
+		res, err = r.Next()
+		require.NoError(t, err)
+		require.Equal(t, "b", res)
+
+		require.NoError(t, r.Reset())
+		require.Equal(t, contents, consume(t, r))
 	})
 }

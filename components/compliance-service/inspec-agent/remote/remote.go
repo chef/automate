@@ -13,13 +13,17 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/interservice/authn"
+	"github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/nodemanager-service/managers"
+	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
 type RemoteJob struct {
 	TokensMgmtClient authn.TokensMgmtClient
+	PoliciesClient   v2.PoliciesClient
 	AutomateFQDN     string
 }
 
@@ -29,16 +33,28 @@ func RunSSMJob(ctx context.Context, ssmJob *types.InspecJob) *inspec.Error {
 	logrus.Debugf("Running ssm job: %+v", ssmJob)
 	// 1. CREATE TOKEN
 	// this is needed to hand over to inspec so it can report to automate
-	if RemoteJobInfo.TokensMgmtClient == nil {
+	if RemoteJobInfo.TokensMgmtClient == nil || RemoteJobInfo.PoliciesClient == nil {
 		logrus.Error("unable to create auth token")
 		return translateToInspecErr(fmt.Errorf("unable to connect to auth client: aborting job run for job %+v", ssmJob))
 	}
+	tokenID := fmt.Sprintf("inspec-to-automate-scanjob-%s", ssmJob.JobID)
+	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx, []string{"tls:service:compliance-service:internal"}, []string{}, "", ""))
 	token, err := RemoteJobInfo.TokensMgmtClient.CreateToken(ctx, &authn.CreateTokenReq{
-		Name:   "token for inspec to report to automate",
+		Id:     tokenID,
+		Name:   tokenID,
 		Active: true,
 	})
 	if err != nil {
-		logrus.Errorf("unable to create auth token for reporting to automate: %s", err.Error())
+		logrus.Errorf("unable to create auth token for reporting to automate; aborting job %s: %s", ssmJob.JobName, err.Error())
+		return translateToInspecErr(err)
+	}
+	// add token to ingest policy
+	_, err = RemoteJobInfo.PoliciesClient.AddPolicyMembers(ctx, &v2.AddPolicyMembersReq{
+		Id:      constants.IngestPolicyID,
+		Members: []string{fmt.Sprintf("token:%s", tokenID)},
+	})
+	if err != nil {
+		logrus.Errorf("unable to add token to ingest policy for reporting to automate; aborting job %s: %s", ssmJob.JobName, err.Error())
 		return translateToInspecErr(err)
 	}
 	ssmJob.Reporter.Token = token.GetValue()

@@ -107,7 +107,6 @@ function channel_contains_commit() {
     fi
 }
 
-
 document "get_release_diff_url" <<DOC
   Provides the latest github URL for commits that are in acceptance but not released.
 
@@ -156,7 +155,7 @@ document "revendor" <<DOC
   Revendor the go modules vendor directory
 DOC
 function revendor() {
-  install_if_missing "$(desired_golang_ident)" go
+  install_go
   install_if_missing core/make make
 
   pushd /src || return 1

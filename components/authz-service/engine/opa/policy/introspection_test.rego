@@ -1,4 +1,4 @@
-package authz_v2.introspection
+package authz.introspection
 
 import data.common
 

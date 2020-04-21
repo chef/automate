@@ -5,10 +5,10 @@ bldr_smoke_test() {
 
     export CYPRESS_SKIP_SSO=true
     export CYPRESS_BASE_URL="https://$CONTAINER_HOSTNAME"
-    export CYPRESS_INTEGRATION_FOLDER=cypress/integration/bldr-smoke 
+    export CYPRESS_INTEGRATION_FOLDER=cypress/integration/bldr-smoke
     export CYPRESS_SUPPORT_FILE='false'
     export CYPRESS_TEST_BUILDER='true'
-    npm install 
+    npm install
     if ! npm run cypress:run; then
         buildkite-agent artifact upload "cypress/videos/**/*;cypress/screenshots/**/*"
         return 1

@@ -30,7 +30,7 @@ document "go_component_unit" <<DOC
   Finally, invoke the command with no arguments to see a concise usage message.
 DOC
 function go_component_unit() {
-  install_if_missing "$(desired_golang_ident)" go
+  install_go
 
   VERBOSE_TESTS=
   if [[ "$1" == "-v" ]]; then
@@ -57,7 +57,7 @@ complete -F _component_auto_complete go_component_unit
 
 # TODO: (@afiune) Document the use of go_test and maybe put in ci-studio-common
 function go_test() {
-  install_if_missing "$(desired_golang_ident)" go
+  install_go
   install_if_missing core/git git
 
   log_line "Executing Go test"
@@ -75,7 +75,7 @@ document "go_build_pkg" <<DOC
       go_build_pkg components/automate-deployment/pkg/server
 DOC
 function go_build_pkg() {
-  install_if_missing "$(desired_golang_ident)" go
+  install_go
 
   if [[ "$1" == "" ]]; then
       error "Missing package path; try 'describe ${FUNCNAME[0]}'"
@@ -87,11 +87,18 @@ function go_build_pkg() {
   go_build "$pkg_path"
 }
 
+document "install_go" <<DOC
+  Ensure the golang version defined in GOLANG_VERSION is installed
+DOC
+function install_go() {
+  install_if_missing "$(desired_golang_ident)" go
+}
+
 document "go_build" <<DOC
   A go vendor aware wrapped for go build
 DOC
 function go_build() {
-  install_if_missing "$(desired_golang_ident)" go
+  install_go
   mkdir -p "${GOBIN}"
 
   go install "${1}"
@@ -232,7 +239,7 @@ function go_component_static_tests() {
   local component=$1
 
   log_line "Installing gofmt"
-  install_if_missing "$(desired_golang_ident)" gofmt
+  install_go
 
   log_line "Testing $component go files"
   unformatted=$(gofmt -l components/$component)
@@ -303,7 +310,7 @@ DOC
 function go_component_make() {
   [[ "$1" == "" ]] && error "Missing component name argument" && return 1
 
-  install_if_missing "$(desired_golang_ident)" go
+  install_go
 
   local component_relpath=$1
   local component_path="/src/$component_relpath"

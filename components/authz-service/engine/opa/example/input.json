@@ -1,7 +1,0 @@
-{
-  "subjects": [
-    "team:local:admins"
-  ],
-  "action": "node:read",
-  "resource": "automate:nodes"
-}

@@ -1,4 +1,4 @@
-package authz_v2
+package authz
 
 import data.common
 import data.policies

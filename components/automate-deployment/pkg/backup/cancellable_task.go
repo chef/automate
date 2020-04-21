@@ -1,8 +1,9 @@
 package backup
 
 import (
-	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/pkg/errors"
+
+	api "github.com/chef/automate/api/interservice/deployment"
 )
 
 type CancellableTask struct {
@@ -20,7 +21,11 @@ func newCancellableTask(opType api.BackupStatusResponse_OperationType, taskIds [
 	}
 
 	switch opType {
-	case api.BackupStatusResponse_CREATE, api.BackupStatusResponse_DELETE, api.BackupStatusResponse_RESTORE, api.BackupStatusResponse_IDLE:
+	case api.BackupStatusResponse_CREATE,
+		api.BackupStatusResponse_DELETE,
+		api.BackupStatusResponse_RESTORE,
+		api.BackupStatusResponse_IDLE,
+		api.BackupStatusResponse_VERIFY_INTEGRITY:
 	default:
 		return t, errors.New("invalid opType")
 	}
