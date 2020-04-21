@@ -16,8 +16,8 @@ const createV2PolicyTemplateStr = `
 	"id": "{{ .ID }}",
 	"name": "{{ .ID }} test policy",
 	"members": [
-		"token:{{ .TokenID }}", 
-		"user:local:{{ .UserID }}", 
+		"token:{{ .TokenID }}",
+		"user:local:{{ .UserID }}",
 		"team:local:{{ .TeamID }}"
 	],
 	"statements": [
@@ -42,6 +42,7 @@ type PolicyParameters struct {
 	UserID    string
 	RoleID    string
 	ProjectID string
+	RuleID    string
 }
 
 type generatedV2PolicyData struct {
@@ -52,6 +53,7 @@ type generatedV2PolicyData struct {
 	UserID     string `json:"user_id"`
 	RoleID     string `json:"role_id"`
 	ProjectID  string `json:"project_id"`
+	RuleID     string `json:"rule_id"`
 	Skipped    bool   `json:"skipped"`
 }
 
@@ -118,6 +120,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 					UserID:     loaded.UserID,
 					RoleID:     loaded.RoleID,
 					ProjectID:  loaded.ProjectID,
+					RuleID:     loaded.RuleID,
 					Skipped:    loaded.Skipped,
 				})
 			}
@@ -157,6 +160,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				UserID:    userInfo.ID,
 				RoleID:    roleInfo.Role.ID,
 				ProjectID: projectInfo.Project.ID,
+				RuleID:    projectInfo.Project.Rule.ID,
 			}
 
 			policyInfo, err := CreateV2Policy(tstCtx, pol)
@@ -178,6 +182,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				UserID:     pol.UserID,
 				RoleID:     pol.RoleID,
 				ProjectID:  pol.ProjectID,
+				RuleID:     projectInfo.Project.Rule.ID,
 				Skipped:    loaded.Skipped,
 			})
 			return nil
@@ -271,7 +276,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				DeleteTeam(tstCtx, loaded.TeamID),
 				DeleteUser(tstCtx, loaded.UserID),
 				DeleteRole(tstCtx, loaded.RoleID),
-				DeleteProject(tstCtx, loaded.ProjectID),
+				DeleteProjectWithRule(tstCtx, loaded.ProjectID, loaded.RuleID),
 			)
 		},
 	}
