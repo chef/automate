@@ -63,7 +63,7 @@ describe('ProjectListComponent', () => {
         MockComponent({
           selector: 'app-create-object-modal',
           inputs: ['creating', 'createForm', 'visible', 'objectNoun',
-            'conflictErrorEvent', 'createProjectModal', 'resetCheckboxEvent'],
+            'conflictErrorEvent', 'createProjectModal', 'resetPoliciesCheckboxEvent'],
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({
