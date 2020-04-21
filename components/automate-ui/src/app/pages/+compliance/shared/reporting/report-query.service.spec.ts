@@ -48,4 +48,12 @@ describe('ReportQueryService', () => {
       expect(service.getFilterTitle(profileType, id)).toEqual(profileTitle);
     });
   });
+
+  describe('formatReturnParams', () => {
+    it('returns empty object when there are no filters and date is today ', () => {
+      service.formatReturnParams();
+      // this is just testing an empty report Query
+      expect(service.formatReturnParams()).toEqual({});
+    });
+  });
 });

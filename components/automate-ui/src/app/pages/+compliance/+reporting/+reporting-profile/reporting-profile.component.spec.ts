@@ -16,7 +16,7 @@ import * as moment from 'moment';
 
 describe('ReportingProfileComponent', () => {
   let store: Store<NgrxStateAtom>;
-  let fixture, component, element, statsService;
+  let fixture, component, element, statsService, reportQueryService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -44,6 +44,7 @@ describe('ReportingProfileComponent', () => {
     component = fixture.componentInstance;
     element = fixture.debugElement;
     statsService = element.injector.get(StatsService);
+    reportQueryService = element.injector.get(ReportQueryService);
   });
 
   describe('ngOnInit()', () => {
@@ -54,6 +55,14 @@ describe('ReportingProfileComponent', () => {
       fixture.detectChanges();
       expect(component.profile).toEqual({});
       expect(component.controls).toEqual([]);
+    });
+
+    it('calls formatReturnParams to set the reports breadcrumb href', () => {
+      component.ngOnInit();
+      spyOn(reportQueryService, 'formatReturnParams');
+      fixture.detectChanges();
+
+      expect(reportQueryService.formatReturnParams).toHaveBeenCalled();
     });
   });
 
