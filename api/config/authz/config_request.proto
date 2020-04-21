@@ -42,6 +42,7 @@ message ConfigRequest {
 				google.protobuf.StringValue database = 1;
 				google.protobuf.StringValue user = 2;
 				google.protobuf.Int32Value max_connections = 5;
+				google.protobuf.Int32Value max_idle_connections = 6;
 			}
 		}
 

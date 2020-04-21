@@ -1,2 +1,2 @@
-[auth_z.v1.sys.service]
-project_limit = 10
+[auth_z.v1.sys.storage]
+max_idle_connections = 10

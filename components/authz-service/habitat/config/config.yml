@@ -10,6 +10,7 @@ tls:
 
 database: {{cfg.storage.database}}
 max_connections: {{cfg.storage.max_connections}}
+max_idle_connections: {{cfg.storage.max_idle_connections}}
 migrations-path: {{pkg.path}}/migrations
 data-migrations-path: {{pkg.path}}/data-migrations
 project-limit: {{cfg.service.project_limit}}

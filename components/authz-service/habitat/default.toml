@@ -12,4 +12,5 @@ level = "info"
 [storage]
 database = "chef_authz_service"
 user = "authz"
+max_idle_connections = 5
 max_connections = 5
