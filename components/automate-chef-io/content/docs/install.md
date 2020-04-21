@@ -156,8 +156,14 @@ Add the following to your config.toml:
 # [global.v1.external.elasticsearch.ssl]
 #  Specify either a root_cert or a root_cert_file
 #  root_cert = """$(cat </path/to/cert_file.crt>)"""
-#  root_cert_file = "</path/to/cert/file>"
 #  server_name = "<elasticsearch server name>"
+
+# Uncomment and fill out if using external elasticsearch that uses hostname-based routing/load balancing
+# [esgateway.v1.sys.ngx.http]
+#  proxy_set_header_host = "yourawesomeexternaleshostname:1234"
+
+# Uncomment and add if you need to change the ssl_verify_depth for the root cert bundle
+#  ssl_verify_depth = "2"
 ```
 
 Because externally-deployed Elasticsearch nodes will not have access to Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
