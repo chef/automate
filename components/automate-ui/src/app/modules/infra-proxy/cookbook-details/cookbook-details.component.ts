@@ -3,11 +3,11 @@ import { Store } from '@ngrx/store';
 import { HttpClient } from '@angular/common/http';
 import { environment as env } from 'environments/environment';
 import { Subject, combineLatest } from 'rxjs';
+import { first ,  filter, takeUntil, pluck } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeURL, routeParams } from 'app/route.selectors';
-import { filter, takeUntil, pluck } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 import { CookbookVersions } from 'app/entities/cookbooks/cookbook-versions.model';
 import { cookbookVersionsFromRoute, getStatus } from 'app/entities/cookbooks/cookbook-versions.selectors';
@@ -52,7 +52,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
       .subscribe((url: string) => {
         this.url = url;
         const [, fragment] = url.split('#');
-        this.tabValue = (fragment === 'details') ? 'details' : 'content';
+        this.tabValue = (fragment === 'content') ? 'content' : 'details';
       });
 
     combineLatest([
@@ -82,9 +82,9 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         !isNil(cookbookVersionState)),
       takeUntil(this.isDestroyed))
       .subscribe(([_getCookbookVersionSt, cookbookVersionState]) => {
+        this.cookbook = cookbookVersionState;
         this.cookbookVersionsLoading = false;
         this.cookbookDetailsLoading = true;
-        this.cookbook = cookbookVersionState;
         this.store.dispatch(new GetCookbookDetails({
           server_id: this.serverId,
           org_id: this.orgId,
@@ -122,6 +122,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
           this.readFileUrl = encodeURIComponent(this.readFile?.url);
           this.http.get(
             `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${cookbook_version}/file-content?url=${this.readFileUrl}`)
+            .pipe(first())
             .subscribe
             (fileContent => {
               this.readFileContent = fileContent;
