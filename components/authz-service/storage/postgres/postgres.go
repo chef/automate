@@ -26,7 +26,7 @@ func New(ctx context.Context, migConf migration.Config, dataMigConf datamigratio
 		)
 	}
 
-	db, err := initPostgresDB(ctx, pgURL)
+	db, err := initPostgresDB(ctx, pgURL, migConf.MaxConnections)
 	if err != nil {
 		return nil, errors.Wrapf(
 			err,
@@ -37,10 +37,14 @@ func New(ctx context.Context, migConf migration.Config, dataMigConf datamigratio
 	return db, nil
 }
 
-func initPostgresDB(ctx context.Context, pgURL string) (*sql.DB, error) {
+func initPostgresDB(ctx context.Context, pgURL string, maxConnections int32) (*sql.DB, error) {
 	d, err := db.PGOpenContext(ctx, pgURL)
 	if err != nil {
 		return nil, err
+	}
+
+	if maxConnections > 0 {
+		d.SetMaxOpenConns(maxConnections)
 	}
 
 	if err := d.PingContext(ctx); err != nil {

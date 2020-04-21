@@ -17,9 +17,10 @@ import (
 // Config holds the information needed to connect to the database (PGURL), to
 // find the migration SQL files (Path), and log debug messages (Logger).
 type Config struct {
-	PGURL  *url.URL
-	Path   string
-	Logger logger.Logger
+	PGURL          *url.URL
+	Path           string
+	Logger         logger.Logger
+	MaxConnections int32
 }
 
 const (

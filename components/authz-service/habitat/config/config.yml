@@ -9,6 +9,7 @@ tls:
   root_ca_path: {{pkg.svc_config_path}}/root_ca.crt
 
 database: {{cfg.storage.database}}
+max_connections: {{cfg.storage.max_connections}}
 migrations-path: {{pkg.path}}/migrations
 data-migrations-path: {{pkg.path}}/data-migrations
 project-limit: {{cfg.service.project_limit}}
