@@ -24,7 +24,6 @@ import (
 	"github.com/chef/automate/api/interservice/authz/common"
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/engine"
-	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	v2_postgres "github.com/chef/automate/components/authz-service/storage/v2/postgres"
@@ -44,13 +43,13 @@ func GRPC(ctx context.Context,
 	}
 	l.Printf("Authz GRPC API listening on %s", addr)
 
-	server, err := NewGRPCServer(ctx, connFactory, l, e, migrationsConfig,
+	serv, err := NewGRPCServer(ctx, connFactory, l, e, migrationsConfig,
 		dataMigrationsConfig, cerealAddress, projectLimit)
 	if err != nil {
 		return err
 	}
 
-	return server.Serve(list)
+	return serv.Serve(list)
 }
 
 // NewGRPCServer creates a grpc server.
@@ -70,27 +69,27 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not create cereal manager")
 	}
 
-	policyRefresher, err := v2.NewPostgresPolicyRefresher(ctx, l, e)
+	policyRefresher, err := NewPostgresPolicyRefresher(ctx, l, e)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 policy refresher")
 	}
 
-	v2ProjectsServer, err := v2.NewPostgresProjectsServer(ctx, l, cerealManager, policyRefresher)
+	v2ProjectsServer, err := NewPostgresProjectsServer(ctx, l, cerealManager, policyRefresher)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 projects server")
 	}
 
-	v2AuthzServer, err := v2.NewPostgresAuthzServer(l, e, v2ProjectsServer)
+	v2AuthzServer, err := NewPostgresAuthzServer(l, e, v2ProjectsServer)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 authz server")
 	}
 
-	v2PolServer, err := v2.NewPostgresPolicyServer(ctx, l, policyRefresher, e)
+	v2PolServer, err := NewPostgresPolicyServer(ctx, l, policyRefresher, e)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 policy server")
 	}
 
-	subjectPurgeServer, err := v2.NewSubjectPurgeServer(ctx, l, v2PolServer)
+	subjectPurgeServer, err := NewSubjectPurgeServer(ctx, l, v2PolServer)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize subject purge server")
 	}

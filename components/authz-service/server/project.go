@@ -1,4 +1,4 @@
-package v2
+package server
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants"
-	"github.com/chef/automate/components/authz-service/server/v2/project_purger_workflow"
+	"github.com/chef/automate/components/authz-service/server/project_purger_workflow"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
@@ -132,7 +132,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 		return nil, status.Errorf(codes.Internal,
 			"creating project with ID %q: %s", req.Id, err.Error())
 	}
-	resp, err := s.store.CreateProject(ctx, &p,req.SkipPolicies)
+	resp, err := s.store.CreateProject(ctx, &p, req.SkipPolicies)
 	switch err {
 	case nil: // continue
 	case storage_errors.ErrConflict:

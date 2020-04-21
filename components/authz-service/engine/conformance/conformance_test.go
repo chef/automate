@@ -15,7 +15,7 @@ import (
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/engine/opa"
-	v2 "github.com/chef/automate/components/authz-service/server/v2"
+	"github.com/chef/automate/components/authz-service/server"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -23,13 +23,13 @@ import (
  * NOTE: These tests are mini-integration tests for the OPA engine,          *
  * confirming that our engine infrastructure on top of OPA is doing its job. *
  *                                                                           *
- * For lower level OPA tests, see opa_v2_test.go.                            *
+ * For lower level OPA tests, see opa_test.go.                               *
  * For the next-higher level up integration tests, see authz_test.go,        *
  * which mock the engine results.                                            *
  ************ ************ ************ ************ ************ ************/
 
-func TestV2p1ProjectsAuthorized(t *testing.T) {
-	ctx, engines := setupV2p1(t)
+func TestProjectsAuthorized(t *testing.T) {
+	ctx, engines := setup(t)
 	sub, act, res := "user:local:admin", "iam:users:create", "iam:users"
 	proj1, proj2, proj3, proj4, unassigned := "proj-1", "proj-2", "proj-3", "proj-4", constants.UnassignedProjectID
 	allProjects := []string{proj1, proj2, proj3, proj4, unassigned}
@@ -61,8 +61,8 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 				}
 
 				// put system policies in engine
-				genericSysPols := make([]interface{}, len(v2.SystemPolicies()))
-				for i, sysPol := range v2.SystemPolicies() {
+				genericSysPols := make([]interface{}, len(server.SystemPolicies()))
+				for i, sysPol := range server.SystemPolicies() {
 					genericSysMembers := make([]string, len(sysPol.Members))
 					for _, member := range sysPol.Members {
 						genericSysMembers = append(genericSysMembers, member.Name)
@@ -456,7 +456,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 }
 
 func TestFilterAuthorizedPairs(t *testing.T) {
-	ctx, engines := setupV2p1(t)
+	ctx, engines := setup(t)
 	sub, act0, res0, act1, res1 := "user:local:someid", "iam:users:create",
 		"nodes:someid", "compliance:profiles:delete", "compliance:profiles"
 	pair0 := engine.Pair{Resource: engine.Resource(res0), Action: engine.Action(act0)}
@@ -568,7 +568,7 @@ func TestFilterAuthorizedPairs(t *testing.T) {
 }
 
 func TestFilterAuthorizedProjects(t *testing.T) {
-	ctx, engines := setupV2p1(t)
+	ctx, engines := setup(t)
 	sub := "user:local:someid"
 	act0, res0 := "iam:users:create", "nodes:someid"
 	act1, res1 := "compliance:profiles:delete", "compliance:profiles"
@@ -754,7 +754,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 }
 
 func TestHierarchicalResourcePolicies(t *testing.T) {
-	ctx, engines := setupV2p1(t)
+	ctx, engines := setup(t)
 	sub, act, res, proj := "user:local:someid", "compliance:scans:read", "compliance:scans:123", "proj"
 	pair := engine.Pair{Resource: engine.Resource(res), Action: engine.Action(act)}
 	args := func() (context.Context, engine.Subjects, []engine.Pair) {
@@ -868,7 +868,7 @@ func TestHierarchicalResourcePolicies(t *testing.T) {
 }
 
 func TestWildcardActionPolicies(t *testing.T) {
-	ctx, engines := setupV2p1(t)
+	ctx, engines := setup(t)
 	sub, act, res, proj := "user:local:someid", "compliance:scans:read", "compliance:scans:123", "proj"
 	pair := engine.Pair{Resource: engine.Resource(res), Action: engine.Action(act)}
 	args := func() (context.Context, engine.Subjects, []engine.Pair) {
@@ -985,7 +985,7 @@ func TestWildcardActionPolicies(t *testing.T) {
 }
 
 func TestWildcardSubjectsPolicies(t *testing.T) {
-	ctx, engines := setupV2p1(t)
+	ctx, engines := setup(t)
 	sub, act, res, proj := "user:local:someid", "compliance:scans:read", "compliance:scans:123", "proj"
 	pair := engine.Pair{Resource: engine.Resource(res), Action: engine.Action(act)}
 	args := func() (context.Context, engine.Subjects, []engine.Pair) {
@@ -1132,15 +1132,7 @@ func setPolicies(t testing.TB, e engine.Engine, policiesAndRoles ...interface{})
 	for _, role := range roles {
 		roleMap[role["id"].(string)] = role
 	}
-	require.NoError(t, e.SetPolicies(ctx, policyMap, roleMap), "SetPolicies() [v2.1]")
-}
-
-func setupV2p1(t testing.TB) (context.Context, map[string]engine.Engine) {
-	ctx, engines := setup(t)
-	if o, ok := engines["opa"]; ok {
-		o.SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{})
-	}
-	return ctx, engines
+	require.NoError(t, e.SetPolicies(ctx, policyMap, roleMap), "SetPolicies()")
 }
 
 func setup(t testing.TB) (context.Context, map[string]engine.Engine) {
@@ -1168,5 +1160,10 @@ func setup(t testing.TB) (context.Context, map[string]engine.Engine) {
 	engines := map[string]engine.Engine{
 		"opa": o,
 	}
+
+	if o, ok := engines["opa"]; ok {
+		o.SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{})
+	}
+
 	return ctx, engines
 }

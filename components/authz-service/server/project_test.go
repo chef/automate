@@ -1,4 +1,4 @@
-package v2_test
+package server_test
 
 import (
 	"context"
@@ -21,9 +21,8 @@ import (
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/prng"
-	grpc_server "github.com/chef/automate/components/authz-service/server"
-	v2 "github.com/chef/automate/components/authz-service/server/v2"
-	"github.com/chef/automate/components/authz-service/server/v2/project_purger_workflow"
+	"github.com/chef/automate/components/authz-service/server"
+	"github.com/chef/automate/components/authz-service/server/project_purger_workflow"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	memstore_v2 "github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/testhelpers"
@@ -566,7 +565,7 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	require.NoError(t, err)
 
 	projectUpdateManager := testhelpers.NewMockProjectUpdateManager()
-	projectsSrv, err := v2.NewProjectsServer(
+	projectsSrv, err := server.NewProjectsServer(
 		ctx, l, mem_v2,
 		projectUpdateManager, projectPurger, testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
@@ -576,7 +575,7 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	// TODO(sr): refactor our constructors. Having to maintain the middleware in
 	// three places is tedious and error-prone.
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
-		grpc_server.InputValidationInterceptor(),
+		server.InputValidationInterceptor(),
 	))
 	api.RegisterProjectsServer(serv, projectsSrv)
 

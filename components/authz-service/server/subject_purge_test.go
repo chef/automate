@@ -1,4 +1,4 @@
-package v2_test
+package server_test
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/chef/automate/api/interservice/authz/common"
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/prng"
-	v2 "github.com/chef/automate/components/authz-service/server/v2"
+	"github.com/chef/automate/components/authz-service/server"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -39,7 +39,7 @@ func TestCommonSubjectPurgeService(t *testing.T) {
 
 	properties.Property("calls both with subject, returns output", prop.ForAll(
 		func(sub string, v2Pols []string) bool {
-			s, err := v2.NewSubjectPurgeServer(ctx, l,
+			s, err := server.NewSubjectPurgeServer(ctx, l,
 				&vee2{expected: sub, returned: v2Pols})
 			if err != nil {
 				return false

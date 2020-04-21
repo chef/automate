@@ -1,4 +1,4 @@
-package v2_test
+package server_test
 
 import (
 	"context"
@@ -24,8 +24,7 @@ import (
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/prng"
-	grpc_server "github.com/chef/automate/components/authz-service/server"
-	v2 "github.com/chef/automate/components/authz-service/server/v2"
+	"github.com/chef/automate/components/authz-service/server"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	memstore_v2 "github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/testhelpers"
@@ -2251,7 +2250,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 				// assert
 				// Note: The response and its qualities have been tested above -- here,
 				// we're interested in the interaction with the engine's store.
-				assert.Equal(t, len(testPolicies)+len(v2.SystemPolicies()), len(te.policyMap),
+				assert.Equal(t, len(testPolicies)+len(server.SystemPolicies()), len(te.policyMap),
 					"the numbers of both stores should match")
 				for _, req := range testPolicies {
 					assertInterfaceMapContainsPolicy(t, te.policyMap, req)
@@ -2271,7 +2270,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 		}
 		policyResp := generateTestPolicies(ctx, t, cl, testCreate)
 
-		assert.Equal(t, 1+len(v2.SystemPolicies()), len(te.policyMap),
+		assert.Equal(t, 1+len(server.SystemPolicies()), len(te.policyMap),
 			"the numbers of both stores should match")
 		assertInterfaceMapContainsPolicy(t, te.policyMap, testCreate[0])
 
@@ -2296,7 +2295,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 		singleStatementAllowEditedFromStore := getPolicyFromStore(t, store, singleStatementAllowEdited.Id)
 
 		// assert: there's still one policy in the engine and it matches the updated one
-		assert.Equal(t, 1+len(v2.SystemPolicies()), len(te.policyMap),
+		assert.Equal(t, 1+len(server.SystemPolicies()), len(te.policyMap),
 			"the numbers of both stores should match")
 		assertPoliciesMatch(t, &singleStatementAllowEditedFromStore, pol)
 
@@ -2316,7 +2315,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 				policies := generateTestPolicies(ctx, t, cl, testPolicies)
 				require.Equal(t, len(testPolicies), store.ItemCount())
 
-				assert.Equal(t, len(testPolicies)+len(v2.SystemPolicies()), len(te.policyMap),
+				assert.Equal(t, len(testPolicies)+len(server.SystemPolicies()), len(te.policyMap),
 					"the numbers of both stores should match")
 				for _, req := range testPolicies {
 					assertInterfaceMapContainsPolicy(t, te.policyMap, req)
@@ -2332,7 +2331,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 				}
 
 				// assert store has changed
-				assert.Equal(t, len(v2.SystemPolicies()), len(te.policyMap),
+				assert.Equal(t, len(server.SystemPolicies()), len(te.policyMap),
 					"the numbers of both stores should match")
 
 				for _, policy := range policies {
@@ -2487,18 +2486,18 @@ func setupV2(t *testing.T,
 
 	mem_v2 := memstore_v2.New()
 
-	polRefresher, err := v2.NewPolicyRefresher(ctx, l, writer, mem_v2)
+	polRefresher, err := server.NewPolicyRefresher(ctx, l, writer, mem_v2)
 	require.NoError(t, err)
 
-	polV2, err := v2.NewPoliciesServer(ctx, l, polRefresher, mem_v2, writer)
+	polV2, err := server.NewPoliciesServer(ctx, l, polRefresher, mem_v2, writer)
 	require.NoError(t, err)
 
 	require.NoError(t, err)
-	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
+	projectsSrv, err := server.NewProjectsServer(ctx, l, mem_v2,
 		testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockProjectPurger(true), testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
-	authzV2, err := v2.NewAuthzServer(l, authorizer, projectsSrv, mem_v2)
+	authzV2, err := server.NewAuthzServer(l, authorizer, projectsSrv, mem_v2)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -2508,7 +2507,7 @@ func setupV2(t *testing.T,
 	// two places is tedious and error-prone.
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
 		grpc_middleware.ChainUnaryServer(
-			grpc_server.InputValidationInterceptor(),
+			server.InputValidationInterceptor(),
 			polV2.EngineUpdateInterceptor(),
 		),
 	))

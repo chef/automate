@@ -21,9 +21,7 @@ import (
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/engine/opa"
 	"github.com/chef/automate/components/authz-service/prng"
-	grpc_server "github.com/chef/automate/components/authz-service/server"
-	server "github.com/chef/automate/components/authz-service/server/v2"
-	v2 "github.com/chef/automate/components/authz-service/server/v2"
+	"github.com/chef/automate/components/authz-service/server"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
@@ -82,7 +80,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
 
-	polRefresher, err := v2.NewPostgresPolicyRefresher(ctx, l, opaInstance)
+	polRefresher, err := server.NewPostgresPolicyRefresher(ctx, l, opaInstance)
 	require.NoError(t, err)
 
 	polSrv, err := server.NewPoliciesServer(ctx, l, polRefresher, pg, opaInstance)
@@ -99,7 +97,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	// TODO(sr): refactor our constructors. Having to maintain the middleware in
 	// three places is tedious and error-prone.
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
-		grpc_server.InputValidationInterceptor(),
+		server.InputValidationInterceptor(),
 	))
 	api.RegisterProjectsServer(serv, projectsSrv)
 	api.RegisterPoliciesServer(serv, polSrv)
@@ -127,7 +125,7 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 
 	opaInstance, err := opa.New(ctx, l)
 	require.NoError(t, err, "init OPA")
-	sysPols := v2.SystemPolicies()
+	sysPols := server.SystemPolicies()
 
 	// OPA requires this format
 	data := make(map[string]interface{})
