@@ -22,9 +22,9 @@ import (
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/server/project_purger_workflow"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/components/authz-service/storage/memstore"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
-	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 )
 
 // ProjectState holds the server state for projects

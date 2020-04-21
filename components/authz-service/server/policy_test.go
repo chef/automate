@@ -25,8 +25,8 @@ import (
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/prng"
 	"github.com/chef/automate/components/authz-service/server"
+	"github.com/chef/automate/components/authz-service/storage/memstore"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
-	memstore_v2 "github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -2484,7 +2484,7 @@ func setupV2(t *testing.T,
 		writer = &testEngine{}
 	}
 
-	mem_v2 := memstore_v2.New()
+	mem_v2 := memstore.New()
 
 	polRefresher, err := server.NewPolicyRefresher(ctx, l, writer, mem_v2)
 	require.NoError(t, err)

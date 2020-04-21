@@ -15,10 +15,10 @@ import (
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/components/authz-service/storage/memstore"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	v2 "github.com/chef/automate/components/authz-service/storage/v2"
-	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/lib/projectassignment"
 )
 

@@ -23,8 +23,8 @@ import (
 	"github.com/chef/automate/components/authz-service/prng"
 	"github.com/chef/automate/components/authz-service/server"
 	"github.com/chef/automate/components/authz-service/server/project_purger_workflow"
+	"github.com/chef/automate/components/authz-service/storage/memstore"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
-	memstore_v2 "github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/authz/project_purge"
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -552,7 +552,7 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
 
-	mem_v2 := memstore_v2.NewWithProjectLimit(projectLimitForTesting)
+	mem_v2 := memstore.NewWithProjectLimit(projectLimitForTesting)
 	// TODO: we should be able to optionally use PG. We're only using memstore
 	pg, testDb, _, _, _ := testhelpers.SetupTestDBWithLimit(t, projectLimitForTesting)
 	manager, err := cereal.NewManager(postgres.NewPostgresBackend(testDb.ConnURI))
