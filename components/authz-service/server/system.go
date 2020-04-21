@@ -1,8 +1,8 @@
 package server
 
 import (
-	constants "github.com/chef/automate/components/authz-service/constants"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/constants"
+	"github.com/chef/automate/components/authz-service/storage"
 )
 
 // SystemPolicies returns a list of system policies that should always exist by default.

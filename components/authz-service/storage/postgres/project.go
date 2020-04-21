@@ -7,13 +7,12 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	constants "github.com/chef/automate/components/authz-service/constants"
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/constants"
+	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/lib/projectassignment"
 )
 
-func (p *pg) CreateProject(ctx context.Context, project *v2.Project, skipPolicies bool) (*v2.Project, error) {
+func (p *pg) CreateProject(ctx context.Context, project *storage.Project, skipPolicies bool) (*storage.Project, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -22,7 +21,7 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project, skipPolicie
 		return nil, p.processError(err)
 	}
 
-	if project.Type == v2.Custom {
+	if project.Type == storage.Custom {
 		row := tx.QueryRowContext(ctx, "SELECT count(*) FROM iam_projects WHERE type='custom'")
 		var numProjects int
 		if err := row.Scan(&numProjects); err != nil {
@@ -30,7 +29,7 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project, skipPolicie
 		}
 
 		if numProjects >= p.projectLimit {
-			return nil, storage_errors.NewMaxProjectsExceededError(p.projectLimit)
+			return nil, storage.NewMaxProjectsExceededError(p.projectLimit)
 		}
 	}
 
@@ -39,12 +38,12 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project, skipPolicie
 	if err := row.Scan(&existsInGraveyard); err != nil {
 		err = p.processError(err)
 		// failed with an unexpected error
-		if err != storage_errors.ErrNotFound {
+		if err != storage.ErrNotFound {
 			return nil, err
 		}
 	}
 	if existsInGraveyard {
-		return nil, storage_errors.ErrProjectInGraveyard
+		return nil, storage.ErrProjectInGraveyard
 	}
 
 	if err := p.insertProjectWithQuerier(ctx, project, tx); err != nil {
@@ -59,14 +58,14 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project, skipPolicie
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 
 	// Currently, we don't change anything from what is passed in.
 	return project, nil
 }
 
-func (p *pg) addSupportPolicies(ctx context.Context, project *v2.Project, q Querier) error {
+func (p *pg) addSupportPolicies(ctx context.Context, project *storage.Project, q Querier) error {
 	policyParams := []struct {
 		id   string
 		name string
@@ -103,14 +102,14 @@ func (p *pg) addSupportPolicies(ctx context.Context, project *v2.Project, q Quer
 	return nil
 }
 
-func generatePolicy(projectID string, id string, name string, role string) v2.Policy {
-	return v2.Policy{
+func generatePolicy(projectID string, id string, name string, role string) storage.Policy {
+	return storage.Policy{
 		ID:      id,
 		Name:    name,
-		Members: []v2.Member{},
-		Statements: []v2.Statement{
+		Members: []storage.Member{},
+		Statements: []storage.Statement{
 			{
-				Effect:    v2.Allow,
+				Effect:    storage.Allow,
 				Resources: []string{"*"},
 				Projects:  []string{projectID},
 				Actions:   []string{},
@@ -121,7 +120,7 @@ func generatePolicy(projectID string, id string, name string, role string) v2.Po
 	}
 }
 
-func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Project, error) {
+func (p *pg) UpdateProject(ctx context.Context, project *storage.Project) (*storage.Project, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -149,13 +148,13 @@ func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 	return project, nil
 }
 
-func (p *pg) GetProject(ctx context.Context, id string) (*v2.Project, error) {
+func (p *pg) GetProject(ctx context.Context, id string) (*storage.Project, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var project v2.Project
+	var project storage.Project
 	// Update project if ID found
 	// AND there is an intersection between projects and a non-empty projectsFilter
 	row := p.db.QueryRowContext(ctx, `SELECT query_project($1, $2)`, id, pq.Array(projectsFilter))
@@ -194,7 +193,7 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 		// this is necessary since the status might not have been reported
 		// to cereal on the first attempt, in which case we want this
 		// function to be idempotent.
-		if err == storage_errors.ErrNotFound {
+		if err == storage.ErrNotFound {
 			gyRes, _ := tx.ExecContext(ctx, `SELECT id FROM iam_projects_graveyard WHERE id=$1`, id)
 			gyErr := p.singleRowResultOrNotFoundErr(gyRes)
 			// if we don't find the project in the graveyard, return the original error
@@ -224,7 +223,7 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 
 	err = tx.Commit()
 	if err != nil {
-		return storage_errors.NewTxCommitError(err)
+		return storage.NewTxCommitError(err)
 	}
 
 	return nil
@@ -279,7 +278,7 @@ func (p *pg) ensureNoProjectsMissingWithQuerier(ctx context.Context, q Querier, 
 	return nil
 }
 
-func (p *pg) ListProjects(ctx context.Context) ([]*v2.Project, error) {
+func (p *pg) ListProjects(ctx context.Context) ([]*storage.Project, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -297,9 +296,9 @@ func (p *pg) ListProjects(ctx context.Context) ([]*v2.Project, error) {
 		}
 	}()
 
-	var projects []*v2.Project
+	var projects []*storage.Project
 	for rows.Next() {
-		var project v2.Project
+		var project storage.Project
 		if err := rows.Scan(&project); err != nil {
 			return nil, p.processError(err)
 		}
@@ -311,7 +310,7 @@ func (p *pg) ListProjects(ctx context.Context) ([]*v2.Project, error) {
 	return projects, nil
 }
 
-func (p *pg) insertProjectWithQuerier(ctx context.Context, project *v2.Project, q Querier) error {
+func (p *pg) insertProjectWithQuerier(ctx context.Context, project *storage.Project, q Querier) error {
 	_, err := q.ExecContext(ctx, `INSERT INTO iam_projects (id, name, type) VALUES ($1, $2, $3);`,
 		project.ID, project.Name, project.Type.String())
 	return err

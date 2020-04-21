@@ -16,8 +16,8 @@ import (
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
+	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/projectassignment"
 )
 

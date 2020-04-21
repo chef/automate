@@ -1,11 +1,9 @@
-package v2
+package storage
 
 import (
 	"encoding/json"
 
 	"github.com/pkg/errors"
-
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
 )
 
 // Role represents a role definition to be persisted to storage.
@@ -21,7 +19,7 @@ type Role struct {
 // so we can pull them out of the database directly as the correct type.
 func (p *Role) Scan(src interface{}) error {
 	if src == nil {
-		return storage_errors.ErrNotFound
+		return ErrNotFound
 	}
 	source, ok := src.([]byte)
 	if !ok {

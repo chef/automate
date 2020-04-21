@@ -7,7 +7,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage"
 )
 
 type policyChangeNotifier struct {
@@ -15,18 +15,18 @@ type policyChangeNotifier struct {
 	minReconnectInterval time.Duration
 	maxReconnectInterval time.Duration
 	pingInterval         time.Duration
-	notificationChan     chan v2.PolicyChangeNotification
+	notificationChan     chan storage.PolicyChangeNotification
 	shutdown             func()
 }
 
-func newPolicyChangeNotifier(ctx context.Context, conninfo string) (v2.PolicyChangeNotifier, error) {
+func newPolicyChangeNotifier(ctx context.Context, conninfo string) (storage.PolicyChangeNotifier, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	p := &policyChangeNotifier{
 		conninfo:             conninfo,
 		minReconnectInterval: 10 * time.Second,
 		maxReconnectInterval: time.Minute,
 		pingInterval:         10 * time.Second,
-		notificationChan:     make(chan v2.PolicyChangeNotification, 1),
+		notificationChan:     make(chan storage.PolicyChangeNotification, 1),
 		shutdown:             cancel,
 	}
 	listener := pq.NewListener(p.conninfo, p.minReconnectInterval, p.maxReconnectInterval, nil)
@@ -39,7 +39,7 @@ func newPolicyChangeNotifier(ctx context.Context, conninfo string) (v2.PolicyCha
 	return p, nil
 }
 
-func (p *policyChangeNotifier) C() <-chan v2.PolicyChangeNotification {
+func (p *policyChangeNotifier) C() <-chan storage.PolicyChangeNotification {
 	return p.notificationChan
 }
 
@@ -60,7 +60,7 @@ RUNLOOP:
 				continue
 			}
 			select {
-			case p.notificationChan <- v2.PolicyChangeNotification{}:
+			case p.notificationChan <- storage.PolicyChangeNotification{}:
 				logrus.Info("Accepted notification from postgres")
 			default:
 				logrus.Debug("Notification listener mailbox full")

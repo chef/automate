@@ -6,14 +6,13 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/projectassignment"
 )
 
 // CreatePolicy stores a new policy and its statements in postgres and returns the final policy.
-func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy, skipProjectsCheckOnV1PolicyMigration bool) (*v2.Policy, error) {
+func (p *pg) CreatePolicy(ctx context.Context, pol *storage.Policy, skipProjectsCheckOnV1PolicyMigration bool) (*storage.Policy, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -35,7 +34,7 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy, skipProjectsCheck
 	}
 
 	// skip project permissions check on upgrade from v1 or for chef-managed policies
-	if !skipProjectsCheckOnV1PolicyMigration && pol.Type == v2.Custom {
+	if !skipProjectsCheckOnV1PolicyMigration && pol.Type == storage.Custom {
 		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projects)
 		if err != nil {
 			return nil, p.processError(err)
@@ -62,7 +61,7 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy, skipProjectsCheck
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 
 	// Currently, we don't change anything from what is passed in.
@@ -110,13 +109,13 @@ func (p *pg) PurgeSubjectFromPolicies(ctx context.Context, sub string) ([]string
 	return polIDs, nil
 }
 
-func (p *pg) ListPolicies(ctx context.Context) ([]*v2.Policy, error) {
+func (p *pg) ListPolicies(ctx context.Context) ([]*storage.Policy, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var pols []*v2.Policy
+	var pols []*storage.Policy
 	rows, err := p.db.QueryContext(ctx,
 		"SELECT query_policies from query_policies($1)", pq.Array(projectsFilter))
 	if err != nil {
@@ -129,7 +128,7 @@ func (p *pg) ListPolicies(ctx context.Context) ([]*v2.Policy, error) {
 	}()
 
 	for rows.Next() {
-		var pol v2.Policy
+		var pol storage.Policy
 		if err := rows.Scan(&pol); err != nil {
 			return nil, p.processError(err)
 		}
@@ -141,7 +140,7 @@ func (p *pg) ListPolicies(ctx context.Context) ([]*v2.Policy, error) {
 	return pols, nil
 }
 
-func (p *pg) GetPolicy(ctx context.Context, id string) (*v2.Policy, error) {
+func (p *pg) GetPolicy(ctx context.Context, id string) (*storage.Policy, error) {
 	pol, err := p.queryPolicy(ctx, id, p.db, false)
 	if err != nil {
 		return nil, p.processError(err)
@@ -180,13 +179,13 @@ func (p *pg) DeletePolicy(ctx context.Context, id string) error {
 
 	err = tx.Commit()
 	if err != nil {
-		return storage_errors.NewTxCommitError(err)
+		return storage.NewTxCommitError(err)
 	}
 
 	return nil
 }
 
-func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, error) {
+func (p *pg) UpdatePolicy(ctx context.Context, pol *storage.Policy) (*storage.Policy, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -196,8 +195,8 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	}
 
 	// Project filtering handled in here. We'll return a 404 right away if we can't find
-	// the policy via ID as filtered by projects. Also locks relevant rows if in v2.1 mode
-	// so we can check project assignment permissions without them being changed under us.
+	// the policy via ID as filtered by projects. Also locks relevant rows so we can check
+	// project assignment permissions without them being changed under us.
 	oldPolicy, err := p.queryPolicy(ctx, pol.ID, tx, true)
 	if err != nil {
 		return nil, p.processError(err)
@@ -228,7 +227,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 		"DELETE FROM iam_statements WHERE policy_id=policy_db_id($1)",
 		pol.ID,
 	); err != nil {
-		if err := p.processError(err); err != storage_errors.ErrNotFound {
+		if err := p.processError(err); err != storage.ErrNotFound {
 			return nil, err
 		}
 	}
@@ -246,7 +245,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 		return nil, p.processError(err)
 	}
 	if affected == 0 {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 
 	// Update policy's projects
@@ -268,7 +267,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 
 	// Currently, we don't change anything from what is passed in.
@@ -287,11 +286,11 @@ func (p *pg) GetPolicyChangeID(ctx context.Context) (string, error) {
 	return policyChangeID, nil
 }
 
-func (p *pg) GetPolicyChangeNotifier(ctx context.Context) (v2.PolicyChangeNotifier, error) {
+func (p *pg) GetPolicyChangeNotifier(ctx context.Context) (storage.PolicyChangeNotifier, error) {
 	return newPolicyChangeNotifier(ctx, p.conninfo)
 }
 
-func (p *pg) insertCompletePolicy(ctx context.Context, pol *v2.Policy, projects []string, q Querier) error {
+func (p *pg) insertCompletePolicy(ctx context.Context, pol *storage.Policy, projects []string, q Querier) error {
 	if err := p.insertPolicyWithQuerier(ctx, pol, q); err != nil {
 		return err
 	}
@@ -308,7 +307,7 @@ func (p *pg) insertCompletePolicy(ctx context.Context, pol *v2.Policy, projects 
 
 // insertPolicyWithQuerier inserts a new custom policy. It does not return the
 // new policy since there are no DEFAULTS in the iam_policy table.
-func (p *pg) insertPolicyWithQuerier(ctx context.Context, inputPol *v2.Policy, q Querier) error {
+func (p *pg) insertPolicyWithQuerier(ctx context.Context, inputPol *storage.Policy, q Querier) error {
 	_, err := q.ExecContext(ctx,
 		`SELECT insert_iam_policy($1, $2, $3);`,
 		inputPol.ID, inputPol.Name, inputPol.Type.String(),
@@ -325,7 +324,7 @@ func (p *pg) insertPolicyWithQuerier(ctx context.Context, inputPol *v2.Policy, q
 // Does not return the statements since they will be exactly the same as passed in since
 // statements have no defaults in the database.
 func (p *pg) insertPolicyStatementsWithQuerier(ctx context.Context,
-	policyID string, inputStatements []v2.Statement,
+	policyID string, inputStatements []storage.Statement,
 	q Querier) error {
 	for _, s := range inputStatements {
 		_, err := q.ExecContext(ctx,
@@ -366,13 +365,13 @@ func (p *pg) associatePolicyWithProjects(ctx context.Context,
 }
 
 // queryPolicy returns a policy based on id or an error. Can optionally lock for updates.
-func (p *pg) queryPolicy(ctx context.Context, id string, q Querier, selectForUpdate bool) (*v2.Policy, error) {
+func (p *pg) queryPolicy(ctx context.Context, id string, q Querier, selectForUpdate bool) (*storage.Policy, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var pol v2.Policy
+	var pol storage.Policy
 	query := "SELECT query_policy($1, $2)"
 	if selectForUpdate {
 		query = "SELECT query_policy($1, $2) FOR UPDATE"

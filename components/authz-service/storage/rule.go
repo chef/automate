@@ -1,11 +1,9 @@
-package v2
+package storage
 
 import (
 	"encoding/json"
 
 	"github.com/pkg/errors"
-
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
 )
 
 // Rule defines an ingest rule for a project.
@@ -23,7 +21,7 @@ type Rule struct {
 // so we can pull them out of the database directly as the correct type.
 func (p *Rule) Scan(src interface{}) error {
 	if src == nil {
-		return storage_errors.ErrNotFound
+		return ErrNotFound
 	}
 	source, ok := src.([]byte)
 	if !ok {

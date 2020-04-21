@@ -4,7 +4,6 @@ import (
 	"context"
 	"sync"
 
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/logger"
@@ -13,7 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/lib/authz/project_purge"
 )
 
@@ -141,7 +140,7 @@ func (m *cerealProjectPurger) GraveyardingCompleted(projectID string) (bool, err
 
 	if err != nil {
 		switch err.Error() {
-		case storage_errors.ErrNotFound.Error():
+		case storage.ErrNotFound.Error():
 			return true, status.Errorf(codes.NotFound, "no project with ID %q found", projectID)
 		default:
 			return true, status.Errorf(codes.Internal,

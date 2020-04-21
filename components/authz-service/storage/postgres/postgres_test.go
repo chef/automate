@@ -15,8 +15,7 @@ import (
 
 	"github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/prng"
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/projectassignment"
@@ -68,7 +67,7 @@ func TestGetPolicy(t *testing.T) {
 			resp, err := store.GetPolicy(ctx, genSimpleID(t, prngSeed))
 			assert.Error(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"policy with projects": func(t *testing.T) {
 			ctx := context.Background()
@@ -290,7 +289,7 @@ func TestGetPolicy(t *testing.T) {
 			resp, err := store.GetPolicy(ctx, polID)
 
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 	}
 
@@ -311,7 +310,7 @@ func TestListPolicyMembers(t *testing.T) {
 			resp, err := store.ListPolicyMembers(ctx, genSimpleID(t, prngSeed))
 			assert.Error(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"contains policies but looking for a different one": func(t *testing.T) {
 			insertTestPolicy(t, db, "testpolicy")
@@ -320,7 +319,7 @@ func TestListPolicyMembers(t *testing.T) {
 
 			assert.Error(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"policy with no members": func(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
@@ -410,7 +409,7 @@ func TestListPolicyMembers(t *testing.T) {
 			resp, err := store.ListPolicyMembers(ctx, polID)
 
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 	}
 
@@ -851,7 +850,7 @@ func TestDeletePolicy(t *testing.T) {
 			assertNoPolicyChange(t, store, func() {
 				err := store.DeletePolicy(ctx, genSimpleID(t, prngSeed))
 				assert.Error(t, err)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 			})
 		},
 		"policy not found with existing policies in store": func(t *testing.T) {
@@ -862,7 +861,7 @@ func TestDeletePolicy(t *testing.T) {
 
 			assertNoPolicyChange(t, store, func() {
 				err := store.DeletePolicy(ctx, genSimpleID(t, prngSeed))
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 			})
 		},
 		"attached policy with no statements": func(t *testing.T) {
@@ -1025,7 +1024,7 @@ func TestDeletePolicy(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{projID2})
 			assertNoPolicyChange(t, store, func() {
 				err := store.DeletePolicy(ctx, polID)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 			})
 		},
 	}
@@ -1111,7 +1110,7 @@ func TestCreatePolicy(t *testing.T) {
 			require.Error(t, err)
 			assert.Nil(t, resp)
 
-			_, ok := err.(*storage_errors.ForeignKeyError)
+			_, ok := err.(*storage.ForeignKeyError)
 			assert.True(t, ok, "expected foreign key error")
 			assert.Equal(t, "role not found: "+role, err.Error())
 
@@ -1683,7 +1682,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 
 				assert.Error(t, err)
 				assert.Nil(t, resp)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 			})
 		},
 		"updating policy with NO members to SOME members": func(t *testing.T) {
@@ -1912,7 +1911,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
 				assert.Nil(t, resp)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 			})
 			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
 		},
@@ -1951,7 +1950,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 
 				assert.Error(t, err)
 				assert.Nil(t, resp)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 			})
 		},
 		"removing members from policy with NO members results in an empty member list": func(t *testing.T) {
@@ -2159,7 +2158,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
 				assert.Nil(t, resp)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 			})
 			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
 		},
@@ -2187,7 +2186,7 @@ func TestAddPolicyMembers(t *testing.T) {
 
 				assert.Error(t, err)
 				assert.Nil(t, resp)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 			})
 		},
 		"fails to add with ErrNotFound when a policy exists but members are added to a non-existent policy": func(t *testing.T) {
@@ -2200,7 +2199,7 @@ func TestAddPolicyMembers(t *testing.T) {
 
 				assert.Error(t, err)
 				assert.Nil(t, resp)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 			})
 		},
 		"adding one member to a policy with NO members results in member being added": func(t *testing.T) {
@@ -2500,7 +2499,7 @@ func TestAddPolicyMembers(t *testing.T) {
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.AddPolicyMembers(ctx, polID, members)
 				assert.Nil(t, resp)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 			})
 			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
 		},
@@ -2532,7 +2531,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.UpdatePolicy(ctx, &pol)
 				assert.Error(t, err)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 				assert.Nil(t, resp)
 			})
 		},
@@ -2555,7 +2554,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.UpdatePolicy(ctx, &pol)
 				assert.Error(t, err)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 				assert.Nil(t, resp)
 			})
 		},
@@ -3076,7 +3075,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.UpdatePolicy(ctx, &pol)
 				assert.Nil(t, resp)
-				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Equal(t, storage.ErrNotFound, err)
 			})
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2`, polID, originalName))
@@ -3105,7 +3104,7 @@ func TestCreateRule(t *testing.T) {
 			resp, err := store.CreateRule(ctx, &rule)
 			require.Error(t, err)
 			assert.Nil(t, resp)
-			_, ok := err.(*storage_errors.ForeignKeyError)
+			_, ok := err.(*storage.ForeignKeyError)
 			require.True(t, ok, "mismatches expected error type")
 			assert.Equal(t, "project not found: project-not-found", err.Error())
 		},
@@ -3117,7 +3116,7 @@ func TestCreateRule(t *testing.T) {
 
 			resp, err := store.CreateRule(ctx, rule)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrConflict, err)
+			assert.Equal(t, storage.ErrConflict, err)
 		},
 		"when rule exists in the staging rules table, return error": func(t *testing.T) {
 			projID := "project-1"
@@ -3127,7 +3126,7 @@ func TestCreateRule(t *testing.T) {
 
 			resp, err := store.CreateRule(ctx, rule)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrConflict, err)
+			assert.Equal(t, storage.ErrConflict, err)
 		},
 		"cannot use improper condition attributes for events": func(t *testing.T) {
 			projID := "project-1"
@@ -3366,7 +3365,7 @@ func TestListRulesForProject(t *testing.T) {
 			require.Error(t, err)
 			assert.Nil(t, resp)
 			assert.Equal(t, storage.RulesStatusError, status)
-			_, ok := err.(*storage_errors.ForeignKeyError)
+			_, ok := err.(*storage.ForeignKeyError)
 			require.True(t, ok, "mismatches expected error type")
 			assert.Equal(t, "project not found: project-not-found", err.Error())
 		}},
@@ -3380,7 +3379,7 @@ func TestListRulesForProject(t *testing.T) {
 			require.Error(t, err)
 			assert.Nil(t, resp)
 			assert.Equal(t, storage.RulesStatusError, status)
-			_, ok := err.(*storage_errors.ForeignKeyError)
+			_, ok := err.(*storage.ForeignKeyError)
 			require.True(t, ok, "mismatches expected error type")
 			assert.Equal(t, "project not found: project-not-found", err.Error())
 		}},
@@ -3462,7 +3461,7 @@ func TestListRulesForProject(t *testing.T) {
 			require.Error(t, err)
 			assert.Nil(t, resp)
 			assert.Equal(t, storage.RulesStatusError, status)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		}},
 		{"when there are only staged changes for the project's rules, returns the staged versions of the rules", func(t *testing.T) {
 			ctx := context.Background()
@@ -3576,7 +3575,7 @@ func TestUpdateRule(t *testing.T) {
 			resp, err := store.UpdateRule(ctx, &rule)
 			require.Error(t, err)
 			assert.Nil(t, resp)
-			_, ok := err.(*storage_errors.ForeignKeyError)
+			_, ok := err.(*storage.ForeignKeyError)
 			require.True(t, ok, "mismatches expected error type")
 			assert.Equal(t, "project not found: project-not-found", err.Error())
 		},
@@ -3591,7 +3590,7 @@ func TestUpdateRule(t *testing.T) {
 
 			resp, err := store.UpdateRule(ctx, &rule)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"when the update attempts to change the project, throw an error": func(t *testing.T) {
 			ctx := context.Background()
@@ -3615,7 +3614,7 @@ func TestUpdateRule(t *testing.T) {
 
 			resp, err := store.UpdateRule(ctx, &ruleUpdated)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrChangeProjectForRule, err)
+			assert.Equal(t, storage.ErrChangeProjectForRule, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=project_db_id($4)`,
 				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
 			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=project_db_id($4)`,
@@ -3640,7 +3639,7 @@ func TestUpdateRule(t *testing.T) {
 
 			resp, err := store.UpdateRule(ctx, &ruleUpdated)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrChangeTypeForRule, err)
+			assert.Equal(t, storage.ErrChangeTypeForRule, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=project_db_id($4)`,
 				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=project_db_id($4)`,
@@ -3719,7 +3718,7 @@ func TestUpdateRule(t *testing.T) {
 
 			resp, err := store.UpdateRule(ctx, &ruleUpdated)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=project_db_id($4)`,
 				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
 		},
@@ -3820,7 +3819,7 @@ func TestUpdateRule(t *testing.T) {
 
 			resp, err := store.UpdateRule(ctx, &updatedRule)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrMarkedForDeletion, err)
+			assert.Equal(t, storage.ErrMarkedForDeletion, err)
 
 			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=project_db_id($4)`,
 				updatedRule.ID, updatedRule.Name, updatedRule.Type.String(), updatedRule.ProjectID))
@@ -3846,7 +3845,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			resp, err := store.GetStagedOrAppliedRule(ctx, "project-not-found", "some-rule")
 			require.Error(t, err)
 			assert.Nil(t, resp)
-			_, ok := err.(*storage_errors.ForeignKeyError)
+			_, ok := err.(*storage.ForeignKeyError)
 			require.True(t, ok, "mismatches expected error type")
 			assert.Equal(t, "project not found: project-not-found", err.Error())
 		},
@@ -3856,7 +3855,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			insertTestProject(t, db, projID, "testing", storage.Custom)
 			resp, err := store.GetStagedOrAppliedRule(ctx, projID, "not-found")
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"when the rule doesn't exist in applied or staged, returns NotFoundErr": func(t *testing.T) {
 			ctx := context.Background()
@@ -3867,7 +3866,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 
 			resp, err := store.GetStagedOrAppliedRule(ctx, projID, "not-found")
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"when multiple rules exists with no project filter, return correct rule": func(t *testing.T) {
 			ctx := context.Background()
@@ -3912,7 +3911,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			resp, err := store.GetStagedOrAppliedRule(ctx, projID, ruleToGet.ID)
 			assert.Error(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"when the rule exists only in the staged table, returns the staged rule": func(t *testing.T) {
 			ctx := context.Background()
@@ -4009,7 +4008,7 @@ func TestDeleteRule(t *testing.T) {
 			ctx := context.Background()
 			err := store.DeleteRule(ctx, "project-not-found", "rule1")
 			require.Error(t, err)
-			_, ok := err.(*storage_errors.ForeignKeyError)
+			_, ok := err.(*storage.ForeignKeyError)
 			require.True(t, ok, "mismatches expected error type")
 			assert.Equal(t, "project not found: project-not-found", err.Error())
 		},
@@ -4018,7 +4017,7 @@ func TestDeleteRule(t *testing.T) {
 			projID := "foo-project"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 			err := store.DeleteRule(ctx, projID, "not-found")
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"when an applied rule exists but the wrong id requested, returns NotFoundErr": func(t *testing.T) {
 			ctx := context.Background()
@@ -4028,7 +4027,7 @@ func TestDeleteRule(t *testing.T) {
 			rule := insertAppliedRuleWithMultipleConditions(t, db, "some-rule", projID, storage.Event)
 
 			err := store.DeleteRule(ctx, projID, "not-found")
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 		},
@@ -4041,7 +4040,7 @@ func TestDeleteRule(t *testing.T) {
 			insertStagedRuleWithMultipleConditions(t, db, rule.ID, rule.ProjectID, rule.Type, false)
 
 			err := store.DeleteRule(ctx, projID, "not-found")
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
@@ -4055,7 +4054,7 @@ func TestDeleteRule(t *testing.T) {
 			rule := insertStagedRuleWithMultipleConditions(t, db, "staged", projID, storage.Event, false)
 
 			err := store.DeleteRule(ctx, projID, "not-found")
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 		},
@@ -4105,7 +4104,7 @@ func TestDeleteRule(t *testing.T) {
 			ruleToSave := insertStagedRuleWithMultipleConditions(t, db, "save-me", projID, ruleType, false)
 
 			err := store.DeleteRule(ctx, projID, ruleToDelete.ID)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
 			assertCount(t, 6, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
@@ -4131,7 +4130,7 @@ func TestDeleteRule(t *testing.T) {
 			insertAppliedRule(t, db, &ruleToSave)
 
 			err = store.DeleteRule(ctx, projID, ruleToDelete.ID)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
@@ -4180,7 +4179,7 @@ func TestDeleteRule(t *testing.T) {
 			ruleToSave := insertAppliedRuleWithMultipleConditions(t, db, "save-me", projID, storage.Node)
 
 			err := store.DeleteRule(ctx, projID, ruleToDelete.ID)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
@@ -4393,7 +4392,7 @@ func TestCreateProject(t *testing.T) {
 			}
 			resp, err = store.CreateProject(ctx, &projectConflict, true)
 			assert.Error(t, err)
-			assert.Equal(t, storage_errors.ErrConflict, err)
+			assert.Equal(t, storage.ErrConflict, err)
 			assert.Nil(t, resp)
 		},
 		"does not create custom project if max number of custom projects allowed has been reached": func(t *testing.T) {
@@ -4420,7 +4419,7 @@ func TestCreateProject(t *testing.T) {
 			resp, err := store.CreateProject(ctx, &oneProjectTooMany, true)
 			assert.Nil(t, resp)
 			assert.Error(t, err)
-			_, correctError := err.(*storage_errors.MaxProjectsExceededError)
+			_, correctError := err.(*storage.MaxProjectsExceededError)
 			assert.True(t, correctError)
 		},
 		"does create chef-managed project if max number of custom projects allowed has been reached": func(t *testing.T) {
@@ -4525,7 +4524,7 @@ func TestUpdateProject(t *testing.T) {
 				Status: storage.NoRules.String(),
 			}
 			resp, err := store.UpdateProject(ctx, &project)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assert.Nil(t, resp)
 		},
 		"returns ErrNotFound if the project exists but does not have a project in the project filter list": func(t *testing.T) {
@@ -4541,7 +4540,7 @@ func TestUpdateProject(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{"wrong", "projects"})
 
 			resp, err := store.UpdateProject(ctx, &project)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assert.Nil(t, resp)
 		},
 	}
@@ -4564,7 +4563,7 @@ func TestGetProject(t *testing.T) {
 		{"when no project exists, returns not found error", func(t *testing.T) {
 			ctx := context.Background()
 			p, err := store.GetProject(ctx, "id-that-wont-be-found")
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assert.Nil(t, p)
 		}},
 		{"when a chef-managed project exists, returns that project", func(t *testing.T) {
@@ -4684,7 +4683,7 @@ func TestGetProject(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{"wrong", "project"})
 
 			p, err := store.GetProject(ctx, "foo")
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assert.Nil(t, p)
 		}},
 	}
@@ -4711,7 +4710,7 @@ func TestDeleteProject(t *testing.T) {
 			ctx := context.Background()
 			err := store.DeleteProject(ctx, "test-project")
 			assert.Error(t, err)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		}},
 		{"returns project not found with several projects in database", func(t *testing.T) {
 			ctx := context.Background()
@@ -4720,7 +4719,7 @@ func TestDeleteProject(t *testing.T) {
 			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
 			err := store.DeleteProject(ctx, "test-project")
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		}},
 		{"when a policy contains a single statement and that statement contains a single project, on project deletion, the statement and policy are deleted", func(t *testing.T) {
 			ctx := context.Background()
@@ -4939,7 +4938,7 @@ func TestDeleteProject(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{"my-id-1", "my-id-2"})
 
 			err := store.DeleteProject(ctx, "test-project")
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, proj.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_projects`))
 		}},
@@ -5199,7 +5198,7 @@ func TestCreateRole(t *testing.T) {
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.CreateRole(ctx, &role2, false)
 				assert.Error(t, err)
-				assert.Equal(t, storage_errors.ErrConflict, err)
+				assert.Equal(t, storage.ErrConflict, err)
 				assert.Nil(t, resp)
 			})
 		},
@@ -5547,14 +5546,14 @@ func TestGetRole(t *testing.T) {
 			resp, err := store.GetRole(ctx, "fake-id")
 			assert.Error(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"returns policy not found error with database that has several roles": func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := store.GetRole(ctx, "fake-id")
 			assert.Error(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"successfully returns appropriate role when the database has one role": func(t *testing.T) {
 			ctx := context.Background()
@@ -5738,7 +5737,7 @@ func TestGetRole(t *testing.T) {
 			resp, err := store.GetRole(ctx, "my-id-1")
 
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 	}
 
@@ -5801,7 +5800,7 @@ func TestDeleteRole(t *testing.T) {
 			ctx := context.Background()
 			err := store.DeleteRole(ctx, "test-role")
 			assert.Error(t, err)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"returns role not found with several roles in database": func(t *testing.T) {
 			ctx := context.Background()
@@ -5820,7 +5819,7 @@ func TestDeleteRole(t *testing.T) {
 
 			err = store.DeleteRole(ctx, "test-role")
 			assert.Error(t, err)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"deletes role with one role in database": func(t *testing.T) {
 			ctx := context.Background()
@@ -6074,7 +6073,7 @@ func TestDeleteRole(t *testing.T) {
 
 			ctx = insertProjectsIntoContext(ctx, []string{project2.ID})
 			err = store.DeleteRole(ctx, role.ID)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 	}
 
@@ -6101,7 +6100,7 @@ func TestUpdateRole(t *testing.T) {
 
 			assert.Nil(t, role)
 			assert.Error(t, err)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"returns role not found with several roles in database": func(t *testing.T) {
 			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
@@ -6114,7 +6113,7 @@ func TestUpdateRole(t *testing.T) {
 
 			assert.Nil(t, role)
 			assert.Error(t, err)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"updates name of a role": func(t *testing.T) {
 			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
@@ -6278,7 +6277,7 @@ func TestUpdateRole(t *testing.T) {
 			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			assert.Nil(t, updatedRole)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Equal(t, storage.ErrNotFound, err)
 		},
 		"updates successfully when a project filter is specified with an intersection": func(t *testing.T) {
 			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})

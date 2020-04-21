@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
 

@@ -8,8 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	constants "github.com/chef/automate/components/authz-service/constants"
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage"
 )
 
 type State struct {
@@ -49,13 +48,13 @@ func (s *State) CreatePolicy(_ context.Context, inputPol *storage.Policy, skipPr
 	for _, item := range s.policies.Items() {
 		if pol, ok := item.Object.(*storage.Policy); ok &&
 			(pol.ID == inputPol.ID) {
-			return nil, storage_errors.ErrConflict
+			return nil, storage.ErrConflict
 		}
 	}
 
 	copyPol := *inputPol
 	if err := s.policies.Add(inputPol.ID, &copyPol, cache.NoExpiration); err != nil {
-		return nil, storage_errors.ErrConflict
+		return nil, storage.ErrConflict
 	}
 
 	s.bumpPolicyVersion()
@@ -99,7 +98,7 @@ func (s *State) GetPolicy(_ context.Context, policyID string) (pol *storage.Poli
 	item, exists := s.policies.Get(policyID)
 
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 
 	pol, ok := item.(*storage.Policy)
@@ -114,7 +113,7 @@ func (s *State) ListPolicyMembers(_ context.Context, policyID string) ([]storage
 	item, exists := s.policies.Get(policyID)
 
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 
 	pol, ok := item.(*storage.Policy)
@@ -130,7 +129,7 @@ func (s *State) AddPolicyMembers(
 
 	item, exists := s.policies.Get(policyID)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 	pol, ok := item.(*storage.Policy)
 	if !ok {
@@ -155,7 +154,7 @@ func (s *State) AddPolicyMembers(
 func (s *State) UpdatePolicy(_ context.Context, p *storage.Policy) (*storage.Policy, error) {
 	item, exists := s.policies.Get(p.ID)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 
 	pol, ok := item.(*storage.Policy)
@@ -184,7 +183,7 @@ func (s *State) ReplacePolicyMembers(
 
 	item, exists := s.policies.Get(policyID)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 	pol, ok := item.(*storage.Policy)
 	if !ok {
@@ -201,7 +200,7 @@ func (s *State) RemovePolicyMembers(ctx context.Context,
 
 	item, exists := s.policies.Get(policyID)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 	pol, ok := item.(*storage.Policy)
 	if !ok {
@@ -251,10 +250,10 @@ func (s *State) CreateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 
 	_, exists := s.projects.Get(rule.ProjectID)
 	if !exists {
-		return nil, &storage_errors.ForeignKeyError{Msg: "project not found"}
+		return nil, &storage.ForeignKeyError{Msg: "project not found"}
 	}
 	if err := s.rules.Add(rule.ID, rule, cache.NoExpiration); err != nil {
-		return nil, storage_errors.ErrConflict
+		return nil, storage.ErrConflict
 	}
 	s.bumpPolicyVersion()
 	return rule, nil
@@ -263,7 +262,7 @@ func (s *State) CreateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 func (s *State) UpdateRule(_ context.Context, rule *storage.Rule) (*storage.Rule, error) {
 	item, exists := s.rules.Get(rule.ID)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 	existingRule, ok := item.(*storage.Rule)
 	if !ok {
@@ -271,11 +270,11 @@ func (s *State) UpdateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 	}
 
 	if existingRule.ProjectID != rule.ProjectID {
-		return nil, storage_errors.ErrChangeProjectForRule
+		return nil, storage.ErrChangeProjectForRule
 	}
 
 	if err := s.rules.Replace(rule.ID, rule, cache.NoExpiration); err != nil {
-		return nil, storage_errors.ErrConflict
+		return nil, storage.ErrConflict
 	}
 	s.bumpPolicyVersion()
 	return rule, nil
@@ -284,11 +283,11 @@ func (s *State) UpdateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 func (s *State) GetStagedOrAppliedRule(_ context.Context, projectID, ruleID string) (*storage.Rule, error) {
 	_, exists := s.projects.Get(projectID)
 	if !exists {
-		return nil, &storage_errors.ForeignKeyError{Msg: "project not found"}
+		return nil, &storage.ForeignKeyError{Msg: "project not found"}
 	}
 	item, exists := s.rules.Get(ruleID)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 
 	rule, ok := item.(*storage.Rule)
@@ -328,7 +327,7 @@ func (s *State) ListRules(_ context.Context) ([]*storage.Rule, error) {
 func (s *State) ListRulesForProject(_ context.Context, projectID string) ([]*storage.Rule, storage.ProjectRulesStatus, error) {
 	_, exists := s.projects.Get(projectID)
 	if !exists {
-		return nil, storage.RulesStatusError, storage_errors.ErrNotFound
+		return nil, storage.RulesStatusError, storage.ErrNotFound
 	}
 
 	items := s.rules.Items()
@@ -395,12 +394,12 @@ func (s *State) CreateProject(_ context.Context, project *storage.Project, addPo
 		}
 
 		if len(projects) >= s.projectLimit {
-			return nil, storage_errors.NewMaxProjectsExceededError(s.projectLimit)
+			return nil, storage.NewMaxProjectsExceededError(s.projectLimit)
 		}
 	}
 
 	if err := s.projects.Add(project.ID, project, cache.NoExpiration); err != nil {
-		return nil, storage_errors.ErrConflict
+		return nil, storage.ErrConflict
 	}
 
 	return project, nil
@@ -409,7 +408,7 @@ func (s *State) CreateProject(_ context.Context, project *storage.Project, addPo
 func (s *State) UpdateProject(_ context.Context, project *storage.Project) (*storage.Project, error) {
 	item, exists := s.projects.Get(project.ID)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 
 	resp, ok := item.(*storage.Project)
@@ -428,7 +427,7 @@ func (s *State) UpdateProject(_ context.Context, project *storage.Project) (*sto
 func (s *State) GetProject(_ context.Context, id string) (*storage.Project, error) {
 	item, exists := s.projects.Get(id)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 
 	project, ok := item.(*storage.Project)
@@ -470,7 +469,7 @@ func (s *State) ListProjects(context.Context) ([]*storage.Project, error) {
 
 func (s *State) CreateRole(_ context.Context, role *storage.Role, skipProjectsCheckOnV1PolicyMigration bool) (*storage.Role, error) {
 	if err := s.roles.Add(role.ID, role, cache.NoExpiration); err != nil {
-		return nil, storage_errors.ErrConflict
+		return nil, storage.ErrConflict
 	}
 
 	s.bumpPolicyVersion()
@@ -493,7 +492,7 @@ func (s *State) ListRoles(context.Context) ([]*storage.Role, error) {
 func (s *State) GetRole(_ context.Context, roleID string) (role *storage.Role, err error) {
 	item, exists := s.roles.Get(roleID)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 
 	role, ok := item.(*storage.Role)
@@ -520,7 +519,7 @@ func (s *State) DeleteRole(ctx context.Context, roleID string) error {
 func (s *State) UpdateRole(_ context.Context, r *storage.Role) (*storage.Role, error) {
 	item, exists := s.roles.Get(r.ID)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 
 	role, ok := item.(*storage.Role)

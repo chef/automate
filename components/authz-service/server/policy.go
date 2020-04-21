@@ -14,11 +14,9 @@ import (
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/memstore"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/projectassignment"
 )
 
@@ -115,7 +113,7 @@ func (s *policyServer) CreatePolicy(
 	returnPol, err := s.store.CreatePolicy(ctx, &pol, false)
 	switch err {
 	case nil: // continue
-	case storage_errors.ErrConflict:
+	case storage.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists,
 			"policy with id %q already exists", req.Id)
 	default:
@@ -124,7 +122,7 @@ func (s *policyServer) CreatePolicy(
 			return nil, status.Error(codes.NotFound, err.Error())
 		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
 			return nil, status.Errorf(codes.PermissionDenied, err.Error())
-		case *storage_errors.ForeignKeyError:
+		case *storage.ForeignKeyError:
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		default:
 			return nil, status.Errorf(codes.Internal,
@@ -176,7 +174,7 @@ func (s *policyServer) GetPolicy(
 	polInternal, err := s.store.GetPolicy(ctx, req.Id)
 	switch err {
 	case nil: // continue
-	case storage_errors.ErrNotFound:
+	case storage.ErrNotFound:
 		return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
 	default:
 		return nil, status.Errorf(codes.Internal, "error retrieving policy with ID %q: %s", req.Id, err.Error())
@@ -199,7 +197,7 @@ func (s *policyServer) DeletePolicy(
 	switch err {
 	case nil:
 		return &api.DeletePolicyResp{}, nil
-	case storage_errors.ErrNotFound:
+	case storage.ErrNotFound:
 		return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
 	default: // some other error
 		return nil, status.Errorf(codes.Internal, "error deleting policy with ID %q: %s", req.Id, err.Error())
@@ -242,9 +240,9 @@ func (s *policyServer) UpdatePolicy(
 	polInternal, err := s.store.UpdatePolicy(ctx, &storagePolicy)
 	if err != nil {
 		switch err {
-		case storage_errors.ErrConflict:
+		case storage.ErrConflict:
 			return nil, status.Errorf(codes.AlreadyExists, "policy with name %q already exists", req.Name)
-		case storage_errors.ErrNotFound:
+		case storage.ErrNotFound:
 			return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
 		default:
 			switch err.(type) {
@@ -252,7 +250,7 @@ func (s *policyServer) UpdatePolicy(
 				return nil, status.Errorf(codes.NotFound, err.Error())
 			case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
 				return nil, status.Errorf(codes.PermissionDenied, err.Error())
-			case *storage_errors.ForeignKeyError:
+			case *storage.ForeignKeyError:
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			default:
 				return nil, status.Errorf(codes.Internal,
@@ -281,7 +279,7 @@ func (s *policyServer) ListPolicyMembers(
 	membersInternal, err := s.store.ListPolicyMembers(ctx, req.Id)
 	switch err {
 	case nil: // continue
-	case storage_errors.ErrNotFound:
+	case storage.ErrNotFound:
 		return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
 	default:
 		return nil, status.Errorf(codes.Internal, "error retrieving policy with ID %q: %s", req.Id, err.Error())
@@ -313,7 +311,7 @@ func (s *policyServer) AddPolicyMembers(
 		return &api.AddPolicyMembersResp{
 			Members: storage.MemberSliceToStringSlice(resp),
 		}, nil
-	case storage_errors.ErrNotFound:
+	case storage.ErrNotFound:
 		return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
 	default: // some other error
 		return nil, status.Errorf(codes.Internal,
@@ -343,7 +341,7 @@ func (s *policyServer) ReplacePolicyMembers(
 		return &api.ReplacePolicyMembersResp{
 			Members: storage.MemberSliceToStringSlice(resp),
 		}, nil
-	case storage_errors.ErrNotFound:
+	case storage.ErrNotFound:
 		return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
 	default: // some other error
 		return nil, status.Errorf(codes.Internal,
@@ -379,7 +377,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 	resp, err := s.store.RemovePolicyMembers(ctx, req.Id, members)
 	switch err {
 	case nil: // continue
-	case storage_errors.ErrNotFound:
+	case storage.ErrNotFound:
 		return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
 	default: // some other error
 		return nil, status.Errorf(codes.Internal,
@@ -414,11 +412,11 @@ func (s *policyServer) CreateRole(
 
 	switch err {
 	case nil:
-	case storage_errors.ErrConflict:
+	case storage.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists, "role with id %q already exists", req.Id)
 	default:
 		switch err.(type) {
-		case *storage_errors.ForeignKeyError:
+		case *storage.ForeignKeyError:
 			return nil, status.Errorf(codes.InvalidArgument, err.Error())
 		case *projectassignment.ProjectsMissingError:
 			return nil, status.Errorf(codes.NotFound, err.Error())
@@ -471,7 +469,7 @@ func (s *policyServer) GetRole(
 	switch err {
 	case nil:
 		return roleFromInternal(roleInternal)
-	case storage_errors.ErrNotFound:
+	case storage.ErrNotFound:
 		return nil, status.Errorf(codes.NotFound, "no role with ID %q found", req.Id)
 	default:
 		return nil, status.Errorf(codes.Internal, "error retrieving role with ID %q: %s", req.Id, err.Error())
@@ -492,7 +490,7 @@ func (s *policyServer) DeleteRole(
 	switch err {
 	case nil:
 		return &api.DeleteRoleResp{}, nil
-	case storage_errors.ErrNotFound:
+	case storage.ErrNotFound:
 		return nil, status.Errorf(codes.NotFound, "no role with ID %q found", req.Id)
 	default: // some other error
 		return nil, status.Errorf(codes.Internal, "error deleting role with ID %q: %s", req.Id, err.Error())
@@ -518,9 +516,9 @@ func (s *policyServer) UpdateRole(
 	roleInternal, err := s.store.UpdateRole(ctx, storageRole)
 	switch err {
 	case nil:
-	case storage_errors.ErrConflict:
+	case storage.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists, "role with name %q already exists", req.Name)
-	case storage_errors.ErrNotFound:
+	case storage.ErrNotFound:
 		return nil, status.Errorf(codes.NotFound, "no role with ID %q found", req.Id)
 	default:
 		switch err.(type) {
@@ -727,7 +725,7 @@ func (s *policyServer) statementFromAPI(statement *api.Statement) (storage.State
 	projects := make([]string, len(statement.Projects))
 
 	if len(statement.Projects) == 0 {
-		return v2.Statement{}, errors.New("policy statements must include projects")
+		return storage.Statement{}, errors.New("policy statements must include projects")
 	}
 
 	// map external representation of "all projects" to actual ID for that meta-project

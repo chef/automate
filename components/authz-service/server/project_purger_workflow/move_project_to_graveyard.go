@@ -3,7 +3,7 @@ package project_purger_workflow
 import (
 	"context"
 
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"

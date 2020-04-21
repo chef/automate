@@ -6,13 +6,12 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/projectassignment"
 )
 
-func (p *pg) CreateRole(ctx context.Context, role *v2.Role, skipProjectsCheckOnV1PolicyMigration bool) (*v2.Role, error) {
+func (p *pg) CreateRole(ctx context.Context, role *storage.Role, skipProjectsCheckOnV1PolicyMigration bool) (*storage.Role, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -23,7 +22,7 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role, skipProjectsCheckOnV
 
 	projects := role.Projects
 	// ensure initial chef-managed policies/roles created
-	if !skipProjectsCheckOnV1PolicyMigration && role.Type == v2.Custom {
+	if !skipProjectsCheckOnV1PolicyMigration && role.Type == storage.Custom {
 		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, role.Projects)
 		if err != nil {
 			return nil, p.processError(err)
@@ -52,19 +51,19 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role, skipProjectsCheckOnV
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 
 	return role, nil
 }
 
-func (p *pg) ListRoles(ctx context.Context) ([]*v2.Role, error) {
+func (p *pg) ListRoles(ctx context.Context) ([]*storage.Role, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var roles []*v2.Role
+	var roles []*storage.Role
 	rows, err := p.db.QueryContext(ctx, "SELECT query_roles($1)", pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
@@ -77,7 +76,7 @@ func (p *pg) ListRoles(ctx context.Context) ([]*v2.Role, error) {
 	}()
 
 	for rows.Next() {
-		var role v2.Role
+		var role storage.Role
 		if err := rows.Scan(&role); err != nil {
 			return nil, p.processError(err)
 		}
@@ -89,7 +88,7 @@ func (p *pg) ListRoles(ctx context.Context) ([]*v2.Role, error) {
 	return roles, nil
 }
 
-func (p *pg) GetRole(ctx context.Context, id string) (*v2.Role, error) {
+func (p *pg) GetRole(ctx context.Context, id string) (*storage.Role, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -108,10 +107,10 @@ func (p *pg) GetRole(ctx context.Context, id string) (*v2.Role, error) {
 		return nil, p.processError(err)
 	}
 	if !doesIntersect {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 
-	var role v2.Role
+	var role storage.Role
 	row := tx.QueryRowContext(ctx, `SELECT query_role($1);`, id)
 	err = row.Scan(&role)
 	if err != nil {
@@ -120,7 +119,7 @@ func (p *pg) GetRole(ctx context.Context, id string) (*v2.Role, error) {
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 
 	return &role, nil
@@ -145,7 +144,7 @@ func (p *pg) DeleteRole(ctx context.Context, id string) error {
 		return p.processError(err)
 	}
 	if !doesIntersect {
-		return storage_errors.ErrNotFound
+		return storage.ErrNotFound
 	}
 
 	res, err := tx.ExecContext(ctx, "DELETE FROM iam_roles WHERE id=$1", id)
@@ -165,13 +164,13 @@ func (p *pg) DeleteRole(ctx context.Context, id string) error {
 
 	err = tx.Commit()
 	if err != nil {
-		return storage_errors.NewTxCommitError(err)
+		return storage.NewTxCommitError(err)
 	}
 
 	return nil
 }
 
-func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
+func (p *pg) UpdateRole(ctx context.Context, role *storage.Role) (*storage.Role, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -190,11 +189,11 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 		return nil, p.processError(err)
 	}
 	if !doesIntersect {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.ErrNotFound
 	}
 
 	newProjects := role.Projects
-	var oldRole v2.Role
+	var oldRole storage.Role
 	// get the old role and lock the role for updates (still readable)
 	// until the update completes or the transaction fails so that
 	// the project diff doesn't change under us while we perform permission checks.
@@ -251,7 +250,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 
 	return role, nil
@@ -278,7 +277,7 @@ func checkIfRoleIntersectsProjectsFilter(ctx context.Context, q Querier,
 	return result, nil
 }
 
-func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier) error {
+func (p *pg) insertRoleWithQuerier(ctx context.Context, role *storage.Role, q Querier) error {
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return p.processError(err)
@@ -302,7 +301,7 @@ func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier
 
 	err = tx.Commit()
 	if err != nil {
-		return storage_errors.NewTxCommitError(err)
+		return storage.NewTxCommitError(err)
 	}
 
 	return nil

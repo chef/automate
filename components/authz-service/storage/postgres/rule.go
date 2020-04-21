@@ -7,8 +7,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage"
 )
 
 // These must match what SQL function query_rule_table_associations returns.
@@ -17,7 +16,7 @@ const (
 	pgStaged  = "staged"
 )
 
-func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
+func (p *pg) CreateRule(ctx context.Context, rule *storage.Rule) (*storage.Rule, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -33,7 +32,7 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	// If any associations return, then the rule already exists in current, staged, or both tables
 	if len(assocMap) > 0 {
-		return nil, storage_errors.ErrConflict
+		return nil, storage.ErrConflict
 	}
 
 	row := tx.QueryRowContext(ctx,
@@ -58,14 +57,14 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 
 	rule.Status = pgStaged
 	return rule, nil
 }
 
-func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
+func (p *pg) UpdateRule(ctx context.Context, rule *storage.Rule) (*storage.Rule, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -105,7 +104,7 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 
 	rule.Status = pgStaged
@@ -135,7 +134,7 @@ func (p *pg) DeleteRule(ctx context.Context, projectID string, ruleID string) er
 	ruleApplied := assocMap[pgApplied]
 
 	if !ruleStaged && !ruleApplied {
-		return storage_errors.ErrNotFound
+		return storage.ErrNotFound
 	}
 
 	if ruleApplied && ruleStaged {
@@ -204,13 +203,13 @@ func (p *pg) DeleteRule(ctx context.Context, projectID string, ruleID string) er
 
 	err = tx.Commit()
 	if err != nil {
-		return storage_errors.NewTxCommitError(err)
+		return storage.NewTxCommitError(err)
 	}
 
 	return nil
 }
 
-func (p *pg) GetStagedOrAppliedRule(ctx context.Context, projectID string, ruleID string) (*v2.Rule, error) {
+func (p *pg) GetStagedOrAppliedRule(ctx context.Context, projectID string, ruleID string) (*storage.Rule, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -219,14 +218,14 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, projectID string, ruleI
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	var rule v2.Rule
+	var rule storage.Rule
 	row := p.db.QueryRowContext(ctx, "SELECT query_staged_or_applied_rule($1, $2, $3)",
 		ruleID, projectID, pq.Array(projectsFilter),
 	)
 	err = row.Scan(&rule)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, storage_errors.ErrNotFound
+			return nil, storage.ErrNotFound
 		}
 		return nil, p.processError(err)
 	}
@@ -234,13 +233,13 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, projectID string, ruleI
 	return &rule, nil
 }
 
-func (p *pg) FetchAppliedRulesByProjectIDs(ctx context.Context) (map[string][]*v2.Rule, error) {
+func (p *pg) FetchAppliedRulesByProjectIDs(ctx context.Context) (map[string][]*storage.Rule, error) {
 	rules, err := p.listRulesUsingFunction(ctx, "SELECT query_rules($1)", false)
 	if err != nil {
 		return nil, err
 	}
 
-	projectRules := make(map[string][]*v2.Rule, len(rules))
+	projectRules := make(map[string][]*storage.Rule, len(rules))
 	for _, rule := range rules {
 		projectRules[rule.ProjectID] = append(projectRules[rule.ProjectID], rule)
 	}
@@ -248,15 +247,15 @@ func (p *pg) FetchAppliedRulesByProjectIDs(ctx context.Context) (map[string][]*v
 	return projectRules, nil
 }
 
-func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
+func (p *pg) ListRules(ctx context.Context) ([]*storage.Rule, error) {
 	return p.listRulesUsingFunction(ctx, "SELECT query_rules($1)", true)
 }
 
-func (p *pg) ListStagedAndAppliedRules(ctx context.Context) ([]*v2.Rule, error) {
+func (p *pg) ListStagedAndAppliedRules(ctx context.Context) ([]*storage.Rule, error) {
 	return p.listRulesUsingFunction(ctx, "SELECT query_staged_and_applied_rules($1)", true)
 }
 
-func (p *pg) listRulesUsingFunction(ctx context.Context, query string, filterProjects bool) ([]*v2.Rule, error) {
+func (p *pg) listRulesUsingFunction(ctx context.Context, query string, filterProjects bool) ([]*storage.Rule, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -269,7 +268,7 @@ func (p *pg) listRulesUsingFunction(ctx context.Context, query string, filterPro
 		}
 	}
 
-	var rules []*v2.Rule
+	var rules []*storage.Rule
 	rows, err := p.db.QueryContext(ctx, query, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
@@ -282,7 +281,7 @@ func (p *pg) listRulesUsingFunction(ctx context.Context, query string, filterPro
 	}()
 
 	for rows.Next() {
-		var rule v2.Rule
+		var rule storage.Rule
 		if err := rows.Scan(&rule); err != nil {
 			return nil, p.processError(err)
 		}
@@ -294,13 +293,13 @@ func (p *pg) listRulesUsingFunction(ctx context.Context, query string, filterPro
 	return rules, nil
 }
 
-func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.Rule, v2.ProjectRulesStatus, error) {
+func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*storage.Rule, storage.ProjectRulesStatus, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, v2.RulesStatusError, err
+		return nil, storage.RulesStatusError, err
 	}
 
 	// in our other APIs we use a a postgres query to do filtering
@@ -316,20 +315,20 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 			}
 		}
 		if !projectInFilter {
-			return nil, v2.RulesStatusError, storage_errors.ErrNotFound
+			return nil, storage.RulesStatusError, storage.ErrNotFound
 		}
 	}
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, v2.RulesStatusError, p.processError(err)
+		return nil, storage.RulesStatusError, p.processError(err)
 	}
 
-	var rules []*v2.Rule
+	var rules []*storage.Rule
 	rows, err := tx.QueryContext(ctx, "SELECT query_rules_for_project($1, $2)",
 		projectID, pq.Array(projectsFilter))
 	if err != nil {
-		return nil, v2.RulesStatusError, p.processError(err)
+		return nil, storage.RulesStatusError, p.processError(err)
 	}
 
 	defer func() {
@@ -340,9 +339,9 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 
 	anyStagedRules := false
 	for rows.Next() {
-		var rule v2.Rule
+		var rule storage.Rule
 		if err := rows.Scan(&rule); err != nil {
-			return nil, v2.RulesStatusError, p.processError(err)
+			return nil, storage.RulesStatusError, p.processError(err)
 		}
 		if rule.Status == pgStaged {
 			anyStagedRules = true
@@ -350,20 +349,20 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 		rules = append(rules, &rule)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, v2.RulesStatusError, errors.Wrap(err, "error retrieving result rows")
+		return nil, storage.RulesStatusError, errors.Wrap(err, "error retrieving result rows")
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, v2.RulesStatusError, storage_errors.NewTxCommitError(err)
+		return nil, storage.RulesStatusError, storage.NewTxCommitError(err)
 	}
 
-	rulesStatus := v2.Applied
+	rulesStatus := storage.Applied
 	if len(rules) == 0 {
-		rulesStatus = v2.NoRules
+		rulesStatus = storage.NoRules
 	}
 	if anyStagedRules {
-		rulesStatus = v2.EditsPending
+		rulesStatus = storage.EditsPending
 	}
 
 	return rules, rulesStatus, nil
@@ -460,7 +459,7 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 
 	err = tx.Commit()
 	if err != nil {
-		return storage_errors.NewTxCommitError(err)
+		return storage.NewTxCommitError(err)
 	}
 
 	return nil

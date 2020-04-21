@@ -5,11 +5,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage"
 )
 
-func (p *pg) ListPolicyMembers(ctx context.Context, id string) ([]v2.Member, error) {
+func (p *pg) ListPolicyMembers(ctx context.Context, id string) ([]storage.Member, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -32,13 +31,13 @@ func (p *pg) ListPolicyMembers(ctx context.Context, id string) ([]v2.Member, err
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 
 	return members, nil
 }
 
-func (p *pg) AddPolicyMembers(ctx context.Context, id string, members []v2.Member) ([]v2.Member, error) {
+func (p *pg) AddPolicyMembers(ctx context.Context, id string, members []storage.Member) ([]storage.Member, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -73,12 +72,12 @@ func (p *pg) AddPolicyMembers(ctx context.Context, id string, members []v2.Membe
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 	return members, nil
 }
 
-func (p *pg) ReplacePolicyMembers(ctx context.Context, policyID string, members []v2.Member) ([]v2.Member, error) {
+func (p *pg) ReplacePolicyMembers(ctx context.Context, policyID string, members []storage.Member) ([]storage.Member, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -112,7 +111,7 @@ func (p *pg) ReplacePolicyMembers(ctx context.Context, policyID string, members 
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 
 	return members, err
@@ -121,7 +120,7 @@ func (p *pg) ReplacePolicyMembers(ctx context.Context, policyID string, members 
 // RemovePolicyMembers takes in a policy ID and a
 // list of members to remove and return the list of remaining users.
 func (p *pg) RemovePolicyMembers(ctx context.Context,
-	policyID string, members []v2.Member) ([]v2.Member, error) {
+	policyID string, members []storage.Member) ([]storage.Member, error) {
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -148,7 +147,7 @@ func (p *pg) RemovePolicyMembers(ctx context.Context,
 		if err != nil {
 			err = p.processError(err)
 			switch err {
-			case storage_errors.ErrNotFound: // continue
+			case storage.ErrNotFound: // continue
 			default:
 				return nil, err
 			}
@@ -168,13 +167,13 @@ func (p *pg) RemovePolicyMembers(ctx context.Context,
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewTxCommitError(err)
+		return nil, storage.NewTxCommitError(err)
 	}
 
 	return members, nil
 }
 
-func (p *pg) replacePolicyMembersWithQuerier(ctx context.Context, policyID string, members []v2.Member,
+func (p *pg) replacePolicyMembersWithQuerier(ctx context.Context, policyID string, members []storage.Member,
 	q Querier) error {
 	// Cascading drop any existing members.
 	_, err := q.ExecContext(ctx,
@@ -197,7 +196,7 @@ func (p *pg) replacePolicyMembersWithQuerier(ctx context.Context, policyID strin
 // If the member already exists in iam_members, it will ignore the new ID and use
 // the existing one. Otherwise, it'll just use the existing ID. In either case,
 // it inserts the new or existing member into iam_policy_members association table.
-func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID string, member v2.Member,
+func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID string, member storage.Member,
 	q Querier) error {
 	// First, we insert the member but on conflict do nothing. Then, we insert the member
 	// into the policy. This is safe to do non-transactionally right now, since we don't support
@@ -218,7 +217,7 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 	return errors.Wrapf(err, "failed to upsert member link: member=%s, policy_id=%s", member.Name, policyID)
 }
 
-func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Querier) ([]v2.Member, error) {
+func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Querier) ([]storage.Member, error) {
 	rows, err := q.QueryContext(ctx,
 		`SELECT m.name FROM iam_policy_members AS pm
 			JOIN iam_members AS m ON pm.member_id=m.db_id
@@ -234,9 +233,9 @@ func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Queri
 		}
 	}()
 
-	members := []v2.Member{}
+	members := []storage.Member{}
 	for rows.Next() {
-		var member v2.Member
+		var member storage.Member
 		if err := rows.Scan(&member.Name); err != nil {
 			return nil, p.processError(err)
 		}

@@ -9,8 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/authz-service/engine"
+	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 )

@@ -13,7 +13,7 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 	uuid "github.com/chef/automate/lib/uuid4"
 
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/logger"

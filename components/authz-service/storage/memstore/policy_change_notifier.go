@@ -3,7 +3,7 @@ package memstore
 import (
 	"sync"
 
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage"
 )
 
 type policyChangeNotifierManager struct {
@@ -13,7 +13,7 @@ type policyChangeNotifierManager struct {
 
 type policyChangeNotifier struct {
 	manager *policyChangeNotifierManager
-	c       chan v2.PolicyChangeNotification
+	c       chan storage.PolicyChangeNotification
 }
 
 func newPolicyChangeNotifierManager() *policyChangeNotifierManager {
@@ -26,7 +26,7 @@ func (manager *policyChangeNotifierManager) notifyChange() {
 
 	for _, c := range manager.channels {
 		select {
-		case c.c <- v2.PolicyChangeNotification{}:
+		case c.c <- storage.PolicyChangeNotification{}:
 		default:
 		}
 	}
@@ -37,7 +37,7 @@ func (manager *policyChangeNotifierManager) register() *policyChangeNotifier {
 	defer manager.lock.Unlock()
 
 	c := &policyChangeNotifier{
-		c:       make(chan v2.PolicyChangeNotification, 1),
+		c:       make(chan storage.PolicyChangeNotification, 1),
 		manager: manager,
 	}
 	manager.channels = append(manager.channels, c)
@@ -49,6 +49,6 @@ func (*policyChangeNotifier) Close() error {
 	return nil
 }
 
-func (p *policyChangeNotifier) C() <-chan v2.PolicyChangeNotification {
+func (p *policyChangeNotifier) C() <-chan storage.PolicyChangeNotification {
 	return p.c
 }
