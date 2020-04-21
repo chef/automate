@@ -77,6 +77,7 @@ func (a *InfraProxyServer) UpdateOrg(ctx context.Context, r *gwreq.UpdateOrg) (*
 		Id:        r.Id,
 		Name:      r.Name,
 		AdminUser: r.AdminUser,
+		AdminKey:  r.AdminKey,
 		ServerId:  r.ServerId,
 		Projects:  r.Projects,
 	}

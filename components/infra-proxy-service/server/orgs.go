@@ -181,6 +181,33 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
+	if req.AdminKey != "" {
+		oldOrg, err := s.service.Storage.GetOrg(ctx, ID)
+		if err != nil {
+			return nil, service.ParseStorageError(err, req, "org")
+		}
+
+		secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: oldOrg.CredentialID})
+		if err != nil {
+			return nil, err
+		}
+
+		newSecret := &secrets.Secret{
+			Id:   secret.GetId(),
+			Name: "infra-proxy-service-admin-key",
+			Type: "ssh",
+			Data: []*query.Kv{
+				{Key: "username", Value: req.AdminUser},
+				{Key: "key", Value: req.AdminKey},
+			},
+		}
+
+		_, err = s.service.Secrets.Update(ctx, newSecret)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	org, err := s.service.Storage.EditOrg(ctx, storage.Org{
 		ID:        ID,
 		Name:      req.Name,

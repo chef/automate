@@ -4,53 +4,55 @@ package chef.automate.api.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/external/infra_proxy/request";
 
 message CreateOrg {
-    // Name of the chef organization.
+    // Chef organization name.
     string name = 1;
-    // Admin user of the chef organization.
+    // Chef organization admin user.
     string admin_user = 2;
-    // Admin key of the chef organization.
+    // Chef organization admin key.
     string admin_key = 3;
-    // ID of the chef infra server.
+    // Chef Infra Server ID.
     string server_id = 4;
     // List of projects this chef organization belongs to. May be empty.
     repeated string projects = 5;
 }
 
 message UpdateOrg {
-    // ID of the chef organization.
+    // Chef organization ID.
     string id = 1;
-    // Name of the chef organization.
+    // Chef organization name.
     string name = 2;
-    // Admin user of the chef organization.
+    // Chef organization admin user.
     string admin_user = 3;
-    // ID of the chef infra server.
-    string server_id = 4;
+    // Chef organization admin key.
+    string admin_key = 4;
+    // Chef Infra Server ID.
+    string server_id = 5;
     // List of projects this chef organization belongs to. May be empty.
-    repeated string projects = 5;
+    repeated string projects = 6;
 }
 
 message DeleteOrg {
-    // ID of the chef organization.
+    // Chef organization ID.
     string id = 1;
-    // ID of the chef infra server.
+    // Chef Infra Server ID.
     string server_id = 2;
 }
 
 message GetOrgs {
-    // ID of the chef infra server.
+    // Chef Infra Server ID.
     string server_id = 1;
 }
 
 message GetOrg {
-    // ID of the chef organization.
+    // Chef organization ID.
     string id = 1;
-    // ID of the chef infra server.
+    // Chef Infra Server ID.
     string server_id = 2;
 }
 
 message GetOrgByName {
-    // Name of the chef organization.
+    // Chef organization name.
     string name = 1;
-    // ID of the chef infra server.
+    // Chef Infra Server ID.
     string server_id = 2;
 }

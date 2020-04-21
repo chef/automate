@@ -4,51 +4,51 @@ package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
 
 message CreateOrg {
-    // Chef organization detail
+    // Chef organization.
     Org org = 1;
 }
 
 message DeleteOrg {
-    // Chef organization detail
+    // Chef organization.
     Org org = 1;
 }
 
 message UpdateOrg {
-    // Chef organization detail
+    // Chef organization.
     Org org = 1;
 }
 
 message GetOrgs {
-    // List of the chef organization.
+    // Chef organization list.
     repeated OrgListItem orgs = 1;
 }
 
 message GetOrg {
-    // Chef organization detail
+    // Chef organization.
     Org org = 1;
 }
 
 message OrgListItem {
-    // ID of the chef organization.
+    // Chef organization ID.
     string id = 1;
-    // Name of the chef organization.
+    // Chef organization name.
     string name = 2;
-    // Admin user of the chef organization.
+    // Chef organization admin user.
     string admin_user = 3;
-    // ID of the chef infra server.
+    // Chef Infra Server ID.
     string server_id = 4;
 }
 
 message Org {
-    // ID of the chef organization.
+    // Chef organization ID.
     string id = 1;
-    // Name of the chef organization.
+    // Chef organization name.
     string name = 2;
-    // Admin user of the chef organization.
+    // Chef organization admin user.
     string admin_user = 3;
-    // Admin key secrets-service credential ID for the chef organization.
+    // Chef organization credential ID.
     string credential_id = 4;
-    // ID of the chef infra server.
+    // Chef Infra Server ID.
     string server_id = 5;
     // List of projects this chef organization belongs to. May be empty.
     repeated string projects = 6;

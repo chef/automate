@@ -165,7 +165,7 @@
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -188,7 +188,7 @@
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -221,14 +221,14 @@
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
-            "description": "ID of the chef organization.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -251,14 +251,14 @@
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
-            "description": "ID of the chef organization.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -281,14 +281,14 @@
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
-            "description": "ID of the chef organization.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -321,14 +321,14 @@
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the chef infra server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "description": "Name of the chef organization.",
+            "description": "Chef organization name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -890,19 +890,19 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the chef organization."
+          "description": "Chef organization name."
         },
         "admin_user": {
           "type": "string",
-          "description": "Admin user of the chef organization."
+          "description": "Chef organization admin user."
         },
         "admin_key": {
           "type": "string",
-          "description": "Admin key of the chef organization."
+          "description": "Chef organization admin key."
         },
         "server_id": {
           "type": "string",
-          "description": "ID of the chef infra server."
+          "description": "Chef Infra Server ID."
         },
         "projects": {
           "type": "array",
@@ -935,19 +935,23 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "ID of the chef organization."
+          "description": "Chef organization ID."
         },
         "name": {
           "type": "string",
-          "description": "Name of the chef organization."
+          "description": "Chef organization name."
         },
         "admin_user": {
           "type": "string",
-          "description": "Admin user of the chef organization."
+          "description": "Chef organization admin user."
+        },
+        "admin_key": {
+          "type": "string",
+          "description": "Chef organization admin key."
         },
         "server_id": {
           "type": "string",
-          "description": "ID of the chef infra server."
+          "description": "Chef Infra Server ID."
         },
         "projects": {
           "type": "array",
@@ -1259,7 +1263,7 @@
       "properties": {
         "org": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
-          "title": "Chef organization detail"
+          "description": "Chef organization."
         }
       }
     },
@@ -1306,7 +1310,7 @@
       "properties": {
         "org": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
-          "title": "Chef organization detail"
+          "description": "Chef organization."
         }
       }
     },
@@ -1396,7 +1400,7 @@
       "properties": {
         "org": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
-          "title": "Chef organization detail"
+          "description": "Chef organization."
         }
       }
     },
@@ -1408,7 +1412,7 @@
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.OrgListItem"
           },
-          "description": "List of the chef organization."
+          "description": "Chef organization list."
         }
       }
     },
@@ -1469,23 +1473,23 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "ID of the chef organization."
+          "description": "Chef organization ID."
         },
         "name": {
           "type": "string",
-          "description": "Name of the chef organization."
+          "description": "Chef organization name."
         },
         "admin_user": {
           "type": "string",
-          "description": "Admin user of the chef organization."
+          "description": "Chef organization admin user."
         },
         "credential_id": {
           "type": "string",
-          "description": "Admin key secrets-service credential ID for the chef organization."
+          "description": "Chef organization credential ID."
         },
         "server_id": {
           "type": "string",
-          "description": "ID of the chef infra server."
+          "description": "Chef Infra Server ID."
         },
         "projects": {
           "type": "array",
@@ -1501,19 +1505,19 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "ID of the chef organization."
+          "description": "Chef organization ID."
         },
         "name": {
           "type": "string",
-          "description": "Name of the chef organization."
+          "description": "Chef organization name."
         },
         "admin_user": {
           "type": "string",
-          "description": "Admin user of the chef organization."
+          "description": "Chef organization admin user."
         },
         "server_id": {
           "type": "string",
-          "description": "ID of the chef infra server."
+          "description": "Chef Infra Server ID."
         }
       }
     },
@@ -1650,7 +1654,7 @@
       "properties": {
         "org": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
-          "title": "Chef organization detail"
+          "description": "Chef organization."
         }
       }
     },
