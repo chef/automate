@@ -417,7 +417,7 @@ describe('ProjectsFilterDropdownComponent', () => {
         component.resetOptions();
       });
 
-      it('apply button is active with no filters and no changes', () => {
+      it('apply button is disabled with no filters and no changes', () => {
         expect(component.optionsEdited).toBe(false);
       });
 
