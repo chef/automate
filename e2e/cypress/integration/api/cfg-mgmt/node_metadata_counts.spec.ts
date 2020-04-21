@@ -1,7 +1,7 @@
 import { uuidv4 } from '../../../support/helpers';
 
-describe('Config-mgmt nodes_field_value_counts', () => {
-  const cypressPrefix = 'test-nodes_field_value_counts';
+describe('Config-mgmt node_metadata_counts', () => {
+  const cypressPrefix = 'test-node_metadata_counts';
   const clientRunsNodeId1 = uuidv4();
   const clientRunsNodeId2 = uuidv4();
   const clientRunsNodeId3 = uuidv4();
@@ -80,31 +80,31 @@ describe('Config-mgmt nodes_field_value_counts', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'GET',
-      url: '/api/v0/cfgmgmt/nodes_field_value_counts?terms=platform&terms=status'
+      url: '/api/v0/cfgmgmt/node_metadata_counts?type=platform&type=status'
     }).then((resp: Cypress.ObjectLike) => {
-      expect(resp.body.fields.length).to.equal(2);
-      const platformField = resp.body.fields[0];
-      expect(platformField.field).to.equal('platform');
-      expect(platformField.terms.length).to.equal(3);
+      expect(resp.body.types.length).to.equal(2);
+      const platformField = resp.body.types[0];
+      expect(platformField.type).to.equal('platform');
+      expect(platformField.values.length).to.equal(3);
 
-      platformField.terms.forEach( (term: any) => {
-        expect(term.count).to.equal(1);
-        expect(term.term === 'macos' ||
-        term.term === 'windows' ||
-        term.term === 'linux').to.equal(true);
+      platformField.values.forEach( (valueCount: any) => {
+        expect(valueCount.count).to.equal(1);
+        expect(valueCount.value === 'macos' ||
+        valueCount.value === 'windows' ||
+        valueCount.value === 'linux').to.equal(true);
       });
 
-      const statusField = resp.body.fields[1];
-      expect(statusField.field).to.equal('status');
+      const statusField = resp.body.types[1];
+      expect(statusField.type).to.equal('status');
 
-      statusField.terms.forEach( (term: any) => {
-        expect(term.term === 'success' || term.term === 'failure').to.equal(true);
+      statusField.values.forEach( (valueCount: any) => {
+        expect(valueCount.value === 'success' || valueCount.value === 'failure').to.equal(true);
 
-        if ( term.term === 'success' ) {
-          expect(term.count).to.equal(1);
+        if ( valueCount.value === 'success' ) {
+          expect(valueCount.count).to.equal(1);
         }
-        if ( term.term === 'failure' ) {
-          expect(term.count).to.equal(2);
+        if ( valueCount.value === 'failure' ) {
+          expect(valueCount.count).to.equal(2);
         }
       });
     });

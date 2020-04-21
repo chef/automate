@@ -36,8 +36,8 @@ message MissingNodeDurationCounts {
   repeated string durations = 1;
 }
 
-message NodesFieldValueCounts {
-  repeated string terms = 1;
+message NodeMetadataCounts {
+  repeated string type = 1;
   repeated string filter = 2;
   string start = 3;
   string end = 4;

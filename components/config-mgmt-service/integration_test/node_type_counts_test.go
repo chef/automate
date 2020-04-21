@@ -14,19 +14,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNodeFieldValueCounts(t *testing.T) {
+func TestGetNodeMetadataCounts(t *testing.T) {
 	cases := []struct {
 		description      string
-		searchTerms      []string
+		types            []string
 		filter           []string
 		start            string
 		end              string
 		nodes            []iBackend.Node
-		expectedResponse []backend.FieldCount
+		expectedResponse []backend.TypeCount
 	}{
 		{
 			description: "Two search terms with the same two filter terms",
-			searchTerms: []string{"platform", "status"},
+			types:       []string{"platform", "status"},
 			filter:      []string{"status:failure", "platform:windows"},
 			nodes: []iBackend.Node{
 				{
@@ -48,29 +48,29 @@ func TestNodeFieldValueCounts(t *testing.T) {
 					},
 				},
 			},
-			expectedResponse: []backend.FieldCount{
+			expectedResponse: []backend.TypeCount{
 				{
-					Field: "platform",
-					Terms: []backend.TermCount{
+					Type: "platform",
+					Values: []backend.ValueCount{
 						{
-							Term:  "windows",
+							Value: "windows",
 							Count: 1,
 						},
 						{
-							Term:  "linux",
+							Value: "linux",
 							Count: 1,
 						},
 					},
 				},
 				{
-					Field: "status",
-					Terms: []backend.TermCount{
+					Type: "status",
+					Values: []backend.ValueCount{
 						{
-							Term:  "failure",
+							Value: "failure",
 							Count: 1,
 						},
 						{
-							Term:  "successful",
+							Value: "successful",
 							Count: 1,
 						},
 					},
@@ -79,7 +79,7 @@ func TestNodeFieldValueCounts(t *testing.T) {
 		},
 		{
 			description: "Two fields with two different values for each",
-			searchTerms: []string{"platform", "status"},
+			types:       []string{"platform", "status"},
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
@@ -100,29 +100,29 @@ func TestNodeFieldValueCounts(t *testing.T) {
 					},
 				},
 			},
-			expectedResponse: []backend.FieldCount{
+			expectedResponse: []backend.TypeCount{
 				{
-					Field: "platform",
-					Terms: []backend.TermCount{
+					Type: "platform",
+					Values: []backend.ValueCount{
 						{
-							Term:  "windows",
+							Value: "windows",
 							Count: 2,
 						},
 						{
-							Term:  "linux",
+							Value: "linux",
 							Count: 1,
 						},
 					},
 				},
 				{
-					Field: "status",
-					Terms: []backend.TermCount{
+					Type: "status",
+					Values: []backend.ValueCount{
 						{
-							Term:  "failure",
+							Value: "failure",
 							Count: 2,
 						},
 						{
-							Term:  "successful",
+							Value: "successful",
 							Count: 1,
 						},
 					},
@@ -131,7 +131,7 @@ func TestNodeFieldValueCounts(t *testing.T) {
 		},
 		{
 			description: "Status filter with platform value counts",
-			searchTerms: []string{"platform"},
+			types:       []string{"platform"},
 			filter:      []string{"status:failure"},
 			nodes: []iBackend.Node{
 				{
@@ -153,16 +153,16 @@ func TestNodeFieldValueCounts(t *testing.T) {
 					},
 				},
 			},
-			expectedResponse: []backend.FieldCount{
+			expectedResponse: []backend.TypeCount{
 				{
-					Field: "platform",
-					Terms: []backend.TermCount{
+					Type: "platform",
+					Values: []backend.ValueCount{
 						{
-							Term:  "windows",
+							Value: "windows",
 							Count: 1,
 						},
 						{
-							Term:  "linux",
+							Value: "linux",
 							Count: 1,
 						},
 					},
@@ -171,7 +171,7 @@ func TestNodeFieldValueCounts(t *testing.T) {
 		},
 		{
 			description: "filtering on the same field counting values for",
-			searchTerms: []string{"platform"},
+			types:       []string{"platform"},
 			filter:      []string{"platform:windows"},
 			nodes: []iBackend.Node{
 				{
@@ -193,20 +193,20 @@ func TestNodeFieldValueCounts(t *testing.T) {
 					},
 				},
 			},
-			expectedResponse: []backend.FieldCount{
+			expectedResponse: []backend.TypeCount{
 				{
-					Field: "platform",
-					Terms: []backend.TermCount{
+					Type: "platform",
+					Values: []backend.ValueCount{
 						{
-							Term:  "windows",
+							Value: "windows",
 							Count: 1,
 						},
 						{
-							Term:  "linux",
+							Value: "linux",
 							Count: 1,
 						},
 						{
-							Term:  "redhat",
+							Value: "redhat",
 							Count: 1,
 						},
 					},
@@ -215,18 +215,18 @@ func TestNodeFieldValueCounts(t *testing.T) {
 		},
 		{
 			description: "No nodes",
-			searchTerms: []string{"platform"},
+			types:       []string{"platform"},
 			nodes:       []iBackend.Node{},
-			expectedResponse: []backend.FieldCount{
+			expectedResponse: []backend.TypeCount{
 				{
-					Field: "platform",
-					Terms: []backend.TermCount{},
+					Type:   "platform",
+					Values: []backend.ValueCount{},
 				},
 			},
 		},
 		{
 			description: "Start Date filter",
-			searchTerms: []string{"platform"},
+			types:       []string{"platform"},
 			start:       time.Now().Add(-time.Hour * 24).Format(time.RFC3339),
 			nodes: []iBackend.Node{
 				{
@@ -248,12 +248,12 @@ func TestNodeFieldValueCounts(t *testing.T) {
 					},
 				},
 			},
-			expectedResponse: []backend.FieldCount{
+			expectedResponse: []backend.TypeCount{
 				{
-					Field: "platform",
-					Terms: []backend.TermCount{
+					Type: "platform",
+					Values: []backend.ValueCount{
 						{
-							Term:  "windows",
+							Value: "windows",
 							Count: 1,
 						},
 					},
@@ -262,7 +262,7 @@ func TestNodeFieldValueCounts(t *testing.T) {
 		},
 		{
 			description: "End Date filter",
-			searchTerms: []string{"platform"},
+			types:       []string{"platform"},
 			end:         time.Now().Add(-time.Hour * 24).Format(time.RFC3339),
 			nodes: []iBackend.Node{
 				{
@@ -284,16 +284,16 @@ func TestNodeFieldValueCounts(t *testing.T) {
 					},
 				},
 			},
-			expectedResponse: []backend.FieldCount{
+			expectedResponse: []backend.TypeCount{
 				{
-					Field: "platform",
-					Terms: []backend.TermCount{
+					Type: "platform",
+					Values: []backend.ValueCount{
 						{
-							Term:  "redhat",
+							Value: "redhat",
 							Count: 1,
 						},
 						{
-							Term:  "ubuntu",
+							Value: "ubuntu",
 							Count: 1,
 						},
 					},
@@ -302,7 +302,7 @@ func TestNodeFieldValueCounts(t *testing.T) {
 		},
 		{
 			description: "Start and End Date filter",
-			searchTerms: []string{"platform"},
+			types:       []string{"platform"},
 			start:       time.Now().Add(-time.Hour * 24 * 5).Format(time.RFC3339),
 			end:         time.Now().Add(-time.Hour * 24).Format(time.RFC3339),
 			nodes: []iBackend.Node{
@@ -325,12 +325,12 @@ func TestNodeFieldValueCounts(t *testing.T) {
 					},
 				},
 			},
-			expectedResponse: []backend.FieldCount{
+			expectedResponse: []backend.TypeCount{
 				{
-					Field: "platform",
-					Terms: []backend.TermCount{
+					Type: "platform",
+					Values: []backend.ValueCount{
 						{
-							Term:  "redhat",
+							Value: "redhat",
 							Count: 1,
 						},
 					},
@@ -356,46 +356,46 @@ func TestNodeFieldValueCounts(t *testing.T) {
 				testCase.filter = []string{}
 			}
 
-			actualResponse, err := cfgmgmt.GetNodesFieldValueCounts(context.Background(),
-				&request.NodesFieldValueCounts{
-					Terms:  testCase.searchTerms,
+			actualResponse, err := cfgmgmt.GetNodeMetadataCounts(context.Background(),
+				&request.NodeMetadataCounts{
+					Type:   testCase.types,
 					Filter: testCase.filter,
 					Start:  testCase.start,
 					End:    testCase.end,
 				})
 			require.NoError(t, err)
 
-			require.Equal(t, len(testCase.expectedResponse), len(actualResponse.Fields))
-			for index := range actualResponse.Fields {
+			require.Equal(t, len(testCase.expectedResponse), len(actualResponse.Types))
+			for index := range actualResponse.Types {
 
-				assert.Equal(t, testCase.expectedResponse[index].Field, actualResponse.Fields[index].Field)
-				assert.Equal(t, testCase.searchTerms[index], actualResponse.Fields[index].Field)
+				assert.Equal(t, testCase.expectedResponse[index].Type, actualResponse.Types[index].Type)
+				assert.Equal(t, testCase.types[index], actualResponse.Types[index].Type)
 
-				expectedTerms := testCase.expectedResponse[index].Terms
-				actualTerms := actualResponse.Fields[index].Terms
-				require.Equal(t, len(expectedTerms), len(actualTerms),
-					"field term lengths for %q do not match", testCase.searchTerms[index])
+				expectedValues := testCase.expectedResponse[index].Values
+				actualValues := actualResponse.Types[index].Values
+				require.Equal(t, len(expectedValues), len(actualValues),
+					"field term lengths for %q do not match", testCase.types[index])
 
-				for _, term := range expectedTerms {
-					count, found := find(term.Term, actualTerms)
-					require.Truef(t, found, "term %q not found", term.Term)
-					assert.Equal(t, term.Count, count)
+				for _, expectedValueCount := range expectedValues {
+					actualCount, found := find(expectedValueCount.Value, actualValues)
+					require.Truef(t, found, "term %q not found", expectedValueCount.Value)
+					assert.Equal(t, expectedValueCount.Count, actualCount)
 				}
 			}
 		})
 	}
 }
 
-func TestNodeFieldValueCountsError(t *testing.T) {
+func TestGetNodeMetadataCountsError(t *testing.T) {
 	cases := []struct {
 		description string
-		searchTerms []string
+		types       []string
 		start       string
 		end         string
 	}{
 		{
 			description: "Start date is after End Date filter",
-			searchTerms: []string{"platform"},
+			types:       []string{"platform"},
 			start:       time.Now().Add(-time.Hour * 24).Format(time.RFC3339),
 			end:         time.Now().Add(-time.Hour * 24 * 5).Format(time.RFC3339),
 		},
@@ -404,9 +404,9 @@ func TestNodeFieldValueCountsError(t *testing.T) {
 	for _, testCase := range cases {
 		t.Run(testCase.description, func(t *testing.T) {
 
-			_, err := cfgmgmt.GetNodesFieldValueCounts(context.Background(),
-				&request.NodesFieldValueCounts{
-					Terms: testCase.searchTerms,
+			_, err := cfgmgmt.GetNodeMetadataCounts(context.Background(),
+				&request.NodeMetadataCounts{
+					Type:  testCase.types,
 					Start: testCase.start,
 					End:   testCase.end,
 				})
@@ -415,10 +415,10 @@ func TestNodeFieldValueCountsError(t *testing.T) {
 	}
 }
 
-func find(needle string, haystack []*response.TermCount) (int, bool) {
-	for _, term := range haystack {
-		if term.Term == needle {
-			return int(term.Count), true
+func find(needle string, haystack []*response.ValueCount) (int, bool) {
+	for _, valueCount := range haystack {
+		if valueCount.Value == needle {
+			return int(valueCount.Count), true
 		}
 	}
 	return 0, false

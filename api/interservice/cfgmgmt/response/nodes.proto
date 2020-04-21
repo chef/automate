@@ -129,16 +129,16 @@ message CountedDuration {
   int32 count = 2;
 }
 
-message NodesFieldValueCounts {
-  repeated FieldCount fields = 1;
+message NodeMetadataCounts {
+  repeated TypeCount types = 1;
 }
 
-message FieldCount {
-	repeated TermCount terms = 1;
-	string field = 2;
+message TypeCount {
+	repeated ValueCount values = 1;
+	string type = 2;
 }
 
-message TermCount {
-	string term = 1;
+message ValueCount {
+	string value = 1;
 	int32 count = 2;
 }

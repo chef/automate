@@ -297,42 +297,45 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context,
 	return toResponseRun(run, getNodes.nodes[0])
 }
 
-func (s *CfgMgmtServer) GetNodesFieldValueCounts(ctx context.Context,
-	req *request.NodesFieldValueCounts) (*response.NodesFieldValueCounts, error) {
+// GetNodeMetadataCounts - For each type of field provided return distinct values the amount for each.
+// For example, if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8
+// could be returned. The number next to each represents the number of nodes with that type of platform.
+func (s *CfgMgmtServer) GetNodeMetadataCounts(ctx context.Context,
+	req *request.NodeMetadataCounts) (*response.NodeMetadataCounts, error) {
 
 	filters, err := stringutils.FormatFiltersWithKeyConverter(req.Filter,
 		params.ConvertParamToNodeStateBackendLowerFilter)
 
 	// Date Range
 	if !params.ValidateDateTimeRange(req.GetStart(), req.GetEnd()) {
-		return &response.NodesFieldValueCounts{}, status.Errorf(codes.InvalidArgument,
+		return &response.NodeMetadataCounts{}, status.Errorf(codes.InvalidArgument,
 			"Invalid start/end time. (format: YYYY-MM-DD'T'HH:mm:ssZ)")
 	}
 
-	fieldCounts, err := s.client.GetNodesFieldValueCounts(filters,
-		req.Terms, req.Start, req.End)
+	typeCounts, err := s.client.GetNodeMetadataCounts(filters,
+		req.Type, req.Start, req.End)
 	if err != nil {
-		return &response.NodesFieldValueCounts{}, errors.GrpcErrorFromErr(codes.Internal, err)
+		return &response.NodeMetadataCounts{}, errors.GrpcErrorFromErr(codes.Internal, err)
 	}
 
-	fields := make([]*response.FieldCount, len(fieldCounts))
-	for index := range fieldCounts {
-		terms := make([]*response.TermCount, len(fieldCounts[index].Terms))
-		for termIndex, term := range fieldCounts[index].Terms {
-			terms[termIndex] = &response.TermCount{
-				Count: int32(term.Count),
-				Term:  term.Term,
+	types := make([]*response.TypeCount, len(typeCounts))
+	for index := range typeCounts {
+		values := make([]*response.ValueCount, len(typeCounts[index].Values))
+		for valueIndex, valueCount := range typeCounts[index].Values {
+			values[valueIndex] = &response.ValueCount{
+				Count: int32(valueCount.Count),
+				Value: valueCount.Value,
 			}
 		}
 
-		fields[index] = &response.FieldCount{
-			Field: fieldCounts[index].Field,
-			Terms: terms,
+		types[index] = &response.TypeCount{
+			Type:   typeCounts[index].Type,
+			Values: values,
 		}
 	}
 
-	return &response.NodesFieldValueCounts{
-		Fields: fields,
+	return &response.NodeMetadataCounts{
+		Types: types,
 	}, nil
 }
 

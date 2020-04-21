@@ -199,7 +199,7 @@ func (m Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.Cou
 	return nil, nil
 }
 
-func (m Backend) GetNodesFieldValueCounts(filters map[string][]string, searchTerms []string, startDate,
-	endDate string) ([]backend.FieldCount, error) {
+func (m Backend) GetNodeMetadataCounts(filters map[string][]string, types []string, startDate,
+	endDate string) ([]backend.TypeCount, error) {
 	return nil, nil
 }

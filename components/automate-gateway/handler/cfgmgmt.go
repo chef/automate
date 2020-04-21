@@ -297,43 +297,44 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 	}, nil
 }
 
-//GetNodesFieldValueCounts - Get field value counts for a list of fields provided. For each
-// field provided a list of distinct values and their amount is returned.
-func (s *CfgMgmtServer) GetNodesFieldValueCounts(ctx context.Context,
-	request *cfgReq.NodesFieldValueCounts) (*cfgRes.NodesFieldValueCounts, error) {
+// GetNodeMetadataCounts - For each type of field provided return distinct values the amount for each.
+// For example, if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8
+// could be returned. The number next to each represents the number of nodes with that type of platform.
+func (s *CfgMgmtServer) GetNodeMetadataCounts(ctx context.Context,
+	request *cfgReq.NodeMetadataCounts) (*cfgRes.NodeMetadataCounts, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	cfgMgmtRequest := &cmsReq.NodesFieldValueCounts{
-		Terms:  request.Terms,
+	cfgMgmtRequest := &cmsReq.NodeMetadataCounts{
+		Type:   request.Type,
 		Filter: request.Filter,
 		Start:  request.Start,
 		End:    request.End,
 	}
 
-	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodesFieldValueCounts(ctx, cfgMgmtRequest)
+	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodeMetadataCounts(ctx, cfgMgmtRequest)
 	if err != nil {
-		return &cfgRes.NodesFieldValueCounts{}, err
+		return &cfgRes.NodeMetadataCounts{}, err
 	}
-	fields := make([]*cfgRes.FieldCount, len(cfgmgmtResponse.Fields))
-	for index, cfgField := range cfgmgmtResponse.Fields {
-		terms := make([]*cfgRes.TermCount, len(cfgField.Terms))
-		for termIndex, cfgTerm := range cfgField.Terms {
-			terms[termIndex] = &cfgRes.TermCount{
-				Term:  cfgTerm.Term,
-				Count: cfgTerm.Count,
+	types := make([]*cfgRes.TypeCount, len(cfgmgmtResponse.Types))
+	for index, cfgField := range cfgmgmtResponse.Types {
+		values := make([]*cfgRes.ValueCount, len(cfgField.Values))
+		for valueIndex, cfgValueCount := range cfgField.Values {
+			values[valueIndex] = &cfgRes.ValueCount{
+				Value: cfgValueCount.Value,
+				Count: cfgValueCount.Count,
 			}
 		}
-		fields[index] = &cfgRes.FieldCount{
-			Terms: terms,
-			Field: cfgField.Field,
+		types[index] = &cfgRes.TypeCount{
+			Values: values,
+			Type:   cfgField.Type,
 		}
 	}
 
-	return &cfgRes.NodesFieldValueCounts{
-		Fields: fields,
+	return &cfgRes.NodeMetadataCounts{
+		Types: types,
 	}, nil
 }
 

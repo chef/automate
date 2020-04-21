@@ -272,61 +272,65 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 	return ns, nil
 }
 
-// GetNodesFieldValueCounts - Get field value counts for a list of fields provided. For each
-// field provided a list of distinct values and their amount is returned.
-func (es Backend) GetNodesFieldValueCounts(filters map[string][]string,
-	fields []string, startDate, endDate string) ([]backend.FieldCount, error) {
+// GetNodeMetadataCounts - For each type of field provided return distinct values the amount for each.
+// For example, if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8
+// could be returned. The number next to each represents the number of nodes with that type of platform.
+//
+// Filters of the same type as the aggregation are removed. For example, if there is a filter of
+// type platform:'windows' and the type 'platform' is requested the filter platform:'windows' will be removed.
+func (es Backend) GetNodeMetadataCounts(filters map[string][]string,
+	types []string, startDate, endDate string) ([]backend.TypeCount, error) {
 	var aggregationTerm = "inner_filter"
 
-	searchSource := createSearchTermAggs(filters, fields, startDate, endDate, aggregationTerm)
+	searchSource := createTypeAggs(filters, types, startDate, endDate, aggregationTerm)
 
 	source, _ := searchSource.Source()
-	LogQueryPartMin(IndexNodeState, source, "GetNodesFieldValueCounts request")
+	LogQueryPartMin(IndexNodeState, source, "GetNodeMetadataCounts request")
 
 	searchResult, err := es.client.Search().
 		SearchSource(searchSource).
 		Index(IndexNodeState).
 		Do(context.Background())
 	if err != nil {
-		return []backend.FieldCount{}, err
+		return []backend.TypeCount{}, err
 	}
 
-	LogQueryPartMin(IndexNodeState, searchResult.Aggregations, "GetNodesFieldValueCounts response")
+	LogQueryPartMin(IndexNodeState, searchResult.Aggregations, "GetNodeMetadataCounts response")
 
 	// no matching nodes found
 	if searchResult.TotalHits() == 0 {
-		fieldCountCollection := make([]backend.FieldCount, len(fields))
-		for index, searchTerm := range fields {
-			fieldCountCollection[index].Terms = []backend.TermCount{}
-			fieldCountCollection[index].Field = searchTerm
+		fieldCountCollection := make([]backend.TypeCount, len(types))
+		for index, fieldType := range types {
+			fieldCountCollection[index].Values = []backend.ValueCount{}
+			fieldCountCollection[index].Type = fieldType
 		}
 		return fieldCountCollection, nil
 	}
 
-	fieldCountCollection := make([]backend.FieldCount, len(fields))
-	for index, searchTerm := range fields {
+	fieldCountCollection := make([]backend.TypeCount, len(types))
+	for index, searchTerm := range types {
 		outerAgg, found := searchResult.Aggregations.Terms(searchTerm)
 		if !found {
 			return nil, errors.NewBackendError("Aggregation term %q not found", searchTerm)
 		}
-		terms := make([]backend.TermCount, 0)
+		terms := make([]backend.ValueCount, 0)
 		for _, bucket := range outerAgg.Buckets {
-			statusCounts, found := bucket.Aggregations.Filter(aggregationTerm)
+			filterCounts, found := bucket.Aggregations.Filter(aggregationTerm)
 			if !found {
-				return []backend.FieldCount{},
+				return []backend.TypeCount{},
 					errors.NewBackendError("Aggregation term %q not found", aggregationTerm)
 			}
 
 			// Are all the found values filtered out
-			if statusCounts.DocCount > 0 {
-				terms = append(terms, backend.TermCount{
-					Count: int(statusCounts.DocCount),
-					Term:  bucket.Key.(string),
+			if filterCounts.DocCount > 0 {
+				terms = append(terms, backend.ValueCount{
+					Count: int(filterCounts.DocCount),
+					Value: bucket.Key.(string),
 				})
 			}
 		}
-		fieldCountCollection[index].Terms = terms
-		fieldCountCollection[index].Field = searchTerm
+		fieldCountCollection[index].Values = terms
+		fieldCountCollection[index].Type = searchTerm
 	}
 
 	return fieldCountCollection, nil
@@ -634,10 +638,10 @@ func findMatchingDurationCount(key string,
 // 		 }
 // 	}
 // }
-func createSearchTermAggs(filters map[string][]string,
-	fields []string, startDate, endDate string, aggregationTerm string) *elastic.SearchSource {
+func createTypeAggs(filters map[string][]string,
+	types []string, startDate, endDate string, aggregationTerm string) *elastic.SearchSource {
 	searchSource := elastic.NewSearchSource()
-	for _, searchTerm := range fields {
+	for _, fieldType := range types {
 		// Copy the filters
 		localFilters := map[string][]string{}
 		for index, element := range filters {
@@ -648,7 +652,7 @@ func createSearchTermAggs(filters map[string][]string,
 		localFilters[backend.ExistsTag] = []string{"true"}
 
 		// remove the filter for the current search term
-		delete(localFilters, params.ConvertParamToNodeStateBackendLowerFilter(searchTerm))
+		delete(localFilters, params.ConvertParamToNodeStateBackendLowerFilter(fieldType))
 
 		mainQuery := newBoolQueryFromFilters(localFilters)
 
@@ -659,11 +663,11 @@ func createSearchTermAggs(filters map[string][]string,
 		}
 
 		agg := elastic.NewTermsAggregation().
-			Field(searchTerm).
+			Field(fieldType).
 			SubAggregation(aggregationTerm,
 				elastic.NewFilterAggregation().Filter(mainQuery))
 
-		searchSource = searchSource.Aggregation(searchTerm, agg)
+		searchSource = searchSource.Aggregation(fieldType, agg)
 	}
 
 	return searchSource

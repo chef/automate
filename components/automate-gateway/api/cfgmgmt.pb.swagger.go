@@ -53,6 +53,62 @@ func init() {
         ]
       }
     },
+    "/cfgmgmt/node_metadata_counts": {
+      "get": {
+        "summary": "GetNodeMetadataCounts",
+        "description": "For each type of field requested this returns distinct values the amount of each. For example, \nif the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8 could be returned. \nThe number next to each represents the number of nodes with that type of platform.\n\nExample:\nrequest\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/node_metadata_counts?type=platform\u0026type=status\n` + "`" + `` + "`" + `` + "`" + `\nresponse\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"types\": [\n{\n\"values\": [\n{\n\"value\": \"mac_os_x 10.11.5\",\n\"count\": 28\n},\n{\n\"value\": \"linux 8.9\",\n\"count\": 1\n},\n{\n\"value\": \"macos 8.9\",\n\"count\": 1\n},\n{\n\"value\": \"windows 8.9\",\n\"count\": 1\n}\n],\n\"type\": \"platform\"\n},\n{\n\"value\": [\n{\n\"value\": \"missing\",\n\"count\": 29\n},\n{\n\"value\": \"failure\",\n\"count\": 2\n}\n],\n\"type\": \"status\"\n}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetNodeMetadataCounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodeMetadataCounts"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "type",
+            "description": "Types of node fields to collect value counts for.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter",
+            "description": "Filters to apply to the counts returned.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "start",
+            "description": "Earliest most recent check-in node information to return.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end",
+            "description": "Latest most recent check-in node information to return.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/cfgmgmt/nodes": {
       "get": {
         "summary": "GetNodes",
@@ -269,58 +325,6 @@ func init() {
             "required": false,
             "type": "string",
             "format": "date-time"
-          }
-        ],
-        "tags": [
-          "ConfigMgmt"
-        ]
-      }
-    },
-    "/cfgmgmt/nodes_field_value_counts": {
-      "get": {
-        "summary": "GetNodesFieldValueCounts",
-        "description": "Returns a list fields with value counts\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetNodesFieldValueCounts",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodesFieldValueCounts"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "terms",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "filter",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "start",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "end",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": [
@@ -775,20 +779,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.cfgmgmt.response.FieldCount": {
-      "type": "object",
-      "properties": {
-        "terms": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.TermCount"
-          }
-        },
-        "field": {
-          "type": "string"
-        }
-      }
-    },
     "chef.automate.api.cfgmgmt.response.MissingNodeDurationCounts": {
       "type": "object",
       "properties": {
@@ -866,6 +856,18 @@ func init() {
         }
       }
     },
+    "chef.automate.api.cfgmgmt.response.NodeMetadataCounts": {
+      "type": "object",
+      "properties": {
+        "types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.TypeCount"
+          },
+          "title": "Field Types for a node with value counts"
+        }
+      }
+    },
     "chef.automate.api.cfgmgmt.response.NodesCounts": {
       "type": "object",
       "properties": {
@@ -888,17 +890,6 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "Total count of nodes that have been labeled as 'missing' as determined by node lifecycle settings."
-        }
-      }
-    },
-    "chef.automate.api.cfgmgmt.response.NodesFieldValueCounts": {
-      "type": "object",
-      "properties": {
-        "fields": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.FieldCount"
-          }
         }
       }
     },
@@ -1204,15 +1195,33 @@ func init() {
         }
       }
     },
-    "chef.automate.api.cfgmgmt.response.TermCount": {
+    "chef.automate.api.cfgmgmt.response.TypeCount": {
       "type": "object",
       "properties": {
-        "term": {
-          "type": "string"
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ValueCount"
+          },
+          "title": "Values of the field type with a count for each"
+        },
+        "type": {
+          "type": "string",
+          "title": "The field type counted"
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.ValueCount": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "title": "The value counted"
         },
         "count": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The number of this distinct value"
         }
       }
     },
