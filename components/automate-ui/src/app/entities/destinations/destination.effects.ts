@@ -94,7 +94,7 @@ export class DestinationEffects {
       ofType(DestinationActionTypes.CREATE_SUCCESS),
       map(({ payload  }: CreateDestinationSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Created data feed ${payload}`
+      message: `Created data feed ${payload.name}`
     })));
 
   @Effect()
@@ -114,6 +114,14 @@ export class DestinationEffects {
         map((resp) => new UpdateDestinationSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new UpdateDestinationFailure(error))))));
+
+  @Effect()
+  updateDestinationSuccess$ = this.actions$.pipe(
+      ofType(DestinationActionTypes.UPDATE_SUCCESS),
+      map(({ payload  }: UpdateDestinationSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Updated data feed ${payload.name}.`
+    })));
 
   @Effect()
   updateDestinationFailure$ = this.actions$.pipe(

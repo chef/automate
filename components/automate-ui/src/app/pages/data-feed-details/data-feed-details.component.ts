@@ -44,13 +44,16 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   public urlStatusModalVisible = false;
 
   constructor(
+    private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
-    fb: FormBuilder,
     private layoutFacade: LayoutFacadeService,
     private datafeedService: DatafeedService
-  ) {
+  ) { }
 
-    this.updateForm = fb.group({
+  public ngOnInit(): void {
+    this.layoutFacade.showSidebar(Sidebar.Settings);
+
+    this.updateForm = this.fb.group({
       // Must stay in sync with error checks in data-feed-details.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       url: ['', [Validators.required,
@@ -58,12 +61,8 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
         Validators.pattern(Regex.patterns.VALID_FQDN)
       ]]
     });
-  }
 
-  public ngOnInit(): void {
-    this.layoutFacade.showSidebar(Sidebar.Settings);
-    this.store.pipe(
-      select(routeParams),
+    this.store.select(routeParams).pipe(
       pluck('id'),
       filter(identity),
       takeUntil(this.isDestroyed))
@@ -105,8 +104,8 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
       name: this.updateForm.controls['name'].value.trim(),
       url: this.updateForm.controls['url'].value.trim(),
       secret: this.destination.secret
-    }
-    
+    };
+
     this.store.dispatch(new UpdateDestination({ destination: destinationObj }));
     this.destination = destinationObj;
   }

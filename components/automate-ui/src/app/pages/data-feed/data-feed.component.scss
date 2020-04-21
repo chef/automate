@@ -1,5 +1,4 @@
 @import "~styles/variables";
-@import "~styles/mixins";
 
 .destinations-container {
   margin-left: 200px;
@@ -7,6 +6,11 @@
 }
 
 .filter-button chef-button {
+  margin-left: 0;
+}
+
+chef-button:first-child {
+  margin-top: 0;
   margin-left: 0;
 }
 

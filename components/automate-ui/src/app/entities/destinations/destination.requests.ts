@@ -45,8 +45,8 @@ export class DestinationRequests {
   }
 
   public getDestination(id: string): Observable<Destination> {
-    return this.http.get<DestinationResponse>(this.joinToDatafeedUrl(['destination', id]))
-    .pipe(map((destinationsJson: DestinationResponse) => destinationsJson.destination));
+    return this.http.get<Destination>(this.joinToDatafeedUrl(['destination', id]))
+    .pipe(map((destinationsJson: Destination) => destinationsJson));
   }
 
   public createDestination(destinationData: CreateDesinationPayload,

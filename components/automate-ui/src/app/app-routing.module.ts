@@ -176,10 +176,6 @@ const routes: Routes = [
           ]
         },
         {
-          path: 'data-feeds/:id',
-          component: DataFeedDetailsComponent
-        },
-        {
           path: 'data-feeds',
           children: [
             {
@@ -193,6 +189,10 @@ const routes: Routes = [
             {
               path: 'form/:id',
               component: DatafeedFormComponent
+            },
+            {
+              path: ':id',
+              component: DataFeedDetailsComponent
             }
           ]
         }

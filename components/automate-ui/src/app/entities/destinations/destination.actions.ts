@@ -72,7 +72,8 @@ export interface CreateDesinationPayload {
 
 export class CreateDestination implements Action {
   readonly type = DestinationActionTypes.CREATE;
-  constructor(public payload: CreateDesinationPayload, public username: string, public password: string ) { }
+  constructor(public payload: CreateDesinationPayload,
+    public username: string, public password: string ) { }
 }
 
 export class CreateDestinationSuccess implements Action {
