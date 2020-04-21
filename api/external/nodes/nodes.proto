@@ -60,7 +60,7 @@ service NodesService {
 	};
 
 	/*
-	List Node Details
+	Show Node Details
 
 	Returns the details for a node given the node ID.
 
