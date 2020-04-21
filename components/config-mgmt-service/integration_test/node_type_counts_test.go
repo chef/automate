@@ -358,10 +358,10 @@ func TestNodeFieldValueCounts(t *testing.T) {
 
 			actualResponse, err := cfgmgmt.GetNodesFieldValueCounts(context.Background(),
 				&request.NodesFieldValueCounts{
-					SearchTerms: testCase.searchTerms,
-					Filter:      testCase.filter,
-					Start:       testCase.start,
-					End:         testCase.end,
+					Terms:  testCase.searchTerms,
+					Filter: testCase.filter,
+					Start:  testCase.start,
+					End:    testCase.end,
 				})
 			require.NoError(t, err)
 
@@ -406,9 +406,9 @@ func TestNodeFieldValueCountsError(t *testing.T) {
 
 			_, err := cfgmgmt.GetNodesFieldValueCounts(context.Background(),
 				&request.NodesFieldValueCounts{
-					SearchTerms: testCase.searchTerms,
-					Start:       testCase.start,
-					End:         testCase.end,
+					Terms: testCase.searchTerms,
+					Start: testCase.start,
+					End:   testCase.end,
 				})
 			require.Error(t, err)
 		})
