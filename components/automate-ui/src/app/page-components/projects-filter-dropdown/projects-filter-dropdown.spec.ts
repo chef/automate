@@ -399,6 +399,50 @@ describe('ProjectsFilterDropdownComponent', () => {
         expect(component.optionsEdited).toBe(false);
       });
     });
+
+    describe('when options have filters applied', () => {
+      beforeEach(() => {
+        component.dropdownActive = true;
+        component.options = genOptionsWithId([
+          ['proj-one', true],
+          ['proj-three', false],
+          ['other-one', false],
+          ['other-two', true],
+          ['proj-two', false],
+          ['other-three', false],
+          ['proj-four', false]
+        ]);
+        component.filteredOptions = component.editableOptions;
+        component.initialFilters = component.filteredOptions.map(option => option.checked);
+        component.resetOptions();
+      });
+
+      it('apply button is active with no filters and no changes', () => {
+        expect(component.optionsEdited).toBe(false);
+      });
+
+      it('apply button is active with one new checked but filtered out option', () => {
+        component.handleOptionChange({ detail: true }, 'other-one');
+        component.handleFilterKeyUp('proj');
+        expect(component.optionsEdited).toBe(true);
+      });
+
+      it('apply button is disabled with a filter, then checked and unchecked option', () => {
+        component.handleFilterKeyUp('proj');
+        component.handleOptionChange({ detail: true }, 'proj-two');
+        expect(component.optionsEdited).toBe(true);
+
+        component.handleOptionChange({ detail: false }, 'proj-two');
+        expect(component.optionsEdited).toBe(false);
+      });
+
+      it('apply button enabled when selection is' +
+            ' cleared while filtered and there are changes', () => {
+          component.handleFilterKeyUp('proj'); // this leaves selected options hidden
+          component.handleClearSelection();
+          expect(component.optionsEdited).toBe(true);
+      });
+    });
   });
 
   describe('resetOptions()', () => {
