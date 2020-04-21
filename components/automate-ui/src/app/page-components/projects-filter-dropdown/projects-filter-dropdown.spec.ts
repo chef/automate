@@ -174,6 +174,69 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
   });
 
+  describe('The applyButton is enabled when', () => {
+    beforeEach(() => {
+      component.optionsEdited = false;
+      fixture.detectChanges();
+    });
+
+    describe('with no projects checked...', () => {
+      beforeEach(() => {
+        component.editableOptions = genOptions([false, false, false, false, false]);
+        component.filteredOptions = component.editableOptions;
+        component.initialFilters = component.filteredOptions.map(option => option.checked);
+      });
+
+      it('check one project', () => {
+        component.handleOptionChange({ detail: true }, 'Project 1');
+        expect(component.optionsEdited).toBe(true);
+      });
+
+      it('check multiple projects', () => {
+        component.handleOptionChange({ detail: true }, 'Project 1');
+        component.handleOptionChange({ detail: true }, 'Project 2');
+        component.handleOptionChange({ detail: true }, 'Project 4');
+
+        expect(component.optionsEdited).toBe(true);
+      });
+
+      it('check all projects', () => {
+        component.editableOptions.forEach(
+          (_o, index) => component.handleOptionChange({ detail: true }, `Project ${index + 1}`));
+
+        expect(component.optionsEdited).toBe(true);
+      });
+    });
+
+    describe('with some projects checked...', () => {
+      beforeEach(() => {
+        component.editableOptions = genOptions([false, true, true, false, false]);
+        component.filteredOptions = component.editableOptions;
+        component.initialFilters = component.filteredOptions.map(option => option.checked);
+      });
+
+      it('check one other project', () => {
+        component.handleOptionChange({ detail: true }, 'Project 1');
+        expect(component.optionsEdited).toBe(true);
+      });
+
+      it('check multiple other projects', () => {
+        component.handleOptionChange({ detail: true }, 'Project 1');
+        component.handleOptionChange({ detail: true }, 'Project 5');
+
+        expect(component.optionsEdited).toBe(true);
+      });
+
+      it('check all other projects', () => {
+        component.handleOptionChange({ detail: true }, 'Project 1');
+        component.handleOptionChange({ detail: true }, 'Project 4');
+        component.handleOptionChange({ detail: true }, 'Project 5');
+
+        expect(component.optionsEdited).toBe(true);
+      });
+    });
+  });
+
   describe('resetOptions()', () => {
     beforeEach(() => {
       component.options = genOptions([false, true]);
