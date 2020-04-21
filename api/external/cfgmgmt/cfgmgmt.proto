@@ -17,9 +17,7 @@ import "api/external/cfgmgmt/response/errors.proto";
 
 import "api/external/common/query/parameters.proto";
 import "api/external/common/version/version.proto";
-import "api/external/common/response.proto";	
-
-import "api/external/compliance/reporting/reporting.proto";
+import "api/external/common/response.proto";
 
 import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
@@ -168,7 +166,7 @@ service ConfigMgmt {
   };
 
   /*
-  List Node Run
+  Show Node Run
 
   Returns the infra run report for the provided node ID and run ID.
 
@@ -249,7 +247,7 @@ service ConfigMgmt {
   };
 
   /*
-  List Attributes
+  Show Attributes
 
   Returns the latest reported attributes for the provided node ID.
 
@@ -280,13 +278,8 @@ service ConfigMgmt {
   /*
   List Policy Cookbooks
 
-<<<<<<< HEAD
-  Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.
-  Policy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.
-=======
   Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID. 
   Policy revision IDs are sent with an infra run report and identifies which instance of a policy the node used for this run.
->>>>>>> cfgmgmt fixes and syncing
 
 	Authorization Action:
 	```
@@ -319,7 +312,7 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }
 
-  rpc NodeExport(cfgmgmt.request.NodeExport) returns (stream chef.automate.api.common.ExportData) {};	
+  rpc NodeExport(cfgmgmt.request.NodeExport) returns (stream chef.automate.api.common.ExportData) {};
 
   rpc ReportExport(cfgmgmt.request.ReportExport) returns (stream chef.automate.api.common.ExportData) {};
 }

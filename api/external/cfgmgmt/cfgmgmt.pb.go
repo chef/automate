@@ -176,7 +176,7 @@ type ConfigMgmtClient interface {
 	//
 	//List Run Status Totals
 	//
-	//Returns totals for failed and successful runs when given a `node_id`.
+	//Returns totals for failed and successful runs given a `node_id`.
 	//
 	//Example:
 	//```
@@ -215,7 +215,7 @@ type ConfigMgmtClient interface {
 	//```
 	GetMissingNodeDurationCounts(ctx context.Context, in *request.MissingNodeDurationCounts, opts ...grpc.CallOption) (*response.MissingNodeDurationCounts, error)
 	//
-	//List Node Run
+	//Show Node Run
 	//
 	//Returns the infra run report for the provided node ID and run ID.
 	//
@@ -261,7 +261,7 @@ type ConfigMgmtClient interface {
 	//```
 	GetSourceFqdns(ctx context.Context, in *request.SourceFqdns, opts ...grpc.CallOption) (*_struct.ListValue, error)
 	//
-	//List Attributes
+	//Show Attributes
 	//
 	//Returns the latest reported attributes for the provided node ID.
 	//
@@ -546,7 +546,7 @@ type ConfigMgmtServer interface {
 	//
 	//List Run Status Totals
 	//
-	//Returns totals for failed and successful runs when given a `node_id`.
+	//Returns totals for failed and successful runs given a `node_id`.
 	//
 	//Example:
 	//```
@@ -585,7 +585,7 @@ type ConfigMgmtServer interface {
 	//```
 	GetMissingNodeDurationCounts(context.Context, *request.MissingNodeDurationCounts) (*response.MissingNodeDurationCounts, error)
 	//
-	//List Node Run
+	//Show Node Run
 	//
 	//Returns the infra run report for the provided node ID and run ID.
 	//
@@ -631,7 +631,7 @@ type ConfigMgmtServer interface {
 	//```
 	GetSourceFqdns(context.Context, *request.SourceFqdns) (*_struct.ListValue, error)
 	//
-	//List Attributes
+	//Show Attributes
 	//
 	//Returns the latest reported attributes for the provided node ID.
 	//

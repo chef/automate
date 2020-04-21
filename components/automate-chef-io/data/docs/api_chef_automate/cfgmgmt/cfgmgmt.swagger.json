@@ -13,11 +13,7 @@
   "paths": {
     "/cfgmgmt/errors": {
       "get": {
-<<<<<<< HEAD
-        "summary": "GetErrors",
-=======
         "summary": "List Errors",
->>>>>>> First attempt at adding API request examples
         "description": "Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
         "operationId": "GetErrors",
         "responses": {
@@ -56,13 +52,8 @@
     },
     "/cfgmgmt/nodes": {
       "get": {
-<<<<<<< HEAD
-        "summary": "GetNodes",
-        "description": "Returns a list of infra nodes that have checked in to Automate.\nAdding a filter makes a list of all nodes that meet the filter criteria.\nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n```\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
-=======
         "summary": "List Checked-in Nodes",
-        "description": "Returns a list of infra nodes that have checked in to Automate. \nAdding a filter makes a list of all nodes that meet the filter criteria. \nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n```\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
->>>>>>> First attempt at adding API request examples
+        "description": "Returns a list of infra nodes that have checked in to Automate.\nAdding a filter makes a list of all nodes that meet the filter criteria.\nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n```\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
         "operationId": "GetNodes",
         "responses": {
           "200": {
@@ -144,7 +135,7 @@
     },
     "/cfgmgmt/nodes/{node_id}/attribute": {
       "get": {
-        "summary": "List Attributes",
+        "summary": "Show Attributes",
         "description": "Returns the latest reported attributes for the provided node ID.\n\nAuthorization Action:\n```\ninfra:nodes:get\n```",
         "operationId": "GetAttributes",
         "responses": {
@@ -171,13 +162,8 @@
     },
     "/cfgmgmt/nodes/{node_id}/runs": {
       "get": {
-<<<<<<< HEAD
-        "summary": "GetRuns",
-        "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node ID.\nSupports pagination.\nAccepts a `start` parameter to denote start date for the list and a filter of type `status`.\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
-=======
         "summary": "List Run Details",
-        "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node ID. \nSupports pagination.\nAccepts a `start` parameter to denote start date for the list and a filter of type `status`.\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
->>>>>>> First attempt at adding API request examples
+        "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node ID.\nSupports pagination.\nAccepts a `start` parameter to denote start date for the list and a filter of type `status`.\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
         "operationId": "GetRuns",
         "responses": {
           "200": {
@@ -247,7 +233,7 @@
     },
     "/cfgmgmt/nodes/{node_id}/runs/{run_id}": {
       "get": {
-        "summary": "List Node Run",
+        "summary": "Show Node Run",
         "description": "Returns the infra run report for the provided node ID and run ID.\n\nAuthorization Action:\n```\ninfra:nodes:get\n```",
         "operationId": "GetNodeRun",
         "responses": {
@@ -310,13 +296,8 @@
     },
     "/cfgmgmt/policy_revision/{revision_id}": {
       "get": {
-<<<<<<< HEAD
-        "summary": "GetPolicyCookbooks",
-        "description": "Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.\nPolicy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
-=======
         "summary": "List Policy Cookbooks",
         "description": "Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID. \nPolicy revision IDs are sent with an infra run report and identifies which instance of a policy the node used for this run.\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
->>>>>>> First attempt at adding API request examples
         "operationId": "GetPolicyCookbooks",
         "responses": {
           "200": {
@@ -465,7 +446,7 @@
     "/cfgmgmt/stats/run_counts": {
       "get": {
         "summary": "List Run Status Totals",
-        "description": "Returns totals for failed and successful runs when given a `node_id`.\n\nExample:\n```\ncfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd\u0026start=2019-11-02\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
+        "description": "Returns totals for failed and successful runs given a `node_id`.\n\nExample:\n```\ncfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd\u0026start=2019-11-02\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
         "operationId": "GetRunsCounts",
         "responses": {
           "200": {

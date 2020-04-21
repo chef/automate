@@ -415,7 +415,7 @@ type Query struct {
 	Order   Query_OrderType `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.compliance.reporting.v1.Query_OrderType" json:"order,omitempty"`
 	// Sort the list of results by a field.
 	Sort string `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
-	// The offset for paginating requests. An offset defines a place in the results in order to fetch the next page of the results.
+	// The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results.
 	Page int32 `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
 	// The number of results on each paginated request page.
 	PerPage              int32    `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
@@ -3211,9 +3211,9 @@ type ReportingServiceClient interface {
 	//```
 	ListControlItems(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error)
 	//
-	//Fetch Report by ID
+	//Show Report by ID
 	//
-	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
+	//Show a specific report by ID. Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//
@@ -3281,9 +3281,9 @@ type ReportingServiceClient interface {
 	Export(ctx context.Context, in *Query, opts ...grpc.CallOption) (ReportingService_ExportClient, error)
 	ExportNode(ctx context.Context, in *Query, opts ...grpc.CallOption) (ReportingService_ExportNodeClient, error)
 	//
-	//Fetch Node by ID
+	//Show Node by ID
 	//
-	//Fetch a specific node by ID.
+	//Show a specific node by ID.
 	//Supports filtering by profile or control.
 	//Does not support pagination or sorting.
 	//
@@ -3548,9 +3548,9 @@ type ReportingServiceServer interface {
 	//```
 	ListControlItems(context.Context, *ControlItemRequest) (*ControlItems, error)
 	//
-	//Fetch Report by ID
+	//Show Report by ID
 	//
-	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
+	//Show a specific report by ID. Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//
@@ -3618,9 +3618,9 @@ type ReportingServiceServer interface {
 	Export(*Query, ReportingService_ExportServer) error
 	ExportNode(*Query, ReportingService_ExportNodeServer) error
 	//
-	//Fetch Node by ID
+	//Show Node by ID
 	//
-	//Fetch a specific node by ID.
+	//Show a specific node by ID.
 	//Supports filtering by profile or control.
 	//Does not support pagination or sorting.
 	//

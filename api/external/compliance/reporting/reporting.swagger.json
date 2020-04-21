@@ -41,8 +41,8 @@
     },
     "/compliance/reporting/nodes/id/{id}": {
       "get": {
-        "summary": "Fetch Node by ID",
-        "description": "Fetch a specific node by ID.\nSupports filtering by profile or control.\nDoes not support pagination or sorting.\n\nAuthorization Action:\n```\ncompliance:reportNodes:get\n```",
+        "summary": "Show Node by ID",
+        "description": "Show a specific node by ID.\nSupports filtering by profile or control.\nDoes not support pagination or sorting.\n\nAuthorization Action:\n```\ncompliance:reportNodes:get\n```",
         "operationId": "ReadNode",
         "responses": {
           "200": {
@@ -180,8 +180,8 @@
     },
     "/compliance/reporting/reports/id/{id}": {
       "post": {
-        "summary": "Fetch Report by ID",
-        "description": "Fetch a specific report by ID. Supports filtering, but not pagination or sorting.\nIncluding more than one value for `profile_id`, or `profile_name` is not allowed.\nIncluding values for both `profile_id` and `profile_name` in one request is not allowed.\n\nAuthorization Action:\n```\ncompliance:reports:get\n```",
+        "summary": "Show Report by ID",
+        "description": "Show a specific report by ID. Supports filtering, but not pagination or sorting.\nIncluding more than one value for `profile_id`, or `profile_name` is not allowed.\nIncluding values for both `profile_id` and `profile_name` in one request is not allowed.\n\nAuthorization Action:\n```\ncompliance:reports:get\n```",
         "operationId": "ReadReport",
         "responses": {
           "200": {
@@ -967,7 +967,7 @@
         "page": {
           "type": "integer",
           "format": "int32",
-          "description": "The offset for paginating requests. An offset defines a place in the results in order to fetch the next page of the results."
+          "description": "The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results."
         },
         "per_page": {
           "type": "integer",

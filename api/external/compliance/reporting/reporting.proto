@@ -115,9 +115,9 @@ service ReportingService {
 	};
 
 	/*
-	Fetch Report by ID
+	Show Report by ID
 
-	Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
+	Show a specific report by ID. Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.
 
@@ -232,9 +232,9 @@ service ReportingService {
 	rpc ExportNode(Query) returns (stream chef.automate.api.common.ExportData) {};
 
 	/*
-	Fetch Node by ID
+	Show Node by ID
 
-	Fetch a specific node by ID.
+	Show a specific node by ID.
 	Supports filtering by profile or control.
 	Does not support pagination or sorting.
 
@@ -407,7 +407,7 @@ message Query {
 	OrderType order = 21;
 	// Sort the list of results by a field.
 	string sort = 22;
-	// The offset for paginating requests. An offset defines a place in the results in order to fetch the next page of the results.
+	// The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results.
 	int32 page = 23;
 	// The number of results on each paginated request page.
 	int32 per_page = 24;
