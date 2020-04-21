@@ -4,35 +4,35 @@ package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
 
 message CreateServer {
-    // Chef infra server ID.
+    // Chef Infra Server ID.
     string id = 1;
-    // Chef infra server name.
+    // Chef Infra Server name.
     string name = 2;
-    // Chef infra server FQDN.
+    // Chef Infra Server FQDN.
     string fqdn = 3;
-    // Chef infra server IP address.
+    // Chef infra Server IP address.
     string ip_address = 4;
 }
 
 message UpdateServer {
-    // Chef infra server ID.
+    // Chef Infra Server ID.
     string id = 1;
-    // Chef infra server name.
+    // Chef Infra Server name.
     string name = 2;
-    // Chef infra server FQDN.
+    // Chef Infra Server FQDN.
     string fqdn = 3;
-    // Chef infra server IP address.
+    // Chef Infra Server IP address.
     string ip_address = 4;
 }
 
 message DeleteServer {
-    // Chef infra server ID.
+    // Chef Infra Server ID.
     string id = 1;
 }
 
 message GetServers {}
 
 message GetServer {
-    // Chef infra server ID.
+    // Chef Infra Server ID.
     string id = 1;
 }

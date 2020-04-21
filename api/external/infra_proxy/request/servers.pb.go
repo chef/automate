@@ -21,13 +21,13 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type CreateServer struct {
-	// Chef infra server ID.
+	// Chef Infra Server ID.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Chef infra server name.
+	// Chef Infra Server name.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Chef infra server FQDN.
+	// Chef Infra Server FQDN.
 	Fqdn string `protobuf:"bytes,3,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
-	// Chef infra server IP address.
+	// Chef infra Server IP address.
 	IpAddress            string   `protobuf:"bytes,4,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -88,13 +88,13 @@ func (m *CreateServer) GetIpAddress() string {
 }
 
 type UpdateServer struct {
-	// Chef infra server ID.
+	// Chef Infra Server ID.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Chef infra server name.
+	// Chef Infra Server name.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Chef infra server FQDN.
+	// Chef Infra Server FQDN.
 	Fqdn string `protobuf:"bytes,3,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
-	// Chef infra server IP address.
+	// Chef Infra Server IP address.
 	IpAddress            string   `protobuf:"bytes,4,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -155,7 +155,7 @@ func (m *UpdateServer) GetIpAddress() string {
 }
 
 type DeleteServer struct {
-	// Chef infra server ID.
+	// Chef Infra Server ID.
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -226,7 +226,7 @@ func (m *GetServers) XXX_DiscardUnknown() {
 var xxx_messageInfo_GetServers proto.InternalMessageInfo
 
 type GetServer struct {
-	// Chef infra server ID.
+	// Chef Infra Server ID.
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

@@ -21,7 +21,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type CreateServer struct {
-	// Chef infra server.
+	// Chef Infra Server.
 	Server               *Server  `protobuf:"bytes,1,opt,name=server,proto3" json:"server,omitempty" toml:"server,omitempty" mapstructure:"server,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -61,7 +61,7 @@ func (m *CreateServer) GetServer() *Server {
 }
 
 type DeleteServer struct {
-	// Chef infra server.
+	// Chef Infra Server.
 	Server               *Server  `protobuf:"bytes,1,opt,name=server,proto3" json:"server,omitempty" toml:"server,omitempty" mapstructure:"server,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -101,7 +101,7 @@ func (m *DeleteServer) GetServer() *Server {
 }
 
 type UpdateServer struct {
-	// Chef infra server.
+	// Chef Infra Server.
 	Server               *Server  `protobuf:"bytes,1,opt,name=server,proto3" json:"server,omitempty" toml:"server,omitempty" mapstructure:"server,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -141,7 +141,7 @@ func (m *UpdateServer) GetServer() *Server {
 }
 
 type GetServers struct {
-	// Chef infra servers.
+	// Chef Infra Servers.
 	Servers              []*Server `protobuf:"bytes,1,rep,name=servers,proto3" json:"servers,omitempty" toml:"servers,omitempty" mapstructure:"servers,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte    `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -181,7 +181,7 @@ func (m *GetServers) GetServers() []*Server {
 }
 
 type GetServer struct {
-	// Chef infra server.
+	// Chef Infra Server.
 	Server               *Server  `protobuf:"bytes,1,opt,name=server,proto3" json:"server,omitempty" toml:"server,omitempty" mapstructure:"server,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -221,15 +221,15 @@ func (m *GetServer) GetServer() *Server {
 }
 
 type Server struct {
-	// Chef infra server ID.
+	// Chef Infra Server ID.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
-	// Chef infra server name.
+	// Chef Infra Server name.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
-	// Chef infra server FQDN.
+	// Chef Infra Server FQDN.
 	Fqdn string `protobuf:"bytes,4,opt,name=fqdn,proto3" json:"fqdn,omitempty" toml:"fqdn,omitempty" mapstructure:"fqdn,omitempty"`
-	// Chef infra server IP address.
+	// Chef Infra Server IP address.
 	IpAddress string `protobuf:"bytes,5,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty" toml:"ip_address,omitempty" mapstructure:"ip_address,omitempty"`
-	// Chef organizations count associated with chef infra server.
+	// Chef organizations count associated with Chef Infra Server.
 	OrgsCount            int32    `protobuf:"varint,6,opt,name=orgs_count,json=orgsCount,proto3" json:"orgs_count,omitempty" toml:"orgs_count,omitempty" mapstructure:"orgs_count,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`

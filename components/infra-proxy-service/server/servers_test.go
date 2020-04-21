@@ -325,15 +325,16 @@ func TestServers(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
-				Name:        "chef-infra-server1",
-				Description: "Chef infra server",
-				Fqdn:        "domain1.com",
-				IpAddress:   "10.0.0.1",
+				Id:        "chef-infra-server1",
+				Name:      "Chef infra server",
+				Fqdn:      "domain1.com",
+				IpAddress: "10.0.0.1",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
 
 			respOrg, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				Id:        "infra-org-id",
 				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
@@ -357,7 +358,7 @@ func TestServers(t *testing.T) {
 			require.NoError(t, err3)
 			assert.Equal(t, len(serverListBefore.Servers), len(serverListAfter.Servers))
 
-			cleanupOrg(ctx, t, cl, respOrg.Org.Id)
+			cleanupOrg(ctx, t, cl, respOrg.Org.Id, respOrg.Org.ServerId)
 			cleanupServer(ctx, t, cl, resp1.Server.Id)
 		})
 
