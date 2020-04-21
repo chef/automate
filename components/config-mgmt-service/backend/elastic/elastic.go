@@ -7,11 +7,13 @@ package elastic
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	elastic "gopkg.in/olivere/elastic.v6"
 
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
@@ -315,4 +317,19 @@ func EmptyStringIfNil(attribute interface{}) string {
 		return v
 	} // captures the nil case, too
 	return ""
+}
+
+func LogQueryPartMin(indices string, partToPrint interface{}, name string) {
+	part, err := json.Marshal(partToPrint)
+	if err != nil {
+		log.Errorf("%s", err)
+	}
+	stringPart := string(part)
+	if stringPart == "null" {
+		stringPart = ""
+	} else {
+		stringPart = "\n" + stringPart
+	}
+	log.Debugf("\n------------------ %s-(start)--[%s]---------------%s \n------------------ %s-(end)-----------------------------------\n",
+		name, indices, stringPart, name)
 }

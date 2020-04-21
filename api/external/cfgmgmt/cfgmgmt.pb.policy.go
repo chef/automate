@@ -136,4 +136,19 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetErrors", "infra:nodes", "infra:nodes:list", "GET", "/cfgmgmt/errors", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetNodeMetadataCounts", "infra:nodes", "infra:nodes:list", "GET", "/cfgmgmt/node_metadata_counts", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.NodeMetadataCounts); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "start":
+					return m.Start
+				case "end":
+					return m.End
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }

@@ -128,3 +128,17 @@ message CountedDuration {
   string duration = 1;
   int32 count = 2;
 }
+
+message NodeMetadataCounts {
+  repeated TypeCount types = 1;
+}
+
+message TypeCount {
+	repeated ValueCount values = 1;
+	string type = 2;
+}
+
+message ValueCount {
+	string value = 1;
+	int32 count = 2;
+}

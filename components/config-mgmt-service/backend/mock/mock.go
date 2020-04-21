@@ -198,3 +198,8 @@ func (m Backend) GetErrors(int32, map[string][]string) ([]*backend.ChefErrorCoun
 func (m Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
 	return nil, nil
 }
+
+func (m Backend) GetNodeMetadataCounts(filters map[string][]string, types []string, startDate,
+	endDate string) ([]backend.TypeCount, error) {
+	return nil, nil
+}

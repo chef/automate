@@ -316,4 +316,71 @@ service ConfigMgmt {
   rpc NodeExport(cfgmgmt.request.NodeExport) returns (stream chef.automate.api.common.ExportData) {};
 
   rpc ReportExport(cfgmgmt.request.ReportExport) returns (stream chef.automate.api.common.ExportData) {};
+
+  /*
+  GetNodeMetadataCounts
+
+  For each type of field requested this returns distinct values the amount of each. For example, 
+  if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8 could be returned. 
+  The number next to each represents the number of nodes with that type of platform.
+
+  Example:
+  request
+  ```
+  cfgmgmt/node_metadata_counts?type=platform&type=status
+  ```
+  response
+  ```
+  {
+    "types": [
+      {
+        "values": [
+          {
+            "value": "mac_os_x 10.11.5",
+            "count": 28
+          },
+          {
+            "value": "linux 8.9",
+            "count": 1
+          },
+          {
+            "value": "macos 8.9",
+            "count": 1
+          },
+          {
+            "value": "windows 8.9",
+            "count": 1
+          }
+        ],
+        "type": "platform"
+      },
+      {
+        "value": [
+          {
+            "value": "missing",
+            "count": 29
+          },
+          {
+            "value": "failure",
+            "count": 2
+          }
+        ],
+        "type": "status"
+      }
+    ]
+  }
+  ```
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc GetNodeMetadataCounts(cfgmgmt.request.NodeMetadataCounts) returns (cfgmgmt.response.NodeMetadataCounts) {
+    option (google.api.http).get = "/cfgmgmt/node_metadata_counts";
+    option (chef.automate.api.policy).resource = "cfgmgmt:nodes";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  }
 }
