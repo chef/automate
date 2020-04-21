@@ -262,6 +262,11 @@ func (p *postgres) RemoveUsers(ctx context.Context, id string, userIDs []string)
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
 		return nil, p.processError(err)
@@ -270,7 +275,7 @@ func (p *postgres) RemoveUsers(ctx context.Context, id string, userIDs []string)
 	var dbID int
 	var teamProjects []string
 	// ensure the team exists and isn't filtered out by the project filter
-	err = p.db.QueryRowContext(ctx,
+	err = tx.QueryRowContext(ctx,
 		`SELECT db_id, projects FROM teams
 		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
 		id, pq.Array(projectsFilter)).
@@ -279,7 +284,7 @@ func (p *postgres) RemoveUsers(ctx context.Context, id string, userIDs []string)
 		return nil, p.processError(err)
 	}
 
-	_, err = p.db.ExecContext(ctx,
+	_, err = tx.ExecContext(ctx,
 		`DELETE FROM teams_users_associations
 		WHERE user_id = ANY($1) AND team_db_id=$2`,
 		pq.Array(userIDs), dbID)
@@ -287,6 +292,13 @@ func (p *postgres) RemoveUsers(ctx context.Context, id string, userIDs []string)
 		return []string{}, p.processError(err)
 	}
 
+	err = tx.Commit()
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	// now that the transaction is complete and the team's users are updated,
+	// we return the updated list
 	row := p.db.QueryRowContext(ctx,
 		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=$1`,
 		dbID)
@@ -412,6 +424,8 @@ func (p *postgres) AddUsers(ctx context.Context,
 		return nil, p.processError(err)
 	}
 
+	// now that the transaction is complete and the team's users are updated,
+	// we return the updated list
 	row := p.db.QueryRowContext(ctx,
 		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=team_db_id($1)`,
 		id)
