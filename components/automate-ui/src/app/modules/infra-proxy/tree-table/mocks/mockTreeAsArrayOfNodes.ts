@@ -1,7 +1,7 @@
 import { Node } from '../models';
-import { ChildLists } from './models';
+import { ChildList } from './models';
 
-export const mockTreeAsArrayOfNodes: Node<ChildLists>[] = [
+export const mockTreeAsArrayOfNodes: Node<ChildList>[] = [
   {
     value: {
       name: 'run_list1',

@@ -28,7 +28,7 @@ export class JsonTreeTableComponent implements OnChanges {
     }
   }
 
-  search(term): number {
+  search(term: string): number {
     let resultCount = 0;
     this.reset();
 
@@ -94,7 +94,7 @@ export class JsonTreeTableComponent implements OnChanges {
       }
     }
 
-    function dequote(s) {
+    function dequote(s: string) {
       return s.replace(/"/g, '');
     }
   }

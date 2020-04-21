@@ -3,7 +3,7 @@ import { TreeTableComponent } from './tree-table.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { mockSearchableTree } from '../mocks/mockSearchableTree';
-import * as _ from 'lodash';
+import * as _ from 'lodash/fp';
 
 describe('TreeTableComponent', () => {
   let component: TreeTableComponent<any>;

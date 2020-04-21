@@ -2,6 +2,7 @@ import { merge } from 'lodash';
 
 export interface InfraRole {
   name: string;
+  environments: string[];
   chef_type: string;
   description: string;
   json_class: string;

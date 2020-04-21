@@ -1,7 +1,7 @@
 import { Node } from '../models';
-import { ChildLists } from './models';
+import { ChildList } from './models';
 
-export const mockTree: Node<ChildLists> = {
+export const mockTree: Node<ChildList> = {
   value: {
     name: 'run_list1',
     version: '0.1',

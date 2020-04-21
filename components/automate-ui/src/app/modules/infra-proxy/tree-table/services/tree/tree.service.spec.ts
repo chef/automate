@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { TreeService } from './tree.service';
 import * as _ from 'lodash';
 import { mockSearchableTree } from '../../mocks/mockSearchableTree';
-import { ChildLists } from '../../mocks/models';
+import { ChildList } from '../../mocks/models';
 import { some, none } from 'fp-ts/lib/Option';
 import { SearchableNode } from '../../models';
 
@@ -14,7 +14,7 @@ describe('TreeService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should search for a node in a tree and return it warapped in Option<> if present', () => {
+  it('should search for a node in a tree and return it wrapped in Option<> if present', () => {
     const service: TreeService = TestBed.inject(TreeService);
     const tree = _.cloneDeep(mockSearchableTree);
     const expectedNode = tree.children[0];
@@ -64,7 +64,7 @@ describe('TreeService', () => {
   it('should return a depth of -1 when the node is not in the tree', () => {
     const service: TreeService = TestBed.inject(TreeService);
     const tree = _.cloneDeep(mockSearchableTree);
-    const node: SearchableNode<ChildLists> = {
+    const node: SearchableNode<ChildList> = {
       id: '0000',
       value: {
         name: 'name',
