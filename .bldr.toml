@@ -1538,6 +1538,7 @@ paths = [
 plan_path = "components/local-user-service"
 paths = [
   "components/local-user-service/*",
+  "api/external/common/*",
   "api/interservice/authz/*",
   "api/interservice/local_user/*",
   "api/interservice/teams/*",
@@ -1743,13 +1744,11 @@ paths = [
   "lib/stringutils/*",
   "lib/tls/*",
   "lib/tracing/*",
-  "lib/uuid4/*",
   "lib/version/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/codahale/hdrhistogram/*",
   "vendor/github.com/envoyproxy/protoc-gen-validate/*",
   "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/gofrs/uuid/*",
   "vendor/github.com/golang-migrate/migrate/*",
   "vendor/github.com/golang/mock/*",
   "vendor/github.com/golang/protobuf/*",

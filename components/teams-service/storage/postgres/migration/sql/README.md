@@ -10,3 +10,4 @@
 - [`08_update_admin_team_name.up.sql`](08_update_admin_team_name.up.sql)
 - [`09_drop_all_projects.up.sql`](09_drop_all_projects.up.sql)
 - [`10_upgrade_to_v2_migrations.up.sql`](10_upgrade_to_v2_migrations.up.sql)
+- [`11_convert_table_to_v2.up.sql`](11_convert_table_to_v2.up.sql)
