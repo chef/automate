@@ -15,7 +15,7 @@ pkg_deps=(
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # We need to pin here to get a build from unstable
-  "habitat/builder-api-proxy/8796/20200309134228"
+  "habitat/builder-api-proxy/8856/20200414195845"
 )
 
 pkg_build_deps=(
