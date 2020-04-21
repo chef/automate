@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { cloneDeep } from 'lodash/fp';
+import { cloneDeep, isEqual } from 'lodash/fp';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 
@@ -32,8 +32,8 @@ export class ProjectsFilterDropdownComponent {
   // Filtered options is merely a copy of the editable options
   // so they can be filtered while maintaining the actual options.
   filteredOptions: ProjectsFilterOption[] = [];
-  // InitialFilters holds a copy of the initial state of filtered Options
-  initialFilters: ProjectsFilterOption[] = [];
+  // InitialFilters holds a boolean copy of the initial checked/unchecked state of filtered Options
+  initialFilters: boolean[] = [];
 
   optionsEdited = false;
 
@@ -44,7 +44,7 @@ export class ProjectsFilterDropdownComponent {
       this.filteredOptions = this.editableOptions = cloneDeep(this.options);
       // Keep a reference to the filteredOptions in initialFilters
       // to check deep equality when a user unchecks/checks same button
-      this.initialFilters = cloneDeep(this.filteredOptions);
+      this.initialFilters = this.filteredOptions.map(option => option.checked);
     }
   }
 
@@ -117,11 +117,13 @@ export class ProjectsFilterDropdownComponent {
     }
   }
 
-  checkInitialEquality(): void {
-    // Check for deep equality against new changes, disabling
+  checkInitialEquality() {
+    // Check for equality against new changes, disabling
     // apply button if changes are not new
-    JSON.stringify(this.initialFilters) === JSON.stringify(this.editableOptions)
-      ? this.optionsEdited = false
-      : this.optionsEdited = true;
+
+    // create a copy of checked/unchecked in most recently edited options
+    const currentEdits: boolean[] = this.editableOptions.map(option => option.checked);
+
+    this.optionsEdited = !isEqual(this.initialFilters, currentEdits);
   }
 }
