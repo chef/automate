@@ -105,6 +105,11 @@ function channel_contains_commit() {
     else
         echo -e '   current: \033[0;91m✗\033[0m'
     fi
+
+    oldest_tag=$(git tag --contains "$commit" | grep -P '\d{14}' | head -1)
+    if [ "$oldest_tag" != "" ]; then
+        echo "Oldest tag containing commit: $oldest_tag"
+    fi
 }
 
 document "get_release_diff_url" <<DOC
