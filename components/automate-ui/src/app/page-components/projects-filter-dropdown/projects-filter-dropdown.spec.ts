@@ -283,6 +283,12 @@ describe('ProjectsFilterDropdownComponent', () => {
       component.handleOptionChange({ detail: true }, 'Project 1');
       expect(component.optionsEdited).toEqual(true);
     });
+
+    it('checks for equality against the initial filters applied', () => {
+      spyOn(component, 'checkInitialEquality');
+      component.handleOptionChange({ detail: true }, 'Project 1');
+      expect(component.checkInitialEquality).toHaveBeenCalled();
+    });
   });
 
   describe('handleApplySelection()', () => {
@@ -359,6 +365,12 @@ describe('ProjectsFilterDropdownComponent', () => {
     it('clears all checked options with no filter applied', () => {
       component.handleClearSelection();
       expect(component.editableOptions.some(o => o.checked)).toEqual(false);
+    });
+
+    it('checks for equality against the initial filters applied', () => {
+      spyOn(component, 'checkInitialEquality');
+      component.handleClearSelection();
+      expect(component.checkInitialEquality).toHaveBeenCalled();
     });
 
     using([
