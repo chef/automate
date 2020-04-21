@@ -406,7 +406,7 @@ func testGetTeam(ctx context.Context, t *testing.T, s storage.Storage) {
 	assert.WithinDuration(t, team.CreatedAt, getTeam.CreatedAt, 50*time.Millisecond)
 	assert.Equal(t, team.Name, getTeam.Name)
 	assert.Equal(t, team.ID, getTeam.ID)
-	assert.Equal(t, addUserIDs, getTeamUserIDs)
+	assert.ElementsMatch(t, userIDs, getTeamUserIDs)
 }
 
 func testGetTeamNotFound(ctx context.Context, t *testing.T, s storage.Storage) {

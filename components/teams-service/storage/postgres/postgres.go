@@ -181,7 +181,7 @@ func (p *postgres) EditTeam(ctx context.Context,
 	err = tx.QueryRowContext(ctx,
 		`SELECT projects FROM teams
 		WHERE id = $1 AND projects_match(projects, $2::TEXT[])
-		FOR UPDATE;`,
+		FOR UPDATE`,
 		id, pq.Array(projectsFilter)).
 		Scan(pq.Array(&oldProjects))
 	if err != nil {
@@ -198,7 +198,7 @@ func (p *postgres) EditTeam(ctx context.Context,
 		`UPDATE teams t
 		SET name = $2, projects = $3, updated_at = now()
 		WHERE t.id = $1 AND projects_match(t.projects, $4::TEXT[])
-		RETURNING id, name, projects, created_at, updated_at;`,
+		RETURNING id, name, projects, created_at, updated_at`,
 		id, name, pq.Array(updatedProjects), pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
@@ -384,7 +384,7 @@ func (p *postgres) AddUsers(ctx context.Context,
 		`SELECT db_id, projects FROM teams
 		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
 		id, pq.Array(projectsFilter)).
-		Scan(&dbID, pq.Array(&teamProjects))
+		Scan(&dbID, pq.Array(&teamProjects)) // TODO is there a way to get these projects without returning them?
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -395,16 +395,14 @@ func (p *postgres) AddUsers(ctx context.Context,
 	 			FROM teams
 				WHERE db_id=$1
 				ON CONFLICT ON CONSTRAINT teams_users_pkey
-				DO NOTHING;
+				DO NOTHING
 				`, dbID, pq.Array(userIDs))
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
-	row := tx.QueryRowContext(ctx, `UPDATE teams SET updated_at=NOW()
-	WHERE db_id=$1
-	RETURNING db_id`, dbID)
-	err = row.Scan(&dbID)
+	_, err = tx.ExecContext(ctx, `UPDATE teams SET updated_at=NOW()
+	WHERE db_id=$1`, dbID)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -414,7 +412,7 @@ func (p *postgres) AddUsers(ctx context.Context,
 		return nil, p.processError(err)
 	}
 
-	row = p.db.QueryRowContext(ctx,
+	row := p.db.QueryRowContext(ctx,
 		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=team_db_id($1)`,
 		id)
 	err = row.Scan(pq.Array(&updatedUserIDs))
@@ -423,7 +421,6 @@ func (p *postgres) AddUsers(ctx context.Context,
 	}
 
 	return updatedUserIDs, nil
-
 }
 
 // GetUserIDsForTeam returns the user IDs for all members of the team.
@@ -439,18 +436,19 @@ func (p *postgres) GetUserIDsForTeam(ctx context.Context, id string) ([]string, 
 		return nil, p.processError(err)
 	}
 
-	var userIDs []string
 	var dbID int
-
+	var teamProjects []string
+	// ensure the team exists and isn't filtered out by the project filter
 	err = p.db.QueryRowContext(ctx,
-		`SELECT db_id FROM teams
+		`SELECT db_id, projects FROM teams
 		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
 		id, pq.Array(projectsFilter)).
-		Scan(&dbID)
+		Scan(&dbID, pq.Array(&teamProjects)) // TODO is there a way to get these projects without returning them?
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
+	var userIDs []string
 	row := p.db.QueryRowContext(ctx,
 		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=$1`, dbID)
 	err = row.Scan(pq.Array(&userIDs))
