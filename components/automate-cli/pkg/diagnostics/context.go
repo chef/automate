@@ -199,7 +199,7 @@ func (c *testContext) DoLBRequest(path string, opts ...lbrequest.Opts) (*http.Re
 			continue
 		}
 		if resp.StatusCode >= 500 || resp.StatusCode == 403 {
-			lastErr = errors.Errorf("Got 5xx. %d %s: %s", resp.StatusCode, resp.Status, path)
+			lastErr = errors.Errorf("Got status: %d %s: %s", resp.StatusCode, resp.Status, path)
 			resp.Body.Close() // nolint: errcheck
 			continue
 		}
