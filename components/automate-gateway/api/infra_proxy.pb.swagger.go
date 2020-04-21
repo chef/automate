@@ -68,7 +68,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Chef infra server ID.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -91,7 +91,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Chef infra server ID.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -114,7 +114,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Chef infra server ID.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -984,19 +984,19 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Chef infra server ID."
+          "description": "Chef Infra Server ID."
         },
         "name": {
           "type": "string",
-          "description": "Chef infra server name."
+          "description": "Chef Infra Server name."
         },
         "fqdn": {
           "type": "string",
-          "description": "Chef infra server FQDN."
+          "description": "Chef Infra Server FQDN."
         },
         "ip_address": {
           "type": "string",
-          "description": "Chef infra server IP address."
+          "description": "Chef infra Server IP address."
         }
       }
     },
@@ -1037,19 +1037,19 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Chef infra server ID."
+          "description": "Chef Infra Server ID."
         },
         "name": {
           "type": "string",
-          "description": "Chef infra server name."
+          "description": "Chef Infra Server name."
         },
         "fqdn": {
           "type": "string",
-          "description": "Chef infra server FQDN."
+          "description": "Chef Infra Server FQDN."
         },
         "ip_address": {
           "type": "string",
-          "description": "Chef infra server IP address."
+          "description": "Chef Infra Server IP address."
         }
       }
     },
@@ -1380,7 +1380,7 @@ func init() {
       "properties": {
         "server": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
-          "description": "Chef infra server."
+          "description": "Chef Infra Server."
         }
       }
     },
@@ -1428,7 +1428,7 @@ func init() {
       "properties": {
         "server": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
-          "description": "Chef infra server."
+          "description": "Chef Infra Server."
         }
       }
     },
@@ -1531,7 +1531,7 @@ func init() {
       "properties": {
         "server": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
-          "description": "Chef infra server."
+          "description": "Chef Infra Server."
         }
       }
     },
@@ -1543,7 +1543,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
           },
-          "description": "Chef infra servers."
+          "description": "Chef Infra Servers."
         }
       }
     },
@@ -1898,24 +1898,24 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Chef infra server ID."
+          "description": "Chef Infra Server ID."
         },
         "name": {
           "type": "string",
-          "description": "Chef infra server name."
+          "description": "Chef Infra Server name."
         },
         "fqdn": {
           "type": "string",
-          "description": "Chef infra server FQDN."
+          "description": "Chef Infra Server FQDN."
         },
         "ip_address": {
           "type": "string",
-          "description": "Chef infra server IP address."
+          "description": "Chef Infra Server IP address."
         },
         "orgs_count": {
           "type": "integer",
           "format": "int32",
-          "description": "Chef organizations count associated with chef infra server."
+          "description": "Chef organizations count associated with Chef Infra Server."
         }
       }
     },
@@ -1942,7 +1942,7 @@ func init() {
       "properties": {
         "server": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
-          "description": "Chef infra server."
+          "description": "Chef Infra Server."
         }
       }
     }
