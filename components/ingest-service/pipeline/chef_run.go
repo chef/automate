@@ -5,6 +5,8 @@ import (
 
 	"context"
 
+	log "github.com/sirupsen/logrus"
+
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/ingest-service/backend"
@@ -12,7 +14,6 @@ import (
 	"github.com/chef/automate/components/ingest-service/pipeline/processor"
 	"github.com/chef/automate/components/ingest-service/pipeline/publisher"
 	"github.com/chef/automate/components/ingest-service/serveropts"
-	log "github.com/sirupsen/logrus"
 )
 
 // ChefRunPipeline pipeline to process Chef client runs

@@ -1,11 +1,12 @@
 package processor
 
 import (
+	log "github.com/sirupsen/logrus"
+
 	chef "github.com/chef/automate/api/external/ingest/request"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/chef/automate/lib/stringutils"
-	log "github.com/sirupsen/logrus"
 )
 
 // BuildActionProjectTagger - Build a project tagger for Chef Actions
@@ -20,20 +21,33 @@ func BuildActionProjectTagger(authzClient iam_v2.ProjectsClient) message.ChefAct
 // it works is when a message comes in, we make a call to the authz-service for the rules. We use
 // these rules for all the messages that are currently in the queue. The 'bundleSize' is the number
 // of messages that can use the current project rules from authz.
+//
+// If our call to authz fails, we return an error for a portion of the existing queue before retrying.
 func actionBundleProjectTagger(in <-chan message.ChefAction,
 	authzClient iam_v2.ProjectsClient) <-chan message.ChefAction {
 	out := make(chan message.ChefAction, 100)
 	go func() {
 		bundleSize := 0
+		dropper := &msgDropper{}
 		var projectRulesCollection map[string]*iam_v2.ProjectRules
+		var err error
 		for msg := range in {
+			if dropper.MaybeDrop(&msg) {
+				continue
+			}
 			if bundleSize <= 0 {
 				bundleSize = len(in)
 				log.WithFields(log.Fields{
 					"message_id": msg.ID,
 					"bundleSize": bundleSize,
 				}).Debug("BundleProjectTagging - Update Project rules")
-				projectRulesCollection = getProjectRulesFromAuthz(msg.Ctx, authzClient)
+				projectRulesCollection, err = getProjectRulesFromAuthz(msg.Ctx, authzClient)
+				if err != nil {
+					dropper.QueueError(err, bundleSize)
+					log.WithError(err).Errorf("failed to list project rules, dropping %d messages", bundleSize+1)
+					msg.FinishProcessing(err)
+					bundleSize = 0
+				}
 			} else {
 				// Skip
 				bundleSize--

@@ -40,6 +40,8 @@ func NewChefRun(ctx context.Context, run *chef.Run, err chan<- error) ChefRun {
 	}
 }
 
+func (chefRun *ChefRun) MessageID() uuid.UUID { return chefRun.ID }
+
 func (chefRun *ChefRun) FinishProcessing(err error) {
 	chefRun.errc <- err
 

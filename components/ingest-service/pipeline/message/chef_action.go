@@ -36,7 +36,9 @@ func NewChefAction(ctx context.Context, action *chef.Action, err chan<- error) C
 	}
 }
 
-func (chefAction ChefAction) FinishProcessing(err error) {
+func (chefAction *ChefAction) MessageID() uuid.UUID { return chefAction.ID }
+
+func (chefAction *ChefAction) FinishProcessing(err error) {
 	chefAction.errc <- err
 
 	if err == nil {
