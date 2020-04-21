@@ -171,7 +171,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 			loaded := generatedV2PolicyData{}
 			err = tstCtx.GetValue("iam-policies-v2", &loaded)
 			if err != nil {
-				return errors.Errorf(err.Error(), "could not find generated context")
+				return errors.Wrap(err, "could not find generated context")
 			}
 
 			tstCtx.SetValue("iam-policies-v2", generatedV2PolicyData{
@@ -198,14 +198,14 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				err = MustJSONDecodeSuccess(
 					tstCtx.DoLBRequest(
 						fmt.Sprintf("/apis/iam/v2/policies/%s", v1loaded.PolicyID),
-					)).Error()
+					)).WithValue(&struct{}{})
 				require.NoError(tstCtx, err, "Expected to be able to read gateway version")
 
 				err = MustJSONDecodeSuccess(
 					tstCtx.DoLBRequest(
 						"/api/v0/gateway/version",
 						lbrequest.WithAuthToken(v1loaded.TokenValue),
-					)).Error()
+					)).WithValue(&struct{}{})
 				require.NoError(tstCtx, err, "Expected to be able to read gateway version")
 			}
 
@@ -226,7 +226,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				tstCtx.DoLBRequest(
 					"/api/v0/gateway/version",
 					lbrequest.WithAuthToken(v2loaded.TokenValue),
-				)).Error()
+				)).WithValue(&struct{}{})
 			require.NoError(tstCtx, err, "Expected to be able to read gateway version")
 
 			type Statement struct {

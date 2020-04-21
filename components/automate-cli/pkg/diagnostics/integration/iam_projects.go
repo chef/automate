@@ -189,7 +189,7 @@ func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 			loaded := generatedProjectData{}
 			err = tstCtx.GetValue("iam-projects", &loaded)
 			if err != nil {
-				return errors.Errorf(err.Error(), "could not find generated context")
+				return errors.Wrap(err, "could not find generated context")
 			}
 
 			tstCtx.SetValue("iam-projects", &generatedProjectData{
