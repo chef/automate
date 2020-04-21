@@ -45,6 +45,8 @@ type config struct {
 	DataMigrationsPath string `mapstructure:"data-migrations-path"`
 	CerealAddress      string `mapstructure:"cereal-address"`
 	ProjectLimit       int    `mapstructure:"project-limit"`
+	MaxIdleConnections int    `mapstructure:"max_idle_connections"`
+	MaxConnections     int    `mapstructure:"max_connections"`
 }
 
 func serve(_ *cobra.Command, args []string) {
@@ -101,9 +103,11 @@ Please pass a config file as the only argument to this command.`))
 		fail(errors.Wrap(err, msg))
 	}
 	migrationConfig := migration.Config{
-		Path:   cfg.MigrationsPath,
-		PGURL:  u,
-		Logger: l,
+		Path:               cfg.MigrationsPath,
+		PGURL:              u,
+		Logger:             l,
+		MaxConnections:     cfg.MaxConnections,
+		MaxIdleConnections: cfg.MaxIdleConnections,
 	}
 
 	// NOTE (TC): These are IAM V2 specific data migrations.

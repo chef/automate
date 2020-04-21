@@ -188,7 +188,11 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 	require.NoError(t, err, "error creating extension")
 
-	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig), projectLimit)
+	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config{
+		PGURL:  dataMigrationConfig.PGURL,
+		Path:   dataMigrationConfig.Path,
+		Logger: dataMigrationConfig.Logger,
+	}, projectLimit)
 	require.NoError(t, err)
 	testDB := &TestDB{
 		DB:      db,

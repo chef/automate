@@ -28,3 +28,14 @@ func TestSetGlobalConfig(t *testing.T) {
 		},
 	)
 }
+
+func TestMaxConnectors(t *testing.T) {
+	t.Run("it configures the max connectors for postgres",
+		func(t *testing.T) {
+			c := NewConfigRequest()
+			c.V1.Sys.Storage.MaxConnections = w.Int32(5)
+
+			assert.Equal(t, int32(5), c.V1.Sys.Storage.MaxConnections.Value)
+		},
+	)
+}
