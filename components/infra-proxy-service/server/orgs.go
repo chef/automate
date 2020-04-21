@@ -177,7 +177,7 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		}
 	}
 
-	org, err := s.service.Storage.EditOrg(ctx, req.Id, req.Name, req.AdminKey, oldOrg.AdminKey, req.ServerId, req.Projects)
+	org, err := s.service.Storage.EditOrg(ctx, req.Id, req.Name, req.AdminUser, req.ServerId, req.Projects)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req, "org")
 	}
@@ -205,7 +205,7 @@ func fromStorageToListOrgs(sl []storage.Org) []*response.OrgListItem {
 
 	for i, org := range sl {
 		tl[i] = &response.OrgListItem{
-			Id:        org.ID.String(),
+			Id:        org.ID,
 			Name:      org.Name,
 			AdminUser: org.AdminUser,
 			ServerId:  org.ServerID,

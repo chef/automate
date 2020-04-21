@@ -41,7 +41,7 @@ func (p *postgres) insertOrg(ctx context.Context,
 		VALUES ($1, $2, $3, $4, $5, $6, now(), now())
 		RETURNING id, name, admin_user, credential_id, server_id, projects, created_at, updated_at`,
 		id, name, adminUser, credentialID, serverID, pq.Array(projects)).
-		Scan(&org.ID, &org.Name, &org.AdminUser, &org.credentialID, &org.ServerID, pq.Array(&org.Projects), &org.CreatedAt, &org.UpdatedAt)
+		Scan(&org.ID, &org.Name, &org.AdminUser, &org.CredentialID, &org.ServerID, pq.Array(&org.Projects), &org.CreatedAt, &org.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
 	}
@@ -87,7 +87,7 @@ func (p *postgres) DeleteOrg(ctx context.Context, orgID string, serverID string)
 }
 
 // EditOrg does a full update on a database org.
-func (p *postgres) EditOrg(ctx context.Context, id string, name string, adminUser string, adminKey string, serverID string, projects []string) (storage.Org, error) {
+func (p *postgres) EditOrg(ctx context.Context, id string, name string, adminUser string, serverID string, projects []string) (storage.Org, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
