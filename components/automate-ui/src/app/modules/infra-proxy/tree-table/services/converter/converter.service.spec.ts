@@ -23,7 +23,7 @@ describe('ConverterService', () => {
   it('should convert a searchable tree into a treetable tree', () => {
     const service: ConverterService = TestBed.inject(ConverterService);
     expect(instanceOfSearchableNode(mockSearchableTree)).toBe(true);
-    expect(instanceOfTreeTableNodee(mockSearchableTree)).toBe(false);
+    expect(instanceOfTreeTableNode(mockSearchableTree)).toBe(false);
     expect(instanceOfSearchableNode(service.toTreeTableTree(mockSearchableTree))).toBe(true);
   });
 
@@ -47,6 +47,6 @@ export function instanceOfSearchableNode<T>(object: any): object is SearchableNo
   return 'id' in object;
 }
 
-export function instanceOfTreeTableNodee<T>(object: any): object is TreeTableNode<T> {
+export function instanceOfTreeTableNode<T>(object: any): object is TreeTableNode<T> {
   return 'depth' in object && 'isVisible' in object && 'isExpanded' in object;
 }

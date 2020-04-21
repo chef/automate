@@ -20,7 +20,7 @@ class MockAttributesService {
   fetch() {
     return Promise.resolve(
       new RoleAttributes({
-        default_attributes: '{\"my-cookbook\": {\"port\": 80, \"code\": {\"location\": \"github\"}}}',
+        default_attributes: '{"my-cookbook": {"port": 80, "code": {"location": "github"}}}',
         override_attributes: '{}'
       })
     );

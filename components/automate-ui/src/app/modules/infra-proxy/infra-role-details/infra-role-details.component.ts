@@ -108,6 +108,8 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       this.idList = [];
       this.attributes = new RoleAttributes(this.role);
       this.getRunListTree(this.expandedList);
+
+      // Settimeout - In the case of passing large attribute data sets
       setTimeout(() => this.filter(this.selected_level), 10);
       this.roleDetailsLoading = false;
     });
@@ -137,7 +139,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectChangeHandler(id): void {
+  selectChangeHandler(id: string): void {
     this.env_id = id;
     this.treeNodes(this.expandedList, this.env_id);
   }
