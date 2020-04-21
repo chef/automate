@@ -1,0 +1,10 @@
+<div class="chart-progress-bar" [ngStyle]="styles.container">
+    <div class="threshold point-1" [ngStyle]="styles.threshold.point1"></div>
+    <div class="threshold point-2" [ngStyle]="styles.threshold.point2"></div>
+    
+    <div id="progress" class="progress" [ngStyle]="styles.progress"></div>
+    <chef-tooltip for="progress">{{ tooltips.value }}</chef-tooltip>
+
+    <div id="bar" class="bar" [ngStyle]="styles.bar"></div>
+    <chef-tooltip for="bar">{{ tooltips.max }}</chef-tooltip>
+</div>
