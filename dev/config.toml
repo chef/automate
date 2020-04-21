@@ -124,3 +124,6 @@ email_attr = "email"
 username_attr = "email"
 groups_attr = "groups"
 entity_issuer = "https://automate.chef.co/dex/callback"
+[esgateway.v1.sys.ngx.http]
+ssl_verify_depth = 10
+proxy_set_header_host = "testing:1234"
