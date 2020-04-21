@@ -24,9 +24,9 @@ import (
 	"github.com/chef/automate/api/interservice/authz/common"
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/engine"
+	"github.com/chef/automate/components/authz-service/storage/postgres"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
-	v2_postgres "github.com/chef/automate/components/authz-service/storage/v2/postgres"
 )
 
 // GRPC creates and listens on grpc server.
@@ -59,7 +59,7 @@ func NewGRPCServer(ctx context.Context,
 	dataMigrationsConfig datamigration.Config, cerealAddress string,
 	projectLimit int) (*grpc.Server, error) {
 
-	err := v2_postgres.Initialize(ctx, e, l, migrationsConfig, dataMigrationsConfig, projectLimit)
+	err := postgres.Initialize(ctx, e, l, migrationsConfig, dataMigrationsConfig, projectLimit)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 postgres singleton")
 	}
