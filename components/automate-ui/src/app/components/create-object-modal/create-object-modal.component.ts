@@ -47,13 +47,15 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     });
 
     // the addPolicies checkbox should always be checked by default when the modal opens
-    this.resetCheckboxEvent.pipe(takeUntil(this.isDestroyed))
-      .subscribe(() => {
-        // the checkbox needs to use this component variable
-        // but we must ensure the createForm.addPolicies value stays in sync
-        this.addPolicies = true;
-        this.createForm.controls.addPolicies.setValue(this.addPolicies);
-      });
+    if (this.resetCheckboxEvent) {
+      this.resetCheckboxEvent.pipe(takeUntil(this.isDestroyed))
+        .subscribe(() => {
+          // the checkbox needs to use this component variable
+          // but we must ensure the createForm.addPolicies value stays in sync
+          this.addPolicies = true;
+          this.createForm.controls.addPolicies.setValue(this.addPolicies);
+        });
+    }
   }
 
   ngOnDestroy() {
