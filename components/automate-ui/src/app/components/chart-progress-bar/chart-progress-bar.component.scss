@@ -1,0 +1,35 @@
+@import "~styles/colors";
+
+
+.chart-progress-bar {
+  margin: 10px;
+  position: relative;
+
+  .bar {
+    background: $lavender-light-1;
+    box-shadow: inset -2px -2px 4px $white, inset 2px 2px 8px $eggplant-light-1;
+    position: absolute;
+    right: 0;
+    width: 100%;
+  }
+
+  .progress {
+    position: absolute;
+    left: 0;
+  }
+
+  .threshold {
+    width: 1px;
+    border-right: 1px dashed;
+    position: absolute;
+    z-index: 1;
+
+    &.point-1 {
+      border-color: $white;
+    }
+
+    &.point-2 {
+      border-color: $crimson;
+    }
+  }
+}
