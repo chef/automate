@@ -1,7 +1,7 @@
 import { TreeTableNode } from '../models';
-import { ChildLists } from './models';
+import { ChildList } from './models';
 
-export const mockTreeTableTree: TreeTableNode<ChildLists> = {
+export const mockTreeTableTree: TreeTableNode<ChildList> = {
   value: {
     name: 'run_list1',
     version: '0.1',

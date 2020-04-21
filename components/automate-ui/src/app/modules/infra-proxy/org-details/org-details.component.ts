@@ -70,7 +70,9 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    this.store.select(routeURL).pipe()
+    this.store.select(routeURL).pipe(
+      takeUntil(this.isDestroyed)
+    )
     .subscribe((url: string) => {
       this.url = url;
       const [, fragment] = url.split('#');
@@ -154,7 +156,8 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
       filter(([getRolesSt, _allInfraRolesState]) =>
         getRolesSt === EntityStatus.loadingSuccess),
       filter(([_getRolesSt, allInfraRolesState]) =>
-        !isNil(allInfraRolesState))
+        !isNil(allInfraRolesState)),
+      takeUntil(this.isDestroyed)
     ).subscribe(([ _getRolesSt, allInfraRolesState]) => {
       this.roles = allInfraRolesState;
       this.rolesListLoading = false;
@@ -192,5 +195,4 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
-
 }

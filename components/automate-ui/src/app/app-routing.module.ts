@@ -14,6 +14,7 @@ import {
 } from './pages/integrations/detail/integrations-detail.component';
 import { IntegrationsEditComponent } from './pages/integrations/edit/integrations-edit.component';
 import { IntegrationsListComponent } from './pages/integrations/list/integrations-list.component';
+import { InfraRoleDetailsComponent } from './modules/infra-proxy/infra-role-details/infra-role-details.component';
 import { JobAddComponent } from './pages/job-add/job-add.component';
 import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
@@ -27,11 +28,11 @@ import { SigninComponent } from './pages/signin/signin.component';
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
 import { ChefServerDetailsComponent } from './modules/infra-proxy/chef-server-details/chef-server-details.component';
-import { OrgDetailsComponent } from './modules/infra-proxy/org-details/org-details.component';
 import { NodeDetailsComponent } from './pages/node-details/node-details.component';
 import {
   NodeNoRunsDetailsComponent
 } from './pages/node-noruns-details/node-noruns-details.component';
+import { OrgDetailsComponent } from './modules/infra-proxy/org-details/org-details.component';
 import { PolicyListComponent } from './modules/policy/list/policy-list.component';
 import { PolicyDetailsComponent } from './modules/policy/details/policy-details.component';
 import { PolicyAddMembersComponent } from './modules/policy/add-members/policy-add-members.component';
@@ -53,7 +54,6 @@ import {
 
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
-import { InfraRoleDetailsComponent } from './modules/infra-proxy/infra-role-details/infra-role-details.component';
 
 const routes: Routes = [
   {

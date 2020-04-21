@@ -1,12 +1,12 @@
-export interface Lists {
+export interface List {
   name: string;
   version: string;
   type: string;
   skipped: string;
-  children: ChildLists[];
+  children: ChildList[];
 }
 
-export interface ChildLists {
+export interface ChildList {
   name: string;
   version: string;
   type: string;

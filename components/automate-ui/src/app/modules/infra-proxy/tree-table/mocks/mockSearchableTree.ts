@@ -1,7 +1,7 @@
 import { SearchableNode } from '../models';
-import { ChildLists } from './models';
+import { ChildList } from './models';
 
-export const mockSearchableTree: SearchableNode<ChildLists> = {
+export const mockSearchableTree: SearchableNode<ChildList> = {
   id: '1',
   value: {
     name: 'run_list1',
