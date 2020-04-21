@@ -21,7 +21,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Input() visible = false;
   @Input() creating = false;
   @Input() objectNoun: string;
-  @Input() createProjectModal = false;
   @Input() assignableProjects: Project[] = [];
   @Input() createForm: FormGroup; // NB: The form must contain 'name' and 'id' fields
   @Input() resetCheckboxEvent: EventEmitter<null>;
@@ -35,6 +34,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   public conflictError = false;
   public addPolicies = true;
   public projectsUpdatedEvent = new EventEmitter();
+  public createProjectModal = false;
 
   private isDestroyed = new Subject<boolean>();
 
@@ -48,6 +48,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
 
     // the addPolicies checkbox should always be checked by default when the modal opens
     if (this.resetCheckboxEvent) {
+      this.createProjectModal = true;
       this.resetCheckboxEvent.pipe(takeUntil(this.isDestroyed))
         .subscribe(() => {
           // the checkbox needs to use this component variable
