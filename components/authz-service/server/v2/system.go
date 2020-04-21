@@ -12,10 +12,14 @@ func SystemPolicies() []*storage.Policy {
 		ID:   constants.UniversalAccessPolicyID,
 		Type: storage.System,
 		// used by automate-cli for API requests through the gateway
-		Name: "deployment-service universal access",
+		// used by compliance service for creating a token to give to ssm jobs
+		Name: "internal service universal access",
 		Members: []storage.Member{
 			{
 				Name: "tls:service:deployment-service:*",
+			},
+			{
+				Name: "tls:service:compliance-service:*",
 			},
 		},
 		Statements: []storage.Statement{{
