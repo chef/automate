@@ -38,7 +38,7 @@ func RunSSMJob(ctx context.Context, ssmJob *types.InspecJob) *inspec.Error {
 		return translateToInspecErr(fmt.Errorf("unable to connect to auth client: aborting job run for job %+v", ssmJob))
 	}
 	tokenID := fmt.Sprintf("inspec-to-automate-scanjob-%s", ssmJob.JobID)
-	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx, []string{"tls:service:compliance-service:internal"}, []string{}, "", ""))
+	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx, []string{"tls:service:deployment-service:internal"}, []string{}, "", ""))
 	token, err := RemoteJobInfo.TokensMgmtClient.CreateToken(ctx, &authn.CreateTokenReq{
 		Id:     tokenID,
 		Name:   tokenID,
