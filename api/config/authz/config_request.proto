@@ -41,6 +41,7 @@ message ConfigRequest {
 				reserved 3 to 4;
 				google.protobuf.StringValue database = 1;
 				google.protobuf.StringValue user = 2;
+				google.protobuf.Int32Value max_connections = 5;
 			}
 		}
 
