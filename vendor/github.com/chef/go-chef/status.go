@@ -11,9 +11,9 @@ type Status struct {
 	Keygen    map[string]int    `json:"keygen"`
 }
 
-// Status gets license information.
+// Status gets the frontend & backend server information.
 //
-// https://docs.chef.io/api_chef_server.html#license
+// https://docs.chef.io/api_chef_server/#_status
 func (e *StatusService) Get() (data Status, err error) {
 	err = e.client.magicRequestDecoder("GET", "_status", nil, &data)
 	return

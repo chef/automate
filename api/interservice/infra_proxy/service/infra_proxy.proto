@@ -12,6 +12,7 @@ import "api/interservice/infra_proxy/request/clients.proto";
 import "api/interservice/infra_proxy/request/databags.proto";
 import "api/interservice/infra_proxy/request/environments.proto";
 import "api/interservice/infra_proxy/request/nodes.proto";
+import "api/interservice/infra_proxy/request/policyfiles.proto";
 
 import "api/interservice/infra_proxy/response/servers.proto";
 import "api/interservice/infra_proxy/response/orgs.proto";
@@ -21,6 +22,7 @@ import "api/interservice/infra_proxy/response/clients.proto";
 import "api/interservice/infra_proxy/response/databags.proto";
 import "api/interservice/infra_proxy/response/environments.proto";
 import "api/interservice/infra_proxy/response/nodes.proto";
+import "api/interservice/infra_proxy/response/policyfiles.proto";
 
 service InfraProxy {
     rpc GetVersion      (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
@@ -57,4 +59,7 @@ service InfraProxy {
     rpc GetEnvironment (chef.automate.domain.infra_proxy.request.Environment) returns (chef.automate.domain.infra_proxy.response.Environment) {};
 
     rpc GetAffectedNodes  (chef.automate.domain.infra_proxy.request.AffectedNodes) returns (chef.automate.domain.infra_proxy.response.AffectedNodes) {};
+
+    rpc GetPolicyfiles (chef.automate.domain.infra_proxy.request.Policyfiles) returns (chef.automate.domain.infra_proxy.response.Policyfiles) {};
+    rpc GetPolicyfile (chef.automate.domain.infra_proxy.request.Policyfile) returns (chef.automate.domain.infra_proxy.response.Policyfile) {};
 }

@@ -14,7 +14,7 @@ type License struct {
 
 // License gets license information.
 //
-// https://docs.chef.io/api_chef_server.html#license
+// https://docs.chef.io/api_chef_server/#license
 func (e *LicenseService) Get() (data License, err error) {
 	err = e.client.magicRequestDecoder("GET", "license", nil, &data)
 	return
