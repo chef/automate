@@ -20,7 +20,7 @@ type Storage interface {
 	GetOrg(context.Context, uuid.UUID) (Org, error)
 	GetOrgByName(ctx context.Context, orgName string, serverID uuid.UUID) (Org, error)
 	GetOrgs(context.Context, uuid.UUID) ([]Org, error)
-	StoreOrg(ctx context.Context, name string, adminUser string, adminKey string, serverID string, projects []string) (Org, error)
+	StoreOrg(ctx context.Context, name string, adminUser string, credentialID string, serverID string, projects []string) (Org, error)
 	DeleteOrg(context.Context, uuid.UUID) (Org, error)
 	EditOrg(context.Context, Org) (Org, error)
 }
@@ -45,14 +45,14 @@ type Server struct {
 
 // Org is the struct ingested and returned by our backend implementations.
 type Org struct {
-	ID        uuid.UUID
-	Name      string
-	AdminUser string
-	AdminKey  string
-	ServerId  string
-	Projects  []string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID           uuid.UUID
+	Name         string
+	AdminUser    string
+	CredentialID string
+	ServerID     string
+	Projects     []string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 // Errors returned from the backend

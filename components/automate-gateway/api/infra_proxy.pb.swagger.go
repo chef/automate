@@ -168,6 +168,7 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -190,6 +191,7 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -222,12 +224,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -250,12 +254,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -278,12 +284,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -316,12 +324,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Chef organization name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -882,22 +892,27 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization name."
         },
         "admin_user": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization admin user."
         },
         "admin_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization admin key."
         },
         "server_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server ID."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of projects this chef organization belongs to. May be empty."
         }
       }
     },
@@ -922,25 +937,31 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization ID."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization name."
         },
         "admin_user": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization admin user."
         },
         "admin_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization admin key."
         },
         "server_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server ID."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of projects this chef organization belongs to. May be empty."
         }
       }
     },
@@ -1244,7 +1265,8 @@ func init() {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "description": "Chef organization."
         }
       }
     },
@@ -1290,7 +1312,8 @@ func init() {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "description": "Chef organization."
         }
       }
     },
@@ -1379,7 +1402,8 @@ func init() {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "description": "Chef organization."
         }
       }
     },
@@ -1389,8 +1413,9 @@ func init() {
         "orgs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
-          }
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.OrgListItem"
+          },
+          "description": "Chef organization list."
         }
       }
     },
@@ -1450,25 +1475,52 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization ID."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization name."
         },
         "admin_user": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization admin user."
         },
-        "admin_key": {
-          "type": "string"
+        "credential_id": {
+          "type": "string",
+          "description": "Chef organization credential ID."
         },
         "server_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server ID."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of projects this chef organization belongs to. May be empty."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.OrgListItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Chef organization name."
+        },
+        "admin_user": {
+          "type": "string",
+          "description": "Chef organization admin user."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
         }
       }
     },
@@ -1604,7 +1656,8 @@ func init() {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "description": "Chef organization."
         }
       }
     },
