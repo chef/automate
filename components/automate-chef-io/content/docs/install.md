@@ -160,7 +160,7 @@ Add the following to your config.toml:
 
 # Uncomment and fill out if using external elasticsearch that uses hostname-based routing/load balancing
 # [esgateway.v1.sys.ngx.http]
-#  proxy_set_header_host = "yourawesomeexternaleshostname:1234"
+#  proxy_set_header_host = "<your external es hostname>:1234"
 
 # Uncomment and add to change the ssl_verify_depth for the root cert bundle
 #  ssl_verify_depth = "2"
