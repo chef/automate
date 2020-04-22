@@ -983,7 +983,59 @@ func runAllServerTests(
 			}
 		})
 
-		t.Run("fails to add user with NotFound when a project filter that excludes the team", func(t *testing.T) {
+		t.Run("successfully adds user to team with existing users", func(t *testing.T) {
+			tests := []struct {
+				users []string
+				desc  string
+			}{
+				{[]string{"6ed95714-9466-463b-80da-0513ecb42a08"}, "single user"},
+				{[]string{
+					"299ea25b-62d4-4660-965a-e25870298792",
+					"d1f642c8-8907-4e8b-a9a0-b998a44dc4bf",
+				}, "multiple users"},
+			}
+			for _, test := range tests {
+				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
+					ctx := context.Background()
+
+					// arrange
+					req := &teams.CreateTeamReq{
+						Name:     "Gotta Catch Em All",
+						Id:       "corgis-inc",
+						Projects: []string{},
+					}
+					resp, err := cl.CreateTeam(ctx, req)
+					require.NoError(t, err)
+
+					targetMemberID := "88f13b6b-b20b-4335-9fd6-2c09edf45cf9"
+					resp1, err := cl.AddTeamMembers(insertProjectsIntoNewContext([]string{constants.UnassignedProjectID}), &teams.AddTeamMembersReq{
+						Id:      req.Id,
+						UserIds: []string{targetMemberID},
+					})
+					require.NoError(t, err)
+					require.Equal(t, 1, len(resp1.UserIds))
+
+					addReq := &teams.AddTeamMembersReq{
+						Id:      req.Id,
+						UserIds: test.users,
+					}
+					// act
+					resp2, err := cl.AddTeamMembers(insertProjectsIntoNewContext([]string{constants.UnassignedProjectID}), addReq)
+
+					// assert
+					require.NoError(t, err)
+					require.NotNil(t, resp2)
+					assert.Equal(t, len(addReq.UserIds)+1, len(resp2.UserIds))
+
+					expectedUsers := append(addReq.UserIds, targetMemberID)
+					assert.ElementsMatch(t, expectedUsers, resp2.UserIds)
+
+					cleanupTeam(t, cl, resp.Team.Id)
+				})
+			}
+		})
+
+		t.Run("fails to adds user with NotFound when a project filter that excludes the team", func(t *testing.T) {
 			tests := []struct {
 				users []string
 				desc  string

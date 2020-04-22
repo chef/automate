@@ -12,10 +12,10 @@ import (
 type Storage interface {
 	GetTeams(context.Context) ([]Team, error)
 	StoreTeam(ctx context.Context, id string, name string, projects []string) (Team, error)
-	RemoveUsers(ctx context.Context, id string, userIDs []string) (Team, error)
+	RemoveUsers(ctx context.Context, id string, userIDs []string) ([]string, error)
 	GetTeam(ctx context.Context, id string) (Team, error)
 	PurgeUserMembership(ctx context.Context, userID string) (teamsUpdated []string, err error)
-	AddUsers(ctx context.Context, id string, userIDs []string) (Team, error)
+	AddUsers(ctx context.Context, id string, userIDs []string) ([]string, error)
 	GetTeamsForUser(ctx context.Context, userID string) ([]Team, error)
 	GetUserIDsForTeam(ctx context.Context, id string) ([]string, error)
 	DeleteTeam(ctx context.Context, id string) (Team, error)

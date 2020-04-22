@@ -134,12 +134,11 @@ func testGetTeamByName(ctx context.Context, t *testing.T, s storage.Storage) {
 	team, err := s.StoreTeam(ctx, id, "team name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to store team")
 
-	users := []string{"one", "two", "three"}
-	team, err = s.AddUsers(ctx, id, users)
+	userIDs := []string{"one", "two", "three"}
+	updatedUserIDs, err := s.AddUsers(ctx, id, userIDs)
 	require.NoError(t, err, "setup: failed to add users to test team")
 
-	usersOnTeam, err := s.GetUserIDsForTeam(ctx, id)
-	require.Equal(t, len(users), len(usersOnTeam), "setup: user list size mismatch")
+	require.Equal(t, len(userIDs), len(updatedUserIDs), "setup: user list size mismatch")
 
 	getTeam, err := s.GetTeam(ctx, id)
 	require.NoError(t, err)
@@ -172,20 +171,19 @@ func testGetTeamsForUser(ctx context.Context, t *testing.T, s storage.Storage) {
 
 	initialUsers := []string{"user-for-team-fetch", "two", "three"}
 
-	team, err := s.AddUsers(ctx, id, initialUsers)
+	_, err = s.AddUsers(ctx, id, initialUsers)
 	require.NoError(t, err, "setup: failed to add users to team-1-with-user")
-	team2, err := s.AddUsers(ctx, id2, initialUsers)
+	_, err = s.AddUsers(ctx, id2, initialUsers)
 	require.NoError(t, err, "setup: failed to add users to team-2-with-user")
 	_, err = s.AddUsers(ctx, idWithout, []string{"two", "three"})
 	require.NoError(t, err, "setup: failed to add users to test team-without-user")
 
 	returnedTeams, err := s.GetTeamsForUser(ctx, "user-for-team-fetch")
 	require.NoError(t, err)
-	expectedFetchedTeams := []storage.Team{team, team2}
-	ids := []string{returnedTeams[0].ID, returnedTeams[1].ID}
-	expectedIDs := []string{expectedFetchedTeams[0].ID, expectedFetchedTeams[1].ID}
+	expectedFetchedTeamIDs := []string{id, id2}
+	returnedIDs := []string{returnedTeams[0].ID, returnedTeams[1].ID}
 
-	assert.ElementsMatch(t, ids, expectedIDs) // Comparing the objects wholly will fail due to updated_at :(
+	assert.ElementsMatch(t, expectedFetchedTeamIDs, returnedIDs)
 }
 
 func testPurgeUserMembership(ctx context.Context, t *testing.T, s storage.Storage) {
@@ -207,7 +205,7 @@ func testPurgeUserMembership(ctx context.Context, t *testing.T, s storage.Storag
 	require.NoError(t, err, "setup: failed to add users to team-1-with-user")
 	_, err = s.AddUsers(ctx, id2, initialUsers)
 	require.NoError(t, err, "setup: failed to add users to team-2-with-user")
-	teamWithout, err = s.AddUsers(ctx, idWithout, []string{"two", "three"})
+	_, err = s.AddUsers(ctx, idWithout, []string{"two", "three"})
 	require.NoError(t, err, "setup: failed to add users to test team-without-user")
 
 	updatedTeams, err := s.PurgeUserMembership(ctx, "user-id-to-purge")
@@ -322,16 +320,13 @@ func testAddUsers(ctx context.Context, t *testing.T, s storage.Storage) {
 	_, err := s.StoreTeam(ctx, id, id+" Name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to create test team")
 
-	users := []string{"one", "two", "three"}
-	team, err := s.AddUsers(ctx, id, users)
-	assert.NotNil(t, team)
+	userIDs := []string{"one", "two", "three"}
+	updatedUserIDs, err := s.AddUsers(ctx, id, userIDs)
+	assert.NotNil(t, updatedUserIDs)
 
-	userIDs, err := s.GetUserIDsForTeam(ctx, id)
-	require.NoError(t, err)
-
-	assert.Equal(t, len(users), len(userIDs), "number of users added does not match")
-	for _, user := range users {
-		assert.Contains(t, userIDs, user, "user %q not added", user)
+	assert.Equal(t, len(userIDs), len(updatedUserIDs), "number of users added does not match")
+	for _, id := range userIDs {
+		assert.Contains(t, updatedUserIDs, id, "user %q not added", id)
 	}
 
 	teams, err := s.GetTeams(ctx)
@@ -343,7 +338,7 @@ func testAddUsers(ctx context.Context, t *testing.T, s storage.Storage) {
 
 	userIDs, err = s.GetUserIDsForTeam(ctx, id)
 	require.NoError(t, err)
-	assert.ElementsMatch(t, users, userIDs)
+	assert.ElementsMatch(t, userIDs, userIDs)
 }
 
 func testAddUsersNotFound(ctx context.Context, t *testing.T, s storage.Storage) {
@@ -395,14 +390,13 @@ func testRemoveUsersNotFound(ctx context.Context, t *testing.T, s storage.Storag
 
 func testGetTeam(ctx context.Context, t *testing.T, s storage.Storage) {
 	id := "id"
-	_, err := s.StoreTeam(ctx, id, "name", emptyProjectsList)
+	name := "name"
+	team, err := s.StoreTeam(ctx, id, name, emptyProjectsList)
 	require.NoError(t, err, "setup: failed to store team")
 	one, two, three := "one", "two", "three"
-	users := []string{one, two, three}
-	team, err := s.AddUsers(ctx, id, users)
+	addUserIDs := []string{one, two, three}
+	_, err = s.AddUsers(ctx, id, addUserIDs)
 	require.NoError(t, err, "setup: failed to add users to test team")
-	userIDs, err := s.GetUserIDsForTeam(ctx, id)
-	require.Equal(t, len(users), len(userIDs), "setup: user list size mismatch")
 
 	getTeam, err := s.GetTeam(ctx, id)
 	getTeamUserIDs, err := s.GetUserIDsForTeam(ctx, id)
@@ -412,7 +406,7 @@ func testGetTeam(ctx context.Context, t *testing.T, s storage.Storage) {
 	assert.WithinDuration(t, team.CreatedAt, getTeam.CreatedAt, 50*time.Millisecond)
 	assert.Equal(t, team.Name, getTeam.Name)
 	assert.Equal(t, team.ID, getTeam.ID)
-	assert.Equal(t, userIDs, getTeamUserIDs)
+	assert.ElementsMatch(t, addUserIDs, getTeamUserIDs)
 }
 
 func testGetTeamNotFound(ctx context.Context, t *testing.T, s storage.Storage) {
@@ -425,12 +419,10 @@ func testGetTeamImmutable(ctx context.Context, t *testing.T, s storage.Storage) 
 	_, err := s.StoreTeam(ctx, id, "name", emptyProjectsList)
 	require.NoError(t, err, "setup: failed to store team")
 	one, two, three := "one", "two", "three"
-	users := []string{one, two, three}
-	_, err = s.AddUsers(ctx, id, users)
+	userIDs := []string{one, two, three}
+	updatedUserIDs, err := s.AddUsers(ctx, id, userIDs)
 	require.NoError(t, err, "setup: failed to add users to test team")
-	userIDs, err := s.GetUserIDsForTeam(ctx, id)
-	require.NoError(t, err)
-	require.Equal(t, len(users), len(userIDs), "setup: user list size mismatch")
+	require.Equal(t, len(userIDs), len(updatedUserIDs), "setup: user list size mismatch")
 }
 
 func testGetTeams(ctx context.Context, t *testing.T, s storage.Storage) {

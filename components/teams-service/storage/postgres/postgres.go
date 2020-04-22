@@ -181,7 +181,7 @@ func (p *postgres) EditTeam(ctx context.Context,
 	err = tx.QueryRowContext(ctx,
 		`SELECT projects FROM teams
 		WHERE id = $1 AND projects_match(projects, $2::TEXT[])
-		FOR UPDATE;`,
+		FOR UPDATE`,
 		id, pq.Array(projectsFilter)).
 		Scan(pq.Array(&oldProjects))
 	if err != nil {
@@ -198,7 +198,7 @@ func (p *postgres) EditTeam(ctx context.Context,
 		`UPDATE teams t
 		SET name = $2, projects = $3, updated_at = now()
 		WHERE t.id = $1 AND projects_match(t.projects, $4::TEXT[])
-		RETURNING id, name, projects, created_at, updated_at;`,
+		RETURNING id, name, projects, created_at, updated_at`,
 		id, name, pq.Array(updatedProjects), pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
@@ -251,49 +251,54 @@ func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
 }
 
 // RemoveUsers deletes teams_users_association rows by teamID and userID, returning the storage team.
-//
-//
-// NOTE: We aren't filtering on projects here for expediency since the server call
-// is already calling GetTeam which does project filtering and will bail in the
-// server code before we get here if the team in question was filtered, but if we call this
-// from a different context we should apply project filtering in this function as well.
-// Not doing it to save us a database call since it's not needed currently.
-func (p *postgres) RemoveUsers(ctx context.Context, id string, userIDs []string) (storage.Team, error) {
+func (p *postgres) RemoveUsers(ctx context.Context, id string, userIDs []string) (updatedUserIDs []string, err error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
-		return storage.Team{}, p.processError(err)
+		return nil, p.processError(err)
 	}
 
-	res, err := tx.ExecContext(ctx,
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	var dbID int
+	var teamProjects []string
+	// ensure the team exists and isn't filtered out by the project filter
+	err = tx.QueryRowContext(ctx,
+		`SELECT db_id, projects FROM teams
+		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
+		id, pq.Array(projectsFilter)).
+		Scan(&dbID, pq.Array(&teamProjects))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	_, err = tx.ExecContext(ctx,
 		`DELETE FROM teams_users_associations
-		WHERE user_id = ANY($1) AND team_db_id = team_db_id($2)`,
-		pq.Array(userIDs), id)
+		WHERE user_id = ANY($1) AND team_db_id=$2`,
+		pq.Array(userIDs), dbID)
 	if err != nil {
-		return storage.Team{}, p.processError(err)
-	}
-	num, err := res.RowsAffected()
-	if err != nil {
-		return storage.Team{}, p.processError(err)
+		return []string{}, p.processError(err)
 	}
 
-	var team storage.Team
-	if num == 0 { // no changes
-		team, err = p.getTeam(ctx, tx, id)
-	} else {
-		team, err = p.touchTeam(ctx, tx, id)
-	}
+	row := tx.QueryRowContext(ctx,
+		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=$1`,
+		dbID)
+	err = row.Scan(pq.Array(&updatedUserIDs))
 	if err != nil {
-		return storage.Team{}, p.processError(err)
+		return nil, p.processError(err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return storage.Team{}, p.processError(err)
+		return nil, p.processError(err)
 	}
-	return team, nil
+
+	return updatedUserIDs, nil
 }
 
 // GetTeam fetches a team by id.
@@ -319,6 +324,7 @@ func (p *postgres) GetTeam(ctx context.Context, id string) (storage.Team, error)
 // PurgeUserMembership removes all teams_users_associations with the userID provided,
 // returning an array of teamIDs for the teams that initially had the provided user
 func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]string, error) {
+
 	rows, err := p.db.QueryContext(ctx,
 		`WITH moved_row_ids AS (
 			DELETE FROM teams_users_associations
@@ -355,49 +361,84 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]st
 
 // AddUsers adds users to a team (adding rows to teams_users_associations and updating
 // team updated_at)
-//
-// NOTE: We aren't filtering on projects here for expediency since the server call
-// is already calling GetTeamByName which does project filtering and will bail in the
-// server code before we get here if the team in question was filtered, but if we call this
-// from a different context we should apply project filtering in this function as well.
-// Not doing it to save us a database call since it's not needed currently.
 func (p *postgres) AddUsers(ctx context.Context,
-	id string, userIDs []string) (storage.Team, error) {
-	var t storage.Team
-	err := p.db.QueryRowContext(ctx,
-		`WITH moved_row_ids AS (
-			INSERT INTO teams_users_associations (team_db_id, user_id, created_at)
-				SELECT db_id, unnest($2::TEXT[]), now()
-				FROM teams
-				WHERE id=$1
-			RETURNING team_db_id
-		)
-		UPDATE teams SET updated_at=NOW()
-		WHERE db_id in (SELECT DISTINCT * FROM moved_row_ids)
-		RETURNING id, name, projects, created_at, updated_at;`, id, pq.Array(userIDs)).Scan(
-		&t.ID, &t.Name, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
-	if err != nil {
-		return storage.Team{}, p.processError(err)
-	}
-	return t, nil
-}
+	id string, userIDs []string) (updatedUserIDs []string, err error) {
 
-// GetUserIDsForTeam returns the user IDs for all members of the team.
-//
-// NOTE: We aren't filtering on projects here for expediency since the server call
-// is already calling GetTeamByName which does project filtering and will bail in the
-// server code before we get here if the team in question was filtered, but if we call this
-// from a different context we should apply project filtering in this function as well.
-// Not doing it to save us a database call since it's not needed currently.
-func (p *postgres) GetUserIDsForTeam(ctx context.Context, id string) ([]string, error) {
-	var userIDs []string
-	row := p.db.QueryRowContext(ctx,
-		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=team_db_id($1)`,
-		id)
-	err := row.Scan(pq.Array(&userIDs))
+	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, p.processError(err)
 	}
+
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	var dbID int
+	var teamProjects []string
+	// ensure the team exists and isn't filtered out by the project filter
+	err = p.db.QueryRowContext(ctx,
+		`SELECT db_id, projects FROM teams
+		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
+		id, pq.Array(projectsFilter)).
+		Scan(&dbID, pq.Array(&teamProjects))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO teams_users_associations (team_db_id, user_id, created_at)
+				SELECT db_id, unnest($2::TEXT[]), now()
+	 			FROM teams
+				WHERE db_id=$1
+				ON CONFLICT ON CONSTRAINT teams_users_pkey
+				DO NOTHING
+				`, dbID, pq.Array(userIDs))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	_, err = tx.ExecContext(ctx, `UPDATE teams SET updated_at=NOW()
+	WHERE db_id=$1`, dbID)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	row := tx.QueryRowContext(ctx,
+		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=team_db_id($1)`,
+		id)
+	err = row.Scan(pq.Array(&updatedUserIDs))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	return updatedUserIDs, nil
+}
+
+// GetUserIDsForTeam returns the user IDs for all members of the team.
+func (p *postgres) GetUserIDsForTeam(ctx context.Context, id string) ([]string, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	var userIDs []string
+	row := p.db.QueryRowContext(ctx,
+		`SELECT array_agg(user_id) 
+		FROM teams_users_associations INNER JOIN teams
+		ON teams.db_id=teams_users_associations.team_db_id
+		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
+		id, pq.Array(projectsFilter))
+	err = row.Scan(pq.Array(&userIDs))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	return userIDs, nil
 }
 

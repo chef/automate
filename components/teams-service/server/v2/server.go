@@ -142,27 +142,13 @@ func (s *Server) AddTeamMembers(ctx context.Context,
 		return nil, status.Error(codes.InvalidArgument, "missing user IDs")
 	}
 
-	// verify team exists and isn't filtered out by the project filter
-	_, err := s.service.Storage.GetTeam(ctx, req.Id)
-	if err != nil {
-		return nil, service.ParseStorageError(err, req.Id, "team")
-	}
-
-	_, err = s.service.Storage.AddUsers(ctx, req.Id, req.UserIds)
+	updatedUserIDs, err := s.service.Storage.AddUsers(ctx, req.Id, req.UserIds)
 	if err != nil && err != storage.ErrConflict {
 		return nil, service.ParseStorageError(err, req.Id, "user")
 	}
 
-	// TODO (tc): Get the updated set of user membership for the team since
-	// that is not what is returned from AddUsers for some reason
-	// (can refactor on V1 deprecation).
-	userIDs, err := s.service.Storage.GetUserIDsForTeam(ctx, req.Id)
-	if err != nil {
-		return nil, service.ParseStorageError(err, req.Id, "team")
-	}
-
 	return &teams.AddTeamMembersResp{
-		UserIds: userIDs,
+		UserIds: updatedUserIDs,
 	}, nil
 }
 
@@ -170,27 +156,13 @@ func (s *Server) AddTeamMembers(ctx context.Context,
 func (s *Server) RemoveTeamMembers(ctx context.Context,
 	req *teams.RemoveTeamMembersReq) (*teams.RemoveTeamMembersResp, error) {
 
-	// verify team exists and isn't filtered out by the project filter
-	_, err := s.service.Storage.GetTeam(ctx, req.Id)
-	if err != nil {
-		return nil, service.ParseStorageError(err, req.Id, "team")
-	}
-
-	_, err = s.service.Storage.RemoveUsers(ctx, req.Id, req.UserIds)
-	if err != nil {
-		return nil, service.ParseStorageError(err, req.Id, "team")
-	}
-
-	// TODO (tc): Get the updated set of user membership for the team since
-	// that is not what is returned from RemoveUsers for some reason
-	// (can refactor on V1 deprecation).
-	userIDs, err := s.service.Storage.GetUserIDsForTeam(ctx, req.Id)
+	updatedUserIDs, err := s.service.Storage.RemoveUsers(ctx, req.Id, req.UserIds)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
 
 	return &teams.RemoveTeamMembersResp{
-		UserIds: userIDs,
+		UserIds: updatedUserIDs,
 	}, nil
 }
 
