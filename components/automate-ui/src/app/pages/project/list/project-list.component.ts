@@ -35,7 +35,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public createProjectForm: FormGroup;
   public creatingProject = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  public resetCheckboxEvent = new EventEmitter();
   private isDestroyed = new Subject<boolean>();
 
   public statusLabel: Record<ProjectStatus, string> = {
@@ -165,7 +164,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   resetCreateModal(): void {
     this.creatingProject = false;
     this.createProjectForm.reset();
-    this.resetCheckboxEvent.emit();
     this.conflictErrorEvent.emit(false);
   }
 

@@ -66,9 +66,9 @@
 
       <app-create-object-modal
         [visible]="createModalVisible"
+        [createProjectModal]="true"
         [creating]="creatingProject"
         [conflictErrorEvent]="conflictErrorEvent"
-        [resetPoliciesCheckboxEvent]="resetCheckboxEvent"
         objectNoun="project"
         [createForm]="createProjectForm"
         (close)="closeCreateModal()"
