@@ -5,8 +5,6 @@ import (
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
@@ -79,7 +77,7 @@ func generateAdminToken(ctx context.Context,
 		Members: []string{"token:" + tokenID},
 	})
 
-	if err != nil && status.Convert(err).Code() != codes.AlreadyExists {
+	if err != nil {
 		// Attempt to be transactional
 		_, deleteTokenError := authnClient.DeleteToken(ctx, &authn.DeleteTokenReq{
 			Id: tokenID,
