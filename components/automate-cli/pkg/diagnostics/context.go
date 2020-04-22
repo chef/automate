@@ -47,6 +47,8 @@ type TestContext interface {
 	GetVersion() (string, error)
 	// IsIAMV2 returns whether or not automate is on the latest version of IAM
 	IsIAMV2() (bool, error)
+	// CleanupAdminToken deletes the admin token generated for the diagnostics test runner
+	CleanupAdminToken() error
 }
 
 // VerificationTestContext is accepted by the Verify stage of a diagnostic. This
@@ -68,6 +70,7 @@ type testContext struct {
 
 type globals struct {
 	CachedToken string    `json:"token"`
+	TokenID     string    `json:"token_id"`
 	Options     []*Option `json:"options"`
 }
 
@@ -340,9 +343,22 @@ func (c *testContext) adminToken() (string, error) {
 
 		if err == nil {
 			c.Globals.CachedToken = resp.ApiToken
+			c.Globals.TokenID = resp.TokenId
 			break
 		}
 	}
 
 	return c.Globals.CachedToken, nil
+}
+
+func (c *testContext) CleanupAdminToken() error {
+	_, err := c.DoLBRequest(
+		fmt.Sprintf("/apis/iam/v2/tokens/%s", c.Globals.TokenID),
+		lbrequest.WithMethod("DELETE"),
+	)
+	if err != nil {
+		return errors.Wrap(err, "Could not delete admin token generated for diagnostics")
+	}
+
+	return nil
 }

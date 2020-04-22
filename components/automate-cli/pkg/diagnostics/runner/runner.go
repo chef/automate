@@ -247,5 +247,9 @@ func (r *Runner) Run() error {
 		}
 	}
 
+	// test context generates an admin token to exercise the APIs
+	// so we clean it up here
+	r.tstContext.CleanupAdminToken()
+
 	return multierr.Combine(errs...)
 }
