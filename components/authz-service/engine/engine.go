@@ -6,9 +6,9 @@ import (
 
 // Engine abstracts different decision engines.
 type Engine interface {
-	// Authorizer and V2Writer are never used together (the authz section of the
-	// service needs Authorizer, the policy section cares about V2Writer), so we
-	// collect them here instead of introducing a V2Engine interface.
+	// Authorizer and Writer are never used together (the authz section of the
+	// service needs Authorizer, the policy section cares about Writer), so we
+	// collect them here instead of introducing a Engine interface.
 	Authorizer
 	Writer
 }
