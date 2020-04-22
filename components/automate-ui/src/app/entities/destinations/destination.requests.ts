@@ -41,11 +41,11 @@ export class DestinationRequests {
 
   public getDestinations(): Observable<DestinationsResponse> {
     return this.http.post<DestinationsResponse>(encodeURI(
-      this.joinToDatafeedUrl(['destinations'])), {});
+      this.joinToDataFeedUrl(['destinations'])), {});
   }
 
   public getDestination(id: string): Observable<Destination> {
-    return this.http.get<Destination>(this.joinToDatafeedUrl(['destination', id]))
+    return this.http.get<Destination>(this.joinToDataFeedUrl(['destination', id]))
     .pipe(map((destinationsJson: Destination) => destinationsJson));
   }
 
@@ -56,18 +56,18 @@ export class DestinationRequests {
       .pipe(mergeMap((secretId: string) => {
         destinationData.secret = secretId;
         return this.http.post<DestinationResponse>(
-          this.joinToDatafeedUrl(['destination']), destinationData);
+          this.joinToDataFeedUrl(['destination']), destinationData);
       }));
   }
 
   public updateDestination(destination: Destination): Observable<DestinationResponse> {
     return this.http.patch<DestinationResponse>(encodeURI(
-      this.joinToDatafeedUrl(['destination', destination.id.toString()])), destination);
+      this.joinToDataFeedUrl(['destination', destination.id.toString()])), destination);
   }
 
   public deleteDestination(id: string): Observable<DestinationResponse> {
     return this.http.delete<DestinationResponse>(encodeURI(
-      this.joinToDatafeedUrl(['destination', id.toString()])));
+      this.joinToDataFeedUrl(['destination', id.toString()])));
   }
 
   private createSecret(destination: CreateDesinationPayload, targetUsername: string,
@@ -94,10 +94,33 @@ export class DestinationRequests {
     };
   }
 
+  public testDestination(destination: Destination): Observable<Object> {
+    if (destination.secret) {
+      return this.testDestinationWithSecretId(destination.url, destination.secret);
+    }
+  }
+
+  public testDestinationWithUsernamePassword(url: string,
+    username: string, password: string): Observable<Object> {
+    return this.http.post(encodeURI(
+      this.joinToDataFeedUrl(['destinations', 'test'])),
+      { url, 'username_password': {username, password} });
+  }
+
+  public testDestinationWithSecretId(url: string, secretId: string): Observable<Object> {
+    return this.http.post(encodeURI(
+      this.joinToDataFeedUrl(['destinations', 'test'])), { url, 'secret_id': { 'id': secretId } });
+  }
+
+  public testDestinationWithNoCreds(url: string): Observable<Object> {
+    return this.http.post(encodeURI(
+      this.joinToDataFeedUrl(['destinations', 'test'])), { url, 'none': {}});
+  }
+
   // Generate an notifier url from a list of words.
   // falsey values; false, null, 0, "", undefined, and NaN are ignored
   // example: ['foo', 'bar', null, 'baz'] == '${NOTIFIERURL}/foo/bar/baz'
-  private joinToDatafeedUrl(words: string[]): string {
+  private joinToDataFeedUrl(words: string[]): string {
     return compact(concat([DATA_FEED_URL], words)).join('/');
   }
 }

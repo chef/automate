@@ -22,9 +22,7 @@ const GET_STATUS = 'getStatus';
 const DELETE_STATUS = 'deleteStatus';
 
 export const destinationEntityAdapter: EntityAdapter<Destination> =
-  createEntityAdapter<Destination>({
-    selectId: (destination: Destination) => destination.id
-  });
+  createEntityAdapter<Destination>();
 
 export const DestinationEntityInitialState: DestinationEntityState =
 destinationEntityAdapter.getInitialState({
@@ -128,6 +126,5 @@ export function destinationEntityReducer(
       return set(UPDATE_STATUS, EntityStatus.loadingFailure, state);
 
   }
-
   return state;
 }

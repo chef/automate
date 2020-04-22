@@ -18,7 +18,10 @@ export enum DestinationActionTypes {
   UPDATE_FAILURE                 = 'DESTINATION::UPDATE::FAILURE',
   DELETE                         = 'DESTINATION::CREATE::DELETE',
   DELETE_SUCCESS                 = 'DESTINATION::CREATE::DELETE::SUCCESS',
-  DELETE_FAILURE                 = 'DESTINATION::CREATE::DELETE::FAILURE'
+  DELETE_FAILURE                 = 'DESTINATION::CREATE::DELETE::FAILURE',
+  SEND_TEST                      = 'DESTINATION::SEND_TEST',
+  SEND_TEST_SUCCESS              = 'DESTINATION::SEND_TEST::SUCCESS',
+  SEND_TEST_FAILURE              = 'DESTINATION::SEND_TEST::FAILURE'
 }
 
 
@@ -119,6 +122,24 @@ export class UpdateDestinationFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class TestDestination implements Action {
+  readonly type = DestinationActionTypes.SEND_TEST;
+
+  constructor(public payload: { destination: Destination }) { }
+}
+
+export class TestDestinationSuccess implements Action {
+  readonly type = DestinationActionTypes.SEND_TEST_SUCCESS;
+
+  constructor(public payload: Destination) { }
+}
+
+export class TestDestinationFailure implements Action {
+  readonly type = DestinationActionTypes.SEND_TEST_FAILURE;
+
+  constructor(public payload: Destination) { }
+}
+
 export type DestinationActions =
   | GetDestinations
   | GetDestinationsSuccess
@@ -134,4 +155,7 @@ export type DestinationActions =
   | UpdateDestinationFailure
   | DeleteDestination
   | DeleteDestinationSuccess
-  | DeleteDestinationFailure;
+  | DeleteDestinationFailure
+  | TestDestination
+  | TestDestinationSuccess
+  | TestDestinationFailure;

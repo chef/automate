@@ -25,7 +25,10 @@ import {
   UpdateDestinationFailure,
   DeleteDestination,
   DeleteDestinationSuccess,
-  DeleteDestinationFailure
+  DeleteDestinationFailure,
+  TestDestination,
+  TestDestinationSuccess,
+  TestDestinationFailure
 } from './destination.actions';
 
 import {
@@ -94,7 +97,7 @@ export class DestinationEffects {
       ofType(DestinationActionTypes.CREATE_SUCCESS),
       map(({ payload  }: CreateDestinationSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Created data feed ${payload.name}`
+      message: `Created data feed ${payload.name}.`
     })));
 
   @Effect()
@@ -103,7 +106,7 @@ export class DestinationEffects {
     filter(({ payload }: CreateDestinationFailure) => payload.status !== HttpStatus.CONFLICT),
     map(({ payload }: CreateDestinationFailure) => new CreateNotification({
         type: Type.error,
-        message: `Could not create data feed: ${payload.error.error || payload}`
+        message: `Could not create data feed: ${payload.error.error || payload}.`
       })));
 
   @Effect()
@@ -130,7 +133,7 @@ export class DestinationEffects {
       const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not update data feed: ${msg || payload.error}`
+        message: `Could not update data feed: ${msg || payload.error}.`
       });
     }));
 
@@ -160,7 +163,34 @@ export class DestinationEffects {
       const msg = error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not delete data feed: ${msg || error}`
+        message: `Could not delete data feed: ${msg || error}.`
+      });
+    }));
+
+  @Effect()
+  testDestination$ = this.actions$.pipe(
+    ofType(DestinationActionTypes.SEND_TEST),
+    mergeMap(({ payload: { destination } }: TestDestination) =>
+      this.requests.testDestination(destination).pipe(
+        map(() => new TestDestinationSuccess(destination)),
+        catchError(() =>
+          observableOf(new TestDestinationFailure(destination))))));
+
+  @Effect()
+  testDestinationSuccess$ = this.actions$.pipe(
+      ofType(DestinationActionTypes.SEND_TEST_SUCCESS),
+      map(({ payload  }: TestDestinationSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Data feed test connected successfully for ${payload.name}.`
+    })));
+
+  @Effect()
+  testDestinationFailure$ = this.actions$.pipe(
+    ofType(DestinationActionTypes.SEND_TEST_FAILURE),
+    map(({ payload }: TestDestinationFailure) => {
+      return new CreateNotification({
+        type: Type.error,
+        message: `We were unable to connect to your data feed ${payload.name}.`
       });
     }));
 }
