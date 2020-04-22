@@ -2,13 +2,17 @@ package processor
 
 import (
 	"context"
+	"time"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
+
+const maxDropOnError = 128
 
 // BundleReportProjectTagger - Build a project tagger processor for InSpec reports
 func BundleReportProjectTagger(authzClient iam_v2.ProjectsClient) message.CompliancePipe {
@@ -29,16 +33,33 @@ func reportProjectTagger(in <-chan message.Compliance, authzClient iam_v2.Projec
 	}
 	out := make(chan message.Compliance, 100)
 	go func() {
+		nextNumToDrop := 1
 		bundleSize := 0
 		var projectRulesCollection map[string]*iam_v2.ProjectRules
 		for msg := range in {
+			if msg.Ctx.Err() != nil {
+				msg.FinishProcessingCompliance(msg.Ctx.Err())
+				continue
+			}
 			if bundleSize <= 0 {
-				bundleSize = len(in)
+				nextBundleSize := len(in)
 				logrus.WithFields(logrus.Fields{
 					"message_id": msg.Report.ReportUuid,
-					"bundleSize": bundleSize,
+					"bundleSize": nextBundleSize,
 				}).Debug("BundleProjectTagging - Update Project rules")
-				projectRulesCollection = getProjectRulesFromAuthz(msg.Ctx, authzClient)
+				var err error
+				projectRulesCollection, err = getProjectRulesFromAuthz(authzClient)
+				if err != nil {
+					msg.FinishProcessingCompliance(err)
+					dropComplianceMessages(in, err, nextNumToDrop-1)
+					nextNumToDrop *= 2
+					if nextNumToDrop > maxDropOnError {
+						nextNumToDrop = maxDropOnError
+					}
+					continue
+				}
+				bundleSize = nextBundleSize
+				nextNumToDrop = 1
 			} else {
 				// Skip
 				bundleSize--
@@ -57,16 +78,31 @@ func reportProjectTagger(in <-chan message.Compliance, authzClient iam_v2.Projec
 	return out
 }
 
-func getProjectRulesFromAuthz(ctx context.Context, authzClient iam_v2.ProjectsClient) map[string]*iam_v2.ProjectRules {
-	projectsCollection, err := authzClient.ListRulesForAllProjects(ctx, &iam_v2.ListRulesForAllProjectsReq{})
-
-	if err != nil {
-		// If there is an error getting the project rules from authz crash the service.
-		logrus.WithError(err).Fatal("Could not fetch project rules from authz")
+func dropComplianceMessages(in <-chan message.Compliance, err error, numToDrop int) {
+	var numDropped int
+	err = errors.Wrap(err, "bulk dropping message")
+	for numDropped = 0; numDropped < numToDrop; numDropped++ {
+		select {
+		case m := <-in:
+			m.FinishProcessingCompliance(err)
+		default:
+			break
+		}
 	}
-	return projectsCollection.ProjectRules
+	logrus.Warnf("Dropped %d chef run messages", numDropped)
 }
 
+func getProjectRulesFromAuthz(authzClient iam_v2.ProjectsClient) (map[string]*iam_v2.ProjectRules, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	projectsCollection, err := authzClient.ListRulesForAllProjects(ctx, &iam_v2.ListRulesForAllProjectsReq{})
+	if err != nil {
+		logrus.WithError(err).Error("Could not fetch project rules from authz")
+		return nil, errors.Wrap(err, "Could not fetch project rules from authz")
+	}
+
+	return projectsCollection.ProjectRules, nil
+}
 func findMatchingProjects(report *relaxting.ESInSpecReport, projects map[string]*iam_v2.ProjectRules) []string {
 	matchingProjects := make([]string, 0)
 
