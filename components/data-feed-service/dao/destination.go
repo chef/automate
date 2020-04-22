@@ -4,10 +4,14 @@ import (
 	"database/sql"
 	"strconv"
 
+	"github.com/lib/pq"
+
 	datafeed "github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/pkg/errors"
 )
+
+const uniqueViolation = "23505"
 
 type Destination struct {
 	ID     int64  `db:"id"`
@@ -50,9 +54,15 @@ func (db *DB) AddDestination(destination *datafeed.AddDestinationRequest) (int64
 	dbDestination := addToDBDestination(destination)
 	err := Transact(db, func(tx *DBTrans) error {
 		if err := tx.Insert(dbDestination); err != nil {
-			return errors.Wrap(err, "AddDestination: unable to insert destination")
+			pgErr, ok := err.(*pq.Error)
+			if ok && pgErr.Code == uniqueViolation {
+				return errors.Wrap(&errorutils.InvalidError{Msg: "A data feed destination already exists with name \"" + destination.Name + "\""}, "AddDestination: unable to insert destination")
+			} else {
+				return errors.Wrap(err, "AddDestination: unable to insert destination")
+			}
 		}
 		return nil
+
 	})
 
 	if err != nil {
@@ -87,7 +97,12 @@ func (db *DB) UpdateDestination(destination *datafeed.UpdateDestinationRequest) 
 	var count int64 = 0
 	err = Transact(db, func(tx *DBTrans) error {
 		if count, err = tx.Update(dbDestination); err != nil {
-			return errors.Wrap(err, "UpdateDestination: unable to update destination")
+			pgErr, ok := err.(*pq.Error)
+			if ok && pgErr.Code == uniqueViolation {
+				return errors.Wrap(&errorutils.InvalidError{Msg: "Cannot update name, a data feed destination already exists with name \"" + destination.Name + "\""}, "UpdateDestination: unable to update destination")
+			} else {
+				return errors.Wrap(err, "UpdateDestination: unable to update destination")
+			}
 		}
 		if count == 0 {
 			return errorutils.ProcessSQLNotFound(sql.ErrNoRows, destination.Id, "UpdateDestination")
