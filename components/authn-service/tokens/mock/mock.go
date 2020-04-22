@@ -144,16 +144,6 @@ func (m *mock) PurgeProject(ctx context.Context, projectID string) error {
 	return nil
 }
 
-func (m *mock) ResetToV1(ctx context.Context) error {
-	for _, tok := range m.tokens {
-		_, err := m.UpdateToken(ctx, tok.ID, tok.Name, tok.Active, []string{})
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (m *mock) UpdateToken(ctx context.Context,
 	id, name string,
 	active bool,

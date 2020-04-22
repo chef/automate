@@ -54,6 +54,3 @@ func (s *state) GetTokens(context.Context) ([]*tokens.Token, error) {
 func (s *state) PurgeProject(context.Context, string) error {
 	return s.err
 }
-func (s *state) ResetToV1(context.Context) error {
-	return s.err
-}
