@@ -134,4 +134,8 @@ require (
 	gopkg.in/yaml.v2 v2.2.7
 )
 
+// https://github.com/dexidp/dex/issues/1578
 replace github.com/dexidp/dex => github.com/ryancragun/dex v2.19.0-incompatible+incompatible
+
+// bumping github.com/open-policy-agent/opa would drag in in protobuf 1.4.0
+replace github.com/golang/protobuf => github.com/golang/protobuf v1.3.5
