@@ -42,7 +42,7 @@ func (a *InfraProxyServer) GetRole(ctx context.Context, r *gwreq.Role) (*gwres.R
 		DefaultAttributes:  res.GetDefaultAttributes(),
 		OverrideAttributes: res.GetOverrideAttributes(),
 		RunList:            res.GetRunList(),
-		ExpandedRunList:    fromUpstreamExpandedRunList(res.GetExpandedRunList()),
+		ExpandedRunList:    GetUpstreamExpandedRunList(res.GetExpandedRunList()),
 		JsonClass:          res.GetJsonClass(),
 	}, nil
 }
@@ -61,7 +61,8 @@ func fromUpstreamRoles(roles []*infra_res.RoleListItem) []*gwres.RoleListItem {
 	return ts
 }
 
-func fromUpstreamExpandedRunList(expRunList []*infra_res.ExpandedRunList) []*gwres.ExpandedRunList {
+// GetUpstreamExpandedRunList gets the expanded run-list from upstream API.
+func GetUpstreamExpandedRunList(expRunList []*infra_res.ExpandedRunList) []*gwres.ExpandedRunList {
 	exp := make([]*gwres.ExpandedRunList, len(expRunList))
 
 	for i, e := range expRunList {
