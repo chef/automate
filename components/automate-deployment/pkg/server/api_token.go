@@ -89,7 +89,7 @@ func generateAdminToken(ctx context.Context,
 		return nil, errors.Wrap(err, "permission token error")
 	}
 	return &api.GenerateAdminTokenResponse{
-		ApiToken: response.Value,
-		TokenId:  tokenID,
+		TokenValue: response.Value,
+		TokenId:    tokenID,
 	}, nil
 }
