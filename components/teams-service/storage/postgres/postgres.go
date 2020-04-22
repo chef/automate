@@ -251,13 +251,6 @@ func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
 }
 
 // RemoveUsers deletes teams_users_association rows by teamID and userID, returning the storage team.
-//
-//
-// NOTE: We aren't filtering on projects here for expediency since the server call
-// is already calling GetTeam which does project filtering and will bail in the
-// server code before we get here if the team in question was filtered, but if we call this
-// from a different context we should apply project filtering in this function as well.
-// Not doing it to save us a database call since it's not needed currently.
 func (p *postgres) RemoveUsers(ctx context.Context, id string, userIDs []string) (updatedUserIDs []string, err error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -292,17 +285,15 @@ func (p *postgres) RemoveUsers(ctx context.Context, id string, userIDs []string)
 		return []string{}, p.processError(err)
 	}
 
-	err = tx.Commit()
+	row := tx.QueryRowContext(ctx,
+		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=$1`,
+		dbID)
+	err = row.Scan(pq.Array(&updatedUserIDs))
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
-	// now that the transaction is complete and the team's users are updated,
-	// we return the updated list
-	row := p.db.QueryRowContext(ctx,
-		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=$1`,
-		dbID)
-	err = row.Scan(pq.Array(&updatedUserIDs))
+	err = tx.Commit()
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -370,12 +361,6 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]st
 
 // AddUsers adds users to a team (adding rows to teams_users_associations and updating
 // team updated_at)
-//
-// NOTE: We aren't filtering on projects here for expediency since the server call
-// is already calling GetTeamByName which does project filtering and will bail in the
-// server code before we get here if the team in question was filtered, but if we call this
-// from a different context we should apply project filtering in this function as well.
-// Not doing it to save us a database call since it's not needed currently.
 func (p *postgres) AddUsers(ctx context.Context,
 	id string, userIDs []string) (updatedUserIDs []string, err error) {
 
@@ -396,7 +381,7 @@ func (p *postgres) AddUsers(ctx context.Context,
 		`SELECT db_id, projects FROM teams
 		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
 		id, pq.Array(projectsFilter)).
-		Scan(&dbID, pq.Array(&teamProjects)) // TODO is there a way to get these projects without returning them?
+		Scan(&dbID, pq.Array(&teamProjects))
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -419,17 +404,15 @@ func (p *postgres) AddUsers(ctx context.Context,
 		return nil, p.processError(err)
 	}
 
-	err = tx.Commit()
+	row := tx.QueryRowContext(ctx,
+		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=team_db_id($1)`,
+		id)
+	err = row.Scan(pq.Array(&updatedUserIDs))
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
-	// now that the transaction is complete and the team's users are updated,
-	// we return the updated list
-	row := p.db.QueryRowContext(ctx,
-		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=team_db_id($1)`,
-		id)
-	err = row.Scan(pq.Array(&updatedUserIDs))
+	err = tx.Commit()
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -438,38 +421,24 @@ func (p *postgres) AddUsers(ctx context.Context,
 }
 
 // GetUserIDsForTeam returns the user IDs for all members of the team.
-//
-// NOTE: We aren't filtering on projects here for expediency since the server call
-// is already calling GetTeamByName which does project filtering and will bail in the
-// server code before we get here if the team in question was filtered, but if we call this
-// from a different context we should apply project filtering in this function as well.
-// Not doing it to save us a database call since it's not needed currently.
 func (p *postgres) GetUserIDsForTeam(ctx context.Context, id string) ([]string, error) {
 	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
-	var dbID int
-	var teamProjects []string
-	// ensure the team exists and isn't filtered out by the project filter
-	err = p.db.QueryRowContext(ctx,
-		`SELECT db_id, projects FROM teams
-		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
-		id, pq.Array(projectsFilter)).
-		Scan(&dbID, pq.Array(&teamProjects)) // TODO is there a way to get these projects without returning them?
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
 	var userIDs []string
 	row := p.db.QueryRowContext(ctx,
-		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=$1`, dbID)
+		`SELECT array_agg(user_id) 
+		FROM teams_users_associations INNER JOIN teams
+		ON teams.db_id=teams_users_associations.team_db_id
+		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
+		id, pq.Array(projectsFilter))
 	err = row.Scan(pq.Array(&userIDs))
-
 	if err != nil {
 		return nil, p.processError(err)
 	}
+
 	return userIDs, nil
 }
 
