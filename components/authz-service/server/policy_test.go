@@ -38,7 +38,7 @@ var dummyWriter engine.Writer = nil
 func TestCreatePolicy(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.policyCache
 	cases := []struct {
@@ -540,7 +540,7 @@ func TestCreatePolicy(t *testing.T) {
 func TestDeletePolicy(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.policyCache
 
@@ -637,7 +637,7 @@ func TestListPolicies(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
 	req := api_v2.ListPoliciesReq{} // it's not changing, can be reused
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.policyCache
 
@@ -735,7 +735,7 @@ func TestListPolicies(t *testing.T) {
 func TestListPolicyMembers(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.policyCache
 	cases := []struct {
@@ -815,7 +815,7 @@ func TestListPolicyMembers(t *testing.T) {
 func TestGetPolicy(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.policyCache
 	cases := []struct {
@@ -912,7 +912,7 @@ func TestUpdatePolicy(t *testing.T) {
 	}
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.policyCache
 	cases := []struct {
@@ -1137,7 +1137,7 @@ func TestUpdatePolicy(t *testing.T) {
 func TestReplacePolicyMembers(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.policyCache
 	cases := []struct {
@@ -1203,7 +1203,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 func TestRemovePolicyMembers(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.policyCache
 	cases := []struct {
@@ -1349,7 +1349,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 func TestAddPolicyMembers(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.policyCache
 	cases := []struct {
@@ -1455,7 +1455,7 @@ func TestAddPolicyMembers(t *testing.T) {
 
 func TestCreateRole(t *testing.T) {
 	ctx := context.Background()
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.roleCache
 
@@ -1754,7 +1754,7 @@ func TestCreateRole(t *testing.T) {
 func TestUpdateRole(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.roleCache
 	existingRoleId := "test-role"
@@ -1970,7 +1970,7 @@ func TestUpdateRole(t *testing.T) {
 func TestDeleteRole(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.roleCache
 	cases := map[string]func(*testing.T){
@@ -2033,7 +2033,7 @@ func TestListRoles(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
 	req := api_v2.ListRolesReq{} // it's not changing, can be reused
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.roleCache
 	cases := map[string]func(*testing.T){
@@ -2093,7 +2093,7 @@ func TestListRoles(t *testing.T) {
 func TestGetRole(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.roleCache
 	cases := []struct {
@@ -2230,7 +2230,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 
 	ctx := context.Background()
 	te := &testEngine{}
-	ts := setupV2p1WithWriter(t, te)
+	ts := setup(t, nil, te)
 	cl := ts.policy
 	store := ts.policyCache
 
@@ -2348,7 +2348,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 func TestPurgeSubjectFromPolicies(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
+	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.policyCache
 	cases := []struct {
@@ -2465,14 +2465,7 @@ type testSetup struct {
 	projectCache *cache.Cache
 }
 
-func setupV2p1WithWriter(t *testing.T,
-	writer engine.Writer) testSetup {
-	return setupV2(t, nil, writer)
-}
-
-func setupV2(t *testing.T,
-	authorizer engine.Authorizer,
-	writer engine.Writer) testSetup {
+func setup(t *testing.T, authorizer engine.Authorizer, writer engine.Writer) testSetup {
 
 	t.Helper()
 	ctx := context.Background()
@@ -2484,20 +2477,20 @@ func setupV2(t *testing.T,
 		writer = &testEngine{}
 	}
 
-	mem_v2 := memstore.New()
+	memInstance := memstore.New()
 
-	polRefresher, err := server.NewPolicyRefresher(ctx, l, writer, mem_v2)
+	polRefresher, err := server.NewPolicyRefresher(ctx, l, writer, memInstance)
 	require.NoError(t, err)
 
-	polV2, err := server.NewPoliciesServer(ctx, l, polRefresher, mem_v2, writer)
+	polV2, err := server.NewPoliciesServer(ctx, l, polRefresher, memInstance, writer)
 	require.NoError(t, err)
 
 	require.NoError(t, err)
-	projectsSrv, err := server.NewProjectsServer(ctx, l, mem_v2,
+	projectsSrv, err := server.NewProjectsServer(ctx, l, memInstance,
 		testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockProjectPurger(true), testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
-	authzV2, err := server.NewAuthzServer(l, authorizer, projectsSrv, mem_v2)
+	authzV2, err := server.NewAuthzServer(l, authorizer, projectsSrv, memInstance)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -2528,9 +2521,9 @@ func setupV2(t *testing.T,
 		policy:       api_v2.NewPoliciesClient(conn),
 		authz:        api_v2.NewAuthorizationClient(conn),
 		projects:     api_v2.NewProjectsClient(conn),
-		policyCache:  mem_v2.PoliciesCache(),
-		roleCache:    mem_v2.RolesCache(),
-		projectCache: mem_v2.ProjectsCache(),
+		policyCache:  memInstance.PoliciesCache(),
+		roleCache:    memInstance.RolesCache(),
+		projectCache: memInstance.ProjectsCache(),
 	}
 }
 

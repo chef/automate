@@ -17,8 +17,8 @@ import (
  * NOTE: These tests are mini-integration tests at the service API level,    *
  * confirming that the wiring to our OPA engine infrastructure is correct.   *
  *                                                                           *
- * For lower level OPA tests, see opa_v2_test.go.                            *
- * For the next-lower down integration tests, see conformance_v2_test.go,    *
+ * For lower level OPA tests, see opa_test.go.                               *
+ * For the next-lower down integration tests, see conformance_test.go,       *
  * which actually use the OPA engine.                                        *
  ************ ************ ************ ************ ************ ************/
 
@@ -116,7 +116,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 
 func setupV2p1AuthTests(t *testing.T, eng *responderEngine) (context.Context, testSetup) {
 	ctx := context.Background()
-	ts := setupV2(t, eng, nil)
+	ts := setup(t, eng, nil)
 	return ctx, ts
 }
 

@@ -53,7 +53,7 @@ func (m *policyRefresherMessageRefresh) Err() error {
 func NewPostgresPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.Writer) (PolicyRefresher, error) {
 	store := postgres.GetInstance()
 	if store == nil {
-		return nil, errors.New("postgres v2 singleton not yet initialized for policy refresher")
+		return nil, errors.New("postgres singleton not yet initialized for policy refresher")
 	}
 	return NewPolicyRefresher(ctx, log, engine, store)
 }
@@ -164,7 +164,7 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 	// Engine updates need unfiltered access to all data.
 	ctx = auth_context.ContextWithoutProjects(ctx)
 
-	refresher.log.Info("initializing OPA store for v2.1")
+	refresher.log.Info("initializing OPA store")
 	policyMap, err := refresher.getPolicyMap(ctx)
 	if err != nil {
 		return err
@@ -175,9 +175,6 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 	}
 
 	return refresher.engine.SetPolicies(ctx, policyMap, roleMap)
-
-	// Note 2019/06/04 (sr): v1?! Yes, IAM v1. Our POC code depends on this query
-	// to be answered regardless of whether IAM is v1 or v2.
 }
 
 func (refresher *policyRefresher) getPolicyMap(ctx context.Context) (map[string]interface{}, error) {
@@ -187,7 +184,7 @@ func (refresher *policyRefresher) getPolicyMap(ctx context.Context) (map[string]
 	if policies, err = refresher.store.ListPolicies(ctx); err != nil {
 		return nil, err
 	}
-	refresher.log.Infof("initializing OPA store with %d V2 policies", len(policies))
+	refresher.log.Infof("initializing OPA store with %d policies", len(policies))
 
 	policies = append(policies, SystemPolicies()...)
 
@@ -234,7 +231,7 @@ func (refresher *policyRefresher) getRoleMap(ctx context.Context) (map[string]in
 	if roles, err = refresher.store.ListRoles(ctx); err != nil {
 		return nil, err
 	}
-	refresher.log.Infof("initializing OPA store with %d V2 roles", len(roles))
+	refresher.log.Infof("initializing OPA store with %d roles", len(roles))
 
 	// OPA requires this format
 	data := make(map[string]interface{})

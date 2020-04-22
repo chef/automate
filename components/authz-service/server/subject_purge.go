@@ -8,31 +8,31 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
-type v2SubjectPurger interface {
+type subjectPurger interface {
 	PurgeSubjectFromPolicies(context.Context,
 		*api_v2.PurgeSubjectFromPoliciesReq) (*api_v2.PurgeSubjectFromPoliciesResp, error)
 }
 
 type purger struct {
 	log logger.Logger
-	v2  v2SubjectPurger
+	sp  subjectPurger
 }
 
 func NewSubjectPurgeServer(_ context.Context,
 	l logger.Logger,
-	v2 v2SubjectPurger,
+	sp subjectPurger,
 ) (common.SubjectPurgeServer, error) {
-	return &purger{log: l, v2: v2}, nil
+	return &purger{log: l, sp: sp}, nil
 }
 
 func (p *purger) PurgeSubjectFromPolicies(ctx context.Context,
 	req *common.PurgeSubjectFromPoliciesReq) (*common.PurgeSubjectFromPoliciesResp, error) {
 
-	v2Resp, err := p.v2.PurgeSubjectFromPolicies(ctx, (*api_v2.PurgeSubjectFromPoliciesReq)(req))
+	resp, err := p.sp.PurgeSubjectFromPolicies(ctx, (*api_v2.PurgeSubjectFromPoliciesReq)(req))
 	if err != nil {
 		return nil, err
 	}
 	return &common.PurgeSubjectFromPoliciesResp{
-		PoliciesV2: v2Resp.Ids,
+		PoliciesV2: resp.Ids,
 	}, nil
 }

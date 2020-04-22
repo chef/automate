@@ -15,7 +15,7 @@ type Storage interface {
 	projectStorage
 	ruleStorage
 
-	// Reset allows "factory-resetting" IAM v2 policies
+	// Reset allows "factory-resetting" IAM policies
 	Reset(context.Context) error
 
 	// Close closes the connection to the backend
@@ -78,7 +78,7 @@ type ruleStorage interface {
 	FetchAppliedRulesByProjectIDs(context.Context) (map[string][]*Rule, error)
 }
 
-// DefaultPolicies shipped with IAM v2, and also the set of policies to which we
+// DefaultPolicies shipped with IAM, and also the set of policies to which we
 // factory-reset our storage.
 func DefaultPolicies() ([]Policy, error) {
 

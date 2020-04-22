@@ -61,7 +61,7 @@ func NewGRPCServer(ctx context.Context,
 
 	err := postgres.Initialize(ctx, e, l, migrationsConfig, dataMigrationsConfig, projectLimit)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v2 postgres singleton")
+		return nil, errors.Wrap(err, "could not initialize postgres singleton")
 	}
 
 	cerealManager, err := createProjectUpdateCerealManager(connFactory, cerealAddress)
@@ -71,25 +71,25 @@ func NewGRPCServer(ctx context.Context,
 
 	policyRefresher, err := NewPostgresPolicyRefresher(ctx, l, e)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v2 policy refresher")
+		return nil, errors.Wrap(err, "could not initialize policy refresher")
 	}
 
-	v2ProjectsServer, err := NewPostgresProjectsServer(ctx, l, cerealManager, policyRefresher)
+	projectsServer, err := NewPostgresProjectsServer(ctx, l, cerealManager, policyRefresher)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v2 projects server")
+		return nil, errors.Wrap(err, "could not initialize projects server")
 	}
 
-	v2AuthzServer, err := NewPostgresAuthzServer(l, e, v2ProjectsServer)
+	authzServer, err := NewPostgresAuthzServer(l, e, projectsServer)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v2 authz server")
+		return nil, errors.Wrap(err, "could not initialize authz server")
 	}
 
-	v2PolServer, err := NewPostgresPolicyServer(ctx, l, policyRefresher, e)
+	polServer, err := NewPostgresPolicyServer(ctx, l, policyRefresher, e)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v2 policy server")
+		return nil, errors.Wrap(err, "could not initialize policy server")
 	}
 
-	subjectPurgeServer, err := NewSubjectPurgeServer(ctx, l, v2PolServer)
+	subjectPurgeServer, err := NewSubjectPurgeServer(ctx, l, polServer)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize subject purge server")
 	}
@@ -121,16 +121,16 @@ func NewGRPCServer(ctx context.Context,
 				tracing.ServerInterceptor(tracing.GlobalTracer()),
 				grpc_logrus.UnaryServerInterceptor(logrusEntry, logrusOpts...),
 				InputValidationInterceptor(),
-				v2PolServer.EngineUpdateInterceptor(),
+				polServer.EngineUpdateInterceptor(),
 			),
 		),
 	)
 
 	// register all services
 	health.RegisterHealthServer(g, health.NewService())
-	api_v2.RegisterPoliciesServer(g, v2PolServer)
-	api_v2.RegisterProjectsServer(g, v2ProjectsServer)
-	api_v2.RegisterAuthorizationServer(g, v2AuthzServer)
+	api_v2.RegisterPoliciesServer(g, polServer)
+	api_v2.RegisterProjectsServer(g, projectsServer)
+	api_v2.RegisterAuthorizationServer(g, authzServer)
 	common.RegisterSubjectPurgeServer(g, subjectPurgeServer)
 	reflection.Register(g)
 

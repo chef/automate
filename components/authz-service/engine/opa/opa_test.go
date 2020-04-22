@@ -1,4 +1,3 @@
-// These tests are for the v2 specific functionality.
 package opa_test
 
 import (
@@ -27,9 +26,9 @@ import (
  * so should be the first line of attack when crafting new rego code.        *
  *                                                                           *
  * These tests do NOT actually invoke the functions in opa.go! Rather,       *
- * they connect to OPA with direct calls (see `resultSetV2` in this file).   *
+ * they connect to OPA with direct calls (see `resultSet` in this file).     *
  *                                                                           *
- * Once these tests pass, move on to the conformance_v2_test.go              *
+ * Once these tests pass, move on to the conformance_test.go                 *
  * that actually do test the functions in opa.go.                            *
  ************ ************ ************ ************ ************ ************/
 
@@ -82,7 +81,7 @@ func TestAuthorizedWithStatements(t *testing.T) {
 	// This data is what our rego code expects to find in the store.
 	//
 	// NOTE the the statements have a similar "id => data" layout as used with
-	// policies in v1 (and v2); that's done to avoid the state explosion issues
+	// policies; that's done to avoid the state explosion issues
 	// we had thought with v1 policies when there's an exponential runtime (in the
 	// number of policies).
 	// It might make sense to adapt our storage layer to expose IDs there -- if we
@@ -150,7 +149,7 @@ func TestAuthorizedWithStatements(t *testing.T) {
 
 	for descr, input := range cases {
 		t.Run(descr, func(t *testing.T) {
-			rs := resultSetV2(t, input, strings.NewReader(data), query)
+			rs := resultSet(t, input, strings.NewReader(data), query)
 
 			require.Equal(t, 1, len(rs), "expected one result")
 			require.Equal(t, 1, len(rs[0].Expressions), "expected one result expression")
@@ -220,7 +219,7 @@ func TestAuthorizedWithStatements(t *testing.T) {
 
 	for descr, input := range cases {
 		t.Run(descr+" (DENY)", func(t *testing.T) {
-			rs := resultSetV2(t, input, strings.NewReader(data), query)
+			rs := resultSet(t, input, strings.NewReader(data), query)
 
 			require.Equal(t, 1, len(rs), "expected one result")
 			require.Equal(t, 1, len(rs[0].Expressions), "expected one result expression")
@@ -279,7 +278,7 @@ func TestAuthorizedProjects(t *testing.T) {
 
 	for descr, input := range cases {
 		t.Run(descr, func(t *testing.T) {
-			rs := resultSetV2(t, input, strings.NewReader(data), query)
+			rs := resultSet(t, input, strings.NewReader(data), query)
 
 			require.Equal(t, 1, len(rs), "expected one result")
 			require.Equal(t, 1, len(rs[0].Expressions), "expected one result expression")
@@ -291,7 +290,7 @@ func TestAuthorizedProjects(t *testing.T) {
 	}
 }
 
-func TestIntrospectionV2(t *testing.T) {
+func TestIntrospection(t *testing.T) {
 	data := `{
   "policies": {
     "9acbe920-d977-4c4d-a482-f125fe83a95a": {
@@ -354,7 +353,7 @@ func TestIntrospectionV2(t *testing.T) {
 
 	for descr, input := range cases {
 		t.Run(descr, func(t *testing.T) {
-			rs := resultSetV2(t, input, strings.NewReader(data), query)
+			rs := resultSet(t, input, strings.NewReader(data), query)
 
 			require.NotZero(t, len(rs), "expected at least one result")
 			for _, result := range rs {
@@ -419,7 +418,7 @@ func TestActionsMatching(t *testing.T) {
 					// We ask directly for what's used in the definition of
 					// data.authz.has_action: the action_matches(in, stored) function
 					query := fmt.Sprintf("data.authz.action_matches(%q, %q)", in, stored)
-					rs := resultSetV2(t, input, strings.NewReader(data), query)
+					rs := resultSet(t, input, strings.NewReader(data), query)
 					if expectedSuccess {
 						require.Equal(t, 1, len(rs))
 						require.Equal(t, 1, len(rs[0].Expressions), "expected one result expression")
@@ -487,7 +486,7 @@ func TestSubjectsMatching(t *testing.T) {
 				t.Run(stored, func(t *testing.T) {
 
 					query := fmt.Sprintf("data.common.subject_matches(%q, %q)", in, stored)
-					rs := resultSetV2(t, input, strings.NewReader(data), query)
+					rs := resultSet(t, input, strings.NewReader(data), query)
 					if expectedSuccess {
 						require.Equal(t, 1, len(rs))
 						require.Equal(t, 1, len(rs[0].Expressions), "expected one result expression")
@@ -560,7 +559,7 @@ func TestHasAction(t *testing.T) {
 
 	for desc, data := range cases {
 		t.Run(desc, func(t *testing.T) {
-			rs := resultSetV2(t, input, strings.NewReader(data), query)
+			rs := resultSet(t, input, strings.NewReader(data), query)
 			require.Equal(t, 1, len(rs))
 			actualBinding := map[string]string{}
 			err := mapstructure.Decode(rs[0].Bindings, &actualBinding)
@@ -596,7 +595,7 @@ func TestHasProject(t *testing.T) {
 
 	for desc, data := range cases {
 		t.Run(desc, func(t *testing.T) {
-			rs := resultSetV2(t, input, strings.NewReader(data), query)
+			rs := resultSet(t, input, strings.NewReader(data), query)
 			require.Equal(t, 1, len(rs))
 			actualBinding := map[string]string{}
 			err := mapstructure.Decode(rs[0].Bindings, &actualBinding)
@@ -608,7 +607,7 @@ func TestHasProject(t *testing.T) {
 
 // Helper functions
 
-func resultSetV2(t *testing.T,
+func resultSet(t *testing.T,
 	input map[string]interface{},
 	data io.Reader,
 	query string,
@@ -621,7 +620,7 @@ func resultSetV2(t *testing.T,
 
 	r := rego.New(
 		rego.Query(query),
-		rego.Compiler(compilerV2(t)),
+		rego.Compiler(compiler(t)),
 		rego.Store(inmem.NewFromReader(data)),
 		rego.Tracer(tracer),
 		rego.Input(input),
@@ -641,7 +640,7 @@ func resultSetV2(t *testing.T,
 	return rs
 }
 
-func compilerV2(t *testing.T) *ast.Compiler {
+func compiler(t *testing.T) *ast.Compiler {
 	t.Helper()
 	return compilerWithModules(t, map[string]string{
 		"authz.rego":         "../opa/policy/authz.rego",

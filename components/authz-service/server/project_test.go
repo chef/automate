@@ -552,13 +552,13 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
 
-	mem_v2 := memstore.NewWithProjectLimit(projectLimitForTesting)
+	memInstance := memstore.NewWithProjectLimit(projectLimitForTesting)
 	// TODO: we should be able to optionally use PG. We're only using memstore
 	pg, testDb, _, _, _ := testhelpers.SetupTestDBWithLimit(t, projectLimitForTesting)
 	manager, err := cereal.NewManager(postgres.NewPostgresBackend(testDb.ConnURI))
 	require.NoError(t, err)
 	domainServices := []string{"testdomain"}
-	projectPurger, err := project_purger_workflow.RegisterCerealProjectPurgerWithDomainServices(manager, l, mem_v2, domainServices)
+	projectPurger, err := project_purger_workflow.RegisterCerealProjectPurgerWithDomainServices(manager, l, memInstance, domainServices)
 	require.NoError(t, err)
 
 	err = project_purge.RegisterTaskExecutors(manager, "testdomain", &MockPurgeClient{})
@@ -566,7 +566,7 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 
 	projectUpdateManager := testhelpers.NewMockProjectUpdateManager()
 	projectsSrv, err := server.NewProjectsServer(
-		ctx, l, mem_v2,
+		ctx, l, memInstance,
 		projectUpdateManager, projectPurger, testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -587,7 +587,7 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	}
 
 	manager.Start(ctx)
-	return api.NewProjectsClient(conn), mem_v2.ProjectsCache(), mem_v2.RulesCache(), seed,
+	return api.NewProjectsClient(conn), memInstance.ProjectsCache(), memInstance.RulesCache(), seed,
 		func() {
 			manager.Stop()
 			pg.Close()

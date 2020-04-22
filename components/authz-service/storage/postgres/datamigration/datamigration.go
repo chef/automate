@@ -76,7 +76,7 @@ func (c *Config) Reset() error {
 func (c *Config) open() (*migrate.Migrate, error) {
 	d, err := db.PGOpen(c.PGURL.String(), db.WithoutPinger())
 	if err != nil {
-		return nil, errors.Wrap(err, "init v2 sql client")
+		return nil, errors.Wrap(err, "init sql client")
 	}
 	driver, err := postgres.WithInstance(d, &postgres.Config{
 		MigrationsTable: "data_migrations",

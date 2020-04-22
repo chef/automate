@@ -55,12 +55,12 @@ func NewPostgresPolicyServer(
 
 	s := postgres.GetInstance()
 	if s == nil {
-		return nil, errors.New("postgres v2 singleton not yet initialized for policy server")
+		return nil, errors.New("postgres singleton not yet initialized for policy server")
 	}
 	return NewPoliciesServer(ctx, l, pr, s, e)
 }
 
-// NewPoliciesServer returns a new IAM v2 Policy server.
+// NewPoliciesServer returns a new IAM Policy server.
 func NewPoliciesServer(
 	ctx context.Context,
 	l logger.Logger,
@@ -86,7 +86,7 @@ func NewPoliciesServer(
 /* * * * * * * * * * * * * * * * * * POLICIES  * * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// CreatePolicy creates an IAM v2 policy.
+// CreatePolicy creates an IAM policy.
 func (s *policyServer) CreatePolicy(
 	ctx context.Context,
 	req *api.CreatePolicyReq) (*api.Policy, error) {
@@ -143,7 +143,7 @@ func (s *policyServer) PurgeSubjectFromPolicies(ctx context.Context,
 	return &api.PurgeSubjectFromPoliciesResp{Ids: affected}, nil
 }
 
-// ListPolicies fetches a list of all IAM v2 policies.
+// ListPolicies fetches a list of all IAM policies.
 func (s *policyServer) ListPolicies(ctx context.Context,
 	_ *api.ListPoliciesReq) (*api.ListPoliciesResp, error) {
 
@@ -162,7 +162,7 @@ func (s *policyServer) ListPolicies(ctx context.Context,
 	return &resp, nil
 }
 
-// GetPolicy fetches an IAM v2 policy.
+// GetPolicy fetches an IAM policy.
 func (s *policyServer) GetPolicy(
 	ctx context.Context,
 	req *api.GetPolicyReq) (*api.Policy, error) {
@@ -183,7 +183,7 @@ func (s *policyServer) GetPolicy(
 	return policyFromInternal(polInternal)
 }
 
-// DeletePolicy removes an IAM v2 policy from the data store.
+// DeletePolicy removes an IAM policy from the data store.
 func (s *policyServer) DeletePolicy(
 	ctx context.Context,
 	req *api.DeletePolicyReq) (*api.DeletePolicyResp, error) {
@@ -204,7 +204,7 @@ func (s *policyServer) DeletePolicy(
 	}
 }
 
-// UpdatePolicy modifies properties of an IAM v2 policy.
+// UpdatePolicy modifies properties of an IAM policy.
 // All properties must be supplied, whether changed or not.
 func (s *policyServer) UpdatePolicy(
 	ctx context.Context,
@@ -266,7 +266,7 @@ func (s *policyServer) UpdatePolicy(
 /* * * * * * * * * * * * * * * * * *  MEMBERS  * * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// ListPolicyMembers fetches an IAM v2 policy's membership list.
+// ListPolicyMembers fetches an IAM policy's membership list.
 func (s *policyServer) ListPolicyMembers(
 	ctx context.Context,
 	req *api.ListPolicyMembersReq) (*api.ListPolicyMembersResp, error) {
@@ -394,7 +394,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 /* * * * * * * * * * * * * * * * * *   ROLES   * * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// CreateRole creates an IAM v2 role.
+// CreateRole creates an IAM role.
 func (s *policyServer) CreateRole(
 	ctx context.Context,
 	req *api.CreateRoleReq) (*api.Role, error) {
@@ -429,7 +429,7 @@ func (s *policyServer) CreateRole(
 	return roleFromInternal(returnRole)
 }
 
-// ListRoles fetches a list of all IAM v2 roles.
+// ListRoles fetches a list of all IAM roles.
 func (s *policyServer) ListRoles(ctx context.Context,
 	_ *api.ListRolesReq) (*api.ListRolesResp, error) {
 
@@ -455,7 +455,7 @@ func (s *policyServer) ListRoles(ctx context.Context,
 	return &resp, nil
 }
 
-// GetRole fetches an IAM v2 role.
+// GetRole fetches an IAM role.
 func (s *policyServer) GetRole(
 	ctx context.Context,
 	req *api.GetRoleReq) (*api.Role, error) {
@@ -476,7 +476,7 @@ func (s *policyServer) GetRole(
 	}
 }
 
-// DeleteRole removes an IAM v2 role from the data store.
+// DeleteRole removes an IAM role from the data store.
 func (s *policyServer) DeleteRole(
 	ctx context.Context,
 	req *api.DeleteRoleReq) (*api.DeleteRoleResp, error) {
@@ -549,7 +549,7 @@ func (s *policyServer) GetPolicyVersion(ctx context.Context,
 	}, nil
 }
 
-// EngineUpdateInterceptor is a middleware for updating the V2 engine when a
+// EngineUpdateInterceptor is a middleware for updating the engine when a
 // certain set of methods has been executed successfully.
 func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context,
@@ -703,7 +703,7 @@ func membersFromAPI(apiMembers []string) ([]storage.Member, error) {
 	for i, member := range apiMembers {
 		memberInternal, err := storage.NewMember(member)
 		if err != nil {
-			return nil, errors.Wrap(err, "format v2 member")
+			return nil, errors.Wrap(err, "format member")
 		}
 		members[i] = memberInternal
 	}
