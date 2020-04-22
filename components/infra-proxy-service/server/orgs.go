@@ -42,9 +42,8 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 
 	newSecret := &secrets.Secret{
 		Name: "infra-proxy-service-admin-key",
-		Type: "ssh",
+		Type: "chef-server",
 		Data: []*query.Kv{
-			{Key: "username", Value: req.AdminUser},
 			{Key: "key", Value: req.AdminKey},
 		},
 	}
@@ -195,9 +194,8 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		newSecret := &secrets.Secret{
 			Id:   secret.GetId(),
 			Name: "infra-proxy-service-admin-key",
-			Type: "ssh",
+			Type: "chef-server",
 			Data: []*query.Kv{
-				{Key: "username", Value: req.AdminUser},
 				{Key: "key", Value: req.AdminKey},
 			},
 		}
