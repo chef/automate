@@ -11,8 +11,6 @@ Example (from `components/automate-gateway/api/iam/v2/teams.proto`):
       post: "/iam/v2/teams"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "auth:teams";
-    option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:teams";
     option (chef.automate.api.iam.policy).action = "iam:teams:create";
   };
