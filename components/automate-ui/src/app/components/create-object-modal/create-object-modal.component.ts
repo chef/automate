@@ -4,11 +4,9 @@ import {
 import { FormGroup } from '@angular/forms';
 
 import { IdMapper } from 'app/helpers/auth/id-mapper';
-import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import {
-  ProjectChecked,
-  ProjectCheckedMap
-} from 'app/components/projects-dropdown/projects-dropdown.component';
+  Project, ProjectConstants, ProjectChecked, ProjectCheckedMap
+} from 'app/entities/projects/project.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

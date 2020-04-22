@@ -15,16 +15,14 @@ import { EntityStatus, pending } from 'app/entities/entities';
 import { User } from 'app/entities/users/user.model';
 import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import {
-  ProjectChecked,
-  ProjectCheckedMap
-} from 'app/components/projects-dropdown/projects-dropdown.component';
 import { GetProjects } from 'app/entities/projects/project.actions';
 import {
   allProjects,
   getAllStatus as getAllProjectStatus
 } from 'app/entities/projects/project.selectors';
-import { ProjectConstants } from 'app/entities/projects/project.model';
+import {
+  ProjectConstants, ProjectChecked, ProjectCheckedMap
+} from 'app/entities/projects/project.model';
 import {
   teamFromRoute,
   teamUsers,

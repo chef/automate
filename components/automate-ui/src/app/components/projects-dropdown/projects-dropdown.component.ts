@@ -1,19 +1,18 @@
 import { Component, EventEmitter, Input, Output, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
-import { ProjectConstants, Project } from 'app/entities/projects/project.model';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 
 const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
 
-// Extend the project model with the checked field.
-// This represents whether the project's checkbox is unchecked or not
-// in this component's UI
-export interface ProjectChecked extends Project {
+export interface ResourceChecked {
+  id: string;
+  name: string;
   checked: boolean;
 }
 
-export interface ProjectCheckedMap {
-  [id: string]: ProjectChecked;
+export interface ResourceCheckedMap {
+  [id: string]: ResourceChecked;
 }
 
 @Component({
@@ -22,9 +21,9 @@ export interface ProjectCheckedMap {
   styleUrls: ['./projects-dropdown.component.scss']
 })
 export class ProjectsDropdownComponent implements OnInit, OnChanges {
-  // The map of ProjectChecked by id. Any checked changes propagated via
+  // The map of ResourceChecked by id. Any checked changes propagated via
   // onProjectChecked. Updates should be applied to parent component state.
-  @Input() projects: ProjectCheckedMap = {};
+  @Input() projects: ResourceCheckedMap = {};
 
   // Setting disabled to true means the dropdown will be unusable and will have a grey background
   @Input() disabled = false;
@@ -42,11 +41,11 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   @Input() objectNounPlural = 'MISSING REQUIRED PARAMETER';
 
   // Emits a project that changed as a result of a check or uncheck.
-  @Output() onProjectChecked = new EventEmitter<ProjectChecked>();
+  @Output() onProjectChecked = new EventEmitter<ResourceChecked>();
 
   // filteredProjects is merely a container to hold the projectsArray
   // that can be altered
-  public filteredProjects: ProjectChecked[] = [];
+  public filteredProjects: ResourceChecked[] = [];
   public active = false;
   public label = UNASSIGNED_PROJECT_ID;
   public filterValue = '';
@@ -68,7 +67,7 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     }
   }
 
-  get projectsArray(): ProjectChecked[] {
+  get projectsArray(): ResourceChecked[] {
     return ChefSorters.naturalSort(Object.values(this.projects), 'name');
   }
 
@@ -85,7 +84,7 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     this.active = !this.active;
   }
 
-  projectChecked(checked: boolean, project: ProjectChecked): void {
+  projectChecked(checked: boolean, project: ResourceChecked): void {
     project.checked = checked;
     this.updateLabel();
     this.onProjectChecked.emit(project);
@@ -101,7 +100,7 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     this.filteredProjects = this.filterProjects(this.filterValue);
   }
 
-  filterProjects(value: string): ProjectChecked[]  {
+  filterProjects(value: string): ResourceChecked[]  {
     return this.projectsArray.filter(project =>
       project.id.toLowerCase().indexOf(value.toLowerCase()) > -1
     );

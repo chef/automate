@@ -11,18 +11,18 @@ import { routeParams } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { pending, EntityStatus } from 'app/entities/entities';
 import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions';
-import { apiTokenFromRoute, getStatus, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
+import {
+  apiTokenFromRoute, getStatus, updateStatus
+} from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
-import { Project, ProjectConstants } from 'app/entities/projects/project.model';
+import {
+  Project, ProjectConstants, ProjectChecked, ProjectCheckedMap
+} from 'app/entities/projects/project.model';
 import { GetProjects } from 'app/entities/projects/project.actions';
 import {
   allProjects,
   getAllStatus as getAllProjectStatus
 } from 'app/entities/projects/project.selectors';
-import {
-  ProjectChecked,
-  ProjectCheckedMap
-} from 'app/components/projects-dropdown/projects-dropdown.component';
 
 type TokenStatus = 'active' | 'inactive';
 type TokenTabName = 'details';
