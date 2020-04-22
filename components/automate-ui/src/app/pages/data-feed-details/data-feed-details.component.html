@@ -43,29 +43,8 @@
             </chef-error>
           </chef-form-field>
         </form>
-        <chef-modal label="url-modal-label" [visible]="urlStatusModalVisible" (closeModal)="closeModal('url')">
-          <div class="status-modal">
-            <ng-container *ngIf="hookStatus === urlState.Failure">
-              <div class="status-icon failure">
-                <chef-icon>warning</chef-icon>
-              </div>
-              <h3 id="url-modal-label" class="status-heading display3 failure">
-                We were unable to connect to your destination {{ destination.name }}.
-              </h3>
-              <p>Please update your destination details and try again.</p>
-              <chef-button primary (click)="closeModal('url')">Close</chef-button>
-            </ng-container>
-            <ng-container *ngIf="hookStatus === urlState.Success">
-              <div class="status-icon success">
-                <chef-icon>done</chef-icon>
-              </div>
-              <h3 class="status-heading display3">Data feed test connected successfully for {{ destination.name }}!</h3>
-              <chef-button primary (click)="closeModal('url')">Close</chef-button>
-            </ng-container>
-          </div>
-        </chef-modal>
         <div>
-          <chef-button secondary [disabled]="testInProgress" (click)="sendTestForDataFeedUrl()">
+          <chef-button secondary [disabled]="testInProgress" (click)="sendTestForDataFeedUrl(destination)">
             <chef-loading-spinner *ngIf="testInProgress"></chef-loading-spinner>
             <span *ngIf="testInProgress">Testing...</span>
             <span *ngIf="!testInProgress">Test Data Feed</span>

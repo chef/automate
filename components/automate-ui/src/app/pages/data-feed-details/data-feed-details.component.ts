@@ -10,10 +10,9 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { pending, EntityStatus } from 'app/entities/entities';
-import { GetDestination, UpdateDestination } from 'app/entities/destinations/destination.actions';
+import { GetDestination, UpdateDestination, TestDestination } from 'app/entities/destinations/destination.actions';
 import { destinationFromRoute, getStatus, updateStatus } from 'app/entities/destinations/destination.selectors';
 import { Destination } from 'app/entities/destinations/destination.model';
-import { DatafeedService } from 'app/services/data-feed/data-feed.service';
 
 type DestinationTabName = 'details';
 
@@ -24,13 +23,12 @@ enum UrlTestState {
   Failure
 }
 
-type Modal = 'url';
-
 @Component({
   selector: 'app-data-feed-details',
   templateUrl: './data-feed-details.component.html',
   styleUrls: ['./data-feed-details.component.scss']
 })
+
 export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   public tabValue: DestinationTabName = 'details';
   public destination: Destination;
@@ -39,15 +37,12 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   public saveInProgress = false;
   public testInProgress = false;
   public saveSuccessful = false;
-  public urlState = UrlTestState;
   public hookStatus = UrlTestState.Inactive;
-  public urlStatusModalVisible = false;
 
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private datafeedService: DatafeedService
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   public ngOnInit(): void {
@@ -110,43 +105,10 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
     this.destination = destinationObj;
   }
 
-  public sendTestForDataFeedUrl(): void {
+  public sendTestForDataFeedUrl(destination: Destination): void {
     this.testInProgress = true;
-    this.hookStatus = UrlTestState.Loading;
-    const targetUrl: string =  this.updateForm.controls['url'].value;
-    if (targetUrl) {
-      this.datafeedService.testDestinationWithNoCreds(targetUrl)
-        .subscribe(
-          () => this.revealUrlStatus(UrlTestState.Success),
-          () => this.revealUrlStatus(UrlTestState.Failure)
-        );
-    }
+    this.store.dispatch(new TestDestination({destination}));
     this.testInProgress = false;
-  }
-
-  private revealUrlStatus(status: UrlTestState) {
-    this.hookStatus = status;
-    this.openModal('url');
-  }
-
-  public openModal(type: Modal): void {
-    switch (type) {
-      case 'url':
-        this.urlStatusModalVisible = true;
-        return;
-      default:
-        return;
-    }
-  }
-
-  public closeModal(type: Modal): void {
-    switch (type) {
-      case 'url':
-        this.urlStatusModalVisible = false;
-        return;
-      default:
-        return;
-    }
   }
 
   public get nameCtrl(): FormControl {
