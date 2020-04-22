@@ -124,6 +124,7 @@ message GenerateAdminTokenRequest {
 
 message GenerateAdminTokenResponse {
 	string api_token = 1;
+	string token_id = 2;
 }
 
 message NewDeploymentRequest {
