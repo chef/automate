@@ -21,19 +21,23 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
   {{~/if}}
 {{~/eachAlive}}
 
+[backups]
 {{~#eachAlive bind.automate-elasticsearch.members as |member|}}
   {{~#if @last}}
     {{~#if member.cfg.deprecated_external_es}}
-[backups]
   backend = "fs"
     {{else}}
       {{~#if cfg.backups.backend}}
-[backups]
   backend = "{{cfg.backups.backend}}"
       {{~/if}}
     {{~/if}}
   {{~/if}}
 {{~/eachAlive}}
+{{~#if cfg.backups.verify_repo}}
+  verify_repo = true
+{{~else}}
+  verify_repo = false
+{{~/if}}
 
 {{~#if cfg.backups.fs.root_location}}
 [backups.fs]

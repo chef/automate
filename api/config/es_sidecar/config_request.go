@@ -112,6 +112,14 @@ func (c *ConfigRequest) applyExternalConfig(
 		return
 	}
 
+	// Repo verification is only useful on multi-node clusters, as such it is
+	// disabled by default. If we're applying global config we're using an external
+	// cluster that likely has multiple nodes so we'll enable it if the user
+	// has not configued it.
+	if cfg.GetVerifyRepo() == nil {
+		cfg.VerifyRepo = w.Bool(true)
+	}
+
 	backend := override.GetLocation().GetValue()
 	switch backend {
 	case "s3":
