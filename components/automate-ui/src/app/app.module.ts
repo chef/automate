@@ -44,7 +44,6 @@ import { InfraProxyModule } from 'app/modules/infra-proxy/infra-proxy.module';
 import { AttributesService } from './services/attributes/attributes.service';
 import { ChefSessionService } from './services/chef-session/chef-session.service';
 import { ConfigService } from './services/config/config.service';
-import { DatafeedService } from './services/data-feed/data-feed.service';
 import { EventFeedService } from './services/event-feed/event-feed.service';
 import { FeatureFlagsService } from './services/feature-flags/feature-flags.service';
 import { HttpClientAuthInterceptor } from './services/http/http-client-auth.interceptor';
@@ -106,9 +105,8 @@ import {
 import {
   ConvergeRadialGraphComponent
 } from './page-components/converge-radial-graph/converge-radial-graph.component';
-import { DatafeedFormComponent } from './pages/data-feed-form/data-feed-form.component';
 import { DataFeedDetailsComponent } from './pages/data-feed-details/data-feed-details.component';
-import { DatafeedComponent } from './pages/data-feed/data-feed.component';
+import { DataFeedComponent } from './pages/data-feed/data-feed.component';
 import { DateSelectorComponent } from './page-components/date-selector/date-selector.component';
 import {
   DeletableNodeControlComponent
@@ -201,8 +199,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
     CreateDataFeedModalComponent,
-    DatafeedComponent,
-    DatafeedFormComponent,
+    DataFeedComponent,
     DataFeedDetailsComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
@@ -291,7 +288,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ClientRunsRequests,
     CookbookRequests,
     CredentialRequests,
-    DatafeedService,
     DesktopRequests,
     DestinationRequests,
     EventFeedService,
