@@ -24,7 +24,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Input() createProjectModal = false;
   @Input() assignableProjects: Project[] = [];
   @Input() createForm: FormGroup; // NB: The form must contain 'name' and 'id' fields
-  @Input() resetCheckboxEvent: EventEmitter<null>;
   @Input() conflictErrorEvent: EventEmitter<boolean>; // TC: This element assumes 'id' is the
                                                       // only create field that can conflict.
   @Output() close = new EventEmitter();
@@ -45,15 +44,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
       // Open the ID input on conflict so user can resolve it.
       this.modifyID = isConflict;
     });
-
-    // the addPolicies checkbox should always be checked by default when the modal opens
-    this.resetCheckboxEvent.pipe(takeUntil(this.isDestroyed))
-      .subscribe(() => {
-        // the checkbox needs to use this component variable
-        // but we must ensure the createForm.addPolicies value stays in sync
-        this.addPolicies = true;
-        this.createForm.controls.addPolicies.setValue(this.addPolicies);
-      });
   }
 
   ngOnDestroy() {
@@ -72,6 +62,9 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     if (changes.visible && (changes.visible.currentValue as boolean)) {
       Object.values(this.projects).forEach(p => p.checked = false);
       this.projectsUpdatedEvent.emit();
+      if (this.createProjectModal) {
+        this.updatePolicyCheckbox(true); // always set to checked upon opening
+      }
     }
   }
 
