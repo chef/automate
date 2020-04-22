@@ -18,16 +18,19 @@ import (
 	"strings"
 
 	"github.com/open-policy-agent/opa/internal/file/archive"
+	"github.com/open-policy-agent/opa/internal/merge"
+	"github.com/open-policy-agent/opa/metrics"
+
+	"github.com/pkg/errors"
 
 	"github.com/open-policy-agent/opa/ast"
-	"github.com/open-policy-agent/opa/internal/file"
 	"github.com/open-policy-agent/opa/util"
-	"github.com/pkg/errors"
 )
 
 // Common file extensions and file names.
 const (
 	RegoExt      = ".rego"
+	WasmFile     = "/policy.wasm"
 	manifestExt  = ".manifest"
 	dataFile     = "data.json"
 	yamlDataFile = "data.yaml"
@@ -40,6 +43,7 @@ type Bundle struct {
 	Manifest Manifest
 	Data     map[string]interface{}
 	Modules  []ModuleFile
+	Wasm     []byte
 }
 
 // Manifest represents the manifest from a bundle. The manifest may contain
@@ -90,7 +94,7 @@ func (m *Manifest) validateAndInjectDefaults(b Bundle) error {
 			}
 		}
 		if !found {
-			return fmt.Errorf("manifest roots do not permit '%v' in %v", module.Parsed.Package, module.Path)
+			return fmt.Errorf("manifest roots %v do not permit '%v' in module '%v'", roots, module.Parsed.Package, module.Path)
 		}
 	}
 
@@ -109,7 +113,7 @@ func (m *Manifest) validateAndInjectDefaults(b Bundle) error {
 				}
 			}
 		}
-		return false, fmt.Errorf("manifest roots do not permit data at path %v", path)
+		return false, fmt.Errorf("manifest roots %v do not permit data at path '/%s' (hint: check bundle directory structure)", roots, path)
 	})
 }
 
@@ -122,21 +126,23 @@ type ModuleFile struct {
 
 // Reader contains the reader to load the bundle from.
 type Reader struct {
-	loader                file.DirectoryLoader
+	loader                DirectoryLoader
 	includeManifestInData bool
+	metrics               metrics.Metrics
+	baseDir               string
 }
 
-// NewReader returns a new Reader.
-// Deprecated: Use NewCustomReader with TarballLoader instead
+// NewReader returns a new Reader which is configured for reading tarballs.
 func NewReader(r io.Reader) *Reader {
-	return NewCustomReader(file.NewTarballLoader(r))
+	return NewCustomReader(NewTarballLoader(r))
 }
 
 // NewCustomReader returns a new Reader configured to use the
 // specified DirectoryLoader.
-func NewCustomReader(loader file.DirectoryLoader) *Reader {
+func NewCustomReader(loader DirectoryLoader) *Reader {
 	nr := Reader{
-		loader: loader,
+		loader:  loader,
+		metrics: metrics.New(),
 	}
 	return &nr
 }
@@ -145,6 +151,19 @@ func NewCustomReader(loader file.DirectoryLoader) *Reader {
 // included in the bundle's data.
 func (r *Reader) IncludeManifestInData(includeManifestInData bool) *Reader {
 	r.includeManifestInData = includeManifestInData
+	return r
+}
+
+// WithMetrics sets the metrics object to be used while loading bundles
+func (r *Reader) WithMetrics(m metrics.Metrics) *Reader {
+	r.metrics = m
+	return r
+}
+
+// WithBaseDir sets a base directory for file paths of loaded Rego
+// modules. This will *NOT* affect the loaded path of data files.
+func (r *Reader) WithBaseDir(dir string) *Reader {
+	r.baseDir = dir
 	return r
 }
 
@@ -177,25 +196,33 @@ func (r *Reader) Read() (Bundle, error) {
 		path := filepath.ToSlash(f.Path())
 
 		if strings.HasSuffix(path, RegoExt) {
-			module, err := ast.ParseModule(path, buf.String())
+			fullPath := r.fullPath(path)
+			r.metrics.Timer(metrics.RegoModuleParse).Start()
+			module, err := ast.ParseModule(fullPath, buf.String())
+			r.metrics.Timer(metrics.RegoModuleParse).Stop()
 			if err != nil {
 				return bundle, err
 			}
-			if module == nil {
-				return bundle, fmt.Errorf("module '%s' is empty", path)
-			}
 
 			mf := ModuleFile{
-				Path:   path,
+				Path:   fullPath,
 				Raw:    buf.Bytes(),
 				Parsed: module,
 			}
 			bundle.Modules = append(bundle.Modules, mf)
 
+		} else if path == WasmFile {
+			bundle.Wasm = buf.Bytes()
+
 		} else if filepath.Base(path) == dataFile {
 			var value interface{}
-			if err := util.NewJSONDecoder(&buf).Decode(&value); err != nil {
-				return bundle, errors.Wrapf(err, "bundle load failed on %v", path)
+
+			r.metrics.Timer(metrics.RegoDataParse).Start()
+			err := util.NewJSONDecoder(&buf).Decode(&value)
+			r.metrics.Timer(metrics.RegoDataParse).Stop()
+
+			if err != nil {
+				return bundle, errors.Wrapf(err, "bundle load failed on %v", r.fullPath(path))
 			}
 
 			if err := insertValue(&bundle, path, value); err != nil {
@@ -205,8 +232,13 @@ func (r *Reader) Read() (Bundle, error) {
 		} else if filepath.Base(path) == yamlDataFile {
 
 			var value interface{}
-			if err := util.Unmarshal(buf.Bytes(), &value); err != nil {
-				return bundle, errors.Wrapf(err, "bundle load failed on %v", path)
+
+			r.metrics.Timer(metrics.RegoDataParse).Start()
+			err := util.Unmarshal(buf.Bytes(), &value)
+			r.metrics.Timer(metrics.RegoDataParse).Stop()
+
+			if err != nil {
+				return bundle, errors.Wrapf(err, "bundle load failed on %v", r.fullPath(path))
 			}
 
 			if err := insertValue(&bundle, path, value); err != nil {
@@ -247,6 +279,13 @@ func (r *Reader) Read() (Bundle, error) {
 	return bundle, nil
 }
 
+func (r *Reader) fullPath(path string) string {
+	if r.baseDir != "" {
+		path = filepath.Join(r.baseDir, path)
+	}
+	return path
+}
+
 // Write serializes the Bundle and writes it to w.
 func Write(w io.Writer, bundle Bundle) error {
 	gw := gzip.NewWriter(w)
@@ -268,6 +307,10 @@ func Write(w io.Writer, bundle Bundle) error {
 		}
 	}
 
+	if err := writeWasm(tw, bundle); err != nil {
+		return err
+	}
+
 	if err := writeManifest(tw, bundle); err != nil {
 		return err
 	}
@@ -277,6 +320,14 @@ func Write(w io.Writer, bundle Bundle) error {
 	}
 
 	return gw.Close()
+}
+
+func writeWasm(tw *tar.Writer, bundle Bundle) error {
+	if len(bundle.Wasm) == 0 {
+		return nil
+	}
+
+	return archive.WriteFile(tw, WasmFile, bundle.Wasm)
 }
 
 func writeManifest(tw *tar.Writer, bundle Bundle) error {
@@ -323,42 +374,50 @@ func (b Bundle) Equal(other Bundle) bool {
 			return false
 		}
 	}
-	return true
+	if (b.Wasm == nil && other.Wasm != nil) || (b.Wasm != nil && other.Wasm == nil) {
+		return false
+	}
+
+	return bytes.Equal(b.Wasm, other.Wasm)
 }
 
 func (b *Bundle) insert(key []string, value interface{}) error {
-	if len(key) == 0 {
-		obj, ok := value.(map[string]interface{})
-		if !ok {
-			return fmt.Errorf("root value must be object")
-		}
-		b.Data = obj
-		return nil
-	}
-
-	obj, err := b.mkdir(key[:len(key)-1])
+	// Build an object with the full structure for the value
+	obj, err := mktree(key, value)
 	if err != nil {
 		return err
 	}
 
-	obj[key[len(key)-1]] = value
+	// Merge the new data in with the current bundle data object
+	merged, ok := merge.InterfaceMaps(b.Data, obj)
+	if !ok {
+		return fmt.Errorf("failed to insert data file from path %s", filepath.Join(key...))
+	}
+
+	b.Data = merged
+
 	return nil
 }
 
-func (b *Bundle) mkdir(key []string) (map[string]interface{}, error) {
-	obj := b.Data
-	for i := 0; i < len(key); i++ {
-		node, ok := obj[key[i]]
+func mktree(path []string, value interface{}) (map[string]interface{}, error) {
+	if len(path) == 0 {
+		// For 0 length path the value is the full tree.
+		obj, ok := value.(map[string]interface{})
 		if !ok {
-			node = map[string]interface{}{}
-			obj[key[i]] = node
+			return nil, fmt.Errorf("root value must be object")
 		}
-		obj, ok = node.(map[string]interface{})
-		if !ok {
-			return nil, fmt.Errorf("non-leaf value must be object")
-		}
+		return obj, nil
 	}
-	return obj, nil
+
+	dir := map[string]interface{}{}
+	for i := len(path) - 1; i > 0; i-- {
+		dir[path[i]] = value
+		value = dir
+		dir = map[string]interface{}{}
+	}
+	dir[path[0]] = value
+
+	return dir, nil
 }
 
 // RootPathsOverlap takes in two bundle root paths and returns
