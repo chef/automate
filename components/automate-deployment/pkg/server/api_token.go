@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/api/interservice/authn"
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	uuid "github.com/chef/automate/lib/uuid4"
@@ -73,17 +74,8 @@ func generateAdminToken(ctx context.Context,
 	}
 	tokenID := response.Id
 
-	_, err = authzV2Client.CreatePolicy(ctx, &authz_v2.CreatePolicyReq{
-		Id:   "admin-token-" + tokenID,
-		Name: "admin policy for token " + tokenID,
-		Statements: []*authz_v2.Statement{
-			{
-				Effect:    authz_v2.Statement_ALLOW,
-				Resources: []string{"*"},
-				Actions:   []string{"*"},
-				Projects:  []string{"*"},
-			},
-		},
+	_, err = authzV2Client.AddPolicyMembers(ctx, &authz_v2.AddPolicyMembersReq{
+		Id:      constants.AdminPolicyID,
 		Members: []string{"token:" + tokenID},
 	})
 
@@ -100,5 +92,6 @@ func generateAdminToken(ctx context.Context,
 	}
 	return &api.GenerateAdminTokenResponse{
 		ApiToken: response.Value,
+		TokenId:  tokenID,
 	}, nil
 }
