@@ -21,7 +21,7 @@ func MinimumTokenLength() int {
 func IsValidLegacyToken(token string) error {
 	if len(token) < MinimumLegacyTokenLength {
 		return fmt.Errorf(
-			"legacy token %q is invalid; it has length %d but must be at least %d characters",
+			"legacy token %q is invalid; it has %d characters should but be at least %d characters",
 			token, len(token), MinimumLegacyTokenLength)
 	}
 
@@ -31,7 +31,7 @@ func IsValidLegacyToken(token string) error {
 func IsValidToken(token string) error {
 	if len(token) < MinimumTokenLength() {
 		return fmt.Errorf(
-			"token %q is invalid; it has length %d but must be at least %d characters",
+			"token %q is invalid; it has %d characters should but be at least %d characters",
 			token, len(token), PRNCount)
 	}
 
