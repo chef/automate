@@ -1007,9 +1007,10 @@ func runAllServerTests(
 					resp, err := cl.CreateTeam(ctx, req)
 					require.NoError(t, err)
 
+					targetMemberID := "88f13b6b-b20b-4335-9fd6-2c09edf45cf9"
 					resp1, err := cl.AddTeamMembers(insertProjectsIntoNewContext([]string{constants.UnassignedProjectID}), &teams.AddTeamMembersReq{
 						Id:      req.Id,
-						UserIds: []string{"88f13b6b-b20b-4335-9fd6-2c09edf45cf9"},
+						UserIds: []string{targetMemberID},
 					})
 					require.NoError(t, err)
 					require.Equal(t, 1, len(resp1.UserIds))
@@ -1026,7 +1027,7 @@ func runAllServerTests(
 					require.NotNil(t, resp2)
 					assert.Equal(t, len(addReq.UserIds)+1, len(resp2.UserIds))
 
-					expectedUsers := append(addReq.UserIds, "88f13b6b-b20b-4335-9fd6-2c09edf45cf9")
+					expectedUsers := append(addReq.UserIds, targetMemberID)
 					assert.ElementsMatch(t, expectedUsers, resp2.UserIds)
 
 					cleanupTeam(t, cl, resp.Team.Id)
