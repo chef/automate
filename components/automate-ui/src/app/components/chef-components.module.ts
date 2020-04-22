@@ -43,6 +43,7 @@ import { PagePickerComponent } from './page-picker/page-picker.component';
 import { PendingEditsBarComponent } from './pending-edits-bar/pending-edits-bar.component';
 import { ProcessProgressBarComponent } from './process-progress-bar/process-progress-bar.component';
 import { ProjectsDropdownComponent } from './projects-dropdown/projects-dropdown.component';
+import { ResourceDropdownComponent } from './resource-dropdown/resource-dropdown.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { SidebarEntryComponent } from './sidebar-entry/sidebar-entry.component';
 import { TabComponent } from './tab/tab.component';
@@ -99,6 +100,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     PendingEditsBarComponent,
     ProcessProgressBarComponent,
     ProjectsDropdownComponent,
+    ResourceDropdownComponent,
     SidebarComponent,
     SidebarEntryComponent,
     TabComponent,
@@ -140,6 +142,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     PendingEditsBarComponent,
     ProcessProgressBarComponent,
     ProjectsDropdownComponent,
+    ResourceDropdownComponent,
     SidebarComponent,
     SidebarEntryComponent,
     TabComponent,
