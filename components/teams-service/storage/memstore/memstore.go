@@ -125,7 +125,7 @@ func (m *memstore) EditTeam(ctx context.Context,
 	return copyTeam(team), nil
 }
 
-// AddUsers adds an array of user IDs to a team's map of user IDs
+// AddUsers updates team membership to include the given list of users.
 func (m *memstore) AddUsers(ctx context.Context, id string, userIDs []string) ([]string, error) {
 	team, teamFound := m.teams[id]
 	if !teamFound {
