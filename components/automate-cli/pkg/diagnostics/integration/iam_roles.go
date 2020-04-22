@@ -73,13 +73,11 @@ func GetRole(tstCtx diagnostics.TestContext, id string) (*RoleInfo, error) {
 
 // DeleteRole deletes the role with the given id
 func DeleteRole(tstCtx diagnostics.TestContext, id string) error {
-	err := MustJSONDecodeSuccess(
+	if err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
 			fmt.Sprintf("/apis/iam/v2/roles/%s", id),
 			lbrequest.WithMethod("DELETE"),
-		)).Error()
-
-	if err != nil {
+		)).WithValue(&struct{}{}); err != nil {
 		return errors.Wrap(err, "Could not delete role")
 	}
 	return nil
@@ -126,7 +124,7 @@ func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 			loaded := generatedRoleData{}
 			err = tstCtx.GetValue("iam-roles", &loaded)
 			if err != nil {
-				return errors.Errorf(err.Error(), "could not find generated context")
+				return errors.Wrap(err, "could not find generated context")
 			}
 
 			tstCtx.SetValue("iam-roles", &generatedRoleData{

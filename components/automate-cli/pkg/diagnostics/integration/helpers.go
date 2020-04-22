@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	uuid "github.com/gofrs/uuid"
+	uuid "github.com/chef/automate/lib/uuid4"
 	"github.com/pkg/errors"
 )
 
