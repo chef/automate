@@ -35,6 +35,12 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   // Other consumers, e.g. team-details.component use it only for a single resource.
   @Input() projectsUpdated: EventEmitter<boolean>;
 
+  // Label to use when none are selected
+  @Input() noneSelectedLabel = 'None';
+
+  // plural display name of resource
+  @Input() objectNounPlural = 'MISSING REQUIRED PARAMETER';
+
   // Emits a project that changed as a result of a check or uncheck.
   @Output() onProjectChecked = new EventEmitter<ProjectChecked>();
 
@@ -44,6 +50,7 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   public active = false;
   public label = UNASSIGNED_PROJECT_ID;
   public filterValue = '';
+
 
   ngOnInit(): void {
     if (this.projectsUpdated) { // an optional setting
@@ -120,20 +127,8 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
 
   private updateLabel(): void {
     const checkedProjects = Object.values(this.projects).filter(p => p.checked);
-    switch (checkedProjects.length) {
-      case 1: {
-        const onlyProject = checkedProjects[0];
-        this.label = onlyProject.name;
-        break;
-      }
-      case 0: {
-        this.label = UNASSIGNED_PROJECT_ID;
-        break;
-      }
-      default: {
-        this.label = `${checkedProjects.length} projects`;
-        break;
-      }
-    }
+    this.label = checkedProjects.length === 0 ? this.noneSelectedLabel
+      : checkedProjects.length === 1 ? checkedProjects[0].name
+        : `${checkedProjects.length} ${this.objectNounPlural}`;
   }
 }

@@ -4,7 +4,7 @@ import {
 import { FormGroup } from '@angular/forms';
 
 import { IdMapper } from 'app/helpers/auth/id-mapper';
-import { Project } from 'app/entities/projects/project.model';
+import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import {
   ProjectChecked,
   ProjectCheckedMap
@@ -34,6 +34,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   public conflictError = false;
   public addPolicies = true;
   public projectsUpdatedEvent = new EventEmitter();
+  public UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   private isDestroyed = new Subject<boolean>();
 
