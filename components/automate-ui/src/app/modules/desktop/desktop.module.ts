@@ -15,6 +15,10 @@ import {
 import { InsightComponent } from './insight/insight.component';
 import { DesktopRoutingModule } from './desktop-routing.module';
 
+import {
+  SimpleLineGraphComponent
+} from 'app/page-components/simple-line-graph/simple-line-graph.component';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -30,7 +34,8 @@ import { DesktopRoutingModule } from './desktop-routing.module';
     CheckInTimeSeriesComponent,
     TopErrorsComponent,
     UnknownDesktopDurationCountsComponent,
-    InsightComponent
+    InsightComponent,
+    SimpleLineGraphComponent
   ],
   declarations: [
     DailyCheckInComponent,
@@ -38,7 +43,8 @@ import { DesktopRoutingModule } from './desktop-routing.module';
     CheckInTimeSeriesComponent,
     TopErrorsComponent,
     UnknownDesktopDurationCountsComponent,
-    InsightComponent
+    InsightComponent,
+    SimpleLineGraphComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
