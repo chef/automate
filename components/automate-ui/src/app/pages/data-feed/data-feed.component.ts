@@ -12,10 +12,19 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { ChefKeyboardEvent } from 'app/types/material-types';
 import { Destination } from '../../entities/destinations/destination.model';
 import {
-  allDestinations, getStatus, saveStatus, saveError } from 'app/entities/destinations/destination.selectors';
-import { CreateDestination, GetDestinations, DeleteDestination } from 'app/entities/destinations/destination.actions';
-// import { ChefSorters } from 'app/helpers/auth/sorter';
-import { DatafeedService } from 'app/services/data-feed/data-feed.service';
+  allDestinations,
+  getStatus,
+  saveStatus,
+  saveError
+} from 'app/entities/destinations/destination.selectors';
+import {
+  CreateDestination,
+  GetDestinations,
+  DeleteDestination,
+  TestDestination
+} from 'app/entities/destinations/destination.actions';
+
+import { DestinationRequests } from 'app/entities/destinations/destination.requests';
 
 enum UrlTestState {
   Inactive,
@@ -24,32 +33,30 @@ enum UrlTestState {
   Failure
 }
 
-type Modal = 'url';
-
 @Component({
   selector: 'app-data-feed',
   templateUrl: './data-feed.component.html',
   styleUrls: ['./data-feed.component.scss']
 })
-export class DatafeedComponent implements OnInit, OnDestroy {
+
+export class DataFeedComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean>;
   public sortedDestinations$: Observable<Destination[]>;
   public createModalVisible = false;
   public createDataFeedForm: FormGroup;
   public creatingDataFeed = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  private isDestroyed = new Subject<boolean>();
   public dataFeedToDelete: Destination;
   public deleteModalVisible = false;
   public sendingDataFeed = false;
-  public urlState = UrlTestState;
   public hookStatus = UrlTestState.Inactive;
-  public urlStatusModalVisible = false;
+  private isDestroyed = new Subject<boolean>();
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
     private layoutFacade: LayoutFacadeService,
-    private datafeedService: DatafeedService
+    private datafeedRequests: DestinationRequests
   ) {
 
     this.loading$ = store.pipe(select(getStatus), map(loading));
@@ -142,17 +149,9 @@ export class DatafeedComponent implements OnInit, OnDestroy {
     }
   }
 
-  public startDataFeedSendTest($event: ChefKeyboardEvent, destination: any) {
+  public startDataFeedSendTest($event: ChefKeyboardEvent, destination: Destination) {
     if ($event.isUserInput) {
-      this.hookStatus = UrlTestState.Loading;
-      if (destination) {
-        this.datafeedService.testDestinationWithSecretId(destination.url,
-          destination.secret)
-          .subscribe(
-            () => this.revealUrlStatusUsingSecretId(UrlTestState.Success),
-            () => this.revealUrlStatusUsingSecretId(UrlTestState.Failure)
-          );
-      }
+      this.store.dispatch(new TestDestination({destination}));
     }
   }
 
@@ -172,13 +171,13 @@ export class DatafeedComponent implements OnInit, OnDestroy {
     const targetUsername: string = this.createDataFeedForm.controls['username'].value;
     const targetPassword: string = this.createDataFeedForm.controls['password'].value;
     if (targetUrl && targetUsername && targetPassword) {
-      this.datafeedService.testDestinationWithUsernamePassword(targetUrl,
+      this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
         targetUsername, targetPassword).subscribe(
           () => this.revealUrlStatus(UrlTestState.Success),
           () => this.revealUrlStatus(UrlTestState.Failure)
         );
     } else {
-      this.datafeedService.testDestinationWithNoCreds(targetUrl)
+      this.datafeedRequests.testDestinationWithNoCreds(targetUrl)
         .subscribe(
           () => this.revealUrlStatus(UrlTestState.Success),
           () => this.revealUrlStatus(UrlTestState.Failure)
@@ -189,30 +188,5 @@ export class DatafeedComponent implements OnInit, OnDestroy {
 
   private revealUrlStatus(status: UrlTestState) {
     this.hookStatus = status;
-  }
-
-  private revealUrlStatusUsingSecretId(status: UrlTestState) {
-    this.hookStatus = status;
-    this.openModal('url');
-  }
-
-  public openModal(type: Modal): void {
-    switch (type) {
-      case 'url':
-        this.urlStatusModalVisible = true;
-        return;
-      default:
-        return;
-    }
-  }
-
-  public closeModal(type: Modal): void {
-    switch (type) {
-      case 'url':
-        this.urlStatusModalVisible = false;
-        return;
-      default:
-        return;
-    }
   }
 }

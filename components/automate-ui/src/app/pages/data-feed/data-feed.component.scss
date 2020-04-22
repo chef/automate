@@ -14,28 +14,6 @@ chef-button:first-child {
   margin-left: 0;
 }
 
-#destinations-list {
-  font-size: 0.9em;
-
-  chef-icon.sort-icon.material-icons {
-    cursor: pointer;
-
-    &::after {
-      @extend .material-icons;
-      display: flex;
-      margin-top: -11px;
-      content: 'arrow_drop_down';
-      flex-wrap: wrap;
-    }
-  }
-
-  img {
-    width: 20px;
-    height: 20px;
-    margin-right: 1em;
-  }
-}
-
 chef-icon#sort-desc {
   color: $chef-primary-dark;
 
@@ -66,99 +44,6 @@ chef-icon#sort-asc {
   }
 }
 
-#destinations-cards {
-  display: flex;
-  flex-wrap: wrap;
-
-  .card {
-    width: 375px;
-    height: 155px;
-    border-radius: $global-radius;
-    background-color: $chef-white;
-    margin-right: 16px;
-    margin-bottom: 16px;
-
-    &.new-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border: 1px dotted $chef-dark-grey;
-      background-color: $chef-lightest-grey;
-
-      span {
-        margin-bottom: 1em;
-        color: $chef-primary-bright;
-      }
-    }
-
-    .card-body {
-      padding-left: 16px;
-
-      dt, dd {
-        display: inline-block;
-        margin: 0;
-      }
-
-      dt {
-        width: 30%;
-        font-weight: bold;
-        font-size: 12pt;
-        color: $chef-dark-grey;
-      }
-
-      dd {
-        width: 65%;
-        padding-left: 16px;
-        font-size: 12pt;
-      }
-    }
-
-    .card-header {
-      display: flex;
-      border-bottom: 1px solid $chef-light-grey;
-      height: 60px;
-
-      .card-header-left {
-        display: flex;
-        align-items: center;
-        width: 60px;
-        border-right: 1px solid $chef-light-grey;
-
-        img {
-          display: block;
-          margin: auto;
-        }
-      }
-
-      .card-header-right {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        margin-right: 8px;
-
-        .card-name {
-          margin-left: 16px;
-          margin-right: 16px;
-          width: 100%;
-          font-weight: bold;
-          font-size: 12pt;
-        }
-
-        button {
-          margin: 0;
-
-          &[label="delete"] {
-            chef-icon {
-              color: $chef-critical;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 .empty-state {
   text-align: center;
 
@@ -166,49 +51,5 @@ chef-icon#sort-asc {
     font-size: 18px;
     font-weight: 400;
     margin-top: 42px;
-  }
-}
-
-chef-modal {
-  #{--modal-width}: 500px;
-
-  .status-modal {
-    text-align: center;
-
-    chef-button {
-      margin-top: 20px;
-    }
-  }
-}
-
-.status-icon {
-  margin: 0 auto 10px;
-  padding: 10px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-
-  &.failure {
-    background: $chef-critical;
-  }
-
-  &.success {
-    background: $chef-success;
-  }
-
-  & > chef-icon {
-    color: $chef-white;
-  }
-}
-
-.status-heading {
-  text-align: center;
-
-  &.failure {
-    color: $chef-critical;
-  }
-
-  &.success {
-    color: $chef-success;
   }
 }
