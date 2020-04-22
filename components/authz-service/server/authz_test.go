@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/storage"
@@ -50,7 +50,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 				addProjectToStore(t, ts.projectCache, "p1", "Numero 1", storage.Custom)
 				addProjectToStore(t, ts.projectCache, "p2", "Numero 2", storage.Custom)
 				addProjectToStore(t, ts.projectCache, "p3", "Numero 3", storage.Custom)
-				resp, err := ts.authz.ProjectsAuthorized(ctx, &api_v2.ProjectsAuthorizedReq{
+				resp, err := ts.authz.ProjectsAuthorized(ctx, &api.ProjectsAuthorizedReq{
 					Subjects:       []string{"user:local:admin"},
 					Resource:       "some:thing",
 					Action:         "do:that:thing",
@@ -71,12 +71,12 @@ func TestFilterAuthorizedPairs(t *testing.T) {
 	ctx, ts := setupV2p1AuthTests(t, &eng)
 
 	t.Run("returns engine response", func(t *testing.T) {
-		resp, err := ts.authz.FilterAuthorizedPairs(ctx, &api_v2.FilterAuthorizedPairsReq{
+		resp, err := ts.authz.FilterAuthorizedPairs(ctx, &api.FilterAuthorizedPairsReq{
 			Subjects: []string{"user:local:admin"},
-			Pairs:    []*api_v2.Pair{},
+			Pairs:    []*api.Pair{},
 		})
 		require.NoError(t, err)
-		assert.Equal(t, []*api_v2.Pair{{Resource: "iam:users", Action: "iam:users:create"}}, resp.Pairs)
+		assert.Equal(t, []*api.Pair{{Resource: "iam:users", Action: "iam:users:create"}}, resp.Pairs)
 	})
 }
 
@@ -90,7 +90,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 		ctx, ts := setupV2p1AuthTests(t, &eng)
 
 		resp, err := ts.authz.FilterAuthorizedProjects(ctx,
-			&api_v2.FilterAuthorizedProjectsReq{
+			&api.FilterAuthorizedProjectsReq{
 				Subjects: []string{"user:local:admin"},
 			})
 		require.NoError(t, err)
@@ -106,7 +106,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 		allProjects := []string{"project-1", "project-2", "(unassigned)"}
 
 		resp, err := ts.authz.FilterAuthorizedProjects(ctx,
-			&api_v2.FilterAuthorizedProjectsReq{
+			&api.FilterAuthorizedProjectsReq{
 				Subjects: []string{"user:local:admin"},
 			})
 		require.NoError(t, err)

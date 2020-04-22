@@ -22,7 +22,7 @@ import (
 	"github.com/chef/automate/lib/tracing"
 
 	"github.com/chef/automate/api/interservice/authz/common"
-	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -128,9 +128,9 @@ func NewGRPCServer(ctx context.Context,
 
 	// register all services
 	health.RegisterHealthServer(g, health.NewService())
-	api_v2.RegisterPoliciesServer(g, polServer)
-	api_v2.RegisterProjectsServer(g, projectsServer)
-	api_v2.RegisterAuthorizationServer(g, authzServer)
+	api.RegisterPoliciesServer(g, polServer)
+	api.RegisterProjectsServer(g, projectsServer)
+	api.RegisterAuthorizationServer(g, authzServer)
 	common.RegisterSubjectPurgeServer(g, subjectPurgeServer)
 	reflection.Register(g)
 

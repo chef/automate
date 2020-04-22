@@ -20,7 +20,7 @@ import (
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 
-	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/prng"
@@ -47,17 +47,17 @@ func TestCreatePolicy(t *testing.T) {
 	}{
 		{"fails with InvalidArgument when policy statement omits projects", func(t *testing.T) {
 			_, items := addSomePoliciesToStore(t, store, prng)
-			statement0 := api_v2.Statement{
-				Effect:    api_v2.Statement_ALLOW,
+			statement0 := api.Statement{
+				Effect:    api.Statement_ALLOW,
 				Projects:  []string{},
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 			}
 
 			resp, err := cl.CreatePolicy(ctx, &req)
@@ -69,24 +69,24 @@ func TestCreatePolicy(t *testing.T) {
 		}},
 		{"successfully creates policy with statement containing resources and actions inline", func(t *testing.T) {
 			projects := []string{"project-1"}
-			statement0 := api_v2.Statement{
-				Effect:    api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:    api.Statement_DENY,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 				Projects:  projects,
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 				Projects:   projects,
 			}
 			resp, err := cl.CreatePolicy(ctx, &req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			require.Equal(t, 1, len(resp.Statements))
-			assert.Equal(t, api_v2.Statement_DENY, resp.Statements[0].Effect)
+			assert.Equal(t, api.Statement_DENY, resp.Statements[0].Effect)
 			assert.Equal(t, []string{"cfgmgmt:nodes:*"}, resp.Statements[0].Actions)
 			assert.Equal(t, []string{"cfgmgmt:delete", "cfgmgmt:list"}, resp.Statements[0].Resources)
 			assert.Empty(t, resp.Statements[0].Role)
@@ -113,16 +113,16 @@ func TestCreatePolicy(t *testing.T) {
 			assert.Equal(t, []string{"cfgmgmt:delete", "cfgmgmt:list"}, ras.Resources)
 		}},
 		{"successfully creates policy with statement containing projects and role", func(t *testing.T) {
-			statement0 := api_v2.Statement{
-				Effect:   api_v2.Statement_ALLOW,
+			statement0 := api.Statement{
+				Effect:   api.Statement_ALLOW,
 				Projects: []string{"my-project", "another-project"},
 				Role:     "my-role",
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 				Projects:   []string{"project-1"},
 			}
 
@@ -132,7 +132,7 @@ func TestCreatePolicy(t *testing.T) {
 			require.NotNil(t, resp)
 
 			require.Equal(t, 1, len(resp.Statements))
-			assert.Equal(t, api_v2.Statement_ALLOW, resp.Statements[0].Effect)
+			assert.Equal(t, api.Statement_ALLOW, resp.Statements[0].Effect)
 			assert.Equal(t, "my-role", resp.Statements[0].Role)
 			assert.Equal(t, []string{"my-project", "another-project"}, resp.Statements[0].Projects)
 			assert.Empty(t, resp.Statements[0].Actions)
@@ -149,18 +149,18 @@ func TestCreatePolicy(t *testing.T) {
 			assert.Equal(t, []string{"my-project", "another-project"}, rss.Projects)
 		}},
 		{"successfully creates policy with statement containing projects, roles, resources, and actions", func(t *testing.T) {
-			statement0 := api_v2.Statement{
-				Effect:    api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:    api.Statement_DENY,
 				Projects:  []string{"my-project", "another-project"},
 				Role:      "my-role",
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 			}
 
 			resp, err := cl.CreatePolicy(ctx, &req)
@@ -170,16 +170,16 @@ func TestCreatePolicy(t *testing.T) {
 		}},
 		{"sets a policy's statement's resources to wildcard if not provided", func(t *testing.T) {
 			projects := []string{"project1"}
-			statement0 := api_v2.Statement{
-				Effect:   api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:   api.Statement_DENY,
 				Actions:  []string{"cfgmgmt:nodes:*"},
 				Projects: projects,
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 				Projects:   projects,
 			}
 
@@ -197,27 +197,27 @@ func TestCreatePolicy(t *testing.T) {
 			assert.ElementsMatch(t, projects, rss.Projects)
 		}},
 		{"successfully creates policy with multiple statements", func(t *testing.T) {
-			statement0 := api_v2.Statement{
-				Effect:   api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:   api.Statement_DENY,
 				Projects: []string{"my-project", "another-project"},
 				Role:     "my-role",
 			}
-			statement1 := api_v2.Statement{
-				Effect:    api_v2.Statement_DENY,
+			statement1 := api.Statement{
+				Effect:    api.Statement_DENY,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 				Projects:  []string{"project-1"},
 			}
-			statement2 := api_v2.Statement{
-				Effect:   api_v2.Statement_ALLOW,
+			statement2 := api.Statement{
+				Effect:   api.Statement_ALLOW,
 				Projects: []string{"my-other-project"},
 				Role:     "my-other-role",
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0, &statement1, &statement2},
+				Statements: []*api.Statement{&statement0, &statement1, &statement2},
 				Projects:   []string{"project-1"},
 			}
 
@@ -228,7 +228,7 @@ func TestCreatePolicy(t *testing.T) {
 		}},
 		{"policy with no statement returns InvalidArgument", func(t *testing.T) {
 			_, items := addSomePoliciesToStore(t, store, prng)
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:      "policy1",
 				Name:    "my favorite policy",
 				Members: []string{"team:local:admins", "user:local:alice"},
@@ -242,17 +242,17 @@ func TestCreatePolicy(t *testing.T) {
 		}},
 		{"successfully creates policy with one project", func(t *testing.T) {
 			expProjects := []string{"project-1"}
-			statement0 := api_v2.Statement{
-				Effect:   api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:   api.Statement_DENY,
 				Actions:  []string{"cfgmgmt:nodes:*"},
 				Projects: expProjects,
 			}
 			_, items := addSomePoliciesToStore(t, store, prng)
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 				Projects:   expProjects,
 			}
 
@@ -266,17 +266,17 @@ func TestCreatePolicy(t *testing.T) {
 		}},
 		{"successfully creates policy with multiple projects", func(t *testing.T) {
 			expProjects := []string{"project-1", "project-2"}
-			statement0 := api_v2.Statement{
-				Effect:   api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:   api.Statement_DENY,
 				Actions:  []string{"cfgmgmt:nodes:*"},
 				Projects: expProjects,
 			}
 			_, items := addSomePoliciesToStore(t, store, prng)
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 				Projects:   expProjects,
 			}
 
@@ -289,17 +289,17 @@ func TestCreatePolicy(t *testing.T) {
 			assert.ElementsMatch(t, expProjects, resp.Statements[0].Projects)
 		}},
 		{"creates an unassigned policy when policy has no projects", func(t *testing.T) {
-			statement0 := api_v2.Statement{
-				Effect:   api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:   api.Statement_DENY,
 				Actions:  []string{"cfgmgmt:nodes:*"},
 				Projects: []string{"project-1"},
 			}
 			_, items := addSomePoliciesToStore(t, store, prng)
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 			}
 
 			resp, err := cl.CreatePolicy(ctx, &req)
@@ -310,19 +310,19 @@ func TestCreatePolicy(t *testing.T) {
 			assert.Equal(t, len(items)+1, store.ItemCount())
 		}},
 		{"creates an unassigned policy when policy has empty projects", func(t *testing.T) {
-			statement0 := api_v2.Statement{
-				Effect:   api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:   api.Statement_DENY,
 				Actions:  []string{"cfgmgmt:nodes:*"},
 				Projects: []string{"project-1"},
 			}
 
 			expProjects := []string{}
 			_, items := addSomePoliciesToStore(t, store, prng)
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 				Projects:   expProjects,
 			}
 
@@ -335,18 +335,18 @@ func TestCreatePolicy(t *testing.T) {
 		}},
 		{"successfully creates policy with duplicate name", func(t *testing.T) {
 			target, items := addSomePoliciesToStore(t, store, prng)
-			statement0 := api_v2.Statement{
-				Effect:    api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:    api.Statement_DENY,
 				Role:      "my-role",
 				Resources: []string{"cfgmgmt:nodes"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 				Projects:  []string{"project1"},
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "my-favorite-policy",
 				Name:       target.Name,
 				Members:    []string{"user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 			}
 
 			resp, err := cl.CreatePolicy(ctx, &req)
@@ -357,18 +357,18 @@ func TestCreatePolicy(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when policy contains statement with empty actions AND no role", func(t *testing.T) {
 			_, items := addSomePoliciesToStore(t, store, prng)
-			statement0 := api_v2.Statement{
-				Effect:    api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:    api.Statement_DENY,
 				Projects:  []string{},
 				Role:      "",
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{},
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 			}
 
 			resp, err := cl.CreatePolicy(ctx, &req)
@@ -380,7 +380,7 @@ func TestCreatePolicy(t *testing.T) {
 		{"fails with InvalidArgument when an ID isn't provided", func(t *testing.T) {
 			_, items := addSomePoliciesToStore(t, store, prng)
 
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Name:    "my favorite policy",
 				Members: []string{"team:local:admins", "user:local:alice"},
 			}
@@ -394,7 +394,7 @@ func TestCreatePolicy(t *testing.T) {
 		{"fails with InvalidArgument when an ID has wrong characters", func(t *testing.T) {
 			_, items := addSomePoliciesToStore(t, store, prng)
 
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:      "underscores_are_not_allowed",
 				Name:    "my favorite policy",
 				Members: []string{"team:local:admins", "user:local:alice"},
@@ -408,18 +408,18 @@ func TestCreatePolicy(t *testing.T) {
 		}},
 		{"fails with AlreadyExists when policy ID is already used", func(t *testing.T) {
 			target, items := addSomePoliciesToStore(t, store, prng)
-			statement0 := api_v2.Statement{
-				Effect:    api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:    api.Statement_DENY,
 				Role:      "my-role",
 				Resources: []string{"cfgmgmt:nodes"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 				Projects:  []string{"project1"},
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         target.ID,
 				Name:       "my favorite policy",
 				Members:    []string{"user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 			}
 
 			resp, err := cl.CreatePolicy(ctx, &req)
@@ -430,17 +430,17 @@ func TestCreatePolicy(t *testing.T) {
 		}},
 		{"successfully creates policy for unassigned projects", func(t *testing.T) {
 			_, items := addSomePoliciesToStore(t, store, prng)
-			statement0 := api_v2.Statement{
-				Effect:    api_v2.Statement_ALLOW,
+			statement0 := api.Statement{
+				Effect:    api.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 				Projects:  []string{constants.UnassignedProjectID},
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 			}
 
 			resp, err := cl.CreatePolicy(ctx, &req)
@@ -452,27 +452,27 @@ func TestCreatePolicy(t *testing.T) {
 		}},
 
 		{"successfully creates policy with wildcard projects", func(t *testing.T) {
-			statement0 := api_v2.Statement{
-				Effect:   api_v2.Statement_DENY,
+			statement0 := api.Statement{
+				Effect:   api.Statement_DENY,
 				Projects: []string{"my-project", "another-project"},
 				Role:     "my-role",
 			}
-			statement1 := api_v2.Statement{
-				Effect:    api_v2.Statement_DENY,
+			statement1 := api.Statement{
+				Effect:    api.Statement_DENY,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 				Projects:  []string{constants.AllProjectsExternalID},
 			}
-			statement2 := api_v2.Statement{
-				Effect:   api_v2.Statement_ALLOW,
+			statement2 := api.Statement{
+				Effect:   api.Statement_ALLOW,
 				Projects: []string{"my-other-project"},
 				Role:     "my-other-role",
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0, &statement1, &statement2},
+				Statements: []*api.Statement{&statement0, &statement1, &statement2},
 			}
 
 			resp, err := cl.CreatePolicy(ctx, &req)
@@ -494,28 +494,28 @@ func TestCreatePolicy(t *testing.T) {
 			assert.ElementsMatch(t, []string{constants.AllProjectsExternalID}, resp.Statements[1].Projects)
 		}},
 		{"successfully creates policy with assorted projects", func(t *testing.T) {
-			statement0 := api_v2.Statement{
-				Effect:    api_v2.Statement_ALLOW,
+			statement0 := api.Statement{
+				Effect:    api.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 				Projects:  []string{constants.UnassignedProjectID},
 			}
-			statement1 := api_v2.Statement{
-				Effect:    api_v2.Statement_DENY,
+			statement1 := api.Statement{
+				Effect:    api.Statement_DENY,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 				Projects:  []string{constants.AllProjectsExternalID},
 			}
-			statement2 := api_v2.Statement{
-				Effect:   api_v2.Statement_ALLOW,
+			statement2 := api.Statement{
+				Effect:   api.Statement_ALLOW,
 				Role:     "my-other-role",
 				Projects: []string{"my-project", "another-project"},
 			}
-			req := api_v2.CreatePolicyReq{
+			req := api.CreatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0, &statement1, &statement2},
+				Statements: []*api.Statement{&statement0, &statement1, &statement2},
 			}
 
 			resp, err := cl.CreatePolicy(ctx, &req)
@@ -550,7 +550,7 @@ func TestDeletePolicy(t *testing.T) {
 	}{
 		{"fails with InvalidArgument when ID is empty", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
-			req := api_v2.DeletePolicyReq{Id: ""}
+			req := api.DeletePolicyReq{Id: ""}
 
 			_, err := cl.DeletePolicy(ctx, &req)
 
@@ -558,7 +558,7 @@ func TestDeletePolicy(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when ID is not valid", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
-			req := api_v2.DeletePolicyReq{Id: " "}
+			req := api.DeletePolicyReq{Id: " "}
 
 			_, err := cl.DeletePolicy(ctx, &req)
 
@@ -566,7 +566,7 @@ func TestDeletePolicy(t *testing.T) {
 		}},
 		{"fails with NotFound when deleting from empty store", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
-			req := api_v2.DeletePolicyReq{
+			req := api.DeletePolicyReq{
 				Id: "75b3f659-b734-4b37-84bf-15a53a67349c",
 			}
 
@@ -579,7 +579,7 @@ func TestDeletePolicy(t *testing.T) {
 			pol.Members = []storage.Member{} // make the policy detached
 			require.Zero(t, store.ItemCount())
 			store.Add(pol.ID, &pol, cache.NoExpiration)
-			req := api_v2.DeletePolicyReq{Id: pol.ID}
+			req := api.DeletePolicyReq{Id: pol.ID}
 
 			_, err := cl.DeletePolicy(ctx, &req)
 
@@ -595,7 +595,7 @@ func TestDeletePolicy(t *testing.T) {
 			store.Add(pol.ID, &pol, cache.NoExpiration)
 			itemsAdded := 4
 			require.Equal(t, itemsAdded, store.ItemCount())
-			req := api_v2.DeletePolicyReq{Id: pol.ID}
+			req := api.DeletePolicyReq{Id: pol.ID}
 
 			_, err := cl.DeletePolicy(ctx, &req)
 
@@ -609,7 +609,7 @@ func TestDeletePolicy(t *testing.T) {
 			itemsAdded := len(items)
 			require.Equal(t, itemsAdded, store.ItemCount())
 
-			req := api_v2.DeletePolicyReq{
+			req := api.DeletePolicyReq{
 				Id: pol.ID,
 			}
 
@@ -636,7 +636,7 @@ func TestListPolicies(t *testing.T) {
 	existingPolicyId := "75b3f659-b734-4b37-84bf-15a53a67349c"
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	req := api_v2.ListPoliciesReq{} // it's not changing, can be reused
+	req := api.ListPoliciesReq{} // it's not changing, can be reused
 	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.policyCache
@@ -683,7 +683,7 @@ func TestListPolicies(t *testing.T) {
 			assert.Equal(t, "CUSTOM", pol.Type.String())
 
 			require.Equal(t, 1, len(pol.Statements))
-			assert.Equal(t, api_v2.Statement_DENY, pol.Statements[0].Effect)
+			assert.Equal(t, api.Statement_DENY, pol.Statements[0].Effect)
 			assert.Equal(t, []string{"delete"}, pol.Statements[0].Actions)
 			assert.Equal(t, []string{"compliance:profiles"}, pol.Statements[0].Resources)
 			assert.Empty(t, pol.Statements[0].Role)
@@ -745,7 +745,7 @@ func TestListPolicyMembers(t *testing.T) {
 		{"successfully finds policy with a single item in store and lists its members", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
 			storedPol := addArbitraryPolicyToStore(t, store, prng)
-			req := api_v2.ListPolicyMembersReq{
+			req := api.ListPolicyMembersReq{
 				Id: storedPol.ID,
 			}
 
@@ -758,7 +758,7 @@ func TestListPolicyMembers(t *testing.T) {
 		}},
 		{"successfully finds policy with multiple items in store and lists its members", func(t *testing.T) {
 			storedPol, items := addSomePoliciesToStore(t, store, prng)
-			req := api_v2.ListPolicyMembersReq{
+			req := api.ListPolicyMembersReq{
 				Id: storedPol.ID,
 			}
 
@@ -773,7 +773,7 @@ func TestListPolicyMembers(t *testing.T) {
 		{"fails with NotFound when ID doesn't match any policies", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
 			nonExistentId := "75b3f659-b734-4b37-84bf-12a34b56789c"
-			req := api_v2.ListPolicyMembersReq{
+			req := api.ListPolicyMembersReq{
 				Id: nonExistentId,
 			}
 
@@ -784,7 +784,7 @@ func TestListPolicyMembers(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when ID is not provided", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
-			req := api_v2.ListPolicyMembersReq{Id: ""}
+			req := api.ListPolicyMembersReq{Id: ""}
 
 			resp, err := cl.ListPolicyMembers(ctx, &req)
 
@@ -793,7 +793,7 @@ func TestListPolicyMembers(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when ID is not valid", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
-			req := api_v2.ListPolicyMembersReq{Id: "    "}
+			req := api.ListPolicyMembersReq{Id: "    "}
 
 			resp, err := cl.ListPolicyMembers(ctx, &req)
 
@@ -825,7 +825,7 @@ func TestGetPolicy(t *testing.T) {
 		{"successfully finds policy with a single item in store", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
 			storedPol := addArbitraryPolicyToStore(t, store, prng)
-			req := api_v2.GetPolicyReq{
+			req := api.GetPolicyReq{
 				Id: storedPol.ID,
 			}
 
@@ -836,7 +836,7 @@ func TestGetPolicy(t *testing.T) {
 		}},
 		{"successfully finds policy with multiple items in store", func(t *testing.T) {
 			storedPol, items := addSomePoliciesToStore(t, store, prng)
-			req := api_v2.GetPolicyReq{
+			req := api.GetPolicyReq{
 				Id: storedPol.ID,
 			}
 
@@ -851,7 +851,7 @@ func TestGetPolicy(t *testing.T) {
 			storedPol.Statements[0].Projects = []string{constants.AllProjectsID}
 			require.Zero(t, store.ItemCount())
 			store.Add(storedPol.ID, &storedPol, cache.NoExpiration)
-			req := api_v2.GetPolicyReq{
+			req := api.GetPolicyReq{
 				Id: storedPol.ID,
 			}
 
@@ -863,7 +863,7 @@ func TestGetPolicy(t *testing.T) {
 		{"fails with NotFound when ID doesn't match any policies", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
 			nonExistentId := "75b3f659-b734-4b37-84bf-12a34b56789c"
-			req := api_v2.GetPolicyReq{
+			req := api.GetPolicyReq{
 				Id: nonExistentId,
 			}
 
@@ -873,7 +873,7 @@ func TestGetPolicy(t *testing.T) {
 			grpctest.AssertCode(t, codes.NotFound, err)
 		}},
 		{"fails with InvalidArgument when ID isn't provided", func(t *testing.T) {
-			req := api_v2.GetPolicyReq{Id: ""}
+			req := api.GetPolicyReq{Id: ""}
 
 			pol, err := cl.GetPolicy(ctx, &req)
 
@@ -881,7 +881,7 @@ func TestGetPolicy(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		}},
 		{"fails with InvalidArgument when ID is whitespace", func(t *testing.T) {
-			req := api_v2.GetPolicyReq{Id: "     "}
+			req := api.GetPolicyReq{Id: "     "}
 
 			pol, err := cl.GetPolicy(ctx, &req)
 
@@ -902,9 +902,9 @@ func TestGetPolicy(t *testing.T) {
 
 func TestUpdatePolicy(t *testing.T) {
 	existingPolicyId := "75b3f659-b734-4b37-84bf-15a53a67349c"
-	testStatement := []*api_v2.Statement{
-		&api_v2.Statement{
-			Effect:    api_v2.Statement_ALLOW,
+	testStatement := []*api.Statement{
+		&api.Statement{
+			Effect:    api.Statement_ALLOW,
 			Resources: []string{"compliance:profiles"},
 			Actions:   []string{"compliance:profiles:upload"},
 			Projects:  []string{constants.AllProjectsExternalID},
@@ -920,11 +920,11 @@ func TestUpdatePolicy(t *testing.T) {
 		f    func(*testing.T)
 	}{
 		{"fails with InvalidArgument when missing policy ID", func(t *testing.T) {
-			req := api_v2.UpdatePolicyReq{
+			req := api.UpdatePolicyReq{
 				Name: "testPolicy1",
-				Statements: []*api_v2.Statement{
-					&api_v2.Statement{
-						Effect:    api_v2.Statement_ALLOW,
+				Statements: []*api.Statement{
+					&api.Statement{
+						Effect:    api.Statement_ALLOW,
 						Resources: []string{"compliance:profiles"},
 						Actions:   []string{"compliance:profiles:upload"},
 						Projects:  []string{constants.AllProjectsExternalID},
@@ -938,7 +938,7 @@ func TestUpdatePolicy(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		}},
 		{"fails with InvalidArgument when ID is invalid", func(t *testing.T) {
-			req := api_v2.UpdatePolicyReq{
+			req := api.UpdatePolicyReq{
 				Id:         "      ",
 				Name:       "testPolicy1",
 				Statements: testStatement,
@@ -950,7 +950,7 @@ func TestUpdatePolicy(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		}},
 		{"fails with InvalidArgument when missing policy name", func(t *testing.T) {
-			req := api_v2.UpdatePolicyReq{
+			req := api.UpdatePolicyReq{
 				Id:         existingPolicyId,
 				Statements: testStatement,
 			}
@@ -962,7 +962,7 @@ func TestUpdatePolicy(t *testing.T) {
 		}},
 		{"fails with NotFound when policy ID doesn't match any policies", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
-			req := api_v2.UpdatePolicyReq{
+			req := api.UpdatePolicyReq{
 				Id:         "this-is-wrong",
 				Name:       "testPolicy1",
 				Statements: testStatement,
@@ -975,7 +975,7 @@ func TestUpdatePolicy(t *testing.T) {
 		}},
 		{"successfully updates policy name", func(t *testing.T) {
 			storedPol, _ := addSomePoliciesToStore(t, store, prng)
-			req := api_v2.UpdatePolicyReq{
+			req := api.UpdatePolicyReq{
 				Id:         storedPol.ID,
 				Name:       "newTestPolicy1",
 				Statements: testStatement,
@@ -992,7 +992,7 @@ func TestUpdatePolicy(t *testing.T) {
 		}},
 		{"successfully updates policy members", func(t *testing.T) {
 			storedPol, _ := addSomePoliciesToStore(t, store, prng)
-			req := api_v2.UpdatePolicyReq{
+			req := api.UpdatePolicyReq{
 				Id:         storedPol.ID,
 				Name:       "TestPolicy1",
 				Members:    []string{"team:local:heroines", "team:local:ladies"},
@@ -1010,22 +1010,22 @@ func TestUpdatePolicy(t *testing.T) {
 		}},
 		{"successfully updates policy statements", func(t *testing.T) {
 			storedPol, _ := addSomePoliciesToStore(t, store, prng)
-			statement0 := api_v2.Statement{
-				Effect:    api_v2.Statement_ALLOW,
+			statement0 := api.Statement{
+				Effect:    api.Statement_ALLOW,
 				Resources: []string{"compliance:profiles"},
 				Actions:   []string{"compliance:profiles:upload"},
 				Projects:  []string{constants.AllProjectsExternalID},
 			}
-			statement1 := api_v2.Statement{
-				Effect:    api_v2.Statement_ALLOW,
+			statement1 := api.Statement{
+				Effect:    api.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 				Projects:  []string{constants.UnassignedProjectID},
 			}
-			req := api_v2.UpdatePolicyReq{
+			req := api.UpdatePolicyReq{
 				Id:         storedPol.ID,
 				Name:       "TestPolicy1",
-				Statements: []*api_v2.Statement{&statement0, &statement1},
+				Statements: []*api.Statement{&statement0, &statement1},
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1035,13 +1035,13 @@ func TestUpdatePolicy(t *testing.T) {
 			// These individual statement checks are included in the final assertPoliciesMatch,
 			// but useful to check these key elements explicitly.
 			s0 := pol.Statements[0]
-			assert.Equal(t, api_v2.Statement_ALLOW, s0.Effect)
+			assert.Equal(t, api.Statement_ALLOW, s0.Effect)
 			assert.Equal(t, []string{"compliance:profiles"}, s0.Resources)
 			assert.Equal(t, []string{"compliance:profiles:upload"}, s0.Actions)
 			assert.Equal(t, []string{constants.AllProjectsExternalID}, s0.Projects)
 
 			s1 := pol.Statements[1]
-			assert.Equal(t, api_v2.Statement_ALLOW, s1.Effect)
+			assert.Equal(t, api.Statement_ALLOW, s1.Effect)
 			assert.Equal(t, []string{"cfgmgmt:delete", "cfgmgmt:list"}, s1.Resources)
 			assert.Equal(t, []string{"cfgmgmt:nodes:*"}, s1.Actions)
 			assert.Equal(t, []string{constants.UnassignedProjectID}, s1.Projects)
@@ -1051,7 +1051,7 @@ func TestUpdatePolicy(t *testing.T) {
 		}},
 		{"successfully updates multiple properties at once", func(t *testing.T) {
 			storedPol, _ := addSomePoliciesToStore(t, store, prng)
-			req := api_v2.UpdatePolicyReq{
+			req := api.UpdatePolicyReq{
 				Id:         storedPol.ID,
 				Name:       "newTestPolicy1",
 				Members:    []string{"team:local:ladies"},
@@ -1069,16 +1069,16 @@ func TestUpdatePolicy(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when policy statement omits projects", func(t *testing.T) {
 			_, items := addSomePoliciesToStore(t, store, prng)
-			statement0 := api_v2.Statement{
-				Effect:    api_v2.Statement_ALLOW,
+			statement0 := api.Statement{
+				Effect:    api.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 			}
-			req := api_v2.UpdatePolicyReq{
+			req := api.UpdatePolicyReq{
 				Id:         "policy1",
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
-				Statements: []*api_v2.Statement{&statement0},
+				Statements: []*api.Statement{&statement0},
 			}
 
 			resp, err := cl.UpdatePolicy(ctx, &req)
@@ -1091,28 +1091,28 @@ func TestUpdatePolicy(t *testing.T) {
 
 		{"successfully updates policy with assorted projects", func(t *testing.T) {
 			storedPol, _ := addSomePoliciesToStore(t, store, prng)
-			statement0 := api_v2.Statement{
-				Effect:    api_v2.Statement_ALLOW,
+			statement0 := api.Statement{
+				Effect:    api.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 				Projects:  []string{constants.UnassignedProjectID},
 			}
-			statement1 := api_v2.Statement{
-				Effect:    api_v2.Statement_DENY,
+			statement1 := api.Statement{
+				Effect:    api.Statement_DENY,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
 				Projects:  []string{constants.AllProjectsExternalID},
 			}
-			statement2 := api_v2.Statement{
-				Effect:   api_v2.Statement_ALLOW,
+			statement2 := api.Statement{
+				Effect:   api.Statement_ALLOW,
 				Role:     "my-other-role",
 				Projects: []string{"my-project", "another-project"},
 			}
 
-			req := api_v2.UpdatePolicyReq{
+			req := api.UpdatePolicyReq{
 				Id:         storedPol.ID,
 				Name:       "TestPolicy1",
-				Statements: []*api_v2.Statement{&statement0, &statement1, &statement2},
+				Statements: []*api.Statement{&statement0, &statement1, &statement2},
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1151,7 +1151,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 				"user:local:name2",
 				"user:local:name3",
 			}
-			req := api_v2.ReplacePolicyMembersReq{
+			req := api.ReplacePolicyMembersReq{
 				Id:      storedPol.ID,
 				Members: members,
 			}
@@ -1164,7 +1164,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when empty ID provided", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
-			req := api_v2.ReplacePolicyMembersReq{
+			req := api.ReplacePolicyMembersReq{
 				Id:      "",
 				Members: []string{"user:local:n1", "user:local:n2"},
 			}
@@ -1177,7 +1177,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 		}},
 		{"fails with NotFound when policy not found", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
-			req := api_v2.ReplacePolicyMembersReq{
+			req := api.ReplacePolicyMembersReq{
 				Id:      "this-is-not-found",
 				Members: []string{"user:local:n1", "user:local:n2"},
 			}
@@ -1218,7 +1218,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 				"user:local:name3",
 				"user:local:name4",
 			}
-			setupReq := api_v2.ReplacePolicyMembersReq{
+			setupReq := api.ReplacePolicyMembersReq{
 				Id:      storedPol.ID,
 				Members: originalMembers,
 			}
@@ -1232,7 +1232,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 				"user:local:name3",
 				"user:local:wrong2",
 			}
-			req := api_v2.RemovePolicyMembersReq{
+			req := api.RemovePolicyMembersReq{
 				Id:      storedPol.ID,
 				Members: removeMembers,
 			}
@@ -1250,7 +1250,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 				"user:local:name3",
 				"user:local:name4",
 			}
-			setupReq := api_v2.ReplacePolicyMembersReq{
+			setupReq := api.ReplacePolicyMembersReq{
 				Id:      storedPol.ID,
 				Members: originalMembers,
 			}
@@ -1266,7 +1266,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 				"user:local:wrong",
 				"user:local:wrong2",
 			}
-			req := api_v2.RemovePolicyMembersReq{
+			req := api.RemovePolicyMembersReq{
 				Id:      storedPol.ID,
 				Members: removeMembers,
 			}
@@ -1278,7 +1278,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when empty ID provided", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
-			req := api_v2.RemovePolicyMembersReq{
+			req := api.RemovePolicyMembersReq{
 				Id:      "",
 				Members: []string{"user:local:n1", "user:local:n2"},
 			}
@@ -1289,7 +1289,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 		}},
 		{"fails with NotFound when policy not found", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
-			req := api_v2.RemovePolicyMembersReq{
+			req := api.RemovePolicyMembersReq{
 				Id:      "this-is-not-found",
 				Members: []string{"user:local:n1", "user:local:n2"},
 			}
@@ -1311,14 +1311,14 @@ func TestRemovePolicyMembers(t *testing.T) {
 				"user:local:somebody",
 				"user:local:somebodyelse",
 			}
-			setupReq := api_v2.ReplacePolicyMembersReq{
+			setupReq := api.ReplacePolicyMembersReq{
 				Id:      adminPolicyID,
 				Members: originalMembers,
 			}
 			_, err := cl.ReplacePolicyMembers(ctx, &setupReq)
 			require.NoError(t, err)
 
-			req := api_v2.RemovePolicyMembersReq{
+			req := api.RemovePolicyMembersReq{
 				Id:      adminPolicyID,
 				Members: []string{"user:local:somebody", "team:local:admins"},
 			}
@@ -1361,7 +1361,7 @@ func TestAddPolicyMembers(t *testing.T) {
 			newMember := []string{
 				"user:local:name1",
 			}
-			setupReq := api_v2.AddPolicyMembersReq{
+			setupReq := api.AddPolicyMembersReq{
 				Id:      pol.ID,
 				Members: newMember,
 			}
@@ -1385,7 +1385,7 @@ func TestAddPolicyMembers(t *testing.T) {
 					"user:local:name4",
 				}
 				members := append(storage.MemberSliceToStringSlice(pol.Members), newMembers...)
-				setupReq := api_v2.AddPolicyMembersReq{
+				setupReq := api.AddPolicyMembersReq{
 					Id:      pol.ID,
 					Members: members,
 				}
@@ -1402,7 +1402,7 @@ func TestAddPolicyMembers(t *testing.T) {
 			pol, _ := addSomePoliciesToStore(t, store, prng)
 			dupMember := pol.Members[0]
 			members := storage.MemberSliceToStringSlice(pol.Members)
-			setupReq := api_v2.AddPolicyMembersReq{
+			setupReq := api.AddPolicyMembersReq{
 				Id:      pol.ID,
 				Members: []string{dupMember.Name},
 			}
@@ -1417,7 +1417,7 @@ func TestAddPolicyMembers(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when empty ID provided", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
-			req := api_v2.AddPolicyMembersReq{
+			req := api.AddPolicyMembersReq{
 				Id:      "",
 				Members: []string{"user:local:name1", "user:local:name2"},
 			}
@@ -1430,7 +1430,7 @@ func TestAddPolicyMembers(t *testing.T) {
 		}},
 		{"fails with NotFound when policy not found", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
-			req := api_v2.AddPolicyMembersReq{
+			req := api.AddPolicyMembersReq{
 				Id:      "this-is-not-found",
 				Members: []string{"team:saml:name1", "user:ldap:name2"},
 			}
@@ -1459,14 +1459,14 @@ func TestCreateRole(t *testing.T) {
 	cl := ts.policy
 	store := ts.roleCache
 
-	project1 := api_v2.CreateProjectReq{
+	project1 := api.CreateProjectReq{
 		Id:   "project-1",
 		Name: "name1",
 	}
 	_, err := ts.projects.CreateProject(ctx, &project1)
 	require.NoError(t, err)
 
-	project2 := api_v2.CreateProjectReq{
+	project2 := api.CreateProjectReq{
 		Id:   "project-2",
 		Name: "name2",
 	}
@@ -1475,7 +1475,7 @@ func TestCreateRole(t *testing.T) {
 
 	cases := map[string]func(*testing.T){
 		"successfully adds role--handler": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "role-id",
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action", "infra:some:other"},
@@ -1492,7 +1492,7 @@ func TestCreateRole(t *testing.T) {
 			assert.ElementsMatch(t, req.Projects, role.Projects)
 		},
 		"successfully adds role--store": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "role-id",
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action", "infra:some:other"},
@@ -1508,7 +1508,7 @@ func TestCreateRole(t *testing.T) {
 			assertRolesMatch(t, storedRole, *role)
 		},
 		"successfully adds role with all suppported characters": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "-role-1234",
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action", "infra:some:other"},
@@ -1524,7 +1524,7 @@ func TestCreateRole(t *testing.T) {
 			assert.ElementsMatch(t, req.Projects, resp.Projects)
 		},
 		"successfully adds role with a single project": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "-role-1234",
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action", "infra:some:other"},
@@ -1540,7 +1540,7 @@ func TestCreateRole(t *testing.T) {
 			assert.ElementsMatch(t, req.Projects, resp.Projects)
 		},
 		"successfully adds role with multiple projects": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "-role-1234",
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action", "infra:some:other"},
@@ -1556,7 +1556,7 @@ func TestCreateRole(t *testing.T) {
 			assert.ElementsMatch(t, req.Projects, resp.Projects)
 		},
 		"fails with InvalidArgument with empty action": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "role-id",
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action", ""},
@@ -1571,7 +1571,7 @@ func TestCreateRole(t *testing.T) {
 			assert.Regexp(t, "invalid.*Actions.*does not match", err.Error())
 		},
 		"fails with InvalidArgument with invalid actions": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "role-id",
 				Name:     "roleName",
 				Actions:  []string{"action1", "action2"},
@@ -1587,7 +1587,7 @@ func TestCreateRole(t *testing.T) {
 			assert.Regexp(t, "invalid.*Actions.*does not match", err.Error())
 		},
 		"fails with InvalidArgument with no actions": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "role-id",
 				Name:     "roleName",
 				Actions:  []string{},
@@ -1602,7 +1602,7 @@ func TestCreateRole(t *testing.T) {
 			assert.Regexp(t, "CreateRoleReq.Actions.*must contain at least 1 item", err.Error())
 		},
 		"fails with InvalidArgument with invalid project": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "role-id",
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action"},
@@ -1617,7 +1617,7 @@ func TestCreateRole(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		},
 		"fails with InvalidArgument with no name": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "valid",
 				Name:     "",
 				Actions:  []string{"infra:some:action"},
@@ -1632,7 +1632,7 @@ func TestCreateRole(t *testing.T) {
 			assert.Regexp(t, "InvalidArgument.*role name is required.*must contain at least one non-whitespace character", err.Error())
 		},
 		"fails with InvalidArgument with blank name": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "valid",
 				Name:     "     ",
 				Actions:  []string{"infra:some:action"},
@@ -1647,7 +1647,7 @@ func TestCreateRole(t *testing.T) {
 			assert.Regexp(t, "InvalidArgument.*role name is required.*must contain at least one non-whitespace character", err.Error())
 		},
 		"fails with InvalidArgument with no id": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action"},
 				Projects: []string{},
@@ -1661,7 +1661,7 @@ func TestCreateRole(t *testing.T) {
 			assert.Regexp(t, "invalid.*Id.*does not match", err.Error())
 		},
 		"fails with InvalidArgument with blank id": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "   ",
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action"},
@@ -1676,7 +1676,7 @@ func TestCreateRole(t *testing.T) {
 			assert.Regexp(t, "invalid.*Id.*does not match", err.Error())
 		},
 		"fails with InvalidArgument with invalid characters in id": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "roleID", // only lowercase allowed
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action"},
@@ -1691,7 +1691,7 @@ func TestCreateRole(t *testing.T) {
 			assert.Regexp(t, "invalid.*Id.*does not match", err.Error())
 		},
 		"successfully adds role with 64-char id": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "abcd-123456789-123456789-123456789-123456789-123456789-123456789",
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action"},
@@ -1706,7 +1706,7 @@ func TestCreateRole(t *testing.T) {
 			assertRolesMatch(t, storedRole, *role)
 		},
 		"fails to add role with 1 char more than 64-char limit": func(t *testing.T) {
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "0abcd-123456789-123456789-123456789-123456789-123456789-123456789",
 				Name:     "roleName",
 				Actions:  []string{"infra:some:action"},
@@ -1729,7 +1729,7 @@ func TestCreateRole(t *testing.T) {
 				Projects: []string{},
 			}
 			store.Add(storedRole.ID, &storedRole, cache.NoExpiration)
-			req := api_v2.CreateRoleReq{
+			req := api.CreateRoleReq{
 				Id:       "role-id",
 				Name:     "otherName",
 				Actions:  []string{"infra:some:action"},
@@ -1761,7 +1761,7 @@ func TestUpdateRole(t *testing.T) {
 
 	cases := map[string]func(*testing.T){
 		"fails with InvalidArgument when missing role id": func(t *testing.T) {
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Name:     "name",
 				Actions:  []string{"foo:bar:baz"},
 				Projects: []string{},
@@ -1773,7 +1773,7 @@ func TestUpdateRole(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		},
 		"fails with InvalidArgument when ID is whitespace": func(t *testing.T) {
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Id:       "    ",
 				Name:     "name",
 				Actions:  []string{"foo:bar:baz"},
@@ -1786,7 +1786,7 @@ func TestUpdateRole(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		},
 		"fails with InvalidArgument when missing role name": func(t *testing.T) {
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Id:       existingRoleId,
 				Actions:  []string{"foo:bar:baz"},
 				Projects: []string{},
@@ -1798,7 +1798,7 @@ func TestUpdateRole(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		},
 		"fails with InvalidArgument when name is whitespace": func(t *testing.T) {
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Id:       existingRoleId,
 				Actions:  []string{"foo:bar:baz"},
 				Projects: []string{},
@@ -1811,7 +1811,7 @@ func TestUpdateRole(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		},
 		"fails with InvalidArgument when missing role actions": func(t *testing.T) {
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Id:       existingRoleId,
 				Name:     "name",
 				Projects: []string{},
@@ -1823,7 +1823,7 @@ func TestUpdateRole(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		},
 		"fails with InvalidArgument when new role name is whitespace": func(t *testing.T) {
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Id:       existingRoleId,
 				Name:     " ",
 				Actions:  []string{"foo:bar:baz"},
@@ -1836,7 +1836,7 @@ func TestUpdateRole(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		},
 		"fails with NotFound when ID doesn't match any roles and there's no roles in store": func(t *testing.T) {
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Id:       "fake-role-id",
 				Name:     "name",
 				Actions:  []string{"foo:bar:baz"},
@@ -1850,7 +1850,7 @@ func TestUpdateRole(t *testing.T) {
 		},
 		"fails with NotFound when ID doesn't match any roles and there's many roles in store": func(t *testing.T) {
 			addSomeRolesToStore(t, store, prng)
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Id:       "fake-role-id",
 				Name:     "name",
 				Actions:  []string{"foo:bar:baz"},
@@ -1866,7 +1866,7 @@ func TestUpdateRole(t *testing.T) {
 			existingRole := genRole(t, existingRoleId, prng)
 			store.Add(existingRole.ID, &existingRole, cache.NoExpiration)
 
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Id:       existingRoleId,
 				Name:     "new name",
 				Actions:  existingRole.Actions,
@@ -1886,7 +1886,7 @@ func TestUpdateRole(t *testing.T) {
 			existingRole := genRole(t, existingRoleId, prng)
 			store.Add(existingRole.ID, &existingRole, cache.NoExpiration)
 
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Id:       existingRoleId,
 				Name:     existingRole.Name,
 				Actions:  []string{"foo:bar:qux"},
@@ -1906,7 +1906,7 @@ func TestUpdateRole(t *testing.T) {
 			existingRole := genRole(t, existingRoleId, prng)
 			store.Add(existingRole.ID, &existingRole, cache.NoExpiration)
 
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Id:       existingRoleId,
 				Name:     existingRole.Name,
 				Actions:  existingRole.Actions,
@@ -1932,7 +1932,7 @@ func TestUpdateRole(t *testing.T) {
 			existingRole := genRole(t, existingRoleId, prng)
 			store.Add(existingRole.ID, &existingRole, cache.NoExpiration)
 
-			req := api_v2.UpdateRoleReq{
+			req := api.UpdateRoleReq{
 				Id:       existingRoleId,
 				Name:     "new name",
 				Actions:  []string{"foo:bar:qux"},
@@ -1976,7 +1976,7 @@ func TestDeleteRole(t *testing.T) {
 	cases := map[string]func(*testing.T){
 		"fails with NotFound when deleting from empty store": func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
-			req := api_v2.DeleteRoleReq{
+			req := api.DeleteRoleReq{
 				Id: "test-role-1",
 			}
 
@@ -1985,7 +1985,7 @@ func TestDeleteRole(t *testing.T) {
 			grpctest.AssertCode(t, codes.NotFound, err)
 		},
 		"fails with InvalidArgument when ID is whitespace": func(t *testing.T) {
-			req := api_v2.DeleteRoleReq{
+			req := api.DeleteRoleReq{
 				Id: "   ",
 			}
 
@@ -1997,7 +1997,7 @@ func TestDeleteRole(t *testing.T) {
 			require.Zero(t, store.ItemCount())
 			role := addArbitraryRoleToStore(t, store, prng)
 
-			req := api_v2.DeleteRoleReq{
+			req := api.DeleteRoleReq{
 				Id: role.ID,
 			}
 
@@ -2009,7 +2009,7 @@ func TestDeleteRole(t *testing.T) {
 		"deletes role from store containing several roles": func(t *testing.T) {
 			role, roles := addSomeRolesToStore(t, store, prng)
 
-			req := api_v2.DeleteRoleReq{
+			req := api.DeleteRoleReq{
 				Id: role.ID,
 			}
 
@@ -2032,7 +2032,7 @@ func TestDeleteRole(t *testing.T) {
 func TestListRoles(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
-	req := api_v2.ListRolesReq{} // it's not changing, can be reused
+	req := api.ListRolesReq{} // it's not changing, can be reused
 	ts := setup(t, nil, dummyWriter)
 	cl := ts.policy
 	store := ts.roleCache
@@ -2103,7 +2103,7 @@ func TestGetRole(t *testing.T) {
 		{"successfully finds role with a single item in store", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
 			storedRole := addArbitraryRoleToStore(t, store, prng)
-			req := api_v2.GetRoleReq{
+			req := api.GetRoleReq{
 				Id: storedRole.ID,
 			}
 
@@ -2117,7 +2117,7 @@ func TestGetRole(t *testing.T) {
 		}},
 		{"successfully finds role with multiple items in store", func(t *testing.T) {
 			storedRole, _ := addSomeRolesToStore(t, store, prng)
-			req := api_v2.GetRoleReq{
+			req := api.GetRoleReq{
 				Id: storedRole.ID,
 			}
 
@@ -2132,7 +2132,7 @@ func TestGetRole(t *testing.T) {
 		{"fails with NotFound when ID doesn't match any roles", func(t *testing.T) {
 			addSomeRolesToStore(t, store, prng)
 			nonExistentId := "fake-id"
-			req := api_v2.GetRoleReq{
+			req := api.GetRoleReq{
 				Id: nonExistentId,
 			}
 
@@ -2145,7 +2145,7 @@ func TestGetRole(t *testing.T) {
 			storedRole, _ := addSomeRolesToStore(t, store, prng)
 			uppercasedID := strings.Title(storedRole.ID)
 
-			req := api_v2.GetRoleReq{
+			req := api.GetRoleReq{
 				Id: uppercasedID,
 			}
 
@@ -2185,13 +2185,13 @@ func TestTypeConversion(t *testing.T) {
 }
 
 func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
-	singleStatementAllow := &api_v2.CreatePolicyReq{
+	singleStatementAllow := &api.CreatePolicyReq{
 		Id:      "single-statement-allow",
 		Name:    "singleStatementAllow",
 		Members: []string{},
-		Statements: []*api_v2.Statement{
+		Statements: []*api.Statement{
 			{
-				Effect:    api_v2.Statement_ALLOW,
+				Effect:    api.Statement_ALLOW,
 				Resources: []string{"some-resource", "some-other-resource"},
 				Actions:   []string{"infra:some:action", "infra:some:other"},
 				Projects:  []string{"project1"},
@@ -2200,26 +2200,26 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 		Projects: []string{"project1"},
 	}
 
-	multiStatementAllow := &api_v2.CreatePolicyReq{
+	multiStatementAllow := &api.CreatePolicyReq{
 		Id:      "multi-statement-allow",
 		Name:    "multiStatementAllow",
 		Members: []string{},
-		Statements: []*api_v2.Statement{
+		Statements: []*api.Statement{
 			{
-				Effect:    api_v2.Statement_ALLOW,
+				Effect:    api.Statement_ALLOW,
 				Resources: []string{"someResource", "someOtherResource"},
 				Actions:   []string{"infra:some:action", "infra:some:other"},
 				Projects:  []string{"project1"},
 			},
 			{
-				Effect:    api_v2.Statement_DENY,
+				Effect:    api.Statement_DENY,
 				Resources: []string{"someResource2", "someOtherResource"},
 				Actions:   []string{"infra:some:action"},
 				Role:      "",
 				Projects:  []string{"project1"},
 			},
 			{
-				Effect:    api_v2.Statement_ALLOW,
+				Effect:    api.Statement_ALLOW,
 				Resources: []string{"someResource3"},
 				Actions:   []string{"infra:some:action"},
 				Projects:  []string{"project1"},
@@ -2235,7 +2235,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 	store := ts.policyCache
 
 	t.Run("CreatePolicy updates the engine", func(t *testing.T) {
-		tests := map[string][]*api_v2.CreatePolicyReq{
+		tests := map[string][]*api.CreatePolicyReq{
 			"add multiple policies": {singleStatementAllow, multiStatementAllow},
 			"add a single policy":   {multiStatementAllow},
 		}
@@ -2265,7 +2265,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 		require.Zero(t, store.ItemCount())
 
 		// arrange: create test policy via API then assure that it's in the testEngine
-		testCreate := []*api_v2.CreatePolicyReq{
+		testCreate := []*api.CreatePolicyReq{
 			singleStatementAllow,
 		}
 		policyResp := generateTestPolicies(ctx, t, cl, testCreate)
@@ -2275,13 +2275,13 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 		assertInterfaceMapContainsPolicy(t, te.policyMap, testCreate[0])
 
 		// act: update test policy via API then assure that the update is in the testEngine
-		singleStatementAllowEdited := &api_v2.UpdatePolicyReq{
+		singleStatementAllowEdited := &api.UpdatePolicyReq{
 			Id:      policyResp[0],
 			Name:    "updatedSingleStatementAllow",
 			Members: []string{},
-			Statements: []*api_v2.Statement{
+			Statements: []*api.Statement{
 				{
-					Effect:    api_v2.Statement_ALLOW,
+					Effect:    api.Statement_ALLOW,
 					Resources: []string{"update-some-resource", "updated-some-other-resource"},
 					Actions:   []string{"infra:some:updatedAction", "infra:some:updatedOther"},
 					Projects:  []string{"project1"},
@@ -2303,7 +2303,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 	})
 
 	t.Run("DeletePolicy updates the engine", func(t *testing.T) {
-		tests := map[string][]*api_v2.CreatePolicyReq{
+		tests := map[string][]*api.CreatePolicyReq{
 			"delete multiple policies": {singleStatementAllow, multiStatementAllow},
 			"delete a single policy":   {multiStatementAllow},
 		}
@@ -2322,7 +2322,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 				}
 
 				for _, policy := range policies {
-					req := api_v2.DeletePolicyReq{
+					req := api.DeletePolicyReq{
 						Id: policy,
 					}
 
@@ -2358,7 +2358,7 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 		{"successfully removes one member from policies", func(t *testing.T) {
 			pol, _ := addSomePoliciesToStore(t, store, prng)
 			oldMembers := pol.Members
-			req := api_v2.PurgeSubjectFromPoliciesReq{Subject: pol.Members[0].Name}
+			req := api.PurgeSubjectFromPoliciesReq{Subject: pol.Members[0].Name}
 
 			resp, err := cl.PurgeSubjectFromPolicies(ctx, &req)
 			require.NoError(t, err)
@@ -2401,7 +2401,7 @@ func assertProjectsMatch(t *testing.T, storageProject string, apiProject string)
 	assert.Equal(t, storageProject, apiProject, "statement projects differ")
 }
 
-func assertStatementsMatch(t *testing.T, storageStatement storage.Statement, apiStatement api_v2.Statement) {
+func assertStatementsMatch(t *testing.T, storageStatement storage.Statement, apiStatement api.Statement) {
 	if storageStatement.Actions != nil && apiStatement.Actions != nil {
 		assert.Equal(t, storageStatement.Actions, apiStatement.Actions, "statement actions differ")
 	}
@@ -2418,7 +2418,7 @@ func assertStatementsMatch(t *testing.T, storageStatement storage.Statement, api
 	}
 }
 
-func assertPoliciesMatch(t *testing.T, storagePolicy *storage.Policy, apiPolicy *api_v2.Policy) {
+func assertPoliciesMatch(t *testing.T, storagePolicy *storage.Policy, apiPolicy *api.Policy) {
 	assert.Equal(t, storagePolicy.Name, apiPolicy.Name, "policy names differ")
 	assert.Equal(t, storagePolicy.Type.String(), strings.ToLower(apiPolicy.Type.String()), "policy types differ")
 	assert.Equal(t, len(storagePolicy.Members), len(apiPolicy.Members), "number of policy members differ")
@@ -2448,7 +2448,7 @@ func getRoleFromStore(t *testing.T, store *cache.Cache, id string) storage.Role 
 	return *role
 }
 
-func assertRolesMatch(t *testing.T, storageRole storage.Role, apiRole api_v2.Role) {
+func assertRolesMatch(t *testing.T, storageRole storage.Role, apiRole api.Role) {
 	assert.Equal(t, storageRole.ID, apiRole.Id, "role names differ")
 	assert.Equal(t, storageRole.Name, apiRole.Name, "role names differ")
 	assert.Equal(t, storageRole.Type.String(), strings.ToLower(apiRole.Type.String()), "role types differ")
@@ -2457,9 +2457,9 @@ func assertRolesMatch(t *testing.T, storageRole storage.Role, apiRole api_v2.Rol
 }
 
 type testSetup struct {
-	policy       api_v2.PoliciesClient
-	authz        api_v2.AuthorizationClient
-	projects     api_v2.ProjectsClient
+	policy       api.PoliciesClient
+	authz        api.AuthorizationClient
+	projects     api.ProjectsClient
 	policyCache  *cache.Cache
 	roleCache    *cache.Cache
 	projectCache *cache.Cache
@@ -2505,9 +2505,9 @@ func setup(t *testing.T, authorizer engine.Authorizer, writer engine.Writer) tes
 		),
 	))
 
-	api_v2.RegisterPoliciesServer(serv, polV2)
-	api_v2.RegisterAuthorizationServer(serv, authzV2)
-	api_v2.RegisterProjectsServer(serv, projectsSrv)
+	api.RegisterPoliciesServer(serv, polV2)
+	api.RegisterAuthorizationServer(serv, authzV2)
+	api.RegisterProjectsServer(serv, projectsSrv)
 	reflection.Register(serv)
 
 	grpcServ := grpctest.NewServer(serv)
@@ -2518,9 +2518,9 @@ func setup(t *testing.T, authorizer engine.Authorizer, writer engine.Writer) tes
 	}
 
 	return testSetup{
-		policy:       api_v2.NewPoliciesClient(conn),
-		authz:        api_v2.NewAuthorizationClient(conn),
-		projects:     api_v2.NewProjectsClient(conn),
+		policy:       api.NewPoliciesClient(conn),
+		authz:        api.NewAuthorizationClient(conn),
+		projects:     api.NewProjectsClient(conn),
 		policyCache:  memInstance.PoliciesCache(),
 		roleCache:    memInstance.RolesCache(),
 		projectCache: memInstance.ProjectsCache(),
@@ -2693,7 +2693,7 @@ func addSomeRolesToStore(t *testing.T, store *cache.Cache, p *prng.Prng) (storag
 }
 
 func generateTestPolicies(ctx context.Context, t *testing.T,
-	cl api_v2.PoliciesClient, policies []*api_v2.CreatePolicyReq) []string {
+	cl api.PoliciesClient, policies []*api.CreatePolicyReq) []string {
 
 	t.Helper()
 	policyResponses := make([]string, len(policies))
@@ -2707,7 +2707,7 @@ func generateTestPolicies(ctx context.Context, t *testing.T,
 }
 
 func assertInterfaceMapContainsPolicy(t *testing.T,
-	data map[string]interface{}, target *api_v2.CreatePolicyReq) bool {
+	data map[string]interface{}, target *api.CreatePolicyReq) bool {
 
 	t.Helper()
 

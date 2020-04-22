@@ -156,7 +156,7 @@ func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 // 12/16/19 summary: up to 1-2 seconds with 1000 teams
 
 // Q: Which type of input is computed faster, generic Go interface or specific OPA Term?
-func BenchmarkV2GenericInput(b *testing.B) {
+func BenchmarGenericInput(b *testing.B) {
 	subjects, projects := []string{"user:local:alice@example.com", "team:local:admins"}, []string{"project-1", "project-2"}
 	resource, action := "some:resource", "some:resource:action"
 	var r ast.Value
@@ -178,7 +178,7 @@ func BenchmarkV2GenericInput(b *testing.B) {
 	result = r
 }
 
-func BenchmarkV2SpecificInput(b *testing.B) {
+func BenchmarkSpecificInput(b *testing.B) {
 	subjects, projects := []string{"user:local:alice@example.com", "team:local:admins"}, []string{"project-1", "project-2"}
 	resource, action := "some:resource", "some:resource:action"
 	var r ast.Value
@@ -193,8 +193,8 @@ func BenchmarkV2SpecificInput(b *testing.B) {
 }
 
 // A: Specific input is faster!
-// BenchmarkV2GenericInput-8   	    338047	      3727 ns/op	    1664 B/op	      50 allocs/op
-// BenchmarkV2SpecificInput-8   	  713064	      1931 ns/op	     976 B/op	      30 allocs/op
+// BenchmarkGenericInput-8   	  338047	      3727 ns/op	    1664 B/op	      50 allocs/op
+// BenchmarkSpecificInput-8   	  713064	      1931 ns/op	     976 B/op	      30 allocs/op
 
 func BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies(b *testing.B) {
 	var r error

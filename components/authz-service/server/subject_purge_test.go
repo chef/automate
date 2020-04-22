@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/chef/automate/api/interservice/authz/common"
-	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/prng"
 	"github.com/chef/automate/components/authz-service/server"
 	"github.com/chef/automate/lib/logger"
@@ -23,11 +23,11 @@ type vee2 struct {
 }
 
 func (v *vee2) PurgeSubjectFromPolicies(_ context.Context,
-	req *api_v2.PurgeSubjectFromPoliciesReq) (*api_v2.PurgeSubjectFromPoliciesResp, error) {
+	req *api.PurgeSubjectFromPoliciesReq) (*api.PurgeSubjectFromPoliciesResp, error) {
 	if req.Subject != v.expected {
 		return nil, fmt.Errorf("unexpected argument: %q (expected %q)", req.Subject, v.expected)
 	}
-	return &api_v2.PurgeSubjectFromPoliciesResp{Ids: v.returned}, nil
+	return &api.PurgeSubjectFromPoliciesResp{Ids: v.returned}, nil
 }
 
 func TestCommonSubjectPurgeService(t *testing.T) {

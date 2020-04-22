@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/chef/automate/api/interservice/authz/common"
-	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/lib/logger"
 )
 
 type subjectPurger interface {
 	PurgeSubjectFromPolicies(context.Context,
-		*api_v2.PurgeSubjectFromPoliciesReq) (*api_v2.PurgeSubjectFromPoliciesResp, error)
+		*api.PurgeSubjectFromPoliciesReq) (*api.PurgeSubjectFromPoliciesResp, error)
 }
 
 type purger struct {
@@ -28,7 +28,7 @@ func NewSubjectPurgeServer(_ context.Context,
 func (p *purger) PurgeSubjectFromPolicies(ctx context.Context,
 	req *common.PurgeSubjectFromPoliciesReq) (*common.PurgeSubjectFromPoliciesResp, error) {
 
-	resp, err := p.sp.PurgeSubjectFromPolicies(ctx, (*api_v2.PurgeSubjectFromPoliciesReq)(req))
+	resp, err := p.sp.PurgeSubjectFromPolicies(ctx, (*api.PurgeSubjectFromPoliciesReq)(req))
 	if err != nil {
 		return nil, err
 	}
