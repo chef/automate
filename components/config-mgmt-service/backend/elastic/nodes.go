@@ -14,6 +14,7 @@ import (
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
+	"github.com/chef/automate/components/config-mgmt-service/params"
 )
 
 var (
@@ -271,6 +272,70 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 	return ns, nil
 }
 
+// GetNodeMetadataCounts - For each type of field provided return distinct values the amount for each.
+// For example, if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8
+// could be returned. The number next to each represents the number of nodes with that type of platform.
+//
+// Filters of the same type as the aggregation are removed. For example, if there is a filter of
+// type platform:'windows' and the type 'platform' is requested the filter platform:'windows' will be removed.
+func (es Backend) GetNodeMetadataCounts(filters map[string][]string,
+	types []string, startDate, endDate string) ([]backend.TypeCount, error) {
+	var aggregationTerm = "inner_filter"
+
+	searchSource := createTypeAggs(filters, types, startDate, endDate, aggregationTerm)
+
+	source, _ := searchSource.Source()
+	LogQueryPartMin(IndexNodeState, source, "GetNodeMetadataCounts request")
+
+	searchResult, err := es.client.Search().
+		SearchSource(searchSource).
+		Index(IndexNodeState).
+		Do(context.Background())
+	if err != nil {
+		return []backend.TypeCount{}, err
+	}
+
+	LogQueryPartMin(IndexNodeState, searchResult.Aggregations, "GetNodeMetadataCounts response")
+
+	// no matching nodes found
+	if searchResult.TotalHits() == 0 {
+		fieldCountCollection := make([]backend.TypeCount, len(types))
+		for index, fieldType := range types {
+			fieldCountCollection[index].Values = []backend.ValueCount{}
+			fieldCountCollection[index].Type = fieldType
+		}
+		return fieldCountCollection, nil
+	}
+
+	fieldCountCollection := make([]backend.TypeCount, len(types))
+	for index, searchTerm := range types {
+		outerAgg, found := searchResult.Aggregations.Terms(searchTerm)
+		if !found {
+			return nil, errors.NewBackendError("Aggregation term %q not found", searchTerm)
+		}
+		terms := make([]backend.ValueCount, 0)
+		for _, bucket := range outerAgg.Buckets {
+			filterCounts, found := bucket.Aggregations.Filter(aggregationTerm)
+			if !found {
+				return []backend.TypeCount{},
+					errors.NewBackendError("Aggregation term %q not found", aggregationTerm)
+			}
+
+			// Are all the found values filtered out
+			if filterCounts.DocCount > 0 {
+				terms = append(terms, backend.ValueCount{
+					Count: int(filterCounts.DocCount),
+					Value: bucket.Key.(string),
+				})
+			}
+		}
+		fieldCountCollection[index].Values = terms
+		fieldCountCollection[index].Type = searchTerm
+	}
+
+	return fieldCountCollection, nil
+}
+
 // GetAttribute Get request for the attribute using the Doc ID
 func (es Backend) GetAttribute(nodeID string) (backend.NodeAttribute, error) {
 	var nodeAttribute backend.NodeAttribute
@@ -435,7 +500,7 @@ func (es Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.Co
 		aggTag = "MissingNodeDurationCounts"
 	)
 	filters := map[string][]string{
-		"exists": []string{"true"},
+		"exists": {"true"},
 	}
 	mainQuery := newBoolQueryFromFilters(filters)
 
@@ -491,4 +556,119 @@ func findMatchingDurationCount(key string,
 		}
 	}
 	return 0
+}
+
+// For each field create an aggregation that counts the number of each distinct value. Apply the
+// filters on each field aggregation separately to allow the removal of the filter for the field being counted.
+// {
+// 	"aggregations":{
+// 		 "platform":{
+// 				"aggregations":{
+// 					 "inner_filter":{
+// 							"filter":{
+// 								 "bool":{
+// 										"filter":[
+// 											 {
+// 													"bool":{
+// 														 "should":{
+// 																"terms":{
+// 																	 "status":[
+// 																			"failure"
+// 																	 ]
+// 																}
+// 														 }
+// 													}
+// 											 },
+// 											 {
+// 													"bool":{
+// 														 "should":{
+// 																"terms":{
+// 																	 "exists":[
+// 																			"true"
+// 																	 ]
+// 																}
+// 														 }
+// 													}
+// 											 }
+// 										]
+// 								 }
+// 							}
+// 					 }
+// 				},
+// 				"terms":{
+// 					 "field":"platform"
+// 				}
+// 		 },
+// 		 "status":{
+// 				"aggregations":{
+// 					 "inner_filter":{
+// 							"filter":{
+// 								 "bool":{
+// 										"filter":[
+// 											 {
+// 													"bool":{
+// 														 "should":{
+// 																"terms":{
+// 																	 "platform.lower":[
+// 																			"windows"
+// 																	 ]
+// 																}
+// 														 }
+// 													}
+// 											 },
+// 											 {
+// 													"bool":{
+// 														 "should":{
+// 																"terms":{
+// 																	 "exists":[
+// 																			"true"
+// 																	 ]
+// 																}
+// 														 }
+// 													}
+// 											 }
+// 										]
+// 								 }
+// 							}
+// 					 }
+// 				},
+// 				"terms":{
+// 					 "field":"status"
+// 				}
+// 		 }
+// 	}
+// }
+func createTypeAggs(filters map[string][]string,
+	types []string, startDate, endDate string, aggregationTerm string) *elastic.SearchSource {
+	searchSource := elastic.NewSearchSource()
+	for _, fieldType := range types {
+		// Copy the filters
+		localFilters := map[string][]string{}
+		for index, element := range filters {
+			localFilters[index] = element
+		}
+
+		// We only want to count nodes that are not deleted
+		localFilters[backend.ExistsTag] = []string{"true"}
+
+		// remove the filter for the current search term
+		delete(localFilters, params.ConvertParamToNodeStateBackendLowerFilter(fieldType))
+
+		mainQuery := newBoolQueryFromFilters(localFilters)
+
+		rangeQuery, ok := newRangeQuery(startDate, endDate, NodeCheckin)
+
+		if ok {
+			mainQuery = mainQuery.Must(rangeQuery)
+		}
+
+		agg := elastic.NewTermsAggregation().
+			Field(fieldType).
+			SubAggregation(aggregationTerm,
+				elastic.NewFilterAggregation().Filter(mainQuery))
+
+		searchSource = searchSource.Aggregation(fieldType, agg)
+	}
+
+	return searchSource
 }

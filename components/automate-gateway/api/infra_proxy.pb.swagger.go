@@ -168,6 +168,7 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -190,6 +191,7 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -222,12 +224,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -250,12 +254,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -278,12 +284,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -316,12 +324,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Chef organization name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -777,6 +787,84 @@ func init() {
         ]
       }
     },
+    "/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
+      "get": {
+        "operationId": "GetPolicyfiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Policyfiles"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef Organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
+      "get": {
+        "operationId": "GetPolicyfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Policyfile"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef Organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Policyfile name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "revision_id",
+            "description": "Policyfile revision ID.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
         "operationId": "GetRoles",
@@ -882,22 +970,27 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization name."
         },
         "admin_user": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization admin user."
         },
         "admin_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization admin key."
         },
         "server_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server ID."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of projects this chef organization belongs to. May be empty."
         }
       }
     },
@@ -922,25 +1015,31 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization ID."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization name."
         },
         "admin_user": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization admin user."
         },
         "admin_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization admin key."
         },
         "server_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server ID."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of projects this chef organization belongs to. May be empty."
         }
       }
     },
@@ -1173,6 +1272,43 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.CookbookLock": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Cookbook name."
+        },
+        "version": {
+          "type": "string",
+          "description": "Cookbook version."
+        },
+        "identifier": {
+          "type": "string",
+          "description": "Cookbook identifier."
+        },
+        "dotted_identifier": {
+          "type": "string",
+          "description": "Cookbook decimal number identifier."
+        },
+        "source": {
+          "type": "string",
+          "description": "Cookbook source."
+        },
+        "cache_key": {
+          "type": "string",
+          "description": "Cookbook cache key."
+        },
+        "SCMDetail": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SCMDetail",
+          "description": "SCM detail."
+        },
+        "source_options": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SourceOptions",
+          "description": "Cookbook source path."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.CookbookMeta": {
       "type": "object",
       "properties": {
@@ -1244,7 +1380,8 @@ func init() {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "description": "Chef organization."
         }
       }
     },
@@ -1290,7 +1427,8 @@ func init() {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "description": "Chef organization."
         }
       }
     },
@@ -1379,7 +1517,8 @@ func init() {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "description": "Chef organization."
         }
       }
     },
@@ -1389,8 +1528,9 @@ func init() {
         "orgs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
-          }
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.OrgListItem"
+          },
+          "description": "Chef organization list."
         }
       }
     },
@@ -1410,6 +1550,39 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
           }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.IncludedPolicyLock": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Included Policyfile name."
+        },
+        "revision_id": {
+          "type": "string",
+          "description": "Policyfile revision ID."
+        },
+        "source_options": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SourceOptions",
+          "description": "Included policyfile source options."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.NamedRunList": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Run list name."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Run list associated with the policy."
         }
       }
     },
@@ -1450,25 +1623,134 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization ID."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization name."
         },
         "admin_user": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef organization admin user."
         },
-        "admin_key": {
-          "type": "string"
+        "credential_id": {
+          "type": "string",
+          "description": "Chef organization credential ID."
         },
         "server_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server ID."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of projects this chef organization belongs to. May be empty."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.OrgListItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Chef organization name."
+        },
+        "admin_user": {
+          "type": "string",
+          "description": "Chef organization admin user."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Policyfile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Policyfile name."
+        },
+        "policy_group": {
+          "type": "string",
+          "description": "Policy group name."
+        },
+        "revision_id": {
+          "type": "string",
+          "description": "Policy revision ID."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Run-list associated with the policy."
+        },
+        "named_run_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NamedRunList"
+          },
+          "description": "Named run-list associated with the policy."
+        },
+        "included_policy_locks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.IncludedPolicyLock"
+          },
+          "description": "Included policy locks files."
+        },
+        "cookbook_locks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookLock"
+          },
+          "description": "List of cookbook locks under this policy."
+        },
+        "default_attributes": {
+          "type": "string",
+          "description": "Stringified JSON of the default attributes."
+        },
+        "override_attributes": {
+          "type": "string",
+          "description": "Stringified JSON of the override attributes."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.PolicyfileListItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Policyfile name."
+        },
+        "revision_id": {
+          "type": "string",
+          "description": "Policyfile Revision ID."
+        },
+        "policy_group": {
+          "type": "string",
+          "description": "Policyfile policy group."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Policyfiles": {
+      "type": "object",
+      "properties": {
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileListItem"
+          },
+          "description": "Policyfiles list."
         }
       }
     },
@@ -1576,6 +1858,40 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.SCMDetail": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "SCM name."
+        },
+        "remote": {
+          "type": "string",
+          "description": "SCM remote location."
+        },
+        "revision": {
+          "type": "string",
+          "description": "SCM revision detail."
+        },
+        "working_tree_clean": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean that denotes if the working tree is clean or not."
+        },
+        "published": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Source's published information."
+        },
+        "synchronized_remote_branches": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Synchronized remote branches list."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.Server": {
       "type": "object",
       "properties": {
@@ -1600,11 +1916,21 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.SourceOptions": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Source options path."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.UpdateOrg": {
       "type": "object",
       "properties": {
         "org": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "description": "Chef organization."
         }
       }
     },

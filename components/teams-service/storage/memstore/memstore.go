@@ -8,26 +8,19 @@ import (
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/postgres"
 	"github.com/chef/automate/lib/logger"
-	uuid "github.com/chef/automate/lib/uuid4"
 )
 
-// WARNING
-// TODO (tc): The storage interface is still using V1 verbiage, so
-// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
-
 type memstore struct {
-	teams       map[uuid.UUID]storage.Team
-	teamsV2     map[string]storage.Team
-	usersByTeam map[uuid.UUID][]string
+	teams       map[string]storage.Team
+	usersByTeam map[string][]string
 	logger      logger.Logger
 }
 
 // New instantiates a memstore struct
 func New(ctx context.Context, logger logger.Logger) (storage.Storage, error) {
 	m := &memstore{
-		teams:       make(map[uuid.UUID]storage.Team),
-		teamsV2:     make(map[string]storage.Team),
-		usersByTeam: make(map[uuid.UUID][]string),
+		teams:       make(map[string]storage.Team),
+		usersByTeam: make(map[string][]string),
 		logger:      logger,
 	}
 
@@ -38,32 +31,24 @@ func New(ctx context.Context, logger logger.Logger) (storage.Storage, error) {
 	return m, nil
 }
 
-// StoreTeam saves a created team to the memstore with the default project
-func (m *memstore) StoreTeam(ctx context.Context, name, description string) (storage.Team, error) {
-	return m.StoreTeamWithProjects(ctx, name, description, []string{})
-}
+// StoreTeam saves a created team to the memstore with the specified teams
+func (m *memstore) StoreTeam(_ context.Context,
+	id string, name string, projects []string) (storage.Team, error) {
 
-// StoreTeamWithProjects saves a created team to the memstore with the specified teams
-func (m *memstore) StoreTeamWithProjects(_ context.Context,
-	name, description string, projects []string) (storage.Team, error) {
-
-	if _, ok := m.teamsV2[name]; ok {
+	if _, ok := m.teams[id]; ok {
 		return storage.Team{}, storage.ErrConflict
 	}
 
 	now := time.Now()
-	id := uuid.Must(uuid.NewV4())
 	team := storage.Team{
-		ID:          id,
-		Name:        name,
-		Description: description,
-		Projects:    projects,
-		CreatedAt:   now,
-		UpdatedAt:   now,
+		ID:        id,
+		Name:      name,
+		Projects:  projects,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
 	m.teams[id] = team
-	m.teamsV2[name] = team
 	m.usersByTeam[id] = make([]string, 0)
 
 	return copyTeam(team), nil
@@ -85,8 +70,8 @@ func (m *memstore) GetTeams(ctx context.Context) ([]storage.Team, error) {
 }
 
 // GetTeam fetches a team from memory
-func (m *memstore) GetTeam(ctx context.Context, teamID uuid.UUID) (storage.Team, error) {
-	team, teamFound := m.teams[teamID]
+func (m *memstore) GetTeam(ctx context.Context, id string) (storage.Team, error) {
+	team, teamFound := m.teams[id]
 	if !teamFound {
 		return storage.Team{}, storage.ErrNotFound
 	}
@@ -99,8 +84,8 @@ func (m *memstore) GetTeam(ctx context.Context, teamID uuid.UUID) (storage.Team,
 }
 
 // DeleteTeam deletes a team
-func (m *memstore) DeleteTeam(ctx context.Context, teamID uuid.UUID) (storage.Team, error) {
-	team, teamFound := m.teams[teamID]
+func (m *memstore) DeleteTeam(ctx context.Context, id string) (storage.Team, error) {
+	team, teamFound := m.teams[id]
 	if !teamFound {
 		return storage.Team{}, storage.ErrNotFound
 	}
@@ -111,18 +96,20 @@ func (m *memstore) DeleteTeam(ctx context.Context, teamID uuid.UUID) (storage.Te
 	// TODO (tc) will need to implement similar logic in pg adapter after that code lands,
 	// but the server test should catch it. I'll do that by added a can_delete field to pg
 	// table once all that code is in place.
-	if !storage.IsTeamDeletable(team.Name) {
+	if !storage.IsTeamDeletable(id) {
 		return storage.Team{}, storage.ErrCannotDelete
 	}
 
-	delete(m.teams, teamID)
-	delete(m.teamsV2, team.Name)
+	delete(m.teams, team.ID)
 	// copy not needed since the team is no longer in the store!
 	return team, nil
 }
 
-func (m *memstore) EditTeam(ctx context.Context, t storage.Team) (storage.Team, error) {
-	team, teamFound := m.teams[t.ID]
+// EditTeam edits a team's name and/or projects
+func (m *memstore) EditTeam(ctx context.Context,
+	id string, name string, projects []string) (storage.Team, error) {
+
+	team, teamFound := m.teams[id]
 	if !teamFound {
 		return storage.Team{}, storage.ErrNotFound
 	}
@@ -130,34 +117,27 @@ func (m *memstore) EditTeam(ctx context.Context, t storage.Team) (storage.Team, 
 		return storage.Team{}, storage.ErrNotFound
 	}
 
-	if team.Name != t.Name {
-		if _, ok := m.teamsV2[t.Name]; ok {
-			return storage.Team{}, storage.ErrConflict
-		}
-	}
-
-	team.Name = t.Name
-	team.Description = t.Description
+	team.Name = name
+	team.Projects = projects
 	// persist change
-	m.teams[t.ID] = team
-	m.teamsV2[t.Name] = team
+	m.teams[team.ID] = team
 
 	return copyTeam(team), nil
 }
 
-// AddUsers adds an array of user IDs to a team's map of user IDs
-func (m *memstore) AddUsers(ctx context.Context, teamID uuid.UUID, userIDs []string) (storage.Team, error) {
-	team, teamFound := m.teams[teamID]
+// AddUsers updates team membership to include the given list of users.
+func (m *memstore) AddUsers(ctx context.Context, id string, userIDs []string) ([]string, error) {
+	team, teamFound := m.teams[id]
 	if !teamFound {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 	if !projectsIntersect(ctx, team) {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 
-	teamUserIDs, usersFound := m.usersByTeam[teamID]
+	teamUserIDs, usersFound := m.usersByTeam[id]
 	if !usersFound {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 
 	for _, userID := range userIDs {
@@ -166,51 +146,44 @@ func (m *memstore) AddUsers(ctx context.Context, teamID uuid.UUID, userIDs []str
 		}
 	}
 
-	m.usersByTeam[teamID] = teamUserIDs
-	return copyTeam(team), nil
+	m.usersByTeam[id] = teamUserIDs
+
+	updatedTeamUsers := m.usersByTeam[id]
+
+	return updatedTeamUsers, nil
 }
 
 // RemoveUsers updates team membership by removing all users from a team it can
 // find that are currently members.
-func (m *memstore) RemoveUsers(ctx context.Context, teamID uuid.UUID, userIDs []string) (storage.Team, error) {
-	team, ok := m.teams[teamID]
+func (m *memstore) RemoveUsers(ctx context.Context, id string, userIDs []string) ([]string, error) {
+	team, ok := m.teams[id]
 	if !ok {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 	if !projectsIntersect(ctx, team) {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 
-	teamUserIDs, usersFound := m.usersByTeam[teamID]
+	teamUserIDs, usersFound := m.usersByTeam[id]
 	if !usersFound {
-		return storage.Team{}, storage.ErrNotFound
+		return []string{}, storage.ErrNotFound
 	}
 
 	for _, userID := range userIDs {
 		teamUserIDs = deleteUser(teamUserIDs, userID)
 	}
 
-	m.usersByTeam[teamID] = teamUserIDs
-	return copyTeam(team), nil
-}
+	m.usersByTeam[id] = teamUserIDs
+	updatedTeamUsers := m.usersByTeam[id]
 
-// GetTeamByName fetches a team from memory by name instead of ID
-func (m *memstore) GetTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
-	team, teamFound := m.teamsV2[teamName]
-	if !teamFound {
-		return storage.Team{}, storage.ErrNotFound
-	}
-	if !projectsIntersect(ctx, team) {
-		return storage.Team{}, storage.ErrNotFound
-	}
-	return copyTeam(team), nil
+	return updatedTeamUsers, nil
 }
 
 // PurgeUserMembership finds all teams the given user is a member of and
 // removes the user from their membership, returning the id of all teams modified.
 func (m *memstore) PurgeUserMembership(ctx context.Context,
-	userID string) (teamsUpdated []uuid.UUID, err error) {
-	var foundTeams []uuid.UUID
+	userID string) (teamsUpdated []string, err error) {
+	var foundTeams []string
 	for _, team := range m.teams {
 		teamUserIDs, usersFound := m.usersByTeam[team.ID]
 		if !usersFound {
@@ -227,8 +200,8 @@ func (m *memstore) PurgeUserMembership(ctx context.Context,
 }
 
 // GetUserIDsForTeam returns the ids of the users comprising the specified team.
-func (m *memstore) GetUserIDsForTeam(ctx context.Context, teamID uuid.UUID) ([]string, error) {
-	teamUserIDs, usersFound := m.usersByTeam[teamID]
+func (m *memstore) GetUserIDsForTeam(ctx context.Context, id string) ([]string, error) {
+	teamUserIDs, usersFound := m.usersByTeam[id]
 	if !usersFound {
 		return nil, storage.ErrNotFound
 	}
@@ -251,49 +224,7 @@ func (m *memstore) GetTeamsForUser(ctx context.Context, userID string) ([]storag
 	return teamArr, nil
 }
 
-func (m *memstore) DeleteTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
-	team, teamFound := m.teamsV2[teamName]
-	if !teamFound {
-		return storage.Team{}, storage.ErrNotFound
-	}
-	if !projectsIntersect(ctx, team) {
-		return storage.Team{}, storage.ErrNotFound
-	}
-
-	// TODO (tc) will need to implement similar logic in pg adapter after that code lands,
-	// but the server test should catch it. I'll do that by added a can_delete field to pg
-	// table once all that code is in place.
-	if !storage.IsTeamDeletable(teamName) {
-		return storage.Team{}, storage.ErrCannotDelete
-	}
-
-	delete(m.teams, team.ID)
-	delete(m.teamsV2, teamName)
-	// copy not needed since the team is no longer in the store!
-	return team, nil
-}
-
-func (m *memstore) EditTeamByName(ctx context.Context,
-	name string, description string, projects []string) (storage.Team, error) {
-
-	team, teamFound := m.teamsV2[name]
-	if !teamFound {
-		return storage.Team{}, storage.ErrNotFound
-	}
-	if !projectsIntersect(ctx, team) {
-		return storage.Team{}, storage.ErrNotFound
-	}
-
-	team.Description = description
-	team.Projects = projects
-	// persist change
-	m.teams[team.ID] = team
-	m.teamsV2[name] = team
-
-	return copyTeam(team), nil
-}
-
-func (m *memstore) teamIncludesUser(teamID uuid.UUID, userID string) bool {
+func (m *memstore) teamIncludesUser(teamID string, userID string) bool {
 	teamUserIDs, usersFound := m.usersByTeam[teamID]
 	if !usersFound {
 		return false
@@ -302,7 +233,7 @@ func (m *memstore) teamIncludesUser(teamID uuid.UUID, userID string) bool {
 }
 
 func (m *memstore) EnsureAdminsTeam(ctx context.Context) error {
-	if _, err := m.StoreTeam(ctx, storage.AdminsTeamName, "admins"); err != nil {
+	if _, err := m.StoreTeam(ctx, storage.AdminsTeamID, "admins", []string{}); err != nil {
 		if err != storage.ErrConflict {
 			return err
 		}
@@ -319,7 +250,6 @@ func (m *memstore) PurgeProject(ctx context.Context, projectID string) error {
 			}
 		}
 		m.teams[team.ID] = team
-		m.teamsV2[team.Name] = team
 	}
 	return nil
 }
@@ -327,10 +257,9 @@ func (m *memstore) PurgeProject(ctx context.Context, projectID string) error {
 // keeps in-memory team safe
 func copyTeam(team storage.Team) storage.Team {
 	copyTeam := storage.Team{
-		ID:          team.ID,
-		Name:        team.Name,
-		Description: team.Description,
-		Projects:    team.Projects,
+		ID:       team.ID,
+		Name:     team.Name,
+		Projects: team.Projects,
 	}
 	return copyTeam
 }

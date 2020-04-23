@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package chef.automate.domain.infra_proxy.response;
+option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
+
+message Policyfiles {
+    // Policyfiles list.
+    repeated PolicyfileListItem policies = 1;
+}
+
+message PolicyfileListItem {
+    // Policyfile name.
+    string name = 1;
+    // Policyfile revision ID.
+    string revision_id = 3;
+    // Policyfile policy group.
+    string policy_group = 2;
+}
+
+message Policyfile {
+    // Policyfile name.
+    string name = 1;
+    // Policy group name.
+    string policy_group = 2;
+    // Policy revision ID.
+    string revision_id = 3;
+    // Run-list associated with the policy.
+    repeated string run_list = 4;
+    // Named run-list associated with the policy.
+    repeated NamedRunList named_run_list = 5;
+    // Included policy locks files.
+    repeated IncludedPolicyLock included_policy_locks = 6;
+    // List of cookbook locks under this policy.
+    repeated CookbookLock cookbook_locks = 7;
+    // Stringified JSON of the default attributes.
+    string default_attributes = 8;
+    // Stringified JSON of the override attributes.
+    string override_attributes = 9;
+}
+
+message IncludedPolicyLock {
+    // Included policyfile name. 
+    string name = 1;
+    // Included policyfile revision ID.
+    string revision_id = 2;
+    // Included policyfile source options.
+    SourceOptions source_options = 3;
+}
+
+message CookbookLock {
+    // Cookbook name.
+    string name = 1;
+    // Cookbook version.
+    string version = 2;
+    // Cookbook identifier.
+    string identifier = 3;
+    // Cookbook decimal number identifier.
+    string dotted_identifier = 4;
+    // Cookbook source.
+    string source = 5;
+    // Cookbook cache key.
+    string cache_key = 6;
+    // SCM detail.
+    SCMDetail SCMDetail = 7;
+    // Cookbook source path.
+    SourceOptions source_options = 8;
+}
+
+message SCMDetail {
+    // SCM name.
+    string name = 1;
+    // SCM remote location.
+    string remote = 2;
+    // SCM revision detail.
+    string revision = 3;
+    // Boolean that denotes if the working tree is clean or not. 
+    bool working_tree_clean = 4;
+    // Source's published info.
+    bool published = 5;
+    // Synchronized remote branches list. 
+    repeated string synchronized_remote_branches = 6;
+}
+
+message SourceOptions {
+    // Source options path.
+    string path = 1;
+}
+
+message NamedRunList {
+    // Run-list name.
+    string name = 1;
+    // Run-list associated with the policy.
+    repeated string run_list = 2;
+}

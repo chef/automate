@@ -5,9 +5,6 @@ option go_package = "github.com/chef/automate/api/external/ingest";
 
 import "google/api/annotations.proto";
 
-// for option (chef.automate.api.policy)
-import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
-// for option (chef.automate.api.iam.policy)
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 import "api/external/common/version/version.proto";
@@ -26,8 +23,6 @@ service ChefIngester {
       post: "/ingest/events/chef/run"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "ingest:nodes:{entity_uuid}:runs";
-    option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "ingest:nodes:{entity_uuid}:runs";
     option (chef.automate.api.iam.policy).action = "ingest:nodes:create";
   };
@@ -38,8 +33,6 @@ service ChefIngester {
     };
     // actions can be anything a user does on chef server
     // not necessarily related to nodes
-    option (chef.automate.api.policy).resource = "ingest:actions";
-    option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "ingest:actions";
     option (chef.automate.api.iam.policy).action = "ingest:actions:create";
   };
@@ -52,8 +45,6 @@ service ChefIngester {
     // but scheduler actually deletes it
     // NOTE: if this is called by chef server, node_id will not be provided
     // for now we cannot enforce deleting a specific node, just any node or none
-    option (chef.automate.api.policy).resource = "ingest:nodes";
-    option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "ingest:nodes";
     option (chef.automate.api.iam.policy).action = "ingest:nodes:delete";
   };
@@ -62,8 +53,6 @@ service ChefIngester {
       post: "/ingest/events/chef/node-multiple-deletes"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "ingest:nodes";
-    option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "ingest:nodes";
     option (chef.automate.api.iam.policy).action = "ingest:nodes:delete";
   };
@@ -72,15 +61,11 @@ service ChefIngester {
       post: "/ingest/events/chef/liveness"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "ingest:nodes:{entity_uuid}:liveness";
-    option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "ingest:nodes:{entity_uuid}:liveness";
     option (chef.automate.api.iam.policy).action = "ingest:nodes:create";
   }
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get = "/ingest/version";
-    option (chef.automate.api.policy).resource = "service_info:version";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
   };

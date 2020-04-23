@@ -134,13 +134,11 @@ func DeleteUser(tstCtx diagnostics.TestContext, username string) error {
 		reqPath = fmt.Sprintf("/api/v0/auth/users/%s", username)
 	}
 
-	err = MustJSONDecodeSuccess(
+	if err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
 			reqPath,
 			lbrequest.WithMethod("DELETE"),
-		)).Error()
-
-	if err != nil {
+		)).WithValue(&struct{}{}); err != nil {
 		return errors.Wrap(err, "Could not delete user")
 	}
 	return nil

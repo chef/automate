@@ -52,10 +52,10 @@ do_build() {
 }
 
 do_install() {
-  cp -R lib/* "$pkg_prefix/lib"
-  install -m 0755 "bin/${CTL_BIN_NAME}" "$pkg_prefix/bin/${CTL_BIN_NAME}"
-  install -m 0644 Gemfile.lock "$pkg_prefix/Gemfile.lock"
-  install -m 0644 Gemfile "$pkg_prefix/Gemfile"
+  cp -R "$PLAN_CONTEXT"/../lib/* "$pkg_prefix/lib"
+  install -m 0755 "$PLAN_CONTEXT/../bin/${CTL_BIN_NAME}" "$pkg_prefix/bin/${CTL_BIN_NAME}"
+  install -m 0644 "$PLAN_CONTEXT/../Gemfile.lock" "$pkg_prefix/Gemfile.lock"
+  install -m 0644 "$PLAN_CONTEXT/../Gemfile" "$pkg_prefix/Gemfile"
   cd $pkg_prefix
   bundle install \
     --jobs "$(nproc)" \

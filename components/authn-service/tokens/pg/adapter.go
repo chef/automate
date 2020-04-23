@@ -32,12 +32,12 @@ func (a *adapter) CreateToken(ctx context.Context,
 func (a *adapter) CreateTokenWithValue(ctx context.Context,
 	id, value, name string, active bool, projects []string) (*tokens.Token, error) {
 	if err := tutil.IsValidToken(value); err != nil {
-		return nil, err
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	err := a.validateTokenInputs(ctx, name, []string{}, projects, false)
 	if err != nil {
-		return nil, err
+		return nil, err // already a grpc status
 	}
 
 	return a.insertToken(ctx, id, name, value, active, projects)
@@ -80,15 +80,6 @@ func (a *adapter) CreateLegacyTokenWithValue(ctx context.Context, value string) 
 // PurgeProject removes a project from every token it exists in
 func (a *adapter) PurgeProject(ctx context.Context, projectID string) error {
 	_, err := a.db.ExecContext(ctx, "UPDATE chef_authn_tokens SET project_ids=array_remove(project_ids, $1)", projectID)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// ResetToV1 removes all projects from every token
-func (a *adapter) ResetToV1(ctx context.Context) error {
-	_, err := a.db.ExecContext(ctx, "UPDATE chef_authn_tokens SET project_ids='{}'")
 	if err != nil {
 		return err
 	}

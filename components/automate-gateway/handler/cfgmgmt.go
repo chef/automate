@@ -297,6 +297,47 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 	}, nil
 }
 
+// GetNodeMetadataCounts - For each type of field provided return distinct values the amount for each.
+// For example, if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8
+// could be returned. The number next to each represents the number of nodes with that type of platform.
+func (s *CfgMgmtServer) GetNodeMetadataCounts(ctx context.Context,
+	request *cfgReq.NodeMetadataCounts) (*cfgRes.NodeMetadataCounts, error) {
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	cfgMgmtRequest := &cmsReq.NodeMetadataCounts{
+		Type:   request.Type,
+		Filter: request.Filter,
+		Start:  request.Start,
+		End:    request.End,
+	}
+
+	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodeMetadataCounts(ctx, cfgMgmtRequest)
+	if err != nil {
+		return &cfgRes.NodeMetadataCounts{}, err
+	}
+	types := make([]*cfgRes.TypeCount, len(cfgmgmtResponse.Types))
+	for index, cfgField := range cfgmgmtResponse.Types {
+		values := make([]*cfgRes.ValueCount, len(cfgField.Values))
+		for valueIndex, cfgValueCount := range cfgField.Values {
+			values[valueIndex] = &cfgRes.ValueCount{
+				Value: cfgValueCount.Value,
+				Count: cfgValueCount.Count,
+			}
+		}
+		types[index] = &cfgRes.TypeCount{
+			Values: values,
+			Type:   cfgField.Type,
+		}
+	}
+
+	return &cfgRes.NodeMetadataCounts{
+		Types: types,
+	}, nil
+}
+
 // GetNodeRun returns the requested run
 func (s *CfgMgmtServer) GetNodeRun(ctx context.Context, request *cfgReq.NodeRun) (*cfgRes.Run, error) {
 	log.WithFields(log.Fields{

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StatsService } from '../../shared/reporting/stats.service';
 import { Subject } from 'rxjs';
-import { ReportQueryService } from '../../shared/reporting/report-query.service';
+import { ReportQueryService, ReturnParams } from '../../shared/reporting/report-query.service';
 import * as moment from 'moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
@@ -13,6 +13,7 @@ import { takeUntil } from 'rxjs/operators';
   templateUrl: './reporting-node.component.html',
   styleUrls: ['./reporting-node.component.scss']
 })
+
 export class ReportingNodeComponent implements OnInit, OnDestroy {
 
   reports = [];
@@ -22,6 +23,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   showScanHistory = false;
   reportLoading = false;
   RFC2822 = DateTime.RFC2822;
+  returnParams: ReturnParams = {};
 
   openControls = {};
 
@@ -30,7 +32,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private statsService: StatsService,
-    private reportQuery: ReportQueryService,
+    private reportQueryService: ReportQueryService,
     private layoutFacade: LayoutFacadeService
   ) {
   }
@@ -39,23 +41,24 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.reportLoading = true;
     this.layoutFacade.ShowPageLoading(true);
+    this.returnParams = this.reportQueryService.formatReturnParams();
     const id: string = this.route.snapshot.params['id'];
-    const reportQuery = this.reportQuery.getReportQuery();
+    const reportQuery = this.reportQueryService.getReportQuery();
     reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
 
     this.statsService.getReports(reportQuery, {sort: 'latest_report.end_time', order: 'DESC'})
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe(reports => {
-        this.reports = reports;
-        const queryForReport = this.reportQuery.getReportQueryForReport(reports[0]);
-        this.statsService.getSingleReport(reports[0].id, queryForReport)
-          .pipe(takeUntil(this.isDestroyed))
-          .subscribe(data => {
-            this.reportLoading = false;
-            this.layoutFacade.ShowPageLoading(false);
-            this.activeReport = Object.assign(reports[0], data);
-          });
-      });
+    .pipe(takeUntil(this.isDestroyed))
+    .subscribe(reports => {
+      this.reports = reports;
+      const queryForReport = this.reportQueryService.getReportQueryForReport(reports[0]);
+      this.statsService.getSingleReport(reports[0].id, queryForReport)
+        .pipe(takeUntil(this.isDestroyed))
+        .subscribe(data => {
+          this.reportLoading = false;
+          this.layoutFacade.ShowPageLoading(false);
+          this.activeReport = Object.assign(reports[0], data);
+        });
+    });
   }
 
   ngOnDestroy() {
@@ -66,7 +69,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   onReportItemClick(_event, report) {
     this.reportLoading = true;
     this.layoutFacade.ShowPageLoading(true);
-    const reportQuery = this.reportQuery.getReportQueryForReport(report);
+    const reportQuery = this.reportQueryService.getReportQueryForReport(report);
     this.statsService.getSingleReport(report.id, reportQuery)
       .pipe(takeUntil(this.isDestroyed))
       .subscribe(data => {

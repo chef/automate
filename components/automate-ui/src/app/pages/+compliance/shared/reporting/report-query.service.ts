@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as moment from 'moment';
 import { FilterC } from '../../+reporting/types';
+import { DateTime } from 'app/helpers/datetime/datetime';
+import { ReportingFilterTypes } from 'app/types/types';
+import { isEmpty } from 'lodash';
+
 
 export interface ReportQuery {
   startDate: moment.Moment;
@@ -17,6 +21,32 @@ interface TimeIntervals {
 
 interface ReportSummary {
   end_time: string;
+}
+
+// ReturnParams can either be an empty object or filled with filters.
+// It is used for populating Reporting-node and Reporting-profile
+// Breadcrumb links
+export interface ReturnParams {
+  [ReportingFilterTypes.END_TIME]?: string;
+  [ReportingFilterTypes.CHEF_SERVER]?: string;
+  [ReportingFilterTypes.CHEF_TAGS]?: string;
+  [ReportingFilterTypes.CONTROL_ID]?: string;
+  [ReportingFilterTypes.CONTROL_NAME]?: string;
+  [ReportingFilterTypes.CONTROL_TAG_KEY]?: string;
+  [ReportingFilterTypes.ENVIRONMENT]?: string;
+  [ReportingFilterTypes.INSPEC_VERSION]?: string;
+  [ReportingFilterTypes.JOB_ID]?: string;
+  [ReportingFilterTypes.NODE_ID]?: string;
+  [ReportingFilterTypes.NODE_NAME]?: string;
+  [ReportingFilterTypes.ORGANIZATION]?: string;
+  [ReportingFilterTypes.PLATFORM_WITH_VERSION]?: string;
+  [ReportingFilterTypes.POLICY_GROUP]?: string;
+  [ReportingFilterTypes.POLICY_NAME]?: string;
+  [ReportingFilterTypes.PROFILE_ID]?: string;
+  [ReportingFilterTypes.PROFILE_WITH_VERSION]?: string;
+  [ReportingFilterTypes.PROFILE_NAME]?: string;
+  [ReportingFilterTypes.RECIPE]?: string;
+  [ReportingFilterTypes.ROLE]?: string;
 }
 
 @Injectable()
@@ -88,5 +118,31 @@ export class ReportQueryService {
 
   getFilterTitle(type: string, id: string): string {
     return this.idToTitle.get(type + '-' + id);
+  }
+
+  formatReturnParams(): ReturnParams {
+    const reportQuery = this.getReportQuery();
+
+    const structuredFilters: { [ReportingFilterTypes: string]: string } = {};
+    reportQuery.filters.map(filter => {
+      return structuredFilters[filter.type.name] = filter.value.id;
+    });
+
+    const today = moment().utc()
+                      .startOf('day').add(12, 'hours'); // Must sync with initial end date
+    const endDate = reportQuery.endDate
+      ? moment(reportQuery.endDate).format(DateTime.REPORT_DATE)
+      : today.format(DateTime.REPORT_DATE);
+
+    // Check if today is the end date
+    const isToday = today.diff(endDate, 'days') === 0;
+
+    // With no filters when the date is today, we don't want
+    // to add any parameters to the URL.
+    if (isEmpty(structuredFilters) && isToday) {
+      return {};
+    } else {
+      return {...structuredFilters, end_time: endDate};
+    }
   }
 }

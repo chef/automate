@@ -99,7 +99,7 @@ func WithFormFile(filename string, data []byte) Opts {
 	}
 }
 
-// WithHost sets the host the request should be made to.
+// WithURL sets the URL the request should be made to.
 func WithURL(url url.URL) Opts {
 	return func(opts *requestOpts) {
 		opts.target = url

@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// Error responses common to all storage adapters, be it v1, v2, memstore, postgres, etc.
+// Error responses common to all storage adapters, be it memstore, postgres, etc.
 var (
 	// ErrNotFound is returned when a requested policy wasn't found.
 	ErrNotFound = errors.New("not found")

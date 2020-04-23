@@ -1,5 +1,5 @@
-# Package common contains functions and rules that are shared between v1 and v2
-# of our rego logic
+# Package common contains functions and rules that are shared
+# between the authz and introspection rego logic
 package common
 
 const_all_projects = "~~ALL-PROJECTS~~"

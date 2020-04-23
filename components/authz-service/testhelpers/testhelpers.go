@@ -17,17 +17,15 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
-	constants "github.com/chef/automate/components/authz-service/constants"
+	"github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/engine/opa"
 	"github.com/chef/automate/components/authz-service/prng"
-	grpc_server "github.com/chef/automate/components/authz-service/server"
-	server "github.com/chef/automate/components/authz-service/server/v2"
-	v2 "github.com/chef/automate/components/authz-service/server/v2"
+	"github.com/chef/automate/components/authz-service/server"
+	"github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/components/authz-service/storage/postgres"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
-	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
@@ -82,7 +80,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
 
-	polRefresher, err := v2.NewPostgresPolicyRefresher(ctx, l, opaInstance)
+	polRefresher, err := server.NewPostgresPolicyRefresher(ctx, l, opaInstance)
 	require.NoError(t, err)
 
 	polSrv, err := server.NewPoliciesServer(ctx, l, polRefresher, pg, opaInstance)
@@ -99,7 +97,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	// TODO(sr): refactor our constructors. Having to maintain the middleware in
 	// three places is tedious and error-prone.
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
-		grpc_server.InputValidationInterceptor(),
+		server.InputValidationInterceptor(),
 	))
 	api.RegisterProjectsServer(serv, projectsSrv)
 	api.RegisterPoliciesServer(serv, polSrv)
@@ -127,7 +125,7 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 
 	opaInstance, err := opa.New(ctx, l)
 	require.NoError(t, err, "init OPA")
-	sysPols := v2.SystemPolicies()
+	sysPols := server.SystemPolicies()
 
 	// OPA requires this format
 	data := make(map[string]interface{})
@@ -188,7 +186,11 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 	require.NoError(t, err, "error creating extension")
 
-	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig), projectLimit)
+	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config{
+		PGURL:  dataMigrationConfig.PGURL,
+		Path:   dataMigrationConfig.Path,
+		Logger: dataMigrationConfig.Logger,
+	}, projectLimit)
 	require.NoError(t, err)
 	testDB := &TestDB{
 		DB:      db,

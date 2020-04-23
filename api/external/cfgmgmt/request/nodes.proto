@@ -92,3 +92,14 @@ message MissingNodeDurationCounts {
   // Will contain one or many. 
   repeated string durations = 1;
 }
+
+message NodeMetadataCounts {
+  // Types of node fields to collect value counts for
+  repeated string type = 1;
+  // Filters to apply to the counts returned
+  repeated string filter = 2;
+  // Earliest most recent check-in node information to return.
+  string start = 3;
+  // Latest most recent check-in node information to return.
+  string end = 4;
+}

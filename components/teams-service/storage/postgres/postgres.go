@@ -16,19 +16,9 @@ import (
 	"github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
-	uuid "github.com/chef/automate/lib/uuid4"
 )
 
 var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
-
-// WARNING
-// TODO (tc): The storage interface is still using V1 verbiage, so
-// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
-// Also, project filtering has only been implemented for storage functions
-// that are used by the V2 server.
-
-// TODOs
-// - CREATE EXTENSION "uuid-ossp"; (currently done via Makefile for tests)
 
 type postgres struct {
 	db          *sql.DB
@@ -69,25 +59,20 @@ func initPostgresDB(pgURL string) (*sql.DB, error) {
 	return d, nil
 }
 
-// StoreTeam saves a team to the DB. This is used by IAM v1 ONLY!
-func (p *postgres) StoreTeam(ctx context.Context, name string, description string) (storage.Team, error) {
-	return p.insertTeam(ctx, name, description, []string{})
-}
-
 // StoreTeam saves a team to the DB.
-func (p *postgres) StoreTeamWithProjects(ctx context.Context,
-	name string, description string, projects []string) (storage.Team, error) {
+func (p *postgres) StoreTeam(ctx context.Context,
+	id string, name string, projects []string) (storage.Team, error) {
 
 	// ensure we do not pass null projects to db and break the "not null" constraint
 	if len(projects) == 0 {
 		projects = []string{}
 	}
-	err := p.validateTeamInputs(ctx, name, description, []string{}, projects, false)
+	err := p.validateTeamInputs(ctx, id, name, []string{}, projects, false)
 	if err != nil {
 		return storage.Team{}, err
 	}
 
-	team, err := p.insertTeam(ctx, name, description, projects)
+	team, err := p.insertTeam(ctx, id, name, projects)
 	if err != nil {
 		return storage.Team{}, err
 	}
@@ -96,13 +81,13 @@ func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 }
 
 func (p *postgres) validateTeamInputs(ctx context.Context,
-	name string, description string, oldProjects, updatedProjects []string, isUpdateRequest bool) error {
+	name string, id string, oldProjects, updatedProjects []string, isUpdateRequest bool) error {
 	if emptyOrWhitespaceOnlyRE.MatchString(name) {
 		return status.Error(
 			codes.InvalidArgument,
 			"a team id is required and must contain at least one non-whitespace character")
 	}
-	if emptyOrWhitespaceOnlyRE.MatchString(description) {
+	if emptyOrWhitespaceOnlyRE.MatchString(id) {
 		return status.Error(
 			codes.InvalidArgument,
 			"a team name is required and must contain at least one non-whitespace character")
@@ -121,15 +106,15 @@ func (p *postgres) validateTeamInputs(ctx context.Context,
 }
 
 func (p *postgres) insertTeam(ctx context.Context,
-	name string, description string, projects []string) (storage.Team, error) {
+	id string, name string, projects []string) (storage.Team, error) {
 
 	var team storage.Team
 	err := p.db.QueryRowContext(ctx,
-		`INSERT INTO teams (id, name, description, projects, created_at, updated_at)
-		VALUES (uuid_generate_v4(), $1, $2, $3, now(), now())
-		RETURNING id, name, projects, description, created_at, updated_at`,
-		name, description, pq.Array(projects)).
-		Scan(&team.ID, &team.Name, pq.Array(&team.Projects), &team.Description, &team.CreatedAt, &team.UpdatedAt)
+		`INSERT INTO teams (id, name, projects, created_at, updated_at)
+		VALUES ($1, $2, $3, now(), now())
+		RETURNING id, name, projects, created_at, updated_at`,
+		id, name, pq.Array(projects)).
+		Scan(&team.ID, &team.Name, pq.Array(&team.Projects), &team.CreatedAt, &team.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -137,40 +122,21 @@ func (p *postgres) insertTeam(ctx context.Context,
 	return team, nil
 }
 
-// GetTeam fetches a team by id. This is used by IAM v1 ONLY!
-func (p *postgres) GetTeam(ctx context.Context, teamID uuid.UUID) (storage.Team, error) {
-	return p.getTeam(ctx, p.db, teamID)
-}
-
-func (p *postgres) getTeam(ctx context.Context, q querier, teamID uuid.UUID) (storage.Team, error) {
+func (p *postgres) getTeam(ctx context.Context, q querier, id string) (storage.Team, error) {
 	var t storage.Team
 	err := q.QueryRowContext(ctx,
-		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at
+		`SELECT t.id, t.name, t.projects, t.updated_at, t.created_at
 		FROM teams t
-		WHERE t.db_id=team_db_id($1)`, teamID).
-		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
+		WHERE t.db_id=team_db_id($1)`, id).
+		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
-	return t, nil
-}
-
-// DeleteTeam deletes a team from the DB. This is used by IAM v1 ONLY!
-func (p *postgres) DeleteTeam(ctx context.Context, teamID uuid.UUID) (storage.Team, error) {
-	var t storage.Team
-	err := p.db.QueryRowContext(ctx,
-		`DELETE FROM teams WHERE id=$1
-		RETURNING id, name, description, projects, created_at, updated_at`, teamID).
-		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
-	if err != nil {
-		return storage.Team{}, p.processError(err)
-	}
-
 	return t, nil
 }
 
 // DeleteTeam deletes a team from the DB.
-func (p *postgres) DeleteTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
+func (p *postgres) DeleteTeam(ctx context.Context, id string) (storage.Team, error) {
 	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
@@ -179,10 +145,10 @@ func (p *postgres) DeleteTeamByName(ctx context.Context, teamName string) (stora
 	var t storage.Team
 	err = p.db.QueryRowContext(ctx,
 		`DELETE FROM teams t
-		WHERE t.name=$1 AND projects_match(t.projects, $2::TEXT[])
-		RETURNING t.id, t.name, t.description, t.projects, t.created_at, t.updated_at`,
-		teamName, pq.Array(projectsFilter)).
-		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
+		WHERE t.id=$1 AND projects_match(t.projects, $2::TEXT[])
+		RETURNING t.id, t.name, t.projects, t.created_at, t.updated_at`,
+		id, pq.Array(projectsFilter)).
+		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -190,30 +156,9 @@ func (p *postgres) DeleteTeamByName(ctx context.Context, teamName string) (stora
 	return t, nil
 }
 
-// EditTeam does a full update on a database team. This is used by IAM v1 ONLY!
-func (p *postgres) EditTeam(ctx context.Context, team storage.Team) (storage.Team, error) {
-	var t storage.Team
-	// ensure we do not pass null projects to db
-	if team.Projects == nil {
-		team.Projects = []string{}
-	}
-	err := p.db.QueryRowContext(ctx,
-		`UPDATE teams
-		SET name = $2, description = $3, projects = $4, updated_at = now()
-		WHERE id = $1
-		RETURNING id, name, description, projects, created_at, updated_at`,
-		team.ID, team.Name, team.Description, pq.Array(team.Projects)).
-		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
-	if err != nil {
-		return storage.Team{}, p.processError(err)
-	}
-
-	return t, nil
-}
-
-// EditTeamByName edits the team's description and projects by name
-func (p *postgres) EditTeamByName(ctx context.Context,
-	teamName string, teamDescription string, updatedProjects []string) (storage.Team, error) {
+// EditTeamByName edits the team's name and projects
+func (p *postgres) EditTeam(ctx context.Context,
+	id string, name string, updatedProjects []string) (storage.Team, error) {
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -235,15 +180,15 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 	var oldProjects []string
 	err = tx.QueryRowContext(ctx,
 		`SELECT projects FROM teams
-		WHERE name = $1 AND projects_match(projects, $2::TEXT[])
-		FOR UPDATE;`,
-		teamName, pq.Array(projectsFilter)).
+		WHERE id = $1 AND projects_match(projects, $2::TEXT[])
+		FOR UPDATE`,
+		id, pq.Array(projectsFilter)).
 		Scan(pq.Array(&oldProjects))
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
 
-	err = p.validateTeamInputs(ctx, teamName, teamDescription, oldProjects, updatedProjects, true)
+	err = p.validateTeamInputs(ctx, id, name, oldProjects, updatedProjects, true)
 	if err != nil {
 		return storage.Team{}, err
 	}
@@ -251,11 +196,11 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 	var t storage.Team
 	err = tx.QueryRowContext(ctx,
 		`UPDATE teams t
-		SET description = $2, projects = $3, updated_at = now()
-		WHERE t.name = $1 AND projects_match(t.projects, $4::TEXT[])
-		RETURNING id, name, projects, description, created_at, updated_at;`,
-		teamName, teamDescription, pq.Array(updatedProjects), pq.Array(projectsFilter)).
-		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.Description, &t.CreatedAt, &t.UpdatedAt)
+		SET name = $2, projects = $3, updated_at = now()
+		WHERE t.id = $1 AND projects_match(t.projects, $4::TEXT[])
+		RETURNING id, name, projects, created_at, updated_at`,
+		id, name, pq.Array(updatedProjects), pq.Array(projectsFilter)).
+		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -277,7 +222,7 @@ func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
 	var teams []storage.Team
 	// TODO eventually these should be ordered
 	rows, err := p.db.QueryContext(ctx,
-		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at
+		`SELECT t.id, t.name, t.projects, t.updated_at, t.created_at
 		FROM teams t
 		WHERE projects_match(t.projects, $1::TEXT[])`,
 		pq.Array(projectsFilter))
@@ -293,7 +238,7 @@ func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
 
 	for rows.Next() {
 		team := storage.Team{}
-		if err := rows.Scan(&team.ID, &team.Name, &team.Description, pq.Array(&team.Projects),
+		if err := rows.Scan(&team.ID, &team.Name, pq.Array(&team.Projects),
 			&team.CreatedAt, &team.UpdatedAt); err != nil {
 			return nil, err // TODO: don't fail it all? handle this more gracefully?
 		}
@@ -306,53 +251,58 @@ func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
 }
 
 // RemoveUsers deletes teams_users_association rows by teamID and userID, returning the storage team.
-//
-//
-// NOTE: We aren't filtering on projects here for expediency since the server call
-// is already calling GetTeamByName which does project filtering and will bail in the
-// server code before we get here if the team in question was filtered, but if we call this
-// from a different context we should apply project filtering in this function as well.
-// Not doing it to save us a database call since it's not needed currently.
-func (p *postgres) RemoveUsers(ctx context.Context, teamID uuid.UUID, userIDs []string) (storage.Team, error) {
+func (p *postgres) RemoveUsers(ctx context.Context, id string, userIDs []string) (updatedUserIDs []string, err error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
-		return storage.Team{}, p.processError(err)
+		return nil, p.processError(err)
 	}
 
-	res, err := tx.ExecContext(ctx,
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	var dbID int
+	var teamProjects []string
+	// ensure the team exists and isn't filtered out by the project filter
+	err = tx.QueryRowContext(ctx,
+		`SELECT db_id, projects FROM teams
+		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
+		id, pq.Array(projectsFilter)).
+		Scan(&dbID, pq.Array(&teamProjects))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	_, err = tx.ExecContext(ctx,
 		`DELETE FROM teams_users_associations
-		WHERE user_id = ANY($1) AND team_db_id = team_db_id($2)`,
-		pq.Array(userIDs), teamID)
+		WHERE user_id = ANY($1) AND team_db_id=$2`,
+		pq.Array(userIDs), dbID)
 	if err != nil {
-		return storage.Team{}, p.processError(err)
-	}
-	num, err := res.RowsAffected()
-	if err != nil {
-		return storage.Team{}, p.processError(err)
+		return []string{}, p.processError(err)
 	}
 
-	var team storage.Team
-	if num == 0 { // no changes
-		team, err = p.getTeam(ctx, tx, teamID)
-	} else {
-		team, err = p.touchTeam(ctx, tx, teamID)
-	}
+	row := tx.QueryRowContext(ctx,
+		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=$1`,
+		dbID)
+	err = row.Scan(pq.Array(&updatedUserIDs))
 	if err != nil {
-		return storage.Team{}, p.processError(err)
+		return nil, p.processError(err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return storage.Team{}, p.processError(err)
+		return nil, p.processError(err)
 	}
-	return team, nil
+
+	return updatedUserIDs, nil
 }
 
-// GetTeamByName fetches a team by name.
-func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
+// GetTeam fetches a team by id.
+func (p *postgres) GetTeam(ctx context.Context, id string) (storage.Team, error) {
 	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
@@ -360,11 +310,11 @@ func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.
 
 	var t storage.Team
 	err = p.db.QueryRowContext(ctx,
-		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at
+		`SELECT t.id, t.name, t.projects, t.updated_at, t.created_at
 		FROM teams t
-		WHERE t.name = $1 AND projects_match(t.projects, $2::TEXT[]);`,
-		teamName, pq.Array(projectsFilter)).
-		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
+		WHERE t.id = $1 AND projects_match(t.projects, $2::TEXT[])`,
+		id, pq.Array(projectsFilter)).
+		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -373,7 +323,8 @@ func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.
 
 // PurgeUserMembership removes all teams_users_associations with the userID provided,
 // returning an array of teamIDs for the teams that initially had the provided user
-func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uuid.UUID, error) {
+func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]string, error) {
+
 	rows, err := p.db.QueryContext(ctx,
 		`WITH moved_row_ids AS (
 			DELETE FROM teams_users_associations
@@ -382,7 +333,7 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uu
 		)
 		UPDATE teams SET updated_at=NOW()
 		WHERE db_id in (SELECT * FROM moved_row_ids)
-		RETURNING id;`, userID)
+		RETURNING id`, userID)
 
 	if err != nil {
 		return nil, p.processError(err)
@@ -394,9 +345,9 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uu
 		}
 	}()
 
-	var teamsIDsUpdated []uuid.UUID
+	var teamsIDsUpdated []string
 	for rows.Next() {
-		var teamID uuid.UUID
+		var teamID string
 		if err := rows.Scan(&teamID); err != nil {
 			return nil, p.processError(err)
 		}
@@ -410,51 +361,85 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uu
 
 // AddUsers adds users to a team (adding rows to teams_users_associations and updating
 // team updated_at)
-//
-// NOTE: We aren't filtering on projects here for expediency since the server call
-// is already calling GetTeamByName which does project filtering and will bail in the
-// server code before we get here if the team in question was filtered, but if we call this
-// from a different context we should apply project filtering in this function as well.
-// Not doing it to save us a database call since it's not needed currently.
 func (p *postgres) AddUsers(ctx context.Context,
-	teamID uuid.UUID,
-	userIDs []string) (storage.Team, error) {
-	var t storage.Team
-	err := p.db.QueryRowContext(ctx,
-		`WITH moved_row_ids AS (
-			INSERT INTO teams_users_associations (team_db_id, user_id, created_at)
-				SELECT db_id, unnest($2::TEXT[]), now()
-				FROM teams
-				WHERE id=$1
-			RETURNING team_db_id
-		)
-		UPDATE teams SET updated_at=NOW()
-		WHERE db_id in (SELECT DISTINCT * FROM moved_row_ids)
-		RETURNING id, name, description, projects, created_at, updated_at;`, teamID, pq.Array(userIDs)).Scan(
-		&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
-	if err != nil {
-		return storage.Team{}, p.processError(err)
-	}
-	return t, nil
-}
+	id string, userIDs []string) (updatedUserIDs []string, err error) {
 
-// GetUserIDsForTeam returns the user IDs for all members of the team.
-//
-// NOTE: We aren't filtering on projects here for expediency since the server call
-// is already calling GetTeamByName which does project filtering and will bail in the
-// server code before we get here if the team in question was filtered, but if we call this
-// from a different context we should apply project filtering in this function as well.
-// Not doing it to save us a database call since it's not needed currently.
-func (p *postgres) GetUserIDsForTeam(ctx context.Context, teamID uuid.UUID) ([]string, error) {
-	var users []string
-	row := p.db.QueryRowContext(ctx,
-		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=team_db_id($1)`,
-		teamID.String())
-	err := row.Scan(pq.Array(&users))
+	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, p.processError(err)
 	}
-	return users, nil
+
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	var dbID int
+	var teamProjects []string
+	// ensure the team exists and isn't filtered out by the project filter
+	err = p.db.QueryRowContext(ctx,
+		`SELECT db_id, projects FROM teams
+		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
+		id, pq.Array(projectsFilter)).
+		Scan(&dbID, pq.Array(&teamProjects))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO teams_users_associations (team_db_id, user_id, created_at)
+				SELECT db_id, unnest($2::TEXT[]), now()
+	 			FROM teams
+				WHERE db_id=$1
+				ON CONFLICT ON CONSTRAINT teams_users_pkey
+				DO NOTHING
+				`, dbID, pq.Array(userIDs))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	_, err = tx.ExecContext(ctx, `UPDATE teams SET updated_at=NOW()
+	WHERE db_id=$1`, dbID)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	row := tx.QueryRowContext(ctx,
+		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=team_db_id($1)`,
+		id)
+	err = row.Scan(pq.Array(&updatedUserIDs))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	return updatedUserIDs, nil
+}
+
+// GetUserIDsForTeam returns the user IDs for all members of the team.
+func (p *postgres) GetUserIDsForTeam(ctx context.Context, id string) ([]string, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	var userIDs []string
+	row := p.db.QueryRowContext(ctx,
+		`SELECT array_agg(user_id) 
+		FROM teams_users_associations INNER JOIN teams
+		ON teams.db_id=teams_users_associations.team_db_id
+		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,
+		id, pq.Array(projectsFilter))
+	err = row.Scan(pq.Array(&userIDs))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	return userIDs, nil
 }
 
 // GetTeamsForUser returns an array of teams that have the provided user
@@ -466,7 +451,7 @@ func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storag
 
 	teams := []storage.Team{}
 	rows, err := p.db.QueryContext(ctx,
-		`SELECT t.id, t.name, t.description, t.projects, t.created_at, t.updated_at
+		`SELECT t.id, t.name, t.projects, t.created_at, t.updated_at
 		FROM teams t
 		LEFT JOIN teams_users_associations tu ON tu.team_db_id=t.db_id
 		WHERE tu.user_id=$1 AND projects_match(t.projects, $2::TEXT[])`,
@@ -481,7 +466,7 @@ func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storag
 	}()
 	for rows.Next() {
 		t := storage.Team{}
-		if err := rows.Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects),
+		if err := rows.Scan(&t.ID, &t.Name, pq.Array(&t.Projects),
 			&t.CreatedAt, &t.UpdatedAt); err != nil {
 			return nil, p.processError(err)
 		}
@@ -502,15 +487,15 @@ func (p *postgres) PurgeProject(ctx context.Context, projectID string) error {
 	return nil
 }
 
-func (p *postgres) touchTeam(ctx context.Context, q querier, teamID uuid.UUID) (storage.Team, error) {
+func (p *postgres) touchTeam(ctx context.Context, q querier, id string) (storage.Team, error) {
 	var t storage.Team
 	err := q.QueryRowContext(ctx,
 		`UPDATE teams
 		SET updated_at = now()
 		WHERE db_id = team_db_id($1)
-		RETURNING id, name, description, projects, created_at, updated_at`,
-		teamID).
-		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
+		RETURNING id, name, projects, created_at, updated_at`,
+		id).
+		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}

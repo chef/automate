@@ -67,6 +67,8 @@ type Client interface {
 	GetCreateCountsTimeSeries(time.Time, time.Time, map[string][]string) ([]CountPeroid, error)
 	GetErrors(int32, map[string][]string) ([]*ChefErrorCount, error)
 	GetMissingNodeDurationCounts(durations []string) ([]CountedDuration, error)
+	GetNodeMetadataCounts(filters map[string][]string, types []string, startDate,
+		endDate string) ([]TypeCount, error)
 }
 
 // Types that we consume from the ingest-service
@@ -93,6 +95,16 @@ type CountedDuration struct {
 type CountPeroid struct {
 	Start time.Time
 	End   time.Time
+	Count int
+}
+
+type TypeCount struct {
+	Values []ValueCount
+	Type   string
+}
+
+type ValueCount struct {
+	Value string
 	Count int
 }
 

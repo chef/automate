@@ -24,6 +24,7 @@ const (
 	requiredAzureClientSecretError         = "Invalid data content for secret type 'azure'. AZURE_CLIENT_SECRET not provided"
 	requiredAzureTenantIDError             = "Invalid data content for secret type 'azure'. AZURE_TENANT_ID not provided"
 	requiredGcpCredentialsJsonError        = "Invalid data content for secret type 'gcp'. GOOGLE_CREDENTIALS_JSON not provided"
+	requiredChefServerOrganizationKeyError = "Invalid data content for secret type 'chef-server'. A 'key' field is required"
 )
 
 type GcpCredential struct {
@@ -77,6 +78,8 @@ func (s *Secret) Validate() error {
 	case "service_now":
 		errors = requiredField(kvMap["username"], requiredServiceNowUsernameError, errors)
 		errors = requiredField(kvMap["password"], requiredServiceNowPasswordError, errors)
+	case "chef-server":
+		errors = requiredField(kvMap["key"], requiredChefServerOrganizationKeyError, errors)
 	}
 
 	// Eventually I'd like to switch our error handling to be handle an aggregation of errors

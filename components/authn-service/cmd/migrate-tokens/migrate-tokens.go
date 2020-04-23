@@ -15,7 +15,7 @@ var (
 )
 
 const (
-	tokensURL  = "https://localhost/iam/v2/tokens"         // nolint
+	tokensURL  = "https://localhost/apis/iam/v2/tokens"    // nolint
 	secretsURL = "https://localhost/api/v0/secrets/search" // nolint
 )
 
@@ -24,7 +24,6 @@ type Secrets struct {
 }
 
 type Secret struct {
-	Id   string
 	Name string
 	Tags []Tag
 }
@@ -35,9 +34,10 @@ type Tag struct {
 }
 
 type token struct {
-	Description string `json:"description"`
-	Token       string `json:"token"`
-	Active      bool   `json:"active"`
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Value  string `json:"value"`
+	Active bool   `json:"active"`
 }
 
 func main() {
@@ -45,15 +45,15 @@ func main() {
 
 	flag.Parse()
 
-	fmt.Printf("migrating tokens from secrets service to authz service using:\n")
+	fmt.Printf("migrating tokens from secrets service to authn service using:\n")
 	fmt.Printf("\tsecrets URL: %s\n", secretsURL)
 	fmt.Printf("\ttokens URL: %s\n", tokensURL)
 	fmt.Printf("\tapi token: %s\n\n", *authToken)
 
 	tokens := getTokensFromSecrets()
-	fmt.Printf("tokens  read from secrets service...\n")
+	fmt.Printf("tokens read from secrets service...\n")
 	for _, t := range tokens {
-		fmt.Printf("\treading token '%s' from secrets\n", t.Description)
+		fmt.Printf("\treading token '%s' from secrets\n", t.Name)
 	}
 	fmt.Printf("\ttotal tokens read from secrets service: %d\n\n", len(tokens))
 
@@ -71,7 +71,7 @@ func getTokensFromSecrets() []*token {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-data-collector-token", *authToken)
+	req.Header.Set("api-token", *authToken)
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -96,7 +96,7 @@ func getTokensFromSecrets() []*token {
 }
 
 func writeTokensToClients(tokens []*token) int {
-	fmt.Printf("writing tokens to authz service...\n")
+	fmt.Printf("writing tokens to authn service...\n")
 	successfulWrites := 0
 	for _, t := range tokens {
 		requestBody, err := json.Marshal(*t)
@@ -109,17 +109,21 @@ func writeTokensToClients(tokens []*token) int {
 		}
 
 		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("x-data-collector-token", *authToken)
+		req.Header.Set("api-token", *authToken)
 
-		_, err = client.Do(req) // nolint:bodyclose
+		resp, err := client.Do(req)
 		if err != nil {
-			fmt.Printf("\tFAILED to write token %s, error: %v\n", t.Description, err)
+			fmt.Printf("\tFAILED to write token %s, error: %v\n", t.Name, err)
+		}
+		defer resp.Body.Close() //nolint
+		if resp.StatusCode != 200 {
+			fmt.Printf("\tFAILED to write token %s, status code: %v\n", t.Name, resp.Status)
 		} else {
-			fmt.Printf("\twrote token %q successfully\n", t.Description)
-			successfulWrites += 1
+			fmt.Printf("\twrote token %q successfully\n", t.Name)
+			successfulWrites++
 		}
 	}
-	fmt.Printf("\ttotal tokens written to authz service: %d\n", successfulWrites)
+	fmt.Printf("\ttotal tokens written to authn service: %d\n", successfulWrites)
 	return successfulWrites
 }
 
@@ -138,9 +142,10 @@ func clientTokenFromSecret(secret *Secret) *token {
 	}
 
 	return &token{
-		Description: secret.Name,
-		Token:       tok,
-		Active:      "1" == active,
+		ID:     secret.Name,
+		Name:   secret.Name,
+		Value:  tok,
+		Active: "1" == active,
 	}
 }
 

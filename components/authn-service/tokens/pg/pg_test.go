@@ -499,38 +499,6 @@ func TestCreateToken(t *testing.T) {
 	}
 }
 
-func TestResetToV1(t *testing.T) {
-	ctx := context.Background()
-	store, db := setup(t)
-	assert := assert.New(t)
-	name := "Test Token Name"
-
-	reset(t, db)
-	t.Run("every project is removed from every token", func(*testing.T) {
-		resp1, err := store.CreateToken(ctx, "test1", name, true, []string{})
-		assert.NoError(err, "failed to store token1")
-		assert.ElementsMatch([]string{}, resp1.Projects)
-
-		resp2, err := store.CreateToken(ctx, "test2", name, true, []string{"proj1"})
-		assert.NoError(err, "failed to store token2")
-		assert.ElementsMatch([]string{"proj1"}, resp2.Projects)
-
-		resp3, err := store.CreateToken(ctx, "test3", name, true, []string{"proj1", "proj2"})
-		assert.NoError(err, "failed to store token3")
-		assert.ElementsMatch([]string{"proj1", "proj2"}, resp3.Projects)
-
-		err = store.ResetToV1(ctx)
-		assert.NoError(err, "failed reset to v1")
-
-		tokens, err := store.GetTokens(ctx)
-		assert.NoError(err, "failed to list tokens")
-		assert.Equal(3, len(tokens))
-		for _, token := range tokens {
-			assert.ElementsMatch([]string{}, token.Projects)
-		}
-	})
-}
-
 func TestPurgeProject(t *testing.T) {
 	ctx := context.Background()
 	store, db := setup(t)

@@ -40,6 +40,7 @@ const (
 // expressed in the service's toml config file
 type BackupsConfig struct {
 	Backend         string          `mapstructure:"backend"`
+	VerifyRepo      bool            `mapstructure:"verify_repo"`
 	FsBackupsConfig FsBackupsConfig `mapstructure:"fs"`
 	S3BackupsConfig S3BackupsConfig `mapstructure:"s3"`
 }
@@ -545,15 +546,13 @@ func (es *Elastic) CreateSnapshotRepository(ctx context.Context, repoName string
 
 	creator := es.client.SnapshotCreateRepository(repoName)
 	creator.BodyJson(req)
+	creator.Verify(bc.VerifyRepo)
 	res, err := creator.Do(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "elasticsearch repository create request failed for repo %q; request data: '%v'", repoName, req)
 	}
 	if !res.Acknowledged {
 		return errors.Errorf("elasticsearch did not acknowledge repository create request for repo %q; request data '%v'", repoName, req)
-	}
-	if _, err = es.client.SnapshotVerifyRepository(repoName).Do(ctx); err != nil {
-		return errors.Wrapf(err, "elasticsearch created repository %q with request data '%v' but verification of the repository failed", repoName, req)
 	}
 
 	return nil

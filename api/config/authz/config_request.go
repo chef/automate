@@ -35,6 +35,8 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Logger.Format = w.String("text")
 	c.V1.Sys.Storage.Database = w.String("chef_authz_service")
 	c.V1.Sys.Storage.User = w.String("authz")
+	c.V1.Sys.Storage.MaxConnections = w.Int32(10)
+	c.V1.Sys.Storage.MaxIdleConnections = w.Int32(10)
 
 	return c
 }

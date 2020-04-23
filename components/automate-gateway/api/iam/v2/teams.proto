@@ -53,8 +53,6 @@ service Teams {
       post: "/iam/v2/teams"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "auth:teams";
-    option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:teams";
     option (chef.automate.api.iam.policy).action = "iam:teams:create";
   };
@@ -76,8 +74,6 @@ service Teams {
     option (google.api.http) = {
       get: "/iam/v2/teams"
     };
-    option (chef.automate.api.policy).resource = "auth:teams";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:teams";
     option (chef.automate.api.iam.policy).action = "iam:teams:list";
   };
@@ -99,8 +95,6 @@ service Teams {
     option (google.api.http) = {
       get: "/iam/v2/teams/{id}"
     };
-    option (chef.automate.api.policy).resource = "auth:teams:{id}";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
     option (chef.automate.api.iam.policy).action = "iam:teams:get";
   };
@@ -146,8 +140,6 @@ service Teams {
       put: "/iam/v2/teams/{id}"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "auth:teams:{id}";
-    option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
     option (chef.automate.api.iam.policy).action = "iam:teams:update";
   };
@@ -169,8 +161,6 @@ service Teams {
     option (google.api.http) = {
       delete: "/iam/v2/teams/{id}"
     };
-    option (chef.automate.api.policy).resource = "auth:teams:{id}";
-    option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
     option (chef.automate.api.iam.policy).action = "iam:teams:delete";
   };
@@ -192,8 +182,6 @@ service Teams {
     option (google.api.http) = {
       get: "/iam/v2/teams/{id}/users"
     };
-    option (chef.automate.api.policy).resource = "auth:teams:{id}:users";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}:users";
     option (chef.automate.api.iam.policy).action = "iam:teamUsers:list";
   };
@@ -242,8 +230,6 @@ service Teams {
       post: "/iam/v2/teams/{id}/users:add"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "auth:teams:{id}";
-    option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
     option (chef.automate.api.iam.policy).action = "iam:teamUsers:create";
   };
@@ -292,8 +278,6 @@ service Teams {
       post: "/iam/v2/teams/{id}/users:remove"
       body: "*"
     };
-    option (chef.automate.api.policy).resource = "auth:teams:{id}";
-    option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
     option (chef.automate.api.iam.policy).action = "iam:teamUsers:delete";
   };
@@ -315,8 +299,6 @@ service Teams {
     option (google.api.http) = {
       get: "/iam/v2/users/{membership_id}/teams"
     };
-    option (chef.automate.api.policy).resource = "auth:users:{membership_id}:teams";
-    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:users:{membership_id}:teams";
     option (chef.automate.api.iam.policy).action = "iam:userTeams:get";
   };

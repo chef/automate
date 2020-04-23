@@ -844,3 +844,30 @@ export enum HttpStatus {
 
 // Map of gRPC codes to HTTP codes is available at:
 // vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/rpc/code.proto
+
+
+// The full list of filter types for filtering node and profile reports inclusive of dates
+export enum ReportingFilterTypes {
+  CHEF_SERVER = 'chef_server',
+  CHEF_TAGS = 'chef_tags',
+  CONTROL_ID = 'control_id',
+  CONTROL_NAME = 'control_name',
+  CONTROL_TAG_KEY = 'control_tag_key',
+  CONTROL_TAG_VALUE = 'control_tag_value',
+  ENVIRONMENT = 'environment',
+  INSPEC_VERSION = 'inspec_version',
+  JOB_ID = 'job_id',
+  NODE_ID = 'node_id',
+  NODE_NAME = 'node_name',
+  ORGANIZATION = 'organization',
+  PLATFORM_WITH_VERSION = 'platform_with_version',
+  POLICY_GROUP = 'policy_group',
+  POLICY_NAME = 'policy_name',
+  PROFILE_ID = 'profile_id',
+  PROFILE_WITH_VERSION = 'profile_with_version',
+  PROFILE_NAME = 'profile_name',
+  RECIPE = 'recipe',
+  ROLE = 'role',
+  END_TIME = 'end_time',
+  DATE_INTERVAL = 'date_interval'
+}

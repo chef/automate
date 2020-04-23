@@ -18,6 +18,7 @@ describe('ReportingNodeComponent', () => {
   let component: ReportingNodeComponent;
   let element: DebugElement;
   let statsService: StatsService;
+  let reportQueryService: ReportQueryService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,6 +47,7 @@ describe('ReportingNodeComponent', () => {
     component = fixture.componentInstance;
     element = fixture.debugElement;
     statsService = element.injector.get(StatsService);
+    reportQueryService = element.injector.get(ReportQueryService);
   });
 
   it('sets reportLoading to false', () => {
@@ -58,6 +60,7 @@ describe('ReportingNodeComponent', () => {
         [ {id: '123'}, {id: '456'} ]));
       spyOn(statsService, 'getSingleReport').and.returnValue(observableOf(
         { node_name: 'teal' } ));
+      spyOn(reportQueryService, 'formatReturnParams');
       component.ngOnInit();
     });
 
@@ -72,6 +75,9 @@ describe('ReportingNodeComponent', () => {
     });
     it('sets the value for activeReport', () => {
       expect(component.activeReport).toEqual({ id: '123', node_name: 'teal' });
+    });
+    it('calls formatReturnParams to set the reports breadcrumb href', () => {
+      expect(reportQueryService.formatReturnParams).toHaveBeenCalled();
     });
   });
 

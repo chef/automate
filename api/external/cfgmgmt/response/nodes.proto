@@ -247,3 +247,22 @@ message CountedDuration {
   // The number of nodes for this duration
   int32 count = 2;
 }
+
+message NodeMetadataCounts {
+  // Field Types for a node with value counts
+  repeated TypeCount types = 1;
+}
+
+message TypeCount {
+  // Values of the field type with a count for each
+  repeated ValueCount values = 1;
+  // The field type counted
+	string type = 2;
+}
+
+message ValueCount {
+  // The value counted
+  string value = 1;
+  // The number of this distinct value
+	int32 count = 2;
+}

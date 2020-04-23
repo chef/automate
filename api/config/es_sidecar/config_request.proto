@@ -35,6 +35,7 @@ message ConfigRequest {
 				reserved 3; // old S3Settings
 				reserved 4; // newer old S3 settings
 				google.protobuf.StringValue backend = 1;
+				google.protobuf.BoolValue verify_repo = 6;
 				FsSettings fs = 2;
 				S3Settings s3 = 5;
 

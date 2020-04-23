@@ -2,7 +2,7 @@
   <div class="container">
     <main>
       <chef-breadcrumbs>
-        <chef-breadcrumb [link]="['/compliance/reports/nodes']">Reports</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/compliance/reports/nodes']" [queryParams]='returnParams'>Reports</chef-breadcrumb>
         {{ activeReport.node_name }}
       </chef-breadcrumbs>
 

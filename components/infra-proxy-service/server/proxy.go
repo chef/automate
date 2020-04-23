@@ -61,12 +61,12 @@ func (s *Server) createClient(ctx context.Context, orgID string) (*ChefClient, e
 		return nil, service.ParseStorageError(err, orgID, "org")
 	}
 
-	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.AdminKey})
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.CredentialID})
 	if err != nil {
 		return nil, err
 	}
 
-	ServerID, err := uuid.FromString(org.ServerId)
+	ServerID, err := uuid.FromString(org.ServerID)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid server: %s", err.Error())
 	}

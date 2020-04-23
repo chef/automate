@@ -7,7 +7,7 @@ import { map, takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StatsService } from '../../shared/reporting/stats.service';
-import { ReportQueryService, ReportQuery } from '../../shared/reporting/report-query.service';
+import { ReportQueryService, ReportQuery, ReturnParams } from '../../shared/reporting/report-query.service';
 import { ScanResultsService } from '../../shared/reporting/scan-results.service';
 import { paginationOverride } from '../shared';
 import * as moment from 'moment';
@@ -25,6 +25,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   displayScanResultsSidebar = false;
   showLoadingIcon = false;
   statusFilter = 'all';
+  returnParams: ReturnParams = {};
 
   openControls: any = {};
 
@@ -33,7 +34,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private statsService: StatsService,
-    private reportQuery: ReportQueryService,
+    private reportQueryService: ReportQueryService,
     public scanResults: ScanResultsService,
     private layoutFacade: LayoutFacadeService
   ) {}
@@ -42,19 +43,21 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.showLoadingIcon = true;
     this.layoutFacade.ShowPageLoading(true);
+    this.returnParams = this.reportQueryService.formatReturnParams();
 
     const id = this.route.snapshot.params['id'];
-    this.fetchProfile(id, this.reportQuery.getReportQuery()).pipe(
+    this.fetchProfile(id, this.reportQueryService.getReportQuery()).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(this.onFetchedProfile.bind(this));
 
     observableCombineLatest([
-        this.reportQuery.state,
+        this.reportQueryService.state,
         this.scanResults.params
       ]).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(([filters, params]: [ReportQuery, any]) =>
         this.onFilterParamsChange(filters, params));
+
   }
 
   fetchProfile(id, reportQuery: ReportQuery) {

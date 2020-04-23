@@ -81,7 +81,7 @@ func (u *userMgmtClient) AddUserToAdminTeam(ctx context.Context, userID string) 
 	adminsTeam, err := u.teamsClient.GetTeam(ctx,
 		// (tc) By convention, this is the admins team name string and will properly be
 		// updated here should that change in teams-service.
-		&teams.GetTeamReq{Id: teams_storage.AdminsTeamName})
+		&teams.GetTeamReq{Id: teams_storage.AdminsTeamID})
 	if err != nil {
 		return err
 	}

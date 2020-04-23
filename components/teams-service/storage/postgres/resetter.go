@@ -18,7 +18,7 @@ func (p *postgres) Reset(ctx context.Context) error {
 		queryArgsArr[i] = "'" + nonDeletableTeam + "'"
 	}
 	queryArgs := strings.Join(queryArgsArr, ",")
-	query := fmt.Sprintf("DELETE FROM teams WHERE name NOT IN (%s);", queryArgs) // nolint: gas
+	query := fmt.Sprintf("DELETE FROM teams WHERE id NOT IN (%s);", queryArgs) // nolint: gas
 	_, err := p.db.ExecContext(ctx, query)
 	if err != nil {
 		return err
