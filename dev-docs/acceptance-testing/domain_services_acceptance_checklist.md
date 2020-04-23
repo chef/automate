@@ -7,7 +7,7 @@ go to: https://a2-local-inplace-upgrade-acceptance.cd.chef.co/dashboards/event-f
 
 dashboards: (event feed) empty\
 applications page: some services data loaded\
-infrastructure: (client runs) some older missing nodes\
+infrastructure: (client runs) some older missing nodes, (chef-servers) a chef server and org with some data\
 compliance: (reports) a few nodes reporting in, (scan jobs) a few old scan jobs, (profiles) a few installed profiles\
 settings: (node integrations) a few integrations\ already created, (node credentials) a few credentials already created
 
@@ -35,14 +35,17 @@ _note: if you find yourself missing tools, please see [the readme](https://githu
 ### test cloud integration, delete and create
 1) navigate to acceptance, settings, node integrations
 2) find "aws-api integration"
-3) delete it
+3) go into the nodes for the integration, delete the node, delete the integration
 4) create new integration for aws: api. select "Read my credentials from my EC2 environment" and name it "aws-api integration"
 5) once created, click into details of integration and make sure there's a node there
 
 
-### create a scan job or two to get some fresh data
+### create some scan jobs to get some fresh data
 1) navigate to acceptance, compliance, scan jobs
-2) select create a new job, and go through the steps to create a job or two
+2) select create a new job, and go through the steps to create three scan jobs
+ - select the aws-api integration you created and use the CIS Amazon Web Services Foundation Benchmark for the first one
+ - select the automate integration, node name filter of `inspec*`, and use a rhel and ssh profile
+ - select the aws-ec2 integration (or create one if none exists) and use some linux and ssh profiles
 
 
 ### delete and install profiles
@@ -69,6 +72,12 @@ _note: if you find yourself missing tools, please see [the readme](https://githu
 3) click into the details for the node, ensure there's data
 4) go back to the list view, apply a filter and expect data (if any) to match filter
 5) download json report
+
+### check on chef servers
+1) navigate to acceptance, infrastructure, chef servers
+2) delete and recreate the chef server/org; instructions can be found in `automate/dev-docs/adding-data/adding_test_data.md` 
+3) click into the details for the chef server and org
+4) browse around
 
 
 ### check on compliance reports
