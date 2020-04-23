@@ -28,11 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// NB: file descriptors are sorted topologically by imports, so
-	//     the last one is the one we've passed
-	f := fs[len(fs)-1:]
-
-	err = printer.PrintProtosToFileSystem(f, ".")
+	err = printer.PrintProtosToFileSystem(fs, ".")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "printer err = %v\n", err)
 		os.Exit(1)
