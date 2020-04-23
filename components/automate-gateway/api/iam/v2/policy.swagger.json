@@ -11,39 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/iam/v2/introspect_projects": {
-      "get": {
-        "operationId": "IntrospectAllProjects",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.ListProjectsResp"
-            }
-          }
-        },
-        "tags": [
-          "hidden"
-        ]
-      }
-    },
-    "/iam/v2/policies": {
-      "get": {
-        "summary": "Lists all policies",
-        "description": "Lists all policies.\n\nAuthorization Action:\n```\niam:policies:list\n```",
-        "operationId": "ListPolicies",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.ListPoliciesResp"
-            }
-          }
-        },
-        "tags": [
-          "policies"
-        ]
-      },
+    "/apis/apis/iam/v2/policies": {
       "post": {
         "summary": "Creates a custom policy",
         "description": "Creates a custom IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass `\"projects\": [\"*\"]` to scope a statement to every project.\n\nA policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),\nwhereas the *statement-level* projects list defines which projects the statement applies to.\n\nThe example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role\non a few projects for all LDAP teams and a custom role `qa` on a specific project.\n\nAuthorization Action:\n```\niam:policies:create\n```",
@@ -77,7 +45,41 @@
         ]
       }
     },
-    "/iam/v2/policies/{id}": {
+    "/apis/iam/v2/introspect_projects": {
+      "get": {
+        "operationId": "IntrospectAllProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.ListProjectsResp"
+            }
+          }
+        },
+        "tags": [
+          "hidden"
+        ]
+      }
+    },
+    "/apis/iam/v2/policies": {
+      "get": {
+        "summary": "Lists all policies",
+        "description": "Lists all policies.\n\nAuthorization Action:\n```\niam:policies:list\n```",
+        "operationId": "ListPolicies",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.ListPoliciesResp"
+            }
+          }
+        },
+        "tags": [
+          "policies"
+        ]
+      }
+    },
+    "/apis/iam/v2/policies/{id}": {
       "get": {
         "summary": "Gets a policy",
         "description": "Returns the details for a policy.\n\nAuthorization Action:\n```\niam:policies:get\n```",
@@ -168,7 +170,7 @@
         ]
       }
     },
-    "/iam/v2/policies/{id}/members": {
+    "/apis/iam/v2/policies/{id}/members": {
       "get": {
         "summary": "Lists policy members",
         "description": "Lists all members of a specific policy.\n\nAuthorization Action:\n```\niam:policyMembers:get\n```",
@@ -234,7 +236,7 @@
         ]
       }
     },
-    "/iam/v2/policies/{id}/members:add": {
+    "/apis/iam/v2/policies/{id}/members:add": {
       "post": {
         "summary": "Adds policy members",
         "description": "Adds members to the member list of a specific policy.\nYou may use this endpoint to update members of either Custom or Chef-managed policies.\n\nEnsure each element of the members array is in the correct\n[Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.\n\nAuthorization Action:\n```\niam:policyMembers:create\n```",
@@ -275,7 +277,7 @@
         ]
       }
     },
-    "/iam/v2/policies/{id}/members:remove": {
+    "/apis/iam/v2/policies/{id}/members:remove": {
       "post": {
         "summary": "Removes policy members",
         "description": "Removes members from the member list of a specific policy. Silently ignores\nmembers that are not already part of the member list.\nYou may use this endpoint to update members of either Custom or Chef-managed policies.\n\nEnsure each element of the members array is in the correct\n[Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.\n\nThe removed members will still exist within Chef Automate, but are no longer associated with this policy.\n\nAuthorization Action:\n```\niam:policyMembers:delete\n```",
@@ -316,7 +318,7 @@
         ]
       }
     },
-    "/iam/v2/policy_version": {
+    "/apis/iam/v2/policy_version": {
       "get": {
         "summary": "Gets IAM version",
         "description": "Returns the major and minor version of IAM that your automate installation is running.\n\nAuthorization Action:\n```\niam:policies:get\n```",
@@ -334,7 +336,7 @@
         ]
       }
     },
-    "/iam/v2/projects": {
+    "/apis/iam/v2/projects": {
       "get": {
         "summary": "Lists all projects",
         "description": "Lists all projects.\n\nAuthorization Action:\n```\niam:projects:list\n```",
@@ -384,7 +386,7 @@
         ]
       }
     },
-    "/iam/v2/projects/{id}": {
+    "/apis/iam/v2/projects/{id}": {
       "get": {
         "summary": "Gets a project",
         "description": "Returns the details for a project.\n\nAuthorization Action:\n```\niam:projects:get\n```",
@@ -475,7 +477,7 @@
         ]
       }
     },
-    "/iam/v2/roles": {
+    "/apis/iam/v2/roles": {
       "get": {
         "summary": "Lists all roles",
         "description": "Lists all *Chef-managed* and *Custom* roles.\n\nAuthorization Action:\n```\niam:roles:list\n```",
@@ -525,7 +527,7 @@
         ]
       }
     },
-    "/iam/v2/roles/{id}": {
+    "/apis/iam/v2/roles/{id}": {
       "get": {
         "summary": "Gets a role",
         "description": "Returns the details for a role.\n\nAuthorization Action:\n```\niam:roles:get\n```",

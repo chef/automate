@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/CreatePolicy", "iam:policies", "iam:policies:create", "POST", "/iam/v2/policies", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/CreatePolicy", "iam:policies", "iam:policies:create", "POST", "/apis/apis/iam/v2/policies", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreatePolicyReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -24,7 +24,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/GetPolicy", "iam:policies:{id}", "iam:policies:get", "GET", "/iam/v2/policies/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/GetPolicy", "iam:policies:{id}", "iam:policies:get", "GET", "/apis/iam/v2/policies/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetPolicyReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -37,10 +37,10 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/ListPolicies", "iam:policies", "iam:policies:list", "GET", "/iam/v2/policies", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/ListPolicies", "iam:policies", "iam:policies:list", "GET", "/apis/iam/v2/policies", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/DeletePolicy", "iam:policies:{id}", "iam:policies:delete", "DELETE", "/iam/v2/policies/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/DeletePolicy", "iam:policies:{id}", "iam:policies:delete", "DELETE", "/apis/iam/v2/policies/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.DeletePolicyReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -53,7 +53,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/UpdatePolicy", "iam:policies:{id}", "iam:policies:update", "PUT", "/iam/v2/policies/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/UpdatePolicy", "iam:policies:{id}", "iam:policies:update", "PUT", "/apis/iam/v2/policies/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.UpdatePolicyReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -68,10 +68,10 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/GetPolicyVersion", "iam:policyVersion", "iam:policies:get", "GET", "/iam/v2/policy_version", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/GetPolicyVersion", "iam:policyVersion", "iam:policies:get", "GET", "/apis/iam/v2/policy_version", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/ListPolicyMembers", "iam:policies:{id}:members", "iam:policyMembers:get", "GET", "/iam/v2/policies/{id}/members", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/ListPolicyMembers", "iam:policies:{id}:members", "iam:policyMembers:get", "GET", "/apis/iam/v2/policies/{id}/members", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.ListPolicyMembersReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -84,7 +84,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/ReplacePolicyMembers", "iam:policies:{id}:members", "iam:policyMembers:update", "PUT", "/iam/v2/policies/{id}/members", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/ReplacePolicyMembers", "iam:policies:{id}:members", "iam:policyMembers:update", "PUT", "/apis/iam/v2/policies/{id}/members", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.ReplacePolicyMembersReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -97,7 +97,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/RemovePolicyMembers", "iam:policies:{id}:members", "iam:policyMembers:delete", "POST", "/iam/v2/policies/{id}/members:remove", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/RemovePolicyMembers", "iam:policies:{id}:members", "iam:policyMembers:delete", "POST", "/apis/iam/v2/policies/{id}/members:remove", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.RemovePolicyMembersReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -110,7 +110,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/AddPolicyMembers", "iam:policies:{id}:members", "iam:policyMembers:create", "POST", "/iam/v2/policies/{id}/members:add", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/AddPolicyMembers", "iam:policies:{id}:members", "iam:policyMembers:create", "POST", "/apis/iam/v2/policies/{id}/members:add", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.AddPolicyMembersReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -123,7 +123,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/CreateRole", "iam:roles", "iam:roles:create", "POST", "/iam/v2/roles", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/CreateRole", "iam:roles", "iam:roles:create", "POST", "/apis/iam/v2/roles", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreateRoleReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -138,10 +138,10 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/ListRoles", "iam:roles", "iam:roles:list", "GET", "/iam/v2/roles", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/ListRoles", "iam:roles", "iam:roles:list", "GET", "/apis/iam/v2/roles", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/GetRole", "iam:roles:{id}", "iam:roles:get", "GET", "/iam/v2/roles/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/GetRole", "iam:roles:{id}", "iam:roles:get", "GET", "/apis/iam/v2/roles/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetRoleReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -154,7 +154,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/DeleteRole", "iam:roles:{id}", "iam:roles:delete", "DELETE", "/iam/v2/roles/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/DeleteRole", "iam:roles:{id}", "iam:roles:delete", "DELETE", "/apis/iam/v2/roles/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.DeleteRoleReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -167,7 +167,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/UpdateRole", "iam:roles:{id}", "iam:roles:update", "PUT", "/iam/v2/roles/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/UpdateRole", "iam:roles:{id}", "iam:roles:update", "PUT", "/apis/iam/v2/roles/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.UpdateRoleReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -182,7 +182,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/CreateProject", "iam:projects", "iam:projects:create", "POST", "/iam/v2/projects", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/CreateProject", "iam:projects", "iam:projects:create", "POST", "/apis/iam/v2/projects", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreateProjectReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -197,7 +197,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/UpdateProject", "iam:projects:{id}", "iam:projects:update", "PUT", "/iam/v2/projects/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/UpdateProject", "iam:projects:{id}", "iam:projects:update", "PUT", "/apis/iam/v2/projects/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.UpdateProjectReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -212,7 +212,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/GetProject", "iam:projects:{id}", "iam:projects:get", "GET", "/iam/v2/projects/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/GetProject", "iam:projects:{id}", "iam:projects:get", "GET", "/apis/iam/v2/projects/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetProjectReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -225,10 +225,10 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/ListProjects", "iam:projects", "iam:projects:list", "GET", "/iam/v2/projects", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/ListProjects", "iam:projects", "iam:projects:list", "GET", "/apis/iam/v2/projects", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/DeleteProject", "iam:projects:{id}", "iam:projects:delete", "DELETE", "/iam/v2/projects/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/DeleteProject", "iam:projects:{id}", "iam:projects:delete", "DELETE", "/apis/iam/v2/projects/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.DeleteProjectReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -241,7 +241,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/IntrospectAllProjects", "iam:introspect", "iam:introspect:getAllProjects", "GET", "/iam/v2/introspect_projects", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/IntrospectAllProjects", "iam:introspect", "iam:introspect:getAllProjects", "GET", "/apis/iam/v2/introspect_projects", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
 }
