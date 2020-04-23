@@ -4,17 +4,12 @@
   display: block;
 }
 
-// todo: update dropdown to have min-width of 250px and increase in width based on length of project name
+// todo: update dropdown to have min-width of 250px and increase in width based on length of resource name
 .dropdown-wrap {
   position: relative;
 
-  #projects-selected {
-    // TODO (tc): the value for $chef-dark-grey here
-    // and what it says in the card description conflict.
-    // From the card:
-    //
-    // The value shown uses `chef-dark-gray` #212234
-    color: #212234;
+  #resources-selected {
+    color: $chef-dark-grey;
   }
 }
 
@@ -74,12 +69,12 @@ chef-dropdown {
     border-bottom: 1px solid $chef-grey;
   }
 
-  #project-container {
+  #resource-container {
     max-height: 210px;
     overflow-y: scroll;
   }
 
-  .no-projects {
+  .no-resources {
     padding: 14px 18px 0px;
     font-style: italic;
   }

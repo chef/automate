@@ -1,14 +1,12 @@
-<label>
-  Projects
-</label>
+<label>{{ objectNounPlural | capitalize }}</label>
 <div class="dropdown-wrap">
-  <button class="dropdown-button" aria-label="Select projects"
+  <button class="dropdown-button" aria-label="Select resources"
     (click)="toggleDropdown($event)"
     [ngClass]="{'active': active}"
     [disabled]="disabled"
     (keydown.arrowup)="moveFocus($event)"
     (keydown.arrowdown)="moveFocus($event)">
-    <div id="projects-selected">{{ (label.length &gt; 25)? (label | slice:0:25)+'...' : label }}
+    <div id="resources-selected">{{ (label.length &gt; 25)? (label | slice:0:25)+'...' : label }}
     </div>
     <chef-icon aria-hidden>keyboard_arrow_down</chef-icon>
   </button>
@@ -16,24 +14,24 @@
     <chef-dropdown [attr.visible]="active">
 
       <div id="filter-container">
-        <input chefInput type="text" [(ngModel)]="filterValue" placeholder="Filter projects..."
+        <input chefInput type="text" [(ngModel)]="filterValue" placeholder="Filter {{ objectNounPlural }}..."
           (keyup)="handleFilterKeyUp()" />
       </div>
 
-      <div id="project-container">
-        <chef-checkbox *ngFor="let project of filteredResources"
-          [checked]="project.checked"
-          [attr.title]="project.name"
-          (change)="resourceChecked($event.detail, project)"
+      <div id="resource-container">
+        <chef-checkbox *ngFor="let resource of filteredResources"
+          [checked]="resource.checked"
+          [attr.title]="resource.name"
+          (change)="resourceChecked($event.detail, resource)"
           (keydown.enter)="closeDropdown()"
           (keydown.esc)="closeDropdown()"
           (keydown.arrowup)="moveFocus($event)"
-          (keydown.arrowdown)="moveFocus($event)">{{ project.name }}</chef-checkbox>
+          (keydown.arrowdown)="moveFocus($event)">{{ resource.name }}</chef-checkbox>
       </div>
 
-      <div class="no-projects" *ngIf="filteredResources.length === 0">
-        <p>No projects found.</p>
-        <p>You don't have access to any projects that match your search.</p>
+      <div class="no-resources" *ngIf="filteredResources.length === 0">
+        <p>No {{ objectNounPlural }} found.</p>
+        <p>You don't have access to any {{ objectNounPlural }} that match your search.</p>
       </div>
 
     </chef-dropdown>

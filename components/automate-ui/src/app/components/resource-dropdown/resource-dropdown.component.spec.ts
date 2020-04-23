@@ -2,6 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA, EventEmitter } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
+import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { ResourceDropdownComponent } from './resource-dropdown.component';
 
 describe('ResourceDropdownComponent', () => {
@@ -11,7 +12,7 @@ describe('ResourceDropdownComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ ResourceDropdownComponent ],
-      imports: [ FormsModule ],
+      imports: [ ChefPipesModule, FormsModule ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
     .compileComponents();
