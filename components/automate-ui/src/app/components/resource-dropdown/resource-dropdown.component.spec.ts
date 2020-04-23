@@ -20,7 +20,7 @@ describe('ResourceDropdownComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ResourceDropdownComponent);
     component = fixture.componentInstance;
-    component.projectsUpdated = new EventEmitter();
+    component.resourcesUpdated = new EventEmitter();
     fixture.detectChanges();
   });
 

@@ -31,7 +31,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // This optional input is needed only when re-displaying the project dropdown
   // for *additional* resources, as with the create-object-modal-component.
   // Other consumers, e.g. team-details.component use it only for a single resource.
-  @Input() projectsUpdated: EventEmitter<boolean>;
+  @Input() resourcesUpdated: EventEmitter<boolean>;
 
   // Label to use when none are selected
   @Input() noneSelectedLabel = 'None';
@@ -50,8 +50,8 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   public filterValue = '';
 
   ngOnInit(): void {
-    if (this.projectsUpdated) { // an optional setting
-      this.projectsUpdated.subscribe(() => {
+    if (this.resourcesUpdated) { // an optional setting
+      this.resourcesUpdated.subscribe(() => {
         this.updateLabel();
       });
     }
