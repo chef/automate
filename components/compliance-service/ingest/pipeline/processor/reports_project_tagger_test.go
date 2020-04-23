@@ -9,7 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
@@ -22,22 +22,22 @@ func TestReportProjectRulesMatching(t *testing.T) {
 	cases := []struct {
 		description string
 		report      *relaxting.ESInSpecReport
-		rules       []*iam_v2.ProjectRule
+		rules       []*authz.ProjectRule
 		matching    bool
 	}{
 		{
 			description: "A project with no rules does not match any resources",
 			matching:    false,
 			report:      &relaxting.ESInSpecReport{},
-			rules:       []*iam_v2.ProjectRule{},
+			rules:       []*authz.ProjectRule{},
 		},
 		{
 			description: "A project with one rules that does not have any conditions does not match any resources",
 			matching:    false,
 			report:      &relaxting.ESInSpecReport{},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
+					Type: authz.ProjectRuleTypes_NODE,
 				},
 			},
 		},
@@ -45,12 +45,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			description: "Single rule single condition matching incorrect rule type",
 			matching:    false,
 			report:      &relaxting.ESInSpecReport{},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_EVENT,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_EVENT,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 							Values:    []string{"production"},
 						},
 					},
@@ -65,12 +65,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Environment: "production",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 							Values:    []string{"production"},
 						},
 					},
@@ -83,12 +83,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Environment: "production",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 							Values:    []string{"production", "dev"},
 						},
 					},
@@ -102,20 +102,20 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				Environment: "production",
 				Roles:       []string{"south-side"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 							Values:    []string{"production"},
 						},
 					},
 				},
 				{
-					Conditions: []*iam_v2.Condition{
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"north-side"},
 						},
 					},
@@ -129,16 +129,16 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				Environment: "production",
 				Roles:       []string{"south-side"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 							Values:    []string{"production"},
 						},
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"north-side"},
 						},
 					},
@@ -151,12 +151,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Environment: "Production",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 							Values:    []string{"production"},
 						},
 					},
@@ -171,12 +171,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -189,12 +189,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				OrganizationName: "Org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -207,12 +207,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_2"},
 						},
 					},
@@ -225,12 +225,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1", "org_2"},
 						},
 					},
@@ -245,12 +245,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				SourceFQDN: "chef_server_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values:    []string{"chef_server_1"},
 						},
 					},
@@ -263,12 +263,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				SourceFQDN: "Chef_server_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values:    []string{"chef_server_1"},
 						},
 					},
@@ -281,12 +281,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				SourceFQDN: "Chef_server_2",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values:    []string{"chef_server_1"},
 						},
 					},
@@ -299,12 +299,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				SourceFQDN: "chef_server_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values:    []string{"chef_server_1", "chef_server_2"},
 						},
 					},
@@ -319,12 +319,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Roles: []string{"area_51"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"area_51"},
 						},
 					},
@@ -337,12 +337,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Roles: []string{"area_51", "vandenberg", "hunter army airfield"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"area_51"},
 						},
 					},
@@ -355,21 +355,21 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Roles: []string{"area_51", "vandenberg", "hunter army airfield"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"area_51"},
 						},
 					},
 				},
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"area_54"},
 						},
 					},
@@ -382,12 +382,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Roles: []string{"area_51", "vandenberg", "hunter army airfield"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"area_51", "area_54"},
 						},
 					},
@@ -400,16 +400,16 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Roles: []string{"area_51", "vandenberg", "hunter army airfield"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"area_51"},
 						},
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"area_54"},
 						},
 					},
@@ -422,12 +422,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Roles: []string{"AREA_51"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"area_51"},
 						},
 					},
@@ -440,12 +440,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Roles: []string{"area_52"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"area_51"},
 						},
 					},
@@ -458,12 +458,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Roles: []string{"area_52"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"area_51", "area_52"},
 						},
 					},
@@ -477,16 +477,16 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				Environment: "production 2",
 				Roles:       []string{"area_52", "area_49"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    []string{"area_52"},
 						},
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 							Values:    []string{"production"},
 						},
 					},
@@ -502,12 +502,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				Environment: "production 2",
 				ChefTags:    []string{"area_51"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 							Values:    []string{"area_51"},
 						},
 					},
@@ -521,12 +521,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				Environment: "production 2",
 				ChefTags:    []string{"area_51", "vandenberg", "hunter army airfield"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 							Values:    []string{"area_51"},
 						},
 					},
@@ -540,12 +540,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				Environment: "production 2",
 				ChefTags:    []string{"AREA_51"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 							Values:    []string{"area_51"},
 						},
 					},
@@ -558,12 +558,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				ChefTags: []string{"area_52"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 							Values:    []string{"area_51"},
 						},
 					},
@@ -576,12 +576,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				ChefTags: []string{"area_52"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 							Values:    []string{"area_51", "area_52"},
 						},
 					},
@@ -594,12 +594,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				ChefTags: []string{"area_52", "vandenberg", "hunter army airfield"},
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 							Values:    []string{"area_51", "area_52"},
 						},
 					},
@@ -613,21 +613,21 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				ChefTags:         []string{"area_52"},
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 							Values:    []string{"area_52"},
 						},
 					},
 				},
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -641,21 +641,21 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				ChefTags:         []string{"area_52"},
 				OrganizationName: "org_2",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 							Values:    []string{"area_52"},
 						},
 					},
 				},
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -670,12 +670,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				PolicyGroup: "PolicyGroup",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 							Values:    []string{"PolicyGroup"},
 						},
 					},
@@ -688,12 +688,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				PolicyGroup: "PolicyGroup",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 							Values:    []string{"policygroup"},
 						},
 					},
@@ -706,12 +706,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				PolicyGroup: "PolicyGroup",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 							Values:    []string{"area_51"},
 						},
 					},
@@ -724,12 +724,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				PolicyGroup: "area_52",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 							Values:    []string{"area_51", "area_52"},
 						},
 					},
@@ -743,21 +743,21 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				PolicyGroup:      "area_52",
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 							Values:    []string{"area_52"},
 						},
 					},
 				},
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -771,21 +771,21 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				PolicyGroup:      "area_52",
 				OrganizationName: "org_2",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 							Values:    []string{"area_52"},
 						},
 					},
 				},
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -800,12 +800,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				PolicyName: "PolicyName",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 							Values:    []string{"PolicyName"},
 						},
 					},
@@ -818,12 +818,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				PolicyName: "PolicyGroup",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 							Values:    []string{"policygroup"},
 						},
 					},
@@ -836,12 +836,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				PolicyName: "area_52",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 							Values:    []string{"area_51"},
 						},
 					},
@@ -854,12 +854,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				PolicyName: "area_52",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 							Values:    []string{"area_51", "area_52"},
 						},
 					},
@@ -873,21 +873,21 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				PolicyName:       "area_52",
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 							Values:    []string{"area_52"},
 						},
 					},
 				},
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -901,21 +901,21 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				PolicyName:       "area_52",
 				OrganizationName: "org_2",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 							Values:    []string{"area_52"},
 						},
 					},
 				},
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -940,11 +940,11 @@ func TestBundler5Messages(t *testing.T) {
 	numberOfMessages := 5
 	inbox := make(chan message.Compliance, numberOfMessages)
 	listProjectRulesCount := 0
-	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	authzClient := authz.NewMockProjectsClient(gomock.NewController(t))
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx interface{}, in interface{}) (*iam_v2.ListRulesForAllProjectsResp, error) {
+		func(ctx interface{}, in interface{}) (*authz.ListRulesForAllProjectsResp, error) {
 			listProjectRulesCount++
-			return &iam_v2.ListRulesForAllProjectsResp{}, nil
+			return &authz.ListRulesForAllProjectsResp{}, nil
 		})
 	done := make(chan error)
 	ctx := context.Background()
@@ -975,23 +975,23 @@ func TestBundlerMatchProjectRule(t *testing.T) {
 	inbox := make(chan message.Compliance, 2)
 	testProjectName := "Test"
 	environmentsName := "env_1"
-	projectRules := map[string]*iam_v2.ProjectRules{}
-	projectRules[testProjectName] = &iam_v2.ProjectRules{
-		Rules: []*iam_v2.ProjectRule{
+	projectRules := map[string]*authz.ProjectRules{}
+	projectRules[testProjectName] = &authz.ProjectRules{
+		Rules: []*authz.ProjectRule{
 			{
-				Type: iam_v2.ProjectRuleTypes_NODE,
-				Conditions: []*iam_v2.Condition{
+				Type: authz.ProjectRuleTypes_NODE,
+				Conditions: []*authz.Condition{
 					{
-						Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+						Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 						Values:    []string{environmentsName},
 					},
 				},
 			},
 		},
 	}
-	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	authzClient := authz.NewMockProjectsClient(gomock.NewController(t))
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
-		&iam_v2.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
+		&authz.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
 
 	done := make(chan error)
 	ctx := context.Background()
@@ -1030,23 +1030,23 @@ func TestBundlerMatchProjectRuleEventRuleType(t *testing.T) {
 	inbox := make(chan message.Compliance, 2)
 	testProjectName := "Test"
 	environmentsName := "env_1"
-	projectRules := map[string]*iam_v2.ProjectRules{}
-	projectRules[testProjectName] = &iam_v2.ProjectRules{
-		Rules: []*iam_v2.ProjectRule{
+	projectRules := map[string]*authz.ProjectRules{}
+	projectRules[testProjectName] = &authz.ProjectRules{
+		Rules: []*authz.ProjectRule{
 			{
-				Type: iam_v2.ProjectRuleTypes_EVENT,
-				Conditions: []*iam_v2.Condition{
+				Type: authz.ProjectRuleTypes_EVENT,
+				Conditions: []*authz.Condition{
 					{
-						Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+						Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 						Values:    []string{environmentsName},
 					},
 				},
 			},
 		},
 	}
-	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	authzClient := authz.NewMockProjectsClient(gomock.NewController(t))
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
-		&iam_v2.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
+		&authz.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
 
 	done := make(chan error)
 	ctx := context.Background()
@@ -1088,23 +1088,23 @@ func TestBundlerWithScanJobReport(t *testing.T) {
 	inbox := make(chan message.Compliance, 100)
 	testProjectName := "Test"
 	environmentsName := "env_1"
-	projectRules := map[string]*iam_v2.ProjectRules{}
-	projectRules[testProjectName] = &iam_v2.ProjectRules{
-		Rules: []*iam_v2.ProjectRule{
+	projectRules := map[string]*authz.ProjectRules{}
+	projectRules[testProjectName] = &authz.ProjectRules{
+		Rules: []*authz.ProjectRule{
 			{
-				Type: iam_v2.ProjectRuleTypes_NODE,
-				Conditions: []*iam_v2.Condition{
+				Type: authz.ProjectRuleTypes_NODE,
+				Conditions: []*authz.Condition{
 					{
-						Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+						Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 						Values:    []string{environmentsName},
 					},
 				},
 			},
 		},
 	}
-	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	authzClient := authz.NewMockProjectsClient(gomock.NewController(t))
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
-		&iam_v2.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
+		&authz.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
 	done := make(chan error)
 	ctx := context.Background()
 

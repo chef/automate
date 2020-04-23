@@ -11,7 +11,7 @@ import (
 	"github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
-	authzv2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/deployment"
@@ -37,7 +37,7 @@ func NewServer() *grpc.Server {
 
 	applications.RegisterApplicationsServiceServer(s, &applications.UnimplementedApplicationsServiceServer{})
 	authn.RegisterAuthenticationServer(s, &authn.UnimplementedAuthenticationServer{})
-	authzv2.RegisterPoliciesServer(s, &authzv2.UnimplementedPoliciesServer{})
+	authz.RegisterPoliciesServer(s, &authz.UnimplementedPoliciesServer{})
 	cc_ingest.RegisterComplianceIngesterServer(s, &cc_ingest.UnimplementedComplianceIngesterServer{})
 	cc_jobs.RegisterJobsServiceServer(s, &cc_jobs.UnimplementedJobsServiceServer{})
 	cc_profiles.RegisterProfilesServiceServer(s, &cc_profiles.UnimplementedProfilesServiceServer{})

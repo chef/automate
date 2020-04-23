@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
-	authz "github.com/chef/automate/api/interservice/authz/common"
+	"github.com/chef/automate/api/interservice/authz"
 	api "github.com/chef/automate/api/interservice/local_user"
 	teams_api "github.com/chef/automate/api/interservice/teams/v2"
 	"github.com/chef/automate/components/local-user-service/users"
@@ -563,16 +563,16 @@ func newTeamsMock(t *testing.T) (*grpctest.Server, *teams_api.TeamsServerMock) {
 	return teams, mockTeams
 }
 
-func newAuthzMock(t *testing.T) (*grpctest.Server, *authz.SubjectPurgeServerMock) {
+func newAuthzMock(t *testing.T) (*grpctest.Server, *authz.PoliciesServerMock) {
 	t.Helper()
 	certs := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*certs)
 	g := connFactory.NewServer()
-	mockCommon := authz.NewSubjectPurgeServerMock()
-	mockCommon.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-	authz.RegisterSubjectPurgeServer(g, mockCommon)
+	mockPolicies := authz.NewPoliciesServerMock()
+	mockPolicies.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
+	authz.RegisterPoliciesServer(g, mockPolicies)
 	authzServer := grpctest.NewServer(g)
-	return authzServer, mockCommon
+	return authzServer, mockPolicies
 }
 
 func defaultMockPurgeFunc(context.Context,

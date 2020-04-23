@@ -32,7 +32,7 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/version"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/tracing"
 )
@@ -245,7 +245,7 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 		}
 		defer authzConn.Close() // nolint: errcheck
 
-		authzProjectsClient := iam_v2.NewProjectsClient(authzConn)
+		authzProjectsClient := authz.NewProjectsClient(authzConn)
 
 		projectUpdateManager, err := createProjectUpdateCerealManager(connFactory, config.Cereal.Endpoint)
 		if err != nil {

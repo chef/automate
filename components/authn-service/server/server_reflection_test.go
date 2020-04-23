@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authn-service/server"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -29,11 +28,10 @@ func TestReflectionIsPossible(t *testing.T) {
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
 	authzServer := grpctest.NewServer(grpcAuthz)
-	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
+	_, err = authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
-	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
 
-	serv, err := server.NewServer(context.Background(), config, authzV2Client)
+	serv, err := server.NewServer(context.Background(), config)
 	require.NoError(t, err)
 
 	grpctest.AssertReflection(t, serv.NewGRPCServer(nil, nil))

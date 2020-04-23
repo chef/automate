@@ -11,7 +11,7 @@ import (
 
 	"github.com/chef/automate/lib/logger"
 
-	api "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/storage"
@@ -497,7 +497,7 @@ func (s *policyServer) DeleteRole(
 	}
 }
 
-// UpdateRole modifies properties of an IAM v2 role.
+// UpdateRole modifies properties of an IAM role.
 // All properties must be supplied, whether changed or not.
 func (s *policyServer) UpdateRole(
 	ctx context.Context,

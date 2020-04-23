@@ -13,8 +13,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/external/secrets"
-	authn "github.com/chef/automate/api/interservice/authn"
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authn"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/api/interservice/compliance/profiles"
@@ -157,7 +157,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		logrus.Fatalf("could not connect to elasticsearch: %v", err)
 	}
 
-	var authzProjectsClient iam_v2.ProjectsClient
+	var authzProjectsClient authz.ProjectsClient
 	eventClient := getEventConnection(connFactory, conf.EventConfig.Endpoint)
 	notifier := getNotificationsConnection(connFactory, conf.Notifications.Target)
 	if os.Getenv("RUN_MODE") != "test" {
@@ -324,7 +324,7 @@ func getNotificationsConnection(connectionFactory *secureconn.Factory,
 }
 
 func createAuthzProjectsClient(connectionFactory *secureconn.Factory,
-	authzEndpoint string) iam_v2.ProjectsClient {
+	authzEndpoint string) authz.ProjectsClient {
 	if authzEndpoint == "" || authzEndpoint == ":0" {
 		logrus.Fatal("authzEndpoint cannot be empty or Dial will get stuck")
 	}
@@ -338,7 +338,7 @@ func createAuthzProjectsClient(connectionFactory *secureconn.Factory,
 		logrus.Fatalf("getAuthzConnection, error grpc dialing to Authz %s", err.Error())
 	}
 
-	authzProjectsClient := iam_v2.NewProjectsClient(conn)
+	authzProjectsClient := authz.NewProjectsClient(conn)
 	if authzProjectsClient == nil {
 		logrus.Fatalf("getAuthzConnection got nil for NewProjectsClient")
 	}
@@ -571,7 +571,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 			return err
 		}
 		// get the authz client
-		authzClient := iam_v2.NewPoliciesClient(authzConn)
+		authzClient := authz.NewPoliciesClient(authzConn)
 		if authzClient == nil {
 			logrus.Errorf("serveGrpc got nil for NewPoliciesClient: %s", err)
 			return err

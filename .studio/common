@@ -107,8 +107,8 @@ function compile_client_mocks() {
     set -e
     pushd /src/api/interservice || return 1
       mockgen_debug -source event/event.pb.go -destination event/event.pb.client_mock.go -package event -self_package github.com/chef/automate/api/interservice/event
-      mockgen_debug -source authz/v2/project.pb.go -destination authz/v2/project.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
-      mockgen_debug -source authz/v2/authz.pb.go -destination authz/v2/authz.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
+      mockgen_debug -source authz/project.pb.go -destination authz/project.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
+      mockgen_debug -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
       mockgen_debug -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
       mockgen_debug -source compliance/ingest/ingest/compliance.pb.go -destination compliance/ingest/ingest/compliance.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/compliance/ingest/ingest
       # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt because of

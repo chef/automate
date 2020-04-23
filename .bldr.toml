@@ -1559,6 +1559,7 @@ paths = [
   "vendor/github.com/envoyproxy/protoc-gen-validate/*",
   "vendor/github.com/ghodss/yaml/*",
   "vendor/github.com/gofrs/uuid/*",
+  "vendor/github.com/golang/mock/*",
   "vendor/github.com/golang/protobuf/*",
   "vendor/github.com/grpc-ecosystem/go-grpc-middleware/*",
   "vendor/github.com/grpc-ecosystem/grpc-gateway/*",

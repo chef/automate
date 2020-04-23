@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/interservice/authn"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -60,7 +60,7 @@ func generateAdminToken(ctx context.Context,
 
 	defer authzConnection.Close() // nolint: errcheck
 
-	authzV2Client := authz_v2.NewPoliciesClient(authzConnection)
+	authzV2Client := authz.NewPoliciesClient(authzConnection)
 
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
 		Id:     uuid.Must(uuid.NewV4()).String(),
@@ -72,7 +72,7 @@ func generateAdminToken(ctx context.Context,
 	}
 	tokenID := response.Id
 
-	_, err = authzV2Client.AddPolicyMembers(ctx, &authz_v2.AddPolicyMembersReq{
+	_, err = authzV2Client.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
 		Id:      constants.AdminPolicyID,
 		Members: []string{"token:" + tokenID},
 	})
