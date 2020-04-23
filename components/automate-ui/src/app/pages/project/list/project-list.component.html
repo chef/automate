@@ -11,11 +11,11 @@
       <section class="page-body">
         <ng-container *ngIf="(sortedProjects$ | async)?.length > 0">
           <chef-toolbar>
-            <app-authorized [allOf]="['/iam/v2/projects', 'post']">
+            <app-authorized [allOf]="['/apis/iam/v2/projects', 'post']">
               <chef-button data-cy="create-project" primary (click)="openCreateModal()">Create Project</chef-button>
             </app-authorized>
           </chef-toolbar>
-          <app-authorized [allOf]="['/iam/v2/projects', 'get']">
+          <app-authorized [allOf]="['/apis/iam/v2/projects', 'get']">
             <chef-table>
               <chef-thead>
                 <chef-tr>
@@ -33,7 +33,7 @@
                   <chef-td>{{ project.id }}</chef-td>
                   <chef-td>{{ statusLabel[project.status] }}</chef-td>
                   <chef-td class="three-dot-column">
-                    <!-- <app-authorized [allOf]="['/iam/v2/projects/{id}', 'delete', project.id]"> -->
+                    <!-- <app-authorized [allOf]="['/apis/iam/v2/projects/{id}', 'delete', project.id]"> -->
                       <mat-select panelClass="chef-control-menu">
                         <mat-option (onSelectionChange)="startProjectDelete($event, project)" data-cy="delete-project">Delete Project</mat-option>
                       </mat-select>
@@ -45,7 +45,7 @@
           </app-authorized>
         </ng-container>
         <ng-container *ngIf="(sortedProjects$ | async)?.length === 0">
-          <app-authorized [allOf]="['/iam/v2/projects', 'post']">
+          <app-authorized [allOf]="['/apis/iam/v2/projects', 'post']">
             <div class="empty-case-container">
               <p>Create the first project to get started!</p>
             </div>
@@ -53,7 +53,7 @@
                 <chef-button primary data-cy="create-project" (click)="openCreateModal()">Create Project</chef-button>
             </div>
           </app-authorized>
-          <app-authorized not [allOf]="['/iam/v2/projects', 'post']">
+          <app-authorized not [allOf]="['/apis/iam/v2/projects', 'post']">
             <div class="empty-case-container">
               <p>It looks like no one has created any projects yet or you<br/>
                 don't have permission to view them.<br/><br/>

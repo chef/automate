@@ -178,7 +178,7 @@ export class LayoutSidebarService {
                 icon: 'person',
                 route: '/settings/users',
                 authorized: {
-                  allOf: ['/iam/v2/users', 'get']
+                  allOf: ['/apis/iam/v2/users', 'get']
                 }
               },
               {
@@ -186,7 +186,7 @@ export class LayoutSidebarService {
                 icon: 'people',
                 route: '/settings/teams',
                 authorized: {
-                  allOf: ['/iam/v2/teams', 'get']
+                  allOf: ['/apis/iam/v2/teams', 'get']
                 }
               },
               {
@@ -194,7 +194,7 @@ export class LayoutSidebarService {
                 icon: 'vpn_key',
                 route: '/settings/tokens',
                 authorized: {
-                  allOf: ['/iam/v2/tokens', 'get']
+                  allOf: ['/apis/iam/v2/tokens', 'get']
                 }
               }
             ]
@@ -207,7 +207,7 @@ export class LayoutSidebarService {
                 icon: 'security',
                 route: '/settings/policies',
                 authorized: {
-                  allOf: ['/iam/v2/policies', 'get']
+                  allOf: ['/apis/iam/v2/policies', 'get']
                 }
               },
               {
@@ -215,7 +215,7 @@ export class LayoutSidebarService {
                 icon: 'assignment_ind',
                 route: '/settings/roles',
                 authorized: {
-                  allOf: ['/iam/v2/roles', 'get']
+                  allOf: ['/apis/iam/v2/roles', 'get']
                 }
               },
               {
@@ -223,7 +223,7 @@ export class LayoutSidebarService {
                 icon: 'work',
                 route: '/settings/projects',
                 authorized: {
-                  allOf: ['/iam/v2/projects', 'get']
+                  allOf: ['/apis/iam/v2/projects', 'get']
                 }
               }
             ]

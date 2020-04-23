@@ -23,8 +23,8 @@
 
         <app-authorized
           [anyOf]="[['/datafeed/destinations', 'post'], ['/notifications/rules', 'get'], ['/secrets/search', 'post'], ['/nodemanagers/search', 'post'], ['/retention/nodes/status', 'get'],
-            ['/iam/v2/users', 'get'], ['/iam/v2/teams', 'get'], ['/iam/v2/tokens', 'get'],
-            ['/iam/v2/policies', 'get'], ['/iam/v2/roles', 'get'], ['/iam/v2/projects', 'get']] ">
+            ['/apis/iam/v2/users', 'get'], ['/apis/iam/v2/teams', 'get'], ['/apis/iam/v2/tokens', 'get'],
+            ['/apis/iam/v2/policies', 'get'], ['/apis/iam/v2/roles', 'get'], ['/apis/iam/v2/projects', 'get']] ">
           <div role="menuitem" class="nav-link"><a routerLink="/settings" routerLinkActive="active" tabindex="0">Settings</a></div>
         </app-authorized>
       </div>

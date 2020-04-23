@@ -228,7 +228,7 @@ export class ProjectEffects {
       state === ApplyRulesStatusState.NotRunning
     ),
     switchMap(([[_interval, list], _status]) => {
-      return get(['/iam/v2/projects', 'get'], list) ?
+      return get(['/apis/iam/v2/projects', 'get'], list) ?
         [new GetProjects(), new GetApplyRulesStatus()] :
         [new GetApplyRulesStatus()];
     }),

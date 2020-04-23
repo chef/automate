@@ -16,7 +16,7 @@ export class UserPermsRequests {
   constructor(private http: HttpClient) {}
 
   // Returns data for all *non-parameterized* endpoints
-  // (i.e. endpoints like "/iam/v2/teams" but not "/iam/v2/users/{email}").
+  // (i.e. endpoints like "/apis/iam/v2/teams" but not "/apis/iam/v2/users/{email}").
   public fetchAll(): Observable<UserPermsResponse> {
     const url = `${env.iam_url}/introspect`;
     return this.http.get<UserPermsResponse>(url);
