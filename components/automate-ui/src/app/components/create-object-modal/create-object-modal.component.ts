@@ -9,6 +9,7 @@ import {
 } from 'app/entities/projects/project.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { PolicyCheckedMap, PolicyChecked } from 'app/entities/policies/policy.model';
 
 @Component({
   selector: 'app-create-object-modal',
@@ -28,10 +29,12 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Output() createClicked = new EventEmitter<Project[]>();
 
   public projects: ProjectCheckedMap = {};
+  public policies: PolicyCheckedMap = {};
   public modifyID = false; // Whether the edit ID form is open or not.
   public conflictError = false;
   public addPolicies = true;
   public projectsUpdatedEvent = new EventEmitter();
+  public policiesUpdatedEvent = new EventEmitter();
   public UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   private isDestroyed = new Subject<boolean>();
@@ -73,12 +76,22 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     this.createForm.controls.projects.setValue(projectsSelected);
   }
 
+  onPolicyChecked(policy: PolicyChecked): void {
+    this.policies[policy.id].checked = policy.checked;
+    const policiesSelected = Object.keys(this.policies).filter(id => this.policies[id].checked);
+    this.createForm.controls.projects.setValue(policiesSelected);
+  }
+
   updatePolicyCheckbox(event: boolean): void {
     this.addPolicies = event;
     this.createForm.controls.addPolicies.setValue(this.addPolicies);
   }
 
-  dropdownDisabled(): boolean {
+  policyDropdownDisabled(): boolean {
+    return Object.values(this.policies).length === 0;
+  }
+
+  projectDropdownDisabled(): boolean {
     return Object.values(this.projects).length === 0;
   }
 

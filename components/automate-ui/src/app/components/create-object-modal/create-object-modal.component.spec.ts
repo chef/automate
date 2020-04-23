@@ -22,6 +22,9 @@ describe('CreateObjectModalComponent', () => {
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-toolbar' }),
         MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
+        MockComponent({ selector: 'app-resource-dropdown',
+          inputs: ['resources', 'disabled', 'resourcesUpdated', 'objectNounPlural'],
+          outputs: ['onResourceChecked'] }),
         MockComponent({ selector: 'app-projects-dropdown',
           inputs: ['projects', 'disabled', 'projectsUpdated'],
           outputs: ['onProjectChecked'] })

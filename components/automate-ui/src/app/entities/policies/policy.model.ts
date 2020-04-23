@@ -14,6 +14,14 @@ export interface Statement {
   resources?: string[];
 }
 
+export interface PolicyChecked extends Policy {
+  checked: boolean;
+}
+
+export interface PolicyCheckedMap {
+  [id: string]: PolicyChecked;
+}
+
 export type IAMType = 'CHEF_MANAGED' | 'CUSTOM';
 
 export interface Member {
