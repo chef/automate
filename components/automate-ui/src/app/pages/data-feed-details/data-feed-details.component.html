@@ -44,7 +44,7 @@
           </chef-form-field>
         </form>
         <div>
-          <chef-button secondary [disabled]="testInProgress" (click)="sendTestForDataFeedUrl(destination)">
+          <chef-button secondary [disabled]="testInProgress" (click)="sendTestForDataFeedUrl()">
             <chef-loading-spinner *ngIf="testInProgress"></chef-loading-spinner>
             <span *ngIf="testInProgress">Testing...</span>
             <span *ngIf="!testInProgress">Test Data Feed</span>
@@ -54,7 +54,6 @@
             <span *ngIf="saveInProgress">Saving...</span>
             <span *ngIf="!saveInProgress">Save</span>
           </chef-button>
-          <span id="saved-note" *ngIf="saveSuccessful && !updateForm.dirty">All changes saved.</span>
         </div>
       </section>
     </main>

@@ -32,12 +32,12 @@ enum UrlTestState {
 export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   public tabValue: DestinationTabName = 'details';
   public destination: Destination;
-  private isDestroyed = new Subject<boolean>();
   public updateForm: FormGroup;
   public saveInProgress = false;
   public testInProgress = false;
   public saveSuccessful = false;
   public hookStatus = UrlTestState.Inactive;
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private fb: FormBuilder,
@@ -47,15 +47,6 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.layoutFacade.showSidebar(Sidebar.Settings);
-
-    this.updateForm = this.fb.group({
-      // Must stay in sync with error checks in data-feed-details.component.html
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      url: ['', [Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK),
-        Validators.pattern(Regex.patterns.VALID_FQDN)
-      ]]
-    });
 
     this.store.select(routeParams).pipe(
       pluck('id'),
@@ -77,6 +68,15 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
         this.updateForm.controls.name.setValue(this.destination.name);
         this.updateForm.controls.url.setValue(this.destination.url);
       });
+
+    this.updateForm = this.fb.group({
+      // Must stay in sync with error checks in data-feed-details.component.html
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      url: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.VALID_FQDN)
+      ]]
+    });
 
     this.store.pipe(
       select(updateStatus),
@@ -105,9 +105,15 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
     this.destination = destinationObj;
   }
 
-  public sendTestForDataFeedUrl(destination: Destination): void {
+  public sendTestForDataFeedUrl(): void {
     this.testInProgress = true;
-    this.store.dispatch(new TestDestination({destination}));
+    const destinationObj = {
+      id: this.destination.id,
+      name: this.updateForm.controls['name'].value.trim(),
+      url: this.updateForm.controls['url'].value.trim(),
+      secret: this.destination.secret
+    };
+    this.store.dispatch(new TestDestination({destination: destinationObj}));
     this.testInProgress = false;
   }
 
