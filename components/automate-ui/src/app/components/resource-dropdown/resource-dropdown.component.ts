@@ -58,10 +58,12 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.updateLabel();
-    // only update the projects list on initialization/the first change
-    if (changes.projects && changes.projects.firstChange) {
-      this.filteredProjects = this.projectsArray;
+    // TODO convert to self-contained modal so this only fires when component is visible.
+    if (changes.projects) {
+      this.updateLabel();
+      if (changes.projects.firstChange) { // only update on initialization/first change
+        this.filteredProjects = this.projectsArray;
+      }
     }
   }
 
