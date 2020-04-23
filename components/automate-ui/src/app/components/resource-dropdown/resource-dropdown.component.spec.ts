@@ -31,7 +31,7 @@ describe('ResourceDropdownComponent', () => {
   describe('dropdown', () => {
     beforeEach(() => {
       component.active = true;
-      component.filteredProjects = [
+      component.filteredResources = [
         {
           name: 'Project 1',
           id: 'project-1',
@@ -50,7 +50,7 @@ describe('ResourceDropdownComponent', () => {
       const options = Array.from(fixture.nativeElement.querySelectorAll('chef-checkbox'));
       expect(options.length).toEqual(2);
       options.forEach((option: HTMLInputElement, index: number) => {
-        const { name, checked } = component.filteredProjects[index];
+        const { name, checked } = component.filteredResources[index];
         expect(option.textContent).toEqual(name);
         expect(option.checked).toEqual(checked);
       });

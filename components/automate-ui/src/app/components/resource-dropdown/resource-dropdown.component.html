@@ -21,17 +21,17 @@
       </div>
 
       <div id="project-container">
-        <chef-checkbox *ngFor="let project of filteredProjects"
+        <chef-checkbox *ngFor="let project of filteredResources"
           [checked]="project.checked"
           [attr.title]="project.name"
-          (change)="projectChecked($event.detail, project)"
+          (change)="resourceChecked($event.detail, project)"
           (keydown.enter)="closeDropdown()"
           (keydown.esc)="closeDropdown()"
           (keydown.arrowup)="moveFocus($event)"
           (keydown.arrowdown)="moveFocus($event)">{{ project.name }}</chef-checkbox>
       </div>
 
-      <div class="no-projects" *ngIf="filteredProjects.length === 0">
+      <div class="no-projects" *ngIf="filteredResources.length === 0">
         <p>No projects found.</p>
         <p>You don't have access to any projects that match your search.</p>
       </div>

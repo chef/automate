@@ -28,7 +28,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   @Input() disabled = false;
 
   // Used to re-synchronize summary label if the set of checked items has changed.
-  // This optional input is needed only when re-displaying the project dropdown
+  // This optional input is needed only when re-displaying the resource dropdown
   // for *additional* resources, as with the create-object-modal-component.
   // Other consumers, e.g. team-details.component use it only for a single resource.
   @Input() resourcesUpdated: EventEmitter<boolean>;
@@ -39,12 +39,12 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // plural display name of resource
   @Input() objectNounPlural = 'MISSING REQUIRED PARAMETER';
 
-  // Emits a project that changed as a result of a check or uncheck.
+  // Emits a resource that changed as a result of a check or uncheck.
   @Output() onResourceChecked = new EventEmitter<ResourceChecked>();
 
-  // filteredProjects is merely a container to hold the projectsArray
+  // filteredResources is merely a container to hold the resourcesArray
   // that can be altered
-  public filteredProjects: ResourceChecked[] = [];
+  public filteredResources: ResourceChecked[] = [];
   public active = false;
   public label = this.noneSelectedLabel;
   public filterValue = '';
@@ -62,12 +62,12 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     if (changes.resources) {
       this.updateLabel();
       if (changes.resources.firstChange) { // only update on initialization/first change
-        this.filteredProjects = this.projectsArray;
+        this.filteredResources = this.resourcesArray;
       }
     }
   }
 
-  get projectsArray(): ResourceChecked[] {
+  get resourcesArray(): ResourceChecked[] {
     return ChefSorters.naturalSort(Object.values(this.resources), 'name');
   }
 
@@ -78,16 +78,16 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     }
     if (!this.active) {
       this.filterValue = '';
-      this.filteredProjects = this.projectsArray;
+      this.filteredResources = this.resourcesArray;
     }
 
     this.active = !this.active;
   }
 
-  projectChecked(checked: boolean, project: ResourceChecked): void {
-    project.checked = checked;
+  resourceChecked(checked: boolean, resource: ResourceChecked): void {
+    resource.checked = checked;
     this.updateLabel();
-    this.onResourceChecked.emit(project);
+    this.onResourceChecked.emit(resource);
   }
 
   closeDropdown(): void {
@@ -97,12 +97,8 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   }
 
   handleFilterKeyUp(): void {
-    this.filteredProjects = this.filterProjects(this.filterValue);
-  }
-
-  filterProjects(value: string): ResourceChecked[]  {
-    return this.projectsArray.filter(project =>
-      project.id.toLowerCase().indexOf(value.toLowerCase()) > -1
+    this.filteredResources = this.resourcesArray.filter(resource =>
+      resource.id.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1
     );
   }
 
@@ -125,9 +121,9 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   }
 
   private updateLabel(): void {
-    const checkedProjects = Object.values(this.resources).filter(p => p.checked);
-    this.label = checkedProjects.length === 0 ? this.noneSelectedLabel
-      : checkedProjects.length === 1 ? checkedProjects[0].name
-        : `${checkedProjects.length} ${this.objectNounPlural}`;
+    const checkedResources = Object.values(this.resources).filter(p => p.checked);
+    this.label = checkedResources.length === 0 ? this.noneSelectedLabel
+      : checkedResources.length === 1 ? checkedResources[0].name
+        : `${checkedResources.length} ${this.objectNounPlural}`;
   }
 }
