@@ -53,8 +53,8 @@ func TestIntrospectAll(t *testing.T) {
 				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
 			map[string]*response.MethodsAllowed{
-				"/iam/v2/introspect":   &response.MethodsAllowed{Get: true},
-				"/notifications/rules": &response.MethodsAllowed{Post: true},
+				"/apis/iam/v2/introspect": &response.MethodsAllowed{Get: true},
+				"/notifications/rules":    &response.MethodsAllowed{Post: true},
 			},
 		},
 		"two response pairs, both mapped, one with holes": {
@@ -140,12 +140,12 @@ func TestIntrospectSome(t *testing.T) {
 				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
-				"/iam/v2/introspect",
+				"/apis/iam/v2/introspect",
 				"/notifications/rules",
 			}},
 			map[string]*response.MethodsAllowed{
-				"/iam/v2/introspect":   {Get: true},
-				"/notifications/rules": {Post: true},
+				"/apis/iam/v2/introspect": {Get: true},
+				"/notifications/rules":    {Post: true},
 			},
 		},
 	}
@@ -188,8 +188,8 @@ func TestIntrospect(t *testing.T) {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "iam:policies:f33a996c-b4e8-4328-9730-90f4b351fa6e", Action: "iam:policies:delete"},
 			}},
-			&request.IntrospectReq{Path: "/iam/v2/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e"},
-			map[string]*response.MethodsAllowed{"/iam/v2/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e": &response.MethodsAllowed{Delete: true}},
+			&request.IntrospectReq{Path: "/apis/iam/v2/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e"},
+			map[string]*response.MethodsAllowed{"/apis/iam/v2/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e": &response.MethodsAllowed{Delete: true}},
 		},
 		"response pair matching the request with param in POST body": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
