@@ -20,8 +20,8 @@ export interface ResourceCheckedMap {
 
 export class ResourceDropdownComponent implements OnInit, OnChanges {
 
-  // The map of ResourceChecked by id. Any checked changes propagated via
-  // onProjectChecked. Updates should be applied to parent component state.
+  // The map of ResourceChecked by id. Any checked changes propagated via onResourceChecked.
+  // Updates should be applied to parent component state.
   @Input() resources: ResourceCheckedMap = {};
 
   // Setting disabled to true means the dropdown will be unusable and will have a grey background
@@ -40,7 +40,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   @Input() objectNounPlural = 'MISSING REQUIRED PARAMETER';
 
   // Emits a project that changed as a result of a check or uncheck.
-  @Output() onProjectChecked = new EventEmitter<ResourceChecked>();
+  @Output() onResourceChecked = new EventEmitter<ResourceChecked>();
 
   // filteredProjects is merely a container to hold the projectsArray
   // that can be altered
@@ -87,7 +87,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   projectChecked(checked: boolean, project: ResourceChecked): void {
     project.checked = checked;
     this.updateLabel();
-    this.onProjectChecked.emit(project);
+    this.onResourceChecked.emit(project);
   }
 
   closeDropdown(): void {
