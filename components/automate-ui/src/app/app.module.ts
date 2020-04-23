@@ -71,6 +71,7 @@ import { ClientRunsRequests } from './entities/client-runs/client-runs.requests'
 import { CredentialRequests } from './entities/credentials/credential.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
 import { DestinationRequests } from './entities/destinations/destination.requests';
+import { NodesRequests } from './entities/nodes/nodes.requests';
 import { JobRequests } from './entities/jobs/job.requests';
 import { LicenseStatusRequests } from './entities/license/license.requests';
 import { ManagerRequests } from './entities/managers/manager.requests';
@@ -285,6 +286,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     CredentialRequests,
     DesktopRequests,
     DestinationRequests,
+    NodesRequests,
     EventFeedService,
     FeatureFlagsService,
     HistorySelection,

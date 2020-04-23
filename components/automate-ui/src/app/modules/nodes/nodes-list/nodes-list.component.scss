@@ -1,0 +1,21 @@
+@import "~styles/variables";
+
+chef-td {
+    font-size: 80%;
+}
+
+chef-tr {
+    height: 60px;
+}
+
+chef-icon.FAILED {
+    color: $chef-critical;
+}
+
+chef-icon.PASSED {
+    color: $chef-success;
+}
+
+chef-icon.UNKNOWN {
+    color: $chef-dark-grey;
+}
