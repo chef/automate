@@ -47,7 +47,7 @@ The default is to label health check reports as disconnected after 5 minutes, an
 
 The Client Runs data lifecycle settings allow you to remove data after a set amount of days.
 They also allow you to label nodes as missing and automatically remove them after a set amount of days.
-The default is to remove Chef Infra Client run data after 30 days, to label nodes as missing after 1 days and to remove nodes labeled as missing after 30 days.
+The default is to remove Chef Infra Client run data after 30 days, to label nodes as missing after 1 day, and to remove nodes labeled as missing after 30 days.
 
 ### Compliance
 
