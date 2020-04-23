@@ -265,10 +265,12 @@ describe('AuthorizedComponent real round trip', () => {
       visible = isAuthorized;
     });
 
-    authorizedChecker.setPermissions([<CheckObj>{ endpoint: '/apis/iam/v2/teams', verb: 'get' }], []);
+    authorizedChecker.setPermissions(
+      [<CheckObj>{ endpoint: '/apis/iam/v2/teams', verb: 'get' }], []);
     setTimeout(() => {
       expect(visible).toBe(true);
-      authorizedChecker.setPermissions([<CheckObj>{ endpoint: '/apis/iam/v2/users', verb: 'get' }], []);
+      authorizedChecker.setPermissions(
+        [<CheckObj>{ endpoint: '/apis/iam/v2/users', verb: 'get' }], []);
       setTimeout(() => {
         expect(visible).toBe(false);
         authorizedChecker.setPermissions([<CheckObj>{
