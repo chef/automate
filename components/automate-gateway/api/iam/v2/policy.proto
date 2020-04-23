@@ -63,7 +63,7 @@ service Policies {
 			}
 		};
     option (google.api.http) = {
-      post: "/apis/apis/iam/v2/policies"
+      post: "/apis/iam/v2/policies"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "iam:policies";
