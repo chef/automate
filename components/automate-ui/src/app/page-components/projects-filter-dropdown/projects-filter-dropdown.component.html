@@ -21,7 +21,8 @@
           <input
             chefInput
             type="text"
-            (keyup)="handleFilterKeyUp($event.target.value)"
+            #filter
+            (keyup)="handleFilterKeyUp(filter.value)"
             placeholder="Filter projects..." />
         </div>
 
