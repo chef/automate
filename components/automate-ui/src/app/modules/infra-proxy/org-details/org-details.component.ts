@@ -26,6 +26,8 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean>;
   public serverId;
   public orgId;
+  public cookbooksTab = true;
+  public rolesTab = false;
   private isDestroyed = new Subject<boolean>();
 
   previousRoute$: Observable<RouterState>;
@@ -36,6 +38,14 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     private telemetryService: TelemetryService
   ) {
       this.previousRoute$ = this.store.select(previousRoute);
+
+      // condition for breadcrumb to select specific tab
+      this.previousRoute$.subscribe((params: any) => {
+        if ( params.path.includes('roles') ) {
+          this.cookbooksTab = false;
+          this.rolesTab = true;
+        }
+      });
     }
 
   ngOnInit() {
