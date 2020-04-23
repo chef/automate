@@ -33,10 +33,10 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // Other consumers, e.g. team-details.component use it only for a single resource.
   @Input() resourcesUpdated: EventEmitter<boolean>;
 
-  // Label to use when none are selected
+  // Label to use when none are selected.
   @Input() noneSelectedLabel = 'None';
 
-  // plural display name of resource
+  // Plural display name of resource.
   @Input() objectNounPlural = 'MISSING REQUIRED PARAMETER';
 
   // Emits a resource that changed as a result of a check or uncheck.
