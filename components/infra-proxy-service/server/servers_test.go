@@ -40,9 +40,8 @@ func TestServers(t *testing.T) {
 	}
 	newSecret := secrets.Secret{
 		Name: "infra-proxy-service-admin-key",
-		Type: "ssh",
+		Type: "chef-server",
 		Data: []*query.Kv{
-			{Key: "username", Value: "admin"},
 			{Key: "key", Value: "--KEY--"},
 		},
 	}
