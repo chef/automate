@@ -38,9 +38,11 @@ func NewChefIngestServer(client backend.Client, authzClient iam_v2.ProjectsClien
 	nodesClient nodes.NodesServiceClient) *ChefIngestServer {
 	return &ChefIngestServer{
 		chefRunPipeline: pipeline.NewChefRunPipeline(client, authzClient,
-			nodeMgrClient, chefIngestServerConfig.ChefIngestRunPipelineConfig),
+			nodeMgrClient, chefIngestServerConfig.ChefIngestRunPipelineConfig,
+			chefIngestServerConfig.MessageBufferSize),
 		chefActionPipeline: pipeline.NewChefActionPipeline(client, authzClient,
-			chefIngestServerConfig.MaxNumberOfBundledActionMsgs),
+			chefIngestServerConfig.MaxNumberOfBundledActionMsgs,
+			chefIngestServerConfig.MessageBufferSize),
 		client:        client,
 		authzClient:   authzClient,
 		nodeMgrClient: nodeMgrClient,

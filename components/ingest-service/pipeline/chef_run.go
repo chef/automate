@@ -28,9 +28,10 @@ type ChefRunPipeline struct {
 // NewChefRunPipeline Create a new chef run pipeline
 func NewChefRunPipeline(client backend.Client, authzClient iam_v2.ProjectsClient,
 	nodeMgrClient manager.NodeManagerServiceClient,
-	chefIngestRunPipelineConfig serveropts.ChefIngestRunPipelineConfig) ChefRunPipeline {
+	chefIngestRunPipelineConfig serveropts.ChefIngestRunPipelineConfig,
+	messageBufferSize int) ChefRunPipeline {
 	var (
-		in            = make(chan message.ChefRun, 100)
+		in            = make(chan message.ChefRun, messageBufferSize)
 		counter int64 = 0
 	)
 

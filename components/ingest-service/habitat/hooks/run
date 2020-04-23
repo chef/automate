@@ -33,6 +33,10 @@ CONFIG="$CONFIG --number-of-run-msgs-transformers {{cfg.service.number_of_run_ms
 CONFIG="$CONFIG --number-of-run-msg-publishers {{cfg.service.number_of_run_msg_publishers}}"
 {{~/if}}
 
+{{~#if cfg.service.message_buffer_size }}
+CONFIG="$CONFIG --message-buffer-size {{cfg.service.message_buffer_size}}"
+{{~/if}}
+
 # If we have a config pointing to an specific host,
 # lets use it, otherwise use the ipaddress of the server
 #

@@ -21,9 +21,9 @@ type ChefActionPipeline struct {
 
 // NewChefActionPipeline Create a new chef action pipeline
 func NewChefActionPipeline(client backend.Client, authzClient iam_v2.ProjectsClient,
-	maxNumberOfBundledActionMsgs int) ChefActionPipeline {
+	maxNumberOfBundledActionMsgs int, messageBufferSize int) ChefActionPipeline {
 	var (
-		in            = make(chan message.ChefAction, 100)
+		in            = make(chan message.ChefAction, messageBufferSize)
 		counter int64 = 0
 	)
 
