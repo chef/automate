@@ -11,40 +11,6 @@
     "application/json"
   ],
   "paths": {
-    "/apis/apis/iam/v2/policies": {
-      "post": {
-        "summary": "Creates a custom policy",
-        "description": "Creates a custom IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass `\"projects\": [\"*\"]` to scope a statement to every project.\n\nA policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),\nwhereas the *statement-level* projects list defines which projects the statement applies to.\n\nThe example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role\non a few projects for all LDAP teams and a custom role `qa` on a specific project.\n\nAuthorization Action:\n```\niam:policies:create\n```",
-        "operationId": "CreatePolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.CreatePolicyResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.CreatePolicyReq"
-            }
-          }
-        ],
-        "tags": [
-          "policies"
-        ],
-        "x-code-samples": [
-          {
-            "lang": "JSON",
-            "source": "{\"name\": \"My Viewer Policy\",\"id\": \"custom-viewer-policy\",\"members\": [\"team:ldap:*\"], \"statements\": [{\"role\": \"viewer\",\"projects\": [\"project1\", \"project2\"], \"effect\": \"ALLOW\"},{\"role\": \"qa\",\"projects\": [\"acceptanceProject\"], \"effect\": \"ALLOW\"}],\"projects\": []}"
-          }
-        ]
-      }
-    },
     "/apis/iam/v2/introspect_projects": {
       "get": {
         "operationId": "IntrospectAllProjects",
@@ -76,6 +42,38 @@
         },
         "tags": [
           "policies"
+        ]
+      },
+      "post": {
+        "summary": "Creates a custom policy",
+        "description": "Creates a custom IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass `\"projects\": [\"*\"]` to scope a statement to every project.\n\nA policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),\nwhereas the *statement-level* projects list defines which projects the statement applies to.\n\nThe example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role\non a few projects for all LDAP teams and a custom role `qa` on a specific project.\n\nAuthorization Action:\n```\niam:policies:create\n```",
+        "operationId": "CreatePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.CreatePolicyResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.CreatePolicyReq"
+            }
+          }
+        ],
+        "tags": [
+          "policies"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"My Viewer Policy\",\"id\": \"custom-viewer-policy\",\"members\": [\"team:ldap:*\"], \"statements\": [{\"role\": \"viewer\",\"projects\": [\"project1\", \"project2\"], \"effect\": \"ALLOW\"},{\"role\": \"qa\",\"projects\": [\"acceptanceProject\"], \"effect\": \"ALLOW\"}],\"projects\": []}"
+          }
         ]
       }
     },

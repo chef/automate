@@ -1912,7 +1912,7 @@ func RegisterPoliciesHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 }
 
 var (
-	pattern_Policies_CreatePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 0, 2, 1, 2, 2, 2, 3}, []string{"apis", "iam", "v2", "policies"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Policies_CreatePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"apis", "iam", "v2", "policies"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Policies_GetPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"apis", "iam", "v2", "policies", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 

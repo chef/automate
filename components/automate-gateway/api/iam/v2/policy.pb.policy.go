@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/CreatePolicy", "iam:policies", "iam:policies:create", "POST", "/apis/apis/iam/v2/policies", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Policies/CreatePolicy", "iam:policies", "iam:policies:create", "POST", "/apis/iam/v2/policies", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreatePolicyReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
