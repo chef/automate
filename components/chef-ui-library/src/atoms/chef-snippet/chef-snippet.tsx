@@ -60,6 +60,15 @@ export class ChefSnippet {
   }
 
   private highlight(code: string, lang = 'html'): string {
-    return Prism.highlight(code, Prism.languages[lang]);
+    let grammar = Prism.languages[lang];
+
+    // If the grammar rules for the specified language are unavailable then
+    // default to 'none' (no color highlighting, formatted plain text only)
+    if (!grammar) {
+      grammar = {};
+      lang = 'none';
+    }
+
+    return Prism.highlight(code, grammar, lang);
   }
 }
