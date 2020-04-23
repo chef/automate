@@ -1,51 +1,8 @@
-<label>
-  Projects
-</label>
-<div class="dropdown-wrap">
-  <button class="dropdown-button"
-    aria-label="Select projects"
-    (click)="toggleDropdown($event)"
-    [ngClass]="{'active': active}"
-    [disabled]="disabled"
-    (keydown.arrowup)="moveFocus($event)"
-    (keydown.arrowdown)="moveFocus($event)">
-    <div id="projects-selected">{{ (label.length &gt; 25)? (label | slice:0:25)+'...' : label }}</div>
-    <chef-icon aria-hidden>keyboard_arrow_down</chef-icon>
-  </button>
-  <chef-click-outside (clickOutside)="closeDropdown()">
-    <chef-dropdown [attr.visible]="active">
-
-      <div id="filter-container">
-        <input 
-          chefInput
-          type="text"
-          [(ngModel)]="filterValue"
-          placeholder="Filter projects..." 
-          (keyup)="handleFilterKeyUp()"
-          />
-      </div>
-
-      <div id="project-container">
-        <chef-checkbox
-          *ngFor="let project of filteredProjects"
-          [checked]="project.checked"
-          [attr.title]="project.name"
-          (change)="projectChecked($event.detail, project)"
-          (keydown.enter)="closeDropdown()"
-          (keydown.esc)="closeDropdown()"
-          (keydown.arrowup)="moveFocus($event)"
-          (keydown.arrowdown)="moveFocus($event)">{{ project.name }}</chef-checkbox>
-      </div>
-
-      <div class="no-projects" *ngIf="filteredProjects.length === 0">
-        <p>No projects found.</p>
-        <p>You don't have access to any projects that match your search.</p>
-      </div>
-
-    </chef-dropdown>
-  </chef-click-outside>
-</div>
-<p class="help-text light">
-  Projects group resources together for role-based access.<br/>
-  Expecting more projects? Try adjusting your filters.
-</p>
+<app-resource-dropdown
+  [projects]="projects"
+  [disabled]="disabled"
+  [projectsUpdated]="projectsUpdated"
+  (onProjectChecked)="onResourceChecked($event)"
+  [objectNounPlural]="objectNounPlural"
+  [noneSelectedLabel]="noneSelectedLabel">
+</app-resource-dropdown>
