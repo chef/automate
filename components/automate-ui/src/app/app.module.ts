@@ -112,9 +112,6 @@ import {
   DeletableNodeControlComponent
 } from './page-components/deletable-node-control/deletable-node-control.component';
 import {
-  DeleteDatafeedDialogComponent
-} from './page-components/delete-data-feed-dialog/delete-data-feed-dialog.component';
-import {
   DeleteNotificationDialogComponent
 } from './page-components/delete-notification-dialog/delete-notification-dialog.component';
 import { DeltaViewerComponent } from './page-components/delta-viewer/delta-viewer.component';
@@ -203,7 +200,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     DataFeedDetailsComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
-    DeleteDatafeedDialogComponent,
     DeleteNotificationDialogComponent,
     DeltaViewerComponent,
     EventFeedComponent,
@@ -248,7 +244,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     WelcomeModalComponent
   ],
   entryComponents: [
-    DeleteDatafeedDialogComponent,
     DeleteNotificationDialogComponent
   ],
   imports: [
