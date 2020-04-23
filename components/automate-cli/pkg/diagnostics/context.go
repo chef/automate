@@ -351,13 +351,29 @@ func (c *testContext) adminToken() (string, error) {
 }
 
 func (c *testContext) CleanupAdminToken() error {
-	_, err := c.DoLBRequest(
+	resp, err := c.DoLBRequest(
 		fmt.Sprintf("/apis/iam/v2/tokens/%s", c.Globals.TokenID),
 		lbrequest.WithMethod("DELETE"),
 	)
 	if err != nil {
-		return errors.Wrap(err, "Could not delete admin token generated for diagnostics")
+		return errors.Wrap(err, "Failed to clean up the diagnostics admin token")
+	}
+	defer resp.Body.Close()
+
+	// as long as the delete was successful or the token is not found
+	// we consider the cleanup a success
+	if resp.StatusCode == 200 || resp.StatusCode == 404 {
+		return nil
 	}
 
-	return nil
+	r := struct {
+		Msg string `json:"message"`
+	}{}
+	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
+		return errors.Wrap(err, "Failed to decode delete response")
+	}
+
+	// DoLBRequest only catches 500s and 403
+	// for any other non-200 or 404 status code, we assume something unexpected occured
+	return errors.Errorf("Unexpected response when cleaning up the diagnostics admin token: %d %s", resp.StatusCode, r.Msg)
 }

@@ -248,8 +248,15 @@ func (r *Runner) Run() error {
 	}
 
 	// test context generates an admin token to exercise the APIs
-	// so we clean it up here
-	r.tstContext.CleanupAdminToken()
+	// so we always clean it up here
+	r.reporter.ReportCleanupStart("diagnostic-admin-token")
+	err := r.tstContext.CleanupAdminToken()
+	if err != nil {
+		r.reporter.ReportCleanupErrored("diagnostic-admin-token", fmt.Sprintf("%+v", err))
+		errs = append(errs, err)
+	} else {
+		r.reporter.ReportCleanupSuccess("diagnostic-admin-token")
+	}
 
 	return multierr.Combine(errs...)
 }
