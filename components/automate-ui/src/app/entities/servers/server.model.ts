@@ -4,5 +4,5 @@ export interface Server {
   description: string;
   fqdn: string;
   ip_address: string;
-  orgs_count?: string;
+  orgs_count?: number;
 }

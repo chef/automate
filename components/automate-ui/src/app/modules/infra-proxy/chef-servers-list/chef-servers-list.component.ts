@@ -30,6 +30,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public serverToDelete: Server;
   public deleteModalVisible = false;
+  public messageModalVisible = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -122,8 +123,12 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
 
   public startServerDelete($event: ChefKeyboardEvent, server: Server): void {
     if ($event.isUserInput) {
-      this.serverToDelete = server;
-      this.deleteModalVisible = true;
+      if (server.orgs_count > 0) {
+        this.messageModalVisible = true;
+      } else {
+        this.serverToDelete = server;
+        this.deleteModalVisible = true;
+      }
     }
   }
 
@@ -134,5 +139,9 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+  }
+
+  public closeMessageModal(): void {
+    this.messageModalVisible = false;
   }
 }
