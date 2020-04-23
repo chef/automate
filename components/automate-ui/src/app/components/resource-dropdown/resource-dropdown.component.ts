@@ -22,7 +22,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   // The map of ResourceChecked by id. Any checked changes propagated via
   // onProjectChecked. Updates should be applied to parent component state.
-  @Input() projects: ResourceCheckedMap = {};
+  @Input() resources: ResourceCheckedMap = {};
 
   // Setting disabled to true means the dropdown will be unusable and will have a grey background
   @Input() disabled = false;
@@ -59,16 +59,16 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     // TODO convert to self-contained modal so this only fires when component is visible.
-    if (changes.projects) {
+    if (changes.resources) {
       this.updateLabel();
-      if (changes.projects.firstChange) { // only update on initialization/first change
+      if (changes.resources.firstChange) { // only update on initialization/first change
         this.filteredProjects = this.projectsArray;
       }
     }
   }
 
   get projectsArray(): ResourceChecked[] {
-    return ChefSorters.naturalSort(Object.values(this.projects), 'name');
+    return ChefSorters.naturalSort(Object.values(this.resources), 'name');
   }
 
   toggleDropdown(event: MouseEvent): void {
@@ -125,7 +125,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   }
 
   private updateLabel(): void {
-    const checkedProjects = Object.values(this.projects).filter(p => p.checked);
+    const checkedProjects = Object.values(this.resources).filter(p => p.checked);
     this.label = checkedProjects.length === 0 ? this.noneSelectedLabel
       : checkedProjects.length === 1 ? checkedProjects[0].name
         : `${checkedProjects.length} ${this.objectNounPlural}`;
