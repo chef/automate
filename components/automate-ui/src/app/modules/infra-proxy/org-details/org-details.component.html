@@ -25,10 +25,10 @@
       </chef-page-header>
       <div class="main page-body">
         <app-tabs class="tabs-row" (tabChange)="tabChange($event)">
-          <app-tab tabTitle="Cookbooks" #cookbooks_tab [active]="true">
+          <app-tab tabTitle="Cookbooks" #cookbooks_tab [active]="cookbooksTab">
             <app-cookbooks *ngIf="cookbooks_tab.active" [serverId]="serverId" [orgId]="orgId"></app-cookbooks>
           </app-tab>
-          <app-tab tabTitle="Roles" #roles_tab  [active]="false">
+          <app-tab tabTitle="Roles" #roles_tab  [active]="rolesTab">
             <app-infra-roles *ngIf="roles_tab.active" [serverId]="serverId" [orgId]="orgId"></app-infra-roles>
           </app-tab>
           <app-tab tabTitle="Details" #details_tab [active]="false">
