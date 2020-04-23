@@ -37,8 +37,12 @@ func bulkRunPublisherBundler(in <-chan message.ChefRun, client backend.Client,
 	go func() {
 		bundledMsgs := []message.ChefRun{}
 		for msg := range in {
-			// Add the message to the bundle
-			bundledMsgs = append(bundledMsgs, msg)
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+			} else {
+				// Add the message to the bundle
+				bundledMsgs = append(bundledMsgs, msg)
+			}
 
 			// Only publish the collection of bundled messages if
 			// the inbox is empty or there are over maxNumberOfBundledRunMsgs number of messages bundled
@@ -95,8 +99,12 @@ func bulkActionPublisherBundler(in <-chan message.ChefAction, client backend.Cli
 	go func() {
 		bundledMsgs := []message.ChefAction{}
 		for msg := range in {
-			// Add the message to the bundle
-			bundledMsgs = append(bundledMsgs, msg)
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+			} else {
+				// Add the message to the bundle
+				bundledMsgs = append(bundledMsgs, msg)
+			}
 
 			// Only publish the collection of bundled messages if
 			// the inbox is empty or there are over maxNumberOfBundledActionMsgs number of messages bundled

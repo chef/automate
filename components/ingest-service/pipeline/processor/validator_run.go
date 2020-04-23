@@ -18,6 +18,11 @@ func MessageValidator(in <-chan message.ChefRun) <-chan message.ChefRun {
 				"buffer_size": len(out),
 			}).Debug("MessageValidator ChefRun")
 
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+				continue
+			}
+
 			if msg.Run.EntityUuid == "" {
 				msg.FinishProcessing(status.Errorf(codes.InvalidArgument, "the entity_uuid is missing from the message"))
 				continue

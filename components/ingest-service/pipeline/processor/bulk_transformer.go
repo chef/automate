@@ -18,17 +18,22 @@ func runMsgToBulkRequestTransformer(in <-chan message.ChefRun, client backend.Cl
 	out := make(chan message.ChefRun, 2000)
 	go func() {
 		for msg := range in {
-			msg.BulkableRequests = []elastic.BulkableRequest{
-				client.CreateBulkRunUpdateRequest(msg.NodeRun),
-				client.CreateBulkNodeUpdateRequest(msg.Node),
-				client.CreateBulkNodeAttributeUpdateRequest(msg.NodeAttribute),
-			}
-
 			log.WithFields(log.Fields{
 				"message_id":  msg.ID,
 				"buffer_size": len(out),
 				"message":     "ChefRun",
 			}).Debug("Transforming to bulk")
+
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+				continue
+			}
+
+			msg.BulkableRequests = []elastic.BulkableRequest{
+				client.CreateBulkRunUpdateRequest(msg.NodeRun),
+				client.CreateBulkNodeUpdateRequest(msg.Node),
+				client.CreateBulkNodeAttributeUpdateRequest(msg.NodeAttribute),
+			}
 
 			out <- msg
 		}
@@ -48,6 +53,11 @@ func actionMsgToBulkRequestTransformer(in <-chan message.ChefAction, client back
 	out := make(chan message.ChefAction, 1000)
 	go func() {
 		for msg := range in {
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+				continue
+			}
+
 			msg.BulkableRequests = []elastic.BulkableRequest{
 				client.CreateBulkActionRequest(msg.InternalChefAction),
 			}

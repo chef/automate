@@ -44,8 +44,8 @@ func (caPipeline *ChefActionPipeline) GetTotalMessages() int64 {
 }
 
 // Run a chef client action through the pipeline
-func (caPipeline *ChefActionPipeline) Run(action *chef.Action, errc chan<- error) {
-	chefAction := message.NewChefAction(context.Background(), action, errc)
+func (caPipeline *ChefActionPipeline) Run(ctx context.Context, action *chef.Action, errc chan<- error) error {
+	chefAction := message.NewChefAction(ctx, action, errc)
 
 	log.WithFields(log.Fields{
 		"message_id":  chefAction.ID,
@@ -53,7 +53,12 @@ func (caPipeline *ChefActionPipeline) Run(action *chef.Action, errc chan<- error
 		"buffer_size": len(caPipeline.in),
 	}).Debug("Running message through the pipeline")
 
-	caPipeline.in <- chefAction
+	select {
+	case caPipeline.in <- chefAction:
+	default:
+		return ErrQueueFull
+	}
+	return nil
 }
 
 // Close the Pipeline and do all clean up

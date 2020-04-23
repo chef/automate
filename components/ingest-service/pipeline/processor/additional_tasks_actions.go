@@ -29,6 +29,11 @@ func chefActionPerform(in <-chan message.ChefAction, client backend.Client) <-ch
 				"buffer_size": len(out),
 			}).Debug("Performing action")
 
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+				continue
+			}
+
 			action := msg.Action
 
 			if action.GetTask() == "delete" && action.GetEntityType() == "node" {

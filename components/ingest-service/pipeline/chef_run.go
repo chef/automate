@@ -1,6 +1,8 @@
 package pipeline
 
 import (
+	"errors"
+
 	chef "github.com/chef/automate/api/external/ingest/request"
 
 	"context"
@@ -14,6 +16,8 @@ import (
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	log "github.com/sirupsen/logrus"
 )
+
+var ErrQueueFull = errors.New("Message rejected because queue is full")
 
 // ChefRunPipeline pipeline to process Chef client runs
 type ChefRunPipeline struct {
@@ -52,8 +56,8 @@ func (crPipeline *ChefRunPipeline) GetTotalMessages() int64 {
 }
 
 // Run a chef client run through the pipeline
-func (crPipeline *ChefRunPipeline) Run(run *chef.Run, errc chan<- error) {
-	chefRun := message.NewChefRun(context.Background(), run, errc)
+func (crPipeline *ChefRunPipeline) Run(ctx context.Context, run *chef.Run, errc chan<- error) error {
+	chefRun := message.NewChefRun(ctx, run, errc)
 
 	log.WithFields(log.Fields{
 		"message_id":  chefRun.ID,
@@ -61,7 +65,12 @@ func (crPipeline *ChefRunPipeline) Run(run *chef.Run, errc chan<- error) {
 		"buffer_size": len(crPipeline.in),
 	}).Debug("Running message through the pipeline")
 
-	crPipeline.in <- chefRun
+	select {
+	case crPipeline.in <- chefRun:
+	default:
+		return ErrQueueFull
+	}
+	return nil
 }
 
 // Close the Pipeline and do all clean up

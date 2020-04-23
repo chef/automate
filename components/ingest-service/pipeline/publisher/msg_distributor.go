@@ -27,6 +27,11 @@ func msgDistributor(in <-chan message.ChefRun,
 
 	go func() {
 		for msg := range in {
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+				continue
+			}
+
 			sendMessage(pipeInChannels, msg)
 		}
 		close(out)

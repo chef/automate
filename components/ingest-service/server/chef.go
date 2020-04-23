@@ -65,8 +65,11 @@ func (s *ChefIngestServer) ProcessChefRun(ctx context.Context, run *chef.Run) (*
 		errc := make(chan error)
 		defer close(errc)
 
-		s.chefRunPipeline.Run(run, errc)
-		err = <-errc
+		if errQ := s.chefRunPipeline.Run(ctx, run, errc); errQ != nil {
+			err = errQ
+		} else {
+			err = <-errc
+		}
 
 		if err != nil {
 			log.WithError(err).Error("Chef run ingestion failure")
@@ -95,8 +98,12 @@ func (s *ChefIngestServer) ProcessChefAction(ctx context.Context, action *chef.A
 		errc := make(chan error)
 		defer close(errc)
 
-		s.chefActionPipeline.Run(action, errc)
-		err := <-errc
+		var err error
+		if errQ := s.chefActionPipeline.Run(ctx, action, errc); err != nil {
+			err = errQ
+		} else {
+			err = <-errc
+		}
 
 		if err != nil {
 			log.WithError(err).Error("Chef Action ingestion failure")
