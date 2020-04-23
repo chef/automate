@@ -10,6 +10,7 @@ import (
 
 func main() {
 	parser := protoparse.Parser{
+		IncludeSourceCodeInfo: true,
 		ImportPaths: []string{
 			".",
 			"vendor/github.com/grpc-ecosystem/grpc-gateway",                         // protoc-gen-swagger/options/annotations.proto
@@ -17,7 +18,9 @@ func main() {
 			"vendor/github.com/envoyproxy/protoc-gen-validate/",                     // validate/validate.proto
 		},
 	}
-	printer := protoprint.Printer{}
+	printer := protoprint.Printer{
+		Compact: true,
+	}
 
 	fs, err := parser.ParseFiles(os.Args[1:]...)
 	if err != nil {
