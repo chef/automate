@@ -1,19 +1,15 @@
 syntax = "proto3";
-
 package chef.automate.api.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/external/infra_proxy/response";
-
 message DataBags {
-    // Data bags item list.
-    repeated DataBagListItem data_bags = 2;
+  // Data bags item list.
+  repeated DataBagListItem data_bags = 2;
 }
-
 message DataBagListItem {
-    // Data bag item name.
-    string name = 1;
+  // Data bag item name.
+  string name = 1;
 }
-
 message DataBag {
-    // Stringified json of data bag item.
-    string data = 1;
+  // Stringified json of data bag item.
+  string data = 1;
 }

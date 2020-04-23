@@ -1,29 +1,21 @@
 syntax = "proto3";
-
 package notifications;
-
 option go_package = "api";
-
 ////
 // Notifications messages and responses
 ////
-
-
 message ExceptionInfo {
   string class = 1;
   string title = 2;
   string msg = 3;
   repeated string backtrace = 4;
 }
-
 message TimeInfo {
   string start_time = 1;
   string end_time = 2;
 }
-
 message Profile {
   message Control {
-
     message Result {
       string status = 1;
       string code_desc = 2;
@@ -32,14 +24,12 @@ message Profile {
       string message = 5;
       string skip_message = 6;
     }
-
     message ResultTotals {
       int32 num_tests = 1;
       int32 num_failed_tests = 2;
       int32 num_skipped_tests = 3;
       int32 num_passed_tests = 4;
     }
-
     string id = 1;
     float impact = 2;
     string title = 3;
@@ -47,20 +37,17 @@ message Profile {
     string desc = 5;
     SourceLocation source_location = 6;
     repeated Refs refs = 7;
-    reserved 8;// google.protobuf.Struct tags = 8;
+    reserved 8;
     repeated Result failed_results = 9;
     ResultTotals stats = 10;
   }
-
   message Attribute {
     message Options {
       string description = 1;
     }
-
     string name = 1;
     Options options = 2;
   }
-
   message ControlTotals {
     // The number of controls in the profile
     int32 num_tests = 1;
@@ -71,7 +58,6 @@ message Profile {
     // The number of controls that passed
     int32 num_passed_tests = 4;
   }
-
   string name = 1;
   string title = 2;
   string version = 3;
@@ -86,27 +72,23 @@ message Profile {
   repeated Control failed_controls = 12;
   ControlTotals stats = 13;
 }
-
 message SourceLocation {
-	string ref = 1;
-	int32 line = 2;
+  string ref = 1;
+  int32 line = 2;
 }
-
 message Refs {
-  reserved 1; //string ref = 1; because the 'ref' can be an array also
+  reserved 1;
   string uri = 2;
   string url = 3;
 }
-
 message PlatformSupport {
-	string inspec = 1;
-	// TODO: this needs to be os-name in json
-	string os_name = 2;
-	// TODO: this needs to be os-family in json
-	string os_family = 3;
-	string release = 4;
+  string inspec = 1;
+  // TODO: this needs to be os-name in json
+  string os_name = 2;
+  // TODO: this needs to be os-family in json
+  string os_family = 3;
+  string release = 4;
 }
-
 message ComplianceSuccess {
   string id = 1;
   string compliance_url = 2;
@@ -115,7 +97,6 @@ message ComplianceSuccess {
   string end_time = 5;
   string timestamp = 6;
 }
-
 message ComplianceFailure {
   message ControlTotals {
     int32 skipped = 1;
@@ -124,7 +105,6 @@ message ComplianceFailure {
     int32 critical = 4;
     int32 critical_failed = 5;
   }
-
   string id = 1;
   string compliance_url = 2;
   string node_name = 3;
@@ -135,7 +115,6 @@ message ComplianceFailure {
   string end_time = 8;
   string timestamp = 9;
 }
-
 message CCRFailure {
   string run_id = 1;
   string node_name = 2;
@@ -147,7 +126,6 @@ message CCRFailure {
   ExceptionInfo exception = 8;
   string timestamp = 9;
 }
-
 message CCRSuccess {
   string run_id = 1;
   string node_name = 2;
@@ -156,11 +134,8 @@ message CCRSuccess {
   int32 updated_resource_count = 5;
   string timestamp = 6;
 }
-
 message Response {
-
 }
-
 message Event {
   string id = 1;
   oneof event {
@@ -169,5 +144,4 @@ message Event {
     ComplianceSuccess ComplianceSuccess = 4;
     ComplianceFailure ComplianceFailure = 5;
   }
-
 }

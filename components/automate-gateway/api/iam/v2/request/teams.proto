@@ -1,94 +1,48 @@
 syntax = "proto3";
-
 package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/request";
-
 import "protoc-gen-swagger/options/annotations.proto";
-
-message ListTeamsReq {}
-
+message ListTeamsReq {
+}
 message GetTeamReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id"]
-      }
-    };
-    string id = 1;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"id"> };
+  string id = 1;
 }
-
 message CreateTeamReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id", "name"]
-      },
-      example: { value: '{"id": "test-id", "name": "My Test Team", "projects": ["project1", "project2"]}'}
-    };
-    string id = 1;
-    string name = 2;
-    repeated string projects = 3;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"id" required:"name"> example:<value:"{\"id\": \"test-id\", \"name\": \"My Test Team\", \"projects\": [\"project1\", \"project2\"]}" > };
+  string id = 1;
+  string name = 2;
+  repeated string projects = 3;
 }
-
 message UpdateTeamReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id", "name"]
-      },
-      example: { value: '{"name": "My Test Team", "projects": ["project1", "project2"]}'}
-    };
-    string id = 1;
-    string name = 2;
-    repeated string projects = 3;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"id" required:"name"> example:<value:"{\"name\": \"My Test Team\", \"projects\": [\"project1\", \"project2\"]}" > };
+  string id = 1;
+  string name = 2;
+  repeated string projects = 3;
 }
-
 message DeleteTeamReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id"]
-      }
-    };
-    string id = 1;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"id"> };
+  string id = 1;
 }
-
 message AddTeamMembersReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id", "membership_ids"]
-      },
-      example: { value: '{"membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
-    };
-    string id = 1;
-    repeated string membership_ids = 2;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"id" required:"membership_ids"> example:<value:"{\"membership_ids\": [\"527ed96f-2ecb-4f8f-abd7-0bf6511459ac\", \"353a62d4-85fa-4423-b12a-f6608a562ae9\"]}" > };
+  string id = 1;
+  repeated string membership_ids = 2;
 }
-
 message GetTeamMembershipReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id"]
-      }
-    };
-    string id = 1;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"id"> };
+  string id = 1;
 }
-
 message RemoveTeamMembersReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id", "membership_ids"]
-      },
-      example: { value: '{"membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
-    };
-    string id = 1;
-    repeated string membership_ids = 2;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"id" required:"membership_ids"> example:<value:"{\"membership_ids\": [\"527ed96f-2ecb-4f8f-abd7-0bf6511459ac\", \"353a62d4-85fa-4423-b12a-f6608a562ae9\"]}" > };
+  string id = 1;
+  repeated string membership_ids = 2;
 }
-
 message GetTeamsForMemberReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["membership_id"]
-      }
-    };
-    string membership_id = 1;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"membership_id"> };
+  string membership_id = 1;
 }
-
-message ApplyV2DataMigrationsReq { }
-
-message ResetAllTeamProjectsReq { }
+message ApplyV2DataMigrationsReq {
+}
+message ResetAllTeamProjectsReq {
+}

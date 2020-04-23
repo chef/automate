@@ -1,11 +1,8 @@
-/*
-   Slack does not support protobuf- we manage this file directly. We're maintaining this
-   here as a bit of an experiment to see how much it simplifies the construction and validation
-   of payloads.
-*/
+// Slack does not support protobuf- we manage this file directly. We're maintaining this
+// here as a bit of an experiment to see how much it simplifies the construction and validation
+// of payloads.
 syntax = "proto3";
 package slack;
-
 message Message {
   message Attachment {
     message Field {
@@ -17,9 +14,9 @@ message Message {
     string fallback = 2;
     string pretext = 3;
     string text = 4;
-    /* valid values for mrkdwn_in, which indicates
-       which fields contain markdown formatting:
-       text, pretext, fields */
+    // valid values for mrkdwn_in, which indicates
+    // which fields contain markdown formatting:
+    // text, pretext, fields
     string mrkdwn_in = 5;
     repeated Field fields = 6;
   }
@@ -28,4 +25,3 @@ message Message {
   string username = 3;
   repeated Attachment attachments = 4;
 }
-

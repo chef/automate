@@ -1,58 +1,51 @@
 syntax = "proto3";
-
 package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
-
 message CreateOrg {
-    // Chef organization name.
-    string name = 1;
-    // Chef organization admin user.
-    string admin_user = 2;
-    // Chef organization admin key.
-    string admin_key = 3;
-    // Chef Infra Server ID.
-    string server_id = 4;
-    // List of projects this chef organization belongs to. May be empty.
-    repeated string projects = 5;
+  // Chef organization name.
+  string name = 1;
+  // Chef organization admin user.
+  string admin_user = 2;
+  // Chef organization admin key.
+  string admin_key = 3;
+  // Chef Infra Server ID.
+  string server_id = 4;
+  // List of projects this chef organization belongs to. May be empty.
+  repeated string projects = 5;
 }
-
 message UpdateOrg {
-    // Chef organization ID.
-    string id = 1;
-    // Chef organization name.
-    string name = 2;
-    // Chef organization admin user.
-    string admin_user = 3;
-    // Chef organization admin key.
-    string admin_key = 4;
-    // Chef Infra Server ID.
-    string server_id = 5;
-    // List of projects this chef organization belongs to. May be empty.
-    repeated string projects = 6;
+  // Chef organization ID.
+  string id = 1;
+  // Chef organization name.
+  string name = 2;
+  // Chef organization admin user.
+  string admin_user = 3;
+  // Chef organization admin key.
+  string admin_key = 4;
+  // Chef Infra Server ID.
+  string server_id = 5;
+  // List of projects this chef organization belongs to. May be empty.
+  repeated string projects = 6;
 }
-
 message DeleteOrg {
-    // Chef organization ID.
-    string id = 1;
-    // Chef Infra Server ID.
-    string server_id = 2;
+  // Chef organization ID.
+  string id = 1;
+  // Chef Infra Server ID.
+  string server_id = 2;
 }
-
 message GetOrgs {
-    // Chef Infra Server ID.
-    string server_id = 1;
+  // Chef Infra Server ID.
+  string server_id = 1;
 }
-
 message GetOrg {
-    // Chef organization ID.
-    string id = 1;
-    // Chef Infra Server ID.
-    string server_id = 2;
+  // Chef organization ID.
+  string id = 1;
+  // Chef Infra Server ID.
+  string server_id = 2;
 }
-
 message GetOrgByName {
-    // Chef organization name.
-    string name = 1;
-    // Chef Infra Server ID.
-    string server_id = 2;
+  // Chef organization name.
+  string name = 1;
+  // Chef Infra Server ID.
+  string server_id = 2;
 }

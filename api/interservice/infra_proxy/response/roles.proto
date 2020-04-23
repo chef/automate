@@ -1,57 +1,51 @@
 syntax = "proto3";
-
 package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
-
 message Roles {
-    // List of the roles item.
-    repeated RoleListItem roles = 1;
+  // List of the roles item.
+  repeated RoleListItem roles = 1;
 }
-
 message RoleListItem {
-    // Name of the role.
-    string name = 1;
-    // Desscription of the role.
-    string description = 2;
-    // Environment for the role.
-    repeated string environments = 3;
+  // Name of the role.
+  string name = 1;
+  // Desscription of the role.
+  string description = 2;
+  // Environment for the role.
+  repeated string environments = 3;
 }
-
 message Role {
-    // Name of the role.
-    string name = 1;
-    // Type of the chef object.
-    string chef_type = 2;
-    // Descrption of the role.
-    string description = 3;
-    // Stringified json of the default attributes.
-    string default_attributes = 4;
-    // Stringified json of the override attributes.
-    string override_attributes = 5;
-    // Json class name.
-    string json_class = 6;
-    // Run list for the role.
-    repeated string run_list  = 7;
-    // List of expanded run list for the role.
-    repeated ExpandedRunList expanded_run_list = 8;
+  // Name of the role.
+  string name = 1;
+  // Type of the chef object.
+  string chef_type = 2;
+  // Descrption of the role.
+  string description = 3;
+  // Stringified json of the default attributes.
+  string default_attributes = 4;
+  // Stringified json of the override attributes.
+  string override_attributes = 5;
+  // Json class name.
+  string json_class = 6;
+  // Run list for the role.
+  repeated string run_list = 7;
+  // List of expanded run list for the role.
+  repeated ExpandedRunList expanded_run_list = 8;
 }
-
 message ExpandedRunList {
-    // ID of the run list collection.
-    string id = 1;
-    // List of the run list.
-    repeated RunList run_list = 2;
+  // ID of the run list collection.
+  string id = 1;
+  // List of the run list.
+  repeated RunList run_list = 2;
 }
-
 message RunList {
-    // Type of run list item (e.g. 'recipe').
-    string type = 1;
-    // Name of run list item.
-    string name = 2;
-    // Version of run list item.
-    string version = 3;
-    // Boolean denoting whether or not the run list item was skipped.
-    bool skipped = 4;
-    // List of the run list.
-    repeated RunList children = 5;
+  // Type of run list item (e.g. 'recipe').
+  string type = 1;
+  // Name of run list item.
+  string name = 2;
+  // Version of run list item.
+  string version = 3;
+  // Boolean denoting whether or not the run list item was skipped.
+  bool skipped = 4;
+  // List of the run list.
+  repeated RunList children = 5;
 }

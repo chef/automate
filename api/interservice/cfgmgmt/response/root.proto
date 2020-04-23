@@ -1,15 +1,12 @@
 syntax = "proto3";
-
 package chef.automate.domain.cfgmgmt.response;
 option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/response";
-
 message VersionInfo {
   string name = 1;
   string version = 2;
   string SHA = 3;
   string built = 4;
 }
-
 // Health message
 //
 // The config-mgmt-service health is constructed with:
@@ -23,19 +20,15 @@ message VersionInfo {
 message Health {
   string status = 1;
 }
-
 message Organizations {
   repeated string organizations = 1;
 }
-
 message SourceFQDNS {
   repeated string source_fqdns = 1;
 }
-
 message ExportData {
-	bytes content = 1;
+  bytes content = 1;
 }
-
 message ReportExportData {
-	bytes content = 1;
+  bytes content = 1;
 }

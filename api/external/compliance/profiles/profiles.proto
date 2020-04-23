@@ -1,397 +1,340 @@
 syntax = "proto3";
-
 package chef.automate.api.compliance.profiles.v1;
 option go_package = "github.com/chef/automate/api/external/compliance/profiles";
-
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
-
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-
 service ProfilesService {
-	// grpc gateway is not able to handle multi-part upload; https://github.com/grpc-ecosystem/grpc-gateway/issues/410
-	// so we do not auto-generate the route for profile upload; we instead custom handle with mux
-	rpc Create (stream ProfilePostRequest) returns (CheckResult) {};
-
-	/*
-	Show an installed profile
-
-	Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
-
-
-	Authorization Action:
-	```
-	compliance:profiles:get
-	```
-	*/
-	rpc Read (ProfileDetails) returns (Profile) {
-		option (google.api.http) = {
-			get: "/compliance/profiles/read/{owner}/{name}/version/{version}"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:profiles:{owner}"
-			action: "compliance:profiles:get"
-		};
-	};
-
-	/*
-	Show an available profile
-
-	Show the details of an un-installed profile using the profile name and version.
-	in the UI, these are the profiles under the "Available" tab.
-	These profiles are created and maintained by Chef, shipped with Chef Automate.
-
-
-	Authorization Action:
-	```
-	compliance:marketProfiles:get
-	```
-	*/
-	rpc ReadFromMarket (ProfileDetails) returns (Profile) {
-		option (google.api.http) = {
-			get: "/compliance/market/read/{name}/version/{version}"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:profiles:market"
-			action: "compliance:marketProfiles:get"
-		};
-	};
-
-	// grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
-	// so we do not auto-generate the route for profile download; we instead custom handle with mux
-	rpc ReadTar(ProfileDetails) returns (stream ProfileData) {};
-
-	/*
-	Delete an installed profile
-
-	Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.
-	Note: this action "uninstalls" the profile. This has no impact on the market profiles.
-
-
-	Authorization Action:
-	```
-	compliance:profiles:delete
-	```
-	*/
-	rpc Delete (ProfileDetails) returns (google.protobuf.Empty) {
-		option (google.api.http) = {
-				delete: "/compliance/profiles/{owner}/{name}/version/{version}"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:profiles:{owner}"
-			action: "compliance:profiles:delete"
-		};
-	};
-
-	/*
-	List all available profiles
-
-	Lists all profiles available for the Automate instance.
-	Empty params return all "market" profiles.
-	Specifying the `owner` field returns all profiles installed for the specified user.
-
-	Supports pagination, sorting, and filtering (wildcard supported).
-
-	Supported sort fields: title, name (default: title)
-	Supported filter fields: name, version, title
-
-	Example:
-	```
-	{
-		"filters":[
-			{"type": "title", "values": [ "Dev*"]}
-		],
-		"page": 1,
-		"per_page": 3,
-		"owner": "admin"
-	}
-	```
-
-
-	Authorization Action:
-	```
-	compliance:profiles:list
-	```
-	*/
-	rpc List (Query) returns (Profiles) {
-		option (google.api.http) = {
-				post: "/compliance/profiles/search"
-				body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:profiles"
-			action: "compliance:profiles:list"
-		};
-	};
-
-	/*
-	Check if one or multiple profiles exist in the metadata database.
-
-	The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend
-	doesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.
-	This is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.
-
-	Authorization Action:
-	```
-	compliance:profiles:list
-	```
-	*/
-	rpc MetaSearch(Sha256) returns (Missing) {
-        option (google.api.http) = {
-                post: "/compliance/profiles/metasearch"
-                body: "*"
-        };
-        option (chef.automate.api.iam.policy) = {
-            resource: "compliance:profiles"
-            action: "compliance:profiles:list"
-        };
-	};
+  // grpc gateway is not able to handle multi-part upload; https://github.com/grpc-ecosystem/grpc-gateway/issues/410
+  // so we do not auto-generate the route for profile upload; we instead custom handle with mux
+  rpc Create ( stream ProfilePostRequest ) returns ( CheckResult );
+  // Show an installed profile
+  //
+  // Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+  //
+  //
+  // Authorization Action:
+  // ```
+  // compliance:profiles:get
+  // ```
+  rpc Read ( ProfileDetails ) returns ( Profile ) {
+    option (google.api.http) = { get:"/compliance/profiles/read/{owner}/{name}/version/{version}" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:profiles:{owner}" action:"compliance:profiles:get" };
+  }
+  // Show an available profile
+  //
+  // Show the details of an un-installed profile using the profile name and version.
+  // in the UI, these are the profiles under the "Available" tab.
+  // These profiles are created and maintained by Chef, shipped with Chef Automate.
+  //
+  //
+  // Authorization Action:
+  // ```
+  // compliance:marketProfiles:get
+  // ```
+  rpc ReadFromMarket ( ProfileDetails ) returns ( Profile ) {
+    option (google.api.http) = { get:"/compliance/market/read/{name}/version/{version}" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:profiles:market" action:"compliance:marketProfiles:get" };
+  }
+  // grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
+  // so we do not auto-generate the route for profile download; we instead custom handle with mux
+  rpc ReadTar ( ProfileDetails ) returns ( stream ProfileData );
+  // Delete an installed profile
+  //
+  // Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+  // Note: this action "uninstalls" the profile. This has no impact on the market profiles.
+  //
+  //
+  // Authorization Action:
+  // ```
+  // compliance:profiles:delete
+  // ```
+  rpc Delete ( ProfileDetails ) returns ( google.protobuf.Empty ) {
+    option (google.api.http) = { delete:"/compliance/profiles/{owner}/{name}/version/{version}" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:profiles:{owner}" action:"compliance:profiles:delete" };
+  }
+  // List all available profiles
+  //
+  // Lists all profiles available for the Automate instance.
+  // Empty params return all "market" profiles.
+  // Specifying the `owner` field returns all profiles installed for the specified user.
+  //
+  // Supports pagination, sorting, and filtering (wildcard supported).
+  //
+  // Supported sort fields: title, name (default: title)
+  // Supported filter fields: name, version, title
+  //
+  // Example:
+  // ```
+  // {
+  // "filters":[
+  // {"type": "title", "values": [ "Dev*"]}
+  // ],
+  // "page": 1,
+  // "per_page": 3,
+  // "owner": "admin"
+  // }
+  // ```
+  //
+  //
+  // Authorization Action:
+  // ```
+  // compliance:profiles:list
+  // ```
+  rpc List ( Query ) returns ( Profiles ) {
+    option (google.api.http) = { post:"/compliance/profiles/search" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:profiles" action:"compliance:profiles:list" };
+  }
+  // Check if one or multiple profiles exist in the metadata database.
+  //
+  // The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend
+  // doesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.
+  // This is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.
+  //
+  // Authorization Action:
+  // ```
+  // compliance:profiles:list
+  // ```
+  rpc MetaSearch ( Sha256 ) returns ( Missing ) {
+    option (google.api.http) = { post:"/compliance/profiles/metasearch" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:profiles" action:"compliance:profiles:list" };
+  }
 }
-
 message Sha256 {
-	// An array of profile sha256 IDs.
-	repeated string sha256 = 1;
+  // An array of profile sha256 IDs.
+  repeated string sha256 = 1;
 }
-
 message Missing {
-	// An array of profile sha256 IDs that are missing from the backend metadata store.
-	repeated string missing_sha256 = 1;
+  // An array of profile sha256 IDs that are missing from the backend metadata store.
+  repeated string missing_sha256 = 1;
 }
-
 message ProfilePostRequest {
-	// Associate an automate user with a profile. A profile is visible only to its associated user.
-	string owner = 5;
-	// Intentionally blank.
-	Chunk chunk = 2;
-	// Intentionally blank.
-	Metadata meta = 3;
+  // Associate an automate user with a profile. A profile is visible only to its associated user.
+  string owner = 5;
+  // Intentionally blank.
+  Chunk chunk = 2;
+  // Intentionally blank.
+  Metadata meta = 3;
 }
-
 // Metadata about the profile.
 message Metadata {
-	// Name of the profile (as specified in the inspec.yml)
-	string name = 2;
-	// Version of the profile.
-	string version = 3;
-	// Content type of the profile (e.g. application/json, application/x-gtar, application/gzip)
-	string content_type =4;
+  // Name of the profile (as specified in the inspec.yml)
+  string name = 2;
+  // Version of the profile.
+  string version = 3;
+  // Content type of the profile (e.g. application/json, application/x-gtar, application/gzip)
+  string content_type = 4;
 }
-
 // Profile contents in byte form.
 message Chunk {
-	bytes data = 1;
-	int64 position = 2;
+  bytes data = 1;
+  int64 position = 2;
 }
-
 message ProfileData {
-	// Automate user associated with the profile.
-	string owner = 1;
-	// Name of the profile.
-	string name = 2;
-	// Version of the profile.
-	string version = 3;
-	// Profile contents in byte form.
-	bytes data = 4;
+  // Automate user associated with the profile.
+  string owner = 1;
+  // Name of the profile.
+  string name = 2;
+  // Version of the profile.
+  string version = 3;
+  // Profile contents in byte form.
+  bytes data = 4;
 }
 message Profiles {
-	// List of profiles matching the query.
-	repeated Profile profiles = 1;
-	// Total count of profiles matching the query.
-	int32 total = 20;
+  // List of profiles matching the query.
+  repeated Profile profiles = 1;
+  // Total count of profiles matching the query.
+  int32 total = 20;
 }
-
 message Profile {
-	// The profile name, as specified in the inspec.yml
-	string name = 1;
-	// The profile title, as specified in the inspec.yml
-	string title = 2;
-	// The profile maintainer, as specified in the inspec.yml
-	string maintainer = 3;
-	// The profile copyright, as specified in the inspec.yml
-	string copyright = 4;
-	// The profile copyright email, as specified in the inspec.yml
-	string copyright_email = 5;
-	// The profile license, as specified in the inspec.yml
-	string license = 6;
-	// The profile summary, as specified in the inspec.yml
-	string summary = 7;
-	// The profile version, as specified in the inspec.yml
-	string version = 8;
-	// The Automate user associated with the profile.
-	string owner = 9;
-	// The list of operating systems compatible with the profile, as specified in the inspec.yml
-	repeated Support supports = 16;
-	// The list of dependencies the profile has, as specified in the inspec.yml
-	repeated Dependency depends = 17;
-	// The SHA256 of the profile.
-	string sha256 = 18;
-	repeated Group groups = 19;
-	// The list of controls in the profile.
-	repeated Control controls = 20;
-	// The list of attributes in the profile.
-	repeated Attribute attributes = 21;
-	// The latest version of the profile.
-	string latest_version = 22;
+  // The profile name, as specified in the inspec.yml
+  string name = 1;
+  // The profile title, as specified in the inspec.yml
+  string title = 2;
+  // The profile maintainer, as specified in the inspec.yml
+  string maintainer = 3;
+  // The profile copyright, as specified in the inspec.yml
+  string copyright = 4;
+  // The profile copyright email, as specified in the inspec.yml
+  string copyright_email = 5;
+  // The profile license, as specified in the inspec.yml
+  string license = 6;
+  // The profile summary, as specified in the inspec.yml
+  string summary = 7;
+  // The profile version, as specified in the inspec.yml
+  string version = 8;
+  // The Automate user associated with the profile.
+  string owner = 9;
+  // The list of operating systems compatible with the profile, as specified in the inspec.yml
+  repeated Support supports = 16;
+  // The list of dependencies the profile has, as specified in the inspec.yml
+  repeated Dependency depends = 17;
+  // The SHA256 of the profile.
+  string sha256 = 18;
+  repeated Group groups = 19;
+  // The list of controls in the profile.
+  repeated Control controls = 20;
+  // The list of attributes in the profile.
+  repeated Attribute attributes = 21;
+  // The latest version of the profile.
+  string latest_version = 22;
 }
 message Group {
-	string id = 1;
-	string title = 2;
-	repeated string controls = 3;
+  string id = 1;
+  string title = 2;
+  repeated string controls = 3;
 }
 message Control {
-	// The ID of the control.
-	string id = 1;
-	// The code (test) for the control.
-	string code = 2;
-	// The description of the control.
-	string desc = 3;
-	// The impact of the control.
-	float impact = 4;
-	// The title of the control.
-	string title = 5;
-	// Intentionally blank.
-	SourceLocation source_location = 6;
-	// The results of the control tests.
-	repeated Result results = 7;
-	// The refs associated with the control.
-	repeated Ref refs = 8;
-	// The tags associated with the control.
-	map<string, string> tags = 9;
+  // The ID of the control.
+  string id = 1;
+  // The code (test) for the control.
+  string code = 2;
+  // The description of the control.
+  string desc = 3;
+  // The impact of the control.
+  float impact = 4;
+  // The title of the control.
+  string title = 5;
+  // Intentionally blank.
+  SourceLocation source_location = 6;
+  // The results of the control tests.
+  repeated Result results = 7;
+  // The refs associated with the control.
+  repeated Ref refs = 8;
+  // The tags associated with the control.
+  map<string, string> tags = 9;
 }
-
 message Ref {
-	// URL of the ref.
-	string url = 1;
-	// Ref for the control.
-	string ref = 2;
+  // URL of the ref.
+  string url = 1;
+  // Ref for the control.
+  string ref = 2;
 }
 message Result {
-	// Status of the test results (passed, failed, skipped).
-	string status = 1;
-	// The code (test) executed.
-	string code_desc = 2;
-	// The amount of time it took to execute the test.
-	float run_time = 3;
-	// The time the test started.
-	string start_time = 4;
-	// The failure message.
-	string message = 5;
-	// Reason for skipping the test.
-	string skip_message = 6;
+  // Status of the test results (passed, failed, skipped).
+  string status = 1;
+  // The code (test) executed.
+  string code_desc = 2;
+  // The amount of time it took to execute the test.
+  float run_time = 3;
+  // The time the test started.
+  string start_time = 4;
+  // The failure message.
+  string message = 5;
+  // Reason for skipping the test.
+  string skip_message = 6;
 }
 message SourceLocation {
-	string ref = 1;
-	int32 line = 2;
+  string ref = 1;
+  int32 line = 2;
 }
 message Attribute {
-	string name = 1;
-	Option options = 2;
+  string name = 1;
+  Option options = 2;
 }
 message Option {
-	string description = 1;
-	string default = 2;
+  string description = 1;
+  string default = 2;
 }
 message Support {
-	// OS name supported by the profile.
-	string os_name = 1;
-	// OS family supported by the profile.
-	string os_family = 2;
-	// OS release supported by the profile.
-	string release = 3;
-	// Minimum InSpec version required for the profile.
-	string inspec_version = 4;
-	// Platform supported by the profile.
-	string platform = 5;
+  // OS name supported by the profile.
+  string os_name = 1;
+  // OS family supported by the profile.
+  string os_family = 2;
+  // OS release supported by the profile.
+  string release = 3;
+  // Minimum InSpec version required for the profile.
+  string inspec_version = 4;
+  // Platform supported by the profile.
+  string platform = 5;
 }
-
 message Dependency {
-	// Name of the profile.
-	string name = 1;
-	// URL of the profile.
-	string url = 2;
-	// Path of the profile.
-	string path = 3;
-	// Git location of the profile.
-	string git = 4;
-	// Branch of the profile.
-	string branch = 5;
-	// Tag associated with the profile.
-	string tag = 6;
-	// Commit sha for the profile.
-	string commit = 7;
-	// Version of the profile.
-	string version = 8;
-	// Supermarket address of the profile.
-	string supermarket = 9;
-	// Github address of the profile.
-	string github = 10;
-	// Automate address of the profile.
-	string compliance = 11;
+  // Name of the profile.
+  string name = 1;
+  // URL of the profile.
+  string url = 2;
+  // Path of the profile.
+  string path = 3;
+  // Git location of the profile.
+  string git = 4;
+  // Branch of the profile.
+  string branch = 5;
+  // Tag associated with the profile.
+  string tag = 6;
+  // Commit sha for the profile.
+  string commit = 7;
+  // Version of the profile.
+  string version = 8;
+  // Supermarket address of the profile.
+  string supermarket = 9;
+  // Github address of the profile.
+  string github = 10;
+  // Automate address of the profile.
+  string compliance = 11;
 }
 message ProfileDetails {
-	// Automate user associated with the profile.
-	string owner = 1;
-	// Name of the profile.
-	string name = 2;
-	// Version of the profile.
-	string version = 3;
+  // Automate user associated with the profile.
+  string owner = 1;
+  // Name of the profile.
+  string name = 2;
+  // Version of the profile.
+  string version = 3;
 }
-
 message CheckResult {
-	// Intentionally blank.
-	ResultSummary summary = 1;
-	// Errors returned by the `inspec check` command.
-	repeated CheckMessage errors = 2;
-	// Warnings returned by the `inspec check` command.
-	repeated CheckMessage warnings = 3;
+  // Intentionally blank.
+  ResultSummary summary = 1;
+  // Errors returned by the `inspec check` command.
+  repeated CheckMessage errors = 2;
+  // Warnings returned by the `inspec check` command.
+  repeated CheckMessage warnings = 3;
 }
 message ResultSummary {
-	// Boolean that denotes if the profile is valid or not (as reported by `inspec check`).
-	bool valid = 1;
-	// Timestamp of when the `inspec check` command was executed.
-	string timestamp = 2;
-	// Path of the checked profile.
-	string location = 3;
-	// Count of controls in the profile.
-	int32 controls = 4;
+  // Boolean that denotes if the profile is valid or not (as reported by `inspec check`).
+  bool valid = 1;
+  // Timestamp of when the `inspec check` command was executed.
+  string timestamp = 2;
+  // Path of the checked profile.
+  string location = 3;
+  // Count of controls in the profile.
+  int32 controls = 4;
 }
 message CheckMessage {
-	// Profile file where the error or warning exists.
-	string file = 1;
-	// Profile line where the error or warning exists.
-	int32 line = 2;
-	// Column where the error or warning exists.
-	int32 column = 3;
-	// Control ID associated with the error or warning.
-	string control_id = 4;
-	// Message associated with the error or warning.
-	string msg = 5;
+  // Profile file where the error or warning exists.
+  string file = 1;
+  // Profile line where the error or warning exists.
+  int32 line = 2;
+  // Column where the error or warning exists.
+  int32 column = 3;
+  // Control ID associated with the error or warning.
+  string control_id = 4;
+  // Message associated with the error or warning.
+  string msg = 5;
 }
 message ListFilter {
-	// List of values to filter on.
-	repeated string values = 20;
-	// The field to filter on.
-	string type = 21;
+  // List of values to filter on.
+  repeated string values = 20;
+  // The field to filter on.
+  string type = 21;
 }
 message Query {
-	// Filters to apply to the query
-	repeated ListFilter filters = 20;
-	enum OrderType {
-		ASC = 0;
-		DESC = 1;
-	}
-	// Order in which to sort. Defaults to ASC.
-	OrderType order = 21;
-	// Field on which to sort.
-	string sort = 22;
-	// Page of results requested.
-	int32 page = 23;
-	// Number of results to return per page.
-	int32 per_page = 24;
-	// Automate user associated with the profile.
-	string owner = 25;
-	// Name of the profile (as defined in `inspec.yml`).
-	string name = 26;
-	// Version of the profile (as defined in `inspec.yml`).
-	string version = 27;
+  // Filters to apply to the query
+  repeated ListFilter filters = 20;
+  enum OrderType {
+    ASC = 0;
+    DESC = 1;
+  }
+  // Order in which to sort. Defaults to ASC.
+  OrderType order = 21;
+  // Field on which to sort.
+  string sort = 22;
+  // Page of results requested.
+  int32 page = 23;
+  // Number of results to return per page.
+  int32 per_page = 24;
+  // Automate user associated with the profile.
+  string owner = 25;
+  // Name of the profile (as defined in `inspec.yml`).
+  string name = 26;
+  // Version of the profile (as defined in `inspec.yml`).
+  string version = 27;
 }

@@ -1,21 +1,17 @@
 syntax = "proto3";
-
 package chef.automate.domain.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
-
 import "google/protobuf/timestamp.proto";
 import "api/interservice/cfgmgmt/request/parameters.proto";
-
 message NodeExport {
-  repeated string filter  = 1;
-  Sorting sorting         = 2;
-  string output_type      = 3;
+  repeated string filter = 1;
+  Sorting sorting = 2;
+  string output_type = 3;
 }
-
 message ReportExport {
-  repeated string filter                = 1;
-  string output_type                    = 2;
-  string node_id                        = 3;
-  google.protobuf.Timestamp start       = 4;
-  google.protobuf.Timestamp end         = 5;
+  repeated string filter = 1;
+  string output_type = 2;
+  string node_id = 3;
+  google.protobuf.Timestamp start = 4;
+  google.protobuf.Timestamp end = 5;
 }

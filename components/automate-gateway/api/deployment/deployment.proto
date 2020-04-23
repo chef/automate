@@ -1,44 +1,34 @@
 syntax = "proto3";
-
 package chef.automate.api.deployment;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/deployment";
-
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
-
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-
 service Deployment {
-  rpc GetVersion (google.protobuf.Empty) returns (Version) {
-    option (google.api.http).get = "/version";
-    option (chef.automate.api.iam.policy).resource = "system:service:version";
-    option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
-  };
-
-  rpc ServiceVersions (ServiceVersionsRequest) returns (ServiceVersionsResponse) {
-    option (google.api.http).get = "/deployment/service_versions";
-    option (chef.automate.api.iam.policy).resource = "system:service:version";
-    option (chef.automate.api.iam.policy).action = "system:serviceVersion:list";
-  };
-};
-
+  rpc GetVersion ( google.protobuf.Empty ) returns ( Version ) {
+    option (google.api.http) = { get:"/version" };
+    option (chef.automate.api.iam.policy) = { resource:"system:service:version" action:"system:serviceVersion:get" };
+  }
+  rpc ServiceVersions ( ServiceVersionsRequest ) returns ( ServiceVersionsResponse ) {
+    option (google.api.http) = { get:"/deployment/service_versions" };
+    option (chef.automate.api.iam.policy) = { resource:"system:service:version" action:"system:serviceVersion:list" };
+  }
+}
 // Version message
 //
 // The manifest version constructed with:
-// * build_timestamp 
+// * build_timestamp
 message Version {
   string build_timestamp = 1;
 }
-
-message ServiceVersionsRequest {}
-
-message ServiceVersionsResponse {
-	repeated ServiceVersion services = 1;
+message ServiceVersionsRequest {
 }
-
+message ServiceVersionsResponse {
+  repeated ServiceVersion services = 1;
+}
 message ServiceVersion {
-	string name = 1;
-	string origin = 2;
-	string version = 3;
-	string release = 4;
+  string name = 1;
+  string origin = 2;
+  string version = 3;
+  string release = 4;
 }

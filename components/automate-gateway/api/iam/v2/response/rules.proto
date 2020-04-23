@@ -1,52 +1,34 @@
 syntax = "proto3";
-
 package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/response";
-
 import "components/automate-gateway/api/iam/v2/common/rules.proto";
 import "google/protobuf/timestamp.proto";
-
 import "protoc-gen-swagger/options/annotations.proto";
-
 message CreateRuleResp {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-    example: { value: '{"id": "example-rule", "project-id": "example-project", "name": "My Example Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "MEMBER_OF", "values": ["example.co", "example.io"]}], "status": "STAGED"}'}
-  };
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { example:<value:"{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Example Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"MEMBER_OF\", \"values\": [\"example.co\", \"example.io\"]}], \"status\": \"STAGED\"}" > };
   Rule rule = 1;
 }
-
 message UpdateRuleResp {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-    example: { value: '{"id": "example-rule", "project-id": "example-project", "name": "My Updated Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "EQUALS", "values": ["example.co"]}], "status": "STAGED"}'}
-  };
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { example:<value:"{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Updated Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"EQUALS\", \"values\": [\"example.co\"]}], \"status\": \"STAGED\"}" > };
   Rule rule = 1;
 }
-
 message GetRuleResp {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-    example: { value: '{"id": "example-rule", "project-id": "example-project", "name": "My Applied Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "EQUALS", "values": ["example.co"]}], "status": "APPLIED"}'}
-  };
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { example:<value:"{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Applied Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"EQUALS\", \"values\": [\"example.co\"]}], \"status\": \"APPLIED\"}" > };
   Rule rule = 1;
 }
-
 message ListRulesForProjectResp {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-    example: { value: '{"rules": [{"id": "example-rule", "project-id": "example-project", "name": "My Applied Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "EQUALS", "values": ["example.co"]}], "status": "APPLIED"}, {"id": "example-rule-2", "project-id": "example-project", "name": "My 2nd Example Rule", "type": "EVENT", "conditions": [{"attribute": "CHEF_ORGANIZATION", "operator": "MEMBER_OF", "values": ["east", "west"]}], "status": "APPLIED"}], "status": "APPLIED"}'}
-  };
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { example:<value:"{\"rules\": [{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Applied Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"EQUALS\", \"values\": [\"example.co\"]}], \"status\": \"APPLIED\"}, {\"id\": \"example-rule-2\", \"project-id\": \"example-project\", \"name\": \"My 2nd Example Rule\", \"type\": \"EVENT\", \"conditions\": [{\"attribute\": \"CHEF_ORGANIZATION\", \"operator\": \"MEMBER_OF\", \"values\": [\"east\", \"west\"]}], \"status\": \"APPLIED\"}], \"status\": \"APPLIED\"}" > };
   repeated Rule rules = 1;
   ProjectRulesStatus status = 2;
 }
-
-message DeleteRuleResp {}
-
-message ApplyRulesStartResp {}
-
-message ApplyRulesCancelResp {}
-
+message DeleteRuleResp {
+}
+message ApplyRulesStartResp {
+}
+message ApplyRulesCancelResp {
+}
 message ApplyRulesStatusResp {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-    example: { value: '{ "state": "running", "estimated_time_complete": "2020-03-20T19:24:55Z", "percentage_complete": 0.5, "failed": false, "failure_message": "", "cancelled": false}'}
-  };
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { example:<value:"{ \"state\": \"running\", \"estimated_time_complete\": \"2020-03-20T19:24:55Z\", \"percentage_complete\": 0.5, \"failed\": false, \"failure_message\": \"\", \"cancelled\": false}" > };
   // One of two states: `not_running` and `running`.
   string state = 1;
   // Estimated time when the project update will complete.

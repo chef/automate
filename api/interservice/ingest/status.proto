@@ -1,10 +1,7 @@
 syntax = "proto3";
-
 package chef.automate.domain.ingest;
 option go_package = "github.com/chef/automate/api/interservice/ingest";
-
 import "google/api/annotations.proto";
-
 // Health message
 //
 // The ingest-service health is constructed with:
@@ -18,7 +15,6 @@ import "google/api/annotations.proto";
 message Health {
   string status = 1;
 }
-
 // Migration message
 message MigrationStatus {
   int64 total = 1;
@@ -26,29 +22,27 @@ message MigrationStatus {
   string status = 3;
   bool finished = 4;
 }
-
 // Metrics message
 message Metrics {
   double uptime = 5;
   PipelineMetrics pipeline = 6;
 }
-
 message PipelineMetrics {
   int64 total_run_messages = 5;
   int64 total_action_messages = 6;
 }
-
-message HealthRequest {}
-message MetricsRequest {}
-message MigrationStatusRequest {}
-
-service IngestStatus {
-	rpc GetMetrics (MetricsRequest) returns (Metrics);
-	rpc GetHealth (HealthRequest) returns (Health) {
-		option (google.api.http).get = "/health";
-	};
-	rpc GetMigrationStatus (MigrationStatusRequest) returns (MigrationStatus) {
-		option (google.api.http).get = "/migration";
-	};
+message HealthRequest {
 }
-
+message MetricsRequest {
+}
+message MigrationStatusRequest {
+}
+service IngestStatus {
+  rpc GetMetrics ( MetricsRequest ) returns ( Metrics );
+  rpc GetHealth ( HealthRequest ) returns ( Health ) {
+    option (google.api.http) = { get:"/health" };
+  }
+  rpc GetMigrationStatus ( MigrationStatusRequest ) returns ( MigrationStatus ) {
+    option (google.api.http) = { get:"/migration" };
+  }
+}

@@ -1,12 +1,7 @@
 syntax = "proto3";
-
 package chef.automate.api.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
-
 message Organizations {
-
 }
-
 message SourceFqdns {
-
 }

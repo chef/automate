@@ -1,22 +1,16 @@
 syntax = "proto3";
-
 package chef.automate.api.telemetry;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/telemetry";
-
 import "google/api/annotations.proto";
-
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-
 service Telemetry {
-  rpc GetTelemetryConfiguration (TelemetryRequest) returns (TelemetryResponse) {
-    option (google.api.http).get = "/telemetry/config";
-    option (chef.automate.api.iam.policy).resource = "system:config";
-    option (chef.automate.api.iam.policy).action = "system:telemetryConfig:get";
-  };
-};
-
-message TelemetryRequest {}
-
+  rpc GetTelemetryConfiguration ( TelemetryRequest ) returns ( TelemetryResponse ) {
+    option (google.api.http) = { get:"/telemetry/config" };
+    option (chef.automate.api.iam.policy) = { resource:"system:config" action:"system:telemetryConfig:get" };
+  }
+}
+message TelemetryRequest {
+}
 message TelemetryResponse {
   string license_id = 1;
   string customer_name = 4;

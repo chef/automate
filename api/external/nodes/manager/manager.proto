@@ -1,400 +1,265 @@
 syntax = "proto3";
-
 package chef.automate.api.nodes.manager.v1;
 option go_package = "github.com/chef/automate/api/external/nodes/manager";
-
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
-
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-
 import "api/external/common/query/parameters.proto";
-
 import "protoc-gen-swagger/options/annotations.proto";
-
 service NodeManagerService {
-	/*
-	Create a Node Manager
-
-	Creates a node manager given a name, credential id *or* credential data, and type.
-
-
-	Authorization Action:
-
-	```
-	infra:nodeManagers:create
-	```
-	*/
-	rpc Create(NodeManager) returns (Ids) {
-		option (google.api.http) = {
-			post: "/nodemanagers"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodeManagers"
-			action: "infra:nodeManagers:create"
-		};
-	};
-
-	/*
-	View a Node Manager
-
-	List the details of a node manager.
-
-	Authorization Action:
-
-	```
-	infra:nodeManagers:get
-	```
-	*/
-	rpc Read(Id) returns (NodeManager) {
-		option (google.api.http) = {
-			get: "/nodemanagers/id/{id}"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodeManagers:{id}"
-			action: "infra:nodeManagers:get"
-		};
-	};
-
-	/*
-	Update a Node Manager
-
-	Update a node manager's metadata, such as its name, associated credential id, or data.
-	This is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty ("").
-
-	Authorization Action:
-
-	```
-	infra:nodeManagers:update
-	```
-	*/
-	rpc Update(NodeManager) returns (google.protobuf.Empty) {
-		option (google.api.http) = {
-			put: "/nodemanagers/id/{id}"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodeManagers:{id}"
-			action: "infra:nodeManagers:update"
-		};
-	};
-
-	/*
-	Delete a Node Manager
-
-	Delete a single node manager. This deletes the node manager itself and
-	reassigns its associated nodes to the Automate node manager.
-
-	Authorization Action:
-
-	```
-	infra:nodeManagers:delete
-	```
-	*/
-	rpc Delete(Id) returns (google.protobuf.Empty) {
-		option (google.api.http) = {
-			delete: "/nodemanagers/id/{id}"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodeManagers:{id}"
-			action: "infra:nodeManagers:delete"
-		};
-	};
-
-	/*
-	Delete a Node Manager and Delete Nodes
-
-	Delete a node manager and all of its associated nodes.
-
-	Authorization Action:
-
-	```
-	infra:nodeManagers:delete
-	```
-	*/
-	rpc DeleteWithNodes(Id) returns (Ids) {
-		option (google.api.http) = {
-			delete: "/nodemanagers/id/{id}/with-nodes"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodeManagers:{id}"
-			action: "infra:nodeManagers:delete"
-		};
-	};
-
-	/*
-	Delete a Node Manager and Stop Nodes
-
-	Delete a node manager and update its associated nodes to `stopped`.
-
-	Authorization Action:
-
-	```
-	infra:nodeManagers:delete
-	```
-	*/
-	rpc DeleteWithNodeStateStopped(Id) returns (google.protobuf.Empty) {
-		option (google.api.http) = {
-			delete: "/nodemanagers/id/{id}/with-node-state/stopped"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodeManagers:{id}"
-			action: "infra:nodeManagers:delete"
-		};
-	};
-
-	/*
-	Delete a Node Manager and Terminate Nodes
-
-	Delete a node manager and update its associated nodes to `terminated`.
-
-	Authorization Action:
-
-	```
-	infra:nodeManagers:delete
-	```
-	*/
-	rpc DeleteWithNodeStateTerminated(Id) returns (google.protobuf.Empty) {
-		option (google.api.http) = {
-			delete: "/nodemanagers/id/{id}/with-node-state/terminated"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodeManagers:{id}"
-			action: "infra:nodeManagers:delete"
-		};
-	};
-
-	/*
-	List all Node Managers
-
-	Returns a list of node managers.
-	Supports filtering, sorting, and pagination.
-
-	Valid filtering fields: manager_type
-
-
-	Authorization Action:
-
-	```
-	infra:nodeManagers:list
-	```
-	*/
-	rpc List(Query) returns (NodeManagers) {
-		option (google.api.http) = {
-			post: "/nodemanagers/search"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodeManagers"
-			action: "infra:nodeManagers:list"
-		};
-	};
-
-	/*
-	Search Node Fields
-
-	Searches the available values for a given field across all nodes associated with the nodemanager id.
-
-
-	Authorization Action:
-
-	```
-	infra:nodeManagers:list
-	```
-	*/
-	rpc SearchNodeFields(FieldQuery) returns (Fields) {
-		option (google.api.http) = {
-			post: "/nodemanagers/id/{node_manager_id}/search-fields"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodeManagers:{node_manager_id}:fields"
-			action: "infra:nodeManagers:list"
-		};
-	};
-
-	/*
-	Search nodes
-
-	Searches the available nodes for a single node manager by id.
-
-
-	Authorization Action:
-
-	```
-	infra:nodeManagers:list
-	```
-	*/
-	rpc SearchNodes(NodeQuery) returns (Nodes) {
-		option (google.api.http) = {
-			post: "/nodemanagers/id/{node_manager_id}/search-nodes"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodeManagers:{node_manager_id}:nodes"
-			action: "infra:nodeManagers:list"
-		};
-	};
-
-	/*
-	Connect
-
-	Attempts to reach the API for the given nodemanager id to validate the
-	credentials associated with the nodemanager.
-
-	Authorization Action:
-
-	```
-	infra:nodeManagers:rerun
-	```
-	*/
-	rpc Connect(Id) returns (ConnectResponse) {
-		option (google.api.http) = {
-			post: "/nodemanagers/rerun/id/{id}"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodeManagers:{id}:nodes"
-			action: "infra:nodeManagers:rerun"
-		};
-	};
+  // Create a Node Manager
+  //
+  // Creates a node manager given a name, credential id *or* credential data, and type.
+  //
+  //
+  // Authorization Action:
+  //
+  // ```
+  // infra:nodeManagers:create
+  // ```
+  rpc Create ( NodeManager ) returns ( Ids ) {
+    option (google.api.http) = { post:"/nodemanagers" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodeManagers" action:"infra:nodeManagers:create" };
+  }
+  // View a Node Manager
+  //
+  // List the details of a node manager.
+  //
+  // Authorization Action:
+  //
+  // ```
+  // infra:nodeManagers:get
+  // ```
+  rpc Read ( Id ) returns ( NodeManager ) {
+    option (google.api.http) = { get:"/nodemanagers/id/{id}" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodeManagers:{id}" action:"infra:nodeManagers:get" };
+  }
+  // Update a Node Manager
+  //
+  // Update a node manager's metadata, such as its name, associated credential id, or data.
+  // This is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty ("").
+  //
+  // Authorization Action:
+  //
+  // ```
+  // infra:nodeManagers:update
+  // ```
+  rpc Update ( NodeManager ) returns ( google.protobuf.Empty ) {
+    option (google.api.http) = { put:"/nodemanagers/id/{id}" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodeManagers:{id}" action:"infra:nodeManagers:update" };
+  }
+  // Delete a Node Manager
+  //
+  // Delete a single node manager. This deletes the node manager itself and
+  // reassigns its associated nodes to the Automate node manager.
+  //
+  // Authorization Action:
+  //
+  // ```
+  // infra:nodeManagers:delete
+  // ```
+  rpc Delete ( Id ) returns ( google.protobuf.Empty ) {
+    option (google.api.http) = { delete:"/nodemanagers/id/{id}" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodeManagers:{id}" action:"infra:nodeManagers:delete" };
+  }
+  // Delete a Node Manager and Delete Nodes
+  //
+  // Delete a node manager and all of its associated nodes.
+  //
+  // Authorization Action:
+  //
+  // ```
+  // infra:nodeManagers:delete
+  // ```
+  rpc DeleteWithNodes ( Id ) returns ( Ids ) {
+    option (google.api.http) = { delete:"/nodemanagers/id/{id}/with-nodes" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodeManagers:{id}" action:"infra:nodeManagers:delete" };
+  }
+  // Delete a Node Manager and Stop Nodes
+  //
+  // Delete a node manager and update its associated nodes to `stopped`.
+  //
+  // Authorization Action:
+  //
+  // ```
+  // infra:nodeManagers:delete
+  // ```
+  rpc DeleteWithNodeStateStopped ( Id ) returns ( google.protobuf.Empty ) {
+    option (google.api.http) = { delete:"/nodemanagers/id/{id}/with-node-state/stopped" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodeManagers:{id}" action:"infra:nodeManagers:delete" };
+  }
+  // Delete a Node Manager and Terminate Nodes
+  //
+  // Delete a node manager and update its associated nodes to `terminated`.
+  //
+  // Authorization Action:
+  //
+  // ```
+  // infra:nodeManagers:delete
+  // ```
+  rpc DeleteWithNodeStateTerminated ( Id ) returns ( google.protobuf.Empty ) {
+    option (google.api.http) = { delete:"/nodemanagers/id/{id}/with-node-state/terminated" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodeManagers:{id}" action:"infra:nodeManagers:delete" };
+  }
+  // List all Node Managers
+  //
+  // Returns a list of node managers.
+  // Supports filtering, sorting, and pagination.
+  //
+  // Valid filtering fields: manager_type
+  //
+  //
+  // Authorization Action:
+  //
+  // ```
+  // infra:nodeManagers:list
+  // ```
+  rpc List ( Query ) returns ( NodeManagers ) {
+    option (google.api.http) = { post:"/nodemanagers/search" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodeManagers" action:"infra:nodeManagers:list" };
+  }
+  // Search Node Fields
+  //
+  // Searches the available values for a given field across all nodes associated with the nodemanager id.
+  //
+  //
+  // Authorization Action:
+  //
+  // ```
+  // infra:nodeManagers:list
+  // ```
+  rpc SearchNodeFields ( FieldQuery ) returns ( Fields ) {
+    option (google.api.http) = { post:"/nodemanagers/id/{node_manager_id}/search-fields" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodeManagers:{node_manager_id}:fields" action:"infra:nodeManagers:list" };
+  }
+  // Search nodes
+  //
+  // Searches the available nodes for a single node manager by id.
+  //
+  //
+  // Authorization Action:
+  //
+  // ```
+  // infra:nodeManagers:list
+  // ```
+  rpc SearchNodes ( NodeQuery ) returns ( Nodes ) {
+    option (google.api.http) = { post:"/nodemanagers/id/{node_manager_id}/search-nodes" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodeManagers:{node_manager_id}:nodes" action:"infra:nodeManagers:list" };
+  }
+  // Connect
+  //
+  // Attempts to reach the API for the given nodemanager id to validate the
+  // credentials associated with the nodemanager.
+  //
+  // Authorization Action:
+  //
+  // ```
+  // infra:nodeManagers:rerun
+  // ```
+  rpc Connect ( Id ) returns ( ConnectResponse ) {
+    option (google.api.http) = { post:"/nodemanagers/rerun/id/{id}" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodeManagers:{id}:nodes" action:"infra:nodeManagers:rerun" };
+  }
 }
-
-message ConnectResponse{}
-
+message ConnectResponse {
+}
 message Id {
-	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["id"]
-		}
-		example: {value: '{"uuid": "cd3ad3d9-2776-4ef1-a904-4c229d1642ee"}'}
-	};
-	// UUID for the node manager.
-	string id = 1;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"id"> example:<value:"{\"uuid\": \"cd3ad3d9-2776-4ef1-a904-4c229d1642ee\"}" > };
+  // UUID for the node manager.
+  string id = 1;
 }
 message Ids {
-	// List of node manager UUIDs.
-	repeated Id ids = 1;
+  // List of node manager UUIDs.
+  repeated Id ids = 1;
 }
-
 message Query {
-	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["filter_map"]
-			}
-		example: {value: '{"filter_map": [{"key": "manager_type","values":["aws-ec2"]}],"sort": "date_added"}'}
-	};
-	// Filters for the query: "manager_type".
-	repeated chef.automate.api.common.query.Filter filter_map = 25;
-	// Sort the results in ascending or descending order.
-	enum OrderType {
-		ASC = 0;
-		DESC = 1;
-	}
-	OrderType order = 21;
-	// Field to use for sorting.
-	// Valid fields are: name, type, status, status_message, date_added.
-	string sort = 22;
-	// Starting page for the list. For example, if your query returns 100 pages,
-	// and you know you're looking for a node manager somewhere in the middle,
-	// you might want to start on page 50.
-	int32 page = 23;
-	// Number of results on each page.
-	int32 per_page = 24;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"filter_map"> example:<value:"{\"filter_map\": [{\"key\": \"manager_type\",\"values\":[\"aws-ec2\"]}],\"sort\": \"date_added\"}" > };
+  // Filters for the query: "manager_type".
+  repeated chef.automate.api.common.query.Filter filter_map = 25;
+  // Sort the results in ascending or descending order.
+  enum OrderType {
+    ASC = 0;
+    DESC = 1;
+  }
+  OrderType order = 21;
+  // Field to use for sorting.
+  // Valid fields are: name, type, status, status_message, date_added.
+  string sort = 22;
+  // Starting page for the list. For example, if your query returns 100 pages,
+  // and you know you're looking for a node manager somewhere in the middle,
+  // you might want to start on page 50.
+  int32 page = 23;
+  // Number of results on each page.
+  int32 per_page = 24;
 }
-
 message Fields {
-	// One or more fields: regions, tags, name, subscription_id.
-	repeated string fields = 1;
+  // One or more fields: regions, tags, name, subscription_id.
+  repeated string fields = 1;
 }
-
 message FieldQuery {
-	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["node_manager_id"]
-		}
-	};
-	// Query details (filters) to be applied to the results.
-	Query query = 20;
-	// Possible search fields: regions, tags, name, subscription_id.
-	string field = 21;
-	// Node manager ID.
-	string node_manager_id = 22;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"node_manager_id"> };
+  // Query details (filters) to be applied to the results.
+  Query query = 20;
+  // Possible search fields: regions, tags, name, subscription_id.
+  string field = 21;
+  // Node manager ID.
+  string node_manager_id = 22;
 }
-
 message Nodes {
-	// List of node names matching the request.
-	repeated string nodes = 1;
-	// Total count of node names matching the request.
-	int32 total = 20;
+  // List of node names matching the request.
+  repeated string nodes = 1;
+  // Total count of node names matching the request.
+  int32 total = 20;
 }
-
 message NodeQuery {
-	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["node_manager_id"]
-		}
-	};
-	// Valid search filters: manager_type.
-	Query query = 20;
-	// Node manager ID.
-	string node_manager_id = 21;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"node_manager_id"> };
+  // Valid search filters: manager_type.
+  Query query = 20;
+  // Node manager ID.
+  string node_manager_id = 21;
 }
-
 message NodeManager {
-	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["id","credential_id","credential_data","type"]
-		}
-		example: {value: '{"account_id": "12345EXAMPLE","credential_data": [{"key": "AWS_ACCESS_KEY_ID","value": "AKIAIOSFODNN7EXAMPLE"},{"key": "AWS_SECRET_ACCESS_KEY","value": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"},{"key": "AWS_SESSION_TOKEN","value": "AQoDYXdzEPT//////////wEXAMPLEt=="}],"credential_ID": "my-credential-UUID","id": "cd3ad3d9-2776-4ef1-a904-1EXAMPLEUUID","instance_credentials": [],"name": "my aws api integration with session token","type": "aws-ec2"}'}
-	};
-	// UUID for the nodemanager.
-	string id = 1;
-	// User defined name for the node manager.
-	string name = 2;
-	// Type of nodemanager (aws-ec2, azure-vm, aws-api, azure-api, gcp).
-	string type = 3;
-	// Use either 'credential_id' OR 'credential_data'.
-	// 'credential_data' will overwrite values in 'credential_id'.
-	// The 'credential_id' is the UUID of credential with the information
-	// you need to connect to aws, azure, or gcp.
-	string credential_id = 20;
-	// List of tag and credential UUID associations for making node managers.
-	// These are ssh, winrm, and sudo creds used to access instances.
-	repeated CredentialsByTags instance_credentials = 21;
-	// Status of the nodemanager (reachable, unreachable).
-	string status = 22;
-	// Account id associated with the nodemanager.
-	string account_id = 24;
-	// Date the nodemanager was created.
-	google.protobuf.Timestamp date_added = 25;
-	// Use either 'credential_data' OR 'credential_id'.
-	// 'credential_data' will overwrite values in 'credential_id'.
-	// Use 'credential_data' when you have not yet created node credentials
-	// and provide credential data (such as AWS_ACCESS_KEY) inline.
-	repeated chef.automate.api.common.query.Kv credential_data = 26;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"id" required:"credential_id" required:"credential_data" required:"type"> example:<value:"{\"account_id\": \"12345EXAMPLE\",\"credential_data\": [{\"key\": \"AWS_ACCESS_KEY_ID\",\"value\": \"AKIAIOSFODNN7EXAMPLE\"},{\"key\": \"AWS_SECRET_ACCESS_KEY\",\"value\": \"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"},{\"key\": \"AWS_SESSION_TOKEN\",\"value\": \"AQoDYXdzEPT//////////wEXAMPLEt==\"}],\"credential_ID\": \"my-credential-UUID\",\"id\": \"cd3ad3d9-2776-4ef1-a904-1EXAMPLEUUID\",\"instance_credentials\": [],\"name\": \"my aws api integration with session token\",\"type\": \"aws-ec2\"}" > };
+  // UUID for the nodemanager.
+  string id = 1;
+  // User defined name for the node manager.
+  string name = 2;
+  // Type of nodemanager (aws-ec2, azure-vm, aws-api, azure-api, gcp).
+  string type = 3;
+  // Use either 'credential_id' OR 'credential_data'.
+  // 'credential_data' will overwrite values in 'credential_id'.
+  // The 'credential_id' is the UUID of credential with the information
+  // you need to connect to aws, azure, or gcp.
+  string credential_id = 20;
+  // List of tag and credential UUID associations for making node managers.
+  // These are ssh, winrm, and sudo creds used to access instances.
+  repeated CredentialsByTags instance_credentials = 21;
+  // Status of the nodemanager (reachable, unreachable).
+  string status = 22;
+  // Account id associated with the nodemanager.
+  string account_id = 24;
+  // Date the nodemanager was created.
+  google.protobuf.Timestamp date_added = 25;
+  // Use either 'credential_data' OR 'credential_id'.
+  // 'credential_data' will overwrite values in 'credential_id'.
+  // Use 'credential_data' when you have not yet created node credentials
+  // and provide credential data (such as AWS_ACCESS_KEY) inline.
+  repeated chef.automate.api.common.query.Kv credential_data = 26;
 }
 message CredentialsByTags {
-	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["tag_key","tag_value","credential_ids"]
-		}
-	};
-	// Tag key to match on.
-	string tag_key = 20;
-	// Tag value to match on.
-	string tag_value = 21;
-	// List of credential ids to associate with the key/value pair.
-	repeated string credential_ids = 22;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema:<required:"tag_key" required:"tag_value" required:"credential_ids"> };
+  // Tag key to match on.
+  string tag_key = 20;
+  // Tag value to match on.
+  string tag_value = 21;
+  // List of credential ids to associate with the key/value pair.
+  repeated string credential_ids = 22;
 }
 message NodeManagers {
-	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-		example: { value: '{"total": "1"}' }
-	};
-	// List of nodemanagers.
-	repeated NodeManager managers = 1;
-	// Total count of nodemanagers.
-	int32 total = 20;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { example:<value:"{\"total\": \"1\"}" > };
+  // List of nodemanagers.
+  repeated NodeManager managers = 1;
+  // Total count of nodemanagers.
+  int32 total = 20;
 }

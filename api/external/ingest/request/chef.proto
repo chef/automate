@@ -1,10 +1,7 @@
 syntax = "proto3";
-
 package chef.automate.api.ingest.request;
 option go_package = "github.com/chef/automate/api/external/ingest/request";
-
 import "google/protobuf/struct.proto";
-
 message Run {
   // 1 through 15 are for frequently occuring fields
   // Reserving for shared fields between run_start and run_converge mesages.
@@ -39,18 +36,15 @@ message Run {
   repeated Deprecation deprecations = 28;
   repeated string tags = 29;
 }
-
 message Deprecation {
-	string message = 1;
-	string url = 2;
-	string location = 3;
+  string message = 1;
+  string url = 2;
+  string location = 3;
 }
-
 message ExpandedRunList {
   string id = 1;
   repeated RunList run_list = 2;
 }
-
 message RunList {
   string type = 1;
   string name = 2;
@@ -58,7 +52,6 @@ message RunList {
   bool skipped = 4;
   repeated RunList children = 5;
 }
-
 message Resource {
   string type = 1;
   string name = 2;
@@ -69,21 +62,19 @@ message Resource {
   string delta = 7;
   string cookbook_name = 8;
   string cookbook_version = 9;
-  reserved 10; // bool ignore_failure = 10;
+  reserved 10;
   string status = 11;
   string recipe_name = 12;
   google.protobuf.Value ignore_failure = 13;
   string conditional = 16;
   string result = 17;
 }
-
 message Error {
   string class = 1;
   string message = 2;
   repeated string backtrace = 16;
   Description description = 17;
 }
-
 message Description {
   string title = 1;
   repeated google.protobuf.Struct sections = 2;

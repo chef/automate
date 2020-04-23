@@ -1,8 +1,6 @@
 syntax = "proto3";
-
 package chef.automate.api.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
-
 message PolicyRevision {
   // Revision id for the policy.
   string revision_id = 1;

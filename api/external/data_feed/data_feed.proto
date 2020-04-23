@@ -1,138 +1,88 @@
-syntax="proto3";
-
+syntax = "proto3";
 package chef.automate.api.datafeed;
 option go_package = "github.com/chef/automate/api/external/data_feed";
-
 import "google/api/annotations.proto";
-
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-
 service DatafeedService {
-  rpc AddDestination(AddDestinationRequest) returns (AddDestinationResponse){
-	  option (google.api.http) = {
-		  post: "/datafeed/destination"
-		  body: "*"
-	  };
-	  option (chef.automate.api.iam.policy) = {
-		  resource: "datafeed:destination"
-		  action: "datafeed:destination:add"
-	  };
-	};
-  rpc GetDestination(GetDestinationRequest) returns (GetDestinationResponse) {
-		option (google.api.http) = {
-			get: "/datafeed/destination/{id}"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "datafeed:destination:{id}"
-			action: "datafeed:destination:get"
-		};
-	};
-  rpc DeleteDestination(DeleteDestinationRequest) returns (DeleteDestinationResponse){
-		option (google.api.http) = {
-			delete: "/datafeed/destination/{id}"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "destination:destination:{id}"
-			action: "destination:destination:delete"
-		};
-	};
-  rpc UpdateDestination(UpdateDestinationRequest) returns (UpdateDestinationResponse) {
- 		option (google.api.http) = {
-			patch: "/datafeed/destination/{id}"
-			body: "*"
-  	};
-		option (chef.automate.api.iam.policy) = {
-			resource: "datafeed:destination:{id}"
-			action: "datafeed:destination:update"
-		};
-	};
-  rpc ListDestinations(ListDestinationRequest) returns (ListDestinationResponse){
-		option (google.api.http) = {
-			post: "/datafeed/destinations"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "datafeed:destinations"
-			action: "datafeed:destinations:list"
-		};
-	};
-	rpc TestDestination(URLValidationRequest) returns (TestDestinationResponse) {
-		option (google.api.http) = {
-			post: "/datafeed/destinations/test"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "datafeed:destinations:test"
-			action: "datafeed:destinations:test"
-		};
-	}
+  rpc AddDestination ( AddDestinationRequest ) returns ( AddDestinationResponse ) {
+    option (google.api.http) = { post:"/datafeed/destination" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"datafeed:destination" action:"datafeed:destination:add" };
+  }
+  rpc GetDestination ( GetDestinationRequest ) returns ( GetDestinationResponse ) {
+    option (google.api.http) = { get:"/datafeed/destination/{id}" };
+    option (chef.automate.api.iam.policy) = { resource:"datafeed:destination:{id}" action:"datafeed:destination:get" };
+  }
+  rpc DeleteDestination ( DeleteDestinationRequest ) returns ( DeleteDestinationResponse ) {
+    option (google.api.http) = { delete:"/datafeed/destination/{id}" };
+    option (chef.automate.api.iam.policy) = { resource:"destination:destination:{id}" action:"destination:destination:delete" };
+  }
+  rpc UpdateDestination ( UpdateDestinationRequest ) returns ( UpdateDestinationResponse ) {
+    option (google.api.http) = { patch:"/datafeed/destination/{id}" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"datafeed:destination:{id}" action:"datafeed:destination:update" };
+  }
+  rpc ListDestinations ( ListDestinationRequest ) returns ( ListDestinationResponse ) {
+    option (google.api.http) = { post:"/datafeed/destinations" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"datafeed:destinations" action:"datafeed:destinations:list" };
+  }
+  rpc TestDestination ( URLValidationRequest ) returns ( TestDestinationResponse ) {
+    option (google.api.http) = { post:"/datafeed/destinations/test" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"datafeed:destinations:test" action:"datafeed:destinations:test" };
+  }
 }
-
-message AddDestinationRequest {	
-  int64  id		 = 1;
-  string name    = 2;
-  string url     = 3;
-  string secret  = 4;
-}
-
-message AddDestinationResponse {
+message AddDestinationRequest {
   int64 id = 1;
-  string name   = 2;
-  string url    = 3;
+  string name = 2;
+  string url = 3;
   string secret = 4;
 }
-
+message AddDestinationResponse {
+  int64 id = 1;
+  string name = 2;
+  string url = 3;
+  string secret = 4;
+}
 message GetDestinationRequest {
   int64 id = 1;
 }
-
 message GetDestinationResponse {
   int64 id = 1;
-  string name   = 2;
-  string url    = 3;
+  string name = 2;
+  string url = 3;
   string secret = 4;
 }
-
 message DeleteDestinationRequest {
   int64 id = 1;
 }
-
 message DeleteDestinationResponse {
   int64 id = 1;
-  string name   = 2;
-  string url    = 3;
+  string name = 2;
+  string url = 3;
   string secret = 4;
 }
-
-message UpdateDestinationRequest {	
-  string  id    = 1;
-  string name   = 2;
-  string url    = 3;
+message UpdateDestinationRequest {
+  string id = 1;
+  string name = 2;
+  string url = 3;
   string secret = 4;
 }
-
 message UpdateDestinationResponse {
   int64 id = 1;
-  string name   = 2;
-  string url    = 3;
+  string name = 2;
+  string url = 3;
   string secret = 4;
 }
-
-message ListDestinationRequest {}
-
+message ListDestinationRequest {
+}
 message ListDestinationResponse {
   repeated GetDestinationResponse destinations = 1;
 }
-
 message UsernamePassword {
   string username = 1;
   string password = 2;
 }
-
 message SecretId {
   string id = 1;
 }
-
 message URLValidationRequest {
   string url = 1;
   oneof credentials {
@@ -140,7 +90,6 @@ message URLValidationRequest {
     SecretId secret_id = 3;
   }
 }
-
 message TestDestinationResponse {
   bool success = 1;
 }

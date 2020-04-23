@@ -1,10 +1,7 @@
 syntax = "proto3";
-
 package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/common";
-
 import "protoc-gen-swagger/options/annotations.proto";
-
 message Team {
   string id = 1;
   string name = 2;

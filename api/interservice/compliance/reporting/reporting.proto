@@ -1,298 +1,286 @@
 syntax = "proto3";
-
 package chef.automate.domain.compliance.reporting;
 option go_package = "github.com/chef/automate/api/interservice/compliance/reporting";
-
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
-
 service ReportingService {
-	rpc ListReports(Query) returns (Reports) {};
-	rpc ListReportIds(Query) returns (ReportIds) {};
-	rpc ReadReport(Query) returns (Report) {};
-	rpc ListSuggestions(SuggestionRequest) returns (Suggestions) {};
-	rpc ListProfiles(Query) returns (ProfileMins) {};
-	rpc Export(Query) returns (stream ExportData) {};
-	rpc ExportNode(Query) returns (stream ExportData) {};
-	rpc ReadNode(Id) returns (Node) {};
-	rpc ListNodes(Query) returns (Nodes) {};
-	rpc ListControlItems(ControlItemRequest) returns (ControlItems) {};
+  rpc ListReports ( Query ) returns ( Reports );
+  rpc ListReportIds ( Query ) returns ( ReportIds );
+  rpc ReadReport ( Query ) returns ( Report );
+  rpc ListSuggestions ( SuggestionRequest ) returns ( Suggestions );
+  rpc ListProfiles ( Query ) returns ( ProfileMins );
+  rpc Export ( Query ) returns ( stream ExportData );
+  rpc ExportNode ( Query ) returns ( stream ExportData );
+  rpc ReadNode ( Id ) returns ( Node );
+  rpc ListNodes ( Query ) returns ( Nodes );
+  rpc ListControlItems ( ControlItemRequest ) returns ( ControlItems );
 }
 message ExportData {
-	bytes content = 1;
+  bytes content = 1;
 }
 message Id {
-	string id = 1;
+  string id = 1;
 }
 message Query {
-	string id = 18;
-	string type = 19;
-	repeated ListFilter filters = 20;
-	enum OrderType {
-		ASC = 0;
-		DESC = 1;
-	}
-	OrderType order = 21;
-	string sort = 22;
-	int32 page = 23;
-	int32 per_page = 24;
+  string id = 18;
+  string type = 19;
+  repeated ListFilter filters = 20;
+  enum OrderType {
+    ASC = 0;
+    DESC = 1;
+  }
+  OrderType order = 21;
+  string sort = 22;
+  int32 page = 23;
+  int32 per_page = 24;
 }
 message ListFilter {
-	repeated string values = 20;
-	string type = 21;
+  repeated string values = 20;
+  string type = 21;
 }
 message Total {
-	int32 total = 1;
+  int32 total = 1;
 }
 message Failed {
-	int32 total = 1;
-	int32 minor = 2;
-	int32 major = 3;
-	int32 critical = 4;
+  int32 total = 1;
+  int32 minor = 2;
+  int32 major = 3;
+  int32 critical = 4;
 }
 message ControlSummary {
-	int32  total = 1;
-	Total  passed = 2;
-	Total  skipped = 3;
-	Failed failed = 4;
-	Total  waived = 5;
+  int32 total = 1;
+  Total passed = 2;
+  Total skipped = 3;
+  Failed failed = 4;
+  Total waived = 5;
 }
-
 message ControlItemRequest {
-	string text = 1;
-	int32 size = 2;
-	repeated ListFilter filters = 3;
+  string text = 1;
+  int32 size = 2;
+  repeated ListFilter filters = 3;
 }
-
 message WaiverData {
-	string waived_str = 1;
-	string expiration_date = 2;
-	string justification = 3;
-	ControlSummary waiver_summary= 4;
+  string waived_str = 1;
+  string expiration_date = 2;
+  string justification = 3;
+  ControlSummary waiver_summary = 4;
 }
-
 message ControlItem {
-	string id = 1;
-	string title = 2;
-	ProfileMin profile = 3;
-	float impact = 4;
-	google.protobuf.Timestamp end_time = 5;
-	ControlSummary control_summary = 6;
-	repeated WaiverData waivers = 7;
+  string id = 1;
+  string title = 2;
+  ProfileMin profile = 3;
+  float impact = 4;
+  google.protobuf.Timestamp end_time = 5;
+  ControlSummary control_summary = 6;
+  repeated WaiverData waivers = 7;
 }
-
 message ControlItems {
-	repeated ControlItem control_items = 1;
-	ControlSummary control_summary_totals = 2;
+  repeated ControlItem control_items = 1;
+  ControlSummary control_summary_totals = 2;
 }
-
 message Reports {
-	repeated Report reports = 1;
-	int32 total = 2;
+  repeated Report reports = 1;
+  int32 total = 2;
 }
 message ReportIds {
-	repeated string ids = 1;
-	repeated ReportData report_data = 2;
+  repeated string ids = 1;
+  repeated ReportData report_data = 2;
 }
-
-message ReportData{
-	string id = 1;
-	google.protobuf.Timestamp end_time = 2;
+message ReportData {
+  string id = 1;
+  google.protobuf.Timestamp end_time = 2;
 }
-
 message Report {
-	string id = 1;
-	string node_id = 2;
-	string node_name = 3;
-	google.protobuf.Timestamp end_time = 4;
-	string status = 5;
-	ControlSummary controls = 6;
-	string environment = 7;
-	string version = 8;
-	Platform platform = 9;
-	Statistics statistics = 10;
-	repeated Profile profiles = 11;
-	string job_id = 12;
-	string ipaddress = 13;
-	string fqdn = 14;
-	string chef_server = 15;
-	string chef_organization = 16;
-	repeated string roles = 17;
-	repeated string chef_tags = 18;
-	repeated string projects = 20;
+  string id = 1;
+  string node_id = 2;
+  string node_name = 3;
+  google.protobuf.Timestamp end_time = 4;
+  string status = 5;
+  ControlSummary controls = 6;
+  string environment = 7;
+  string version = 8;
+  Platform platform = 9;
+  Statistics statistics = 10;
+  repeated Profile profiles = 11;
+  string job_id = 12;
+  string ipaddress = 13;
+  string fqdn = 14;
+  string chef_server = 15;
+  string chef_organization = 16;
+  repeated string roles = 17;
+  repeated string chef_tags = 18;
+  repeated string projects = 20;
 }
 message Profile {
-	string name = 1;
-	string title = 2;
-	string maintainer = 3;
-	string copyright = 4;
-	string copyright_email = 5;
-	string license = 6;
-	string summary = 7;
-	string version = 8;
-	string owner = 9;
-	string full = 10;
-	repeated Support supports = 16;
-	repeated Dependency depends = 17;
-	string sha256 = 18;
-	repeated Group groups = 19;
-	repeated Control controls = 20;
-	repeated Attribute attributes = 21;
-	string latest_version = 22;
-	string status = 23;
-	string skip_message = 24;
+  string name = 1;
+  string title = 2;
+  string maintainer = 3;
+  string copyright = 4;
+  string copyright_email = 5;
+  string license = 6;
+  string summary = 7;
+  string version = 8;
+  string owner = 9;
+  string full = 10;
+  repeated Support supports = 16;
+  repeated Dependency depends = 17;
+  string sha256 = 18;
+  repeated Group groups = 19;
+  repeated Control controls = 20;
+  repeated Attribute attributes = 21;
+  string latest_version = 22;
+  string status = 23;
+  string skip_message = 24;
 }
 message Ref {
-	string url = 1;
-	string ref = 2;
+  string url = 1;
+  string ref = 2;
 }
 message Result {
-	string status = 1;
-	string code_desc = 2;
-	float run_time = 3;
-	string start_time = 4;
-	string message = 5;
-	string skip_message = 6;
+  string status = 1;
+  string code_desc = 2;
+  float run_time = 3;
+  string start_time = 4;
+  string message = 5;
+  string skip_message = 6;
 }
 message SourceLocation {
-	string ref = 1;
-	int32 line = 2;
+  string ref = 1;
+  int32 line = 2;
 }
 message Option {
-	string description = 1;
-	string default = 2 ;
+  string description = 1;
+  string default = 2;
 }
 message Support {
-	string os_name = 1;
-	string os_family = 2;
-	string release = 3;
-	string inspec_version = 4;
-	string platform = 5;
+  string os_name = 1;
+  string os_family = 2;
+  string release = 3;
+  string inspec_version = 4;
+  string platform = 5;
 }
 message Dependency {
-	string name = 1;
-	string url = 2;
-	string path = 3;
-	string git = 4;
-	string branch = 5;
-	string tag = 6;
-	string commit = 7;
-	string version = 8;
-	string supermarket = 9;
-	string github = 10;
-	string compliance = 11;
-	string status = 12;
-	string skip_message = 13;
+  string name = 1;
+  string url = 2;
+  string path = 3;
+  string git = 4;
+  string branch = 5;
+  string tag = 6;
+  string commit = 7;
+  string version = 8;
+  string supermarket = 9;
+  string github = 10;
+  string compliance = 11;
+  string status = 12;
+  string skip_message = 13;
 }
 message Group {
-	string id = 1;
-	string title = 2;
-	repeated string controls = 3;
+  string id = 1;
+  string title = 2;
+  repeated string controls = 3;
 }
 message Control {
-	string id = 1;
-	string code = 2;
-	string desc = 3;
-	float impact = 4;
-	string title = 5;
-	SourceLocation source_location = 6;
-	repeated Result results = 7;
-	repeated Ref refs = 8;
-	map<string, string> tags = 9;
-	map<string, TagValues> string_tags = 10;
-	string waived_str = 11;
-	OrigWaiverData waiver_data = 12;
+  string id = 1;
+  string code = 2;
+  string desc = 3;
+  float impact = 4;
+  string title = 5;
+  SourceLocation source_location = 6;
+  repeated Result results = 7;
+  repeated Ref refs = 8;
+  map<string, string> tags = 9;
+  map<string, TagValues> string_tags = 10;
+  string waived_str = 11;
+  OrigWaiverData waiver_data = 12;
 }
-
 // WaiverData as it originally came from the InSpec report
 // Will supplement this with waived_str to make consumption easier
 message OrigWaiverData {
-	string expiration_date = 1;
-	string justification = 2;
-	bool run = 3;
-	bool skipped_due_to_waiver = 4;
-	string message = 5;
+  string expiration_date = 1;
+  string justification = 2;
+  bool run = 3;
+  bool skipped_due_to_waiver = 4;
+  string message = 5;
 }
-
 message TagValues {
-	repeated string values = 1;
+  repeated string values = 1;
 }
 message Attribute {
-	string name = 1;
-	Option options = 2;
+  string name = 1;
+  Option options = 2;
 }
 message Platform {
-	string name = 1;
-	string release = 2;
-	string full = 3;
+  string name = 1;
+  string release = 2;
+  string full = 3;
 }
 message Statistics {
-	float duration = 1;
+  float duration = 1;
 }
 message SuggestionRequest {
-	string type = 1;
-	string text = 2;
-	int32 size = 3;
-	repeated ListFilter filters = 4;
+  string type = 1;
+  string text = 2;
+  int32 size = 3;
+  repeated ListFilter filters = 4;
 }
 message Suggestion {
-	string text = 1;
-	string id = 2;
-	float score = 3;
-	string version = 4;
+  string text = 1;
+  string id = 2;
+  float score = 3;
+  string version = 4;
 }
 message Suggestions {
-	repeated Suggestion suggestions = 1;
+  repeated Suggestion suggestions = 1;
 }
 message ProfileMins {
-	repeated ProfileMin profiles = 1;
-	ProfileCounts counts = 2;
+  repeated ProfileMin profiles = 1;
+  ProfileCounts counts = 2;
 }
 message ProfileCounts {
-	int32 total = 1;
-	int32 failed = 2;
-	int32 skipped = 3;
-	int32 passed = 4;
-	int32 waived = 5;
+  int32 total = 1;
+  int32 failed = 2;
+  int32 skipped = 3;
+  int32 passed = 4;
+  int32 waived = 5;
 }
 message ProfileMin {
-	string name = 1;
-	string title = 2;
-	string id = 3;
-	string version = 4;
-	string status = 5;
+  string name = 1;
+  string title = 2;
+  string id = 3;
+  string version = 4;
+  string status = 5;
 }
 message Node {
-	string id = 1;
-	string name = 2;
-	Platform platform = 3;
-	string environment = 4;
-	LatestReportSummary latest_report = 8;
-	repeated Kv tags = 9;
-	repeated ProfileMeta profiles = 10;
+  string id = 1;
+  string name = 2;
+  Platform platform = 3;
+  string environment = 4;
+  LatestReportSummary latest_report = 8;
+  repeated Kv tags = 9;
+  repeated ProfileMeta profiles = 10;
 }
 message Nodes {
-	repeated Node nodes = 1;
-	int32 total = 20;
-	int32 total_passed = 21;
-	int32 total_failed = 22;
-	int32 total_skipped = 23;
-	int32 total_waived = 24;
+  repeated Node nodes = 1;
+  int32 total = 20;
+  int32 total_passed = 21;
+  int32 total_failed = 22;
+  int32 total_skipped = 23;
+  int32 total_waived = 24;
 }
 message Kv {
-	string key = 1;
-	string value = 2;
+  string key = 1;
+  string value = 2;
 }
 message LatestReportSummary {
-	string id = 1;
-	google.protobuf.Timestamp end_time = 2;
-	string status = 3;
-	ControlSummary controls = 4;
+  string id = 1;
+  google.protobuf.Timestamp end_time = 2;
+  string status = 3;
+  ControlSummary controls = 4;
 }
 message ProfileMeta {
-	string name = 1;
-	string version = 2;
-	string id = 3;
-	string status = 4;
-	string full = 5;
+  string name = 1;
+  string version = 2;
+  string id = 3;
+  string status = 4;
+  string full = 5;
 }

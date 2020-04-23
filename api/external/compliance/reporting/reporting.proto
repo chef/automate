@@ -1,785 +1,655 @@
 syntax = "proto3";
-
 package chef.automate.api.compliance.reporting.v1;
 option go_package = "github.com/chef/automate/api/external/compliance/reporting";
-
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "protoc-gen-swagger/options/annotations.proto";
-
 import "api/external/common/version/version.proto";
 import "api/external/common/response.proto";
-
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-
 service ReportingService {
-	/*
-	List reports
-
-	Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
-	Supports pagination, filtering, and sorting.
-	Limited to 10k results.
-
-	Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
-	latest_report.end_time, latest_report.status, node_name
-
-	Example:
-	```
-	{"filters":
-		[
-			{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
-			{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
-		],
-		"page":1, "per_page": 3,
-		"sort": "latest_report.status", "order": "ASC"
-	}
-	```
-
-	Authorization Action:
-	```
-	compliance:reports:list
-	```
-	*/
-	rpc ListReports(Query) returns (Reports) {
-		option (google.api.http) = {
-			post: "/compliance/reporting/reports"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:reports"
-			action: "compliance:reports:list"
-		};
-	};
-
-	/*
-	List report IDs
-
-	List all IDs for the latest report for each node, with optional filtering.
-	Supports filtering, but not pagination or sorting.
-	Including more than one value for `profile_id`, or `profile_name` is not allowed.
-	Including values for both `profile_id` and `profile_name` in one request is not allowed.
-	Not limited to 10k results.
-
-	Authorization Action:
-	```
-	compliance:reportids:list
-	```
-	*/
-	rpc ListReportIds(Query) returns (ReportIds) {
-		option (google.api.http) = {
-			post: "/compliance/reporting/report-ids"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:report-ids"
-			action: "compliance:reportids:list"
-		};
-	};
-
-	/*
-	List controls
-
-	Lists controls from the last run, with optional filtering.
-	Supports filtering, but not pagination or sorting.
-	Limited to 100 results by default.
-
-	Authorization Action:
-	```
-	compliance:controlItems:list
-	```
-	*/
-	rpc ListControlItems(ControlItemRequest) returns (ControlItems) {
-		option (google.api.http) = {
-			post: "/compliance/reporting/controls"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:control"
-			action: "compliance:controlItems:list"
-		};
-	};
-
-	/*
-	Fetch a report
-
-	Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
-	Including more than one value for `profile_id`, or `profile_name` is not allowed.
-	Including values for both `profile_id` and `profile_name` in one request is not allowed.
-
-	Authorization Action:
-	```
-	compliance:reports:get
-	```
-	*/
-	rpc ReadReport(Query) returns (Report) {
-		option (google.api.http) = {
-			post: "/compliance/reporting/reports/id/{id}"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:reports:{id}"
-			action: "compliance:reports:get"
-		};
-	};
-
-	/*
-	List suggestions
-
-	Get suggestions for compliance reporting resources based on matching text substrings.
-	Supports filtering, but not pagination or sorting.
-	`type` parameter is required. It must be one of the parameters from the following table.
-
-	| Suggestion type parameter | Suggestion type value |
-	| --- | --- |
-	| chef_server | source_fqdn |
-	| chef_tags | chef_tags |
-	| control | profiles.controls.title |
-	| control_tag_key | profiles.controls.string_tags.key |
-	| control_tag_value | profiles.controls.string_tags.values |
-	| environment | environment |
-	| inspec_version | version |
-	| node | node_name |
-	| organization | organization_name |
-	| platform | platform.name |
-	| platform_with_version | platform.full |
-	| policy_group | policy_group |
-	| policy_name | policy_name |
-	| profile | profiles.title |
-	| profile_with_version | profiles.full |
-	| recipe | recipes |
-	| role | roles |
-
-	Example:
-	```
-	{
-		"type":"environment",
-		"text":"aws*",
-		"filters":[
-			{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-			{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-		]
-	}
-	```
-
-	Authorization Action:
-	```
-	compliance:reportSuggestions:list
-	```
-	*/
-	rpc ListSuggestions(SuggestionRequest) returns (Suggestions) {
-		option (google.api.http) = {
-			post: "/compliance/reporting/suggestions"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:suggestions"
-			action: "compliance:reportSuggestions:list"
-		};
-	};
-
-	/*
-	List profiles
-
-	List all profiles in use, with optional filtering.
-	Supports pagination, filtering, and sorting.
-	Valid sort fields: name, title
-
-	Authorization Action:
-	```
-	compliance:reportProfiles:list
-	```
-	*/
-	rpc ListProfiles(Query) returns (ProfileMins) {
-		option (google.api.http) = {
-			post: "/compliance/reporting/profiles"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:profiles"
-			action: "compliance:reportProfiles:list"
-		};
-	};
-
-	rpc Export(Query) returns (stream chef.automate.api.common.ExportData) {};
-
-	rpc ExportNode(Query) returns (stream chef.automate.api.common.ExportData) {};
-
-	/*
-	Fetch a node
-
-	Fetch a specific node by ID.
-	Supports filtering by profile or control.
-	Does not support pagination or sorting.
-
-	Authorization Action:
-	```
-	compliance:reportNodes:get
-	```
-	*/
-	rpc ReadNode(Id) returns (Node) {
-		option (google.api.http) = {
-			get: "/compliance/reporting/nodes/id/{id}"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:nodes:{id}"
-			action: "compliance:reportNodes:get"
-		};
-	};
-
-	/*
-	List nodes
-
-	List all nodes, with optional filtering, pagination, and sorting.
-	Limited to 10k results.
-
-	| Sort parameter | Sort value |
-	| --- | --- |
-	| environment | environment.lower |
-	| latest_report.controls.failed.critical | controls_sums.failed.critical |
-	| latest_report.controls.failed.total | controls_sums.failed.total |
-	| latest_report.end_time (default) | end_time |
-	| latest_report.status | status |
-	| name | node_name.lower |
-	| platform | platform.full |
-	| status | status |
-
-	Example:
-	```
-	{
-		"filters":[
-			{"type":"environment","values":["dev*"]},
-			{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-			{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-		],
-		"page":1,"per_page":100,
-		"sort":"environment","order":"ASC"
-	}
-	```
-
-	Authorization Action:
-	```
-	compliance:reportNodes:list
-	```
-	*/
-	rpc ListNodes(Query) returns (Nodes) {
-		option (google.api.http) = {
-			post: "/compliance/reporting/nodes/search"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:nodes"
-			action: "compliance:reportNodes:list"
-		};
-	};
-
-	rpc GetVersion(google.protobuf.Empty) returns (common.version.VersionInfo) {
-		option (google.api.http) = {
-			get: "/compliance/reporting/version"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "system:service:version"
-			action: "system:serviceVersion:get"
-		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "hidden";
-		};
-	};
-
-	rpc LicenseUsageNodes(TimeQuery) returns (Reports) {
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:licenseusage"
-			action: "compliance:reportingLicenseUsage:list"
-		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "hidden";
-		};
-	};
+  // List reports
+  //
+  // Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
+  // Supports pagination, filtering, and sorting.
+  // Limited to 10k results.
+  //
+  // Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
+  // latest_report.end_time, latest_report.status, node_name
+  //
+  // Example:
+  // ```
+  // {"filters":
+  // [
+  // {"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+  // {"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+  // ],
+  // "page":1, "per_page": 3,
+  // "sort": "latest_report.status", "order": "ASC"
+  // }
+  // ```
+  //
+  // Authorization Action:
+  // ```
+  // compliance:reports:list
+  // ```
+  rpc ListReports ( Query ) returns ( Reports ) {
+    option (google.api.http) = { post:"/compliance/reporting/reports" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:reports" action:"compliance:reports:list" };
+  }
+  // List report IDs
+  //
+  // List all IDs for the latest report for each node, with optional filtering.
+  // Supports filtering, but not pagination or sorting.
+  // Including more than one value for `profile_id`, or `profile_name` is not allowed.
+  // Including values for both `profile_id` and `profile_name` in one request is not allowed.
+  // Not limited to 10k results.
+  //
+  // Authorization Action:
+  // ```
+  // compliance:reportids:list
+  // ```
+  rpc ListReportIds ( Query ) returns ( ReportIds ) {
+    option (google.api.http) = { post:"/compliance/reporting/report-ids" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:report-ids" action:"compliance:reportids:list" };
+  }
+  // List controls
+  //
+  // Lists controls from the last run, with optional filtering.
+  // Supports filtering, but not pagination or sorting.
+  // Limited to 100 results by default.
+  //
+  // Authorization Action:
+  // ```
+  // compliance:controlItems:list
+  // ```
+  rpc ListControlItems ( ControlItemRequest ) returns ( ControlItems ) {
+    option (google.api.http) = { post:"/compliance/reporting/controls" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:control" action:"compliance:controlItems:list" };
+  }
+  // Fetch a report
+  //
+  // Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
+  // Including more than one value for `profile_id`, or `profile_name` is not allowed.
+  // Including values for both `profile_id` and `profile_name` in one request is not allowed.
+  //
+  // Authorization Action:
+  // ```
+  // compliance:reports:get
+  // ```
+  rpc ReadReport ( Query ) returns ( Report ) {
+    option (google.api.http) = { post:"/compliance/reporting/reports/id/{id}" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:reports:{id}" action:"compliance:reports:get" };
+  }
+  // List suggestions
+  //
+  // Get suggestions for compliance reporting resources based on matching text substrings.
+  // Supports filtering, but not pagination or sorting.
+  // `type` parameter is required. It must be one of the parameters from the following table.
+  //
+  // | Suggestion type parameter | Suggestion type value |
+  // | --- | --- |
+  // | chef_server | source_fqdn |
+  // | chef_tags | chef_tags |
+  // | control | profiles.controls.title |
+  // | control_tag_key | profiles.controls.string_tags.key |
+  // | control_tag_value | profiles.controls.string_tags.values |
+  // | environment | environment |
+  // | inspec_version | version |
+  // | node | node_name |
+  // | organization | organization_name |
+  // | platform | platform.name |
+  // | platform_with_version | platform.full |
+  // | policy_group | policy_group |
+  // | policy_name | policy_name |
+  // | profile | profiles.title |
+  // | profile_with_version | profiles.full |
+  // | recipe | recipes |
+  // | role | roles |
+  //
+  // Example:
+  // ```
+  // {
+  // "type":"environment",
+  // "text":"aws*",
+  // "filters":[
+  // {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+  // {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+  // ]
+  // }
+  // ```
+  //
+  // Authorization Action:
+  // ```
+  // compliance:reportSuggestions:list
+  // ```
+  rpc ListSuggestions ( SuggestionRequest ) returns ( Suggestions ) {
+    option (google.api.http) = { post:"/compliance/reporting/suggestions" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:suggestions" action:"compliance:reportSuggestions:list" };
+  }
+  // List profiles
+  //
+  // List all profiles in use, with optional filtering.
+  // Supports pagination, filtering, and sorting.
+  // Valid sort fields: name, title
+  //
+  // Authorization Action:
+  // ```
+  // compliance:reportProfiles:list
+  // ```
+  rpc ListProfiles ( Query ) returns ( ProfileMins ) {
+    option (google.api.http) = { post:"/compliance/reporting/profiles" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:profiles" action:"compliance:reportProfiles:list" };
+  }
+  rpc Export ( Query ) returns ( stream chef.automate.api.common.ExportData );
+  rpc ExportNode ( Query ) returns ( stream chef.automate.api.common.ExportData );
+  // Fetch a node
+  //
+  // Fetch a specific node by ID.
+  // Supports filtering by profile or control.
+  // Does not support pagination or sorting.
+  //
+  // Authorization Action:
+  // ```
+  // compliance:reportNodes:get
+  // ```
+  rpc ReadNode ( Id ) returns ( Node ) {
+    option (google.api.http) = { get:"/compliance/reporting/nodes/id/{id}" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:nodes:{id}" action:"compliance:reportNodes:get" };
+  }
+  // List nodes
+  //
+  // List all nodes, with optional filtering, pagination, and sorting.
+  // Limited to 10k results.
+  //
+  // | Sort parameter | Sort value |
+  // | --- | --- |
+  // | environment | environment.lower |
+  // | latest_report.controls.failed.critical | controls_sums.failed.critical |
+  // | latest_report.controls.failed.total | controls_sums.failed.total |
+  // | latest_report.end_time (default) | end_time |
+  // | latest_report.status | status |
+  // | name | node_name.lower |
+  // | platform | platform.full |
+  // | status | status |
+  //
+  // Example:
+  // ```
+  // {
+  // "filters":[
+  // {"type":"environment","values":["dev*"]},
+  // {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+  // {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+  // ],
+  // "page":1,"per_page":100,
+  // "sort":"environment","order":"ASC"
+  // }
+  // ```
+  //
+  // Authorization Action:
+  // ```
+  // compliance:reportNodes:list
+  // ```
+  rpc ListNodes ( Query ) returns ( Nodes ) {
+    option (google.api.http) = { post:"/compliance/reporting/nodes/search" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:nodes" action:"compliance:reportNodes:list" };
+  }
+  rpc GetVersion ( google.protobuf.Empty ) returns ( chef.automate.api.common.version.VersionInfo ) {
+    option (google.api.http) = { get:"/compliance/reporting/version" };
+    option (chef.automate.api.iam.policy) = { resource:"system:service:version" action:"system:serviceVersion:get" };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = { tags:"hidden" };
+  }
+  rpc LicenseUsageNodes ( TimeQuery ) returns ( Reports ) {
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:licenseusage" action:"compliance:reportingLicenseUsage:list" };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = { tags:"hidden" };
+  }
 }
-
 message ControlItemRequest {
-	// The term to use to match resources on.
-	string text = 1;
-	// The maximum number of controls to return (Default 100).
-	int32 size = 2;
-	// The criteria used to filter the controls returned.
-	repeated ListFilter filters = 3;
+  // The term to use to match resources on.
+  string text = 1;
+  // The maximum number of controls to return (Default 100).
+  int32 size = 2;
+  // The criteria used to filter the controls returned.
+  repeated ListFilter filters = 3;
 }
-
 message WaiverData {
-	// The waived state of the control item. Possible values: `yes`, `yes_run`, `no`, `no_expired`.
-	string waived_str = 1;
-	// The expiration date for the waiver. After this date, the control is no longer waived.
-	string expiration_date = 2;
-	// The reason for the waiver.
-	string justification = 3;
-	// Intentionally blank.
-	ControlSummary waiver_summary= 4;
+  // The waived state of the control item. Possible values: `yes`, `yes_run`, `no`, `no_expired`.
+  string waived_str = 1;
+  // The expiration date for the waiver. After this date, the control is no longer waived.
+  string expiration_date = 2;
+  // The reason for the waiver.
+  string justification = 3;
+  // Intentionally blank.
+  ControlSummary waiver_summary = 4;
 }
-
 message ControlItem {
-	// The control's unique ID.
-	string id = 1;
-	// The control's compact description.
-	string title= 2;
-	// Intentionally blank.
-	ProfileMin profile = 3;
-	// The severity of the control.
-	float impact = 4;
-	// The time the report using the control was submitted at.
-	google.protobuf.Timestamp end_time = 5;
-	// Intentionally blank.
-	ControlSummary control_summary = 6;
-	// A list of waivers for the nodes affected by this control.
-	repeated WaiverData waivers = 7;
+  // The control's unique ID.
+  string id = 1;
+  // The control's compact description.
+  string title = 2;
+  // Intentionally blank.
+  ProfileMin profile = 3;
+  // The severity of the control.
+  float impact = 4;
+  // The time the report using the control was submitted at.
+  google.protobuf.Timestamp end_time = 5;
+  // Intentionally blank.
+  ControlSummary control_summary = 6;
+  // A list of waivers for the nodes affected by this control.
+  repeated WaiverData waivers = 7;
 }
-
 message ControlItems {
-	// The paginated results of controls matching the filters.
-	repeated ControlItem control_items = 1;
-	// The summary totals for this list of control items
-	ControlSummary control_summary_totals = 2;
+  // The paginated results of controls matching the filters.
+  repeated ControlItem control_items = 1;
+  // The summary totals for this list of control items
+  ControlSummary control_summary_totals = 2;
 }
-
 message TimeQuery {
-	google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp start_time = 1;
 }
-
 message Id {
-	// Unique identifier.
-	string id = 1;
+  // Unique identifier.
+  string id = 1;
 }
-
 message Query {
-	// Unique identifier.
-	string id = 18;
-	// File type, either JSON or CSV.
-	string type = 19;
-	// Filters applied to the report results.
-	repeated ListFilter filters = 20;
-	// Sort the results in ascending or descending order.
-	enum OrderType {
-		ASC = 0;
-		DESC = 1;
-	}
-	OrderType order = 21;
-	// Sort the list of results by a field.
-	string sort = 22;
-	// The offset for paginating requests. An offset defines a place in the results in order to fetch the next page of the results.
-	int32 page = 23;
-	// The number of results on each paginated request page.
-	int32 per_page = 24;
+  // Unique identifier.
+  string id = 18;
+  // File type, either JSON or CSV.
+  string type = 19;
+  // Filters applied to the report results.
+  repeated ListFilter filters = 20;
+  // Sort the results in ascending or descending order.
+  enum OrderType {
+    ASC = 0;
+    DESC = 1;
+  }
+  OrderType order = 21;
+  // Sort the list of results by a field.
+  string sort = 22;
+  // The offset for paginating requests. An offset defines a place in the results in order to fetch the next page of the results.
+  int32 page = 23;
+  // The number of results on each paginated request page.
+  int32 per_page = 24;
 }
-
 message ListFilter {
-	// Filters applied to the list.
-	repeated string values = 20;
-	// The field to filter on.
-	string type = 21;
+  // Filters applied to the list.
+  repeated string values = 20;
+  // The field to filter on.
+  string type = 21;
 }
-
 // A subtotal of controls.
 message Total {
-	// The total number of controls.
-	int32 total = 1;
+  // The total number of controls.
+  int32 total = 1;
 }
-
 // Stats of failed controls.
 message Failed {
-	// The total number of failed controls.
-	int32 total = 1;
-	// The number of failed controls with minor severity.
-	int32 minor = 2;
-	// The number of failed controls with major severity.
-	int32 major = 3;
-	// The number of failed controls with critical severity.
-	int32 critical = 4;
+  // The total number of failed controls.
+  int32 total = 1;
+  // The number of failed controls with minor severity.
+  int32 minor = 2;
+  // The number of failed controls with major severity.
+  int32 major = 3;
+  // The number of failed controls with critical severity.
+  int32 critical = 4;
 }
-
 // A minimal representation of the statuses of the controls in the report.
 message ControlSummary {
-	// The total number of controls in the report.
-	int32 total = 1;
-	// Intentionally blank.
-	Total passed = 2;
-	// Intentionally blank.
-	Total skipped = 3;
-	// Intentionally blank.
-	Failed failed = 4;
-	// Intentionally blank.
-	Total  waived = 5;
+  // The total number of controls in the report.
+  int32 total = 1;
+  // Intentionally blank.
+  Total passed = 2;
+  // Intentionally blank.
+  Total skipped = 3;
+  // Intentionally blank.
+  Failed failed = 4;
+  // Intentionally blank.
+  Total waived = 5;
 }
-
 message Reports {
-	// Paginated results of reports matching the filters.
-	repeated Report reports = 1;
-	// Total number of reports matching the filters.
-	int32 total = 2;
+  // Paginated results of reports matching the filters.
+  repeated Report reports = 1;
+  // Total number of reports matching the filters.
+  int32 total = 2;
 }
-
 message ReportIds {
-	// The list of unique report identifiers found matching the query.
-	repeated string ids = 1;
-	// The list of unique report identifiers with their respective end_time, found matching the query.
-	repeated ReportData report_data = 2;
+  // The list of unique report identifiers found matching the query.
+  repeated string ids = 1;
+  // The list of unique report identifiers with their respective end_time, found matching the query.
+  repeated ReportData report_data = 2;
 }
-
-message ReportData{
-	// The report run_uuid
-	string id = 1;
-	// The time in UTC that the scan was completed
-	google.protobuf.Timestamp end_time = 2;
+message ReportData {
+  // The report run_uuid
+  string id = 1;
+  // The time in UTC that the scan was completed
+  google.protobuf.Timestamp end_time = 2;
 }
-
 message Report {
-	// A unique report identifier.
-	string id = 1;
-	// The reporting node's unique ID.
-	string node_id = 2;
-	// The reporting node name.
-	string node_name = 3;
-	// The time that the report was completed.
-	google.protobuf.Timestamp end_time = 4;
-	// The status of the run the report was made from.
-	string status = 5;
-	// Intentionally blank.
-	ControlSummary controls = 6;
-	// The environment of the node making the report.
-	string environment = 7;
-	// The version of the report.
-	string version = 8;
-	// Intentionally blank.
-	Platform platform = 9;
-	// Intentionally blank.
-	Statistics statistics = 10;
-	// The profiles run as part of this report.
-	repeated Profile profiles = 11;
-	// The compliance scan job ID associated with the report.
-	string job_id = 12;
-	// The reporting node IP address.
-	string ipaddress = 13;
-	// The FQDN (fully qualified domain name) of the node making the report.
-	string fqdn = 14;
-	// The Chef Infra Server that manages the node making the report.
-	string chef_server = 15;
-	// The Organization the node belongs to.
-	string chef_organization = 16;
-	// The Roles associated with the node.
-	repeated string roles = 17;
-	// The Chef Tags associated with the node.
-	repeated string chef_tags = 18;
-	// The projects the node is assigned to. This is a resource-scoped access control feature of IAMv2.
-	repeated string projects = 20;
+  // A unique report identifier.
+  string id = 1;
+  // The reporting node's unique ID.
+  string node_id = 2;
+  // The reporting node name.
+  string node_name = 3;
+  // The time that the report was completed.
+  google.protobuf.Timestamp end_time = 4;
+  // The status of the run the report was made from.
+  string status = 5;
+  // Intentionally blank.
+  ControlSummary controls = 6;
+  // The environment of the node making the report.
+  string environment = 7;
+  // The version of the report.
+  string version = 8;
+  // Intentionally blank.
+  Platform platform = 9;
+  // Intentionally blank.
+  Statistics statistics = 10;
+  // The profiles run as part of this report.
+  repeated Profile profiles = 11;
+  // The compliance scan job ID associated with the report.
+  string job_id = 12;
+  // The reporting node IP address.
+  string ipaddress = 13;
+  // The FQDN (fully qualified domain name) of the node making the report.
+  string fqdn = 14;
+  // The Chef Infra Server that manages the node making the report.
+  string chef_server = 15;
+  // The Organization the node belongs to.
+  string chef_organization = 16;
+  // The Roles associated with the node.
+  repeated string roles = 17;
+  // The Chef Tags associated with the node.
+  repeated string chef_tags = 18;
+  // The projects the node is assigned to. This is a resource-scoped access control feature of IAMv2.
+  repeated string projects = 20;
 }
-
 message Profile {
-	// The name of the profile. Must be unique.
-	string name = 1;
-	// The profile title.
-	string title = 2;
-	// The maintainer listed in the profile metadata.
-	string maintainer = 3;
-	// The name of the copyright holder.
-	string copyright = 4;
-	// The contact information for the copyright holder.
-	string copyright_email = 5;
-	// The license the profile is released under.
-	string license = 6;
-	// A short description of the profile.
-	string summary = 7;
-	// The version of the profile.
-	string version = 8;
-	// The name of the account that uploaded the profile to Automate.
-	string owner = 9;
-	// The combined name and version of the profile.
-	string full = 10;
-	// The supported platform targets.
-	repeated Support supports = 16;
-	// Other profiles that this profile depends on.
-	repeated Dependency depends = 17;
-	// A unique value generated from the profile used to identify it.
-	string sha256 = 18;
-	// The groups of controls defined in the profile.
-	repeated Group groups = 19;
-	// The controls defined on the profile.
-	repeated Control controls = 20;
-	// The attributes defined on the profile.
-	repeated Attribute attributes = 21;
-	// The highest version number of the profile stored in Automate.
-	string latest_version = 22;
-	// The status of the profile in the generated report.
-	string status = 23;
-	// The reason this profile was skipped in the generated report, if any.
-	string skip_message = 24;
+  // The name of the profile. Must be unique.
+  string name = 1;
+  // The profile title.
+  string title = 2;
+  // The maintainer listed in the profile metadata.
+  string maintainer = 3;
+  // The name of the copyright holder.
+  string copyright = 4;
+  // The contact information for the copyright holder.
+  string copyright_email = 5;
+  // The license the profile is released under.
+  string license = 6;
+  // A short description of the profile.
+  string summary = 7;
+  // The version of the profile.
+  string version = 8;
+  // The name of the account that uploaded the profile to Automate.
+  string owner = 9;
+  // The combined name and version of the profile.
+  string full = 10;
+  // The supported platform targets.
+  repeated Support supports = 16;
+  // Other profiles that this profile depends on.
+  repeated Dependency depends = 17;
+  // A unique value generated from the profile used to identify it.
+  string sha256 = 18;
+  // The groups of controls defined in the profile.
+  repeated Group groups = 19;
+  // The controls defined on the profile.
+  repeated Control controls = 20;
+  // The attributes defined on the profile.
+  repeated Attribute attributes = 21;
+  // The highest version number of the profile stored in Automate.
+  string latest_version = 22;
+  // The status of the profile in the generated report.
+  string status = 23;
+  // The reason this profile was skipped in the generated report, if any.
+  string skip_message = 24;
 }
-
 message Ref {
-	// The external document URL.
-	string url = 1;
-	// A description of the external document.
-	string ref = 2;
+  // The external document URL.
+  string url = 1;
+  // A description of the external document.
+  string ref = 2;
 }
-
 message Result {
-	// The status of the test.
-	string status = 1;
-	// The description of the test.
-	string code_desc = 2;
-	// The time taken to run the test.
-	float run_time = 3;
-	// The timestamp of when this individual test was run.
-	string start_time = 4;
-	// The reason the test failed, if any.
-	string message = 5;
-	// The reason the test was skipped, if any.
-	string skip_message = 6;
+  // The status of the test.
+  string status = 1;
+  // The description of the test.
+  string code_desc = 2;
+  // The time taken to run the test.
+  float run_time = 3;
+  // The timestamp of when this individual test was run.
+  string start_time = 4;
+  // The reason the test failed, if any.
+  string message = 5;
+  // The reason the test was skipped, if any.
+  string skip_message = 6;
 }
-
 message SourceLocation {
-	// The source code file the control is defined in.
-	string ref = 1;
-	// The line number the control is defined on.
-	int32 line = 2;
+  // The source code file the control is defined in.
+  string ref = 1;
+  // The line number the control is defined on.
+  int32 line = 2;
 }
-
 message Option {
-	// The description of the attribute.
-	string description = 1;
-	// The default value of the attribute.
-	string default = 2 ;
+  // The description of the attribute.
+  string description = 1;
+  // The default value of the attribute.
+  string default = 2;
 }
-
 message Support {
-	// The name of the supported operating system.
-	string os_name = 1;
-	// The wider category of supported platform (e.g., linux, windows).
-	string os_family = 2;
-	// The specific operating system release number this profile supports.
-	string release = 3;
-	// The supported inspec version for this profile.
-	string inspec_version = 4;
-	// The platform name and version combined.
-	string platform = 5;
+  // The name of the supported operating system.
+  string os_name = 1;
+  // The wider category of supported platform (e.g., linux, windows).
+  string os_family = 2;
+  // The specific operating system release number this profile supports.
+  string release = 3;
+  // The supported inspec version for this profile.
+  string inspec_version = 4;
+  // The platform name and version combined.
+  string platform = 5;
 }
-
 message Dependency {
-	// The name of the profile.
-	string name = 1;
-	// The URL of the profile accessible over HTTP or HTTPS.
-	string url = 2;
-	// The path to the profile on disk.
-	string path = 3;
-	// The git URL of the profile.
-	string git = 4;
-	// The specific git branch of the dependency.
-	string branch = 5;
-	// The specific git tag of the dependency.
-	string tag = 6;
-	// The specific git commit of the dependency.
-	string commit = 7;
-	// The specific git version of the dependency.
-	string version = 8;
-	// The name of the dependency stored in Chef Supermarket.
-	string supermarket = 9;
-	// The short name of the dependency stored on Github.
-	string github = 10;
-	// The short name of the dependency stored on the Chef Automate or Chef Compliance server.
-	string compliance = 11;
-	// The status of the dependency in the report.
-	string status = 12;
-	// The reason this profile was skipped in the generated report, if any.
-	string skip_message = 13;
+  // The name of the profile.
+  string name = 1;
+  // The URL of the profile accessible over HTTP or HTTPS.
+  string url = 2;
+  // The path to the profile on disk.
+  string path = 3;
+  // The git URL of the profile.
+  string git = 4;
+  // The specific git branch of the dependency.
+  string branch = 5;
+  // The specific git tag of the dependency.
+  string tag = 6;
+  // The specific git commit of the dependency.
+  string commit = 7;
+  // The specific git version of the dependency.
+  string version = 8;
+  // The name of the dependency stored in Chef Supermarket.
+  string supermarket = 9;
+  // The short name of the dependency stored on Github.
+  string github = 10;
+  // The short name of the dependency stored on the Chef Automate or Chef Compliance server.
+  string compliance = 11;
+  // The status of the dependency in the report.
+  string status = 12;
+  // The reason this profile was skipped in the generated report, if any.
+  string skip_message = 13;
 }
-
 message Group {
-	// The name of the file the controls are defined in.
-	string id = 1;
-	// The title of control group.
-	string title = 2;
-	// The ids of the controls defined in this file.
-	repeated string controls = 3;
+  // The name of the file the controls are defined in.
+  string id = 1;
+  // The title of control group.
+  string title = 2;
+  // The ids of the controls defined in this file.
+  repeated string controls = 3;
 }
-
 message Control {
-	// The unique ID of this control.
-	string id = 1;
-	// The full ruby code of the control defined in the profile.
-	string code = 2;
-	// The full description of the control.
-	string desc = 3;
-	// The severity of the control.
-	float impact = 4;
-	// The compact description of the control.
-	string title = 5;
-	// Intentionally blank.
-	SourceLocation source_location = 6;
-	// The results of running all tests defined in the control against the node.
-	repeated Result results = 7;
-	// External supporting documents for the control.
-	repeated Ref refs = 8;
-	// Metadata defined on the control in key-value format.
-	map<string, string> tags = 9;
-	// Indicates if the control has been waived or not
-	string waived_str = 11;
-	// Additional details for waived controls
-	OrigWaiverData waiver_data = 12;
+  // The unique ID of this control.
+  string id = 1;
+  // The full ruby code of the control defined in the profile.
+  string code = 2;
+  // The full description of the control.
+  string desc = 3;
+  // The severity of the control.
+  float impact = 4;
+  // The compact description of the control.
+  string title = 5;
+  // Intentionally blank.
+  SourceLocation source_location = 6;
+  // The results of running all tests defined in the control against the node.
+  repeated Result results = 7;
+  // External supporting documents for the control.
+  repeated Ref refs = 8;
+  // Metadata defined on the control in key-value format.
+  map<string, string> tags = 9;
+  // Indicates if the control has been waived or not
+  string waived_str = 11;
+  // Additional details for waived controls
+  OrigWaiverData waiver_data = 12;
 }
-
 // OrigWaiverData as it originally came from the InSpec report
 // Will supplement this with waived_str to make consumption easier
 message OrigWaiverData {
-	string expiration_date = 1;
-	string justification = 2;
-	bool run = 3;
-	bool skipped_due_to_waiver = 4;
-	string message = 5;
+  string expiration_date = 1;
+  string justification = 2;
+  bool run = 3;
+  bool skipped_due_to_waiver = 4;
+  string message = 5;
 }
-
 message Attribute {
-	// The name of the attribute.
-	string name = 1;
-	// The options defined for the attribute.
-	Option options = 2;
+  // The name of the attribute.
+  string name = 1;
+  // The options defined for the attribute.
+  Option options = 2;
 }
-
 // The name and version of the node's operating system.
 message Platform {
-	// The name of the node's operating system.
-	string name = 1;
-	// The version of the node's operating system.
-	string release = 2;
-	// The combined name and version of the node's operating system.
-	string full = 3;
+  // The name of the node's operating system.
+  string name = 1;
+  // The version of the node's operating system.
+  string release = 2;
+  // The combined name and version of the node's operating system.
+  string full = 3;
 }
-
 // Statistics of the report's run.
 message Statistics {
-	// The duration of the report's generation time.
-	float duration = 1;
+  // The duration of the report's generation time.
+  float duration = 1;
 }
-
 message SuggestionRequest {
-	// The type of resource to get suggestions for.
-	string type = 1;
-	// The term to use to match resources on.
-	string text = 2;
-	// The maximum number of suggestions to return.
-	int32 size = 3;
-	// The criteria used to filter the suggestions returned.
-	repeated ListFilter filters = 4;
+  // The type of resource to get suggestions for.
+  string type = 1;
+  // The term to use to match resources on.
+  string text = 2;
+  // The maximum number of suggestions to return.
+  int32 size = 3;
+  // The criteria used to filter the suggestions returned.
+  repeated ListFilter filters = 4;
 }
-
 message Suggestion {
-	// The content that matched the search term.
-	string text = 1;
-	// The ID of the resource that was suggested.
-	string id = 2;
-	// The confidence in the match quality.
-	float score = 3;
-	// The version of the suggestion.
-	string version = 4;
+  // The content that matched the search term.
+  string text = 1;
+  // The ID of the resource that was suggested.
+  string id = 2;
+  // The confidence in the match quality.
+  float score = 3;
+  // The version of the suggestion.
+  string version = 4;
 }
-
 message Suggestions {
-	// The list of returned suggestions.
-	repeated Suggestion suggestions = 1;
+  // The list of returned suggestions.
+  repeated Suggestion suggestions = 1;
 }
-
 message ProfileMins {
-	// Minimal representations of the profiles matching the filters.
-	repeated ProfileMin profiles = 1;
-	// Intentionally blank.
-	ProfileCounts counts = 2;
+  // Minimal representations of the profiles matching the filters.
+  repeated ProfileMin profiles = 1;
+  // Intentionally blank.
+  ProfileCounts counts = 2;
 }
-
 // Stats on the statuses of nodes matching the filters.
 message ProfileCounts {
-	// The total number of nodes matching the filters.
-	int32 total = 1;
-	// The total number of failed nodes matching the filters.
-	int32 failed = 2;
-	// The total number of skipped nodes matching the filters.
-	int32 skipped = 3;
-	// The total number of passing nodes matching the filters.
-	int32 passed = 4;
-	// The total number of waived nodes matching the filters.
-	int32 waived = 5;
+  // The total number of nodes matching the filters.
+  int32 total = 1;
+  // The total number of failed nodes matching the filters.
+  int32 failed = 2;
+  // The total number of skipped nodes matching the filters.
+  int32 skipped = 3;
+  // The total number of passing nodes matching the filters.
+  int32 passed = 4;
+  // The total number of waived nodes matching the filters.
+  int32 waived = 5;
 }
-
 // Minimal representation of a profile.
 message ProfileMin {
-	// The name of the profile.
-	string name = 1;
-	// The profile title.
-	string title = 2;
-	// The profile ID.
-	string id = 3;
-	// The profile version.
-	string version = 4;
-	// The aggregated status of the profile across the nodes it has been run on.
-	string status = 5;
+  // The name of the profile.
+  string name = 1;
+  // The profile title.
+  string title = 2;
+  // The profile ID.
+  string id = 3;
+  // The profile version.
+  string version = 4;
+  // The aggregated status of the profile across the nodes it has been run on.
+  string status = 5;
 }
-
 message Node {
-	// The node ID.
-	string id = 1;
-	// The name assigned to the node.
-	string name = 2;
-	// Intentionally blank.
-	Platform platform = 3;
-	// The environment assigned to the node.
-	string environment = 4;
-	// A summary of the information contained in the latest report for this node.
-	LatestReportSummary latest_report = 8;
-	// The tags assigned to this node.
-	repeated Kv tags = 9;
-	// A minimal representation of the compliance profiles run against the node.
-	repeated ProfileMeta profiles = 10;
+  // The node ID.
+  string id = 1;
+  // The name assigned to the node.
+  string name = 2;
+  // Intentionally blank.
+  Platform platform = 3;
+  // The environment assigned to the node.
+  string environment = 4;
+  // A summary of the information contained in the latest report for this node.
+  LatestReportSummary latest_report = 8;
+  // The tags assigned to this node.
+  repeated Kv tags = 9;
+  // A minimal representation of the compliance profiles run against the node.
+  repeated ProfileMeta profiles = 10;
 }
-
 message Nodes {
-	// The nodes matching the request filters.
-	repeated Node nodes = 1;
-	// The total number of nodes matching the filters.
-	int32 total = 20;
-	// The total number of passing nodes matching the filters.
-	int32 total_passed = 21;
-	// The total number of failed nodes matching the filters.
-	int32 total_failed = 22;
-	// The total number of skipped nodes matching the filters.
-	int32 total_skipped = 23;
-	// The total number of waived nodes matching the filters.
-	int32 total_waived = 24;
+  // The nodes matching the request filters.
+  repeated Node nodes = 1;
+  // The total number of nodes matching the filters.
+  int32 total = 20;
+  // The total number of passing nodes matching the filters.
+  int32 total_passed = 21;
+  // The total number of failed nodes matching the filters.
+  int32 total_failed = 22;
+  // The total number of skipped nodes matching the filters.
+  int32 total_skipped = 23;
+  // The total number of waived nodes matching the filters.
+  int32 total_waived = 24;
 }
-
 message Kv {
-	// The key of the tag.
-	string key = 1;
-	// The value of the tag.
-	string value = 2;
+  // The key of the tag.
+  string key = 1;
+  // The value of the tag.
+  string value = 2;
 }
-
 // A summary of the latest report for this node.
 message LatestReportSummary {
-	// The latest report ID.
-	string id = 1;
-	// The time the report was submitted at.
-	google.protobuf.Timestamp end_time = 2;
-	// The status of the run the report was made from.
-	string status = 3;
-	// Intentionally blank.
-	ControlSummary controls = 4;
+  // The latest report ID.
+  string id = 1;
+  // The time the report was submitted at.
+  google.protobuf.Timestamp end_time = 2;
+  // The status of the run the report was made from.
+  string status = 3;
+  // Intentionally blank.
+  ControlSummary controls = 4;
 }
-
 message ProfileMeta {
-	// The name of the profile.
-	string name = 1;
-	// The profile version.
-	string version = 2;
-	// The profile unique ID.
-	string id = 3;
-	// The status of the profile run against the node.
-	string status = 4;
-	// The combined name and version of the profile.
-	string full = 5;
+  // The name of the profile.
+  string name = 1;
+  // The profile version.
+  string version = 2;
+  // The profile unique ID.
+  string id = 3;
+  // The status of the profile run against the node.
+  string status = 4;
+  // The combined name and version of the profile.
+  string full = 5;
 }

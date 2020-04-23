@@ -5,12 +5,10 @@
 syntax = "proto3";
 // local modification: set go package to something we can using in automate
 option go_package = "github.com/chef/automate/api/external/habitat";
-
 package chef.habitat.supervisor.event;
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
-
 message EventMetadata {
   // The unique ID of this Supervisor.
   string supervisor_id = 1;
@@ -23,7 +21,6 @@ message EventMetadata {
   string fqdn = 7;
   string site = 8;
 }
-
 message ServiceMetadata {
   // The fully-qualified identifier of the package that is currently
   // running.
@@ -36,7 +33,6 @@ message ServiceMetadata {
   string service_group = 3;
   UpdateConfig update_config = 4;
 }
-
 // Note that there is no `None` value, as currently exists in the Rust
 // code for the Supervisor. Here we are only going to deal with the
 // actual update strategies (because `None` isn't really a strategy!)
@@ -48,7 +44,6 @@ enum UpdateStrategy {
   // prevent everything from updating all at once.
   Rolling = 1;
 }
-
 // Encapsulates an update strategy with the channel that is checked
 // for updates. Both must be present for either to be meaningful.a
 message UpdateConfig {
@@ -57,32 +52,27 @@ message UpdateConfig {
   // service.
   string channel = 2;
 }
-
 enum HealthCheckResult {
   Ok = 0;
   Warning = 1;
   Critical = 2;
   Unknown = 3;
 }
-
 ////////////////////////////////////////////////////////////////////////
 // Concrete Event Types
 ////////////////////////////////////////////////////////////////////////
-
 message ServiceStartedEvent {
   EventMetadata event_metadata = 1;
   ServiceMetadata service_metadata = 2;
 }
-
 message ServiceStoppedEvent {
   EventMetadata event_metadata = 1;
   ServiceMetadata service_metadata = 2;
 }
-
 message ServiceUpdateStartedEvent {
   EventMetadata event_metadata = 1;
   ServiceMetadata service_metadata = 2;
-  // Details of the service pkg to which 
+  // Details of the service pkg to which
   // we're attempting to update.This is
   // implemented as a string for now,
   // but at some point we'll may want
@@ -90,7 +80,6 @@ message ServiceUpdateStartedEvent {
   // attributes (FullyQualifiedPackageIdent)
   string update_package_ident = 3;
 }
-
 message HealthCheckEvent {
   EventMetadata event_metadata = 1;
   ServiceMetadata service_metadata = 2;

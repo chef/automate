@@ -1,9 +1,7 @@
 // -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
 syntax = "proto3";
-
 package chef.automate.domain.deployment;
 option go_package = "github.com/chef/automate/api/config/deployment";
-
 import "api/config/applications/config_request.proto";
 import "api/config/authn/config_request.proto";
 import "api/config/authz/config_request.proto";
@@ -47,55 +45,49 @@ import "api/config/builder_api/config_request.proto";
 import "api/config/builder_api_proxy/config_request.proto";
 import "api/config/minio/config_request.proto";
 import "api/config/builder_memcached/config_request.proto";
-
 message AutomateConfig {
-	reserved 26; // automate-blob-store
-	reserved 20; // data-lifecycle-service
-	chef.automate.infra.config.GlobalConfig global = 19;
-	chef.automate.domain.authn.ConfigRequest auth_n = 1;
-	chef.automate.domain.authz.ConfigRequest auth_z = 2;
-	chef.automate.domain.compliance.config.ConfigRequest compliance = 10;
-	chef.automate.domain.cfgmgmt.ConfigRequest config_mgmt = 6;
-	chef.automate.domain.deployment.ConfigRequest deployment = 3;
-	chef.automate.domain.dex.ConfigRequest dex = 4;
-	chef.automate.infra.elasticsearch.ConfigRequest elasticsearch = 7;
-	chef.automate.infra.esgateway.ConfigRequest esgateway = 31;
-	chef.automate.infra.es_sidecar.ConfigRequest es_sidecar = 11;
-	chef.automate.api.config.ConfigRequest gateway = 5;
-	chef.automate.domain.ingest.ConfigRequest ingest = 13;
-	chef.automate.infra.load_balancer.ConfigRequest load_balancer = 8;
-	chef.automate.domain.local_user.ConfigRequest local_user = 12;
-	chef.automate.domain.license_control.ConfigRequest license_control = 16;
-	chef.automate.domain.notifications.ConfigRequest notifications = 14;
-	chef.automate.infra.postgresql.ConfigRequest postgresql = 15;
-	chef.automate.domain.session.ConfigRequest session = 17;
-	chef.automate.domain.teams.ConfigRequest teams = 18;
-	chef.automate.ui.ConfigRequest u_i = 9;
-	chef.automate.domain.secrets.ConfigRequest secrets = 21;
-	chef.automate.infra.backup_gateway.ConfigRequest backup_gateway = 29;
-	chef.automate.infra.pg_sidecar.ConfigRequest pg_sidecar = 35;
-	chef.automate.infra.pg_gateway.ConfigRequest pg_gateway = 34;
-	chef.automate.domain.applications.ConfigRequest applications = 36;
-
-	chef.automate.domain.bookshelf.ConfigRequest bookshelf = 22;
-	chef.automate.domain.bifrost.ConfigRequest bifrost = 23;
-	chef.automate.domain.erchef.ConfigRequest erchef = 24;
-	chef.automate.domain.cs_nginx.ConfigRequest cs_nginx = 25;
-
-	chef.automate.domain.workflow_server.ConfigRequest workflow = 27;
-	chef.automate.domain.workflow_nginx.ConfigRequest workflow_nginx = 28;
-
-	chef.automate.domain.event.ConfigRequest event_service = 30;
-	chef.automate.domain.nodemanager.ConfigRequest nodemanager = 33;
-	chef.automate.domain.event_gateway.ConfigRequest event_gateway = 37;
-
-	chef.automate.infra.prometheus.ConfigRequest prometheus = 32;
-	chef.automate.domain.data_feed.ConfigRequest data_feed_service = 38;
-	chef.automate.domain.event_feed.ConfigRequest event_feed_service = 39;
-	chef.automate.infra.cereal.ConfigRequest cereal = 40;
-	chef.automate.domain.builder_api.ConfigRequest builder_api = 41;
-	chef.automate.domain.builder_api_proxy.ConfigRequest builder_api_proxy = 42;
-	chef.automate.infra.minio.ConfigRequest minio = 43;
-	chef.automate.infra.builder_memcached.ConfigRequest builder_memcached = 44;
-	chef.automate.domain.infra_proxy.ConfigRequest infra_proxy = 45;
+  reserved 26, 20;
+  chef.automate.infra.config.GlobalConfig global = 19;
+  chef.automate.domain.authn.ConfigRequest auth_n = 1;
+  chef.automate.domain.authz.ConfigRequest auth_z = 2;
+  chef.automate.domain.compliance.config.ConfigRequest compliance = 10;
+  chef.automate.domain.cfgmgmt.ConfigRequest config_mgmt = 6;
+  ConfigRequest deployment = 3;
+  chef.automate.domain.dex.ConfigRequest dex = 4;
+  chef.automate.infra.elasticsearch.ConfigRequest elasticsearch = 7;
+  chef.automate.infra.esgateway.ConfigRequest esgateway = 31;
+  chef.automate.infra.es_sidecar.ConfigRequest es_sidecar = 11;
+  chef.automate.api.config.ConfigRequest gateway = 5;
+  chef.automate.domain.ingest.ConfigRequest ingest = 13;
+  chef.automate.infra.load_balancer.ConfigRequest load_balancer = 8;
+  chef.automate.domain.local_user.ConfigRequest local_user = 12;
+  chef.automate.domain.license_control.ConfigRequest license_control = 16;
+  chef.automate.domain.notifications.ConfigRequest notifications = 14;
+  chef.automate.infra.postgresql.ConfigRequest postgresql = 15;
+  chef.automate.domain.session.ConfigRequest session = 17;
+  chef.automate.domain.teams.ConfigRequest teams = 18;
+  chef.automate.ui.ConfigRequest u_i = 9;
+  chef.automate.domain.secrets.ConfigRequest secrets = 21;
+  chef.automate.infra.backup_gateway.ConfigRequest backup_gateway = 29;
+  chef.automate.infra.pg_sidecar.ConfigRequest pg_sidecar = 35;
+  chef.automate.infra.pg_gateway.ConfigRequest pg_gateway = 34;
+  chef.automate.domain.applications.ConfigRequest applications = 36;
+  chef.automate.domain.bookshelf.ConfigRequest bookshelf = 22;
+  chef.automate.domain.bifrost.ConfigRequest bifrost = 23;
+  chef.automate.domain.erchef.ConfigRequest erchef = 24;
+  chef.automate.domain.cs_nginx.ConfigRequest cs_nginx = 25;
+  chef.automate.domain.workflow_server.ConfigRequest workflow = 27;
+  chef.automate.domain.workflow_nginx.ConfigRequest workflow_nginx = 28;
+  chef.automate.domain.event.ConfigRequest event_service = 30;
+  chef.automate.domain.nodemanager.ConfigRequest nodemanager = 33;
+  chef.automate.domain.event_gateway.ConfigRequest event_gateway = 37;
+  chef.automate.infra.prometheus.ConfigRequest prometheus = 32;
+  chef.automate.domain.data_feed.ConfigRequest data_feed_service = 38;
+  chef.automate.domain.event_feed.ConfigRequest event_feed_service = 39;
+  chef.automate.infra.cereal.ConfigRequest cereal = 40;
+  chef.automate.domain.builder_api.ConfigRequest builder_api = 41;
+  chef.automate.domain.builder_api_proxy.ConfigRequest builder_api_proxy = 42;
+  chef.automate.infra.minio.ConfigRequest minio = 43;
+  chef.automate.infra.builder_memcached.ConfigRequest builder_memcached = 44;
+  chef.automate.domain.infra_proxy.ConfigRequest infra_proxy = 45;
 }

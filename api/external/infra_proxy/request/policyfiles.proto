@@ -1,24 +1,20 @@
 syntax = "proto3";
-
 package chef.automate.api.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/external/infra_proxy/request";
-
 import "protoc-gen-swagger/options/annotations.proto";
-
 message Policyfiles {
-    // Chef Organization ID.
-    string org_id = 1;
-    // Chef Infra Server ID.
-    string server_id = 2;
+  // Chef Organization ID.
+  string org_id = 1;
+  // Chef Infra Server ID.
+  string server_id = 2;
 }
-
 message Policyfile {
-    // Chef Organization ID.
-    string org_id = 1;
-    // Chef Infra Server ID.
-    string server_id = 2;
-    // Policyfile name.
-    string name = 3;
-    // Policyfile revision ID.
-    string revision_id = 4;
+  // Chef Organization ID.
+  string org_id = 1;
+  // Chef Infra Server ID.
+  string server_id = 2;
+  // Policyfile name.
+  string name = 3;
+  // Policyfile revision ID.
+  string revision_id = 4;
 }

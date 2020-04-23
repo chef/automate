@@ -1,26 +1,19 @@
 syntax = "proto3";
-
 package chef.automate.api;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/gateway";
-
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
-
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-
 service Gateway {
-  rpc GetVersion (google.protobuf.Empty) returns (Version) {
-    option (google.api.http).get = "/gateway/version";
-    option (chef.automate.api.iam.policy).resource = "system:service:version";
-    option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
-  };
-  rpc GetHealth (google.protobuf.Empty) returns (Health) {
-    option (google.api.http).get = "/gateway/health";
-    option (chef.automate.api.iam.policy).resource = "system:health";
-    option (chef.automate.api.iam.policy).action = "system:health:get";
-  };
-};
-
+  rpc GetVersion ( google.protobuf.Empty ) returns ( Version ) {
+    option (google.api.http) = { get:"/gateway/version" };
+    option (iam.policy) = { resource:"system:service:version" action:"system:serviceVersion:get" };
+  }
+  rpc GetHealth ( google.protobuf.Empty ) returns ( Health ) {
+    option (google.api.http) = { get:"/gateway/health" };
+    option (iam.policy) = { resource:"system:health" action:"system:health:get" };
+  }
+}
 // Version message
 //
 // The service version constructed with:
@@ -34,7 +27,6 @@ message Version {
   string name = 3;
   string sha = 4;
 }
-
 // Health message
 //
 // The automate-gateway service health is constructed with:
@@ -48,4 +40,3 @@ message Version {
 message Health {
   string status = 1;
 }
-

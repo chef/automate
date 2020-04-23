@@ -1,16 +1,12 @@
 syntax = "proto3";
-
 package chef.automate.api.cfgmgmt.response;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/response";
-
-
 message PolicyCookbooks {
   // Name of the policy.
   string policy_name = 1;
   // Intentionally blank.
   repeated CookbookLock cookbook_locks = 2;
 }
-
 message CookbookLock {
   // Cookbook name.
   string cookbook = 1;

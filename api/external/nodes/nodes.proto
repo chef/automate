@@ -1,416 +1,324 @@
 syntax = "proto3";
-
 package chef.automate.api.nodes.v1;
 option go_package = "github.com/chef/automate/api/external/nodes";
-
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
-
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-
 import "api/external/common/query/parameters.proto";
-
 service NodesService {
-	/*
-	Create a node
-
-	Creates a node and adds it to the Automate node manager.
-	Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
-	Useful for creating nodes for the purpose of running compliance scan jobs.
-
-	Example:
-	```
-	{
-		"name": "my-vagrant-node",
-		"manager":"automate",
-		"target_config": {
-			"backend":"ssh",
-			"host":"localhost",
-			"secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
-			"port": 22
-		},
-		"tags": [
-			{ "key":"test-node", "value":"is amazing" }
-		]
-	}
-	```
-
-	Authorization Action:
-	```
-	infra:nodes:create
-	```
-	*/
-	rpc Create(Node) returns (Id) {
-		option (google.api.http) = {
-			post: "/nodes"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes"
-			action: "infra:nodes:create"
-		};
-	};
-
-	/*
-	Read a node
-
-	Returns the details for a node given the node ID.
-
-	Authorization Action:
-	```
-	infra:nodes:get
-	```
-	*/
-	rpc Read(Id) returns (Node) {
-		option (google.api.http) = {
-			get: "/nodes/id/{id}"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
-			action: "infra:nodes:get"
-		};
-	};
-
-	/*
-	Update a node
-
-	This PUT operation overwrites ALL node details and requires the complete set of node details,
-	consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
-	Substitute the desired values for the existing node details in the PUT message.
-
-	Authorization Action:
-	```
-	infra:nodes:update
-	```
-	*/
-	rpc Update(Node) returns (google.protobuf.Empty) {
-		option (google.api.http) = {
-			put: "/nodes/id/{id}"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
-			action: "infra:nodes:update"
-		};
-	};
-
-	/*
-	Delete a node
-
-	Deletes the node with the node ID.
-
-	Authorization Action:
-	```
-	infra:nodes:delete
-	```
-	*/
-	rpc Delete(Id) returns (google.protobuf.Empty) {
-		option (google.api.http) = {
-			delete: "/nodes/id/{id}"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
-			action: "infra:nodes:delete"
-		};
-	};
-
-	/*
-	Bulk delete by ID
-
-	Deletes a set of nodes given a list of IDs.
-	Invalid IDs will be ignored.
-
-	Authorization Action:
-	```
-	infra:nodes:delete
-	```
-	*/
-	rpc BulkDeleteById(Ids) returns (BulkDeleteResponse) {
-		option (google.api.http) = {
-			post: "/nodes/delete/ids"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes"
-			action: "infra:nodes:delete"
-		};
-	};
-
-	/*
-	List and filter nodes
-
-	Makes a list of nodes.
-	Supports filtering, pagination, and sorting.
-	Adding a filter narrows the list of nodes only those that match the filter or filters.
-	Supported filters:
-	account_id, last_contact, manager_id, manager_type, name, platform_name,
-	platform_release, region, source_id, state, statechange_timerange, status,
-	last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
-	last_run_penultimate_status, last_scan_penultimate_status
-
-	Example:
-	```
-	{
-		"filters":[
-			{"key": "last_scan_status", "values": ["FAILED"]},
-			{"key": "last_scan_penultimate_status", "values": ["PASSED"]},
-			{"key": "name", "values": ["MyNode*"]}
-		],
-		"page":1, "per_page":100,
-		"sort":"status", "order":"ASC"
-	}
-	```
-
-	Authorization Action:
-	```
-	infra:nodes:list
-	```
-	*/
-	rpc List(Query) returns (Nodes) {
-		option (google.api.http) = {
-			post: "/nodes/search"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes"
-			action: "infra:nodes:list"
-		};
-	};
-
-	/*
-	Node status
-
-	Use this to run an `inspec detect` job on the node, which updates the status to reflect
-	that the node is reachable or unreachable.
-
-	Authorization Action:
-	```
-	infra:nodes:rerun
-	```
-	*/
-	rpc Rerun(Id) returns (RerunResponse) {
-		option (google.api.http) = {
-			get: "/nodes/rerun/id/{id}"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
-			action: "infra:nodes:rerun"
-		};
-	};
-
-	/*
-	Bulk delete nodes
-
-	Deletes a set of nodes that match a filter.
-	Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
-	platform_release, region, source_id, state, statechange_timerange, status,
-	last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
-	last_run_penultimate_status, last_scan_penultimate_status
-
-	Example:
-	```
-	{"filters": [{"key": "name", "values": ["vj*"]}]}'
-	```
-
-	Authorization Action:
-	```
-	infra:nodes:delete
-	```
-	*/
-	rpc BulkDelete(Query) returns (BulkDeleteResponse) {
-		option (google.api.http) = {
-			post: "/nodes/delete"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes"
-			action: "infra:nodes:delete"
-		};
-	};
-
-	/*
-	Bulk create nodes
-
-	Creates multiple nodes from a list of node data.
-	Hosts field is required. Multiple hosts may be defined in this field.
-
-	Example:
-	```
-	{
-		"name_prefix": "000-my-ssh-node",
-    	"manager":"automate",
-		"target_config": {
-			"backend":"ssh",
-			"hosts":["localhost","127.0.0.1"],
-			"secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
-			"port": 22
-		},
-		"tags": [
-			{ "key":"test-node", "value":"is-amazing" },
-		]
-	}
-	```
-
-	Authorization Action:
-	```
-	infra:nodes:create
-	```
-	*/
-	rpc BulkCreate(Nodes) returns (Ids) {
-		option (google.api.http) = {
-			post: "/nodes/bulk-create"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes"
-			action: "infra:nodes:create"
-		};
-	};
-
+  // Create a node
+  //
+  // Creates a node and adds it to the Automate node manager.
+  // Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
+  // Useful for creating nodes for the purpose of running compliance scan jobs.
+  //
+  // Example:
+  // ```
+  // {
+  // "name": "my-vagrant-node",
+  // "manager":"automate",
+  // "target_config": {
+  // "backend":"ssh",
+  // "host":"localhost",
+  // "secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
+  // "port": 22
+  // },
+  // "tags": [
+  // { "key":"test-node", "value":"is amazing" }
+  // ]
+  // }
+  // ```
+  //
+  // Authorization Action:
+  // ```
+  // infra:nodes:create
+  // ```
+  rpc Create ( Node ) returns ( Id ) {
+    option (google.api.http) = { post:"/nodes" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodes" action:"infra:nodes:create" };
+  }
+  // Read a node
+  //
+  // Returns the details for a node given the node ID.
+  //
+  // Authorization Action:
+  // ```
+  // infra:nodes:get
+  // ```
+  rpc Read ( Id ) returns ( Node ) {
+    option (google.api.http) = { get:"/nodes/id/{id}" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodes:{id}" action:"infra:nodes:get" };
+  }
+  // Update a node
+  //
+  // This PUT operation overwrites ALL node details and requires the complete set of node details,
+  // consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
+  // Substitute the desired values for the existing node details in the PUT message.
+  //
+  // Authorization Action:
+  // ```
+  // infra:nodes:update
+  // ```
+  rpc Update ( Node ) returns ( google.protobuf.Empty ) {
+    option (google.api.http) = { put:"/nodes/id/{id}" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodes:{id}" action:"infra:nodes:update" };
+  }
+  // Delete a node
+  //
+  // Deletes the node with the node ID.
+  //
+  // Authorization Action:
+  // ```
+  // infra:nodes:delete
+  // ```
+  rpc Delete ( Id ) returns ( google.protobuf.Empty ) {
+    option (google.api.http) = { delete:"/nodes/id/{id}" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodes:{id}" action:"infra:nodes:delete" };
+  }
+  // Bulk delete by ID
+  //
+  // Deletes a set of nodes given a list of IDs.
+  // Invalid IDs will be ignored.
+  //
+  // Authorization Action:
+  // ```
+  // infra:nodes:delete
+  // ```
+  rpc BulkDeleteById ( Ids ) returns ( BulkDeleteResponse ) {
+    option (google.api.http) = { post:"/nodes/delete/ids" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodes" action:"infra:nodes:delete" };
+  }
+  // List and filter nodes
+  //
+  // Makes a list of nodes.
+  // Supports filtering, pagination, and sorting.
+  // Adding a filter narrows the list of nodes only those that match the filter or filters.
+  // Supported filters:
+  // account_id, last_contact, manager_id, manager_type, name, platform_name,
+  // platform_release, region, source_id, state, statechange_timerange, status,
+  // last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
+  // last_run_penultimate_status, last_scan_penultimate_status
+  //
+  // Example:
+  // ```
+  // {
+  // "filters":[
+  // {"key": "last_scan_status", "values": ["FAILED"]},
+  // {"key": "last_scan_penultimate_status", "values": ["PASSED"]},
+  // {"key": "name", "values": ["MyNode*"]}
+  // ],
+  // "page":1, "per_page":100,
+  // "sort":"status", "order":"ASC"
+  // }
+  // ```
+  //
+  // Authorization Action:
+  // ```
+  // infra:nodes:list
+  // ```
+  rpc List ( Query ) returns ( Nodes ) {
+    option (google.api.http) = { post:"/nodes/search" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodes" action:"infra:nodes:list" };
+  }
+  // Node status
+  //
+  // Use this to run an `inspec detect` job on the node, which updates the status to reflect
+  // that the node is reachable or unreachable.
+  //
+  // Authorization Action:
+  // ```
+  // infra:nodes:rerun
+  // ```
+  rpc Rerun ( Id ) returns ( RerunResponse ) {
+    option (google.api.http) = { get:"/nodes/rerun/id/{id}" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodes:{id}" action:"infra:nodes:rerun" };
+  }
+  // Bulk delete nodes
+  //
+  // Deletes a set of nodes that match a filter.
+  // Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
+  // platform_release, region, source_id, state, statechange_timerange, status,
+  // last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
+  // last_run_penultimate_status, last_scan_penultimate_status
+  //
+  // Example:
+  // ```
+  // {"filters": [{"key": "name", "values": ["vj*"]}]}'
+  // ```
+  //
+  // Authorization Action:
+  // ```
+  // infra:nodes:delete
+  // ```
+  rpc BulkDelete ( Query ) returns ( BulkDeleteResponse ) {
+    option (google.api.http) = { post:"/nodes/delete" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodes" action:"infra:nodes:delete" };
+  }
+  // Bulk create nodes
+  //
+  // Creates multiple nodes from a list of node data.
+  // Hosts field is required. Multiple hosts may be defined in this field.
+  //
+  // Example:
+  // ```
+  // {
+  // "name_prefix": "000-my-ssh-node",
+  // "manager":"automate",
+  // "target_config": {
+  // "backend":"ssh",
+  // "hosts":["localhost","127.0.0.1"],
+  // "secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
+  // "port": 22
+  // },
+  // "tags": [
+  // { "key":"test-node", "value":"is-amazing" },
+  // ]
+  // }
+  // ```
+  //
+  // Authorization Action:
+  // ```
+  // infra:nodes:create
+  // ```
+  rpc BulkCreate ( Nodes ) returns ( Ids ) {
+    option (google.api.http) = { post:"/nodes/bulk-create" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"infra:nodes" action:"infra:nodes:create" };
+  }
 }
-
 message Id {
-	// Unique node ID (UUID)
-	string id = 1;
+  // Unique node ID (UUID)
+  string id = 1;
 }
-
 message Ids {
-	// List of node UUIDs.
-	repeated string ids = 1;
+  // List of node UUIDs.
+  repeated string ids = 1;
 }
-
-message RerunResponse {}
-
+message RerunResponse {
+}
 message Query {
-	// Use filters to limit the set of nodes to delete.
-	repeated chef.automate.api.common.query.Filter filters = 20;
-	// Return the results in ascending or descending order.
-	enum OrderType {
-		ASC = 0;
-		DESC = 1;
-	}
-	OrderType order = 21;
-	// Sort the results on a specific field.
-	string sort = 22;
-	// The number of result pages to return.
-	int32 page = 23;
-	// The number of results on each page.
-	int32 per_page = 24;
+  // Use filters to limit the set of nodes to delete.
+  repeated chef.automate.api.common.query.Filter filters = 20;
+  // Return the results in ascending or descending order.
+  enum OrderType {
+    ASC = 0;
+    DESC = 1;
+  }
+  OrderType order = 21;
+  // Sort the results on a specific field.
+  string sort = 22;
+  // The number of result pages to return.
+  int32 page = 23;
+  // The number of results on each page.
+  int32 per_page = 24;
 }
-
 // Details for ssh/winrm access of the node.
 message TargetConfig {
-	// List of credential IDs for a node.
-	repeated string secrets = 20;
-	// Node backend type (ssh, winrm, aws, ssm, azure, gcp).
-	string backend = 22;
-	// Node FQDN or IP address.
-	string host = 23;
-	// ssh or winrm connection port
-	int32 port = 24;
-	// Uses `sudo` (boolean).
-	bool sudo = 26;
-	// Check ssl (boolean).
-	bool ssl = 27;
-	// Allow self-signed certificate (boolean).
-	bool self_signed = 28;
-	// Username from the credential ID for this node.
-	string user = 29;
-	// Sudo options to use when accessing the node.
-	string sudo_options = 33;
-	// List of hostnames (FQDN or IP address) for bulk creating nodes.
-	repeated string hosts = 40;
+  // List of credential IDs for a node.
+  repeated string secrets = 20;
+  // Node backend type (ssh, winrm, aws, ssm, azure, gcp).
+  string backend = 22;
+  // Node FQDN or IP address.
+  string host = 23;
+  // ssh or winrm connection port
+  int32 port = 24;
+  // Uses `sudo` (boolean).
+  bool sudo = 26;
+  // Check ssl (boolean).
+  bool ssl = 27;
+  // Allow self-signed certificate (boolean).
+  bool self_signed = 28;
+  // Username from the credential ID for this node.
+  string user = 29;
+  // Sudo options to use when accessing the node.
+  string sudo_options = 33;
+  // List of hostnames (FQDN or IP address) for bulk creating nodes.
+  repeated string hosts = 40;
 }
-
 // Node information.
 message Node {
-	// Unique node ID (UUID).
-	string id = 1;
-	// User-specified node name.
-	string name = 2;
-	// Node platform.
-	string platform = 3;
-	// Node platform version.
-	string platform_version = 4;
-	// Node manager (automate, aws-ec2, aws-api, azure-vm, azure-api, gcp).
-	string manager = 5;
-	// Node tags.
-	repeated chef.automate.api.common.query.Kv tags = 20;
-	// Timestamp of the last `detect` or `exec` job.
-	google.protobuf.Timestamp last_contact = 21;
-	// Node status (unreachable, reachable, unknown).
-	string status = 22;
-	// Results of the last compliance scan job for this node.
-	ResultsRow last_job = 23;
-	// Node configuration for ssh or winrm.
-	TargetConfig target_config = 99;
-	// List of manager IDs for the node.
-	repeated string manager_ids = 24;
-	// Last connection error received when trying to contact the node.
-	string connection_error = 25;
-	// Last known node state (running, stopped, terminated).
-	string state = 26;
-	// Prefix for node name. The full node name is the prefix + the host.
-	string name_prefix = 27;
-	// List of projects associated with the node. Projects are a concept introduced in IAMv2.
-	repeated string projects = 28;
-	// Most recent node data from the last Chef Infra run results.
-	LastContactData run_data = 29;
-	// Most recent compliance scan data for the node from the last InSpec scan.
-	LastContactData scan_data = 30;
+  // Unique node ID (UUID).
+  string id = 1;
+  // User-specified node name.
+  string name = 2;
+  // Node platform.
+  string platform = 3;
+  // Node platform version.
+  string platform_version = 4;
+  // Node manager (automate, aws-ec2, aws-api, azure-vm, azure-api, gcp).
+  string manager = 5;
+  // Node tags.
+  repeated chef.automate.api.common.query.Kv tags = 20;
+  // Timestamp of the last `detect` or `exec` job.
+  google.protobuf.Timestamp last_contact = 21;
+  // Node status (unreachable, reachable, unknown).
+  string status = 22;
+  // Results of the last compliance scan job for this node.
+  ResultsRow last_job = 23;
+  // Node configuration for ssh or winrm.
+  TargetConfig target_config = 99;
+  // List of manager IDs for the node.
+  repeated string manager_ids = 24;
+  // Last connection error received when trying to contact the node.
+  string connection_error = 25;
+  // Last known node state (running, stopped, terminated).
+  string state = 26;
+  // Prefix for node name. The full node name is the prefix + the host.
+  string name_prefix = 27;
+  // List of projects associated with the node. Projects are a concept introduced in IAMv2.
+  repeated string projects = 28;
+  // Most recent node data from the last Chef Infra run results.
+  LastContactData run_data = 29;
+  // Most recent compliance scan data for the node from the last InSpec scan.
+  LastContactData scan_data = 30;
 }
-
 // Most recent node data from the latest Chef Infra run and InSpec scan.
 message LastContactData {
-	// Chef Infra run report ID or InSpec scan report ID.
-	string id = 1;
-	enum Status {
-		UNKNOWN = 0;
-		PASSED = 1;
-		FAILED = 2;
-		SKIPPED = 3;
-	}
-	// Last node report status.
-	Status status = 2;
-	// Next-to-last node status report.
-	Status penultimate_status = 3;
-	// Last node report endtime.
-	google.protobuf.Timestamp end_time = 4;
+  // Chef Infra run report ID or InSpec scan report ID.
+  string id = 1;
+  enum Status {
+    UNKNOWN = 0;
+    PASSED = 1;
+    FAILED = 2;
+    SKIPPED = 3;
+  }
+  // Last node report status.
+  Status status = 2;
+  // Next-to-last node status report.
+  Status penultimate_status = 3;
+  // Last node report endtime.
+  google.protobuf.Timestamp end_time = 4;
 }
-
 message Nodes {
-	// List of nodes.
-	repeated Node nodes = 1;
-	// Total number of nodes in the system.
-	int32 total = 20;
-	// Total number of unreachable nodes in the system.
-	int32 total_unreachable = 21;
-	// Total number of reachable nodes in the system.
-	int32 total_reachable = 22;
-	// Total number of unknown nodes in the system.
-	int32 total_unknown = 23;
+  // List of nodes.
+  repeated Node nodes = 1;
+  // Total number of nodes in the system.
+  int32 total = 20;
+  // Total number of unreachable nodes in the system.
+  int32 total_unreachable = 21;
+  // Total number of reachable nodes in the system.
+  int32 total_reachable = 22;
+  // Total number of unknown nodes in the system.
+  int32 total_unknown = 23;
 }
-
 // Summary of the last Chef InSpec scan job run on the node.
 message ResultsRow {
-	// Unique node ID.
-	string node_id = 1;
-	// Unique ID of the report generated by the InSpec scan.
-	string report_id = 2;
-	// Status of the report (failed, success, skipped).
-	string status = 3;
-	// Error message returned after several failed attempts to contact a node.
-	string result = 4;
-	// Unique ID of the scan job that generated the report.
-	string job_id = 5;
-	// Start time on the report.
-	google.protobuf.Timestamp start_time = 20;
-	// End time on the report.
-	google.protobuf.Timestamp end_time = 21;
+  // Unique node ID.
+  string node_id = 1;
+  // Unique ID of the report generated by the InSpec scan.
+  string report_id = 2;
+  // Status of the report (failed, success, skipped).
+  string status = 3;
+  // Error message returned after several failed attempts to contact a node.
+  string result = 4;
+  // Unique ID of the scan job that generated the report.
+  string job_id = 5;
+  // Start time on the report.
+  google.protobuf.Timestamp start_time = 20;
+  // End time on the report.
+  google.protobuf.Timestamp end_time = 21;
 }
-
 message BulkDeleteResponse {
-	// List of deleted nodes, by name.
-	repeated string names = 1;
+  // List of deleted nodes, by name.
+  repeated string names = 1;
 }

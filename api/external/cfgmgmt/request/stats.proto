@@ -1,13 +1,10 @@
 syntax = "proto3";
-
 package chef.automate.api.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
-
 message NodesCounts {
   // List of filters to be applied to the node count results.
   repeated string filter = 1;
 }
-
 message RunsCounts {
   // List of filters to be applied to the run count results.
   repeated string filter = 1;
@@ -18,7 +15,6 @@ message RunsCounts {
   // Node id associated with the run.
   string node_id = 4;
 }
-
 message CheckInCountsTimeSeries {
   // List of filters to be applied to the time series.
   repeated string filter = 1;

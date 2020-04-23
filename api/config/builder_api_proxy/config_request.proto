@@ -1,70 +1,58 @@
 // -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
 syntax = "proto3";
-
 package chef.automate.domain.builder_api_proxy;
 option go_package = "github.com/chef/automate/api/config/builder_api_proxy;bldrapiproxy";
-
 import "api/config/shared/global.proto";
 import "api/config/shared/tls.proto";
 import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
-
 message ConfigRequest {
-  option (chef.automate.api.service_config) = {name: "automate-builder-api-proxy"};
-
-	V1 v1 = 1;
-
-	message V1 {
-		System sys = 1;
-		Service svc =  2;
-
-		message System {
-			chef.automate.infra.config.Mlsa mlsa = 1;
-			chef.automate.infra.config.TLSCredentials tls = 2;
-			Service service = 3;
-			Logger log = 4;
-			Nginx nginx = 5;
-			HTTP http = 6;
-			Web web = 7;
-
-			message Service {
-				google.protobuf.StringValue host = 1;
-				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "https", default: 10104, protocol: "https" } ];
-			}
-
-			message Logger {
-				google.protobuf.StringValue level = 1;
-			}
-
-			message Nginx {
-				google.protobuf.Int32Value worker_connections = 1;
-				google.protobuf.Int32Value worker_processes = 2;
-				google.protobuf.Int32Value worker_rlimit_nofile = 3;
-				google.protobuf.Int32Value max_body_size = 4;
-				google.protobuf.Int32Value proxy_send_timeout = 5;
-				google.protobuf.Int32Value proxy_read_timeout = 6;
-				google.protobuf.Int32Value proxy_connect_timeout = 7;
-				google.protobuf.BoolValue enable_caching = 8;
-				google.protobuf.BoolValue enable_gzip = 9;
-			}
-
-			message HTTP {
-				google.protobuf.Int32Value keepalive_connections = 1;
-				google.protobuf.Int32Value keepalive_requests = 2;
-				google.protobuf.Int32Value keepalive_timeout = 3;
-				google.protobuf.StringValue ssl_ciphers = 4;
-				google.protobuf.StringValue ssl_protocols = 5;
-				google.protobuf.Int32Value ssl_verify_depth = 6;
-			}
-
-			message Web {
-				google.protobuf.StringValue cookie_domain = 1;
-				google.protobuf.StringValue environment = 2;
-				google.protobuf.BoolValue use_gravatar = 3;
-			}
-		}
-
-		message Service {
-		}
-	}
+  option (chef.automate.api.service_config) = { name:"automate-builder-api-proxy" };
+  V1 v1 = 1;
+  message V1 {
+    System sys = 1;
+    Service svc = 2;
+    message System {
+      chef.automate.infra.config.Mlsa mlsa = 1;
+      chef.automate.infra.config.TLSCredentials tls = 2;
+      Service service = 3;
+      Logger log = 4;
+      Nginx nginx = 5;
+      HTTP http = 6;
+      Web web = 7;
+      message Service {
+        google.protobuf.StringValue host = 1;
+        google.protobuf.Int32Value port = 2 [(chef.automate.api.port) = { name:"https" default:10104 protocol:"https" }];
+      }
+      message Logger {
+        google.protobuf.StringValue level = 1;
+      }
+      message Nginx {
+        google.protobuf.Int32Value worker_connections = 1;
+        google.protobuf.Int32Value worker_processes = 2;
+        google.protobuf.Int32Value worker_rlimit_nofile = 3;
+        google.protobuf.Int32Value max_body_size = 4;
+        google.protobuf.Int32Value proxy_send_timeout = 5;
+        google.protobuf.Int32Value proxy_read_timeout = 6;
+        google.protobuf.Int32Value proxy_connect_timeout = 7;
+        google.protobuf.BoolValue enable_caching = 8;
+        google.protobuf.BoolValue enable_gzip = 9;
+      }
+      message HTTP {
+        google.protobuf.Int32Value keepalive_connections = 1;
+        google.protobuf.Int32Value keepalive_requests = 2;
+        google.protobuf.Int32Value keepalive_timeout = 3;
+        google.protobuf.StringValue ssl_ciphers = 4;
+        google.protobuf.StringValue ssl_protocols = 5;
+        google.protobuf.Int32Value ssl_verify_depth = 6;
+      }
+      message Web {
+        google.protobuf.StringValue cookie_domain = 1;
+        google.protobuf.StringValue environment = 2;
+        google.protobuf.BoolValue use_gravatar = 3;
+      }
+    }
+    message Service {
+    }
+  }
 }

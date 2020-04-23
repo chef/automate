@@ -1,24 +1,21 @@
 syntax = "proto3";
-
 package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
-
 message DataBags {
-    // Chef organization ID.
-    string org_id = 1;
-    // Chef Infra Server ID.
-    string server_id = 2;
-    // Data bag name.
-    string name = 3;
+  // Chef organization ID.
+  string org_id = 1;
+  // Chef Infra Server ID.
+  string server_id = 2;
+  // Data bag name.
+  string name = 3;
 }
-
 message DataBag {
-    // Chef organization ID.
-    string org_id = 1;
-    // Chef Infra Server ID.
-    string server_id = 2;
-    // Data bag name.
-    string name = 3;
-    // Data bag item name.
-    string item = 4;
+  // Chef organization ID.
+  string org_id = 1;
+  // Chef Infra Server ID.
+  string server_id = 2;
+  // Data bag name.
+  string name = 3;
+  // Data bag item name.
+  string item = 4;
 }

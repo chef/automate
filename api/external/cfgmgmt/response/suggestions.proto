@@ -1,8 +1,6 @@
 syntax = "proto3";
-
 package chef.automate.api.cfgmgmt.response;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/response";
-
 message Suggestion {
   // Text to search on for the suggestions.
   string text = 1;

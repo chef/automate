@@ -1,8 +1,6 @@
 syntax = "proto3";
-
 package chef.automate.api.ingest.request;
 option go_package = "github.com/chef/automate/api/external/ingest/request";
-
 message Liveness {
   string event_type = 1;
   string entity_uuid = 2;

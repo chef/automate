@@ -1,8 +1,6 @@
 syntax = "proto3";
-
 package chef.automate.api.cfgmgmt.response;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/response";
-
 message RunsCounts {
   // Total count of run reports that have landed in Automate for the node.
   int32 total = 1;
@@ -11,7 +9,6 @@ message RunsCounts {
   // Total count of failed run reports that have landed in Automate for the node.
   int32 failure = 3;
 }
-
 message NodesCounts {
   // Total count of nodes that have reported in to Automate.
   int32 total = 1;
@@ -22,12 +19,10 @@ message NodesCounts {
   // Total count of nodes that have been labeled as 'missing' as determined by node lifecycle settings.
   int32 missing = 4;
 }
-
 message CheckInCountsTimeSeries {
   // List of daily checkin counts
   repeated CheckInCounts counts = 1;
 }
-
 message CheckInCounts {
   string start = 1;
   string end = 2;

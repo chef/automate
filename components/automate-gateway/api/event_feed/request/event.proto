@@ -1,8 +1,6 @@
 syntax = "proto3";
-
 package chef.automate.api.event_feed.request;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/event_feed/request";
-
 message EventFilter {
   repeated string filter = 1;
   int64 start = 2;
@@ -13,7 +11,6 @@ message EventFilter {
   string cursor = 7;
   bool collapse = 8;
 }
-
 message EventCountsFilter {
   repeated string filter = 1;
   int64 start = 2;

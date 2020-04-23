@@ -1,409 +1,353 @@
 syntax = "proto3";
-
 package chef.automate.api.compliance.reporting.stats.v1;
 option go_package = "github.com/chef/automate/api/external/compliance/reporting/stats";
-
 import "google/api/annotations.proto";
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 import "api/external/compliance/reporting/reporting.proto";
-
 service StatsService {
-	/*
-	Read Summary
-
-	Returns summary statistics for compliance reports. 
-	General report summary information is the default. 
-	Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
-	Supports filtering.
-
-	Example:
-	```
-	{
-		"type":"nodes",
-		"filters":[
-			{"type":"environment","values":["dev*"]},
-			{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-			{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-		]
-	}
-	```
-
-	Authorization Action:
-	```
-	compliance:reportSummary:get
-	```
-	*/
-	rpc ReadSummary(Query) returns (Summary) {
-		option (google.api.http) = {
-			post: "/compliance/reporting/stats/summary"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:stats:summary"
-			action: "compliance:reportSummary:get"
-		};
-	};
-
-	/*
-	Read Trend
-
-	Returns trendgraph statistics for compliance reports. 
-	The `type` field is required for this api call. Options are `nodes` or `controls`.
-	Requires minimum `interval` field of 3600 and defined start time and end time filters.
-	Supports filtering.
-
-	Example:
-	```
-	{
-		"type":"nodes",
-		"interval":86400,
-		"filters":[
-			{"type":"environment","values":["dev*"]},
-			{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-			{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-		]
-	}
-	```
-
-	Authorization Action:
-	```
-	compliance:reportTrend:get
-	```
-	*/
-	rpc ReadTrend(Query) returns (Trends) {
-		option (google.api.http) = {
-			post: "/compliance/reporting/stats/trend"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:stats:trend"
-			action: "compliance:reportTrend:get"
-		};
-	};
-
-	/*
-	Read Profiles
-
-	Returns statistics and summary information for profiles executed as part of the compliance reports. 
-	If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
-	If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
-	Supports filtering.
-
-	```
-	{
-		"type":"controls",
-		"id":"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
-		"filters":[
-			{"type":"environment","values":["dev*"]},
-			{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-			{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-		]
-	}
-	```
-
-	Authorization Action:
-	```
-	compliance:reportProfiles:get
-	```
-	*/
-	rpc ReadProfiles(Query) returns (Profile) {
-		option (google.api.http) = {
-			post: "/compliance/reporting/stats/profiles"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:stats:profiles"
-			action: "compliance:reportProfiles:get"
-		};
-	};
-
-	/*
-	Read Failures
-
-	Returns the top failures for the specified object. A types filter is required for this api.
-	Supported values are `platform`, `environment`, `control`, and `profile`.
-	By default, the top ten failed objects for the specified type are returned.
-	Supports filtering and respects `size` parameter.
-
-	Example:
-	```
-	{
-		"filters":[
-			{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-			{"type":"end_time","values":["2019-11-05T23:59:59Z"]},
-			{"type":"types","values":["platform","environment"]}
-		]
-	}
-	```
-
-	Authorization Action:
-	```
-	compliance:reportFailures:get
-	```
-	*/
-	rpc ReadFailures(Query) returns (Failures) {
-		option (google.api.http) = {
-			post: "/compliance/reporting/stats/failures"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:stats:failures"
-			action: "compliance:reportFailures:get"
-		};
-	};
+  // Read Summary
+  //
+  // Returns summary statistics for compliance reports.
+  // General report summary information is the default.
+  // Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
+  // Supports filtering.
+  //
+  // Example:
+  // ```
+  // {
+  // "type":"nodes",
+  // "filters":[
+  // {"type":"environment","values":["dev*"]},
+  // {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+  // {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+  // ]
+  // }
+  // ```
+  //
+  // Authorization Action:
+  // ```
+  // compliance:reportSummary:get
+  // ```
+  rpc ReadSummary ( Query ) returns ( Summary ) {
+    option (google.api.http) = { post:"/compliance/reporting/stats/summary" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:stats:summary" action:"compliance:reportSummary:get" };
+  }
+  // Read Trend
+  //
+  // Returns trendgraph statistics for compliance reports.
+  // The `type` field is required for this api call. Options are `nodes` or `controls`.
+  // Requires minimum `interval` field of 3600 and defined start time and end time filters.
+  // Supports filtering.
+  //
+  // Example:
+  // ```
+  // {
+  // "type":"nodes",
+  // "interval":86400,
+  // "filters":[
+  // {"type":"environment","values":["dev*"]},
+  // {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+  // {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+  // ]
+  // }
+  // ```
+  //
+  // Authorization Action:
+  // ```
+  // compliance:reportTrend:get
+  // ```
+  rpc ReadTrend ( Query ) returns ( Trends ) {
+    option (google.api.http) = { post:"/compliance/reporting/stats/trend" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:stats:trend" action:"compliance:reportTrend:get" };
+  }
+  // Read Profiles
+  //
+  // Returns statistics and summary information for profiles executed as part of the compliance reports.
+  // If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
+  // If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
+  // Supports filtering.
+  //
+  // ```
+  // {
+  // "type":"controls",
+  // "id":"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+  // "filters":[
+  // {"type":"environment","values":["dev*"]},
+  // {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+  // {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+  // ]
+  // }
+  // ```
+  //
+  // Authorization Action:
+  // ```
+  // compliance:reportProfiles:get
+  // ```
+  rpc ReadProfiles ( Query ) returns ( Profile ) {
+    option (google.api.http) = { post:"/compliance/reporting/stats/profiles" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:stats:profiles" action:"compliance:reportProfiles:get" };
+  }
+  // Read Failures
+  //
+  // Returns the top failures for the specified object. A types filter is required for this api.
+  // Supported values are `platform`, `environment`, `control`, and `profile`.
+  // By default, the top ten failed objects for the specified type are returned.
+  // Supports filtering and respects `size` parameter.
+  //
+  // Example:
+  // ```
+  // {
+  // "filters":[
+  // {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+  // {"type":"end_time","values":["2019-11-05T23:59:59Z"]},
+  // {"type":"types","values":["platform","environment"]}
+  // ]
+  // }
+  // ```
+  //
+  // Authorization Action:
+  // ```
+  // compliance:reportFailures:get
+  // ```
+  rpc ReadFailures ( Query ) returns ( Failures ) {
+    option (google.api.http) = { post:"/compliance/reporting/stats/failures" body:"*" };
+    option (chef.automate.api.iam.policy) = { resource:"compliance:reporting:stats:failures" action:"compliance:reportFailures:get" };
+  }
 }
-
-message Empty {}
-
+message Empty {
+}
 message ListFilter {
-	// The list of values to filter on for the given type. We 'OR' between these fields.
-	repeated string values = 20;
-	// The field to filter on.
-	string type = 21;
+  // The list of values to filter on for the given type. We 'OR' between these fields.
+  repeated string values = 20;
+  // The field to filter on.
+  string type = 21;
 }
-
 message Query {
-	// Unique identifier, such as a profile ID.
-	string id = 17;
-	// Type of data being requested, used for ReadTrend and ReadSummary.
-	string type = 19;
-	// The number of results to return (used when pagination is not supported).
-	int32 size = 18;
-	// The interval to use for ReadTrend results, in integer seconds. Default of one hour, 3600.
-	int32 interval = 25;
-	// Filters applied to the results.
-	repeated ListFilter filters = 20;
-	// Sort the results in ascending or descending order.
-	enum OrderType {
-		ASC = 0;
-		DESC = 1;
-	}
-	OrderType order = 21;
-	// Sort the list of results by a field.
-	string sort = 22;
-	// The offset for paginating requests. An offset defines a place in the results in order to fetch the next page of the results.
-	int32 page = 23;
-	// The number of results on each paginated request page.
-	int32 per_page = 24;
+  // Unique identifier, such as a profile ID.
+  string id = 17;
+  // Type of data being requested, used for ReadTrend and ReadSummary.
+  string type = 19;
+  // The number of results to return (used when pagination is not supported).
+  int32 size = 18;
+  // The interval to use for ReadTrend results, in integer seconds. Default of one hour, 3600.
+  int32 interval = 25;
+  // Filters applied to the results.
+  repeated ListFilter filters = 20;
+  // Sort the results in ascending or descending order.
+  enum OrderType {
+    ASC = 0;
+    DESC = 1;
+  }
+  OrderType order = 21;
+  // Sort the list of results by a field.
+  string sort = 22;
+  // The offset for paginating requests. An offset defines a place in the results in order to fetch the next page of the results.
+  int32 page = 23;
+  // The number of results on each paginated request page.
+  int32 per_page = 24;
 }
-
 message Summary {
-	// Intentionally blank.
-	ControlsSummary controls_summary = 1;
-	// Intentionally blank.
-	NodeSummary node_summary = 2;
-	// Intentionally blank.
-	ReportSummary report_summary = 3;
+  // Intentionally blank.
+  ControlsSummary controls_summary = 1;
+  // Intentionally blank.
+  NodeSummary node_summary = 2;
+  // Intentionally blank.
+  ReportSummary report_summary = 3;
 }
-
 // Statistics for the controls executed in the compliance reports.
 message ControlsSummary {
-	// The total number of failed controls in the reports.
-	int32 failures = 1;
-	// The total number of failed controls with an impact between 0.4 and 0.7.
-	int32 majors = 2;
-	// The total number of failed controls with an impact of 0.3 or less.
-	int32 minors = 3;
-	// The total number of failed controls with an impact of 0.7 or higher.
-	int32 criticals = 4;
-	// The total number of passed controls in the reports.
-	int32 passed = 5;
-	// The total number of skipped controls in the reports.
-	int32 skipped = 6;
-	// The total number of waived controls in the reports.
-	int32 waived = 7;
+  // The total number of failed controls in the reports.
+  int32 failures = 1;
+  // The total number of failed controls with an impact between 0.4 and 0.7.
+  int32 majors = 2;
+  // The total number of failed controls with an impact of 0.3 or less.
+  int32 minors = 3;
+  // The total number of failed controls with an impact of 0.7 or higher.
+  int32 criticals = 4;
+  // The total number of passed controls in the reports.
+  int32 passed = 5;
+  // The total number of skipped controls in the reports.
+  int32 skipped = 6;
+  // The total number of waived controls in the reports.
+  int32 waived = 7;
 }
-
 // Statistics about the nodes scanned in the compliance reports.
 message NodeSummary {
-	// The total number of nodes that passed their compliance scans.
-	int32 compliant = 1;
-	// The total number of nodes that skipped their compliance scans.
-	int32 skipped = 2;
-	// The total number of nodes that failed their compliance scans.
-	int32 noncompliant = 3;
-	// The total number of nodes that failed their compliance scan with one or more control of critical impact.
-	int32 high_risk = 4;
-	// The total number of nodes that failed their compliance scan with one or more control of major impact.
-	int32 medium_risk = 5;
-	// The total number of nodes that failed their compliance scan with one or more control of minor impact.
-	int32 low_risk = 6;
-	// The total number of nodes with a waived compliance scan.
-	int32 waived = 7;
+  // The total number of nodes that passed their compliance scans.
+  int32 compliant = 1;
+  // The total number of nodes that skipped their compliance scans.
+  int32 skipped = 2;
+  // The total number of nodes that failed their compliance scans.
+  int32 noncompliant = 3;
+  // The total number of nodes that failed their compliance scan with one or more control of critical impact.
+  int32 high_risk = 4;
+  // The total number of nodes that failed their compliance scan with one or more control of major impact.
+  int32 medium_risk = 5;
+  // The total number of nodes that failed their compliance scan with one or more control of minor impact.
+  int32 low_risk = 6;
+  // The total number of nodes with a waived compliance scan.
+  int32 waived = 7;
 }
-
 // General statistics about the reports.
 message Stats {
-	// Deprecated. int64 types render into string types when serialized to satisfy all browsers
-	// Replaced by the `nodes_cnt` field
-	int64 nodes = 1 [deprecated = true];
-	// The number of unique node platforms in the reports.
-	int32 platforms = 2;
-	// The number of unique environments in the reports.
-	int32 environments = 3;
-	// The number of unique profiles in the reports.
-	int32 profiles = 4;
-	// The number of unique nodes scanned in the reports.
-	int32 nodes_cnt = 5;
-	// The number of unique controls scanned in the reports.
-	int32 controls = 6;
+  // Deprecated. int64 types render into string types when serialized to satisfy all browsers
+  // Replaced by the `nodes_cnt` field
+  int64 nodes = 1 [deprecated = true];
+  // The number of unique node platforms in the reports.
+  int32 platforms = 2;
+  // The number of unique environments in the reports.
+  int32 environments = 3;
+  // The number of unique profiles in the reports.
+  int32 profiles = 4;
+  // The number of unique nodes scanned in the reports.
+  int32 nodes_cnt = 5;
+  // The number of unique controls scanned in the reports.
+  int32 controls = 6;
 }
-
 // Statistics on the overall compliance reports.
 message ReportSummary {
-	// Intentionally blank.
-	Stats stats = 4;
-	// Overall aggregated status for all the reports.
-	string status = 1;
-	// Not used.
-	double duration = 2;
-	// Not used.
-	string start_date = 3;
+  // Intentionally blank.
+  Stats stats = 4;
+  // Overall aggregated status for all the reports.
+  string status = 1;
+  // Not used.
+  double duration = 2;
+  // Not used.
+  string start_date = 3;
 }
-
 message Trend {
-	// Time in point for which the passed/failed/skipped data is valid.
-	string report_time = 1;
-	// Total passed objects (nodes or controls) on the reports at the given report time.
-	int32 passed = 2;
-	// Total failed objects (nodes or controls) on the reports at the given report time.
-	int32 failed = 3;
-	// Total skipped objects (nodes or controls) on the reports at the given report time.
-	int32 skipped = 4;
-	// Total waived objects (nodes or controls) on the reports at the given report time.
-	int32 waived = 5;
+  // Time in point for which the passed/failed/skipped data is valid.
+  string report_time = 1;
+  // Total passed objects (nodes or controls) on the reports at the given report time.
+  int32 passed = 2;
+  // Total failed objects (nodes or controls) on the reports at the given report time.
+  int32 failed = 3;
+  // Total skipped objects (nodes or controls) on the reports at the given report time.
+  int32 skipped = 4;
+  // Total waived objects (nodes or controls) on the reports at the given report time.
+  int32 waived = 5;
 }
-
 message Trends {
-	// Set of statistics for passed/failed/skipped nodes or controls in a trendgraph friendly data format.
-	repeated Trend trends = 1;
+  // Set of statistics for passed/failed/skipped nodes or controls in a trendgraph friendly data format.
+  repeated Trend trends = 1;
 }
-
 message Profile {
-	// Set of statistics about the profiles executed in the reports.
-	repeated ProfileList profile_list = 1;
-	// Intentionally blank.
-	ProfileSummary profile_summary = 2;
-	// Summary information about a specific profile's control results across the reports.
-	repeated ControlStats control_stats = 3;
+  // Set of statistics about the profiles executed in the reports.
+  repeated ProfileList profile_list = 1;
+  // Intentionally blank.
+  ProfileSummary profile_summary = 2;
+  // Summary information about a specific profile's control results across the reports.
+  repeated ControlStats control_stats = 3;
 }
-
 message ProfileList {
-	// The profile name.
-	string name = 1;
-	// The profile SHA ID.
-	string id = 2;
-	// Total number of nodes that failed this profile.
-	int32 failures = 3;
-	// Total number of failed nodes with major control failures that executed the profile.
-	int32 majors = 4;
-	// Total number of failed nodes with minor control failures that executed the profile.
-	int32 minors = 5;
-	// Total number of failed nodes with critical control failures that executed the profile.
-	int32 criticals = 6;
-	// Total number of passed nodes that executed the profile.
-	int32 passed = 7;
-	// Total number of skipped nodes that executed the profile.
-	int32 skipped = 8;
-	// Total number of waived nodes that executed the profile.
-	int32 waived = 9;
-
+  // The profile name.
+  string name = 1;
+  // The profile SHA ID.
+  string id = 2;
+  // Total number of nodes that failed this profile.
+  int32 failures = 3;
+  // Total number of failed nodes with major control failures that executed the profile.
+  int32 majors = 4;
+  // Total number of failed nodes with minor control failures that executed the profile.
+  int32 minors = 5;
+  // Total number of failed nodes with critical control failures that executed the profile.
+  int32 criticals = 6;
+  // Total number of passed nodes that executed the profile.
+  int32 passed = 7;
+  // Total number of skipped nodes that executed the profile.
+  int32 skipped = 8;
+  // Total number of waived nodes that executed the profile.
+  int32 waived = 9;
 }
-
 // Summary information about a specific profile's execution across the reports.
 message ProfileSummary {
-	// Name of the profile.
-	string name = 1;
-	// Title of the profile.
-	string title = 2;
-	// Version of the profile.
-	string version = 3;
-	// License info for the profile.
-	string license = 4;
-	// Maintainer for the profile.
-	string maintainer = 5;
-	// Copyright info for the profile.
-	string copyright = 6;
-	// Copyright email info for the profile.
-	string copyright_email = 7;
-	// Summary description of the profile.
-	string summary = 8;
-	// Supports information for the profile (which os it can run on).
-	repeated Support supports = 9;
-	// Intentionally blank.
-	ProfileSummaryStats stats = 10;
-	// Dependency information about the profile (which profiles it inherits).
-	repeated chef.automate.api.compliance.reporting.v1.Dependency depends = 11;
+  // Name of the profile.
+  string name = 1;
+  // Title of the profile.
+  string title = 2;
+  // Version of the profile.
+  string version = 3;
+  // License info for the profile.
+  string license = 4;
+  // Maintainer for the profile.
+  string maintainer = 5;
+  // Copyright info for the profile.
+  string copyright = 6;
+  // Copyright email info for the profile.
+  string copyright_email = 7;
+  // Summary description of the profile.
+  string summary = 8;
+  // Supports information for the profile (which os it can run on).
+  repeated Support supports = 9;
+  // Intentionally blank.
+  ProfileSummaryStats stats = 10;
+  // Dependency information about the profile (which profiles it inherits).
+  repeated chef.automate.api.compliance.reporting.v1.Dependency depends = 11;
 }
-
 // Statistics about the nodes that executed the profile.
 message ProfileSummaryStats {
-	// Total number of failed nodes that executed the profile.
-	int32 failed = 1;
-	// Total number of passed nodes that executed the profile.
-	int32 passed = 2;
-	// Total number of skipped nodes that executed the profile.
-	int32 skipped = 3;
-	// Not used.
-	int32 failed_nodes = 4;
-	// Not used.
-	int32 total_nodes = 5;
-	// Total number of waived controls for the given profile across nodes.
-	int32 waived = 6;
+  // Total number of failed nodes that executed the profile.
+  int32 failed = 1;
+  // Total number of passed nodes that executed the profile.
+  int32 passed = 2;
+  // Total number of skipped nodes that executed the profile.
+  int32 skipped = 3;
+  // Not used.
+  int32 failed_nodes = 4;
+  // Not used.
+  int32 total_nodes = 5;
+  // Total number of waived controls for the given profile across nodes.
+  int32 waived = 6;
 }
-
 message ControlStats {
-	// Control ID.
-	string control = 1;
-	// Control title.
-	string title = 2;
-	// Count of passed nodes that executed the control.
-	int32 passed = 3;
-	// Count of failed nodes that executed the control.
-	int32 failed = 4;
-	// Count of skipped nodes that executed the control.
-	int32 skipped = 5;
-	// Impact of the control.
-	float impact = 6;
-	// Count of waived nodes that executed the control.
-	int32 waived = 7;
+  // Control ID.
+  string control = 1;
+  // Control title.
+  string title = 2;
+  // Count of passed nodes that executed the control.
+  int32 passed = 3;
+  // Count of failed nodes that executed the control.
+  int32 failed = 4;
+  // Count of skipped nodes that executed the control.
+  int32 skipped = 5;
+  // Impact of the control.
+  float impact = 6;
+  // Count of waived nodes that executed the control.
+  int32 waived = 7;
 }
-
 message Support {
-	// OS Name compatible with the profile. This is legacy InSpec syntax.
-	string os_name = 1 [json_name = "os-name"];
-	// OS Family compatible with the profile. This is legacy InSpec syntax.
-	string os_family = 2 [json_name = "os-family"];
-	// OS Release compatible with the profile.
-	string release = 3;
-	// InSpec Version compatible with the profile.
-	string inspec_version = 4;
-	// Platform Name compatible with the profile.
-	string platform_name = 5 [json_name = "platform-name"];
-	// Platform Family compatible with the profile.
-	string platform_family = 6 [json_name = "platform-family"];
-	// Platform compatible with the profile.
-	string platform = 7;
+  // OS Name compatible with the profile. This is legacy InSpec syntax.
+  string os_name = 1 [json_name = "os-name"];
+  // OS Family compatible with the profile. This is legacy InSpec syntax.
+  string os_family = 2 [json_name = "os-family"];
+  // OS Release compatible with the profile.
+  string release = 3;
+  // InSpec Version compatible with the profile.
+  string inspec_version = 4;
+  // Platform Name compatible with the profile.
+  string platform_name = 5 [json_name = "platform-name"];
+  // Platform Family compatible with the profile.
+  string platform_family = 6 [json_name = "platform-family"];
+  // Platform compatible with the profile.
+  string platform = 7;
 }
-
 message Failures {
-	// Top failed profiles across the infrastructure.
-	repeated FailureSummary profiles = 1;
-	// Top failed platforms across the infrastructure.
-	repeated FailureSummary platforms = 2;
-	// Top failed controls across the infrastructure.
-	repeated FailureSummary controls = 3;
-	// Top failed environments across the infrastructure.
-	repeated FailureSummary environments = 4;
+  // Top failed profiles across the infrastructure.
+  repeated FailureSummary profiles = 1;
+  // Top failed platforms across the infrastructure.
+  repeated FailureSummary platforms = 2;
+  // Top failed controls across the infrastructure.
+  repeated FailureSummary controls = 3;
+  // Top failed environments across the infrastructure.
+  repeated FailureSummary environments = 4;
 }
-
 message FailureSummary {
-	// Name of the object failing.
-	string name = 1;
-	// Total count of failures.
-	int32 failures = 2;
-	// ID of the object, included if applicable.
-	string id = 3;
-	// Not used.
-	string profile = 4;
+  // Name of the object failing.
+  string name = 1;
+  // Total count of failures.
+  int32 failures = 2;
+  // ID of the object, included if applicable.
+  string id = 3;
+  // Not used.
+  string profile = 4;
 }

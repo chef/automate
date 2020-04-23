@@ -1,8 +1,5 @@
 syntax = "proto3";
-
 package chef.automate.api.ingest.response;
 option go_package = "github.com/chef/automate/api/external/ingest/response";
-
 message ProcessChefRunResponse {
-
 }

@@ -1,22 +1,18 @@
 syntax = "proto3";
-
 package chef.automate.api.common.query;
 option go_package = "github.com/chef/automate/api/external/common/query";
-
 message Pagination {
   // Page number of the results to return.
   int32 page = 1;
   // Amount of results to include per page.
   int32 size = 2;
 }
-
 message Sorting {
   // Field to sort the list results on.
   string field = 1;
   // Order the results should be returned in.
   SortOrder order = 2;
 }
-
 message Suggestion {
   // Field for which suggestions are being returned.
   string type = 1;
@@ -25,23 +21,20 @@ message Suggestion {
   // Filters to be applied to the results.
   repeated string filter = 3;
 }
-
 enum SortOrder {
   ASC = 0;
   DESC = 1;
 }
-
 message Filter {
   // Field to filter on.
   string key = 20;
   // Include matches for this filter.(boolean)
-  // `true` (default) *includes* all nodes that match this filter. 
+  // `true` (default) *includes* all nodes that match this filter.
   // `false` *excludes* all nodes that match this filter.
   bool exclude = 22;
   // Field values to filter on.
   repeated string values = 23;
 }
-
 message Kv {
   // Tag key.
   string key = 1;
