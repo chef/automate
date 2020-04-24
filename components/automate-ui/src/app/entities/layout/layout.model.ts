@@ -49,8 +49,8 @@ export interface MenuItem {
 
 // Authorized {
 //   isAuthorized: false,
-//   allOf: "['/notifications/rules', 'get']"
-//   anyOf: "['/notifications/rules', 'get']"
+//   allOf: "['/api/v0/notifications/rules', 'get']"
+//   anyOf: "['/api/v0/notifications/rules', 'get']"
 // }
 
 export interface Authorized {
