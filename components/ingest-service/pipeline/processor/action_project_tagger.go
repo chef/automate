@@ -5,6 +5,8 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -24,16 +26,33 @@ func actionBundleProjectTagger(in <-chan message.ChefAction,
 	authzClient iam_v2.ProjectsClient) <-chan message.ChefAction {
 	out := make(chan message.ChefAction, 100)
 	go func() {
+		nextNumToDrop := 1
 		bundleSize := 0
 		var projectRulesCollection map[string]*iam_v2.ProjectRules
 		for msg := range in {
+			if msg.Ctx.Err() != nil {
+				msg.FinishProcessing(msg.Ctx.Err())
+				continue
+			}
 			if bundleSize <= 0 {
-				bundleSize = len(in)
+				nextBundleSize := len(in)
 				log.WithFields(log.Fields{
 					"message_id": msg.ID,
-					"bundleSize": bundleSize,
+					"bundleSize": nextBundleSize,
 				}).Debug("BundleProjectTagging - Update Project rules")
-				projectRulesCollection = getProjectRulesFromAuthz(msg.Ctx, authzClient)
+				var err error
+				projectRulesCollection, err = getProjectRulesFromAuthz(authzClient)
+				if err != nil {
+					msg.FinishProcessing(err)
+					dropChefActionMessages(in, err, nextNumToDrop-1)
+					nextNumToDrop *= 2
+					if nextNumToDrop > maxDropOnError {
+						nextNumToDrop = maxDropOnError
+					}
+					continue
+				}
+				bundleSize = nextBundleSize
+				nextNumToDrop = 1
 			} else {
 				// Skip
 				bundleSize--
@@ -47,6 +66,20 @@ func actionBundleProjectTagger(in <-chan message.ChefAction,
 	}()
 
 	return out
+}
+
+func dropChefActionMessages(in <-chan message.ChefAction, err error, numToDrop int) {
+	var numDropped int
+	err = errors.Wrap(err, "bulk dropping message")
+	for numDropped = 0; numDropped < numToDrop; numDropped++ {
+		select {
+		case m := <-in:
+			m.FinishProcessing(err)
+		default:
+			break
+		}
+	}
+	logrus.Warnf("Dropped %d messages", numDropped)
 }
 
 func findMatchingProjectsForAction(action *chef.Action, projects map[string]*iam_v2.ProjectRules) []string {

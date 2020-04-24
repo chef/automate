@@ -2,7 +2,10 @@ package processor
 
 import (
 	"context"
+	"time"
 
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
@@ -10,6 +13,8 @@ import (
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/chef/automate/lib/stringutils"
 )
+
+const maxDropOnError = 128
 
 // BuildRunProjectTagger - Build a project tagger for CCRs
 func BuildRunProjectTagger(authzClient iam_v2.ProjectsClient) message.ChefRunPipe {
@@ -27,16 +32,33 @@ func runBundleProjectTagger(in <-chan message.ChefRun,
 	authzClient iam_v2.ProjectsClient) <-chan message.ChefRun {
 	out := make(chan message.ChefRun, 100)
 	go func() {
+		nextNumToDrop := 1
 		bundleSize := 0
 		var projectRulesCollection map[string]*iam_v2.ProjectRules
 		for msg := range in {
+			if msg.Ctx.Err() != nil {
+				msg.FinishProcessing(msg.Ctx.Err())
+				continue
+			}
 			if bundleSize <= 0 {
-				bundleSize = len(in)
+				nextBundleSize := len(in)
 				log.WithFields(log.Fields{
 					"message_id": msg.ID,
-					"bundleSize": bundleSize,
+					"bundleSize": nextBundleSize,
 				}).Debug("BundleProjectTagging - Update Project rules")
-				projectRulesCollection = getProjectRulesFromAuthz(msg.Ctx, authzClient)
+				var err error
+				projectRulesCollection, err = getProjectRulesFromAuthz(authzClient)
+				if err != nil {
+					msg.FinishProcessing(err)
+					dropChefRunMessages(in, err, nextNumToDrop-1)
+					nextNumToDrop *= 2
+					if nextNumToDrop > maxDropOnError {
+						nextNumToDrop = maxDropOnError
+					}
+					continue
+				}
+				bundleSize = nextBundleSize
+				nextNumToDrop = 1
 			} else {
 				// Skip
 				bundleSize--
@@ -52,6 +74,20 @@ func runBundleProjectTagger(in <-chan message.ChefRun,
 	return out
 }
 
+func dropChefRunMessages(in <-chan message.ChefRun, err error, numToDrop int) {
+	var numDropped int
+	err = errors.Wrap(err, "bulk dropping message")
+	for numDropped = 0; numDropped < numToDrop; numDropped++ {
+		select {
+		case m := <-in:
+			m.FinishProcessing(err)
+		default:
+			break
+		}
+	}
+	logrus.Warnf("Dropped %d chef run messages", numDropped)
+}
+
 func findMatchingProjects(node backend.Node, projects map[string]*iam_v2.ProjectRules) []string {
 	matchingProjects := make([]string, 0)
 
@@ -64,15 +100,16 @@ func findMatchingProjects(node backend.Node, projects map[string]*iam_v2.Project
 	return matchingProjects
 }
 
-func getProjectRulesFromAuthz(ctx context.Context,
-	authzClient iam_v2.ProjectsClient) map[string]*iam_v2.ProjectRules {
+func getProjectRulesFromAuthz(authzClient iam_v2.ProjectsClient) (map[string]*iam_v2.ProjectRules, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	projectsCollection, err := authzClient.ListRulesForAllProjects(ctx, &iam_v2.ListRulesForAllProjectsReq{})
 	if err != nil {
-		// If there is an error getting the project rules from authz crash the service.
-		log.WithError(err).Fatal("Could not fetch project rules from authz")
+		log.WithError(err).Error("Could not fetch project rules from authz")
+		return nil, errors.Wrap(err, "Could not fetch project rules from authz")
 	}
 
-	return projectsCollection.ProjectRules
+	return projectsCollection.ProjectRules, nil
 }
 
 // Only one rule has to be true for the project to match (ORed together).
