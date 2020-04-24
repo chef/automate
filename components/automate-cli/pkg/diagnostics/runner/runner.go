@@ -252,8 +252,8 @@ func (r *Runner) Run() error {
 	r.reporter.ReportCleanupStart("diagnostic-admin-token")
 	err := r.tstContext.CleanupAdminToken()
 	if err != nil {
+		// we report the error but do not fail the whole diagnostic
 		r.reporter.ReportCleanupErrored("diagnostic-admin-token", fmt.Sprintf("%+v", err))
-		errs = append(errs, err)
 	} else {
 		r.reporter.ReportCleanupSuccess("diagnostic-admin-token")
 	}
