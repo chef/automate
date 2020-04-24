@@ -90,6 +90,23 @@ func (srv *Server) GetJobResultByNodeId(ctx context.Context, in *jobs.GetJobResu
 	return srv.db.GetJobResultByNodeId(ctx, in)
 }
 
+func validateProfilesFormat(profiles []string) error {
+	for _, url := range profiles {
+		if strings.HasPrefix(url, "compliance://") {
+			profile := url[13:]
+			ownerID := strings.SplitN(profile, "/", 2)
+			if len(ownerID) < 2 {
+				return status.Error(codes.InvalidArgument, fmt.Sprintf("Invalid job: profile owner must be specified. Profile url provided: %s", url))
+			}
+			idVersion := strings.SplitN(ownerID[1], "#", 2)
+			if len(idVersion) < 2 {
+				return status.Error(codes.InvalidArgument, fmt.Sprintf("Invalid job: profile version must be specified. Profile url provided: %s", url))
+			}
+		}
+	}
+	return nil
+}
+
 // Create creates a new job
 func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 	logrus.Debugf("Create a new job: %+v", in)
@@ -104,6 +121,11 @@ func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 
 	if in.NodeSelectors == nil && in.Nodes == nil {
 		return nil, status.Error(codes.InvalidArgument, "Invalid job: nodes or node selectors required.")
+	}
+
+	err := validateProfilesFormat(in.GetProfiles())
+	if err != nil {
+		return nil, err
 	}
 
 	sID, err := srv.db.AddJob(in)
