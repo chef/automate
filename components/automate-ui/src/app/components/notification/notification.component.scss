@@ -9,6 +9,7 @@
   background-color: $chef-dark-grey;
   padding: 0.5em;
   padding-right: 1.5em;
+  overflow: hidden;
 
   p {
     color: $chef-white;
@@ -47,5 +48,28 @@
     height: 30px;
     width: 30px;
     cursor: pointer;
+  }
+
+  .shine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25%;
+    height: 100%;
+    background: linear-gradient(110deg, rgba(255,255,255,0) 22%, 
+                                        rgba(255,255,255,.11) 50%, 
+                                        rgba(255,255,255,0) 83%);
+    animation: shine 3s infinite cubic-bezier(.17,.71,.05,.98);
+    animation-delay: 500ms;
+    cursor: none;
+  }
+}
+
+@keyframes shine {
+  from {
+    transform: translateX(-50%)
+  }
+  to {
+    transform: translateX(500%)
   }
 }

@@ -7,11 +7,31 @@ import { Notification, Type } from 'app/entities/notifications/notification.mode
 const inOutAnim = trigger('inOutAnim', [
   transition(':enter', [
     style({ opacity: 0 }),
-    animate('1000ms ease-out', style({ opacity: 1 }))
+    animate('220ms ease-out', style({ opacity: 1 }))
   ]),
   transition(':leave', [
     style({ opacity: 1 }),
-    animate('1000ms', style({ opacity: 0 }))
+    animate('195ms ease-in', style({ opacity: 0 }))
+  ])
+]);
+
+const slideAnim = trigger('slideAnim', [
+  transition(':enter', [
+    style({
+      opacity: 0,
+      transform: 'scale3d(0,1,1)',
+      transformOrigin: 'left'
+    }),
+    animate('300ms 100ms ease-out',
+      style({
+        opacity: 1,
+        transform: 'scale3d(1,1,1)',
+        transformOrigin: 'left'
+      }))
+  ]),
+  transition(':leave', [
+    style({ opacity: 1, transformOrigin: 'right' }),
+    animate('195ms ease-in', style({ opacity: 0, transform: 'scale3d(0,1,1)' }))
   ])
 ]);
 
@@ -19,7 +39,7 @@ const inOutAnim = trigger('inOutAnim', [
   selector: 'app-chef-notification',
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
-  animations: [inOutAnim]
+  animations: [inOutAnim, slideAnim]
 })
 export class ChefNotificationComponent implements AfterViewInit {
 
@@ -28,7 +48,8 @@ export class ChefNotificationComponent implements AfterViewInit {
   @Input() timeout: number;
   @Output() dismissed = new EventEmitter();
 
-  @HostBinding('@inOutAnim') inOutAnim;
+  // @HostBinding('@inOutAnim') inOutAnim;
+  @HostBinding('@slideAnim') slideAnim;
   @HostBinding('class') get theType() {return this.type; }
 
   timeOutRef;
