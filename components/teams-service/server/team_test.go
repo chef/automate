@@ -1,4 +1,4 @@
-package v2
+package server_test
 
 import (
 	"context"
@@ -24,6 +24,7 @@ import (
 	"github.com/chef/automate/lib/version"
 
 	"github.com/chef/automate/components/teams-service/constants"
+	team_serv "github.com/chef/automate/components/teams-service/server"
 	"github.com/chef/automate/components/teams-service/service"
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
@@ -36,7 +37,7 @@ func TestTeamsGRPC(t *testing.T) {
 	l, err := logger.NewLogger("text", "debug")
 	require.NoError(t, err, "could not init logger", err)
 
-	migrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../../storage/postgres/migration/sql")
+	migrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
 	if err != nil {
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
@@ -51,7 +52,7 @@ func TestTeamsGRPC(t *testing.T) {
 
 		// If ciMode, run in-memory AND PG
 		// else just run PG.
-		if os.Getenv("CI") == "true, *authz.SubjectPurgeServerMock" {
+		if os.Getenv("CI") == "true" {
 			serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil)
 			runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsClient(conn), close)
 		}
@@ -59,7 +60,7 @@ func TestTeamsGRPC(t *testing.T) {
 }
 
 func runAllServerTests(
-	t *testing.T, serv *Server, serviceRef *service.Service,
+	t *testing.T, serv *team_serv.TeamServer, serviceRef *service.Service,
 	authzMock *authz.SubjectPurgeServerMock, cl teams.TeamsClient, close func()) {
 
 	t.Helper()
@@ -2049,7 +2050,7 @@ func cleanupTeam(t *testing.T, cl teams.TeamsClient, id string) {
 
 // Pass nil for migrationConfig if you want in-memory server.
 func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
-	migrationConfig *migration.Config) (*Server, *service.Service,
+	migrationConfig *migration.Config) (*team_serv.TeamServer, *service.Service,
 	*grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
 
 	t.Helper()
@@ -2092,8 +2093,8 @@ func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
 		t.Fatalf("could not create server: %s", err)
 	}
 	grpcServ := serviceRef.ConnFactory.NewServer(tracing.GlobalServerInterceptor())
-	v2Server := NewServer(serviceRef)
-	teams.RegisterTeamsServer(grpcServ, v2Server)
+	teamServer := team_serv.NewTeamServer(serviceRef)
+	teams.RegisterTeamsServer(grpcServ, teamServer)
 
 	resetState(ctx, t, serviceRef)
 
@@ -2103,7 +2104,7 @@ func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
 	if err != nil {
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
-	return v2Server, serviceRef, conn, func() { g.Close(); authzServer.Close() }, mockCommon
+	return teamServer, serviceRef, conn, func() { g.Close(); authzServer.Close() }, mockCommon
 }
 
 func resetState(ctx context.Context, t *testing.T, serviceRef *service.Service) {
