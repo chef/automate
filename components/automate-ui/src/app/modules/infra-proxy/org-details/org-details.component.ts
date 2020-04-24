@@ -69,9 +69,18 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         }
         if ( params.path.includes('resetkey') ) {
           this.cookbooksTab = false;
+          this.clientsTab = false;
           this.rolesTab = false;
           this.environmentsTab = false;
           this.resetKeyTab = true;
+        }
+
+        if ( params.path.includes('clients') ) {
+          this.cookbooksTab = false;
+          this.environmentsTab = false;
+          this.dataBagsTab = false;
+          this.rolesTab = false;
+          this.clientsTab = true;
         }
       });
 

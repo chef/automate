@@ -11,6 +11,7 @@ import * as apiToken from './entities/api-tokens/api-token.reducer';
 import * as automateSettings from './entities/automate-settings/automate-settings.reducer';
 import * as cdsEntity from './entities/cds/cds.reducer';
 import * as clientEntity from './entities/clients/client.reducer';
+import * as clientDetailsEntity from './entities/clients/client-details.reducer';
 import * as clientRuns from './entities/client-runs/client-runs.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
 import * as cookbookDetailsEntity from './entities/cookbooks/cookbook-details.reducer';
@@ -77,6 +78,7 @@ export interface NgrxStateAtom {
   clientRunsEntity: clientRuns.ClientRunsEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
   clients: clientEntity.ClientEntityState;
+  clientDetail: clientDetailsEntity.ClientDetailsEntityState;
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityState;
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityState;
   dataBags: dataBagsEntity.DataBagsEntityState;
@@ -199,6 +201,7 @@ export const defaultInitialState = {
   automateSettings: automateSettings.AutomateSettingsEntityInitialState,
   cds: cdsEntity.cdsEntityInitialState,
   clients: clientEntity.ClientEntityInitialState,
+  clientDetails: clientDetailsEntity.ClientEntityInitialState,
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityInitialState,
@@ -256,6 +259,7 @@ export const ngrxReducers = {
   automateSettings: automateSettings.automateSettingsEntityReducer,
   cds: cdsEntity.desktopEntityReducer,
   clients: clientEntity.clientEntityReducer,
+  clientDetails: clientDetailsEntity.clientDetailsEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
   cookbookDetails: cookbookDetailsEntity.cookbookDetailsEntityReducer,
