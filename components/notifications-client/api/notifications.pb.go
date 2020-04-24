@@ -20,6 +20,9 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+////
+// Notifications messages and responses
+////
 type ExceptionInfo struct {
 	Class                string   `protobuf:"bytes,1,opt,name=class,proto3" json:"class,omitempty"`
 	Title                string   `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`

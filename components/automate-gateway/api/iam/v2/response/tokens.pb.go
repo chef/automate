@@ -22,6 +22,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// NB: Doc annotations in responses will only apply for simple types; others will be ignored.
 type CreateTokenResp struct {
 	Token                *common.Token `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`

@@ -1617,105 +1617,101 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type StatsServiceClient interface {
+	// Read Summary
 	//
-	//Read Summary
+	// Returns summary statistics for compliance reports.
+	// General report summary information is the default.
+	// Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
+	// Supports filtering.
 	//
-	//Returns summary statistics for compliance reports.
-	//General report summary information is the default.
-	//Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
-	//Supports filtering.
+	// Example:
+	// ```
+	// {
+	// "type":"nodes",
+	// "filters":[
+	// {"type":"environment","values":["dev*"]},
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"type":"nodes",
-	//"filters":[
-	//{"type":"environment","values":["dev*"]},
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//compliance:reportSummary:get
-	//```
+	// Authorization Action:
+	// ```
+	// compliance:reportSummary:get
+	// ```
 	ReadSummary(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Summary, error)
+	// Read Trend
 	//
-	//Read Trend
+	// Returns trendgraph statistics for compliance reports.
+	// The `type` field is required for this api call. Options are `nodes` or `controls`.
+	// Requires minimum `interval` field of 3600 and defined start time and end time filters.
+	// Supports filtering.
 	//
-	//Returns trendgraph statistics for compliance reports.
-	//The `type` field is required for this api call. Options are `nodes` or `controls`.
-	//Requires minimum `interval` field of 3600 and defined start time and end time filters.
-	//Supports filtering.
+	// Example:
+	// ```
+	// {
+	// "type":"nodes",
+	// "interval":86400,
+	// "filters":[
+	// {"type":"environment","values":["dev*"]},
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"type":"nodes",
-	//"interval":86400,
-	//"filters":[
-	//{"type":"environment","values":["dev*"]},
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//compliance:reportTrend:get
-	//```
+	// Authorization Action:
+	// ```
+	// compliance:reportTrend:get
+	// ```
 	ReadTrend(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Trends, error)
+	// Read Profiles
 	//
-	//Read Profiles
+	// Returns statistics and summary information for profiles executed as part of the compliance reports.
+	// If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
+	// If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
+	// Supports filtering.
 	//
-	//Returns statistics and summary information for profiles executed as part of the compliance reports.
-	//If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
-	//If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
-	//Supports filtering.
+	// ```
+	// {
+	// "type":"controls",
+	// "id":"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+	// "filters":[
+	// {"type":"environment","values":["dev*"]},
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	// ]
+	// }
+	// ```
 	//
-	//```
-	//{
-	//"type":"controls",
-	//"id":"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
-	//"filters":[
-	//{"type":"environment","values":["dev*"]},
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//compliance:reportProfiles:get
-	//```
+	// Authorization Action:
+	// ```
+	// compliance:reportProfiles:get
+	// ```
 	ReadProfiles(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Profile, error)
+	// Read Failures
 	//
-	//Read Failures
+	// Returns the top failures for the specified object. A types filter is required for this api.
+	// Supported values are `platform`, `environment`, `control`, and `profile`.
+	// By default, the top ten failed objects for the specified type are returned.
+	// Supports filtering and respects `size` parameter.
 	//
-	//Returns the top failures for the specified object. A types filter is required for this api.
-	//Supported values are `platform`, `environment`, `control`, and `profile`.
-	//By default, the top ten failed objects for the specified type are returned.
-	//Supports filtering and respects `size` parameter.
+	// Example:
+	// ```
+	// {
+	// "filters":[
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]},
+	// {"type":"types","values":["platform","environment"]}
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"filters":[
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]},
-	//{"type":"types","values":["platform","environment"]}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//compliance:reportFailures:get
-	//```
+	// Authorization Action:
+	// ```
+	// compliance:reportFailures:get
+	// ```
 	ReadFailures(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Failures, error)
 }
 
@@ -1765,105 +1761,101 @@ func (c *statsServiceClient) ReadFailures(ctx context.Context, in *Query, opts .
 
 // StatsServiceServer is the server API for StatsService service.
 type StatsServiceServer interface {
+	// Read Summary
 	//
-	//Read Summary
+	// Returns summary statistics for compliance reports.
+	// General report summary information is the default.
+	// Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
+	// Supports filtering.
 	//
-	//Returns summary statistics for compliance reports.
-	//General report summary information is the default.
-	//Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
-	//Supports filtering.
+	// Example:
+	// ```
+	// {
+	// "type":"nodes",
+	// "filters":[
+	// {"type":"environment","values":["dev*"]},
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"type":"nodes",
-	//"filters":[
-	//{"type":"environment","values":["dev*"]},
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//compliance:reportSummary:get
-	//```
+	// Authorization Action:
+	// ```
+	// compliance:reportSummary:get
+	// ```
 	ReadSummary(context.Context, *Query) (*Summary, error)
+	// Read Trend
 	//
-	//Read Trend
+	// Returns trendgraph statistics for compliance reports.
+	// The `type` field is required for this api call. Options are `nodes` or `controls`.
+	// Requires minimum `interval` field of 3600 and defined start time and end time filters.
+	// Supports filtering.
 	//
-	//Returns trendgraph statistics for compliance reports.
-	//The `type` field is required for this api call. Options are `nodes` or `controls`.
-	//Requires minimum `interval` field of 3600 and defined start time and end time filters.
-	//Supports filtering.
+	// Example:
+	// ```
+	// {
+	// "type":"nodes",
+	// "interval":86400,
+	// "filters":[
+	// {"type":"environment","values":["dev*"]},
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"type":"nodes",
-	//"interval":86400,
-	//"filters":[
-	//{"type":"environment","values":["dev*"]},
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//compliance:reportTrend:get
-	//```
+	// Authorization Action:
+	// ```
+	// compliance:reportTrend:get
+	// ```
 	ReadTrend(context.Context, *Query) (*Trends, error)
+	// Read Profiles
 	//
-	//Read Profiles
+	// Returns statistics and summary information for profiles executed as part of the compliance reports.
+	// If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
+	// If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
+	// Supports filtering.
 	//
-	//Returns statistics and summary information for profiles executed as part of the compliance reports.
-	//If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
-	//If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
-	//Supports filtering.
+	// ```
+	// {
+	// "type":"controls",
+	// "id":"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+	// "filters":[
+	// {"type":"environment","values":["dev*"]},
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	// ]
+	// }
+	// ```
 	//
-	//```
-	//{
-	//"type":"controls",
-	//"id":"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
-	//"filters":[
-	//{"type":"environment","values":["dev*"]},
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//compliance:reportProfiles:get
-	//```
+	// Authorization Action:
+	// ```
+	// compliance:reportProfiles:get
+	// ```
 	ReadProfiles(context.Context, *Query) (*Profile, error)
+	// Read Failures
 	//
-	//Read Failures
+	// Returns the top failures for the specified object. A types filter is required for this api.
+	// Supported values are `platform`, `environment`, `control`, and `profile`.
+	// By default, the top ten failed objects for the specified type are returned.
+	// Supports filtering and respects `size` parameter.
 	//
-	//Returns the top failures for the specified object. A types filter is required for this api.
-	//Supported values are `platform`, `environment`, `control`, and `profile`.
-	//By default, the top ten failed objects for the specified type are returned.
-	//Supports filtering and respects `size` parameter.
+	// Example:
+	// ```
+	// {
+	// "filters":[
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]},
+	// {"type":"types","values":["platform","environment"]}
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"filters":[
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]},
-	//{"type":"types","values":["platform","environment"]}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//compliance:reportFailures:get
-	//```
+	// Authorization Action:
+	// ```
+	// compliance:reportFailures:get
+	// ```
 	ReadFailures(context.Context, *Query) (*Failures, error)
 }
 

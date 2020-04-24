@@ -808,136 +808,125 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NodeManagerServiceClient interface {
+	// Create a Node Manager
 	//
-	//Create a Node Manager
-	//
-	//Creates a node manager given a name, credential id *or* credential data, and type.
+	// Creates a node manager given a name, credential id *or* credential data, and type.
 	//
 	//
-	//Authorization Action:
+	// Authorization Action:
 	//
-	//```
-	//infra:nodeManagers:create
-	//```
+	// ```
+	// infra:nodeManagers:create
+	// ```
 	Create(ctx context.Context, in *NodeManager, opts ...grpc.CallOption) (*Ids, error)
+	// View a Node Manager
 	//
-	//View a Node Manager
+	// List the details of a node manager.
 	//
-	//List the details of a node manager.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:get
-	//```
+	// ```
+	// infra:nodeManagers:get
+	// ```
 	Read(ctx context.Context, in *Id, opts ...grpc.CallOption) (*NodeManager, error)
+	// Update a Node Manager
 	//
-	//Update a Node Manager
+	// Update a node manager's metadata, such as its name, associated credential id, or data.
+	// This is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty ("").
 	//
-	//Update a node manager's metadata, such as its name, associated credential id, or data.
-	//This is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty ("").
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:update
-	//```
+	// ```
+	// infra:nodeManagers:update
+	// ```
 	Update(ctx context.Context, in *NodeManager, opts ...grpc.CallOption) (*empty.Empty, error)
+	// Delete a Node Manager
 	//
-	//Delete a Node Manager
+	// Delete a single node manager. This deletes the node manager itself and
+	// reassigns its associated nodes to the Automate node manager.
 	//
-	//Delete a single node manager. This deletes the node manager itself and
-	//reassigns its associated nodes to the Automate node manager.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:delete
-	//```
+	// ```
+	// infra:nodeManagers:delete
+	// ```
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
+	// Delete a Node Manager and Delete Nodes
 	//
-	//Delete a Node Manager and Delete Nodes
+	// Delete a node manager and all of its associated nodes.
 	//
-	//Delete a node manager and all of its associated nodes.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:delete
-	//```
+	// ```
+	// infra:nodeManagers:delete
+	// ```
 	DeleteWithNodes(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Ids, error)
+	// Delete a Node Manager and Stop Nodes
 	//
-	//Delete a Node Manager and Stop Nodes
+	// Delete a node manager and update its associated nodes to `stopped`.
 	//
-	//Delete a node manager and update its associated nodes to `stopped`.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:delete
-	//```
+	// ```
+	// infra:nodeManagers:delete
+	// ```
 	DeleteWithNodeStateStopped(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
+	// Delete a Node Manager and Terminate Nodes
 	//
-	//Delete a Node Manager and Terminate Nodes
+	// Delete a node manager and update its associated nodes to `terminated`.
 	//
-	//Delete a node manager and update its associated nodes to `terminated`.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:delete
-	//```
+	// ```
+	// infra:nodeManagers:delete
+	// ```
 	DeleteWithNodeStateTerminated(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
+	// List all Node Managers
 	//
-	//List all Node Managers
+	// Returns a list of node managers.
+	// Supports filtering, sorting, and pagination.
 	//
-	//Returns a list of node managers.
-	//Supports filtering, sorting, and pagination.
-	//
-	//Valid filtering fields: manager_type
+	// Valid filtering fields: manager_type
 	//
 	//
-	//Authorization Action:
+	// Authorization Action:
 	//
-	//```
-	//infra:nodeManagers:list
-	//```
+	// ```
+	// infra:nodeManagers:list
+	// ```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*NodeManagers, error)
+	// Search Node Fields
 	//
-	//Search Node Fields
-	//
-	//Searches the available values for a given field across all nodes associated with the nodemanager id.
+	// Searches the available values for a given field across all nodes associated with the nodemanager id.
 	//
 	//
-	//Authorization Action:
+	// Authorization Action:
 	//
-	//```
-	//infra:nodeManagers:list
-	//```
+	// ```
+	// infra:nodeManagers:list
+	// ```
 	SearchNodeFields(ctx context.Context, in *FieldQuery, opts ...grpc.CallOption) (*Fields, error)
+	// Search nodes
 	//
-	//Search nodes
-	//
-	//Searches the available nodes for a single node manager by id.
+	// Searches the available nodes for a single node manager by id.
 	//
 	//
-	//Authorization Action:
+	// Authorization Action:
 	//
-	//```
-	//infra:nodeManagers:list
-	//```
+	// ```
+	// infra:nodeManagers:list
+	// ```
 	SearchNodes(ctx context.Context, in *NodeQuery, opts ...grpc.CallOption) (*Nodes, error)
+	// Connect
 	//
-	//Connect
+	// Attempts to reach the API for the given nodemanager id to validate the
+	// credentials associated with the nodemanager.
 	//
-	//Attempts to reach the API for the given nodemanager id to validate the
-	//credentials associated with the nodemanager.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:rerun
-	//```
+	// ```
+	// infra:nodeManagers:rerun
+	// ```
 	Connect(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ConnectResponse, error)
 }
 
@@ -1050,136 +1039,125 @@ func (c *nodeManagerServiceClient) Connect(ctx context.Context, in *Id, opts ...
 
 // NodeManagerServiceServer is the server API for NodeManagerService service.
 type NodeManagerServiceServer interface {
+	// Create a Node Manager
 	//
-	//Create a Node Manager
-	//
-	//Creates a node manager given a name, credential id *or* credential data, and type.
+	// Creates a node manager given a name, credential id *or* credential data, and type.
 	//
 	//
-	//Authorization Action:
+	// Authorization Action:
 	//
-	//```
-	//infra:nodeManagers:create
-	//```
+	// ```
+	// infra:nodeManagers:create
+	// ```
 	Create(context.Context, *NodeManager) (*Ids, error)
+	// View a Node Manager
 	//
-	//View a Node Manager
+	// List the details of a node manager.
 	//
-	//List the details of a node manager.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:get
-	//```
+	// ```
+	// infra:nodeManagers:get
+	// ```
 	Read(context.Context, *Id) (*NodeManager, error)
+	// Update a Node Manager
 	//
-	//Update a Node Manager
+	// Update a node manager's metadata, such as its name, associated credential id, or data.
+	// This is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty ("").
 	//
-	//Update a node manager's metadata, such as its name, associated credential id, or data.
-	//This is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty ("").
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:update
-	//```
+	// ```
+	// infra:nodeManagers:update
+	// ```
 	Update(context.Context, *NodeManager) (*empty.Empty, error)
+	// Delete a Node Manager
 	//
-	//Delete a Node Manager
+	// Delete a single node manager. This deletes the node manager itself and
+	// reassigns its associated nodes to the Automate node manager.
 	//
-	//Delete a single node manager. This deletes the node manager itself and
-	//reassigns its associated nodes to the Automate node manager.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:delete
-	//```
+	// ```
+	// infra:nodeManagers:delete
+	// ```
 	Delete(context.Context, *Id) (*empty.Empty, error)
+	// Delete a Node Manager and Delete Nodes
 	//
-	//Delete a Node Manager and Delete Nodes
+	// Delete a node manager and all of its associated nodes.
 	//
-	//Delete a node manager and all of its associated nodes.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:delete
-	//```
+	// ```
+	// infra:nodeManagers:delete
+	// ```
 	DeleteWithNodes(context.Context, *Id) (*Ids, error)
+	// Delete a Node Manager and Stop Nodes
 	//
-	//Delete a Node Manager and Stop Nodes
+	// Delete a node manager and update its associated nodes to `stopped`.
 	//
-	//Delete a node manager and update its associated nodes to `stopped`.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:delete
-	//```
+	// ```
+	// infra:nodeManagers:delete
+	// ```
 	DeleteWithNodeStateStopped(context.Context, *Id) (*empty.Empty, error)
+	// Delete a Node Manager and Terminate Nodes
 	//
-	//Delete a Node Manager and Terminate Nodes
+	// Delete a node manager and update its associated nodes to `terminated`.
 	//
-	//Delete a node manager and update its associated nodes to `terminated`.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:delete
-	//```
+	// ```
+	// infra:nodeManagers:delete
+	// ```
 	DeleteWithNodeStateTerminated(context.Context, *Id) (*empty.Empty, error)
+	// List all Node Managers
 	//
-	//List all Node Managers
+	// Returns a list of node managers.
+	// Supports filtering, sorting, and pagination.
 	//
-	//Returns a list of node managers.
-	//Supports filtering, sorting, and pagination.
-	//
-	//Valid filtering fields: manager_type
+	// Valid filtering fields: manager_type
 	//
 	//
-	//Authorization Action:
+	// Authorization Action:
 	//
-	//```
-	//infra:nodeManagers:list
-	//```
+	// ```
+	// infra:nodeManagers:list
+	// ```
 	List(context.Context, *Query) (*NodeManagers, error)
+	// Search Node Fields
 	//
-	//Search Node Fields
-	//
-	//Searches the available values for a given field across all nodes associated with the nodemanager id.
+	// Searches the available values for a given field across all nodes associated with the nodemanager id.
 	//
 	//
-	//Authorization Action:
+	// Authorization Action:
 	//
-	//```
-	//infra:nodeManagers:list
-	//```
+	// ```
+	// infra:nodeManagers:list
+	// ```
 	SearchNodeFields(context.Context, *FieldQuery) (*Fields, error)
+	// Search nodes
 	//
-	//Search nodes
-	//
-	//Searches the available nodes for a single node manager by id.
+	// Searches the available nodes for a single node manager by id.
 	//
 	//
-	//Authorization Action:
+	// Authorization Action:
 	//
-	//```
-	//infra:nodeManagers:list
-	//```
+	// ```
+	// infra:nodeManagers:list
+	// ```
 	SearchNodes(context.Context, *NodeQuery) (*Nodes, error)
+	// Connect
 	//
-	//Connect
+	// Attempts to reach the API for the given nodemanager id to validate the
+	// credentials associated with the nodemanager.
 	//
-	//Attempts to reach the API for the given nodemanager id to validate the
-	//credentials associated with the nodemanager.
+	// Authorization Action:
 	//
-	//Authorization Action:
-	//
-	//```
-	//infra:nodeManagers:rerun
-	//```
+	// ```
+	// infra:nodeManagers:rerun
+	// ```
 	Connect(context.Context, *Id) (*ConnectResponse, error)
 }
 

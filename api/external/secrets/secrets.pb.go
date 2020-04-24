@@ -442,111 +442,106 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type SecretsServiceClient interface {
+	// Create a secret
 	//
-	//Create a secret
+	// Creates a secret. Requires values for name, type, and data.
 	//
-	//Creates a secret. Requires values for name, type, and data.
+	// Supported types: ssh, winrm, sudo, aws, azure, gcp, service_now
+	// Supported keys by type:
+	// ssh: username, password, key
+	// winrm: username, password
+	// sudo: username, password
+	// service_now: username, password
+	// aws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
+	// azure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
+	// gcp: GOOGLE_CREDENTIALS_JSON
 	//
-	//Supported types: ssh, winrm, sudo, aws, azure, gcp, service_now
-	//Supported keys by type:
-	//ssh: username, password, key
-	//winrm: username, password
-	//sudo: username, password
-	//service_now: username, password
-	//aws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
-	//azure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
-	//gcp: GOOGLE_CREDENTIALS_JSON
+	// Example:
+	// ```
+	// {
+	// "name": "my ssh secret",
+	// "type": "ssh",
+	// "data": [
+	// { "key": "username", "value": "vagrant" },
+	// { "key": "password", "value": "vagrant"}
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"name": "my ssh secret",
-	//"type": "ssh",
-	//"data": [
-	//{ "key": "username", "value": "vagrant" },
-	//{ "key": "password", "value": "vagrant"}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//secrets:secrets:create
-	//```
+	// Authorization Action:
+	// ```
+	// secrets:secrets:create
+	// ```
 	Create(ctx context.Context, in *Secret, opts ...grpc.CallOption) (*Id, error)
+	// Read a secret
 	//
-	//Read a secret
+	// Reads a secret given the ID of the secret.
+	// Note that the secret information (password and key values) will not be returned by the API, as a safety measure.
 	//
-	//Reads a secret given the ID of the secret.
-	//Note that the secret information (password and key values) will not be returned by the API, as a safety measure.
-	//
-	//Authorization Action:
-	//```
-	//secrets:secrets:get
-	//```
+	// Authorization Action:
+	// ```
+	// secrets:secrets:get
+	// ```
 	Read(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Secret, error)
+	// Update a secret
 	//
-	//Update a secret
+	// Updates a secret.
+	// This is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.
+	// Secret information that is not in the body of the request will persist.
 	//
-	//Updates a secret.
-	//This is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.
-	//Secret information that is not in the body of the request will persist.
+	// Example:
+	// ```
+	// given a credential with a username and password, a user could update the password by passing in the following body,
+	// and the name of the secret as well as the username for the secret be unchanged:
 	//
-	//Example:
-	//```
-	//given a credential with a username and password, a user could update the password by passing in the following body,
-	//and the name of the secret as well as the username for the secret be unchanged:
+	// {
+	// "id": "525c013a-2ab3-4e6f-9005-51bc620e9157",
+	// "data": [
+	// { "key": "password", "value": "new-value"}
+	// ]
+	// }
+	// ```
 	//
-	//{
-	//"id": "525c013a-2ab3-4e6f-9005-51bc620e9157",
-	//"data": [
-	//{ "key": "password", "value": "new-value"}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//secrets:secrets:update
-	//```
+	// Authorization Action:
+	// ```
+	// secrets:secrets:update
+	// ```
 	Update(ctx context.Context, in *Secret, opts ...grpc.CallOption) (*UpdateResponse, error)
+	// Delete a secret
 	//
-	//Delete a secret
+	// Deletes a secret given the ID of the secret.
+	// Note that any nodes that were using the secret will no longer be associated with the deleted secret.
 	//
-	//Deletes a secret given the ID of the secret.
-	//Note that any nodes that were using the secret will no longer be associated with the deleted secret.
-	//
-	//Authorization Action:
-	//```
-	//secrets:secrets:delete
-	//```
+	// Authorization Action:
+	// ```
+	// secrets:secrets:delete
+	// ```
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*DeleteResponse, error)
+	// List and filter secrets
 	//
-	//List and filter secrets
+	// Makes a list of secrets.
+	// Supports filtering, pagination, and sorting.
+	// Adding a filter narrows the list of secrets to only those that match the filter or filters.
+	// Supported filters: type
+	// Supported sort types: name, type, last modified
 	//
-	//Makes a list of secrets.
-	//Supports filtering, pagination, and sorting.
-	//Adding a filter narrows the list of secrets to only those that match the filter or filters.
-	//Supported filters: type
-	//Supported sort types: name, type, last modified
+	// Example:
+	// ```
+	// {
+	// "sort": "type",
+	// "order": "ASC",
+	// "filters": [
+	// { "key": "type", "values": ["ssh","winrm","sudo"] }
+	// ],
+	// "page":1,
+	// "per_page":100
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"sort": "type",
-	//"order": "ASC",
-	//"filters": [
-	//{ "key": "type", "values": ["ssh","winrm","sudo"] }
-	//],
-	//"page":1,
-	//"per_page":100
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//secrets:secrets:list
-	//```
+	// Authorization Action:
+	// ```
+	// secrets:secrets:list
+	// ```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Secrets, error)
 }
 
@@ -605,111 +600,106 @@ func (c *secretsServiceClient) List(ctx context.Context, in *Query, opts ...grpc
 
 // SecretsServiceServer is the server API for SecretsService service.
 type SecretsServiceServer interface {
+	// Create a secret
 	//
-	//Create a secret
+	// Creates a secret. Requires values for name, type, and data.
 	//
-	//Creates a secret. Requires values for name, type, and data.
+	// Supported types: ssh, winrm, sudo, aws, azure, gcp, service_now
+	// Supported keys by type:
+	// ssh: username, password, key
+	// winrm: username, password
+	// sudo: username, password
+	// service_now: username, password
+	// aws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
+	// azure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
+	// gcp: GOOGLE_CREDENTIALS_JSON
 	//
-	//Supported types: ssh, winrm, sudo, aws, azure, gcp, service_now
-	//Supported keys by type:
-	//ssh: username, password, key
-	//winrm: username, password
-	//sudo: username, password
-	//service_now: username, password
-	//aws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
-	//azure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
-	//gcp: GOOGLE_CREDENTIALS_JSON
+	// Example:
+	// ```
+	// {
+	// "name": "my ssh secret",
+	// "type": "ssh",
+	// "data": [
+	// { "key": "username", "value": "vagrant" },
+	// { "key": "password", "value": "vagrant"}
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"name": "my ssh secret",
-	//"type": "ssh",
-	//"data": [
-	//{ "key": "username", "value": "vagrant" },
-	//{ "key": "password", "value": "vagrant"}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//secrets:secrets:create
-	//```
+	// Authorization Action:
+	// ```
+	// secrets:secrets:create
+	// ```
 	Create(context.Context, *Secret) (*Id, error)
+	// Read a secret
 	//
-	//Read a secret
+	// Reads a secret given the ID of the secret.
+	// Note that the secret information (password and key values) will not be returned by the API, as a safety measure.
 	//
-	//Reads a secret given the ID of the secret.
-	//Note that the secret information (password and key values) will not be returned by the API, as a safety measure.
-	//
-	//Authorization Action:
-	//```
-	//secrets:secrets:get
-	//```
+	// Authorization Action:
+	// ```
+	// secrets:secrets:get
+	// ```
 	Read(context.Context, *Id) (*Secret, error)
+	// Update a secret
 	//
-	//Update a secret
+	// Updates a secret.
+	// This is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.
+	// Secret information that is not in the body of the request will persist.
 	//
-	//Updates a secret.
-	//This is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.
-	//Secret information that is not in the body of the request will persist.
+	// Example:
+	// ```
+	// given a credential with a username and password, a user could update the password by passing in the following body,
+	// and the name of the secret as well as the username for the secret be unchanged:
 	//
-	//Example:
-	//```
-	//given a credential with a username and password, a user could update the password by passing in the following body,
-	//and the name of the secret as well as the username for the secret be unchanged:
+	// {
+	// "id": "525c013a-2ab3-4e6f-9005-51bc620e9157",
+	// "data": [
+	// { "key": "password", "value": "new-value"}
+	// ]
+	// }
+	// ```
 	//
-	//{
-	//"id": "525c013a-2ab3-4e6f-9005-51bc620e9157",
-	//"data": [
-	//{ "key": "password", "value": "new-value"}
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//secrets:secrets:update
-	//```
+	// Authorization Action:
+	// ```
+	// secrets:secrets:update
+	// ```
 	Update(context.Context, *Secret) (*UpdateResponse, error)
+	// Delete a secret
 	//
-	//Delete a secret
+	// Deletes a secret given the ID of the secret.
+	// Note that any nodes that were using the secret will no longer be associated with the deleted secret.
 	//
-	//Deletes a secret given the ID of the secret.
-	//Note that any nodes that were using the secret will no longer be associated with the deleted secret.
-	//
-	//Authorization Action:
-	//```
-	//secrets:secrets:delete
-	//```
+	// Authorization Action:
+	// ```
+	// secrets:secrets:delete
+	// ```
 	Delete(context.Context, *Id) (*DeleteResponse, error)
+	// List and filter secrets
 	//
-	//List and filter secrets
+	// Makes a list of secrets.
+	// Supports filtering, pagination, and sorting.
+	// Adding a filter narrows the list of secrets to only those that match the filter or filters.
+	// Supported filters: type
+	// Supported sort types: name, type, last modified
 	//
-	//Makes a list of secrets.
-	//Supports filtering, pagination, and sorting.
-	//Adding a filter narrows the list of secrets to only those that match the filter or filters.
-	//Supported filters: type
-	//Supported sort types: name, type, last modified
+	// Example:
+	// ```
+	// {
+	// "sort": "type",
+	// "order": "ASC",
+	// "filters": [
+	// { "key": "type", "values": ["ssh","winrm","sudo"] }
+	// ],
+	// "page":1,
+	// "per_page":100
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"sort": "type",
-	//"order": "ASC",
-	//"filters": [
-	//{ "key": "type", "values": ["ssh","winrm","sudo"] }
-	//],
-	//"page":1,
-	//"per_page":100
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//secrets:secrets:list
-	//```
+	// Authorization Action:
+	// ```
+	// secrets:secrets:list
+	// ```
 	List(context.Context, *Query) (*Secrets, error)
 }
 

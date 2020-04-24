@@ -169,7 +169,7 @@
           "type": "object"
         }
       },
-      "title": "We can't have options as another message because the default field inside can take any json value(int, string, bool, hash, array)\nWe get options as a struct and handle the unmarshalling and marshaling in the code"
+      "title": "message Attribute {\n\tstring name = 1;\n\tOptions options = 20;\n}\nmessage Options {\n\tstring description = 1;\n\tgoogle.protobuf.Struct default = 20;\n}\nWe can't have options as another message because the default field inside can take any json value(int, string, bool, hash, array)\nWe get options as a struct and handle the unmarshalling and marshaling in the code"
     },
     "chef.automate.domain.compliance.ingest.events.inspec.Control": {
       "type": "object",

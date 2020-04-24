@@ -987,165 +987,156 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NodesServiceClient interface {
+	// Create a node
 	//
-	//Create a node
+	// Creates a node and adds it to the Automate node manager.
+	// Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
+	// Useful for creating nodes for the purpose of running compliance scan jobs.
 	//
-	//Creates a node and adds it to the Automate node manager.
-	//Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
-	//Useful for creating nodes for the purpose of running compliance scan jobs.
+	// Example:
+	// ```
+	// {
+	// "name": "my-vagrant-node",
+	// "manager":"automate",
+	// "target_config": {
+	// "backend":"ssh",
+	// "host":"localhost",
+	// "secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
+	// "port": 22
+	// },
+	// "tags": [
+	// { "key":"test-node", "value":"is amazing" }
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"name": "my-vagrant-node",
-	//"manager":"automate",
-	//"target_config": {
-	//"backend":"ssh",
-	//"host":"localhost",
-	//"secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
-	//"port": 22
-	//},
-	//"tags": [
-	//{ "key":"test-node", "value":"is amazing" }
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:create
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:create
+	// ```
 	Create(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Id, error)
+	// Read a node
 	//
-	//Read a node
+	// Returns the details for a node given the node ID.
 	//
-	//Returns the details for a node given the node ID.
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:get
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:get
+	// ```
 	Read(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
+	// Update a node
 	//
-	//Update a node
+	// This PUT operation overwrites ALL node details and requires the complete set of node details,
+	// consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
+	// Substitute the desired values for the existing node details in the PUT message.
 	//
-	//This PUT operation overwrites ALL node details and requires the complete set of node details,
-	//consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
-	//Substitute the desired values for the existing node details in the PUT message.
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:update
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:update
+	// ```
 	Update(ctx context.Context, in *Node, opts ...grpc.CallOption) (*empty.Empty, error)
+	// Delete a node
 	//
-	//Delete a node
+	// Deletes the node with the node ID.
 	//
-	//Deletes the node with the node ID.
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:delete
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:delete
+	// ```
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
+	// Bulk delete by ID
 	//
-	//Bulk delete by ID
+	// Deletes a set of nodes given a list of IDs.
+	// Invalid IDs will be ignored.
 	//
-	//Deletes a set of nodes given a list of IDs.
-	//Invalid IDs will be ignored.
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:delete
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:delete
+	// ```
 	BulkDeleteById(ctx context.Context, in *Ids, opts ...grpc.CallOption) (*BulkDeleteResponse, error)
+	// List and filter nodes
 	//
-	//List and filter nodes
+	// Makes a list of nodes.
+	// Supports filtering, pagination, and sorting.
+	// Adding a filter narrows the list of nodes only those that match the filter or filters.
+	// Supported filters:
+	// account_id, last_contact, manager_id, manager_type, name, platform_name,
+	// platform_release, region, source_id, state, statechange_timerange, status,
+	// last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
+	// last_run_penultimate_status, last_scan_penultimate_status
 	//
-	//Makes a list of nodes.
-	//Supports filtering, pagination, and sorting.
-	//Adding a filter narrows the list of nodes only those that match the filter or filters.
-	//Supported filters:
-	//account_id, last_contact, manager_id, manager_type, name, platform_name,
-	//platform_release, region, source_id, state, statechange_timerange, status,
-	//last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
-	//last_run_penultimate_status, last_scan_penultimate_status
+	// Example:
+	// ```
+	// {
+	// "filters":[
+	// {"key": "last_scan_status", "values": ["FAILED"]},
+	// {"key": "last_scan_penultimate_status", "values": ["PASSED"]},
+	// {"key": "name", "values": ["MyNode*"]}
+	// ],
+	// "page":1, "per_page":100,
+	// "sort":"status", "order":"ASC"
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"filters":[
-	//{"key": "last_scan_status", "values": ["FAILED"]},
-	//{"key": "last_scan_penultimate_status", "values": ["PASSED"]},
-	//{"key": "name", "values": ["MyNode*"]}
-	//],
-	//"page":1, "per_page":100,
-	//"sort":"status", "order":"ASC"
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:list
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:list
+	// ```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Nodes, error)
+	// Node status
 	//
-	//Node status
+	// Use this to run an `inspec detect` job on the node, which updates the status to reflect
+	// that the node is reachable or unreachable.
 	//
-	//Use this to run an `inspec detect` job on the node, which updates the status to reflect
-	//that the node is reachable or unreachable.
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:rerun
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:rerun
+	// ```
 	Rerun(ctx context.Context, in *Id, opts ...grpc.CallOption) (*RerunResponse, error)
+	// Bulk delete nodes
 	//
-	//Bulk delete nodes
+	// Deletes a set of nodes that match a filter.
+	// Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
+	// platform_release, region, source_id, state, statechange_timerange, status,
+	// last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
+	// last_run_penultimate_status, last_scan_penultimate_status
 	//
-	//Deletes a set of nodes that match a filter.
-	//Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
-	//platform_release, region, source_id, state, statechange_timerange, status,
-	//last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
-	//last_run_penultimate_status, last_scan_penultimate_status
+	// Example:
+	// ```
+	// {"filters": [{"key": "name", "values": ["vj*"]}]}'
+	// ```
 	//
-	//Example:
-	//```
-	//{"filters": [{"key": "name", "values": ["vj*"]}]}'
-	//```
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:delete
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:delete
+	// ```
 	BulkDelete(ctx context.Context, in *Query, opts ...grpc.CallOption) (*BulkDeleteResponse, error)
+	// Bulk create nodes
 	//
-	//Bulk create nodes
+	// Creates multiple nodes from a list of node data.
+	// Hosts field is required. Multiple hosts may be defined in this field.
 	//
-	//Creates multiple nodes from a list of node data.
-	//Hosts field is required. Multiple hosts may be defined in this field.
+	// Example:
+	// ```
+	// {
+	// "name_prefix": "000-my-ssh-node",
+	// "manager":"automate",
+	// "target_config": {
+	// "backend":"ssh",
+	// "hosts":["localhost","127.0.0.1"],
+	// "secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
+	// "port": 22
+	// },
+	// "tags": [
+	// { "key":"test-node", "value":"is-amazing" },
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"name_prefix": "000-my-ssh-node",
-	//"manager":"automate",
-	//"target_config": {
-	//"backend":"ssh",
-	//"hosts":["localhost","127.0.0.1"],
-	//"secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
-	//"port": 22
-	//},
-	//"tags": [
-	//{ "key":"test-node", "value":"is-amazing" },
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:create
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:create
+	// ```
 	BulkCreate(ctx context.Context, in *Nodes, opts ...grpc.CallOption) (*Ids, error)
 }
 
@@ -1240,165 +1231,156 @@ func (c *nodesServiceClient) BulkCreate(ctx context.Context, in *Nodes, opts ...
 
 // NodesServiceServer is the server API for NodesService service.
 type NodesServiceServer interface {
+	// Create a node
 	//
-	//Create a node
+	// Creates a node and adds it to the Automate node manager.
+	// Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
+	// Useful for creating nodes for the purpose of running compliance scan jobs.
 	//
-	//Creates a node and adds it to the Automate node manager.
-	//Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
-	//Useful for creating nodes for the purpose of running compliance scan jobs.
+	// Example:
+	// ```
+	// {
+	// "name": "my-vagrant-node",
+	// "manager":"automate",
+	// "target_config": {
+	// "backend":"ssh",
+	// "host":"localhost",
+	// "secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
+	// "port": 22
+	// },
+	// "tags": [
+	// { "key":"test-node", "value":"is amazing" }
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"name": "my-vagrant-node",
-	//"manager":"automate",
-	//"target_config": {
-	//"backend":"ssh",
-	//"host":"localhost",
-	//"secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
-	//"port": 22
-	//},
-	//"tags": [
-	//{ "key":"test-node", "value":"is amazing" }
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:create
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:create
+	// ```
 	Create(context.Context, *Node) (*Id, error)
+	// Read a node
 	//
-	//Read a node
+	// Returns the details for a node given the node ID.
 	//
-	//Returns the details for a node given the node ID.
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:get
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:get
+	// ```
 	Read(context.Context, *Id) (*Node, error)
+	// Update a node
 	//
-	//Update a node
+	// This PUT operation overwrites ALL node details and requires the complete set of node details,
+	// consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
+	// Substitute the desired values for the existing node details in the PUT message.
 	//
-	//This PUT operation overwrites ALL node details and requires the complete set of node details,
-	//consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
-	//Substitute the desired values for the existing node details in the PUT message.
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:update
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:update
+	// ```
 	Update(context.Context, *Node) (*empty.Empty, error)
+	// Delete a node
 	//
-	//Delete a node
+	// Deletes the node with the node ID.
 	//
-	//Deletes the node with the node ID.
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:delete
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:delete
+	// ```
 	Delete(context.Context, *Id) (*empty.Empty, error)
+	// Bulk delete by ID
 	//
-	//Bulk delete by ID
+	// Deletes a set of nodes given a list of IDs.
+	// Invalid IDs will be ignored.
 	//
-	//Deletes a set of nodes given a list of IDs.
-	//Invalid IDs will be ignored.
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:delete
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:delete
+	// ```
 	BulkDeleteById(context.Context, *Ids) (*BulkDeleteResponse, error)
+	// List and filter nodes
 	//
-	//List and filter nodes
+	// Makes a list of nodes.
+	// Supports filtering, pagination, and sorting.
+	// Adding a filter narrows the list of nodes only those that match the filter or filters.
+	// Supported filters:
+	// account_id, last_contact, manager_id, manager_type, name, platform_name,
+	// platform_release, region, source_id, state, statechange_timerange, status,
+	// last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
+	// last_run_penultimate_status, last_scan_penultimate_status
 	//
-	//Makes a list of nodes.
-	//Supports filtering, pagination, and sorting.
-	//Adding a filter narrows the list of nodes only those that match the filter or filters.
-	//Supported filters:
-	//account_id, last_contact, manager_id, manager_type, name, platform_name,
-	//platform_release, region, source_id, state, statechange_timerange, status,
-	//last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
-	//last_run_penultimate_status, last_scan_penultimate_status
+	// Example:
+	// ```
+	// {
+	// "filters":[
+	// {"key": "last_scan_status", "values": ["FAILED"]},
+	// {"key": "last_scan_penultimate_status", "values": ["PASSED"]},
+	// {"key": "name", "values": ["MyNode*"]}
+	// ],
+	// "page":1, "per_page":100,
+	// "sort":"status", "order":"ASC"
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"filters":[
-	//{"key": "last_scan_status", "values": ["FAILED"]},
-	//{"key": "last_scan_penultimate_status", "values": ["PASSED"]},
-	//{"key": "name", "values": ["MyNode*"]}
-	//],
-	//"page":1, "per_page":100,
-	//"sort":"status", "order":"ASC"
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:list
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:list
+	// ```
 	List(context.Context, *Query) (*Nodes, error)
+	// Node status
 	//
-	//Node status
+	// Use this to run an `inspec detect` job on the node, which updates the status to reflect
+	// that the node is reachable or unreachable.
 	//
-	//Use this to run an `inspec detect` job on the node, which updates the status to reflect
-	//that the node is reachable or unreachable.
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:rerun
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:rerun
+	// ```
 	Rerun(context.Context, *Id) (*RerunResponse, error)
+	// Bulk delete nodes
 	//
-	//Bulk delete nodes
+	// Deletes a set of nodes that match a filter.
+	// Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
+	// platform_release, region, source_id, state, statechange_timerange, status,
+	// last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
+	// last_run_penultimate_status, last_scan_penultimate_status
 	//
-	//Deletes a set of nodes that match a filter.
-	//Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
-	//platform_release, region, source_id, state, statechange_timerange, status,
-	//last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
-	//last_run_penultimate_status, last_scan_penultimate_status
+	// Example:
+	// ```
+	// {"filters": [{"key": "name", "values": ["vj*"]}]}'
+	// ```
 	//
-	//Example:
-	//```
-	//{"filters": [{"key": "name", "values": ["vj*"]}]}'
-	//```
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:delete
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:delete
+	// ```
 	BulkDelete(context.Context, *Query) (*BulkDeleteResponse, error)
+	// Bulk create nodes
 	//
-	//Bulk create nodes
+	// Creates multiple nodes from a list of node data.
+	// Hosts field is required. Multiple hosts may be defined in this field.
 	//
-	//Creates multiple nodes from a list of node data.
-	//Hosts field is required. Multiple hosts may be defined in this field.
+	// Example:
+	// ```
+	// {
+	// "name_prefix": "000-my-ssh-node",
+	// "manager":"automate",
+	// "target_config": {
+	// "backend":"ssh",
+	// "hosts":["localhost","127.0.0.1"],
+	// "secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
+	// "port": 22
+	// },
+	// "tags": [
+	// { "key":"test-node", "value":"is-amazing" },
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"name_prefix": "000-my-ssh-node",
-	//"manager":"automate",
-	//"target_config": {
-	//"backend":"ssh",
-	//"hosts":["localhost","127.0.0.1"],
-	//"secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
-	//"port": 22
-	//},
-	//"tags": [
-	//{ "key":"test-node", "value":"is-amazing" },
-	//]
-	//}
-	//```
-	//
-	//Authorization Action:
-	//```
-	//infra:nodes:create
-	//```
+	// Authorization Action:
+	// ```
+	// infra:nodes:create
+	// ```
 	BulkCreate(context.Context, *Nodes) (*Ids, error)
 }
 

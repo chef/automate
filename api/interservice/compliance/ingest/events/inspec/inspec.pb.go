@@ -749,6 +749,14 @@ func (m *Support) GetPlatform() string {
 	return ""
 }
 
+//message Attribute {
+//	string name = 1;
+//	Options options = 20;
+//}
+//message Options {
+//	string description = 1;
+//	google.protobuf.Struct default = 20;
+//}
 // We can't have options as another message because the default field inside can take any json value(int, string, bool, hash, array)
 // We get options as a struct and handle the unmarshalling and marshaling in the code
 type Attribute struct {

@@ -214,7 +214,8 @@ func init() {
         "token": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Token"
         }
-      }
+      },
+      "description": "NB: Doc annotations in responses will only apply for simple types; others will be ignored."
     },
     "chef.automate.api.iam.v2.DeleteTokenResp": {
       "type": "object"

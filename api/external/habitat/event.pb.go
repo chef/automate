@@ -303,6 +303,9 @@ func (m *UpdateConfig) GetChannel() string {
 	return ""
 }
 
+////////////////////////////////////////////////////////////////////////
+// Concrete Event Types
+////////////////////////////////////////////////////////////////////////
 type ServiceStartedEvent struct {
 	EventMetadata        *EventMetadata   `protobuf:"bytes,1,opt,name=event_metadata,json=eventMetadata,proto3" json:"event_metadata,omitempty"`
 	ServiceMetadata      *ServiceMetadata `protobuf:"bytes,2,opt,name=service_metadata,json=serviceMetadata,proto3" json:"service_metadata,omitempty"`

@@ -314,6 +314,7 @@ func (m *ConfigRequest_V1_System_Log) GetScopedLevels() []string {
 	return nil
 }
 
+// System
 type ConfigRequest_V1_Service struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`

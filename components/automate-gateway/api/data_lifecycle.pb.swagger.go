@@ -70,7 +70,8 @@ func init() {
     },
     "/data-lifecycle/compliance/status": {
       "get": {
-        "summary": "GetComplianceStatus returns the compliance job scheduler status",
+        "summary": "Compliance",
+        "description": "GetComplianceStatus returns the compliance job scheduler status",
         "operationId": "GetComplianceStatus",
         "responses": {
           "200": {
@@ -168,7 +169,8 @@ func init() {
     },
     "/data-lifecycle/event-feed/status": {
       "get": {
-        "summary": "GetEventFeedStatus returns the event feed job scheduler status",
+        "summary": "Event Feed",
+        "description": "GetEventFeedStatus returns the event feed job scheduler status",
         "operationId": "GetEventFeedStatus",
         "responses": {
           "200": {
@@ -239,7 +241,8 @@ func init() {
     },
     "/data-lifecycle/infra/status": {
       "get": {
-        "summary": "GetInfraStatus returns the infra job scheduler status",
+        "summary": "Infra",
+        "description": "GetInfraStatus returns the infra job scheduler status",
         "operationId": "GetInfraStatus",
         "responses": {
           "200": {

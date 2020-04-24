@@ -53,7 +53,7 @@
     "/cfgmgmt/node_metadata_counts": {
       "get": {
         "summary": "GetNodeMetadataCounts",
-        "description": "For each type of field requested this returns distinct values the amount of each. For example, \nif the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8 could be returned. \nThe number next to each represents the number of nodes with that type of platform.\n\nExample:\nrequest\n```\ncfgmgmt/node_metadata_counts?type=platform\u0026type=status\n```\nresponse\n```\n{\n\"types\": [\n{\n\"values\": [\n{\n\"value\": \"mac_os_x 10.11.5\",\n\"count\": 28\n},\n{\n\"value\": \"linux 8.9\",\n\"count\": 1\n},\n{\n\"value\": \"macos 8.9\",\n\"count\": 1\n},\n{\n\"value\": \"windows 8.9\",\n\"count\": 1\n}\n],\n\"type\": \"platform\"\n},\n{\n\"value\": [\n{\n\"value\": \"missing\",\n\"count\": 29\n},\n{\n\"value\": \"failure\",\n\"count\": 2\n}\n],\n\"type\": \"status\"\n}\n]\n}\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
+        "description": "For each type of field requested this returns distinct values the amount of each. For example,\nif the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8 could be returned.\nThe number next to each represents the number of nodes with that type of platform.\n\nExample:\nrequest\n```\ncfgmgmt/node_metadata_counts?type=platform\u0026type=status\n```\nresponse\n```\n{\n\"types\": [\n{\n\"values\": [\n{\n\"value\": \"mac_os_x 10.11.5\",\n\"count\": 28\n},\n{\n\"value\": \"linux 8.9\",\n\"count\": 1\n},\n{\n\"value\": \"macos 8.9\",\n\"count\": 1\n},\n{\n\"value\": \"windows 8.9\",\n\"count\": 1\n}\n],\n\"type\": \"platform\"\n},\n{\n\"value\": [\n{\n\"value\": \"missing\",\n\"count\": 29\n},\n{\n\"value\": \"failure\",\n\"count\": 2\n}\n],\n\"type\": \"status\"\n}\n]\n}\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
         "operationId": "GetNodeMetadataCounts",
         "responses": {
           "200": {
@@ -453,7 +453,7 @@
         "parameters": [
           {
             "name": "durations",
-            "description": "A valid duration is any number zero or greater with one of these characters 'h', 'd', 'w', or 'M'. \n'h' is hours\n'd' is days\n'w' is weeks\n'M' is months\nExamples '12h', '3d', and '1M'.\nWill contain one or many.",
+            "description": "A valid duration is any number zero or greater with one of these characters 'h', 'd', 'w', or 'M'.\n'h' is hours\n'd' is days\n'w' is weeks\n'M' is months\nExamples '12h', '3d', and '1M'.\nWill contain one or many.",
             "in": "query",
             "required": false,
             "type": "array",
