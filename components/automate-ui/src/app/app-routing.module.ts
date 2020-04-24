@@ -17,10 +17,10 @@ import { IntegrationsListComponent } from './pages/integrations/list/integration
 import { JobAddComponent } from './pages/job-add/job-add.component';
 import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
+import { DataFeedComponent } from './pages/data-feed/data-feed.component';
+import { DataFeedDetailsComponent } from './pages/data-feed-details/data-feed-details.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
-import { DatafeedComponent } from './pages/data-feed/data-feed.component';
-import { DatafeedFormComponent } from './pages/data-feed-form/data-feed-form.component';
 import { SigninComponent } from './pages/signin/signin.component';
 
 // Components
@@ -175,19 +175,15 @@ const routes: Routes = [
           ]
         },
         {
-          path: 'data-feed',
+          path: 'data-feeds',
           children: [
             {
               path: '',
-              component: DatafeedComponent
+              component: DataFeedComponent
             },
             {
-              path: 'form',
-              component: DatafeedFormComponent
-            },
-            {
-              path: 'form/:id',
-              component: DatafeedFormComponent
+              path: ':id',
+              component: DataFeedDetailsComponent
             }
           ]
         }

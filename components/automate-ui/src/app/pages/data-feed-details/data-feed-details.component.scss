@@ -1,0 +1,117 @@
+@import "~styles/variables";
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+.detail-row {
+  display: flex;
+  color: $chef-primary-dark;
+}
+
+thead {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: $chef-primary-dark;
+}
+
+th {
+  text-align: left;
+  padding: 0px;
+}
+
+tbody > .detail-row {
+  padding-top: 0px;
+  padding-bottom: 15px;
+}
+
+.header-column {
+  padding-top: 0px;
+  padding-left: 0px;
+  width: 33%;
+}
+
+chef-tab-selector {
+  chef-option {
+    margin-right: 16px;
+    color: $chef-primary-dark;
+  }
+}
+
+chef-form-field {
+  width: 310px;
+  padding-bottom: 30px;
+}
+
+chef-radio chef-option {
+  display: inline-block;
+}
+
+section {
+  app-projects-dropdown {
+    width: 310px;
+  }
+
+  chef-button {
+    margin: 0;
+
+    chef-loading-spinner {
+      position: relative;
+      top: 2px;
+      margin-right: 5px;
+    }
+  }
+
+  #saved-note {
+    font-size: 0.75em;
+    padding-left: 12px;
+  }
+
+  chef-button[primary] {
+    margin-left: 15px;
+  }
+}
+
+chef-modal {
+  #{--modal-width}: 500px;
+
+  .status-modal {
+    text-align: center;
+
+    chef-button {
+      margin-top: 20px;
+    }
+  }
+}
+
+.status-icon {
+  margin: 0 auto 10px;
+  padding: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+
+  &.failure {
+    background: $chef-critical;
+  }
+
+  &.success {
+    background: $chef-success;
+  }
+
+  & > chef-icon {
+    color: $chef-white;
+  }
+}
+
+.status-heading {
+  text-align: center;
+
+  &.failure {
+    color: $chef-critical;
+  }
+
+  &.success {
+    color: $chef-success;
+  }
+}
