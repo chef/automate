@@ -23,16 +23,17 @@ Specify the action to restrict user access to the specific action.
 | View Service Group Data | Applications | applications:*  | /applications/service-groups | https://{{< example_fqdn "automate" >}}/applications/service-groups |
 | View Client Runs | Infrastructure | infra:nodes:*   | /cfgmgmt/nodes | https://{{< example_fqdn "automate" >}}/infrastructure/client-runs |
 | Manage Chef Servers | Infrastructure | infra:servers:* | <endpoint> | https://{{< example_fqdn "automate" >}}/infrastructure/chef-servers |
-| View Reports | Compliance | compliance:reporting:*  | /compliance/reporting/reports | https://{{< example_fqdn "automate" >}}/compliance/reports/overview |
-| Review Scan Jobs | Compliance | [compliance:scannerJobs:* , infra:nodes:* , infra:nodeManagers:* , compliance:profiles:* ] | /compliance/scanner/jobs | https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs |
+| List Reports | Compliance | compliance:reporting:*  | /compliance/reporting/reports | https://{{< example_fqdn "automate" >}}/compliance/reports/overview |
+| List Scan Jobs | Compliance | compliance:scannerJobs:* | /compliance/scanner/jobs | https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs |
+| Manage Scan Jobs | Compliance | [compliance:scannerJobs:* , infra:nodes:* , infra:nodeManagers:* , compliance:profiles:* ] | /compliance/scanner/jobs | https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs |
 | Manage Compliance Profiles | Compliance | compliance:profiles:* | /compliance/profiles | https://{{< example_fqdn "automate" >}}/compliance/compliance-profiles |
 | Manage Notifications | Settings | notifications:* | /notifications | https://{{< example_fqdn "automate" >}}/settings/notifications |
-| Manage Datafeed | Settings | datafeed:* | /data_feed/destination | https://{{< example_fqdn "automate" >}}/settings/data-feed |
+| Manage Data Feed | Settings | datafeed:* | /data_feed/destination | https://{{< example_fqdn "automate" >}}/settings/data-feed |
 | Manage Node Integrations | Settings | [infra:nodeManagers:* , infra:nodes:* , secrets:* ] | /nodemanagers , /cfgmgmt/nodes , /secrets | https://{{< example_fqdn "automate" >}}/settings/node-integrations |
-| Manage Credentials | Settings | secrets:* | /secrets | https://{{< example_fqdn "automate" >}}/settings/node-credentials |
+| Manage Node Credentials | Settings | secrets:* | /secrets | https://{{< example_fqdn "automate" >}}/settings/node-credentials |
 | Manage Data Lifecycle | Settings | dataLifecycle:* | /data-lifecycle | https://{{< example_fqdn "automate" >}}/settings/data-lifecycle |
-| Manage Local Users | Settings | iam:users:* | /iam/v2/users | https://{{< example_fqdn "automate" >}}/settings/users |
-| Manage Local Teams | Settings | iam:teams:* | /iam/v2/teams | https://{{< example_fqdn "automate" >}}/settings/teams |
+| Manage Users | Settings | iam:users:* | /iam/v2/users | https://{{< example_fqdn "automate" >}}/settings/users |
+| Manage Teams | Settings | iam:teams:* | /iam/v2/teams | https://{{< example_fqdn "automate" >}}/settings/teams |
 | Manage API Tokens | Settings | iam:tokens:* | /iam/v2/tokens | https://{{< example_fqdn "automate" >}}/settings/tokens |
 | Manage Policies | Settings | iam:policies:* | /iam/v2/policies | https://{{< example_fqdn "automate" >}}/settings/policies |
 | Manage Roles | Settings | iam:roles:* | /iam/v2/roles | https://{{< example_fqdn "automate" >}}/settings/roles |
