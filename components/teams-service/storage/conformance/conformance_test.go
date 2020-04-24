@@ -97,7 +97,7 @@ func TestStorage(t *testing.T) {
 
 		authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
 
-		adp, err := postgres.New(l, *migrationConfig, true, authzV2AuthorizationClient)
+		adp, err := postgres.New(l, *migrationConfig, authzV2AuthorizationClient)
 		require.NoError(t, err)
 		adapters["postgres"] = adp
 

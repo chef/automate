@@ -2067,7 +2067,6 @@ func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
 	authz.RegisterSubjectPurgeServer(grpcAuthz, mockCommon)
 
 	mockPolicies := authz_v2.NewPoliciesServerMock()
-	mockV2Policies.GetPolicyVersionFunc = defaultGetPolicyVersionFunc
 	authz_v2.RegisterPoliciesServer(grpcAuthz, mockPolicies)
 
 	mockAuthz := authz_v2.NewAuthorizationServerMock()
@@ -2119,16 +2118,6 @@ func resetState(ctx context.Context, t *testing.T, serviceRef *service.Service) 
 func defaultMockPurgeFunc(context.Context,
 	*authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
 	return &authz.PurgeSubjectFromPoliciesResp{}, nil
-}
-
-func defaultGetPolicyVersionFunc(context.Context,
-	*authz_v2.GetPolicyVersionReq) (*authz_v2.GetPolicyVersionResp, error) {
-	return &authz_v2.GetPolicyVersionResp{
-		Version: &authz_v2.Version{
-			Major: authz_v2.Version_V2,
-			Minor: authz_v2.Version_V1,
-		},
-	}, nil
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,

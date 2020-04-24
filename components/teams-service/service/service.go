@@ -46,12 +46,7 @@ func NewPostgresService(l logger.Logger, connFactory *secureconn.Factory, migrat
 	authzSubjectClient authz.SubjectPurgeClient, authzV2PoliciesClient authz_v2.PoliciesClient,
 	authzV2AuthorizationClient authz_v2.AuthorizationClient) (*Service, error) {
 
-	resp, err := authzV2PoliciesClient.GetPolicyVersion(context.Background(), &authz_v2.GetPolicyVersionReq{})
-	if err != nil {
-		return nil, err
-	}
-
-	p, err := postgres.New(l, migrationsConfig, resp.Version.Major == authz_v2.Version_V2, authzV2AuthorizationClient)
+	p, err := postgres.New(l, migrationsConfig, authzV2AuthorizationClient)
 	if err != nil {
 		return nil, err
 	}
