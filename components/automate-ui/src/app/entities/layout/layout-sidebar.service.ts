@@ -74,7 +74,7 @@ export class LayoutSidebarService {
               icon: 'storage',
               route: '/infrastructure/chef-servers',
               authorized: {
-                anyOf: [['/infra/servers', 'get']]
+                anyOf: [['/api/v0/infra/servers', 'get']]
               },
               visible$: new BehaviorSubject(this.chefInfraServerViewsFeatureFlagOn)
             },
@@ -94,9 +94,9 @@ export class LayoutSidebarService {
               icon: 'equalizer',
               route: '/compliance/reports',
               authorized: {
-                allOf: [['/compliance/reporting/stats/summary', 'post'],
-                ['/compliance/reporting/stats/failures', 'post'],
-                ['/compliance/reporting/stats/trend', 'post']]
+                allOf: [['/api/v0/compliance/reporting/stats/summary', 'post'],
+                ['/api/v0/compliance/reporting/stats/failures', 'post'],
+                ['/api/v0/compliance/reporting/stats/trend', 'post']]
               }
             },
             {
@@ -104,7 +104,7 @@ export class LayoutSidebarService {
               icon: 'wifi_tethering',
               route: '/compliance/scan-jobs',
               authorized: {
-                allOf: ['/compliance/scanner/jobs/search', 'post']
+                allOf: ['/api/v0/compliance/scanner/jobs/search', 'post']
               }
             },
             {
@@ -112,7 +112,7 @@ export class LayoutSidebarService {
               icon: 'library_books',
               route: '/compliance/compliance-profiles',
               authorized: {
-                allOf: [['/compliance/profiles/search', 'post']]
+                allOf: [['/api/v0/compliance/profiles/search', 'post']]
               }
             }
           ]
@@ -126,7 +126,7 @@ export class LayoutSidebarService {
                 icon: 'notifications',
                 route: '/settings/notifications',
                 authorized: {
-                  anyOf: ['/notifications/rules', 'get']
+                  anyOf: ['/api/v0/notifications/rules', 'get']
                 }
               },
               {
@@ -134,7 +134,7 @@ export class LayoutSidebarService {
                 icon: 'assignment',
                 route: '/settings/data-feeds',
                 authorized: {
-                  anyOf: ['/datafeed/destinations', 'post']
+                  anyOf: ['/api/v0/datafeed/destinations', 'post']
                 },
                 visible$: new BehaviorSubject(this.ServiceNowFeatureFlagOn)
               },
@@ -143,7 +143,7 @@ export class LayoutSidebarService {
                 icon: 'storage',
                 route: '/settings/data-lifecycle',
                 authorized: {
-                  anyOf: ['/retention/nodes/status', 'get']
+                  anyOf: ['/api/v0/retention/nodes/status', 'get']
                 }
               }
             ]
@@ -156,7 +156,7 @@ export class LayoutSidebarService {
                 icon: 'settings_input_component',
                 route: '/settings/node-integrations',
                 authorized: {
-                  anyOf: ['/nodemanagers/search', 'post']
+                  anyOf: ['/api/v0/nodemanagers/search', 'post']
                 }
               },
               {
@@ -165,7 +165,7 @@ export class LayoutSidebarService {
                 iconRotation: 90,
                 route: '/settings/node-credentials',
                 authorized: {
-                  anyOf: ['/secrets/search', 'post']
+                  anyOf: ['/api/v0/secrets/search', 'post']
                 }
               }
             ]
