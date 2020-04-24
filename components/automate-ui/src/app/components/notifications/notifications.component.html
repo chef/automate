@@ -1,5 +1,6 @@
 <div class="notifications"> 
-  <ng-container *ngFor="let notification of notifications">
+  <!-- CHANGE REVERSE TO CUSTOM PIPE -->
+  <ng-container *ngFor="let notification of notifications.slice().reverse()">
     <app-chef-notification
     *ngIf="notification.type !== 'license'"
     [message]="notification.message"
