@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/chef/automate/lib/validate"
 
 	"github.com/golang/protobuf/ptypes"
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
@@ -98,7 +99,7 @@ func NewProjectsServer(
 
 func (s *ProjectState) GetProject(ctx context.Context,
 	req *api.GetProjectReq) (*api.GetProjectResp, error) {
-	err := confirmRequiredID(req.Id, "project")
+	err := validate.RequiredID(req.Id, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -122,7 +123,7 @@ func (s *ProjectState) GetProject(ctx context.Context,
 
 func (s *ProjectState) CreateProject(ctx context.Context,
 	req *api.CreateProjectReq) (*api.CreateProjectResp, error) {
-	err := confirmRequiredName(req.Name, "project")
+	err := validate.RequiredName(req.Name, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -160,7 +161,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 func (s *ProjectState) UpdateProject(ctx context.Context,
 	req *api.UpdateProjectReq) (*api.UpdateProjectResp, error) {
 
-	err := confirmRequiredIDandName(req.Id, req.Name, "project")
+	err := validate.RequiredIDandName(req.Id, req.Name, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -349,7 +350,7 @@ func (s *ProjectState) ListProjectsForIntrospection(
 func (s *ProjectState) DeleteProject(ctx context.Context,
 	req *api.DeleteProjectReq) (*api.DeleteProjectResp, error) {
 
-	err := confirmRequiredID(req.Id, "project")
+	err := validate.RequiredID(req.Id, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -520,7 +521,7 @@ func (s *ProjectState) listRulesWithFunction(ctx context.Context, req *api.ListR
 }
 
 func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
-	err := confirmRequiredID(req.Id, "project")
+	err := validate.RequiredID(req.Id, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -578,7 +579,7 @@ func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (
 }
 
 func confirmRequiredFieldsForRule(id, project_id string) error {
-	err := confirmRequiredID(id, "rule")
+	err := validate.RequiredID(id, "rule")
 	if err != nil {
 		return status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -587,6 +588,10 @@ func confirmRequiredFieldsForRule(id, project_id string) error {
 		return status.Errorf(codes.InvalidArgument, err.Error())
 	}
 	return nil
+}
+
+func confirmRequiredProjectID(projectID, resourceName string) error {
+	return validate.RequiredField(projectID, "project_id", resourceName)
 }
 
 func (s *ProjectState) validateProjectDelete(ctx context.Context, projectID string) error {
@@ -809,7 +814,7 @@ func fromAPIType(t api.ProjectRuleTypes) (storage.RuleType, error) {
 func (s *ProjectState) prepareStorageRule(inID, projectID, name string,
 	inType api.ProjectRuleTypes, inConditions []*api.Condition) (*storage.Rule, error) {
 
-	err := confirmRequiredIDandName(inID, name, "rule")
+	err := validate.RequiredIDandName(inID, name, "rule")
 	if err != nil {
 		return nil, err
 	}

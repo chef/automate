@@ -10,6 +10,8 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/projectassignment"
+	"github.com/chef/automate/lib/validate"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants"
@@ -17,7 +19,6 @@ import (
 	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/memstore"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
-	"github.com/chef/automate/lib/projectassignment"
 )
 
 // policyServer is the server state for policies
@@ -167,7 +168,7 @@ func (s *policyServer) GetPolicy(
 	ctx context.Context,
 	req *api.GetPolicyReq) (*api.Policy, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "cannot get policy")
 	}
@@ -188,7 +189,7 @@ func (s *policyServer) DeletePolicy(
 	ctx context.Context,
 	req *api.DeletePolicyReq) (*api.DeletePolicyResp, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -271,7 +272,7 @@ func (s *policyServer) ListPolicyMembers(
 	ctx context.Context,
 	req *api.ListPolicyMembersReq) (*api.ListPolicyMembersResp, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -295,7 +296,7 @@ func (s *policyServer) AddPolicyMembers(
 	ctx context.Context,
 	req *api.AddPolicyMembersReq) (*api.AddPolicyMembersResp, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -325,7 +326,7 @@ func (s *policyServer) ReplacePolicyMembers(
 	ctx context.Context,
 	req *api.ReplacePolicyMembersReq) (*api.ReplacePolicyMembersResp, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -354,7 +355,7 @@ func (s *policyServer) ReplacePolicyMembers(
 func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 	req *api.RemovePolicyMembersReq) (*api.RemovePolicyMembersResp, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req.Id, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -460,7 +461,7 @@ func (s *policyServer) GetRole(
 	ctx context.Context,
 	req *api.GetRoleReq) (*api.Role, error) {
 
-	err := confirmRequiredID(req.Id, "role")
+	err := validate.RequiredID(req.Id, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -481,7 +482,7 @@ func (s *policyServer) DeleteRole(
 	ctx context.Context,
 	req *api.DeleteRoleReq) (*api.DeleteRoleResp, error) {
 
-	err := confirmRequiredID(req.Id, "role")
+	err := validate.RequiredID(req.Id, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -761,4 +762,12 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 		}
 	}
 	s.log.WithFields(kv).Info("Policy definition")
+}
+
+func validateRequiredFieldsAndProjectsForPolicy(id string, name string, projectIDs []string) error {
+	return validate.RequiredFieldsAndProjects(id, name, projectIDs, "policy")
+}
+
+func validateRequiredFieldsAndProjectsForRole(id string, name string, projectIDs []string) error {
+	return validate.RequiredFieldsAndProjects(id, name, projectIDs, "role")
 }
