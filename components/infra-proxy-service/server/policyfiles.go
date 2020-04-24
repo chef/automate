@@ -53,11 +53,27 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	result, err := c.GetRoleList()
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	runList, err := GetExpandRunlistFromRole(policy.RunList, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	eRunList := &response.ExpandedRunList{
+		Id:      "_default",
+		RunList: runList,
+	}
+
 	return &response.Policyfile{
 		RevisionId:          policy.RevisionID,
 		Name:                policy.Name,
 		RunList:             policy.RunList,
 		NamedRunList:        fromAPINamedRunList(policy.NamedRunList),
+		ExpandedRunList:     []*response.ExpandedRunList{eRunList},
 		IncludedPolicyLocks: fromAPIIncludedPolicyLocks(policy.IncludedPolicyLocks),
 		CookbookLocks:       fromAPICookbookLocks(policy.CookbookLocks),
 		DefaultAttributes:   string(defaultAttrs),
