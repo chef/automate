@@ -61,13 +61,13 @@ control 'iam-introspection-1' do
       resp = automate_api_request('/apis/iam/v2/introspect',
                                   http_method: 'POST',
                                   request_body:  {
-                                    path: '/iam/v2/policies/foo'
+                                    path: '/apis/iam/v2/policies/foo'
                                   }.to_json)
       # The parameter is "foo" because the matching path is '/iam/v2/policies/{id}'
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:endpoints]).to eq(
         {
-          '/iam/v2/policies/foo': {
+          '/apis/iam/v2/policies/foo': {
             'get': true,
             'put': true,
             'post': false,
