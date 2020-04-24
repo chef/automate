@@ -20,6 +20,7 @@ func main() {
 		IncludeSourceCodeInfo: true,
 		ImportPaths: []string{
 			".",
+			"components/notifications-service/server/priv/",
 			"vendor/github.com/grpc-ecosystem/grpc-gateway",                         // protoc-gen-swagger/options/annotations.proto
 			"vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/", // google/api/{annotations,http}.proto
 			"vendor/github.com/envoyproxy/protoc-gen-validate/",                     // validate/validate.proto
