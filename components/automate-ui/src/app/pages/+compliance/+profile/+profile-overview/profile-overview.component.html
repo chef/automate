@@ -30,7 +30,7 @@
             </chef-option>
           </chef-tab-selector>
         </chef-page-header>
-    
+
         <div class="empty-help setup-help" *ngIf="!profilesEnabled">
           <img class="help-icon" src="/assets/img/services.svg" alt="">
           <div class="help-msg">
@@ -40,13 +40,13 @@
             <p>into <code>/etc/delivery/delivery.rb</code> and running <code>automate-ctl reconfigure</code>. The <code>automate-ctl status</code> command should now list the status of the compliance_profiles service.</p>
           </div>
         </div>
-    
+
         <!--only show content if profile store is enabled-->
         <div *ngIf="profilesEnabled" class="profiles-content">
-    
+
           <!--profiles tab-->
           <div *ngIf="selectedTab === 'installed'">
-    
+
             <chef-modal
               id="upload-modal"
               [visible]="uploadModalVisible"
@@ -124,7 +124,7 @@
               <chef-tr *ngFor="let profile of filteredProfiles">
                 <chef-td >
                   <a
-                    [routerLink]="['/compliance/compliance-profiles/profile-details']"
+                    [routerLink]="['/api/v0/compliance/compliance-profiles/profile-details']"
                     [queryParams]="{name: profile.name, version: profile.version, owner: user}">
                     {{ profile.title }}
                   </a>
@@ -163,7 +163,7 @@
               <chef-tr *ngFor="let profile of profileUpdatesAvailable">
                 <chef-td>
                   <a
-                    [routerLink]="['/compliance/compliance-profiles/profile-details']"
+                    [routerLink]="['/api/v0/compliance/compliance-profiles/profile-details']"
                     [queryParams]="{name: profile.name, version: profile.version}">
                     {{ profile.title }}
                   </a>
@@ -193,7 +193,7 @@
               <chef-tr *ngFor="let profile of filteredAvailableProfiles">
                 <chef-td>
                   <a
-                    [routerLink]="['/compliance/compliance-profiles/profile-details']"
+                    [routerLink]="['/api/v0/compliance/compliance-profiles/profile-details']"
                     [queryParams]="{name: profile.name, version: profile.version}">
                     {{ profile.title }}
                   </a>

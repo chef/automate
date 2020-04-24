@@ -7,22 +7,24 @@
       <div class="navigation-menu">
         <div role="menuitem" class="nav-link"><a routerLink="/dashboards/event-feed" routerLinkActive="active" tabindex="0">Dashboards</a></div>
 
-        <app-authorized [allOf]="[['/applications/services', 'get'], ['/applications/service-groups', 'get']]">
+        <app-authorized [allOf]="[['/api/v0/applications/services', 'get'], ['/api/v0/applications/service-groups', 'get']]">
           <div role="menuitem" class="nav-link"><a routerLink="/applications/service-groups" routerLinkActive="active" tabindex="0">Applications</a></div>
         </app-authorized>
 
-        <app-authorized [allOf]="[['/cfgmgmt/nodes', 'get'], ['/cfgmgmt/stats/node_counts', 'get']]">
+        <app-authorized [allOf]="[['/api/v0/cfgmgmt/nodes', 'get'], ['/api/v0/cfgmgmt/stats/node_counts', 'get']]">
           <div role="menuitem" class="nav-link"><a routerLink="/infrastructure" routerLinkActive="active" tabindex="0">Infrastructure</a></div>
         </app-authorized>
 
         <app-authorized
-          [anyOf]="[['/compliance/reporting/stats/summary', 'post'], ['/compliance/reporting/stats/failures', 'post'], ['/compliance/reporting/stats/trend', 'post'],
-            ['/compliance/scanner/jobs', 'post'], ['/compliance/scanner/jobs/search', 'post'], ['/compliance/profiles/search', 'post']]">
+          [anyOf]="[['/api/v0/compliance/reporting/stats/summary', 'post'], ['/api/v0/compliance/reporting/stats/failures', 'post'],
+            ['/api/v0/compliance/reporting/stats/trend', 'post'], ['/api/v0/compliance/scanner/jobs', 'post'],
+            ['/api/v0/compliance/scanner/jobs/search', 'post'], ['/api/v0/compliance/profiles/search', 'post']]">
           <div role="menuitem" class="nav-link"><a routerLink="/compliance" routerLinkActive="active" tabindex="0">Compliance</a></div>
         </app-authorized>
 
         <app-authorized
-          [anyOf]="[['/datafeed/destinations', 'post'], ['/notifications/rules', 'get'], ['/secrets/search', 'post'], ['/nodemanagers/search', 'post'], ['/retention/nodes/status', 'get'],
+          [anyOf]="[['/api/v0/datafeed/destinations', 'post'], ['/api/v0/notifications/rules', 'get'], ['/api/v0/secrets/search', 'post'],
+            ['/api/v0/nodemanagers/search', 'post'], ['/api/v0/retention/nodes/status', 'get'],
             ['/apis/iam/v2/users', 'get'], ['/apis/iam/v2/teams', 'get'], ['/apis/iam/v2/tokens', 'get'],
             ['/apis/iam/v2/policies', 'get'], ['/apis/iam/v2/roles', 'get'], ['/apis/iam/v2/projects', 'get']] ">
           <div role="menuitem" class="nav-link"><a routerLink="/settings" routerLinkActive="active" tabindex="0">Settings</a></div>
