@@ -2066,28 +2066,28 @@ func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
 	mockCommon.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
 	authz.RegisterSubjectPurgeServer(grpcAuthz, mockCommon)
 
-	mockV2Policies := authz_v2.NewPoliciesServerMock()
+	mockPolicies := authz_v2.NewPoliciesServerMock()
 	mockV2Policies.GetPolicyVersionFunc = defaultGetPolicyVersionFunc
-	authz_v2.RegisterPoliciesServer(grpcAuthz, mockV2Policies)
+	authz_v2.RegisterPoliciesServer(grpcAuthz, mockPolicies)
 
-	mockV2Authz := authz_v2.NewAuthorizationServerMock()
-	mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-	authz_v2.RegisterAuthorizationServer(grpcAuthz, mockV2Authz)
+	mockAuthz := authz_v2.NewAuthorizationServerMock()
+	mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
+	authz_v2.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
 
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
 
 	authzClient := authz.NewSubjectPurgeClient(authzConn)
-	authzV2PoliciesClient := authz_v2.NewPoliciesClient(authzConn)
-	authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
+	authzPoliciesClient := authz_v2.NewPoliciesClient(authzConn)
+	authzAuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
 
 	var serviceRef *service.Service
 	if migrationConfig == nil {
 		serviceRef, err = service.NewInMemoryService(l, connFactory, authzClient)
 	} else {
 		serviceRef, err = service.NewPostgresService(l, connFactory,
-			*migrationConfig, authzClient, authzV2PoliciesClient, authzV2AuthorizationClient)
+			*migrationConfig, authzClient, authzPoliciesClient, authzAuthorizationClient)
 	}
 	if err != nil {
 		t.Fatalf("could not create server: %s", err)
