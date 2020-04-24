@@ -46,6 +46,8 @@ var (
 	Timestamp          string = "timestamp"
 	Created            string = "created"
 	ExistsTag          string = NodeFieldToJson("Exists")
+	StatusTag          string = "status"
+	RunIDTag           string = "run_id"
 )
 
 // NodeFieldToJson returns the value associated with key in the tag

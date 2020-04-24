@@ -98,6 +98,13 @@ type CountPeroid struct {
 	Count int
 }
 
+type RunStatus struct {
+	Start  time.Time
+	End    time.Time
+	Status string
+	RunID  string
+}
+
 type TypeCount struct {
 	Values []ValueCount
 	Type   string

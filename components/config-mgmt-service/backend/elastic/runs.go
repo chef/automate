@@ -211,7 +211,7 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 	var (
 		dateHistoTag = "dateHisto"
 		mainQuery    = newBoolQueryFromFilters(filters)
-		nodeID       = "node_id"
+		innerAggTag  = "inneragg"
 	)
 
 	// Filters the runs down to the needed time range
@@ -227,7 +227,7 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 			startTime.Format(time.RFC3339), endTime.Format(time.RFC3339)). // needed to return empty buckets
 		Format("yyyy-MM-dd'T'HH:mm:ssZ").
 		TimeZone(getTimezoneWithStartOfDayAtUtcHour(startTime)). // needed start the buckets at the beginning of the current hour.
-		SubAggregation(nodeID,
+		SubAggregation(innerAggTag,
 			elastic.NewCardinalityAggregation().Field(backend.Id)) // count how many unique nodes are in this bucket
 
 	searchResult, err := es.client.Search().
@@ -260,7 +260,7 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 	}
 
 	for index, bucket := range dateHistoRes.Buckets {
-		item, found := bucket.Aggregations.Cardinality(nodeID)
+		item, found := bucket.Aggregations.Cardinality(innerAggTag)
 		if found {
 			checkInPeriods[index].Count = int(*item.Value)
 		} else {
@@ -460,6 +460,217 @@ func (es Backend) getAllConvergeIndiceNames() ([]string, error) {
 	}
 
 	return names, nil
+}
+
+func (es Backend) GetNodeDailyStatusTimeSeries(nodeID string, startTime, endTime time.Time) ([]backend.RunStatus, error) {
+	var (
+		endDateAggTag = "sort_descending_on_end_time"
+		statusAggTag  = "status_agg"
+		IDAggTag      = "id_agg"
+		outerAggTag   = "date_histogram_on_end_time"
+		mainQuery     = elastic.NewBoolQuery()
+	)
+
+	// Runs for only one node
+	mainQuery = mainQuery.Must(elastic.NewBoolQuery().Must(elastic.NewTermsQuery(backend.Id, nodeID)))
+
+	// Filters the runs down to the needed time range
+	rangeQuery, _ := newRangeQuery(startTime.Format(time.RFC3339),
+		endTime.Format(time.RFC3339), backend.RunEndTime)
+
+	mainQuery = mainQuery.Must(rangeQuery)
+
+	innerAgg := elastic.NewTermsAggregation().Field(backend.StatusTag)
+	innerAgg.SubAggregation(endDateAggTag,
+		elastic.NewTermsAggregation().Field(backend.RunEndTime).OrderByTerm(false).Size(1).
+			SubAggregation(IDAggTag, elastic.NewTermsAggregation().Field(backend.RunIDTag)))
+
+	bucketHist := elastic.NewDateHistogramAggregation().Field(backend.RunEndTime).
+		Interval("24h"). // do not use "1d" because daylight savings time could have 23 or 25 hours
+		MinDocCount(0).  // needed to return empty buckets
+		ExtendedBounds(
+			startTime.Format(time.RFC3339), endTime.Format(time.RFC3339)). // needed to return empty buckets
+		Format("yyyy-MM-dd'T'HH:mm:ssZ").
+		TimeZone(getTimezoneWithStartOfDayAtUtcHour(startTime)). // needed start the buckets at the beginning of the current hour.
+		SubAggregation(statusAggTag, innerAgg)
+
+	searchResult, err := es.client.Search().
+		Index(IndexConvergeHistory).
+		Query(mainQuery).
+		Aggregation(outerAggTag, bucketHist).
+		Do(context.Background())
+	if err != nil {
+		return []backend.RunStatus{}, err
+	}
+
+	LogQueryPartMin(IndexConvergeHistory, searchResult.Aggregations, "GetNodeDailyStatusTimeSeries2 response")
+
+	runStatusDurations := make([]backend.RunStatus, getNumberOf24hBetween(startTime, endTime))
+	dateHistoRes, outerAggfound := searchResult.Aggregations.DateHistogram(outerAggTag)
+	if !outerAggfound {
+		// This case is if there are no runs for the entire range of the time series
+		// We are creating the buckets manually with zero check-ins
+		for index := 0; index < len(runStatusDurations); index++ {
+			runStatusDurations[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
+			runStatusDurations[index].End = startTime.Add(time.Hour * 24 *
+				time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
+			runStatusDurations[index].Status = "missing"
+		}
+		return runStatusDurations, nil
+	}
+
+	if len(dateHistoRes.Buckets) != len(runStatusDurations) {
+		return []backend.RunStatus{}, errors.NewBackendError(
+			"The number of buckets found is incorrect expected %d actual %d",
+			len(runStatusDurations), len(dateHistoRes.Buckets))
+	}
+
+	for index, outerBucket := range dateHistoRes.Buckets {
+		start := startTime.Add(time.Hour * 24 * time.Duration(index))
+		end := startTime.Add(time.Hour * 24 *
+			time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
+
+		runStatusDurations[index].Start = start
+		runStatusDurations[index].End = end
+
+		statusAgg, innerAggFound := outerBucket.Aggregations.Terms(statusAggTag)
+		if !innerAggFound {
+			runStatusDurations[index].Status = "missing"
+			continue
+		}
+
+		if len(statusAgg.Buckets) == 0 {
+			runStatusDurations[index].Status = "missing"
+			continue
+		}
+
+		statuses := collectLatestStatusBuckets(statusAgg.Buckets, endDateAggTag, IDAggTag)
+		if len(statuses) == 0 {
+			runStatusDurations[index].Status = "missing"
+			continue
+		}
+
+		selectedStatus := selectPriorityStatus(statuses)
+
+		runStatusDurations[index].Status = selectedStatus.Status
+		runStatusDurations[index].RunID = selectedStatus.RunID
+	}
+
+	return runStatusDurations, nil
+}
+
+// Select the latest 'failure' run over all 'successful' runs
+func selectPriorityStatus(latestStatusBucketCollection []LatestStatusBucket) LatestStatusBucket {
+	for _, latestStatusBucket := range latestStatusBucketCollection {
+		if latestStatusBucket.Status == "failure" {
+			return latestStatusBucket
+		}
+	}
+
+	return latestStatusBucketCollection[0]
+}
+
+type LatestStatusBucket struct {
+	Date   float64
+	Status string
+	RunID  string
+}
+
+// "buckets":[
+// 	{
+// 			"key":"failure",
+// 			"doc_count":1,
+// 			"sort_descending_on_end_time":{
+// 				"doc_count_error_upper_bound":0,
+// 				"sum_other_doc_count":0,
+// 				"buckets":[
+// 						{
+// 							"key":1584183779000,
+// 							"key_as_string":"2020-03-14T11:02:59.000Z",
+// 							"doc_count":1,
+// 							"id_agg":{
+// 									"doc_count_error_upper_bound":0,
+// 									"sum_other_doc_count":0,
+// 									"buckets":[
+// 										{
+// 												"key":"3",
+// 												"doc_count":1
+// 										}
+// 									]
+// 							}
+// 						}
+// 				]
+// 			}
+// 	},
+// 	{
+// 			"key":"successful",
+// 			"doc_count":1,
+// 			"sort_descending_on_end_time":{
+// 				"doc_count_error_upper_bound":0,
+// 				"sum_other_doc_count":0,
+// 				"buckets":[
+// 						{
+// 							"key":1584187379000,
+// 							"key_as_string":"2020-03-14T12:02:59.000Z",
+// 							"doc_count":1,
+// 							"id_agg":{
+// 									"doc_count_error_upper_bound":0,
+// 									"sum_other_doc_count":0,
+// 									"buckets":[
+// 										{
+// 												"key":"4",
+// 												"doc_count":1
+// 										}
+// 									]
+// 							}
+// 						}
+// 				]
+// 			}
+// 	}
+// ]
+func collectLatestStatusBuckets(statusBuckets []*elastic.AggregationBucketKeyItem,
+	endDateAggTag, IDAggTag string) []LatestStatusBucket {
+	latestStatusBucketCollection := make([]LatestStatusBucket, 0)
+	for _, statusBucket := range statusBuckets {
+		status := statusBucket.Key.(string)
+		endDateAgg, endDateAggFound := statusBucket.Aggregations.Terms(endDateAggTag)
+		if !endDateAggFound {
+			log.Errorf("End Date aggregation not found for status %q", status)
+			continue
+		}
+
+		if len(endDateAgg.Buckets) != 1 {
+			log.Errorf("End Date aggregation did not have one entry for status %q", status)
+			continue
+		}
+
+		latestRunEndDateBucket := endDateAgg.Buckets[0]
+
+		runIDAgg, runIDFound := latestRunEndDateBucket.Aggregations.Terms(IDAggTag)
+		if !runIDFound {
+			log.Errorf("Run ID not found for status %q", status)
+			continue
+		}
+
+		date := latestRunEndDateBucket.Key.(float64)
+
+		if len(runIDAgg.Buckets) != 1 {
+			log.Errorf("Run ID aggregation did not have one entry for status %q and date %d", status, date)
+			continue
+		}
+
+		latestRunIDBucket := runIDAgg.Buckets[0]
+		runID := latestRunIDBucket.Key.(string)
+
+		latestStatusBucketCollection = append(latestStatusBucketCollection,
+			LatestStatusBucket{
+				Date:   date,
+				RunID:  runID,
+				Status: status,
+			})
+	}
+
+	return latestStatusBucketCollection
 }
 
 // The number of 24 hour blocks between the start and end times.
