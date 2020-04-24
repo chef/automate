@@ -1,41 +1,30 @@
 // -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
-syntax = 'proto3';
-
+syntax = "proto3";
 package chef.automate.api.debug;
 option go_package = "github.com/chef/automate/lib/grpc/debug/debug_api";
-
 import "google/protobuf/duration.proto";
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-
 service Debug {
-	rpc Trace(TraceRequest) returns (stream Chunk) {}
-	rpc Profile(ProfileRequest) returns (stream Chunk) {}
-	rpc SetLogLevel(SetLogLevelRequest) returns (SetLogLevelResponse) {
-		// This isn't exposed from the rest api, but we need to add the
-		// policy annotations so that we can have this work for automate-gateway
-		option (chef.automate.api.iam.policy).resource = "system:service:logLevel";
-		option (chef.automate.api.iam.policy).action = "system:serviceLogLevel:set";
-	}
-	rpc GetVersion(VersionRequest) returns (VersionResponse) {
-		option (chef.automate.api.iam.policy).resource = "system:service:version";
-		option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
-	}
+  rpc Trace ( TraceRequest ) returns ( stream Chunk );
+  rpc Profile ( ProfileRequest ) returns ( stream Chunk );
+  rpc SetLogLevel ( SetLogLevelRequest ) returns ( SetLogLevelResponse ) {
+    option (chef.automate.api.iam.policy) = { resource:"system:service:logLevel" action:"system:serviceLogLevel:set" };
+  }
+  rpc GetVersion ( VersionRequest ) returns ( VersionResponse ) {
+    option (chef.automate.api.iam.policy) = { resource:"system:service:version" action:"system:serviceVersion:get" };
+  }
 }
-
 message Chunk {
-	bytes chunk = 1;
+  bytes chunk = 1;
 }
-
 message TraceRequest {
-	google.protobuf.Duration duration = 1;
+  google.protobuf.Duration duration = 1;
 }
-
 message ProfileRequest {
-	string profile_name = 1;
-	int64 sample_rate = 2;
-	google.protobuf.Duration duration = 3;
+  string profile_name = 1;
+  int64 sample_rate = 2;
+  google.protobuf.Duration duration = 3;
 }
-
 message SetLogLevelRequest {
   enum Level {
     UNKNOWN = 0;
@@ -46,12 +35,12 @@ message SetLogLevelRequest {
   }
   Level level = 1;
 }
-message SetLogLevelResponse {}
-
-message VersionRequest {}
-
+message SetLogLevelResponse {
+}
+message VersionRequest {
+}
 message VersionResponse {
-	string version = 1;
-	string git_ref = 2;
-	string go_version = 3;
+  string version = 1;
+  string git_ref = 2;
+  string go_version = 3;
 }

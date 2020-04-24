@@ -1,6 +1,6 @@
 #!/bin/bash
 
-find api components -name '*.proto' \
+find lib api components -name '*.proto' \
      -not -path '*components/notifications-service/server/priv/notifications.proto' \
      -not -path '*components/notifications-service/server/priv/rules.proto' \
      -not -path '*components/notifications-service/server/priv/health.proto' \
