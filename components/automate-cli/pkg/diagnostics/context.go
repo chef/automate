@@ -360,9 +360,7 @@ func (c *testContext) CleanupAdminToken() error {
 	}
 	defer resp.Body.Close()
 
-	// as long as the delete was successful or the token is not found
-	// we consider the cleanup a success
-	if resp.StatusCode == 200 || resp.StatusCode == 404 {
+	if resp.StatusCode == 200 {
 		return nil
 	}
 
@@ -374,6 +372,6 @@ func (c *testContext) CleanupAdminToken() error {
 	}
 
 	// DoLBRequest only catches 500s and 403
-	// for any other non-200 or 404 status code, we assume something unexpected occured
+	// for any other non-200 status code, we assume something unexpected occured
 	return errors.Errorf("Unexpected response when cleaning up the diagnostics admin token: %d %s", resp.StatusCode, r.Msg)
 }
