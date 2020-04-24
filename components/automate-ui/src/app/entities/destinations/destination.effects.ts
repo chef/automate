@@ -190,7 +190,7 @@ export class DestinationEffects {
     map(({ payload }: TestDestinationFailure) => {
       return new CreateNotification({
         type: Type.error,
-        message: `We were unable to connect to your data feed ${payload.name}.`
+        message: `Unable to connect to data feed ${payload.name}.`
       });
     }));
 }

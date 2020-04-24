@@ -8,7 +8,7 @@
               <span class="label">Name <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="name" type="text" id="name-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
-            <span class="i-desc">Don't worry, data feed name can be changed later.</span>
+            <span class="i-desc">Don't worry, data feed names can be changed later.</span>
             <chef-error
             *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
             Display Name is required.
