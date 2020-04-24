@@ -16,23 +16,13 @@ import (
 	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/service"
 	"github.com/chef/automate/components/infra-proxy-service/test"
 	"github.com/chef/automate/lib/grpc/grpctest"
-	"github.com/chef/automate/lib/logger"
 )
 
 func TestServers(t *testing.T) {
 	ctx := context.Background()
-
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(t, err, "could not init logger", err)
-
-	migrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
-	require.NoError(t, err)
-
-	_, serviceRef, conn, close, _ := test.SetupInfraProxyService(ctx, t, l, *migrationConfig)
-	secretsMock := serviceRef.Secrets.(*secrets.MockSecretsServiceClient)
+	_, serviceRef, conn, close, _, secretsMock := test.SetupInfraProxyService(ctx, t)
 	cl := infra_proxy.NewInfraProxyClient(conn)
 
-	t.Helper()
 	defer close()
 
 	secretID := &secrets.Id{

@@ -19,34 +19,13 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/constants"
 	"github.com/chef/automate/components/infra-proxy-service/test"
 	"github.com/chef/automate/lib/grpc/grpctest"
-	"github.com/chef/automate/lib/logger"
 )
 
 func TestOrgs(t *testing.T) {
 	ctx := context.Background()
-
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(t, err, "could not init logger", err)
-
-	migrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
-	require.NoError(t, err)
-
-	_, serviceRef, conn, close, authzMock := test.SetupInfraProxyService(ctx, t, l, *migrationConfig)
-	secretsMock := serviceRef.Secrets.(*secrets.MockSecretsServiceClient)
-
+	_, serviceRef, conn, close, authzMock, secretsMock := test.SetupInfraProxyService(ctx, t)
 	cl := infra_proxy.NewInfraProxyClient(conn)
-
-	t.Helper()
 	defer close()
-
-	serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-		Name:        "Chef infra server",
-		Description: "Chef infra server",
-		Fqdn:        "domain.com",
-		IpAddress:   "0.0.0.0",
-	})
-	require.NoError(t, err)
-	require.NotNil(t, serverRes)
 
 	secretID := &secrets.Id{
 		Id: "fake id",
@@ -63,6 +42,15 @@ func TestOrgs(t *testing.T) {
 
 	t.Run("CreateOrg", func(t *testing.T) {
 		test.ResetState(ctx, t, serviceRef)
+
+		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+			Name:        "Chef infra server",
+			Description: "Chef infra server",
+			Fqdn:        "domain.com",
+			IpAddress:   "0.0.0.0",
+		})
+		require.NoError(t, err)
+		require.NotNil(t, serverRes)
 
 		t.Run("when a valid org is submitted, creates the new org successfully", func(t *testing.T) {
 			ctx := context.Background()
@@ -212,10 +200,19 @@ func TestOrgs(t *testing.T) {
 			grpctest.AssertCode(t, codes.NotFound, err)
 
 		})
+		cleanupServer(ctx, t, cl, serverRes.Server.Id)
 	})
 
 	t.Run("GetOrgs", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
+		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+			Name:        "Chef infra server",
+			Description: "Chef infra server",
+			Fqdn:        "domain.com",
+			IpAddress:   "0.0.0.0",
+		})
+		require.NoError(t, err)
+		require.NotNil(t, serverRes)
 
 		t.Run("when no orgs exist returns empty list", func(t *testing.T) {
 			ctx := context.Background()
@@ -488,11 +485,21 @@ func TestOrgs(t *testing.T) {
 			cleanupOrg(ctx, t, cl, resp1.Org.Id)
 			cleanupOrg(ctx, t, cl, resp2.Org.Id)
 		})
+		cleanupServer(ctx, t, cl, serverRes.Server.Id)
 
 	})
 
 	t.Run("GetOrg", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
+
+		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+			Name:        "Chef infra server",
+			Description: "Chef infra server",
+			Fqdn:        "domain.com",
+			IpAddress:   "0.0.0.0",
+		})
+		require.NoError(t, err)
+		require.NotNil(t, serverRes)
 
 		t.Run("when there is no ID in the request, raise an invalid argument error", func(t *testing.T) {
 			ctx := context.Background()
@@ -555,10 +562,19 @@ func TestOrgs(t *testing.T) {
 
 			cleanupOrg(ctx, t, cl, resp.Org.Id)
 		})
+		cleanupServer(ctx, t, cl, serverRes.Server.Id)
 	})
 
 	t.Run("DeleteOrg", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
+		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+			Name:        "Chef infra server",
+			Description: "Chef infra server",
+			Fqdn:        "domain.com",
+			IpAddress:   "0.0.0.0",
+		})
+		require.NoError(t, err)
+		require.NotNil(t, serverRes)
 
 		t.Run("when an existing org is deleted, deletes the org successfully", func(t *testing.T) {
 			ctx := context.Background()
@@ -890,10 +906,19 @@ func TestOrgs(t *testing.T) {
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err2)
 		})
+		cleanupServer(ctx, t, cl, serverRes.Server.Id)
 	})
 
 	t.Run("UpdateOrg", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
+		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+			Name:        "Chef infra server",
+			Description: "Chef infra server",
+			Fqdn:        "domain.com",
+			IpAddress:   "0.0.0.0",
+		})
+		require.NoError(t, err)
+		require.NotNil(t, serverRes)
 
 		t.Run("when a valid org update request is submitted, updates the org successfully", func(t *testing.T) {
 			ctx := context.Background()
@@ -1051,8 +1076,8 @@ func TestOrgs(t *testing.T) {
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err)
 		})
+		cleanupServer(ctx, t, cl, serverRes.Server.Id)
 	})
-	cleanupServer(ctx, t, cl, serverRes.Server.Id)
 }
 
 func cleanupOrg(ctx context.Context, t *testing.T, cl infra_proxy.InfraProxyClient, orgID string) {

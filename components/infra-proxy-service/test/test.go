@@ -29,10 +29,10 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
 )
 
-// MigrationConfigIfPGTestsToBeRun either returns the pg migration config
+// migrationConfigIfPGTestsToBeRun either returns the pg migration config
 // if PG_URL is set or we are in CI system, otherwise it returns nil, indicating
 // postgres based tests shouldn't be run.
-func MigrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*migration.Config, error) {
+func migrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*migration.Config, error) {
 	customPGURL, pgURLPassed := os.LookupEnv("PG_URL")
 	ciMode := os.Getenv("CI") == "true"
 
@@ -69,8 +69,7 @@ func MigrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*mi
 
 // SetupInfraProxyService provides the connection service client.
 func SetupInfraProxyService(ctx context.Context,
-	t *testing.T, l logger.Logger,
-	migrationConfig migration.Config) (*server.Server, *service.Service, *grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
+	t *testing.T) (*server.Server, *service.Service, *grpc.ClientConn, func(), *authz.SubjectPurgeServerMock, *secrets.MockSecretsServiceClient) {
 
 	t.Helper()
 
@@ -97,7 +96,14 @@ func SetupInfraProxyService(ctx context.Context,
 	authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
 
 	secretsClient := secrets.NewMockSecretsServiceClient(gomock.NewController(t))
-	serviceRef, err := service.Start(l, migrationConfig, connFactory, secretsClient,
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(t, err, "could not init logger", err)
+
+	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
+	require.NoError(t, err)
+
+	serviceRef, err := service.Start(l, *migrationConfig, connFactory, secretsClient,
 		authzClient, authzV2AuthorizationClient)
 
 	if err != nil {
@@ -110,13 +116,16 @@ func SetupInfraProxyService(ctx context.Context,
 
 	ResetState(ctx, t, serviceRef)
 
+	secretsMock := serviceRef.Secrets.(*secrets.MockSecretsServiceClient)
+
 	g := grpctest.NewServer(grpcServ)
 
 	conn, err := connFactory.Dial("infra-proxy-service", g.URL)
 	if err != nil {
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
-	return newServer, serviceRef, conn, func() { g.Close(); authzServer.Close() }, mockCommon
+
+	return newServer, serviceRef, conn, func() { g.Close(); authzServer.Close() }, mockCommon, secretsMock
 }
 
 // ResetState reset the state

@@ -26,7 +26,9 @@ build:
 	go build -mod=vendor -o bin/infra-proxy-service ./cmd/infra-proxy-service
 
 test:
+	@docker ps | grep infra-proxy-postgres || (echo "Docker postgres not up. Run make setup_docker_pg and try this command again."; exit 1)
 	@PG_URL=$(PG_URL) go test $(verbose) -cover -count=1 -parallel=1 -p 1 $(packages)
+	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test."
 
 setup_docker_pg:
 	docker run --name infra-proxy-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=infra_proxy_test -e POSTGRES_PASSWORD=docker -p 5432:5432 -d postgres:9
@@ -37,9 +39,6 @@ setup_docker_pg:
 
 kill_docker_pg:
 	docker rm -f infra-proxy-postgres || true
-
-truncate_servers:
-	docker exec -it infra-proxy-postgres psql -U postgres -d infra_proxy_test -c "TRUNCATE table servers CASCADE;"
 
 # this command lists all the changes since master, and looks for modifications
 # to the migration files -- if there's any of (M)odify, (R)ename, or (D)elete,
