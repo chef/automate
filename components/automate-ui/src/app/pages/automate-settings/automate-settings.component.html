@@ -2,13 +2,13 @@
   <div class="container">
     <main>
       <div class="sticky-notifications">
-        <chef-notification
+        <app-chef-notification
           *ngIf="notificationVisible"
           [type]="notificationType"
           [timeout]="notificationTimeout()"
-          (dismissed)="hideNotification()">
-          {{ notificationMessage }}
-        </chef-notification>
+          (dismissed)="hideNotification()"
+          [message]="notificationMessage">
+        </app-chef-notification>
       </div>
 
       <chef-page-header>

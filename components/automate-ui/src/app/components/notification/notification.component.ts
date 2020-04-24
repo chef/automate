@@ -1,7 +1,6 @@
 import { Component, Input, HostBinding, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
-
-import { Notification, Type } from 'app/entities/notifications/notification.model';
+import { Type } from 'app/entities/notifications/notification.model';
 
 
 const inOutAnim = trigger('inOutAnim', [
@@ -43,7 +42,7 @@ const slideAnim = trigger('slideAnim', [
 })
 export class ChefNotificationComponent implements AfterViewInit {
 
-  @Input() notification: Notification;
+  @Input() message: string;
   @Input() type: Type;
   @Input() timeout: number;
   @Output() dismissed = new EventEmitter();

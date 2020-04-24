@@ -63,6 +63,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
 
   userProfilesDataLoaded = false;
   availableProfilesDataLoaded = false;
+  notificationMessage = 'Failed to install profile. Please try again later.';
 
   // Tabs
   selectedTab: 'installed' | 'available' = 'installed';

@@ -7,29 +7,29 @@
       </chef-breadcrumbs>
 
       <div class="sticky-notifications">
-        <chef-notification
+        <app-chef-notification
           *ngIf="downloadErrorVisible"
           type="error"
           timeout="5"
-          (dismissed)="hideDownloadError()">
-          Failed to download profile. Please try again later.
-        </chef-notification>
+          (dismissed)="hideDownloadError()"
+          [message]="downloadFailureNotificationContent">
+        </app-chef-notification>
 
-        <chef-notification
+        <app-chef-notification
           *ngIf="deleteErrorVisible"
           type="error"
           timeout="5"
-          (dismissed)="hideDeleteError()">
-          Failed to delete profile. Please try again later.
-        </chef-notification>
+          (dismissed)="hideDeleteError()"
+          [message]="deleteFailureNotificationContent">
+        </app-chef-notification>
 
-        <chef-notification
+        <app-chef-notification
           *ngIf="installErrorVisible"
           type="error"
           timeout="5"
-          (dismissed)="hideInstallError()">
-          Failed to install profile. Please try again later.
-        </chef-notification>
+          (dismissed)="hideInstallError()"
+          [message]="installFailureNotificationContent">
+        </app-chef-notification>
       </div>
 
       <ng-container class="applications-container" *ngIf="!showLoadingIcon">
