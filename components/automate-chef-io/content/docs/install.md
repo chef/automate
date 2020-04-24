@@ -16,9 +16,9 @@ See [Airgapped Installation]({{< relref "airgapped-installation.md" >}}) for
 installing Chef Automate to a host with no inbound or outbound internet
 traffic.
 
-## Download the Chef Automate
+## Download the Chef Automate Command-Line Utility
 
-Download and unzip Chef Automate:
+Download and unzip the Chef Automate command-line utility:
 
 ```shell
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
