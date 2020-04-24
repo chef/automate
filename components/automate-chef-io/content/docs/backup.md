@@ -192,7 +192,7 @@ Restore Chef Automate to an instance on which Automate is not already installed.
 
 #### Prerequisites
 
-1. On the restore host, download and unzip the Chef Automate command-line utility:
+1. On the restore host, download and unzip the Chef Automate command line tool:
     ```shell
         curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     ```
