@@ -156,7 +156,7 @@ func RegisterComplianceIngesterHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_ComplianceIngester_ProcessComplianceReport_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"events", "compliance", "report"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ComplianceIngester_ProcessComplianceReport_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "events", "compliance", "report"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

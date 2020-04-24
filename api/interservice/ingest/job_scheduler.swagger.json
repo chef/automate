@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/job/delete-nodes/config": {
+    "/api/v0/job/delete-nodes/config": {
       "post": {
         "operationId": "ConfigureDeleteNodesScheduler",
         "responses": {
@@ -27,7 +27,7 @@
         ]
       }
     },
-    "/job/delete-nodes/delete-marked-nodes": {
+    "/api/v0/job/delete-nodes/delete-marked-nodes": {
       "post": {
         "summary": "DeleteNodesScheduler",
         "operationId": "DeleteMarkedNodes",
@@ -44,7 +44,7 @@
         ]
       }
     },
-    "/job/delete-nodes/start": {
+    "/api/v0/job/delete-nodes/start": {
       "post": {
         "operationId": "StartDeleteNodesScheduler",
         "responses": {
@@ -60,7 +60,7 @@
         ]
       }
     },
-    "/job/delete-nodes/stop": {
+    "/api/v0/job/delete-nodes/stop": {
       "post": {
         "operationId": "StopDeleteNodesScheduler",
         "responses": {
@@ -76,7 +76,7 @@
         ]
       }
     },
-    "/job/job-scheduler/status": {
+    "/api/v0/job/job-scheduler/status": {
       "get": {
         "operationId": "GetStatusJobScheduler",
         "responses": {
@@ -92,7 +92,7 @@
         ]
       }
     },
-    "/job/missing-nodes/config": {
+    "/api/v0/job/missing-nodes/config": {
       "post": {
         "operationId": "ConfigureNodesMissingScheduler",
         "responses": {
@@ -108,7 +108,7 @@
         ]
       }
     },
-    "/job/missing-nodes/mark-nodes-missing": {
+    "/api/v0/job/missing-nodes/mark-nodes-missing": {
       "post": {
         "operationId": "MarkNodesMissing",
         "responses": {
@@ -124,7 +124,7 @@
         ]
       }
     },
-    "/job/missing-nodes/start": {
+    "/api/v0/job/missing-nodes/start": {
       "post": {
         "operationId": "StartNodesMissingScheduler",
         "responses": {
@@ -140,7 +140,7 @@
         ]
       }
     },
-    "/job/missing-nodes/stop": {
+    "/api/v0/job/missing-nodes/stop": {
       "post": {
         "operationId": "StopNodesMissingScheduler",
         "responses": {

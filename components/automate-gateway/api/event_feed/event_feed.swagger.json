@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/event_task_counts": {
+    "/api/v0/event_task_counts": {
       "get": {
         "operationId": "GetEventTaskCounts",
         "responses": {
@@ -53,7 +53,7 @@
         ]
       }
     },
-    "/event_type_counts": {
+    "/api/v0/event_type_counts": {
       "get": {
         "operationId": "GetEventTypeCounts",
         "responses": {
@@ -95,7 +95,7 @@
         ]
       }
     },
-    "/eventfeed": {
+    "/api/v0/eventfeed": {
       "get": {
         "operationId": "GetEventFeed",
         "responses": {
@@ -171,7 +171,7 @@
         ]
       }
     },
-    "/eventstrings": {
+    "/api/v0/eventstrings": {
       "get": {
         "operationId": "GetEventStringBuckets",
         "responses": {

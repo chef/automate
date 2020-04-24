@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/license/apply": {
+    "/api/v0/license/apply": {
       "post": {
         "operationId": "ApplyLicense",
         "responses": {
@@ -40,7 +40,7 @@ func init() {
         ]
       }
     },
-    "/license/request": {
+    "/api/v0/license/request": {
       "post": {
         "operationId": "RequestLicense",
         "responses": {
@@ -66,7 +66,7 @@ func init() {
         ]
       }
     },
-    "/license/status": {
+    "/api/v0/license/status": {
       "get": {
         "operationId": "GetStatus",
         "responses": {

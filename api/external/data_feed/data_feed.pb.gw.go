@@ -601,17 +601,17 @@ func RegisterDatafeedServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 }
 
 var (
-	pattern_DatafeedService_AddDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"datafeed", "destination"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DatafeedService_AddDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "datafeed", "destination"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DatafeedService_GetDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"datafeed", "destination", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DatafeedService_GetDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "datafeed", "destination", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DatafeedService_DeleteDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"datafeed", "destination", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DatafeedService_DeleteDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "datafeed", "destination", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DatafeedService_UpdateDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"datafeed", "destination", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DatafeedService_UpdateDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "datafeed", "destination", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DatafeedService_ListDestinations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"datafeed", "destinations"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DatafeedService_ListDestinations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "datafeed", "destinations"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DatafeedService_TestDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"datafeed", "destinations", "test"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DatafeedService_TestDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "datafeed", "destinations", "test"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

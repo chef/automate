@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/notifications/rules": {
+    "/api/v0/notifications/rules": {
       "get": {
         "operationId": "ListRules",
         "responses": {
@@ -54,7 +54,7 @@ func init() {
         ]
       }
     },
-    "/notifications/rules/{id}": {
+    "/api/v0/notifications/rules/{id}": {
       "get": {
         "operationId": "GetRule",
         "responses": {
@@ -130,7 +130,7 @@ func init() {
         ]
       }
     },
-    "/notifications/version": {
+    "/api/v0/notifications/version": {
       "get": {
         "operationId": "Version",
         "responses": {
@@ -146,7 +146,7 @@ func init() {
         ]
       }
     },
-    "/notifications/webhook": {
+    "/api/v0/notifications/webhook": {
       "post": {
         "operationId": "ValidateWebhook",
         "responses": {

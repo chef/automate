@@ -198,9 +198,9 @@ func RegisterDeploymentHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
-	pattern_Deployment_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"version"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Deployment_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Deployment_ServiceVersions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"deployment", "service_versions"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Deployment_ServiceVersions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "deployment", "service_versions"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/gateway/health": {
+    "/api/v0/gateway/health": {
       "get": {
         "operationId": "GetHealth",
         "responses": {
@@ -30,7 +30,7 @@ func init() {
         ]
       }
     },
-    "/gateway/version": {
+    "/api/v0/gateway/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {

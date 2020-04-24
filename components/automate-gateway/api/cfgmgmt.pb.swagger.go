@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/cfgmgmt/errors": {
+    "/api/v0/cfgmgmt/errors": {
       "get": {
         "summary": "GetErrors",
         "description": "Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -53,7 +53,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/node_metadata_counts": {
+    "/api/v0/cfgmgmt/node_metadata_counts": {
       "get": {
         "summary": "GetNodeMetadataCounts",
         "description": "For each type of field requested this returns distinct values the amount of each. For example, \nif the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8 could be returned. \nThe number next to each represents the number of nodes with that type of platform.\n\nExample:\nrequest\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/node_metadata_counts?type=platform\u0026type=status\n` + "`" + `` + "`" + `` + "`" + `\nresponse\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"types\": [\n{\n\"values\": [\n{\n\"value\": \"mac_os_x 10.11.5\",\n\"count\": 28\n},\n{\n\"value\": \"linux 8.9\",\n\"count\": 1\n},\n{\n\"value\": \"macos 8.9\",\n\"count\": 1\n},\n{\n\"value\": \"windows 8.9\",\n\"count\": 1\n}\n],\n\"type\": \"platform\"\n},\n{\n\"value\": [\n{\n\"value\": \"missing\",\n\"count\": 29\n},\n{\n\"value\": \"failure\",\n\"count\": 2\n}\n],\n\"type\": \"status\"\n}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -227,7 +227,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/nodes/{node_id}/attribute": {
+    "/api/v0/cfgmgmt/nodes/{node_id}/attribute": {
       "get": {
         "summary": "GetAttributes",
         "description": "Returns the latest reported attributes for the provided node ID.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -254,7 +254,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/nodes/{node_id}/runs": {
+    "/api/v0/cfgmgmt/nodes/{node_id}/runs": {
       "get": {
         "summary": "GetRuns",
         "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node ID.\nSupports pagination.\nAccepts a ` + "`" + `start` + "`" + ` parameter to denote start date for the list and a filter of type ` + "`" + `status` + "`" + `.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -325,7 +325,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/nodes/{node_id}/runs/{run_id}": {
+    "/api/v0/cfgmgmt/nodes/{node_id}/runs/{run_id}": {
       "get": {
         "summary": "GetNodeRun",
         "description": "Returns the infra run report for the provided node ID and run ID.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -367,7 +367,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/organizations": {
+    "/api/v0/cfgmgmt/organizations": {
       "get": {
         "summary": "GetOrganizations",
         "description": "Returns a list of all organizations associated with nodes that have checked in to Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -388,7 +388,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/policy_revision/{revision_id}": {
+    "/api/v0/cfgmgmt/policy_revision/{revision_id}": {
       "get": {
         "summary": "GetPolicyCookbooks",
         "description": "Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.\nPolicy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -415,7 +415,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/source_fqdns": {
+    "/api/v0/cfgmgmt/source_fqdns": {
       "get": {
         "summary": "GetSourceFqdns",
         "description": "Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -436,7 +436,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/stats/checkin_counts_timeseries": {
+    "/api/v0/cfgmgmt/stats/checkin_counts_timeseries": {
       "get": {
         "summary": "GetCheckinCountsTimeSeries",
         "description": "Returns a daily time series of unique node check-ins for the number of days requested.\nIf days ago value is empty, api will return the default 1 day ago results.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -475,7 +475,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/stats/missing_node_duration_counts": {
+    "/api/v0/cfgmgmt/stats/missing_node_duration_counts": {
       "get": {
         "summary": "GetMissingNodeDurationCounts",
         "description": "Returns a count of missing nodes for the provided durations.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/missing_node_duration_counts?durations=3d\u0026durations=1w\u0026durations=2w\u0026durations=1M\u0026durations=3M\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -506,7 +506,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/stats/node_counts": {
+    "/api/v0/cfgmgmt/stats/node_counts": {
       "get": {
         "summary": "GetNodesCounts",
         "description": "Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.\nSupports filtering.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/node_counts?filter=name:mySO*\u0026filter=platform:ubun*\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -537,7 +537,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/stats/run_counts": {
+    "/api/v0/cfgmgmt/stats/run_counts": {
       "get": {
         "summary": "GetRunsCounts",
         "description": "Returns totals for failed and successful runs given a ` + "`" + `node_id` + "`" + `.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd\u0026start=2019-11-02\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -589,7 +589,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/suggestions": {
+    "/api/v0/cfgmgmt/suggestions": {
       "get": {
         "summary": "GetSuggestions",
         "description": "Returns possible filter values given a valid ` + "`" + `type` + "`" + ` parameter. All values returned until two or more\ncharacters are provided for the ` + "`" + `text` + "`" + ` parameter.\nSupports wildcard (* and ?).\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/suggestions?type=environment\u0026text=_d\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -637,7 +637,7 @@ func init() {
         ]
       }
     },
-    "/cfgmgmt/version": {
+    "/api/v0/cfgmgmt/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {
