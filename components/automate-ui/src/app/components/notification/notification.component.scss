@@ -1,0 +1,51 @@
+@import "~styles/variables";
+
+:host {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  color: $chef-white;
+  background-color: $chef-dark-grey;
+  padding: 0.5em;
+  padding-right: 1.5em;
+
+  p {
+    color: $chef-white;
+    margin: 0;
+  }
+
+  &.info {
+    background-color: $chef-success;
+
+    &::before {
+      font-family: "Material Icons";
+      content: "\E86C";
+      color: currentColor;
+      padding-right: 0.5em;
+    }
+  }
+
+  &.error {
+    background-color: $chef-critical;
+
+    &::before {
+      font-family: "Material Icons";
+      content: "\E002";
+      color: currentColor;
+      padding-right: 0.5em;
+    }
+  }
+
+  chef-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+  }
+}

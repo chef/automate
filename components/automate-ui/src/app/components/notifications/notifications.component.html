@@ -1,9 +1,12 @@
-<div class="notifications">
+<div class="notifications"> 
   <ng-container *ngFor="let notification of notifications">
-    <chef-notification *ngIf="notification.type !== 'license'"
-      [type]="notification.type"
-      [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
-      {{ notification.message }}
-    </chef-notification>
+    <app-chef-notification
+    *ngIf="notification.type !== 'license'"
+    [notification]="notification"
+    [type]="notification.type"
+    [timeout]="notification.timeout"
+    (dismissed)="handleNotificationDismissal(notification.id)"
+    >
+    </app-chef-notification>
   </ng-container>
 </div>

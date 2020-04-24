@@ -24,7 +24,7 @@ export class ChefNotificationsComponent {
         this.notifications = notifications;
         this.layoutFacade.layout.header.license =
           notifications &&  notifications.some(n => n.type === Type.license);
-        // this.layoutFacade.updateDisplay();
+        this.layoutFacade.updateDisplay();
       });
   }
 
