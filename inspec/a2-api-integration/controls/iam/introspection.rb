@@ -22,29 +22,29 @@ control 'iam-introspection-1' do
                                   http_method: 'POST',
                                   request_body:  {
                                     paths: [
-                                      '/compliance/reporting/stats/summary',
-                                      '/compliance/reporting/stats/failures',
-                                      '/compliance/reporting/stats/trend',
+                                      '/api/v0/compliance/reporting/stats/summary',
+                                      '/api/v0/compliance/reporting/stats/failures',
+                                      '/api/v0/compliance/reporting/stats/trend',
                                     ]
                                   }.to_json)
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:endpoints]).to eq(
         {
-          '/compliance/reporting/stats/failures': {
+          '/api/v0/compliance/reporting/stats/failures': {
             'get': false,
             'put': false,
             'post': true,
             'delete': false,
             'patch': false
           },
-          '/compliance/reporting/stats/summary': {
+          '/api/v0/compliance/reporting/stats/summary': {
             'get': false,
             'put': false,
             'post': true,
             'delete': false,
             'patch': false
           },
-          '/compliance/reporting/stats/trend': {
+          '/api/v0/compliance/reporting/stats/trend': {
             'get': false,
             'put': false,
             'post': true,
