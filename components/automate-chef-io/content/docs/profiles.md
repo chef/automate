@@ -43,6 +43,10 @@ Uploads use either the `.tar.gz` or zip archive file formats.
 
 All profiles are stored in PostgreSQL, and are covered by backup and restore functionality.
 
+{{% info %}}
+All profiles should have a valid version in their inspec.yml. Valid versions consist of at least three elements of the form x.y.z, for example "1.2.0", and optionally can have one more element, like "1.2.0-20". Profile versions with two elements, for example "1.2" will silently fail to install when uploaded through the UI, and will be visible in the UI, but cannot be retrieved by Inspec runs.
+{{% /info %}}
+
 ### Updating profiles
 
 New releases of profiles are shipped with the product when available.
