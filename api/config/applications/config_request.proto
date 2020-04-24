@@ -1,4 +1,3 @@
-// -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
 syntax = "proto3";
 package chef.automate.domain.applications;
 option go_package = "github.com/chef/automate/api/config/applications";

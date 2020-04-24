@@ -25,7 +25,6 @@ The path for this code isn't standardized, but if you don't have a reason to do 
 A basic `.proto` file is like this:
 
 ```
-// -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
 syntax = "proto3";
 
 package chef.automate.infra.esgateway;
