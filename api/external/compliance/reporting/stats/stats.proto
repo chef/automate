@@ -35,7 +35,7 @@ service StatsService {
 	*/
 	rpc ReadSummary(Query) returns (Summary) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/stats/summary"
+			post: "/api/v0/compliance/reporting/stats/summary"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -72,7 +72,7 @@ service StatsService {
 	*/
 	rpc ReadTrend(Query) returns (Trends) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/stats/trend"
+			post: "/api/v0/compliance/reporting/stats/trend"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -108,7 +108,7 @@ service StatsService {
 	*/
 	rpc ReadProfiles(Query) returns (Profile) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/stats/profiles"
+			post: "/api/v0/compliance/reporting/stats/profiles"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -143,7 +143,7 @@ service StatsService {
 	*/
 	rpc ReadFailures(Query) returns (Failures) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/stats/failures"
+			post: "/api/v0/compliance/reporting/stats/failures"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {

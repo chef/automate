@@ -10,13 +10,13 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Deployment {
   rpc GetVersion (google.protobuf.Empty) returns (Version) {
-    option (google.api.http).get = "/version";
+    option (google.api.http).get = "/api/v0/version";
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
   };
 
   rpc ServiceVersions (ServiceVersionsRequest) returns (ServiceVersionsResponse) {
-    option (google.api.http).get = "/deployment/service_versions";
+    option (google.api.http).get = "/api/v0/deployment/service_versions";
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:list";
   };

@@ -10,7 +10,7 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 service DatafeedService {
   rpc AddDestination(AddDestinationRequest) returns (AddDestinationResponse){
 	  option (google.api.http) = {
-		  post: "/datafeed/destination"
+		  post: "/api/v0/datafeed/destination"
 		  body: "*"
 	  };
 	  option (chef.automate.api.iam.policy) = {
@@ -20,7 +20,7 @@ service DatafeedService {
 	};
   rpc GetDestination(GetDestinationRequest) returns (GetDestinationResponse) {
 		option (google.api.http) = {
-			get: "/datafeed/destination/{id}"
+			get: "/api/v0/datafeed/destination/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "datafeed:destination:{id}"
@@ -29,7 +29,7 @@ service DatafeedService {
 	};
   rpc DeleteDestination(DeleteDestinationRequest) returns (DeleteDestinationResponse){
 		option (google.api.http) = {
-			delete: "/datafeed/destination/{id}"
+			delete: "/api/v0/datafeed/destination/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "destination:destination:{id}"
@@ -38,7 +38,7 @@ service DatafeedService {
 	};
   rpc UpdateDestination(UpdateDestinationRequest) returns (UpdateDestinationResponse) {
  		option (google.api.http) = {
-			patch: "/datafeed/destination/{id}"
+			patch: "/api/v0/datafeed/destination/{id}"
 			body: "*"
   	};
 		option (chef.automate.api.iam.policy) = {
@@ -48,7 +48,7 @@ service DatafeedService {
 	};
   rpc ListDestinations(ListDestinationRequest) returns (ListDestinationResponse){
 		option (google.api.http) = {
-			post: "/datafeed/destinations"
+			post: "/api/v0/datafeed/destinations"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -58,7 +58,7 @@ service DatafeedService {
 	};
 	rpc TestDestination(URLValidationRequest) returns (TestDestinationResponse) {
 		option (google.api.http) = {
-			post: "/datafeed/destinations/test"
+			post: "/api/v0/datafeed/destinations/test"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {

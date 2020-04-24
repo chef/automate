@@ -13,23 +13,23 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service EventFeed {
   rpc GetEventFeed(event_feed.request.EventFilter) returns (event_feed.response.Events) {
-    option (google.api.http).get =  "/eventfeed";
+    option (google.api.http).get =  "/api/v0/eventfeed";
     // event feed includes compliance and cfg mgmt events
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
   };
   rpc GetEventTypeCounts(request.EventCountsFilter) returns (response.EventCounts) {
-    option (google.api.http).get =  "/event_type_counts";
+    option (google.api.http).get =  "/api/v0/event_type_counts";
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
   };
   rpc GetEventTaskCounts(request.EventCountsFilter) returns (response.EventCounts) {
-    option (google.api.http).get =  "/event_task_counts";
+    option (google.api.http).get =  "/api/v0/event_task_counts";
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
   };
   rpc GetEventStringBuckets(request.EventStrings) returns (response.EventStrings) {
-    option (google.api.http).get = "/eventstrings";
+    option (google.api.http).get = "/api/v0/eventstrings";
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
   };
