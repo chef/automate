@@ -44,10 +44,10 @@ func TestOrgs(t *testing.T) {
 		test.ResetState(ctx, t, serviceRef)
 
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-			Name:        "Chef infra server",
-			Description: "Chef infra server",
-			Fqdn:        "domain.com",
-			IpAddress:   "0.0.0.0",
+			Id:        "Chef infra server",
+			Name:      "Chef infra server",
+			Fqdn:      "domain.com",
+			IpAddress: "0.0.0.0",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -215,10 +215,10 @@ func TestOrgs(t *testing.T) {
 	t.Run("GetOrgs", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-			Name:        "Chef infra server",
-			Description: "Chef infra server",
-			Fqdn:        "domain.com",
-			IpAddress:   "0.0.0.0",
+			Id:        "Chef infra server",
+			Name:      "Chef infra server",
+			Fqdn:      "domain.com",
+			IpAddress: "0.0.0.0",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -514,10 +514,10 @@ func TestOrgs(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-			Name:        "Chef infra server",
-			Description: "Chef infra server",
-			Fqdn:        "domain.com",
-			IpAddress:   "0.0.0.0",
+			Id:        "Chef infra server",
+			Name:      "Chef infra server",
+			Fqdn:      "domain.com",
+			IpAddress: "0.0.0.0",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -581,10 +581,10 @@ func TestOrgs(t *testing.T) {
 	t.Run("DeleteOrg", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-			Name:        "Chef infra server",
-			Description: "Chef infra server",
-			Fqdn:        "domain.com",
-			IpAddress:   "0.0.0.0",
+			Id:        "Chef infra server",
+			Name:      "Chef infra server",
+			Fqdn:      "domain.com",
+			IpAddress: "0.0.0.0",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -935,10 +935,10 @@ func TestOrgs(t *testing.T) {
 	t.Run("UpdateOrg", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-			Name:        "Chef infra server",
-			Description: "Chef infra server",
-			Fqdn:        "domain.com",
-			IpAddress:   "0.0.0.0",
+			Id:        "Chef infra server",
+			Name:      "Chef infra server",
+			Fqdn:      "domain.com",
+			IpAddress: "0.0.0.0",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
