@@ -1,13 +1,15 @@
 <div class="content-container">
   <div class="container">
     <main>
-      <chef-notification
-        *ngIf="notificationVisible"
-        [type]="notificationType"
-        [timeout]="notificationTimeout()"
-        (dismissed)="hideNotification()">
-        {{ notificationMessage }}
-      </chef-notification>
+      <div class="sticky-notifications">
+        <chef-notification
+          *ngIf="notificationVisible"
+          [type]="notificationType"
+          [timeout]="notificationTimeout()"
+          (dismissed)="hideNotification()">
+          {{ notificationMessage }}
+        </chef-notification>
+      </div>
 
       <chef-page-header>
         <chef-heading>Data Lifecycle</chef-heading>

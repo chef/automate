@@ -6,13 +6,15 @@
 
   <div class="container">
     
-    <chef-notification
-      *ngIf="notificationVisible"
-      [type]="'error'"
-      [timeout]="8"
-      (dismissed)="hideNotification()">
-      Failed to retrieve data.
-    </chef-notification>
+    <div class="sticky-notifications">
+      <chef-notification
+        *ngIf="notificationVisible"
+        [type]="'error'"
+        [timeout]="8"
+        (dismissed)="hideNotification()">
+        Failed to retrieve data.
+      </chef-notification>
+    </div>
     <main>
       <div class="node-list-container">
         <chef-page-header>
