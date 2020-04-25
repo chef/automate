@@ -61,7 +61,6 @@
         </div>
         <div class="dropdown-margin" *ngIf="objectNoun !== 'project'">
           <app-projects-dropdown
-            [projects]="projects"
             (onProjectChecked)="onProjectChecked($event)"
             [disabled]="projectDropdownDisabled()"
             [projectsUpdated]="projectsUpdatedEvent">

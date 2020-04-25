@@ -1,17 +1,20 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
 
-import { ResourceCheckedMap, ResourceChecked } from '../resource-dropdown/resource-dropdown.component';
-import { ProjectConstants } from 'app/entities/projects/project.model';
+import { ResourceChecked } from '../resource-dropdown/resource-dropdown.component';
+import { ProjectConstants, Project } from 'app/entities/projects/project.model';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 
 @Component({
   selector: 'app-projects-dropdown',
   templateUrl: './projects-dropdown.component.html',
   styleUrls: ['./projects-dropdown.component.scss']
 })
-export class ProjectsDropdownComponent {
-  // The map of ResourceChecked by id. Any checked changes propagated via
-  // onProjectChecked. Updates should be applied to parent component state.
-  @Input() projects: ResourceCheckedMap = {};
+export class ProjectsDropdownComponent implements OnInit, OnDestroy {
 
   // Setting disabled to true means the dropdown will be unusable and will have a grey background
   @Input() disabled = false;
@@ -30,6 +33,32 @@ export class ProjectsDropdownComponent {
 
   // plural display name of resource
   public objectNounPlural = 'projects';
+
+  public projects: Project[];
+
+  private isDestroyed = new Subject<boolean>();
+
+  constructor(private store: Store<NgrxStateAtom>) { }
+
+  ngOnInit(): void {
+    this.store.select(assignableProjects)
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe((assignable: ProjectsFilterOption[]) => {
+        this.projects =
+          assignable.map(p => {
+            return <Project>{
+              id: p.value,
+              name: p.label,
+              type: p.type
+            };
+          });
+      });
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
+  }
 
   onResourceChecked(project: ResourceChecked): void {
     this.onProjectChecked.emit(project);

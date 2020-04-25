@@ -24,9 +24,7 @@ import {
 } from 'app/entities/api-tokens/api-token.actions';
 import { CreateToken } from 'app/entities/api-tokens/api-token.actions';
 import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selectors';
-import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
-import { Project, ProjectConstants } from 'app/entities/projects/project.model';
-import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 
 @Component({
   selector: 'app-api-tokens',
@@ -44,7 +42,6 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   private isDestroyed = new Subject<boolean>();
 
-  public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public readonly RFC2822 = DateTime.RFC2822;
 
@@ -79,18 +76,6 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetAllTokens());
-
-    this.store.select(assignableProjects)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((assignable: ProjectsFilterOption[]) => {
-        this.dropdownProjects = assignable.map(p => {
-          return <Project>{
-            id: p.value,
-            name: p.label,
-            type: p.type
-          };
-        });
-      });
 
     this.store.pipe(
       select(saveStatus),

@@ -21,7 +21,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Input() creating = false;
   @Input() objectNoun: string;
   @Input() createProjectModal = false;
-  @Input() assignableProjects: Project[] = [];
   @Input() createForm: FormGroup; // NB: The form must contain 'name' and 'id' fields
   @Input() conflictErrorEvent: EventEmitter<boolean>; // TC: This element assumes 'id' is the
                                                       // only create field that can conflict.
@@ -55,11 +54,11 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
 
   ngOnChanges(changes: SimpleChanges): void {
     // update project dropdown if list changes
-    if (changes.assignableProjects) {
-      this.projects = {};
-      changes.assignableProjects.currentValue.forEach((proj: Project) =>
-        this.projects[proj.id] = { ...proj, checked: false });
-    }
+    // if (changes.assignableProjects) {
+    //   this.projects = {};
+    //   changes.assignableProjects.currentValue.forEach((proj: Project) =>
+    //     this.projects[proj.id] = { ...proj, checked: false });
+    // }
     // clear checked projects when opening
     if (changes.visible && (changes.visible.currentValue as boolean)) {
       Object.values(this.projects).forEach(p => p.checked = false);
