@@ -49,7 +49,7 @@
             Also create owner, editor, and viewer policies for this project.
           </chef-checkbox>
         </div>
-        <div class="dropdown-margin" *ngIf="objectNoun === 'token'">
+        <!-- <div class="dropdown-margin" *ngIf="objectNoun === 'token'">
           <app-resource-dropdown
             [resources]="policies"
             [disabled]="policyDropdownDisabled()"
@@ -58,10 +58,10 @@
             [objectNounPlural]="'policies'">
             Assign the token to a policy to give the token permissions.
           </app-resource-dropdown>
-        </div>
+        </div> -->
         <div class="dropdown-margin" *ngIf="objectNoun !== 'project'">
           <app-projects-dropdown
-            (onProjectChecked)="onProjectChecked($event)"
+            (onModalClosing)="onProjectModalClosing($event)"
             [projectsUpdated]="projectsUpdatedEvent">
           </app-projects-dropdown>
         </div>

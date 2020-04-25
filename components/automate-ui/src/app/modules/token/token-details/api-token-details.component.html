@@ -49,7 +49,9 @@
             </chef-error>
           </chef-form-field>
           <div id='projects-container'>
-            <app-projects-dropdown (onProjectChecked)="onProjectChecked($event)">
+            <app-projects-dropdown
+              [checkedProjectIDs]="token?.projects"
+              (onModalClosing)="onProjectModalClosing($event)">
             </app-projects-dropdown>
           </div>
           <chef-form-field>

@@ -20,9 +20,9 @@ export interface ResourceCheckedMap {
 
 export class ResourceDropdownComponent implements OnInit, OnChanges {
 
-  // The map of ResourceChecked by id. Any checked changes propagated via onResourceChecked.
+  // The map of ResourceChecked by id.
   // Updates should be applied to parent component state.
-  @Input() resources: ResourceCheckedMap = {};
+  @Input() resources: ResourceChecked[] = [];
 
   // Used to re-synchronize summary label if the set of checked items has changed.
   // This optional input is needed only when re-displaying the resource dropdown
@@ -36,10 +36,10 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // Plural display name of resource.
   @Input() objectNounPlural = 'MISSING REQUIRED PARAMETER';
 
-  // Emits a resource that changed as a result of a check or uncheck.
-  @Output() onResourceChecked = new EventEmitter<ResourceChecked>();
+  // Emits checked set of ids upon completion.
+  @Output() onModalClosing = new EventEmitter<string[]>();
 
-  // filteredResources is merely a container to hold the resourcesArray
+  // filteredResources is merely a container to hold the resources
   // that can be altered
   public filteredResources: ResourceChecked[] = [];
   public active = false;
@@ -59,13 +59,13 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     if (changes.resources) {
       this.updateLabel();
       if (changes.resources.firstChange) { // only update on initialization/first change
-        this.filteredResources = this.resourcesArray;
+        this.filteredResources = this.resourcesInOrder;
       }
     }
   }
 
-  get resourcesArray(): ResourceChecked[] {
-    return ChefSorters.naturalSort(Object.values(this.resources), 'name');
+  get resourcesInOrder(): ResourceChecked[] {
+    return ChefSorters.naturalSort(this.resources, 'name');
   }
 
   toggleDropdown(event: MouseEvent): void {
@@ -73,9 +73,11 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     if (this.disabled) {
       return;
     }
-    if (!this.active) {
+    if (!this.active) { // opening
       this.filterValue = '';
-      this.filteredResources = this.resourcesArray;
+      this.filteredResources = this.resourcesInOrder;
+    } else { // closing
+      this.closeDropdown();
     }
 
     this.active = !this.active;
@@ -84,17 +86,18 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   resourceChecked(checked: boolean, resource: ResourceChecked): void {
     resource.checked = checked;
     this.updateLabel();
-    this.onResourceChecked.emit(resource);
   }
 
   closeDropdown(): void {
     if (this.active) {
       this.active = false;
+      this.onModalClosing.emit(
+        this.resources.filter(r => r.checked).map(r => r.id));
     }
   }
 
   handleFilterKeyUp(): void {
-    this.filteredResources = this.resourcesArray.filter(resource =>
+    this.filteredResources = this.resourcesInOrder.filter(resource =>
       resource.id.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1
     );
   }
@@ -118,13 +121,13 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   }
 
   private updateLabel(): void {
-    const checkedResources = Object.values(this.resources).filter(p => p.checked);
+    const checkedResources = this.resources.filter(p => p.checked);
     this.label = checkedResources.length === 0 ? this.noneSelectedLabel
       : checkedResources.length === 1 ? checkedResources[0].name
         : `${checkedResources.length} ${this.objectNounPlural}`;
   }
 
   get disabled(): boolean {
-    return Object.values(this.resources).length === 0;
+    return this.resources.length === 0;
   }
 }

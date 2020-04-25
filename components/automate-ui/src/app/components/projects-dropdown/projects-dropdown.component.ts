@@ -1,23 +1,20 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 
-import { ResourceChecked } from '../resource-dropdown/resource-dropdown.component';
-import { ProjectConstants, Project } from 'app/entities/projects/project.model';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
+import { ResourceChecked } from '../resource-dropdown/resource-dropdown.component';
 
 @Component({
   selector: 'app-projects-dropdown',
   templateUrl: './projects-dropdown.component.html',
   styleUrls: ['./projects-dropdown.component.scss']
 })
-export class ProjectsDropdownComponent implements OnInit, OnDestroy {
-
-  // Setting disabled to true means the dropdown will be unusable and will have a grey background
-  @Input() disabled = false;
+export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
 
   // Used to re-synchronize summary label if the set of checked items has changed.
   // This optional input is needed only when re-displaying the project dropdown
@@ -25,8 +22,10 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy {
   // Other consumers, e.g. team-details.component use it only for a single resource.
   @Input() projectsUpdated: EventEmitter<boolean>;
 
-  // Emits a project that changed as a result of a check or uncheck.
-  @Output() onProjectChecked = new EventEmitter<ResourceChecked>();
+  @Input() checkedProjectIDs: string[] = [];
+
+  // Emits checked set of ids upon completion.
+  @Output() onModalClosing = new EventEmitter<string[]>();
 
   // Label to use when none are selected
   public noneSelectedLabel = ProjectConstants.UNASSIGNED_PROJECT_ID;
@@ -34,7 +33,7 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy {
   // plural display name of resource
   public objectNounPlural = 'projects';
 
-  public projects: Project[];
+  public projects: ResourceChecked[];
 
   private isDestroyed = new Subject<boolean>();
 
@@ -46,10 +45,12 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy {
       .subscribe((assignable: ProjectsFilterOption[]) => {
         this.projects =
           assignable.map(p => {
-            return <Project>{
+            return <ResourceChecked>{
               id: p.value,
               name: p.label,
-              type: p.type
+              type: p.type,
+              checked: this.checkedProjectIDs
+                && this.checkedProjectIDs.includes(p.value)
             };
           });
       });
@@ -60,8 +61,20 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  onResourceChecked(project: ResourceChecked): void {
-    this.onProjectChecked.emit(project);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.checkedProjectIDs && changes.checkedProjectIDs.currentValue && this.projects) {
+      // Need to trigger OnChanges in ResourceDropdownComponent
+      // so we cannot just update the checked property of the existing array elements.
+      this.projects = this.projects
+        .map(p => ({
+          ...p,
+          checked: (changes.checkedProjectIDs.currentValue as string[]).includes(p.id)
+        }));
+    }
+  }
+
+  onProjectModalClosing(ids: string[]): void {
+    this.onModalClosing.emit(ids);
   }
 
 }

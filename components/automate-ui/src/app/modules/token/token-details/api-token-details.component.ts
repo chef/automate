@@ -16,7 +16,7 @@ import {
 } from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 import {
-  Project, ProjectConstants, ProjectChecked, ProjectCheckedMap
+  Project, ProjectConstants, ProjectCheckedMap
 } from 'app/entities/projects/project.model';
 import { GetProjects } from 'app/entities/projects/project.actions';
 import {
@@ -130,9 +130,10 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     return <FormControl>this.updateForm.controls.name;
   }
 
-  // updates whether the project was checked or unchecked
-  onProjectChecked(project: ProjectChecked): void {
-    this.projects[project.id].checked = project.checked;
+  onProjectModalClosing(selectedProjects: string[]): void {
+
+    Object.keys(this.projects).forEach(id => this.projects[id].checked = false);
+    selectedProjects.forEach(id => this.projects[id].checked = true);
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions

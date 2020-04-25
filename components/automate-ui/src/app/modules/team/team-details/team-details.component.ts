@@ -21,7 +21,7 @@ import {
   getAllStatus as getAllProjectStatus
 } from 'app/entities/projects/project.selectors';
 import {
-  ProjectConstants, ProjectChecked, ProjectCheckedMap
+  ProjectConstants, ProjectCheckedMap
 } from 'app/entities/projects/project.model';
 import {
   teamFromRoute,
@@ -226,9 +226,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
-  // updates whether the project was checked or unchecked
-  onProjectChecked(project: ProjectChecked): void {
-    this.projects[project.id].checked = project.checked;
+  onProjectModalClosing(selectedProjects: string[]): void {
+
+    Object.keys(this.projects).forEach(id => this.projects[id].checked = false);
+    selectedProjects.forEach(id => this.projects[id].checked = true);
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions

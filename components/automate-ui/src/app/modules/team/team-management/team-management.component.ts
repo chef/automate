@@ -36,7 +36,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public createTeamForm: FormGroup;
   public creatingTeam = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   private isDestroyed = new Subject<boolean>();
@@ -69,17 +68,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetTeams());
-
-    this.store.select(assignableProjects)
-      .subscribe((assignable: ProjectsFilterOption[]) => {
-        this.dropdownProjects = assignable.map(p => {
-          return <Project>{
-            id: p.value,
-            name: p.label,
-            type: p.type
-          };
-        });
-      });
 
     // handle team creation success response
     this.store.pipe(

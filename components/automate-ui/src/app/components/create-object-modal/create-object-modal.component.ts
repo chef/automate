@@ -5,7 +5,7 @@ import { FormGroup } from '@angular/forms';
 
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import {
-  Project, ProjectConstants, ProjectChecked, ProjectCheckedMap
+  Project, ProjectConstants, ProjectCheckedMap
 } from 'app/entities/projects/project.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -53,12 +53,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // update project dropdown if list changes
-    // if (changes.assignableProjects) {
-    //   this.projects = {};
-    //   changes.assignableProjects.currentValue.forEach((proj: Project) =>
-    //     this.projects[proj.id] = { ...proj, checked: false });
-    // }
     // clear checked projects when opening
     if (changes.visible && (changes.visible.currentValue as boolean)) {
       Object.values(this.projects).forEach(p => p.checked = false);
@@ -69,9 +63,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
-  onProjectChecked(project: ProjectChecked): void {
-    this.projects[project.id].checked = project.checked;
-    const projectsSelected = Object.keys(this.projects).filter(id => this.projects[id].checked);
+  onProjectModalClosing(projectsSelected: string[]): void {
     this.createForm.controls.projects.setValue(projectsSelected);
   }
 
@@ -88,10 +80,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
 
   policyDropdownDisabled(): boolean {
     return Object.values(this.policies).length === 0;
-  }
-
-  projectDropdownDisabled(): boolean {
-    return Object.values(this.projects).length === 0;
   }
 
   handleNameInput(event: KeyboardEvent): void {

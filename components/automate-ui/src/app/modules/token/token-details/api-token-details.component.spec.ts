@@ -57,8 +57,7 @@ describe('ApiTokenDetailsComponent', () => {
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'app-projects-dropdown',
-          inputs: ['projects', 'disabled'], outputs: ['onProjectChecked'] }),
+        MockComponent({ selector: 'app-projects-dropdown', inputs: ['checkedProjectIDs'] }),
         MockComponent({ selector: 'chef-tab-selector',
           inputs: ['value', 'routerLink', 'fragment']
         }),
