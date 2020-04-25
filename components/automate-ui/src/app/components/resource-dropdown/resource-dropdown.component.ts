@@ -24,9 +24,6 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // Updates should be applied to parent component state.
   @Input() resources: ResourceCheckedMap = {};
 
-  // Setting disabled to true means the dropdown will be unusable and will have a grey background
-  @Input() disabled = false;
-
   // Used to re-synchronize summary label if the set of checked items has changed.
   // This optional input is needed only when re-displaying the resource dropdown
   // for *additional* resources, as with the create-object-modal-component.
@@ -125,5 +122,9 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     this.label = checkedResources.length === 0 ? this.noneSelectedLabel
       : checkedResources.length === 1 ? checkedResources[0].name
         : `${checkedResources.length} ${this.objectNounPlural}`;
+  }
+
+  get disabled(): boolean {
+    return Object.values(this.resources).length === 0;
   }
 }

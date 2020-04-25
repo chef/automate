@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { isEmpty, keyBy, at, xor, isNil, identity } from 'lodash/fp';
+import { keyBy, at, xor, isNil, identity } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
@@ -245,9 +245,5 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.team.projects,
       Object.keys(this.projects).filter(id => this.projects[id].checked));
     return projectsUpdated.length === 0;
-  }
-
-  dropdownDisabled(): boolean {
-    return isEmpty(this.projects) || this.saveInProgress;
   }
 }

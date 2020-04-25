@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { isEmpty, identity, xor, isNil } from 'lodash/fp';
+import { identity, xor, isNil } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 
@@ -148,9 +148,5 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       this.token.projects,
       Object.keys(this.projects).filter(id => this.projects[id].checked));
     return projectsUpdated.length === 0;
-  }
-
-  dropdownDisabled(): boolean {
-    return isEmpty(this.projects) || this.saveInProgress;
   }
 }

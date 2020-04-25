@@ -49,10 +49,7 @@
             </chef-error>
           </chef-form-field>
           <div id='projects-container'>
-            <app-projects-dropdown
-              [projects]="projects"
-              (onProjectChecked)="onProjectChecked($event)"
-              [disabled]="dropdownDisabled()">
+            <app-projects-dropdown (onProjectChecked)="onProjectChecked($event)">
             </app-projects-dropdown>
           </div>
           <chef-form-field>
