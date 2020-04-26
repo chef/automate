@@ -63,7 +63,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
-  onProjectModalClosing(projectsSelected: string[]): void {
+  onProjectDropdownClosing(projectsSelected: string[]): void {
     this.createForm.controls.projects.setValue(projectsSelected);
   }
 

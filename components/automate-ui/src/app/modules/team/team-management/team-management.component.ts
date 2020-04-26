@@ -18,9 +18,7 @@ import { Team } from 'app/entities/teams/team.model';
 import { CreateTeam, DeleteTeam, GetTeams } from 'app/entities/teams/team.actions';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
-import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
-import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { Project, ProjectConstants } from 'app/entities/projects/project.model';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({

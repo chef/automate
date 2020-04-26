@@ -51,7 +51,7 @@
           <div id='projects-container'>
             <app-projects-dropdown
               [checkedProjectIDs]="token?.projects"
-              (onModalClosing)="onProjectModalClosing($event)">
+              (onDropdownClosing)="onProjectDropdownClosing($event)">
             </app-projects-dropdown>
           </div>
           <chef-form-field>

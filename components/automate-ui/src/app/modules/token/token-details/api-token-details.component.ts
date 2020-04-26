@@ -130,7 +130,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     return <FormControl>this.updateForm.controls.name;
   }
 
-  onProjectModalClosing(selectedProjects: string[]): void {
+  onProjectDropdownClosing(selectedProjects: string[]): void {
 
     Object.keys(this.projects).forEach(id => this.projects[id].checked = false);
     selectedProjects.forEach(id => this.projects[id].checked = true);

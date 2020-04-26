@@ -1,7 +1,7 @@
 <app-resource-dropdown
   [resources]="projects"
   [resourcesUpdated]="projectsUpdated"
-  (onModalClosing)="onProjectModalClosing($event)"
+  (onDropdownClosing)="onProjectDropdownClosing($event)"
   [objectNounPlural]="objectNounPlural"
   [noneSelectedLabel]="noneSelectedLabel">
   Projects group resources together for role-based access.<br />

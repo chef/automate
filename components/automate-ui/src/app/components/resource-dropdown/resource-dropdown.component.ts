@@ -37,7 +37,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   @Input() objectNounPlural = 'MISSING REQUIRED PARAMETER';
 
   // Emits checked set of ids upon completion.
-  @Output() onModalClosing = new EventEmitter<string[]>();
+  @Output() onDropdownClosing = new EventEmitter<string[]>();
 
   // filteredResources is merely a container to hold the resources
   // that can be altered
@@ -91,7 +91,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   closeDropdown(): void {
     if (this.active) {
       this.active = false;
-      this.onModalClosing.emit(
+      this.onDropdownClosing.emit(
         this.resources.filter(r => r.checked).map(r => r.id));
     }
   }

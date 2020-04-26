@@ -25,7 +25,7 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
   @Input() checkedProjectIDs: string[] = [];
 
   // Emits checked set of ids upon completion.
-  @Output() onModalClosing = new EventEmitter<string[]>();
+  @Output() onDropdownClosing = new EventEmitter<string[]>();
 
   // Label to use when none are selected
   public noneSelectedLabel = ProjectConstants.UNASSIGNED_PROJECT_ID;
@@ -73,8 +73,8 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  onProjectModalClosing(ids: string[]): void {
-    this.onModalClosing.emit(ids);
+  onProjectDropdownClosing(ids: string[]): void {
+    this.onDropdownClosing.emit(ids);
   }
 
 }

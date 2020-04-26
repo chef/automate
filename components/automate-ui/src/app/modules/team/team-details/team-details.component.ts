@@ -226,7 +226,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
-  onProjectModalClosing(selectedProjects: string[]): void {
+  onProjectDropdownClosing(selectedProjects: string[]): void {
 
     Object.keys(this.projects).forEach(id => this.projects[id].checked = false);
     selectedProjects.forEach(id => this.projects[id].checked = true);
