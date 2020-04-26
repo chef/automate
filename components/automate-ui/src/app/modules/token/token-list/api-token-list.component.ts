@@ -25,6 +25,8 @@ import {
 import { CreateToken } from 'app/entities/api-tokens/api-token.actions';
 import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
+import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policies/policy.actions';
+import { stringToMember } from 'app/entities/policies/policy.model';
 
 @Component({
   selector: 'app-api-tokens',
@@ -69,7 +71,8 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       name: ['', Validators.required],
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
-      projects: [[]]
+      projects: [[]],
+      policies: [[]]
     });
   }
 
@@ -135,6 +138,14 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(new CreateToken(tok));
 
+    const member = stringToMember(`token:${tok.id}`);
+    (this.createTokenForm.controls.policies.value as string[])
+      .forEach(id =>
+        this.store.dispatch(new AddPolicyMembers(<PolicyMembersMgmtPayload>{
+          id,
+          members: [member]
+        }))
+      );
   }
 
   public toggleActive($event: ChefKeyboardEvent, token: ApiToken): void {

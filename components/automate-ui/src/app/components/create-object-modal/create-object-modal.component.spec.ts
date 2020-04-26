@@ -1,8 +1,10 @@
 import { EventEmitter, SimpleChange } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
+import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { using } from 'app/testing/spec-helpers';
 import { Project } from 'app/entities/projects/project.model';
 import { CreateObjectModalComponent } from './create-object-modal.component';
@@ -30,7 +32,8 @@ describe('CreateObjectModalComponent', () => {
           outputs: ['onProjectChecked'] })
       ],
      imports: [
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ]
     }).compileComponents();
   });

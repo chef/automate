@@ -2,14 +2,18 @@ import {
   Component, EventEmitter, Input, Output, OnInit, OnDestroy, OnChanges, SimpleChanges
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import {
   Project, ProjectConstants, ProjectCheckedMap
 } from 'app/entities/projects/project.model';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { PolicyCheckedMap, PolicyChecked } from 'app/entities/policies/policy.model';
+import { PolicyChecked } from 'app/entities/policies/policy.model';
+import { GetPolicies } from 'app/entities/policies/policy.actions';
+import { allPolicies } from 'app/entities/policies/policy.selectors';
 
 @Component({
   selector: 'app-create-object-modal',
@@ -28,7 +32,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Output() createClicked = new EventEmitter<Project[]>();
 
   public projects: ProjectCheckedMap = {};
-  public policies: PolicyCheckedMap = {};
+  public policies: PolicyChecked[] = [];
   public modifyID = false; // Whether the edit ID form is open or not.
   public conflictError = false;
   public addPolicies = true;
@@ -38,6 +42,8 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
 
   private isDestroyed = new Subject<boolean>();
 
+  constructor(private store: Store<NgrxStateAtom>) { }
+
   ngOnInit(): void {
     this.conflictErrorEvent.pipe(takeUntil(this.isDestroyed))
     .subscribe((isConflict: boolean) => {
@@ -45,6 +51,11 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
       // Open the ID input on conflict so user can resolve it.
       this.modifyID = isConflict;
     });
+
+    this.store.select(allPolicies)
+      .pipe(takeUntil(this.isDestroyed))
+      // OK to leave `checked` undefined--will be initialized upon `visible`
+      .subscribe(policies => this.policies = policies as PolicyChecked[]);
   }
 
   ngOnDestroy() {
@@ -55,8 +66,15 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   ngOnChanges(changes: SimpleChanges): void {
     // clear checked projects when opening
     if (changes.visible && (changes.visible.currentValue as boolean)) {
-      Object.values(this.projects).forEach(p => p.checked = false);
+
+      this.store.dispatch(new GetPolicies()); // refresh in case of updates
+
+      Object.values(this.projects).forEach(p => p.checked = false); // reset projects
       this.projectsUpdatedEvent.emit();
+
+      Object.values(this.policies).forEach(p => p.checked = false); // reset policies
+      this.policiesUpdatedEvent.emit();
+
       if (this.createProjectModal) {
         this.updatePolicyCheckbox(true); // always set to checked upon opening
       }
@@ -67,19 +85,13 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     this.createForm.controls.projects.setValue(projectsSelected);
   }
 
-  onPolicyChecked(policy: PolicyChecked): void {
-    this.policies[policy.id].checked = policy.checked;
-    const policiesSelected = Object.keys(this.policies).filter(id => this.policies[id].checked);
-    this.createForm.controls.projects.setValue(policiesSelected);
+  onPolicyDropdownClosing(policiesSelected: string[]): void {
+    this.createForm.controls.policies.setValue(policiesSelected);
   }
 
   updatePolicyCheckbox(event: boolean): void {
     this.addPolicies = event;
     this.createForm.controls.addPolicies.setValue(this.addPolicies);
-  }
-
-  policyDropdownDisabled(): boolean {
-    return Object.values(this.policies).length === 0;
   }
 
   handleNameInput(event: KeyboardEvent): void {
