@@ -6,8 +6,8 @@
           *ngIf="notificationVisible"
           [type]="notificationType"
           [timeout]="notificationTimeout()"
-          (dismissed)="hideNotification()"
-          [message]="notificationMessage">
+          (dismissed)="hideNotification()">
+          {{ notificationMessage }}
         </app-chef-notification>
       </div>
 

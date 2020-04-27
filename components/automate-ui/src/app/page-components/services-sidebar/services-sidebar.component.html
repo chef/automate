@@ -1,10 +1,10 @@
 <div class="sticky-notifications">
-  <chef-notification
+  <app-chef-notification
     *ngIf="(serviceGroupsStatus$ | async) === 'loadingFailure'"
     [type]="'error'"
     [timeout]="10">
     {{ (serviceGroupsError$ | async).status }}: {{ (serviceGroupsError$ | async).error.message }}
-  </chef-notification>
+  </app-chef-notification>
 </div>
 <div id="services-panel" class="services-panel">
   <chef-page-header>

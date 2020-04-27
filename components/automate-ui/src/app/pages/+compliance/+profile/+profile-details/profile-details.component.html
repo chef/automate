@@ -11,24 +11,24 @@
           *ngIf="downloadErrorVisible"
           type="error"
           timeout="5"
-          (dismissed)="hideDownloadError()"
-          [message]="downloadFailureNotificationContent">
+          (dismissed)="hideDownloadError()">
+          {{ downloadFailureNotificationContent }}
         </app-chef-notification>
 
         <app-chef-notification
           *ngIf="deleteErrorVisible"
           type="error"
           timeout="5"
-          (dismissed)="hideDeleteError()"
-          [message]="deleteFailureNotificationContent">
+          (dismissed)="hideDeleteError()">
+          {{ deleteFailureNotificationContent }}
         </app-chef-notification>
 
         <app-chef-notification
           *ngIf="installErrorVisible"
           type="error"
           timeout="5"
-          (dismissed)="hideInstallError()"
-          [message]="installFailureNotificationContent">
+          (dismissed)="hideInstallError()">
+          {{ installFailureNotificationContent }}
         </app-chef-notification>
       </div>
 

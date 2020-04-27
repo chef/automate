@@ -6,8 +6,8 @@
           *ngIf="downloadErrorVisible"
           type="error"
           timeout="5"
-          (dismissed)="hideDownloadError()"
-          [message]="notificationMessage">
+          (dismissed)="hideDownloadError()">
+          {{ notificationMessage }}
         </app-chef-notification>
       </div>
 
