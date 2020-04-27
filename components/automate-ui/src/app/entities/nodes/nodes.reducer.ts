@@ -10,14 +10,14 @@ import { EntityStatus } from '../entities';
 export interface NodesEntityState extends EntityState<Node>{
   status: EntityStatus;
   nodesList: {
-    loading: boolean,
-    items: Node[],
-    total: number,
-    per_page: number,
-    page: number,
-    sort: string,
-    order: string,
-    filters: any[]
+    loading?: boolean,
+    items?: Node[],
+    total?: number,
+    per_page?: number,
+    page?: number,
+    sort?: string,
+    order?: string,
+    filters?: any[]
   };
   nodeTotals: {
     all: number,

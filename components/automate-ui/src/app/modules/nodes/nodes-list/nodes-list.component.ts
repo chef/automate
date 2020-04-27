@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
+import { Router} from '@angular/router';
 import { timer as observableTimer, Subject } from 'rxjs';
 import { takeUntil, withLatestFrom } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { DateTime } from 'app/helpers/datetime/datetime';
 
-// import * as actions  from '../../../entities/nodes/nodes.actions';
-// import * as selectors  from '../../../entities/nodes/nodes.selectors';
-import * as selectors from '../../../pages/+compliance/+scanner/state/scanner.selectors';
-import * as actions from '../../../pages/+compliance/+scanner/state/scanner.actions';
+import * as actions  from '../../../entities/nodes/nodes.actions';
+import * as selectors  from '../../../entities/nodes/nodes.selectors';
+// import * as selectors from '../../../pages/+compliance/+scanner/state/scanner.selectors';
+// import * as actions from '../../../pages/+compliance/+scanner/state/scanner.actions';
 import * as moment from 'moment';
 
 
@@ -20,7 +21,8 @@ import * as moment from 'moment';
 
 export class NodesListComponent implements OnInit {
   constructor(
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private router: Router
   ) { }
 
   nodesList;
@@ -41,11 +43,27 @@ export class NodesListComponent implements OnInit {
   }
 
   orderFor(sortKey) {
-    const {sort, order} = this.nodesList;
+    const {sort, order} = this.nodesList.items;
     if (sortKey === sort) {
       return order;
     }
     return 'none';
+  }
+
+  trackBy(node) {
+    return node;
+  }
+
+  onSortToggled(event) {
+    let {sort, order} = event.detail;
+    if (order === 'none') {
+      sort = undefined;
+      order = undefined;
+    }
+
+    const queryParams = {sort, order};
+
+    this.router.navigate([], {queryParams} );
   }
 
   deleteNode(node) {
