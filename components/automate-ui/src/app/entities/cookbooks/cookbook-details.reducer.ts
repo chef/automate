@@ -6,7 +6,6 @@ import { CookbookDetailsActionTypes, CookbookDetailsActions } from './cookbook-d
 import { CookbookDetails } from './cookbook-details.model';
 
 export interface CookbookDetailsEntityState extends EntityState<CookbookDetails> {
-  status: EntityStatus;
   getStatus: EntityStatus;
 }
 
@@ -14,7 +13,7 @@ const GET_STATUS = 'getStatus';
 
 export const cookbookDetailsEntityAdapter:
   EntityAdapter<CookbookDetails> = createEntityAdapter<CookbookDetails>({
-    selectId: (cookbookdetails: CookbookDetails) => cookbookdetails.name
+    selectId: (cookbookdetails: CookbookDetails) => cookbookdetails.cookbook_name
   });
 
 export const CookbookDetailsEntityInitialState: CookbookDetailsEntityState =
@@ -43,4 +42,4 @@ export function cookbookDetailsEntityReducer(
 }
 
 export const getEntityById = (id: string) =>
-(state: CookbookDetailsEntityState) => state.entities[id];
+  (state: CookbookDetailsEntityState) => state.entities[id];

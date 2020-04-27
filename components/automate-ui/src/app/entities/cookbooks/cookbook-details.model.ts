@@ -1,6 +1,26 @@
-export interface CookbookDetails {
+export interface RespCookbookDetails {
     name: string;
     cookbook_name: string;
+    version: string;
+    chef_type?: string;
+    frozen?: string;
+    json_class?: string;
+    files?: string[];
+    templates?: string[];
+    attributes?: string[];
+    recipes?: string[];
+    definitions?: string[];
+    libraries?: string[];
+    providers?: string[];
+    resources?: string[];
+    root_files?: RootFiles[];
+    metadata?: string[];
+    access?: string[];
+}
+
+export interface CookbookDetails {
+    cookbook_name: string;
+    name_version: string;
     version: string;
     chef_type?: string;
     frozen?: string;

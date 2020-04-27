@@ -6,19 +6,18 @@ import { CookbookVersionsActionTypes, CookbookVersionsActions } from './cookbook
 import { CookbookVersions } from './cookbook-versions.model';
 
 export interface CookbookVersionsEntityState extends EntityState<CookbookVersions> {
-  status: EntityStatus;
   getStatus: EntityStatus;
 }
 
 const GET_STATUS = 'getStatus';
 
 export const cookbookVersionsEntityAdapter:
-EntityAdapter<CookbookVersions> = createEntityAdapter<CookbookVersions>({
-  selectId: (cookbookversions: CookbookVersions) => cookbookversions.name
-});
+  EntityAdapter<CookbookVersions> = createEntityAdapter<CookbookVersions>({
+    selectId: (cookbookversions: CookbookVersions) => cookbookversions.name
+  });
 
 export const CookbookVersionsEntityInitialState: CookbookVersionsEntityState =
-cookbookVersionsEntityAdapter.getInitialState(<CookbookVersionsEntityState>{
+  cookbookVersionsEntityAdapter.getInitialState(<CookbookVersionsEntityState>{
     getStatus: EntityStatus.notLoaded
   });
 
@@ -45,4 +44,4 @@ export function cookbookVersionsEntityReducer(
 }
 
 export const getEntityById = (id: string) =>
-(state: CookbookVersionsEntityState) => state.entities[id];
+  (state: CookbookVersionsEntityState) => state.entities[id];

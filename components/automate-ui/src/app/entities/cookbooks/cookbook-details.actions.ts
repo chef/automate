@@ -9,10 +9,6 @@ export enum CookbookDetailsActionTypes {
   GET_FAILURE = 'COOKBOOK_DETAILS::GET::FAILURE'
 }
 
-export interface CookbookDetailsSuccessPayload {
-  cookbookdetails: CookbookDetails;
-}
-
 export class GetCookbookDetails implements Action {
   readonly type = CookbookDetailsActionTypes.GET;
 
