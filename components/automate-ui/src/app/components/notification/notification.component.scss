@@ -12,8 +12,12 @@
   overflow: hidden;
 
   p {
-    color: $chef-white;
     margin: 0;
+    color: $chef-white;
+  }
+
+  a {
+    color: $chef-white;
   }
 
   &.info {
@@ -56,10 +60,9 @@
     left: 0;
     width: 25%;
     height: 100%;
-    background: linear-gradient(110deg, rgba(255,255,255,0) 22%, 
-                                        rgba(255,255,255,.11) 50%, 
-                                        rgba(255,255,255,0) 83%);
-    animation: shine 3s infinite cubic-bezier(.17,.71,.05,.98);
+    background: linear-gradient(110deg, rgba(255, 255, 255, 0) 22%,
+      rgba(255, 255, 255, .11) 50%, rgba(255, 255, 255, 0) 83%);
+    animation: shine 3s infinite cubic-bezier(.17, .71, .05, .98);
     animation-delay: 500ms;
     cursor: none;
   }
@@ -67,9 +70,10 @@
 
 @keyframes shine {
   from {
-    transform: translateX(-50%)
+    transform: translateX(-50%);
   }
+
   to {
-    transform: translateX(500%)
+    transform: translateX(500%);
   }
 }
