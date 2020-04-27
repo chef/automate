@@ -38,10 +38,7 @@ export class ChefNotificationComponent implements AfterViewInit {
   @HostBinding('@slideAnim') slideAnim;
   @HostBinding('class') get theType() { return this.type; }
 
-  timeOutRef;
-
-  constructor() {}
-
+  private timeOutRef: ReturnType<typeof setTimeout>;
 
   ngAfterViewInit() {
     const isInfinite = this.timeout === 0;
@@ -50,7 +47,7 @@ export class ChefNotificationComponent implements AfterViewInit {
     this.timeOutRef = setTimeout(this.handleClose, this.timeout * 1000);
   }
 
-  handleClose = () => {
+  handleClose = (): void => {
     clearTimeout(this.timeOutRef);
     this.dismissed.emit();
   }
