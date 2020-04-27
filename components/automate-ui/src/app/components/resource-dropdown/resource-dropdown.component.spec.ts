@@ -49,7 +49,7 @@ describe('ResourceDropdownComponent', () => {
 
     it('displays a list of checkbox options', () => {
       const options = Array.from(fixture.nativeElement.querySelectorAll('chef-checkbox'));
-      expect(options.length).toEqual(2);
+      expect(options.length).toEqual(component.filteredResources.length);
       options.forEach((option: HTMLInputElement, index: number) => {
         const { name, checked } = component.filteredResources[index];
         expect(option.textContent).toEqual(name);

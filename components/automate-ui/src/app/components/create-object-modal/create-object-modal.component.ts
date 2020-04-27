@@ -64,7 +64,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // clear checked projects when opening
     if (changes.visible && (changes.visible.currentValue as boolean)) {
 
       this.store.dispatch(new GetPolicies()); // refresh in case of updates
@@ -76,7 +75,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
       this.policiesUpdatedEvent.emit();
 
       if (this.createProjectModal) {
-        this.updatePolicyCheckbox(true); // always set to checked upon opening
+        this.updatePolicyCheckbox(true); // default to checked upon opening
       }
     }
   }

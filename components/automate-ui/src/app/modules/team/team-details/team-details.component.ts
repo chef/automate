@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { keyBy, at, xor, isNil, identity } from 'lodash/fp';
+import { keyBy, at, isNil, identity } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
@@ -21,7 +21,7 @@ import {
   getAllStatus as getAllProjectStatus
 } from 'app/entities/projects/project.selectors';
 import {
-  ProjectConstants, ProjectCheckedMap
+  ProjectConstants, ProjectCheckedMap, noProjectsUpdated
 } from 'app/entities/projects/project.model';
 import {
   teamFromRoute,
@@ -233,7 +233,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
-    if (this.noProjectsUpdated()) {
+    if (noProjectsUpdated(this.team.projects, this.projects)) {
       this.updateNameForm.controls.projects.markAsPristine();
     } else {
       this.updateNameForm.controls.projects.markAsDirty();
@@ -241,10 +241,4 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   }
 
-  private noProjectsUpdated(): boolean {
-    const projectsUpdated = xor(
-      this.team.projects,
-      Object.keys(this.projects).filter(id => this.projects[id].checked));
-    return projectsUpdated.length === 0;
-  }
 }

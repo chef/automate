@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { identity, xor, isNil } from 'lodash/fp';
+import { identity, isNil } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 
@@ -16,7 +16,7 @@ import {
 } from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 import {
-  Project, ProjectConstants, ProjectCheckedMap
+  Project, ProjectConstants, ProjectCheckedMap, noProjectsUpdated
 } from 'app/entities/projects/project.model';
 import { GetProjects } from 'app/entities/projects/project.actions';
 import {
@@ -137,17 +137,10 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
-    if (this.noProjectsUpdated()) {
+    if (noProjectsUpdated(this.token.projects, this.projects)) {
       this.updateForm.controls.projects.markAsPristine();
     } else {
       this.updateForm.controls.projects.markAsDirty();
     }
-  }
-
-  private noProjectsUpdated(): boolean {
-    const projectsUpdated = xor(
-      this.token.projects,
-      Object.keys(this.projects).filter(id => this.projects[id].checked));
-    return projectsUpdated.length === 0;
   }
 }
