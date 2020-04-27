@@ -5,14 +5,25 @@
         <chef-heading>Chef Servers</chef-heading>
         <chef-subheading>Manage Chef Servers with Chef Automate.</chef-subheading>
       </chef-page-header>
-      <app-create-chef-server-modal [visible]="createModalVisible" [creating]="creatingChefServer"
-        [createForm]="createChefServerForm" (close)="closeCreateModal()" [conflictErrorEvent]="conflictErrorEvent"
+      <app-create-chef-server-modal 
+        [visible]="createModalVisible" 
+        [creating]="creatingChefServer"
+        [createForm]="createChefServerForm" 
+        (close)="closeCreateModal()" 
+        [conflictErrorEvent]="conflictErrorEvent"
         (createClicked)="createChefServer()">
       </app-create-chef-server-modal>
-      <app-delete-object-modal [visible]="deleteModalVisible" objectNoun="server" [objectName]="serverToDelete?.name"
-        (close)="closeDeleteModal()" (deleteClicked)="deleteServer()" objectAction="Delete">
+      <app-delete-object-modal 
+        [visible]="deleteModalVisible" 
+        objectNoun="server" 
+        [objectName]="serverToDelete?.name"
+        (close)="closeDeleteModal()" 
+        (deleteClicked)="deleteServer()" 
+        objectAction="Delete">
       </app-delete-object-modal>
-      <app-message-modal [title]="'Could Not Delete Server'" [visible]="messageModalVisible"
+      <app-message-modal 
+        [title]="'Could Not Delete Server'" 
+        [visible]="messageModalVisible"
         (close)="closeMessageModal()">
         Before you can delete this server, delete all orgnisations attached to this server.
       </app-message-modal>
