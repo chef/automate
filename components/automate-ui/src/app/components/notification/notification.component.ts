@@ -32,7 +32,7 @@ const slideAnim = trigger('slideAnim', [
 export class ChefNotificationComponent implements AfterViewInit {
 
   @Input() type: Type;
-  @Input() timeout = 5;
+  @Input() timeout = 8;
   @Output() dismissed = new EventEmitter();
 
   @HostBinding('@slideAnim') slideAnim;
@@ -44,6 +44,9 @@ export class ChefNotificationComponent implements AfterViewInit {
 
 
   ngAfterViewInit() {
+    const isInfinite = this.timeout === 0;
+    if ( isInfinite ) { return; }
+
     this.timeOutRef = setTimeout(this.handleClose, this.timeout * 1000);
   }
 
