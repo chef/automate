@@ -41,7 +41,6 @@ setup_gobin() {
     vendor_hash=$(cat \
       /src/vendor/modules.txt \
       /src/components/automate-grpc/protoc-gen-policy/policy/policy.go \
-      /src/components/automate-grpc/protoc-gen-policy/api/policy.proto \
       /src/components/automate-grpc/protoc-gen-policy/iam/policy.proto \
     | sha256sum | cut -c1-16)
     export GOBIN_BASE="/src/bin"
