@@ -361,6 +361,8 @@ func (c *testContext) CleanupAdminToken() error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
+		c.Globals.CachedToken = ""
+		c.Globals.TokenID = ""
 		return nil
 	}
 
