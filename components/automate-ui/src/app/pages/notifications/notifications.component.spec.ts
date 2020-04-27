@@ -6,7 +6,6 @@ import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { Store, StoreModule } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
-import { MockComponent } from 'ng2-mock-component';
 
 import { Rule, ServiceActionType } from './rule';
 import { RulesService } from '../../services/rules/rules.service';
@@ -68,8 +67,7 @@ describe('NotificationsComponent', () => {
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
-        NotificationsComponent,
-        MockComponent({ selector: 'chef-notification'})
+        NotificationsComponent
       ],
       providers: [
         { provide: MatDialog, useClass: MockMdDialog },

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MockComponent } from 'ng2-mock-component';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
@@ -35,8 +34,8 @@ describe('LicenseNotificationsComponent', () => {
         StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
       ],
       declarations: [
-        MockComponent({ selector: 'chef-notification', inputs: ['type', 'timeout'] }),
-        LicenseNotificationsComponent],
+        LicenseNotificationsComponent
+      ],
       providers: [
         { provide: LicenseFacadeService, useClass:  MockLicenseFacadeService },
         { provide: LayoutFacadeService, useClass:  MockLayoutFacadeService }
