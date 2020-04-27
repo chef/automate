@@ -1,12 +1,19 @@
 <div class="content-container">
-  <div class="page-title">Unknown Duration</div>
+  <div class="page-title">Time since Last Check-in</div>
   <div class="update-time">Updated {{ lastUpdatedMessage }}</div>
   <table>
     <tbody>
       <tr *ngFor="let items of countedDurationItems">
         <td>{{ formatDuration(items.duration) }}</td>
-        <td>{{ items.count }}</td>
-        <td></td>
+        <td>
+          <span>
+            {{ items.count }}
+            <chef-icon>desktop_windows</chef-icon>
+          </span>
+        </td>
+        <td>
+          <chef-progress-bar [value]="items.count" [valueMax]="countedDurationItemsMax.count"></chef-progress-bar>
+        </td>
       </tr>
     </tbody>
   </table>

@@ -3,7 +3,6 @@
 .page-title {
   color: var(--chef-primary-dark);
   margin-top: 0;
-  margin-bottom: 12px;
   font-weight: inherit;
   font-style: inherit;
   font-size: 18px;
@@ -24,26 +23,44 @@
   font-weight: 100;
 }
 
-.item {
-  margin: 8px;
-  padding: 3px;
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  chef-button {
+    margin: 0;
+  }
 }
 
-chef-icon {
-  margin-right: 1em;
+.filters {
+  margin: 1em 0;
+  --pill-background-color: $chef-white;
+
+  > chef-pill {
+    display: inline-flex;
+    padding: 8px;
+    margin-right: 8px;
+    border: 1px solid $chef-grey;
+  }
+
+  chef-checkbox::ng-deep {
+    --pill-background-color: #{$chef-grey};
+
+    chef-pill {
+      margin-left: 8px;
+      padding: 0 8px;
+    }
+
+    .check-wrap {
+      border: 1px solid $chef-grey;
+    }
+  }
 }
 
-.table-title {
-  text-align: left;
-}
+chef-table {
 
-#x {
-  margin-right: 5px;
-  margin-top: 5px;
-  position: absolute;
-  background: grey;
-  color: black;
-  top: -10px;
-  right: -10px;
-  border: 1px solid black;
+  chef-icon {
+    margin-right: 8px;
+  }
 }

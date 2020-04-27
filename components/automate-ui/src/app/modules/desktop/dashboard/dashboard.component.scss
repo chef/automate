@@ -27,7 +27,7 @@ app-insight {
   height: calc(100% - 2rem);
 }
 
-app-unknown-desktop-duration-counts {
+app-top-errors {
   margin-bottom: 2rem;
 }
 
@@ -75,8 +75,8 @@ chef-heading::ng-deep {
 
   .bx--col {
     height: 100%;
-    background: rgba(0, 50, 200, 0.2);
-    outline: 1px solid rgba(0, 50, 200, 0.4);
+    background: rgba(0, 50, 200, 0.1);
+    outline: 1px dashed rgba(0, 50, 200, 0.4);
     position: relative;
 
     &::before {
@@ -87,8 +87,32 @@ chef-heading::ng-deep {
       right: 1rem;
       bottom: 0;
       left: 1rem;
-      background: rgba(0, 50, 200, 0.2);
+      background: rgba(0, 50, 200, 0.1);
       outline: 1px solid rgba(0, 50, 200, 0.4);
+    }
+  }
+
+  .bx--col:nth-child(n + 5) {
+    display: none;
+  }
+
+  @media (min-width: 42rem) {
+    .bx--col:nth-child(n + 5) {
+      display: block;
+    }
+
+    .bx--col:nth-child(n + 9) {
+      display: none;
+    }
+  }
+
+  @media (min-width: 66rem) {
+    .bx--col:nth-child(n + 5) {
+      display: block;
+    }
+
+    .bx--col:nth-child(n + 9) {
+      display: block;
     }
   }
 }

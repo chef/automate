@@ -1,30 +1,51 @@
 <div class="content-container">
-  <button (click)="close()" id="x">X</button>
-  <div class="page-title">Insight</div>
-  <ul>
-    <li *ngFor="let term of termFilters">
-      <button (click)="termFilterClicked(term)" id="filter-item">
+  <div class="header">
+    <div class="heading">
+      <div class="page-title">Insight</div>
+      <div class="update-time">Error: Chef::ExampleError1: Error 1 occurred</div>
+    </div>
+    <chef-button secondary (click)="close()">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <div class="filters">
+    <!-- <li *ngFor="let term of termFilters">
+      <button (click)="termFilterClicked(term)" id="filter-item"> style="--pill-background-color: black; --pill-text-color: white"
         {{term.type}}: {{term.value}}
       </button>
-    </li>
-  </ul>
-  <div>Total: {{totalDesktops}}</div>
-  <table>
-    <thead>
-      <tr >
-        <th (click)="sortOn('name')" class="table-title">DESKTOP NAME</th>
-        <th (click)="sortOn('check-in')" class="table-title">LAST CHECK-IN TIME</th>
-        <th (click)="sortOn('platform')" class="table-title">PLATFORM</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let desktop of desktops">
-        <td>{{ desktop.name }}</td>
-        <td><chef-icon>{{ desktop.status | chefStatusIcon }}</chef-icon> {{ desktop.checkin | timeFromNow }}</td>
-        <td>{{ desktop.platform }}</td>
-      </tr>
-    </tbody>
-  </table>
+    </li> -->
+    <!-- <chef-pill *ngFor="let term of termFilters">
+      <chef-checkbox>{{term.value}}</chef-checkbox>
+    </chef-pill> -->
+
+    <chef-pill>
+      <chef-checkbox>windows <chef-pill>10</chef-pill></chef-checkbox>
+    </chef-pill>
+    <chef-pill>
+      <chef-checkbox>ubuntu<chef-pill>60</chef-pill></chef-checkbox>
+    </chef-pill>
+    <chef-pill>
+      <chef-checkbox>linux<chef-pill>30</chef-pill></chef-checkbox>
+    </chef-pill>
+  </div>
+  <!-- <pre>{{ termFilters | json }}</pre> -->
+  <h4>Total: {{totalDesktops}}</h4>
+  <chef-table>
+    <!-- <chef-thead>
+      <chef-tr>
+        <chef-th (click)="sortOn('name')" class="table-title">Desktop Name</chef-th>
+        <chef-th (click)="sortOn('check-in')" class="table-title">Last Check-in</chef-th>
+        <chef-th (click)="sortOn('platform')" class="table-title">Platform</chef-th>
+      </chef-tr>
+    </chef-thead> -->
+    <chef-tbody>
+      <chef-tr *ngFor="let desktop of desktops">
+        <chef-td>{{ desktop.name }}</chef-td>
+        <chef-td><chef-icon>{{ desktop.status | chefStatusIcon }}</chef-icon> {{ desktop.checkin | timeFromNow }}</chef-td>
+        <chef-td>{{ desktop.platform }}</chef-td>
+      </chef-tr>
+    </chef-tbody>
+  </chef-table>
   <app-page-picker
     [total]="totalDesktops"
     [perPage]="pageSize"

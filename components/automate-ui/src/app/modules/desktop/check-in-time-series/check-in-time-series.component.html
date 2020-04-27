@@ -1,7 +1,9 @@
 <div class="content-container">
-  <div class="page-title">Last Check-in by Day</div>
-  <div class="update-time">Updated {{ lastUpdatedMessage }}</div>
-  <div>
+  <div class="header">
+    <div class="heading">
+      <div class="page-title">Check-in History</div>
+      <div class="update-time">Updated {{ lastUpdatedMessage }}</div>
+    </div>
     <select (change)="dateChanged($event.target.value)">
       <option *ngFor="let selectableDaysAgo of selectableDaysAgoCollection" [value]="selectableDaysAgo"
         [selected]="selectableDaysAgo == selectedDaysAgo">
@@ -9,18 +11,23 @@
       </option>
     </select>
   </div>
-  <table>
-    <thead>
-      <tr>
-        <th>Days Ago</th>
-        <th>Percentage of Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let day of days">
-        <td>{{ day.daysAgo }}</td>
-        <td>{{ day.percentage | number:'1.0-0' }}%</td>
-      </tr>
-    </tbody>
-  </table>
+
+  <chef-table>
+    <!-- <chef-thead>
+      <chef-tr>
+        <chef-th>Days Ago</chef-th>
+        <chef-th>Percentage of Total</chef-th>
+      </chef-tr>
+    </chef-thead> -->
+    <chef-tbody>
+      <chef-tr *ngFor="let day of days">
+        <chef-td [ngSwitch]="day.daysAgo">
+          <ng-container *ngSwitchCase="0">Today</ng-container>
+          <ng-container *ngSwitchCase="1">Yesterday</ng-container>
+          <ng-container *ngSwitchDefault>{{ day.daysAgo }} days ago</ng-container>
+        </chef-td>
+        <chef-td>{{ day.percentage | number:'1.0-0' }}%</chef-td>
+      </chef-tr>
+    </chef-tbody>
+  </chef-table>
 </div>

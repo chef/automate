@@ -61,6 +61,7 @@ export class DashboardComponent implements OnInit {
   public pageSize$: Observable<number>;
   public termFilters$: Observable<TermFilter[]>;
   public insightVisible = false;
+  public gridVisible = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
