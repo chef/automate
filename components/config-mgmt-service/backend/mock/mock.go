@@ -203,3 +203,8 @@ func (m Backend) GetNodeMetadataCounts(filters map[string][]string, types []stri
 	endDate string) ([]backend.TypeCount, error) {
 	return nil, nil
 }
+
+func (m Backend) GetNodeRunsDailyStatusTimeSeries(nodeID string, startTime,
+	endTime time.Time) ([]backend.RunDurationStatus, error) {
+	return nil, nil
+}

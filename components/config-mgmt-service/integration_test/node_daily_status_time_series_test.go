@@ -1,16 +1,19 @@
 package integration_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
+	"github.com/chef/automate/api/interservice/cfgmgmt/request"
+	"github.com/chef/automate/api/interservice/cfgmgmt/response"
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetNodeDailyStatusTimeSeries(t *testing.T) {
+func TestGetNodeDailyStatusTimeSeriesBackend(t *testing.T) {
 
 	cases := []struct {
 		now              time.Time
@@ -403,6 +406,147 @@ func TestGetNodeDailyStatusTimeSeries(t *testing.T) {
 				assert.Equal(t, expected.End, actualRunDurationStatus.End)
 				assert.Equal(t, expected.RunID, actualRunDurationStatus.RunID)
 				assert.Equal(t, expected.Status, actualRunDurationStatus.Status)
+			}
+		})
+	}
+}
+
+func TestGetNodeDailyStatusTimeSeriesRPC(t *testing.T) {
+
+	now := time.Now()
+	cases := []struct {
+		description      string
+		request          *request.NodeRunsDailyStatusTimeSeries
+		node             iBackend.Node
+		runs             []iBackend.Run
+		expectedResponse *response.NodeRunsDailyStatusTimeSeries
+		expectedFailure  bool
+	}{
+		{
+			description:     "Fails: Missing node ID",
+			expectedFailure: true,
+			request: &request.NodeRunsDailyStatusTimeSeries{
+				NodeId:  "",
+				DaysAgo: 1,
+			},
+			node: iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					EntityUuid: "123456",
+				},
+				Checkin: parseTime(t, "2020-03-12T16:02:59Z"),
+			},
+		},
+		{
+			description:     "Fails: Missing node ID",
+			expectedFailure: true,
+			request: &request.NodeRunsDailyStatusTimeSeries{
+				NodeId:  "123456",
+				DaysAgo: -1,
+			},
+			node: iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					EntityUuid: "123456",
+				},
+				Checkin: parseTime(t, "2020-03-12T16:02:59Z"),
+			},
+		},
+		{
+			description: "Return one 24-hour duration",
+			request: &request.NodeRunsDailyStatusTimeSeries{
+				NodeId:  "123456",
+				DaysAgo: 1,
+			},
+			expectedResponse: &response.NodeRunsDailyStatusTimeSeries{
+				Durations: []*response.RunDurationStatus{
+					{
+						Status: "missing",
+						RunId:  "",
+						Start: time.Date(now.Year(), now.Month(), now.Day(),
+							now.Hour(), 0, 0, 0, time.UTC).Add(time.Hour).Add(-time.Hour * 24).Format(time.RFC3339),
+						End: time.Date(now.Year(), now.Month(), now.Day(),
+							now.Hour(), 0, 0, 0, time.UTC).Add(time.Hour).Add(-time.Millisecond).Format(time.RFC3339),
+					},
+				},
+			},
+			node: iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					EntityUuid: "123456",
+				},
+				Checkin: parseTime(t, "2020-03-12T16:02:59Z"),
+			},
+		},
+		{
+			description: "Return three 24-hour durations",
+			request: &request.NodeRunsDailyStatusTimeSeries{
+				NodeId:  "123456",
+				DaysAgo: 3,
+			},
+			expectedResponse: &response.NodeRunsDailyStatusTimeSeries{
+				Durations: []*response.RunDurationStatus{
+					{
+						Status: "missing",
+						RunId:  "",
+						Start: time.Date(now.Year(), now.Month(), now.Day(),
+							now.Hour(), 0, 0, 0, time.UTC).Add(time.Hour).Add(-time.Hour * 24 * 3).Format(time.RFC3339),
+						End: time.Date(now.Year(), now.Month(), now.Day(),
+							now.Hour(), 0, 0, 0, time.UTC).Add(time.Hour).Add(-time.Hour * 24 * 2).Add(-time.Millisecond).Format(time.RFC3339),
+					},
+					{
+						Status: "missing",
+						RunId:  "",
+						Start: time.Date(now.Year(), now.Month(), now.Day(),
+							now.Hour(), 0, 0, 0, time.UTC).Add(time.Hour).Add(-time.Hour * 24 * 2).Format(time.RFC3339),
+						End: time.Date(now.Year(), now.Month(), now.Day(),
+							now.Hour(), 0, 0, 0, time.UTC).Add(time.Hour).Add(-time.Hour * 24 * 1).Add(-time.Millisecond).Format(time.RFC3339),
+					},
+					{
+						Status: "missing",
+						RunId:  "",
+						Start: time.Date(now.Year(), now.Month(), now.Day(),
+							now.Hour(), 0, 0, 0, time.UTC).Add(time.Hour).Add(-time.Hour * 24).Format(time.RFC3339),
+						End: time.Date(now.Year(), now.Month(), now.Day(),
+							now.Hour(), 0, 0, 0, time.UTC).Add(time.Hour).Add(-time.Millisecond).Format(time.RFC3339),
+					},
+				},
+			},
+			node: iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					EntityUuid: "123456",
+				},
+				Checkin: parseTime(t, "2020-03-12T16:02:59Z"),
+			},
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.description, func(t *testing.T) {
+
+			testCase.node.Exists = true
+			testCase.node.NodeName = "nodeDailyStatusTimeSeries"
+			for runIndex := range testCase.runs {
+				testCase.runs[runIndex].EntityUuid = testCase.node.NodeInfo.EntityUuid
+			}
+
+			suite.IngestNodes([]iBackend.Node{testCase.node})
+			suite.IngestRuns(testCase.runs)
+			defer suite.DeleteAllDocuments()
+
+			actualResponse, err := cfgmgmt.GetNodeRunsDailyStatusTimeSeries(context.Background(),
+				testCase.request)
+			if testCase.expectedFailure {
+				assert.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			require.Equal(t, len(testCase.expectedResponse.Durations), len(actualResponse.Durations))
+			for index, expectedDuration := range testCase.expectedResponse.Durations {
+				actualRunDurationStatus := actualResponse.Durations[index]
+
+				assert.Equal(t, expectedDuration.Start, actualRunDurationStatus.Start)
+				assert.Equal(t, expectedDuration.End, actualRunDurationStatus.End)
+				assert.Equal(t, expectedDuration.RunId, actualRunDurationStatus.RunId)
+				assert.Equal(t, expectedDuration.Status, actualRunDurationStatus.Status)
 			}
 		})
 	}

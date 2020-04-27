@@ -125,6 +125,50 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context,
 	return nodesCounts, nil
 }
 
+// This function provides the status of runs for each 24-hour duration. For multiple runs in one
+// 24-hour duration, the most recent failed run will be returned. If there are no failed runs the
+// most recent successful run will be returned. If no runs are found in the 24-hour duration, the
+// status will be "missing" and no run will be returned.
+func (s *CfgMgmtServer) GetNodeRunsDailyStatusTimeSeries(ctx context.Context,
+	request *request.NodeRunsDailyStatusTimeSeries) (*response.NodeRunsDailyStatusTimeSeries, error) {
+	if request.GetNodeId() == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Parameter 'node_id' not provided")
+	}
+
+	daysAgo := request.GetDaysAgo()
+	if daysAgo < 0 {
+		return &response.NodeRunsDailyStatusTimeSeries{}, errors.GrpcError(codes.InvalidArgument,
+			"daysAgo needs to be greater than zero")
+	}
+
+	// default to provide a time series for the past 24 hours
+	if daysAgo == 0 {
+		daysAgo = 1
+	}
+
+	startTime, endTime := calculateStartEndCheckInTimeSeries(daysAgo)
+
+	timeSeries, err := s.client.GetNodeRunsDailyStatusTimeSeries(request.GetNodeId(), startTime,
+		endTime.Add(-time.Millisecond))
+	if err != nil {
+		return &response.NodeRunsDailyStatusTimeSeries{}, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
+	runDurationStatusCollection := make([]*response.RunDurationStatus, len(timeSeries))
+	for index, duration := range timeSeries {
+		runDurationStatusCollection[index] = &response.RunDurationStatus{
+			Start:  duration.Start.Format(time.RFC3339),
+			End:    duration.End.Format(time.RFC3339),
+			Status: duration.Status,
+			RunId:  duration.RunID,
+		}
+	}
+
+	return &response.NodeRunsDailyStatusTimeSeries{
+		Durations: runDurationStatusCollection,
+	}, nil
+}
+
 // GetCheckInCountsTimeSeries - Returns a daily time series of unique node check-ins for the number of day requested
 func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 	request *request.CheckInCountsTimeSeries) (*response.CheckInCountsTimeSeries, error) {
