@@ -31,7 +31,7 @@ const slideAnim = trigger('slideAnim', [
 })
 export class ChefNotificationComponent implements AfterViewInit {
 
-  @Input() type: Type;
+  @Input() type: Type = Type.info;
   @Input() timeout = 8;
   @Output() dismissed = new EventEmitter();
 
