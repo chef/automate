@@ -30,9 +30,6 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
   // Label to use when none are selected
   public noneSelectedLabel = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
-  // plural display name of resource
-  public objectNounPlural = 'projects';
-
   public projects: ResourceChecked[];
 
   private isDestroyed = new Subject<boolean>();

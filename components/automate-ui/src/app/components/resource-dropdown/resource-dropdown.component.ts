@@ -20,23 +20,22 @@ export interface ResourceCheckedMap {
 
 export class ResourceDropdownComponent implements OnInit, OnChanges {
 
-  // The map of ResourceChecked by id.
-  // Updates should be applied to parent component state.
+  // The map of resources to operate on.
   @Input() resources: ResourceChecked[] = [];
 
-  // Used to re-synchronize summary label if the set of checked items has changed.
-  // This optional input is needed only when re-displaying the resource dropdown
+  // (Optional) Used to re-synchronize summary label if the set of checked items has changed.
+  // This input is needed only when re-displaying the resource dropdown
   // for *additional* resources, as with the create-object-modal-component.
-  // Other consumers, e.g. team-details.component use it only for a single resource.
+  // Consumers that use it only for a single resource, e.g., team-details.component, should omit.
   @Input() resourcesUpdated: EventEmitter<boolean>;
 
-  // Label to use when none are selected.
+  // (Optional) Label to use with no resources selected; defaulted if not provided.
   @Input() noneSelectedLabel = 'None';
 
-  // Plural display name of resource.
+  // Plural display name of resource (e.g. "policies", "projects").
   @Input() objectNounPlural = 'MISSING REQUIRED PARAMETER';
 
-  // Emits checked set of ids upon completion.
+  // Emits checked set of resource IDs upon completion.
   @Output() onDropdownClosing = new EventEmitter<string[]>();
 
   // filteredResources is merely a container to hold the resources
@@ -55,7 +54,6 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // TODO convert to self-contained modal so this only fires when component is visible.
     if (changes.resources) {
       this.updateLabel();
       if (changes.resources.firstChange) { // only update on initialization/first change
