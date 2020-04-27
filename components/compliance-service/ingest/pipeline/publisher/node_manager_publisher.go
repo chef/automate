@@ -25,6 +25,10 @@ func nodeManagerPublisher(in <-chan message.Compliance, nodeManagerClient manage
 	out := make(chan message.Compliance, maxNumberOfBundledMsgs)
 	go func() {
 		for msg := range in {
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessingCompliance(err)
+				continue
+			}
 			// send to node manager from here.
 			log.Debugf("send info about node %s to node manager", msg.Report.NodeName)
 
@@ -39,7 +43,7 @@ func nodeManagerPublisher(in <-chan message.Compliance, nodeManagerClient manage
 				log.Errorf("unable to send info about node %s to node manager", msg.Report.NodeName)
 			}
 
-			out <- msg
+			message.Propagate(out, &msg)
 		}
 		close(out)
 	}()

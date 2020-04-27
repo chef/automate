@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 
@@ -15,6 +16,8 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/publisher"
 )
+
+var ErrQueueFull = errors.New("Report processing queue is full")
 
 type Compliance struct {
 	in chan<- message.Compliance
@@ -45,9 +48,12 @@ func (s *Compliance) Run(report *compliance.Report) error {
 		Done:      done,
 	}
 	var err error
+	select {
+	case s.in <- msg:
+	default:
+		return ErrQueueFull
+	}
 	logrus.WithFields(logrus.Fields{"report_id": report.ReportUuid}).Debug("Running Compliance pipeline")
-
-	s.in <- msg
 	err = <-done
 	if err != nil {
 		logrus.WithFields(logrus.Fields{"error": err.Error()}).Error("Message failure")

@@ -70,7 +70,7 @@ func reportProjectTagger(in <-chan message.Compliance, authzClient iam_v2.Projec
 			msg.InspecReport.Projects = projectTags
 			msg.InspecSummary.Projects = projectTags
 
-			out <- msg
+			message.Propagate(out, &msg)
 		}
 		close(out)
 	}()
