@@ -122,7 +122,7 @@ func init() {
 	serveCmd.Flags().Int("max-number-of-bundled-action-msgs", 10000, "The maximum number of action messages to bundle together during ingestion")
 	serveCmd.Flags().Int("number-of-run-msgs-transformers", 9, "The number of run messages to transform at a time")
 	serveCmd.Flags().Int("number-of-run-msg-publishers", 2, "The number of run messages publishers")
-	serveCmd.Flags().Int("message-buffer-size", 200, "The number of messages that can be buffered")
+	serveCmd.Flags().Int("message-buffer-size", 100, "The number of messages that can be buffered")
 	serveCmd.Flags().String("key", "key.pem", "SSL Private key for gRPC server")
 	serveCmd.Flags().String("cert", "cert.pem", "SSL Certificate for gRPC server")
 	serveCmd.Flags().String("root-cert", "cacert.pem", "Root SSL CA Certificate for gRPC server")
