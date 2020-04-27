@@ -76,7 +76,7 @@ describe('project management', () => {
     cy.get('[data-cy=save-button]').click();
     cy.get('app-project-list chef-modal').should('not.be.visible');
     cy.get('#main-content-wrapper').scrollTo('top');
-    cy.get('chef-notification.info').should('be.visible');
+    cy.get('app-chef-notification.info').should('be.visible');
     cy.contains(projectName).should('exist');
     cy.contains(projectID).should('exist');
 
@@ -239,7 +239,7 @@ describe('project management', () => {
     // Once we get this notification we know the network call to delete succeeded,
     // so now we can check if there are other projects or not.
     cy.get('#main-content-wrapper').scrollTo('top');
-    cy.get('chef-notification.info').contains(`Deleted project ${projectID}`);
+    cy.get('app-chef-notification.info').contains(`Deleted project ${projectID}`);
     cy.request({
       auth: { bearer: adminIdToken },
       method: 'GET',
@@ -277,7 +277,7 @@ describe('project management', () => {
     cy.get('[data-cy=save-button]').click();
     cy.get('app-project-list chef-modal').should('not.be.visible');
     cy.get('#main-content-wrapper').scrollTo('top');
-    cy.get('chef-notification.info').should('be.visible');
+    cy.get('app-chef-notification.info').should('be.visible');
     cy.contains(projectName).should('exist');
     cy.contains(customProjectID).should('exist');
 
