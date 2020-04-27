@@ -79,7 +79,7 @@ func mergeOutChannels(pipeOutChannels []<-chan message.ChefRun) chan message.Che
 	for _, pipeOut := range pipeOutChannels {
 		go func(pipeOut <-chan message.ChefRun) {
 			for msg := range pipeOut {
-				message.PropogateChefRun(mergedOut, &msg)
+				message.PropagateChefRun(mergedOut, &msg)
 			}
 		}(pipeOut)
 	}

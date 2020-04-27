@@ -43,7 +43,7 @@ func nodeManagerPublisher(in <-chan message.ChefRun, nodeManagerClient manager.N
 				log.Errorf("unable to send info about node %s to node manager", msg.Node.NodeName)
 			}
 
-			message.PropogateChefRun(out, &msg)
+			message.PropagateChefRun(out, &msg)
 		}
 		close(out)
 	}()

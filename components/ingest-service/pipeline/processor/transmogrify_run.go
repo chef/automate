@@ -80,7 +80,7 @@ func ChefRunTransmogrify(in <-chan message.ChefRun, out chan<- message.ChefRun, 
 				continue
 			}
 
-			message.PropogateChefRun(out, &msg)
+			message.PropagateChefRun(out, &msg)
 		}
 		close(out)
 	}()

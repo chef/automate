@@ -27,7 +27,7 @@ func CountActions(counter *int64) message.ChefActionPipe {
 					"buffer_size":        len(out),
 				}).Debug("Counting pipeline messages")
 
-				message.PropogateChefAction(out, &msg)
+				message.PropagateChefAction(out, &msg)
 			}
 			close(out)
 		}()
@@ -52,7 +52,7 @@ func CountRuns(counter *int64) message.ChefRunPipe {
 					"total_messages":     *counter,
 				}).Debug("Counting pipeline messages")
 
-				message.PropogateChefRun(out, &msg)
+				message.PropagateChefRun(out, &msg)
 			}
 			close(out)
 		}()

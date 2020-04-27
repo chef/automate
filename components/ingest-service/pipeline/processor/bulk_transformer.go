@@ -35,7 +35,7 @@ func runMsgToBulkRequestTransformer(in <-chan message.ChefRun, client backend.Cl
 				client.CreateBulkNodeAttributeUpdateRequest(msg.NodeAttribute),
 			}
 
-			message.PropogateChefRun(out, &msg)
+			message.PropagateChefRun(out, &msg)
 		}
 		close(out)
 	}()
@@ -68,7 +68,7 @@ func actionMsgToBulkRequestTransformer(in <-chan message.ChefAction, client back
 				"message":     "ChefAction",
 			}).Debug("Transforming to bulk")
 
-			message.PropogateChefAction(out, &msg)
+			message.PropagateChefAction(out, &msg)
 		}
 		close(out)
 	}()

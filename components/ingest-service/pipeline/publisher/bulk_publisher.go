@@ -75,7 +75,7 @@ func bulkRunPublisherBundler(in <-chan message.ChefRun, client backend.Client,
 					// elasticsearch publish was successful
 					// Send all the bundled messages to the next processor in the pipeline
 					for _, publishedMsg := range bundledMsgs {
-						message.PropogateChefRun(out, &publishedMsg)
+						message.PropagateChefRun(out, &publishedMsg)
 					}
 					bundledMsgs = []message.ChefRun{}
 					dur := time.Since(start)
@@ -140,7 +140,7 @@ func bulkActionPublisherBundler(in <-chan message.ChefAction, client backend.Cli
 					// elasticsearch publish was successful
 					// Send all the bundled messages to the next processor in the pipeline
 					for _, publishedMsg := range bundledMsgs {
-						message.PropogateChefAction(out, &publishedMsg)
+						message.PropagateChefAction(out, &publishedMsg)
 					}
 					bundledMsgs = []message.ChefAction{}
 					dur := time.Since(start)

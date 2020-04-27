@@ -14,7 +14,7 @@ import (
 
 type ChefActionPipe func(<-chan ChefAction) <-chan ChefAction
 
-func PropogateChefAction(out chan<- ChefAction, msg *ChefAction) {
+func PropagateChefAction(out chan<- ChefAction, msg *ChefAction) {
 	select {
 	case out <- *msg:
 	case <-msg.Ctx.Done():

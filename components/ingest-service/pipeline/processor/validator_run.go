@@ -33,7 +33,7 @@ func MessageValidator(in <-chan message.ChefRun) <-chan message.ChefRun {
 				continue
 			}
 
-			message.PropogateChefRun(out, &msg)
+			message.PropagateChefRun(out, &msg)
 		}
 		close(out)
 	}()

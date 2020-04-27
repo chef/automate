@@ -14,7 +14,7 @@ import (
 
 type ChefRunPipe func(<-chan ChefRun) <-chan ChefRun
 
-func PropogateChefRun(out chan<- ChefRun, msg *ChefRun) {
+func PropagateChefRun(out chan<- ChefRun, msg *ChefRun) {
 	select {
 	case out <- *msg:
 	case <-msg.Ctx.Done():
