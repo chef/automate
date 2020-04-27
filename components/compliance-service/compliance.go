@@ -194,7 +194,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	// needs to be the first one, since it creates the es indices
 	ingest.RegisterComplianceIngesterServer(s,
 		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient,
-			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient))
+			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, conf.Service.MessageBufferSize))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
 		conf.Manager.Endpoint, cerealManager))

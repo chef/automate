@@ -34,9 +34,11 @@ type ComplianceIngestServer struct {
 var MinimumSupportedInspecVersion = semver.MustParse("2.0.0")
 
 func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.NodeManagerServiceClient,
-	automateURL string, notifierClient notifier.Notifier, authzProjectsClient iam_v2.ProjectsClient) *ComplianceIngestServer {
+	automateURL string, notifierClient notifier.Notifier, authzProjectsClient iam_v2.ProjectsClient,
+	messageBufferSize int) *ComplianceIngestServer {
 
-	compliancePipeline := pipeline.NewCompliancePipeline(esClient, authzProjectsClient, mgrClient)
+	compliancePipeline := pipeline.NewCompliancePipeline(esClient,
+		authzProjectsClient, mgrClient, messageBufferSize)
 
 	return &ComplianceIngestServer{
 		compliancePipeline: compliancePipeline,

@@ -75,7 +75,7 @@ func NewGlobalSuite() *Suite {
 
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, "", s.NotifierMock,
-		s.ProjectsClientMock)
+		s.ProjectsClientMock, 100)
 
 	return s
 }
@@ -104,7 +104,7 @@ func NewLocalSuite(t *testing.T) *Suite {
 
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, "", s.NotifierMock,
-		s.ProjectsClientMock)
+		s.ProjectsClientMock, 100)
 
 	return s
 }
