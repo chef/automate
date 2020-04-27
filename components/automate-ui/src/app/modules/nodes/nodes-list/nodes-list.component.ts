@@ -8,8 +8,6 @@ import { DateTime } from 'app/helpers/datetime/datetime';
 
 import * as actions  from '../../../entities/nodes/nodes.actions';
 import * as selectors  from '../../../entities/nodes/nodes.selectors';
-// import * as selectors from '../../../pages/+compliance/+scanner/state/scanner.selectors';
-// import * as actions from '../../../pages/+compliance/+scanner/state/scanner.actions';
 import * as moment from 'moment';
 
 
