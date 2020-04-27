@@ -60,7 +60,7 @@ func actionBundleProjectTagger(in <-chan message.ChefAction,
 
 			msg.InternalChefAction.Projects = findMatchingProjectsForAction(msg.Action, projectRulesCollection)
 
-			out <- msg
+			message.PropogateChefAction(out, &msg)
 		}
 		close(out)
 	}()

@@ -51,7 +51,7 @@ func chefActionPerform(in <-chan message.ChefAction, client backend.Client) <-ch
 			if filterSelfCCR(msg.Ctx, action, client) {
 				msg.FinishProcessing(nil)
 			} else {
-				out <- msg
+				message.PropogateChefAction(out, &msg)
 			}
 		}
 		close(out)

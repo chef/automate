@@ -23,7 +23,7 @@ func ChefRunCorrections(in <-chan message.ChefRun) <-chan message.ChefRun {
 
 			cleanUpErrorTitle(&msg)
 
-			out <- msg
+			message.PropogateChefRun(out, &msg)
 		}
 		close(out)
 	}()

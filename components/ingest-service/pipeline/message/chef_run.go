@@ -14,6 +14,14 @@ import (
 
 type ChefRunPipe func(<-chan ChefRun) <-chan ChefRun
 
+func PropogateChefRun(out chan<- ChefRun, msg *ChefRun) {
+	select {
+	case out <- *msg:
+	case <-msg.Ctx.Done():
+		msg.FinishProcessing(msg.Ctx.Err())
+	}
+}
+
 type ChefRun struct {
 	ID               uuid.UUID
 	QueueTime        time.Time

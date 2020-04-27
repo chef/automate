@@ -66,7 +66,7 @@ func runBundleProjectTagger(in <-chan message.ChefRun,
 
 			msg.Node.Projects = findMatchingProjects(msg.Node, projectRulesCollection)
 
-			out <- msg
+			message.PropogateChefRun(out, &msg)
 		}
 		close(out)
 	}()

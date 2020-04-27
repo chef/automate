@@ -109,7 +109,7 @@ func ChefActionTransmogrify(in <-chan message.ChefAction) <-chan message.ChefAct
 				}
 			}
 
-			out <- msg
+			message.PropogateChefAction(out, &msg)
 		}
 		close(out)
 	}()
