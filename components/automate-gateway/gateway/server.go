@@ -417,10 +417,10 @@ func (s *Server) startHTTPServer() error {
 	// needed b/c gateway does not support stream; corresponds to
 	// https://github.com/chef/automate/blob/master/api/interservice/cfgmgmt/service/cfgmgmt.proto
 	// `rpc NodeExport(NodeExport) returns (stream ExportData) {};`
-	mux.HandleFunc("/cfgmgmt/nodes/export", s.configMgmtNodeExportHandler)
+	mux.HandleFunc("/api/v0/cfgmgmt/nodes/export", s.configMgmtNodeExportHandler)
 
 	// rpc ReportExport(ReportExport) returns (stream ReportExportData);
-	mux.HandleFunc("/cfgmgmt/reports/export", s.configMgmtReportExportHandler)
+	mux.HandleFunc("/api/v0/cfgmgmt/reports/export", s.configMgmtReportExportHandler)
 
 	// "GET /status" is used for monitoring
 	// We made it a custom handler in order to be able to return 500 when some services are down.
