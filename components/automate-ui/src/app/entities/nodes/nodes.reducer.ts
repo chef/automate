@@ -7,7 +7,7 @@ import { Node } from './nodes.model';
 import { EntityStatus } from '../entities';
 
 
-export interface NodesEntityState extends EntityState<Node>{
+export interface NodesEntityState extends EntityState<Node> {
   status: EntityStatus;
   nodesList: {
     loading?: boolean,
@@ -57,7 +57,7 @@ export function nodesEntityReducer(state: NodesEntityState = NodesEntityInitialS
   switch (action.type) {
     case NodesActionTypes.LIST_NODES: {
       const {page, per_page, sort, order, filters} = action.payload;
-      set('status', EntityStatus.loading, state)      
+      set('status', EntityStatus.loading, state);
       const nodesList = assign({}, state.nodesList,
         {page, per_page, sort, order, filters});
       return assign({}, state, {nodesList});

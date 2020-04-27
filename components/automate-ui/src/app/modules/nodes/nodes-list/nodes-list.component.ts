@@ -1,17 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { Router} from '@angular/router';
+import { Router } from '@angular/router';
 import { timer as observableTimer, Subject } from 'rxjs';
 import { takeUntil, withLatestFrom } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { DateTime } from 'app/helpers/datetime/datetime';
 
-import * as actions  from '../../../entities/nodes/nodes.actions';
-import * as selectors  from '../../../entities/nodes/nodes.selectors';
+import * as actions from '../../../entities/nodes/nodes.actions';
+import * as selectors from '../../../entities/nodes/nodes.selectors';
 import * as moment from 'moment';
 
 
-@Component({  
+@Component({
   selector: 'app-nodes-list',
   templateUrl: './nodes-list.component.html',
   styleUrls: ['./nodes-list.component.scss']
@@ -35,7 +35,6 @@ export class NodesListComponent implements OnInit {
       withLatestFrom(this.store.select(selectors.nodesListParams)),
       takeUntil(this.isDestroyed))
       .subscribe(([_i, params]) => {
-        params = {}
         this.store.dispatch(actions.getNodes(params));
       });
   }
@@ -83,12 +82,12 @@ export class NodesListComponent implements OnInit {
   }
 
   displayNodeTags(tags) {
-    let stringTags = "";
+    let stringTags = '';
     if (tags.length > 0) {
       tags.forEach((tag) => {
-        stringTags = stringTags + tag.key + ":" + tag.value + " ";
-      })
+        stringTags = stringTags + tag.key + ':' + tag.value + ' ';
+      });
     }
-    return stringTags
+    return stringTags;
   }
 }

@@ -1,25 +1,25 @@
 @import "~styles/variables";
 
 chef-td {
-    font-size: 80%;
+  font-size: 80%;
 }
 
 chef-tr {
-    height: 60px;
+  height: 60px;
 }
 
 chef-icon.FAILED {
-    color: $chef-critical;
+  color: $chef-critical;
 }
 
 chef-icon.PASSED {
-    color: $chef-success;
+  color: $chef-success;
 }
 
 chef-icon.UNKNOWN {
-    color: $chef-dark-grey;
+  color: $chef-dark-grey;
 }
 
 chef-icon.SKIPPED {
-    color: $chef-dark-grey;
+  color: $chef-dark-grey;
 }

@@ -4,7 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 export enum NodesActionTypes {
   LIST_NODES             = 'NODES::LIST_NODES',
   LIST_NODES_SUCCESS     = 'NODES::LIST_NODES::SUCCESS',
-  LIST_NODES_FAILURE     = 'NODES::LIST_NODES::FAILURE',
+  LIST_NODES_FAILURE     = 'NODES::LIST_NODES::FAILURE'
 }
 export interface NodesAction extends Action {
   payload?: any;

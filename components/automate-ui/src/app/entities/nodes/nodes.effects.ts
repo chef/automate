@@ -4,7 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, mergeMap, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-import { NodesActionTypes, ListNodes, ListNodesSuccess, ListNodesFailure} from './nodes.actions';
+import { NodesActionTypes, ListNodes, ListNodesSuccess, ListNodesFailure } from './nodes.actions';
 import { RespNodes, NodesRequests } from './nodes.requests';
 import { CreateNotification } from '../notifications/notification.actions';
 import { Type } from '../notifications/notification.model';
@@ -13,7 +13,7 @@ import { Type } from '../notifications/notification.model';
 export class NodesEffects {
   constructor(
     private actions$: Actions,
-    private requests: NodesRequests,
+    private requests: NodesRequests
   ) { }
 
 

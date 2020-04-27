@@ -14,8 +14,8 @@ export interface RespNodes {
 }
 
 export interface Node {
-  id: string,
-  name: string
+  id: string;
+  name: string;
 }
 
 @Injectable()
@@ -29,8 +29,6 @@ export class NodesRequests {
     const { page, per_page } = payload;
     const filters = [];
     const body = { filters, page, per_page };
-    console.log("called listNodes")
     return this.http.post(url, body);
-}
-  
+  }
 }
