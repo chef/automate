@@ -39,10 +39,11 @@ export class ChefNotificationComponent implements AfterViewInit {
   @HostBinding('class') get theType() { return this.type; }
 
   private timeOutRef: ReturnType<typeof setTimeout>;
+  isInfinite = false;
 
   ngAfterViewInit() {
-    const isInfinite = this.timeout === 0;
-    if ( isInfinite ) { return; }
+    this.isInfinite = this.timeout === 0;
+    if ( this.isInfinite ) { return; }
 
     this.timeOutRef = setTimeout(this.handleClose, this.timeout * 1000);
   }
