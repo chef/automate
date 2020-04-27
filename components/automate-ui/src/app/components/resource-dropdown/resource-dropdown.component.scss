@@ -4,6 +4,10 @@
   display: block;
 }
 
+label {
+  padding-bottom: 0.75em;
+}
+
 // todo: update dropdown to have min-width of 250px and increase in width based on length of resource name
 .dropdown-wrap {
   position: relative;
