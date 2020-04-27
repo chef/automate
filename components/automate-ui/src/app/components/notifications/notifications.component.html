@@ -3,10 +3,10 @@
   <ng-container *ngFor="let notification of notifications.slice().reverse()">
     <app-chef-notification
     *ngIf="notification.type !== 'license'"
-    [message]="notification.message"
     [type]="notification.type"
     [timeout]="notification.timeout"
     (dismissed)="handleNotificationDismissal(notification.id)">
+    {{ notification.message }}
     </app-chef-notification>
   </ng-container>
 </div>
