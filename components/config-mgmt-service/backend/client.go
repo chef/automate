@@ -98,7 +98,7 @@ type CountPeroid struct {
 	Count int
 }
 
-type RunStatus struct {
+type RunDurationStatus struct {
 	Start  time.Time
 	End    time.Time
 	Status string

@@ -462,16 +462,22 @@ func (es Backend) getAllConvergeIndiceNames() ([]string, error) {
 	return names, nil
 }
 
-func (es Backend) GetNodeDailyStatusTimeSeries(nodeID string, startTime, endTime time.Time) ([]backend.RunStatus, error) {
+// This function provides the status of runs for each 24-hour duration. For multiple runs in one
+// 24-hour duration, the most recent failed run will be returned. If there are no failed runs the
+// most recent successful run will be returned. If no runs are found in the 24-hour duration, the
+// status will be "missing" and no run will be returned.
+func (es Backend) GetNodeRunsDailyStatusTimeSeries(nodeID string, startTime,
+	endTime time.Time) ([]backend.RunDurationStatus, error) {
 	var (
 		endDateAggTag = "sort_descending_on_end_time"
 		statusAggTag  = "status_agg"
 		IDAggTag      = "id_agg"
 		outerAggTag   = "date_histogram_on_end_time"
 		mainQuery     = elastic.NewBoolQuery()
+		missingTag    = "missing"
 	)
 
-	// Runs for only one node
+	// Filter for Runs for only one node
 	mainQuery = mainQuery.Must(elastic.NewBoolQuery().Must(elastic.NewTermsQuery(backend.Id, nodeID)))
 
 	// Filters the runs down to the needed time range
@@ -480,6 +486,8 @@ func (es Backend) GetNodeDailyStatusTimeSeries(nodeID string, startTime, endTime
 
 	mainQuery = mainQuery.Must(rangeQuery)
 
+	// for each 24-hour bucket create sub buckets for each status
+	// for each status find the most recent run.
 	innerAgg := elastic.NewTermsAggregation().Field(backend.StatusTag)
 	innerAgg.SubAggregation(endDateAggTag,
 		elastic.NewTermsAggregation().Field(backend.RunEndTime).OrderByTerm(false).Size(1).
@@ -500,32 +508,33 @@ func (es Backend) GetNodeDailyStatusTimeSeries(nodeID string, startTime, endTime
 		Aggregation(outerAggTag, bucketHist).
 		Do(context.Background())
 	if err != nil {
-		return []backend.RunStatus{}, err
+		return []backend.RunDurationStatus{}, err
 	}
 
-	LogQueryPartMin(IndexConvergeHistory, searchResult.Aggregations, "GetNodeDailyStatusTimeSeries2 response")
+	LogQueryPartMin(IndexConvergeHistory, searchResult.Aggregations,
+		"GetNodeDailyStatusTimeSeries response")
 
-	runStatusDurations := make([]backend.RunStatus, getNumberOf24hBetween(startTime, endTime))
+	runStatusDurations := make([]backend.RunDurationStatus, getNumberOf24hBetween(startTime, endTime))
 	dateHistoRes, outerAggfound := searchResult.Aggregations.DateHistogram(outerAggTag)
 	if !outerAggfound {
 		// This case is if there are no runs for the entire range of the time series
-		// We are creating the buckets manually with zero check-ins
+		// We are creating the buckets manually with missing status
 		for index := 0; index < len(runStatusDurations); index++ {
 			runStatusDurations[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
 			runStatusDurations[index].End = startTime.Add(time.Hour * 24 *
 				time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
-			runStatusDurations[index].Status = "missing"
+			runStatusDurations[index].Status = missingTag
 		}
 		return runStatusDurations, nil
 	}
 
 	if len(dateHistoRes.Buckets) != len(runStatusDurations) {
-		return []backend.RunStatus{}, errors.NewBackendError(
+		return []backend.RunDurationStatus{}, errors.NewBackendError(
 			"The number of buckets found is incorrect expected %d actual %d",
 			len(runStatusDurations), len(dateHistoRes.Buckets))
 	}
 
-	for index, outerBucket := range dateHistoRes.Buckets {
+	for index, dailyBucket := range dateHistoRes.Buckets {
 		start := startTime.Add(time.Hour * 24 * time.Duration(index))
 		end := startTime.Add(time.Hour * 24 *
 			time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
@@ -533,24 +542,20 @@ func (es Backend) GetNodeDailyStatusTimeSeries(nodeID string, startTime, endTime
 		runStatusDurations[index].Start = start
 		runStatusDurations[index].End = end
 
-		statusAgg, innerAggFound := outerBucket.Aggregations.Terms(statusAggTag)
-		if !innerAggFound {
-			runStatusDurations[index].Status = "missing"
-			continue
-		}
-
-		if len(statusAgg.Buckets) == 0 {
-			runStatusDurations[index].Status = "missing"
+		statusAgg, statusAggFound := dailyBucket.Aggregations.Terms(statusAggTag)
+		if !statusAggFound || len(statusAgg.Buckets) == 0 {
+			// no runs were found
+			runStatusDurations[index].Status = missingTag
 			continue
 		}
 
 		statuses := collectLatestStatusBuckets(statusAgg.Buckets, endDateAggTag, IDAggTag)
 		if len(statuses) == 0 {
-			runStatusDurations[index].Status = "missing"
+			runStatusDurations[index].Status = missingTag
 			continue
 		}
 
-		selectedStatus := selectPriorityStatus(statuses)
+		selectedStatus := selectPriorityStatusRun(statuses)
 
 		runStatusDurations[index].Status = selectedStatus.Status
 		runStatusDurations[index].RunID = selectedStatus.RunID
@@ -559,8 +564,9 @@ func (es Backend) GetNodeDailyStatusTimeSeries(nodeID string, startTime, endTime
 	return runStatusDurations, nil
 }
 
-// Select the latest 'failure' run over all 'successful' runs
-func selectPriorityStatus(latestStatusBucketCollection []LatestStatusBucket) LatestStatusBucket {
+// Select the most recent 'failure' run over all 'success' runs
+// If there are no 'failure' runs select the most recent 'success' run
+func selectPriorityStatusRun(latestStatusBucketCollection []LatestStatusBucket) LatestStatusBucket {
 	for _, latestStatusBucket := range latestStatusBucketCollection {
 		if latestStatusBucket.Status == "failure" {
 			return latestStatusBucket
