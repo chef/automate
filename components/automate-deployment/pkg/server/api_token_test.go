@@ -57,49 +57,21 @@ func TestGenerateAdminToken(t *testing.T) {
 			}, nil
 		}
 
-		mockV2PolicyServer.CreatePolicyFunc = func(
-			_ context.Context, req *authz_v2.CreatePolicyReq) (*authz_v2.Policy, error) {
+		mockV2PolicyServer.AddPolicyMembersFunc = func(
+			_ context.Context, req *authz_v2.AddPolicyMembersReq) (*authz_v2.AddPolicyMembersResp, error) {
 
-			assert.Equal(t, "admin-token-"+testID, req.Id)
-			assert.Equal(t, "admin policy for token "+testID, req.Name)
-			assert.Equal(t, authz_v2.Statement_ALLOW, req.Statements[0].Effect)
+			assert.Equal(t, "administrator-access", req.Id)
 
-			return &authz_v2.Policy{}, nil
-		}
-
-		req := &api.GenerateAdminTokenRequest{Name: testName}
-		resp, err := generateAdminToken(ctx, req, connFactory, authnServer.URL, authzServer.URL)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
-	})
-
-	t.Run("when API token succeeds but v2 policy creation fails due to 'already exists', ignore the error", func(t *testing.T) {
-		mockAuthN.CreateTokenFunc = func(
-			_ context.Context, req *authn.CreateTokenReq) (*authn.Token, error) {
-
-			assert.True(t, req.Active)
-			assert.Equal(t, testName, req.Name)
-
-			return &authn.Token{
-				Value: testTokenString,
-				Id:    testID,
+			return &authz_v2.AddPolicyMembersResp{
+				Members: []string{"team:local:admins", "token:" + testID},
 			}, nil
 		}
 
-		mockV2PolicyServer.CreatePolicyFunc = func(
-			_ context.Context, req *authz_v2.CreatePolicyReq) (*authz_v2.Policy, error) {
-
-			assert.Equal(t, "admin-token-"+testID, req.Id)
-			assert.Equal(t, "admin policy for token "+testID, req.Name)
-			assert.Equal(t, authz_v2.Statement_ALLOW, req.Statements[0].Effect)
-
-			return nil, status.Error(codes.AlreadyExists, "policy with id \"diagnostics-admin-token\" already exists")
-		}
-
 		req := &api.GenerateAdminTokenRequest{Name: testName}
 		resp, err := generateAdminToken(ctx, req, connFactory, authnServer.URL, authzServer.URL)
 		require.NoError(t, err)
 		require.NotNil(t, resp)
+		assert.Equal(t, testID, resp.TokenId)
 	})
 
 	t.Run("when API token succeeds but policy creation fails and rollback fails", func(t *testing.T) {
@@ -115,12 +87,10 @@ func TestGenerateAdminToken(t *testing.T) {
 			}, nil
 		}
 
-		mockV2PolicyServer.CreatePolicyFunc = func(
-			_ context.Context, req *authz_v2.CreatePolicyReq) (*authz_v2.Policy, error) {
+		mockV2PolicyServer.AddPolicyMembersFunc = func(
+			_ context.Context, req *authz_v2.AddPolicyMembersReq) (*authz_v2.AddPolicyMembersResp, error) {
 
-			assert.Equal(t, "admin-token-"+testID, req.Id)
-			assert.Equal(t, "admin policy for token "+testID, req.Name)
-			assert.Equal(t, authz_v2.Statement_ALLOW, req.Statements[0].Effect)
+			assert.Equal(t, "administrator-access", req.Id)
 
 			return nil, status.Error(codes.Internal, "unexpected error")
 		}

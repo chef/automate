@@ -2,21 +2,26 @@ package runner_test
 
 import (
 	"errors"
+	"io"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/components/automate-cli/pkg/diagnostics"
+	"github.com/chef/automate/components/automate-cli/pkg/diagnostics/lbrequest"
 	"github.com/chef/automate/components/automate-cli/pkg/diagnostics/runner"
 )
 
 func TestRunnerHappyPath(t *testing.T) {
+	mockTstCtx := NewMockTestContext()
 	generateCalled := false
 	verifyCalled := false
 	cleanupCalled := false
 
 	r := runner.New(
+		runner.WithTestContext(mockTstCtx),
 		runner.WithDiagnostics(
 			diagnostics.Diagnostic{
 				Name: "test",
@@ -44,11 +49,13 @@ func TestRunnerHappyPath(t *testing.T) {
 }
 
 func TestRunnerSkippedAtRuntime(t *testing.T) {
+	mockTstCtx := NewMockTestContext()
 	generateCalled := false
 	verifyCalled := false
 	cleanupCalled := false
 
 	r := runner.New(
+		runner.WithTestContext(mockTstCtx),
 		runner.WithDiagnostics(
 			diagnostics.Diagnostic{
 				Name: "test",
@@ -79,11 +86,13 @@ func TestRunnerSkippedAtRuntime(t *testing.T) {
 }
 
 func TestRunnerSkippedAtRuntimeBecauseCheckFailed(t *testing.T) {
+	mockTstCtx := NewMockTestContext()
 	generateCalled := false
 	verifyCalled := false
 	cleanupCalled := false
 
 	r := runner.New(
+		runner.WithTestContext(mockTstCtx),
 		runner.WithDiagnostics(
 			diagnostics.Diagnostic{
 				Name: "test",
@@ -114,7 +123,9 @@ func TestRunnerSkippedAtRuntimeBecauseCheckFailed(t *testing.T) {
 }
 
 func TestRunnerAllStepsSkippable(t *testing.T) {
+	mockTstCtx := NewMockTestContext()
 	r := runner.New(
+		runner.WithTestContext(mockTstCtx),
 		runner.WithDiagnostics(
 			diagnostics.Diagnostic{
 				Name: "test",
@@ -132,9 +143,10 @@ func TestRunnerCanRequiredAssertions(t *testing.T) {
 	// that such a call stops execution of the running test somehow. The
 	// golang testing framework, and this diagnostic framework both just
 	// stop the goroutine
-
+	mockTstCtx := NewMockTestContext()
 	called := false
 	r := runner.New(
+		runner.WithTestContext(mockTstCtx),
 		runner.WithDiagnostics(
 			diagnostics.Diagnostic{
 				Name: "test",
@@ -153,7 +165,9 @@ func TestRunnerCanRequiredAssertions(t *testing.T) {
 }
 
 func TestRunnerSkipsVerifyIfGenerateFails(t *testing.T) {
+	mockTstCtx := NewMockTestContext()
 	r := runner.New(
+		runner.WithTestContext(mockTstCtx),
 		runner.WithDiagnostics(
 			diagnostics.Diagnostic{
 				Name: "test",
@@ -172,8 +186,10 @@ func TestRunnerSkipsVerifyIfGenerateFails(t *testing.T) {
 }
 
 func TestRunnerCallsCleanupIfGenerateFails(t *testing.T) {
+	mockTstCtx := NewMockTestContext()
 	called := false
 	r := runner.New(
+		runner.WithTestContext(mockTstCtx),
 		runner.WithDiagnostics(
 			diagnostics.Diagnostic{
 				Name: "test",
@@ -194,8 +210,10 @@ func TestRunnerCallsCleanupIfGenerateFails(t *testing.T) {
 }
 
 func TestRunnerCallsCleanupIfVerifyFails(t *testing.T) {
+	mockTstCtx := NewMockTestContext()
 	called := false
 	r := runner.New(
+		runner.WithTestContext(mockTstCtx),
 		runner.WithDiagnostics(
 			diagnostics.Diagnostic{
 				Name: "test",
@@ -219,9 +237,11 @@ func TestRunnerCallsCleanupIfVerifyFails(t *testing.T) {
 }
 
 func TestRunnerTagFiltering(t *testing.T) {
+	mockTstCtx := NewMockTestContext()
 	fooCalled := false
 	anothermatchingCalled := false
 	r := runner.New(
+		runner.WithTestContext(mockTstCtx),
 		runner.WithDiagnostics(
 			diagnostics.Diagnostic{
 				// Name matches foo tag
@@ -261,8 +281,10 @@ func TestRunnerTagFiltering(t *testing.T) {
 }
 
 func TestRunnerTagFilteringNegations(t *testing.T) {
+	mockTstCtx := NewMockTestContext()
 	bazCalled := false
 	r := runner.New(
+		runner.WithTestContext(mockTstCtx),
 		runner.WithDiagnostics(
 			diagnostics.Diagnostic{
 				// Name matches foo tag
@@ -301,8 +323,10 @@ func TestRunnerTagFilteringNegations(t *testing.T) {
 }
 
 func TestRunnerTagFilteringMultipleFilters(t *testing.T) {
+	mockTstCtx := NewMockTestContext()
 	anothermatchingCalled := false
 	r := runner.New(
+		runner.WithTestContext(mockTstCtx),
 		runner.WithDiagnostics(
 			diagnostics.Diagnostic{
 				// Name matches foo tag
@@ -338,4 +362,44 @@ func TestRunnerTagFilteringMultipleFilters(t *testing.T) {
 	err := r.Run()
 	assert.NoError(t, err)
 	assert.True(t, anothermatchingCalled)
+}
+
+type mockTestContext struct{}
+
+func NewMockTestContext() *mockTestContext {
+	return &mockTestContext{}
+}
+
+func (*mockTestContext) GetValue(key string, value interface{}) error {
+	return nil
+}
+
+func (*mockTestContext) SetValue(key string, value interface{}) {}
+
+func (*mockTestContext) WriteJSON(writer io.Writer) error {
+	return nil
+}
+
+func (*mockTestContext) DoLBRequest(path string, opts ...lbrequest.Opts) (*http.Response, error) {
+	return nil, nil
+}
+
+func (*mockTestContext) PublishViaNATS([][]byte) error {
+	return nil
+}
+
+func (*mockTestContext) GetOption(key string) *diagnostics.Option {
+	return nil
+}
+
+func (*mockTestContext) GetVersion() (string, error) {
+	return "latest", nil
+}
+
+func (*mockTestContext) IsIAMV2() (bool, error) {
+	return true, nil
+}
+
+func (*mockTestContext) CleanupAdminToken() error {
+	return nil
 }
