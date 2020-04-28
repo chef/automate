@@ -225,8 +225,8 @@ export class StatsService {
     if (statuses.every(s => s === 'passed')) { return 'passed'; }
     if (statuses.every(s => s === 'failed')) { return 'failed'; }
     if (statuses.every(s => s === 'skipped')) { return 'skipped'; }
-    // In some cases, nodes don't have results data.  In these
-    // cases we want to display those nodes as passed
+    // In some cases, controls don't have results data.  In these
+    // cases we want to display those controls as passed
     return 'passed';
   }
 
