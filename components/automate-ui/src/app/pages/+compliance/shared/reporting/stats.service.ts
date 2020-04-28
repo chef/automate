@@ -219,9 +219,9 @@ export class StatsService {
      them private? */
   getControlStatus(control): ControlStatus {
     // In some cases, nodes don't have results data.  In these
-    // cases we want to display those nodes as skipped
+    // cases we want to display those nodes as passed
     const hasResults = control.results.length > 0;
-    if (!hasResults) { return 'skipped'; }
+    if (!hasResults) { return 'passed'; }
 
     const waived = this.checkIfWaived(control.waived_str);
     if (waived) { return 'waived'; }
