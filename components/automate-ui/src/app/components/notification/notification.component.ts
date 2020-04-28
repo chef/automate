@@ -2,24 +2,21 @@ import { Component, Input, HostBinding, Output, EventEmitter, AfterViewInit } fr
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Type } from 'app/entities/notifications/notification.model';
 
-
-const slideAnim = trigger('slideAnim', [
+const slideDownAnim = trigger('slideDownAnim', [
   transition(':enter', [
     style({
       opacity: 0,
-      transform: 'scale3d(0,1,1)',
-      transformOrigin: 'left'
+      transform: 'translateY(-100%) scale(0.98)'
     }),
-    animate('300ms 100ms ease-out',
+    animate('300ms ease-out',
       style({
         opacity: 1,
-        transform: 'scale3d(1,1,1)',
-        transformOrigin: 'left'
+        transform: 'translateY(0%) scale(1)'
       }))
   ]),
   transition(':leave', [
-    style({ opacity: 1, transformOrigin: 'right' }),
-    animate('195ms ease-in', style({ opacity: 0, transform: 'scale3d(0,1,1)' }))
+    style({ opacity: 1 }),
+    animate('195ms ease-in', style({ opacity: 0 }))
   ])
 ]);
 
@@ -27,7 +24,7 @@ const slideAnim = trigger('slideAnim', [
   selector: 'app-chef-notification',
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
-  animations: [ slideAnim ]
+  animations: [ slideDownAnim ]
 })
 export class ChefNotificationComponent implements AfterViewInit {
 
@@ -35,7 +32,7 @@ export class ChefNotificationComponent implements AfterViewInit {
   @Input() timeout = 8;
   @Output() dismissed = new EventEmitter();
 
-  @HostBinding('@slideAnim') slideAnim;
+  @HostBinding('@slideDownAnim') slideDownAnim;
   @HostBinding('class') get theType() { return this.type; }
 
   private timeOutRef: ReturnType<typeof setTimeout>;

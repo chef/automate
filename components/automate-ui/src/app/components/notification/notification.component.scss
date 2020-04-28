@@ -21,7 +21,7 @@
   }
 
   &.info {
-    background-color: $chef-success;
+    background-color: transparentize($chef-success, 0.1);
 
     &::before {
       font-family: "Material Icons";
@@ -32,7 +32,7 @@
   }
 
   &.error {
-    background-color: $chef-critical;
+    background-color: transparentize($chef-critical, 0.1);
 
     &::before {
       font-family: "Material Icons";
@@ -62,8 +62,8 @@
     height: 100%;
     background: linear-gradient(110deg, rgba(255, 255, 255, 0) 22%,
       rgba(255, 255, 255, .11) 50%, rgba(255, 255, 255, 0) 83%);
-    animation: shine 3s infinite cubic-bezier(.17, .71, .05, .98);
-    animation-delay: 500ms;
+    animation: shine 3s cubic-bezier(.17, .71, .05, .98) forwards;
+    animation-delay: 1s;
     cursor: none;
   }
 }
