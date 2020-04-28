@@ -222,8 +222,10 @@ export class StatsService {
     if (waived) { return 'waived'; }
 
     const statuses = control.results.map(r => r.status);
+    // If any of the results come back as failed, the control has failed
+    if (statuses.find(s => s === 'failed')) { return 'failed'; }
+
     if (statuses.every(s => s === 'passed')) { return 'passed'; }
-    if (statuses.every(s => s === 'failed')) { return 'failed'; }
     if (statuses.every(s => s === 'skipped')) { return 'skipped'; }
     // In some cases, controls don't have results data.  In these
     // cases we want to display those controls as passed
