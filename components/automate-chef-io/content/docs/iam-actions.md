@@ -35,6 +35,6 @@ Specify the action to restrict user access to the specific action.
 | Manage Users | Settings | iam:users:* | /iam/v2/users | https://{{< example_fqdn "automate" >}}/settings/users |
 | Manage Teams | Settings | iam:teams:* | /iam/v2/teams | https://{{< example_fqdn "automate" >}}/settings/teams |
 | Manage API Tokens | Settings | iam:tokens:* | /iam/v2/tokens | https://{{< example_fqdn "automate" >}}/settings/tokens |
-| Add or Edit Policies | Settings | iam:policies:* | /iam/v2/policies | https://{{< example_fqdn "automate" >}}/settings/policies |
+| Manage Policies | Settings | iam:policies:* | /iam/v2/policies | https://{{< example_fqdn "automate" >}}/settings/policies |
 | Manage Roles | Settings | iam:roles:* | /iam/v2/roles | https://{{< example_fqdn "automate" >}}/settings/roles |
 | Manage Projects | Settings | iam:projects:* | /iam/v2/projects | https://{{< example_fqdn "automate" >}}/settings/projects |
