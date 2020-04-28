@@ -507,7 +507,8 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 		profileVersion = t.Version
 		profileOwner = t.Owner
 	}
-	log.Infof("processing profile tar request for owner: %s, name: %s %s", profileOwner, profileName, profileVersion)
+	log.Infof("processing profile tar request for owner: %s, name: %s (version %s)",
+		profileOwner, profileName, profileVersion)
 
 	var resource, action string
 	if len(profileOwner) > 0 {
