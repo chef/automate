@@ -3,6 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
@@ -12,7 +13,6 @@ import { CreateServerSuccess, CreateServerFailure } from 'app/entities/servers/s
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 
 describe('ChefServersListComponent', () => {
   let component: ChefServersListComponent;
@@ -215,37 +215,40 @@ describe('ChefServersListComponent', () => {
   });
 
   describe('delete modal', () => {
-    const mockChefKeyEvent = new KeyboardEvent('keypress') as ChefKeyboardEvent;
-    mockChefKeyEvent.isUserInput = true;
+    const mockEvent = { isUserInput: true } as MatOptionSelectionChange;
 
-    it('upon selecting delete from control menu, opens with org count 0', () => {
+    it('With no orgs, selecting delete from control menu opens the delete modal', () => {
       expect(component.deleteModalVisible).toBe(false);
-      component.startServerDelete(mockChefKeyEvent, genServer('uuid-111', 0));
+      component.startServerDelete(mockEvent, genServer('uuid-111', 0));
       expect(component.deleteModalVisible).toBe(true);
     });
 
     it('closes upon sending request to back-end', () => {
-      component.startServerDelete(mockChefKeyEvent, genServer('uuid-111', 0));
-       expect(component.deleteModalVisible).toBe(true);
-       component.deleteServer();
-       expect(component.deleteModalVisible).toBe(false);
-     });
+      component.startServerDelete(mockEvent, genServer('uuid-111', 0));
+      expect(component.deleteModalVisible).toBe(true);
+      component.deleteServer();
+      expect(component.deleteModalVisible).toBe(false);
+    });
 
   });
 
   describe('message modal', () => {
-    const mockChefKeyEvent = new KeyboardEvent('keypress') as ChefKeyboardEvent;
-    mockChefKeyEvent.isUserInput = true;
+    const mockEvent = { isUserInput: true } as MatOptionSelectionChange;
 
-
-    it('upon selecting delete from control menu, opens with org count 1', () => {
+    it('With one org, selecting delete from control menu opens the message modal', () => {
       expect(component.messageModalVisible).toBe(false);
-      component.startServerDelete(mockChefKeyEvent, genServer('uuid-111', 1));
+      component.startServerDelete(mockEvent, genServer('uuid-111', 1));
+      expect(component.messageModalVisible).toBe(true);
+    });
+
+    it('With multiple orgs, selecting delete from control menu opens the message modal', () => {
+      expect(component.messageModalVisible).toBe(false);
+      component.startServerDelete(mockEvent, genServer('uuid-111', 1));
       expect(component.messageModalVisible).toBe(true);
     });
 
     it('closes upon request', () => {
-      component.startServerDelete(mockChefKeyEvent, genServer('uuid-111', 1));
+      component.startServerDelete(mockEvent, genServer('uuid-111', 4));
       expect(component.messageModalVisible).toBe(true);
       component.closeMessageModal();
       expect(component.messageModalVisible).toBe(false);
