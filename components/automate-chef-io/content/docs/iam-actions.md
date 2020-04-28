@@ -25,16 +25,16 @@ Specify the action to restrict user access to the specific action.
 | View Chef Servers | Infrastructure | infra:servers:* | <endpoint> | https://{{< example_fqdn "automate" >}}/infrastructure/chef-servers |
 | List Reports | Compliance | compliance:reporting:*  | /compliance/reporting/reports | https://{{< example_fqdn "automate" >}}/compliance/reports/overview |
 | List Scan Jobs | Compliance | compliance:scannerJobs:* | /compliance/scanner/jobs | https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs |
-| Add or Edit Scan Jobs | Compliance | [compliance:scannerJobs:* , infra:nodes:* , infra:nodeManagers:* , compliance:profiles:* ] | /compliance/scanner/jobs | https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs |
-| Add or Edit Compliance Profiles | Compliance | compliance:profiles:* | /compliance/profiles | https://{{< example_fqdn "automate" >}}/compliance/compliance-profiles |
-| Add or Edit Notifications | Settings | notifications:* | /notifications | https://{{< example_fqdn "automate" >}}/settings/notifications |
-| Add or Edit Data Feed | Settings | datafeed:* | /data_feed/destination | https://{{< example_fqdn "automate" >}}/settings/data-feed |
+| Manage Scan Jobs | Compliance | [compliance:scannerJobs:* , infra:nodes:* , infra:nodeManagers:* , compliance:profiles:* ] | /compliance/scanner/jobs | https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs |
+| Manage Compliance Profiles | Compliance | compliance:profiles:* | /compliance/profiles | https://{{< example_fqdn "automate" >}}/compliance/compliance-profiles |
+| Manage Notifications | Settings | notifications:* | /notifications | https://{{< example_fqdn "automate" >}}/settings/notifications |
+| Manage Data Feed | Settings | datafeed:* | /data_feed/destination | https://{{< example_fqdn "automate" >}}/settings/data-feed |
 | Manage Node Integrations | Settings | [infra:nodeManagers:* , infra:nodes:* , secrets:* ] | /nodemanagers , /cfgmgmt/nodes , /secrets | https://{{< example_fqdn "automate" >}}/settings/node-integrations |
-| Add or Edit Node Credentials | Settings | secrets:* | /secrets | https://{{< example_fqdn "automate" >}}/settings/node-credentials |
-| Add or Edit Data Lifecycle | Settings | dataLifecycle:* | /data-lifecycle | https://{{< example_fqdn "automate" >}}/settings/data-lifecycle |
+| Manage Node Credentials | Settings | secrets:* | /secrets | https://{{< example_fqdn "automate" >}}/settings/node-credentials |
+| Manage Data Lifecycle | Settings | dataLifecycle:* | /data-lifecycle | https://{{< example_fqdn "automate" >}}/settings/data-lifecycle |
 | Manage Users | Settings | iam:users:* | /iam/v2/users | https://{{< example_fqdn "automate" >}}/settings/users |
-| Add or Edit Teams | Settings | iam:teams:* | /iam/v2/teams | https://{{< example_fqdn "automate" >}}/settings/teams |
-| Add or Edit API Tokens | Settings | iam:tokens:* | /iam/v2/tokens | https://{{< example_fqdn "automate" >}}/settings/tokens |
+| Manage Teams | Settings | iam:teams:* | /iam/v2/teams | https://{{< example_fqdn "automate" >}}/settings/teams |
+| Manage API Tokens | Settings | iam:tokens:* | /iam/v2/tokens | https://{{< example_fqdn "automate" >}}/settings/tokens |
 | Add or Edit Policies | Settings | iam:policies:* | /iam/v2/policies | https://{{< example_fqdn "automate" >}}/settings/policies |
 | Manage Roles | Settings | iam:roles:* | /iam/v2/roles | https://{{< example_fqdn "automate" >}}/settings/roles |
-| Add or Edit Projects | Settings | iam:projects:* | /iam/v2/projects | https://{{< example_fqdn "automate" >}}/settings/projects |
+| Manage Projects | Settings | iam:projects:* | /iam/v2/projects | https://{{< example_fqdn "automate" >}}/settings/projects |
