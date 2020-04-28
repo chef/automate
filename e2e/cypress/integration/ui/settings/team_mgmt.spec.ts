@@ -105,7 +105,6 @@ describe('team management', () => {
 
       cy.get('[data-cy=save-button]').click();
       cy.get('app-team-management chef-modal').should('not.be.visible');
-      // cy.get('#main-content-wrapper').scrollTo('top');
       cy.get('app-chef-notification.info').should('be.visible');
       cy.contains(teamName).should('exist');
       cy.contains(customTeamID).should('exist');
@@ -133,7 +132,6 @@ describe('team management', () => {
         // save team
         cy.get('[data-cy=save-button]').click();
         cy.get('app-team-management chef-modal').should('not.be.visible');
-        // cy.get('#main-content-wrapper').scrollTo('top');
         cy.get('app-chef-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
@@ -183,7 +181,6 @@ describe('team management', () => {
         // save team
         cy.get('[data-cy=save-button]').click();
         cy.get('app-team-management chef-modal').should('not.be.visible');
-        // cy.get('#main-content-wrapper').scrollTo('top');
         cy.get('app-chef-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
