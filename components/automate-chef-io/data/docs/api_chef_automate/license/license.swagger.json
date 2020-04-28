@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v0/license/apply": {
+    "/license/apply": {
       "post": {
         "operationId": "ApplyLicense",
         "responses": {
@@ -37,7 +37,7 @@
         ]
       }
     },
-    "/api/v0/license/request": {
+    "/license/request": {
       "post": {
         "operationId": "RequestLicense",
         "responses": {
@@ -63,7 +63,7 @@
         ]
       }
     },
-    "/api/v0/license/status": {
+    "/license/status": {
       "get": {
         "operationId": "GetStatus",
         "responses": {

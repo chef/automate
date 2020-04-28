@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v0/retention/nodes/delete-nodes/config": {
+    "/retention/nodes/delete-nodes/config": {
       "post": {
         "operationId": "ConfigureDeleteNodesScheduler",
         "responses": {
@@ -37,7 +37,7 @@
         ]
       }
     },
-    "/api/v0/retention/nodes/missing-nodes-deletion/config": {
+    "/retention/nodes/missing-nodes-deletion/config": {
       "post": {
         "operationId": "ConfigureMissingNodesForDeletionScheduler",
         "responses": {
@@ -63,7 +63,7 @@
         ]
       }
     },
-    "/api/v0/retention/nodes/missing-nodes/config": {
+    "/retention/nodes/missing-nodes/config": {
       "post": {
         "operationId": "ConfigureNodesMissingScheduler",
         "responses": {
@@ -89,7 +89,7 @@
         ]
       }
     },
-    "/api/v0/retention/nodes/status": {
+    "/retention/nodes/status": {
       "get": {
         "operationId": "GetStatusJobScheduler",
         "responses": {

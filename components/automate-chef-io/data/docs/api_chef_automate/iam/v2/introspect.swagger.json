@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/apis/iam/v2/introspect": {
+    "/iam/v2/introspect": {
       "get": {
         "operationId": "IntrospectAll",
         "responses": {
@@ -51,7 +51,7 @@
         ]
       }
     },
-    "/apis/iam/v2/introspect_some": {
+    "/iam/v2/introspect_some": {
       "post": {
         "operationId": "IntrospectSome",
         "responses": {

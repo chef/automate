@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v0/datafeed/destination": {
+    "/datafeed/destination": {
       "post": {
         "operationId": "AddDestination",
         "responses": {
@@ -37,7 +37,7 @@
         ]
       }
     },
-    "/api/v0/datafeed/destination/{id}": {
+    "/datafeed/destination/{id}": {
       "get": {
         "operationId": "GetDestination",
         "responses": {
@@ -115,7 +115,7 @@
         ]
       }
     },
-    "/api/v0/datafeed/destinations": {
+    "/datafeed/destinations": {
       "post": {
         "operationId": "ListDestinations",
         "responses": {
@@ -141,7 +141,7 @@
         ]
       }
     },
-    "/api/v0/datafeed/destinations/test": {
+    "/datafeed/destinations/test": {
       "post": {
         "operationId": "TestDestination",
         "responses": {

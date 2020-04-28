@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v0/gateway/health": {
+    "/gateway/health": {
       "get": {
         "operationId": "GetHealth",
         "responses": {
@@ -27,7 +27,7 @@
         ]
       }
     },
-    "/api/v0/gateway/version": {
+    "/gateway/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {

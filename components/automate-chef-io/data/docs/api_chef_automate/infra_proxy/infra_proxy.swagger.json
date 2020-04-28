@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v0/infra/servers": {
+    "/infra/servers": {
       "get": {
         "operationId": "GetServers",
         "responses": {
@@ -51,7 +51,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{id}": {
+    "/infra/servers/{id}": {
       "get": {
         "operationId": "GetServer",
         "responses": {
@@ -127,7 +127,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{name}": {
+    "/infra/servers/{name}": {
       "get": {
         "operationId": "GetServerByName",
         "responses": {
@@ -151,7 +151,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs": {
+    "/infra/servers/{server_id}/orgs": {
       "get": {
         "operationId": "GetOrgs",
         "responses": {
@@ -207,7 +207,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{id}": {
+    "/infra/servers/{server_id}/orgs/{id}": {
       "get": {
         "operationId": "GetOrg",
         "responses": {
@@ -307,7 +307,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{name}": {
+    "/infra/servers/{server_id}/orgs/{name}": {
       "get": {
         "operationId": "GetOrgByName",
         "responses": {
@@ -339,7 +339,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}": {
       "get": {
         "operationId": "GetAffectedNodes",
         "responses": {
@@ -392,7 +392,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients": {
+    "/infra/servers/{server_id}/orgs/{org_id}/clients": {
       "get": {
         "operationId": "GetClients",
         "responses": {
@@ -422,7 +422,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
       "get": {
         "operationId": "GetClient",
         "responses": {
@@ -458,7 +458,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
+    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
       "get": {
         "operationId": "GetCookbooks",
         "responses": {
@@ -490,7 +490,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
       "get": {
         "operationId": "GetCookbookVersions",
         "responses": {
@@ -529,7 +529,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
       "get": {
         "operationId": "GetCookbook",
         "responses": {
@@ -575,7 +575,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
+    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
       "get": {
         "operationId": "GetCookbookFileContent",
         "responses": {
@@ -628,7 +628,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
       "get": {
         "operationId": "GetDataBags",
         "responses": {
@@ -667,7 +667,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
       "get": {
         "operationId": "GetDataBagItem",
         "responses": {
@@ -713,7 +713,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments": {
+    "/infra/servers/{server_id}/orgs/{org_id}/environments": {
       "get": {
         "operationId": "GetEnvironments",
         "responses": {
@@ -745,7 +745,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
       "get": {
         "operationId": "GetEnvironment",
         "responses": {
@@ -784,7 +784,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
+    "/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
       "get": {
         "operationId": "GetPolicyfiles",
         "responses": {
@@ -816,7 +816,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
       "get": {
         "operationId": "GetPolicyfile",
         "responses": {
@@ -862,7 +862,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles": {
+    "/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
         "operationId": "GetRoles",
         "responses": {
@@ -892,7 +892,7 @@
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/roles/{name}": {
       "get": {
         "operationId": "GetRole",
         "responses": {
@@ -928,7 +928,7 @@
         ]
       }
     },
-    "/api/v0/infra/version": {
+    "/infra/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {

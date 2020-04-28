@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v0/telemetry/config": {
+    "/telemetry/config": {
       "get": {
         "operationId": "GetTelemetryConfiguration",
         "responses": {
