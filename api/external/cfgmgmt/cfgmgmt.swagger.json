@@ -106,6 +106,41 @@
         ]
       }
     },
+    "/cfgmgmt/node_runs_daily_status_time_series": {
+      "get": {
+        "summary": "GetNodeRunsDailyStatusTimeSeries",
+        "description": "Provides the status of runs for each 24-hour duration. For multiple runs in one 24-hour duration, \nthe most recent failed run will be returned. If there are no failed runs the most recent successful \nrun will be returned. If no runs are found in the 24-hour duration, the status will be \"missing\" \nand no run information will be returned.\n\nExample:\nrequest\n```\ncfgmgmt/node_runs_daily_status_time_series?node_id=507bd518-5c18-4c2d-a445-60fe7dde9961\u0026days_ago=3\n```\nresponse\n```\n{\n\"durations\": [\n{\n\"start\": \"2020-04-25T19:00:00Z\",\n\"end\": \"2020-04-26T18:59:59Z\",\n\"status\": \"missing\",\n\"run_id\": \"\"\n},\n{\n\"start\": \"2020-04-26T19:00:00Z\",\n\"end\": \"2020-04-27T18:59:59Z\",\n\"status\": \"missing\",\n\"run_id\": \"\"\n},\n{\n\"start\": \"2020-04-27T19:00:00Z\",\n\"end\": \"2020-04-28T18:59:59Z\",\n\"status\": \"failure\",\n\"run_id\": \"b7904f41-68b5-44ec-9da6-cf2481ff8600\"\n}\n]\n}\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
+        "operationId": "GetNodeRunsDailyStatusTimeSeries",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodeRunsDailyStatusTimeSeries"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "node_id",
+            "description": "Node ID of the runs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "days_ago",
+            "description": "Number of past days.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/cfgmgmt/nodes": {
       "get": {
         "summary": "GetNodes",
@@ -865,6 +900,18 @@
         }
       }
     },
+    "chef.automate.api.cfgmgmt.response.NodeRunsDailyStatusTimeSeries": {
+      "type": "object",
+      "properties": {
+        "durations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunDurationStatus"
+          },
+          "title": "runs status of a 24-hour duration"
+        }
+      }
+    },
     "chef.automate.api.cfgmgmt.response.NodesCounts": {
       "type": "object",
       "properties": {
@@ -1140,6 +1187,27 @@
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.VersionedCookbook"
           },
           "title": "List of versioned cookbooks associated with the node"
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.RunDurationStatus": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string",
+          "title": "Start of the duration (RFC3339)"
+        },
+        "end": {
+          "type": "string",
+          "title": "End of the duration (RFC3339)"
+        },
+        "status": {
+          "type": "string",
+          "title": "Prominent Run's status"
+        },
+        "run_id": {
+          "type": "string",
+          "title": "Prominent Run's ID"
         }
       }
     },
