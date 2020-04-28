@@ -22,7 +22,7 @@ Specify the action to restrict user access to the specific action.
 | View Events | Dashboards | event:* | /event_feed | https://{{< example_fqdn "automate" >}}/dashboards/event-feed |
 | View Service Group Data | Applications | applications:*  | /applications/service-groups | https://{{< example_fqdn "automate" >}}/applications/service-groups |
 | View Client Runs | Infrastructure | infra:nodes:*   | /cfgmgmt/nodes | https://{{< example_fqdn "automate" >}}/infrastructure/client-runs |
-| View Chef Servers | Infrastructure | infra:servers:* | <endpoint> | https://{{< example_fqdn "automate" >}}/infrastructure/chef-servers |
+| View Chef Servers | Infrastructure | infra:infraServers:* | <endpoint> | https://{{< example_fqdn "automate" >}}/infrastructure/chef-servers |
 | List Reports | Compliance | compliance:reporting:*  | /compliance/reporting/reports | https://{{< example_fqdn "automate" >}}/compliance/reports/overview |
 | List Scan Jobs | Compliance | compliance:scannerJobs:* | /compliance/scanner/jobs | https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs |
 | Manage Scan Jobs | Compliance | [compliance:scannerJobs:* , infra:nodes:* , infra:nodeManagers:* , compliance:profiles:* ] | /compliance/scanner/jobs | https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs |
