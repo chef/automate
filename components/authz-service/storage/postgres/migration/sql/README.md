@@ -76,3 +76,4 @@
 - [`74_pre_force_upgrade.up.sql`](74_pre_force_upgrade.up.sql)
 - [`75_update_roles_pols.up.sql`](75_update_roles_pols.up.sql)
 - [`76_compliance_roles_pols.up.sql`](76_compliance_roles_pols.up.sql)
+- [`77_update_infra_servers_editor_role_pols.up.sql`](77_update_infra_servers_editor_role_pols.up.sql)
