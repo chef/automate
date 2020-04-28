@@ -27,9 +27,11 @@
         </tbody>
       </table>
 
-      <app-simple-line-graph
-        [data]="days"
-      ></app-simple-line-graph>
+      <div *ngIf="days && days.length > 0">
+        <app-simple-line-graph
+          [data]="days"
+        ></app-simple-line-graph>
+      </div>
 
     </main>
   </div>

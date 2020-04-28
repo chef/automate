@@ -1,25 +1,10 @@
 import {
-  Component,
-  ElementRef,
-  EventEmitter,
-  Inject,
-  Input,
-  Output,
-  OnChanges,
-  OnDestroy,
-  ViewChild
+  Component, Input, OnChanges, ViewChild, ElementRef
 } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
-import * as moment from 'moment';
-import { DateTime } from 'app/helpers/datetime/datetime';
+// import * as moment from 'moment';
+// import { DateTime } from 'app/helpers/datetime/datetime';
 
-export interface TrendData {
-  report_time: Date;
-  failed: number;
-  passed: number;
-  skipped: number;
-}
 
 @Component({
   selector: 'app-simple-line-graph',
@@ -27,284 +12,124 @@ export interface TrendData {
   styleUrls: ['./simple-line-graph.component.scss']
 })
 
-export class SimpleLineGraphComponent implements OnChanges, OnDestroy {
+export class SimpleLineGraphComponent implements OnChanges {
 
   constructor(
-    private el: ElementRef,
-    @Inject(DOCUMENT) private document: Document
-  ) { }
+    private chart: ElementRef
+  ) {}
 
-  @Input() data = [];
+  @Input() data: any = [];
+  @Input() width = 900;
+  @Input() height = 300;
 
-  @Output() dateSelected: EventEmitter<string> = new EventEmitter<string>();
+  @ViewChild('svg', {static: true}) svg: ElementRef;
 
-  @Input() type: 'nodes' | 'controls';
 
-  @Input() vbWidth = 900;
-
-  @Input() vbHeight = 300;
-
-  @ViewChild('svg', { static: true }) svg;
-
-  get viewBox() {
-    return `0 0 ${this.vbWidth} ${this.vbHeight}`;
+  // maps all of our x data points
+  get xData() {
+    return this.data.map(d => d.daysAgo);
   }
 
-  get trendData(): any {
-    console.log(this.data);
-    return this.data;
-    // return this.data.map(d => {
-    //   return { ...d, report_time: this.createUtcDate(d.report_time) };
-    // });
+  // maps all of our Y data points
+  get yData() {
+    return this.data.map(d => d.percentage);
   }
 
-  get domainX() {
-    const min = d3.min(this.trendData, (d: any) => d.daysAgo);
-    const max = d3.max(this.trendData, (d: any) => d.daysAgo);
-    return [min, max];
-  }
-
+  // determines how wide the graph should be to hold our data
+  // in its respective area;
   get rangeX() {
     const min = 50;
-    const max = this.vbWidth - 50;
-    return [min, max];
-  }
-
-  get scaleX() {
-    return d3.scaleTime()
-      .domain(this.domainX)
-      .range(this.rangeX);
-  }
-
-  get domainY() {
-    const min = 0;
-    const max = d3.max(this.trendData, (d: any) => d.percentage);
+    const max = this.width - 50;
     return [min, max];
   }
 
   get rangeY() {
     const min = 10;
-    const max = this.vbHeight - 30;
+    const max = this.height - 10;
     return [max, min];
   }
 
+  // determines the min and max values of the x axis
+  get domainX() {
+    const min = Math.min(...this.xData);
+    const max = Math.max(...this.xData);
+    return [min, max];
+  }
+
+  get domainY() {
+    const min = 0;
+    const max = 100; // since this based on a percentage do we want 0 to 100?
+    return [min, max];
+  }
+
+  // determines each of our X axis points using the height and width of the chart
+  get scaleX() {
+    return d3.scaleLinear()
+              .range(this.rangeX)
+              .domain(this.domainX);
+  }
+
+  // determines each of our Y axis points using the height and width of the chart
   get scaleY() {
     return d3.scaleLinear()
-      .domain(this.domainY)
-      .range(this.rangeY);
-  }
-
-  get svgSelection() {
-    return d3.select(this.svg.nativeElement);
-  }
-
-  get axisXSelection() {
-    return this.svgSelection.select('.x-axis');
+             .range(this.rangeY)
+             .domain(this.domainY);
   }
 
   get axisYSelection() {
-    return this.svgSelection.select('.y-axis');
+    return this.chartSvg.select('.y-axis');
   }
 
-  // get dotsSelection() {
-  //   return this.svgSelection.selectAll('.dot-group')
-  //     .data(this.trendData, (d: any) => d.report_time.getTime());
-  // }
+  // returns a function that when passed our data, will return an svg path
+  get path() {
+    return d3.line()
+              .x(d => this.scaleX( d.daysAgo) )
+              .y(d => this.scaleY( d.percentage) );
+  }
 
-  // get tipsSelection() {
-  //   return d3.select(this.document.body).selectAll('.dot-group-tip')
-  //     .data(this.trendData, (d: any) => d.report_time.getTime());
-  // }
+  get chartSvg() {
+    return d3.select(this.svg.nativeElement);
+  }
 
-  get linesSelection() {
-    return this.svgSelection.selectAll('.status-line')
-      .data(['skipped', 'passed', 'failed'].map(status => ({ status, values: this.trendData })));
+  get viewBox() {
+    return `0 0 ${this.width} ${this.height}`;
+  }
+
+  resizeChart() {
+    this.width = this.chart.nativeElement.getBoundingClientRect().width;
+  }
+
+  drawLine() {
+    // we are looking at days backwards, so we need the data reversed;
+    const reversedData = this.data.reverse();
+
+    // in order to redraw lines, we'll have to use enter and exit
+    const path = this.chartSvg().append('path');
+    path.attr('d', this.path(reversedData));
+  }
+
+  drawChartLines() {
+    const yAxis = d3.axisLeft(this.scaleY);
+    this.axisYSelection.call(yAxis);
+
+    const grid = d3.axisBottom()
+                      .ticks(this.data.length)
+                      .tickFormat('')
+                      .tickSize(this.height)
+                      .scale(this.scaleX);
+    this.chartSvg.append('g')
+                 .attr('class', 'grid')
+                 .call(grid);
   }
 
   ngOnChanges() {
-    this.resize();
-    this.draw();
-  }
-
-  ngOnDestroy() {
-    this.clear();
+    console.log(this.data);
+    this.resizeChart();
+    this.drawChartLines();
+    this.drawLine();
   }
 
   onResize() {
-    this.resize();
-    this.draw();
-  }
-
-  clear() {
-    this.svgSelection.remove();
-    // this.tipsSelection.remove();
-  }
-
-  resize() {
-    this.vbWidth = this.el.nativeElement.getBoundingClientRect().width;
-  }
-
-  draw() {
-    // this.drawAxisX();
-    this.drawAxisY();
-    this.drawLines();
-    // this.drawDots();
-    // this.drawTips();
-  }
-
-  drawAxisX() {
-    this.axisXSelection.select('text')
-      .attr('x', this.vbWidth / 2)
-      .attr('y', this.vbHeight - 3)
-      .text(() => {
-        return [
-          moment.utc(this.domainX[0]).format(DateTime.CHEF_DATE_TIME),
-          moment.utc(this.domainX[1]).format(DateTime.CHEF_DATE_TIME)
-        ].join(' - ');
-      });
-
-    this.axisXSelection.select('.domain')
-      .attr('x1', this.rangeX[0])
-      .attr('y1', this.rangeY[0])
-      .attr('x2', this.rangeX[1])
-      .attr('y2', this.rangeY[0]);
-  }
-
-  drawAxisY() {
-    const tickFormat = d => {
-      if (d >= 1000) { return d3.format('4.3s')(d); }
-      return Math.floor(d) === d ? d : '';
-    };
-    const drawAxis = d3.axisLeft(this.scaleY)
-      .ticks(10)
-      .tickFormat(tickFormat);
-    this.axisYSelection.call(drawAxis);
-  }
-
-  drawLines() {
-    const linesEnter = this.linesSelection.enter().append('path');
-    const linesUpdate = this.linesSelection.merge(linesEnter);
-    const linesExit = this.linesSelection.exit();
-
-    const drawLine = status => d3.line()
-      .x(d => this.scaleX(d.daysAgo))
-      .y(d => this.scaleY(d[status]))
-      .curve(d3.curveMonotoneX);
-
-    linesUpdate
-      .attr('class', d => `status-line ${d.status}`)
-      .attr('d', d => drawLine(d.status)(d.values));
-
-    linesExit.remove();
-  }
-
-  drawDots() {
-    const enter = this.dotsSelection.enter().append('g');
-    const update = this.dotsSelection.merge(enter);
-    const exit = this.dotsSelection.exit();
-
-    const maxDots = 10;
-    const statuses = ['failed', 'passed', 'skipped'];
-    const isHidden = (_d, i, ns) => i % Math.round(ns.length / maxDots) !== 0;
-
-    enter
-      .attr('class', 'dot-group');
-    enter.append('line')
-      .attr('class', 'dot-group-tick');
-
-    statuses.forEach(status => {
-      enter.append('circle')
-        .attr('class', `status-dot ${status}`)
-        .attr('r', 4);
-    });
-
-    enter.append('rect')
-      .attr('class', 'dot-group-bg');
-
-    enter.on('click', (line) => {
-      this.dateSelected.next(moment(line.report_time).format('YYYY-MM-DD'));
-    });
-
-    update.select('.dot-group-tick')
-      .attr('x1', d => this.scaleX(d.report_time))
-      .attr('y1', this.rangeY[1])
-      .attr('x2', d => this.scaleX(d.report_time))
-      .attr('y2', this.rangeY[0])
-      .classed('hidden', isHidden);
-
-    statuses.forEach(status => {
-      update.select(`.status-dot.${status}`)
-        .attr('cy', d => this.scaleY(d[status]))
-        .attr('cx', d => this.scaleX(d.report_time))
-        .classed('hidden', isHidden);
-    });
-
-    update.select('.status-dot.failed')
-      .attr('r', d => {
-        if (d.failed === d.passed && d.failed === d.skipped) { return 8; }
-        if (d.failed === d.passed || d.failed === d.skipped) { return 6; }
-        return 4;
-      });
-
-    update.select('.status-dot.passed')
-      .attr('r', d => d.passed === d.skipped ? 6 : 4);
-
-    update.select('.dot-group-bg')
-      .attr('id', (_d, i) => `dot-group-bg-${i}`)
-      .attr('x', (d, _i, ns) => {
-        const position = this.scaleX(d.report_time);
-        const width = this.vbWidth / ns.length;
-        const offset = width / 2;
-        return position - offset;
-      })
-      .attr('y', this.rangeY[1])
-      .attr('width', (_d, _i, ns) => this.vbWidth / ns.length)
-      .attr('height', this.rangeY[0]);
-
-    exit.remove();
-  }
-
-  drawTips() {
-    const enter = this.tipsSelection.enter().append('chef-tooltip');
-    const update = this.tipsSelection.merge(enter);
-    const exit = this.tipsSelection.exit();
-
-    const statuses = ['failed', 'passed', 'skipped'];
-    const tipText = (count, status, type) => `${d3.format(',')(count)} ${status} ${type}`;
-
-    enter
-      .attr('class', 'dot-group-tip')
-      .attr('delay', '0');
-    enter.append('p')
-      .attr('class', 'tip-name');
-    enter.append('div')
-      .attr('class', 'tip-legend');
-
-    statuses.forEach(status => {
-      enter.select('.tip-legend').append('div')
-        .attr('class', `tip-legend-item ${status}`);
-    });
-
-    update
-      .attr('for', (_d, i) => `dot-group-bg-${i}`);
-    update.select('.tip-name')
-      .text(d => d3.timeFormat('%a %B %e %Y')(d.report_time));
-
-    statuses.forEach(status => {
-      update.select(`.tip-legend-item.${status}`)
-        .text(d => tipText(d[status], status, this.type));
-    });
-
-    exit.remove();
-  }
-
-  createUtcDate(time: string): Date {
-    const utcDate = moment(time).utc();
-    if (utcDate.isValid) {
-      return new Date(utcDate.year(), utcDate.month(), utcDate.date());
-    } else {
-      console.error('Not a valid date ' + time);
-      return new Date();
-    }
+    this.resizeChart();
   }
 }
