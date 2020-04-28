@@ -43,15 +43,10 @@ func NewInMemoryService(l logger.Logger, connFactory *secureconn.Factory,
 
 // NewPostgresService returns an instance of Service that connects to a postgres storage backend.
 func NewPostgresService(l logger.Logger, connFactory *secureconn.Factory, migrationsConfig migration.Config,
-	authzSubjectClient authz.SubjectPurgeClient, authzV2PoliciesClient authz_v2.PoliciesClient,
-	authzV2AuthorizationClient authz_v2.AuthorizationClient) (*Service, error) {
+	authzSubjectClient authz.SubjectPurgeClient, authzPoliciesClient authz_v2.PoliciesClient,
+	authzAuthorizationClient authz_v2.AuthorizationClient) (*Service, error) {
 
-	resp, err := authzV2PoliciesClient.GetPolicyVersion(context.Background(), &authz_v2.GetPolicyVersionReq{})
-	if err != nil {
-		return nil, err
-	}
-
-	p, err := postgres.New(l, migrationsConfig, resp.Version.Major == authz_v2.Version_V2, authzV2AuthorizationClient)
+	p, err := postgres.New(l, migrationsConfig, authzAuthorizationClient)
 	if err != nil {
 		return nil, err
 	}
