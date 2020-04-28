@@ -14,7 +14,7 @@
         <chef-alert type="error" *ngIf="errorLoading">There was an error loading notifications.</chef-alert>
 
         <chef-toolbar>
-          <app-authorized [anyOf]="['/notifications/rules', 'post']">
+          <app-authorized [anyOf]="['/api/v0/notifications/rules', 'post']">
             <div *ngIf="(rules$ | async)?.length === 0" class="empty-state">
               <p>Create the first notification to get started!</p>
             </div>
