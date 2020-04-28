@@ -27,6 +27,11 @@ func nodeManagerPublisher(in <-chan message.ChefRun, nodeManagerClient manager.N
 			// send to node manager from here.
 			log.Debugf("send info about node %s to node manager", msg.Node.NodeName)
 
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+				continue
+			}
+
 			nodeMetadata, err := gatherInfoForNode(msg.Node)
 			if err != nil {
 				log.Errorf("unable parse node data to be send to manager. aborting attempt to send info to mgr for node %s -- %v", msg.Node.NodeName, err)
@@ -38,7 +43,7 @@ func nodeManagerPublisher(in <-chan message.ChefRun, nodeManagerClient manager.N
 				log.Errorf("unable to send info about node %s to node manager", msg.Node.NodeName)
 			}
 
-			out <- msg
+			message.PropagateChefRun(out, &msg)
 		}
 		close(out)
 	}()

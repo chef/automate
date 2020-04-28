@@ -50,7 +50,7 @@ _Custom_ roles can only be created using the [Roles API]({{< relref "api/#tag/ro
 
 ### Changing Role Details
 
-For _custom_ roles, use the [Roles API]({{< relref "api/#tag/roles" >}} to change the role name, actions list, and projects.
+For _custom_ roles, use the [Roles API]({{< relref "api/#tag/roles" >}}) to change the role name, actions list, and projects.
 
 ### Deleting Roles
 

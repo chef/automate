@@ -31,7 +31,7 @@ type querier interface {
 }
 
 // New instantiates and returns a postgres storage implementation
-func New(logger logger.Logger, migrationConfig migration.Config, isAuthZV2 bool,
+func New(logger logger.Logger, migrationConfig migration.Config,
 	authzClient authz_v2.AuthorizationClient) (storage.Storage, error) {
 
 	if err := migrationConfig.Migrate(); err != nil {

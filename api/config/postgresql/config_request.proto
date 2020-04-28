@@ -53,6 +53,8 @@ message ConfigRequest {
 				google.protobuf.StringValue shared_buffers = 13;
 				google.protobuf.StringValue work_mem = 14;
 				google.protobuf.StringValue ssl_ciphers = 15;
+				google.protobuf.StringValue log_disconnections = 16;
+				google.protobuf.StringValue client_min_messages = 17;
 			}
 
 			message Superuser {

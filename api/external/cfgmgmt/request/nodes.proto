@@ -95,3 +95,10 @@ message NodeMetadataCounts {
   // Latest most recent check-in node information to return.
   string end = 4;
 }
+
+message NodeRunsDailyStatusTimeSeries {
+  // Node ID of the runs
+  string node_id = 1;
+  // Number of past days
+  int32 days_ago = 2;
+}

@@ -15,6 +15,8 @@ export interface DateRange {
   end: Date | moment.Moment;
 }
 
+export type ControlStatus = 'passed' | 'failed' | 'waived' | 'skipped';
+
 @Injectable()
 export class StatsService {
   constructor(
@@ -215,14 +217,25 @@ export class StatsService {
   /* TODO Auth team: Helper functions that are only not private because
      they have unit testing. Should we delete their tests and make
      them private? */
-  getControlStatus(control): string {
-    const statuses = control.results.map(r => r.status);
-    const waived = control.waiver_data && control.waiver_data.skipped_due_to_waiver;
+  getControlStatus(control): ControlStatus {
+    const waived = this.checkIfWaived(control.waived_str);
     if (waived) { return 'waived'; }
+
+    const statuses = control.results.map(r => r.status);
+    // If any of the results come back as failed, the control has failed
+    if (statuses.find(s => s === 'failed')) { return 'failed'; }
+
     if (statuses.every(s => s === 'passed')) { return 'passed'; }
     if (statuses.every(s => s === 'skipped')) { return 'skipped'; }
-    return 'failed';
+    // In some cases, controls don't have results data.  In these
+    // cases we want to display those controls as passed
+    return 'passed';
   }
+
+  private checkIfWaived(waivedStatus: string): boolean {
+    return waivedStatus === 'yes_run' || waivedStatus === 'yes';
+  }
+
 
   addDateRange(filters, dateRange) {
     if (filters) {

@@ -69,6 +69,7 @@ type Client interface {
 	GetMissingNodeDurationCounts(durations []string) ([]CountedDuration, error)
 	GetNodeMetadataCounts(filters map[string][]string, types []string, startDate,
 		endDate string) ([]TypeCount, error)
+	GetNodeRunsDailyStatusTimeSeries(string, time.Time, time.Time) ([]RunDurationStatus, error)
 }
 
 // Types that we consume from the ingest-service
@@ -96,6 +97,13 @@ type CountPeroid struct {
 	Start time.Time
 	End   time.Time
 	Count int
+}
+
+type RunDurationStatus struct {
+	Start  time.Time
+	End    time.Time
+	Status string
+	RunID  string
 }
 
 type TypeCount struct {

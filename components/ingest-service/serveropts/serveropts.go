@@ -16,6 +16,7 @@ type ChefIngestRunPipelineConfig struct {
 }
 
 type ChefIngestServerConfig struct {
+	MessageBufferSize            int
 	MaxNumberOfBundledActionMsgs int
 	ChefIngestRunPipelineConfig  ChefIngestRunPipelineConfig
 }

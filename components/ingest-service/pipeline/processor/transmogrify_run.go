@@ -36,6 +36,11 @@ func ChefRunTransmogrify(in <-chan message.ChefRun, out chan<- message.ChefRun, 
 				"buffer_size":  len(out),
 			}).Debug("Transforming ChefRun")
 
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+				continue
+			}
+
 			runJSONBytes, err := msg.Run.ToJSONBytes()
 			if err != nil {
 				grpcErr := status.Errorf(codes.Internal, "Unable to transform Run message to JSON: %v", err)
@@ -75,7 +80,7 @@ func ChefRunTransmogrify(in <-chan message.ChefRun, out chan<- message.ChefRun, 
 				continue
 			}
 
-			out <- msg
+			message.PropagateChefRun(out, &msg)
 		}
 		close(out)
 	}()

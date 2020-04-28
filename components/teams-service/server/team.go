@@ -1,4 +1,4 @@
-package v2
+package server
 
 import (
 	"context"
@@ -14,18 +14,18 @@ import (
 	"github.com/chef/automate/components/teams-service/storage"
 )
 
-// Server is a V2 teams server
-type Server struct {
+// TeamServer is a teams server
+type TeamServer struct {
 	service *service.Service
 }
 
-// NewServer returns a V2 Teams server
-func NewServer(service *service.Service) *Server {
-	return &Server{service: service}
+// NewTeamServer returns a Teams server
+func NewTeamServer(service *service.Service) *TeamServer {
+	return &TeamServer{service: service}
 }
 
 // GetVersion returns the version of Teams GRPC API
-func (s *Server) GetVersion(
+func (t *TeamServer) GetVersion(
 	ctx context.Context,
 	_ *ver_api.VersionInfoRequest) (*ver_api.VersionInfo, error) {
 	return &ver_api.VersionInfo{
@@ -37,11 +37,11 @@ func (s *Server) GetVersion(
 }
 
 // GetTeam takes an ID and returns a Team object
-func (s *Server) GetTeam(ctx context.Context, req *teams.GetTeamReq) (*teams.GetTeamResp, error) {
+func (t *TeamServer) GetTeam(ctx context.Context, req *teams.GetTeamReq) (*teams.GetTeamResp, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	team, err := s.service.Storage.GetTeam(ctx, req.Id)
+	team, err := t.service.Storage.GetTeam(ctx, req.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
@@ -52,11 +52,11 @@ func (s *Server) GetTeam(ctx context.Context, req *teams.GetTeamReq) (*teams.Get
 }
 
 // ListTeams returns a list of teams from the db
-func (s *Server) ListTeams(ctx context.Context, req *teams.ListTeamsReq) (*teams.ListTeamsResp, error) {
+func (t *TeamServer) ListTeams(ctx context.Context, req *teams.ListTeamsReq) (*teams.ListTeamsResp, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	teamsList, err := s.service.Storage.GetTeams(ctx)
+	teamsList, err := t.service.Storage.GetTeams(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -67,7 +67,7 @@ func (s *Server) ListTeams(ctx context.Context, req *teams.ListTeamsReq) (*teams
 }
 
 // CreateTeam creates a new team
-func (s *Server) CreateTeam(ctx context.Context,
+func (t *TeamServer) CreateTeam(ctx context.Context,
 	req *teams.CreateTeamReq) (*teams.CreateTeamResp, error) {
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -75,7 +75,7 @@ func (s *Server) CreateTeam(ctx context.Context,
 
 	var team storage.Team
 	var err error
-	if team, err = s.service.Storage.StoreTeam(ctx, req.Id, req.Name, req.Projects); err != nil {
+	if team, err = t.service.Storage.StoreTeam(ctx, req.Id, req.Name, req.Projects); err != nil {
 		// if the error is already a GRPC status code, return that directly.
 		if _, ok := status.FromError(err); ok {
 			return nil, err
@@ -92,21 +92,21 @@ func (s *Server) CreateTeam(ctx context.Context,
 }
 
 // DeleteTeam deletes a team from the db
-func (s *Server) DeleteTeam(ctx context.Context, req *teams.DeleteTeamReq) (*teams.DeleteTeamResp, error) {
+func (t *TeamServer) DeleteTeam(ctx context.Context, req *teams.DeleteTeamReq) (*teams.DeleteTeamResp, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	team, err := s.service.Storage.DeleteTeam(ctx, req.Id)
+	team, err := t.service.Storage.DeleteTeam(ctx, req.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
 
 	teamSubject := "team:local:" + team.ID
-	_, err = s.service.AuthzClient.PurgeSubjectFromPolicies(ctx, &authz.PurgeSubjectFromPoliciesReq{
+	_, err = t.service.AuthzClient.PurgeSubjectFromPolicies(ctx, &authz.PurgeSubjectFromPoliciesReq{
 		Subject: teamSubject,
 	})
 	if err != nil {
-		s.service.Logger.Warnf("failed to purge subjects on team delete: %s", err.Error())
+		t.service.Logger.Warnf("failed to purge subjects on team delete: %s", err.Error())
 		return nil, status.Errorf(codes.Internal, "failed to purge team %q from policies: %s", req.Id, err.Error())
 	}
 
@@ -116,11 +116,11 @@ func (s *Server) DeleteTeam(ctx context.Context, req *teams.DeleteTeamReq) (*tea
 }
 
 // UpdateTeam updates a team in the db via post
-func (s *Server) UpdateTeam(ctx context.Context, req *teams.UpdateTeamReq) (*teams.UpdateTeamResp, error) {
+func (t *TeamServer) UpdateTeam(ctx context.Context, req *teams.UpdateTeamReq) (*teams.UpdateTeamResp, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	team, err := s.service.Storage.EditTeam(ctx, req.Id, req.Name, req.Projects)
+	team, err := t.service.Storage.EditTeam(ctx, req.Id, req.Name, req.Projects)
 	if err != nil {
 		// if the error is already a GRPC status code, return that directly.
 		if _, ok := status.FromError(err); ok {
@@ -135,14 +135,14 @@ func (s *Server) UpdateTeam(ctx context.Context, req *teams.UpdateTeamReq) (*tea
 }
 
 // AddTeamMembers associates an array of members with an existing team
-func (s *Server) AddTeamMembers(ctx context.Context,
+func (t *TeamServer) AddTeamMembers(ctx context.Context,
 	req *teams.AddTeamMembersReq) (*teams.AddTeamMembersResp, error) {
 
 	if len(req.UserIds) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "missing user IDs")
 	}
 
-	updatedUserIDs, err := s.service.Storage.AddUsers(ctx, req.Id, req.UserIds)
+	updatedUserIDs, err := t.service.Storage.AddUsers(ctx, req.Id, req.UserIds)
 	if err != nil && err != storage.ErrConflict {
 		return nil, service.ParseStorageError(err, req.Id, "user")
 	}
@@ -153,10 +153,10 @@ func (s *Server) AddTeamMembers(ctx context.Context,
 }
 
 // RemoveTeamMembers disassociates an array of members with an existing team.
-func (s *Server) RemoveTeamMembers(ctx context.Context,
+func (t *TeamServer) RemoveTeamMembers(ctx context.Context,
 	req *teams.RemoveTeamMembersReq) (*teams.RemoveTeamMembersResp, error) {
 
-	updatedUserIDs, err := s.service.Storage.RemoveUsers(ctx, req.Id, req.UserIds)
+	updatedUserIDs, err := t.service.Storage.RemoveUsers(ctx, req.Id, req.UserIds)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
@@ -167,12 +167,12 @@ func (s *Server) RemoveTeamMembers(ctx context.Context,
 }
 
 // GetTeamsForMember fetches a list of a members's associated teams
-func (s *Server) GetTeamsForMember(
+func (t *TeamServer) GetTeamsForMember(
 	ctx context.Context,
 	req *teams.GetTeamsForMemberReq,
 ) (*teams.GetTeamsForMemberResp, error) {
 
-	teamList, err := s.service.Storage.GetTeamsForUser(ctx, req.UserId)
+	teamList, err := t.service.Storage.GetTeamsForUser(ctx, req.UserId)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.UserId, "user")
 	}
@@ -183,16 +183,16 @@ func (s *Server) GetTeamsForMember(
 }
 
 // GetTeamMembership fetches a list of member ids associated with a team
-func (s *Server) GetTeamMembership(ctx context.Context,
+func (t *TeamServer) GetTeamMembership(ctx context.Context,
 	req *teams.GetTeamMembershipReq) (*teams.GetTeamMembershipResp, error) {
 
 	// verify team exists and isn't filtered out by the project filter
-	_, err := s.service.Storage.GetTeam(ctx, req.Id)
+	_, err := t.service.Storage.GetTeam(ctx, req.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
 
-	userIDs, err := s.service.Storage.GetUserIDsForTeam(ctx, req.Id)
+	userIDs, err := t.service.Storage.GetUserIDsForTeam(ctx, req.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
@@ -206,14 +206,14 @@ func (s *Server) GetTeamMembership(ctx context.Context,
 
 // PurgeUserMembership removes the user's membership from all teams to which
 // the user belongs and returns that list of teams
-func (s *Server) PurgeUserMembership(ctx context.Context,
+func (t *TeamServer) PurgeUserMembership(ctx context.Context,
 	req *teams.PurgeUserMembershipReq) (*teams.PurgeUserMembershipResp, error) {
 
 	if req.UserId == "" {
 		return nil, status.Error(codes.InvalidArgument, "invalid userId")
 	}
 
-	teamIDs, err := s.service.Storage.PurgeUserMembership(ctx, req.UserId)
+	teamIDs, err := t.service.Storage.PurgeUserMembership(ctx, req.UserId)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.UserId, "user")
 	}
