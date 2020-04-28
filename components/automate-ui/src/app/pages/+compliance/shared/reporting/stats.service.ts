@@ -218,18 +218,16 @@ export class StatsService {
      they have unit testing. Should we delete their tests and make
      them private? */
   getControlStatus(control): ControlStatus {
-    // In some cases, nodes don't have results data.  In these
-    // cases we want to display those nodes as passed
-    const hasResults = control.results.length > 0;
-    if (!hasResults) { return 'passed'; }
-
     const waived = this.checkIfWaived(control.waived_str);
     if (waived) { return 'waived'; }
 
     const statuses = control.results.map(r => r.status);
     if (statuses.every(s => s === 'passed')) { return 'passed'; }
+    if (statuses.every(s => s === 'failed')) { return 'failed'; }
     if (statuses.every(s => s === 'skipped')) { return 'skipped'; }
-    return 'failed';
+    // In some cases, nodes don't have results data.  In these
+    // cases we want to display those nodes as passed
+    return 'passed';
   }
 
   private checkIfWaived(waivedStatus: string): boolean {
