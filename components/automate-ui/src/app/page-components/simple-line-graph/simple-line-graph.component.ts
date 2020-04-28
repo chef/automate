@@ -112,6 +112,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     const yAxis = d3.axisLeft(this.scaleY);
     this.axisYSelection.call(yAxis);
 
+    // draw the x axis grid lines
     const grid = d3.axisBottom()
                       .ticks(this.data.length)
                       .tickFormat('')
