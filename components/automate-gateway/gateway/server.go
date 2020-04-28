@@ -347,6 +347,11 @@ func (s *Server) startHTTPServer() error {
 	// TODO(sr): there's no need to differentiate the muxes anymore
 	mux.Handle("/apis/", prettifier(versionedMux))
 
+	// /!\ Anything NOT part of versionedMux or unversionedMux (i.e. provided by grpc-gateway)
+	//     needs to deal with AUTHENTICATION and AUTHORIZATION on its own (likely by calling
+	//     authRequest); or needs to ensure that it's not part of the public API (by choosing a
+	//     prefix that isn't forward by automate-load-balancer, i.e. not /apis/ or /api/).
+
 	// custom mux route for data-collector
 	// Note: automate-load-balancer rewrites
 	//   /data-collector/v0(.*) => /api/v0/events/data-collector
