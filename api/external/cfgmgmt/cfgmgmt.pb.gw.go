@@ -1371,9 +1371,9 @@ var (
 
 	pattern_ConfigMgmt_GetErrors_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "cfgmgmt", "errors"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetNodeMetadataCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "node_metadata_counts"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ConfigMgmt_GetNodeMetadataCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "cfgmgmt", "node_metadata_counts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetNodeRunsDailyStatusTimeSeries_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "node_runs_daily_status_time_series"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ConfigMgmt_GetNodeRunsDailyStatusTimeSeries_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "cfgmgmt", "node_runs_daily_status_time_series"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

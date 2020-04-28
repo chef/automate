@@ -396,7 +396,7 @@ service ConfigMgmt {
   ```
   */
   rpc GetNodeRunsDailyStatusTimeSeries(cfgmgmt.request.NodeRunsDailyStatusTimeSeries) returns (cfgmgmt.response.NodeRunsDailyStatusTimeSeries) {
-    option (google.api.http).get = "/cfgmgmt/node_runs_daily_status_time_series";
+    option (google.api.http).get = "/api/v0/cfgmgmt/node_runs_daily_status_time_series";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }

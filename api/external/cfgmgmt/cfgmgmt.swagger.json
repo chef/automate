@@ -106,7 +106,7 @@
         ]
       }
     },
-    "/cfgmgmt/node_runs_daily_status_time_series": {
+    "/api/v0/cfgmgmt/node_runs_daily_status_time_series": {
       "get": {
         "summary": "GetNodeRunsDailyStatusTimeSeries",
         "description": "Provides the status of runs for each 24-hour duration. For multiple runs in one 24-hour duration, \nthe most recent failed run will be returned. If there are no failed runs the most recent successful \nrun will be returned. If no runs are found in the 24-hour duration, the status will be \"missing\" \nand no run information will be returned.\n\nExample:\nrequest\n```\ncfgmgmt/node_runs_daily_status_time_series?node_id=507bd518-5c18-4c2d-a445-60fe7dde9961\u0026days_ago=3\n```\nresponse\n```\n{\n\"durations\": [\n{\n\"start\": \"2020-04-25T19:00:00Z\",\n\"end\": \"2020-04-26T18:59:59Z\",\n\"status\": \"missing\",\n\"run_id\": \"\"\n},\n{\n\"start\": \"2020-04-26T19:00:00Z\",\n\"end\": \"2020-04-27T18:59:59Z\",\n\"status\": \"missing\",\n\"run_id\": \"\"\n},\n{\n\"start\": \"2020-04-27T19:00:00Z\",\n\"end\": \"2020-04-28T18:59:59Z\",\n\"status\": \"failure\",\n\"run_id\": \"b7904f41-68b5-44ec-9da6-cf2481ff8600\"\n}\n]\n}\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
@@ -141,7 +141,7 @@
         ]
       }
     },
-    "/cfgmgmt/nodes": {
+    "/api/v0/cfgmgmt/nodes": {
       "get": {
         "summary": "GetNodes",
         "description": "Returns a list of infra nodes that have checked in to Automate.\nAdding a filter makes a list of all nodes that meet the filter criteria.\nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n```\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",

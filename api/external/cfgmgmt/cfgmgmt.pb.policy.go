@@ -151,7 +151,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetNodeRunsDailyStatusTimeSeries", "infra:nodes", "infra:nodes:list", "GET", "/cfgmgmt/node_runs_daily_status_time_series", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetNodeRunsDailyStatusTimeSeries", "infra:nodes", "infra:nodes:list", "GET", "/api/v0/cfgmgmt/node_runs_daily_status_time_series", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.NodeRunsDailyStatusTimeSeries); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
