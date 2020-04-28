@@ -424,16 +424,18 @@ func (s *Server) startHTTPServer() error {
 
 	// "GET /status" is used for monitoring
 	// We made it a custom handler in order to be able to return 500 when some services are down.
+	// Note: this is not supposed to be called through automate-load-balancer, since it's not
+	// prefixed with /api/v0.
 	mux.HandleFunc("/status", s.DeploymentStatusHandler)
 
 	// register open api endpoint definitions
-	mux.Handle("/openapi/", http.StripPrefix("/openapi", openAPIServicesHandler()))
+	mux.Handle("/api/v0/openapi/", http.StripPrefix("/api/v0/openapi", openAPIServicesHandler()))
 
 	// attach open api ui
-	mux.Handle("/openapi/ui/", http.StripPrefix("/openapi/ui", serveOpenAPIUI(s.Config.OpenAPIUIDir)))
+	mux.Handle("/api/v0/openapi/ui/", http.StripPrefix("/api/v0/openapi/ui", serveOpenAPIUI(s.Config.OpenAPIUIDir)))
 
 	// Register Prometheus metrics handler.
-	mux.Handle("/metrics", promhttp.Handler())
+	mux.Handle("/api/v0/metrics", promhttp.Handler())
 
 	// start https server
 	uri := fmt.Sprintf("%s:%d", s.Config.Hostname, s.Config.Port)
