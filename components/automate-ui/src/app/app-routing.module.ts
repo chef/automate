@@ -272,6 +272,10 @@ const routes: Routes = [
       loadChildren: () => import('./modules/desktop/desktop.module').then(m => m.DesktopModule)
     },
     {
+      path: 'nodes',
+      loadChildren: () => import('./modules/nodes/nodes.module').then(m => m.NodesModule)
+    },
+    {
       path: 'profiles',
       redirectTo: '/compliance/compliance-profiles',
       pathMatch: 'full'

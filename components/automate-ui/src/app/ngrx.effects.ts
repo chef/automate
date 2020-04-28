@@ -15,6 +15,7 @@ import { EventFeedEffects } from './services/event-feed/event-feed.effects';
 import { JobEffects } from './entities/jobs/job.effects';
 import { LicenseStatusEffects } from './entities/license/license.effects';
 import { ManagerEffects } from './entities/managers/manager.effects';
+import { NodesEffects } from './entities/nodes/nodes.effects';
 import { PolicyEffects } from './entities/policies/policy.effects';
 import { ProfileEffects } from './entities/profiles/profile.effects';
 import { ProjectEffects } from './entities/projects/project.effects';
@@ -45,6 +46,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       JobEffects,
       LicenseStatusEffects,
       ManagerEffects,
+      NodesEffects,
       PolicyEffects,
       ProfileEffects,
       ProjectEffects,
