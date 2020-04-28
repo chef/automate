@@ -77,7 +77,6 @@ describe('user management', () => {
     // save new user
     cy.get('[data-cy=save-user]').click();
     cy.get('app-user-management chef-modal').should('not.be.visible');
-    cy.get('#main-content-wrapper').scrollTo('top');
     cy.get('app-chef-notification.info').contains(`Created user: ${username}`);
     // close notification banner so we can assert the password success notification later
     cy.get('app-chef-notification.info chef-icon').click();
