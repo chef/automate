@@ -350,4 +350,54 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }
+
+    /*
+  GetNodeRunsDailyStatusTimeSeries
+
+  Provides the status of runs for each 24-hour duration. For multiple runs in one 24-hour duration, 
+  the most recent failed run will be returned. If there are no failed runs the most recent successful 
+  run will be returned. If no runs are found in the 24-hour duration, the status will be "missing" 
+  and no run information will be returned.
+
+    Example:
+  request
+  ```
+  cfgmgmt/node_runs_daily_status_time_series?node_id=507bd518-5c18-4c2d-a445-60fe7dde9961&days_ago=3
+  ```
+  response
+  ```
+  {
+    "durations": [
+      {
+        "start": "2020-04-25T19:00:00Z",
+        "end": "2020-04-26T18:59:59Z",
+        "status": "missing",
+        "run_id": ""
+      },
+      {
+        "start": "2020-04-26T19:00:00Z",
+        "end": "2020-04-27T18:59:59Z",
+        "status": "missing",
+        "run_id": ""
+      },
+      {
+        "start": "2020-04-27T19:00:00Z",
+        "end": "2020-04-28T18:59:59Z",
+        "status": "failure",
+        "run_id": "b7904f41-68b5-44ec-9da6-cf2481ff8600"
+      }
+    ]
+  }
+  ```
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc GetNodeRunsDailyStatusTimeSeries(cfgmgmt.request.NodeRunsDailyStatusTimeSeries) returns (cfgmgmt.response.NodeRunsDailyStatusTimeSeries) {
+    option (google.api.http).get = "/cfgmgmt/node_runs_daily_status_time_series";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  }
 }

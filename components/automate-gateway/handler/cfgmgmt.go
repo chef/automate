@@ -297,6 +297,41 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 	}, nil
 }
 
+// GetNodeRunsDailyStatusTimeSeries -   Provides the status of runs for each 24-hour duration.
+// For multiple runs in one 24-hour duration, the most recent failed run will be returned.
+// If there are no failed runs the most recent successful run will be returned. If no runs are
+// found in the 24-hour duration, the status will be "missing" and no run information will be returned.
+func (s *CfgMgmtServer) GetNodeRunsDailyStatusTimeSeries(ctx context.Context,
+	request *cfgReq.NodeRunsDailyStatusTimeSeries) (*cfgRes.NodeRunsDailyStatusTimeSeries, error) {
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	cfgMgmtRequest := &cmsReq.NodeRunsDailyStatusTimeSeries{
+		NodeId:  request.NodeId,
+		DaysAgo: request.DaysAgo,
+	}
+
+	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodeRunsDailyStatusTimeSeries(ctx, cfgMgmtRequest)
+	if err != nil {
+		return &cfgRes.NodeRunsDailyStatusTimeSeries{}, err
+	}
+	durations := make([]*cfgRes.RunDurationStatus, len(cfgmgmtResponse.Durations))
+	for index, cfgDuration := range cfgmgmtResponse.Durations {
+		durations[index] = &cfgRes.RunDurationStatus{
+			Start:  cfgDuration.Start,
+			End:    cfgDuration.End,
+			Status: cfgDuration.Status,
+			RunId:  cfgDuration.RunId,
+		}
+	}
+
+	return &cfgRes.NodeRunsDailyStatusTimeSeries{
+		Durations: durations,
+	}, nil
+}
+
 // GetNodeMetadataCounts - For each type of field provided return distinct values the amount for each.
 // For example, if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8
 // could be returned. The number next to each represents the number of nodes with that type of platform.

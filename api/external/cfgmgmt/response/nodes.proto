@@ -266,3 +266,20 @@ message ValueCount {
   // The number of this distinct value
 	int32 count = 2;
 }
+
+message NodeRunsDailyStatusTimeSeries {
+  // runs status of a 24-hour duration
+  repeated RunDurationStatus durations = 1;
+}
+
+message RunDurationStatus {
+  // Start of the duration (RFC3339)
+  string start = 1;
+  // End of the duration (RFC3339)
+  string end = 2;
+  // Prominent Run's status
+  string status = 3;
+  // Prominent Run's ID
+  string run_id = 4;
+}
+
