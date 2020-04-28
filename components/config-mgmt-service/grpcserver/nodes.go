@@ -363,7 +363,7 @@ func backendNodeArrayToMessageArray(nodes []backend.Node,
 				ChefVersion:       node.ChefVersion,
 				ChefTags:          node.ChefTags,
 				DeprecationsCount: int32(node.DeprecationsCount),
-				CreateAt:          createdProto,
+				CreatedAt:         createdProto,
 			}
 		}
 	}

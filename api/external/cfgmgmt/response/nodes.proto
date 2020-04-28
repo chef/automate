@@ -52,7 +52,7 @@ message Node {
   // Count of cookbook deprectations on the node.
   int32 deprecations_count                    = 22;
   // Timestamp when the node was created
-  google.protobuf.Timestamp create_at         = 23;
+  google.protobuf.Timestamp created_at         = 23;
 }
 
 message NodeAttribute{
