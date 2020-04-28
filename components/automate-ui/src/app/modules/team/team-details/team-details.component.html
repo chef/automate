@@ -62,12 +62,12 @@
               Name is required.
             </chef-error>
           </chef-form-field>
-          <div id='projects-container'>
+          <chef-form-field id='projects-container'>
             <app-projects-dropdown
               [checkedProjectIDs]="team?.projects"
               (onDropdownClosing)="onProjectDropdownClosing($event)">
             </app-projects-dropdown>
-          </div>
+          </chef-form-field>
         </form>
         <chef-button [disabled]="isLoadingTeam || !updateNameForm.valid || !updateNameForm.dirty" primary inline
           (click)="saveTeam()" data-cy="team-details-submit-button">
