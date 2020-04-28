@@ -5,10 +5,10 @@
 }
 
 .chart-progress-bar {
-  position: relative;
-  overflow: hidden;
-  border-radius: 9999px;
   margin: 10px;
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
 
   &.small {
     height: 8px;
@@ -24,8 +24,8 @@
     .bar {
       background: $lavender-light-1;
       box-shadow:
-        inset -2px -2px 4px $white,
-        inset 2px 2px 8px $eggplant-light-1;
+      inset -2px -2px 4px $white,
+      inset 2px 2px 8px $eggplant-light-1;
     }
   }
 }
@@ -47,15 +47,15 @@
   background: linear-gradient(90deg, $start, $end);
 
   &.low {
-    background: linear-gradient(90deg, $start, #f9891a);
+    background: linear-gradient(90deg, $start, #F9891A);
   }
 
   &.mid {
-    background: linear-gradient(90deg, $start, #f36628);
+    background: linear-gradient(90deg, $start, #F36628);
   }
 
   &.high {
-    background: linear-gradient(90deg, $start, #ee472f);
+    background: linear-gradient(90deg, $start, #EE472F);
   }
 }
 

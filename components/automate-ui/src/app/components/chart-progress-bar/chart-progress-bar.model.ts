@@ -13,5 +13,5 @@ export interface Progress {
 }
 
 export interface Threshold {
-  [index:string]: { marginLeft?: string }
+  [index: string]: { marginLeft?: string };
 }

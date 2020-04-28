@@ -12,7 +12,6 @@ export class ChartProgressBarComponent implements OnChanges {
   @Input() id = `progress-bar-${nextId++}`;
   @Input() size = 'large'; // large or small
   @Input() value: number;
-  @Input() min: number;
   @Input() max: number;
   @Input() threshold: number[] = []; // [min, max]
   @Input() valueTooltip: string;
