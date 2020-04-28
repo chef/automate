@@ -92,6 +92,7 @@ steps:
 
   - label: "[unit] OPA"
     command:
+      - scripts/install_hab_pkg.sh core/glibc # opa depends implicitly glibc
       - scripts/install_hab_pkg.sh core/opa
       - cd components/authz-service/engine/opa/policy
       - make static unit
@@ -611,7 +612,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E  PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-scanner
+      - sudo -E  PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-scanner
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/secrets-service.log
