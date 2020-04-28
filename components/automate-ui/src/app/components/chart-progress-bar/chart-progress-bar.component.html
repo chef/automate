@@ -1,10 +1,9 @@
-<div class="chart-progress-bar" [ngStyle]="styles.container">
-    <div class="threshold point-1" [ngStyle]="styles.threshold.point1"></div>
-    <div class="threshold point-2" [ngStyle]="styles.threshold.point2"></div>
-    
-    <div id="progress" class="progress" [ngStyle]="styles.progress"></div>
-    <chef-tooltip for="progress">{{ tooltips.value }}</chef-tooltip>
+<div class="chart-progress-bar" [ngClass]="size">
+  <div *ngFor="let t of threshold; index as i" class="threshold point-{{ i }}" [ngStyle]="styles.threshold[i]"></div>
 
-    <div id="bar" class="bar" [ngStyle]="styles.bar"></div>
-    <chef-tooltip for="bar">{{ tooltips.max }}</chef-tooltip>
+  <div [id]="'progress' + id" class="progress" [ngStyle]="styles.progress" [ngClass]="progressClassName"></div>
+  <chef-tooltip *ngIf="valueTooltip" [attr.for]="'progress' + id">{{ valueTooltip }}</chef-tooltip>
+
+  <div [id]="'bar' + id" class="bar" [ngStyle]="styles.bar"></div>
+  <chef-tooltip *ngIf="maxTooltip" [attr.for]="'bar' + id">{{ maxTooltip }}</chef-tooltip>
 </div>
