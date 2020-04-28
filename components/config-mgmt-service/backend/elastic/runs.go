@@ -661,7 +661,7 @@ func collectLatestStatusBuckets(statusBuckets []*elastic.AggregationBucketKeyIte
 		date := latestRunEndDateBucket.Key.(float64)
 
 		if len(runIDAgg.Buckets) != 1 {
-			log.Errorf("Run ID aggregation did not have one entry for status %q and date %d", status, date)
+			log.Errorf("Run ID aggregation did not have one entry for status %q and date %f", status, date)
 			continue
 		}
 
