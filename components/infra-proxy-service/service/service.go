@@ -48,7 +48,7 @@ func ParseStorageError(err error, v interface{}, noun string) error {
 		case storage.ErrCannotDelete:
 			return status.Errorf(codes.FailedPrecondition, "cannot delete server %q because it still has organizations attached", reflect.Indirect(reflect.ValueOf(v)).FieldByName("Id"))
 		case storage.ErrConflict:
-			return status.Errorf(codes.AlreadyExists, "%s with that name %q already exists", noun, reflect.Indirect(reflect.ValueOf(v)).FieldByName("Name"))
+			return status.Errorf(codes.AlreadyExists, "%s with ID %q already exists", noun, reflect.Indirect(reflect.ValueOf(v)).FieldByName("Id"))
 		case storage.ErrForeignKeyViolation:
 			return status.Errorf(codes.NotFound, "no server found with ID %q", reflect.Indirect(reflect.ValueOf(v)).FieldByName("ServerId"))
 		default:
