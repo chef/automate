@@ -332,6 +332,15 @@ func backendNodeArrayToMessageArray(nodes []backend.Node,
 				}).Warn("Unable to translate lastCCR time to timestamp proto")
 			}
 
+			createdProto, err := ptypes.TimestampProto(node.Created.UTC())
+			if err != nil {
+				log.WithFields(log.Fields{
+					"func":    nameOfFunc(),
+					"err":     err,
+					"lastCCR": node.Created.UTC().String(),
+				}).Warn("Unable to translate created time to timestamp proto")
+			}
+
 			messages[i] = &externalResp.Node{
 				// TODO: (@afiune) Change this to EntityUUID
 				Id:                node.EntityUuid,
@@ -356,6 +365,7 @@ func backendNodeArrayToMessageArray(nodes []backend.Node,
 				ChefVersion:       node.ChefVersion,
 				ChefTags:          node.ChefTags,
 				DeprecationsCount: int32(node.DeprecationsCount),
+				CreatedAt:         createdProto,
 			}
 		}
 	}
