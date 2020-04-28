@@ -10,6 +10,9 @@ import { MatSelectModule  } from '@angular/material/select';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 
+// Chart components
+import { ChartProgressBarComponent } from './chart-progress-bar/chart-progress-bar.component';
+
 // Components
 import { AuthorizedComponent } from './authorized/authorized.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
@@ -77,6 +80,9 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     MatProgressBarModule,
     MatButtonModule,
 
+    // Charts
+    ChartProgressBarComponent,
+
     // Components
     AuthorizedComponent,
     BreadcrumbsComponent,
@@ -116,6 +122,8 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     InputDirective
   ],
   declarations: [
+    ChartProgressBarComponent,
+    // components
     AuthorizedComponent,
     BreadcrumbsComponent,
     BreadcrumbComponent,
