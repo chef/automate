@@ -1,6 +1,6 @@
 <label>{{ objectNounPlural | capitalize }}</label>
 <div class="dropdown-wrap">
-  <button class="dropdown-button" aria-label="Select resources"
+  <button class="dropdown-button" attr.aria-label="Select {{ objectNounPlural }}"
     (click)="toggleDropdown($event)"
     [ngClass]="{'active': active}"
     [disabled]="disabled"
