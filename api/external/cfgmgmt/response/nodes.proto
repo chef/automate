@@ -51,6 +51,8 @@ message Node {
   repeated string chef_tags                   = 21;
   // Count of cookbook deprectations on the node.
   int32 deprecations_count                    = 22;
+  // Timestamp when the node was created
+  google.protobuf.Timestamp create_at         = 23;
 }
 
 message NodeAttribute{

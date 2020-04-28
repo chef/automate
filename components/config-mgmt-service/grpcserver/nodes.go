@@ -323,7 +323,6 @@ func backendNodeArrayToMessageArray(nodes []backend.Node,
 				hasRunsData = true
 			}
 			lastCCRProto, err := ptypes.TimestampProto(lastCCR.UTC())
-
 			if err != nil {
 				log.WithFields(log.Fields{
 					"func":    nameOfFunc(),
@@ -332,8 +331,16 @@ func backendNodeArrayToMessageArray(nodes []backend.Node,
 				}).Warn("Unable to translate lastCCR time to timestamp proto")
 			}
 
+			createdProto, err := ptypes.TimestampProto(node.Created.UTC())
+			if err != nil {
+				log.WithFields(log.Fields{
+					"func":    nameOfFunc(),
+					"err":     err,
+					"lastCCR": node.Created.UTC().String(),
+				}).Warn("Unable to translate created time to timestamp proto")
+			}
+
 			messages[i] = &externalResp.Node{
-				// TODO: (@afiune) Change this to EntityUUID
 				Id:                node.EntityUuid,
 				Name:              node.NodeName,
 				Fqdn:              node.Fqdn,
@@ -356,6 +363,7 @@ func backendNodeArrayToMessageArray(nodes []backend.Node,
 				ChefVersion:       node.ChefVersion,
 				ChefTags:          node.ChefTags,
 				DeprecationsCount: int32(node.DeprecationsCount),
+				CreateAt:          createdProto,
 			}
 		}
 	}
