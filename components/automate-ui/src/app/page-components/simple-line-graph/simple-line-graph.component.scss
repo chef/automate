@@ -39,6 +39,10 @@
     }
   }
 
+  .tick:last-of-type line {
+    stroke-dasharray: 2;
+  }
+
 
   .grid {
 
