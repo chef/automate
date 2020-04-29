@@ -11,6 +11,7 @@ import (
 
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
+	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
 // CreateServer creates a new server
@@ -18,28 +19,22 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if req.Id == "" {
-		s.service.Logger.Debug("incomplete create server request: missing server ID")
-		return nil, status.Error(codes.InvalidArgument, "must supply server ID")
-	}
+	err := validation.New(validation.Options{
+		Target:          "server",
+		Request:         *req,
+		RequiredDefault: false,
 
-	if req.Name == "" {
-		s.service.Logger.Debug("incomplete create server request: missing server name")
-		return nil, status.Error(codes.InvalidArgument, "must supply server name")
-	}
+		Rules: validation.Rules{
+			"Name": []string{"required"},
+		},
+	}).Validate()
 
-	if req.Fqdn == "" {
-		s.service.Logger.Debug("incomplete create server request: missing server fqdn")
-		return nil, status.Error(codes.InvalidArgument, "must supply server fqdn")
-	}
-
-	if req.IpAddress == "" {
-		s.service.Logger.Debug("incomplete create server request: missing server IP address")
-		return nil, status.Error(codes.InvalidArgument, "must supply server IP address")
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	server, err := s.service.Storage.StoreServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
-	if err == storage.ErrConflict {
+	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
 	}
 
