@@ -87,6 +87,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       .subscribe(state => {
         this.creatingToken = false;
         if (state === EntityStatus.loadingSuccess) {
+          this.assignPolicies();
           this.closeCreateModal();
         }
       });
@@ -132,22 +133,20 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public createToken(): void {
     this.creatingToken = true;
     const tok = {
-      id: this.createTokenForm.controls['id'].value,
-      name: this.createTokenForm.controls['name'].value.trim(),
+      id: this.createTokenForm.controls.id.value,
+      name: this.createTokenForm.controls.name.value.trim(),
       projects: this.createTokenForm.controls.projects.value
     };
     this.store.dispatch(new CreateToken(tok));
+  }
 
-    const member = stringToMember(`token:${tok.id}`);
-    const policies: string[] = this.createTokenForm.controls.policies.value;
-    if (policies) {
-      policies.forEach(id =>
-        this.store.dispatch(new AddPolicyMembers(<PolicyMembersMgmtPayload>{
-          id,
-          members: [member]
-        }))
-      );
-    }
+  private assignPolicies(): void {
+    const member = stringToMember(`token:${this.createTokenForm.controls.id.value}`);
+    const policies: string[] = this.createTokenForm.controls.policies.value || [];
+    policies.forEach(id => this.store.dispatch(new AddPolicyMembers(<PolicyMembersMgmtPayload>{
+      id,
+      members: [member]
+    })));
   }
 
   public toggleActive($event: ChefKeyboardEvent, token: ApiToken): void {
