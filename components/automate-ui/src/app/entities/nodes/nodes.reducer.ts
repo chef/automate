@@ -39,7 +39,7 @@ export const NodesEntityInitialState: NodesEntityState = nodesEntityAdapter.getI
     per_page: 100,
     page: 1,
     sort: 'name',
-    order: null,
+    order: 'DESC',
     filters: []
   },
   nodeTotals: {
