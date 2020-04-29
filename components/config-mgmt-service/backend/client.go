@@ -78,7 +78,7 @@ type Client interface {
 // service since it is the origin of our data. Therefore we will just import
 // them as our own so we can call them as `backend.Type`
 type Run ingest.Run
-type Node ingest.Node
+type Node ingest.UpsertNode
 type NodeAttribute ingest.NodeAttribute
 type ChefError ingest.ChefError
 type ExpandedRunList ingest.ExpandedRunList

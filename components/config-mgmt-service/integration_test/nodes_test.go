@@ -3427,6 +3427,7 @@ func TestNodeRunErrors(t *testing.T) {
 
 func ingestNodeArrayToMessageArray(nodes []iBackend.Node, hasRunsData bool) []proto.Message {
 	messages := make([]proto.Message, len(nodes))
+	createdProto, _ := ptypes.TimestampProto(time.Time{}.UTC())
 	for i, node := range nodes {
 		checkin, _ := ptypes.TimestampProto(node.Checkin.UTC())
 		messages[i] = &external_response.Node{
@@ -3448,6 +3449,7 @@ func ingestNodeArrayToMessageArray(nodes []iBackend.Node, hasRunsData bool) []pr
 			PolicyRevision:  node.PolicyRevision,
 			HasRunsData:     hasRunsData,
 			LastCcrReceived: checkin,
+			CreatedAt:       createdProto,
 		}
 	}
 	return messages
