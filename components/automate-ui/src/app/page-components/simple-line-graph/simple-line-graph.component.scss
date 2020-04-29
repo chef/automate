@@ -25,6 +25,7 @@
   .y-axis {
     transform: translateX(50px);
 
+    path,
     line {
       stroke: $eggplant-light-1;
       stroke-width: 1px;

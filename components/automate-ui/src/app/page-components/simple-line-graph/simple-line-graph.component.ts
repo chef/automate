@@ -1,5 +1,5 @@
 import {
-  Component, Input, OnChanges, ViewChild, ElementRef
+  Component, Input, OnChanges, ViewChild, ElementRef, OnInit
 } from '@angular/core';
 import * as d3 from 'd3';
 // import * as moment from 'moment';
@@ -12,35 +12,59 @@ import * as d3 from 'd3';
   styleUrls: ['./simple-line-graph.component.scss']
 })
 
-export class SimpleLineGraphComponent implements OnChanges {
+export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   constructor(
     private chart: ElementRef
   ) {}
 
-  @Input() data: any = [];
+  // using onInit for fake data
+  @Input() data: any = [
+    { daysAgo: 6, percentage: 37 },
+    { daysAgo: 5, percentage: 27 },
+    { daysAgo: 4, percentage: 67 },
+    { daysAgo: 3, percentage: 77 },
+    { daysAgo: 2, percentage: 87 },
+    { daysAgo: 1, percentage: 97 },
+    { daysAgo: 0, percentage: 68 }
+  ];
   @Input() width = 900;
   @Input() height = 300;
 
   @ViewChild('svg', {static: true}) svg: ElementRef;
 
 
+  ////////   X AXIS ITEMS   ////////
   // maps all of our x data points
   get xData() {
     return this.data.map(d => d.daysAgo);
   }
-
-  // maps all of our Y data points
-  get yData() {
-    return this.data.map(d => d.percentage);
-  }
-
   // determines how wide the graph should be to hold our data
   // in its respective area;
   get rangeX() {
     const min = 50;
     const max = this.width - 50;
     return [min, max];
+  }
+  // determines the min and max values of the x axis
+  get domainX() {
+    const min = Math.min(...this.xData);
+    const max = Math.max(...this.xData);
+    return [min, max];
+  }
+  // determines each of our X axis points using the height and width of the chart
+  get xScale() {
+    return d3.scaleTime()
+      .range(this.rangeX)
+      .domain(this.domainX);
+  }
+
+
+  ////////   Y AXIS ITEMS   ////////
+
+  // maps all of our Y data points
+  get yData() {
+    return this.data.map(d => d.percentage);
   }
 
   get rangeY() {
@@ -49,47 +73,34 @@ export class SimpleLineGraphComponent implements OnChanges {
     return [max, min];
   }
 
-  // determines the min and max values of the x axis
-  get domainX() {
-    const min = Math.min(...this.xData);
-    const max = Math.max(...this.xData);
-    return [min, max];
-  }
-
   get domainY() {
     const min = 0;
     const max = 100; // since this based on a percentage do we want 0 to 100?
     return [min, max];
   }
-
-  // determines each of our X axis points using the height and width of the chart
-  get scaleX() {
-    return d3.scaleLinear()
-              .range(this.rangeX)
-              .domain(this.domainX);
-  }
-
   // determines each of our Y axis points using the height and width of the chart
-  get scaleY() {
+  get yScale() {
     return d3.scaleLinear()
              .range(this.rangeY)
              .domain(this.domainY);
   }
 
+  //////// SELECTIONS ////////
   get axisYSelection() {
-    return this.chartSvg.select('.y-axis');
+    return this.svgSelection.select('.y-axis');
+  }
+
+  get svgSelection() {
+    return d3.select(this.svg.nativeElement);
   }
 
   // returns a function that when passed our data, will return an svg path
   get path() {
     return d3.line()
-              .x(d => this.scaleX( d.daysAgo) )
-              .y(d => this.scaleY( d.percentage) );
+              .x(d => this.xScale( d.daysAgo) )
+              .y(d => this.yScale( d.percentage) );
   }
 
-  get chartSvg() {
-    return d3.select(this.svg.nativeElement);
-  }
 
   get viewBox() {
     return `0 0 ${this.width} ${this.height}`;
@@ -100,39 +111,47 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   drawLine() {
-    // we are looking at days backwards, so we need the data reversed;
-    const reversedData = this.data.reverse();
-
-    // in order to redraw lines, we'll have to use enter and exit
-    const path = this.chartSvg.append('path')
-                              .attr('class', 'line');
-    path.attr('d', this.path(reversedData));
+    // create the line using path function
+    const line = this.path(this.data);
+    
+    // append the line to the chart
+    this.svgSelection.append('path')
+                      .attr('class', 'line')
+                      .attr('d', line);
   }
 
   drawChartLines() {
-    const yAxis = d3.axisRight(this.scaleY).ticks(1);
+    const yAxis = d3.axisRight(this.yScale).ticks(1);
     this.axisYSelection.call(yAxis);
 
     // draw the x axis grid lines
-    const grid = d3.axisTop()
+    const xGrid = d3.axisTop()
                       .ticks(this.data.length)
                       .tickFormat('')
-                      .tickSize(this.height) // will need to subtract extra height here
-                      .scale(this.scaleX);
+                      .tickSize(this.height - 20) // will need to subtract extra height here
+                      .tickSizeOuter(0)
+                      .scale(this.xScale);
 
-    this.chartSvg.append('g')
+    this.svgSelection.append('g')
                  .attr('class', 'grid')
                  // this line will need to be updated to flexible
                  .attr('transform', `translate(0, ${this.height - 10})`)
-                 .call(grid);
+                 .call(xGrid);
 
     // remove zero from bottom of chart on x axis
-    this.chartSvg.selectAll('.tick')
+    this.svgSelection.selectAll('.tick')
                   .filter(t => t === 0)
                   .remove();
   }
 
   ngOnChanges() {
+    // console.log(this.data);
+    // this.resizeChart();
+    // this.drawChartLines();
+    // this.drawLine();
+  }
+
+  ngOnInit() {
     console.log(this.data);
     this.resizeChart();
     this.drawChartLines();
