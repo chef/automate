@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { StoreModule, Store } from '@ngrx/store';
@@ -39,7 +39,8 @@ describe('LicenseNotificationsComponent', () => {
       providers: [
         { provide: LicenseFacadeService, useClass:  MockLicenseFacadeService },
         { provide: LayoutFacadeService, useClass:  MockLayoutFacadeService }
-      ]
+      ],
+      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();
       store = TestBed.inject(Store);
       spyOn(store, 'dispatch').and.callThrough();
