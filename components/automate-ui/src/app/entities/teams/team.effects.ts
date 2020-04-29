@@ -189,7 +189,7 @@ export class TeamEffects {
   addTeamUsers$ = this.actions$.pipe(ofType<AddTeamUsers>(TeamActionTypes.ADD_USERS),
     mergeMap(({ payload }: AddTeamUsers) =>
       this.requests.addTeamUsers(payload).pipe(
-        map((resp: UsersResponse) => new AddTeamUsersSuccess({...resp, id: payload.id})),
+        map((_: UsersResponse) => new AddTeamUsersSuccess(payload)),
         catchError((error: HttpErrorResponse) => observableOf(new AddTeamUsersFailure(error))))
     ));
 
