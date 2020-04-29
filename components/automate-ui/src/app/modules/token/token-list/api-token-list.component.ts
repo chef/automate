@@ -139,13 +139,15 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     this.store.dispatch(new CreateToken(tok));
 
     const member = stringToMember(`token:${tok.id}`);
-    (this.createTokenForm.controls.policies.value as string[])
-      .forEach(id =>
+    const policies: string[] = this.createTokenForm.controls.policies.value;
+    if (policies) {
+      policies.forEach(id =>
         this.store.dispatch(new AddPolicyMembers(<PolicyMembersMgmtPayload>{
           id,
           members: [member]
         }))
       );
+    }
   }
 
   public toggleActive($event: ChefKeyboardEvent, token: ApiToken): void {

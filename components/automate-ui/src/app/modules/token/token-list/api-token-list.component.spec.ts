@@ -1,10 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { StoreModule } from '@ngrx/store';
+import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
+import { runtimeChecks, ngrxReducers, NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ApiTokenListComponent } from './api-token-list.component';
@@ -13,6 +13,7 @@ describe('ApiTokenListComponent', () => {
   let component: ApiTokenListComponent;
   let fixture: ComponentFixture<ApiTokenListComponent>;
   let element: HTMLElement;
+  let store: Store<NgrxStateAtom>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -65,6 +66,7 @@ describe('ApiTokenListComponent', () => {
     fixture = TestBed.createComponent(ApiTokenListComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement.nativeElement;
+    store = TestBed.inject(Store);
     fixture.detectChanges();
   });
 
@@ -85,6 +87,21 @@ describe('ApiTokenListComponent', () => {
       expect(component.createTokenForm.controls.name.value).toBe(null);
       expect(component.createTokenForm.controls.id.value).toBe(null);
       expect(component.createTokenForm.controls.projects.value).toBe(null);
+    });
+
+    it('create token with no policies dispatches action just to create token', () => {
+      spyOn(store, 'dispatch').and.callThrough();
+      component.createTokenForm.controls.policies.setValue(null);
+      component.createToken();
+      expect(store.dispatch).toHaveBeenCalledTimes(1);
+    });
+
+    it('create token with 2 policies dispatches actions to create token plus each policy', () => {
+      const policies = ['p1', 'p2'];
+      spyOn(store, 'dispatch').and.callThrough();
+      component.createTokenForm.controls.policies.setValue(policies);
+      component.createToken();
+      expect(store.dispatch).toHaveBeenCalledTimes(1 + policies.length);
     });
   });
 });
