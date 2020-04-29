@@ -3,25 +3,49 @@
 :host {
   display: block;
   width: 100%;
-  border: 1px solid red;
 }
 
 ::ng-deep {
   svg {
-    background: white;
+    background: $chef-white;
+    padding: .5em;
   }
 
-  path {
+  .line {
     fill: transparent;
-    stroke: blue;
-    stroke-width: 3px;
+    stroke: black;
+    stroke-width: 1px;
   }
 
   .tick {
-    stroke: red;
+    stroke: $eggplant-light-1;
+    stroke-width: 1px;
   }
 
-      .y-axis {
-      transform: translateX(40px)
+  .y-axis {
+    transform: translateX(50px);
+
+    line {
+      stroke: $eggplant-light-1;
+      stroke-width: 1px;
     }
+
+    text {
+      font-weight: 400;
+      font-size: 10px;
+      line-height: 12px;
+      letter-spacing: 0.5px;
+    }
+  }
+
+
+  .grid {
+
+    .domain,
+    line {
+      stroke: $eggplant-light-1;
+      stroke-width: 1px;
+    }
+  }
+
 }

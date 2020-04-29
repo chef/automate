@@ -104,23 +104,32 @@ export class SimpleLineGraphComponent implements OnChanges {
     const reversedData = this.data.reverse();
 
     // in order to redraw lines, we'll have to use enter and exit
-    const path = this.chartSvg().append('path');
+    const path = this.chartSvg.append('path')
+                              .attr('class', 'line');
     path.attr('d', this.path(reversedData));
   }
 
   drawChartLines() {
-    const yAxis = d3.axisLeft(this.scaleY);
+    const yAxis = d3.axisRight(this.scaleY).ticks(1);
     this.axisYSelection.call(yAxis);
 
     // draw the x axis grid lines
-    const grid = d3.axisBottom()
+    const grid = d3.axisTop()
                       .ticks(this.data.length)
                       .tickFormat('')
-                      .tickSize(this.height)
+                      .tickSize(this.height) // will need to subtract extra height here
                       .scale(this.scaleX);
+
     this.chartSvg.append('g')
                  .attr('class', 'grid')
+                 // this line will need to be updated to flexible
+                 .attr('transform', `translate(0, ${this.height - 10})`)
                  .call(grid);
+
+    // remove zero from bottom of chart on x axis
+    this.chartSvg.selectAll('.tick')
+                  .filter(t => t === 0)
+                  .remove();
   }
 
   ngOnChanges() {
