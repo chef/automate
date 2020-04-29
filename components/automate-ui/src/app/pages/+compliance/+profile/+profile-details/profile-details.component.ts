@@ -25,9 +25,6 @@ export class ProfileDetailsComponent implements OnInit, OnDestroy {
   deleteErrorVisible = false;
   downloadErrorVisible = false;
   installErrorVisible = false;
-  downloadFailureNotificationContent = 'Failed to download profile.Please try again later.';
-  deleteFailureNotificationContent = 'Failed to delete profile. Please try again later.';
-  installFailureNotificationContent = 'Failed to install profile. Please try again later.';
 
   openControls: any = {};
 

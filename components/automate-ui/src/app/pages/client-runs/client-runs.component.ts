@@ -168,7 +168,6 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
 
   // Is the Error banner visible
   notificationVisible = false;
-  notificationMessage = 'Failed to retrieve data.';
 
   // autocomplete suggestions
   nodeSuggestions$: Observable<any[]>;

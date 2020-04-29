@@ -13,7 +13,7 @@
             type="error"
             timeout="5"
             (dismissed)="hideDownloadError()">
-            {{ downloadFailureNotificationContent }}
+            Failed to download profile.Please try again later.
           </app-chef-notification>
 
           <app-chef-notification
@@ -21,7 +21,7 @@
             type="error"
             timeout="5"
             (dismissed)="hideDeleteError()">
-            {{ deleteFailureNotificationContent }}
+            Failed to delete profile. Please try again later.
           </app-chef-notification>
 
           <app-chef-notification
@@ -29,7 +29,7 @@
             type="error"
             timeout="5"
             (dismissed)="hideInstallError()">
-            {{ installFailureNotificationContent }}
+            Failed to install profile. Please try again later.
           </app-chef-notification>
         </div>
       </div>
