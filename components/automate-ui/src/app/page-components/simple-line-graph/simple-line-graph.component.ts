@@ -116,7 +116,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   }
 
   renderChart() {
-    // const t = d3.transition().duration(1000);
+    const t = d3.transition().duration(1000);
 
     // create the line using path function
     const line = this.path(this.data);
@@ -124,7 +124,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     // make Update selection for any incoming data
     const update = this.svgSelection
       .selectAll('.line')
-      .data(this.data.filter(d => d.percentage, d => d.daysAgo));
+      .data(this.data.filter(d => d.daysAgo));
 
     // remove any points no longer needed
     update
@@ -133,13 +133,20 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
     // make enter selection
     // this is for any new data coming in
-    const enter = update
-      .enter()
-      .append('path');
+    // const enter = update
+    //   .enter()
+    //   .append('path');
+    // update
+    //   .transition()
+    //   .delay(1000);
 
     //  merge new data with existing data
-    update.merge(enter)
+    update
+      .enter()
+      .append('path')
       .attr('class', 'line')
+      .merge(update)
+      .transition(t)
       .attr('d', line);
   }
 
@@ -181,14 +188,17 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   ngOnChanges() {
     // console.log(this.data);
     // this.resizeChart();
+    this.resizeChart();
+    this.renderGrid();
+    this.renderChart();
   }
 
   ngOnInit() {
     console.log(this.data);
-    this.resizeChart();
+    // this.resizeChart();
 
-    this.renderGrid();
-    this.renderChart();
+    // this.renderGrid();
+    // this.renderChart();
   }
 
   onResize() {
@@ -222,7 +232,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       this.isData1 = true;
     }
 
-    this.renderGrid()
+    this.renderGrid();
     this.renderChart();
   }
 }
