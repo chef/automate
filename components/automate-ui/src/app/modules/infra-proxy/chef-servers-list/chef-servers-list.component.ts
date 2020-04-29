@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Store, select } from '@ngrx/store';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { Regex } from 'app/helpers/auth/regex';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { isNil } from 'lodash/fp';
+
 import { HttpStatus } from 'app/types/types';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { loading, EntityStatus, pending } from 'app/entities/entities';
@@ -30,6 +31,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public serverToDelete: Server;
   public deleteModalVisible = false;
+  public messageModalVisible = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -120,10 +122,14 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
     this.conflictErrorEvent.emit(false);
   }
 
-  public startServerDelete($event: ChefKeyboardEvent, server: Server): void {
+  public startServerDelete($event: MatOptionSelectionChange, server: Server): void {
     if ($event.isUserInput) {
-      this.serverToDelete = server;
-      this.deleteModalVisible = true;
+      if (server.orgs_count > 0) {
+        this.messageModalVisible = true;
+      } else {
+        this.serverToDelete = server;
+        this.deleteModalVisible = true;
+      }
     }
   }
 
@@ -134,5 +140,9 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+  }
+
+  public closeMessageModal(): void {
+    this.messageModalVisible = false;
   }
 }
