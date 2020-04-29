@@ -19,6 +19,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   ) {}
 
   // using onInit for fake data
+  // @Input() data: any = []
   @Input() data: any = [
     { daysAgo: 6, percentage: 37 },
     { daysAgo: 5, percentage: 27 },
@@ -32,6 +33,10 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   @Input() height = 300;
 
   @ViewChild('svg', {static: true}) svg: ElementRef;
+
+  // for temp fake data -- delete isData1
+  public isData1 = false;
+
 
 
   ////////   X AXIS ITEMS   ////////
@@ -110,16 +115,26 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     this.width = this.chart.nativeElement.getBoundingClientRect().width;
   }
 
-  drawLine() {
+  renderChart() {
     // create the line using path function
     const line = this.path(this.data);
 
-    // append the line to the chart
-    this.svgSelection
+    // make Update selection for any incoming data
+    const update = this.svgSelection
       .selectAll('.line')
-      .data(this.data)
+      .data(this.data);
+
+    // remove any points no longer needed
+    update.exit().remove();
+
+    // make enter selection
+    // this is for any new data coming in
+    const enter = update
       .enter()
-      .append('path')
+      .append('path');
+
+    //  merge new data with existing data
+    update.merge(enter)
       .attr('class', 'line')
       .attr('d', line);
   }
@@ -159,10 +174,40 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     console.log(this.data);
     this.resizeChart();
     this.drawGrid();
-    this.drawLine();
+    this.renderChart();
   }
 
   onResize() {
     this.resizeChart();
+  }
+
+
+  /// TEMP FAKE DATA
+  changeData() {
+    const data = [
+        { daysAgo: 6, percentage: 37 },
+        { daysAgo: 5, percentage: 27 },
+        { daysAgo: 4, percentage: 67 },
+        { daysAgo: 3, percentage: 77 },
+        { daysAgo: 2, percentage: 87 },
+        { daysAgo: 1, percentage: 97 },
+        { daysAgo: 0, percentage: 68 }
+      ];
+
+    const data1 = [
+      { daysAgo: 2, percentage: 22 },
+      { daysAgo: 1, percentage: 33 },
+      { daysAgo: 0, percentage: 88 }
+    ];
+
+    if (this.isData1) {
+      this.data = data;
+      this.isData1 = false;
+    } else {
+      this.data = data1;
+      this.isData1 = true;
+    }
+    this.drawGrid();
+    this.renderChart();
   }
 }
