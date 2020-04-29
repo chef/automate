@@ -116,16 +116,20 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   }
 
   renderChart() {
+    // const t = d3.transition().duration(1000);
+
     // create the line using path function
     const line = this.path(this.data);
 
     // make Update selection for any incoming data
     const update = this.svgSelection
       .selectAll('.line')
-      .data(this.data);
+      .data(this.data.filter(d => d.percentage, d => d.daysAgo));
 
     // remove any points no longer needed
-    update.exit().remove();
+    update
+      .exit()
+      .remove();
 
     // make enter selection
     // this is for any new data coming in
@@ -139,41 +143,51 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .attr('d', line);
   }
 
-  drawGrid() {
-    const yAxis = d3.axisRight(this.yScale).ticks(1);
-    this.axisYSelection.call(yAxis);
 
-    // draw the x axis grid lines
+  ////////////////// RENDER FUNCTIONS ////////////////////
+  renderGrid() {
+    // create the Y axis
+    const yAxis = d3.axisRight(this.yScale)
+                    .tickFormat(d => d + '%')
+                    .ticks(1);
+    // create the X axis grid lines
     const xGrid = d3.axisTop()
-                      .ticks(this.data.length)
-                      .tickFormat('')
-                      .tickSize(this.height - 20) // will need to subtract extra height here
-                      .tickSizeOuter(0)
-                      .scale(this.xScale);
+      .ticks(this.data.length)
+      .tickFormat('')
+      .tickSize(this.height - 20) // will need to subtract extra height here
+      .tickSizeOuter(0)
+      .scale(this.xScale);
 
-    this.svgSelection.append('g')
-                 .attr('class', 'grid')
-                 // this line will need to be updated to flexible
-                 .attr('transform', `translate(0, ${this.height - 10})`)
-                 .call(xGrid);
+    // Add the Y Axis
+    this.svgSelection
+      .append('g')
+      .attr('class', 'y-axis')
+      .call(yAxis);
+
+    // Add the Grid lines
+    this.svgSelection
+      .append('g')
+      .attr('class', 'grid')
+      // this line will need to be updated to flexible
+      .attr('transform', `translate(0, ${this.height - 10})`)
+      .call(xGrid);
 
     // remove zero from bottom of chart on x axis
     this.svgSelection.selectAll('.tick')
-                  .filter(t => t === 0)
-                  .remove();
+      .filter(t => t === 0)
+      .remove();
   }
 
   ngOnChanges() {
     // console.log(this.data);
     // this.resizeChart();
-    // this.drawGrid();
-    // this.drawLine();
   }
 
   ngOnInit() {
     console.log(this.data);
     this.resizeChart();
-    this.drawGrid();
+
+    this.renderGrid();
     this.renderChart();
   }
 
@@ -207,7 +221,8 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       this.data = data1;
       this.isData1 = true;
     }
-    this.drawGrid();
+
+    this.renderGrid()
     this.renderChart();
   }
 }
