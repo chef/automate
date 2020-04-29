@@ -63,8 +63,8 @@ export interface NgrxStateAtom {
   clientRunsEntity: clientRuns.ClientRunsEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
   destinations: destinationEntity.DestinationEntityState;
-  infraroles: infraRoleEntity.InfraRoleEntityState;
-  infraroledetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
+  infraRoles: infraRoleEntity.InfraRoleEntityState;
+  infraRoledetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
@@ -175,8 +175,8 @@ export const defaultInitialState = {
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
-  infraroles: infraRoleEntity.InfraRoleEntityInitialState,
-  infraroledetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
+  infraRoles: infraRoleEntity.InfraRoleEntityInitialState,
+  infraRoledetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
   licenseStatus: license.LicenseStatusEntityInitialState,
   managers: manager.ManagerEntityInitialState,
