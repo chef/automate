@@ -20,7 +20,7 @@ export interface RespCookbookDetails {
 
 export interface CookbookDetails {
     cookbook_name: string;
-    name_version: string;
+    name_and_version: string;
     version: string;
     chef_type?: string;
     frozen?: string;

@@ -23,7 +23,7 @@ export class CookbookDetailsRequests {
   private createCookbookDetails(respCookbookDetails: RespCookbookDetails): CookbookDetails {
     return {
       cookbook_name: respCookbookDetails.cookbook_name,
-      name_version: name,
+      name_and_version: name,
       version: respCookbookDetails.version,
       chef_type: respCookbookDetails.chef_type,
       frozen: respCookbookDetails.frozen,
