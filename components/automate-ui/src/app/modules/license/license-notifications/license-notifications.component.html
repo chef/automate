@@ -1,5 +1,5 @@
 <ng-container *ngFor="let notification of notifications">
-  <app-chef-notification
+  <app-notification
     [className]="'license-banner'"
     [type]="'error'"
     [timeout]="notification.timeout" 
@@ -10,5 +10,5 @@
       or
       <a href="https://www.chef.io/contact-us/" target="_blank">contact Chef</a> to continue to use Chef Automate.
     </ng-container>
-  </app-chef-notification>
+  </app-notification>
 </ng-container>

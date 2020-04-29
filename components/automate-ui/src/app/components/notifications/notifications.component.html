@@ -1,11 +1,11 @@
 <div class="notifications"> 
   <ng-container *ngFor="let notification of notifications">
-    <app-chef-notification
+    <app-notification
     *ngIf="notification.type !== 'license'"
     [type]="notification.type"
     [timeout]="notification.timeout"
     (dismissed)="handleNotificationDismissal(notification.id)">
     {{ notification.message }}
-    </app-chef-notification>
+    </app-notification>
   </ng-container>
 </div>

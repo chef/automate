@@ -8,13 +8,13 @@
     
     <div class="sticky-notifications">
       <div class="sticky-inner">
-        <app-chef-notification
+        <app-notification
           *ngIf="notificationVisible"
           [type]="'error'"
           [timeout]="8"
           (dismissed)="hideNotification()">
           Failed to retrieve data.
-        </app-chef-notification>
+        </app-notification>
       </div>
     </div>
     <main>

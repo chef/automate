@@ -8,29 +8,29 @@
 
       <div class="sticky-notifications">
         <div class="sticky-inner">
-          <app-chef-notification
+          <app-notification
             *ngIf="downloadErrorVisible"
             type="error"
             timeout="5"
             (dismissed)="hideDownloadError()">
             Failed to download profile.Please try again later.
-          </app-chef-notification>
+          </app-notification>
 
-          <app-chef-notification
+          <app-notification
             *ngIf="deleteErrorVisible"
             type="error"
             timeout="5"
             (dismissed)="hideDeleteError()">
             Failed to delete profile. Please try again later.
-          </app-chef-notification>
+          </app-notification>
 
-          <app-chef-notification
+          <app-notification
             *ngIf="installErrorVisible"
             type="error"
             timeout="5"
             (dismissed)="hideInstallError()">
             Failed to install profile. Please try again later.
-          </app-chef-notification>
+          </app-notification>
         </div>
       </div>
 
