@@ -31,17 +31,17 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // TODO(sr): Can we check if the request is sent to some external API?
+    //           Right now, we're throwing the ID token across the internet for telemetry,
+    //           where it's not needed. It would be nice to _not_ do that.
     let headers = request.headers.set('Authorization', `Bearer ${this.chefSession.id_token}`);
     const filtered = request.params.get('unfiltered') !== 'true';
-    // Uncomment here and after to clone() arg list
-    // after we've upgraded to angular 7.2+ (for this issue:
-    // https://github.com/angular/angular/issues/18812).
-    // const params = request.params.delete('unfiltered');
+    const params = request.params.delete('unfiltered');
     if (this.projects && filtered) {
       headers = headers.set('projects', this.projects);
     }
     return next
-      .handle(request.clone({ headers })).pipe(
+      .handle(request.clone({ headers, params })).pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.status === 401) {
             this.chefSession.logout();
