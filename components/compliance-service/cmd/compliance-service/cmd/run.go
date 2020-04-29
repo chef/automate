@@ -97,6 +97,7 @@ func init() {
 	runCmd.Flags().StringVar(&conf.Service.TLSConfig.RootCACertPath, "root-cert", "", "Root CA Cert to use to verify clients")
 	runCmd.Flags().Int32Var(&conf.DataRetention.ComplianceReportDays, "reports-retention-days", 60, "Number of days to keep compliance reports")
 	runCmd.Flags().StringVar(&conf.Service.ConfigFilePath, "config", "", "config file")
+	runCmd.Flags().IntVar(&conf.Service.MessageBufferSize, "message-buffer-size", 100, "Number of ingest messages allowed to buffer")
 
 	// Postgres Config Flags
 	runCmd.Flags().StringVar(&conf.Postgres.ConnectionString, "postgres-uri", conf.Postgres.ConnectionString, "PostgreSQL connection string to use")

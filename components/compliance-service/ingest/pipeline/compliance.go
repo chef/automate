@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 
@@ -16,12 +17,15 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/publisher"
 )
 
+var ErrQueueFull = errors.New("Report processing queue is full")
+
 type Compliance struct {
 	in chan<- message.Compliance
 }
 
-func NewCompliancePipeline(client *ingestic.ESClient, authzClient iam_v2.ProjectsClient, nodeMgrClient manager.NodeManagerServiceClient) Compliance {
-	in := make(chan message.Compliance, 100)
+func NewCompliancePipeline(client *ingestic.ESClient, authzClient iam_v2.ProjectsClient,
+	nodeMgrClient manager.NodeManagerServiceClient, messageBufferSize int) Compliance {
+	in := make(chan message.Compliance, messageBufferSize)
 	compliancePipeline(in,
 		processor.ComplianceProfile(client),
 		processor.ComplianceShared,
@@ -45,9 +49,12 @@ func (s *Compliance) Run(report *compliance.Report) error {
 		Done:      done,
 	}
 	var err error
+	select {
+	case s.in <- msg:
+	default:
+		return ErrQueueFull
+	}
 	logrus.WithFields(logrus.Fields{"report_id": report.ReportUuid}).Debug("Running Compliance pipeline")
-
-	s.in <- msg
 	err = <-done
 	if err != nil {
 		logrus.WithFields(logrus.Fields{"error": err.Error()}).Error("Message failure")

@@ -17,6 +17,11 @@ func ComplianceReport(in <-chan message.Compliance) <-chan message.Compliance {
 	out := make(chan message.Compliance, 100)
 	go func() {
 		for msg := range in {
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessingCompliance(err)
+				continue
+			}
+
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processing Compliance Report")
 			parsedTime, err := time.Parse(time.RFC3339, msg.Report.EndTime)
 			if err != nil {
@@ -61,7 +66,7 @@ func ComplianceReport(in <-chan message.Compliance) <-chan message.Compliance {
 			msg.InspecReport.Platform.Full = fmt.Sprintf("%s %s",
 				msg.InspecReport.Platform.Name, msg.InspecReport.Platform.Release)
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processed Compliance Report")
-			out <- msg
+			message.Propagate(out, &msg)
 		}
 		close(out)
 	}()
