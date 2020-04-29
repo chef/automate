@@ -18,7 +18,7 @@
               </chef-th>
               <chef-th>
                 Last Contact
-                <chef-sort-toggle sort="manager" [order]="orderFor('last_contact')"></chef-sort-toggle>
+                <chef-sort-toggle sort="last_contact" [order]="orderFor('last_contact')"></chef-sort-toggle>
               </chef-th>
               <chef-th>
                 Last Scans
@@ -28,7 +28,7 @@
               </chef-th>
               <chef-th>
                 Last Known State
-                <chef-sort-toggle sort="manager" [order]="orderFor('state')"></chef-sort-toggle>
+                <chef-sort-toggle sort="state" [order]="orderFor('state')"></chef-sort-toggle>
               </chef-th>
               <chef-th>
                 Tags
@@ -75,6 +75,12 @@
             </chef-tr>
           </chef-tbody>
         </chef-table>
+        <app-page-picker
+        [total]="totalDesktops"
+        [perPage]="pageSize"
+        [page]="currentPage"
+        (pageChanged)="onPageChange($event)">
+      </app-page-picker>
       </main>
     </div>
   </div>
