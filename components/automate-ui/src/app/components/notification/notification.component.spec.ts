@@ -40,7 +40,7 @@ describe('ChefNotificationComponent', () => {
 
   describe('generates a notification', () => {
 
-    it('and defaults to type of info and timeout of 8', () => {
+    it('and defaults to type of "info" and timeout of 8', () => {
       expect(component.type).toBe('info');
       expect(component.timeout).toEqual(8);
     });
@@ -77,7 +77,7 @@ describe('ChefNotificationComponent', () => {
       [Type.error, 0, true],
       [Type.error, 7, false]
     ], function (type: Type, timeout: number, isInfinite: boolean) {
-      it('determinites notification timeout is inifinite when timeout equals 0', () => {
+      it('determines notification timeout is infinite when timeout equals 0', () => {
         genNotification(type, timeout);
         component.ngAfterViewInit();
 
