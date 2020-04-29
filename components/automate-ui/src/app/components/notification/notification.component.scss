@@ -25,7 +25,7 @@
 
     &::before {
       font-family: "Material Icons";
-      content: "\E86C";
+      content: "\E86C";  // circle-check icon - https://material.io/resources/icons/?icon=check_circle&style=baseline
       color: currentColor;
       padding-right: 0.5em;
     }
@@ -36,7 +36,7 @@
 
     &::before {
       font-family: "Material Icons";
-      content: "\E002";
+      content: "\E002";  // triangle warning icon - https://material.io/resources/icons/?icon=warning&style=baseline
       color: currentColor;
       padding-right: 0.5em;
     }
