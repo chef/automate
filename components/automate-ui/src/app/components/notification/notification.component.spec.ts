@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed, tick, fakeAsync, flush } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
@@ -89,11 +89,10 @@ describe('ChefNotificationComponent', () => {
         component.ngAfterViewInit();
 
         expect(component.isInfinite).toBe(expected);
-        tick((timeLimit * 1000) + 1);
-        expect(component.handleClose).toHaveBeenCalled();
-
-        fixture.destroy();
         flush();
+        fixture.detectChanges();
+
+        expect(component.handleClose).toHaveBeenCalled();
       }));
     });
 
@@ -107,11 +106,10 @@ describe('ChefNotificationComponent', () => {
         component.ngAfterViewInit();
 
         expect(component.isInfinite).toBe(expected);
-        tick(500);
-        expect(component.handleClose).not.toHaveBeenCalled();
-
-        fixture.destroy();
         flush();
+        fixture.detectChanges();
+
+        expect(component.handleClose).not.toHaveBeenCalled();
       }));
     });
   });
@@ -124,11 +122,10 @@ describe('ChefNotificationComponent', () => {
 
       const closeButton = fixture.debugElement.nativeElement.querySelector('chef-icon');
       closeButton.click();
-      tick(500);
-      expect(component.handleClose).toHaveBeenCalled();
-
-      fixture.destroy();
       flush();
+      fixture.detectChanges();
+
+      expect(component.handleClose).toHaveBeenCalled();
     }));
   });
 });
