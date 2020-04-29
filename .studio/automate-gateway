@@ -23,7 +23,7 @@ function gateway_integration() {
   # the relevant services up and running:
   wait_or_fail_for_port_to_listen "$GATEWAY_PORT"
   # Make sure that the gateway is accepting requests
-  wait_for_success gateway_get /gateway/version || return 1
+  wait_for_success gateway_get /api/v0/gateway/version || return 1
   log_line "The automate-gateway version"
   gateway_version || return 1
 
@@ -36,7 +36,7 @@ function gateway_integration() {
     send_chef_action_example || return 1
   done
   log_line "List Cfgmgmt Nodes (Empty)"
-  gateway_get /cfgmgmt/nodes "$viewer_token" | jq || return 1
+  gateway_get /api/v0/cfgmgmt/nodes "$viewer_token" | jq || return 1
   log_line "Sending a Chef Run Message"
   # shellcheck disable=SC2119
   send_chef_run_example || return 1
@@ -44,9 +44,9 @@ function gateway_integration() {
   send_inspec_example legacy || return 1
   log_line "List Cfgmgmt Nodes (Displays the ingested node)"
   # wait for 5 secs to index the node
-  sleep 5 && gateway_get /cfgmgmt/nodes "$viewer_token" | jq || return 1
+  sleep 5 && gateway_get /api/v0/cfgmgmt/nodes "$viewer_token" | jq || return 1
   log_line "List Event Feed (Displays the ingested actions)"
-  gateway_get '/eventfeed?collapse=true&page_size=1000' "$viewer_token" | jq || return 1
+  gateway_get '/api/v0/eventfeed?collapse=true&page_size=1000' "$viewer_token" | jq || return 1
 
   set +o pipefail # reset
 }
@@ -68,16 +68,16 @@ function gateway_version() {
   install_if_missing core/jq-static jq
 
   log_line "Gateway"
-  gateway_get /gateway/version | jq .
+  gateway_get /api/v0/gateway/version | jq .
 
   log_line "Ingest"
-  gateway_get /ingest/version | jq .
+  gateway_get /api/v0/ingest/version | jq .
 
   log_line "ConfigMgmt"
-  gateway_get /cfgmgmt/version | jq .
+  gateway_get /api/v0/cfgmgmt/version | jq .
 
   log_line "Compliance"
-  gateway_get /compliance/reporting/version | jq .
+  gateway_get /api/v0/compliance/reporting/version | jq .
 }
 
 document "gateway_get" <<DOC
@@ -124,7 +124,7 @@ function send_chef_action_example() {
   if [[ "$2" != "" ]]; then
     event_task=$2
   fi
-  local endpoint="/events/data-collector"
+  local endpoint="/api/v0/events/data-collector"
   local examples_path="/src/components/ingest-service/examples"
   local tmp_action_json
   local rfc_time
@@ -288,11 +288,11 @@ function send_chef_data_raw() {
   local endpoint=$1
   local token=$2
   if [[ "$1" == "legacy" ]]; then
-    endpoint="${GATEWAY_URL}/events/data-collector"
+    endpoint="${GATEWAY_URL}/api/v0/events/data-collector"
   elif [[ "$1" == "lb" ]]; then
     endpoint="https://localhost/data-collector/v0"
   elif [[ "$1x" == "x" ]]; then
-    endpoint="${GATEWAY_URL}/ingest/events/chef/run"
+    endpoint="${GATEWAY_URL}/api/v0/ingest/events/chef/run"
   else
     endpoint="$1"
   fi
@@ -341,7 +341,7 @@ function delete_multiple_nodes() {
   install_if_missing core/curl curl
   install_if_missing core/jo jo
 
-  endpoint="/ingest/events/chef/node-multiple-deletes"
+  endpoint="/api/v0/ingest/events/chef/node-multiple-deletes"
 
   jo "node_ids=$(jo -a "$@")" \
     | curl -X POST -f --insecure -H "api-token: $(get_api_token)" \
@@ -354,7 +354,7 @@ DOC
 function send_inspec_example() {
   install_if_missing core/curl curl
 
-  local endpoint="/events/data-collector"
+  local endpoint="/api/v0/events/data-collector"
   local examples_json_path=${JSON_FILE:-/src/components/compliance-service/ingest/examples/compliance-success-tiny-report.json}
 
   local uuid
@@ -377,7 +377,7 @@ function send_inspec_failure_example() {
   install_if_missing core/curl curl
 
   local examples_path="/src/components/compliance-service/ingest/examples"
-  local endpoint="/events/data-collector"
+  local endpoint="/api/v0/events/data-collector"
   local uuid
   uuid=$(uuidgen)
 
@@ -402,7 +402,7 @@ function gateway_list_secrets() {
   install_if_missing core/curl curl
   install_if_missing core/jq-static jq
 
-  endpoint="/secrets/search"
+  endpoint="/api/v0/secrets/search"
 
   curl -X POST -f --insecure -H "api-token: $(get_admin_token)" "${GATEWAY_URL}${endpoint}" | jq
 }
@@ -420,7 +420,7 @@ function gateway_create_secret() {
   install_if_missing core/curl curl
   install_if_missing core/jq-static jq
 
-  endpoint="/secrets"
+  endpoint="/api/v0/secrets"
 
   # shellcheck disable=SC2086
   echo '{"name": "bob", "type": "service_now", "data": [{"key": "username", "value": "'$username'"}, {"key": "password", "value": "'$password'"}] }' |\
@@ -439,7 +439,7 @@ function gateway_delete_secret() {
   install_if_missing core/curl curl
   local id=$1
 
-  endpoint="/secrets/id/$id"
+  endpoint="/api/v0/secrets/id/$id"
 
   # shellcheck disable=SC2086
   echo '{"id": "'$id'"}' |\
@@ -459,7 +459,7 @@ function gateway_read_secret() {
   install_if_missing core/curl curl
   install_if_missing core/jq-static jq
 
-  endpoint="/secrets/id/$id"
+  endpoint="/api/v0/secrets/id/$id"
 
   # shellcheck disable=SC2086
   echo '{"id": "'$id'"}' |\
@@ -480,7 +480,7 @@ function gateway_update_secret() {
   local username=${2:-"default"}
   local password=${3:-"super_secret"}
 
-  endpoint="/secrets/id/$id"
+  endpoint="/api/v0/secrets/id/$id"
 
   # shellcheck disable=SC2086
   echo '{"id": "'$id'", "name": "bob", "type": "service_now", "data": [{"key": "username", "value": "'$username'"}, {"key": "password", "value": "'$password'"}] }' |\
@@ -500,7 +500,7 @@ function gateway_delete_notification_rule() {
   install_if_missing core/curl curl
   install_if_missing core/jq-static jq
 
-  endpoint="/notifications/rules/$id"
+  endpoint="/api/v0/notifications/rules/$id"
 
   # shellcheck disable=SC2086
   echo '{"id": "'$id'"}' |\
@@ -515,7 +515,7 @@ function gateway_create_notification_rule() {
   install_if_missing core/curl curl
   install_if_missing core/jq-static jq
 
-  endpoint="/notifications/rules"
+  endpoint="/api/v0/notifications/rules"
 
   # shellcheck disable=SC2154,SC2086
   echo '{"rule": { "name": "'$name'", "event": "CCRFailure", "SlackAlert": { "url": "http://localhost:55565"} }}' |\
@@ -535,7 +535,7 @@ function gateway_get_notification_rule() {
   install_if_missing core/curl curl
   install_if_missing core/jq-static jq
 
-  endpoint="/notifications/rules/$id"
+  endpoint="/api/v0/notifications/rules/$id"
 
   # shellcheck disable=SC2086
   echo '{"id": "'$id'"}' |\
@@ -555,7 +555,7 @@ function gateway_notification_validate_connection() {
 
   install_if_missing core/curl curl
 
-  endpoint="/notifications/webhook"
+  endpoint="/api/v0/notifications/webhook"
 
   # There are three cases for testing a url: with a secret ID, with a username:password, no creds needed
   # message='{"url": "'$url'", "secret_id": {"id": "kdfkdfj"}}'

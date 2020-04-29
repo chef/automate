@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/nodes": {
+    "/api/v0/nodes": {
       "post": {
         "summary": "Create a node",
         "description": "Creates a node and adds it to the Automate node manager.\nRequires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.\nUseful for creating nodes for the purpose of running compliance scan jobs.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"my-vagrant-node\",\n\"manager\":\"automate\",\n\"target_config\": {\n\"backend\":\"ssh\",\n\"host\":\"localhost\",\n\"secrets\":[\"b75195e5-a173-4502-9f59-d949adfe2c38\"],\n\"port\": 22\n},\n\"tags\": [\n{ \"key\":\"test-node\", \"value\":\"is amazing\" }\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:create\n` + "`" + `` + "`" + `` + "`" + `",
@@ -42,7 +42,7 @@ func init() {
         ]
       }
     },
-    "/nodes/bulk-create": {
+    "/api/v0/nodes/bulk-create": {
       "post": {
         "summary": "Bulk create nodes",
         "description": "Creates multiple nodes from a list of node data.\nHosts field is required. Multiple hosts may be defined in this field.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name_prefix\": \"000-my-ssh-node\",\n\"manager\":\"automate\",\n\"target_config\": {\n\"backend\":\"ssh\",\n\"hosts\":[\"localhost\",\"127.0.0.1\"],\n\"secrets\":[\"b75195e5-a173-4502-9f59-d949adfe2c38\"],\n\"port\": 22\n},\n\"tags\": [\n{ \"key\":\"test-node\", \"value\":\"is-amazing\" },\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:create\n` + "`" + `` + "`" + `` + "`" + `",
@@ -70,7 +70,7 @@ func init() {
         ]
       }
     },
-    "/nodes/delete": {
+    "/api/v0/nodes/delete": {
       "post": {
         "summary": "Bulk delete nodes",
         "description": "Deletes a set of nodes that match a filter.\nAvailable filters: account_id, last_contact, manager_id, manager_type, name, platform_name,\nplatform_release, region, source_id, state, statechange_timerange, status,\nlast_run_timerange, last_scan_timerange, last_run_status, last_scan_status,\nlast_run_penultimate_status, last_scan_penultimate_status\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\"filters\": [{\"key\": \"name\", \"values\": [\"vj*\"]}]}'\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:delete\n` + "`" + `` + "`" + `` + "`" + `",
@@ -98,7 +98,7 @@ func init() {
         ]
       }
     },
-    "/nodes/delete/ids": {
+    "/api/v0/nodes/delete/ids": {
       "post": {
         "summary": "Bulk delete by ID",
         "description": "Deletes a set of nodes given a list of IDs.\nInvalid IDs will be ignored.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:delete\n` + "`" + `` + "`" + `` + "`" + `",
@@ -126,7 +126,7 @@ func init() {
         ]
       }
     },
-    "/nodes/id/{id}": {
+    "/api/v0/nodes/id/{id}": {
       "get": {
         "summary": "Read a node",
         "description": "Returns the details for a node given the node ID.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -211,7 +211,7 @@ func init() {
         ]
       }
     },
-    "/nodes/rerun/id/{id}": {
+    "/api/v0/nodes/rerun/id/{id}": {
       "get": {
         "summary": "Node status",
         "description": "Use this to run an ` + "`" + `inspec detect` + "`" + ` job on the node, which updates the status to reflect\nthat the node is reachable or unreachable.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:rerun\n` + "`" + `` + "`" + `` + "`" + `",
@@ -238,7 +238,7 @@ func init() {
         ]
       }
     },
-    "/nodes/search": {
+    "/api/v0/nodes/search": {
       "post": {
         "summary": "List and filter nodes",
         "description": "Makes a list of nodes.\nSupports filtering, pagination, and sorting.\nAdding a filter narrows the list of nodes only those that match the filter or filters.\nSupported filters:\naccount_id, last_contact, manager_id, manager_type, name, platform_name,\nplatform_release, region, source_id, state, statechange_timerange, status,\nlast_run_timerange, last_scan_timerange, last_run_status, last_scan_status,\nlast_run_penultimate_status, last_scan_penultimate_status\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filters\":[\n{\"key\": \"last_scan_status\", \"values\": [\"FAILED\"]},\n{\"key\": \"last_scan_penultimate_status\", \"values\": [\"PASSED\"]},\n{\"key\": \"name\", \"values\": [\"MyNode*\"]}\n],\n\"page\":1, \"per_page\":100,\n\"sort\":\"status\", \"order\":\"ASC\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",

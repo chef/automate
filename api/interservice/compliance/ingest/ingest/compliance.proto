@@ -12,7 +12,7 @@ import "google/protobuf/timestamp.proto";
 service ComplianceIngester {
 	rpc ProcessComplianceReport (chef.automate.domain.compliance.ingest.events.compliance.Report) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
-			post: "/events/compliance/report"
+			post: "/api/v0/events/compliance/report"
 			body: "*"
 		};
 	};

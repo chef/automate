@@ -45,10 +45,10 @@ message MigrationStatusRequest {}
 service IngestStatus {
 	rpc GetMetrics (MetricsRequest) returns (Metrics);
 	rpc GetHealth (HealthRequest) returns (Health) {
-		option (google.api.http).get = "/health";
+		option (google.api.http).get = "/api/v0/health";
 	};
 	rpc GetMigrationStatus (MigrationStatusRequest) returns (MigrationStatus) {
-		option (google.api.http).get = "/migration";
+		option (google.api.http).get = "/api/v0/migration";
 	};
 }
 

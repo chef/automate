@@ -31,7 +31,7 @@ service ApplicationsService {
   ```
   */
   rpc GetServiceGroups(ServiceGroupsReq) returns (ServiceGroups) {
-    option (google.api.http).get = "/applications/service-groups";
+    option (google.api.http).get = "/api/v0/applications/service-groups";
     option (chef.automate.api.iam.policy) = {
       resource: "applications:serviceGroups"
       action: "applications:serviceGroups:list"
@@ -51,7 +51,7 @@ service ApplicationsService {
   ```
   */
   rpc GetServiceGroupsHealthCounts(ServiceGroupsHealthCountsReq) returns (HealthCounts) {
-    option (google.api.http).get = "/applications/service_groups_health_counts";
+    option (google.api.http).get = "/api/v0/applications/service_groups_health_counts";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -70,7 +70,7 @@ service ApplicationsService {
   ```
   */
   rpc GetServices(ServicesReq) returns (ServicesRes) {
-    option (google.api.http).get = "/applications/services";
+    option (google.api.http).get = "/api/v0/applications/services";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -110,7 +110,7 @@ service ApplicationsService {
   ```
   */
   rpc GetServicesDistinctValues(ServicesDistinctValuesReq) returns (ServicesDistinctValuesRes) {
-    option (google.api.http).get = "/applications/services-distinct-values";
+    option (google.api.http).get = "/api/v0/applications/services-distinct-values";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -135,7 +135,7 @@ service ApplicationsService {
   ```
   */
   rpc GetServicesBySG(ServicesBySGReq) returns (ServicesBySGRes) {
-    option (google.api.http).get = "/applications/service-groups/{service_group_id}";
+    option (google.api.http).get = "/api/v0/applications/service-groups/{service_group_id}";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -156,7 +156,7 @@ service ApplicationsService {
   ```
   */
   rpc GetServicesStats(ServicesStatsReq) returns (ServicesStatsRes) {
-    option (google.api.http).get = "/applications/stats";
+    option (google.api.http).get = "/api/v0/applications/stats";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -178,7 +178,7 @@ service ApplicationsService {
   ```
   */
   rpc GetDisconnectedServices(DisconnectedServicesReq) returns (ServicesRes ) {
-    option (google.api.http).get = "/applications/disconnected_services";
+    option (google.api.http).get = "/api/v0/applications/disconnected_services";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -200,7 +200,7 @@ service ApplicationsService {
   */
   rpc DeleteDisconnectedServices(DisconnectedServicesReq) returns (ServicesRes ) {
     option (google.api.http) = {
-      post: "/applications/delete_disconnected_services"
+      post: "/api/v0/applications/delete_disconnected_services"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
@@ -221,7 +221,7 @@ service ApplicationsService {
   */
   rpc DeleteServicesByID(DeleteServicesByIDReq) returns (ServicesRes ) {
     option (google.api.http) = {
-      post: "/applications/delete_services_by_id"
+      post: "/api/v0/applications/delete_services_by_id"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
@@ -241,7 +241,7 @@ service ApplicationsService {
   ```
   */
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
-    option (google.api.http).get = "/applications/version";
+    option (google.api.http).get = "/api/v0/applications/version";
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -261,7 +261,7 @@ service ApplicationsService {
   ```
   */
   rpc GetDisconnectedServicesConfig(GetDisconnectedServicesConfigReq) returns (PeriodicMandatoryJobConfig) {
-    option (google.api.http).get = "/retention/service_groups/disconnected_services/config";
+    option (google.api.http).get = "/api/v0/retention/service_groups/disconnected_services/config";
 
     option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
     option (chef.automate.api.iam.policy).action = "retention:serviceGroups:get";
@@ -291,7 +291,7 @@ service ApplicationsService {
   */
   rpc UpdateDisconnectedServicesConfig(PeriodicMandatoryJobConfig) returns (UpdateDisconnectedServicesConfigRes) {
     option (google.api.http) = {
-      post: "/retention/service_groups/disconnected_services/config"
+      post: "/api/v0/retention/service_groups/disconnected_services/config"
       body: "*"
     };
 
@@ -315,7 +315,7 @@ service ApplicationsService {
   ```
   */
   rpc GetDeleteDisconnectedServicesConfig(GetDeleteDisconnectedServicesConfigReq) returns (PeriodicJobConfig) {
-    option (google.api.http).get = "/retention/service_groups/delete_disconnected_services/config";
+    option (google.api.http).get = "/api/v0/retention/service_groups/delete_disconnected_services/config";
 
     option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
     option (chef.automate.api.iam.policy).action = "retention:serviceGroups:get";
@@ -346,7 +346,7 @@ service ApplicationsService {
   */
   rpc UpdateDeleteDisconnectedServicesConfig(PeriodicJobConfig) returns (UpdateDeleteDisconnectedServicesConfigRes) {
     option (google.api.http) = {
-      post: "/retention/service_groups/delete_disconnected_services/config"
+      post: "/api/v0/retention/service_groups/delete_disconnected_services/config"
       body: "*"
     };
 

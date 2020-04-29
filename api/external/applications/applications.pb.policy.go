@@ -6,19 +6,19 @@ package applications
 import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroups", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/applications/service-groups", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroups", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/api/v0/applications/service-groups", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroupsHealthCounts", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/applications/service_groups_health_counts", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroupsHealthCounts", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/api/v0/applications/service_groups_health_counts", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServices", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/applications/services", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServices", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/api/v0/applications/services", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/FindServices", "applications:serviceGroups", "applications:serviceGroups:list", "", "", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesDistinctValues", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/applications/services-distinct-values", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesDistinctValues", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/api/v0/applications/services-distinct-values", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*ServicesDistinctValuesReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -33,7 +33,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesBySG", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/applications/service-groups/{service_group_id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesBySG", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/api/v0/applications/service-groups/{service_group_id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*ServicesBySGReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -46,25 +46,25 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesStats", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/applications/stats", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesStats", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/api/v0/applications/stats", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDisconnectedServices", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/applications/disconnected_services", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDisconnectedServices", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/api/v0/applications/disconnected_services", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/DeleteDisconnectedServices", "applications:serviceGroups", "applications:serviceGroups:delete", "POST", "/applications/delete_disconnected_services", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/DeleteDisconnectedServices", "applications:serviceGroups", "applications:serviceGroups:delete", "POST", "/api/v0/applications/delete_disconnected_services", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/DeleteServicesByID", "applications:serviceGroups", "applications:serviceGroups:delete", "POST", "/applications/delete_services_by_id", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/DeleteServicesByID", "applications:serviceGroups", "applications:serviceGroups:delete", "POST", "/api/v0/applications/delete_services_by_id", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetVersion", "system:service:version", "system:serviceVersion:get", "GET", "/applications/version", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetVersion", "system:service:version", "system:serviceVersion:get", "GET", "/api/v0/applications/version", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:get", "GET", "/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:get", "GET", "/api/v0/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:update", "POST", "/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:update", "POST", "/api/v0/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*PeriodicMandatoryJobConfig); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -77,10 +77,10 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDeleteDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:get", "GET", "/retention/service_groups/delete_disconnected_services/config", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDeleteDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:get", "GET", "/api/v0/retention/service_groups/delete_disconnected_services/config", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateDeleteDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:update", "POST", "/retention/service_groups/delete_disconnected_services/config", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateDeleteDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:update", "POST", "/api/v0/retention/service_groups/delete_disconnected_services/config", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*PeriodicJobConfig); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

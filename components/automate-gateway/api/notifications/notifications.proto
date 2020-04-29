@@ -110,7 +110,7 @@ message URLValidationResponse {
 service Notifications {
   rpc AddRule(RuleAddRequest) returns (RuleAddResponse) {
     option (google.api.http) = {
-      post: "/notifications/rules"
+      post: "/api/v0/notifications/rules"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "notifications:rules";
@@ -119,7 +119,7 @@ service Notifications {
 
   rpc DeleteRule(RuleIdentifier) returns (RuleDeleteResponse) {
     option (google.api.http) = {
-      delete: "/notifications/rules/{id}"
+      delete: "/api/v0/notifications/rules/{id}"
     };
     option (chef.automate.api.iam.policy).resource = "notifications:rules:{id}";
     option (chef.automate.api.iam.policy).action = "notifications:notifyRules:delete";
@@ -127,7 +127,7 @@ service Notifications {
 
   rpc UpdateRule(RuleUpdateRequest) returns (RuleUpdateResponse) {
     option (google.api.http) = {
-      put: "/notifications/rules/{id}"
+      put: "/api/v0/notifications/rules/{id}"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "notifications:rules:{id}";
@@ -136,7 +136,7 @@ service Notifications {
 
   rpc GetRule(RuleIdentifier) returns (RuleGetResponse) {
     option (google.api.http) = {
-      get: "/notifications/rules/{id}"
+      get: "/api/v0/notifications/rules/{id}"
     };
     option (chef.automate.api.iam.policy).resource = "notifications:rules:{id}";
     option (chef.automate.api.iam.policy).action = "notifications:notifyRules:get";
@@ -144,7 +144,7 @@ service Notifications {
 
   rpc ListRules(RuleListRequest) returns (RuleListResponse) {
     option (google.api.http) = {
-      get: "/notifications/rules"
+      get: "/api/v0/notifications/rules"
     };
     option (chef.automate.api.iam.policy).resource = "notifications:rules";
     option (chef.automate.api.iam.policy).action = "notifications:notifyRules:list";
@@ -152,7 +152,7 @@ service Notifications {
 
   rpc ValidateWebhook(URLValidationRequest) returns (URLValidationResponse) {
     option (google.api.http) = {
-      post: "/notifications/webhook"
+      post: "/api/v0/notifications/webhook"
       body: "*"
     };
     // this call is used to test a notification rule being created
@@ -163,7 +163,7 @@ service Notifications {
 
   rpc Version(VersionRequest) returns (VersionResponse) {
     option (google.api.http) = {
-      get: "/notifications/version"
+      get: "/api/v0/notifications/version"
     };
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";

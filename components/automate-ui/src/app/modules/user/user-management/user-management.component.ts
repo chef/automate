@@ -28,7 +28,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public users: User[] = [];
   public addButtonText = 'Create User';
   public removeText = 'Delete User';
-  public baseUrl = '/iam/v2/users';
+  public baseUrl = '/apis/iam/v2/users';
 
   constructor(
     private store: Store<NgrxStateAtom>,

@@ -6,7 +6,7 @@ package license
 import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.license.License/ApplyLicense", "system:license", "system:license:apply", "POST", "/license/apply", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.license.License/ApplyLicense", "system:license", "system:license:apply", "POST", "/api/v0/license/apply", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*ApplyLicenseReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -19,10 +19,10 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.license.License/GetStatus", "system:status", "system:license:get", "GET", "/license/status", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.license.License/GetStatus", "system:status", "system:license:get", "GET", "/api/v0/license/status", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.license.License/RequestLicense", "system:license", "system:license:request", "POST", "/license/request", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.license.License/RequestLicense", "system:license", "system:license:request", "POST", "/api/v0/license/request", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*RequestLicenseReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

@@ -32,7 +32,7 @@ describe('PendingEditsBarComponent', () => {
 
   beforeEach(async(() => {
       configureWith({
-        '/iam/v2/projects': genPerm('/iam/v2/projects', true)
+        '/apis/iam/v2/projects': genPerm('/apis/iam/v2/projects', true)
       });
   }));
 
@@ -178,7 +178,7 @@ describe('PendingEditsBarComponent--unauthorized', () => {
 
   beforeEach(async(() => {
     configureWith({
-      '/iam/v2/projects': genPerm('/iam/v2/projects', false)
+      '/apis/iam/v2/projects': genPerm('/apis/iam/v2/projects', false)
     });
   }));
 

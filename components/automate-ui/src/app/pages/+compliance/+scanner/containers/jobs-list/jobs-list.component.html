@@ -23,7 +23,7 @@
   <chef-loading-spinner *ngIf="jobsList.loading" size="100"></chef-loading-spinner>
 
   <chef-tbody *ngIf="!jobsList.loading">
-    <app-authorized [allOf]="['/compliance/scanner/jobs', 'post']">
+    <app-authorized [allOf]="['/api/v0/compliance/scanner/jobs', 'post']">
       <chef-tr class="empty new-row">
         <span class="cta">Create a new scan job with nodes and profiles</span>
         <span class="action">
@@ -36,7 +36,7 @@
         {{ job.name }}
       </chef-td>
       <chef-td  *ngIf="!isJobReport(job)">
-        <a [routerLink]="['/compliance', 'scan-jobs', 'jobs', job.id, 'scans']">{{ job.name }}</a>
+        <a [routerLink]="['/api/v0/compliance', 'scan-jobs', 'jobs', job.id, 'scans']">{{ job.name }}</a>
       </chef-td>
       <chef-td >{{ displayNodeCount(job.node_count | number, job.recurrence) }}</chef-td>
       <chef-td >{{ timeFromNow(job.end_time) }}</chef-td>

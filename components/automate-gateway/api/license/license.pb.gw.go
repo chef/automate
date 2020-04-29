@@ -287,11 +287,11 @@ func RegisterLicenseHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 }
 
 var (
-	pattern_License_ApplyLicense_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"license", "apply"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_License_ApplyLicense_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "license", "apply"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_License_GetStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"license", "status"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_License_GetStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "license", "status"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_License_RequestLicense_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"license", "request"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_License_RequestLicense_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "license", "request"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

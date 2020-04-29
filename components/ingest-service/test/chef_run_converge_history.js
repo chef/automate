@@ -4,7 +4,7 @@ var chakram = require('chakram'),
 var helpers = require('./helpers.js');
 
 function endpoint() {
-  return helpers.REST_SERVICE_URI + '/events/chef/run';
+  return helpers.REST_SERVICE_URI + '/api/v0/events/chef/run';
 }
 
 function convergeHistoryUrl() {
@@ -24,8 +24,8 @@ describe("creating converge history", function () {
       chefRun.set('entity_uuid', entityUuid);
       chefRun.set('node_name', nodeName);
       chefRun.set('run_id', runID);
-      
-      // Wait until after the chef run is posted. 
+
+      // Wait until after the chef run is posted.
       return chakram.all([chakram.post(endpoint(), chefRun.json())]).then(function(responses) {
         expect(responses[0]).to.have.status(200);
         // Wait until the converge-history index is refreshed.
@@ -62,13 +62,13 @@ describe("creating converge history", function () {
       chefRun2.set('entity_uuid', entityUuid2);
 
       let postResponses = [
-        chakram.post(endpoint(), chefRun1.json()), 
+        chakram.post(endpoint(), chefRun1.json()),
         chakram.post(endpoint(), chefRun2.json())
       ];
-      
-      // Wait to post both runs to pipeline 
+
+      // Wait to post both runs to pipeline
       return chakram.all(postResponses).then(function(responses) {
-        for (i = 0; i < responses.length; i++) { 
+        for (i = 0; i < responses.length; i++) {
           let response = responses[i];
           expect(response).to.have.status(200);
         }
@@ -114,13 +114,13 @@ describe("creating converge history", function () {
       chefRun1.set('end_time', '2016-06-29T15:13:22Z');
 
       let postResponses = [
-        chakram.post(endpoint(), chefRun1.json()), 
+        chakram.post(endpoint(), chefRun1.json()),
         chakram.post(endpoint(), chefRun2.json())
       ];
-      
-      // Wait to post both runs to pipeline 
+
+      // Wait to post both runs to pipeline
       return chakram.all(postResponses).then(function(responses) {
-        for (i = 0; i < responses.length; i++) { 
+        for (i = 0; i < responses.length; i++) {
           let response = responses[i];
           expect(response).to.have.status(200);
         }

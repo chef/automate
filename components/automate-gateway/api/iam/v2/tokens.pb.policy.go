@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Tokens/CreateToken", "iam:tokens", "iam:tokens:create", "POST", "/iam/v2/tokens", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Tokens/CreateToken", "iam:tokens", "iam:tokens:create", "POST", "/apis/iam/v2/tokens", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreateTokenReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -26,7 +26,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Tokens/GetToken", "iam:tokens:{id}", "iam:tokens:get", "GET", "/iam/v2/tokens/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Tokens/GetToken", "iam:tokens:{id}", "iam:tokens:get", "GET", "/apis/iam/v2/tokens/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetTokenReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -39,7 +39,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Tokens/UpdateToken", "iam:tokens:{id}", "iam:tokens:update", "PUT", "/iam/v2/tokens/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Tokens/UpdateToken", "iam:tokens:{id}", "iam:tokens:update", "PUT", "/apis/iam/v2/tokens/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.UpdateTokenReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -54,7 +54,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Tokens/DeleteToken", "iam:tokens:{id}", "iam:tokens:delete", "DELETE", "/iam/v2/tokens/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Tokens/DeleteToken", "iam:tokens:{id}", "iam:tokens:delete", "DELETE", "/apis/iam/v2/tokens/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.DeleteTokenReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -67,7 +67,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Tokens/ListTokens", "iam:tokens", "iam:tokens:list", "GET", "/iam/v2/tokens", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Tokens/ListTokens", "iam:tokens", "iam:tokens:list", "GET", "/apis/iam/v2/tokens", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
 }

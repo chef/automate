@@ -10,18 +10,18 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service License {
   rpc ApplyLicense (ApplyLicenseReq) returns (ApplyLicenseResp) {
-    option (google.api.http).post = "/license/apply";
+    option (google.api.http).post = "/api/v0/license/apply";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "system:license";
     option (chef.automate.api.iam.policy).action = "system:license:apply";
   }
   rpc GetStatus (GetStatusReq) returns (GetStatusResp) {
-    option (google.api.http).get = "/license/status";
+    option (google.api.http).get = "/api/v0/license/status";
     option (chef.automate.api.iam.policy).resource = "system:status";
     option (chef.automate.api.iam.policy).action = "system:license:get";
   }
   rpc RequestLicense (RequestLicenseReq) returns (RequestLicenseResp) {
-    option (google.api.http).post = "/license/request";
+    option (google.api.http).post = "/api/v0/license/request";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "system:license";
     option (chef.automate.api.iam.policy).action = "system:license:request";

@@ -58,7 +58,7 @@ func TestCreatesValidCode(t *testing.T) {
 					"// source: "+testdata("one_method_plus_http"),
 					"package mock",
 					`policy.MapMethodTo("/chef.automate.domain.one_method.Mock/MockMethod", "mock:foo:{bar}", "action:item:verb", `+
-						`"GET", "/auth/foo/baz", func(unexpandedResource string, input interface{}) string {`),
+						`"GET", "/api/v0/auth/foo/baz", func(unexpandedResource string, input interface{}) string {`),
 			)},
 
 		"service with one method": {

@@ -50,7 +50,7 @@ service JobsService {
 	*/
 	rpc Create(Job) returns (Id) {
 		option (google.api.http) = {
-			post: "/compliance/scanner/jobs"
+			post: "/api/v0/compliance/scanner/jobs"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -72,7 +72,7 @@ service JobsService {
 	*/
 	rpc Read(Id) returns (Job) {
 		option (google.api.http) = {
-			get: "/compliance/scanner/jobs/id/{id}"
+			get: "/api/v0/compliance/scanner/jobs/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:scanner:jobs:{id}"
@@ -95,7 +95,7 @@ service JobsService {
 	*/
 	rpc Update(Job) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
-			put: "/compliance/scanner/jobs/id/{id}"
+			put: "/api/v0/compliance/scanner/jobs/id/{id}"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -117,7 +117,7 @@ service JobsService {
 	*/
 	rpc Delete(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
-			delete: "/compliance/scanner/jobs/id/{id}"
+			delete: "/api/v0/compliance/scanner/jobs/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:scanner:jobs:{id}"
@@ -155,7 +155,7 @@ service JobsService {
 	*/
 	rpc List(Query) returns (Jobs) {
 		option (google.api.http) = {
-			post: "/compliance/scanner/jobs/search"
+			post: "/api/v0/compliance/scanner/jobs/search"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -178,7 +178,7 @@ service JobsService {
 	*/
 	rpc Rerun(Id) returns (RerunResponse) {
 		option (google.api.http) = {
-			get: "/compliance/scanner/jobs/rerun/id/{id}"
+			get: "/api/v0/compliance/scanner/jobs/rerun/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:scanner:jobs:{id}"

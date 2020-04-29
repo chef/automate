@@ -485,13 +485,13 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 
 	url := r.URL.Path
 	splitURL := strings.Split(url, "/")
-	if len(splitURL) > 4 {
-		profileOwner = splitURL[3]
-		profileName = splitURL[4]
-	}
 	if len(splitURL) > 6 {
-		if splitURL[5] == "version" {
-			profileVersion = splitURL[6]
+		profileOwner = splitURL[5]
+		profileName = splitURL[6]
+	}
+	if len(splitURL) > 8 {
+		if splitURL[7] == "version" {
+			profileVersion = splitURL[8]
 		}
 	}
 
@@ -507,7 +507,8 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 		profileVersion = t.Version
 		profileOwner = t.Owner
 	}
-	log.Infof("processing profile tar request for owner: %s, name: %s %s", profileOwner, profileName, profileVersion)
+	log.Infof("processing profile tar request for owner: %s, name: %s (version %s)",
+		profileOwner, profileName, profileVersion)
 
 	var resource, action string
 	if len(profileOwner) > 0 {

@@ -15,7 +15,7 @@
 
         <h2 class="display4 strong">Cloud Platform Providers</h2>
         <chef-toolbar>
-          <app-authorized [anyOf]="['/nodemanagers', 'post']">
+          <app-authorized [anyOf]="['/api/v0/nodemanagers', 'post']">
             <chef-button primary [routerLink]="['/settings/node-integrations/add']">Create Integration</chef-button>
           </app-authorized>
         </chef-toolbar>

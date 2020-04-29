@@ -29,7 +29,7 @@
         <ng-container *ngIf="(sortedTeams$ | async)?.length > 0">
           <section>
             <chef-toolbar>
-              <app-authorized [allOf]="['/iam/v2/teams', 'post']">
+              <app-authorized [allOf]="['/apis/iam/v2/teams', 'post']">
                 <chef-button primary (click)="openCreateModal()" data-cy="team-create-button">Create Team</chef-button>
               </app-authorized>
             </chef-toolbar>
@@ -55,7 +55,7 @@
                       <ng-container *ngIf="team.projects.length > 1">{{ team.projects.length }} projects</ng-container>
                     </chef-td>
                     <chef-td class="three-dot-column">
-                      <!-- <app-authorized [allOf]="['/iam/v2/teams/{id}', 'delete', team.id]"> -->
+                      <!-- <app-authorized [allOf]="['/apis/iam/v2/teams/{id}', 'delete', team.id]"> -->
                       <mat-select panelClass="chef-control-menu">
                         <mat-option (onSelectionChange)="startTeamDelete($event, team)">Delete Team</mat-option>
                       </mat-select>
@@ -68,7 +68,7 @@
           </section>
         </ng-container>
         <ng-container *ngIf="(sortedTeams$ | async)?.length === 0">
-            <app-authorized [allOf]="['/iam/v2/teams', 'post']">
+            <app-authorized [allOf]="['/apis/iam/v2/teams', 'post']">
               <div class="empty-case-container">
                 <p>Create the first team to get started!</p>
               </div>
@@ -76,7 +76,7 @@
                   <chef-button primary (click)="openCreateModal()">Create Team</chef-button>
               </div>
             </app-authorized>
-            <app-authorized not [allOf]="['/iam/v2/teams', 'post']">
+            <app-authorized not [allOf]="['/apis/iam/v2/teams', 'post']">
               <div class="empty-case-container">
                 <p>It looks like no one has created any teams yet and you<br/>
                   don't have permission to create them.<br/><br/>

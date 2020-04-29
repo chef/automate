@@ -106,7 +106,7 @@ All public APIs are described via a GRPC service definition in a `.proto` file.
 
 1. Determine the level of access an Admin, Viewer, and Editor should have on the API and add an authz smoke test to `a2-iam-no-legacy-integration/controls/chef_managed_role_access.rb`.
 2. Add the method and any new message types for the request and response to the `.proto` file under `a2/components/automate-gateway/api` ([Example](https://github.com/chef/automate/blob/c41a1863627c950c9ec5f5b8d5cd48254b8d8b71/components/automate-gateway/api/auth/users/users.proto#L16)).
-3. Annotate your API with an `http` option, defining its HTTP method and endpoint (e.g. `option (google.api.http).get = "/cfgmgmt/nodes";`).
+3. Annotate your API with an `http` option, defining its HTTP method and endpoint (e.g. `option (google.api.http).get = "/api/v0/cfgmgmt/nodes";`).
 4. Annotate your API with the authorization _resource_ and _action_ mappings
    (e.g. `option (chef.automate.api.iam.policy).resource = "iam:users";` and
    `option (chef.automate.api.iam.policy).action = "iam:users:list";`).

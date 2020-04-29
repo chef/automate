@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/telemetry/config": {
+    "/api/v0/telemetry/config": {
       "get": {
         "operationId": "GetTelemetryConfiguration",
         "responses": {
