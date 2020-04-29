@@ -93,7 +93,7 @@ func (s *policyServer) CreatePolicy(
 	req *api.CreatePolicyReq) (*api.Policy, error) {
 
 	// API requests always create custom policies.
-	err := validateRequiredFieldsAndProjectsForPolicy(req.Id, req.Name, req.Projects)
+	err := validate.RequiredFieldsAndProjects(req, "policy")
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -168,7 +168,7 @@ func (s *policyServer) GetPolicy(
 	ctx context.Context,
 	req *api.GetPolicyReq) (*api.Policy, error) {
 
-	err := validate.RequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "cannot get policy")
 	}
@@ -189,7 +189,7 @@ func (s *policyServer) DeletePolicy(
 	ctx context.Context,
 	req *api.DeletePolicyReq) (*api.DeletePolicyResp, error) {
 
-	err := validate.RequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -211,7 +211,7 @@ func (s *policyServer) UpdatePolicy(
 	ctx context.Context,
 	req *api.UpdatePolicyReq) (*api.Policy, error) {
 
-	err := validateRequiredFieldsAndProjectsForPolicy(req.Id, req.Name, req.Projects)
+	err := validate.RequiredFieldsAndProjects(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -272,7 +272,7 @@ func (s *policyServer) ListPolicyMembers(
 	ctx context.Context,
 	req *api.ListPolicyMembersReq) (*api.ListPolicyMembersResp, error) {
 
-	err := validate.RequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -296,7 +296,7 @@ func (s *policyServer) AddPolicyMembers(
 	ctx context.Context,
 	req *api.AddPolicyMembersReq) (*api.AddPolicyMembersResp, error) {
 
-	err := validate.RequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -326,7 +326,7 @@ func (s *policyServer) ReplacePolicyMembers(
 	ctx context.Context,
 	req *api.ReplacePolicyMembersReq) (*api.ReplacePolicyMembersResp, error) {
 
-	err := validate.RequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -355,7 +355,7 @@ func (s *policyServer) ReplacePolicyMembers(
 func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 	req *api.RemovePolicyMembersReq) (*api.RemovePolicyMembersResp, error) {
 
-	err := validate.RequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -399,7 +399,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 func (s *policyServer) CreateRole(
 	ctx context.Context,
 	req *api.CreateRoleReq) (*api.Role, error) {
-	err := validateRequiredFieldsAndProjectsForRole(req.Id, req.Name, req.Projects)
+	err := validate.RequiredFieldsAndProjects(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -461,7 +461,7 @@ func (s *policyServer) GetRole(
 	ctx context.Context,
 	req *api.GetRoleReq) (*api.Role, error) {
 
-	err := validate.RequiredID(req.Id, "role")
+	err := validate.RequiredID(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -482,7 +482,7 @@ func (s *policyServer) DeleteRole(
 	ctx context.Context,
 	req *api.DeleteRoleReq) (*api.DeleteRoleResp, error) {
 
-	err := validate.RequiredID(req.Id, "role")
+	err := validate.RequiredID(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -504,7 +504,7 @@ func (s *policyServer) UpdateRole(
 	ctx context.Context,
 	req *api.UpdateRoleReq) (*api.Role, error) {
 
-	err := validateRequiredFieldsAndProjectsForRole(req.Id, req.Name, req.Projects)
+	err := validate.RequiredFieldsAndProjects(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -762,12 +762,4 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 		}
 	}
 	s.log.WithFields(kv).Info("Policy definition")
-}
-
-func validateRequiredFieldsAndProjectsForPolicy(id string, name string, projectIDs []string) error {
-	return validate.RequiredFieldsAndProjects(id, name, projectIDs, "policy")
-}
-
-func validateRequiredFieldsAndProjectsForRole(id string, name string, projectIDs []string) error {
-	return validate.RequiredFieldsAndProjects(id, name, projectIDs, "role")
 }

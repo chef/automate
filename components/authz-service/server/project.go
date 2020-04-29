@@ -99,7 +99,7 @@ func NewProjectsServer(
 
 func (s *ProjectState) GetProject(ctx context.Context,
 	req *api.GetProjectReq) (*api.GetProjectResp, error) {
-	err := validate.RequiredID(req.Id, "project")
+	err := validate.RequiredID(req, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -123,7 +123,7 @@ func (s *ProjectState) GetProject(ctx context.Context,
 
 func (s *ProjectState) CreateProject(ctx context.Context,
 	req *api.CreateProjectReq) (*api.CreateProjectResp, error) {
-	err := validate.RequiredName(req.Name, "project")
+	err := validate.RequiredName(req, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -161,7 +161,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 func (s *ProjectState) UpdateProject(ctx context.Context,
 	req *api.UpdateProjectReq) (*api.UpdateProjectResp, error) {
 
-	err := validate.RequiredIDandName(req.Id, req.Name, "project")
+	err := validate.RequiredIDandName(req, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -350,7 +350,7 @@ func (s *ProjectState) ListProjectsForIntrospection(
 func (s *ProjectState) DeleteProject(ctx context.Context,
 	req *api.DeleteProjectReq) (*api.DeleteProjectResp, error) {
 
-	err := validate.RequiredID(req.Id, "project")
+	err := validate.RequiredID(req, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -406,7 +406,7 @@ func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
 }
 
 func (s *ProjectState) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.CreateRuleResp, error) {
-	r, err := s.prepareStorageRule(req.Id, req.ProjectId, req.Name, req.Type, req.Conditions)
+	r, err := s.prepareStorageRule(req)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "error processing request: %s", err.Error())
 	}
@@ -434,7 +434,7 @@ func (s *ProjectState) CreateRule(ctx context.Context, req *api.CreateRuleReq) (
 }
 
 func (s *ProjectState) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (*api.UpdateRuleResp, error) {
-	r, err := s.prepareStorageRule(req.Id, req.ProjectId, req.Name, req.Type, req.Conditions)
+	r, err := s.prepareStorageRule(req)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "error processing request: %s", err.Error())
 	}
@@ -465,10 +465,15 @@ func (s *ProjectState) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (
 }
 
 func (s *ProjectState) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
-	err := confirmRequiredFieldsForRule(req.Id, req.ProjectId)
+	err := validate.RequiredID(req, "rule")
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
+	err = confirmRequiredProjectID(req.ProjectId, "rule")
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
 	resp, err := s.store.GetStagedOrAppliedRule(ctx, req.ProjectId, req.Id)
 	switch err {
 	case nil: // continue
@@ -521,7 +526,7 @@ func (s *ProjectState) listRulesWithFunction(ctx context.Context, req *api.ListR
 }
 
 func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
-	err := validate.RequiredID(req.Id, "project")
+	err := validate.RequiredID(req, "project")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -557,9 +562,13 @@ func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRul
 }
 
 func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {
-	err := confirmRequiredFieldsForRule(req.Id, req.ProjectId)
+	err := validate.RequiredID(req, "rule")
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+	err = confirmRequiredProjectID(req.ProjectId, "rule")
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
 	err = s.store.DeleteRule(ctx, req.ProjectId, req.Id)
@@ -576,18 +585,6 @@ func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (
 		return nil, status.Errorf(codes.Internal,
 			"error deleting rule with ID %q: %s", req.Id, err.Error())
 	}
-}
-
-func confirmRequiredFieldsForRule(id, project_id string) error {
-	err := validate.RequiredID(id, "rule")
-	if err != nil {
-		return status.Errorf(codes.InvalidArgument, err.Error())
-	}
-	err = confirmRequiredProjectID(project_id, "rule")
-	if err != nil {
-		return status.Errorf(codes.InvalidArgument, err.Error())
-	}
-	return nil
 }
 
 func confirmRequiredProjectID(projectID, resourceName string) error {
@@ -811,35 +808,42 @@ func fromAPIType(t api.ProjectRuleTypes) (storage.RuleType, error) {
 	}
 }
 
-func (s *ProjectState) prepareStorageRule(inID, projectID, name string,
-	inType api.ProjectRuleTypes, inConditions []*api.Condition) (*storage.Rule, error) {
+type apiRuleRequest interface {
+	GetId() string
+	GetName() string
+	GetProjectId() string
+	GetType() api.ProjectRuleTypes
+	GetConditions() []*api.Condition
+}
 
-	err := validate.RequiredIDandName(inID, name, "rule")
+func (s *ProjectState) prepareStorageRule(req apiRuleRequest) (*storage.Rule, error) {
+
+	err := validate.RequiredIDandName(req, "rule")
 	if err != nil {
 		return nil, err
 	}
-	err = confirmRequiredProjectID(projectID, "rule")
+	err = confirmRequiredProjectID(req.GetProjectId(), "rule")
 	if err != nil {
 		return nil, err
 	}
-	if len(inConditions) == 0 {
+	if len(req.GetConditions()) == 0 {
 		return nil, errors.New("at least one condition is required")
 	}
 
-	ruleType, err := fromAPIType(inType)
+	ruleType, err := fromAPIType(req.GetType())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
-			"creating rule with ID %q: %s", inID, err.Error())
+			"creating rule with ID %q: %s", req.GetId(), err.Error())
 	}
-	conditions, err := storageConditions(inConditions)
+	conditions, err := storageConditions(req.GetConditions())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
-			"creating rule with ID %q: %s", inID, err.Error())
+			"creating rule with ID %q: %s", req.GetId(), err.Error())
 	}
-	r, err := storage.NewRule(inID, projectID, name, ruleType, conditions)
+	r, err := storage.NewRule(req.GetId(), req.GetProjectId(), req.GetName(), ruleType, conditions)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
-			"creating rule with ID %q: %s", inID, err.Error())
+			"creating rule with ID %q: %s", req.GetId(), err.Error())
 	}
 	return &r, nil
 }
