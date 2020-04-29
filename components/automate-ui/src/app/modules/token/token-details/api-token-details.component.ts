@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { isEmpty, identity, xor, isNil } from 'lodash/fp';
+import { identity, isNil } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 
@@ -11,18 +11,18 @@ import { routeParams } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { pending, EntityStatus } from 'app/entities/entities';
 import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions';
-import { apiTokenFromRoute, getStatus, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
+import {
+  apiTokenFromRoute, getStatus, updateStatus
+} from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
-import { Project, ProjectConstants } from 'app/entities/projects/project.model';
+import {
+  Project, ProjectConstants, ProjectCheckedMap, noProjectsUpdated
+} from 'app/entities/projects/project.model';
 import { GetProjects } from 'app/entities/projects/project.actions';
 import {
   allProjects,
   getAllStatus as getAllProjectStatus
 } from 'app/entities/projects/project.selectors';
-import {
-  ProjectChecked,
-  ProjectCheckedMap
-} from 'app/components/projects-dropdown/projects-dropdown.component';
 
 type TokenStatus = 'active' | 'inactive';
 type TokenTabName = 'details';
@@ -130,27 +130,17 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     return <FormControl>this.updateForm.controls.name;
   }
 
-  // updates whether the project was checked or unchecked
-  onProjectChecked(project: ProjectChecked): void {
-    this.projects[project.id].checked = project.checked;
+  onProjectDropdownClosing(selectedProjects: string[]): void {
+
+    Object.keys(this.projects).forEach(id => this.projects[id].checked = false);
+    selectedProjects.forEach(id => this.projects[id].checked = true);
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
-    if (this.noProjectsUpdated()) {
+    if (noProjectsUpdated(this.token.projects, this.projects)) {
       this.updateForm.controls.projects.markAsPristine();
     } else {
       this.updateForm.controls.projects.markAsDirty();
     }
-  }
-
-  private noProjectsUpdated(): boolean {
-    const projectsUpdated = xor(
-      this.token.projects,
-      Object.keys(this.projects).filter(id => this.projects[id].checked));
-    return projectsUpdated.length === 0;
-  }
-
-  dropdownDisabled(): boolean {
-    return isEmpty(this.projects) || this.saveInProgress;
   }
 }

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { isEmpty, keyBy, at, xor, isNil, identity } from 'lodash/fp';
+import { keyBy, at, isNil, identity } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
@@ -15,16 +15,14 @@ import { EntityStatus, pending } from 'app/entities/entities';
 import { User } from 'app/entities/users/user.model';
 import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import {
-  ProjectChecked,
-  ProjectCheckedMap
-} from 'app/components/projects-dropdown/projects-dropdown.component';
 import { GetProjects } from 'app/entities/projects/project.actions';
 import {
   allProjects,
   getAllStatus as getAllProjectStatus
 } from 'app/entities/projects/project.selectors';
-import { ProjectConstants } from 'app/entities/projects/project.model';
+import {
+  ProjectConstants, ProjectCheckedMap, noProjectsUpdated
+} from 'app/entities/projects/project.model';
 import {
   teamFromRoute,
   teamUsers,
@@ -228,13 +226,14 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
-  // updates whether the project was checked or unchecked
-  onProjectChecked(project: ProjectChecked): void {
-    this.projects[project.id].checked = project.checked;
+  onProjectDropdownClosing(selectedProjects: string[]): void {
+
+    Object.keys(this.projects).forEach(id => this.projects[id].checked = false);
+    selectedProjects.forEach(id => this.projects[id].checked = true);
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
-    if (this.noProjectsUpdated()) {
+    if (noProjectsUpdated(this.team.projects, this.projects)) {
       this.updateNameForm.controls.projects.markAsPristine();
     } else {
       this.updateNameForm.controls.projects.markAsDirty();
@@ -242,14 +241,4 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   }
 
-  private noProjectsUpdated(): boolean {
-    const projectsUpdated = xor(
-      this.team.projects,
-      Object.keys(this.projects).filter(id => this.projects[id].checked));
-    return projectsUpdated.length === 0;
-  }
-
-  dropdownDisabled(): boolean {
-    return isEmpty(this.projects) || this.saveInProgress;
-  }
 }

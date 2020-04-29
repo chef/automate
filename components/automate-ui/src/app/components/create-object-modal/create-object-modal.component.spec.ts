@@ -1,15 +1,18 @@
 import { EventEmitter, SimpleChange } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
+import { ngrxReducers, runtimeChecks, NgrxStateAtom } from 'app/ngrx.reducers';
 import { using } from 'app/testing/spec-helpers';
-import { Project } from 'app/entities/projects/project.model';
+import { GetPolicies } from 'app/entities/policies/policy.actions';
 import { CreateObjectModalComponent } from './create-object-modal.component';
 
 describe('CreateObjectModalComponent', () => {
   let fixture: ComponentFixture<CreateObjectModalComponent>;
   let component: CreateObjectModalComponent;
+  let store: Store<NgrxStateAtom>;
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -22,14 +25,17 @@ describe('CreateObjectModalComponent', () => {
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-toolbar' }),
         MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
+        MockComponent({ selector: 'app-resource-dropdown',
+          inputs: ['resources', 'resourcesUpdated', 'objectNounPlural'] }),
         MockComponent({ selector: 'app-projects-dropdown',
-          inputs: ['projects', 'disabled', 'projectsUpdated'],
-          outputs: ['onProjectChecked'] })
+          inputs: ['projects', 'projectsUpdated'] })
       ],
      imports: [
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ]
     }).compileComponents();
+    store = TestBed.inject(Store);
   });
 
   beforeEach(() => {
@@ -63,22 +69,7 @@ describe('CreateObjectModalComponent', () => {
     });
   });
 
-  it('ngOnChanges initializes checked status to false for all projects ', () => {
-    const assignableProjects: Project[] = [
-      {id: 'proj1', name: 'proj1', type: 'CHEF_MANAGED', status: 'NO_RULES'},
-      {id: 'proj3', name: 'proj3', type: 'CUSTOM', status: 'EDITS_PENDING'},
-      { id: 'proj2', name: 'proj2', type: 'CUSTOM', status: 'RULES_APPLIED' }
-    ];
-    component.ngOnChanges(
-      { assignableProjects: new SimpleChange({}, assignableProjects, true) });
-    expect(Object.values(component.projects).length).toEqual(assignableProjects.length);
-    assignableProjects.forEach(p => {
-      const proj = component.projects[p.id];
-      expect(proj).toEqual({ ...p, checked: false });
-    });
-  });
-
-  it('ngOnChanges resets checked status to false for all projects ', () => {
+  it('upon opening, checked status of all projects is set to false', () => {
     component.projects = {
       'proj1':
         { id: 'proj1', name: 'proj1', type: 'CHEF_MANAGED', status: 'NO_RULES', checked: true },
@@ -87,11 +78,51 @@ describe('CreateObjectModalComponent', () => {
       'proj2':
         { id: 'proj2', name: 'proj2', type: 'CUSTOM', status: 'RULES_APPLIED', checked: true }
     };
+
     component.ngOnChanges(
       { visible: new SimpleChange(false, true, true) });
+
     Object.values(component.projects).forEach(p => {
       expect(p.checked).toBe(false);
     });
+  });
+
+  it('upon opening, checked status of all policies is set to false', () => {
+    component.policies = [
+        { id: 'proj1', name: 'proj1', type: 'CHEF_MANAGED', members: [], checked: true },
+        { id: 'proj3', name: 'proj3', type: 'CUSTOM', members: [], checked: false },
+        { id: 'proj2', name: 'proj2', type: 'CUSTOM', members: [], checked: true }
+    ];
+
+    component.ngOnChanges(
+      { visible: new SimpleChange(false, true, true) });
+
+    Object.values(component.policies).forEach(p => {
+      expect(p.checked).toBe(false);
+    });
+  });
+
+  it('upon opening, dispatches a call to refresh policies', () => {
+    spyOn(store, 'dispatch');
+
+    component.ngOnChanges(
+      { visible: new SimpleChange(false, true, true) });
+
+    expect(store.dispatch).toHaveBeenCalledWith(new GetPolicies());
+  });
+
+  it('upon opening, "also create policies" checkbox is checked', () => {
+    component.createForm = new FormBuilder().group({
+      name: '',
+      addPolicies: ''
+    });
+    component.createForm.controls.addPolicies.setValue(false); // force it to start at false
+    component.createProjectModal = true;
+
+    component.ngOnChanges(
+      { visible: new SimpleChange(false, true, true) });
+
+    expect(component.createForm.controls.addPolicies.value).toEqual(true);
   });
 
 });

@@ -24,9 +24,9 @@ import {
 } from 'app/entities/api-tokens/api-token.actions';
 import { CreateToken } from 'app/entities/api-tokens/api-token.actions';
 import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selectors';
-import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
-import { Project, ProjectConstants } from 'app/entities/projects/project.model';
-import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
+import { ProjectConstants } from 'app/entities/projects/project.model';
+import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policies/policy.actions';
+import { stringToMember } from 'app/entities/policies/policy.model';
 
 @Component({
   selector: 'app-api-tokens',
@@ -44,7 +44,6 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   private isDestroyed = new Subject<boolean>();
 
-  public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public readonly RFC2822 = DateTime.RFC2822;
 
@@ -72,25 +71,14 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       name: ['', Validators.required],
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
-      projects: [[]]
+      projects: [[]],
+      policies: [[]]
     });
   }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetAllTokens());
-
-    this.store.select(assignableProjects)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((assignable: ProjectsFilterOption[]) => {
-        this.dropdownProjects = assignable.map(p => {
-          return <Project>{
-            id: p.value,
-            name: p.label,
-            type: p.type
-          };
-        });
-      });
 
     this.store.pipe(
       select(saveStatus),
@@ -150,6 +138,14 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(new CreateToken(tok));
 
+    const member = stringToMember(`token:${tok.id}`);
+    (this.createTokenForm.controls.policies.value as string[])
+      .forEach(id =>
+        this.store.dispatch(new AddPolicyMembers(<PolicyMembersMgmtPayload>{
+          id,
+          members: [member]
+        }))
+      );
   }
 
   public toggleActive($event: ChefKeyboardEvent, token: ApiToken): void {

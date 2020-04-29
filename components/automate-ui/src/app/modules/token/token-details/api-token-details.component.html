@@ -48,13 +48,12 @@
               Name is required.
             </chef-error>
           </chef-form-field>
-          <div id='projects-container'>
+          <chef-form-field id='projects-container'>
             <app-projects-dropdown
-              [projects]="projects"
-              (onProjectChecked)="onProjectChecked($event)"
-              [disabled]="dropdownDisabled()">
+              [checkedProjectIDs]="token?.projects"
+              (onDropdownClosing)="onProjectDropdownClosing($event)">
             </app-projects-dropdown>
-          </div>
+          </chef-form-field>
           <chef-form-field>
             <label>Status <span aria-hidden="true">*</span></label>
             <chef-radio ngDefaultControl formControlName="status" [resetOrigin]="saveSuccessful">

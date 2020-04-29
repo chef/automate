@@ -18,9 +18,7 @@ import { Team } from 'app/entities/teams/team.model';
 import { CreateTeam, DeleteTeam, GetTeams } from 'app/entities/teams/team.actions';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
-import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
-import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { Project, ProjectConstants } from 'app/entities/projects/project.model';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
@@ -36,7 +34,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public createTeamForm: FormGroup;
   public creatingTeam = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   private isDestroyed = new Subject<boolean>();
@@ -69,17 +66,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetTeams());
-
-    this.store.select(assignableProjects)
-      .subscribe((assignable: ProjectsFilterOption[]) => {
-        this.dropdownProjects = assignable.map(p => {
-          return <Project>{
-            id: p.value,
-            name: p.label,
-            type: p.type
-          };
-        });
-      });
 
     // handle team creation success response
     this.store.pipe(

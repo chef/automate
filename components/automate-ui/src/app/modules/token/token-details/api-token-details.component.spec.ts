@@ -57,8 +57,7 @@ describe('ApiTokenDetailsComponent', () => {
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'app-projects-dropdown',
-          inputs: ['projects', 'disabled'], outputs: ['onProjectChecked'] }),
+        MockComponent({ selector: 'app-projects-dropdown', inputs: ['checkedProjectIDs'] }),
         MockComponent({ selector: 'chef-tab-selector',
           inputs: ['value', 'routerLink', 'fragment']
         }),
@@ -117,7 +116,7 @@ describe('ApiTokenDetailsComponent', () => {
     expect(component.token).toEqual(token);
   });
 
-  it('initializes dropdown with those checked on the token', () => {
+  it('initializes project dropdown with those checked on the token', () => {
     spyOn(store, 'dispatch').and.callThrough();
     const tokenProjects  = ['b-proj', 'd-proj'];
     store.dispatch(new GetTokenSuccess({...someToken, projects: tokenProjects}));
@@ -137,7 +136,7 @@ describe('ApiTokenDetailsComponent', () => {
     store.dispatch(new GetProjectsSuccess({ projects: projectList }));
 
     expect(component.updateForm.controls.projects.pristine).toEqual(true);
-    component.onProjectChecked({ ...genProject('a-proj'), checked: true });
+    component.onProjectDropdownClosing([ 'a-proj']);
     expect(component.updateForm.controls.projects.pristine).toEqual(false);
   });
 
@@ -147,19 +146,19 @@ describe('ApiTokenDetailsComponent', () => {
     store.dispatch(new GetProjectsSuccess({ projects: projectList }));
 
     expect(component.updateForm.controls.projects.pristine).toEqual(true);
-    component.onProjectChecked({ ...genProject('b-proj'), checked: false });
+    component.onProjectDropdownClosing([ 'd-proj']);
     expect(component.updateForm.controls.projects.pristine).toEqual(false);
   });
 
-  it('sets projects back to pristine when project changed back to original value', () => {
+  it('sets projects back to pristine when project list changed back to original', () => {
     store.dispatch(new GetTokenSuccess(
       { ...someToken, projects: ['b-proj', 'd-proj']}));
     store.dispatch(new GetProjectsSuccess({ projects: projectList }));
 
     expect(component.updateForm.controls.projects.pristine).toEqual(true);
-    component.onProjectChecked({ ...genProject('a-proj'), checked: true });
+    component.onProjectDropdownClosing([ 'd-proj']);
     expect(component.updateForm.controls.projects.pristine).toEqual(false);
-    component.onProjectChecked({ ...genProject('a-proj'), checked: false });
+    component.onProjectDropdownClosing([ 'b-proj', 'd-proj']);
     expect(component.updateForm.controls.projects.pristine).toEqual(true);
   });
 
