@@ -8,16 +8,31 @@ import (
 	"github.com/pkg/errors"
 )
 
+type hasID interface {
+	GetId() string
+}
+
+type hasName interface {
+	GetName() string
+}
+
+type hasProjects interface {
+	GetProjects() []string
+}
+
 // EmptyOrWhitespaceOnlyRE is a regex that checks for blank or whitespace only strings
 var EmptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
 // RequiredIDandName verifies that the ID and Name fields are not empty
-func RequiredIDandName(id, name, resourceName string) error {
-	err := RequiredID(id, resourceName)
+func RequiredIDandName(obj interface {
+	hasID
+	hasName
+}, resourceName string) error {
+	err := RequiredID(obj, resourceName)
 	if err != nil {
 		return err
 	}
-	return RequiredName(name, resourceName)
+	return RequiredName(obj, resourceName)
 }
 
 // RequiredField verifies that the given field is not empty
@@ -29,22 +44,26 @@ func RequiredField(field, fieldName, resourceName string) error {
 }
 
 // RequiredID verifies that the id is not empty
-func RequiredID(id, resourceName string) error {
-	return RequiredField(id, "id", resourceName)
+func RequiredID(obj hasID, resourceName string) error {
+	return RequiredField(obj.GetId(), "id", resourceName)
 }
 
 // RequiredName verifies that the name is not empty
-func RequiredName(name, resourceName string) error {
-	return RequiredField(name, "name", resourceName)
+func RequiredName(obj hasName, resourceName string) error {
+	return RequiredField(obj.GetName(), "name", resourceName)
 }
 
 // RequiredFieldsAndProjects verifies that all the required inputs are not empty
-func RequiredFieldsAndProjects(id string, name string, projectIDs []string, resourceName string) error {
-	err := RequiredIDandName(id, name, resourceName)
+func RequiredFieldsAndProjects(obj interface {
+	hasID
+	hasName
+	hasProjects
+}, resourceName string) error {
+	err := RequiredIDandName(obj, resourceName)
 	if err != nil {
 		return err
 	}
-	return RequiredProjects(projectIDs)
+	return RequiredProjects(obj.GetProjects())
 }
 
 // RequiredProjects verifies that the projects are not empty and do not include '(unassigned)'
