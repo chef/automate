@@ -2,13 +2,15 @@
   <div class="container">
     <main>
       <div class="sticky-notifications">
-        <app-chef-notification
-          *ngIf="downloadErrorVisible"
-          type="error"
-          timeout="5"
-          (dismissed)="hideDownloadError()">
-          {{ notificationMessage }}
-        </app-chef-notification>
+        <div class="sticky-inner">
+          <app-chef-notification
+            *ngIf="downloadErrorVisible"
+            type="error"
+            timeout="5"
+            (dismissed)="hideDownloadError()">
+            {{ notificationMessage }}
+          </app-chef-notification>
+        </div>
       </div>
 
       <chef-page-header class="profiles-header">

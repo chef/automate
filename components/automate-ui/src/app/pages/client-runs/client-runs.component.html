@@ -7,13 +7,15 @@
   <div class="container">
     
     <div class="sticky-notifications">
-      <app-chef-notification
-        *ngIf="notificationVisible"
-        [type]="'error'"
-        [timeout]="8"
-        (dismissed)="hideNotification()">
-        {{ notificationMessage }}
-      </app-chef-notification>
+      <div class="sticky-inner">
+        <app-chef-notification
+          *ngIf="notificationVisible"
+          [type]="'error'"
+          [timeout]="8"
+          (dismissed)="hideNotification()">
+          {{ notificationMessage }}
+        </app-chef-notification>
+      </div>
     </div>
     <main>
       <div class="node-list-container">

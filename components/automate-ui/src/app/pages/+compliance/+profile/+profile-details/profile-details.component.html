@@ -7,29 +7,31 @@
       </chef-breadcrumbs>
 
       <div class="sticky-notifications">
-        <app-chef-notification
-          *ngIf="downloadErrorVisible"
-          type="error"
-          timeout="5"
-          (dismissed)="hideDownloadError()">
-          {{ downloadFailureNotificationContent }}
-        </app-chef-notification>
+        <div class="sticky-inner">
+          <app-chef-notification
+            *ngIf="downloadErrorVisible"
+            type="error"
+            timeout="5"
+            (dismissed)="hideDownloadError()">
+            {{ downloadFailureNotificationContent }}
+          </app-chef-notification>
 
-        <app-chef-notification
-          *ngIf="deleteErrorVisible"
-          type="error"
-          timeout="5"
-          (dismissed)="hideDeleteError()">
-          {{ deleteFailureNotificationContent }}
-        </app-chef-notification>
+          <app-chef-notification
+            *ngIf="deleteErrorVisible"
+            type="error"
+            timeout="5"
+            (dismissed)="hideDeleteError()">
+            {{ deleteFailureNotificationContent }}
+          </app-chef-notification>
 
-        <app-chef-notification
-          *ngIf="installErrorVisible"
-          type="error"
-          timeout="5"
-          (dismissed)="hideInstallError()">
-          {{ installFailureNotificationContent }}
-        </app-chef-notification>
+          <app-chef-notification
+            *ngIf="installErrorVisible"
+            type="error"
+            timeout="5"
+            (dismissed)="hideInstallError()">
+            {{ installFailureNotificationContent }}
+          </app-chef-notification>
+        </div>
       </div>
 
       <ng-container class="applications-container" *ngIf="!showLoadingIcon">
