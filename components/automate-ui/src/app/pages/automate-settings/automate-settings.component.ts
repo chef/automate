@@ -131,7 +131,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   // Notification bits
   notificationVisible = false;
   notificationType = 'info';
-  notificationMessage = 'Settings saved';
+  notificationMessage = 'Settings saved.';
 
   private isDestroyed = new Subject<boolean>();
 
