@@ -113,14 +113,18 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   drawLine() {
     // create the line using path function
     const line = this.path(this.data);
-    
+
     // append the line to the chart
-    this.svgSelection.append('path')
-                      .attr('class', 'line')
-                      .attr('d', line);
+    this.svgSelection
+      .selectAll('.line')
+      .data(this.data)
+      .enter()
+      .append('path')
+      .attr('class', 'line')
+      .attr('d', line);
   }
 
-  drawChartLines() {
+  drawGrid() {
     const yAxis = d3.axisRight(this.yScale).ticks(1);
     this.axisYSelection.call(yAxis);
 
@@ -147,14 +151,14 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   ngOnChanges() {
     // console.log(this.data);
     // this.resizeChart();
-    // this.drawChartLines();
+    // this.drawGrid();
     // this.drawLine();
   }
 
   ngOnInit() {
     console.log(this.data);
     this.resizeChart();
-    this.drawChartLines();
+    this.drawGrid();
     this.drawLine();
   }
 
