@@ -11,6 +11,8 @@ import * as automateSettings from './entities/automate-settings/automate-setting
 import * as clientRuns from './entities/client-runs/client-runs.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
+import * as infraRoleEntity from './entities/infra-roles/infra-role.reducer';
+import * as infraRoleDetailsEntity from './entities/infra-roles/infra-role-details.reducer';
 import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
 import * as integrationsDetail from './pages/integrations/detail/integrations-detail.reducer';
 import * as integrationsEdit from './pages/integrations/edit/integrations-edit.reducer';
@@ -61,6 +63,8 @@ export interface NgrxStateAtom {
   clientRunsEntity: clientRuns.ClientRunsEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
   destinations: destinationEntity.DestinationEntityState;
+  infraroles: infraRoleEntity.InfraRoleEntityState;
+  infraroledetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
@@ -171,6 +175,8 @@ export const defaultInitialState = {
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
+  infraroles: infraRoleEntity.InfraRoleEntityInitialState,
+  infraroledetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
   licenseStatus: license.LicenseStatusEntityInitialState,
   managers: manager.ManagerEntityInitialState,
@@ -213,6 +219,8 @@ export const ngrxReducers = {
   automateSettings: automateSettings.automateSettingsEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
+  infraRoles: infraRoleEntity.infraRoleEntityReducer,
+  infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
   credentialEntity: credential.credentialReducer,
   destinations: destinationEntity.destinationEntityReducer,
   jobs: jobEntity.jobEntityReducer,
