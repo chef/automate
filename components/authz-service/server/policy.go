@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -93,7 +94,7 @@ func (s *policyServer) CreatePolicy(
 	req *api.CreatePolicyReq) (*api.Policy, error) {
 
 	// API requests always create custom policies.
-	err := validate.RequiredIDandName(req, "policy")
+	err := requiredFieldsAndProjects(req, "policy")
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -211,7 +212,7 @@ func (s *policyServer) UpdatePolicy(
 	ctx context.Context,
 	req *api.UpdatePolicyReq) (*api.Policy, error) {
 
-	err := validate.RequiredIDandName(req, "policy")
+	err := requiredFieldsAndProjects(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -399,7 +400,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 func (s *policyServer) CreateRole(
 	ctx context.Context,
 	req *api.CreateRoleReq) (*api.Role, error) {
-	err := validate.RequiredIDandName(req, "role")
+	err := requiredFieldsAndProjects(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -504,7 +505,7 @@ func (s *policyServer) UpdateRole(
 	ctx context.Context,
 	req *api.UpdateRoleReq) (*api.Role, error) {
 
-	err := validate.RequiredIDandName(req, "role")
+	err := requiredFieldsAndProjects(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -762,4 +763,33 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 		}
 	}
 	s.log.WithFields(kv).Info("Policy definition")
+}
+
+// requiredFieldsAndProjects verifies that all the required inputs are not empty
+func requiredFieldsAndProjects(obj interface {
+	GetId() string
+	GetName() string
+	GetProjects() []string
+}, resourceName string) error {
+	err := validate.RequiredIDandName(obj, resourceName)
+	if err != nil {
+		return err
+	}
+	return requiredProjects(obj.GetProjects())
+}
+
+// requiredProjects verifies that the projects are not empty and do not include '(unassigned)'
+func requiredProjects(projects []string) error {
+	for _, project := range projects {
+		if validate.EmptyOrWhitespaceOnlyRE.MatchString(project) {
+			e := fmt.Sprintf("projects must contain at least one non-whitespace character")
+			return errors.New(e)
+		}
+		if project == constants.UnassignedProjectID {
+			return errors.Errorf("%q cannot explicitly be set. "+
+				"If you wish to create an object in %q, you should pass no projects on creation.",
+				constants.UnassignedProjectID, constants.UnassignedProjectID)
+		}
+	}
+	return nil
 }
