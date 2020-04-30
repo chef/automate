@@ -82,7 +82,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
     this.updateServerForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       fqdn: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       ip_address: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
@@ -123,7 +122,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.server = { ...ServerState };
       this.orgs = allOrgsState;
       this.updateServerForm.controls['name'].setValue(this.server.name);
-      this.updateServerForm.controls['description'].setValue(this.server.description);
       this.updateServerForm.controls['fqdn'].setValue(this.server.fqdn);
       this.updateServerForm.controls['ip_address'].setValue(this.server.ip_address);
       this.creatingServerOrg = false;
@@ -209,7 +207,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     const updatedServer = {
       id: this.server.id,
       name: this.updateServerForm.controls.name.value.trim(),
-      description: this.updateServerForm.controls.description.value.trim(),
       fqdn: this.updateServerForm.controls.fqdn.value.trim(),
       ip_address: this.updateServerForm.controls.ip_address.value.trim()
     };

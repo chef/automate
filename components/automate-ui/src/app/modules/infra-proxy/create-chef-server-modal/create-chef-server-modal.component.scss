@@ -27,6 +27,14 @@ chef-modal {
       label {
         padding-bottom: 0;
       }
+
+      #id-fields {
+        font-size: 0.75em;
+
+        .key-label {
+          font-weight: bold;
+        }
+      }
     }
 
     #button-bar {

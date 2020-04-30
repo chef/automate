@@ -47,8 +47,9 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
 
     this.createChefServerForm = this.fb.group({
       // Must stay in sync with error checks in create-chef-server-modal.component.html
+      id: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       fqdn: ['', [Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.VALID_FQDN)
@@ -109,8 +110,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   public createChefServer(): void {
     this.creatingChefServer = true;
     const server = {
+      id: this.createChefServerForm.controls['id'].value,
       name: this.createChefServerForm.controls['name'].value.trim(),
-      description: this.createChefServerForm.controls['description'].value.trim(),
       fqdn: this.createChefServerForm.controls['fqdn'].value.trim(),
       ip_address: this.createChefServerForm.controls['ip_address'].value.trim()
     };
