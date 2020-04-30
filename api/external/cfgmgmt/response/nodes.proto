@@ -8,51 +8,66 @@ import "google/protobuf/struct.proto";
 
 message Node {
   // The chef_guid associated with the node.
-  string id                                   = 1;
+  string id                                          = 1;
   // The name of the node.
-  string name                                 = 2;
+  string name                                        = 2;
   // The FQDN of the node.
-  string fqdn                                 = 3;
+  string fqdn                                        = 3;
   // The time on the latest received infra node report. 
-  google.protobuf.Timestamp checkin           = 4;
+  google.protobuf.Timestamp checkin                  = 4;
   // Count in seconds that the node has been active.
-  int32  uptime_seconds                       = 5;
+  int32  uptime_seconds                              = 5;
   // The organization the node is associated with.
-  string organization                         = 6;
+  string organization                                = 6;
   // The environment the node is in.
-  string environment                          = 7;
+  string environment                                 = 7;
   // The full platform information for the node (platform + version).
-  string platform                             = 8;
+  string platform                                    = 8;
   // The platform family information for the node.
-  string platform_family                      = 9;
+  string platform_family                             = 9;
   // The platform version information for the node.
-  string platform_version                     = 10;
+  string platform_version                            = 10;
   // The status on the latest infra report for the node.
-  string status                               = 11;
+  string status                                      = 11;
   // The chef server associated with the node.
-  string source_fqdn                          = 12;
+  string source_fqdn                                 = 12;
   // The latest infra run report id for the node.
-  string latest_run_id                        = 13;
+  string latest_run_id                               = 13;
   // Boolean used to denote whether or not the run data for the node is in Automate.
-  bool	 has_runs_data                        = 14;
+  bool	 has_runs_data                               = 14;
   // Timestamp on most recently received infra run report for the node.
-  google.protobuf.Timestamp last_ccr_received = 15;
+  google.protobuf.Timestamp last_ccr_received        = 15;
   // The policy name associated with the node.
-  string policy_name                          = 16;
+  string policy_name                                 = 16;
   // The policy group associated with the node.
-  string policy_group                         = 17;
+  string policy_group                                = 17;
   // The policy revision associated with the node.
-  string policy_revision                      = 18;
+  string policy_revision                             = 18;
   // Boolean used to denote whether or not the node has been identified to be running cookbooks with deprecations.
-  bool   has_deprecations                     = 19;
+  bool   has_deprecations                            = 19;
   // Chef Infra version on the node.
-  string chef_version                         = 20;
+  string chef_version                                = 20;
   // Chef tags associated with the node.
-  repeated string chef_tags                   = 21;
+  repeated string chef_tags                          = 21;
   // Count of cookbook deprectations on the node.
-  int32 deprecations_count                    = 22;
+  int32 deprecations_count                           = 22;
   // Timestamp when the node was created
-  google.protobuf.Timestamp created_at        = 23;
+  google.protobuf.Timestamp created_at               = 23;
+  string ipaddress                                   = 24;
+  string ip6address                                  = 25;
+  // timezone of the node
+  string timezone                                    = 26;
+  string domain                                      = 27;
+  string hostname                                    = 28;
+  string memory_total                                = 29;
+  string macaddress                                  = 30;
+  string dmi_system_serial_number                    = 31;
+  string dmi_system_manufacturer                     = 32;
+  string virtualization_role                         = 33;
+  string virtualization_system                       = 34;
+  string kernel_version                              = 35;
+  string kernel_release                              = 36;
+  string cloud_provider                              = 37;
 }
 
 message NodeAttribute{
@@ -86,75 +101,90 @@ message NodeAttribute{
 
 message Run {
   // Id of the infra node run.
-  string                    id                     = 1;
+  string                    id                       = 1;
   // The chef_guid associated with the node.
-  string                    node_id                = 2;
+  string                    node_id                  = 2;
   // Name of the node.
-  string                    node_name              = 3;
+  string                    node_name                = 3;
   // The organization the node is associated with.
-  string                    organization           = 4;
+  string                    organization             = 4;
   // Start time of the infra run.
-  google.protobuf.Timestamp start_time             = 5;
+  google.protobuf.Timestamp start_time               = 5;
   // End time of the infra run.
-  google.protobuf.Timestamp end_time               = 6;
+  google.protobuf.Timestamp end_time                 = 6;
   // Source of the node run (e.g. chef-solo).
-  string                    source                 = 7;
+  string                    source                   = 7;
   // Status of the infra node run.
-  string                    status                 = 8;
+  string                    status                   = 8;
   // Resource count reported on the infra node run.
-  int32                     total_resource_count   = 9;
+  int32                     total_resource_count     = 9;
   // Count of resources updated in the infra node run.
-  int32                     updated_resource_count = 10;
+  int32                     updated_resource_count   = 10;
   // Chef-client version on the node.
-  string                    chef_version           = 11;
+  string                    chef_version             = 11;
   // Count in seconds that the node has been active.
-  int32                     uptime_seconds         = 12;
+  int32                     uptime_seconds           = 12;
   // The environment for the node. 
-  string                    environment            = 13;
+  string                    environment              = 13;
   // FQDN of the node.
-  string                    fqdn                   = 14;
+  string                    fqdn                     = 14;
   // Chef server associated with the node.
-  string                    source_fqdn            = 15;
+  string                    source_fqdn              = 15;
   // IP Address for the node.
-  string                    ipaddress              = 16;
+  string                    ipaddress                = 16;
   // Intentionally blank.
-  repeated Resource         resources              = 17;
+  repeated Resource         resources                = 17;
   // Run list for the node.
-  repeated string           run_list               = 18;
+  repeated string           run_list                 = 18;
   // Intentionally blank.
-  repeated Deprecation      deprecations           = 19;
+  repeated Deprecation      deprecations             = 19;
   // Chef Error information, available on failed runs.
-  ChefError                 error                  = 20;
+  ChefError                 error                    = 20;
   // Unused field.
-  repeated string           tags                   = 21;
+  repeated string           tags                     = 21;
   // List of resource names for the node.
-  repeated string           resource_names         = 22;
+  repeated string           resource_names           = 22;
   // List of recipes the node calls.
-  repeated string           recipes                = 23;
+  repeated string           recipes                  = 23;
   // List of tags associated with the node.
-  repeated string           chef_tags              = 24;
+  repeated string           chef_tags                = 24;
   // List of cookbooks associated with the node.
-  repeated string           cookbooks              = 25;
+  repeated string           cookbooks                = 25;
   // Full platform string for the node (family + version).
-  string                    platform               = 26;
+  string                    platform                 = 26;
   // Platform family for the node.
-  string                    platform_family        = 27;
+  string                    platform_family          = 27;
   // Platform version for the node.
-  string                    platform_version       = 28;
+  string                    platform_version         = 28;
   // List of roles associated with the node.
-  repeated string           roles                  = 29;
+  repeated string           roles                    = 29;
   // Policy name associated with the node.
-  string                    policy_name            = 30;
+  string                    policy_name              = 30;
   // Policy group associated with the node.
-  string                    policy_group           = 31;
+  string                    policy_group             = 31;
   // Policy revision associated with the node.
-  string                    policy_revision        = 32;
+  string                    policy_revision          = 32;
   // Expanded run list for the node.
-  ExpandedRunList           expanded_run_list      = 33;
+  ExpandedRunList           expanded_run_list        = 33;
   // List of projects the node belongs to. This is a concept introduced with IAMv2.
-  repeated string           projects               = 34;
+  repeated string           projects                 = 34;
   // List of versioned cookbooks associated with the node
-  repeated VersionedCookbook versioned_cookbooks   = 35;
+  repeated VersionedCookbook versioned_cookbooks     = 35;
+  // IP 6 Address for the node.
+  string                    ip6address               = 36;
+  // timezone of the node
+  string                    timezone                 = 37;
+  string                    domain                   = 38;
+  string                    hostname                 = 39;
+  string                    memory_total             = 40;
+  string                    macaddress               = 41;
+  string                    dmi_system_serial_number = 42;
+  string                    dmi_system_manufacturer  = 43;
+  string                    virtualization_role      = 44;
+  string                    virtualization_system    = 45;
+  string                    kernel_version           = 46;
+  string                    kernel_release           = 47;
+  string                    cloud_provider           = 48;
 }
 
 message ExpandedRunList {

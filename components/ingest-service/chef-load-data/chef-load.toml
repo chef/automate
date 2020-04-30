@@ -1,4 +1,4 @@
-data_collector_url = "https://localhost:2000/events/data-collector"
+data_collector_url = "https://localhost:2000/api/v0/events/data-collector"
 data_collector_token = "REPLACE_ME_VIA_HAB"
 converge_status_json_file = "./components/ingest-service/examples/converge-success-report.json"
 ohai_json_file = "./components/ingest-service/chef-load-data/ohai-data.json"

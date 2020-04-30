@@ -513,6 +513,9 @@ control 'config-mgmt-ccr-2' do
         expect(run[:expanded_run_list][:run_list][0][:name]).to eq 'opscode-ci::slave'
         expect(run[:expanded_run_list][:run_list][0][:version]).to eq ''
         expect(run[:expanded_run_list][:run_list][0][:skipped]).to eq false
+
+        expect(run[:policy_name]).to eq 'policy_name1'
+        expect(run[:ip6address]).to eq '242.58.187.217'
       end
     end
 

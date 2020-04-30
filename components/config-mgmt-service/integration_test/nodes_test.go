@@ -2343,7 +2343,6 @@ func TestGetRunsProjectFilter(t *testing.T) {
 			suite.IngestRuns(test.runs)
 			defer suite.DeleteAllDocuments()
 
-			// call GetNodes
 			res, err := cfgmgmt.GetRuns(test.ctx, &test.request)
 
 			assert.NoError(t, err)
