@@ -26,6 +26,8 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   @ViewChild('svg', {static: true}) svg: ElementRef;
 
+  heightMargin = 40;
+
   ////////   X AXIS ITEMS   ////////
   // maps all of our x data points
   get xData() {
@@ -61,7 +63,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   get rangeY() {
     const min = 10;
-    const max = this.height - 10;
+    const max = this.height - this.heightMargin;
     return [max, min];
   }
 
@@ -156,22 +158,11 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
 
   renderGrid() {
-    // create the Y axis
-    const yAxis = d3.axisRight(this.yScale)
-                    .tickFormat(d => d + '%')
-                    .ticks(1);
-    // render the Y axis
-    const y = this.svgSelection.selectAll('.y-axis').data([this.data]);
-    y.exit().remove();
-    y.enter().append('g').attr('class', 'y-axis').merge(y)
-      .transition().duration(1000)
-      .call(yAxis);
-
     // create the X axis grid lines
     const xGrid = d3.axisTop()
       .ticks(this.data.length)
       .tickFormat('')
-      .tickSize(this.height - 20) // will need to subtract extra height here
+      .tickSize(this.height - ( this.heightMargin * ( 3 / 2 ) ))
       .tickSizeOuter(0)
       .scale(this.xScale);
     // Render the X axis and X ticks
@@ -179,9 +170,32 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     grid.exit().remove();
     grid.enter().append('g').attr('class', 'grid')
       // this line will need to be updated to flexible
-      .attr('transform', `translate(0, ${this.height - 10})`)
+      .attr('transform', `translate(0, ${this.height - this.heightMargin })`)
       .merge(grid).transition().duration(1000)
       .call(xGrid);
+
+    // create the Y axis
+    const yAxis = d3.axisRight(this.yScale).tickFormat(d => d + '%').ticks(1);
+    // render the Y axis
+    const y = this.svgSelection.selectAll('.y-axis').data([this.data]);
+    y.exit().remove();
+    y.enter().append('g').attr('class', 'y-axis').merge(y)
+      .transition().duration(1000)
+      .call(yAxis);
+
+    const xAxis = d3.axisBottom().ticks(this.data.length)
+      .tickSize(0).tickSizeOuter(0)
+      .scale(this.xScale);
+
+    const x = this.svgSelection.selectAll('.x-axis')
+    .each(d => console.log(d))
+    .data([this.data]);
+
+    x.exit().remove();
+    x.enter().append('g').attr('class', 'x-axis')
+      .attr('transform', `translate(0, ${this.height - this.heightMargin })`)
+      .merge(x).transition().duration(1000)
+      .call(xAxis);
 
     // remove zero from bottom of chart on x axis
     this.svgSelection.selectAll('.tick')
