@@ -35,8 +35,12 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
     //           Right now, we're throwing the ID token across the internet for telemetry,
     //           where it's not needed. It would be nice to _not_ do that.
     let headers = request.headers.set('Authorization', `Bearer ${this.chefSession.id_token}`);
+    // Check and then remove `unfiltered` param; it is a piggybacked parameter
+    // needed by this interceptor, not to be passed on.
+    // It allows certain URLs to suppress sending the projects filter.
     const filtered = request.params.get('unfiltered') !== 'true';
     const params = request.params.delete('unfiltered');
+
     if (this.projects && filtered) {
       headers = headers.set('projects', this.projects);
     }
