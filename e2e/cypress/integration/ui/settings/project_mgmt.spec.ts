@@ -19,8 +19,17 @@ describe('project management', () => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminIdToken = admin.id_token;
       cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-      // Set the projects filter to all projects
-      cy.applyProjectsFilter([]);
+
+      // if there are projects that already exist, set the projects filter to all projects
+      cy.request({
+        auth: { bearer: adminIdToken },
+        url: '/apis/iam/v2/projects'
+      }).then((response) => {
+        expect(response.status).to.equal(200);
+        if (response.body.projects.length > 0) {
+          cy.applyProjectsFilter([]);
+        }
+      });
     });
   });
 
@@ -94,7 +103,7 @@ describe('project management', () => {
 
   // something is occasionally resetting the projects filter to (unassigned)
   it('can create a rule for the new project', () => {
-    cy.get('app-project-details').contains('Edits are pending').should('not.exist');
+    cy.get('app-pending-edits-bar').should('not.be.visible');
     cy.get('app-project-details app-authorized button').contains('Create Rule').click();
 
     cy.url().should('include', `/settings/projects/${projectID}/rules`);
@@ -110,13 +119,13 @@ describe('project management', () => {
     // Event
     cy.get('#create-type-dropdown').select('Event');
     cy.get('[data-cy=attribute-dropdown]').select('Chef Organization');
-    cy.get('[data-cy=attribute-dropdown]').select('Chef Server');
+    cy.get('[data-cy=attribute-dropdown]').select('Chef Infra Server');
     cy.get('[data-cy=operator-dropdown]').select('equals');
     cy.get('[data-cy=operator-dropdown]').select('member of');
 
     // Node
     cy.get('#create-type-dropdown').select('Node');
-    const nodeAttributes = ['Chef Organization', 'Chef Server', 'Environment',
+    const nodeAttributes = ['Chef Organization', 'Chef Infra Server', 'Environment',
       'Chef Role', 'Chef Tag', 'Chef Policy Name', 'Chef Policy Group'];
 
     nodeAttributes.forEach((att: string) => {
@@ -125,14 +134,14 @@ describe('project management', () => {
 
     cy.get('[data-cy=operator-dropdown]').select('member of');
     cy.get('[data-cy=operator-dropdown]').select('equals');
-    cy.get('[data-cy=rule-value] input').type('Chef Policy Group Foo');
+    cy.get('[data-cy=rule-value]').type('Chef Policy Group Foo');
 
     cy.get('app-project-rules #right-buttons button').contains('Save Rule').click();
     cy.get('app-project-rules chef-page').should('not.be.visible');
 
     cy.url().should('include', `/settings/projects/${projectID}`);
     cy.get('app-project-details chef-td').contains(ruleID);
-    cy.get('app-project-details').contains('Edits are pending');
+    cy.get('app-pending-edits-bar').contains('Project edits pending');
   });
 
   it('displays a list of rules for a project', () => {
@@ -148,7 +157,7 @@ describe('project management', () => {
   });
 
   it('can update a project rule', () => {
-    cy.get('app-project-details').contains('Edits are pending');
+    cy.get('app-pending-edits-bar').contains('Project edits pending');
     const updatedRuleName = `updated ${ruleName}`;
     cy.get('app-project-details a').contains(ruleName).click();
 
@@ -174,7 +183,7 @@ describe('project management', () => {
     cy.get('[data-cy=operator-dropdown]:last')
       .select('member of');
 
-    cy.get('[data-cy=rule-value]:last input')
+    cy.get('[data-cy=rule-value]:last')
       .type('Dev, Prod, Test');
 
     cy.get('app-project-rules #right-buttons button').contains('Save Rule').click();
@@ -183,7 +192,7 @@ describe('project management', () => {
     cy.url().should('include', '/settings/projects');
     cy.get('app-project-details chef-td').contains(updatedRuleName);
     cy.get('app-project-details chef-td').contains('2 conditions');
-    cy.get('app-project-details').contains('Edits are pending');
+    cy.get('app-pending-edits-bar').contains('Project edits pending');
   });
 
   it('can update a project name', () => {
@@ -202,7 +211,7 @@ describe('project management', () => {
   });
 
   it('can delete a project rule', () => {
-    cy.get('app-project-details').contains('Edits are pending');
+    cy.get('app-pending-edits-bar').contains('Project edits pending');
     cy.get('[data-cy=rules-tab]').click();
 
     cy.get('app-project-details chef-td').contains(ruleID).parent()
@@ -217,7 +226,7 @@ describe('project management', () => {
     // since this is a cypress custom project, we know this is the only rule.
     // the empty UI should show up so entire table will be missing.
     cy.get('app-project-details chef-tbody').should('not.exist');
-    cy.get('app-project-details').contains('Edits are pending').should('not.exist');
+    cy.get('app-pending-edits-bar').contains('Project edits pending').should('not.exist');
   });
 
   // sometimes the deleted successfully notification isn't showing up
