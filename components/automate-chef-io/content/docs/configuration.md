@@ -379,6 +379,17 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 # key = "-----BEGIN RSA PRIVATE KEY-----\n<your load balancer private key>\n-----END RSA PRIVATE KEY-----\n"
 ```
 
+#### Buffer Size
+
+Configure buffer size when ingesting.
+
+```toml
+[compliance.v1.sys.service]
+message_buffer_size = 200
+[ingest.v1.sys.service]
+message_buffer_size = 200
+```
+
 ### Troubleshooting
 
 Common syntax errors may cause issues in configuration files:
