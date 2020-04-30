@@ -1,9 +1,4 @@
-import { itFlaky } from '../../../support/constants';
-interface Project {
-  id: string;
-  name: string;
-  type: string;
-}
+import { Project } from '../../../support/types';
 
 describe('project management', () => {
   // we increase the default delay to mimic the average human's typing speed
@@ -98,7 +93,7 @@ describe('project management', () => {
   });
 
   // something is occasionally resetting the projects filter to (unassigned)
-  itFlaky('can create a rule for the new project', () => {
+  it('can create a rule for the new project', () => {
     cy.get('app-project-details').contains('Edits are pending').should('not.exist');
     cy.get('app-project-details app-authorized button').contains('Create Rule').click();
 
@@ -140,7 +135,7 @@ describe('project management', () => {
     cy.get('app-project-details').contains('Edits are pending');
   });
 
-  itFlaky('displays a list of rules for a project', () => {
+  it('displays a list of rules for a project', () => {
     ['Name', 'ID', 'Resource Type', 'Conditions', 'Edits'].forEach((header) => {
       cy.get('app-project-details chef-th').contains(header);
     });
@@ -152,7 +147,7 @@ describe('project management', () => {
     cy.get('app-project-details chef-td').contains('Edits pending');
   });
 
-  itFlaky('can update a project rule', () => {
+  it('can update a project rule', () => {
     cy.get('app-project-details').contains('Edits are pending');
     const updatedRuleName = `updated ${ruleName}`;
     cy.get('app-project-details a').contains(ruleName).click();
@@ -191,7 +186,7 @@ describe('project management', () => {
     cy.get('app-project-details').contains('Edits are pending');
   });
 
-  itFlaky('can update a project name', () => {
+  it('can update a project name', () => {
     const updatedProjectName = `updated ${projectName}`;
     cy.route('GET', `/apis/iam/v2/projects/${projectID}`).as('getProject');
 
@@ -206,7 +201,7 @@ describe('project management', () => {
     cy.get('app-project-details h1.page-title').contains(updatedProjectName);
   });
 
-  itFlaky('can delete a project rule', () => {
+  it('can delete a project rule', () => {
     cy.get('app-project-details').contains('Edits are pending');
     cy.get('[data-cy=rules-tab]').click();
 
@@ -226,7 +221,7 @@ describe('project management', () => {
   });
 
   // sometimes the deleted successfully notification isn't showing up
-  itFlaky('can delete a project', () => {
+  it('can delete a project', () => {
     cy.get('.breadcrumb').click();
 
     cy.get('app-project-list chef-td').contains(projectID).parent()
@@ -258,7 +253,7 @@ describe('project management', () => {
   });
 
   // these tests are currently interdependent so mark as flaky until the above isn't
-  itFlaky('can create a project with a custom ID', () => {
+  it('can create a project with a custom ID', () => {
     cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
     cy.get('[data-cy=create-project]').contains('Create Project').click();
