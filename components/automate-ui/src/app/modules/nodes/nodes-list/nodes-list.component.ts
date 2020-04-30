@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
 import { timer as observableTimer, Subject } from 'rxjs';
 import { takeUntil, withLatestFrom } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
@@ -19,11 +18,13 @@ import * as moment from 'moment/moment';
 
 export class NodesListComponent implements OnInit, OnDestroy {
   constructor(
-    private store: Store<NgrxStateAtom>,
-    private router: Router
+    private store: Store<NgrxStateAtom>
   ) { }
 
   nodesList;
+  nodesListSort;
+  nodesListSortOrder;
+  nodesListFilters;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   ngOnInit(): void {
@@ -32,9 +33,10 @@ export class NodesListComponent implements OnInit, OnDestroy {
       .subscribe(nodesList => this.nodesList = nodesList);
 
     observableTimer(0, 100000).pipe(
-      withLatestFrom(this.store.select(selectors.nodesListParams)),
+      withLatestFrom(this.store.select(selectors.nodesList)),
       takeUntil(this.isDestroyed))
-      .subscribe(([_i, params]) => {
+      .subscribe(([_i]) => {
+        const params = {page: this.nodesList.page, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
         this.store.dispatch(actions.getNodes(params));
       });
   }
@@ -43,17 +45,18 @@ export class NodesListComponent implements OnInit, OnDestroy {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
-
-  orderFor(sortKey) {
-    const {sort, order} = this.nodesList.items;
-    if (sortKey === sort) {
-      return order;
-    }
-    return 'none';
+  
+  onPageChange(event) {
+    this.nodesList.page = event;
+    const params = {page: this.nodesList.page, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+    this.store.dispatch(actions.getNodes(params));
   }
 
-  trackBy(node) {
-    return node;
+  orderFor(sortKey) {
+    if (sortKey === this.nodesListSort) {
+      return this.nodesListSortOrder;
+    }
+    return 'none';
   }
 
   onSortToggled(event) {
@@ -61,11 +64,22 @@ export class NodesListComponent implements OnInit, OnDestroy {
     if (order === 'none') {
       sort = undefined;
       order = undefined;
+      return;
     }
+    this.nodesListSort = sort;
+    this.nodesListSortOrder = order.toUpperCase();
+    const params = {page: this.nodesList.page, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+    this.store.dispatch(actions.getNodes(params));
+  }
 
-    const queryParams = {sort, order};
+  filterFor(type, item) {
+    this.nodesListFilters = [{key: type, values: [item]}];
+    const params = {page: this.nodesList.page, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+    this.store.dispatch(actions.getNodes(params));
+  }
 
-    this.router.navigate([], {queryParams} );
+  trackBy(node) {
+    return node;
   }
 
   deleteNode(node) {

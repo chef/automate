@@ -1,6 +1,9 @@
 <div class="content-container">
     <div class="container">
       <main>
+        NOTE:<br>
+        THIS IS AN EXPERIMENTAL VIEW, ONLY INTENDED TO BE USED FOR DEVELOPMENT.<br>
+        THIS IS NOT INTENDED FOR CUSTOMER USE (yet).<br>
         <chef-table class="nodes-list-table" (sort-toggled)="onSortToggled($event)">
           <chef-thead>
             <chef-tr>
@@ -38,13 +41,13 @@
           </chef-thead>
         
           <chef-loading-spinner *ngIf="nodesList.loading" size="100"></chef-loading-spinner>
-        
+
           <chef-tbody *ngIf="!nodesList.loading">
             <chef-tr *ngFor="let node of nodesList.items; index as i; trackBy: trackBy;">
-              <chef-td>{{ node.name }}</chef-td>
-              <chef-td>{{ node.platform }} {{ node.platform_version }}</chef-td>
-              <chef-td>{{ node.manager }}</chef-td>
-              <chef-td>{{ node.last_contact }}</chef-td>
+              <chef-td (click)="filterFor('name', node.name)"> {{ node.name }}</chef-td>
+              <chef-td (click)="filterFor('platform', node.platform)">{{ node.platform }} {{ node.platform_version }}</chef-td>
+              <chef-td (click)="filterFor('manager', node.manager)">{{ node.manager }}</chef-td>
+              <chef-td (click)="filterFor('last_contact', node.last_contact)">{{ node.last_contact }}</chef-td>
               <chef-td>
                 <chef-icon class="status-icon" [ngClass]="node.scan_data.status">
                   {{ statusIcon(node.scan_data.status) }}
@@ -61,7 +64,7 @@
                   {{ statusIcon(node.run_data.penultimate_status) }}
                 </chef-icon>               
               </chef-td>    
-              <chef-td>{{ node.state }}</chef-td>
+              <chef-td (click)="filterFor('state', node.state)">{{ node.state }}</chef-td>
               <chef-td>{{ displayNodeTags(node.tags) }}</chef-td>
               <chef-td>
                 <chef-button label="edit" secondary
@@ -75,12 +78,19 @@
             </chef-tr>
           </chef-tbody>
         </chef-table>
-        <app-page-picker
-        [total]="totalDesktops"
+        <!-- <app-page-picker
+        [total]="totalNodes"
         [perPage]="pageSize"
         [page]="currentPage"
         (pageChanged)="onPageChange($event)">
-      </app-page-picker>
+      </app-page-picker> -->
+      <app-page-picker
+  class="nodes-list-paging"
+  [total]="nodesList.total"
+  [perPage]="nodesList.per_page"
+  [page]="nodesList.page"
+  (pageChanged)="onPageChange($event)">
+</app-page-picker>
       </main>
     </div>
   </div>
