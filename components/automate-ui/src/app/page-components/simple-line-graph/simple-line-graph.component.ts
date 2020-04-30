@@ -1,10 +1,7 @@
 import {
   Component, Input, OnChanges, ViewChild, ElementRef, OnInit
 } from '@angular/core';
-// import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
-// import * as moment from 'moment';
-// import { DateTime } from 'app/helpers/datetime/datetime';
 
 
 @Component({
@@ -17,7 +14,6 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   constructor(
     private chart: ElementRef
-    // @Inject(DOCUMENT) private document: Document
   ) {}
 
   @Input() data: any = [];
@@ -39,7 +35,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   get rangeX() {
     const min = 50;
     const max = this.width - 50;
-    return [min, max];
+    return [max, min];  // we want to plot our data backwards, so we reverse [min, max]
   }
   // determines the min and max values of the x axis
   get domainX() {
@@ -195,7 +191,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
         default:
           return `${daysPassed} days ago`;
       }
-    });
+    }).reverse(); // because we reversed our data above, we need to reverse our labels as well
 
     const xAxis = d3.axisBottom().ticks(this.data.length)
       .tickSize(0).tickSizeOuter(0).tickFormat((_d, i) => tickLabels[i])
