@@ -37,6 +37,21 @@
       line-height: 12px;
       letter-spacing: 0.5px;
     }
+
+  }
+
+  .circle {
+    cursor: pointer;
+  }
+
+  .tooltip {
+    position: absolute;			
+    // display: block;						
+    // background-color: $chef-white;
+    // padding: 8px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   // styles the far right x-line
@@ -53,5 +68,29 @@
       stroke-width: 1px;
     }
   }
+}
 
+::ng-deep {
+chef-tooltip {
+  font-size: 10px;
+  padding: 8px 10px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: #3023AE;
+    background: linear-gradient(315deg, #3023AE, #C86DD7);
+    border-bottom-left-radius: $chef-border-radius;
+    border-top-left-radius: $chef-border-radius;
+  }
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
 }

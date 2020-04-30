@@ -1,6 +1,7 @@
 import {
   Component, Input, OnChanges, ViewChild, ElementRef, OnInit
 } from '@angular/core';
+// import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
 // import * as moment from 'moment';
 // import { DateTime } from 'app/helpers/datetime/datetime';
@@ -16,6 +17,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   constructor(
     private chart: ElementRef
+    // @Inject(DOCUMENT) private document: Document
   ) {}
 
   @Input() data: any = [];
@@ -120,11 +122,29 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   }
 
   renderPoints() {
+    // render tooltip
+    const toolTip = d3.select('body').selectAll('chef-tooltip').data([this.data]);
+    toolTip.exit().remove();
+    toolTip.enter().append('chef-tooltip')
+      .attr('for', 'tooltip').merge(toolTip);
+
+    const theToolTip = d3.select('chef-tooltip');
     const points = this.svgSelection.selectAll('circle').data(this.data);
     points.exit().remove();
     points
       .enter()
       .append('circle')
+        .on('mouseover', (cd) => {
+          console.log('mouseover');
+          theToolTip.style('left', `${d3.event.pageX}px`);
+          theToolTip.style('top', `${d3.event.pageY - 5}px`);
+          theToolTip.classed('active', true);
+          theToolTip
+            .text(_d => `Checked-in ${cd.percentage}%`);
+        })
+      .on('mouseout', () => {
+        theToolTip.classed('active', false);
+        })
       .attr('class', 'circle')
       .merge(points)
       .transition().duration(1000)
@@ -133,6 +153,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .attr('r', 4)
       .style('fill', 'black');
   }
+
 
   renderGrid() {
     // create the Y axis
