@@ -1,69 +1,38 @@
 @import "~styles/variables";
 
+:host {
+  display: block;
+  background-color: $white;
+  height: $navigation-height;
+  border-bottom: 1px solid $chef-grey;
+}
+
 header {
   position: relative;
+}
 
-  .cl-link {
-    display: flex;
-    position: fixed;
-    align-items: center;
-    color: $white;
-    bottom: 0;
-    right: 0;
-    background-color: $chef-primary;
-    padding: 0.25em 1em 0.25em 0.5em;
-    border-radius: $global-radius 0 0 0;
-    opacity: 0.5;
-    font-weight: bold;
-    text-decoration: none;
+.navigation-wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
 
-    &:hover {
-      opacity: 1;
-    }
+  .logo-wrapper {
+    margin-left: 16px;
 
-    span {
-      padding-left: 0.5em;
+    a.logo {
+      display: block;
+      background: $default-logo transparent no-repeat center;
+      width: 160px;
+      height: $navigation-height;
     }
   }
 
-  .navigation-wrapper {
+  .navigation-menu {
     display: flex;
-    justify-content: space-between;
-    padding-top: 2px 36px 0 0;
-    background-color: $white;
-    box-sizing: padding-box;
-    z-index: 200;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: $navigation-height;
-    border-bottom: 1px solid #DFE3E5;
+    align-items: center;
 
-    .left-nav {
-      display: flex;
-    }
-
-    .right-nav {
-      display: flex;
-      align-items: center;
-      padding-right: 16px;
-    }
-
-    .logo-wrapper {
-      margin: 0 21px 0 20px;
-
-      a.logo {
-        display: block;
-        background: $default-logo transparent no-repeat center;
-        width: 160px;
-        height: $navigation-height;
-      }
-    }
-
-    .navigation-menu {
-      display: flex;
-      align-items: center;
+    app-authorized {
+      display: block;
     }
 
     .nav-link {
@@ -80,35 +49,38 @@ header {
     }
   }
 
-  .nav-icon-link {
-    display: inline-block;
-    margin: 0 0 0 16px;
-    padding: 0.36em 0;
-    text-align: center;
-    color: $chef-primary-bright;
-    font-size: 18px;
-    height: 32px;
-    width: 32px;
-    border: 1px solid $chef-primary-bright;
-    border-radius: 50%;
-
-    &.active {
-      background-color: $chef-primary-bright;
-      color: $chef-white;
-    }
-
-    &.key-icon {
-      padding: 0.42em 0;
-      font-size: 16px;
-    }
+  .right-nav {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    padding-right: 16px;
   }
 }
 
-chef-tooltip {
-  font-size: 14px;
-}
+@media (max-width: 66rem) {
+  .navigation-wrapper {
+    flex-flow: row wrap;
 
-.rotated-icon {
-  transform: rotate(90deg) scaleX(1);
-  -webkit-transform: rotate(90deg) scaleX(1);
+    .logo-wrapper a.logo {
+      height: $navigation-height / 2;
+    }
+
+    .navigation-menu {
+      order: 3;
+      width: 100%;
+      height: ($navigation-height / 2) - 2px;
+      line-height: ($navigation-height / 2) - 2px;
+      border-top: 1px solid $chef-grey;
+      // background: $chef-lightest-grey;
+      overflow-x: auto;
+
+      .nav-link {
+        padding-left: 16px;
+
+        a {
+          font-size: 14px;
+        }
+      }
+    }
+  }
 }

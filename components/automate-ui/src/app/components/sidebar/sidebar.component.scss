@@ -10,6 +10,11 @@
   background-color: $chef-white;
   border-right: 1px solid #DFE3E5;
 
+  chef-tooltip {
+    display: none;
+    transition-duration: 0.1s;
+  }
+
   .sidebar-selector {
 
     ::ng-deep .select-items {
@@ -73,6 +78,7 @@
         text-decoration: none;
         font-size: 16px;
         overflow: hidden;
+        white-space: nowrap;
 
         // yields required 16px gap between elements
         padding-top: 8px;
@@ -87,6 +93,7 @@
 
           .arrow {
             display: inline;
+            margin-right: -3px;
           }
         }
       }
@@ -120,27 +127,32 @@
   }
 }
 
-@media screen and (max-width: 769px) {
+@media screen and (max-width: 66rem) {
   .sidebar {
     width: $sidebar-small-width;
 
-    .text {
-      display: none;
+    chef-tooltip {
+      display: block;
     }
 
-    ul {
-      li {
-        padding: 0;
-      }
-    }
-
-    .sidebar-nav {
-      ul {
-        li {
-          a {
-            padding: 30px 7px 30px 7px;
+    .sidebar-nav::ng-deep  {
+      .nav-items {
+        > span:first-child {
+          & .group {
+            display: none;
           }
         }
+      }
+
+      .group {
+        height: 1px;
+        border-bottom: 1px solid $chef-grey;
+        text-indent: -9999px;
+        margin: 8px 0;
+      }
+
+      .text {
+        display: none;
       }
     }
   }

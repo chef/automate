@@ -36,6 +36,7 @@ export class FeatureFlagsComponent implements OnInit {
   @Input() legacyCode = 'LEGA';
   @Input() legacyFeatures: Array<Feature> = [];
   isVisible = false;
+  gridVisible = false;
 
   public warning: string;
   public flagType: FlagTypes;
@@ -76,6 +77,10 @@ export class FeatureFlagsComponent implements OnInit {
 
   @HostListener('document: keyup', ['$event.keyCode'])
   handleKeyUp(keyCode: number): void {
+    if (String.fromCharCode(keyCode) === 'G') {
+      this.gridVisible = !this.gridVisible;
+    }
+
     // when reaching codeLength, drop first item
     if (this.keysCache.push(keyCode) === codeLength + 1) {
       this.keysCache.shift();

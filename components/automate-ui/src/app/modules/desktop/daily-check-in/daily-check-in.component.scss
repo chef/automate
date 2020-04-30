@@ -23,19 +23,24 @@
   font-weight: 100;
 }
 
-.header {
-
-  chef-progress-bar::ng-deep {
-    margin: 2em 0 3em 0;
-
-    .progress-bars {
-      height: 16px;
-    }
-  }
+app-chart-progress-bar {
+  margin: 2em 0 3em 0;
 }
 
 chef-phat-radio {
   display: flex;
+
+  @media (max-width: 42rem) {
+    flex-direction: column;
+
+    chef-option {
+      margin: 0 0 8px 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
 
   chef-option {
     flex: 1;

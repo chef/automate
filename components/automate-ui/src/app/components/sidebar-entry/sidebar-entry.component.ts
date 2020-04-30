@@ -3,7 +3,7 @@ import { Component, Input } from '@angular/core';
 @Component({
   selector: 'chef-sidebar-entry',
   templateUrl: './sidebar-entry.component.html',
-  styleUrls: []
+  styleUrls: ['./sidebar-entry.component.scss']
 })
 export class SidebarEntryComponent {
   @Input() icon: string;

@@ -3,6 +3,12 @@
 
 $dropdown-width: 196px;
 
+:host {
+  display: block;
+  margin-left: 6px;
+  margin-right: -4px
+}
+
 button {
   -webkit-appearance: none;
   background: transparent;
@@ -38,16 +44,19 @@ a, button:not(.dropdown-toggle) {
 }
 
 .dropdown-toggle {
-  margin-left: 35px;
+  display: flex;
+  align-items: center;
   padding: 10px 0;
 }
 
 .dropdown-toggle-user-icon {
   position: relative;
-  top: 6px;
-  margin-right: -5px;
   font-size: 30px;
   line-height: 10px;
+
+  @media (max-width: 66rem) {
+    font-size: 20px;
+  }
 }
 
 .dropdown {

@@ -4,7 +4,7 @@
       <div class="page-title">Daily Check-in</div>
       <div class="update-time">Updated {{ lastUpdatedMessage }}</div>
     </div>
-    <chef-progress-bar [value]="unknownCount" [valueMax]="totalCount"></chef-progress-bar>
+    <app-chart-progress-bar size="large" [value]="unknownCount" [max]="totalCount"></app-chart-progress-bar>
   </div>
   <chef-phat-radio>
     <chef-option value='unknown'>
