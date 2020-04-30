@@ -31,6 +31,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   ////////   X AXIS ITEMS   ////////
   // maps all of our x data points
   get xData() {
+    console.log(this.data);
     return this.data.map(d => d.daysAgo);
   }
   // determines how wide the graph should be to hold our data
@@ -183,14 +184,24 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .transition().duration(1000)
       .call(yAxis);
 
+
+    // tick Labels is responsible for converting the data to human readable
+    const tickLabels = this.xData.map(data => {
+      const daysPassed = data + 1;
+      switch (daysPassed) {
+        case 1:
+          return '24 hrs ago';
+          break;
+        default:
+          return `${daysPassed} days ago`;
+      }
+    });
+
     const xAxis = d3.axisBottom().ticks(this.data.length)
-      .tickSize(0).tickSizeOuter(0)
+      .tickSize(0).tickSizeOuter(0).tickFormat((_d, i) => tickLabels[i])
       .scale(this.xScale);
 
-    const x = this.svgSelection.selectAll('.x-axis')
-    .each(d => console.log(d))
-    .data([this.data]);
-
+    const x = this.svgSelection.selectAll('.x-axis').data([this.data]);
     x.exit().remove();
     x.enter().append('g').attr('class', 'x-axis')
       .attr('transform', `translate(0, ${this.height - this.heightMargin })`)
