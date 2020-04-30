@@ -62,9 +62,9 @@ export class CredentialsAddEditScreenComponent implements OnInit {
       this.httpClient.post<Credential>(`${SECRETS_URL}`, credential);
 
     saveReq.pipe(
-      catchError(error => {
+      catchError(response => {
         this.saveErrorOccurred = true;
-        this.saveErrorMessage = error._body || '';
+        this.saveErrorMessage = response.error.message || '';
         this.ref.markForCheck();
 
         return observableThrowError(this.saveErrorMessage);
