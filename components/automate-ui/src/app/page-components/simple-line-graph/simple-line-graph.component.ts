@@ -18,24 +18,11 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     private chart: ElementRef
   ) {}
 
-  // using onInit for fake data
-  // @Input() data: any = []
-  @Input() data: any = [
-    { daysAgo: 6, percentage: 37 },
-    { daysAgo: 5, percentage: 27 },
-    { daysAgo: 4, percentage: 67 },
-    { daysAgo: 3, percentage: 77 },
-    { daysAgo: 2, percentage: 87 },
-    { daysAgo: 1, percentage: 97 },
-    { daysAgo: 0, percentage: 68 }
-  ];
+  @Input() data: any = [];
   @Input() width = 900;
   @Input() height = 300;
 
   @ViewChild('svg', {static: true}) svg: ElementRef;
-
-  // for temp fake data -- delete isData1
-  public isData1 = false;
 
 
 
@@ -148,11 +135,24 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .merge(update)
       .transition(t)
       .attr('d', line);
+
+    const point = update.append('g').attr('class', 'line-point');
+    point.selectAll('circle')
+      .data(this.data)
+      .enter()
+      .append('circle')
+      .attr('cx', d => this.xScale(d.daysAgo) )
+      .attr('cy', d => this.yScale(d.percentage) )
+      .attr('r', 100)
+      .style('fill', 'red')
+      .style('stroke', 'red');
   }
 
 
   ////////////////// RENDER FUNCTIONS ////////////////////
+
   renderGrid() {
+    const t = d3.transition().duration(1000);
     // create the Y axis
     const yAxis = d3.axisRight(this.yScale)
                     .tickFormat(d => d + '%')
@@ -169,23 +169,28 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     this.svgSelection
       .append('g')
       .attr('class', 'y-axis')
+      .transition(t)
       .call(yAxis);
 
+    // Remove existing GridLInes
+    this.svgSelection.selectAll('.grid').remove();
     // Add the Grid lines
     this.svgSelection
       .append('g')
       .attr('class', 'grid')
       // this line will need to be updated to flexible
       .attr('transform', `translate(0, ${this.height - 10})`)
+      .transition(t)
       .call(xGrid);
 
     // remove zero from bottom of chart on x axis
     this.svgSelection.selectAll('.tick')
-      .filter(t => t === 0)
+      .filter(tick => tick === 0)
       .remove();
   }
 
   ngOnChanges() {
+    console.log('change');
     // console.log(this.data);
     // this.resizeChart();
     this.resizeChart();
@@ -204,35 +209,5 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   onResize() {
     this.resizeChart();
   }
-
-
-  /// TEMP FAKE DATA
-  changeData() {
-    const data = [
-        { daysAgo: 6, percentage: 37 },
-        { daysAgo: 5, percentage: 27 },
-        { daysAgo: 4, percentage: 67 },
-        { daysAgo: 3, percentage: 77 },
-        { daysAgo: 2, percentage: 87 },
-        { daysAgo: 1, percentage: 97 },
-        { daysAgo: 0, percentage: 68 }
-      ];
-
-    const data1 = [
-      { daysAgo: 2, percentage: 22 },
-      { daysAgo: 1, percentage: 33 },
-      { daysAgo: 0, percentage: 88 }
-    ];
-
-    if (this.isData1) {
-      this.data = data;
-      this.isData1 = false;
-    } else {
-      this.data = data1;
-      this.isData1 = true;
-    }
-
-    this.renderGrid();
-    this.renderChart();
-  }
 }
+
