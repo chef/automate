@@ -111,7 +111,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
   }
 
   private policyToString(policy: Policy): string {
-    return JSON.stringify(policy);
+    return JSON.stringify(policy, null, '  ');
   }
 
   removeMember($event: ChefKeyboardEvent, member: Member): void {
