@@ -118,15 +118,6 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .exit()
       .remove();
 
-    // make enter selection
-    // this is for any new data coming in
-    // const enter = update
-    //   .enter()
-    //   .append('path');
-    // update
-    //   .transition()
-    //   .delay(1000);
-
     //  merge new data with existing data
     update
       .enter()
@@ -165,6 +156,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .tickSizeOuter(0)
       .scale(this.xScale);
 
+    this.svgSelection.selectAll('.y-axis').remove();
     // Add the Y Axis
     this.svgSelection
       .append('g')
@@ -174,6 +166,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
     // Remove existing GridLInes
     this.svgSelection.selectAll('.grid').remove();
+
     // Add the Grid lines
     this.svgSelection
       .append('g')
@@ -189,10 +182,9 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .remove();
   }
 
+
   ngOnChanges() {
     console.log('change');
-    // console.log(this.data);
-    // this.resizeChart();
     this.resizeChart();
     this.renderGrid();
     this.renderChart();
@@ -200,10 +192,6 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   ngOnInit() {
     console.log(this.data);
-    // this.resizeChart();
-
-    // this.renderGrid();
-    // this.renderChart();
   }
 
   onResize() {
