@@ -33,9 +33,24 @@
     .tick line {
       display: none;
     }
+
+    .label-text {
+      font-size: 10px;
+      stroke: #222435;
+      stroke-width: .2;
+      text-anchor: middle;
+      transition: 1s;
+      
+      &.turnt {
+        font-size: 8px;
+        // potentially will need to be more flexible - so far ok
+        transform: rotate(-45deg) translate(-15px, -3px);
+      }
+    }
   }
 
   .circle {
+    fill: $eggplant-dark-2;
     cursor: pointer;
   }
 

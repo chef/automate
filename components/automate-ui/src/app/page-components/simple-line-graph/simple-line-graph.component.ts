@@ -207,6 +207,12 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     this.svgSelection.selectAll('.tick')
       .filter(tick => tick === 0)
       .remove();
+
+    this.svgSelection.selectAll('.x-axis .tick text')
+      .attr('class', 'label-text')
+      .classed('turnt', () => {
+        return tickLabels.length > 7;
+      }).transition().duration(1000)
   }
 
 
@@ -220,7 +226,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   }
 
   onResize() {
-    this.resizeChart();
+    this.renderChart();
   }
 }
 
