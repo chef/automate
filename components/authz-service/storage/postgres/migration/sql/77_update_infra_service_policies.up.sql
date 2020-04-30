@@ -1,5 +1,5 @@
 
--- append "infra:infraServers:list" & "infra:infraServers:list" with "infra:nodes:*" and "infra:nodeManagers:*"
+-- append "infra:infraServers:list" & "infra:infraServers:get" with "infra:nodes:*" and "infra:nodeManagers:*"
 -- for the editor role
 
 UPDATE iam_roles
@@ -9,7 +9,7 @@ UPDATE iam_roles
         NOT actions @> '{infra:infraServers:list,infra:infraServers:get}';
 
 
--- append "infra:infraServers:list" & "infra:infraServers:list" with "infra:nodes:*" and "infra:nodeManagers:*"
+-- append "infra:infraServers:list" & "infra:infraServers:get" with "infra:nodes:*" and "infra:nodeManagers:*"
 -- for the viewer role
 UPDATE iam_roles
     SET actions = '{infra:infraServers:list,infra:infraServers:get}' || actions
