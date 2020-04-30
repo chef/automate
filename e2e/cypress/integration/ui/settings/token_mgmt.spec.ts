@@ -101,8 +101,8 @@ describe('token management', () => {
         cy.get('.chef-control-menu').find('[data-cy=copy-token]').click({force: true})
       );
 
-    cy.get('chef-notification').should('be.visible');
-    cy.get('chef-notification').should('contain', 'API Token copied to clipboard.');
+    cy.get('app-notification').should('be.visible');
+    cy.get('app-notification').should('contain', 'API Token copied to clipboard.');
   });
 
   it('can delete token', () => {
@@ -136,7 +136,7 @@ describe('token management', () => {
 
     cy.get('#create-button-object-modal').click();
     cy.get('chef-modal').should('not.be.visible');
-    cy.get('chef-notification.info').should('be.visible');
+    cy.get('app-notification.info').should('be.visible');
     cy.contains(tokenName3).should('exist');
   });
 
