@@ -65,15 +65,21 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
       filter(([status, _]) => status === EntityStatus.loadingSuccess),
       filter(([_, state]) => !isNil(state)),
       takeUntil(this.isDestroyed)
-    ).subscribe(([_, { statements: allStatements, members, ...rest }]) => {
+    ).subscribe(([_, { id, type, name, members, projects, statements: allStatements }]) => {
         // massage statements: remove '*' resources
-        const statements = allStatements.map(({resources: allResources, ...stmt}) => {
+        const statements = allStatements.map(
+          ({resources: allResources, effect, actions, projects: stmtProjects, role }) => {
           const resources = allResources.filter(res => res !== '*');
           // include remaining resources if there are some
-          return (resources.length > 0) ? { resources, ...stmt } : stmt;
+          if (resources.length > 0) {
+            return { effect, role, actions, resources, projects: stmtProjects };
+          } else {
+            return { effect, role, actions, projects: stmtProjects }; // omit resources
+          }
         });
-
-        this.policyJSON = this.policyToString({ statements, members, ...rest });
+        // we do this to sort the keys in the json output
+        this.policy =  { name, id, type, projects, statements }; // omit members
+        this.policyJSON = this.policyToString({ name, id, type, projects, members, statements });
         this.members = members.map(e => stringToMember(e));
         this.members.forEach(member => {
           if (member.type === Type.LocalUser) {
@@ -84,7 +90,6 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
             this.memberURLs[member.name] = ['/settings', 'tokens', member.displayName];
           }
         });
-        this.policy = { statements, ...rest }; // omit members
       });
 
     this.store.select(routeState).pipe(
