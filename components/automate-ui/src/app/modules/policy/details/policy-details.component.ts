@@ -19,6 +19,9 @@ import { ChefKeyboardEvent } from 'app/types/material-types';
 
 export type PolicyTabName = 'definition' | 'members';
 
+// from https://stackoverflow.com/a/50689136
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 const POLICY_DETAILS_ROUTE = /^\/settings\/policies/;
 
 @Component({
@@ -27,7 +30,7 @@ const POLICY_DETAILS_ROUTE = /^\/settings\/policies/;
   styleUrls: ['./policy-details.component.scss']
 })
 export class PolicyDetailsComponent implements OnInit, OnDestroy {
-  public policy: Policy;
+  public policy: Omit<Policy, 'members'>; // policy without 'members' key
   public policyJSON: string;
   public members: Member[] = [];
   public tabValue: PolicyTabName = 'definition';
@@ -62,13 +65,17 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
       filter(([status, _]) => status === EntityStatus.loadingSuccess),
       filter(([_, state]) => !isNil(state)),
       takeUntil(this.isDestroyed)
-    ).subscribe(([_, state]) => {
-        this.policy = <Policy>Object.assign({}, state);
-        this.policyJSON = this.policyToString(this.policy);
-        this.members = [];
-        this.policy.members.forEach(element => {
-          const member = stringToMember(element);
-          this.members.push(member);
+    ).subscribe(([_, { statements: allStatements, members, ...rest }]) => {
+        // massage statements: remove '*' resources
+        const statements = allStatements.map(({resources: allResources, ...stmt}) => {
+          const resources = allResources.filter(res => res !== '*');
+          // include remaining resources if there are some
+          return (resources.length > 0) ? { resources, ...stmt } : stmt;
+        });
+
+        this.policyJSON = this.policyToString({ statements, members, ...rest });
+        this.members = members.map(e => stringToMember(e));
+        this.members.forEach(member => {
           if (member.type === Type.LocalUser) {
             this.memberURLs[member.name] = ['/settings', 'users', member.displayName];
           } else if (member.type === Type.LocalTeam) {
@@ -77,7 +84,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
             this.memberURLs[member.name] = ['/settings', 'tokens', member.displayName];
           }
         });
-        delete this.policy.members;
+        this.policy = { statements, ...rest }; // omit members
       });
 
     this.store.select(routeState).pipe(
