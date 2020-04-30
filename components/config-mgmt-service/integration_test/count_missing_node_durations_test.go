@@ -160,7 +160,7 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 			description: "months: no nodes are missing after 2 months",
 			nodes: []iBackend.Node{
 				{
-					Checkin: time.Now().AddDate(0, -2, 0).Add(time.Hour * 2),
+					Checkin: time.Now().AddDate(0, -2, 3),
 				},
 			},
 			durations: []string{"2M"},
@@ -175,7 +175,7 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 			description: "months: one node is missing after 2 months",
 			nodes: []iBackend.Node{
 				{
-					Checkin: time.Now().AddDate(0, -2, 0).Add(time.Hour * -2),
+					Checkin: time.Now().AddDate(0, -2, -3),
 				},
 			},
 			durations: []string{"2M"},
