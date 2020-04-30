@@ -79,7 +79,7 @@ func gatherInfoForNode(node backend.Node) (*manager.NodeMetadata, error) {
 	return &manager.NodeMetadata{
 		Uuid:            node.EntityUuid,
 		Name:            node.NodeName,
-		PlatformName:    node.Platform,
+		PlatformName:    node.PlatformFamily,
 		PlatformRelease: node.PlatformVersion,
 		LastContact:     timestamp,
 		SourceId:        node.CloudID,
