@@ -103,31 +103,21 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     this.width = this.chart.nativeElement.getBoundingClientRect().width;
   }
 
-  renderLine() {
-    // create the line using path function
-    const line = this.createPath(this.data);
-
-    // make Update selection for any incoming data
-    const update = this.svgSelection.selectAll('path.line').data(this.data);
-    // remove any points no longer needed
-    update.exit().remove();
-    //  merge new data with existing data
-    update
-      .enter()
-      .append('path')
-      .attr('class', 'line')
-      .merge(update)
-      .transition(this.t)
-      .attr('d', line);
-
-    }
-
     ////////////////// RENDER FUNCTIONS ////////////////////
   renderChart() {
     this.resizeChart();
     this.renderGrid();
     this.renderLine();
     this.renderPoints();
+  }
+
+  renderLine() {
+    // create the line using path function
+    const line = this.createPath(this.data);
+    // update line
+    this.svgSelection.select('.line')
+      .transition(this.t)
+      .attr('d', line);
   }
 
   renderPoints() {

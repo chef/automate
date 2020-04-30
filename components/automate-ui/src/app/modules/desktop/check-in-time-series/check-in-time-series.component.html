@@ -12,23 +12,9 @@
         </select>
       </div>
 
-      <table>
-        <thead>
-          <tr >
-            <th>Days Ago</th>
-            <th>Percentage of Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let day of days">
-            <td>{{ day.daysAgo }}</td>
-            <td>{{ day.percentage | number:'1.0-0' }}%</td>
-          </tr>
-        </tbody>
-      </table>
-
       <!-- <div *ngIf="days && days.length > 0"> -->
         <app-simple-line-graph
+        [data]="days"
         ></app-simple-line-graph>
       <!-- </div> -->
 
