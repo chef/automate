@@ -192,6 +192,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/uuid4/*",
+  "lib/validate/*",
   "lib/version/*",
   "vendor/github.com/OneOfOne/xxhash/*",
   "vendor/github.com/apache/thrift/*",

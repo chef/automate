@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -10,6 +11,8 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/projectassignment"
+	"github.com/chef/automate/lib/validate"
 
 	api "github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants"
@@ -17,7 +20,6 @@ import (
 	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/memstore"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
-	"github.com/chef/automate/lib/projectassignment"
 )
 
 // policyServer is the server state for policies
@@ -92,7 +94,7 @@ func (s *policyServer) CreatePolicy(
 	req *api.CreatePolicyReq) (*api.Policy, error) {
 
 	// API requests always create custom policies.
-	err := validateRequiredFieldsAndProjectsForPolicy(req.Id, req.Name, req.Projects)
+	err := requiredFields(req, "policy")
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -167,7 +169,7 @@ func (s *policyServer) GetPolicy(
 	ctx context.Context,
 	req *api.GetPolicyReq) (*api.Policy, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "cannot get policy")
 	}
@@ -188,7 +190,7 @@ func (s *policyServer) DeletePolicy(
 	ctx context.Context,
 	req *api.DeletePolicyReq) (*api.DeletePolicyResp, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -210,7 +212,7 @@ func (s *policyServer) UpdatePolicy(
 	ctx context.Context,
 	req *api.UpdatePolicyReq) (*api.Policy, error) {
 
-	err := validateRequiredFieldsAndProjectsForPolicy(req.Id, req.Name, req.Projects)
+	err := requiredFields(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -271,7 +273,7 @@ func (s *policyServer) ListPolicyMembers(
 	ctx context.Context,
 	req *api.ListPolicyMembersReq) (*api.ListPolicyMembersResp, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -295,7 +297,7 @@ func (s *policyServer) AddPolicyMembers(
 	ctx context.Context,
 	req *api.AddPolicyMembersReq) (*api.AddPolicyMembersResp, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -325,7 +327,7 @@ func (s *policyServer) ReplacePolicyMembers(
 	ctx context.Context,
 	req *api.ReplacePolicyMembersReq) (*api.ReplacePolicyMembersResp, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -354,7 +356,7 @@ func (s *policyServer) ReplacePolicyMembers(
 func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 	req *api.RemovePolicyMembersReq) (*api.RemovePolicyMembersResp, error) {
 
-	err := confirmRequiredID(req.Id, "policy")
+	err := validate.RequiredID(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -398,7 +400,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 func (s *policyServer) CreateRole(
 	ctx context.Context,
 	req *api.CreateRoleReq) (*api.Role, error) {
-	err := validateRequiredFieldsAndProjectsForRole(req.Id, req.Name, req.Projects)
+	err := requiredFields(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -460,7 +462,7 @@ func (s *policyServer) GetRole(
 	ctx context.Context,
 	req *api.GetRoleReq) (*api.Role, error) {
 
-	err := confirmRequiredID(req.Id, "role")
+	err := validate.RequiredID(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -481,7 +483,7 @@ func (s *policyServer) DeleteRole(
 	ctx context.Context,
 	req *api.DeleteRoleReq) (*api.DeleteRoleResp, error) {
 
-	err := confirmRequiredID(req.Id, "role")
+	err := validate.RequiredID(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -503,7 +505,7 @@ func (s *policyServer) UpdateRole(
 	ctx context.Context,
 	req *api.UpdateRoleReq) (*api.Role, error) {
 
-	err := validateRequiredFieldsAndProjectsForRole(req.Id, req.Name, req.Projects)
+	err := requiredFields(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -761,4 +763,32 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 		}
 	}
 	s.log.WithFields(kv).Info("Policy definition")
+}
+
+// requiredFields verifies that all the required inputs are not empty
+func requiredFields(obj interface {
+	GetId() string
+	GetName() string
+	GetProjects() []string
+}, resourceName string) error {
+	err := validate.RequiredIDandName(obj, resourceName)
+	if err != nil {
+		return err
+	}
+	return requiredProjects(obj.GetProjects())
+}
+
+// requiredProjects verifies that the projects are not empty and do not include '(unassigned)'
+func requiredProjects(projects []string) error {
+	for _, project := range projects {
+		if validate.EmptyOrWhitespaceOnlyRE.MatchString(project) {
+			e := fmt.Sprintf("projects must contain at least one non-whitespace character")
+			return errors.New(e)
+		}
+		if project == constants.UnassignedProjectID {
+			return errors.Errorf("%q cannot explicitly be set; pass an empty projects array instead.",
+				constants.UnassignedProjectID)
+		}
+	}
+	return nil
 }
