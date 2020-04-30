@@ -11,33 +11,22 @@
     padding: .5em;
   }
 
+  path,
+  line,
+  .tick,
+  .grid {
+      stroke: $eggplant-light-1;
+      stroke-width: 1px;
+    }
+
   .line {
     fill: transparent;
     stroke: black;
     stroke-width: 1px;
   }
 
-  .tick {
-    stroke: $eggplant-light-1;
-    stroke-width: 1px;
-  }
-
   .y-axis {
     transform: translateX(50px);
-
-    path,
-    line {
-      stroke: $eggplant-light-1;
-      stroke-width: 1px;
-    }
-
-    text {
-      font-weight: 400;
-      font-size: 10px;
-      line-height: 12px;
-      letter-spacing: 0.5px;
-    }
-
   }
 
   .circle {
@@ -46,9 +35,6 @@
 
   .tooltip {
     position: absolute;			
-    // display: block;						
-    // background-color: $chef-white;
-    // padding: 8px;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -59,16 +45,9 @@
     stroke-dasharray: 2;
   }
 
-
-  .grid {
-
-    .domain,
-    line {
-      stroke: $eggplant-light-1;
-      stroke-width: 1px;
-    }
-  }
 }
+
+
 
 ::ng-deep {
 chef-tooltip {
