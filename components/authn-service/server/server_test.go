@@ -343,7 +343,7 @@ func newTestServer(ctx context.Context,
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
-	authzServer := grpctest.NewServer(grpcAuthz)
+	grpctest.NewServer(grpcAuthz)
 
 	srv, err := newServer(ctx, config)
 	return srv, serviceCerts, err
