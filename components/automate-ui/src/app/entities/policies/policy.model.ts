@@ -5,6 +5,7 @@ export interface Policy {
   type: IAMType;
   members: string[];
   statements?: Statement[];
+  projects: string[];
 }
 
 export interface Statement {
@@ -12,6 +13,7 @@ export interface Statement {
   role?: string;
   actions?: string[];
   resources?: string[];
+  projects: string[];
 }
 
 export interface PolicyChecked extends Policy {

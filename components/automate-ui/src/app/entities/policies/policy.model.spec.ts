@@ -306,9 +306,11 @@ describe('policy model', () => {
           {
             effect: 'ALLOW',
             actions: ['*'],
-            role: ''
+            role: '',
+            projects: []
           }
-        ]
+        ],
+        projects: []
       };
       const actual = policyFromPayload(policy);
       expect(actual.statements[0].role).toBeUndefined();
@@ -325,9 +327,11 @@ describe('policy model', () => {
           {
             effect: 'ALLOW',
             actions: [],
-            role: 'viewer'
+            role: 'viewer',
+            projects: []
           }
-        ]
+        ],
+        projects: []
       };
       const actual = policyFromPayload(policy);
       expect(actual.statements[0].actions).toBeUndefined();
