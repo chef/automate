@@ -30,10 +30,10 @@ func TestGenerateAdminToken(t *testing.T) {
 	defer authnServer.Close()
 
 	serviceCerts = helpers.LoadDevCerts(t, "authz-service")
-	mockV2PolicyServer := authz.NewPoliciesServerMock()
+	mockPolicyServer := authz.NewPoliciesServerMock()
 	connFactory = secureconn.NewFactory(*serviceCerts)
 	g = connFactory.NewServer()
-	authz.RegisterPoliciesServer(g, mockV2PolicyServer)
+	authz.RegisterPoliciesServer(g, mockPolicyServer)
 	authzServer := grpctest.NewServer(g)
 	defer authzServer.Close()
 
@@ -57,7 +57,7 @@ func TestGenerateAdminToken(t *testing.T) {
 			}, nil
 		}
 
-		mockV2PolicyServer.AddPolicyMembersFunc = func(
+		mockPolicyServer.AddPolicyMembersFunc = func(
 			_ context.Context, req *authz.AddPolicyMembersReq) (*authz.AddPolicyMembersResp, error) {
 
 			assert.Equal(t, "administrator-access", req.Id)
@@ -87,7 +87,7 @@ func TestGenerateAdminToken(t *testing.T) {
 			}, nil
 		}
 
-		mockV2PolicyServer.AddPolicyMembersFunc = func(
+		mockPolicyServer.AddPolicyMembersFunc = func(
 			_ context.Context, req *authz.AddPolicyMembersReq) (*authz.AddPolicyMembersResp, error) {
 
 			assert.Equal(t, "administrator-access", req.Id)

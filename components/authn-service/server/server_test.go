@@ -344,8 +344,6 @@ func newTestServer(ctx context.Context,
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
 	authzServer := grpctest.NewServer(grpcAuthz)
-	_, err := authzConnFactory.Dial("authz-service", authzServer.URL)
-	require.NoError(t, err)
 
 	srv, err := newServer(ctx, config)
 	return srv, serviceCerts, err

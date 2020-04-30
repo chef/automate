@@ -60,7 +60,7 @@ func generateAdminToken(ctx context.Context,
 
 	defer authzConnection.Close() // nolint: errcheck
 
-	authzV2Client := authz.NewPoliciesClient(authzConnection)
+	authzClient := authz.NewPoliciesClient(authzConnection)
 
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
 		Id:     uuid.Must(uuid.NewV4()).String(),
@@ -72,7 +72,7 @@ func generateAdminToken(ctx context.Context,
 	}
 	tokenID := response.Id
 
-	_, err = authzV2Client.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
+	_, err = authzClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
 		Id:      constants.AdminPolicyID,
 		Members: []string{"token:" + tokenID},
 	})

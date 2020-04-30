@@ -20,7 +20,6 @@ type Service struct {
 	Logger      logger.Logger
 	ConnFactory *secureconn.Factory
 	Storage     storage.Storage
-	Authz       authz.AuthorizationClient
 	Secrets     secrets.SecretsServiceClient
 }
 
@@ -36,7 +35,6 @@ func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secu
 		Logger:      l,
 		ConnFactory: connFactory,
 		Storage:     p,
-		Authz:       authzClient,
 		Secrets:     secretsClient,
 	}, nil
 }
