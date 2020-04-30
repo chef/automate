@@ -20,7 +20,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   @Input() data: any = [];
   @Input() width = 900;
-  @Input() height = 300;
+  @Input() height = 200;
 
   @ViewChild('svg', {static: true}) svg: ElementRef;
 
