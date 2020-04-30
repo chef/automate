@@ -120,7 +120,7 @@ export class LayoutFacadeService {
     this.layout.userNotifications.display = true;
   }
 
-  showSidebar(sidebarName: string) {
+  showSidebar(sidebarName: Sidebar) {
     this.layoutSidebarService.updateSidebars(sidebarName);
   }
 
