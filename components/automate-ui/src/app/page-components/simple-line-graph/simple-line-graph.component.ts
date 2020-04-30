@@ -24,9 +24,6 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   @ViewChild('svg', {static: true}) svg: ElementRef;
 
-  private t = d3.transition().duration(1000);
-
-
   ////////   X AXIS ITEMS   ////////
   // maps all of our x data points
   get xData() {
@@ -117,7 +114,8 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
     const theLine = this.svgSelection.selectAll('.line').data([this.data]);
     theLine.exit().remove();
-    theLine.enter().append('path').attr('class', 'line').merge(theLine).transition(this.t)
+    theLine.enter().append('path').attr('class', 'line').merge(theLine)
+    .transition().duration(1000)
     .attr('d', line);
   }
 
@@ -129,10 +127,10 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .append('circle')
       .attr('class', 'circle')
       .merge(points)
+      .transition().duration(1000)
       .attr('cx', d => this.xScale(d.daysAgo))
       .attr('cy', d => this.yScale(d.percentage))
       .attr('r', 4)
-      .transition(this.t)
       .style('fill', 'black');
   }
 
@@ -144,7 +142,8 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     // render the Y axis
     const y = this.svgSelection.selectAll('.y-axis').data([this.data]);
     y.exit().remove();
-    y.enter().append('g').attr('class', 'y-axis').merge(y).transition(this.t)
+    y.enter().append('g').attr('class', 'y-axis').merge(y)
+      .transition().duration(1000)
       .call(yAxis);
 
     // create the X axis grid lines
@@ -160,7 +159,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     grid.enter().append('g').attr('class', 'grid')
       // this line will need to be updated to flexible
       .attr('transform', `translate(0, ${this.height - 10})`)
-      .merge(grid).transition(this.t)
+      .merge(grid).transition().duration(1000)
       .call(xGrid);
 
     // remove zero from bottom of chart on x axis
