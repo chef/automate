@@ -27,7 +27,6 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   ////////   X AXIS ITEMS   ////////
   // maps all of our x data points
   get xData() {
-    console.log(this.data);
     return this.data.map(d => d.daysAgo);
   }
   // determines how wide the graph should be to hold our data
@@ -194,7 +193,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     }).reverse(); // because we reversed our data above, we need to reverse our labels as well
 
     const xAxis = d3.axisBottom().ticks(this.data.length)
-      .tickSize(0).tickSizeOuter(0).tickFormat((_d, i) => tickLabels[i])
+      .tickSizeInner(10).tickSizeOuter(0).tickFormat((_d, i) => tickLabels[i])
       .scale(this.xScale);
 
     const x = this.svgSelection.selectAll('.x-axis').data([this.data]);
