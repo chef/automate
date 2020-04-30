@@ -48,6 +48,9 @@ var (
 	ExistsTag          string = NodeFieldToJson("Exists")
 	StatusTag          string = "status"
 	RunIDTag           string = "run_id"
+	CloudProviderTag   string = "cloud_provider"
+	TimezoneTag        string = "timezone"
+	KernelReleaseTag   string = "kernel_release"
 )
 
 // NodeFieldToJson returns the value associated with key in the tag

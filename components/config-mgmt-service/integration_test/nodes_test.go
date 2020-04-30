@@ -466,6 +466,370 @@ func TestGetNodesStartEndDateTimeFilter(t *testing.T) {
 	}
 }
 
+func TestGetNodesFilters(t *testing.T) {
+
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     request.Nodes
+		expected    []string
+	}{
+		{
+			description: "cloud provider",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not_matched",
+						CloudProvider: "azure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 1",
+						CloudProvider: "ec2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 2",
+						CloudProvider: "ec2",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"cloud_provider:ec2"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "cloud provider case insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched",
+						CloudProvider: "Azure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match 1",
+						CloudProvider: "ec2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match 2",
+						CloudProvider: "ec2",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"cloud_provider:azure"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "cloud provider case insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched",
+						CloudProvider: "azure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match 1",
+						CloudProvider: "ec2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match 2",
+						CloudProvider: "ec2",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"cloud_provider:AZURE"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "cloud provider regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not_matched",
+						CloudProvider: "azure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 1",
+						CloudProvider: "ec2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 2",
+						CloudProvider: "ec1",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"cloud_provider:ec*"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+
+		// Timezone
+		{
+			description: "timezone",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not_matched",
+						Timezone: "PDT",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "match 1",
+						Timezone: "EDT",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "match 2",
+						Timezone: "EDT",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"timezone:EDT"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "timezone insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched",
+						Timezone: "Pdt",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not match",
+						Timezone: "EDT",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not match",
+						Timezone: "EDT",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"timezone:pdt"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "timezone insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched",
+						Timezone: "pdt",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not match",
+						Timezone: "EDT",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not match",
+						Timezone: "EDT",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"timezone:PDT"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "timezone regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 1",
+						Timezone: "9:00",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 2",
+						Timezone: "9:30",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not match",
+						Timezone: "1:00",
+					},
+				},
+			},
+			request: request.Nodes{
+				// '%3A' = ':'
+				Filter: []string{"timezone:9%3A*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+
+		// KernelRelease
+		{
+			description: "Kernel Release",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not_matched",
+						KernelRelease: "3.9.0",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 1",
+						KernelRelease: "3.10.0",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 2",
+						KernelRelease: "3.10.0",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"kernel_release:3.10.0"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "Kernel Release insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched",
+						KernelRelease: "3.9.0El7",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match",
+						KernelRelease: "3.10.0",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match",
+						KernelRelease: "3.10.0",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"kernel_release:3.9.0el7"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "Kernel Release insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched",
+						KernelRelease: "3.9.0el7",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match",
+						KernelRelease: "3.10.0",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match",
+						KernelRelease: "3.10.0",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"kernel_release:3.9.0El7"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "Kernel Release regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not matched",
+						KernelRelease: "3.11.0el7",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched 1",
+						KernelRelease: "3.10.2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched 2",
+						KernelRelease: "3.10.4",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"kernel_release:3.10.*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Filter on %s", test.description), func(t *testing.T) {
+
+			// Adding required node data
+			for index := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add nodes
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+
+			// call GetNodes
+			res, err := cfgmgmt.GetNodes(context.Background(), &test.request)
+			assert.NoError(t, err)
+
+			names := getFieldValues(res, "name")
+
+			// Test what nodes are returned.
+			assert.ElementsMatch(t, test.expected, names)
+		})
+	}
+}
+
 func TestGetNodesRegexWithExactSameField(t *testing.T) {
 
 	cases := []struct {

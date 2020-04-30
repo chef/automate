@@ -104,6 +104,12 @@ func ConvertParamToNodeStateBackendLowerFilter(parameter string) string {
 		return backend.PolicyName + ".lower"
 	case "policy_revision", backend.PolicyRevision:
 		return backend.PolicyRevision + ".lower"
+	case "cloud_provider", backend.CloudProviderTag:
+		return backend.CloudProviderTag + ".lower"
+	case "timezone", backend.TimezoneTag:
+		return backend.TimezoneTag + ".lower"
+	case "kernel_release", backend.KernelReleaseTag:
+		return backend.KernelReleaseTag + ".lower"
 	default:
 		return parameter
 	}
