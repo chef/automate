@@ -114,10 +114,11 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   renderLine() {
     // create the line using path function
     const line = this.createPath(this.data);
-    // update line
-    this.svgSelection.select('.line')
-      .transition(this.t)
-      .attr('d', line);
+
+    const theLine = this.svgSelection.selectAll('.line').data([this.data]);
+    theLine.exit().remove();
+    theLine.enter().append('path').attr('class', 'line').merge(theLine).transition(this.t)
+    .attr('d', line);
   }
 
   renderPoints() {
@@ -140,6 +141,12 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     const yAxis = d3.axisRight(this.yScale)
                     .tickFormat(d => d + '%')
                     .ticks(1);
+    // render the Y axis
+    const y = this.svgSelection.selectAll('.y-axis').data([this.data]);
+    y.exit().remove();
+    y.enter().append('g').attr('class', 'y-axis').merge(y).transition(this.t)
+      .call(yAxis);
+
     // create the X axis grid lines
     const xGrid = d3.axisTop()
       .ticks(this.data.length)
@@ -147,25 +154,13 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .tickSize(this.height - 20) // will need to subtract extra height here
       .tickSizeOuter(0)
       .scale(this.xScale);
-
-    this.svgSelection.selectAll('.y-axis').remove();
-    // Add the Y Axis
-    this.svgSelection
-      .append('g')
-      .attr('class', 'y-axis')
-      .transition(this.t)
-      .call(yAxis);
-
-    // Remove existing GridLInes
-    this.svgSelection.selectAll('.grid').remove();
-
-    // Add the Grid lines
-    this.svgSelection
-      .append('g')
-      .attr('class', 'grid')
+    // Render the X axis and X ticks
+    const grid = this.svgSelection.selectAll('.grid').data([this.data]);
+    grid.exit().remove();
+    grid.enter().append('g').attr('class', 'grid')
       // this line will need to be updated to flexible
       .attr('transform', `translate(0, ${this.height - 10})`)
-      .transition(this.t)
+      .merge(grid).transition(this.t)
       .call(xGrid);
 
     // remove zero from bottom of chart on x axis
