@@ -94,7 +94,7 @@ func (s *policyServer) CreatePolicy(
 	req *api.CreatePolicyReq) (*api.Policy, error) {
 
 	// API requests always create custom policies.
-	err := requiredFieldsAndProjects(req, "policy")
+	err := requiredFields(req, "policy")
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -212,7 +212,7 @@ func (s *policyServer) UpdatePolicy(
 	ctx context.Context,
 	req *api.UpdatePolicyReq) (*api.Policy, error) {
 
-	err := requiredFieldsAndProjects(req, "policy")
+	err := requiredFields(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -400,7 +400,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 func (s *policyServer) CreateRole(
 	ctx context.Context,
 	req *api.CreateRoleReq) (*api.Role, error) {
-	err := requiredFieldsAndProjects(req, "role")
+	err := requiredFields(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -505,7 +505,7 @@ func (s *policyServer) UpdateRole(
 	ctx context.Context,
 	req *api.UpdateRoleReq) (*api.Role, error) {
 
-	err := requiredFieldsAndProjects(req, "role")
+	err := requiredFields(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -765,8 +765,8 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 	s.log.WithFields(kv).Info("Policy definition")
 }
 
-// requiredFieldsAndProjects verifies that all the required inputs are not empty
-func requiredFieldsAndProjects(obj interface {
+// requiredFields verifies that all the required inputs are not empty
+func requiredFields(obj interface {
 	GetId() string
 	GetName() string
 	GetProjects() []string
@@ -786,9 +786,8 @@ func requiredProjects(projects []string) error {
 			return errors.New(e)
 		}
 		if project == constants.UnassignedProjectID {
-			return errors.Errorf("%q cannot explicitly be set. "+
-				"If you wish to create an object in %q, you should pass no projects on creation.",
-				constants.UnassignedProjectID, constants.UnassignedProjectID)
+			return errors.Errorf("%q cannot explicitly be set; pass an empty projects array instead.",
+				constants.UnassignedProjectID)
 		}
 	}
 	return nil
