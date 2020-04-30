@@ -24,6 +24,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   @ViewChild('svg', {static: true}) svg: ElementRef;
 
+  private t = d3.transition().duration(1000);
 
 
   ////////   X AXIS ITEMS   ////////
@@ -87,7 +88,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   }
 
   // returns a function that when passed our data, will return an svg path
-  get path() {
+  get createPath() {
     return d3.line()
               .x(d => this.xScale( d.daysAgo) )
               .y(d => this.yScale( d.percentage) );
@@ -102,48 +103,49 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     this.width = this.chart.nativeElement.getBoundingClientRect().width;
   }
 
-  renderChart() {
-    const t = d3.transition().duration(1000);
-
+  renderLine() {
     // create the line using path function
-    const line = this.path(this.data);
+    const line = this.createPath(this.data);
 
     // make Update selection for any incoming data
-    const update = this.svgSelection
-      .selectAll('.line')
-      .data(this.data.filter(d => d.daysAgo));
-
+    const update = this.svgSelection.selectAll('path.line').data(this.data);
     // remove any points no longer needed
-    update
-      .exit()
-      .remove();
-
+    update.exit().remove();
     //  merge new data with existing data
     update
       .enter()
       .append('path')
       .attr('class', 'line')
       .merge(update)
-      .transition(t)
+      .transition(this.t)
       .attr('d', line);
 
-    const point = update.append('g').attr('class', 'line-point');
-    point.selectAll('circle')
-      .data(this.data)
-      .enter()
-      .append('circle')
-      .attr('cx', d => this.xScale(d.daysAgo) )
-      .attr('cy', d => this.yScale(d.percentage) )
-      .attr('r', 100)
-      .style('fill', 'red')
-      .style('stroke', 'red');
+    }
+
+    ////////////////// RENDER FUNCTIONS ////////////////////
+  renderChart() {
+    this.resizeChart();
+    this.renderGrid();
+    this.renderLine();
+    this.renderPoints();
   }
 
-
-  ////////////////// RENDER FUNCTIONS ////////////////////
+  renderPoints() {
+    const points = this.svgSelection.selectAll('circle').data(this.data);
+    points.exit().remove();
+    points
+      .enter()
+      .append('circle')
+      .attr('class', 'circle')
+      .merge(points)
+      .attr('cx', d => this.xScale(d.daysAgo))
+      .attr('cy', d => this.yScale(d.percentage))
+      .attr('r', 4)
+      .transition(this.t)
+      .style('fill', 'black');
+  }
 
   renderGrid() {
-    const t = d3.transition().duration(1000);
     // create the Y axis
     const yAxis = d3.axisRight(this.yScale)
                     .tickFormat(d => d + '%')
@@ -161,7 +163,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     this.svgSelection
       .append('g')
       .attr('class', 'y-axis')
-      .transition(t)
+      .transition(this.t)
       .call(yAxis);
 
     // Remove existing GridLInes
@@ -173,7 +175,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .attr('class', 'grid')
       // this line will need to be updated to flexible
       .attr('transform', `translate(0, ${this.height - 10})`)
-      .transition(t)
+      .transition(this.t)
       .call(xGrid);
 
     // remove zero from bottom of chart on x axis
@@ -185,13 +187,11 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   ngOnChanges() {
     console.log('change');
-    this.resizeChart();
-    this.renderGrid();
     this.renderChart();
   }
 
   ngOnInit() {
-    console.log(this.data);
+    // console.log(this.data);
   }
 
   onResize() {
