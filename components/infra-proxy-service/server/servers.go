@@ -19,14 +19,11 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	// Validate all request fields are required
 	err := validation.New(validation.Options{
 		Target:          "server",
 		Request:         *req,
-		RequiredDefault: false,
-
-		Rules: validation.Rules{
-			"Name": []string{"required"},
-		},
+		RequiredDefault: true,
 	}).Validate()
 
 	if err != nil {
@@ -62,11 +59,6 @@ func (s *Server) GetServers(ctx context.Context, req *request.GetServers) (*resp
 func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*response.GetServer, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-
-	if req.Id == "" {
-		s.service.Logger.Debug("incomplete create server request: missing server ID")
-		return nil, status.Error(codes.InvalidArgument, "must supply server ID")
-	}
 
 	server, err := s.service.Storage.GetServer(ctx, req.Id)
 	if err != nil {

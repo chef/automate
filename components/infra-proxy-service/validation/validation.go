@@ -19,10 +19,10 @@ func RequiredField(field, fieldName, resourceName string) error {
 }
 
 type (
-	// Rules msg
+	// Rules represents rules for fields with name and rules
 	Rules map[string][]string
 
-	// Options msg
+	// Options represent configuration option for validator
 	Options struct {
 		Target          string
 		Request         interface{}
@@ -30,26 +30,26 @@ type (
 		Rules           Rules
 	}
 
-	// Validator msg
+	// Validator is a validator with options
 	Validator struct {
 		Opts Options // Opts contains all the options for validator
 	}
 )
 
-// New func
+// New returns a new validator object with provided options
 func New(opts Options) *Validator {
 	return &Validator{Opts: opts}
 }
 
-// Validate msg
+// Validate validates the validation object raise the error if any
 func (v *Validator) Validate() error {
 	reqVal := reflect.ValueOf(v.Opts.Request)
 	typeOfS := reqVal.Type()
 	if v.Opts.RequiredDefault {
 		for i := 0; i < reqVal.NumField(); i++ {
-			err1 := RequiredField(reqVal.Field(i).String(), strings.Split(typeOfS.Field(i).Tag.Get("json"), ",")[0], v.Opts.Target)
-			if err1 != nil {
-				return err1
+			err := RequiredField(reqVal.Field(i).String(), strings.Split(typeOfS.Field(i).Tag.Get("json"), ",")[0], v.Opts.Target)
+			if err != nil {
+				return err
 			}
 		}
 	}
@@ -59,9 +59,9 @@ func (v *Validator) Validate() error {
 			name, _ := typeOfS.FieldByName(field)
 			switch rule {
 			case "required":
-				err1 := RequiredField(reqVal.FieldByName(field).String(), strings.Split(name.Tag.Get("json"), ",")[0], v.Opts.Target)
-				if err1 != nil {
-					return err1
+				err := RequiredField(reqVal.FieldByName(field).String(), strings.Split(name.Tag.Get("json"), ",")[0], v.Opts.Target)
+				if err != nil {
+					return err
 				}
 			case "ipv4":
 				return nil
