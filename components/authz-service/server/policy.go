@@ -93,7 +93,7 @@ func (s *policyServer) CreatePolicy(
 	req *api.CreatePolicyReq) (*api.Policy, error) {
 
 	// API requests always create custom policies.
-	err := validate.RequiredFieldsAndProjects(req, "policy")
+	err := validate.RequiredIDandName(req, "policy")
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -211,7 +211,7 @@ func (s *policyServer) UpdatePolicy(
 	ctx context.Context,
 	req *api.UpdatePolicyReq) (*api.Policy, error) {
 
-	err := validate.RequiredFieldsAndProjects(req, "policy")
+	err := validate.RequiredIDandName(req, "policy")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -399,7 +399,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 func (s *policyServer) CreateRole(
 	ctx context.Context,
 	req *api.CreateRoleReq) (*api.Role, error) {
-	err := validate.RequiredFieldsAndProjects(req, "role")
+	err := validate.RequiredIDandName(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -504,7 +504,7 @@ func (s *policyServer) UpdateRole(
 	ctx context.Context,
 	req *api.UpdateRoleReq) (*api.Role, error) {
 
-	err := validate.RequiredFieldsAndProjects(req, "role")
+	err := validate.RequiredIDandName(req, "role")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}

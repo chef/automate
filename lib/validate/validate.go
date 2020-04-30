@@ -3,9 +3,6 @@ package validate
 import (
 	"fmt"
 	"regexp"
-
-	constants "github.com/chef/automate/components/authz-service/constants"
-	"github.com/pkg/errors"
 )
 
 type hasID interface {
@@ -51,33 +48,4 @@ func RequiredID(obj hasID, resourceName string) error {
 // RequiredName verifies that the name is not empty
 func RequiredName(obj hasName, resourceName string) error {
 	return RequiredField(obj.GetName(), "name", resourceName)
-}
-
-// RequiredFieldsAndProjects verifies that all the required inputs are not empty
-func RequiredFieldsAndProjects(obj interface {
-	hasID
-	hasName
-	hasProjects
-}, resourceName string) error {
-	err := RequiredIDandName(obj, resourceName)
-	if err != nil {
-		return err
-	}
-	return RequiredProjects(obj.GetProjects())
-}
-
-// RequiredProjects verifies that the projects are not empty and do not include '(unassigned)'
-func RequiredProjects(projects []string) error {
-	for _, project := range projects {
-		if EmptyOrWhitespaceOnlyRE.MatchString(project) {
-			e := fmt.Sprintf("projects must contain at least one non-whitespace character")
-			return errors.New(e)
-		}
-		if project == constants.UnassignedProjectID {
-			return errors.Errorf("%q cannot explicitly be set. "+
-				"If you wish to create an object in %q, you should pass no projects on creation.",
-				constants.UnassignedProjectID, constants.UnassignedProjectID)
-		}
-	}
-	return nil
 }
