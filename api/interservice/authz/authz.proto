@@ -3,8 +3,8 @@ syntax = "proto3";
 import "validate/validate.proto";
 import "api/external/common/version/version.proto";
 
-package chef.automate.domain.authz.v2;
-option go_package = "github.com/chef/automate/api/interservice/authz/v2";
+package chef.automate.domain.authz;
+option go_package = "github.com/chef/automate/api/interservice/authz";
 
 // TODO (tc): Keeping this around for the validation used in protoc-gen-policy/policy.go
 message IsAuthorizedReq {

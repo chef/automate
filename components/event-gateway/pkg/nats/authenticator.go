@@ -18,7 +18,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
-	authz "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/event-gateway/pkg/config"
 
 	"github.com/chef/automate/lib/grpc/secureconn"

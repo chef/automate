@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -56,7 +56,7 @@ var NoStatus = SerializedProjectUpdateTaskStatus{}
 
 type SerializedProjectUpdate interface {
 	ListProjectUpdateTasks(ctx context.Context) ([]SerializedProjectUpdateTask, error)
-	RunProjectUpdateTask(ctx context.Context, projectUpdateID string, params map[string]string, projectTaggingRules map[string]*iam_v2.ProjectRules) (SerializedProjectUpdateTaskID, SerializedProjectUpdateTaskStatus, error)
+	RunProjectUpdateTask(ctx context.Context, projectUpdateID string, params map[string]string, projectTaggingRules map[string]*authz.ProjectRules) (SerializedProjectUpdateTaskID, SerializedProjectUpdateTaskStatus, error)
 	MonitorProjectUpdateTask(ctx context.Context, projectUpdateID string, id SerializedProjectUpdateTaskID) (SerializedProjectUpdateTaskStatus, error)
 	CancelProjectUpdateTask(ctx context.Context, projectUpdateID string, id SerializedProjectUpdateTaskID) error
 }
@@ -490,7 +490,7 @@ func (s *serializedProjectUpdateListTasksTask) Run(
 
 type serializedProjectUpdateRunTaskTask struct {
 	client              SerializedProjectUpdate
-	authzProjectsClient iam_v2.ProjectsClient
+	authzProjectsClient authz.ProjectsClient
 	svc                 string
 }
 
@@ -509,7 +509,7 @@ func (s *serializedProjectUpdateRunTaskTask) Run(
 	}).Info("Running project update task")
 
 	projectCollectionRulesResp, err := s.authzProjectsClient.ListRulesForAllProjects(ctx,
-		&iam_v2.ListRulesForAllProjectsReq{})
+		&authz.ListRulesForAllProjectsReq{})
 	if err != nil {
 		return []string{}, errors.Wrap(err, "Failed to get authz project rules")
 	}
@@ -583,7 +583,7 @@ func (s *serializedProjectUpdateCancelTaskTask) Run(
 }
 
 func RegisterSerialTaskExecutors(manager *cereal.Manager, svc string, client SerializedProjectUpdate,
-	authzProjectsClient iam_v2.ProjectsClient) error {
+	authzProjectsClient authz.ProjectsClient) error {
 
 	taskExecutorOpts := cereal.TaskExecutorOpts{
 		Workers: 1,

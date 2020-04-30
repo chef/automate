@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -30,10 +30,10 @@ func TestGenerateAdminToken(t *testing.T) {
 	defer authnServer.Close()
 
 	serviceCerts = helpers.LoadDevCerts(t, "authz-service")
-	mockV2PolicyServer := authz_v2.NewPoliciesServerMock()
+	mockPolicyServer := authz.NewPoliciesServerMock()
 	connFactory = secureconn.NewFactory(*serviceCerts)
 	g = connFactory.NewServer()
-	authz_v2.RegisterPoliciesServer(g, mockV2PolicyServer)
+	authz.RegisterPoliciesServer(g, mockPolicyServer)
 	authzServer := grpctest.NewServer(g)
 	defer authzServer.Close()
 
@@ -57,12 +57,12 @@ func TestGenerateAdminToken(t *testing.T) {
 			}, nil
 		}
 
-		mockV2PolicyServer.AddPolicyMembersFunc = func(
-			_ context.Context, req *authz_v2.AddPolicyMembersReq) (*authz_v2.AddPolicyMembersResp, error) {
+		mockPolicyServer.AddPolicyMembersFunc = func(
+			_ context.Context, req *authz.AddPolicyMembersReq) (*authz.AddPolicyMembersResp, error) {
 
 			assert.Equal(t, "administrator-access", req.Id)
 
-			return &authz_v2.AddPolicyMembersResp{
+			return &authz.AddPolicyMembersResp{
 				Members: []string{"team:local:admins", "token:" + testID},
 			}, nil
 		}
@@ -87,8 +87,8 @@ func TestGenerateAdminToken(t *testing.T) {
 			}, nil
 		}
 
-		mockV2PolicyServer.AddPolicyMembersFunc = func(
-			_ context.Context, req *authz_v2.AddPolicyMembersReq) (*authz_v2.AddPolicyMembersResp, error) {
+		mockPolicyServer.AddPolicyMembersFunc = func(
+			_ context.Context, req *authz.AddPolicyMembersReq) (*authz.AddPolicyMembersResp, error) {
 
 			assert.Equal(t, "administrator-access", req.Id)
 

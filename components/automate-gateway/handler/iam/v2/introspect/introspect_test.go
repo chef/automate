@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	authz "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 	"github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 	middleware_authz "github.com/chef/automate/components/automate-gateway/gateway/middleware/authz"

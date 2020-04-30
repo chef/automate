@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	authz "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/automate-gateway/api/iam/v2/pairs"
 	"github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"

@@ -11,7 +11,7 @@ import (
 
 	"github.com/chef/automate/lib/logger"
 
-	api "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/storage"
@@ -497,7 +497,7 @@ func (s *policyServer) DeleteRole(
 	}
 }
 
-// UpdateRole modifies properties of an IAM v2 role.
+// UpdateRole modifies properties of an IAM role.
 // All properties must be supplied, whether changed or not.
 func (s *policyServer) UpdateRole(
 	ctx context.Context,
@@ -562,23 +562,23 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 		}
 
 		// ignore anything not related to the OPA store.
-		if !strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Policies/") &&
-			!strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Projects/") {
+		if !strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Policies/") &&
+			!strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Projects/") {
 			return resp, nil
 		}
 
 		switch info.FullMethod {
 		// Important! Any new endpoint that requires refreshing the OPA cache must be added here.
-		case "/chef.automate.domain.authz.v2.Policies/ReplacePolicyMembers",
-			"/chef.automate.domain.authz.v2.Policies/CreatePolicy",
-			"/chef.automate.domain.authz.v2.Policies/DeletePolicy",
-			"/chef.automate.domain.authz.v2.Policies/UpdatePolicy",
-			"/chef.automate.domain.authz.v2.Policies/CreateRole",
-			"/chef.automate.domain.authz.v2.Policies/DeleteRole",
-			"/chef.automate.domain.authz.v2.Policies/UpdateRole",
-			"/chef.automate.domain.authz.v2.Policies/RemovePolicyMembers",
-			"/chef.automate.domain.authz.v2.Policies/AddPolicyMembers",
-			"/chef.automate.domain.authz.v2.Policies/PurgeSubjectFromPolicies":
+		case "/chef.automate.domain.authz.Policies/ReplacePolicyMembers",
+			"/chef.automate.domain.authz.Policies/CreatePolicy",
+			"/chef.automate.domain.authz.Policies/DeletePolicy",
+			"/chef.automate.domain.authz.Policies/UpdatePolicy",
+			"/chef.automate.domain.authz.Policies/CreateRole",
+			"/chef.automate.domain.authz.Policies/DeleteRole",
+			"/chef.automate.domain.authz.Policies/UpdateRole",
+			"/chef.automate.domain.authz.Policies/RemovePolicyMembers",
+			"/chef.automate.domain.authz.Policies/AddPolicyMembers",
+			"/chef.automate.domain.authz.Policies/PurgeSubjectFromPolicies":
 			if err := s.updateEngineStore(ctx); err != nil {
 				return nil, status.Errorf(codes.Internal, "error updating engine store: %s", err.Error())
 			}

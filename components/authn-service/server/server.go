@@ -13,8 +13,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 
 	api "github.com/chef/automate/api/interservice/authn"
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	teams "github.com/chef/automate/api/interservice/teams/v2"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -44,19 +43,20 @@ type Server struct {
 	// Map of authenticator IDs to authenticators.
 	// Note: dex wraps this with a ResourceVersion, but that is due to storing
 	// connectors in the database -- we don't do this
-	TokenStorage       tokens.Storage
-	authenticators     map[string]authenticator.Authenticator
-	logger             *zap.Logger
-	connFactory        *secureconn.Factory
-	teamsClient        teams.TeamsClient
-	authzSubjectClient authz.SubjectPurgeClient
-	authzV2Client      authz_v2.AuthorizationClient
-	health             *health.Service
+	TokenStorage   tokens.Storage
+	authenticators map[string]authenticator.Authenticator
+	logger         *zap.Logger
+	connFactory    *secureconn.Factory
+	teamsClient    teams.TeamsClient
+	policiesClient authz.PoliciesClient
+	authzClient    authz.AuthorizationClient
+	health         *health.Service
 }
 
 // NewServer constructs a server from the provided config.
-func NewServer(ctx context.Context, c Config, authzV2Client authz_v2.AuthorizationClient) (*Server, error) {
-	return newServer(ctx, c, authzV2Client)
+func NewServer(ctx context.Context, c Config) (*Server, error) {
+
+	return newServer(ctx, c)
 }
 
 // Serve tells authn to start responding to GRPC and HTTP1 requests. On success, it never returns.
@@ -65,7 +65,7 @@ func (s *Server) Serve(grpcEndpoint, http1Endpoint string) error {
 	if err != nil {
 		return err
 	}
-	server := s.NewGRPCServer(s.authzSubjectClient, s.authzV2Client)
+	server := s.NewGRPCServer(s.policiesClient, s.authzClient)
 
 	opts := []runtime.ServeMuxOption{
 		runtime.WithIncomingHeaderMatcher(headerMatcher),
@@ -103,7 +103,8 @@ func (s *Server) ServeHTTP1(pbmux *runtime.ServeMux, http1Endpoint string) error
 	return http.ListenAndServe(http1Endpoint, httpmux)
 }
 
-func newServer(ctx context.Context, c Config, authzV2Client authz_v2.AuthorizationClient) (*Server, error) {
+func newServer(ctx context.Context, c Config) (*Server, error) {
+
 	// Users shouldn't see this, but gives you a clearer error message if you
 	// don't configure things correctly in testing.
 	if c.ServiceCerts == nil {
@@ -133,10 +134,12 @@ func newServer(ctx context.Context, c Config, authzV2Client authz_v2.Authorizati
 	if err != nil {
 		return nil, errors.Wrapf(err, "dial authz-service (%s)", c.AuthzAddress)
 	}
+	authzClient := authz.NewAuthorizationClient(authzConn)
+	policiesClient := authz.NewPoliciesClient(authzConn)
 
 	var ts tokens.Storage
 	if c.Token != nil {
-		ts, err = c.Token.Open(c.ServiceCerts, c.Logger, authzV2Client)
+		ts, err = c.Token.Open(c.ServiceCerts, c.Logger, authzClient)
 		if err != nil {
 			return nil, errors.Wrap(err, "initialize tokens adapter")
 		}
@@ -161,14 +164,14 @@ func newServer(ctx context.Context, c Config, authzV2Client authz_v2.Authorizati
 	}
 
 	s := &Server{
-		TokenStorage:       ts,
-		authzSubjectClient: authz.NewSubjectPurgeClient(authzConn),
-		authzV2Client:      authzV2Client,
-		authenticators:     authenticators,
-		logger:             c.Logger,
-		connFactory:        factory,
-		teamsClient:        teams.NewTeamsClient(teamsConn),
-		health:             health.NewService(),
+		TokenStorage:   ts,
+		authzClient:    authzClient,
+		policiesClient: policiesClient,
+		authenticators: authenticators,
+		logger:         c.Logger,
+		connFactory:    factory,
+		teamsClient:    teams.NewTeamsClient(teamsConn),
+		health:         health.NewService(),
 	}
 
 	// make grpc-go log through zap

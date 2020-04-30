@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 )
 
@@ -21,22 +21,22 @@ func TestActionProjectRulesMatching(t *testing.T) {
 	cases := []struct {
 		description string
 		action      *chef.Action
-		rules       []*iam_v2.ProjectRule
+		rules       []*authz.ProjectRule
 		matching    bool
 	}{
 		{
 			description: "A project with no rules does not match any resources",
 			matching:    false,
 			action:      &chef.Action{},
-			rules:       []*iam_v2.ProjectRule{},
+			rules:       []*authz.ProjectRule{},
 		},
 		{
 			description: "A project with one rule that does not have any conditions does not match any resources",
 			matching:    false,
 			action:      &chef.Action{},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_EVENT,
+					Type: authz.ProjectRuleTypes_EVENT,
 				},
 			},
 		},
@@ -47,12 +47,12 @@ func TestActionProjectRulesMatching(t *testing.T) {
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_EVENT,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_EVENT,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 							Values:    []string{"production"},
 						},
 					},
@@ -66,12 +66,12 @@ func TestActionProjectRulesMatching(t *testing.T) {
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -85,21 +85,21 @@ func TestActionProjectRulesMatching(t *testing.T) {
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
 				},
 				{
-					Type: iam_v2.ProjectRuleTypes_EVENT,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_EVENT,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -115,12 +115,12 @@ func TestActionProjectRulesMatching(t *testing.T) {
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_EVENT,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_EVENT,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -134,12 +134,12 @@ func TestActionProjectRulesMatching(t *testing.T) {
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "Org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_EVENT,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_EVENT,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1"},
 						},
 					},
@@ -153,12 +153,12 @@ func TestActionProjectRulesMatching(t *testing.T) {
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_NODE,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_NODE,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_2"},
 						},
 					},
@@ -172,12 +172,12 @@ func TestActionProjectRulesMatching(t *testing.T) {
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_EVENT,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_EVENT,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values:    []string{"org_1", "org_2"},
 						},
 					},
@@ -193,12 +193,12 @@ func TestActionProjectRulesMatching(t *testing.T) {
 				RemoteHostname:   "chef_server_1",
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_EVENT,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_EVENT,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values:    []string{"chef_server_1"},
 						},
 					},
@@ -212,12 +212,12 @@ func TestActionProjectRulesMatching(t *testing.T) {
 				RemoteHostname:   "Chef_server_1",
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_EVENT,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_EVENT,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values:    []string{"chef_server_1"},
 						},
 					},
@@ -231,12 +231,12 @@ func TestActionProjectRulesMatching(t *testing.T) {
 				RemoteHostname:   "chef_server_2",
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_EVENT,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_EVENT,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values:    []string{"chef_server_1"},
 						},
 					},
@@ -250,12 +250,12 @@ func TestActionProjectRulesMatching(t *testing.T) {
 				RemoteHostname:   "chef_server_1",
 				OrganizationName: "org_1",
 			},
-			rules: []*iam_v2.ProjectRule{
+			rules: []*authz.ProjectRule{
 				{
-					Type: iam_v2.ProjectRuleTypes_EVENT,
-					Conditions: []*iam_v2.Condition{
+					Type: authz.ProjectRuleTypes_EVENT,
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values:    []string{"chef_server_1", "chef_server_2"},
 						},
 					},
@@ -279,9 +279,9 @@ func TestActionProjectRulesMatching(t *testing.T) {
 func TestActionBundlerSingleMessage(t *testing.T) {
 	inbox := make(chan message.ChefAction, 100)
 	ctrl := gomock.NewController(t)
-	authzClient := iam_v2.NewMockProjectsClient(ctrl)
+	authzClient := authz.NewMockProjectsClient(ctrl)
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Times(1).Return(
-		&iam_v2.ListRulesForAllProjectsResp{}, nil)
+		&authz.ListRulesForAllProjectsResp{}, nil)
 	errc := make(chan error)
 
 	inbox <- message.NewChefAction(context.Background(), &chef.Action{}, errc)
@@ -299,9 +299,9 @@ func TestActionBundlerSingleMessage(t *testing.T) {
 func TestActionBundler5Messages(t *testing.T) {
 	inbox := make(chan message.ChefAction, 100)
 	ctrl := gomock.NewController(t)
-	authzClient := iam_v2.NewMockProjectsClient(ctrl)
+	authzClient := authz.NewMockProjectsClient(ctrl)
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Times(1).Return(
-		&iam_v2.ListRulesForAllProjectsResp{}, nil)
+		&authz.ListRulesForAllProjectsResp{}, nil)
 	errc := make(chan error)
 
 	inbox <- message.NewChefAction(context.Background(), &chef.Action{}, errc)
@@ -327,26 +327,26 @@ func TestActionBundler5Messages(t *testing.T) {
 func TestActionBundlerMatchProjectRule(t *testing.T) {
 	testProjectName := "Test"
 	orgName := "org_1"
-	projectRules := map[string]*iam_v2.ProjectRules{}
+	projectRules := map[string]*authz.ProjectRules{}
 
 	// Project 'Test' has an ingest rule for events of orgs matching 'org_1'
 	// This will be returned in the `ListRulesForAllProjects` request
-	projectRules[testProjectName] = &iam_v2.ProjectRules{
-		Rules: []*iam_v2.ProjectRule{
+	projectRules[testProjectName] = &authz.ProjectRules{
+		Rules: []*authz.ProjectRule{
 			{
-				Type: iam_v2.ProjectRuleTypes_EVENT,
-				Conditions: []*iam_v2.Condition{
+				Type: authz.ProjectRuleTypes_EVENT,
+				Conditions: []*authz.Condition{
 					{
-						Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+						Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 						Values:    []string{orgName},
 					},
 				},
 			},
 		},
 	}
-	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	authzClient := authz.NewMockProjectsClient(gomock.NewController(t))
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
-		&iam_v2.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
+		&authz.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
 	errc := make(chan error)
 
 	// Creating an ingest Chef Action that matches the project 'Test' rules

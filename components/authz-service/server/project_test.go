@@ -18,7 +18,7 @@ import (
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/logger"
 
-	api "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/prng"
 	"github.com/chef/automate/components/authz-service/server"

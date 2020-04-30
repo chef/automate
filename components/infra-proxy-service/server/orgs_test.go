@@ -13,7 +13,7 @@ import (
 
 	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
-	authz "github.com/chef/automate/api/interservice/authz/common"
+	"github.com/chef/automate/api/interservice/authz"
 	request "github.com/chef/automate/api/interservice/infra_proxy/request"
 	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/service"
 	"github.com/chef/automate/components/infra-proxy-service/constants"

@@ -1,10 +1,10 @@
 syntax = "proto3";
 
 import "validate/validate.proto";
-import "api/interservice/authz/v2/type.proto";
+import "api/interservice/authz/type.proto";
 
-package chef.automate.domain.authz.v2;
-option go_package = "github.com/chef/automate/api/interservice/authz/v2";
+package chef.automate.domain.authz;
+option go_package = "github.com/chef/automate/api/interservice/authz";
 
 message Policy {
     string name = 1;

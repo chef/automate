@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
 
@@ -21,7 +21,7 @@ func TestProjectUpdate(t *testing.T) {
 		description string
 		report      *relaxting.ESInSpecReport
 		summary     *relaxting.ESInSpecSummary
-		projects    map[string]*iam_v2.ProjectRules
+		projects    map[string]*authz.ProjectRules
 		projectIDs  []string
 	}{
 		{
@@ -34,13 +34,13 @@ func TestProjectUpdate(t *testing.T) {
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -60,13 +60,13 @@ func TestProjectUpdate(t *testing.T) {
 				Environment: "env2",
 				Projects:    []string{"old_tag"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1", "env2"},
 								},
 							},
@@ -88,17 +88,17 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:    []string{"old_tag"},
 				Roles:       []string{"backend"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"backend"},
 								},
 							},
@@ -120,17 +120,17 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:    []string{"old_tag"},
 				Roles:       []string{"backend"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"frontend"},
 								},
 							},
@@ -150,21 +150,21 @@ func TestProjectUpdate(t *testing.T) {
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env2"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -184,13 +184,13 @@ func TestProjectUpdate(t *testing.T) {
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env2"},
 								},
 							},
@@ -198,11 +198,11 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 				"project3": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -224,13 +224,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:    []string{"old_tag"},
 				Roles:       []string{"backend"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"backend"},
 								},
 							},
@@ -238,11 +238,11 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 				"project3": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -264,13 +264,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -290,13 +290,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_52"},
 								},
 							},
@@ -316,13 +316,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Roles:    []string{"Area_51"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -342,13 +342,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51", "area_52"},
 								},
 							},
@@ -368,13 +368,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51", "area_52", "area_53"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -394,13 +394,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51", "area_52", "area_53"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_54"},
 								},
 							},
@@ -418,13 +418,13 @@ func TestProjectUpdate(t *testing.T) {
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_54"},
 								},
 							},
@@ -446,13 +446,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "chef-server.org",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
@@ -472,13 +472,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "chef-server2.org",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
@@ -498,13 +498,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "Chef-server.org",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
@@ -524,13 +524,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "chef-server.org",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org", "chef-server2.org"},
 								},
 							},
@@ -552,21 +552,21 @@ func TestProjectUpdate(t *testing.T) {
 				SourceFQDN:       "chef-server.org",
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -588,21 +588,21 @@ func TestProjectUpdate(t *testing.T) {
 				SourceFQDN:       "chef-server.org",
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server2.org"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -624,13 +624,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -650,13 +650,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -676,13 +676,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"old_tag": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -704,13 +704,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"prod"},
 								},
 							},
@@ -730,13 +730,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"dev"},
 								},
 							},
@@ -756,13 +756,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"Prod"},
 								},
 							},
@@ -782,13 +782,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"prod", "dev"},
 								},
 							},
@@ -810,21 +810,21 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyGroup:      "prod",
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"prod"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -846,21 +846,21 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyGroup:      "prod",
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"dev"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -882,13 +882,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"prod"},
 								},
 							},
@@ -908,13 +908,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"dev"},
 								},
 							},
@@ -934,13 +934,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"Prod"},
 								},
 							},
@@ -960,13 +960,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"prod", "dev"},
 								},
 							},
@@ -988,21 +988,21 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyName:       "prod",
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"prod"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -1024,17 +1024,17 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyName:       "prod",
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"dev"},
 								},
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -1056,13 +1056,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -1082,13 +1082,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_52"},
 								},
 							},
@@ -1108,13 +1108,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"Area_51"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -1134,13 +1134,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51", "area_52"},
 								},
 							},
@@ -1162,21 +1162,21 @@ func TestProjectUpdate(t *testing.T) {
 				ChefTags:         []string{"area_51"},
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -1198,21 +1198,21 @@ func TestProjectUpdate(t *testing.T) {
 				ChefTags:         []string{"area_51"},
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -1234,17 +1234,17 @@ func TestProjectUpdate(t *testing.T) {
 				ChefTags:         []string{"area_51"},
 				OrganizationName: "org1",
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -1264,13 +1264,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51", "area_52", "area_53"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -1290,13 +1290,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51", "area_52", "area_53"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_54"},
 								},
 							},
@@ -1314,13 +1314,13 @@ func TestProjectUpdate(t *testing.T) {
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_54"},
 								},
 							},
@@ -1377,13 +1377,13 @@ func TestProjectUpdate(t *testing.T) {
 
 func TestProjectUpdateNoReports(t *testing.T) {
 	ctx := context.Background()
-	projects := map[string]*iam_v2.ProjectRules{
+	projects := map[string]*authz.ProjectRules{
 		"project9": {
-			Rules: []*iam_v2.ProjectRule{
+			Rules: []*authz.ProjectRule{
 				{
-					Conditions: []*iam_v2.Condition{
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 							Values:    []string{"area_54"},
 						},
 					},

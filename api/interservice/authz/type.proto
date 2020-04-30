@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package chef.automate.domain.authz;
+option go_package = "github.com/chef/automate/api/interservice/authz";
+
+enum Type {
+    CHEF_MANAGED = 0;
+    CUSTOM = 1;
+}

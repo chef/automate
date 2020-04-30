@@ -7,7 +7,7 @@ import (
 
 	"context"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
@@ -26,7 +26,7 @@ type ChefRunPipeline struct {
 }
 
 // NewChefRunPipeline Create a new chef run pipeline
-func NewChefRunPipeline(client backend.Client, authzClient iam_v2.ProjectsClient,
+func NewChefRunPipeline(client backend.Client, authzClient authz.ProjectsClient,
 	nodeMgrClient manager.NodeManagerServiceClient,
 	chefIngestRunPipelineConfig serveropts.ChefIngestRunPipelineConfig,
 	messageBufferSize int) ChefRunPipeline {
