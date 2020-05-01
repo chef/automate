@@ -1,4 +1,24 @@
 <svg #svg [attr.viewBox]="viewBox" 
     [ngStyle]="{'width': width}" 
     (window:resize)="onResize()">
-</svg>
+
+
+    <defs>
+      <linearGradient id="chef-gradient-purple" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(315)">
+        <stop offset="0%" style="stop-color:#C86DD7;" />
+        <stop offset="100%" style="stop-color:#3023AE;" />
+      </linearGradient>
+    </defs>
+
+    <!-- <circle r="10" class="highlight" stroke-width="1" fill="none" stroke="url(#chef-gradient-purple)">
+    </circle> -->
+  </svg>
+
+
+<chef-tooltip for="tooltip"></chef-tooltip>
+
+<!-- <div class="highlight"></div> -->
+
+<div class="rect-highlight">
+  <div class="rect-inner"></div>
+</div>

@@ -54,17 +54,17 @@
   .circle {
     fill: $eggplant-dark-2;
 
-    &.active {
+    &.lock {
       fill: #3023AE;
+      fill: url('#chef-gradient-purple');
     }
   }
 
-  .highlight {
+  .ring-highlight {
     position: absolute;
-    border: 1px solid #3023AE;
-    width: 20px;
-    height: 20px;
-    border-radius: 100%;
+    stroke-width: 1;
+    fill: none;
+    stroke: url(#chef-gradient-purple);
 
     opacity: 0;
     visibility: hidden;
@@ -164,30 +164,28 @@
 
 
 ::ng-deep {
-chef-tooltip {
-  position: absolute;
-  top: unset;
-  min-height: 40px;
-  font-size: 12px;
-  padding: 8px 10px;
-  padding-left: 16px; // extra 8px to account for ::before gradient
+  chef-tooltip {
+    min-height: 40px;
+    font-size: 12px;
+    padding: 8px 10px;
+    padding-left: 16px; // extra 8px to account for ::before gradient
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 8px;
-    height: 100%;
-    background: #3023AE;
-    background: linear-gradient(315deg, #3023AE, #C86DD7);
-    border-bottom-left-radius: $chef-border-radius;
-    border-top-left-radius: $chef-border-radius;
-  }
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 100%;
+      background: #3023AE;
+      background: linear-gradient(315deg, #3023AE, #C86DD7);
+      border-bottom-left-radius: $chef-border-radius;
+      border-top-left-radius: $chef-border-radius;
+    }
 
-  &.active {
-    opacity: 1;
-    visibility: visible;
+    &.active {
+      opacity: 1;
+      visibility: visible;
+    }
   }
-}
 }
