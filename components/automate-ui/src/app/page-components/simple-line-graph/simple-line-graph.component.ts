@@ -23,9 +23,6 @@ export class SimpleLineGraphComponent implements OnChanges {
   @ViewChild('svg', {static: true}) svg: ElementRef;
 
   public heightMargin = 40;
-  public theToolTip;
-  public theHighlight;
-  public theRectHighlight;
 
   ////////   X AXIS ITEMS   ////////
   // maps all of our x data points
@@ -91,6 +88,24 @@ export class SimpleLineGraphComponent implements OnChanges {
     return d3.select(this.svg.nativeElement);
   }
 
+  get theToolTip() {
+    return d3.select('chef-tooltip');
+  }
+
+  get theHighlight() {
+    const highlight = d3.select(this.svg.nativeElement)
+      .selectAll('.ring-highlight').data([this.data]);
+    highlight.exit().remove();
+    highlight.enter().append('circle').attr('class', 'ring-highlight')
+      .merge(highlight).attr('r', 10);
+    return highlight;
+  }
+
+  get theRectHighlight() {
+    return d3.select('.rect-highlight');
+  }
+
+
   // returns a function that when passed our data, will return an svg path
   get createPath() {
     return d3.line()
@@ -124,35 +139,13 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   renderPoints() {
-    // render tooltip
-    const toolTip = d3.select('body').selectAll('chef-tooltip').data([this.data]);
-    toolTip.exit().remove();
-    toolTip.enter().append('chef-tooltip')
-      .attr('for', 'tooltip').merge(toolTip);
-    // render highlight ring
-    const highlight = this.containerSelection.selectAll('.highlight').data([this.data]);
-    highlight.exit().remove();
-    highlight.enter().append('div').attr('class', 'highlight').merge(highlight);
-    // render rectangle label highlight
-    const rectHighlight = this.containerSelection
-      .selectAll('.rect-highlight').data([this.data]);
-    rectHighlight.exit().remove();
-    rectHighlight.enter().append('div').attr('class', 'rect-highlight')
-                          // for linear gradient, we attach another div;
-                        .append('div').attr('class', 'rect-inner').merge(rectHighlight);
-
-    // Create selections for the tooltip, highlight, and rectangle highlight
-    this.theToolTip = d3.select('body').append('chef-tooltip');
-    this.theHighlight = d3.select('.highlight');
-    this.theRectHighlight = d3.select('.rect-highlight');
-
-    const points = this.svgSelection.selectAll('circle').data(this.data);
+    const points = this.svgSelection.selectAll('circle.point').data(this.data);
     points.exit().remove();
     points.enter().append('circle')
-        .attr('class', (_d,i) => `circle highlight-${i}`)
-        .attr('percent', ( d => d.percentage ) )
+        .attr('class', (_d,i) => `circle point highlight-${i}`)
         .merge(points)
         .transition().duration(1000)
+        .attr('percent', ( d => d.percentage ) )
         .attr('cx', d => this.xScale(d.daysAgo))
         .attr('cy', d => this.yScale(d.percentage))
         .attr('r', 4);
@@ -197,6 +190,7 @@ export class SimpleLineGraphComponent implements OnChanges {
           return `${daysPassed} days ago`;
       }
     }).reverse(); // because we reversed our data above, we need to reverse our labels as well
+    // might be able to flip this back when real data is piping in
 
     const xAxis = d3.axisBottom().ticks(this.data.length)
       .tickSizeInner(10).tickSizeOuter(0).tickFormat((_d, i) => tickLabels[i])
@@ -233,13 +227,12 @@ export class SimpleLineGraphComponent implements OnChanges {
         }
       })
       .on('mouseout', () => {
-        this.theRectHighlight.classed('active', false);
-        this.theToolTip.classed('active', false);
-        this.theHighlight.classed('active', false);
+        this.AllDeactivate();
       })
       .on('click', () => {
         this.theToolTip.classed('active', false);
         this.theHighlight.classed('lock', true);
+        this.lockCircleGradient(d3.event);
         // don't show labels gradient if too many labels
         if (this.data.length < 8) {
           this.theRectHighlight.classed('lock', true);
@@ -252,39 +245,33 @@ export class SimpleLineGraphComponent implements OnChanges {
     // For the rectangle ring highlighter
     // Find the class to match with label
     const highlightNum = this.getClassHighlightNumber(d3Event);
-
     // get the text content from the label
     const text = d3.select(`.label-text.highlight-${highlightNum}`).text();
-
     // generate the box highlight ring size
     const textBounds = d3
       .select(`.label-text.highlight-${highlightNum}`).node().getBoundingClientRect();
 
     const rectWidth = textBounds.width + 16;
-    const textLeft = (textBounds.x - containerCoords.x) - 8;
-    const textBottom = (containerCoords.bottom - textBounds.bottom) - 3;
+    const posLeft = (textBounds.x - containerCoords.x) - 8;
+    const posBottom = (containerCoords.bottom - textBounds.bottom) - 3;
 
     // apply the highlight styles
     this.theRectHighlight.select('.rect-inner').text(() => text);
     this.theRectHighlight
-      .style('left', `${textLeft}px`)
-      .style('bottom', `${textBottom}px`)
+      .style('left', `${posLeft}px`)
+      .style('bottom', `${posBottom}px`)
       .style('width', `${rectWidth}px`)
       .classed('active', true);
   }
 
   attachTooltipAndRing(d3Event) {
-    const containerCoords = this.containerSelection.node().getBoundingClientRect();
     // Find the class to match with label
     const highlightNum = this.getClassHighlightNumber(d3Event);
 
     // get the text content from the label
     const coords = d3.select(`.circle.highlight-${highlightNum}`).node().getBoundingClientRect();
-    const percentage = d3.select(`.circle.highlight-${highlightNum}`).attr('percent');
-
-    // 6 is half highlight width minus radius of point
-    const posLeft = (coords.x - containerCoords.x) - 6;
-    const posBottom = (containerCoords.bottom - coords.bottom) - 6;
+    const highlightCircle = d3.select(`.circle.highlight-${highlightNum}`);
+    const percentage = highlightCircle.attr('percent');
 
     // theToolTip is the tooltip that shows on hover
     this.theToolTip
@@ -294,10 +281,20 @@ export class SimpleLineGraphComponent implements OnChanges {
       .classed('active', true)
       .text(_d => `Checked-in ${ percentage }%`);
 
+    const cx = highlightCircle.attr('cx');
+    const cy = highlightCircle.attr('cy');
+
+    console.log(this.theHighlight);
+
     this.theHighlight
-      .style('left', `${(posLeft)}px`) 
-      .style('bottom', `${(posBottom)}px`)
+      .attr('cx', cx)
+      .attr('cy', cy)
       .classed('active', true);
+  }
+
+  lockCircleGradient(d3Event) {
+    const highlightNum = this.getClassHighlightNumber(d3Event);
+    d3.select(`.circle.highlight-${highlightNum}`).classed('lock', 'true');
   }
 
   getClassHighlightNumber(d3Event) {
@@ -307,10 +304,13 @@ export class SimpleLineGraphComponent implements OnChanges {
     return num;
   }
 
+  AllDeactivate() {
+    d3.selectAll('.active').classed('active', false); // deactivate any active items on page
+  }
 
   AllUnlockDeactivate() {
-    d3.selectAll('.lock').classed('lock', false); // unlock any locked items on change
-    d3.selectAll('.active').classed('lock', false); // unlock any locked items on change
+    d3.selectAll('.lock').classed('lock', false); // unlock any locked items on page
+    this.AllDeactivate(); // deactivate any active items on page
   }
 
 
