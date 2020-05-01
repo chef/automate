@@ -127,21 +127,36 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .attr('for', 'tooltip').merge(toolTip);
 
     const theToolTip = d3.select('chef-tooltip');
+
+    const highlight = d3.select('body').selectAll('.highlight').data([this.data]);
+    highlight.exit().remove();
+    highlight.enter().append('div').attr('class', 'highlight').merge(highlight);
+
+    const theHighlight = d3.select('.highlight');
+
     const points = this.svgSelection.selectAll('circle').data(this.data);
     points.exit().remove();
     points
       .enter()
       .append('circle')
         .on('mouseover', (cd) => {
-          console.log('mouseover');
+          const highlightPos = d3.event.target.getBoundingClientRect();
+
+          theHighlight
+            .style('left', `${(highlightPos.x - 8)}px`) // 8 is half highlight width
+            .style('top', `${(highlightPos.y - 8)}px`) // minus diameter of point
+            .transition().duration(250)
+            .end(theHighlight.classed('active', true));
+
           theToolTip.style('left', `${d3.event.pageX}px`);
-          theToolTip.style('top', `${d3.event.pageY - 5}px`);
+          theToolTip.style('top', `${d3.event.pageY - 15}px`); // 15px for thhe tooltip to breathe;
           theToolTip.classed('active', true);
           theToolTip
             .text(_d => `Checked-in ${cd.percentage}%`);
         })
       .on('mouseout', () => {
         theToolTip.classed('active', false);
+        theHighlight.classed('active', false);
         })
       .attr('class', 'circle')
       .merge(points)
