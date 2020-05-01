@@ -24,6 +24,8 @@ export class SimpleLineGraphComponent implements OnChanges {
 
   public heightMargin = 40;
   public theHighlight;
+  public locked = false;
+  public currentHighlightnum: number;
 
   ////////   X AXIS ITEMS   ////////
   // maps all of our x data points
@@ -93,19 +95,9 @@ export class SimpleLineGraphComponent implements OnChanges {
     return d3.select('chef-tooltip');
   }
 
-  // get theHighlight() {
-  //   const highlight = d3.select(this.svg.nativeElement)
-  //     .selectAll('.ring-highlight').data([this.data]);
-  //   highlight.exit().remove();
-  //   highlight.enter().append('circle').attr('class', 'ring-highlight')
-  //     .merge(highlight).attr('r', 10);
-  //   return highlight;
-  // }
-
   get theRectHighlight() {
     return d3.select('.rect-highlight');
   }
-
 
   // returns a function that when passed our data, will return an svg path
   get createPath() {
@@ -114,12 +106,11 @@ export class SimpleLineGraphComponent implements OnChanges {
               .y(d => this.yScale( d.percentage) );
   }
 
-
   get viewBox() {
     return `0 0 ${this.width} ${this.height}`;
   }
 
-  createTheRingHighlight() {
+  createTheRingHighlight(): void {
       const highlight = this.svgSelection.selectAll('.ring-highlight').data([this.data]);
       highlight.exit().remove();
       highlight.enter().append('circle').attr('class', 'ring-highlight')
@@ -138,7 +129,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.renderPoints();
   }
 
-  renderLine() {
+  renderLine(): void {
     // create the line using path function
     const line = this.createPath(this.data);
 
@@ -149,7 +140,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     .attr('d', line);
   }
 
-  renderPoints() {
+  renderPoints(): void {
     const points = this.svgSelection.selectAll('circle.point').data(this.data);
     points.exit().remove();
     points.enter().append('circle')
@@ -168,7 +159,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     const xGrid = d3.axisTop()
       .ticks(this.data.length)
       .tickFormat('')
-      .tickSize(this.height - ( this.heightMargin * ( 3 / 2 ) ))
+      .tickSize(this.height - ( this.heightMargin * ( 3 / 2 ) ) + 10) // magic numbers?
       .tickSizeOuter(0)
       .scale(this.xScale);
     // Render the X axis and X ticks
@@ -176,7 +167,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     grid.exit().remove();
     grid.enter().append('g').attr('class', 'grid')
       // this line will need to be updated to flexible
-      .attr('transform', `translate(0, ${this.height - this.heightMargin })`)
+      .attr('transform', `translate(0, ${this.height - this.heightMargin})`)
       .merge(grid).transition().duration(1000)
       .call(xGrid);
 
@@ -210,7 +201,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     const x = this.svgSelection.selectAll('.x-axis').data([this.data]);
     x.exit().remove();
     x.enter().append('g').attr('class', 'x-axis')
-      .attr('transform', `translate(0, ${this.height - this.heightMargin })`)
+      .attr('transform', `translate(0, ${this.height - this.heightMargin})`)
       .merge(x).transition().duration(1000)
       .call(xAxis);
 
@@ -229,29 +220,43 @@ export class SimpleLineGraphComponent implements OnChanges {
 
     this.svgSelection.selectAll('.label-text')
       .on('mouseenter', () => {
-        this.AllUnlockDeactivate();
-
-        this.attachTooltipAndRing(d3.event);
-        // don't show labels gradient if too many labels
-        if (this.data.length < 8) {
-          this.createGradientLabel(d3.event);
-        }
+          if ( this.locked === true ) { return; }
+          this.attachTooltipAndRing(d3.event);
+          // don't show label gradient if too many labels
+          if (this.data.length < 8) {
+            this.createGradientLabel(d3.event);
+          }
       })
       .on('mouseout', () => {
+        if (this.locked === true) { return; }
         this.AllDeactivate();
       })
       .on('click', () => {
-        this.theToolTip.classed('active', false);
-        this.theHighlight.classed('lock', true);
-        this.lockCircleGradient(d3.event);
-        // don't show labels gradient if too many labels
-        if (this.data.length < 8) {
-          this.theRectHighlight.classed('lock', true);
+        if ( this.locked ) {
+          // if locked, check if the target matches the highlighted number
+          if ( !d3.event.target.classList
+              .contains(`highlight-${this.currentHighlightnum}`) ) { return; }
+          this.theToolTip.classed('active', true);
+          this.allUnlock();
+        } else {
+          this.lockCircleGradient(d3.event);
+          this.theToolTip.classed('active', false);
+          this.theHighlight.classed('lock', true);
+          // don't show labels gradient if too many labels
+          if (this.data.length < 8) {
+            this.theRectHighlight.classed('lock', true);
+          }
+          this.locked = true;
         }
       });
   }
 
-  createGradientLabel(d3Event) {
+  toggleLock(): void {
+    this.locked = !this.locked;
+
+  }
+
+  createGradientLabel(d3Event): void {
     const containerCoords = this.containerSelection.node().getBoundingClientRect();
     // For the rectangle ring highlighter
     // Find the class to match with label
@@ -275,7 +280,7 @@ export class SimpleLineGraphComponent implements OnChanges {
       .classed('active', true);
   }
 
-  attachTooltipAndRing(d3Event) {
+  attachTooltipAndRing(d3Event): void {
     // Find the class to match with label
     const highlightNum = this.getClassHighlightNumber(d3Event);
 
@@ -301,24 +306,30 @@ export class SimpleLineGraphComponent implements OnChanges {
       .classed('active', true);
   }
 
-  lockCircleGradient(d3Event) {
+  lockCircleGradient(d3Event): void {
     const highlightNum = this.getClassHighlightNumber(d3Event);
     d3.select(`.circle.highlight-${highlightNum}`).classed('lock', 'true');
   }
 
-  getClassHighlightNumber(d3Event) {
+  getClassHighlightNumber(d3Event): number {
     const classes = d3.select(d3Event.target).attr('class');
     const match = classes.match(/highlight-([0-9]{1,2})/g)[0];
     const num = match.split('-')[1];
+    this.currentHighlightnum = num;
     return num;
   }
 
-  AllDeactivate() {
+  AllDeactivate(): void {
     d3.selectAll('.active').classed('active', false); // deactivate any active items on page
   }
 
-  AllUnlockDeactivate() {
+  allUnlock(): void {
     d3.selectAll('.lock').classed('lock', false); // unlock any locked items on page
+    this.locked = false;
+  }
+
+  AllUnlockDeactivate(): void {
+    this.allUnlock();
     this.AllDeactivate(); // deactivate any active items on page
   }
 
@@ -327,11 +338,11 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.renderChart();
   }
 
-  onResize() {
+  onResize(): void {
     this.renderChart();
   }
 
-  resizeChart() {
+  resizeChart(): void {
     this.width = this.chart.nativeElement.getBoundingClientRect().width;
   }
 
