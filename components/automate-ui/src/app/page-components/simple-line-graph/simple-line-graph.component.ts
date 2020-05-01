@@ -215,6 +215,7 @@ export class SimpleLineGraphComponent implements OnChanges {
 
     let tickLength = tickLabels.length; // make variable to reverse class assignment
     this.svgSelection.selectAll('.x-axis .tick text')
+              // with real data we should be able to get rid of this and just use index
       .attr('class', () => `label-text highlight-${(tickLength--) - 1}`)
       .classed('turnt', () => {
         return tickLabels.length > 7;
@@ -269,7 +270,7 @@ export class SimpleLineGraphComponent implements OnChanges {
       .select(`.label-text.highlight-${num}`).node().getBoundingClientRect();
     const rectWidth = textBounds.width + 16;
     const textLeft = textBounds.x - (rectWidth / 2) + (textBounds.width / 2);
-    const textTop = textBounds.y - (textBounds.height / 2) + 2;
+    const textTop = textBounds.y - (textBounds.height / 2) + 5;
 
     // apply the highlight styles
     this.theRectHighlight.select('.rect-inner').text(() => text);
@@ -299,8 +300,8 @@ export class SimpleLineGraphComponent implements OnChanges {
       .text(_d => `Checked-in ${ percentage }%`);
 
     this.theHighlight
-      .style('left', `${(coords.x - 8)}px`) // 8 is half highlight width
-      .style('top', `${(coords.y - 8)}px`) // minus diameter of point
+      .style('left', `${(coords.x - 6)}px`) // 6 is half highlight width / 2
+      .style('top', `${(coords.y - 6)}px`) // minus diameter of point
       .classed('active', true);
   }
 

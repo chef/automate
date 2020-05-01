@@ -61,9 +61,9 @@
 
   .highlight {
     position: absolute;
-    border: 2px solid #3023AE;
-    width: 24px;
-    height: 24px;
+    border: 1px solid #3023AE;
+    width: 20px;
+    height: 20px;
     border-radius: 100%;
 
     opacity: 0;
@@ -102,7 +102,7 @@
     position: absolute;
     background: #3023AE;
     background: linear-gradient(315deg, #3023AE, #C86DD7);
-    height: 22px;
+    height: 16px;
     border-radius: 4px;
     opacity: 0;
     visibility: hidden;
@@ -113,10 +113,10 @@
     justify-content: center;
 
     .rect-inner {
-      border-radius: 2px;
+      border-radius: 3px;
       background: $chef-white;
-      width: calc(100% - 4px);
-      height: calc(100% - 4px);
+      width: calc(100% - 2px);
+      height: calc(100% - 2px);
       font-size: 10px;
       display: flex;
       align-items: center;
@@ -164,15 +164,17 @@
 
 ::ng-deep {
 chef-tooltip {
-  font-size: 10px;
+  min-height: 40px;
+  font-size: 12px;
   padding: 8px 10px;
+  padding-left: 16px; // extra 8px to account for ::before gradient
 
   &::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    width: 5px;
+    width: 8px;
     height: 100%;
     background: #3023AE;
     background: linear-gradient(315deg, #3023AE, #C86DD7);
