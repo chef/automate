@@ -89,7 +89,9 @@
             </chef-thead>
             <chef-tbody>
               <chef-tr *ngFor="let cookbook of cookbooks">
-                <chef-td>{{ cookbook.name }}</chef-td>
+                <chef-td>
+                  <a [routerLink]="['/infrastructure','chef-servers', serverId, 'org', org.id, 'cookbooks', cookbook.name]">{{ cookbook.name }}</a>
+                </chef-td>
                 <chef-td>{{ cookbook.version }}</chef-td>
               </chef-tr>
             </chef-tbody>
