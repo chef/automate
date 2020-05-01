@@ -22,7 +22,10 @@ export class SimpleLineGraphComponent implements OnChanges {
 
   @ViewChild('svg', {static: true}) svg: ElementRef;
 
-  heightMargin = 40;
+  public heightMargin = 40;
+  public theToolTip;
+  public theHighlight;
+  public theRectHighlight;
 
   ////////   X AXIS ITEMS   ////////
   // maps all of our x data points
@@ -96,16 +99,13 @@ export class SimpleLineGraphComponent implements OnChanges {
     return `0 0 ${this.width} ${this.height}`;
   }
 
-  public theToolTip;
-  public theHighlight;
-  public theRectHighlight;
-
   resizeChart() {
     this.width = this.chart.nativeElement.getBoundingClientRect().width;
   }
 
     ////////////////// RENDER FUNCTIONS ////////////////////
   renderChart() {
+    this.AllUnlockDeactivate();
     this.resizeChart();
     this.renderGrid();
     this.renderLine();
@@ -148,50 +148,6 @@ export class SimpleLineGraphComponent implements OnChanges {
     const points = this.svgSelection.selectAll('circle').data(this.data);
     points.exit().remove();
     points.enter().append('circle')
-        .on('mouseover', () => {
-          // clear all actives to start fresh on new mouseover
-          this.theToolTip.classed('active', false);
-          this.theHighlight.classed('active', false);
-          this.theRectHighlight.classed('active', false);
-
-          this.theHighlight.classed('lock', false);
-          this.theRectHighlight.classed('lock', false);
-
-
-          const theTarget = d3.select(d3.event.target);
-          theTarget.classed('active', 'true');
-
-          // highlight is the ring around the point on hover
-          const highlightPos = d3.event.target.getBoundingClientRect();
-
-          this.theHighlight
-            .style('left', `${(highlightPos.x - 8)}px`) // 8 is half highlight width
-            .style('top', `${(highlightPos.y - 8)}px`) // minus diameter of point
-            .classed('active', true);
-
-          this.getToolTipCoordinates(d3.event);
-
-          // attach gradient label
-          if (this.data.length < 8) {
-            this.createGradientLabel(d3.event);
-          }
-
-        })
-        .on('mouseout', () => {
-          d3.select(d3.event.target).classed('active', false);
-          this.theToolTip.classed('active', false);
-          this.theHighlight.classed('active', false);
-          this.theRectHighlight.classed('active', false);
-          })
-        .on('click', () => {
-          console.log('clicked');
-          this.theToolTip.classed('active', false);
-          this.theHighlight.classed('lock', true);
-
-          if (this.data.length < 8) {
-            this.theRectHighlight.classed('lock', true);
-          }
-        })
         .attr('class', (_d,i) => `circle highlight-${i}`)
         .attr('percent', ( d => d.percentage ) )
         .merge(points)
@@ -266,18 +222,31 @@ export class SimpleLineGraphComponent implements OnChanges {
 
     this.svgSelection.selectAll('.label-text')
       .on('mouseenter', () => {
-        this.createGradientLabel(d3.event);
-        this.getToolTipCoordinates(d3.event);
+        this.AllUnlockDeactivate();
+
+        this.attachTooltipAndRing(d3.event);
+        // don't show labels gradient if too many labels
+        if (this.data.length < 8) {
+          this.createGradientLabel(d3.event);
+        }
       })
       .on('mouseout', () => {
         this.theRectHighlight.classed('active', false);
         this.theToolTip.classed('active', false);
+        this.theHighlight.classed('active', false);
       })
+      .on('click', () => {
+        this.theToolTip.classed('active', false);
+        this.theHighlight.classed('lock', true);
+        // don't show labels gradient if too many labels
+        if (this.data.length < 8) {
+          this.theRectHighlight.classed('lock', true);
+        }
+      });
   }
 
 
   ngOnChanges() {
-    d3.selectAll('.lock').classed('lock', false); // unlock any locked items on change
     this.renderChart();
   }
 
@@ -304,14 +273,14 @@ export class SimpleLineGraphComponent implements OnChanges {
 
     // apply the highlight styles
     this.theRectHighlight.select('.rect-inner').text(() => text);
-    this.theRectHighlight.style('left', `${textLeft}px`);
-    this.theRectHighlight.style('top', `${textTop}px`);
-    this.theRectHighlight.style('width', `${rectWidth}px`);
-    this.theRectHighlight.classed('active', true);
+    this.theRectHighlight
+      .style('left', `${textLeft}px`)
+      .style('top', `${textTop}px`)
+      .style('width', `${rectWidth}px`)
+      .classed('active', true);
   }
 
-  getToolTipCoordinates(d3Event) {
-    // For the rectangle ring highlighter
+  attachTooltipAndRing(d3Event) {
     // Find the class to match with label
     const classes = d3.select(d3Event.target).attr('class');
     const match = classes.match(/highlight-([0-9]{1,2})/g)[0];
@@ -322,11 +291,25 @@ export class SimpleLineGraphComponent implements OnChanges {
     const percentage = d3.select(`.circle.highlight-${num}`).attr('percent');
 
     // theToolTip is the tooltip that shows on hover
-    this.theToolTip.style('left', `${ coords.left + 4 }px`);
+    this.theToolTip
+      .style('left', `${ coords.left + 4 }px`)
     // 15px for thhe tooltip to breathe;
-    this.theToolTip.style('top', `${coords.top - 15}px`);
-    this.theToolTip.classed('active', true);
-    this.theToolTip.text(_d => `Checked-in ${ percentage }%`);
+      .style('top', `${coords.top - 15}px`)
+      .classed('active', true)
+      .text(_d => `Checked-in ${ percentage }%`);
+
+    this.theHighlight
+      .style('left', `${(coords.x - 8)}px`) // 8 is half highlight width
+      .style('top', `${(coords.y - 8)}px`) // minus diameter of point
+      .classed('active', true);
   }
+
+
+
+  AllUnlockDeactivate() {
+    d3.selectAll('.lock').classed('lock', false); // unlock any locked items on change
+    d3.selectAll('.active').classed('lock', false); // unlock any locked items on change
+  }
+
 }
 
