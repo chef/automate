@@ -1,5 +1,3 @@
-import { itFlaky } from '../../../support/constants';
-
 describe('team add users', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'test-add-users';
@@ -63,17 +61,17 @@ describe('team add users', () => {
     cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['users', 'teams']);
   });
 
-  itFlaky('when the x is clicked, it returns to the team details page', () => {
+  it('when the x is clicked, it returns to the team details page', () => {
     cy.get('chef-page chef-button.close-button').click();
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamID}`);
   });
 
-  itFlaky('when the cancel button is clicked, it returns to the team details page', () => {
+  it('when the cancel button is clicked, it returns to the team details page', () => {
     cy.get('#page-footer #right-buttons chef-button').last().click();
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamID}`);
   });
 
-  itFlaky('navigates to the team users add page', () => {
+  it('navigates to the team users add page', () => {
     cy.get('chef-page-header h1').contains(`Add Users to ${teamName}`);
 
     cy.get('chef-tbody chef-tr').contains(userID);
@@ -85,7 +83,7 @@ describe('team add users', () => {
     cy.get('#page-footer #right-buttons chef-button ng-container').first().contains('Add User');
   });
 
-  itFlaky('adds a single user', () => {
+  it('adds a single user', () => {
     cy.get('chef-tbody').contains('chef-tr', userID)
       .find('chef-checkbox').click();
     cy.get('#users-selected').contains('1 user selected');
@@ -115,7 +113,7 @@ describe('team add users', () => {
     });
   });
 
-  itFlaky('adds all users then sees empty message on attempting to add more users', () => {
+  it('adds all users then sees empty message on attempting to add more users', () => {
     // Note: we add one user, and there always is an admin user. So,
     // we don't need to care for singular texts here ("Add 1 user" etc).
     cy.get('chef-tbody').find('chef-tr').then(rows => {
