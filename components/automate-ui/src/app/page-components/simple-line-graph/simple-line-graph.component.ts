@@ -164,18 +164,22 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
           theToolTip.text(_d => `Checked-in ${cd.percentage}%`);
 
 
+          // For the rectangle ring highlighter
+          // Find the class to match with label
           const classes = theTarget.attr('class');
           const match = classes.match(/circle-([0-9]{1,2})/g)[0];
           const num = match.split('-')[1];
 
-          const parent = d3.select(`.label-text-${num}`).node().parentNode;
-          d3.select(parent).append('rect').attr('class', 'active');
+
+          const text = d3.select(`.label-text-${num}`).text();
+          console.log(text);
 
           const textBounds = d3.select(`.label-text-${num}`).node().getBoundingClientRect();
           const rectWidth = textBounds.width + 16;
           const textLeft = textBounds.x - ( rectWidth / 2)  + (textBounds.width / 2);
-          const textTop = textBounds.y - ( textBounds.height / 2 );
+          const textTop = textBounds.y - ( textBounds.height / 2 ) + 2;
 
+          rectHighlight.select('.rect-inner').text(() => text);
           rectHighlight.style('left', `${textLeft}px`);
           rectHighlight.style('top', `${textTop}px`);
           rectHighlight.style('width', `${rectWidth}px`);
