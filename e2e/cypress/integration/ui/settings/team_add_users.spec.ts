@@ -105,10 +105,10 @@ describe('team add users', () => {
     }).then((resp) => {
       cy.request({
         auth: { bearer: adminIdToken },
-        method: 'PUT',
-        url: `/apis/iam/v2/teams/${teamID}/users`,
+        method: 'POST',
+        url: `/apis/iam/v2/teams/${teamID}/users:remove`,
         body: {
-          membership_ids: [resp.body.id]
+          membership_ids: [resp.body.user.membership_id]
         }
       });
     });
@@ -132,7 +132,7 @@ describe('team add users', () => {
     cy.get('chef-tbody chef-td a').contains('Local Administrator');
 
     // navigate back to add users and see empty page and message
-    cy.get('chef-toolbar chef-button').contains('Add User').click();
+    cy.get('chef-toolbar chef-button').contains('Add Users').click();
     cy.url().should('eq',
     `${Cypress.config().baseUrl}/settings/teams/${teamID}/add-users`);
     cy.get('chef-table').should('not.exist');
