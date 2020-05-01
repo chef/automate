@@ -32,7 +32,7 @@ export class LayoutSidebarService {
         this.updateSidebars();
     }
 
-    populateSidebar() {
+    private populateSidebar() {
       const sidebars: Sidebars = {
         active: '',
         dashboards: [{
