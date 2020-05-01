@@ -165,6 +165,8 @@
 
 ::ng-deep {
 chef-tooltip {
+  position: absolute;
+  top: unset;
   min-height: 40px;
   font-size: 12px;
   padding: 8px 10px;
