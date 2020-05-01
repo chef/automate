@@ -54,6 +54,25 @@
     cursor: pointer;
   }
 
+  .highlight {
+    position: absolute;
+    border: 2px solid #3023AE;
+    width: 24px;
+    height: 24px;
+    border-radius: 100%;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: 1s;
+
+    &.active {
+      opacity: 1;
+      visibility: visible;
+      transition: 1s;
+    }
+  }
+
   .tooltip {
     position: absolute;			
     opacity: 0;
