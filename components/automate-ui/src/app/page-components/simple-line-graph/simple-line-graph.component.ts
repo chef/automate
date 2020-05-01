@@ -262,8 +262,6 @@ export class SimpleLineGraphComponent implements OnChanges {
 
   createGradientLabel(d3Event) {
     const containerCoords = this.containerSelection.node().getBoundingClientRect();
-    console.log('containerCoords');
-    console.log(containerCoords);
     // For the rectangle ring highlighter
     // Find the class to match with label
     const classes = d3.select(d3Event.target).attr('class');
