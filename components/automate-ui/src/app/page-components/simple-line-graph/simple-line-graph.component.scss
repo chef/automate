@@ -100,6 +100,7 @@
 
   .rect-highlight {
     position: absolute;
+    z-index: 5;
     background: #3023AE;
     background: linear-gradient(315deg, #3023AE, #C86DD7);
     height: 16px;

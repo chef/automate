@@ -79,6 +79,10 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   //////// SELECTIONS ////////
+  get containerSelection() {
+    return d3.select('app-simple-line-graph');
+  }
+
   get axisYSelection() {
     return this.svgSelection.select('.y-axis');
   }
@@ -134,7 +138,8 @@ export class SimpleLineGraphComponent implements OnChanges {
     highlight.exit().remove();
     highlight.enter().append('div').attr('class', 'highlight').merge(highlight);
     // render rectangle label highlight
-    const rectHighlight = d3.select('body').selectAll('.rect-highlight').data([this.data]);
+    const rectHighlight = this.containerSelection
+      .selectAll('.rect-highlight').data([this.data]);
     rectHighlight.exit().remove();
     rectHighlight.enter().append('div').attr('class', 'rect-highlight')
                           // for linear gradient, we attach another div;
@@ -256,6 +261,9 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   createGradientLabel(d3Event) {
+    const containerCoords = this.containerSelection.node().getBoundingClientRect();
+    console.log('containerCoords');
+    console.log(containerCoords);
     // For the rectangle ring highlighter
     // Find the class to match with label
     const classes = d3.select(d3Event.target).attr('class');
@@ -268,15 +276,16 @@ export class SimpleLineGraphComponent implements OnChanges {
     // generate the box highlight ring size
     const textBounds = d3
       .select(`.label-text.highlight-${num}`).node().getBoundingClientRect();
+
     const rectWidth = textBounds.width + 16;
-    const textLeft = textBounds.x - (rectWidth / 2) + (textBounds.width / 2);
-    const textTop = textBounds.y - (textBounds.height / 2) + 5;
+    const textLeft = (textBounds.x - containerCoords.x) - 8;
+    const textBottom = (containerCoords.bottom - textBounds.bottom) - 3;
 
     // apply the highlight styles
     this.theRectHighlight.select('.rect-inner').text(() => text);
     this.theRectHighlight
       .style('left', `${textLeft}px`)
-      .style('top', `${textTop}px`)
+      .style('bottom', `${textBottom}px`)
       .style('width', `${rectWidth}px`)
       .classed('active', true);
   }
