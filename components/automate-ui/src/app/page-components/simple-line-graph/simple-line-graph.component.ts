@@ -96,6 +96,10 @@ export class SimpleLineGraphComponent implements OnChanges {
     return `0 0 ${this.width} ${this.height}`;
   }
 
+  public theToolTip;
+  public theHighlight;
+  public theRectHighlight;
+
   resizeChart() {
     this.width = this.chart.nativeElement.getBoundingClientRect().width;
   }
@@ -125,91 +129,71 @@ export class SimpleLineGraphComponent implements OnChanges {
     toolTip.exit().remove();
     toolTip.enter().append('chef-tooltip')
       .attr('for', 'tooltip').merge(toolTip);
-
     // render highlight ring
     const highlight = d3.select('body').selectAll('.highlight').data([this.data]);
     highlight.exit().remove();
     highlight.enter().append('div').attr('class', 'highlight').merge(highlight);
+    // render rectangle label highlight
+    const rectHighlight = d3.select('body').selectAll('.rect-highlight').data([this.data]);
+    rectHighlight.exit().remove();
+    rectHighlight.enter().append('div').attr('class', 'rect-highlight')
+                          // for linear gradient, we attach another div;
+                        .append('div').attr('class', 'rect-inner').merge(rectHighlight);
 
-    // Create selections for the tooltip and highlight
-    const theToolTip = d3.select('chef-tooltip');
-    const theHighlight = d3.select('.highlight');
-    const rectHighlight = d3.select('body')
-      .append('div').attr('class', 'rect-highlight');
-      // for linear gradient, we attach another div;
-      rectHighlight.append('div').attr('class', 'rect-inner');
+    // Create selections for the tooltip, highlight, and rectangle highlight
+    this.theToolTip = d3.select('body').append('chef-tooltip');
+    this.theHighlight = d3.select('.highlight');
+    this.theRectHighlight = d3.select('.rect-highlight');
 
     const points = this.svgSelection.selectAll('circle').data(this.data);
     points.exit().remove();
     points.enter().append('circle')
-        .on('mouseover', (cd) => {
+        .on('mouseover', () => {
           // clear all actives to start fresh on new mouseover
-          theToolTip.classed('active', false);
-          theHighlight.classed('active', false);
-          rectHighlight.classed('active', false);
+          this.theToolTip.classed('active', false);
+          this.theHighlight.classed('active', false);
+          this.theRectHighlight.classed('active', false);
 
-          theHighlight.classed('lock', false);
-          rectHighlight.classed('lock', false);
+          this.theHighlight.classed('lock', false);
+          this.theRectHighlight.classed('lock', false);
 
 
-          console.log(d3.event);
           const theTarget = d3.select(d3.event.target);
           theTarget.classed('active', 'true');
 
           // highlight is the ring around the point on hover
           const highlightPos = d3.event.target.getBoundingClientRect();
 
-          theHighlight
+          this.theHighlight
             .style('left', `${(highlightPos.x - 8)}px`) // 8 is half highlight width
             .style('top', `${(highlightPos.y - 8)}px`) // minus diameter of point
             .classed('active', true);
 
-          // theToolTip is the tooltip that shows on hover
-          theToolTip.style('left', `${d3.event.pageX}px`);
-          theToolTip.style('top', `${d3.event.pageY - 15}px`); // 15px for thhe tooltip to breathe;
-          theToolTip.classed('active', true);
-          theToolTip.text(_d => `Checked-in ${cd.percentage}%`);
+          this.getToolTipCoordinates(d3.event);
 
-
+          // attach gradient label
           if (this.data.length < 8) {
-            // For the rectangle ring highlighter
-            // Find the class to match with label
-            const classes = theTarget.attr('class');
-            const match = classes.match(/circle-([0-9]{1,2})/g)[0];
-            const num = match.split('-')[1];
-
-            // get the text content from the label
-            const text = d3.select(`.label-text-${num}`).text();
-
-            // generate the box highlight ring size
-            const textBounds = d3.select(`.label-text-${num}`).node().getBoundingClientRect();
-            const rectWidth = textBounds.width + 16;
-            const textLeft = textBounds.x - ( rectWidth / 2)  + (textBounds.width / 2);
-            const textTop = textBounds.y - ( textBounds.height / 2 ) + 2;
-
-            // apply the highlight styles
-            rectHighlight.select('.rect-inner').text(() => text);
-            rectHighlight.style('left', `${textLeft}px`);
-            rectHighlight.style('top', `${textTop}px`);
-            rectHighlight.style('width', `${rectWidth}px`);
-            rectHighlight.classed('active', true);
+            this.createGradientLabel(d3.event);
           }
 
         })
         .on('mouseout', () => {
           d3.select(d3.event.target).classed('active', false);
-          theToolTip.classed('active', false);
-          theHighlight.classed('active', false);
-          rectHighlight.classed('active', false);
+          this.theToolTip.classed('active', false);
+          this.theHighlight.classed('active', false);
+          this.theRectHighlight.classed('active', false);
           })
         .on('click', () => {
           console.log('clicked');
-          theToolTip.classed('active', false);
-          theHighlight.classed('lock', true);
-          rectHighlight.classed('lock', true);
+          this.theToolTip.classed('active', false);
+          this.theHighlight.classed('lock', true);
+
+          if (this.data.length < 8) {
+            this.theRectHighlight.classed('lock', true);
+          }
         })
-        .attr('class', 'circle')
-        .attr('class', (_d,i) => `circle-${i}`)
+        .attr('class', (_d,i) => `circle highlight-${i}`)
+        .attr('percent', ( d => d.percentage ) )
         .merge(points)
         .transition().duration(1000)
         .attr('cx', d => this.xScale(d.daysAgo))
@@ -275,10 +259,20 @@ export class SimpleLineGraphComponent implements OnChanges {
 
     let tickLength = tickLabels.length; // make variable to reverse class assignment
     this.svgSelection.selectAll('.x-axis .tick text')
-      .attr('class', () => `label-text label-text-${(tickLength--) - 1}`)
+      .attr('class', () => `label-text highlight-${(tickLength--) - 1}`)
       .classed('turnt', () => {
         return tickLabels.length > 7;
       }).transition().duration(1000);
+
+    this.svgSelection.selectAll('.label-text')
+      .on('mouseenter', () => {
+        this.createGradientLabel(d3.event);
+        this.getToolTipCoordinates(d3.event);
+      })
+      .on('mouseout', () => {
+        this.theRectHighlight.classed('active', false);
+        this.theToolTip.classed('active', false);
+      })
   }
 
 
@@ -289,6 +283,50 @@ export class SimpleLineGraphComponent implements OnChanges {
 
   onResize() {
     this.renderChart();
+  }
+
+  createGradientLabel(d3Event) {
+    // For the rectangle ring highlighter
+    // Find the class to match with label
+    const classes = d3.select(d3Event.target).attr('class');
+    const match = classes.match(/highlight-([0-9]{1,2})/g)[0];
+    const num = match.split('-')[1];
+
+    // get the text content from the label
+    const text = d3.select(`.label-text.highlight-${num}`).text();
+
+    // generate the box highlight ring size
+    const textBounds = d3
+      .select(`.label-text.highlight-${num}`).node().getBoundingClientRect();
+    const rectWidth = textBounds.width + 16;
+    const textLeft = textBounds.x - (rectWidth / 2) + (textBounds.width / 2);
+    const textTop = textBounds.y - (textBounds.height / 2) + 2;
+
+    // apply the highlight styles
+    this.theRectHighlight.select('.rect-inner').text(() => text);
+    this.theRectHighlight.style('left', `${textLeft}px`);
+    this.theRectHighlight.style('top', `${textTop}px`);
+    this.theRectHighlight.style('width', `${rectWidth}px`);
+    this.theRectHighlight.classed('active', true);
+  }
+
+  getToolTipCoordinates(d3Event) {
+    // For the rectangle ring highlighter
+    // Find the class to match with label
+    const classes = d3.select(d3Event.target).attr('class');
+    const match = classes.match(/highlight-([0-9]{1,2})/g)[0];
+    const num = match.split('-')[1];
+
+    // get the text content from the label
+    const coords = d3.select(`.circle.highlight-${num}`).node().getBoundingClientRect();
+    const percentage = d3.select(`.circle.highlight-${num}`).attr('percent');
+
+    // theToolTip is the tooltip that shows on hover
+    this.theToolTip.style('left', `${ coords.left + 4 }px`);
+    // 15px for thhe tooltip to breathe;
+    this.theToolTip.style('top', `${coords.top - 15}px`);
+    this.theToolTip.classed('active', true);
+    this.theToolTip.text(_d => `Checked-in ${ percentage }%`);
   }
 }
 
