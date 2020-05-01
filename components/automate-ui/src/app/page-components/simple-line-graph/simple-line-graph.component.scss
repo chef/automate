@@ -39,6 +39,7 @@
       stroke: #222435;
       stroke-width: .2;
       text-anchor: middle;
+      font-family: 'muli';
       transition: 1s;
       
       &.turnt {
@@ -93,7 +94,7 @@
     position: absolute;
     background: #3023AE;
     background: linear-gradient(315deg, #3023AE, #C86DD7);
-    height: 29px;
+    height: 22px;
     border-radius: 4px;
     opacity: 0;
     visibility: hidden;
@@ -104,13 +105,19 @@
     justify-content: center;
 
     .rect-inner {
-      width: calc(100% - 4px);
-      height: calc(100% - 4px);
       border-radius: 4px;
       background: $chef-white;
+      width: calc(100% - 4px);
+      height: calc(100% - 4px);
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
+      transition: opacity 0ms;
     }
 
     &.active,
@@ -118,6 +125,10 @@
       opacity: 1;
       visibility: visible;
       transition: opacity 500ms;
+    }
+
+    &.active .rect-inner {
+      transition: opacity 0ms;
     }
   }
 
