@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	IngestAccessPolicyID = "ingest-access"
+	IngestPolicyID = "ingest-access"
 )
 
 // Config holds the server's configuration options.
@@ -186,12 +186,12 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		}
 
 		_, err := policiesClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
-			Id:      IngestAccessPolicyID,
+			Id:      IngestPolicyID,
 			Members: []string{fmt.Sprintf("token:%s", tokenID)},
 		})
 		if err != nil {
 			s.logger.Warn(errors.Wrap(err, "there was an error granting the legacy data collector token ingest access").Error())
-			s.logger.Warn(fmt.Sprintf("please manually add token with ID %s to the policy with ID %s", tokenID, IngestAccessPolicyID))
+			s.logger.Warn(fmt.Sprintf("please manually add token with ID %q to the policy with ID %q", tokenID, IngestPolicyID))
 		}
 	}
 
