@@ -6,7 +6,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"path"
@@ -76,13 +75,14 @@ func ConfigFromViper() (*Service, error) {
 
 	// Setup the Elasticsearch backend
 	var backend backend.Client
-	switch viper.GetString("backend") {
+	selectedBackend := viper.GetString("backend")
+	switch selectedBackend {
 	case "elasticsearch":
 		backend = elastic.New(viper.GetString("elasticsearch-url"))
 	case "mock":
 		backend = mock.New()
 	default:
-		err := errors.New("Unavailable backend machanism")
+		err := fmt.Errorf("Invalid backend machanism %q set in configuration", selectedBackend)
 		log.Error(err)
 		return cfg, err
 	}
