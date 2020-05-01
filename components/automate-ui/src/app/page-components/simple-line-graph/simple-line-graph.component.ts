@@ -1,5 +1,5 @@
 import {
-  Component, Input, OnChanges, ViewChild, ElementRef, OnInit
+  Component, Input, OnChanges, ViewChild, ElementRef
 } from '@angular/core';
 import * as d3 from 'd3';
 
@@ -10,7 +10,7 @@ import * as d3 from 'd3';
   styleUrls: ['./simple-line-graph.component.scss']
 })
 
-export class SimpleLineGraphComponent implements OnChanges, OnInit {
+export class SimpleLineGraphComponent implements OnChanges {
 
   constructor(
     private chart: ElementRef
@@ -141,10 +141,17 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
     const points = this.svgSelection.selectAll('circle').data(this.data);
     points.exit().remove();
-    points
-      .enter()
-      .append('circle')
+    points.enter().append('circle')
         .on('mouseover', (cd) => {
+          // clear all actives to start fresh on new mouseover
+          theToolTip.classed('active', false);
+          theHighlight.classed('active', false);
+          rectHighlight.classed('active', false);
+
+          theHighlight.classed('lock', false);
+          rectHighlight.classed('lock', false);
+
+
           console.log(d3.event);
           const theTarget = d3.select(d3.event.target);
           theTarget.classed('active', 'true');
@@ -164,26 +171,30 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
           theToolTip.text(_d => `Checked-in ${cd.percentage}%`);
 
 
-          // For the rectangle ring highlighter
-          // Find the class to match with label
-          const classes = theTarget.attr('class');
-          const match = classes.match(/circle-([0-9]{1,2})/g)[0];
-          const num = match.split('-')[1];
+          if (this.data.length < 8) {
+            // For the rectangle ring highlighter
+            // Find the class to match with label
+            const classes = theTarget.attr('class');
+            const match = classes.match(/circle-([0-9]{1,2})/g)[0];
+            const num = match.split('-')[1];
 
+            // get the text content from the label
+            const text = d3.select(`.label-text-${num}`).text();
 
-          const text = d3.select(`.label-text-${num}`).text();
-          console.log(text);
+            // generate the box highlight ring size
+            const textBounds = d3.select(`.label-text-${num}`).node().getBoundingClientRect();
+            const rectWidth = textBounds.width + 16;
+            const textLeft = textBounds.x - ( rectWidth / 2)  + (textBounds.width / 2);
+            const textTop = textBounds.y - ( textBounds.height / 2 ) + 2;
 
-          const textBounds = d3.select(`.label-text-${num}`).node().getBoundingClientRect();
-          const rectWidth = textBounds.width + 16;
-          const textLeft = textBounds.x - ( rectWidth / 2)  + (textBounds.width / 2);
-          const textTop = textBounds.y - ( textBounds.height / 2 ) + 2;
+            // apply the highlight styles
+            rectHighlight.select('.rect-inner').text(() => text);
+            rectHighlight.style('left', `${textLeft}px`);
+            rectHighlight.style('top', `${textTop}px`);
+            rectHighlight.style('width', `${rectWidth}px`);
+            rectHighlight.classed('active', true);
+          }
 
-          rectHighlight.select('.rect-inner').text(() => text);
-          rectHighlight.style('left', `${textLeft}px`);
-          rectHighlight.style('top', `${textTop}px`);
-          rectHighlight.style('width', `${rectWidth}px`);
-          rectHighlight.classed('active', true);
         })
         .on('mouseout', () => {
           d3.select(d3.event.target).classed('active', false);
@@ -191,6 +202,12 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
           theHighlight.classed('active', false);
           rectHighlight.classed('active', false);
           })
+        .on('click', () => {
+          console.log('clicked');
+          theToolTip.classed('active', false);
+          theHighlight.classed('lock', true);
+          rectHighlight.classed('lock', true);
+        })
         .attr('class', 'circle')
         .attr('class', (_d,i) => `circle-${i}`)
         .merge(points)
@@ -266,12 +283,8 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
 
   ngOnChanges() {
-    console.log('change');
+    d3.selectAll('.lock').classed('lock', false); // unlock any locked items on change
     this.renderChart();
-  }
-
-  ngOnInit() {
-    // console.log(this.data);
   }
 
   onResize() {
