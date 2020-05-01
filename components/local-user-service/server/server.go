@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authz"
-	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/local-user-service/password"
 	"github.com/chef/automate/components/local-user-service/users"
 	"github.com/chef/automate/lib/grpc/health"

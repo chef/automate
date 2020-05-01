@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	teams_api "github.com/chef/automate/api/interservice/teams/v2"
+	teams_api "github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/local-user-service/server"
 	"github.com/chef/automate/components/local-user-service/users"
 	usersMock "github.com/chef/automate/components/local-user-service/users/mock"

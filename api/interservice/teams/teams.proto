@@ -4,8 +4,8 @@ import "google/api/annotations.proto";
 import "validate/validate.proto";
 import "api/external/common/version/version.proto";
 
-package chef.automate.domain.teams.v2;
-option go_package = "github.com/chef/automate/api/interservice/teams/v2";
+package chef.automate.domain.teams;
+option go_package = "github.com/chef/automate/api/interservice/teams";
 
 message Team {
   string id = 1;
