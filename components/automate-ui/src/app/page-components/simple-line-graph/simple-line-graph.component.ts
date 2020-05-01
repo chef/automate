@@ -140,13 +140,14 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .enter()
       .append('circle')
         .on('mouseover', (cd) => {
+          d3.select(d3.event.target).classed('active', 'true');
+
           const highlightPos = d3.event.target.getBoundingClientRect();
 
           theHighlight
             .style('left', `${(highlightPos.x - 8)}px`) // 8 is half highlight width
             .style('top', `${(highlightPos.y - 8)}px`) // minus diameter of point
-            .transition().duration(250)
-            .end(theHighlight.classed('active', true));
+            .classed('active', true);
 
           theToolTip.style('left', `${d3.event.pageX}px`);
           theToolTip.style('top', `${d3.event.pageY - 15}px`); // 15px for thhe tooltip to breathe;
@@ -155,6 +156,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
             .text(_d => `Checked-in ${cd.percentage}%`);
         })
       .on('mouseout', () => {
+        d3.select(d3.event.target).classed('active', false);
         theToolTip.classed('active', false);
         theHighlight.classed('active', false);
         })
@@ -163,8 +165,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .transition().duration(1000)
       .attr('cx', d => this.xScale(d.daysAgo))
       .attr('cy', d => this.yScale(d.percentage))
-      .attr('r', 4)
-      .style('fill', 'black');
+      .attr('r', 4);
   }
 
 

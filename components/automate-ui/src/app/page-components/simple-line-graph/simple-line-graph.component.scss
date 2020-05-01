@@ -52,6 +52,10 @@
   .circle {
     fill: $eggplant-dark-2;
     cursor: pointer;
+
+    &.active {
+      fill: #3023AE;
+    }
   }
 
   .highlight {
@@ -64,12 +68,12 @@
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: 1s;
-
+    transition: opacity 500ms, visibility 500ms ease-out 250ms;
+    
     &.active {
       opacity: 1;
       visibility: visible;
-      transition: 1s;
+      transition: opacity 500ms;
     }
   }
 
