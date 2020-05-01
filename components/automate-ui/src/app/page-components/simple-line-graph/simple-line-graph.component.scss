@@ -76,6 +76,14 @@
       visibility: visible;
       transition: opacity 500ms;
     }
+
+    // theHighlight lock styles
+    &.lock,
+    &.active.lock {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 500ms;
+    }
   }
 
   .tooltip {
@@ -121,6 +129,7 @@
     }
 
     &.active,
+    &.lock,
     &.active .rect-inner {
       opacity: 1;
       visibility: visible;
@@ -130,6 +139,23 @@
     &.active .rect-inner {
       transition: opacity 0ms;
     }
+
+    // lock styles
+    &.lock,
+    &.lock.active {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 500ms;
+    }
+
+    &.lock .rect-inner,
+    &.lock.active .rect-inner {
+      color: white;
+      background-color: transparent;
+      opacity: 1;
+      visibility: visible;
+    }
+
   }
 
 }
