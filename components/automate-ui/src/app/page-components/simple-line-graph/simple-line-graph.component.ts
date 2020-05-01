@@ -23,6 +23,7 @@ export class SimpleLineGraphComponent implements OnChanges {
   @ViewChild('svg', {static: true}) svg: ElementRef;
 
   public heightMargin = 40;
+  public theHighlight;
 
   ////////   X AXIS ITEMS   ////////
   // maps all of our x data points
@@ -92,14 +93,14 @@ export class SimpleLineGraphComponent implements OnChanges {
     return d3.select('chef-tooltip');
   }
 
-  get theHighlight() {
-    const highlight = d3.select(this.svg.nativeElement)
-      .selectAll('.ring-highlight').data([this.data]);
-    highlight.exit().remove();
-    highlight.enter().append('circle').attr('class', 'ring-highlight')
-      .merge(highlight).attr('r', 10);
-    return highlight;
-  }
+  // get theHighlight() {
+  //   const highlight = d3.select(this.svg.nativeElement)
+  //     .selectAll('.ring-highlight').data([this.data]);
+  //   highlight.exit().remove();
+  //   highlight.enter().append('circle').attr('class', 'ring-highlight')
+  //     .merge(highlight).attr('r', 10);
+  //   return highlight;
+  // }
 
   get theRectHighlight() {
     return d3.select('.rect-highlight');
@@ -118,10 +119,20 @@ export class SimpleLineGraphComponent implements OnChanges {
     return `0 0 ${this.width} ${this.height}`;
   }
 
+  createTheRingHighlight() {
+      const highlight = this.svgSelection.selectAll('.ring-highlight').data([this.data]);
+      highlight.exit().remove();
+      highlight.enter().append('circle').attr('class', 'ring-highlight')
+        .merge(highlight).attr('r', 10);
+
+      this.theHighlight = d3.select('.ring-highlight');
+  }
+
     ////////////////// RENDER FUNCTIONS ////////////////////
   renderChart() {
     this.AllUnlockDeactivate();
     this.resizeChart();
+    this.createTheRingHighlight();
     this.renderGrid();
     this.renderLine();
     this.renderPoints();
@@ -145,7 +156,7 @@ export class SimpleLineGraphComponent implements OnChanges {
         .attr('class', (_d,i) => `circle point highlight-${i}`)
         .merge(points)
         .transition().duration(1000)
-        .attr('percent', ( d => d.percentage ) )
+        .attr('percent', ( d => d.percentage ) ) // must add this data AFTER the merge
         .attr('cx', d => this.xScale(d.daysAgo))
         .attr('cy', d => this.yScale(d.percentage))
         .attr('r', 4);
@@ -281,11 +292,9 @@ export class SimpleLineGraphComponent implements OnChanges {
       .classed('active', true)
       .text(_d => `Checked-in ${ percentage }%`);
 
+    // ring highlight position can come straight from the highlighted circle
     const cx = highlightCircle.attr('cx');
     const cy = highlightCircle.attr('cy');
-
-    console.log(this.theHighlight);
-
     this.theHighlight
       .attr('cx', cx)
       .attr('cy', cy)
