@@ -103,10 +103,6 @@ export class SimpleLineGraphComponent implements OnChanges {
     return `0 0 ${this.width} ${this.height}`;
   }
 
-  resizeChart() {
-    this.width = this.chart.nativeElement.getBoundingClientRect().width;
-  }
-
     ////////////////// RENDER FUNCTIONS ////////////////////
   renderChart() {
     this.AllUnlockDeactivate();
@@ -134,7 +130,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     toolTip.enter().append('chef-tooltip')
       .attr('for', 'tooltip').merge(toolTip);
     // render highlight ring
-    const highlight = d3.select('body').selectAll('.highlight').data([this.data]);
+    const highlight = this.containerSelection.selectAll('.highlight').data([this.data]);
     highlight.exit().remove();
     highlight.enter().append('div').attr('class', 'highlight').merge(highlight);
     // render rectangle label highlight
@@ -251,29 +247,18 @@ export class SimpleLineGraphComponent implements OnChanges {
       });
   }
 
-
-  ngOnChanges() {
-    this.renderChart();
-  }
-
-  onResize() {
-    this.renderChart();
-  }
-
   createGradientLabel(d3Event) {
     const containerCoords = this.containerSelection.node().getBoundingClientRect();
     // For the rectangle ring highlighter
     // Find the class to match with label
-    const classes = d3.select(d3Event.target).attr('class');
-    const match = classes.match(/highlight-([0-9]{1,2})/g)[0];
-    const num = match.split('-')[1];
+    const highlightNum = this.getClassHighlightNumber(d3Event);
 
     // get the text content from the label
-    const text = d3.select(`.label-text.highlight-${num}`).text();
+    const text = d3.select(`.label-text.highlight-${highlightNum}`).text();
 
     // generate the box highlight ring size
     const textBounds = d3
-      .select(`.label-text.highlight-${num}`).node().getBoundingClientRect();
+      .select(`.label-text.highlight-${highlightNum}`).node().getBoundingClientRect();
 
     const rectWidth = textBounds.width + 16;
     const textLeft = (textBounds.x - containerCoords.x) - 8;
@@ -289,14 +274,17 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   attachTooltipAndRing(d3Event) {
+    const containerCoords = this.containerSelection.node().getBoundingClientRect();
     // Find the class to match with label
-    const classes = d3.select(d3Event.target).attr('class');
-    const match = classes.match(/highlight-([0-9]{1,2})/g)[0];
-    const num = match.split('-')[1];
+    const highlightNum = this.getClassHighlightNumber(d3Event);
 
     // get the text content from the label
-    const coords = d3.select(`.circle.highlight-${num}`).node().getBoundingClientRect();
-    const percentage = d3.select(`.circle.highlight-${num}`).attr('percent');
+    const coords = d3.select(`.circle.highlight-${highlightNum}`).node().getBoundingClientRect();
+    const percentage = d3.select(`.circle.highlight-${highlightNum}`).attr('percent');
+
+    // 6 is half highlight width minus radius of point
+    const posLeft = (coords.x - containerCoords.x) - 6;
+    const posBottom = (containerCoords.bottom - coords.bottom) - 6;
 
     // theToolTip is the tooltip that shows on hover
     this.theToolTip
@@ -307,16 +295,35 @@ export class SimpleLineGraphComponent implements OnChanges {
       .text(_d => `Checked-in ${ percentage }%`);
 
     this.theHighlight
-      .style('left', `${(coords.x - 6)}px`) // 6 is half highlight width / 2
-      .style('top', `${(coords.y - 6)}px`) // minus diameter of point
+      .style('left', `${(posLeft)}px`) 
+      .style('bottom', `${(posBottom)}px`)
       .classed('active', true);
   }
 
+  getClassHighlightNumber(d3Event) {
+    const classes = d3.select(d3Event.target).attr('class');
+    const match = classes.match(/highlight-([0-9]{1,2})/g)[0];
+    const num = match.split('-')[1];
+    return num;
+  }
 
 
   AllUnlockDeactivate() {
     d3.selectAll('.lock').classed('lock', false); // unlock any locked items on change
     d3.selectAll('.active').classed('lock', false); // unlock any locked items on change
+  }
+
+
+  ngOnChanges() {
+    this.renderChart();
+  }
+
+  onResize() {
+    this.renderChart();
+  }
+
+  resizeChart() {
+    this.width = this.chart.nativeElement.getBoundingClientRect().width;
   }
 
 }
