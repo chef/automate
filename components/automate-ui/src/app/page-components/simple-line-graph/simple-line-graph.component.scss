@@ -89,6 +89,38 @@
     stroke-dasharray: 2;
   }
 
+  .rect-highlight {
+    position: absolute;
+    background: #3023AE;
+    background: linear-gradient(315deg, #3023AE, #C86DD7);
+    height: 29px;
+    border-radius: 4px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .rect-inner {
+      width: calc(100% - 4px);
+      height: calc(100% - 4px);
+      border-radius: 4px;
+      background: $chef-white;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    &.active,
+    &.active .rect-inner {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 500ms;
+    }
+  }
+
 }
 
 

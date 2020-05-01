@@ -126,13 +126,18 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     toolTip.enter().append('chef-tooltip')
       .attr('for', 'tooltip').merge(toolTip);
 
-    const theToolTip = d3.select('chef-tooltip');
-
+    // render highlight ring
     const highlight = d3.select('body').selectAll('.highlight').data([this.data]);
     highlight.exit().remove();
     highlight.enter().append('div').attr('class', 'highlight').merge(highlight);
 
+    // Create selections for the tooltip and highlight
+    const theToolTip = d3.select('chef-tooltip');
     const theHighlight = d3.select('.highlight');
+    const rectHighlight = d3.select('body')
+      .append('div').attr('class', 'rect-highlight');
+      // for linear gradient, we attach another div;
+      rectHighlight.append('div').attr('class', 'rect-inner');
 
     const points = this.svgSelection.selectAll('circle').data(this.data);
     points.exit().remove();
@@ -140,8 +145,11 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .enter()
       .append('circle')
         .on('mouseover', (cd) => {
-          d3.select(d3.event.target).classed('active', 'true');
+          console.log(d3.event);
+          const theTarget = d3.select(d3.event.target);
+          theTarget.classed('active', 'true');
 
+          // highlight is the ring around the point on hover
           const highlightPos = d3.event.target.getBoundingClientRect();
 
           theHighlight
@@ -149,23 +157,43 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
             .style('top', `${(highlightPos.y - 8)}px`) // minus diameter of point
             .classed('active', true);
 
+          // theToolTip is the tooltip that shows on hover
           theToolTip.style('left', `${d3.event.pageX}px`);
           theToolTip.style('top', `${d3.event.pageY - 15}px`); // 15px for thhe tooltip to breathe;
           theToolTip.classed('active', true);
-          theToolTip
-            .text(_d => `Checked-in ${cd.percentage}%`);
+          theToolTip.text(_d => `Checked-in ${cd.percentage}%`);
+
+
+          const classes = theTarget.attr('class');
+          const match = classes.match(/circle-([0-9]{1,2})/g)[0];
+          const num = match.split('-')[1];
+
+          const parent = d3.select(`.label-text-${num}`).node().parentNode;
+          d3.select(parent).append('rect').attr('class', 'active');
+
+          const textBounds = d3.select(`.label-text-${num}`).node().getBoundingClientRect();
+          const rectWidth = textBounds.width + 16;
+          const textLeft = textBounds.x - ( rectWidth / 2)  + (textBounds.width / 2);
+          const textTop = textBounds.y - ( textBounds.height / 2 );
+
+          rectHighlight.style('left', `${textLeft}px`);
+          rectHighlight.style('top', `${textTop}px`);
+          rectHighlight.style('width', `${rectWidth}px`);
+          rectHighlight.classed('active', true);
         })
-      .on('mouseout', () => {
-        d3.select(d3.event.target).classed('active', false);
-        theToolTip.classed('active', false);
-        theHighlight.classed('active', false);
-        })
-      .attr('class', 'circle')
-      .merge(points)
-      .transition().duration(1000)
-      .attr('cx', d => this.xScale(d.daysAgo))
-      .attr('cy', d => this.yScale(d.percentage))
-      .attr('r', 4);
+        .on('mouseout', () => {
+          d3.select(d3.event.target).classed('active', false);
+          theToolTip.classed('active', false);
+          theHighlight.classed('active', false);
+          rectHighlight.classed('active', false);
+          })
+        .attr('class', 'circle')
+        .attr('class', (_d,i) => `circle-${i}`)
+        .merge(points)
+        .transition().duration(1000)
+        .attr('cx', d => this.xScale(d.daysAgo))
+        .attr('cy', d => this.yScale(d.percentage))
+        .attr('r', 4);
   }
 
 
@@ -224,11 +252,12 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .filter(tick => tick === 0)
       .remove();
 
+    let tickLength = tickLabels.length; // make variable to reverse class assignment
     this.svgSelection.selectAll('.x-axis .tick text')
-      .attr('class', 'label-text')
+      .attr('class', () => `label-text label-text-${(tickLength--) - 1}`)
       .classed('turnt', () => {
         return tickLabels.length > 7;
-      }).transition().duration(1000)
+      }).transition().duration(1000);
   }
 
 
