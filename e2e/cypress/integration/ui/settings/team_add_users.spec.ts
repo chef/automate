@@ -52,6 +52,7 @@ describe('team add users', () => {
     // the whole app has to reload, slowing down the test and causing timeouts
     cy.visit(`/settings/teams/${teamID}/add-users`);
     cy.wait(['@getTeam', '@getTeamUsers', '@getUsers']);
+    cy.get('app-welcome-modal').invoke('hide');
   });
 
   afterEach(() => {
