@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrgDetailsComponent } from './org-details.component';
+import { InfraRolesComponent } from './infra-roles.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
@@ -9,14 +9,13 @@ import { StoreModule } from '@ngrx/store';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
-describe('OrgDetailsComponent', () => {
-  let component: OrgDetailsComponent;
-  let fixture: ComponentFixture<OrgDetailsComponent>;
+describe('InfraRolesComponent', () => {
+  let component: InfraRolesComponent;
+  let fixture: ComponentFixture<InfraRolesComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
@@ -25,9 +24,6 @@ describe('OrgDetailsComponent', () => {
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-breadcrumbs'}),
-        MockComponent({ selector: 'chef-breadcrumb', inputs: ['link']}),
-        MockComponent({ selector: 'app-tabs' }),
         MockComponent({ selector: 'chef-table' }),
         MockComponent({ selector: 'chef-thead' }),
         MockComponent({ selector: 'chef-tbody' }),
@@ -36,7 +32,7 @@ describe('OrgDetailsComponent', () => {
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        OrgDetailsComponent
+        InfraRolesComponent
       ],
       providers: [
         FeatureFlagsService
@@ -53,7 +49,7 @@ describe('OrgDetailsComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OrgDetailsComponent);
+    fixture = TestBed.createComponent(InfraRolesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
