@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
 	"github.com/chef/automate/components/config-mgmt-service/backend"
+	"github.com/chef/automate/components/config-mgmt-service/backend/postgres"
 	"github.com/chef/automate/components/config-mgmt-service/config"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
 	"github.com/chef/automate/components/config-mgmt-service/params"
@@ -25,6 +26,7 @@ import (
 type CfgMgmtServer struct {
 	client backend.Client
 	cs     *config.Service
+	pg     *postgres.Postgres
 }
 
 // NewCfgMgmtServer creates a new server instance and it automatically
@@ -34,6 +36,15 @@ func NewCfgMgmtServer(cs *config.Service) *CfgMgmtServer {
 		client: cs.GetBackend(),
 		cs:     cs,
 	}
+}
+
+func (s *CfgMgmtServer) ConnectPg() error {
+	pg, err := postgres.Open(&s.cs.Postgres)
+	if err != nil {
+		return err
+	}
+	s.pg = pg
+	return nil
 }
 
 // GetPolicyCookbooks returns a list of cookbook name, policy
