@@ -9,7 +9,7 @@ import {
   ChefEventCollection,
   ChefEvent
 } from '../../types/types';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 
 class MockEventFeedService {

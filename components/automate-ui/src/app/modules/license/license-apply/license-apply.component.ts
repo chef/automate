@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 import { LicenseFacadeService, LicenseApplyReason } from 'app/entities/license/license.facade';
 import { HttpStatus } from 'app/types/types';

@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, Output, EventEmitter } from '@angular/core';
 import { ApplyRulesStatus } from 'app/entities/projects/project.reducer';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 @Component({
   selector: 'app-confirm-apply-stop-modal',

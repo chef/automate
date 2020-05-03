@@ -12,7 +12,7 @@ import { StatsService, ReportQueryService,
   ScanResultsService, ReportQuery } from '../../shared/reporting';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { of as observableOf } from 'rxjs';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 describe('ReportingProfileComponent', () => {
   let store: Store<NgrxStateAtom>;

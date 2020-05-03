@@ -21,7 +21,7 @@ import {
 } from '../shared/reporting';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
 import { using } from 'app/testing/spec-helpers';
 

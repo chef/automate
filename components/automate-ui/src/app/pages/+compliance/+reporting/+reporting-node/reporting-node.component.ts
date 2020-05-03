@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { StatsService } from '../../shared/reporting/stats.service';
 import { Subject } from 'rxjs';
 import { ReportQueryService, ReturnParams } from '../../shared/reporting/report-query.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { takeUntil } from 'rxjs/operators';

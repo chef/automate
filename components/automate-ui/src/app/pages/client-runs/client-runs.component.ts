@@ -36,7 +36,7 @@ import {
   UpdateNodeFilters, GetWorkflowEnabled, GetNodeSuggestions, DeleteNodes, UpdateColumns
 } from '../../entities/client-runs/client-runs.actions';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { saveAs } from 'file-saver';
 import { AuthorizedChecker } from 'app/helpers/auth/authorized';
 import {

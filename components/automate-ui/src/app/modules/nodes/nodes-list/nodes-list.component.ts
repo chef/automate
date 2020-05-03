@@ -8,7 +8,7 @@ import { DateTime } from 'app/helpers/datetime/datetime';
 
 import * as actions from '../../../entities/nodes/nodes.actions';
 import * as selectors from '../../../entities/nodes/nodes.selectors';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 
 @Component({
