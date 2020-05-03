@@ -81,19 +81,6 @@ That is a guess on my part, could not really confirm what version one should be 
  - https://www.npmjs.com/package/@types/node
  - https://github.com/DefinitelyTyped/DefinitelyTyped#how-do-definitely-typed-package-versions-relate-to-versions-of-the-corresponding-library
 
-**Package diff2html: ^2.12.2**
-
-Reason: After installing the latest version (`npm install diff2html@3`) then `ng build` reports these errors:
-
-```text
-ERROR in Module build failed (from ./node_modules/sass-loader/dist/cjs.js):
-SassError: File to import not found or unreadable: ~diff2html/dist/diff2html.
-        on line 4 of /Users/msorens/code/go/src/github.com/chef/automate/components/automate-ui/src/app/page-components/delta-viewer/delta-viewer.component.scss
->>   @import "~diff2html/dist/diff2html";
-```
-
-Reference: https://github.com/rtfpessoa/diff2html
-
 **Package immutable: ^3.8.2**
 
 Reason: Later releases are release candidates; should only be using production-releases.

@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Diff2Html } from 'diff2html';
+import * as Diff2Html from 'diff2html';
+
 
 @Component({
   selector: 'app-delta-viewer',
@@ -12,7 +13,7 @@ export class DeltaViewerComponent {
 
   get diffHtml(): SafeHtml {
     const str = this.delta.split('\\n').join('\n');
-    const html = Diff2Html.getPrettyHtml(str);
+    const html = Diff2Html.html(str);
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
