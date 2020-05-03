@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"net/textproto"
@@ -22,6 +23,10 @@ import (
 	wrap "github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/version"
+)
+
+const (
+	IngestPolicyID = "ingest-access"
 )
 
 // Config holds the server's configuration options.
@@ -147,22 +152,6 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		c.Logger.Debug("no tokens adapter defined")
 	}
 
-	// Add the legacy data collector token as a secret if it was defined in the config.
-	if c.LegacyDataCollectorToken != "" {
-		if _, err := ts.GetTokenIDWithValue(ctx, c.LegacyDataCollectorToken); err != nil {
-
-			// If we couldn't find the legacy data collector token, create it.
-			if _, ok := errors.Cause(err).(*tokens.NotFoundError); ok {
-				_, err = ts.CreateLegacyTokenWithValue(ctx, c.LegacyDataCollectorToken)
-			}
-
-			if err != nil {
-				return nil, errors.Wrap(err,
-					"could not populate the legacy data collector token")
-			}
-		}
-	}
-
 	s := &Server{
 		TokenStorage:   ts,
 		authzClient:    authzClient,
@@ -176,6 +165,35 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 
 	// make grpc-go log through zap
 	grpclog.SetLoggerV2(wrap.WrapZapGRPC(s.logger))
+
+	// Add the legacy data collector token as a secret if it was defined in the config.
+	if c.LegacyDataCollectorToken != "" {
+		var tokenID string
+		if existingID, err := ts.GetTokenIDWithValue(ctx, c.LegacyDataCollectorToken); err != nil {
+			// If we couldn't find the legacy data collector token, create it.
+			if _, ok := errors.Cause(err).(*tokens.NotFoundError); ok {
+				var token *tokens.Token
+				token, err = ts.CreateLegacyTokenWithValue(ctx, c.LegacyDataCollectorToken)
+				tokenID = token.ID
+			}
+
+			if err != nil {
+				return nil, errors.Wrap(err,
+					"could not populate the legacy data collector token")
+			}
+		} else {
+			tokenID = existingID
+		}
+
+		_, err := policiesClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
+			Id:      IngestPolicyID,
+			Members: []string{fmt.Sprintf("token:%s", tokenID)},
+		})
+		if err != nil {
+			s.logger.Warn(errors.Wrap(err, "there was an error granting the legacy data collector token ingest access").Error())
+			s.logger.Warn(fmt.Sprintf("please manually add token with ID %q to the policy with ID %q", tokenID, IngestPolicyID))
+		}
+	}
 
 	return s, nil
 }
