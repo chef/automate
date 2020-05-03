@@ -55,7 +55,7 @@ Certain packages in package.json are constrained for the reasons detailed here.
 At any future moment though, the reasons for constraint here could be invalidated, so this should be updated as needed when package.json is updated.
 While it is problematic to document this information due to the maintenance burden, the value of having this in one place outweighs that burden.
 
-**Package @types/jasmine: =3.3.10**
+### Package @types/jasmine: =3.3.10
 
 Reason: `make serve` and `make unit` report this error:
 
@@ -74,21 +74,23 @@ error TS6200: Definitions of the following identifiers conflict with those in an
 There are very few reports of others experiencing this problem and no resolution presents itself.
 Reference: https://stackoverflow.com/a/57592510
 
-**Package @types/node: ~12.12.29**
+### Package @types/node: ~12.12.29
 
 Reason: The major version should match our node version, which is 12.13.1, so I have constrained it to the highest version less than that.
 That is a guess on my part, could not really confirm what version one should be running, through these references:
- - https://www.npmjs.com/package/@types/node
- - https://github.com/DefinitelyTyped/DefinitelyTyped#how-do-definitely-typed-package-versions-relate-to-versions-of-the-corresponding-library
 
-**Package immutable: ^3.8.2**
+- https://www.npmjs.com/package/@types/node
+- https://github.com/DefinitelyTyped/DefinitelyTyped#how-do-definitely-typed-package-versions-relate-to-versions-of-the-corresponding-library
+
+### Package immutable: ^3.8.2
 
 Reason: Later releases are release candidates; should only be using production-releases.
 
-**Package rrule: =2.4.1**
+### Package rrule: =2.4.1
+
 Per https://github.com/chef/automate/pull/1867, future versions have made a breaking change so it breaks our code base.
 
-**Package tslint: ^5.20.1**
+### Package tslint: ^5.20.1
 
 Reason: Trying to install the latest version `npm install tslint@6` reports these warnings
 so maintaining at highest version of 5.x.x:
@@ -100,7 +102,7 @@ npm WARN rxjs-tslint@0.1.7 requires a peer of tslint@^5.0.0 but none is installe
 npm WARN tslint-defocus@2.0.6 requires a peer of tslint@^5.x but none is installed. You must install peer dependencies yourself.
 ```
 
-**Package typescript: ~3.5.3**
+### Package typescript: ~3.5.3
 
 Reason: Trying to install the latest version `npm install typescript@3.7.4` reports these warnings
 so maintaining at highest version of 3.5.x:
@@ -111,7 +113,7 @@ so maintaining at highest version of 3.5.x:
 @ngtools/webpack@8.3.21 requires a peer of typescript@>=3.4 < 3.6 but none is installed.
 ```
 
-**Package @nguniversal/express-engine: 9.0.0-rc.2**
+### Package @nguniversal/express-engine: 9.0.0-rc.2
 
 Reason: `ng build` reported this error:
 
