@@ -669,6 +669,7 @@ google.golang.org/appengine/urlfetch
 # google.golang.org/genproto v0.0.0-20200211111953-2dc5924e3898
 google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/api/httpbody
+google.golang.org/genproto/googleapis/rpc/errdetails
 google.golang.org/genproto/googleapis/rpc/status
 google.golang.org/genproto/protobuf/api
 google.golang.org/genproto/protobuf/field_mask

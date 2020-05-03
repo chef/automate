@@ -1,22 +1,9 @@
 package validation
 
 import (
-	"fmt"
 	"reflect"
-	"regexp"
 	"strings"
 )
-
-// EmptyOrWhitespaceOnlyRE is a regex that checks for blank or whitespace only strings
-var EmptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
-
-// RequiredField verifies that the given field is not empty
-func RequiredField(field, fieldName, resourceName string) error {
-	if EmptyOrWhitespaceOnlyRE.MatchString(field) {
-		return fmt.Errorf("a %s %s is required and must contain at least one non-whitespace character", resourceName, fieldName)
-	}
-	return nil
-}
 
 type (
 	// Rules represents rules for fields with name and rules
@@ -34,6 +21,12 @@ type (
 	Validator struct {
 		Opts Options // Opts contains all the options for validator
 	}
+
+	// FieldViolation represents custom bad request error field violation error option.
+	FieldViolation struct {
+		Field       string
+		Description string
+	}
 )
 
 // New returns a new validator object with provided options
@@ -45,23 +38,24 @@ func New(opts Options) *Validator {
 func (v *Validator) Validate() error {
 	reqVal := reflect.ValueOf(v.Opts.Request)
 	typeOfS := reqVal.Type()
+	violations := []*FieldViolation{}
+
 	if v.Opts.RequiredDefault {
 		for i := 0; i < reqVal.NumField(); i++ {
-			err := RequiredField(reqVal.Field(i).String(), strings.Split(typeOfS.Field(i).Tag.Get("json"), ",")[0], v.Opts.Target)
-			if err != nil {
-				return err
+			fv := RequiredField(getFieldValue(reqVal, i), getFieldTag(typeOfS, i), v.Opts.Target)
+			if fv != nil {
+				violations = append(violations, fv)
 			}
 		}
 	}
 
 	for field, rules := range v.Opts.Rules {
 		for _, rule := range rules {
-			name, _ := typeOfS.FieldByName(field)
 			switch rule {
 			case "required":
-				err := RequiredField(reqVal.FieldByName(field).String(), strings.Split(name.Tag.Get("json"), ",")[0], v.Opts.Target)
-				if err != nil {
-					return err
+				fv := RequiredField(getFieldValue(reqVal, field), getFieldTag(typeOfS, field), v.Opts.Target)
+				if fv != nil {
+					violations = append(violations, fv)
 				}
 			case "ipv4":
 				return nil
@@ -71,5 +65,31 @@ func (v *Validator) Validate() error {
 		}
 	}
 
+	if len(violations) > 0 {
+		return NewError(violations)
+	}
+
 	return nil
+}
+
+func getFieldTag(rType reflect.Type, id interface{}) string {
+	var field reflect.StructField
+	switch id.(type) {
+	case int:
+		field = rType.Field(id.(int))
+	default:
+		field, _ = rType.FieldByName(id.(string))
+	}
+
+	return strings.Split(field.Tag.Get("json"), ",")[0]
+}
+
+func getFieldValue(value reflect.Value, id interface{}) string {
+	switch id.(type) {
+	case int:
+		return value.Field(id.(int)).String()
+	default:
+		return value.FieldByName(id.(string)).String()
+	}
+
 }
