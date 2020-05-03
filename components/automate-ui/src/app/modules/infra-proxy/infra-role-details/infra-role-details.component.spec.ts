@@ -102,7 +102,7 @@ describe('InfraRoleDetailsComponent', () => {
     component = fixture.componentInstance;
     element = fixture.debugElement;
     fixture.detectChanges();
-    router = TestBed.get(Router);
+    router = TestBed.inject(Router);
     component.attributes = new RoleAttributes(role);
   });
 
