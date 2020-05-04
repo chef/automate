@@ -193,6 +193,21 @@ control 'config-mgmt-ccr-2' do
         expect(node[:policy_revision]).to eq nil
         expect(node[:has_deprecations]).to eq true
         expect(node[:deprecations_count]).to eq 10
+
+        expect(node[:ipaddress]).to eq '121.215.209.200'
+        expect(node[:macaddress]).to eq '02:67:CB:F3:A0:CA'
+        expect(node[:ip6address]).to eq 'fe80::67:cbff:fef3:a0ca'
+        expect(node[:timezone]).to eq ''
+        expect(node[:domain]).to eq 'us-west-2.compute.internal'
+        expect(node[:hostname]).to eq 'ip-121-215-9-40.us-west-2.compute.internal'
+        expect(node[:cloud_provider]).to eq 'ec2'
+        expect(node[:memory_total]).to eq '4057600kB'
+        expect(node[:virtualization_role]).to eq 'guest'
+        expect(node[:virtualization_system]).to eq 'xen'
+        expect(node[:kernel_version]).to eq '#1 SMP Debian 3.16.7-ckt9-2 (2015-04-13)'
+        expect(node[:kernel_release]).to eq '3.16.0-4-amd64'
+        expect(node[:dmi_system_serial_number]).to eq 'ec2c341d-f4fe-c48b-65fa-557cd94e45ad'
+        expect(node[:dmi_system_manufacturer]).to eq 'Xen'
       end
     end
 
@@ -515,7 +530,19 @@ control 'config-mgmt-ccr-2' do
         expect(run[:expanded_run_list][:run_list][0][:skipped]).to eq false
 
         expect(run[:policy_name]).to eq 'policy_name1'
-        expect(run[:ip6address]).to eq '242.58.187.217'
+        expect(run[:ip6address]).to eq 'fe80::7:f5ff:fe70:9ff0'
+        expect(run[:timezone]).to eq 'UTC'
+        expect(run[:domain]).to eq 'us-west-2.compute.internal'
+        expect(run[:hostname]).to eq 'ip-242-58-187-217.us-west-2.compute.internal'
+        expect(run[:macaddress]).to eq '02:07:F5:70:9F:F0'
+        expect(run[:cloud_provider]).to eq 'ec2'
+        expect(run[:memory_total]).to eq '3797988kB'
+        expect(run[:virtualization_role]).to eq 'guest'
+        expect(run[:virtualization_system]).to eq 'xen'
+        expect(run[:kernel_version]).to eq '#1 SMP Debian 3.2.65-1+deb7u1'
+        expect(run[:kernel_release]).to eq '3.2.0-4-amd64'
+        expect(run[:dmi_system_serial_number]).to eq 'ec261a1a-2a60-5962-4e85-8d3286c7c354'
+        expect(run[:dmi_system_manufacturer]).to eq 'Xen'
       end
     end
 
