@@ -61,34 +61,17 @@ describe('ChefNotificationComponent', () => {
         });
   });
 
-  describe('After a notification is visible', () => {
-
-    using([
-      ['is not infinite', Type.info, 10, false],
-      ['is infinite', Type.info, 0, true],
-      ['is not infinite', Type.error, 43, false],
-      ['is infinite', Type.error, 0, true],
-      ['is infinite', Type.error, -1, true]
-    ], function (description: string, type: Type, timeLimit: number, expected: boolean) {
-      it(`${description} when type is ${type} and timeout is ${timeLimit}`, () => {
-        genNotification(type, timeLimit);
-        component.ngAfterViewInit();
-
-        expect(component.isInfinite).toBe(expected);
-      });
-    });
-
+  describe('After a notification appears', () => {
     using([
       [Type.info, 1, false],
       [Type.info, 2, false],
       [Type.error, 3, false]
-    ], function (type: Type, timeLimit: number, expected: boolean) {
+    ], function (type: Type, timeLimit: number) {
       it(`notification closes when timeout is ${timeLimit}`, fakeAsync(() => {
         spyOn(component, 'handleClose');
         genNotification(type, timeLimit);
         component.ngAfterViewInit();
 
-        expect(component.isInfinite).toBe(expected);
         flush();
         fixture.detectChanges();
 
@@ -99,13 +82,12 @@ describe('ChefNotificationComponent', () => {
     using([
       [Type.info, 0, true],
       [Type.error, 0, true]
-    ], function (type: Type, timeLimit: number, expected: boolean) {
-      it(`${type} notification does not close when infinite`, fakeAsync(() => {
+    ], function (type: Type, timeLimit: number) {
+      it(`the ${type} notification does not close when infinite`, fakeAsync(() => {
         spyOn(component, 'handleClose');
         genNotification(type, timeLimit);
         component.ngAfterViewInit();
 
-        expect(component.isInfinite).toBe(expected);
         flush();
         fixture.detectChanges();
 
