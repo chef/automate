@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc/reflection"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	automate_event "github.com/chef/automate/api/interservice/event"
@@ -106,7 +106,7 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 	defer authzConn.Close() // nolint: errcheck
 
-	authzProjectsClient := iam_v2.NewProjectsClient(authzConn)
+	authzProjectsClient := authz.NewProjectsClient(authzConn)
 
 	// event Interface
 	eventConn, err := opts.ConnFactory.Dial("event-service", opts.EventAddress)

@@ -8,7 +8,7 @@ import (
 	"github.com/lib/pq" // adapter for database/sql
 	"github.com/pkg/errors"
 
-	authz "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/db"

@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -51,7 +51,7 @@ func (a *adapter) validateTokenInputs(ctx context.Context,
 			"a token name is required and must contain at least one non-whitespace character")
 	}
 
-	_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+	_, err := a.validator.ValidateProjectAssignment(ctx, &authz.ValidateProjectAssignmentReq{
 		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 		OldProjects:     oldProjects,
 		NewProjects:     updatedProjects,

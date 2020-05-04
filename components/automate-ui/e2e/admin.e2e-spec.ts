@@ -121,13 +121,21 @@ describe('Admin pages', () => {
                 id: 'some-policy-id',
                 name: 'Some policy whose name does not start with A',
                 members: [],
-                type: 'CUSTOM'
+                type: 'CUSTOM',
+                statements: [
+                  { effect: 'ALLOW', role: 'some-role', resources: ['*'], projects: [] }
+                ],
+                projects: []
               },
               {
                 id: 'chef-managed-administrator',
                 name: 'Administrator All Access',
                 members: ['team:local:admins'],
-                type: 'CHEF_MANAGED'
+                statements: [
+                  { effect: 'ALLOW', actions: ['*'], resources: ['*'], projects: [] }
+                ],
+                type: 'CHEF_MANAGED',
+                projects: []
               }
             ]
           }
@@ -258,7 +266,11 @@ describe('Admin pages', () => {
               id: 'some-test-policy',
               name: 'All access policy',
               members: ['team:local:admins'],
-              type: 'CHEF_MANAGED'
+              type: 'CHEF_MANAGED',
+              statements: [
+                { effect: 'ALLOW', role: 'some-role', resources: ['*'], projects: [] }
+              ],
+              projects: []
             }
           }
         ));

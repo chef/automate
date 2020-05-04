@@ -7,8 +7,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	secrets "github.com/chef/automate/api/external/secrets"
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
@@ -21,14 +20,13 @@ type Service struct {
 	Logger      logger.Logger
 	ConnFactory *secureconn.Factory
 	Storage     storage.Storage
-	Authz       authz.SubjectPurgeClient
 	Secrets     secrets.SecretsServiceClient
 }
 
 // Start returns an instance of Service that connects to a postgres storage backend.
 func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secureconn.Factory, secretsClient secrets.SecretsServiceClient,
-	authzClient authz.SubjectPurgeClient, authzV2AuthorizationClient authz_v2.AuthorizationClient) (*Service, error) {
-	p, err := postgres.New(l, migrationsConfig, authzV2AuthorizationClient)
+	authzClient authz.AuthorizationClient) (*Service, error) {
+	p, err := postgres.New(l, migrationsConfig, authzClient)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +35,6 @@ func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secu
 		Logger:      l,
 		ConnFactory: connFactory,
 		Storage:     p,
-		Authz:       authzClient,
 		Secrets:     secretsClient,
 	}, nil
 }

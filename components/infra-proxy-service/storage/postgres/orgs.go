@@ -6,7 +6,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	authz "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 
 	"github.com/chef/automate/lib/grpc/auth_context"

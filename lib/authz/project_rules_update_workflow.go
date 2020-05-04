@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/lib/cereal"
 )
 
@@ -194,7 +194,7 @@ func (m *ESCancelUpdateProjectTagsTask) Run(
 
 type ESStartProjectTagUpdaterTask struct {
 	esClient            EsClient
-	authzProjectsClient iam_v2.ProjectsClient
+	authzProjectsClient authz.ProjectsClient
 }
 
 func (m *ESStartProjectTagUpdaterTask) Run(
@@ -213,7 +213,7 @@ func (m *ESStartProjectTagUpdaterTask) startProjectTagUpdater(ctx context.Contex
 	logrus.Info("starting es project updater")
 
 	projectCollectionRulesResp, err := m.authzProjectsClient.ListRulesForAllProjects(ctx,
-		&iam_v2.ListRulesForAllProjectsReq{})
+		&authz.ListRulesForAllProjectsReq{})
 	if err != nil {
 		return []string{}, errors.Wrap(err, "Failed to get authz project rules")
 	}
@@ -286,7 +286,7 @@ func NewWorkflowExecutorForDomainService(domainService string) *DomainProjectUpd
 	}
 }
 
-func RegisterTaskExecutors(manager *cereal.Manager, domainService string, esClient EsClient, authzProjectsClient iam_v2.ProjectsClient) error {
+func RegisterTaskExecutors(manager *cereal.Manager, domainService string, esClient EsClient, authzProjectsClient authz.ProjectsClient) error {
 	cancelUpdateProjectTagsTaskName := CancelUpdateProjectTagsTaskName(domainService)
 	startProjectTagUpdaterTaskName := StartProjectTagUpdaterTaskName(domainService)
 	projectTagUpdaterStatusTaskName := ProjectTagUpdaterStatusTaskName(domainService)

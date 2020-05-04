@@ -10,8 +10,7 @@ import (
 	"github.com/spf13/viper"
 
 	secrets "github.com/chef/automate/api/external/secrets"
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/server"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
@@ -97,8 +96,7 @@ func serve(cmd *cobra.Command, args []string) {
 	if err != nil {
 		fail(errors.Wrapf(err, "failed to dial authz-service at (%s)", cfg.AuthzAddress))
 	}
-	authzClient := authz.NewSubjectPurgeClient(authzConn)
-	authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
+	authzClient := authz.NewAuthorizationClient(authzConn)
 
 	if cfg.SecretsAddress == "" {
 		fail(errors.New("missing required config secrets_address"))
@@ -111,8 +109,7 @@ func serve(cmd *cobra.Command, args []string) {
 	// get secrets client
 	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
 
-	service, err := service.Start(l, migrationConfig, connFactory,
-		secretsClient, authzClient, authzV2AuthorizationClient)
+	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}

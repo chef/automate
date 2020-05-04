@@ -9,7 +9,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	policies "github.com/chef/automate/api/interservice/authz/v2"
+	policies "github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
 )

@@ -21,7 +21,6 @@ import (
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/tls/test/helpers"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	teams_api "github.com/chef/automate/api/interservice/teams/v2"
 	teams_server "github.com/chef/automate/components/teams-service/server"
 	teams_service "github.com/chef/automate/components/teams-service/service"
@@ -344,11 +343,8 @@ func newTestServer(ctx context.Context,
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
-	authzServer := grpctest.NewServer(grpcAuthz)
-	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
-	require.NoError(t, err)
-	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
+	grpctest.NewServer(grpcAuthz)
 
-	srv, err := newServer(ctx, config, authzV2Client)
+	srv, err := newServer(ctx, config)
 	return srv, serviceCerts, err
 }

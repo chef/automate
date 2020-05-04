@@ -13,21 +13,21 @@ import (
 	"google.golang.org/grpc/status"
 
 	api "github.com/chef/automate/api/interservice/authn"
-	authz "github.com/chef/automate/api/interservice/authz/common"
+	"github.com/chef/automate/api/interservice/authz"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/tracing"
 )
 
 type tokenAPI struct {
-	ts                 tokens.Storage
-	authzSubjectClient authz.SubjectPurgeClient
-	pv                 tokens.ProjectValidator
+	ts             tokens.Storage
+	policiesClient authz.PoliciesClient
+	pv             tokens.ProjectValidator
 }
 
 // NewGRPCServer returns a server that provides our services: token
 // and authentication requests.
-func (s *Server) NewGRPCServer(authzSubjectClient authz.SubjectPurgeClient, pv tokens.ProjectValidator) *grpc.Server {
+func (s *Server) NewGRPCServer(policiesClient authz.PoliciesClient, pv tokens.ProjectValidator) *grpc.Server {
 	g := s.connFactory.NewServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
@@ -36,7 +36,7 @@ func (s *Server) NewGRPCServer(authzSubjectClient authz.SubjectPurgeClient, pv t
 			),
 		),
 	)
-	api.RegisterTokensMgmtServer(g, newTokenAPI(s.TokenStorage, authzSubjectClient, pv))
+	api.RegisterTokensMgmtServer(g, newTokenAPI(s.TokenStorage, policiesClient, pv))
 	health.RegisterHealthServer(g, s.health)
 	api.RegisterAuthenticationServer(g, s)
 	reflection.Register(g)
@@ -60,11 +60,11 @@ func inputValidationInterceptor() grpc.UnaryServerInterceptor {
 	}
 }
 
-func newTokenAPI(ts tokens.Storage, authzSubjectClient authz.SubjectPurgeClient, pv tokens.ProjectValidator) api.TokensMgmtServer {
+func newTokenAPI(ts tokens.Storage, policiesClient authz.PoliciesClient, pv tokens.ProjectValidator) api.TokensMgmtServer {
 	return &tokenAPI{
-		ts:                 ts,
-		authzSubjectClient: authzSubjectClient,
-		pv:                 pv,
+		ts:             ts,
+		policiesClient: policiesClient,
+		pv:             pv,
 	}
 }
 
@@ -124,7 +124,7 @@ func (a *tokenAPI) DeleteToken(ctx context.Context, req *api.DeleteTokenReq) (*a
 	}
 
 	tokenSubject := "token:" + id
-	_, err = a.authzSubjectClient.PurgeSubjectFromPolicies(ctx, &authz.PurgeSubjectFromPoliciesReq{
+	_, err = a.policiesClient.PurgeSubjectFromPolicies(ctx, &authz.PurgeSubjectFromPoliciesReq{
 		Subject: tokenSubject,
 	})
 	if err != nil {

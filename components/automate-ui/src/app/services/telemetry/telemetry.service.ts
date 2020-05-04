@@ -253,7 +253,7 @@ export class TelemetryService {
       "timestamp": "${this.getCurrentDateTime()}",
       "payload": ${JSON.stringify(payload)}
     }`;
-    this.httpClient.post(this.telemetryUrl + '/events', json, { headers: headers })
+    this.httpClient.post(this.telemetryUrl + '/events', json, { headers, params: { unfiltered: 'true' } })
       .subscribe(
          _response => {
            // WooHoo! we successfully submitted our telemetry event to the pipeline!
@@ -265,7 +265,8 @@ export class TelemetryService {
   }
 
   private retrieveSegmentWriteKey() {
-    return this.httpClient.get(this.telemetryUrl + '/segment/api_keys');
+    return this.httpClient.get(this.telemetryUrl + '/segment/api_keys',
+     { params: { unfiltered: 'true' }}); // don't pass 'projects' header
   }
 
   // ISO 8601 formatted date time

@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 
 	ver_api "github.com/chef/automate/api/external/common/version"
-	api "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/storage"

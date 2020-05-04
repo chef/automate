@@ -13,7 +13,7 @@ import (
 
 	elastic "gopkg.in/olivere/elastic.v6"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 )
@@ -103,7 +103,7 @@ func (es *Backend) DeleteNodeByID(ctx context.Context, nodeID string) (int, erro
 // Only one rule has to be true for the project to match (ORed together).
 // If there are no rules the project does not match
 // If the rule does not have any conditions it does not match any resources.
-func (es *Backend) UpdateNodeProjectTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
+func (es *Backend) UpdateNodeProjectTags(ctx context.Context, projectTaggingRules map[string]*authz.ProjectRules) (string, error) {
 	script := `
 		ArrayList matchingProjects = new ArrayList();
 		for (def project : params.projects) {
@@ -399,7 +399,7 @@ func (es *Backend) FindNodeIDsByFields(ctx context.Context, filters map[string]s
 	return nodeIDs, nil
 }
 
-func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2.ProjectRules) map[string]interface{} {
+func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.ProjectRules) map[string]interface{} {
 	esProjectCollection := make([]map[string]interface{}, len(projectTaggingRules))
 	projectIndex := 0
 	for projectName, projectRules := range projectTaggingRules {
@@ -416,19 +416,19 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2
 				policyGroups := []string{}
 				policyNames := []string{}
 				switch condition.Attribute {
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER:
+				case authz.ProjectRuleConditionAttributes_CHEF_SERVER:
 					chefServers = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION:
+				case authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION:
 					organizations = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT:
+				case authz.ProjectRuleConditionAttributes_ENVIRONMENT:
 					environments = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE:
+				case authz.ProjectRuleConditionAttributes_CHEF_ROLE:
 					roles = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_TAG:
+				case authz.ProjectRuleConditionAttributes_CHEF_TAG:
 					chefTags = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP:
+				case authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP:
 					policyGroups = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME:
+				case authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME:
 					policyNames = condition.Values
 				}
 				esConditionCollection[conditionIndex] = map[string]interface{}{
