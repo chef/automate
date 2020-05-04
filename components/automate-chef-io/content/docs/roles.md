@@ -30,6 +30,18 @@ Owner         | **Do** everything in the system *including* IAM
 Project Owner | Editor + **view** and **assign** projects
 Ingest        | Ingest data into the system
 
+#### Actions for Chef-managed Roles
+
+Name | ID| Actions
+-----------------------|-----|--------
+Owner              | owner         | \*
+Project Owner      | project-owner | infra:nodes:\*, infra:nodeManagers:\*, compliance:\*, event:\*, ingest:\*, secrets:\*, iam:projects:list, iam:projects:get, iam:projects:assign, iam:policies:list, iam:policies:get, iam:policyMembers:\*, iam:teams:list, iam:teams:get, iam:teamUsers:\*, iam:users:get, iam:users:list, applications:\*
+Editor             | editor        | infra:infraServers:list, infra:infraServers:get, infra:nodes:\*, infra:nodeManagers:\*, compliance:\*, event:\*, ingest:\*, secrets:\*, iam:projects:list, iam:projects:get, iam:projects:assign, applications:\*
+Viewer             | viewer        | infra:infraServers:list, infra:infraServers:get, secrets:\*:get, secrets:\*:list, infra:nodes:get, infra:nodes:list, infra:nodeManagers:get, infra:nodeManagers:list, compliance:\*:get, compliance:\*:list, event:\*:get, event:\*:list, ingest:\*:get, ingest:\*:list, iam:projects:list, iam:projects:get, applications:\*:get, applications:\*:list
+Ingest             | ingest        | infra:ingest:\*, compliance:profiles:get, compliance:profiles:list
+
+
+
 ### Custom Roles
 
 Custom roles are roles that any user with the permission for `iam:roles:update` can change. 
@@ -47,6 +59,25 @@ You can edit these custom roles like other user-created custom roles.
 ### Creating Roles
 
 _Custom_ roles can only be created using the [Roles API]({{< relref "api/#tag/roles" >}}).
+
+#### Example Custom Role
+
+```json
+{
+  "name": "Advocate",
+  "id": "advocate-role",
+  "actions": [
+    "infra:*",
+    "compliance:*",
+    "teams:*",
+    "users:*"
+  ],
+  "projects": [
+    "east-region",
+    "west-region"
+  ]
+}
+```
 
 ### Changing Role Details
 
