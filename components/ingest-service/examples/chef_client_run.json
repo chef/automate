@@ -2882,7 +2882,9 @@
       },
       "current_user": "root",
       "root_group": "root",
-      "timezone": "EDT",
+      "time": {
+        "timezone": "EDT"
+      },
       "recipes": [
         "opscode-ci::slave",
         "opscode-ci::_build_support",

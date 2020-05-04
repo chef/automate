@@ -267,7 +267,7 @@ func (ccr *ChefClientRun) initializeNodeInfo() (sharedNodeInfo NodeInfo, err err
 		Tags:                  ccr.Tags,
 		Timestamp:             time.Now().UTC(),
 		Ip6address:            ccr.NodePayload.Automatic["ip6address"], // Avoid returning an empty string
-		Timezone:              EmptyStringIfNil(ccr.NodePayload.Automatic["timezone"]),
+		Timezone:              ccr.Timezone(),
 		Domain:                EmptyStringIfNil(ccr.NodePayload.Automatic["domain"]),
 		Hostname:              EmptyStringIfNil(ccr.NodePayload.Automatic["hostname"]),
 		Macaddress:            EmptyStringIfNil(ccr.NodePayload.Automatic["macaddress"]),
@@ -297,6 +297,12 @@ func (ccr *ChefClientRun) initializeNodeInfo() (sharedNodeInfo NodeInfo, err err
 	sharedNodeInfo.ChefVersion = ccr.ChefVersion()
 	sharedNodeInfo.VersionedCookbooks = VersionedCookbooks(ccr.NodePayload)
 	return // nolint: nakedret
+}
+
+func (ccr *ChefClientRun) Timezone() string {
+	time := extractMapOrEmpty(ccr.NodePayload.Automatic, "time")
+
+	return EmptyStringIfNil(time["timezone"])
 }
 
 func (ccr *ChefClientRun) DmiSystemManufacturer() string {

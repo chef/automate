@@ -193,13 +193,12 @@ control 'config-mgmt-ccr-2' do
         expect(node[:policy_revision]).to eq nil
         expect(node[:has_deprecations]).to eq true
         expect(node[:deprecations_count]).to eq 10
-
         expect(node[:ipaddress]).to eq '121.215.209.200'
         expect(node[:macaddress]).to eq '02:67:CB:F3:A0:CA'
         expect(node[:ip6address]).to eq 'fe80::67:cbff:fef3:a0ca'
-        expect(node[:timezone]).to eq ''
+        expect(node[:timezone]).to eq 'UTC'
         expect(node[:domain]).to eq 'us-west-2.compute.internal'
-        expect(node[:hostname]).to eq 'ip-121-215-9-40.us-west-2.compute.internal'
+        expect(node[:hostname]).to eq 'ip-121-215-9-40'
         expect(node[:cloud_provider]).to eq 'ec2'
         expect(node[:memory_total]).to eq '4057600kB'
         expect(node[:virtualization_role]).to eq 'guest'
@@ -533,7 +532,7 @@ control 'config-mgmt-ccr-2' do
         expect(run[:ip6address]).to eq 'fe80::7:f5ff:fe70:9ff0'
         expect(run[:timezone]).to eq 'UTC'
         expect(run[:domain]).to eq 'us-west-2.compute.internal'
-        expect(run[:hostname]).to eq 'ip-242-58-187-217.us-west-2.compute.internal'
+        expect(run[:hostname]).to eq 'ip-242-58-187-217'
         expect(run[:macaddress]).to eq '02:07:F5:70:9F:F0'
         expect(run[:cloud_provider]).to eq 'ec2'
         expect(run[:memory_total]).to eq '3797988kB'

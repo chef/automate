@@ -195,7 +195,9 @@ func TestCCRToNode(t *testing.T) {
 	assert.Equal(t, dmiSystem["manufacturer"], translatedNode.NodeInfo.DmiSystemManufacturer)
 	assert.Equal(t, dmiSystem["serial_number"], translatedNode.NodeInfo.DmiSystemSerialNumber)
 
-	assert.Equal(t, run.NodePayload.Automatic["timezone"], translatedNode.NodeInfo.Timezone)
+	time := run.NodePayload.Automatic["time"].(map[string]interface{})
+	assert.Equal(t, time["timezone"], translatedNode.NodeInfo.Timezone)
+
 	assert.Equal(t, run.NodePayload.Automatic["domain"], translatedNode.NodeInfo.Domain)
 	assert.Equal(t, run.NodePayload.Automatic["hostname"], translatedNode.NodeInfo.Hostname)
 	assert.Equal(t, run.NodePayload.Automatic["macaddress"], translatedNode.NodeInfo.Macaddress)
@@ -358,7 +360,8 @@ func TestCCRToRun(t *testing.T) {
 	assert.Equal(t, dmiSystem["manufacturer"], translatedRun.NodeInfo.DmiSystemManufacturer)
 	assert.Equal(t, dmiSystem["serial_number"], translatedRun.NodeInfo.DmiSystemSerialNumber)
 
-	assert.Equal(t, run.NodePayload.Automatic["timezone"], translatedRun.NodeInfo.Timezone)
+	time := run.NodePayload.Automatic["time"].(map[string]interface{})
+	assert.Equal(t, time["timezone"], translatedRun.NodeInfo.Timezone)
 	assert.Equal(t, run.NodePayload.Automatic["domain"], translatedRun.NodeInfo.Domain)
 	assert.Equal(t, run.NodePayload.Automatic["hostname"], translatedRun.NodeInfo.Hostname)
 	assert.Equal(t, run.NodePayload.Automatic["macaddress"], translatedRun.NodeInfo.Macaddress)
