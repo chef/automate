@@ -93,11 +93,6 @@
     pointer-events: none;
   }
 
-  // styles the far right x-line
-  .grid .tick:first-of-type line {
-    stroke-dasharray: 2;
-  }
-
   .rect-highlight {
     position: absolute;
     z-index: 5;
