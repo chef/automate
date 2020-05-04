@@ -24,6 +24,7 @@ import (
 
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authz"
+	"github.com/chef/automate/components/automate-gateway/pkg/limiter"
 	"github.com/chef/automate/components/automate-gateway/pkg/nullbackend"
 	"github.com/chef/automate/lib/grpc/debug/debug_api"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -33,11 +34,12 @@ import (
 // Server holds the state of an instance of this service
 type Server struct {
 	Config
-	clientsFactory ClientsFactory
-	connFactory    *secureconn.Factory
-	serviceKeyPair *tls.Certificate
-	rootCerts      *x509.CertPool
-	authorizer     middleware.AuthorizationHandler
+	clientsFactory       ClientsFactory
+	connFactory          *secureconn.Factory
+	serviceKeyPair       *tls.Certificate
+	rootCerts            *x509.CertPool
+	authorizer           middleware.AuthorizationHandler
+	datacollectorLimiter limiter.Limiter
 
 	httpServer        *http.Server
 	httpMuxConnCancel func()
@@ -131,6 +133,7 @@ func (s *Server) Start() error {
 	s.logger.Info("starting automate-gateway")
 	s.loadConnFactory()
 	s.loadServiceCerts()
+	s.loadDatacollectorLimiter()
 
 	err := s.startNullBackendServer()
 	if err != nil {
@@ -158,6 +161,10 @@ func (s *Server) Start() error {
 	}
 
 	return s.startSignalHandler()
+}
+
+func (s *Server) loadDatacollectorLimiter() {
+	s.datacollectorLimiter = limiter.NewInflightRequestLimiter("collector-requests", 800)
 }
 
 func (s *Server) loadConnFactory() {

@@ -58,6 +58,14 @@ func (s *Server) dataCollectorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ticket, err := s.datacollectorLimiter.TakeTicket()
+	if err != nil {
+		s.logger.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusServiceUnavailable)
+		return
+	}
+	defer ticket.Return()
+
 	// Read the body in bytes
 	body, err := ioutil.ReadAll(r.Body)
 	r.Body.Close() // nolint: errcheck
