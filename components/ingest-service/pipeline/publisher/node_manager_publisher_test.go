@@ -25,13 +25,14 @@ func TestGatherInfoForNode(t *testing.T) {
 		NodeInfo: backend.NodeInfo{
 			EntityUuid:       "8dcca219-a730-3985-907b-e6b22f9f848d",
 			NodeName:         "chef-load-44",
-			Platform:         "ubuntu",
+			PlatformFamily:   "ubuntu",
 			PlatformVersion:  "16.04",
 			ChefTags:         []string{"application", "database"},
 			Status:           "success",
 			OrganizationName: "test-org",
 			SourceFqdn:       "chef-server-2",
 			Roles:            []string{"my-cool-role"},
+			Environment:      "test-env",
 		},
 		Checkin:        nowTime,
 		LatestRunID:    "123353254545425",
@@ -51,6 +52,7 @@ func TestGatherInfoForNode(t *testing.T) {
 		Tags: []*common.Kv{
 			{Key: "chef-tag", Value: "application"},
 			{Key: "chef-tag", Value: "database"},
+			{Key: "Environment", Value: "test-env"},
 		},
 		LastContact:     timestampNow,
 		SourceId:        "i-0aee75f0b4b0d9f22",
@@ -63,6 +65,7 @@ func TestGatherInfoForNode(t *testing.T) {
 		},
 		Projects: []string{"tomato", "cucumber"},
 		ProjectsData: []*nodes.ProjectsData{
+			{Key: "environment", Values: []string{"test-env"}},
 			{Key: "roles", Values: []string{"my-cool-role"}},
 			{Key: "organization_name", Values: []string{"test-org"}},
 			{Key: "chef_tags", Values: []string{"application", "database"}},
