@@ -1,5 +1,10 @@
 +++
 title = "IAM Overview"
+aliases = [
+    "/docs/authorization-overview/",
+    "/docs/default-policies/",
+    "/docs/iam-v1-policies/"
+]
 description = "IAM Overview"
 draft = false
 bref = ""
