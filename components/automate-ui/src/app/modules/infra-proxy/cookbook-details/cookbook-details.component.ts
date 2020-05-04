@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { HttpClient } from '@angular/common/http';
 import { environment as env } from 'environments/environment';
 import { Subject, combineLatest } from 'rxjs';
-import { first ,  filter, takeUntil, pluck } from 'rxjs/operators';
+import { first, filter, takeUntil, pluck } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
@@ -31,6 +31,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
   public url: string;
   public serverId: string;
   public orgId: string;
+  public currentVersion: string;
   public cookbookName: string;
   public cookbookDetails: CookbookDetails;
   public tabValue: CookbookDetailsTab = 'details';
@@ -85,27 +86,15 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         this.cookbook = cookbookVersionState;
         this.cookbookVersionsLoading = false;
         this.cookbookDetailsLoading = true;
+        this.currentVersion = this.cookbook.versions[0];
         this.store.dispatch(new GetCookbookDetails({
           server_id: this.serverId,
           org_id: this.orgId,
           cookbook_name: this.cookbook.name,
-          cookbook_version: this.cookbook.versions[0]
+          cookbook_version: this.currentVersion
         }));
-        this.onCookbookVersionChange(
-          this.serverId,
-          this.orgId,
-          this.cookbook.name,
-          this.cookbook.versions[0]
-        );
       });
-  }
 
-  public onCookbookVersionChange(
-    server_id: string,
-    org_id: string,
-    cookbook_name: string,
-    cookbook_version: string
-  ): void {
     combineLatest([
       this.store.select(getAllCookbooksDetailsStatus),
       this.store.select(cookbookDetailsFromRoute)
@@ -121,7 +110,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         if (this.readFile) {
           this.readFileUrl = encodeURIComponent(this.readFile?.url);
           this.http.get(
-            `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${cookbook_version}/file-content?url=${this.readFileUrl}`)
+            `${env.infra_proxy_url}/servers/${this.serverId}/orgs/${this.orgId}/cookbooks/${this.cookbookName}/${this.currentVersion}/file-content?url=${this.readFileUrl}`)
             .pipe(first())
             .subscribe
             (fileContent => {
@@ -130,17 +119,18 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
             });
         }
       });
+
   }
 
-  public handleCookbookVersionChange(
-    server_id: string,
-    org_id: string,
-    cookbook_name: string,
-    event
-  ): void {
+  public handleCookbookVersionChange(event): void {
     this.readFileContent = '';
     this.cookbookDetailsLoading = true;
-    this.onCookbookVersionChange(server_id, org_id, cookbook_name, event.target.value);
+    this.store.dispatch(new GetCookbookDetails({
+      server_id: this.serverId,
+      org_id: this.orgId,
+      cookbook_name: this.cookbook.name,
+      cookbook_version: event.target.value
+    }));
   }
 
   ngOnDestroy(): void {

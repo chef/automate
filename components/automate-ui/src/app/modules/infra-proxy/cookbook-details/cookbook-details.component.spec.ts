@@ -16,8 +16,6 @@ import {
   defaultRouterRouterState
 } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { GetCookbookVersionsSuccess } from 'app/entities/cookbooks/cookbook-versions.actions';
-import { CookbookVersions } from 'app/entities/cookbooks/cookbook-versions.model';
 import { GetCookbookDetailsSuccess } from 'app/entities/cookbooks/cookbook-details.actions';
 import { CookbookDetails } from 'app/entities/cookbooks/cookbook-details.model';
 import { CookbookDetailsComponent } from './cookbook-details.component';
@@ -39,10 +37,6 @@ const declarations: any[] = [
 const serverId = '6e98f609-586d-4816-a6de-e841e659b11d';
 const orgId = '6e98f609-586d-4816-a6de';
 const cookbook_name = 'aix';
-const cookbookVersion: CookbookVersions = {
-  name: 'cookbook version',
-  versions: []
-};
 
 const cookbookDetails: CookbookDetails = {
     cookbook_name: 'aix',
@@ -112,32 +106,14 @@ describe('CookbookDetailsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('defaults to showing users section', () => {
+  it('defaults to showing details section', () => {
     expect(component.tabValue).toBe('details');
   });
 
-  describe('empty state', () => {
-    beforeEach(() => {
-      store.dispatch(new GetCookbookVersionsSuccess(cookbookVersion));
-      fixture.detectChanges();
-    });
-
-    it('cookbook should be empty', () => {
-      expect(component.cookbook).toBeUndefined();
-    });
-  });
-
-  it('check cookbook version changed', () => {
-    expect(component.cookbookDetailsLoading).toBe(false);
-    component.handleCookbookVersionChange(serverId, orgId, cookbook_name, {target: {value: '1'}});
-    expect(component.cookbookDetailsLoading).toBe(true);
-  });
-
-  it('cookbook details should not be empty', () => {
-    component.onCookbookVersionChange(serverId, orgId, cookbook_name, '1.1.1');
+  it('Check cookbook details success', () => {
     store.dispatch(new GetCookbookDetailsSuccess(cookbookDetails));
     fixture.detectChanges();
-    expect(component.cookbookDetailsLoading).toBe(false);
+    expect(component.cookbookDetails).toEqual(cookbookDetails);
   });
 
 });

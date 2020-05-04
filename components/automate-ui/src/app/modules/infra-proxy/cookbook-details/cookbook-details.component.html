@@ -13,7 +13,7 @@
         <div class="version-dropdown">
           <label>Version</label>
           <chef-select *ngIf="cookbook"
-            (change)="handleCookbookVersionChange(serverId, orgId, cookbookName, $event)">
+            (change)="handleCookbookVersionChange($event)">
             <chef-option *ngFor="let version of cookbook.versions" [value]="version">{{ version }}</chef-option>
           </chef-select>
         </div>
