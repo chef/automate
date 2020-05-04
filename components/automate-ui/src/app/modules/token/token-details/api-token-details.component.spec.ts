@@ -117,20 +117,6 @@ describe('ApiTokenDetailsComponent', () => {
     expect(component.token).toEqual(token);
   });
 
-  it('initializes project dropdown with those checked on the token', () => {
-    spyOn(store, 'dispatch').and.callThrough();
-    const tokenProjects  = ['b-proj', 'd-proj'];
-    store.dispatch(new GetTokenSuccess({...someToken, projects: tokenProjects}));
-
-    expect(Object.keys(component.projects).length).toBe(0);
-    store.dispatch(new GetProjectsSuccess({ projects: projectList }));
-    expect(Object.keys(component.projects).length).toBe(projectList.length);
-
-    projectList.forEach(p => {
-      expect(component.projects[p.id].checked).toEqual(tokenProjects.includes(p.id));
-    });
-  });
-
   it('sets projects dirty when an unchecked project is checked', () => {
     store.dispatch(new GetTokenSuccess(
       { ...someToken, projects: ['b-proj', 'd-proj']}));

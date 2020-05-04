@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { keyBy, at, isNil, identity } from 'lodash/fp';
+import { keyBy, at, identity, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
@@ -16,13 +16,7 @@ import { User } from 'app/entities/users/user.model';
 import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
 import { GetProjects } from 'app/entities/projects/project.actions';
-import {
-  allProjects,
-  getAllStatus as getAllProjectStatus
-} from 'app/entities/projects/project.selectors';
-import {
-  ProjectConstants, ProjectCheckedMap, noProjectsUpdated
-} from 'app/entities/projects/project.model';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 import {
   teamFromRoute,
   teamUsers,
@@ -65,7 +59,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public removeText = 'Remove User';
 
   public teamId = '';
-  public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   constructor(
@@ -139,22 +132,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     });
 
     combineLatest([
-      this.store.select(allProjects),
-      this.store.select(getAllProjectStatus),
-      this.store.select(teamFromRoute)
-    ]).pipe(
-      takeUntil(this.isDestroyed),
-      filter(([_, pStatus, team]) => !pending(pStatus) && !isNil(team))
-    ).subscribe(([allowedProjects, _, team]) => {
-        this.projects = {};
-        allowedProjects
-          .forEach(p => {
-            this.projects[p.id] = { ...p, checked: team.projects.includes(p.id)
-            };
-          });
-      });
-
-    combineLatest([
       this.store.select(allUsers),
       this.store.select(getAllUsersStatus),
       this.store.select(teamUsers),
@@ -216,7 +193,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.saveInProgress = true;
     this.updateNameForm.controls['name'].disable();
     const name: string = this.updateNameForm.controls.name.value.trim();
-    const projects = Object.keys(this.projects).filter(id => this.projects[id].checked);
+    const projects: string[] = this.updateNameForm.controls.projects.value;
     this.store.dispatch(new UpdateTeam({ ...this.team, name, projects }));
   }
 
@@ -228,12 +205,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   onProjectDropdownClosing(selectedProjects: string[]): void {
 
-    Object.keys(this.projects).forEach(id => this.projects[id].checked = false);
-    selectedProjects.forEach(id => this.projects[id].checked = true);
+    this.updateNameForm.controls.projects.setValue(selectedProjects);
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
-    if (noProjectsUpdated(this.team.projects, this.projects)) {
+    if (xor(this.team.projects, this.updateNameForm.controls.projects.value).length === 0) {
       this.updateNameForm.controls.projects.markAsPristine();
     } else {
       this.updateNameForm.controls.projects.markAsDirty();
