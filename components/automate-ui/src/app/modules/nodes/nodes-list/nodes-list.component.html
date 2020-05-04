@@ -51,18 +51,22 @@
               <chef-td (click)="filterFor('manager', node.manager)">{{ node.manager }}</chef-td>
               <chef-td (click)="filterFor('last_contact', node.last_contact)">{{ node.last_contact }}</chef-td>
               <chef-td>
-                <chef-icon class="status-icon" [ngClass]="node.scan_data.status">
+                <chef-icon class="status-icon" [ngClass]="node.scan_data.status"
+                (click)="filterFor('last_scan_status', node.scan_data.status)">
                   {{ statusIcon(node.scan_data.status) }}
                 </chef-icon>
-                <chef-icon class="status-icon" [ngClass]="node.scan_data.penultimate_status">
+                <chef-icon class="status-icon" [ngClass]="node.scan_data.penultimate_status"
+                (click)="filterFor('last_scan_penultimate_status', node.scan_data.penultimate_status)">
                   {{ statusIcon(node.scan_data.penultimate_status) }}
                 </chef-icon>               
               </chef-td>
               <chef-td>
-                <chef-icon class="status-icon" [ngClass]="node.run_data.status">
+                <chef-icon class="status-icon" [ngClass]="node.run_data.status"
+                (click)="filterFor('last_run_status', node.run_data.status)">
                   {{ statusIcon(node.run_data.status) }}
                 </chef-icon>
-                <chef-icon class="status-icon" [ngClass]="node.run_data.penultimate_status">
+                <chef-icon class="status-icon" [ngClass]="node.run_data.penultimate_status"
+                (click)="filterFor('last_run_penultimate_status', node.run_data.penultimate_status)">
                   {{ statusIcon(node.run_data.penultimate_status) }}
                 </chef-icon>               
               </chef-td>    
