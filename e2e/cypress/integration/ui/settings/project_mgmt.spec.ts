@@ -79,8 +79,11 @@ describe('project management', () => {
 
     cy.get('[data-cy=save-button]').click();
     cy.get('app-project-list chef-modal').should('not.be.visible');
-    cy.get('#main-content-wrapper').scrollTo('top');
-    cy.get('app-notification.info').should('be.visible');
+
+    // verify success notification and then dismiss it
+    cy.get('app-notification.info').contains(`Created project ${projectID}`);
+    cy.get('app-notification.info chef-icon').click();
+
     cy.contains(projectName).should('exist');
     cy.contains(projectID).should('exist');
 
@@ -106,8 +109,11 @@ describe('project management', () => {
 
     cy.get('[data-cy=save-button]').click();
     cy.get('app-project-list chef-modal').should('not.be.visible');
-    cy.get('#main-content-wrapper').scrollTo('top');
-    cy.get('chef-notification.info').should('be.visible');
+
+    // verify success notification and then dismiss it
+    cy.get('app-notification.info').contains(`Created project ${customProjectID}`);
+    cy.get('app-notification.info chef-icon').click();
+
     cy.contains(projectName).should('exist');
     cy.contains(customProjectID).should('exist');
 
@@ -254,10 +260,10 @@ describe('project management', () => {
     // the empty UI should show up so entire table will be missing.
     cy.get('app-project-details chef-tbody').should('not.exist');
     cy.get('app-pending-edits-bar').contains('Project edits pending').should('not.be.visible');
-    cy.get('chef-notification.info').contains(`Deleted rule ${ruleID}`);
 
-    // dismiss notification
-    cy.get('chef-notification.info chef-icon').click();
+    // verify success notification and then dismiss it
+    cy.get('app-notification.info').contains(`Deleted rule ${ruleID}`);
+    cy.get('app-notification.info chef-icon').click();
   });
 
   it('can delete a project', () => {
@@ -266,7 +272,7 @@ describe('project management', () => {
 
     cy.wait('@getProjects');
 
-    cy.get('app-project-list chef-td').contains(projectID).parent()
+    cy.get('app-project-list chef-td').contains(customProjectID).parent()
       .find('.mat-select-trigger').as('controlMenu');
 
     // we throw in a `should` so cypress retries until introspection allows menu to be shown
@@ -278,10 +284,12 @@ describe('project management', () => {
     // accept dialog
     cy.get('app-project-list chef-button').contains('Delete Project').click();
 
+    // verify success notification and then dismiss it
+    cy.get('app-notification.info').contains(`Deleted project ${customProjectID}`);
+    cy.get('app-notification.info chef-icon').click();
+
     // Once we get this notification we know the network call to delete succeeded,
     // so now we can check if there are other projects or not.
-    cy.get('#main-content-wrapper').scrollTo('top');
-    cy.get('app-notification.info').contains(`Deleted project ${projectID}`);
     cy.request({
       auth: { bearer: adminIdToken },
       method: 'GET',
@@ -294,7 +302,7 @@ describe('project management', () => {
         // otherwise, check that the projectID is no longer in the table
       } else {
         cy.get('app-project-list chef-tbody chef-td')
-          .contains(projectID).should('not.exist');
+          .contains(customProjectID).should('not.exist');
       }
     });
   });
