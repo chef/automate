@@ -95,7 +95,7 @@
     "protractor": "^5.4.4",
     "rxjs-tslint": "^0.1.8",
     "sass-lint": "^1.13.1",
-    "ts-node": "^8.9.1",
+    "ts-node": "^8.10.1",
     "tslint": "^5.20.1",
     "tslint-defocus": "^2.0.6",
     "typescript": "~3.7.5",
