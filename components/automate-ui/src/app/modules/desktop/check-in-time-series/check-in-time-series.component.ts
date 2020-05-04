@@ -24,13 +24,17 @@ export class CheckInTimeSeriesComponent implements OnInit, OnDestroy, OnChanges 
   private timeFromNowPipe = new TimeFromNowPipe();
   private minute = 6000;
 
+  fakeData = [];
+
   constructor() {}
 
   dateChanged(selectedDaysAgo: number) {
-    this.daysAgoChanged.emit(selectedDaysAgo);
+    // this.daysAgoChanged.emit(selectedDaysAgo);
+    this.genRandomData(selectedDaysAgo);
   }
 
   ngOnInit(): void {
+    this.genRandomData(3);
     timer(0, this.minute).pipe(
       takeUntil(this.isDestroyed)
     ).subscribe(() => {
@@ -47,5 +51,16 @@ export class CheckInTimeSeriesComponent implements OnInit, OnDestroy, OnChanges 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  genRandomData(amount) {
+    const newData = [];
+    while ( amount > 0 ) {
+      amount -= 1;
+      newData.push(
+        {daysAgo: amount, percentage: Math.floor(Math.random() * 100)}
+        );
+    }
+    this.fakeData = newData;
   }
 }
