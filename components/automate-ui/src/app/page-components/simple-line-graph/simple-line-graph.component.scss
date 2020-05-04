@@ -60,7 +60,7 @@
     }
   }
 
-  .ring-highlight {
+  .ring {
     position: absolute;
     stroke-width: 1;
     fill: none;
@@ -84,13 +84,6 @@
       visibility: visible;
       transition: opacity 500ms;
     }
-  }
-
-  .tooltip {
-    position: absolute;			
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
   }
 
   .rect-highlight {
@@ -153,16 +146,19 @@
 
   }
 
-}
 
+  .graph-tooltip {
+  position: absolute;
+  min-height: 40px;
+  font-size: 12px;
+  padding: 8px 10px;
+  padding-left: 16px; // extra 8px to account for ::before gradient
+  background: $chef-white;
+  border-radius: $chef-border-radius;
 
-
-::ng-deep {
-  chef-tooltip {
-    min-height: 40px;
-    font-size: 12px;
-    padding: 8px 10px;
-    padding-left: 16px; // extra 8px to account for ::before gradient
+  opacity: 0;
+  visibility: hidden;
+  transition: 500ms;
 
     &::before {
       content: '';
@@ -180,6 +176,7 @@
     &.active {
       opacity: 1;
       visibility: visible;
+      transform: translateY(-10px);
     }
   }
 }

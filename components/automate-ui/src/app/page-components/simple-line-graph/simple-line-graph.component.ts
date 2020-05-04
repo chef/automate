@@ -110,23 +110,15 @@ export class SimpleLineGraphComponent implements OnChanges {
     return `0 0 ${this.width} ${this.height}`;
   }
 
-  createTheRingHighlight(): void {
-      const highlight = this.svgSelection.selectAll('.ring-highlight').data([this.data]);
-      highlight.exit().remove();
-      highlight.enter().append('circle').attr('class', 'ring-highlight')
-        .merge(highlight).attr('r', 10);
-
-      this.theHighlight = d3.select('.ring-highlight');
-  }
-
     ////////////////// RENDER FUNCTIONS ////////////////////
   renderChart() {
     this.AllUnlockDeactivate();
     this.resizeChart();
-    this.createTheRingHighlight();
     this.renderGrid();
     this.renderLine();
     this.renderPoints();
+    this.renderTooltips();
+    this.renderRings();
   }
 
   renderLine(): void {
@@ -151,6 +143,28 @@ export class SimpleLineGraphComponent implements OnChanges {
         .attr('cx', d => this.xScale(d.daysAgo))
         .attr('cy', d => this.yScale(d.percentage))
         .attr('r', 4);
+  }
+
+  renderRings(): void {
+    const rings = this.svgSelection.selectAll('circle.ring').data(this.data);
+    rings.exit().remove();
+    rings.enter().append('circle')
+      .attr('class', (_d, i) => `ring elem-${i}`)
+      .merge(rings)
+      .attr('cx', d => this.xScale(d.daysAgo))
+      .attr('cy', d => this.yScale(d.percentage))
+      .attr('r', 20);
+  }
+
+  renderTooltips() {
+    const tooltips = this.containerSelection.selectAll('div.graph-tooltip').data(this.data);
+    tooltips.exit().remove();
+    tooltips.enter().append('div')
+      .attr('class', (_d, i) => `graph-tooltip elem-${i}`)
+      .merge(tooltips)
+      .text(d => `Checked in ${d.percentage}%`)
+      .style('left', d => `${this.xScale(d.daysAgo) - 50}px`) // magic number
+      .style('top', d => `${this.yScale(d.percentage) + 20}px`);
   }
 
 
@@ -221,10 +235,11 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.svgSelection.selectAll('.label-text')
       .on('mouseenter', () => {
           if ( this.locked === true ) { return; }
-          this.attachTooltipAndRing(d3.event);
+          // this.attachTooltipAndRing(d3.event);
+          this.handleHover(d3.event);
           // don't show label gradient if too many labels
           if (this.data.length < 8) {
-            this.createGradientLabel(d3.event);
+            // this.createGradientLabel(d3.event);
           }
       })
       .on('mouseout', () => {
@@ -236,10 +251,9 @@ export class SimpleLineGraphComponent implements OnChanges {
           // if locked, check if the target matches the highlighted number
           if ( !d3.event.target.classList
               .contains(`highlight-${this.currentHighlightnum}`) ) { return; }
-          this.theToolTip.classed('active', true);
+
           this.allUnlock();
         } else {
-          this.lockCircleGradient(d3.event);
           this.theToolTip.classed('active', false);
           this.theHighlight.classed('lock', true);
           // don't show labels gradient if too many labels
@@ -251,71 +265,44 @@ export class SimpleLineGraphComponent implements OnChanges {
       });
   }
 
+  handleHover(d3Event): void {
+    const num = this.getHoveredElement(d3Event);
+    d3.selectAll(`.elem-${num}`).classed('active', true);
+  }
+
   toggleLock(): void {
     this.locked = !this.locked;
 
   }
 
-  createGradientLabel(d3Event): void {
-    const containerCoords = this.containerSelection.node().getBoundingClientRect();
-    // For the rectangle ring highlighter
-    // Find the class to match with label
-    const highlightNum = this.getClassHighlightNumber(d3Event);
-    // get the text content from the label
-    const text = d3.select(`.label-text.highlight-${highlightNum}`).text();
-    // generate the box highlight ring size
-    const textBounds = d3
-      .select(`.label-text.highlight-${highlightNum}`).node().getBoundingClientRect();
+  // createGradientLabel(d3Event): void {
+  //   const containerCoords = this.containerSelection.node().getBoundingClientRect();
+  //   // For the rectangle ring highlighter
+  //   // Find the class to match with label
+  //   // const highlightNum = this.getClassHighlightNumber(d3Event);
+  //   // get the text content from the label
+  //   // const text = d3.select(`.label-text.highlight-${highlightNum}`).text();
+  //   // generate the box highlight ring size
+  //   const textBounds = d3
+  //     // .select(`.label-text.highlight-${highlightNum}`).node().getBoundingClientRect();
 
-    const rectWidth = textBounds.width + 16;
-    const posLeft = (textBounds.x - containerCoords.x) - 8;
-    const posBottom = (containerCoords.bottom - textBounds.bottom) - 3;
+  //   const rectWidth = textBounds.width + 16;
+  //   const posLeft = (textBounds.x - containerCoords.x) - 8;
+  //   const posBottom = (containerCoords.bottom - textBounds.bottom) - 3;
 
-    // apply the highlight styles
-    this.theRectHighlight.select('.rect-inner').text(() => text);
-    this.theRectHighlight
-      .style('left', `${posLeft}px`)
-      .style('bottom', `${posBottom}px`)
-      .style('width', `${rectWidth}px`)
-      .classed('active', true);
-  }
+  //   // apply the highlight styles
+  //   this.theRectHighlight.select('.rect-inner').text(() => text);
+  //   this.theRectHighlight
+  //     .style('left', `${posLeft}px`)
+  //     .style('bottom', `${posBottom}px`)
+  //     .style('width', `${rectWidth}px`)
+  //     .classed('active', true);
+  // }
 
-  attachTooltipAndRing(d3Event): void {
-    // Find the class to match with label
-    const highlightNum = this.getClassHighlightNumber(d3Event);
-
-    // get the text content from the label
-    const coords = d3.select(`.circle.highlight-${highlightNum}`).node().getBoundingClientRect();
-    const highlightCircle = d3.select(`.circle.highlight-${highlightNum}`);
-    const percentage = highlightCircle.attr('percent');
-
-    // theToolTip is the tooltip that shows on hover
-    this.theToolTip
-      .style('left', `${ coords.left + 4 }px`)
-    // 15px for thhe tooltip to breathe;
-      .style('top', `${coords.top - 15}px`)
-      .classed('active', true)
-      .text(_d => `Checked-in ${ percentage }%`);
-
-    // ring highlight position can come straight from the highlighted circle
-    const cx = highlightCircle.attr('cx');
-    const cy = highlightCircle.attr('cy');
-    this.theHighlight
-      .attr('cx', cx)
-      .attr('cy', cy)
-      .classed('active', true);
-  }
-
-  lockCircleGradient(d3Event): void {
-    const highlightNum = this.getClassHighlightNumber(d3Event);
-    d3.select(`.circle.highlight-${highlightNum}`).classed('lock', 'true');
-  }
-
-  getClassHighlightNumber(d3Event): number {
+  getHoveredElement(d3Event): number {
     const classes = d3.select(d3Event.target).attr('class');
     const match = classes.match(/highlight-([0-9]{1,2})/g)[0];
     const num = match.split('-')[1];
-    this.currentHighlightnum = num;
     return num;
   }
 
