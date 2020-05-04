@@ -3,7 +3,8 @@ title = "IAM Overview"
 aliases = [
     "/docs/authorization-overview/",
     "/docs/default-policies/",
-    "/docs/iam-v1-policies/"
+    "/docs/iam-v1-policies/",
+    "/docs/iam-v1-overview/"
 ]
 description = "IAM Overview"
 draft = false
