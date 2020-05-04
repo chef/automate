@@ -106,12 +106,18 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context,
 		return nodesCounts, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
+	// Date Range
+	if !params.ValidateDateTimeRange(request.GetStart(), request.GetEnd()) {
+		return nodesCounts, status.Errorf(codes.InvalidArgument,
+			"Invalid start/end time. (format: YYYY-MM-DD'T'HH:mm:ssZ)")
+	}
+
 	filters, err = filterByProjects(ctx, filters)
 	if err != nil {
 		return nodesCounts, errors.GrpcErrorFromErr(codes.Internal, err)
 	}
 
-	state, err := s.client.GetNodesCounts(filters)
+	state, err := s.client.GetNodesCounts(filters, request.GetStart(), request.GetEnd())
 	if err != nil {
 		return nodesCounts, errors.GrpcErrorFromErr(codes.Internal, err)
 	}

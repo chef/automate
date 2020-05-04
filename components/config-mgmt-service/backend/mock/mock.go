@@ -37,7 +37,8 @@ func (m Backend) NodeExists(id string, filters map[string][]string) (bool, error
 	return false, nil
 }
 
-func (m Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCounts, error) {
+func (m Backend) GetNodesCounts(filters map[string][]string,
+	startDate string, endDate string) (backend.NodesCounts, error) {
 	ns := backend.NodesCounts{}
 	return ns, nil
 }
