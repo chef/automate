@@ -31,5 +31,4 @@ export class ChefNotificationsComponent {
   handleNotificationDismissal(id: string): void {
     this.store.dispatch(new DeleteNotification({ id }));
   }
-
 }

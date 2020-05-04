@@ -17,6 +17,24 @@
   }
 }
 
+
+// These are used to wrap a collection of notifications
+// An outer container of sticky-notifications causes the notifications to to stick to the 
+// upper scrollable window the user scrolls.
+.sticky-notifications {
+  position: sticky;
+  top: 0;
+  z-index: 199;
+
+  // An inner container of sticky-inner ensures the notification content will overlay
+  // page content and not push it down.
+  .sticky-inner {
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+}
+
 .content-container {
   height: 100%;
   position: relative;
