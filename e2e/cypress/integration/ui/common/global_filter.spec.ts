@@ -1,28 +1,30 @@
 import { Project } from '../../../support/types';
 
 describe('global projects filter', () => {
+  const cypressPrefix = 'cypress-global-filter';
+  const now = Cypress.moment().format('MMDDYYhhmm');
+
   const proj1: Project = {
-    id: `cypress-project-1-${Cypress.moment().format('MMDDYYhhmm')}`,
+    id: `${cypressPrefix}-proj1-${now}`,
     name: 'Cypress Project 1',
     skip_policies: true
   };
   const proj2: Project = {
-    id: `cypress-project-2-${Cypress.moment().format('MMDDYYhhmm')}`,
+    id: `${cypressPrefix}-proj2-${now}`,
     name: 'Cypress Project 2',
     skip_policies: true
   };
   const proj3: Project = {
-    id: `cypress-project-3-${Cypress.moment().format('MMDDYYhhmm')}`,
+    id: `${cypressPrefix}-proj3-${now}`,
     name: 'Cypress Project 3',
     skip_policies: true
    };
-  const pol_id = `cypress-policy-${Cypress.moment().format('MMDDYYhhmm')}`;
-  const nonAdminUsername = `nonadmin-${Cypress.moment().format('MMDDYYhhmm')}`;
+  const pol_id = `${cypressPrefix}-pol-${now}`;
+  const nonAdminUsername = `${cypressPrefix}-nonadmin-${now}`;
 
   before(() => {
     cy.adminLogin('/').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      cleanupProjects(admin.id_token);
       createProject(admin.id_token, proj1);
       createProject(admin.id_token, proj2);
       createProject(admin.id_token, proj3);
@@ -31,6 +33,10 @@ describe('global projects filter', () => {
       createPolicy(admin.id_token, pol_id, nonAdminUsername, [proj1.id, proj2.id]);
       cy.logout();
     });
+  });
+
+  after(() => {
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'users', 'policies']);
   });
 
   it('shows all projects for admin', () => {
@@ -57,24 +63,6 @@ describe('global projects filter', () => {
     });
   });
 });
-
-function cleanupProjects(id_token: string): void {
-  cy.request({
-    auth: { bearer: id_token },
-    method: 'GET',
-    url: '/apis/iam/v2/projects',
-    failOnStatusCode: false
-  }).then((resp) => {
-    for (const project of resp.body.projects) {
-      cy.request({
-        auth: { bearer: id_token },
-        method: 'DELETE',
-        url: `/apis/iam/v2/projects/${project.id}`,
-        failOnStatusCode: false
-      });
-    }
-  });
-}
 
 function createUser(id_token: string, username: string): void {
   cy.request({
