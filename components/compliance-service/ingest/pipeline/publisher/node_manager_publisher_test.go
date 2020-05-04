@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/chef/automate/api/interservice/compliance/common"
 	inspec "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
@@ -40,6 +41,7 @@ func TestGatherInfoForNode(t *testing.T) {
 			SourceRegion:      "us-west-2a",
 			ReportUuid:        "123353254545425",
 			AutomateManagerId: "12345",
+			Environment:       "test-env",
 		},
 		InspecReport: &relaxting.ESInSpecReport{
 			Projects: []string{"tomato", "cucumber"},
@@ -64,12 +66,18 @@ func TestGatherInfoForNode(t *testing.T) {
 		},
 		Projects: []string{"tomato", "cucumber"},
 		ProjectsData: []*nodes.ProjectsData{
+			{Key: "environment", Values: []string{"test-env"}},
 			{Key: "roles", Values: []string{"my-cool-role"}},
 			{Key: "organization_name", Values: []string{"test-org"}},
 			{Key: "chef_tags", Values: []string{"application", "database"}},
 			{Key: "chef_server", Values: []string{"chef-server-2"}},
 		},
 		ManagerId: "12345",
+		Tags: []*common.Kv{
+			{Key: "chef-tag", Value: "application"},
+			{Key: "chef-tag", Value: "database"},
+			{Key: "Environment", Value: "test-env"},
+		},
 	}, nodeMetadata)
 }
 
