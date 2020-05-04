@@ -24,7 +24,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
   nodesList;
   nodesListSort;
   nodesListSortOrder;
-  nodesListFilters;
+  nodesListFilters = [];
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   ngOnInit(): void {
@@ -73,9 +73,19 @@ export class NodesListComponent implements OnInit, OnDestroy {
   }
 
   filterFor(type, item) {
-    this.nodesListFilters = [{key: type, values: [item]}];
-    const params = {page: this.nodesList.page, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+    this.nodesListFilters.push({key: type, values: [item]});
+    const params = {page: 1, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
     this.store.dispatch(actions.getNodes(params));
+  }
+
+  displayCurrentFilters() {
+    let filterStrings = '';
+    this.nodesListFilters.forEach((filter) => {
+      filter.values.forEach((val) => {
+        filterStrings = filterStrings + filter.key + val; 
+      })
+    });
+    return filterStrings;
   }
 
   trackBy(node) {
