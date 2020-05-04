@@ -12,7 +12,7 @@ toc = true
 
 ## Overview
 
-Chef Automate Identity and Access Management roles are named groups of actions used to define [policies]({{< relref "policies.md" >}}). Actions describe what is allowed by users in Automate. [IAM Actions]({{< relref "iam-actions.md" >}}) describes how actions map to the UI.
+Chef Automate Identity and Access Management roles are named groups of actions used to define [policies]({{< relref "policies.md" >}}). Actions describe what is allowed by users in Automate. [IAM Actions]({{< relref "iam-actions.md" >}}) describes how actions map to pages in the browser.
 
 Users require permission for the `iam:roles` action to interact with roles. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 
@@ -30,7 +30,7 @@ Owner         | **Do** everything in the system *including* IAM
 Project Owner | Editor + **view** and **assign** projects
 Ingest        | Ingest data into the system
 
-#### Actions for Chef-managed Roles
+#### Actions for Chef-Managed Roles
 
 Name | ID| Actions
 -----------------------|-----|--------
@@ -39,8 +39,6 @@ Project Owner      | project-owner | infra:nodes:\*, infra:nodeManagers:\*, comp
 Editor             | editor        | infra:infraServers:list, infra:infraServers:get, infra:nodes:\*, infra:nodeManagers:\*, compliance:\*, event:\*, ingest:\*, secrets:\*, iam:projects:list, iam:projects:get, iam:projects:assign, applications:\*
 Viewer             | viewer        | infra:infraServers:list, infra:infraServers:get, secrets:\*:get, secrets:\*:list, infra:nodes:get, infra:nodes:list, infra:nodeManagers:get, infra:nodeManagers:list, compliance:\*:get, compliance:\*:list, event:\*:get, event:\*:list, ingest:\*:get, ingest:\*:list, iam:projects:list, iam:projects:get, applications:\*:get, applications:\*:list
 Ingest             | ingest        | infra:ingest:\*, compliance:profiles:get, compliance:profiles:list
-
-
 
 ### Custom Roles
 
