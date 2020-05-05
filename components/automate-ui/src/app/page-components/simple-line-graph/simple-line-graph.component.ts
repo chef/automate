@@ -178,7 +178,7 @@ export class SimpleLineGraphComponent implements OnChanges {
         .style('bottom', `${this.margin.bottom / 2}px`)
       .transition().duration(1000)
         .style('bottom', `${this.margin.bottom / 2}px`)
-        .style('left', (d, i) => {
+        .style('left', (d) => {
           return `${this.xScale(d.daysAgo) - 30}px`;  // needs adjustment
         })
       .call(parent => {
