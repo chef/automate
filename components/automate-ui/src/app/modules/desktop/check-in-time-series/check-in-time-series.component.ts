@@ -57,7 +57,7 @@ export class CheckInTimeSeriesComponent implements OnInit, OnDestroy, OnChanges 
     const newData = [];
     while ( amount > 0 ) {
       amount -= 1;
-      newData.push(
+      newData.unshift(
         {daysAgo: amount, percentage: Math.floor(Math.random() * 100)}
         );
     }
