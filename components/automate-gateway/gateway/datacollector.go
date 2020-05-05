@@ -58,7 +58,7 @@ func (s *Server) dataCollectorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ticket, err := s.datacollectorLimiter.TakeTicket()
+	ticket, err := s.dataCollectorLimiter.TakeTicket()
 	if err != nil {
 		s.logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)

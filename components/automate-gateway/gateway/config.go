@@ -24,6 +24,10 @@ type Config struct {
 	TLSConfig         certs.TLSConfig `mapstructure:"tls" toml:"tls"`
 	TrialLicenseURL   string          `mapstructure:"trial_license_url" toml:"trial_license_url"`
 	EnableAppsFeature bool            `mapstructure:"enable_apps_feature" toml:"enable_apps_feature"`
+	DataCollector     struct {
+		DisableLimiter     bool `mapstructure:"disable_limiter" toml:"disable_limiter"`
+		LimiterMaxRequests int  `mapstructure:"limiter_max_requests" toml:"limiter_max_requests"`
+	} `mapstructure:"data_collector" toml:"data_collector"`
 }
 
 type gwRouteFeatureFlags map[string]bool
