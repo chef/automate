@@ -16,9 +16,9 @@
   line,
   .tick,
   .grid {
-      stroke: $eggplant-light-1;
-      stroke-width: 1px;
-    }
+    stroke: $eggplant-light-1;
+    stroke-width: 1px;
+  }
 
   .line {
     fill: transparent;
@@ -50,7 +50,7 @@
     visibility: hidden;
     pointer-events: none;
     transition: 1s;
-    
+
     &.active {
       opacity: 1;
       visibility: visible;
@@ -58,13 +58,13 @@
   }
 
   .graph-button {
+    display: flex;
     position: absolute;
     z-index: 5;
     background: transparent;
     padding: 1px;
     border: none;
     border-radius: 4px;
-    display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
@@ -75,14 +75,15 @@
       background: linear-gradient(315deg, #3023AE, #C86DD7);
       transition: background 500ms, color 500ms;
     }
-    
+
     &.turnt {
       transition: transform 1s; // keep in sync with label transition duration in ts file
       font-size: 8px;
       transform: rotate(-45deg) translate(-10px, 10px);
     }
-    
+
     .inner {
+      display: flex;
       border: none;
       border-radius: 3px;
       background: $chef-white;
@@ -90,29 +91,26 @@
       font-size: 10px;
       font-family: 'muli';
       padding: 2px;
-      display: flex;
       align-items: center;
       justify-content: center;
       pointer-events: none;
       transition: background 500ms, color 500ms;
     }
-
   }
 
 
   .graph-tooltip {
-  position: absolute;
-  min-height: 40px;
-  font-size: 12px;
-  padding: 8px 10px;
-  padding-left: 16px; // extra 8px to account for ::before gradient
-  background: $chef-white;
-  border-radius: $chef-border-radius;
-  box-shadow: 0 0 1em 0 rgba(0, 0, 0, .21);
-
-  opacity: 0;
-  visibility: hidden;
-  transition: 500ms;
+    position: absolute;
+    min-height: 40px;
+    font-size: 12px;
+    padding: 8px 10px;
+    padding-left: 16px; // extra 8px to account for ::before gradient
+    background: $chef-white;
+    border-radius: $chef-border-radius;
+    box-shadow: 0 0 1em 0 rgba(0, 0, 0, .21);
+    opacity: 0;
+    visibility: hidden;
+    transition: 500ms;
 
     &::before {
       content: '';
@@ -128,8 +126,8 @@
     }
 
     &::after {
-      content: '';
       display: block;
+      content: '';
       width: 0.75em;
       height: 0.75em;
       position: absolute;
@@ -146,32 +144,31 @@
     }
   }
 
-      // lock styles
-    circle.point.lock {
-      fill: #3023AE;
-      fill: url('#chef-gradient-purple');
-    }
+  // lock styles
+  circle.point.lock {
+    fill: #3023AE;
+    fill: url('#chef-gradient-purple');
+  }
 
-    .graph-button.lock {
-      background: #3023AE;
-      background: linear-gradient(315deg, #3023AE, #C86DD7);
+  .graph-button.lock {
+    background: #3023AE;
+    background: linear-gradient(315deg, #3023AE, #C86DD7);
 
-     .inner {
-        color: white;
-        background-color: transparent;
-        opacity: 1;
-        visibility: visible;
-      }
-    }
-
-    .graph-tooltip.lock {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    .ring.lock  {
+    .inner {
+      color: white;
+      background-color: transparent;
       opacity: 1;
       visibility: visible;
     }
+  }
 
+  .graph-tooltip.lock {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .ring.lock  {
+    opacity: 1;
+    visibility: visible;
+  }
 }
