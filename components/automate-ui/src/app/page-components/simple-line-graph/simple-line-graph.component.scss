@@ -33,22 +33,6 @@
     .tick line {
       display: none;
     }
-
-    .label-text {
-      font-size: 10px;
-      stroke: #222435;
-      stroke-width: .1;
-      text-anchor: middle;
-      font-family: 'muli';
-      transition: 1s;
-      cursor: pointer;
-      
-      &.turnt {
-        font-size: 8px;
-        // potentially will need to be more flexible - so far ok
-        transform: rotate(-45deg) translate(-15px, -3px);
-      }
-    }
   }
 
   circle.point {
@@ -73,6 +57,13 @@
       // transition: opacity 500ms;
     }
   }
+
+  // .button-container {
+  //   margin: 0 20px;
+  //   display: flex;
+  //   flex-direction: row-reverse;
+  //   justify-content: space-between;
+  // }
 
   .graph-button {
     position: absolute;

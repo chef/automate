@@ -19,8 +19,7 @@ export class SimpleLineGraphComponent implements OnChanges {
   @ViewChild('svg', {static: true}) svg: ElementRef;
   @Input() data: any = [];
   @Input() width = 900;
-  @Input() height = 156; // we want a 116px height on the ticks, 156 - 40 = 116
-  public heightMargin = 40;
+  @Input() height = 156; // we want a 116px height on the ticks, this minus margins
   public locked: number = null;
 
 
@@ -78,20 +77,12 @@ export class SimpleLineGraphComponent implements OnChanges {
     return d3.select('app-simple-line-graph');
   }
 
-  get axisYSelection() {
-    return this.svgSelection.select('.y-axis');
-  }
-
   get svgSelection() {
     return d3.select(this.svg.nativeElement);
   }
 
-  get theToolTip() {
-    return d3.select('chef-tooltip');
-  }
-
-  get theRectHighlight() {
-    return d3.select('.rect-highlight');
+  get axisYSelection() {
+    return this.svgSelection.select('.y-axis');
   }
 
   // returns a function that when passed our data, will return an svg path
@@ -163,12 +154,17 @@ export class SimpleLineGraphComponent implements OnChanges {
       .attr('class', (_d, i) => `graph-tooltip elem-${i}`)
       .merge(tooltips)
       .text(d => `Checked in ${d.percentage}%`)
-      .style('left', d => `${this.xScale(d.daysAgo) - 50}px`) // magic number...for now
+      .style('left', d => {
+         // 50 is magic number...for now
+        const left = this.xScale(d.daysAgo) - 50 < 0 ? 0 : this.xScale(d.daysAgo) - 50;
+        return `${left}px`;
+      })
       .style('top', d => `${this.yScale(d.percentage) + 20}px`);
   }
 
   renderLabelButtons() {
     const labels = this.containerSelection.selectAll('.graph-button')
+    // const labels = d3.select('div.button-container').selectAll('.graph-button')
     .data(this.data, d => d.daysAgo);
     labels.exit().remove();
     labels.enter().append('button')
@@ -178,9 +174,13 @@ export class SimpleLineGraphComponent implements OnChanges {
       })
       .attr('class', (_d, i) => `graph-button elem-${i}`)
       .merge(labels)
+      .transition().duration(0)
+        .style('bottom', `${this.margin.bottom / 2}px`)
       .transition().duration(1000)
-      .style('bottom', `${this.margin.bottom / 2}px`)
-      .style('left', d => `${this.xScale(d.daysAgo) - 30}px`) // will need adjustment
+        .style('bottom', `${this.margin.bottom / 2}px`)
+        .style('left', (d, i) => {
+          return `${this.xScale(d.daysAgo) - 30}px`;  // needs adjustment
+        })
       .call(parent => {
         parent.select('.inner')
           .text(p => this.formatLabels(p.daysAgo));
@@ -188,6 +188,7 @@ export class SimpleLineGraphComponent implements OnChanges {
 
       // add all listeners
     this.containerSelection.selectAll('.graph-button')
+      // add class to rotate labels when more than comfortable to fit in space
       .classed('turnt', () => this.xData.length > 7)
 
       .on('mouseenter', () => {
@@ -226,11 +227,10 @@ export class SimpleLineGraphComponent implements OnChanges {
       .tickSize(this.height - (this.margin.bottom + this.margin.top))
       .tickSizeOuter(0)
       .scale(this.xScale);
-    // Render the X axis and X ticks
+    // Render the X grid lines
     const grid = this.svgSelection.selectAll('.grid').data([this.data]);
     grid.exit().remove();
     grid.enter().append('g').attr('class', 'grid')
-      // this line will need to be updated to flexible
       .attr('transform', `translate(0, ${this.height - this.margin.bottom})`)
       .merge(grid).transition().duration(1000)
       .call(xGrid);
