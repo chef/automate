@@ -1,12 +1,6 @@
 <div class="content-container">
   <div class="container">
     <main>
-      <app-check-in-time-series
-        [days] = "days$ | async"
-        [selectedDaysAgo] = "selectedDaysAgo$ | async"
-        [lastUpdated] = "checkInCountCollectedUpdated$ | async"
-        (daysAgoChanged)="handleDaysAgoChange($event)">
-      </app-check-in-time-series>
       <app-insight
         [visible] = "insightVisible"
         [desktops] = "desktops$ | async"
@@ -32,6 +26,12 @@
         [lastUpdated] = "checkInCountCollectedUpdated$ | async"
         [checkedInCount] = "checkedInCount$ | async">
       </app-daily-check-in>
+      <app-check-in-time-series
+        [days] = "days$ | async"
+        [selectedDaysAgo] = "selectedDaysAgo$ | async"
+        [lastUpdated] = "checkInCountCollectedUpdated$ | async"
+        (daysAgoChanged)="handleDaysAgoChange($event)">
+      </app-check-in-time-series>
       <app-unknown-desktop-duration-counts
         [countedDurationItems] = "unknownDesktopCountedDurationItems$ | async"
         [lastUpdated] = "unknownDesktopCountedDurationUpdated$ | async">
