@@ -1,3 +1,4 @@
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async,
   ComponentFixtureAutoDetect,
   ComponentFixture,
@@ -51,7 +52,8 @@ describe('OrgDetailsComponent', () => {
         RouterTestingModule,
         HttpClientTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
-      ]
+      ],
+      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
     .compileComponents();
   }));
