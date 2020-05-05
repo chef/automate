@@ -283,6 +283,45 @@ var ConvergeHistory = Mapping{
 							"name": { "type": "keyword", "ignore_above": 256 },
 							"version": { "type": "keyword", "ignore_above": 256 }
 						}
+					},
+					"cloud_provider": {
+						"type": "keyword"
+					},
+					"timezone": {
+						"type": "keyword"
+					},
+					"kernel_release": {
+						"type": "keyword"
+					},
+					"kernel_version": {
+						"type": "keyword"
+					},
+					"virtualization_system": {
+						"type": "keyword"
+					},
+					"virtualization_role": {
+						"type": "keyword"
+					},
+					"dmi_system_manufacturer": {
+						"type": "keyword"
+					},
+					"dmi_system_serial_number": {
+						"type": "keyword"
+					},
+					"domain": {
+						"type": "keyword"
+					},
+					"hostname": {
+						"type": "keyword"
+					},
+					"macaddress": {
+						"type": "keyword"
+					},
+					"memory_total": {
+						"type": "keyword"
+					},
+					"ip6address": {
+						"type": "ip"
 					}
 				}
 			}
