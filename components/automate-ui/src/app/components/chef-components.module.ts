@@ -18,6 +18,7 @@ import { AuthorizedComponent } from './authorized/authorized.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { CalendarComponent } from './calendar/calendar.component';
+import { ChefNotificationComponent } from './notification/notification.component';
 import { ChefNotificationsComponent } from './notifications/notifications.component';
 import { ConfirmApplyStartModalComponent } from './confirm-apply-start-modal/confirm-apply-start-modal.component';
 import { ConfirmApplyStopModalComponent } from './confirm-apply-stop-modal/confirm-apply-stop-modal.component';
@@ -89,6 +90,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbsComponent,
     BreadcrumbComponent,
     CalendarComponent,
+    ChefNotificationComponent,
     ChefNotificationsComponent,
     ConfirmApplyStartModalComponent,
     ConfirmApplyStopModalComponent,
@@ -130,6 +132,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbsComponent,
     BreadcrumbComponent,
     CalendarComponent,
+    ChefNotificationComponent,
     ChefNotificationsComponent,
     ConfirmApplyStartModalComponent,
     ConfirmApplyStopModalComponent,

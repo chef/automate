@@ -1201,6 +1201,47 @@
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.VersionedCookbook"
           },
           "title": "List of versioned cookbooks associated with the node"
+        },
+        "ip6address": {
+          "type": "string",
+          "description": "IP 6 Address for the node."
+        },
+        "timezone": {
+          "type": "string",
+          "title": "timezone of the node"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "memory_total": {
+          "type": "string"
+        },
+        "macaddress": {
+          "type": "string"
+        },
+        "dmi_system_serial_number": {
+          "type": "string"
+        },
+        "dmi_system_manufacturer": {
+          "type": "string"
+        },
+        "virtualization_role": {
+          "type": "string"
+        },
+        "virtualization_system": {
+          "type": "string"
+        },
+        "kernel_version": {
+          "type": "string"
+        },
+        "kernel_release": {
+          "type": "string"
+        },
+        "cloud_provider": {
+          "type": "string"
         }
       }
     },

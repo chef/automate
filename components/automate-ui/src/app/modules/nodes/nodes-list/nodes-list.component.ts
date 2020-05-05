@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { timer as observableTimer, Subject } from 'rxjs';
 import { takeUntil, withLatestFrom } from 'rxjs/operators';
@@ -17,7 +17,7 @@ import * as moment from 'moment';
   styleUrls: ['./nodes-list.component.scss']
 })
 
-export class NodesListComponent implements OnInit {
+export class NodesListComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router
@@ -37,6 +37,11 @@ export class NodesListComponent implements OnInit {
       .subscribe(([_i, params]) => {
         this.store.dispatch(actions.getNodes(params));
       });
+  }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   orderFor(sortKey) {
