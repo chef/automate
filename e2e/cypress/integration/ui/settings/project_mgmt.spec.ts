@@ -1,16 +1,16 @@
 import { Project } from '../../../support/types';
 
 describe('project management', () => {
-  // we increase the default delay to mimic the average human's typing speed
-  // only need this for input values upon which later test assertions depend
-  // ref: https://github.com/cypress-io/cypress/issues/534
-  const typeDelay = 50;
+
   let adminIdToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
-  const cypressPrefix = 'cypress-test';
+  const cypressPrefix = 'proj-mgmt';
   const projectID = `${cypressPrefix}-project1-${now}`;
   const projectName = `${cypressPrefix} project1 ${now}`;
-  const customProjectID = `${cypressPrefix}-custom-${now}`;
+
+  const customWithoutPolsProjectID = `${cypressPrefix}-custom1-${now}`;
+  const customWithPolsProjectID = `${cypressPrefix}-custom2-${now}`;
+  const associatedPolicies = ['project-editors', 'project-viewers', 'project-owners'];
 
   before(() => {
     cy.adminLogin('/settings/projects').then(() => {
@@ -62,7 +62,7 @@ describe('project management', () => {
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
 
     cy.get('[data-cy=create-name]').focus()
-      .type(projectName, { delay: typeDelay }).should('have.value', projectName);
+      .type(projectName).should('have.value', projectName);
 
     cy.get('[data-cy=create-id]').should('not.be.visible');
     cy.get('[data-cy=edit-button]').contains('Edit ID').click();
@@ -88,12 +88,12 @@ describe('project management', () => {
     cy.url().should('include', '/settings/projects');
   });
 
-  it('can create a project with a custom ID', () => {
+  it('can create a project with a custom ID without generating associated policies', () => {
     cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
 
     cy.get('[data-cy=create-name]').focus()
-      .type(projectName, { delay: typeDelay }).should('have.value', projectName);
+      .type(projectName).should('have.value', projectName);
 
     cy.get('[data-cy=create-id]').should('not.be.visible');
     cy.get('[data-cy=edit-button]').contains('Edit ID').click();
@@ -103,28 +103,70 @@ describe('project management', () => {
     cy.get('app-create-object-modal chef-checkbox').click();
 
     cy.get('[data-cy=create-id]').should('be.visible').clear()
-      .type(customProjectID, { delay: typeDelay }).should('have.value', customProjectID);
+      .type(customWithoutPolsProjectID).should('have.value', customWithoutPolsProjectID);
 
     cy.get('[data-cy=save-button]').click();
     cy.get('app-project-list chef-modal').should('not.be.visible');
 
     // verify success notification and then dismiss it
-    cy.get('app-notification.info').contains(`Created project ${customProjectID}`);
+    cy.get('app-notification.info').contains(`Created project ${customWithoutPolsProjectID}`);
     cy.get('app-notification.info chef-icon').click();
 
-    cy.contains(projectName).should('exist');
-    cy.contains(customProjectID).should('exist');
+    cy.contains(customWithoutPolsProjectID).should('exist');
+
+    // verify no associated policies were generated
+    associatedPolicies.forEach((policy) => {
+      cy.request({
+        auth: { bearer: adminIdToken },
+        url: `/apis/iam/v2/policies/${customWithoutPolsProjectID}-${policy}`,
+        failOnStatusCode: false
+      }).then((response) => {
+        expect(response.status).to.equal(404);
+      });
+    });
 
     cy.url().should('include', '/settings/projects');
   });
 
-  it('addPolicies checkbox is always checked on modal open', () => {
+  it('can create a project with a custom ID and generate associated policies', () => {
     cy.get('[data-cy=create-project]').contains('Create Project').click();
+    cy.get('app-project-list chef-modal').should('have.class', 'visible');
 
+    cy.get('[data-cy=create-name]').focus()
+      .type(projectName).should('have.value', projectName);
+
+    cy.get('[data-cy=create-id]').should('not.be.visible');
+    cy.get('[data-cy=edit-button]').contains('Edit ID').click();
+    cy.get('[data-cy=id-label]').should('not.be.visible');
+
+    // addPolicies checkbox is always checked on modal open
     cy.get('app-create-object-modal chef-checkbox')
       .should('have.attr', 'aria-checked', 'true');
 
-    cy.get('app-create-object-modal chef-button').contains('Cancel').click();
+    cy.get('[data-cy=create-id]').should('be.visible').clear()
+      .type(customWithPolsProjectID).should('have.value', customWithPolsProjectID);
+
+    cy.get('[data-cy=save-button]').click();
+    cy.get('app-project-list chef-modal').should('not.be.visible');
+
+    // verify success notification and then dismiss it
+    cy.get('app-notification.info')
+      .contains(`Created project ${customWithPolsProjectID} and associated policies`);
+    cy.get('app-notification.info chef-icon').click();
+
+    cy.contains(customWithPolsProjectID).should('exist');
+
+    // verify associated policies were generated
+    associatedPolicies.forEach((policy) => {
+      cy.request({
+        auth: { bearer: adminIdToken },
+        url: `/apis/iam/v2/policies/${customWithPolsProjectID}-${policy}`
+      }).then((response) => {
+        expect(response.status).to.equal(200);
+      });
+    });
+
+    cy.url().should('include', '/settings/projects');
   });
 
   it('can open the new project\'s details page', () => {
@@ -140,7 +182,7 @@ describe('project management', () => {
     cy.wait('@getProject');
 
     cy.get('[data-cy=update-project-name]').focus().clear()
-      .type(updatedProjectName, { delay: typeDelay })
+      .type(updatedProjectName)
       .should('have.value', updatedProjectName);
     cy.get('app-project-details chef-button').contains('Save').click();
 
@@ -153,11 +195,11 @@ describe('project management', () => {
 
     cy.wait('@getProjects');
 
-    cy.get('app-project-list chef-td').contains(customProjectID).parent()
+    cy.get('app-project-list chef-td').contains(customWithoutPolsProjectID).parent()
       .find('.mat-select-trigger').as('controlMenu');
 
     // we throw in a `should` so cypress retries until introspection allows menu to be shown
-    cy.get('@controlMenu').should('be.visible')
+    cy.get('@controlMenu').scrollIntoView().should('be.visible')
       .click();
     cy.get('[data-cy=delete-project]').should('be.visible')
       .click();
@@ -166,7 +208,7 @@ describe('project management', () => {
     cy.get('app-project-list chef-button').contains('Delete Project').click();
 
     // verify success notification and then dismiss it
-    cy.get('app-notification.info').contains(`Deleted project ${customProjectID}`);
+    cy.get('app-notification.info').contains(`Deleted project ${customWithoutPolsProjectID}`);
     cy.get('app-notification.info chef-icon').click();
 
     // Once we get this notification we know the network call to delete succeeded,
@@ -183,7 +225,7 @@ describe('project management', () => {
         // otherwise, check that the projectID is no longer in the table
       } else {
         cy.get('app-project-list chef-tbody chef-td')
-          .contains(customProjectID).should('not.exist');
+          .contains(customWithoutPolsProjectID).should('not.exist');
       }
     });
   });
