@@ -35,8 +35,6 @@ func NewChefRunPipeline(client backend.Client, authzClient authz.ProjectsClient,
 		counter int64 = 0
 	)
 
-	log.Infof("Message buffer size = %d", messageBufferSize)
-
 	chefRunPipeline(in,
 		processor.MessageValidator,
 		processor.BuildTransmogrify(chefIngestRunPipelineConfig.NumberOfMsgsTransformers),
