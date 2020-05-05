@@ -39,10 +39,11 @@ const (
 // BackupsConfig contains settings for Es snapshot repo type and options, as
 // expressed in the service's toml config file
 type BackupsConfig struct {
-	Backend         string          `mapstructure:"backend"`
-	VerifyRepo      bool            `mapstructure:"verify_repo"`
-	FsBackupsConfig FsBackupsConfig `mapstructure:"fs"`
-	S3BackupsConfig S3BackupsConfig `mapstructure:"s3"`
+	Backend         string            `mapstructure:"backend"`
+	VerifyRepo      bool              `mapstructure:"verify_repo"`
+	FsBackupsConfig FsBackupsConfig   `mapstructure:"fs"`
+	S3BackupsConfig S3BackupsConfig   `mapstructure:"s3"`
+	GCSBackupsConfig GCSBackupsConfig `mapstructure:"gcs"`
 }
 
 // BackupsDisabled returns true if the backend is set to disabled
@@ -540,6 +541,8 @@ func (es *Elastic) CreateSnapshotRepository(ctx context.Context, repoName string
 	switch bc.Backend {
 	case "s3":
 		req = bc.S3BackupsConfig.createRepoReq(repoName)
+	case "gcs":
+		req = bc.GCSBackupsConfig.createRepoReq(repoName)
 	default:
 		req = bc.FsBackupsConfig.createRepoReq(repoName)
 	}
