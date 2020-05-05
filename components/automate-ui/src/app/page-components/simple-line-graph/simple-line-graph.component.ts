@@ -16,17 +16,18 @@ export class SimpleLineGraphComponent implements OnChanges {
     private chart: ElementRef
   ) {}
 
+  @ViewChild('svg', {static: true}) svg: ElementRef;
   @Input() data: any = [];
   @Input() width = 900;
-  @Input() height = 200;
-
-  @ViewChild('svg', {static: true}) svg: ElementRef;
-
+  @Input() height = 156; // we want a 116px height on the ticks, 156 - 40 = 116
   public heightMargin = 40;
-  public theHighlight;
   public locked: number = null;
-  public currentHighlightnum: number;
 
+
+
+  get margin() {
+    return { right: 20, left: 20, top: 20, bottom: 20 };
+  }
   ////////   X AXIS ITEMS   ////////
   // maps all of our x data points
   get xData() {
@@ -35,8 +36,8 @@ export class SimpleLineGraphComponent implements OnChanges {
   // determines how wide the graph should be to hold our data
   // in its respective area;
   get rangeX() {
-    const min = 50;
-    const max = this.width - 50;
+    const min = this.margin.left;
+    const max = this.width - this.margin.right;
     return [max, min];  // we want to plot our data backwards, so we reverse [min, max]
   }
   // determines the min and max values of the x axis
@@ -54,15 +55,9 @@ export class SimpleLineGraphComponent implements OnChanges {
 
 
   ////////   Y AXIS ITEMS   ////////
-
-  // maps all of our Y data points
-  get yData() {
-    return this.data.map(d => d.percentage);
-  }
-
   get rangeY() {
-    const min = 10;
-    const max = this.height - this.heightMargin;
+    const min = this.margin.top;
+    const max = this.height - this.margin.bottom;
     return [max, min];
   }
 
@@ -127,7 +122,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     // create the line using path function
     const line = this.createPath(this.data);
 
-    const theLine = this.svgSelection.selectAll('.line').data([this.data],d => d.daysAgo);
+    const theLine = this.svgSelection.selectAll('.line').data([this.data], d => d.daysAgo);
     theLine.exit().remove();
     theLine.enter().append('path').attr('class', 'line').merge(theLine)
     .transition().duration(1000)
@@ -184,8 +179,8 @@ export class SimpleLineGraphComponent implements OnChanges {
       .attr('class', (_d, i) => `graph-button elem-${i}`)
       .merge(labels)
       .transition().duration(1000)
-      .style('top', `calc(100% - ${this.heightMargin}px)`)
-      .style('left', d => `${this.xScale(d.daysAgo) - this.heightMargin}px`) // will need adjustment
+      .style('bottom', `${this.margin.bottom / 2}px`)
+      .style('left', d => `${this.xScale(d.daysAgo) - 30}px`) // will need adjustment
       .call(parent => {
         parent.select('.inner')
           .text(p => this.formatLabels(p.daysAgo));
@@ -228,7 +223,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     const xGrid = d3.axisTop()
       .ticks(this.data.length)
       .tickFormat('')
-      .tickSize(this.height - ( this.heightMargin * ( 3 / 2 ) ) + 10) // magic numbers?
+      .tickSize(this.height - (this.margin.bottom + this.margin.top))
       .tickSizeOuter(0)
       .scale(this.xScale);
     // Render the X axis and X ticks
@@ -236,7 +231,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     grid.exit().remove();
     grid.enter().append('g').attr('class', 'grid')
       // this line will need to be updated to flexible
-      .attr('transform', `translate(0, ${this.height - this.heightMargin})`)
+      .attr('transform', `translate(0, ${this.height - this.margin.bottom})`)
       .merge(grid).transition().duration(1000)
       .call(xGrid);
 
@@ -245,8 +240,9 @@ export class SimpleLineGraphComponent implements OnChanges {
     // render the Y axis
     const y = this.svgSelection.selectAll('.y-axis').data([this.data]);
     y.exit().remove();
-    y.enter().append('g').attr('class', 'y-axis').merge(y)
-      .transition().duration(1000)
+    y.enter().append('g').attr('class', 'y-axis')
+      .attr('transform', `translate(${this.margin.left}, 0)`)
+      .merge(y).transition().duration(1000)
       .call(yAxis);
 
     const xAxis = d3.axisBottom().ticks(this.data.length)
@@ -256,7 +252,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     const x = this.svgSelection.selectAll('.x-axis').data([this.data]);
     x.exit().remove();
     x.enter().append('g').attr('class', 'x-axis')
-      .attr('transform', `translate(0, ${this.height - this.heightMargin})`)
+      .attr('transform', `translate(0, ${this.height - this.margin.bottom})`)
       .merge(x).transition().duration(1000)
       .call(xAxis);
 
@@ -292,9 +288,7 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   relock(): void {
-    console.log(this.locked);
     if (this.locked) {
-      console.log('isLocked');
       d3.selectAll(`.elem-${this.locked}`).classed('lock', true);
     }
   }
