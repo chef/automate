@@ -22,8 +22,6 @@ export class SimpleLineGraphComponent implements OnChanges {
   @Input() height = 156; // we want a 116px height on the ticks, this minus margins
   public locked: number = null;
 
-
-
   get margin() {
     return { right: 20, left: 20, top: 20, bottom: 20 };
   }
@@ -45,7 +43,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     const max = Math.max(...this.xData);
     return [min, max];
   }
-  // determines each of our X axis points using the height and width of the chart
+
   get xScale() {
     return d3.scaleTime()
       .range(this.rangeX)
@@ -62,10 +60,10 @@ export class SimpleLineGraphComponent implements OnChanges {
 
   get domainY() {
     const min = 0;
-    const max = 100; // since this based on a percentage do we want 0 to 100?
+    const max = 100; // since this based on a percentage we are doing 0 to 100;
     return [min, max];
   }
-  // determines each of our Y axis points using the height and width of the chart
+
   get yScale() {
     return d3.scaleLinear()
              .range(this.rangeY)
@@ -116,7 +114,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     const theLine = this.svgSelection.selectAll('.line').data([this.data], d => d.daysAgo);
     theLine.exit().remove();
     theLine.enter().append('path').attr('class', 'line').merge(theLine)
-    .transition().duration(1000)
+      .transition().duration(1000)
     .attr('d', line);
   }
 
@@ -128,7 +126,7 @@ export class SimpleLineGraphComponent implements OnChanges {
         .attr('class', (_d, i) => `point elem-${i}`)
         .merge(points)
         .transition().duration(1000)
-        .attr('percent', ( d => d.percentage ) ) // must add this data AFTER the merge
+        .attr('percent', ( d => d.percentage ) )
         .attr('cx', d => this.xScale(d.daysAgo))
         .attr('cy', d => this.yScale(d.percentage))
         .attr('r', 4);
@@ -146,7 +144,14 @@ export class SimpleLineGraphComponent implements OnChanges {
       .attr('r', 10);
   }
 
-  renderTooltips() {
+  renderTooltips(): void {
+    // these numbers are specific to its container
+    const localWidth = this.width - this.margin.right - this.margin.left - 34;
+    const thisRange = [localWidth, -this.margin.right];
+    const thisScale = d3.scaleLinear()
+      .domain(this.domainX)
+      .range(thisRange);
+
     const tooltips = this.containerSelection.selectAll('div.graph-tooltip')
       .data(this.data, d => d.daysAgo);
     tooltips.exit().remove();
@@ -154,17 +159,16 @@ export class SimpleLineGraphComponent implements OnChanges {
       .attr('class', (_d, i) => `graph-tooltip elem-${i}`)
       .merge(tooltips)
       .text(d => `Checked in ${d.percentage}%`)
-      .style('left', d => {
-         // 50 is magic number...for now
-        const left = this.xScale(d.daysAgo) - 50 < 0 ? 0 : this.xScale(d.daysAgo) - 50;
+      .style('left', (d, i) => {
+        const left = thisScale(d.daysAgo);
+        if ( i === 0 ) { return `${localWidth + this.margin.right}px`; }
         return `${left}px`;
       })
-      .style('top', d => `${this.yScale(d.percentage) + 20}px`);
+      .style('top', d => `${this.yScale(d.percentage) + this.margin.top}px`);
   }
 
-  renderLabelButtons() {
-    // calculate narrower range for the labels
-    // first number is left margin/spacing, right number is right margin
+  renderLabelButtons(): void {
+    // these numbers are specific to its container
     const thisRange = [this.width - 48, 53];
     const thisScale = d3.scaleLinear()
       .domain(this.domainX)
@@ -219,7 +223,7 @@ export class SimpleLineGraphComponent implements OnChanges {
       });
   }
 
-  formatLabels(daysAgo): string {
+  private formatLabels(daysAgo: number): string {
     switch (daysAgo) {
       case 0:
         return '24 hrs ago';
@@ -255,10 +259,11 @@ export class SimpleLineGraphComponent implements OnChanges {
       .merge(y).transition().duration(1000)
       .call(yAxis);
 
+    // create the X axis
     const xAxis = d3.axisBottom().ticks(this.data.length)
       .tickSizeInner(10).tickSizeOuter(0).tickFormat('')
       .scale(this.xScale);
-
+    // render the X axis
     const x = this.svgSelection.selectAll('.x-axis').data([this.data]);
     x.exit().remove();
     x.enter().append('g').attr('class', 'x-axis')
@@ -266,7 +271,7 @@ export class SimpleLineGraphComponent implements OnChanges {
       .merge(x).transition().duration(1000)
       .call(xAxis);
 
-    // remove zero from bottom of chart on x axis
+    // remove zero from bottom of chart on X axis
     this.svgSelection.selectAll('.tick')
       .filter(tick => tick === 0)
       .remove();
@@ -304,21 +309,16 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   AllDeactivate(): void {
-    d3.selectAll('.active').classed('active', false); // deactivate any active items on page
+    d3.selectAll('.active').classed('active', false);
   }
 
   allUnlock(): void {
-    d3.selectAll('.lock').classed('lock', false); // unlock any locked items on page
+    d3.selectAll('.lock').classed('lock', false);
   }
 
   AllUnlockDeactivate(): void {
     this.allUnlock();
-    this.AllDeactivate(); // deactivate any active items on page
-  }
-
-
-  ngOnChanges() {
-    this.renderChart();
+    this.AllDeactivate();
   }
 
   onResize(): void {
@@ -327,6 +327,10 @@ export class SimpleLineGraphComponent implements OnChanges {
 
   resizeChart(): void {
     this.width = this.chart.nativeElement.getBoundingClientRect().width;
+  }
+
+  ngOnChanges() {
+    this.renderChart();
   }
 
 }
