@@ -3,6 +3,7 @@
 :host {
   display: block;
   width: 100%;
+  margin-bottom: 16px;
 }
 
 ::ng-deep {
@@ -48,22 +49,13 @@
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    // transition: opacity 500ms, visibility 500ms ease-out 250ms;
     transition: 1s;
     
     &.active {
       opacity: 1;
       visibility: visible;
-      // transition: opacity 500ms;
     }
   }
-
-  // .button-container {
-  //   margin: 0 20px;
-  //   display: flex;
-  //   flex-direction: row-reverse;
-  //   justify-content: space-between;
-  // }
 
   .graph-button {
     position: absolute;
@@ -85,7 +77,7 @@
     &.turnt {
       transition: transform 1s; // keep in sync with label transition duration in ts file
       font-size: 8px;
-      transform: rotate(-45deg) translate(-8px, 10px);
+      transform: rotate(-45deg) translate(-10px, 10px);
     }
     
     .inner {
@@ -131,6 +123,18 @@
       background: linear-gradient(315deg, #3023AE, #C86DD7);
       border-bottom-left-radius: $chef-border-radius;
       border-top-left-radius: $chef-border-radius;
+    }
+
+    &::after {
+      content: '';
+      display: block;
+      width: 0.75em;
+      height: 0.75em;
+      position: absolute;
+      background-color: $chef-white;
+      transform: translateX(-50%) translateY(-50%) rotate(45deg);
+      top: 100%;
+      left: calc(50% - .75em);
     }
 
     &.active {

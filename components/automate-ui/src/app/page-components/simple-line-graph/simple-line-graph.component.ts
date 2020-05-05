@@ -125,7 +125,7 @@ export class SimpleLineGraphComponent implements OnChanges {
       .data(this.data, d => d.daysAgo);
     points.exit().remove();
     points.enter().append('circle')
-        .attr('class', (_d,i) => `point elem-${i}`)
+        .attr('class', (_d, i) => `point elem-${i}`)
         .merge(points)
         .transition().duration(1000)
         .attr('percent', ( d => d.percentage ) ) // must add this data AFTER the merge
@@ -163,9 +163,15 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   renderLabelButtons() {
+    // calculate narrower range for the labels
+    // first number is left margin/spacing, right number is right margin
+    const thisRange = [this.width - 48, 53];
+    const thisScale = d3.scaleLinear()
+      .domain(this.domainX)
+      .range(thisRange);
+
     const labels = this.containerSelection.selectAll('.graph-button')
-    // const labels = d3.select('div.button-container').selectAll('.graph-button')
-    .data(this.data, d => d.daysAgo);
+      .data(this.data, d => d.daysAgo);
     labels.exit().remove();
     labels.enter().append('button')
       .call(parent => {
@@ -179,7 +185,11 @@ export class SimpleLineGraphComponent implements OnChanges {
       .transition().duration(1000)
         .style('bottom', `${this.margin.bottom / 2}px`)
         .style('left', (d) => {
-          return `${this.xScale(d.daysAgo) - 30}px`;  // needs adjustment
+          if ( this.xData.length > 7 ) {
+            return `${this.xScale(d.daysAgo) - 30}px`;
+          } else {
+            return `${thisScale(d.daysAgo) - 30}px`;
+          }
         })
       .call(parent => {
         parent.select('.inner')
