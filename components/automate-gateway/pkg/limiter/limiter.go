@@ -2,10 +2,8 @@ package limiter
 
 import (
 	"errors"
+	"fmt"
 	"sync"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var ErrLimitExceeded = errors.New("Resource limit exceeded")
@@ -51,8 +49,8 @@ func (l *inflightRequestLimiter) TakeTicket() (Ticket, error) {
 	l.lock.Unlock()
 
 	if !taken {
-		err := status.Errorf(codes.ResourceExhausted,
-			"Resource limit exceeded for %s: cur=%d max=%d", l.name, cur, max)
+		err := fmt.Errorf("resource=%s cur=%d max=%d: %w",
+			l.name, cur, max, ErrLimitExceeded)
 		return nil, err
 	}
 	return &inflightRequestLimiterTicket{
@@ -81,7 +79,7 @@ func NewNoopRequestLimiter() Limiter {
 	return noopRequestLimiter{}
 }
 
-func (l noopRequestLimiter) TakeTicket() (Ticket, error) {
+func (noopRequestLimiter) TakeTicket() (Ticket, error) {
 	return noopRequestLimiterTicket{}, nil
 }
 
