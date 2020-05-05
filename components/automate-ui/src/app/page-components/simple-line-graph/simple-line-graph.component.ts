@@ -119,6 +119,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.renderPoints();
     this.renderTooltips();
     this.renderRings();
+    this.renderLabelButtons();
   }
 
   renderLine(): void {
@@ -163,10 +164,67 @@ export class SimpleLineGraphComponent implements OnChanges {
       .attr('class', (_d, i) => `graph-tooltip elem-${i}`)
       .merge(tooltips)
       .text(d => `Checked in ${d.percentage}%`)
-      .style('left', d => `${this.xScale(d.daysAgo) - 50}px`) // magic number
+      .style('left', d => `${this.xScale(d.daysAgo) - 50}px`) // magic number...for now
       .style('top', d => `${this.yScale(d.percentage) + 20}px`);
   }
 
+  renderLabelButtons() {
+    const labels = this.containerSelection.selectAll('.graph-button').data(this.data);
+    labels.exit().remove();
+    labels.enter().append('div')
+      .attr('class', (_d, i) => `graph-button elem-${i}`)
+      .attr('tabindex', '0')
+      .call(parent => {
+        parent.append('div')
+          .attr('class', (_d, i) => `inner elem-${i}`);
+      })
+      .merge(labels)
+      .transition().duration(1000)
+      .style('top', `calc(100% - ${this.heightMargin}px)`)
+      .style('left', d => `${this.xScale(d.daysAgo) - this.heightMargin}px`) // will need adjustment
+      .call(parent => {
+        parent.select('.inner')
+          .text(p => this.formatLabels(p.daysAgo));
+      });
+
+    this.containerSelection.selectAll('.graph-button')
+      .classed('turnt', () => this.xData.length > 7)
+
+      .on('mouseenter', () => {
+        if (this.locked === true) { return; }
+        this.handleHover(d3.event);
+        // don't show label gradient if too many labels
+        if (this.data.length < 8) {
+          // this.createGradientLabel(d3.event);
+        }
+      })
+      .on('mouseout', () => {
+        if (this.locked === true) { return; }
+        this.AllDeactivate();
+      })
+      .on('focus', () => {
+        if (this.locked === true) { return; }
+        this.handleHover(d3.event);
+        // don't show label gradient if too many labels
+        if (this.data.length < 8) {
+          // this.createGradientLabel(d3.event);
+        }
+      })
+      .on('focusout', () => {
+        if (this.locked === true) { return; }
+        this.AllDeactivate();
+      })
+  }
+
+  formatLabels(daysAgo): string {
+    switch (daysAgo) {
+      case 0:
+        return '24 hrs ago';
+        break;
+      default:
+        return `${daysAgo + 1} days ago`;
+    }
+  }
 
   renderGrid() {
     // create the X axis grid lines
@@ -194,22 +252,8 @@ export class SimpleLineGraphComponent implements OnChanges {
       .transition().duration(1000)
       .call(yAxis);
 
-
-    // tick Labels is responsible for converting the data to human readable
-    const tickLabels = this.xData.map(data => {
-      const daysPassed = data + 1;
-      switch (daysPassed) {
-        case 1:
-          return '24 hrs ago';
-          break;
-        default:
-          return `${daysPassed} days ago`;
-      }
-    }).reverse(); // because we reversed our data above, we need to reverse our labels as well
-    // might be able to flip this back when real data is piping in
-
     const xAxis = d3.axisBottom().ticks(this.data.length)
-      .tickSizeInner(10).tickSizeOuter(0).tickFormat((_d, i) => tickLabels[i])
+      .tickSizeInner(10).tickSizeOuter(0).tickFormat('')
       .scale(this.xScale);
 
     const x = this.svgSelection.selectAll('.x-axis').data([this.data]);
@@ -224,45 +268,45 @@ export class SimpleLineGraphComponent implements OnChanges {
       .filter(tick => tick === 0)
       .remove();
 
-    let tickLength = tickLabels.length; // make variable to reverse class assignment
-    this.svgSelection.selectAll('.x-axis .tick text')
-              // with real data we should be able to get rid of this and just use index
-      .attr('class', () => `label-text highlight-${(tickLength--) - 1}`)
-      .classed('turnt', () => {
-        return tickLabels.length > 7;
-      }).transition().duration(1000);
+    // let tickLength = tickLabels.length; // make variable to reverse class assignment
+    // this.svgSelection.selectAll('.x-axis .tick text')
+    //           // with real data we should be able to get rid of this and just use index
+    //   .attr('class', () => `label-text highlight-${(tickLength--) - 1}`)
+    //   .classed('turnt', () => {
+    //     return tickLabels.length > 7;
+    //   }).transition().duration(1000);
 
-    this.svgSelection.selectAll('.label-text')
-      .on('mouseenter', () => {
-          if ( this.locked === true ) { return; }
-          // this.attachTooltipAndRing(d3.event);
-          this.handleHover(d3.event);
-          // don't show label gradient if too many labels
-          if (this.data.length < 8) {
-            // this.createGradientLabel(d3.event);
-          }
-      })
-      .on('mouseout', () => {
-        if (this.locked === true) { return; }
-        this.AllDeactivate();
-      })
-      .on('click', () => {
-        if ( this.locked ) {
-          // if locked, check if the target matches the highlighted number
-          if ( !d3.event.target.classList
-              .contains(`highlight-${this.currentHighlightnum}`) ) { return; }
+    // this.svgSelection.selectAll('.label-text')
+    //   .on('mouseenter', () => {
+    //       if ( this.locked === true ) { return; }
+    //       // this.attachTooltipAndRing(d3.event);
+    //       this.handleHover(d3.event);
+    //       // don't show label gradient if too many labels
+    //       if (this.data.length < 8) {
+    //         // this.createGradientLabel(d3.event);
+    //       }
+    //   })
+    //   .on('mouseout', () => {
+    //     if (this.locked === true) { return; }
+    //     this.AllDeactivate();
+    //   })
+    //   .on('click', () => {
+    //     if ( this.locked ) {
+    //       // if locked, check if the target matches the highlighted number
+    //       if ( !d3.event.target.classList
+    //           .contains(`highlight-${this.currentHighlightnum}`) ) { return; }
 
-          this.allUnlock();
-        } else {
-          this.theToolTip.classed('active', false);
-          this.theHighlight.classed('lock', true);
-          // don't show labels gradient if too many labels
-          if (this.data.length < 8) {
-            this.theRectHighlight.classed('lock', true);
-          }
-          this.locked = true;
-        }
-      });
+    //       this.allUnlock();
+    //     } else {
+    //       this.theToolTip.classed('active', false);
+    //       this.theHighlight.classed('lock', true);
+    //       // don't show labels gradient if too many labels
+    //       if (this.data.length < 8) {
+    //         this.theRectHighlight.classed('lock', true);
+    //       }
+    //       this.locked = true;
+    //     }
+    //   });
   }
 
   handleHover(d3Event): void {
@@ -274,6 +318,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.locked = !this.locked;
 
   }
+
 
   // createGradientLabel(d3Event): void {
   //   const containerCoords = this.containerSelection.node().getBoundingClientRect();
@@ -301,7 +346,7 @@ export class SimpleLineGraphComponent implements OnChanges {
 
   getHoveredElement(d3Event): number {
     const classes = d3.select(d3Event.target).attr('class');
-    const match = classes.match(/highlight-([0-9]{1,2})/g)[0];
+    const match = classes.match(/elem-([0-9]{1,2})/g)[0];
     const num = match.split('-')[1];
     return num;
   }

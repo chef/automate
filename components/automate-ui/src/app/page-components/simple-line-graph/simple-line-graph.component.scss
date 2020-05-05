@@ -86,62 +86,97 @@
     }
   }
 
-  .rect-highlight {
+  // .rect-highlight {
+  //   position: absolute;
+  //   z-index: 5;
+  //   background: #3023AE;
+  //   background: linear-gradient(315deg, #3023AE, #C86DD7);
+  //   height: 16px;
+  //   border-radius: 4px;
+  //   opacity: 0;
+  //   visibility: hidden;
+  //   pointer-events: none;
+
+  //   display: flex;
+  //   align-items: center;
+  //   justify-content: center;
+
+  //   .rect-inner {
+  //     border-radius: 3px;
+  //     background: $chef-white;
+  //     width: calc(100% - 2px);
+  //     height: calc(100% - 2px);
+  //     font-size: 10px;
+  //     display: flex;
+  //     align-items: center;
+  //     justify-content: center;
+
+  //     opacity: 0;
+  //     visibility: hidden;
+  //     transition: opacity 0ms;
+  //   }
+
+  //   &.active,
+  //   &.lock,
+  //   &.active .rect-inner {
+  //     opacity: 1;
+  //     visibility: visible;
+  //     transition: opacity 500ms;
+  //   }
+
+  //   &.active .rect-inner {
+  //     transition: opacity 0ms;
+  //   }
+
+  //   // lock styles
+  //   &.lock,
+  //   &.lock.active {
+  //     opacity: 1;
+  //     visibility: visible;
+  //     transition: opacity 500ms;
+  //   }
+
+  //   &.lock .rect-inner,
+  //   &.lock.active .rect-inner {
+  //     color: white;
+  //     background-color: transparent;
+  //     opacity: 1;
+  //     visibility: visible;
+  //   }
+
+  // }
+
+  .graph-button {
     position: absolute;
     z-index: 5;
     background: #3023AE;
     background: linear-gradient(315deg, #3023AE, #C86DD7);
-    height: 16px;
+    // height: 16px;
+    padding: 1px;
     border-radius: 4px;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 1s;
+    cursor: pointer;
 
-    .rect-inner {
+    &.turnt {
+      font-size: 8px;
+      // potentially will need to be more flexible - so far ok
+      transform: rotate(-45deg) translate(-8px, 10px);
+    }
+
+    .inner {
       border-radius: 3px;
       background: $chef-white;
-      width: calc(100% - 2px);
-      height: calc(100% - 2px);
+      height: 16px;
       font-size: 10px;
+      font-family: 'muli';
+      padding: 4px 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0ms;
-    }
-
-    &.active,
-    &.lock,
-    &.active .rect-inner {
-      opacity: 1;
-      visibility: visible;
-      transition: opacity 500ms;
-    }
-
-    &.active .rect-inner {
-      transition: opacity 0ms;
-    }
-
-    // lock styles
-    &.lock,
-    &.lock.active {
-      opacity: 1;
-      visibility: visible;
-      transition: opacity 500ms;
-    }
-
-    &.lock .rect-inner,
-    &.lock.active .rect-inner {
-      color: white;
-      background-color: transparent;
-      opacity: 1;
-      visibility: visible;
+      pointer-events: none;
     }
 
   }
