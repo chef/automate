@@ -124,6 +124,26 @@ configure_retention() {
   }'
 }
 
+configure_automate_infra_views() {
+  if chef-automate dev grpcurl infra-proxy-service list | grep "chef.automate.domain.infra_proxy.service.InfraProxy" &> /dev/null; then
+      chef_server_admin_key=$(cat "/hab/chef-server-admin-key.txt")
+      chef-automate dev grpcurl infra-proxy-service -- chef.automate.domain.infra_proxy.service.InfraProxy.CreateServer -d '{
+        "id": "auto-deployed-chef-server",
+        "name": "auto-deployed-chef-server",
+        "fqdn": "localhost",
+        "ip_address": "127.0.0.1",
+      }'
+
+      chef-automate dev grpcurl infra-proxy-service -- chef.automate.domain.infra_proxy.service.InfraProxy.CreateOrg -d '{
+        "id": "auto-deployed-chef-server",
+        "name": "${chef_server_org}",
+        "admin_user": "${chef_server_admin_name}",
+        "admin_key": "${chef_server_admin_key}",
+        "server_id": "auto-deployed-chef-server",
+      }'
+  fi
+}
+
 if [[ "${airgapped}" == "false" ]]; then
     if ! command -v unzip &> /dev/null; then
         command -v apt-get &> /dev/null && apt-get install -y unzip
@@ -226,6 +246,9 @@ EOH
 
   berks install -b /tmp/.Berksfile -c /tmp/.berks.config.json
   berks upload -b /tmp/.Berksfile -c /tmp/.berks.config.json
+
+  # add record to automate infra views to pre-populate deployed chef server.
+  configure_automate_infra_views
 
   if [[ "${enable_workflow}" == "true" ]]; then
     if ! chef-server-ctl user-list | grep delivery &> /dev/null; then
