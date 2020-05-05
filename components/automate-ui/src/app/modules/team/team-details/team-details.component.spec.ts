@@ -177,7 +177,7 @@ describe('TeamDetailsComponent', () => {
 
       component.onProjectDropdownClosing(projects);
 
-      expect(component.updateNameForm.controls.projects.value).toEqual(projects);
+      expect(component.updateForm.controls.projects.value).toEqual(projects);
     });
   });
 });

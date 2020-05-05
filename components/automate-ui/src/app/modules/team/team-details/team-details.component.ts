@@ -42,7 +42,7 @@ export type TeamTabName = 'users' | 'details';
   styleUrls: ['./team-details.component.scss']
 })
 export class TeamDetailsComponent implements OnInit, OnDestroy {
-  public updateNameForm: FormGroup;
+  public updateForm: FormGroup;
   // isLoadingTeam represents the initial team load as well as subsequent updates in progress.
   public isLoadingTeam = true;
   public saveInProgress = false;
@@ -67,7 +67,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.updateNameForm = fb.group({
+    this.updateForm = fb.group({
       // Must stay in sync with error checks in team-details.component.html.
       // Also, initialize the form to disabled and enable after team load
       // to prevent people from typing before the team is fetched and have their
@@ -114,9 +114,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         (uStatus === EntityStatus.loading) ||
         (usersStatus === EntityStatus.loading);
       if (this.isLoadingTeam) {
-        this.updateNameForm.controls['name'].disable();
+        this.updateForm.controls['name'].disable();
       } else {
-        this.updateNameForm.controls['name'].enable();
+        this.updateForm.controls['name'].enable();
       }
     });
 
@@ -126,7 +126,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     ).subscribe((team) => {
       this.teamId = team.id;
       this.team = team;
-      this.updateNameForm.controls.name.setValue(this.team.name);
+      this.updateForm.controls.name.setValue(this.team.name);
       this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
       this.store.dispatch(new GetProjects());
     });
@@ -159,7 +159,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         this.saveInProgress = false;
         this.saveSuccessful = (state === EntityStatus.loadingSuccess);
         if (this.saveSuccessful) {
-          this.updateNameForm.markAsPristine();
+          this.updateForm.markAsPristine();
         }
       });
  }
@@ -191,9 +191,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   saveTeam(): void {
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    this.updateNameForm.controls['name'].disable();
-    const name: string = this.updateNameForm.controls.name.value.trim();
-    const projects: string[] = this.updateNameForm.controls.projects.value;
+    this.updateForm.controls['name'].disable();
+    const name: string = this.updateForm.controls.name.value.trim();
+    const projects: string[] = this.updateForm.controls.projects.value;
     this.store.dispatch(new UpdateTeam({ ...this.team, name, projects }));
   }
 
@@ -205,14 +205,14 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   onProjectDropdownClosing(selectedProjects: string[]): void {
 
-    this.updateNameForm.controls.projects.setValue(selectedProjects);
+    this.updateForm.controls.projects.setValue(selectedProjects);
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
-    if (xor(this.team.projects, this.updateNameForm.controls.projects.value).length === 0) {
-      this.updateNameForm.controls.projects.markAsPristine();
+    if (xor(this.team.projects, this.updateForm.controls.projects.value).length === 0) {
+      this.updateForm.controls.projects.markAsPristine();
     } else {
-      this.updateNameForm.controls.projects.markAsDirty();
+      this.updateForm.controls.projects.markAsDirty();
     }
 
   }
