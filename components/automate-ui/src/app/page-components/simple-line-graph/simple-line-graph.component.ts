@@ -24,7 +24,7 @@ export class SimpleLineGraphComponent implements OnChanges {
 
   public heightMargin = 40;
   public theHighlight;
-  public locked = false;
+  public locked: number = null;
   public currentHighlightnum: number;
 
   ////////   X AXIS ITEMS   ////////
@@ -120,6 +120,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.renderTooltips();
     this.renderRings();
     this.renderLabelButtons();
+    this.relock();
   }
 
   renderLine(): void {
@@ -137,7 +138,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     const points = this.svgSelection.selectAll('circle.point').data(this.data);
     points.exit().remove();
     points.enter().append('circle')
-        .attr('class', (_d,i) => `circle point highlight-${i}`)
+        .attr('class', (_d,i) => `point elem-${i}`)
         .merge(points)
         .transition().duration(1000)
         .attr('percent', ( d => d.percentage ) ) // must add this data AFTER the merge
@@ -154,7 +155,7 @@ export class SimpleLineGraphComponent implements OnChanges {
       .merge(rings)
       .attr('cx', d => this.xScale(d.daysAgo))
       .attr('cy', d => this.yScale(d.percentage))
-      .attr('r', 20);
+      .attr('r', 10);
   }
 
   renderTooltips() {
@@ -171,12 +172,11 @@ export class SimpleLineGraphComponent implements OnChanges {
   renderLabelButtons() {
     const labels = this.containerSelection.selectAll('.graph-button').data(this.data);
     labels.exit().remove();
-    labels.enter().append('div')
+    labels.enter().append('button')
       .attr('class', (_d, i) => `graph-button elem-${i}`)
-      .attr('tabindex', '0')
       .call(parent => {
         parent.append('div')
-          .attr('class', (_d, i) => `inner elem-${i}`);
+          .attr('class', (_d, i) => `inner elem-${i}`)
       })
       .merge(labels)
       .transition().duration(1000)
@@ -187,11 +187,11 @@ export class SimpleLineGraphComponent implements OnChanges {
           .text(p => this.formatLabels(p.daysAgo));
       });
 
+      // add all listeners
     this.containerSelection.selectAll('.graph-button')
       .classed('turnt', () => this.xData.length > 7)
 
       .on('mouseenter', () => {
-        if (this.locked === true) { return; }
         this.handleHover(d3.event);
         // don't show label gradient if too many labels
         if (this.data.length < 8) {
@@ -199,11 +199,10 @@ export class SimpleLineGraphComponent implements OnChanges {
         }
       })
       .on('mouseout', () => {
-        if (this.locked === true) { return; }
         this.AllDeactivate();
       })
+      // focus styles
       .on('focus', () => {
-        if (this.locked === true) { return; }
         this.handleHover(d3.event);
         // don't show label gradient if too many labels
         if (this.data.length < 8) {
@@ -211,9 +210,11 @@ export class SimpleLineGraphComponent implements OnChanges {
         }
       })
       .on('focusout', () => {
-        if (this.locked === true) { return; }
         this.AllDeactivate();
       })
+      .on('click', () => {
+        this.handleClick(d3.event);
+      });
   }
 
   formatLabels(daysAgo): string {
@@ -267,46 +268,6 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.svgSelection.selectAll('.tick')
       .filter(tick => tick === 0)
       .remove();
-
-    // let tickLength = tickLabels.length; // make variable to reverse class assignment
-    // this.svgSelection.selectAll('.x-axis .tick text')
-    //           // with real data we should be able to get rid of this and just use index
-    //   .attr('class', () => `label-text highlight-${(tickLength--) - 1}`)
-    //   .classed('turnt', () => {
-    //     return tickLabels.length > 7;
-    //   }).transition().duration(1000);
-
-    // this.svgSelection.selectAll('.label-text')
-    //   .on('mouseenter', () => {
-    //       if ( this.locked === true ) { return; }
-    //       // this.attachTooltipAndRing(d3.event);
-    //       this.handleHover(d3.event);
-    //       // don't show label gradient if too many labels
-    //       if (this.data.length < 8) {
-    //         // this.createGradientLabel(d3.event);
-    //       }
-    //   })
-    //   .on('mouseout', () => {
-    //     if (this.locked === true) { return; }
-    //     this.AllDeactivate();
-    //   })
-    //   .on('click', () => {
-    //     if ( this.locked ) {
-    //       // if locked, check if the target matches the highlighted number
-    //       if ( !d3.event.target.classList
-    //           .contains(`highlight-${this.currentHighlightnum}`) ) { return; }
-
-    //       this.allUnlock();
-    //     } else {
-    //       this.theToolTip.classed('active', false);
-    //       this.theHighlight.classed('lock', true);
-    //       // don't show labels gradient if too many labels
-    //       if (this.data.length < 8) {
-    //         this.theRectHighlight.classed('lock', true);
-    //       }
-    //       this.locked = true;
-    //     }
-    //   });
   }
 
   handleHover(d3Event): void {
@@ -314,35 +275,18 @@ export class SimpleLineGraphComponent implements OnChanges {
     d3.selectAll(`.elem-${num}`).classed('active', true);
   }
 
-  toggleLock(): void {
-    this.locked = !this.locked;
-
+  handleClick(d3Event): void {
+    const num = this.getHoveredElement(d3Event);
+    const isAlreadyLocked = d3.selectAll(`.elem-${num}`).classed('lock');
+    if ( isAlreadyLocked ) {
+      d3.selectAll(`.elem-${num}`).classed('lock', false);
+      this.locked = null;
+    } else {
+      d3.selectAll('.lock').classed('lock', false);
+      d3.selectAll(`.elem-${num}`).classed('lock', true);
+      this.locked = num;
+    }
   }
-
-
-  // createGradientLabel(d3Event): void {
-  //   const containerCoords = this.containerSelection.node().getBoundingClientRect();
-  //   // For the rectangle ring highlighter
-  //   // Find the class to match with label
-  //   // const highlightNum = this.getClassHighlightNumber(d3Event);
-  //   // get the text content from the label
-  //   // const text = d3.select(`.label-text.highlight-${highlightNum}`).text();
-  //   // generate the box highlight ring size
-  //   const textBounds = d3
-  //     // .select(`.label-text.highlight-${highlightNum}`).node().getBoundingClientRect();
-
-  //   const rectWidth = textBounds.width + 16;
-  //   const posLeft = (textBounds.x - containerCoords.x) - 8;
-  //   const posBottom = (containerCoords.bottom - textBounds.bottom) - 3;
-
-  //   // apply the highlight styles
-  //   this.theRectHighlight.select('.rect-inner').text(() => text);
-  //   this.theRectHighlight
-  //     .style('left', `${posLeft}px`)
-  //     .style('bottom', `${posBottom}px`)
-  //     .style('width', `${rectWidth}px`)
-  //     .classed('active', true);
-  // }
 
   getHoveredElement(d3Event): number {
     const classes = d3.select(d3Event.target).attr('class');
@@ -351,13 +295,20 @@ export class SimpleLineGraphComponent implements OnChanges {
     return num;
   }
 
+  relock(): void {
+    console.log(this.locked);
+    if (this.locked) {
+      console.log('isLocked');
+      d3.selectAll(`.elem-${this.locked}`).classed('lock', true);
+    }
+  }
+
   AllDeactivate(): void {
     d3.selectAll('.active').classed('active', false); // deactivate any active items on page
   }
 
   allUnlock(): void {
     d3.selectAll('.lock').classed('lock', false); // unlock any locked items on page
-    this.locked = false;
   }
 
   AllUnlockDeactivate(): void {
