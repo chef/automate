@@ -13,6 +13,7 @@ import {
   defaultRouterState,
   defaultRouterRouterState
 } from 'app/ngrx.reducers';
+import { using } from 'app/testing/spec-helpers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { Project } from 'app/entities/projects/project.model';
@@ -160,6 +161,34 @@ describe('ApiTokenDetailsComponent', () => {
     expect(component.updateForm.controls.projects.pristine).toEqual(false);
     component.onProjectDropdownClosing([ 'b-proj', 'd-proj']);
     expect(component.updateForm.controls.projects.pristine).toEqual(true);
+  });
+
+  using([
+    ['no projects', []],
+    ['one project', ['proj-one']],
+    ['multiple projects', ['p1', 'p2', 'p3', 'p4']]
+  ], function (description: string, projects: string[]) {
+    it(`initializes dropdown with those included on the team for ${description}`, () => {
+      store.dispatch(new GetTokenSuccess({ ...someToken, projects }));
+
+      expect(component.token.projects).toEqual(projects);
+    });
+  });
+
+  using([
+    ['no projects', []],
+    ['one project', ['proj-one']],
+    ['multiple projects', ['p1', 'p2', 'p3', 'p4']]
+  ], function (description: string, projects: string[]) {
+    it(`transfers result from closing dropdown into form for ${description}`, () => {
+      const originalProjects = ['to-be-overwritten'];
+      store.dispatch(new GetTokenSuccess({ ...someToken, projects: originalProjects }));
+      expect(component.token.projects).toEqual(originalProjects);
+
+      component.onProjectDropdownClosing(projects);
+
+      expect(component.updateForm.controls.projects.value).toEqual(projects);
+    });
   });
 
   function genProject(id: string): Project {
