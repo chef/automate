@@ -1,7 +1,7 @@
 +++
 title = "Data Feed"
 description = "Exporting Node Data from Chef Client Runs to External Data Collectors"
-date = 
+date = 2020-05-05T13:19:02-07:00
 draft = true
 bref = ""
 toc = true
@@ -18,7 +18,7 @@ The following types of information are sent:
  
  - Ohai data gathered from each node being managed, this includes HW, OS and installed program information, there is some variation depending on the OS being managed
  - Configuration information about each node being managed, this includes Chef Client Run status, Runlists, Cookbooks, Recipes being run against each node
- - Compliance information about each node to show it’s compliance state, this includes passed and failed controls for each profile executed against the node
+ - Compliance information about each node that shows the compliance state, this includes passed and failed controls for each profile executed against that node
 
 The Data Feed is not a Data Tap, it operates by doing the following:
 
@@ -45,11 +45,7 @@ To add an endpoint for a Data Feed in Chef Automate:
 1. Use the **Test Data Feed** button to validate the connection details
 1. Once the Test is successful, use the **Create Data Feed** button to save your Data Feed Configuration
 
-![Saved Data Feed Page](/images/docs/saved_data_feed.png)
-
 ### Edit a Data Feed Endpoint
-
-![Edit Data Feed Page](/images/docs/edit_data_feed.png)
 
 To edit an Endpoint for a Data Feed in Chef Automate:
 
@@ -58,8 +54,6 @@ To edit an Endpoint for a Data Feed in Chef Automate:
 1. Use the **Save** button to save the Data Feed.
 
 ### Delete a Data Feed Endpoint
-
-![Delete Data Feed Page](/images/docs/option_delete_datafeed.png)
 
 To delete an Endpoint for a Data Feed in Chef Automate:
 
