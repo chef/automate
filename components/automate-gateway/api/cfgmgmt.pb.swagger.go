@@ -530,6 +530,20 @@ func init() {
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "start",
+            "description": "Earliest node check-in.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end",
+            "description": "Latest node check-in.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
