@@ -68,10 +68,12 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: transform 1s;
 
     &.active {
       background: #3023AE;
       background: linear-gradient(315deg, #3023AE, #C86DD7);
+      transition: background 500ms, color 500ms;
     }
     
     &.turnt {

@@ -12,11 +12,7 @@
         </select>
       </div>
 
-      <!-- <div *ngIf="days && days.length > 0"> -->
-          <app-simple-line-graph
-          [data]="fakeData"
-          ></app-simple-line-graph>
-      <!-- </div> -->
+      <app-simple-line-graph [data]="days"></app-simple-line-graph>
 
     </main>
   </div>

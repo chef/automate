@@ -1,5 +1,5 @@
 import {
-  Component, Input, OnChanges, ViewChild, ElementRef
+  Component, Input, OnChanges, ViewChild, ElementRef, SimpleChanges
 } from '@angular/core';
 import * as d3 from 'd3';
 import {
@@ -161,7 +161,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     tooltips.enter().append('div')
       .attr('class', (_d, i: number) => `graph-tooltip elem-${i}`)
       .merge(tooltips)
-      .text(d => `Checked in ${d.percentage}%`)
+      .text(d => `Checked in ${Math.round(d.percentage)}%`)
       .style('left', (d, i: number) => {
         const left = thisScale(d.daysAgo);
         if ( i === 0 ) { return `${localWidth + this.margin.right}px`; }
@@ -332,8 +332,10 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.width = this.chart.nativeElement.getBoundingClientRect().width;
   }
 
-  ngOnChanges() {
-    this.renderChart();
+  ngOnChanges(changes: SimpleChanges) {
+    if ( changes.data && !changes.data.firstChange ) {
+      this.renderChart();
+    }
   }
 
 }
