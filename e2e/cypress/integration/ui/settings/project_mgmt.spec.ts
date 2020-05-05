@@ -1,4 +1,4 @@
-import { Project } from '../../../support/types';
+import { Project, Rule } from '../../../support/types';
 
 describe('project management', () => {
 
@@ -189,13 +189,61 @@ describe('project management', () => {
     cy.get('app-project-details h1.page-title').contains(updatedProjectName);
   });
 
-  it('can delete a project', () => {
+  it('cannot delete a project with rules', () => {
+    const rule: Rule = {
+      id: `${cypressPrefix}-rule`,
+      name: 'test rule',
+      project_id: customWithoutPolsProjectID,
+      type: 'NODE',
+      conditions: [
+        {
+          attribute: 'CHEF_ORGANIZATION',
+          operator: 'EQUALS',
+          values: ['foo']
+        }
+      ]
+    };
+    // add rule via the API to save time,
+    // since we test rules more thoroughly in project_rule_mgmt.spec.ts
+    cy.request({
+      auth: { bearer: adminIdToken },
+      method: 'POST',
+      url: `/apis/iam/v2/projects/${customWithoutPolsProjectID}/rules`,
+      body: rule
+    }).then((response) => {
+      expect(response.status).to.equal(200);
+    });
+
+    // navigate back to the project list page and get latest project data
     cy.route('GET', '/apis/iam/v2/projects').as('getProjects');
     cy.get('.breadcrumb').click();
-
     cy.wait('@getProjects');
 
     cy.get('app-project-list chef-td').contains(customWithoutPolsProjectID).parent()
+      .find('.mat-select-trigger').as('controlMenu');
+
+    // we throw in a `should` so cypress retries until introspection allows menu to be shown
+    cy.get('@controlMenu').scrollIntoView().should('be.visible')
+      .click();
+    cy.get('[data-cy=delete-project]').should('be.visible')
+      .click();
+
+    cy.get('app-project-list app-message-modal')
+      .contains('Could Not Delete Project').should('be.visible');
+
+    //  close modal
+    cy.get('app-project-list app-message-modal chef-button:first').click();
+
+    // delete rule
+    cy.request({
+      auth: { bearer: adminIdToken },
+      method: 'DELETE',
+      url: `/apis/iam/v2/projects/${customWithoutPolsProjectID}/rules/${rule.id}`
+    });
+  });
+
+  it('can delete a project without rules', () => {
+    cy.get('app-project-list chef-td').contains(customWithPolsProjectID).parent()
       .find('.mat-select-trigger').as('controlMenu');
 
     // we throw in a `should` so cypress retries until introspection allows menu to be shown
@@ -208,7 +256,7 @@ describe('project management', () => {
     cy.get('app-project-list chef-button').contains('Delete Project').click();
 
     // verify success notification and then dismiss it
-    cy.get('app-notification.info').contains(`Deleted project ${customWithoutPolsProjectID}`);
+    cy.get('app-notification.info').contains(`Deleted project ${customWithPolsProjectID}`);
     cy.get('app-notification.info chef-icon').click();
 
     // Once we get this notification we know the network call to delete succeeded,
@@ -225,7 +273,7 @@ describe('project management', () => {
         // otherwise, check that the projectID is no longer in the table
       } else {
         cy.get('app-project-list chef-tbody chef-td')
-          .contains(customWithoutPolsProjectID).should('not.exist');
+          .contains(customWithPolsProjectID).should('not.exist');
       }
     });
   });
