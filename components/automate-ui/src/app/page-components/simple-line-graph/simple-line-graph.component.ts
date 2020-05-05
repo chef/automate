@@ -2,6 +2,9 @@ import {
   Component, Input, OnChanges, ViewChild, ElementRef
 } from '@angular/core';
 import * as d3 from 'd3';
+import {
+  DayPercentage
+} from 'app/entities/desktop/desktop.model';
 
 
 @Component({
@@ -17,10 +20,10 @@ export class SimpleLineGraphComponent implements OnChanges {
   ) {}
 
   @ViewChild('svg', {static: true}) svg: ElementRef;
-  @Input() data: any = [];
+  @Input() data: DayPercentage[] = [];
   @Input() width = 900;
   @Input() height = 156; // we want a 116px height on the ticks, this minus margins
-  public locked: number = null;
+  private locked: number = null;
 
   get margin() {
     return { right: 20, left: 20, top: 20, bottom: 20 };
@@ -95,7 +98,7 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
     ////////////////// RENDER FUNCTIONS ////////////////////
-  renderChart() {
+  private renderChart() {
     this.AllUnlockDeactivate();
     this.resizeChart();
     this.renderGrid();
@@ -107,7 +110,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.relock();
   }
 
-  renderLine(): void {
+  private renderLine(): void {
     // create the line using path function
     const line = this.createPath(this.data);
 
@@ -118,7 +121,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     .attr('d', line);
   }
 
-  renderPoints(): void {
+  private renderPoints(): void {
     const points = this.svgSelection.selectAll('circle.point')
       .data(this.data, d => d.daysAgo);
     points.exit().remove();
@@ -132,7 +135,7 @@ export class SimpleLineGraphComponent implements OnChanges {
         .attr('r', 4);
   }
 
-  renderRings(): void {
+  private renderRings(): void {
     const rings = this.svgSelection.selectAll('circle.ring')
       .data(this.data, d => d.daysAgo);
     rings.exit().remove();
@@ -144,7 +147,7 @@ export class SimpleLineGraphComponent implements OnChanges {
       .attr('r', 10);
   }
 
-  renderTooltips(): void {
+  private renderTooltips(): void {
     // these numbers are specific to its container
     const localWidth = this.width - this.margin.right - this.margin.left - 34;
     const thisRange = [localWidth, -this.margin.right];
@@ -167,7 +170,7 @@ export class SimpleLineGraphComponent implements OnChanges {
       .style('top', d => `${this.yScale(d.percentage) + this.margin.top}px`);
   }
 
-  renderLabelButtons(): void {
+  private renderLabelButtons(): void {
     // these numbers are specific to its container
     const thisRange = [this.width - 48, 53];
     const thisScale = d3.scaleLinear()
@@ -233,7 +236,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     }
   }
 
-  renderGrid() {
+  private renderGrid() {
     // create the X axis grid lines
     const xGrid = d3.axisTop()
       .ticks(this.data.length)
@@ -277,12 +280,12 @@ export class SimpleLineGraphComponent implements OnChanges {
       .remove();
   }
 
-  handleHover(d3Event): void {
+  private handleHover(d3Event): void {
     const num = this.getHoveredElement(d3Event);
     d3.selectAll(`.elem-${num}`).classed('active', true);
   }
 
-  handleClick(d3Event): void {
+  private handleClick(d3Event): void {
     const num = this.getHoveredElement(d3Event);
     const isAlreadyLocked = d3.selectAll(`.elem-${num}`).classed('lock');
     if ( isAlreadyLocked ) {
@@ -295,28 +298,28 @@ export class SimpleLineGraphComponent implements OnChanges {
     }
   }
 
-  getHoveredElement(d3Event): number {
+  private getHoveredElement(d3Event): number {
     const classes = d3.select(d3Event.target).attr('class');
     const match = classes.match(/elem-([0-9]{1,2})/g)[0];
     const num = match.split('-')[1];
     return num;
   }
 
-  relock(): void {
+  private relock(): void {
     if (this.locked) {
       d3.selectAll(`.elem-${this.locked}`).classed('lock', true);
     }
   }
 
-  AllDeactivate(): void {
+  private AllDeactivate(): void {
     d3.selectAll('.active').classed('active', false);
   }
 
-  allUnlock(): void {
+  private allUnlock(): void {
     d3.selectAll('.lock').classed('lock', false);
   }
 
-  AllUnlockDeactivate(): void {
+  private AllUnlockDeactivate(): void {
     this.allUnlock();
     this.AllDeactivate();
   }
@@ -325,7 +328,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.renderChart();
   }
 
-  resizeChart(): void {
+  private resizeChart(): void {
     this.width = this.chart.nativeElement.getBoundingClientRect().width;
   }
 
