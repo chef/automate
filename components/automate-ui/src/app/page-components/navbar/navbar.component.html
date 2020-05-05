@@ -5,7 +5,14 @@
         <a tabindex="0" routerLink="/" class="logo" title="logo link to homepage"></a>
       </div>
       <div class="navigation-menu">
-        <div role="menuitem" class="nav-link"><a routerLink="/dashboards/event-feed" routerLinkActive="active" tabindex="0">Dashboards</a></div>
+        <app-authorized [allOf]="[
+            ['/api/v0/eventfeed', 'get'],
+            ['/api/v0/eventstrings', 'get'],
+            ['/api/v0/event_type_counts', 'get'],
+            ['/api/v0/event_task_counts', 'get'],
+            ['/api/v0/cfgmgmt/suggestions', 'get']]">
+          <div role="menuitem" class="nav-link"><a routerLink="/dashboards/event-feed" routerLinkActive="active" tabindex="0">Dashboards</a></div>
+        </app-authorized>
 
         <app-authorized [allOf]="[
             ['/api/v0/applications/services', 'get'],
