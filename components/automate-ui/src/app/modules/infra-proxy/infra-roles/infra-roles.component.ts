@@ -43,8 +43,8 @@ export class InfraRolesComponent implements OnInit {
       this.store.select(getAllRolesForOrgStatus),
       this.store.select(allInfraRoles)
     ]).pipe(
-      filter(([getRolesSt, _allInfraRolesState]) =>
-        getRolesSt === EntityStatus.loadingSuccess && !isNil(_allInfraRolesState))
+      filter(([getRolesSt, allInfraRolesState]) =>
+        getRolesSt === EntityStatus.loadingSuccess && !isNil(allInfraRolesState))
     ).subscribe(([ _getRolesSt, allInfraRolesState]) => {
       this.roles = allInfraRolesState;
       this.rolesListLoading = false;

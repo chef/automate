@@ -1,4 +1,3 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InfraRolesComponent } from './infra-roles.component';
@@ -42,8 +41,7 @@ describe('InfraRolesComponent', () => {
         ReactiveFormsModule,
         RouterTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
-      ],
-      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+      ]
     })
     .compileComponents();
   }));
