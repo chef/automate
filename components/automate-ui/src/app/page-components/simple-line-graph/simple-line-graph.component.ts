@@ -30,18 +30,18 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
   ////////   X AXIS ITEMS   ////////
   // maps all of our x data points
-  get xData() {
+  get xData(): number[] {
     return this.data.map(d => d.daysAgo);
   }
   // determines how wide the graph should be to hold our data
   // in its respective area;
-  get rangeX() {
+  get rangeX(): [number, number] {
     const min = this.margin.left;
     const max = this.width - this.margin.right;
     return [max, min];  // we want to plot our data backwards, so we reverse [min, max]
   }
   // determines the min and max values of the x axis
-  get domainX() {
+  get domainX(): [number, number] {
     const min = Math.min(...this.xData);
     const max = Math.max(...this.xData);
     return [min, max];
@@ -55,13 +55,13 @@ export class SimpleLineGraphComponent implements OnChanges {
 
 
   ////////   Y AXIS ITEMS   ////////
-  get rangeY() {
+  get rangeY(): [number, number] {
     const min = this.margin.top;
     const max = this.height - this.margin.bottom;
     return [max, min];
   }
 
-  get domainY() {
+  get domainY(): [number, number] {
     const min = 0;
     const max = 100; // since this based on a percentage we are doing 0 to 100;
     return [min, max];
@@ -159,10 +159,10 @@ export class SimpleLineGraphComponent implements OnChanges {
       .data(this.data, d => d.daysAgo);
     tooltips.exit().remove();
     tooltips.enter().append('div')
-      .attr('class', (_d, i) => `graph-tooltip elem-${i}`)
+      .attr('class', (_d, i: number) => `graph-tooltip elem-${i}`)
       .merge(tooltips)
       .text(d => `Checked in ${d.percentage}%`)
-      .style('left', (d, i) => {
+      .style('left', (d, i: number) => {
         const left = thisScale(d.daysAgo);
         if ( i === 0 ) { return `${localWidth + this.margin.right}px`; }
         return `${left}px`;
@@ -183,15 +183,15 @@ export class SimpleLineGraphComponent implements OnChanges {
     labels.enter().append('button')
       .call(parent => {
         parent.append('div')
-          .attr('class', (_d, i) => `inner elem-${i}`);
+          .attr('class', (_d, i: number) => `inner elem-${i}`);
       })
-      .attr('class', (_d, i) => `graph-button elem-${i}`)
+      .attr('class', (_d, i: number) => `graph-button elem-${i}`)
       .merge(labels)
       .transition().duration(0)
         .style('bottom', `${this.margin.bottom / 2}px`)
       .transition().duration(1000)
         .style('bottom', `${this.margin.bottom / 2}px`)
-        .style('left', (d) => {
+        .style('left', d => {
           if ( this.xData.length > 7 ) {
             return `${this.xScale(d.daysAgo) - 30}px`;
           } else {
