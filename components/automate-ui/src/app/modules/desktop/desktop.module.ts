@@ -8,6 +8,7 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { DailyCheckInComponent } from './daily-check-in/daily-check-in.component';
 import { CheckInTimeSeriesComponent } from './check-in-time-series/check-in-time-series.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { SimpleLineGraphComponent } from 'app/page-components/simple-line-graph/simple-line-graph.component';
 import { TopErrorsComponent } from './top-errors/top-errors.component';
 import {
   UnknownDesktopDurationCountsComponent
@@ -15,9 +16,6 @@ import {
 import { InsightComponent } from './insight/insight.component';
 import { DesktopRoutingModule } from './desktop-routing.module';
 
-import {
-  SimpleLineGraphComponent
-} from 'app/page-components/simple-line-graph/simple-line-graph.component';
 
 @NgModule({
   imports: [
@@ -29,22 +27,22 @@ import {
     ChefPipesModule
   ],
   exports: [
+    CheckInTimeSeriesComponent,
     DailyCheckInComponent,
     DashboardComponent,
-    CheckInTimeSeriesComponent,
-    TopErrorsComponent,
-    UnknownDesktopDurationCountsComponent,
     InsightComponent,
-    SimpleLineGraphComponent
+    SimpleLineGraphComponent,
+    TopErrorsComponent,
+    UnknownDesktopDurationCountsComponent
   ],
   declarations: [
+    CheckInTimeSeriesComponent,
     DailyCheckInComponent,
     DashboardComponent,
-    CheckInTimeSeriesComponent,
-    TopErrorsComponent,
-    UnknownDesktopDurationCountsComponent,
     InsightComponent,
-    SimpleLineGraphComponent
+    SimpleLineGraphComponent,
+    TopErrorsComponent,
+    UnknownDesktopDurationCountsComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
