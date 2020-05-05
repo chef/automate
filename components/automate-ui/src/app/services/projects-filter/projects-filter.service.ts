@@ -43,8 +43,12 @@ export class ProjectsFilterService {
     this.store.dispatch(new UpdateSelectionCount(options));
   }
 
-  storeOptions(options: ProjectsFilterOption[]) {
+  updateLocalstorage(options: ProjectsFilterOption[]) {
     localStorage.setItem(STORE_OPTIONS_KEY, JSON.stringify(options));
+  }
+
+  storeOptions(options: ProjectsFilterOption[]) {
+    this.updateLocalstorage(options);
 
     // To get back to where we are
     const currentUrl = location.pathname + location.search;
