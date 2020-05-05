@@ -9,3 +9,10 @@
     margin-top: 42px;
   }
 }
+
+::ng-deep .mat-select-panel {
+  position: relative;
+  margin-top: 36px;
+  right: 62px;
+  width: 54px;
+}
