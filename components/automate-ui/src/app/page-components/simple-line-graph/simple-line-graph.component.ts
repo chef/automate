@@ -127,7 +127,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     // create the line using path function
     const line = this.createPath(this.data);
 
-    const theLine = this.svgSelection.selectAll('.line').data([this.data]);
+    const theLine = this.svgSelection.selectAll('.line').data([this.data],d => d.daysAgo);
     theLine.exit().remove();
     theLine.enter().append('path').attr('class', 'line').merge(theLine)
     .transition().duration(1000)
@@ -135,7 +135,8 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   renderPoints(): void {
-    const points = this.svgSelection.selectAll('circle.point').data(this.data);
+    const points = this.svgSelection.selectAll('circle.point')
+      .data(this.data, d => d.daysAgo);
     points.exit().remove();
     points.enter().append('circle')
         .attr('class', (_d,i) => `point elem-${i}`)
@@ -148,7 +149,8 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   renderRings(): void {
-    const rings = this.svgSelection.selectAll('circle.ring').data(this.data);
+    const rings = this.svgSelection.selectAll('circle.ring')
+      .data(this.data, d => d.daysAgo);
     rings.exit().remove();
     rings.enter().append('circle')
       .attr('class', (_d, i) => `ring elem-${i}`)
@@ -159,7 +161,8 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   renderTooltips() {
-    const tooltips = this.containerSelection.selectAll('div.graph-tooltip').data(this.data);
+    const tooltips = this.containerSelection.selectAll('div.graph-tooltip')
+      .data(this.data, d => d.daysAgo);
     tooltips.exit().remove();
     tooltips.enter().append('div')
       .attr('class', (_d, i) => `graph-tooltip elem-${i}`)
@@ -170,14 +173,15 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   renderLabelButtons() {
-    const labels = this.containerSelection.selectAll('.graph-button').data(this.data);
+    const labels = this.containerSelection.selectAll('.graph-button')
+    .data(this.data, d => d.daysAgo);
     labels.exit().remove();
     labels.enter().append('button')
-      .attr('class', (_d, i) => `graph-button elem-${i}`)
       .call(parent => {
         parent.append('div')
-          .attr('class', (_d, i) => `inner elem-${i}`)
+          .attr('class', (_d, i) => `inner elem-${i}`);
       })
+      .attr('class', (_d, i) => `graph-button elem-${i}`)
       .merge(labels)
       .transition().duration(1000)
       .style('top', `calc(100% - ${this.heightMargin}px)`)
@@ -193,10 +197,6 @@ export class SimpleLineGraphComponent implements OnChanges {
 
       .on('mouseenter', () => {
         this.handleHover(d3.event);
-        // don't show label gradient if too many labels
-        if (this.data.length < 8) {
-          // this.createGradientLabel(d3.event);
-        }
       })
       .on('mouseout', () => {
         this.AllDeactivate();
@@ -204,10 +204,6 @@ export class SimpleLineGraphComponent implements OnChanges {
       // focus styles
       .on('focus', () => {
         this.handleHover(d3.event);
-        // don't show label gradient if too many labels
-        if (this.data.length < 8) {
-          // this.createGradientLabel(d3.event);
-        }
       })
       .on('focusout', () => {
         this.AllDeactivate();
