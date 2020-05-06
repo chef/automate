@@ -6,12 +6,14 @@ option go_package = "github.com/chef/automate/api/external/cfgmgmt";
 // Local request & response messages
 import "api/external/cfgmgmt/request/actions.proto";
 import "api/external/cfgmgmt/request/nodes.proto";
+import "api/external/cfgmgmt/request/rollouts.proto";
 import "api/external/cfgmgmt/request/stats.proto";
 import "api/external/cfgmgmt/request/errors.proto";
 import "api/external/cfgmgmt/request/root.proto";
 
 import "api/external/cfgmgmt/response/actions.proto";
 import "api/external/cfgmgmt/response/nodes.proto";
+import "api/external/cfgmgmt/response/rollouts.proto";
 import "api/external/cfgmgmt/response/stats.proto";
 import "api/external/cfgmgmt/response/errors.proto";
 
@@ -396,6 +398,132 @@ service ConfigMgmt {
   */
   rpc GetNodeRunsDailyStatusTimeSeries(cfgmgmt.request.NodeRunsDailyStatusTimeSeries) returns (cfgmgmt.response.NodeRunsDailyStatusTimeSeries) {
     option (google.api.http).get = "/api/v0/cfgmgmt/node_runs_daily_status_time_series";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  }
+
+  /*
+  CreateRollout
+
+  Creates a Rollout record. A rollout represents the process of nodes acquiring
+  the latest policy revision pushed to a policy group.
+
+  Authorization Action:
+  ```
+  ingest:unifiedEvents:create
+  ```
+  */
+  rpc CreateRollout(cfgmgmt.request.CreateRollout) returns (cfgmgmt.response.CreateRollout) {
+    option (google.api.http) = {
+      post: "/beta/cfgmgmt/rollouts/create"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "ingest:unifiedEvents";
+    option (chef.automate.api.iam.policy).action = "ingest:unifiedEvents:create";
+  };
+
+  /*
+  GetRollouts
+
+  Gives a list of rollouts
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc GetRollouts(cfgmgmt.request.Rollouts) returns (cfgmgmt.response.Rollouts) {
+    option (google.api.http).get = "/beta/cfgmgmt/rollouts/list";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  }
+
+  /*
+  GetRolloutsProgress
+
+  Provides the progress of rollouts. 
+
+  For each Chef Server, Policy Name, and
+  Policy Group, provides a count of nodes according to which policy revision
+  the node applied on its most recent run. 
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc GetRolloutsProgress(cfgmgmt.request.RolloutsProgress) returns (cfgmgmt.response.RolloutsProgress) {
+    option (google.api.http).get = "/beta/cfgmgmt/rollouts/progress";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+
+  /*
+  GetRolloutById
+
+  Returns the rollout with the given Id
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc GetRolloutById(cfgmgmt.request.RolloutById) returns (cfgmgmt.response.Rollout) {
+    option (google.api.http).get = "/beta/cfgmgmt/rollouts/rollout/{rollout_id}";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+
+  /*
+  GetRolloutForChefRun
+
+  Returns the rollout for the given Chef Server/org, policy group, policy name, and policy revision
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc GetRolloutForChefRun(cfgmgmt.request.RolloutForChefRun) returns (cfgmgmt.response.Rollout) {
+    option (google.api.http).get = "/beta/cfgmgmt/rollouts/find";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+
+  /*
+  DeleteRolloutsByAge
+
+  Deletes all rollouts older than the specified age.
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc DeleteRolloutsByAge(cfgmgmt.request.DeleteRolloutsByAge) returns (cfgmgmt.response.DeleteRolloutsByAge) {
+    option (google.api.http) = {
+      post: "/beta/cfgmgmt/rollouts/delete_by_age"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  }
+
+  /*
+  ArchiveRollouts
+
+  Marks the selected rollouts as "hidden" so they will not be shown in the UI.
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc ArchiveRollouts(cfgmgmt.request.ArchiveRollouts) returns (cfgmgmt.response.ArchiveRollouts) {
+    option (google.api.http) = {
+      post: "/beta/cfgmgmt/rollouts/archive"
+      body: "*"
+    };
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }

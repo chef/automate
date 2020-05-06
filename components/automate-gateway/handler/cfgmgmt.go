@@ -415,6 +415,35 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context, request *sharedReq.S
 	return s.cfgMgmtClient.GetSuggestions(ctx, &sugRequest)
 }
 
+func (a *CfgMgmtServer) CreateRollout(context.Context, *cfgReq.CreateRollout) (*cfgRes.CreateRollout, error) {
+	// TODO
+	return nil, nil
+}
+func (a *CfgMgmtServer) GetRollouts(context.Context, *cfgReq.Rollouts) (*cfgRes.Rollouts, error) {
+	// TODO
+	return nil, nil
+}
+func (a *CfgMgmtServer) GetRolloutsProgress(context.Context, *cfgReq.RolloutsProgress) (*cfgRes.RolloutsProgress, error) {
+	// TODO
+	return nil, nil
+}
+func (a *CfgMgmtServer) GetRolloutById(context.Context, *cfgReq.RolloutById) (*cfgRes.Rollout, error) {
+	// TODO
+	return nil, nil
+}
+func (a *CfgMgmtServer) GetRolloutForChefRun(context.Context, *cfgReq.RolloutForChefRun) (*cfgRes.Rollout, error) {
+	// TODO
+	return nil, nil
+}
+func (a *CfgMgmtServer) DeleteRolloutsByAge(context.Context, *cfgReq.DeleteRolloutsByAge) (*cfgRes.DeleteRolloutsByAge, error) {
+	// TODO
+	return nil, nil
+}
+func (a *CfgMgmtServer) ArchiveRollouts(context.Context, *cfgReq.ArchiveRollouts) (*cfgRes.ArchiveRollouts, error) {
+	// TODO
+	return nil, nil
+}
+
 func (a *CfgMgmtServer) NodeExport(*cfgReq.NodeExport, cfgService.ConfigMgmt_NodeExportServer) error {
 	// Please see components/automate-gateway/services.go configMgmtNodeExportHandler for implementation
 	return nil

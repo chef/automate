@@ -666,9 +666,185 @@ func init() {
           "hidden"
         ]
       }
+    },
+    "/beta/cfgmgmt/rollouts/archive": {
+      "post": {
+        "summary": "ArchiveRollouts",
+        "description": "Marks the selected rollouts as \"hidden\" so they will not be shown in the UI.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "ArchiveRollouts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ArchiveRollouts"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.ArchiveRollouts"
+            }
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/beta/cfgmgmt/rollouts/create": {
+      "post": {
+        "summary": "CreateRollout",
+        "description": "Creates a Rollout record. A rollout represents the process of nodes acquiring\nthe latest policy revision pushed to a policy group.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ningest:unifiedEvents:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "CreateRollout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CreateRollout"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.CreateRollout"
+            }
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/beta/cfgmgmt/rollouts/delete_by_age": {
+      "post": {
+        "summary": "DeleteRolloutsByAge",
+        "description": "Deletes all rollouts older than the specified age.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "DeleteRolloutsByAge",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.DeleteRolloutsByAge"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.DeleteRolloutsByAge"
+            }
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/beta/cfgmgmt/rollouts/find": {
+      "get": {
+        "summary": "GetRolloutForChefRun",
+        "description": "Returns the rollout for the given Chef Server/org, policy group, policy name, and policy revision\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetRolloutForChefRun",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout"
+            }
+          }
+        },
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/beta/cfgmgmt/rollouts/list": {
+      "get": {
+        "summary": "GetRollouts",
+        "description": "Gives a list of rollouts\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetRollouts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollouts"
+            }
+          }
+        },
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/beta/cfgmgmt/rollouts/progress": {
+      "get": {
+        "summary": "GetRolloutsProgress",
+        "description": "Provides the progress of rollouts. \n\nFor each Chef Server, Policy Name, and\nPolicy Group, provides a count of nodes according to which policy revision\nthe node applied on its most recent run. \n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetRolloutsProgress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RolloutsProgress"
+            }
+          }
+        },
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/beta/cfgmgmt/rollouts/rollout/{rollout_id}": {
+      "get": {
+        "summary": "GetRolloutById",
+        "description": "Returns the rollout with the given Id\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetRolloutById",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "rollout_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
     }
   },
   "definitions": {
+    "chef.automate.api.cfgmgmt.request.ArchiveRollouts": {
+      "type": "object"
+    },
+    "chef.automate.api.cfgmgmt.request.CreateRollout": {
+      "type": "object"
+    },
+    "chef.automate.api.cfgmgmt.request.DeleteRolloutsByAge": {
+      "type": "object"
+    },
+    "chef.automate.api.cfgmgmt.response.ArchiveRollouts": {
+      "type": "object"
+    },
     "chef.automate.api.cfgmgmt.response.CheckInCounts": {
       "type": "object",
       "properties": {
@@ -750,6 +926,12 @@ func init() {
           "title": "The number of nodes for this duration"
         }
       }
+    },
+    "chef.automate.api.cfgmgmt.response.CreateRollout": {
+      "type": "object"
+    },
+    "chef.automate.api.cfgmgmt.response.DeleteRolloutsByAge": {
+      "type": "object"
     },
     "chef.automate.api.cfgmgmt.response.Deprecation": {
       "type": "object",
@@ -1023,6 +1205,15 @@ func init() {
           "description": "Boolean that denotes whether or not the resource failure should be ignored."
         }
       }
+    },
+    "chef.automate.api.cfgmgmt.response.Rollout": {
+      "type": "object"
+    },
+    "chef.automate.api.cfgmgmt.response.Rollouts": {
+      "type": "object"
+    },
+    "chef.automate.api.cfgmgmt.response.RolloutsProgress": {
+      "type": "object"
     },
     "chef.automate.api.cfgmgmt.response.Run": {
       "type": "object",

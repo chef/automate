@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package chef.automate.api.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
+
+message CreateRollout {
+}
+
+message Rollouts {
+}
+
+message RolloutsProgress {
+}
+
+message RolloutById {
+  string rollout_id = 1;
+}
+
+message RolloutForChefRun {
+}
+
+message DeleteRolloutsByAge {
+}
+
+message ArchiveRollouts {
+}
