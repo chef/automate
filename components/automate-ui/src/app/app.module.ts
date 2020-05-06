@@ -185,6 +185,7 @@ import {
 import {
   TelemetryCheckboxComponent
 } from './page-components/telemetry-checkbox/telemetry-checkbox.component';
+import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 import { UIComponent } from 'app/ui.component';
 
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
@@ -244,6 +245,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     SettingsLandingComponent,
     SigninComponent,
     TelemetryCheckboxComponent,
+    TopNavLandingComponent,
     UIComponent,
     WelcomeModalComponent
   ],
