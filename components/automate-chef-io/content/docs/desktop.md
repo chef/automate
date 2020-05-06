@@ -2,7 +2,7 @@
 title = "Desktop"
 description = "Using the Desktop View"
 date = 2018-03-26T16:01:47-07:00
-draft = false
+draft = true
 bref = ""
 toc = true
 +++
