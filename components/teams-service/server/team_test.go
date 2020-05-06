@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/chef/automate/api/interservice/authz"
-	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"

@@ -14,7 +14,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/authz"
 	api "github.com/chef/automate/api/interservice/local_user"
-	teams_api "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/local-user-service/users"
 	usersMock "github.com/chef/automate/components/local-user-service/users/mock"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -435,8 +435,8 @@ func TestUsersGRPC(t *testing.T) {
 		t.Run("when user is deleted successfully", func(t *testing.T) {
 
 			mockTeams.PurgeUserMembershipFunc = func(
-				context.Context, *teams_api.PurgeUserMembershipReq) (*teams_api.PurgeUserMembershipResp, error) {
-				return &teams_api.PurgeUserMembershipResp{}, nil
+				context.Context, *teams.PurgeUserMembershipReq) (*teams.PurgeUserMembershipResp, error) {
+				return &teams.PurgeUserMembershipResp{}, nil
 			}
 
 			mockAuthz.PurgeSubjectFromPoliciesFunc = func(
@@ -449,9 +449,9 @@ func TestUsersGRPC(t *testing.T) {
 			}
 
 			mockTeams.PurgeUserMembershipFunc = func(
-				_ context.Context, req *teams_api.PurgeUserMembershipReq) (*teams_api.PurgeUserMembershipResp, error) {
+				_ context.Context, req *teams.PurgeUserMembershipReq) (*teams.PurgeUserMembershipResp, error) {
 				if req.UserId == "alice" {
-					return &teams_api.PurgeUserMembershipResp{Ids: []string{"teams-uuid-is-not-read"}}, nil
+					return &teams.PurgeUserMembershipResp{Ids: []string{"teams-uuid-is-not-read"}}, nil
 				}
 				return nil, errors.New("unexpected args")
 			}
@@ -552,13 +552,13 @@ func TestUsersGRPCInternalErrors(t *testing.T) {
 	})
 }
 
-func newTeamsMock(t *testing.T) (*grpctest.Server, *teams_api.TeamsServerMock) {
+func newTeamsMock(t *testing.T) (*grpctest.Server, *teams.TeamsServerMock) {
 	t.Helper()
 	certs := helpers.LoadDevCerts(t, "teams-service")
-	mockTeams := teams_api.NewTeamsServerMock()
+	mockTeams := teams.NewTeamsServerMock()
 	connFactory := secureconn.NewFactory(*certs)
 	g := connFactory.NewServer()
-	teams_api.RegisterTeamsServer(g, mockTeams)
+	teams.RegisterTeamsServer(g, mockTeams)
 	teams := grpctest.NewServer(g)
 	return teams, mockTeams
 }

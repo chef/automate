@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	local_users_api "github.com/chef/automate/api/interservice/local_user"
-	teams_api "github.com/chef/automate/api/interservice/teams/v2"
+	teams_api "github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/test/helpers"

@@ -21,7 +21,7 @@ import (
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/tls/test/helpers"
 
-	teams_api "github.com/chef/automate/api/interservice/teams/v2"
+	teams_api "github.com/chef/automate/api/interservice/teams"
 	teams_server "github.com/chef/automate/components/teams-service/server"
 	teams_service "github.com/chef/automate/components/teams-service/service"
 	teams_logger "github.com/chef/automate/lib/logger"

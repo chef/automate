@@ -15,7 +15,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authn"
 	"github.com/chef/automate/api/interservice/authz"
-	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	"github.com/chef/automate/lib/grpc/health"

@@ -26,7 +26,7 @@ import (
 	local_user "github.com/chef/automate/api/interservice/local_user"
 	manager "github.com/chef/automate/api/interservice/nodemanager/manager"
 	nodes "github.com/chef/automate/api/interservice/nodemanager/nodes"
-	v2 "github.com/chef/automate/api/interservice/teams/v2"
+	teams "github.com/chef/automate/api/interservice/teams"
 	api "github.com/chef/automate/components/notifications-client/api"
 	notifier "github.com/chef/automate/components/notifications-client/notifier"
 	gomock "github.com/golang/mock/gomock"
@@ -207,10 +207,10 @@ func (mr *MockClientsFactoryMockRecorder) ProjectsClient() *gomock.Call {
 }
 
 // TeamsClient mocks base method
-func (m *MockClientsFactory) TeamsClient() (v2.TeamsClient, error) {
+func (m *MockClientsFactory) TeamsClient() (teams.TeamsClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TeamsClient")
-	ret0, _ := ret[0].(v2.TeamsClient)
+	ret0, _ := ret[0].(teams.TeamsClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

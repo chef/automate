@@ -15,7 +15,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/local_user"
-	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/local-user-service/constants"
 	"github.com/chef/automate/components/local-user-service/users"
 	"github.com/chef/automate/lib/grpc/health"
