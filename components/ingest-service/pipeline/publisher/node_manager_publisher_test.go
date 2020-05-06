@@ -52,7 +52,7 @@ func TestGatherInfoForNode(t *testing.T) {
 		Tags: []*common.Kv{
 			{Key: "chef-tag", Value: "application"},
 			{Key: "chef-tag", Value: "database"},
-			{Key: "Environment", Value: "test-env"},
+			{Key: "environment", Value: "test-env"},
 		},
 		LastContact:     timestampNow,
 		SourceId:        "i-0aee75f0b4b0d9f22",

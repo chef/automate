@@ -76,7 +76,7 @@ func gatherInfoForNode(node backend.Node) (*manager.NodeMetadata, error) {
 		}
 	}
 	if node.Environment != "" {
-		tags = append(tags, &common.Kv{Key: "Environment", Value: node.Environment})
+		tags = append(tags, &common.Kv{Key: "environment", Value: node.Environment})
 	}
 
 	return &manager.NodeMetadata{
