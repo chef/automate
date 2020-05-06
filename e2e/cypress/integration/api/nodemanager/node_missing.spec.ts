@@ -11,12 +11,8 @@ describe('Nodemanager node missing', () => {
       cy.fixture('converge/avengers1.json').then((node) => {
         node.entity_uuid = clientRunsNodeId;
         node.node_name = nodeName;
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       // Wait for that node to appear
@@ -57,7 +53,7 @@ describe('Nodemanager node missing', () => {
 
     it('nodemanager nodes state is missing', () => {
       // Check that the node is missing from the nodemanager
-      waitUntilNodemanagerNodeState(10, nodeName, 'MISSING');
+      waitUntilNodemanagerNodeState(nodeName, 'MISSING');
     });
   });
 
@@ -72,12 +68,8 @@ describe('Nodemanager node missing', () => {
         node.node_name = nodeName;
         node.run_id = uuidv4();
         node.id = node.run_id;
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       // Wait for that node to appear
@@ -107,12 +99,8 @@ describe('Nodemanager node missing', () => {
         node.id = node.run_id;
         node.start_time = runEndDate.subtract(5, 'minute').toISOString();
         node.end_time = runEndDate.toISOString();
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
     });
 
@@ -135,14 +123,19 @@ describe('Nodemanager node missing', () => {
 
     it('nodemanager node state is running', () => {
       // Check that the nodemanager's node was changed to running
-      waitUntilNodemanagerNodeState(10, nodeName, 'RUNNING');
+      waitUntilNodemanagerNodeState(nodeName, 'RUNNING');
     });
   });
 });
 
-function waitUntilNodemanagerNodeState(attempts: number, nodeName: string, state: string): void {
-  if (attempts === -1) {
-    throw new Error('node was never marked missing');
+function waitUntilNodemanagerNodeState(nodeName: string, state: string) {
+  waitUntilNodemanagerNodeStateLoop(nodeName, state, 10);
+}
+
+function waitUntilNodemanagerNodeStateLoop(nodeName: string, state: string,
+  attemptsLeft: number): void {
+  if (attemptsLeft === -1) {
+    throw new Error(`nodemanager node with name ${nodeName} was never marked missing`);
   }
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -159,9 +152,9 @@ function waitUntilNodemanagerNodeState(attempts: number, nodeName: string, state
       response.body.nodes[0].state === state) {
       return;
     } else {
-      cy.log(`${attempts} attempts remaining: waiting for node to be missing`);
+      cy.log(`${attemptsLeft} attempts remaining: waiting for node to be missing`);
       cy.wait(1000);
-      waitUntilNodemanagerNodeState(--attempts, nodeName, state);
+      waitUntilNodemanagerNodeStateLoop(nodeName, state, attemptsLeft - 1);
     }
   });
 }

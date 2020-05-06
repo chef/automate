@@ -107,12 +107,7 @@ describe('projects API', () => {
           cy.fixture('converge/xmen1.json').then(node3 => {
             cy.fixture('converge/xmen2.json').then(node4 => {
               for (const node of [node1, node2, node3, node4]) {
-                cy.request({
-                  headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-                  method: 'POST',
-                  url: '/data-collector/v0',
-                  body: node
-                });
+                cy.sendToDataCollector(node);
               }
             });
           });

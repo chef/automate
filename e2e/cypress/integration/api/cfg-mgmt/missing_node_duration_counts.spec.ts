@@ -18,12 +18,8 @@ describe('Config-mgmt missing node duration counts', () => {
         node.run_id = runId;
         node.start_time = runEndDate.subtract(5, 'minute').toISOString();
         node.end_time = runEndDate.toISOString();
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       // Wait for it to be ingested

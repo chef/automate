@@ -9,12 +9,7 @@ describe('Nodemanager config mgmt node deletion', () => {
     cy.fixture('converge/avengers1.json').then((node) => {
       node.entity_uuid = clientRunsNodeId;
       node.node_name = nodeName;
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+      cy.sendToDataCollector(node);
     });
 
     // Wait for that config mgmt node to appear

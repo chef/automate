@@ -19,12 +19,8 @@ describe('Config-mgmt node_counts', () => {
       node.end_time = runEndDate.toISOString();
       node.status = 'failure';
       node.node.chef_environment = cypressPrefix;
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+
+      cy.sendToDataCollector(node);
     });
     cy.fixture('converge/avengers1.json').then((node: any) => {
       const runEndDate = Cypress.moment('2020-03-15T10:32:59Z');
@@ -37,12 +33,8 @@ describe('Config-mgmt node_counts', () => {
       node.end_time = runEndDate.toISOString();
       node.status = 'success';
       node.node.chef_environment = cypressPrefix;
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+
+      cy.sendToDataCollector(node);
     });
     cy.fixture('converge/avengers1.json').then((node: any) => {
       const runEndDate = Cypress.moment('2020-03-16T10:32:59Z');
@@ -55,12 +47,8 @@ describe('Config-mgmt node_counts', () => {
       node.end_time = runEndDate.toISOString();
       node.status = 'failure';
       node.node.chef_environment = cypressPrefix;
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+
+      cy.sendToDataCollector(node);
     });
 
     // Wait for nodes to be ingested

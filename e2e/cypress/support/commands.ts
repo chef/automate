@@ -3,6 +3,16 @@ import { eventExist } from '../support/helpers';
 // Cypress Commands: any action that could be taken in any test
 // any command added in here must also have its signature added to index.d.ts
 
+
+Cypress.Commands.add('sendToDataCollector', (report: any) => {
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    method: 'POST',
+    url: '/data-collector/v0',
+    body: report
+  });
+});
+
 Cypress.Commands.add('login', (url: string, username: string) => {
   // CYPRESS_BASE_URL environment variable must be set
   cy.visit(url);
@@ -168,7 +178,7 @@ Cypress.Commands.add('applyRulesAndWait', () => {
   waitUntilApplyRulesNotRunning(100);
 });
 
-Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string, maxRetries: number) => {
+Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string) => {
   waitForNodemanagerNodeLoop(nodeId, 10);
 });
 
@@ -199,8 +209,8 @@ function waitForNodemanagerNodeLoop(nodeId: string, attemptsLeft: number) {
   });
 }
 
-Cypress.Commands.add('waitForClientRunsNode', (nodeId: string, maxRetries: number) => {
-  waitForClientRunsNodeLoop(nodeId, maxRetries - 1);
+Cypress.Commands.add('waitForClientRunsNode', (nodeId: string) => {
+  waitForClientRunsNodeLoop(nodeId, 10);
 });
 
 function waitForClientRunsNodeLoop(nodeId: string, attemptsLeft: number) {

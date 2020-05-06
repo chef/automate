@@ -19,12 +19,8 @@ describe('Config-mgmt node_metadata_counts', () => {
       node.end_time = runEndDate.toISOString();
       node.node.automatic.platform = 'windows';
       node.status = 'failure';
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+
+      cy.sendToDataCollector(node);
     });
     cy.fixture('converge/avengers1.json').then((node: any) => {
       const runEndDate = Cypress.moment().subtract(12, 'hour');
@@ -37,12 +33,8 @@ describe('Config-mgmt node_metadata_counts', () => {
       node.end_time = runEndDate.toISOString();
       node.node.automatic.platform = 'linux';
       node.status = 'success';
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+
+      cy.sendToDataCollector(node);
     });
     cy.fixture('converge/avengers1.json').then((node: any) => {
       const runEndDate = Cypress.moment().subtract(12, 'hour');
@@ -55,12 +47,8 @@ describe('Config-mgmt node_metadata_counts', () => {
       node.end_time = runEndDate.toISOString();
       node.node.automatic.platform = 'macos';
       node.status = 'failure';
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+
+      cy.sendToDataCollector(node);
     });
 
     // Wait for nodes to be ingested

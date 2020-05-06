@@ -19,5 +19,6 @@ declare namespace Cypress {
     waitUntilNodeIsMissing(clientRunsNodeId: string): void
     waitUntilNodemanagerNodeIsDeleted(nodeName: string): void
     waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId: string): void
+    sendToDataCollector(report: any): void
   }
 }

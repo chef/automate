@@ -235,12 +235,8 @@ describe('project update re-tagging', () => {
       report.node_name = nodeName;
       report.end_time = Cypress.moment().utc().format();
       report.report_uuid = reportId;
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: report
-      });
+
+      cy.sendToDataCollector(report);
     });
 
     // Ingest a node with attributes that match all the projects
@@ -253,12 +249,8 @@ describe('project update re-tagging', () => {
       node.node.automatic.roles = ['backend'];
       node.node.normal.tags = ['v3'];
       node.entity_uuid = clientRunsNodeId;
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+
+      cy.sendToDataCollector(node);
     });
 
     // Ingest an action with attributes that match all the projects
@@ -268,12 +260,8 @@ describe('project update re-tagging', () => {
       action.id = actionId;
       action.entity_name = entityName;
       action.recorded_at = Cypress.moment().utc().subtract(1, 'day').format();
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: action
-      });
+
+      cy.sendToDataCollector(action);
     });
 
     // wait for the report to be ingested

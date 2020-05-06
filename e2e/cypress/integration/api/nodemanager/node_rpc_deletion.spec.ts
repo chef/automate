@@ -15,12 +15,8 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
         node.node_name = nodeName1;
         node.id = runId;
         node.run_id = runId;
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       // Create the second node
@@ -30,12 +26,8 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
         node.node_name = nodeName2;
         node.id = runId;
         node.run_id = runId;
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       // Wait for that config mgmt node to appear
@@ -80,12 +72,8 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
         node.node_name = nodeName;
         node.organization_name = org;
         node.chef_server_fqdn = chefServer;
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       // Wait for that config mgmt node to appear
@@ -124,12 +112,8 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       cy.fixture('converge/avengers1.json').then((node) => {
         node.entity_uuid = clientRunsNodeId;
         node.node_name = nodeName;
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       // Wait for that config mgmt node to appear

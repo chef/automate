@@ -24,12 +24,8 @@ describe('Config-mgmt check-in time series', () => {
         node.start_time = runEndDate.subtract(5, 'minute').toISOString();
         node.end_time = runEndDate.toISOString();
         node.node.chef_environment = 'forest';
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       cy.fixture('converge/avengers1.json').then((node: any) => {
@@ -41,12 +37,8 @@ describe('Config-mgmt check-in time series', () => {
         node.end_time = runEndDate.toISOString();
         node.start_time = runEndDate.subtract(5, 'minute').toISOString();
         node.node.chef_environment = 'forest';
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       cy.fixture('converge/avengers1.json').then((node: any) => {
@@ -58,12 +50,8 @@ describe('Config-mgmt check-in time series', () => {
         node.end_time = runEndDate.toISOString();
         node.start_time = runEndDate.subtract(5, 'minute').toISOString();
         node.node.chef_environment = 'forest';
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       // add a node within the three days with the environment "desert"
@@ -76,12 +64,8 @@ describe('Config-mgmt check-in time series', () => {
         node.start_time = runEndDate.subtract(5, 'minute').toISOString();
         node.end_time = runEndDate.toISOString();
         node.node.chef_environment = 'desert';
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       cy.waitForClientRunsNode(clientRunsNodeId);
