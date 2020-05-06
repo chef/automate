@@ -41,7 +41,7 @@ const orgId = '6e98f609-586d-4816-a6de';
 const cookbook_name = 'aix';
 const currentVersion = '1.1.1';
 const readme_content = 'test content';
-const cookbookVesrion: CookbookVersions = {
+const cookbookVersion: CookbookVersions = {
   name: 'aix',
   versions: []
 };
@@ -128,9 +128,9 @@ describe('CookbookDetailsComponent', () => {
   });
 
   it('Check cookbook version success', () => {
-    store.dispatch(new GetCookbookVersionsSuccess(cookbookVesrion));
+    store.dispatch(new GetCookbookVersionsSuccess(cookbookVersion));
     fixture.detectChanges();
-    expect(component.cookbook).toEqual(cookbookVesrion);
+    expect(component.cookbook).toEqual(cookbookVersion);
   });
 
   it('Check cookbook details success', () => {
