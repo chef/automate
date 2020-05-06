@@ -1,0 +1,3 @@
+//+build wireinject
+
+package scratch
