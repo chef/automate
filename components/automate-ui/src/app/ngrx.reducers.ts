@@ -10,6 +10,8 @@ import * as apiToken from './entities/api-tokens/api-token.reducer';
 import * as automateSettings from './entities/automate-settings/automate-settings.reducer';
 import * as clientRuns from './entities/client-runs/client-runs.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
+import * as cookbookDetailsEntity from './entities/cookbooks/cookbook-details.reducer';
+import * as cookbookVersionsEntity from './entities/cookbooks/cookbook-versions.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
 import * as infraRoleEntity from './entities/infra-roles/infra-role.reducer';
 import * as infraRoleDetailsEntity from './entities/infra-roles/infra-role-details.reducer';
@@ -62,6 +64,8 @@ export interface NgrxStateAtom {
   automateSettings: automateSettings.AutomateSettingsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
+  cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityState;
+  cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityState;
   destinations: destinationEntity.DestinationEntityState;
   infraroles: infraRoleEntity.InfraRoleEntityState;
   infraroledetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
@@ -174,6 +178,8 @@ export const defaultInitialState = {
   automateSettings: automateSettings.AutomateSettingsEntityInitialState,
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
+  cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityInitialState,
+  cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
   infraroles: infraRoleEntity.InfraRoleEntityInitialState,
   infraroledetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
@@ -219,10 +225,12 @@ export const ngrxReducers = {
   automateSettings: automateSettings.automateSettingsEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
-  infraRoles: infraRoleEntity.infraRoleEntityReducer,
-  infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
+  cookbookDetails: cookbookDetailsEntity.cookbookDetailsEntityReducer,
+  cookbookVersions: cookbookVersionsEntity.cookbookVersionsEntityReducer,
   credentialEntity: credential.credentialReducer,
   destinations: destinationEntity.destinationEntityReducer,
+  infraRoles: infraRoleEntity.infraRoleEntityReducer,
+  infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
   jobs: jobEntity.jobEntityReducer,
   managers: manager.managerEntityReducer,
   nodes: nodesEntity.nodesEntityReducer,
