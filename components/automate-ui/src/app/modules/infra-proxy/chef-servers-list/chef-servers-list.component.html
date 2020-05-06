@@ -29,7 +29,9 @@
       </app-message-modal>
       <div class="page-body">
         <chef-toolbar>
-          <chef-button primary (click)="openCreateModal()">Add Chef Server</chef-button>
+          <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
+            <chef-button primary (click)="openCreateModal()">Connect Chef Server</chef-button>
+          </app-authorized>
         </chef-toolbar>
         <chef-table>
           <chef-thead>
@@ -50,10 +52,12 @@
               <chef-td>{{ server.ip_address }}</chef-td>
               <chef-td>{{ server.orgs_count }}</chef-td>
               <chef-td class="three-dot-column">
-                <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
-                  <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="remove-server">Remove
-                    Chef Server</mat-option>
-                </mat-select>
+                <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
+                  <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
+                    <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="remove-server">Remove
+                      Chef Server</mat-option>
+                  </mat-select>
+                </app-authorized>  
               </chef-td>
             </chef-tr>
           </chef-tbody>

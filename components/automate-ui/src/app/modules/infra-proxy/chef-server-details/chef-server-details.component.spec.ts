@@ -20,10 +20,14 @@ describe('ChefServerDetailsComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({
+          selector: 'app-authorized',
+          inputs: ['allOf']
+        }),
+        MockComponent({
           selector: 'app-create-org-modal',
           inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
           outputs: ['close', 'createClicked']
-          }),
+        }),
         MockComponent({ selector: 'chef-button',
           inputs: ['disabled', 'routerLink'] }),
         MockComponent({ selector: 'mat-select' }),
@@ -57,7 +61,7 @@ describe('ChefServerDetailsComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -73,12 +77,12 @@ describe('ChefServerDetailsComponent', () => {
   describe('create org', () => {
     let store: Store<NgrxStateAtom>;
     const org: Org = {
-        id: '1',
-        name: 'new org',
-        admin_user: 'new org user',
-        admin_key: 'new admin key',
-        server_id: '39cabe9d-996e-42cd-91d0-4335b2480aaf'
-      };
+      id: '1',
+      name: 'new org',
+      admin_user: 'new org user',
+      admin_key: 'new admin key',
+      server_id: '39cabe9d-996e-42cd-91d0-4335b2480aaf'
+    };
 
     beforeEach(() => {
       store = TestBed.inject(Store);

@@ -245,15 +245,15 @@ const routes: Routes = [
               component: ChefServerDetailsComponent
             },
             {
-              path: ':id/org/:orgid',
+              path: ':id/organizations/:orgid',
               component: OrgDetailsComponent
             },
             {
-              path: ':id/org/:orgid/roles/:name',
+            path: ':id/organizations/:orgid/roles/:name',
               component: InfraRoleDetailsComponent
             },
             {
-              path: ':id/org/:orgid/cookbooks/:cookbook_name',
+              path: ':id/organizations/:orgid/cookbooks/:cookbook_name',
               component: CookbookDetailsComponent
             }
           ]
