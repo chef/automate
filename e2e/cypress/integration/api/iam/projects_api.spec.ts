@@ -107,12 +107,7 @@ describe('projects API', () => {
           cy.fixture('converge/xmen1.json').then(node3 => {
             cy.fixture('converge/xmen2.json').then(node4 => {
               for (const node of [node1, node2, node3, node4]) {
-                cy.request({
-                  headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-                  method: 'POST',
-                  url: '/data-collector/v0',
-                  body: node
-                });
+                cy.sendToDataCollector(node);
               }
             });
           });
@@ -220,7 +215,7 @@ describe('projects API', () => {
           .forEach(({ status }) => expect(status).to.equal(editsPendingStr));
       });
 
-      cy.applyRulesAndWait(100);
+      cy.applyRulesAndWait();
 
       // confirm rules are applied
       for (const project of [projectWithOrgRule, projectWithServerRule]) {
@@ -336,7 +331,7 @@ describe('projects API', () => {
           .forEach(({ status }) => expect(status).to.equal(editsPendingStr));
       });
 
-      cy.applyRulesAndWait(100);
+      cy.applyRulesAndWait();
 
       cy.request({
         headers: {
@@ -394,7 +389,7 @@ describe('projects API', () => {
         expect(response.body.project.status).to.equal(editsPendingStr);
       });
 
-      cy.applyRulesAndWait(100);
+      cy.applyRulesAndWait();
 
       // verify the project no longer has any rules
       cy.request({

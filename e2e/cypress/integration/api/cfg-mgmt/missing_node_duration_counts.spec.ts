@@ -18,21 +18,17 @@ describe('Config-mgmt missing node duration counts', () => {
         node.run_id = runId;
         node.start_time = runEndDate.subtract(5, 'minute').toISOString();
         node.end_time = runEndDate.toISOString();
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+
+        cy.sendToDataCollector(node);
       });
 
       // Wait for it to be ingested
-      waitUntilNodeIsIngested(10, clientRunsNodeId);
+      cy.waitForClientRunsNode(clientRunsNodeId);
     });
 
     after(() => {
       // delete all nodes created
-      deleteNode(10, clientRunsNodeId);
+      cy.deleteClientRunsNode(clientRunsNodeId);
     });
 
     it('Ensure the node is counted in the missing node duration counts', () => {
@@ -50,50 +46,3 @@ describe('Config-mgmt missing node duration counts', () => {
     });
   });
 });
-
-function waitUntilNodeIsIngested(attempts: number, clientRunsNodeId: string): void {
-  if (attempts === -1) {
-    throw new Error('node was never ingested');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
-  }).then((response) => {
-    if (response.body.length === 1 && response.body[0].id === clientRunsNodeId) {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be ingested`);
-      cy.wait(1000);
-      waitUntilNodeIsIngested(--attempts, clientRunsNodeId);
-    }
-  });
-}
-
-function deleteNode(attempts: number, clientRunsNodeId: string): void {
-  if (attempts === -1) {
-    throw new Error('node was never deleted');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
-  }).then((response: any) => {
-    if (response.body.length === 0) {
-      return;
-    } else {
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: 'api/v0/ingest/events/chef/node-multiple-deletes',
-        body: {
-          node_ids: [
-            clientRunsNodeId
-          ]
-        },
-        failOnStatusCode: true
-      });
-      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be deleted`);
-      cy.wait(1000);
-      deleteNode(--attempts, clientRunsNodeId);
-    }
-  });
-}
