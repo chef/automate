@@ -461,13 +461,43 @@ func TestStatsNodesCountsWhen20Nodes(t *testing.T) {
 func TestStatsNodesCountsFilteringWithTableDriven(t *testing.T) {
 	dataNodes := []struct {
 		number int
-		node   iBackend.NodeInfo
+		node   iBackend.Node
 	}{
-		{10, iBackend.NodeInfo{Status: "success", Platform: "windows"}},
-		{10, iBackend.NodeInfo{Status: "failure", Platform: "ubuntu"}},
-		{10, iBackend.NodeInfo{Status: "success", Platform: "centos"}},
-		{10, iBackend.NodeInfo{Status: "missing", Platform: "centos"}},
-		{1, iBackend.NodeInfo{NodeName: "mock", Status: "success"}},
+		{
+			10,
+			iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{Status: "success", Platform: "windows"},
+				Checkin:  parseTime(t, "2020-03-15T10:32:59Z"),
+			},
+		},
+		{
+			10,
+			iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{Status: "failure", Platform: "ubuntu"},
+				Checkin:  parseTime(t, "2020-03-16T10:32:59Z"),
+			},
+		},
+		{
+			10,
+			iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{Status: "success", Platform: "centos"},
+				Checkin:  parseTime(t, "2020-03-17T10:32:59Z"),
+			},
+		},
+		{
+			10,
+			iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{Status: "missing", Platform: "centos"},
+				Checkin:  parseTime(t, "2020-03-18T10:32:59Z"),
+			},
+		},
+		{
+			1,
+			iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{NodeName: "mock", Status: "success"},
+				Checkin:  parseTime(t, "2020-03-19T10:32:59Z"),
+			},
+		},
 	}
 
 	var totalNodes int32 = 0
@@ -477,11 +507,8 @@ func TestStatsNodesCountsFilteringWithTableDriven(t *testing.T) {
 		for i := 0; i < data.number; i++ {
 			// Generate a uuid
 			data.node.EntityUuid = newUUID()
-			node := iBackend.Node{
-				NodeInfo: data.node,
-				Exists:   true,
-			}
-			nodes = append(nodes, node)
+			data.node.Exists = true
+			nodes = append(nodes, data.node)
 			// Increment the total number of nodes
 			totalNodes++
 		}
@@ -528,8 +555,30 @@ func TestStatsNodesCountsFilteringWithTableDriven(t *testing.T) {
 			request.NodesCounts{Filter: []string{"platform:oracle"}},
 			response.NodesCounts{}},
 		{"should return only the 'mock' node",
-			request.NodesCounts{Filter: []string{"name:mock"}},
-			response.NodesCounts{Total: 1, Success: 1}},
+			request.NodesCounts{
+				Filter: []string{"name:mock"},
+			},
+			response.NodesCounts{Total: 1, Success: 1},
+		},
+		{"should not return any of the first and last nodes by date",
+			request.NodesCounts{
+				Start: "2020-03-15T15:32:59Z",
+				End:   "2020-03-18T15:32:59Z",
+			},
+			response.NodesCounts{Total: 30, Success: 10, Failure: 10, Missing: 10},
+		},
+		{"should return only the first nodes by date",
+			request.NodesCounts{
+				Start: "2020-03-18T15:32:59Z",
+			},
+			response.NodesCounts{Total: 1, Success: 1},
+		},
+		{"should return only the last nodes by date",
+			request.NodesCounts{
+				End: "2020-03-16T05:32:59Z",
+			},
+			response.NodesCounts{Total: 10, Success: 10},
+		},
 	}
 
 	// Run all the cases!
