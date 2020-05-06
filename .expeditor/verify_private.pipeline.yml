@@ -771,6 +771,15 @@ steps:
         linux:
           privileged: true
 
+  - label: "a1 legacy token"
+    command:
+      - integration/run_test integration/tests/a1_legacy_token.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
   - label: "security"
     command:
       - integration/run_test integration/tests/security.sh
