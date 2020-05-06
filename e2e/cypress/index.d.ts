@@ -16,10 +16,10 @@ declare namespace Cypress {
       maxRetries: number): void
     waitForAction(entityName: string, start: string, end: string, 
       maxRetries: number): void
-    deleteClientRunsNode(attempts: number, clientRunsNodeId: string): void
-    waitUntilRunIsIngested(attempts: number, clientRunsNodeId: string, runId: string): void
-    waitUntilNodeIsMissing(attempts: number, clientRunsNodeId: string): void
-    waitUntilNodemanagerNodeIsDeleted(attempts: number, nodeName: string): void
-    waitUntilConfigMgmtNodeIsDeleted(attempts: number, clientRunsNodeId: string): void
+    deleteClientRunsNode(clientRunsNodeId: string, attempts: number): void
+    waitUntilRunIsIngested(clientRunsNodeId: string, runId: string, attempts: number): void
+    waitUntilNodeIsMissing(clientRunsNodeId: string, attempts: number): void
+    waitUntilNodemanagerNodeIsDeleted(nodeName: string, attempts: number): void
+    waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId: string, attempts: number): void
   }
 }

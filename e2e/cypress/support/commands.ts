@@ -280,7 +280,7 @@ Cypress.Commands.add('waitForAction', (entityName: string, start: string, end: s
     });
 });
 
-Cypress.Commands.add('deleteClientRunsNode', (attempts: number, clientRunsNodeId: string) => {
+Cypress.Commands.add('deleteClientRunsNode', (clientRunsNodeId: string, attempts: number) => {
   if (attempts === -1) {
     throw new Error('node was never deleted');
   }
@@ -304,13 +304,13 @@ Cypress.Commands.add('deleteClientRunsNode', (attempts: number, clientRunsNodeId
       });
       cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be deleted`);
       cy.wait(1000);
-      cy.deleteClientRunsNode(--attempts, clientRunsNodeId);
+      cy.deleteClientRunsNode(clientRunsNodeId, --attempts);
     }
   });
 });
 
 // This function is only waiting for the node to be deleted. It is not deleting it.
-Cypress.Commands.add('waitUntilNodemanagerNodeIsDeleted', (attempts: number, nodeName: string) => {
+Cypress.Commands.add('waitUntilNodemanagerNodeIsDeleted', (nodeName: string, attempts: number) => {
   if (attempts === -1) {
     throw new Error('nodemanager node was never deleted');
   }
@@ -330,13 +330,13 @@ Cypress.Commands.add('waitUntilNodemanagerNodeIsDeleted', (attempts: number, nod
     } else {
       cy.log(`${attempts} attempts remaining: waiting for nodemanager node to be deleted`);
       cy.wait(1000);
-      cy.waitUntilNodemanagerNodeIsDeleted(--attempts, nodeName);
+      cy.waitUntilNodemanagerNodeIsDeleted(nodeName, --attempts);
     }
   });
 });
 
 Cypress.Commands.add('waitUntilConfigMgmtNodeIsDeleted',
-  (attempts: number, clientRunsNodeId: string) => {
+  (clientRunsNodeId: string, attempts: number) => {
   if (attempts === -1) {
     throw new Error('config mgmt node was not deleted');
   }
@@ -349,13 +349,13 @@ Cypress.Commands.add('waitUntilConfigMgmtNodeIsDeleted',
     } else {
       cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be deleted`);
       cy.wait(1000);
-      cy.waitUntilConfigMgmtNodeIsDeleted(--attempts, clientRunsNodeId);
+      cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId, --attempts);
     }
   });
 });
 
-Cypress.Commands.add('waitUntilRunIsIngested', (attempts: number, clientRunsNodeId: string,
-  runId: string) => {
+Cypress.Commands.add('waitUntilRunIsIngested', (clientRunsNodeId: string,
+  runId: string, attempts: number) => {
   if (attempts === -1) {
     throw new Error('run was never ingested');
   }
@@ -369,12 +369,12 @@ Cypress.Commands.add('waitUntilRunIsIngested', (attempts: number, clientRunsNode
     } else {
       cy.log(`${attempts} attempts remaining: waiting for run ${runId} to be ingested`);
       cy.wait(1000);
-      cy.waitUntilRunIsIngested(--attempts, clientRunsNodeId, runId);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId, --attempts);
     }
   });
 });
 
-Cypress.Commands.add('waitUntilNodeIsMissing', (attempts: number, clientRunsNodeId: string) => {
+Cypress.Commands.add('waitUntilNodeIsMissing', (clientRunsNodeId: string, attempts: number) => {
   if (attempts === -1) {
     throw new Error('node was never marked missing');
   }
@@ -390,7 +390,7 @@ Cypress.Commands.add('waitUntilNodeIsMissing', (attempts: number, clientRunsNode
         `${attempts} attempts remaining: waiting for node ${clientRunsNodeId}` +
         'to have status missing');
       cy.wait(1000);
-      cy.waitUntilNodeIsMissing(--attempts, clientRunsNodeId);
+      cy.waitUntilNodeIsMissing(clientRunsNodeId, --attempts);
     }
   });
 });

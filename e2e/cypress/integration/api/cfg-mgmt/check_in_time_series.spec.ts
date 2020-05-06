@@ -85,18 +85,18 @@ describe('Config-mgmt check-in time series', () => {
       });
 
       cy.waitForClientRunsNode(clientRunsNodeId, 10);
-      cy.waitUntilRunIsIngested(10, clientRunsNodeId, runId1);
-      cy.waitUntilRunIsIngested(10, clientRunsNodeId, runId2);
-      cy.waitUntilRunIsIngested(10, clientRunsNodeId, runId3);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId1, 10);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId2, 10);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId3, 10);
 
       cy.waitForClientRunsNode(clientRunsFilteredOutNodeId, 10);
-      cy.waitUntilRunIsIngested(10, clientRunsFilteredOutNodeId, runId4);
+      cy.waitUntilRunIsIngested(clientRunsFilteredOutNodeId, runId4, 10);
     });
 
     after(() => {
       // delete all nodes created
-      cy.deleteClientRunsNode(10, clientRunsNodeId);
-      cy.deleteClientRunsNode(10, clientRunsFilteredOutNodeId);
+      cy.deleteClientRunsNode(clientRunsNodeId, 10);
+      cy.deleteClientRunsNode(clientRunsFilteredOutNodeId, 10);
     });
 
     it('filter for the forest environment', () => {

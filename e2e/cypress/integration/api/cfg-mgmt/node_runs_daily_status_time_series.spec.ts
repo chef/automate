@@ -80,15 +80,15 @@ describe('Config-mgmt node runs daily time series statuses', () => {
       });
 
       cy.waitForClientRunsNode(clientRunsNodeId, 10);
-      cy.waitUntilRunIsIngested(10, clientRunsNodeId, runId1);
-      cy.waitUntilRunIsIngested(10, clientRunsNodeId, runId2);
-      cy.waitUntilRunIsIngested(10, clientRunsNodeId, runId3);
-      cy.waitUntilRunIsIngested(10, clientRunsNodeId, runId4);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId1, 10);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId2, 10);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId3, 10);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId4, 10);
     });
 
     after(() => {
       // delete all nodes created
-      cy.deleteClientRunsNode(10, clientRunsNodeId);
+      cy.deleteClientRunsNode(clientRunsNodeId, 10);
     });
 
     it('check statues', () => {

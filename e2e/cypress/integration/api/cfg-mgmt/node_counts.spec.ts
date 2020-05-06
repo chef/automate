@@ -71,9 +71,9 @@ describe('Config-mgmt node_counts', () => {
 
   after(() => {
     // delete all nodes created
-    cy.deleteClientRunsNode(10, clientRunsNodeId1);
-    cy.deleteClientRunsNode(10, clientRunsNodeId2);
-    cy.deleteClientRunsNode(10, clientRunsNodeId3);
+    cy.deleteClientRunsNode(clientRunsNodeId1, 10);
+    cy.deleteClientRunsNode(clientRunsNodeId2, 10);
+    cy.deleteClientRunsNode(clientRunsNodeId3, 10);
   });
 
   it('Get the node counts environment filter', () => {
