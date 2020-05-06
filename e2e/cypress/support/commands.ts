@@ -169,6 +169,9 @@ Cypress.Commands.add('applyRulesAndWait', (attempts: number) => {
 });
 
 Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string, maxRetries: number) => {
+  if (maxRetries === -1) {
+    throw new Error('nodemanager node was never ingested');
+  }
   cy.request({
     headers: {
       projects: ['*'],
@@ -195,6 +198,9 @@ Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string, maxRetries: numb
 });
 
 Cypress.Commands.add('waitForClientRunsNode', (nodeId: string, maxRetries: number) => {
+  if (maxRetries === -1) {
+    throw new Error('node was never ingested');
+  }
   cy
   .request({
     headers: {
@@ -209,7 +215,7 @@ Cypress.Commands.add('waitForClientRunsNode', (nodeId: string, maxRetries: numbe
     if (maxRetries === 0) {
       return;
     }
-    if (resp.body && resp.body.length > 0 ) {
+    if (resp.body.length === 1 && resp.body[0].id === nodeId) {
       return;
     }
     cy.wait(1000);
@@ -272,6 +278,121 @@ Cypress.Commands.add('waitForAction', (entityName: string, start: string, end: s
       cy.wait(1000);
       cy.waitForAction(entityName, start, end, maxRetries - 1);
     });
+});
+
+Cypress.Commands.add('deleteClientRunsNode', (attempts: number, clientRunsNodeId: string) => {
+  if (attempts === -1) {
+    throw new Error('node was never deleted');
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
+  }).then((response) => {
+    if (response.body.length === 0) {
+      return;
+    } else {
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: 'api/v0/ingest/events/chef/node-multiple-deletes',
+        body: {
+          node_ids: [
+            clientRunsNodeId
+          ]
+        },
+        failOnStatusCode: true
+      });
+      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be deleted`);
+      cy.wait(1000);
+      cy.deleteClientRunsNode(--attempts, clientRunsNodeId);
+    }
+  });
+});
+
+// This function is only waiting for the node to be deleted. It is not deleting it.
+Cypress.Commands.add('waitUntilNodemanagerNodeIsDeleted', (attempts: number, nodeName: string) => {
+  if (attempts === -1) {
+    throw new Error('nodemanager node was never deleted');
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    method: 'POST',
+    url: '/api/v0/nodes/search',
+    body: {
+      filters: [
+        {key: 'manager_id', values: ['']},
+        {key: 'name', 'values': [nodeName]}
+      ]
+    }
+  }).then((response) => {
+    if (response.body.nodes.length === 0) {
+      return;
+    } else {
+      cy.log(`${attempts} attempts remaining: waiting for nodemanager node to be deleted`);
+      cy.wait(1000);
+      cy.waitUntilNodemanagerNodeIsDeleted(--attempts, nodeName);
+    }
+  });
+});
+
+Cypress.Commands.add('waitUntilConfigMgmtNodeIsDeleted',
+  (attempts: number, clientRunsNodeId: string) => {
+  if (attempts === -1) {
+    throw new Error('config mgmt node was not deleted');
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
+  }).then((response) => {
+    if (response.body.length === 0) {
+      return;
+    } else {
+      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be deleted`);
+      cy.wait(1000);
+      cy.waitUntilConfigMgmtNodeIsDeleted(--attempts, clientRunsNodeId);
+    }
+  });
+});
+
+Cypress.Commands.add('waitUntilRunIsIngested', (attempts: number, clientRunsNodeId: string,
+  runId: string) => {
+  if (attempts === -1) {
+    throw new Error('run was never ingested');
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: `/api/v0/cfgmgmt/nodes/${clientRunsNodeId}/runs/${runId}`,
+    failOnStatusCode: false
+  }).then((response) => {
+    if (response.status !== 404 && response.body.id === runId) {
+      return;
+    } else {
+      cy.log(`${attempts} attempts remaining: waiting for run ${runId} to be ingested`);
+      cy.wait(1000);
+      cy.waitUntilRunIsIngested(--attempts, clientRunsNodeId, runId);
+    }
+  });
+});
+
+Cypress.Commands.add('waitUntilNodeIsMissing', (attempts: number, clientRunsNodeId: string) => {
+  if (attempts === -1) {
+    throw new Error('node was never marked missing');
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
+  }).then((response) => {
+    if (response.body.length === 1 && response.body[0].id === clientRunsNodeId &&
+      response.body[0].status === 'missing') {
+      return;
+    } else {
+      cy.log(
+        `${attempts} attempts remaining: waiting for node ${clientRunsNodeId}` +
+        'to have status missing');
+      cy.wait(1000);
+      cy.waitUntilNodeIsMissing(--attempts, clientRunsNodeId);
+    }
+  });
 });
 
 // the helpers below are used only in the Cypress commands defined in this file

@@ -39,12 +39,12 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for that config mgmt node to appear
-      waitUntilConfigMgmtNodeIsIngested(10, clientRunsNodeId1);
-      waitUntilConfigMgmtNodeIsIngested(10, clientRunsNodeId2);
+      cy.waitForClientRunsNode(clientRunsNodeId1, 10);
+      cy.waitForClientRunsNode(clientRunsNodeId2, 10);
 
       // Wait for the node to appear in the node manager
-      waitUntilNodemanagerNodeIsIngested(10, nodeName1);
-      waitUntilNodemanagerNodeIsIngested(10, nodeName2);
+      cy.waitForNodemanagerNode(clientRunsNodeId1, 10);
+      cy.waitForNodemanagerNode(clientRunsNodeId2, 10);
 
       // delete both nodes
       cy.request({
@@ -57,13 +57,13 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for the node to be removed from config mgmt
-      waitUntilConfigMgmtNodeIsDeleted(10, clientRunsNodeId1);
-      waitUntilConfigMgmtNodeIsDeleted(10, clientRunsNodeId2);
+      cy.waitUntilConfigMgmtNodeIsDeleted(10, clientRunsNodeId1);
+      cy.waitUntilConfigMgmtNodeIsDeleted(10, clientRunsNodeId2);
     });
 
     it('nodemanager nodes are deleted', () => {
-      waitUntilNodemanagerNodeIsDeleted(10, nodeName1);
-      waitUntilNodemanagerNodeIsDeleted(10, nodeName2);
+      cy.waitUntilNodemanagerNodeIsDeleted(10, nodeName1);
+      cy.waitUntilNodemanagerNodeIsDeleted(10, nodeName2);
     });
   });
 
@@ -89,10 +89,10 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for that config mgmt node to appear
-      waitUntilConfigMgmtNodeIsIngested(10, clientRunsNodeId);
+      cy.waitForClientRunsNode(clientRunsNodeId, 10);
 
       // Wait for the node to appear in the node manager
-      waitUntilNodemanagerNodeIsIngested(10, nodeName);
+      cy.waitForNodemanagerNode(clientRunsNodeId, 10);
 
       // delete the node
       cy.request({
@@ -107,11 +107,11 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for the node to be removed from config mgmt
-      waitUntilConfigMgmtNodeIsDeleted(10, clientRunsNodeId);
+      cy.waitUntilConfigMgmtNodeIsDeleted(10, clientRunsNodeId);
     });
 
     it('nodemanager node is deleted', () => {
-      waitUntilNodemanagerNodeIsDeleted(10, nodeName);
+      cy.waitUntilNodemanagerNodeIsDeleted(10, nodeName);
     });
   });
 
@@ -133,10 +133,10 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for that config mgmt node to appear
-      waitUntilConfigMgmtNodeIsIngested(10, clientRunsNodeId);
+      cy.waitForClientRunsNode(clientRunsNodeId, 10);
 
       // Wait for the node to appear in the node manager
-      waitUntilNodemanagerNodeIsIngested(10, nodeName);
+      cy.waitForNodemanagerNode(clientRunsNodeId, 10);
 
       // delete the node
       cy.request({
@@ -149,98 +149,11 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for the node to be removed from config mgmt
-      waitUntilConfigMgmtNodeIsDeleted(10, clientRunsNodeId);
+      cy.waitUntilConfigMgmtNodeIsDeleted(10, clientRunsNodeId);
     });
 
     it('nodemanager node is deleted', () => {
-      waitUntilNodemanagerNodeIsDeleted(10, nodeName);
+      cy.waitUntilNodemanagerNodeIsDeleted(10, nodeName);
     });
   });
 });
-
-function waitUntilNodemanagerNodeIsDeleted(attempts: number, nodeName: string): void {
-  if (attempts === -1) {
-    throw new Error('nodemanager node was never deleted');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'POST',
-    url: '/api/v0/nodes/search',
-    body: {
-      filters: [
-        {key: 'manager_id', values: ['']},
-        {key: 'name', 'values': [nodeName]}
-      ]
-    }
-  }).then((response) => {
-    if (response.body.nodes.length === 0) {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for nodemanager node to be deleted`);
-      cy.wait(1000);
-      waitUntilNodemanagerNodeIsDeleted(--attempts, nodeName);
-    }
-  });
-}
-
-function waitUntilNodemanagerNodeIsIngested(attempts: number, nodeName: string): void {
-  if (attempts === -1) {
-    throw new Error('nodemanager node was never ingested');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'POST',
-    url: '/api/v0/nodes/search',
-    body: {
-      filters: [
-        {key: 'manager_id', values: ['']},
-        {key: 'name', 'values': [nodeName]}
-      ]
-    }
-  }).then((response) => {
-    if (response.body.nodes.length === 1) {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for node to be missing`);
-      cy.wait(1000);
-      waitUntilNodemanagerNodeIsIngested(--attempts, nodeName);
-    }
-  });
-}
-
-function waitUntilConfigMgmtNodeIsIngested(attempts: number, clientRunsNodeId: string): void {
-  if (attempts === -1) {
-    throw new Error('config mgmt node was never ingested');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
-  }).then((response) => {
-    if (response.body.length === 1 && response.body[0].id === clientRunsNodeId) {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be ingested`);
-      cy.wait(1000);
-      waitUntilConfigMgmtNodeIsIngested(--attempts, clientRunsNodeId);
-    }
-  });
-}
-
-function waitUntilConfigMgmtNodeIsDeleted(attempts: number, clientRunsNodeId: string): void {
-  if (attempts === -1) {
-    throw new Error('config mgmt node was not deleted');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
-  }).then((response) => {
-    if (response.body.length === 0) {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be deleted`);
-      cy.wait(1000);
-      waitUntilConfigMgmtNodeIsDeleted(--attempts, clientRunsNodeId);
-    }
-  });
-}
-

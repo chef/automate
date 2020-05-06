@@ -20,7 +20,7 @@ describe('Nodemanager node missing', () => {
       });
 
       // Wait for that node to appear
-      waitUntilNodeIsIngested(10, clientRunsNodeId);
+      cy.waitForClientRunsNode(clientRunsNodeId, 10);
 
       // Set the ConfigureNodesMissingScheduler threshold to zero
       cy.request({
@@ -35,12 +35,12 @@ describe('Nodemanager node missing', () => {
       });
 
       // Wait until the node is missing
-      waitUntilNodeIsMissing(10, clientRunsNodeId);
+      cy.waitUntilNodeIsMissing(10, clientRunsNodeId);
     });
 
     after(() => {
       // delete node
-      deleteNode(10, clientRunsNodeId);
+      cy.deleteClientRunsNode(10, clientRunsNodeId);
 
       // Set the ConfigureNodesMissingScheduler threshold back
       cy.request({
@@ -81,7 +81,7 @@ describe('Nodemanager node missing', () => {
       });
 
       // Wait for that node to appear
-      waitUntilNodeIsIngested(10, clientRunsNodeId);
+      cy.waitForClientRunsNode(clientRunsNodeId, 10);
 
       // Force a node missing check
       cy.request({
@@ -96,7 +96,7 @@ describe('Nodemanager node missing', () => {
       });
 
       // Wait until the node is missing
-      waitUntilNodeIsMissing(10, clientRunsNodeId);
+      cy.waitUntilNodeIsMissing(10, clientRunsNodeId);
 
       // Send a CCR within the last day
       cy.fixture('converge/avengers1.json').then((node) => {
@@ -118,7 +118,7 @@ describe('Nodemanager node missing', () => {
 
     after(() => {
       // delete node
-      deleteNode(10, clientRunsNodeId);
+      cy.deleteClientRunsNode(10, clientRunsNodeId);
 
       // Set the ConfigureNodesMissingScheduler threshold back
       cy.request({
@@ -162,74 +162,6 @@ function waitUntilNodemanagerNodeState(attempts: number, nodeName: string, state
       cy.log(`${attempts} attempts remaining: waiting for node to be missing`);
       cy.wait(1000);
       waitUntilNodemanagerNodeState(--attempts, nodeName, state);
-    }
-  });
-}
-
-function waitUntilNodeIsIngested(attempts: number, clientRunsNodeId: string): void {
-  if (attempts === -1) {
-    throw new Error('node was never ingested');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
-  }).then((response) => {
-    if (response.body.length === 1 && response.body[0].id === clientRunsNodeId) {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be ingested`);
-      cy.wait(1000);
-      waitUntilNodeIsIngested(--attempts, clientRunsNodeId);
-    }
-  });
-}
-
-function deleteNode(attempts: number, clientRunsNodeId: string): void {
-  if (attempts === -1) {
-    throw new Error('node was never deleted');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
-  }).then((response) => {
-    if (response.body.length === 0) {
-      return;
-    } else {
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: 'api/v0/ingest/events/chef/node-multiple-deletes',
-        body: {
-          node_ids: [
-            clientRunsNodeId
-          ]
-        },
-        failOnStatusCode: true
-      });
-      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be deleted`);
-      cy.wait(1000);
-      deleteNode(--attempts, clientRunsNodeId);
-    }
-  });
-}
-
-function waitUntilNodeIsMissing(attempts: number, clientRunsNodeId: string): void {
-  if (attempts === -1) {
-    throw new Error('node was never marked missing');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
-  }).then((response) => {
-    if (response.body.length === 1 && response.body[0].id === clientRunsNodeId &&
-      response.body[0].status === 'missing') {
-      return;
-    } else {
-      cy.log(
-        `${attempts} attempts remaining: waiting for node ${clientRunsNodeId}` +
-        'to have status missing');
-      cy.wait(1000);
-      waitUntilNodeIsMissing(--attempts, clientRunsNodeId);
     }
   });
 }
