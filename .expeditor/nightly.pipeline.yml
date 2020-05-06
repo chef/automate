@@ -96,6 +96,15 @@ steps:
           single-use: true
           privileged: true
 
+  - label: "[integration] a1 legacy token"
+    command:
+      - integration/run_test integration/tests/a1_legacy_token.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
   # TODO(ssd) 2019-12-13: This test is broken given the current design
   # of config patch and backup/restore.  We are working on fixes for
   # the various problems that make this test incorrect.
