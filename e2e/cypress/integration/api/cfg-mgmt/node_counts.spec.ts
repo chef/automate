@@ -64,16 +64,16 @@ describe('Config-mgmt node_counts', () => {
     });
 
     // Wait for nodes to be ingested
-    cy.waitForClientRunsNode(clientRunsNodeId1, 10);
-    cy.waitForClientRunsNode(clientRunsNodeId2, 10);
-    cy.waitForClientRunsNode(clientRunsNodeId2, 10);
+    cy.waitForClientRunsNode(clientRunsNodeId1);
+    cy.waitForClientRunsNode(clientRunsNodeId2);
+    cy.waitForClientRunsNode(clientRunsNodeId2);
   });
 
   after(() => {
     // delete all nodes created
-    cy.deleteClientRunsNode(clientRunsNodeId1, 10);
-    cy.deleteClientRunsNode(clientRunsNodeId2, 10);
-    cy.deleteClientRunsNode(clientRunsNodeId3, 10);
+    cy.deleteClientRunsNode(clientRunsNodeId1);
+    cy.deleteClientRunsNode(clientRunsNodeId2);
+    cy.deleteClientRunsNode(clientRunsNodeId3);
   });
 
   it('Get the node counts environment filter', () => {

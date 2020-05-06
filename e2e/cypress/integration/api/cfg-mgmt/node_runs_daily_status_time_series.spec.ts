@@ -79,16 +79,16 @@ describe('Config-mgmt node runs daily time series statuses', () => {
         });
       });
 
-      cy.waitForClientRunsNode(clientRunsNodeId, 10);
-      cy.waitUntilRunIsIngested(clientRunsNodeId, runId1, 10);
-      cy.waitUntilRunIsIngested(clientRunsNodeId, runId2, 10);
-      cy.waitUntilRunIsIngested(clientRunsNodeId, runId3, 10);
-      cy.waitUntilRunIsIngested(clientRunsNodeId, runId4, 10);
+      cy.waitForClientRunsNode(clientRunsNodeId);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId1);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId2);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId3);
+      cy.waitUntilRunIsIngested(clientRunsNodeId, runId4);
     });
 
     after(() => {
       // delete all nodes created
-      cy.deleteClientRunsNode(clientRunsNodeId, 10);
+      cy.deleteClientRunsNode(clientRunsNodeId);
     });
 
     it('check statues', () => {

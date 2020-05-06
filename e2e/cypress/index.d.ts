@@ -9,17 +9,15 @@ declare namespace Cypress {
     restoreStorage(): void
     applyProjectsFilter(projectsToFilterOn: string[]): void
     cleanupIAMObjectsByIDPrefixes(idPrefix: string, objectPlurals: string[]): void
-    applyRulesAndWait(attempts: number): void
-    waitForNodemanagerNode(nodeId: string, maxRetries: number): void
-    waitForClientRunsNode(nodeId: string, maxRetries: number): void
-    waitForComplianceNode(nodeId: string, start: string, end: string,
-      maxRetries: number): void
-    waitForAction(entityName: string, start: string, end: string, 
-      maxRetries: number): void
-    deleteClientRunsNode(clientRunsNodeId: string, attempts: number): void
-    waitUntilRunIsIngested(clientRunsNodeId: string, runId: string, attempts: number): void
-    waitUntilNodeIsMissing(clientRunsNodeId: string, attempts: number): void
-    waitUntilNodemanagerNodeIsDeleted(nodeName: string, attempts: number): void
-    waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId: string, attempts: number): void
+    applyRulesAndWait(): void
+    waitForNodemanagerNode(nodeId: string): void
+    waitForClientRunsNode(nodeId: string): void
+    waitForComplianceNode(nodeId: string, start: string, end: string): void
+    waitForAction(entityName: string, start: string, end: string): void
+    deleteClientRunsNode(clientRunsNodeId: string): void
+    waitUntilRunIsIngested(clientRunsNodeId: string, runId: string): void
+    waitUntilNodeIsMissing(clientRunsNodeId: string): void
+    waitUntilNodemanagerNodeIsDeleted(nodeName: string): void
+    waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId: string): void
   }
 }

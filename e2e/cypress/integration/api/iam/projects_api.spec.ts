@@ -220,7 +220,7 @@ describe('projects API', () => {
           .forEach(({ status }) => expect(status).to.equal(editsPendingStr));
       });
 
-      cy.applyRulesAndWait(100);
+      cy.applyRulesAndWait();
 
       // confirm rules are applied
       for (const project of [projectWithOrgRule, projectWithServerRule]) {
@@ -336,7 +336,7 @@ describe('projects API', () => {
           .forEach(({ status }) => expect(status).to.equal(editsPendingStr));
       });
 
-      cy.applyRulesAndWait(100);
+      cy.applyRulesAndWait();
 
       cy.request({
         headers: {
@@ -394,7 +394,7 @@ describe('projects API', () => {
         expect(response.body.project.status).to.equal(editsPendingStr);
       });
 
-      cy.applyRulesAndWait(100);
+      cy.applyRulesAndWait();
 
       // verify the project no longer has any rules
       cy.request({

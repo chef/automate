@@ -20,7 +20,7 @@ describe('Nodemanager node missing', () => {
       });
 
       // Wait for that node to appear
-      cy.waitForClientRunsNode(clientRunsNodeId, 10);
+      cy.waitForClientRunsNode(clientRunsNodeId);
 
       // Set the ConfigureNodesMissingScheduler threshold to zero
       cy.request({
@@ -35,12 +35,12 @@ describe('Nodemanager node missing', () => {
       });
 
       // Wait until the node is missing
-      cy.waitUntilNodeIsMissing(clientRunsNodeId, 10);
+      cy.waitUntilNodeIsMissing(clientRunsNodeId);
     });
 
     after(() => {
       // delete node
-      cy.deleteClientRunsNode(clientRunsNodeId, 10);
+      cy.deleteClientRunsNode(clientRunsNodeId);
 
       // Set the ConfigureNodesMissingScheduler threshold back
       cy.request({
@@ -81,7 +81,7 @@ describe('Nodemanager node missing', () => {
       });
 
       // Wait for that node to appear
-      cy.waitForClientRunsNode(clientRunsNodeId, 10);
+      cy.waitForClientRunsNode(clientRunsNodeId);
 
       // Force a node missing check
       cy.request({
@@ -96,7 +96,7 @@ describe('Nodemanager node missing', () => {
       });
 
       // Wait until the node is missing
-      cy.waitUntilNodeIsMissing(clientRunsNodeId, 10);
+      cy.waitUntilNodeIsMissing(clientRunsNodeId);
 
       // Send a CCR within the last day
       cy.fixture('converge/avengers1.json').then((node) => {
@@ -118,7 +118,7 @@ describe('Nodemanager node missing', () => {
 
     after(() => {
       // delete node
-      cy.deleteClientRunsNode(clientRunsNodeId, 10);
+      cy.deleteClientRunsNode(clientRunsNodeId);
 
       // Set the ConfigureNodesMissingScheduler threshold back
       cy.request({

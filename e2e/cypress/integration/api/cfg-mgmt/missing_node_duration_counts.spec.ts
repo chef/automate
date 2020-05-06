@@ -27,12 +27,12 @@ describe('Config-mgmt missing node duration counts', () => {
       });
 
       // Wait for it to be ingested
-      cy.waitForClientRunsNode(clientRunsNodeId, 10);
+      cy.waitForClientRunsNode(clientRunsNodeId);
     });
 
     after(() => {
       // delete all nodes created
-      cy.deleteClientRunsNode(clientRunsNodeId, 10);
+      cy.deleteClientRunsNode(clientRunsNodeId);
     });
 
     it('Ensure the node is counted in the missing node duration counts', () => {

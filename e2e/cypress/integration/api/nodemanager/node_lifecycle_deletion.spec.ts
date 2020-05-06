@@ -18,10 +18,10 @@ describe('Nodemanager config mgmt node deletion', () => {
     });
 
     // Wait for that config mgmt node to appear
-    cy.waitForClientRunsNode(clientRunsNodeId, 10);
+    cy.waitForClientRunsNode(clientRunsNodeId);
 
     // Wait for the node to appear in the node manager
-    cy.waitForNodemanagerNode(clientRunsNodeId, 10);
+    cy.waitForNodemanagerNode(clientRunsNodeId);
 
     // Set the ConfigureNodesMissingScheduler threshold to 1 hour
     cy.request({
@@ -36,7 +36,7 @@ describe('Nodemanager config mgmt node deletion', () => {
     });
 
     // Wait until the node is missing
-    cy.waitUntilNodeIsMissing(clientRunsNodeId, 10);
+    cy.waitUntilNodeIsMissing(clientRunsNodeId);
 
     // Set the ConfigureNodesDeleteScheduler threshold to 0 minutes
     cy.request({
@@ -51,7 +51,7 @@ describe('Nodemanager config mgmt node deletion', () => {
     });
 
     // Wait until the config mgmt node is deleted
-    cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId, 10);
+    cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId);
   });
 
   after(() => {
@@ -81,7 +81,7 @@ describe('Nodemanager config mgmt node deletion', () => {
   });
 
   it('nodemanager nodes is deleted', () => {
-    cy.waitUntilNodemanagerNodeIsDeleted(nodeName, 10);
+    cy.waitUntilNodemanagerNodeIsDeleted(nodeName);
   });
 });
 

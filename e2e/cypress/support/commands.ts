@@ -158,18 +158,22 @@ Cypress.Commands.add('cleanupIAMObjectsByIDPrefixes',
   });
 });
 
-Cypress.Commands.add('applyRulesAndWait', (attempts: number) => {
+Cypress.Commands.add('applyRulesAndWait', () => {
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'POST',
     url: '/apis/iam/v2/apply-rules'
   });
 
-  waitUntilApplyRulesNotRunning(attempts);
+  waitUntilApplyRulesNotRunning(100);
 });
 
 Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string, maxRetries: number) => {
-  if (maxRetries === -1) {
+  waitForNodemanagerNodeLoop(nodeId, 10);
+});
+
+function waitForNodemanagerNodeLoop(nodeId: string, attemptsLeft: number) {
+  if (attemptsLeft === -1) {
     throw new Error('nodemanager node was never ingested');
   }
   cy.request({
@@ -186,20 +190,22 @@ Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string, maxRetries: numb
     }
   })
   .then((resp: Cypress.ObjectLike) => {
-    // to avoid getting stuck in an infinite loop
-    expect(maxRetries).to.not.be.equal(0);
     if (resp.body.nodes && resp.body.nodes.length > 0 &&
       resp.body.nodes.some((node: any) => node.id === nodeId)) {
       return;
     }
     cy.wait(1000);
-    cy.waitForNodemanagerNode(nodeId, maxRetries - 1);
+    waitForNodemanagerNodeLoop(nodeId, attemptsLeft - 1);
   });
-});
+}
 
 Cypress.Commands.add('waitForClientRunsNode', (nodeId: string, maxRetries: number) => {
-  if (maxRetries === -1) {
-    throw new Error('node was never ingested');
+  waitForClientRunsNodeLoop(nodeId, maxRetries - 1);
+});
+
+function waitForClientRunsNodeLoop(nodeId: string, attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error('client runs node was never created');
   }
   cy
   .request({
@@ -211,20 +217,23 @@ Cypress.Commands.add('waitForClientRunsNode', (nodeId: string, maxRetries: numbe
     url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${nodeId}`
   })
   .then((resp: Cypress.ObjectLike) => {
-    // to avoid getting stuck in an infinite loop
-    if (maxRetries === 0) {
-      return;
-    }
     if (resp.body.length === 1 && resp.body[0].id === nodeId) {
       return;
     }
     cy.wait(1000);
-    cy.waitForClientRunsNode(nodeId, maxRetries - 1);
+    waitForClientRunsNodeLoop(nodeId, attemptsLeft - 1);
   });
+}
+
+Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, end: string) => {
+  waitForComplianceNodeLoop(nodeId, start, end, 100);
 });
 
-Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, end: string,
-  maxRetries: number) => {
+function waitForComplianceNodeLoop(nodeId: string, start: string, end: string,
+  attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error(`Compliance node with ID ${nodeId} was not created`);
+  }
   cy.request({
     headers: {
       projects: ['*'],
@@ -245,18 +254,23 @@ Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, en
     }
   })
   .then((resp: Cypress.ObjectLike) => {
-    // to avoid getting stuck in an infinite loop
-    expect(maxRetries, `Looking for compliance node with ID ${nodeId}`).to.not.be.equal(0);
     if (resp.body.nodes && resp.body.nodes.length > 0 && resp.body.nodes[0].id === nodeId ) {
       return;
     }
     cy.wait(1000);
-    cy.waitForComplianceNode(nodeId, start, end, maxRetries - 1);
+    waitForComplianceNodeLoop(nodeId, start, end, attemptsLeft - 1);
   });
+}
+
+Cypress.Commands.add('waitForAction', (entityName: string, start: string, end: string) => {
+  waitForActionLoop(entityName, start, end, 30);
 });
 
-Cypress.Commands.add('waitForAction', (entityName: string, start: string, end: string,
-  maxRetries: number) => {
+function waitForActionLoop(entityName: string, start: string, end: string,
+  attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error(`Action with entity name ${entityName} was not created`);
+  }
   cy.request({
     headers: {
       projects: ['*'],
@@ -264,25 +278,24 @@ Cypress.Commands.add('waitForAction', (entityName: string, start: string, end: s
     },
     method: 'GET',
     url: `api/v0/eventfeed?collapse=false&page_size=100&start=${start}&end=${end}`
-  })
-    .then((resp: Cypress.ObjectLike) => {
-      // to avoid getting stuck in an infinite loop
-      if (maxRetries === 0) {
-        expect(0).to.equal(1);
-        return;
-      }
+  }).then((resp: Cypress.ObjectLike) => {
       if (resp.body.events && resp.body.events.length > 0 &&
         eventExist(entityName, resp.body.events)) {
         return;
       }
       cy.wait(1000);
-      cy.waitForAction(entityName, start, end, maxRetries - 1);
-    });
-});
+      waitForActionLoop(entityName, start, end, attemptsLeft - 1);
+  });
+}
 
 Cypress.Commands.add('deleteClientRunsNode', (clientRunsNodeId: string, attempts: number) => {
-  if (attempts === -1) {
-    throw new Error('node was never deleted');
+  deleteClientRunsNodeLoop(clientRunsNodeId, 10);
+});
+
+function deleteClientRunsNodeLoop(clientRunsNodeId: string,
+  attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error('client runs node was never deleted');
   }
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -302,17 +315,23 @@ Cypress.Commands.add('deleteClientRunsNode', (clientRunsNodeId: string, attempts
         },
         failOnStatusCode: true
       });
-      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be deleted`);
+      cy.log(`${attemptsLeft} attempts remaining: waiting for node` +
+        ` ${clientRunsNodeId} to be deleted`);
       cy.wait(1000);
-      cy.deleteClientRunsNode(clientRunsNodeId, --attempts);
+      deleteClientRunsNodeLoop(clientRunsNodeId, attemptsLeft - 1);
     }
   });
-});
+}
 
 // This function is only waiting for the node to be deleted. It is not deleting it.
-Cypress.Commands.add('waitUntilNodemanagerNodeIsDeleted', (nodeName: string, attempts: number) => {
-  if (attempts === -1) {
-    throw new Error('nodemanager node was never deleted');
+Cypress.Commands.add('waitUntilNodemanagerNodeIsDeleted', (nodeName: string) => {
+  waitUntilNodemanagerNodeIsDeletedLoop(nodeName, 10);
+});
+
+function waitUntilNodemanagerNodeIsDeletedLoop(nodeName: string,
+  attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error(`nodemanager node with name ${nodeName} was never deleted`);
   }
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -328,17 +347,20 @@ Cypress.Commands.add('waitUntilNodemanagerNodeIsDeleted', (nodeName: string, att
     if (response.body.nodes.length === 0) {
       return;
     } else {
-      cy.log(`${attempts} attempts remaining: waiting for nodemanager node to be deleted`);
+      cy.log(`${attemptsLeft} attempts remaining: waiting for nodemanager node to be deleted`);
       cy.wait(1000);
-      cy.waitUntilNodemanagerNodeIsDeleted(nodeName, --attempts);
+      waitUntilNodemanagerNodeIsDeletedLoop(nodeName, attemptsLeft - 1);
     }
   });
+}
+
+Cypress.Commands.add('waitUntilConfigMgmtNodeIsDeleted', (clientRunsNodeId: string) => {
+  waitUntilConfigMgmtNodeIsDeletedLoop(clientRunsNodeId, 10);
 });
 
-Cypress.Commands.add('waitUntilConfigMgmtNodeIsDeleted',
-  (clientRunsNodeId: string, attempts: number) => {
-  if (attempts === -1) {
-    throw new Error('config mgmt node was not deleted');
+function waitUntilConfigMgmtNodeIsDeletedLoop(clientRunsNodeId: string, attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error(`infra node with ID ${clientRunsNodeId} was not deleted`);
   }
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -347,17 +369,22 @@ Cypress.Commands.add('waitUntilConfigMgmtNodeIsDeleted',
     if (response.body.length === 0) {
       return;
     } else {
-      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be deleted`);
+      cy.log(`${attemptsLeft} attempts remaining: waiting for node` +
+        ` ${clientRunsNodeId} to be deleted`);
       cy.wait(1000);
-      cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId, --attempts);
+      waitUntilConfigMgmtNodeIsDeletedLoop(clientRunsNodeId, attemptsLeft - 1);
     }
   });
+}
+
+Cypress.Commands.add('waitUntilRunIsIngested', (clientRunsNodeId: string, runId: string) => {
+  waitUntilRunIsIngestedLoop(clientRunsNodeId, runId, 10);
 });
 
-Cypress.Commands.add('waitUntilRunIsIngested', (clientRunsNodeId: string,
-  runId: string, attempts: number) => {
-  if (attempts === -1) {
-    throw new Error('run was never ingested');
+function waitUntilRunIsIngestedLoop(clientRunsNodeId: string,
+  runId: string, attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error(`run with ID ${clientRunsNodeId} was never ingested`);
   }
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -367,16 +394,20 @@ Cypress.Commands.add('waitUntilRunIsIngested', (clientRunsNodeId: string,
     if (response.status !== 404 && response.body.id === runId) {
       return;
     } else {
-      cy.log(`${attempts} attempts remaining: waiting for run ${runId} to be ingested`);
+      cy.log(`${attemptsLeft} attempts remaining: waiting for run ${runId} to be ingested`);
       cy.wait(1000);
-      cy.waitUntilRunIsIngested(clientRunsNodeId, runId, --attempts);
+      waitUntilRunIsIngestedLoop(clientRunsNodeId, runId, attemptsLeft - 1);
     }
   });
+}
+
+Cypress.Commands.add('waitUntilNodeIsMissing', (clientRunsNodeId: string) => {
+  waitUntilNodeIsMissingLoop(clientRunsNodeId, 10);
 });
 
-Cypress.Commands.add('waitUntilNodeIsMissing', (clientRunsNodeId: string, attempts: number) => {
-  if (attempts === -1) {
-    throw new Error('node was never marked missing');
+function waitUntilNodeIsMissingLoop(clientRunsNodeId: string, attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error('infra node was never marked missing');
   }
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -387,13 +418,13 @@ Cypress.Commands.add('waitUntilNodeIsMissing', (clientRunsNodeId: string, attemp
       return;
     } else {
       cy.log(
-        `${attempts} attempts remaining: waiting for node ${clientRunsNodeId}` +
+        `${attemptsLeft} attempts remaining: waiting for node ${clientRunsNodeId}` +
         'to have status missing');
       cy.wait(1000);
-      cy.waitUntilNodeIsMissing(clientRunsNodeId, --attempts);
+      waitUntilNodeIsMissingLoop(clientRunsNodeId, attemptsLeft - 1);
     }
   });
-});
+}
 
 // the helpers below are used only in the Cypress commands defined in this file
 // other helpers for use in tests can be found in helpers.ts

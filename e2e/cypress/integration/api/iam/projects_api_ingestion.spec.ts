@@ -249,7 +249,7 @@ describe('Ingestion project tagging', () => {
       });
     });
 
-    cy.applyRulesAndWait(100);
+    cy.applyRulesAndWait();
 
     // Ingest a InSpec report with attributes that match all the projects
     cy.fixture('compliance/inspec-report.json').then((report) => {
@@ -307,15 +307,15 @@ describe('Ingestion project tagging', () => {
     });
 
     // wait for the report to be ingested
-    cy.waitForNodemanagerNode(complianceNodeId, 30);
-    cy.waitForComplianceNode(complianceNodeId, nodeStart, nodeEnd, 30);
+    cy.waitForNodemanagerNode(complianceNodeId);
+    cy.waitForComplianceNode(complianceNodeId, nodeStart, nodeEnd);
 
     // wait for the client run report to be ingested
-    cy.waitForNodemanagerNode(clientRunsNodeId, 30);
-    cy.waitForClientRunsNode(clientRunsNodeId, 30);
+    cy.waitForNodemanagerNode(clientRunsNodeId);
+    cy.waitForClientRunsNode(clientRunsNodeId);
 
     // wait for the action to be ingested
-    cy.waitForAction(entityName, eventStart, eventEnd, 30);
+    cy.waitForAction(entityName, eventStart, eventEnd);
   });
 
   after(() => {

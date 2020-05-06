@@ -39,12 +39,12 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for that config mgmt node to appear
-      cy.waitForClientRunsNode(clientRunsNodeId1, 10);
-      cy.waitForClientRunsNode(clientRunsNodeId2, 10);
+      cy.waitForClientRunsNode(clientRunsNodeId1);
+      cy.waitForClientRunsNode(clientRunsNodeId2);
 
       // Wait for the node to appear in the node manager
-      cy.waitForNodemanagerNode(clientRunsNodeId1, 10);
-      cy.waitForNodemanagerNode(clientRunsNodeId2, 10);
+      cy.waitForNodemanagerNode(clientRunsNodeId1);
+      cy.waitForNodemanagerNode(clientRunsNodeId2);
 
       // delete both nodes
       cy.request({
@@ -57,13 +57,13 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for the node to be removed from config mgmt
-      cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId1, 10);
-      cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId2, 10);
+      cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId1);
+      cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId2);
     });
 
     it('nodemanager nodes are deleted', () => {
-      cy.waitUntilNodemanagerNodeIsDeleted(nodeName1, 10);
-      cy.waitUntilNodemanagerNodeIsDeleted(nodeName2, 10);
+      cy.waitUntilNodemanagerNodeIsDeleted(nodeName1);
+      cy.waitUntilNodemanagerNodeIsDeleted(nodeName2);
     });
   });
 
@@ -89,10 +89,10 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for that config mgmt node to appear
-      cy.waitForClientRunsNode(clientRunsNodeId, 10);
+      cy.waitForClientRunsNode(clientRunsNodeId);
 
       // Wait for the node to appear in the node manager
-      cy.waitForNodemanagerNode(clientRunsNodeId, 10);
+      cy.waitForNodemanagerNode(clientRunsNodeId);
 
       // delete the node
       cy.request({
@@ -107,11 +107,11 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for the node to be removed from config mgmt
-      cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId, 10);
+      cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId);
     });
 
     it('nodemanager node is deleted', () => {
-      cy.waitUntilNodemanagerNodeIsDeleted(nodeName, 10);
+      cy.waitUntilNodemanagerNodeIsDeleted(nodeName);
     });
   });
 
@@ -133,10 +133,10 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for that config mgmt node to appear
-      cy.waitForClientRunsNode(clientRunsNodeId, 10);
+      cy.waitForClientRunsNode(clientRunsNodeId);
 
       // Wait for the node to appear in the node manager
-      cy.waitForNodemanagerNode(clientRunsNodeId, 10);
+      cy.waitForNodemanagerNode(clientRunsNodeId);
 
       // delete the node
       cy.request({
@@ -149,11 +149,11 @@ describe('Nodemanager config mgmt node rpc deletion', () => {
       });
 
       // Wait for the node to be removed from config mgmt
-      cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId, 10);
+      cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId);
     });
 
     it('nodemanager node is deleted', () => {
-      cy.waitUntilNodemanagerNodeIsDeleted(nodeName, 10);
+      cy.waitUntilNodemanagerNodeIsDeleted(nodeName);
     });
   });
 });

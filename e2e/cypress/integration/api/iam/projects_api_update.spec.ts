@@ -277,15 +277,15 @@ describe('project update re-tagging', () => {
     });
 
     // wait for the report to be ingested
-    cy.waitForNodemanagerNode(complianceNodeId, 30);
-    cy.waitForComplianceNode(complianceNodeId, nodeStart, nodeEnd, 30);
+    cy.waitForNodemanagerNode(complianceNodeId);
+    cy.waitForComplianceNode(complianceNodeId, nodeStart, nodeEnd);
 
     // wait for the client run report to be ingested
-    cy.waitForNodemanagerNode(clientRunsNodeId, 30);
-    cy.waitForClientRunsNode(clientRunsNodeId, 30);
+    cy.waitForNodemanagerNode(clientRunsNodeId);
+    cy.waitForClientRunsNode(clientRunsNodeId);
 
     // wait for the action to be ingested
-    cy.waitForAction(entityName, actionStart, actionEnd, 30);
+    cy.waitForAction(entityName, actionStart, actionEnd);
 
     // create the projects with one node rule
     projectsWithNodeRule.forEach(projectWithRule => {
@@ -321,7 +321,7 @@ describe('project update re-tagging', () => {
       });
     });
 
-    cy.applyRulesAndWait(100);
+    cy.applyRulesAndWait();
   });
 
   after(() => {
