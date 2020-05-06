@@ -80,6 +80,9 @@ func ChefRunTransmogrify(in <-chan message.ChefRun, out chan<- message.ChefRun, 
 				continue
 			}
 
+			// Needed for the nodemanager because the platform field is combined with the version.
+			msg.Platform = ccr.Platform()
+
 			message.PropagateChefRun(out, &msg)
 		}
 		close(out)
