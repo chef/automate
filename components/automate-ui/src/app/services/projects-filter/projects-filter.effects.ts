@@ -63,13 +63,13 @@ export class ProjectsFilterEffects {
         const fetched = this.convertResponse(resp.projects);
         let restored = this.projectsFilter.restoreOptions() || [];
 
-        // throw out any localstoreage keys that no longer exist.
-        // intersectionBy choses results from the first array so
+        // throw out any LocalStorage keys that no longer exist.
+        // intersectionBy chooses results from the first array so
         // restored's checked results are preserved.
         restored = intersectionBy('value', restored, fetched);
 
         // don't reload the page, but persist to localstorage
-        this.projectsFilter.updateLocalstorage(restored);
+        this.projectsFilter.updateLocalStorage(restored);
 
         return new LoadOptionsSuccess({
           fetched,
