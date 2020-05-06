@@ -29,7 +29,7 @@ defmodule Notifications.Formatters.Slack.Test do
           Line: 26```
           """)
         }],
-        icon_url: "https://docs.chef.io/_static/chef_logo_v2.png",
+        icon_url: "https://docs.chef.io/images/chef-icon.png",
         text: "<https://localhost/nodes/0271e125-97dd-498a-b026-8448ee60aafe/runs/ba6acb91-1eaa-4c84-8d68-f19ee641e606|Chef client run failure on insights.chef.co>\n",
         username: "Chef Automate"
     }

@@ -23,7 +23,7 @@ defmodule Notifications.Formatters.Slack.Compliance.Test do
             mrkdwn_in: ["text", "pretext"],
             text: "```expected File /etc/ssh not to be readable by others```\n"
         }],
-        icon_url: "https://docs.chef.io/_static/chef_logo_v2.png",
+        icon_url: "https://docs.chef.io/images/chef-icon.png",
         text: "<https://localhost/compliance/reporting/nodes/deadbeef05|InSpec found a critical control failure on node pretty-chipper-node>",
         username: "Chef Automate"
     }
@@ -52,7 +52,7 @@ defmodule Notifications.Formatters.Slack.Compliance.Test do
             mrkdwn_in: ["text", "pretext"],
             text: "```2 of 3 tests failed. View in Chef Automate for full details.```\n"
         }],
-        icon_url: "https://docs.chef.io/_static/chef_logo_v2.png",
+        icon_url: "https://docs.chef.io/images/chef-icon.png",
         text: "<https://localhost/compliance/reporting/nodes/deadbeef04|InSpec found a critical control failure on node unhappy-node>",
         username: "Chef Automate"
     }
@@ -81,7 +81,7 @@ defmodule Notifications.Formatters.Slack.Compliance.Test do
             mrkdwn_in: ["text", "pretext"],
             text: "```2 of 3 tests failed. View in Chef Automate for full details.```\n"
         }],
-        icon_url: "https://docs.chef.io/_static/chef_logo_v2.png",
+        icon_url: "https://docs.chef.io/images/chef-icon.png",
         text: "<https://localhost/compliance/reporting/nodes/deadbeef03|InSpec found a critical control failure on node sad-node>",
         username: "Chef Automate"
     }
@@ -110,7 +110,7 @@ defmodule Notifications.Formatters.Slack.Compliance.Test do
             mrkdwn_in: ["text", "pretext"],
             text: "```97 of 174 tests failed. View in Chef Automate for full details.```\n"
         }],
-        icon_url: "https://docs.chef.io/_static/chef_logo_v2.png",
+        icon_url: "https://docs.chef.io/images/chef-icon.png",
         text: "<https://localhost/compliance/reporting/nodes/deadbeef06|InSpec found a critical control failure on node failing-node>",
         username: "Chef Automate"
     }

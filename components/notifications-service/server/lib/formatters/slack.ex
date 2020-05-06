@@ -16,7 +16,7 @@ defmodule Notifications.Formatters.Slack do
   def format(%{__struct__: type} = n) when type in [CCRFailure, CCRSuccess] do
     payload = Message.new(
       username: "Chef Automate",
-      icon_url: "https://docs.chef.io/_static/chef_logo_v2.png",
+      icon_url: "https://docs.chef.io/images/chef-icon.png",
       attachments: [attachment_note(n)],
       text: alert_text(n)
     )
