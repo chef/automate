@@ -11,7 +11,7 @@ import {
 } from '../../types/types';
 
 import { EventFeedService } from './event-feed.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { initialState } from './event-feed.reducer';
 
 describe('EventFeedService', () => {

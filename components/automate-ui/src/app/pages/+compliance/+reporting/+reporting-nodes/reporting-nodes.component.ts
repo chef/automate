@@ -2,7 +2,7 @@ import { takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { groupBy } from 'lodash';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { FilterC } from '../types';
 import { paginationOverride } from '../shared';
 import {

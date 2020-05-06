@@ -55,7 +55,7 @@ describe('OrgDetailsComponent', () => {
     fixture = TestBed.createComponent(OrgDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    router = TestBed.get(Router);
+    router = TestBed.inject(Router);
   });
 
   it('should create', () => {

@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { includes } from 'lodash/fp';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 import { EntityStatus } from '../../entities/entities';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';

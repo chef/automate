@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 /**
  * The datetime pipe formats datetime strings or moment objects. It's

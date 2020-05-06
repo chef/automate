@@ -3,7 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { StatsService } from './stats.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
 

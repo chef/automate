@@ -3,7 +3,7 @@ import { Component, OnChanges, SimpleChange, Input, AfterContentInit,
 import {
   NodeDetailsService
 } from '../../services/node-details/node-details.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { NodeRun } from '../../types/types';
 import { DateTime } from 'app/helpers/datetime/datetime';
 

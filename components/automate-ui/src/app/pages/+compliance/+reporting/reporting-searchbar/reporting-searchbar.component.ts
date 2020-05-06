@@ -14,7 +14,7 @@ import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
 import { FilterC } from '../types';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { Chicklet } from 'app/types/types';
 import {
   ReportQueryService

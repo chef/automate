@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { of as observableOf } from 'rxjs';
 
 import { DateTime } from 'app/helpers/datetime/datetime';
