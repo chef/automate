@@ -87,7 +87,7 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 		})
 	}
 	if in.Report.GetEnvironment() != "" {
-		tags = append(tags, &common.Kv{Key: "Environment", Value: in.Report.GetEnvironment()})
+		tags = append(tags, &common.Kv{Key: "environment", Value: in.Report.GetEnvironment()})
 	}
 
 	return &manager.NodeMetadata{
