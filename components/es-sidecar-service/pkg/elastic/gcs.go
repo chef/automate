@@ -27,14 +27,12 @@ func (gcs *GCSBackupsConfig) createRepoReq(repoName string) createRepoReq {
 			"bucket":    gcs.BucketName,
 			"base_path": filepath.Join(gcs.BasePath, RepoBaseName, repoName),
 			"compress":  gcs.Compress,
+			"readonly":  gcs.ReadOnly,
 		},
 	}
 
 	if gcs.ClientName != "" {
 		req.Settings["client"] = gcs.ClientName
-	}
-	if gcs.ReadOnly != "" {
-		req.Settings["readonly"] = gcs.ReadOnly
 	}
 	if gcs.ChunkSize != "" {
 		req.Settings["chunk_size"] = gcs.ChunkSize
