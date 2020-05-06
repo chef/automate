@@ -128,6 +128,10 @@ func TestGatherInfoForNodeDoesNotCollectProjectsDataIfScanJob(t *testing.T) {
 		Projects:     []string{"tomato", "cucumber"},
 		JobUuid:      "12335892329454",
 		ProjectsData: []*nodes.ProjectsData{},
+		Tags: []*common.Kv{
+			{Key: "chef-tag", Value: "application"},
+			{Key: "chef-tag", Value: "database"},
+		},
 	}, nodeMetadata)
 }
 
