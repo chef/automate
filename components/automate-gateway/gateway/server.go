@@ -429,9 +429,7 @@ func (s *Server) startHTTPServer() error {
 
 	// "GET /status" is used for monitoring
 	// We made it a custom handler in order to be able to return 500 when some services are down.
-	// Note: this is not supposed to be called through automate-load-balancer, since it's not
-	// prefixed with /api/v0.
-	mux.HandleFunc("/status", s.DeploymentStatusHandler)
+	mux.HandleFunc("/api/v0/status", s.DeploymentStatusHandler)
 
 	// register open api endpoint definitions
 	mux.Handle("/api/v0/openapi/", http.StripPrefix("/api/v0/openapi", openAPIServicesHandler()))
