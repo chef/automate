@@ -114,9 +114,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         (uStatus === EntityStatus.loading) ||
         (usersStatus === EntityStatus.loading);
       if (this.isLoadingTeam) {
-        this.updateForm.controls['name'].disable();
+        this.updateForm.controls.name.disable();
       } else {
-        this.updateForm.controls['name'].enable();
+        this.updateForm.controls.name.enable();
       }
     });
 
@@ -191,7 +191,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   saveTeam(): void {
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    this.updateForm.controls['name'].disable();
+    this.updateForm.controls.name.disable();
     const name: string = this.updateForm.controls.name.value.trim();
     const projects: string[] = this.updateForm.controls.projects.value;
     this.store.dispatch(new UpdateTeam({ ...this.team, name, projects }));
