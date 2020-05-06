@@ -1,3 +1,5 @@
+PAGE_DIR := pages
+PAGE_FLAGS := --module app
 PAGE_COMPONENT_DIR := page-components
 PAGE_COMPONENT_FLAGS := --module app
 COMPONENT_PREFIX := chef
@@ -60,11 +62,24 @@ license_scout:
 	cd /tmp/license_scout && bundle install --without=development --quiet && echo "license_scout version" && git rev-parse HEAD
 	/tmp/license_scout/bin/license_scout
 
+# These are shortcuts for generating new components in various subdirs.
+# Example:
+#    $ make page/TopNavLanding
+#    ng "generate" "component" "pages/TopNavLanding" "--module" "app"
+#    CREATE src/app/pages/top-nav-landing/top-nav-landing.component.scss (0 bytes)
+#    CREATE src/app/pages/top-nav-landing/top-nav-landing.component.html (30 bytes)
+#    CREATE src/app/pages/top-nav-landing/top-nav-landing.component.spec.ts (679 bytes)
+#    CREATE src/app/pages/top-nav-landing/top-nav-landing.component.ts (310 bytes)
+#    UPDATE src/app/app.module.ts (14252 bytes)
+
 demo/%:
 	$(NG_CMD) generate component $(DEMO_DIR)/demo-$(@F) $(DEMO_FLAGS)
 
 component/%:
 	$(NG_CMD) generate component $(COMPONENT_DIR)/$(@F) $(COMPONENT_FLAGS)
+
+page/%:
+	$(NG_CMD) generate component $(PAGE_DIR)/$(@F) $(PAGE_FLAGS)
 
 page-component/%:
 	$(NG_CMD) generate component $(PAGE_COMPONENT_DIR)/$(@F) $(PAGE_COMPONENT_FLAGS)
