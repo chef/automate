@@ -73,17 +73,17 @@ function infra_service_load_sample_data() {
 }
 
 function infra_service_create_servers_orgs() {
-  chef-automate dev grpcurl infra-proxy-service -- -d \
+  chef-automate dev grpcurl automate-gateway -- -d \
   "$(cat << EOF
     {"id": "$1", "name": "$2", "ip_address": "$3", "fqdn": "$4"}
 EOF
-  )" chef.automate.domain.infra_proxy.service.InfraProxy.CreateServer >/dev/null 2>&1
+  )" chef.automate.api.infra_proxy.InfraProxy.CreateServer >/dev/null
 
-  chef-automate dev grpcurl infra-proxy-service -- -d \
+  chef-automate dev grpcurl automate-gateway -- -d \
   "$(cat << EOF
     {"id": "$5", "name": "$6", "admin_user": "$7", "admin_key": "$8", "server_id": "$1", "projects": []}
 EOF
-  )" chef.automate.domain.infra_proxy.service.InfraProxy.CreateOrg >/dev/null 2>&1
+  )" chef.automate.api.infra_proxy.InfraProxy.CreateOrg >/dev/null
 }
 
 document "infra_service_psql" <<DOC
