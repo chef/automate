@@ -83,7 +83,6 @@ describe('ChefServersListComponent', () => {
     const server = <Server>{
       id: '1',
       name: 'new server',
-      description: 'new server description',
       fqdn: 'xyz.com',
       ip_address: '1.1.1.1'
     };
@@ -98,21 +97,21 @@ describe('ChefServersListComponent', () => {
       expect(component.createModalVisible).toBe(true);
     });
 
-    it('opening create modal resets name, description, fqdn and ip_address to empty string', () => {
+    it('opening create modal resets id, name, fqdn and ip_address to empty string', () => {
+      component.createChefServerForm.controls['id'].setValue('any');
       component.createChefServerForm.controls['name'].setValue('any');
-      component.createChefServerForm.controls['description'].setValue('any');
       component.createChefServerForm.controls['fqdn'].setValue('any');
       component.createChefServerForm.controls['ip_address'].setValue('any');
       component.openCreateModal();
+      expect(component.createChefServerForm.controls['id'].value).toBe(null);
       expect(component.createChefServerForm.controls['name'].value).toBe(null);
-      expect(component.createChefServerForm.controls['description'].value).toBe(null);
       expect(component.createChefServerForm.controls['fqdn'].value).toBe(null);
       expect(component.createChefServerForm.controls['ip_address'].value).toBe(null);
     });
 
     it('on success, closes modal and adds new server', () => {
+      component.createChefServerForm.controls['id'].setValue(server.id);
       component.createChefServerForm.controls['name'].setValue(server.name);
-      component.createChefServerForm.controls['description'].setValue(server.description);
       component.createChefServerForm.controls['fqdn'].setValue(server.fqdn);
       component.createChefServerForm.controls['ip_address'].setValue(server.ip_address);
       component.createChefServer();
@@ -127,8 +126,8 @@ describe('ChefServersListComponent', () => {
     it('on conflict error, modal is open with conflict error', () => {
       spyOn(component.conflictErrorEvent, 'emit');
       component.openCreateModal();
+      component.createChefServerForm.controls['id'].setValue(server.id);
       component.createChefServerForm.controls['name'].setValue(server.name);
-      component.createChefServerForm.controls['description'].setValue(server.description);
       component.createChefServerForm.controls['fqdn'].setValue(server.fqdn);
       component.createChefServerForm.controls['ip_address'].setValue(server.ip_address);
       component.createChefServer();
@@ -146,8 +145,8 @@ describe('ChefServersListComponent', () => {
     it('on create error, modal is closed with failure banner', () => {
       spyOn(component.conflictErrorEvent, 'emit');
       component.openCreateModal();
+      component.createChefServerForm.controls['id'].setValue(server.id);
       component.createChefServerForm.controls['name'].setValue(server.name);
-      component.createChefServerForm.controls['description'].setValue(server.description);
       component.createChefServerForm.controls['fqdn'].setValue(server.fqdn);
       component.createChefServerForm.controls['ip_address'].setValue(server.ip_address);
       component.createChefServer();
@@ -261,7 +260,6 @@ describe('ChefServersListComponent', () => {
       id,
       orgs_count,
       name: 'Demo Server',
-      description: 'Demo Description',
       fqdn: 'http://demo.com/',
       ip_address: '192.168.2.1'
     };

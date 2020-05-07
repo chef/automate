@@ -61,7 +61,7 @@
         <chef-form-field>
           <label>
             <span class="label">Admin Key <span aria-hidden="true">*</span></span>
-            <textarea chefInput name="admin_key" id="admin_key" formControlName="admin_key" cols="54" rows="10" autofocus></textarea>
+            <textarea chefInput name="admin_key" id="admin_key" formControlName="admin_key" cols="54" rows="10" placeholder="-----BEGIN RSA PRIVATE KEY -----" autofocus></textarea>
           </label>
           <chef-error
             *ngIf="(createForm.get('admin_key').hasError('required') || createForm.get('admin_key').hasError('pattern')) && createForm.get('admin_key').dirty">
