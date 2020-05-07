@@ -19,9 +19,13 @@ if ! [[ -L "{{pkg.svc_var_path}}/config/certs/CAs/public.crt" ]]; then
   ln -s "{{pkg.svc_config_path}}/public.crt" "{{pkg.svc_var_path}}/config/certs/CAs/public.crt"
 fi
 
+
 {{#if cfg.gateway.backup.s3.ssl.root_cert}}
 ln -fs "{{pkg.svc_config_path}}/custom_s3.crt" "{{pkg.svc_var_path}}/config/certs/CAs/custom_s3.crt"
 {{/if}}
+
+{{#if cfg.backup.gcs.credentials}}
+export GOOGLE_APPLICATION_CREDENTIALS="{{../pkg.svc_config_path}}/google_application_credentials.json"
 
 secrets-helper generate backup-gateway.access_key 64 --if-not-exists
 secrets-helper generate backup-gateway.secret_key 64 --if-not-exists
@@ -39,6 +43,13 @@ exec minio gateway s3 {{cfg.gateway.backup.s3.bucket.endpoint}} \
   --config-dir "{{pkg.svc_var_path}}/config" \
   --address "{{sys.ip}}:{{cfg.service.port}}" \
   --quiet
+
+{{else if cfg.gateway.backup.gcs.bucket.name~}}
+exec minio gateway gcs {{cfg.gateway.backup.gcs.bucket.projectid}} \
+  --config-dir "{{pkg.svc_var_path}}/config" \
+  --address "{{sys.ip}}:{{cfg.service.port}}" \
+  --quiet
+
 {{else}}
 
 # Symlink the "backups" bucket to the backup filesystem path
