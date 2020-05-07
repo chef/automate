@@ -21,12 +21,12 @@
       <div class="page-body">
 
         <div class="group-section">
-          <chef-button primary [disabled]="(!automateSettingsForm.dirty || !automateSettingsForm.valid) || saving" (click)="applyChanges()">
-            <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
-            <span *ngIf="!saving">Save Changes</span>
-            <span *ngIf="saving">Saving...</span>
-          </chef-button>
-          <button ibmButton="primary">I'm a button</button>
+          <ngx-chef-button 
+            [buttonText]="saving ? 'Saving...' : 'Save Changes'"
+            [loading]="saving ? true : false" 
+            [disabled]="(!automateSettingsForm.dirty || !automateSettingsForm.valid) || saving"
+            (click)="applyChanges()"
+          ></ngx-chef-button>
         </div>
 
 

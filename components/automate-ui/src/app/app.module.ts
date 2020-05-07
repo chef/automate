@@ -188,11 +188,12 @@ import { UIComponent } from 'app/ui.component';
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
 
 import { ButtonModule } from 'carbon-components-angular';
-import { ModalModule } from 'carbon-components-angular';
+import { NgxChefDesignSystemModule } from 'ngx-chef-design-system';
 
 @NgModule({
   declarations: [
     // Page Components
+
     AppComponent,
     ApplicationsComponent,
     AttributesComponent,
@@ -252,8 +253,8 @@ import { ModalModule } from 'carbon-components-angular';
     DeleteNotificationDialogComponent
   ],
   imports: [
+    NgxChefDesignSystemModule,
     ButtonModule,
-    ModalModule,
     ApiTokenModule,
     AppRoutingModule,
     BrowserAnimationsModule,
