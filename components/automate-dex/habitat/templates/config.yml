@@ -61,6 +61,7 @@ staticClients:
   - id: automate-api # public, no secret, used by a2-api tests and l-u-s
     name: Automate API
     public: true
+    secretEnv: THISDOESNOTEXIST
   - id: automate-session
     secret: secretchangeme # TODO
     redirectURIs:
