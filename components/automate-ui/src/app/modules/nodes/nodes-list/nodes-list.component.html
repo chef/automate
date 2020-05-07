@@ -89,19 +89,13 @@
             </chef-tr>
           </chef-tbody>
         </chef-table>
-        <!-- <app-page-picker
-        [total]="totalNodes"
-        [perPage]="pageSize"
-        [page]="currentPage"
-        (pageChanged)="onPageChange($event)">
-      </app-page-picker> -->
       <app-page-picker
-  class="nodes-list-paging"
-  [total]="nodesList.total"
-  [perPage]="nodesList.per_page"
-  [page]="nodesList.page"
-  (pageChanged)="onPageChange($event)">
-</app-page-picker>
+        class="nodes-list-paging"
+        [total]="nodesList.total"
+        [perPage]="nodesList.per_page"
+        [page]="nodesList.page"
+        (pageChanged)="onPageChange($event)">
+      </app-page-picker>
       </main>
     </div>
   </div>

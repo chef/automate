@@ -101,7 +101,6 @@ export class NodesListComponent implements OnInit, OnDestroy {
       if (this.nodesListFilters[i].key === arr[0]) {
         for(let j = 0 ; j < this.nodesListFilters[i].values.length; j++) {
           if (this.nodesListFilters[i].values[j] === arr[1]) {
-            console.log("found match ", this.nodesListFilters[i])
             return {filter: this.nodesListFilters[i]};
           }
         }
