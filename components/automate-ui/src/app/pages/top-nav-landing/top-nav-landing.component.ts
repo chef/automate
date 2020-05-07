@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { RoutePerms } from 'app/components/landing/landing.component';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 @Component({
   selector: 'app-top-nav-landing',
-  template: '<app-landing [routePerms]="routeList"></app-landing>',
+  templateUrl: './top-nav-landing.component.html',
   styleUrls: []
 })
 export class TopNavLandingComponent {
@@ -57,4 +58,8 @@ export class TopNavLandingComponent {
       ], route: '/settings'
     }
   ];
+
+  constructor(public layoutFacade: LayoutFacadeService) { }
+
+  SetPageCoverage = () => this.layoutFacade.showFullPagePlusTopBar();
 }
