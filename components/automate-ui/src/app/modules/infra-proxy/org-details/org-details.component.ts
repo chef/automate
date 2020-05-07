@@ -27,7 +27,7 @@ import {
   getAllStatus as getAllRolesForOrgStatus
 } from 'app/entities/infra-roles/infra-role.selectors';
 
-export type OrgTabName = 'cookbooks' | 'roles' | 'details';
+export type OrgTabName = 'cookbooks' | 'roles' | 'details' | 'data-bags';
 
 @Component({
   selector: 'app-org-details',
@@ -87,6 +87,10 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         }
         case 'roles': {
           this.tabValue = 'roles';
+          break;
+        }
+        case 'data-bags': {
+          this.tabValue = 'data-bags';
           break;
         }
       }
