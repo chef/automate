@@ -28,6 +28,11 @@ table {
   border-spacing: 0 8px;
 }
 
+tr:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
 td {
   margin-bottom: 8px;
 }

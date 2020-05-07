@@ -1,0 +1,125 @@
+<div class="content-container">
+  <div class="header">
+    <div class="heading">
+      <div class="page-title">Desktop</div>
+      <div class="update-time">{{ desktop.id }}</div>
+    </div>
+    <div class="heading-actions">
+      <chef-button secondary (click)="fullscreenToggled.emit()">
+        <chef-icon *ngIf="!fullscreened">fullscreen</chef-icon>
+        <chef-icon *ngIf="fullscreened">fullscreen_exit</chef-icon>
+      </chef-button>
+      <chef-button secondary (click)="close()">
+        <chef-icon>close</chef-icon>
+      </chef-button>
+    </div>
+  </div>
+
+  <h3>Check-in History</h3>
+  <table>
+    <tr>
+      <th>Status</th>
+      <td>{{ desktop.status }}</td>
+    </tr>
+    <tr>
+      <th>Last Check-in</th>
+      <td>{{ desktop.checkin }}</td>
+    </tr>
+  </table>
+
+  <h3>Overview</h3>
+  <table>
+    <tr>
+      <th>Host Name</th>
+      <td>{{ desktop.name }}</td>
+    </tr>
+    <tr>
+      <th>Chef Infra Server</th>
+      <td>fakechefserver.eastus.cloudapp.azure.com</td>
+    </tr>
+    <tr>
+      <th>Node ID</th>
+      <td>{{ desktop.id }}</td>
+    </tr>
+    <tr>
+      <th>Platform Version</th>
+      <td>{{ desktop.platform }}</td>
+    </tr>
+    <tr>
+      <th>Total Memory</th>
+      <td>16.64GB</td>
+    </tr>
+    <tr>
+      <th>Domain</th>
+      <td>chef.io</td>
+    </tr>
+    <tr>
+      <th>IP Address</th>
+      <td>192.168.5.30</td>
+    </tr>
+    <tr>
+      <th>IPV6 Address</th>
+      <td>fe80:20c:29ff:fe2a:76e5</td>
+    </tr>
+    <tr>
+      <th>MAC Address</th>
+      <td>00:0C:29:2A:76:E5</td>
+    </tr>
+    <tr>
+      <th>Uptime</th>
+      <td>{{ desktop.uptimeSeconds }}</td>
+    </tr>
+    <tr>
+      <th>Time Zone</th>
+      <td>GMT</td>
+    </tr>
+  </table>
+
+  <h3>Chef Infra Client</h3>
+  <table>
+    <tr>
+      <th>Version</th>
+      <td>{{ desktop.chefVersion }}</td>
+    </tr>
+    <tr>
+      <th>Last Run End Time</th>
+      <td>{{ desktop.checkin }}</td>
+    </tr>
+  </table>
+
+  <h3>System</h3>
+  <table>
+    <tr>
+      <th>Manufacturer</th>
+      <td>LENOVO</td>
+    </tr>
+    <tr>
+      <th>Serial Number</th>
+      <td>R90QS96N</td>
+    </tr>
+  </table>
+
+  <h3>Virtualization</h3>
+  <table>
+    <tr>
+      <th>System</th>
+      <td>vmware</td>
+    </tr>
+    <tr>
+      <th>Role</th>
+      <td>guest</td>
+    </tr>
+  </table>
+
+  <h3>Kernel</h3>
+  <table>
+    <tr>
+      <th>Version</th>
+      <td>10.0.18362</td>
+    </tr>
+    <tr>
+      <th>Release</th>
+      <td>10.0.18362</td>
+    </tr>
+  </table>
+</div>

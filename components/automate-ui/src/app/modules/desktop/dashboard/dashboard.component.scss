@@ -17,7 +17,8 @@ app-top-errors,
 app-daily-check-in,
 app-check-in-time-series,
 app-unknown-desktop-duration-counts,
-app-insight {
+app-insight,
+app-desktop-detail {
   display: block;
   padding: 1rem;
   background: $chef-white;
@@ -38,11 +39,13 @@ app-top-errors {
   app-daily-check-in,
   app-check-in-time-series,
   app-unknown-desktop-duration-counts,
-  app-insight {
+  app-insight,
+  app-desktop-detail {
     height: auto;
   }
 
-  app-insight {
+  app-insight,
+  app-desktop-detail {
     margin: 2rem 0;
   }
 }

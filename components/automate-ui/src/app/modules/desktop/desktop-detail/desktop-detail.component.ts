@@ -2,14 +2,13 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Desktop, TermFilter } from 'app/entities/desktop/desktop.model';
 
 @Component({
-  selector: 'app-insight',
-  templateUrl: './insight.component.html',
-  styleUrls: ['./insight.component.scss']
+  selector: 'app-desktop-detail',
+  templateUrl: './desktop-detail.component.html',
+  styleUrls: ['./desktop-detail.component.scss']
 })
-export class InsightComponent {
+export class DesktopDetailComponent {
 
-  @Input() desktops: Desktop[];
-  @Input() selectedDesktop: Desktop;
+  @Input() desktop: Desktop;
   @Input() currentPage: number;
   @Input() pageSize: number;
   @Input() totalDesktops: number;
@@ -17,15 +16,11 @@ export class InsightComponent {
   @Input() fullscreened = false;
 
   @Output() closed: EventEmitter<any> = new EventEmitter();
-  @Output() fullscreenToggled: EventEmitter<any> = new EventEmitter();
+  @Output() fullscreenToggled: EventEmitter<void> = new EventEmitter();
   @Output() pageChange: EventEmitter<number> = new EventEmitter();
   @Output() termFilterSelected: EventEmitter<TermFilter> = new EventEmitter();
   // Returns 'name', 'check-in', or 'platform'
   @Output() sortChange: EventEmitter<string> = new EventEmitter();
-
-  @Output() desktopSelected: EventEmitter<string> = new EventEmitter();
-
-  constructor() { }
 
   public close(): void {
     this.closed.emit();
