@@ -187,6 +187,9 @@ import { UIComponent } from 'app/ui.component';
 
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
 
+import { ButtonModule } from 'carbon-components-angular';
+import { ModalModule } from 'carbon-components-angular';
+
 @NgModule({
   declarations: [
     // Page Components
@@ -249,6 +252,8 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     DeleteNotificationDialogComponent
   ],
   imports: [
+    ButtonModule,
+    ModalModule,
     ApiTokenModule,
     AppRoutingModule,
     BrowserAnimationsModule,
