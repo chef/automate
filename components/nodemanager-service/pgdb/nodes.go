@@ -166,6 +166,7 @@ var nodesSortFields = map[string]string{
 	"status":           "LOWER(n.status)",
 	"manager":          "LOWER(n.manager)",
 	"last_contact":     "n.last_contact",
+	"state":            "n.source_state",
 }
 
 type dbNode struct {

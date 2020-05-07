@@ -45,7 +45,7 @@ describe File.basename(__FILE__) do
       MANAGER_GRPC nodes, :read, Nodes::Id.new(id: 'missing')
     end
 
-    assert_grpc_error("Invalid sort field, valid ones are: [last_contact manager name platform platform_version status]", 3) do
+    assert_grpc_error("Invalid sort field, valid ones are: [last_contact manager name platform platform_version state status]", 3) do
       MANAGER_GRPC nodes, :list, Nodes::Query.new(sort: "wrong")
     end
 
