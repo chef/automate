@@ -40,7 +40,7 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 
 	server, err := s.service.Storage.StoreServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
 	if err == storage.ErrConflict {
-		return nil, service.ParseStorageError(err, req, "server")
+		return nil, service.ParseStorageError(err, *req, "server")
 	}
 
 	return &response.CreateServer{
@@ -55,7 +55,7 @@ func (s *Server) GetServers(ctx context.Context, req *request.GetServers) (*resp
 
 	serversList, err := s.service.Storage.GetServers(ctx)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req, "server")
+		return nil, service.ParseStorageError(err, *req, "server")
 	}
 
 	return &response.GetServers{
@@ -75,7 +75,7 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 
 	server, err := s.service.Storage.GetServer(ctx, req.Id)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req, "server")
+		return nil, service.ParseStorageError(err, *req, "server")
 	}
 
 	return &response.GetServer{
@@ -95,7 +95,7 @@ func (s *Server) DeleteServer(ctx context.Context, req *request.DeleteServer) (*
 
 	server, err := s.service.Storage.DeleteServer(ctx, req.Id)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req, "server")
+		return nil, service.ParseStorageError(err, *req, "server")
 	}
 
 	return &response.DeleteServer{
@@ -127,7 +127,7 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 
 	server, err := s.service.Storage.EditServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req, "server")
+		return nil, service.ParseStorageError(err, *req, "server")
 	}
 
 	return &response.UpdateServer{

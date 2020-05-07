@@ -48,6 +48,12 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	// TODO: combine get server & org query in one statement.
+	server, err := s.service.Storage.GetServer(ctx, serverID)
+	if err != nil {
+		return nil, service.ParseStorageError(err, serverID, "server")
+	}
+
 	org, err := s.service.Storage.GetOrg(ctx, orgID, serverID)
 	if err != nil {
 		return nil, service.ParseStorageError(err, orgID, "org")
@@ -56,11 +62,6 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.CredentialID})
 	if err != nil {
 		return nil, err
-	}
-
-	server, err := s.service.Storage.GetServer(ctx, serverID)
-	if err != nil {
-		return nil, service.ParseStorageError(err, serverID, "org")
 	}
 
 	baseURL, err := targetURL(server.Fqdn, server.IPAddress, org.Name)

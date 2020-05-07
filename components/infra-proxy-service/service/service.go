@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"reflect"
 
 	"google.golang.org/grpc/codes"
@@ -44,16 +45,26 @@ func ParseStorageError(err error, v interface{}, noun string) error {
 	if err != nil {
 		switch err {
 		case storage.ErrNotFound:
-			return status.Errorf(codes.NotFound, "no %s found with ID %q", noun, reflect.Indirect(reflect.ValueOf(v)).FieldByName("Id"))
+			return status.Errorf(codes.NotFound, "no %s found with ID %q", noun, getFieldValue(v, "Id"))
 		case storage.ErrCannotDelete:
-			return status.Errorf(codes.FailedPrecondition, "cannot delete server %q because it still has organizations attached", reflect.Indirect(reflect.ValueOf(v)).FieldByName("Id"))
+			return status.Errorf(codes.FailedPrecondition, "cannot delete server %q because it still has organizations attached", getFieldValue(v, "Id"))
 		case storage.ErrConflict:
-			return status.Errorf(codes.AlreadyExists, "%s with ID %q already exists", noun, reflect.Indirect(reflect.ValueOf(v)).FieldByName("Id"))
+			return status.Errorf(codes.AlreadyExists, "%s with ID %q already exists", noun, getFieldValue(v, "Id"))
 		case storage.ErrForeignKeyViolation:
-			return status.Errorf(codes.NotFound, "no server found with ID %q", reflect.Indirect(reflect.ValueOf(v)).FieldByName("ServerId"))
+			return status.Errorf(codes.NotFound, "no server found with ID %q", getFieldValue(v, "ServerId"))
 		default:
 			return status.Error(codes.Internal, err.Error())
 		}
 	}
 	return nil
+}
+
+func getFieldValue(v interface{}, field string) string {
+	rv := reflect.ValueOf(v)
+	switch rv.Kind() {
+	case reflect.Struct:
+		return rv.FieldByName(field).String()
+	default:
+		return fmt.Sprintf("%v", rv)
+	}
 }

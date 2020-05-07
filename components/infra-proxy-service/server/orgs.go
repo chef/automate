@@ -59,7 +59,7 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 
 	org, err := s.service.Storage.StoreOrg(ctx, req.Id, req.Name, req.AdminUser, secretID.GetId(), req.ServerId, req.Projects)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req, "org")
+		return nil, service.ParseStorageError(err, *req, "org")
 	}
 
 	return &response.CreateOrg{
@@ -78,7 +78,7 @@ func (s *Server) GetOrgs(ctx context.Context, req *request.GetOrgs) (*response.G
 
 	orgsList, err := s.service.Storage.GetOrgs(ctx, req.ServerId)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req, "org")
+		return nil, service.ParseStorageError(err, *req, "org")
 	}
 
 	return &response.GetOrgs{
@@ -97,7 +97,7 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 
 	org, err := s.service.Storage.GetOrg(ctx, req.Id, req.ServerId)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req, "org")
+		return nil, service.ParseStorageError(err, *req, "org")
 	}
 
 	return &response.GetOrg{
@@ -116,7 +116,7 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 
 	org, err := s.service.Storage.DeleteOrg(ctx, req.Id, req.ServerId)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req, "org")
+		return nil, service.ParseStorageError(err, *req, "org")
 	}
 
 	_, err = s.service.Secrets.Delete(ctx, &secrets.Id{Id: org.CredentialID})
@@ -154,7 +154,7 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 	if req.AdminKey != "" {
 		oldOrg, err := s.service.Storage.GetOrg(ctx, req.Id, req.ServerId)
 		if err != nil {
-			return nil, service.ParseStorageError(err, req, "org")
+			return nil, service.ParseStorageError(err, *req, "org")
 		}
 
 		secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: oldOrg.CredentialID})
@@ -179,7 +179,7 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 
 	org, err := s.service.Storage.EditOrg(ctx, req.Id, req.Name, req.AdminUser, req.ServerId, req.Projects)
 	if err != nil {
-		return nil, service.ParseStorageError(err, req, "org")
+		return nil, service.ParseStorageError(err, *req, "org")
 	}
 
 	return &response.UpdateOrg{
