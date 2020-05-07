@@ -18,8 +18,8 @@
 }
 
 
-// These are used to wrap a collection of notifications
-// An outer container of sticky-notifications causes the notifications to to stick to the 
+// These are used to wrap a collection of notifications.
+// An outer container of sticky-notifications causes the notifications to stick to the
 // upper scrollable window the user scrolls.
 .sticky-notifications {
   position: sticky;
@@ -67,7 +67,6 @@
   font-weight: bold;
 
   & > p {
-    margin: 0;
     line-height: 1.6;
     color: $chef-dark-grey;
   }
