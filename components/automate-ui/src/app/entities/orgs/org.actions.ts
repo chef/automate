@@ -66,6 +66,7 @@ export class GetOrgFailure implements Action {
 }
 
 export interface CreateOrgPayload {
+  id: string;
   server_id: string;
   name: string;
   admin_user: string;

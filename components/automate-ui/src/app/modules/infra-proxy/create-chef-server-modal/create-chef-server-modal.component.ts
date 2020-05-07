@@ -34,6 +34,7 @@ export class CreateChefServerModalComponent implements OnInit {
         IdMapper.transform(this.createForm.controls.name.value.trim()));
     }
   }
+
   public handleInput(event: KeyboardEvent): void {
     if (this.isNavigationKey(event)) {
       return;
