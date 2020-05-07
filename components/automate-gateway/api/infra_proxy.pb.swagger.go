@@ -631,7 +631,7 @@ func init() {
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags": {
       "get": {
         "operationId": "GetDataBags",
         "responses": {
@@ -660,8 +660,8 @@ func init() {
           {
             "name": "name",
             "description": "Data bag name.",
-            "in": "path",
-            "required": true,
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
