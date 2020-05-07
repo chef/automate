@@ -39,10 +39,18 @@ message External {
 				chef.automate.infra.config.Backups.S3.Elasticsearch settings = 4; // optional settings
 			}
 
+			message GCSSettings {
+				google.protobuf.StringValue bucket = 1;
+				google.protobuf.StringValue client = 2;
+				google.protobuf.StringValue base_path = 3;
+				chef.automate.infra.config.Backups.GCS.Elasticsearch settings = 4; // optional settings
+			}
+
 			google.protobuf.BoolValue enable = 1;
 			google.protobuf.StringValue location = 2;
 			FsSettings fs = 3;
 			S3Settings s3 = 4;
+			GCSSettings gcs = 5;
 		}
 
 		message Authentication {
@@ -138,10 +146,11 @@ message Backups {
 	// 1 is a field that got committed in generated code but not in the
 	// proto file
 	reserved 1;
-	// location should be one of ["filesystem", "s3"]
+	// location should be one of ["filesystem", "s3", "gcs"]
 	google.protobuf.StringValue location = 3;
 	Filesystem filesystem = 2;
 	S3 s3 = 4;
+	GCS gcs = 5;
 
 	message Filesystem {
 		google.protobuf.StringValue path = 1;
@@ -188,6 +197,36 @@ message Backups {
 		message SSL {
 			google.protobuf.StringValue root_cert = 1;
 		}
+	}
+
+	message GCS {
+		GCPCredentials credentials = 1;
+		Elasticsearch es = 2;
+		Bucket bucket = 3;
+
+		message GCPCredentials {
+			google.protobuf.StringValue json = 1;
+		}
+
+		message Elasticsearch {
+			// Backup repo settings
+			google.protobuf.BoolValue compress = 2;
+			 google.protobuf.BoolValue application_name = 3;
+			// Snapshot settings
+			google.protobuf.StringValue max_snapshot_bytes_per_sec = 4;
+			google.protobuf.StringValue max_restore_bytes_per_sec = 5;
+			google.protobuf.StringValue chunk_size = 6;
+			// GCS client settings
+			google.protobuf.StringValue read_timeout = 7;
+			google.protobuf.BoolValue connect_timeout = 8;
+		}
+
+		message Bucket {
+			google.protobuf.StringValue endpoint = 1;
+			google.protobuf.StringValue base_path = 2;
+			google.protobuf.StringValue name = 3;
+		}
+
 	}
 }
 
