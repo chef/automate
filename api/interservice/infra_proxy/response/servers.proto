@@ -19,7 +19,7 @@ message UpdateServer {
 }
 
 message GetServers {
-    // Chef Infra Servers.
+    // List of Chef Infra Servers.
     repeated Server servers = 1;
 }
 

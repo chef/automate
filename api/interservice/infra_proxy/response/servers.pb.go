@@ -141,7 +141,7 @@ func (m *UpdateServer) GetServer() *Server {
 }
 
 type GetServers struct {
-	// Chef Infra Servers.
+	// List of Chef Infra Servers.
 	Servers              []*Server `protobuf:"bytes,1,rep,name=servers,proto3" json:"servers,omitempty" toml:"servers,omitempty" mapstructure:"servers,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte    `json:"-" toml:"-" mapstructure:"-,omitempty"`

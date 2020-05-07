@@ -996,7 +996,7 @@ func init() {
         },
         "ip_address": {
           "type": "string",
-          "description": "Chef infra Server IP address."
+          "description": "Chef Infra Server IP address."
         }
       }
     },
@@ -1543,7 +1543,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
           },
-          "description": "Chef Infra Servers."
+          "description": "List of Chef Infra Servers."
         }
       }
     },

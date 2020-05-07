@@ -10,7 +10,7 @@ message CreateServer {
     string name = 2;
     // Chef Infra Server FQDN.
     string fqdn = 3;
-    // Chef infra Server IP address.
+    // Chef Infra Server IP address.
     string ip_address = 4;
 }
 

@@ -27,7 +27,7 @@ type CreateServer struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
 	// Chef Infra Server FQDN.
 	Fqdn string `protobuf:"bytes,3,opt,name=fqdn,proto3" json:"fqdn,omitempty" toml:"fqdn,omitempty" mapstructure:"fqdn,omitempty"`
-	// Chef infra Server IP address.
+	// Chef Infra Server IP address.
 	IpAddress            string   `protobuf:"bytes,4,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty" toml:"ip_address,omitempty" mapstructure:"ip_address,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
