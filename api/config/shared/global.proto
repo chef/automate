@@ -222,7 +222,7 @@ message Backups {
 		}
 
 		message Bucket {
-			google.protobuf.StringValue endpoint = 1;
+			google.protobuf.StringValue projectid = 1;
 			google.protobuf.StringValue base_path = 2;
 			google.protobuf.StringValue name = 3;
 		}
