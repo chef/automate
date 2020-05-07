@@ -52,13 +52,13 @@
         </div>
       </section>
       <section class="page-body" *ngIf="tabValue === 'details'">
-        <form [formGroup]="updateNameForm">
+        <form [formGroup]="updateForm">
           <chef-form-field>
             <label>Name <span aria-hidden="true">*</span></label>
             <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
               data-cy="team-details-name-input">
             <chef-error
-              *ngIf="(updateNameForm.get('name').hasError('required') || updateNameForm.get('name').hasError('pattern')) && updateNameForm.get('name').dirty">
+              *ngIf="(updateForm.get('name').hasError('required') || updateForm.get('name').hasError('pattern')) && updateForm.get('name').dirty">
               Name is required.
             </chef-error>
           </chef-form-field>
@@ -69,13 +69,13 @@
             </app-projects-dropdown>
           </chef-form-field>
         </form>
-        <chef-button [disabled]="isLoadingTeam || !updateNameForm.valid || !updateNameForm.dirty" primary inline
+        <chef-button [disabled]="isLoadingTeam || !updateForm.valid || !updateForm.dirty" primary inline
           (click)="saveTeam()" data-cy="team-details-submit-button">
           <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
           <span *ngIf="saveInProgress">Saving...</span>
           <span *ngIf="!saveInProgress">Save</span>
         </chef-button>
-        <span id="saved-note" *ngIf="saveSuccessful && !updateNameForm.dirty">All changes saved.</span>
+        <span id="saved-note" *ngIf="saveSuccessful && !updateForm.dirty">All changes saved.</span>
       </section>
     </main>
   </div>

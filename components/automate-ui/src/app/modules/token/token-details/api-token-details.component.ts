@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { identity, isNil } from 'lodash/fp';
+import { identity, isNil, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 
@@ -15,14 +15,8 @@ import {
   apiTokenFromRoute, getStatus, updateStatus
 } from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
-import {
-  Project, ProjectConstants, ProjectCheckedMap, noProjectsUpdated
-} from 'app/entities/projects/project.model';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 import { GetProjects } from 'app/entities/projects/project.actions';
-import {
-  allProjects,
-  getAllStatus as getAllProjectStatus
-} from 'app/entities/projects/project.selectors';
 
 type TokenStatus = 'active' | 'inactive';
 type TokenTabName = 'details';
@@ -41,7 +35,6 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   public saveInProgress = false;
   public saveSuccessful = false;
 
-  public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   constructor(
@@ -84,21 +77,6 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         this.store.dispatch(new GetProjects());
       });
 
-    combineLatest([
-      this.store.select(allProjects),
-      this.store.select(getAllProjectStatus)
-    ]).pipe(
-      filter(([_, pStatus]: [Project[], EntityStatus]) => pStatus !== EntityStatus.loading),
-      filter(() => !!this.token),
-      takeUntil(this.isDestroyed))
-      .subscribe(([allowedProjects, _]) => {
-        this.projects = {};
-        allowedProjects.forEach(p => {
-            this.projects[p.id] = { ...p, checked: this.token.projects.includes(p.id)
-            };
-          });
-      });
-
     this.store.pipe(
       select(updateStatus),
       takeUntil(this.isDestroyed),
@@ -122,7 +100,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     this.saveInProgress = true;
     const name: string = this.updateForm.controls.name.value.trim();
     const active = <TokenStatus>this.updateForm.controls.status.value === 'active';
-    const projects = Object.keys(this.projects).filter(id => this.projects[id].checked);
+    const projects: string[] = this.updateForm.controls.projects.value;
     this.store.dispatch(new UpdateToken({...this.token, name, active, projects }));
   }
 
@@ -132,12 +110,11 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
 
   onProjectDropdownClosing(selectedProjects: string[]): void {
 
-    Object.keys(this.projects).forEach(id => this.projects[id].checked = false);
-    selectedProjects.forEach(id => this.projects[id].checked = true);
+    this.updateForm.controls.projects.setValue(selectedProjects);
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
-    if (noProjectsUpdated(this.token.projects, this.projects)) {
+    if (xor(this.token.projects, this.updateForm.controls.projects.value).length === 0) {
       this.updateForm.controls.projects.markAsPristine();
     } else {
       this.updateForm.controls.projects.markAsDirty();

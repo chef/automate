@@ -13,6 +13,7 @@ import {
   defaultRouterState,
   defaultRouterRouterState
 } from 'app/ngrx.reducers';
+import { using } from 'app/testing/spec-helpers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { Project } from 'app/entities/projects/project.model';
@@ -116,20 +117,6 @@ describe('ApiTokenDetailsComponent', () => {
     expect(component.token).toEqual(token);
   });
 
-  it('initializes project dropdown with those checked on the token', () => {
-    spyOn(store, 'dispatch').and.callThrough();
-    const tokenProjects  = ['b-proj', 'd-proj'];
-    store.dispatch(new GetTokenSuccess({...someToken, projects: tokenProjects}));
-
-    expect(Object.keys(component.projects).length).toBe(0);
-    store.dispatch(new GetProjectsSuccess({ projects: projectList }));
-    expect(Object.keys(component.projects).length).toBe(projectList.length);
-
-    projectList.forEach(p => {
-      expect(component.projects[p.id].checked).toEqual(tokenProjects.includes(p.id));
-    });
-  });
-
   it('sets projects dirty when an unchecked project is checked', () => {
     store.dispatch(new GetTokenSuccess(
       { ...someToken, projects: ['b-proj', 'd-proj']}));
@@ -160,6 +147,34 @@ describe('ApiTokenDetailsComponent', () => {
     expect(component.updateForm.controls.projects.pristine).toEqual(false);
     component.onProjectDropdownClosing([ 'b-proj', 'd-proj']);
     expect(component.updateForm.controls.projects.pristine).toEqual(true);
+  });
+
+  using([
+    ['no projects', []],
+    ['one project', ['proj-one']],
+    ['multiple projects', ['p1', 'p2', 'p3', 'p4']]
+  ], function (description: string, projects: string[]) {
+    it(`initializes dropdown with those included on the team for ${description}`, () => {
+      store.dispatch(new GetTokenSuccess({ ...someToken, projects }));
+
+      expect(component.token.projects).toEqual(projects);
+    });
+  });
+
+  using([
+    ['no projects', []],
+    ['one project', ['proj-one']],
+    ['multiple projects', ['p1', 'p2', 'p3', 'p4']]
+  ], function (description: string, projects: string[]) {
+    it(`transfers result from closing dropdown into form for ${description}`, () => {
+      const originalProjects = ['to-be-overwritten'];
+      store.dispatch(new GetTokenSuccess({ ...someToken, projects: originalProjects }));
+      expect(component.token.projects).toEqual(originalProjects);
+
+      component.onProjectDropdownClosing(projects);
+
+      expect(component.updateForm.controls.projects.value).toEqual(projects);
+    });
   });
 
   function genProject(id: string): Project {
