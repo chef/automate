@@ -14,6 +14,8 @@ document "gateway_integration" <<DOC
   Runs the integration tests for automate-gateway
 DOC
 function gateway_integration() {
+  install_if_missing core/curl curl
+
   set -o pipefail # don't let the jq-pipe ruin the return 1
   install_if_missing core/jq-static jq
 
@@ -26,6 +28,11 @@ function gateway_integration() {
   wait_for_success gateway_get /api/v0/gateway/version || return 1
   log_line "The automate-gateway version"
   gateway_version || return 1
+
+  log_line "/api/v0/status responds correctly"
+  local status
+  status="$(gateway_get /api/v0/status)"
+  jq -ne --argjson status "$status" '$status.ok' || return 1
 
   local viewer_token
   viewer_token="$(get_api_token_with_policy viewer-access)"
