@@ -53,6 +53,7 @@ func TestValidate(t *testing.T) {
 			UsernameAttr:       w.String("username"),
 			GroupsAttr:         w.String("groups"),
 			NameIdPolicyFormat: w.String("urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"),
+			AllowedGroups:      &dex.ConfigRequest_V1_ListStringValue{Values: []string{"admins", "ops"}},
 		}
 	}
 
