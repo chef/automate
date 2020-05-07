@@ -133,12 +133,30 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				}
 			}
 		}
+	case "gcs":
+		if bu.GetGcs().GetBucket().GetProjectid().GetValue() == "" {
+			cfgErr.AddMissingKey("global.v1.backups.gcs.bucket.projectid")
+		}
+
+		if bu.GetGcs().GetBucket().GetName().GetValue() == "" {
+			cfgErr.AddMissingKey("global.v1.backups.gcs.bucket.name")
+		}
+
+		// The user might be relying on IAM for GCP credentials. Here we'll
+		// make sure that if credentials are provided
+		if bu.GetGcs().GetCredentials() != nil {
+			json := bu.GetGcs().GetCredentials().GetJson().GetValue()
+
+			if json == "" {
+				cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.json")
+			}
+		}
 	default:
 		// Make sure that if a backup location is specified that is valid. If
 		// none is given the default configuration "filesystem" location will
 		// be used.
 		if location != "" {
-			cfgErr.AddInvalidValue("global.v1.backups.location", "Must be either 'filesystem' or 's3'")
+			cfgErr.AddInvalidValue("global.v1.backups.location", "Must be either 'filesystem', 's3', or 'gcs'")
 		}
 	}
 
