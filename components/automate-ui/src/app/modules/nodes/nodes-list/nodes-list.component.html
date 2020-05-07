@@ -5,7 +5,12 @@
         THIS IS AN EXPERIMENTAL VIEW, ONLY INTENDED TO BE USED FOR DEVELOPMENT.<br>
         THIS IS NOT INTENDED FOR CUSTOMER USE (yet).<br>
         currently applied filters: <br>
-        {{displayCurrentFilters()}}
+        <chef-tr *ngFor="let filter of displayCurrentFilters(); index as i; trackBy: trackBy;">
+          <chef-td> {{filter}} 
+            <button (click)="negateFilter(filter)"> negate filter </button>
+            <button (click)="removeFilter(filter)"> remove filter </button>
+          </chef-td>
+        </chef-tr>
         <chef-table class="nodes-list-table" (sort-toggled)="onSortToggled($event)">
           <chef-thead>
             <chef-tr>

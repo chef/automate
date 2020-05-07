@@ -8,7 +8,7 @@ import { DateTime } from 'app/helpers/datetime/datetime';
 import * as actions from '../../../entities/nodes/nodes.actions';
 import * as selectors from '../../../entities/nodes/nodes.selectors';
 import * as moment from 'moment/moment';
-
+import { reject } from 'lodash';
 
 @Component({
   selector: 'app-nodes-list',
@@ -79,13 +79,55 @@ export class NodesListComponent implements OnInit, OnDestroy {
   }
 
   displayCurrentFilters() {
-    let filterStrings = '';
+    let filters = [];
     this.nodesListFilters.forEach((filter) => {
       filter.values.forEach((val) => {
-        filterStrings = filterStrings + filter.key + val; 
+        if (filter.exclude) {
+        filters.push(filter.key + ":" + val + ":negated=true"); 
+        } else {
+          filters.push(filter.key + ":" + val + ":negated=false"); 
+        }
       })
     });
-    return filterStrings;
+    filters = filters.filter(function( element ) {
+      return element !== undefined;
+   });
+    return filters;
+  }
+
+  isMatchingFilter(stringFilter) {
+    let arr = stringFilter.split(":");
+    for(let i = 0 ; i < this.nodesListFilters.length; i++) {
+      if (this.nodesListFilters[i].key === arr[0]) {
+        for(let j = 0 ; j < this.nodesListFilters[i].values.length; j++) {
+          if (this.nodesListFilters[i].values[j] === arr[1]) {
+            console.log("found match ", this.nodesListFilters[i])
+            return {filter: this.nodesListFilters[i]};
+          }
+        }
+      }
+    }
+    return undefined;
+  }
+
+  negateFilter(filter) {
+    const filterToNegate = this.isMatchingFilter(filter)
+    if (filterToNegate !== undefined) {
+      this.nodesListFilters = reject(this.nodesListFilters, function(item) { return item === filterToNegate.filter; });
+      filterToNegate.filter['exclude'] = true;
+      this.nodesListFilters.push(filterToNegate.filter);
+      const params = {page: 1, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+      this.store.dispatch(actions.getNodes(params));
+    }  
+  }
+
+  removeFilter(filter) {
+    const filterToRemove = this.isMatchingFilter(filter)
+    if (filterToRemove !== undefined) {
+      this.nodesListFilters = reject(this.nodesListFilters, function(item) { return item === filterToRemove.filter; });
+      const params = {page: 1, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+      this.store.dispatch(actions.getNodes(params));
+    }  
   }
 
   trackBy(node) {
