@@ -63,7 +63,11 @@
                 <chef-icon class="status-icon" [ngClass]="node.scan_data.penultimate_status"
                 (click)="filterFor('last_scan_penultimate_status', node.scan_data.penultimate_status)">
                   {{ statusIcon(node.scan_data.penultimate_status) }}
-                </chef-icon>               
+                </chef-icon> 
+                <chef-tooltip >
+                  <p>Scan Data:</p>
+                  <a [routerLink]="['/compliance/reports/nodes', node.id]">{{node.scan_data.end_time}</a>
+                </chef-tooltip>  
               </chef-td>
               <chef-td>
                 <chef-icon class="status-icon" [ngClass]="node.run_data.status"
@@ -73,7 +77,11 @@
                 <chef-icon class="status-icon" [ngClass]="node.run_data.penultimate_status"
                 (click)="filterFor('last_run_penultimate_status', node.run_data.penultimate_status)">
                   {{ statusIcon(node.run_data.penultimate_status) }}
-                </chef-icon>               
+                </chef-icon> 
+                <chef-tooltip>
+                  <p>Run Data:</p>
+                  <a [routerLink]="['/infrastructure/client-runs', node.id, 'runs', node.run_data.id]">{{node.run_data.end_time}</a>
+                </chef-tooltip>  
               </chef-td>    
               <chef-td (click)="filterFor('state', node.state)">{{ node.state }}</chef-td>
               <chef-td>{{ displayNodeTags(node.tags) }}</chef-td>
