@@ -335,7 +335,7 @@ input {
       background-color: var(--chef-white);
 
       &:after {
-        color: #212334;
+        color: $chef-primary-dark;
       }
     }
   }

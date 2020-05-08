@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css?family=Muli:400,600');
 
-html, 
+html,
 body {
   margin: 0;
   padding: 0;
@@ -9,7 +9,7 @@ body {
   height: 100%;
   background-color: #F3F6F8;
 
-  color: #212334;
+  color: #222435;
   font-family: Muli, Helvetica, sans-serif;
 }
 
