@@ -188,6 +188,7 @@ import {
 import { UIComponent } from 'app/ui.component';
 
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
+import { ButtonModule } from '@seajamied/carbon-test';
 
 @NgModule({
   declarations: [
@@ -251,6 +252,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     DeleteNotificationDialogComponent
   ],
   imports: [
+    ButtonModule,
     ApiTokenModule,
     AppRoutingModule,
     BrowserAnimationsModule,
