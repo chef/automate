@@ -24,8 +24,7 @@ Note: The count of controls listed in the _Profile Status_ pane of the Reports O
 ### Dates in Compliance Reports
 
 The dashboard shows the results of all scans with end times on the _currently selected day_.
-The currently selected day, as highlighted in the search bar, follows the format of "dd MMM yyyy".
-Chef Automate formats timestamp information in Coordinated Universal Time (UTC).
+The currently selected day, as highlighted in the search bar, bases itself on timestamps in Coordinated Universal Time (UTC).
 
 A historical view is provided through the trend graph, which can be adjusted to show a 10 day, month, 3 month, or year overview.
 
@@ -78,7 +77,9 @@ Please note the only supported filters for deep filtering are:
 
 A node's waived status appears if applicable in displays where a node's status appears in Chef Automate. 
 The Compliance Reports overview displays the node count and history of waived nodes, and the count and history of waived controls.
-Hover over the control's Waived icon in the Controls list to view more details about the waiver applied to the control.
+_Nodes_ and _Profiles_ views include _Waived Nodes_ and _Waived Profiles_ status filters respectively. 
+Select the _Waived_ status filter to display only the respective Node or Profile reporting with that status.
+Hover over the control's Waived icon under the Node Status column in _Controls_ to view more details about the waiver applied to the control.
 
 Use Chef InSpec to configure [waivers](https://www.inspec.io/docs/reference/waivers/).
 
@@ -142,7 +143,7 @@ Top Control Failures
 
 ## Switching views
 
-In addition to filtering your reports data, you can also switch your views to see compliance report results from the perspective of _Nodes_ and _Profiles_.
+In addition to filtering your reports data, you can also switch your views to see compliance report results from the perspective of _Nodes_, _Profiles_, and _Controls_.
 
 ### Nodes
 
