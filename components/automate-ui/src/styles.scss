@@ -62,13 +62,14 @@
   bottom: 0;
   background: rgba($chef-white, 0.85);
   z-index: 190;
-  padding-top: 38vh;
+  padding-top: 77px;
   text-align: center;
   font-weight: bold;
 
   & > p {
+    font-size: 18px;
     line-height: 1.6;
-    color: $chef-dark-grey;
+    color: $chef-primary-dark;
   }
 }
 
