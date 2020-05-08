@@ -30,8 +30,19 @@ app-desktop-detail {
   }
 }
 
-app-top-errors {
+app-top-errors,
+app-unknown-desktop-duration-counts {
   margin-bottom: 2rem;
+
+  @media (min-width: 66rem) {
+    height: calc(100% - 3rem);
+  }
+}
+
+app-unknown-desktop-duration-counts {
+  @media (max-width: 66rem) {
+    margin-bottom: 1rem;
+  }
 }
 
 .insight-visible {

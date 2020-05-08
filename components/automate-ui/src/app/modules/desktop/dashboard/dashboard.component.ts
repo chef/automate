@@ -199,6 +199,11 @@ export class DashboardComponent implements OnInit {
     this.insightVisible = true;
   }
 
+  public onDurationSelected(_durationItem: any): void {
+    this.store.dispatch(new UpdateDesktopFilterCurrentPage({ page: 1 }));
+    this.insightVisible = true;
+  }
+
   public onDesktopSelected(desktop: Desktop) {
     this.selectedDesktop = desktop;
     this.desktopDetailVisible = true;

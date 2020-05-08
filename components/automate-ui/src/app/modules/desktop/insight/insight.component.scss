@@ -44,7 +44,7 @@
     border: 1px solid $chef-grey;
   }
 
-  chef-checkbox::ng-deep {
+  chef-checkbox {
     --pill-background-color: #{$chef-grey};
 
     chef-pill {
@@ -52,7 +52,7 @@
       padding: 0 8px;
     }
 
-    .check-wrap {
+    ::ng-deep .check-wrap {
       border: 1px solid $chef-grey;
     }
   }
@@ -68,6 +68,7 @@ chef-tr:hover {
   cursor: pointer;
 }
 
+chef-tr:hover,
 chef-tr.selected {
   chef-th,
   chef-td {

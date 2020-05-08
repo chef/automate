@@ -33,79 +33,44 @@
   }
 }
 
-.filters {
-  margin: 1em 0;
-  --pill-background-color: $chef-white;
-
-  > chef-pill {
-    display: inline-flex;
-    padding: 8px;
-    margin-right: 8px;
-    border: 1px solid $chef-grey;
-  }
-
-  chef-checkbox::ng-deep {
-    --pill-background-color: #{$chef-grey};
-
-    chef-pill {
-      margin-left: 8px;
-      padding: 0 8px;
-    }
-
-    .check-wrap {
-      border: 1px solid $chef-grey;
-    }
-  }
-}
-
 h3 {
   margin-bottom: 1rem;
 }
 
-table {
-  margin-bottom: 2rem;
+chef-table {
   border: 1px solid $chef-grey;
   border-radius: $global-radius;
-  border-collapse: separate;
-  border-spacing: 0;
+  margin-bottom: 2rem;
+  overflow: hidden;
 
   &:last-child {
     margin-bottom: 0;
   }
 
-  th, td {
-    padding: 8px 16px;
-    text-align: left;
-  }
+  chef-tr {
+    margin-bottom: 0;
 
-  th {
-    font-weight: normal;
-    text-transform: uppercase;
-  }
-
-  tr:nth-child(odd) {
-    th, td {
-      background: $chef-lightest-grey;
-    }
-  }
-
-  tr:first-child {
-    th:first-child {
-      border-top-left-radius: $global-radius;
+    chef-th,
+    chef-td,
+    chef-th:first-child,
+    chef-td:first-child,
+    chef-th:last-child,
+    chef-td:last-child  {
+      border: none;
+      border-radius: 0;
+      background: $chef-white;
     }
 
-    td:last-child {
-      border-top-right-radius: $global-radius;
-    }
-  }
-
-  tr:last-child {
-    th:first-child {
-      border-bottom-left-radius: $global-radius;
+    chef-th {
+      font-weight: 400;
+      text-transform: uppercase;
     }
 
-    td:last-child {
-      border-bottom-right-radius: $global-radius;
+    &:nth-child(odd) {
+      chef-th,
+      chef-td {
+        background: $chef-lightest-grey;
+      }
     }
   }
 }

@@ -36,7 +36,8 @@
             <div [ngClass]="{'bx--col-lg-8': !insightVisible, 'bx--col-lg-16': insightVisible}">
               <app-unknown-desktop-duration-counts
                 [countedDurationItems] = "unknownDesktopCountedDurationItems$ | async"
-                [lastUpdated] = "unknownDesktopCountedDurationUpdated$ | async">
+                [lastUpdated] = "unknownDesktopCountedDurationUpdated$ | async"
+                (durationSelected)="onDurationSelected($event)">
               </app-unknown-desktop-duration-counts>
             </div>
             <div [ngClass]="{'bx--col-lg-8': !insightVisible, 'bx--col-lg-16': insightVisible}">
