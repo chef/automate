@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	ingest_api "github.com/chef/automate/api/interservice/ingest"
 	event "github.com/chef/automate/components/event-service/config"
@@ -21,7 +21,7 @@ type AutomateEventHandlerServer struct {
 }
 
 func NewAutomateEventHandlerServer(client backend.Client, chefIngestServer ChefIngestServer,
-	authzProjectsClient iam_v2.ProjectsClient, eventServiceClient automate_event.EventServiceClient) *AutomateEventHandlerServer {
+	authzProjectsClient authz.ProjectsClient, eventServiceClient automate_event.EventServiceClient) *AutomateEventHandlerServer {
 
 	server := &AutomateEventHandlerServer{
 		client:           client,

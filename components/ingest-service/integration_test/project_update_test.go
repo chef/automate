@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +20,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 	cases := []struct {
 		description string
 		node        iBackend.Node
-		projects    map[string]*iam_v2.ProjectRules
+		projects    map[string]*authz.ProjectRules
 		projectIDs  []string
 	}{
 		// Environment
@@ -36,13 +36,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -64,13 +64,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1", "env2"},
 								},
 							},
@@ -92,17 +92,17 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -124,17 +124,17 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -156,21 +156,21 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env2"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -192,13 +192,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env2"},
 								},
 							},
@@ -206,11 +206,11 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 					},
 				},
 				"project3": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -232,13 +232,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -246,11 +246,11 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 					},
 				},
 				"project3": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+									Attribute: authz.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -274,14 +274,14 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Type: iam_v2.ProjectRuleTypes_NODE,
-							Conditions: []*iam_v2.Condition{
+							Type: authz.ProjectRuleTypes_NODE,
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -303,13 +303,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -331,13 +331,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"old_tag": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -360,13 +360,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
@@ -387,13 +387,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
@@ -414,13 +414,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
@@ -441,13 +441,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org", "chef-server2.org"},
 								},
 							},
@@ -469,21 +469,21 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -505,21 +505,21 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server2.org"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -542,13 +542,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -569,13 +569,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_52"},
 								},
 							},
@@ -596,13 +596,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -623,13 +623,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51", "area_52"},
 								},
 							},
@@ -651,21 +651,21 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -687,21 +687,21 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -723,17 +723,17 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -754,13 +754,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -781,13 +781,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_54"},
 								},
 							},
@@ -807,13 +807,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_54"},
 								},
 							},
@@ -836,13 +836,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -863,13 +863,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_52"},
 								},
 							},
@@ -890,13 +890,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -917,13 +917,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51", "area_52"},
 								},
 							},
@@ -945,21 +945,21 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -981,21 +981,21 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -1017,17 +1017,17 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -1048,13 +1048,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -1075,13 +1075,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_54"},
 								},
 							},
@@ -1101,13 +1101,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_54"},
 								},
 							},
@@ -1130,13 +1130,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"prod"},
 								},
 							},
@@ -1157,13 +1157,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"dev"},
 								},
 							},
@@ -1184,13 +1184,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"Prod"},
 								},
 							},
@@ -1211,13 +1211,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"prod", "dev"},
 								},
 							},
@@ -1239,21 +1239,21 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"prod"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -1275,21 +1275,21 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"dev"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -1312,13 +1312,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"prod"},
 								},
 							},
@@ -1339,13 +1339,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"dev"},
 								},
 							},
@@ -1366,13 +1366,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"Prod"},
 								},
 							},
@@ -1393,13 +1393,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"prod", "dev"},
 								},
 							},
@@ -1421,21 +1421,21 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"prod"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -1457,21 +1457,21 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"project9": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"dev"},
 								},
 							},
 						},
 						{
-							Conditions: []*iam_v2.Condition{
+							Conditions: []*authz.Condition{
 								{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Attribute: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -1495,9 +1495,9 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"old_tag": {
-					Rules: []*iam_v2.ProjectRule{},
+					Rules: []*authz.ProjectRule{},
 				},
 			},
 			projectIDs: []string{},
@@ -1514,11 +1514,11 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				Projects: []string{"old_tag"},
 				Exists:   true,
 			},
-			projects: map[string]*iam_v2.ProjectRules{
+			projects: map[string]*authz.ProjectRules{
 				"old_tag": {
-					Rules: []*iam_v2.ProjectRule{
+					Rules: []*authz.ProjectRule{
 						{
-							Conditions: []*iam_v2.Condition{},
+							Conditions: []*authz.Condition{},
 						},
 					},
 				},
@@ -1565,13 +1565,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 func TestProjectUpdatePainlessElasticsearchScriptNoNodes(t *testing.T) {
 
 	ctx := context.Background()
-	projects := map[string]*iam_v2.ProjectRules{
+	projects := map[string]*authz.ProjectRules{
 		"project 9": {
-			Rules: []*iam_v2.ProjectRule{
+			Rules: []*authz.ProjectRule{
 				{
-					Conditions: []*iam_v2.Condition{
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 							Values:    []string{"dev"},
 						},
 					},

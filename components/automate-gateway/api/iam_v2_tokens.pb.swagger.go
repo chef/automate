@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/iam/v2/tokens": {
+    "/apis/iam/v2/tokens": {
       "get": {
         "summary": "Lists all tokens",
         "description": "Lists all tokens, both admin and non-admin.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -64,7 +64,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/tokens/{id}": {
+    "/apis/iam/v2/tokens/{id}": {
       "get": {
         "summary": "Gets a token",
         "description": "Returns the details for a token.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:get\n` + "`" + `` + "`" + `` + "`" + `",

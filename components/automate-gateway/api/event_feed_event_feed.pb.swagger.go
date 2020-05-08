@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/event_task_counts": {
+    "/api/v0/event_task_counts": {
       "get": {
         "operationId": "GetEventTaskCounts",
         "responses": {
@@ -56,7 +56,7 @@ func init() {
         ]
       }
     },
-    "/event_type_counts": {
+    "/api/v0/event_type_counts": {
       "get": {
         "operationId": "GetEventTypeCounts",
         "responses": {
@@ -98,7 +98,7 @@ func init() {
         ]
       }
     },
-    "/eventfeed": {
+    "/api/v0/eventfeed": {
       "get": {
         "operationId": "GetEventFeed",
         "responses": {
@@ -174,7 +174,7 @@ func init() {
         ]
       }
     },
-    "/eventstrings": {
+    "/api/v0/eventstrings": {
       "get": {
         "operationId": "GetEventStringBuckets",
         "responses": {

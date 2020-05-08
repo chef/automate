@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/notifications/rules": {
+    "/api/v0/notifications/rules": {
       "get": {
         "operationId": "ListRules",
         "responses": {
@@ -51,7 +51,7 @@
         ]
       }
     },
-    "/notifications/rules/{id}": {
+    "/api/v0/notifications/rules/{id}": {
       "get": {
         "operationId": "GetRule",
         "responses": {
@@ -127,7 +127,7 @@
         ]
       }
     },
-    "/notifications/version": {
+    "/api/v0/notifications/version": {
       "get": {
         "operationId": "Version",
         "responses": {
@@ -143,7 +143,7 @@
         ]
       }
     },
-    "/notifications/webhook": {
+    "/api/v0/notifications/webhook": {
       "post": {
         "operationId": "ValidateWebhook",
         "responses": {

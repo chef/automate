@@ -313,8 +313,8 @@ pins = {
   # This will pin the services that we package and start with the deployment service,
   # while still allowing the clients of these databases to upgrade their client
   # libraries if any fixes are shipped there.
-  "automate-postgresql"    => {"origin" => "chef", "name" => "automate-postgresql",    "version" => "9.6.11", "release" => "20190409151101"},
-  "automate-elasticsearch" => {"origin" => "chef", "name" => "automate-elasticsearch", "version" => "6.8.3",  "release" => "20191217225932"},
+  "automate-postgresql"    => {"origin" => "chef", "name" => "automate-postgresql",    "version" => "9.6.11", "release" => "20200428204055"},
+  "automate-elasticsearch" => {"origin" => "chef", "name" => "automate-elasticsearch", "version" => "6.8.3",  "release" => "20200429011833"},
 }
 
 unless no_pin_hab
@@ -322,9 +322,9 @@ unless no_pin_hab
   # components/automate-deployment/habitat/plan.sh
   #
   # WARNING: These pins are managed by .expeditor/update_habitat.sh.
-  pins["hab"]          = { "origin" => "core", "name" => "hab",          "version" => "0.90.6", "release" => "20191112141314"}
-  pins["hab-sup"]      = { "origin" => "core", "name" => "hab-sup",      "version" => "0.90.6", "release" => "20191112144831"}
-  pins["hab-launcher"] = { "origin" => "core", "name" => "hab-launcher", "version" => "12605",  "release" => "20191112144831"}
+  pins["hab"]          = { "origin" => "core", "name" => "hab",          "version" => "1.6.0", "release" => "20200420200029"}
+  pins["hab-sup"]      = { "origin" => "core", "name" => "hab-sup",      "version" => "1.6.0", "release" => "20200420202331"}
+  pins["hab-launcher"] = { "origin" => "core", "name" => "hab-launcher", "version" => "13606",  "release" => "20200420202330"}
 end
 
 # CONFIGURATION

@@ -7,7 +7,7 @@ import { paginationOverride } from '../shared';
 import { StatsService, ReportQueryService, ReportDataService,
   ReportQuery } from '../../shared/reporting';
 import { ChefSessionService } from '../../../../services/chef-session/chef-session.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({

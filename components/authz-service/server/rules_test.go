@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 
-	api "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )

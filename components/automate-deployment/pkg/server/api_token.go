@@ -5,12 +5,11 @@ import (
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	uuid "github.com/chef/automate/lib/uuid4"
@@ -61,7 +60,7 @@ func generateAdminToken(ctx context.Context,
 
 	defer authzConnection.Close() // nolint: errcheck
 
-	authzV2Client := authz_v2.NewPoliciesClient(authzConnection)
+	authzClient := authz.NewPoliciesClient(authzConnection)
 
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
 		Id:     uuid.Must(uuid.NewV4()).String(),
@@ -73,21 +72,12 @@ func generateAdminToken(ctx context.Context,
 	}
 	tokenID := response.Id
 
-	_, err = authzV2Client.CreatePolicy(ctx, &authz_v2.CreatePolicyReq{
-		Id:   "admin-token-" + tokenID,
-		Name: "admin policy for token " + tokenID,
-		Statements: []*authz_v2.Statement{
-			{
-				Effect:    authz_v2.Statement_ALLOW,
-				Resources: []string{"*"},
-				Actions:   []string{"*"},
-				Projects:  []string{"*"},
-			},
-		},
+	_, err = authzClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
+		Id:      constants.AdminPolicyID,
 		Members: []string{"token:" + tokenID},
 	})
 
-	if err != nil && status.Convert(err).Code() != codes.AlreadyExists {
+	if err != nil {
 		// Attempt to be transactional
 		_, deleteTokenError := authnClient.DeleteToken(ctx, &authn.DeleteTokenReq{
 			Id: tokenID,
@@ -99,6 +89,7 @@ func generateAdminToken(ctx context.Context,
 		return nil, errors.Wrap(err, "permission token error")
 	}
 	return &api.GenerateAdminTokenResponse{
-		ApiToken: response.Value,
+		TokenValue: response.Value,
+		TokenId:    tokenID,
 	}, nil
 }

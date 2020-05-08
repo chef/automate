@@ -53,6 +53,8 @@ describe File.basename(__FILE__) do
     assert_equal(Profiles::CheckResult, res.class)
 
     assert_equal(true, res['summary']['valid'])
-    assert_equal([Profiles::CheckMessage.new(file: "controls/files_spec.rb", line: 9, control_id: "apache-08", msg: "Control apache-08 has no tests defined")], res['warnings'])
+    assert_equal(true, res['warnings'].include?(
+      Profiles::CheckMessage.new(file: "controls/files_spec.rb", line: 9, control_id: "apache-08", msg: "Control apache-08 has no tests defined")
+    ))
   end
 end

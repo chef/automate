@@ -46,7 +46,7 @@ service ConfigMgmt {
 	```
 	*/
   rpc GetNodes(cfgmgmt.request.Nodes) returns (google.protobuf.ListValue) {
-    option (google.api.http).get = "/cfgmgmt/nodes";
+    option (google.api.http).get = "/api/v0/cfgmgmt/nodes";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
@@ -64,7 +64,7 @@ service ConfigMgmt {
 	```
 	*/
   rpc GetRuns(cfgmgmt.request.Runs) returns (google.protobuf.ListValue) {
-    option (google.api.http).get = "/cfgmgmt/nodes/{node_id}/runs";
+    option (google.api.http).get = "/api/v0/cfgmgmt/nodes/{node_id}/runs";
     option (chef.automate.api.iam.policy).resource = "infra:nodes:{node_id}";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
@@ -86,7 +86,7 @@ service ConfigMgmt {
 	```
 	*/
   rpc GetNodesCounts (cfgmgmt.request.NodesCounts) returns (cfgmgmt.response.NodesCounts) {
-    option (google.api.http).get = "/cfgmgmt/stats/node_counts";
+    option (google.api.http).get = "/api/v0/cfgmgmt/stats/node_counts";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
@@ -107,7 +107,7 @@ service ConfigMgmt {
 	```
 	*/
   rpc GetRunsCounts (cfgmgmt.request.RunsCounts) returns (cfgmgmt.response.RunsCounts) {
-    option (google.api.http).get = "/cfgmgmt/stats/run_counts";
+    option (google.api.http).get = "/api/v0/cfgmgmt/stats/run_counts";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
@@ -124,7 +124,7 @@ service ConfigMgmt {
 	```
 	*/
   rpc GetCheckInCountsTimeSeries(cfgmgmt.request.CheckInCountsTimeSeries) returns (cfgmgmt.response.CheckInCountsTimeSeries) {
-    option (google.api.http).get =  "/cfgmgmt/stats/checkin_counts_timeseries";
+    option (google.api.http).get =  "/api/v0/cfgmgmt/stats/checkin_counts_timeseries";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
@@ -145,7 +145,7 @@ service ConfigMgmt {
   ```
   */
   rpc GetMissingNodeDurationCounts(cfgmgmt.request.MissingNodeDurationCounts) returns (cfgmgmt.response.MissingNodeDurationCounts) {
-    option (google.api.http).get =  "/cfgmgmt/stats/missing_node_duration_counts";
+    option (google.api.http).get =  "/api/v0/cfgmgmt/stats/missing_node_duration_counts";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
@@ -161,7 +161,7 @@ service ConfigMgmt {
 	```
 	*/
   rpc GetNodeRun (cfgmgmt.request.NodeRun) returns (cfgmgmt.response.Run) {
-    option (google.api.http).get = "/cfgmgmt/nodes/{node_id}/runs/{run_id}";
+    option (google.api.http).get = "/api/v0/cfgmgmt/nodes/{node_id}/runs/{run_id}";
     option (chef.automate.api.iam.policy).resource = "infra:nodes:{node_id}";
     option (chef.automate.api.iam.policy).action = "infra:nodes:get";
   };
@@ -183,7 +183,7 @@ service ConfigMgmt {
 	```
 	*/
   rpc GetSuggestions (common.query.Suggestion) returns (google.protobuf.ListValue) {
-    option (google.api.http).get = "/cfgmgmt/suggestions";
+    option (google.api.http).get = "/api/v0/cfgmgmt/suggestions";
     // if you can get nodes, you are allowed to get suggested fields on nodes
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
@@ -200,7 +200,7 @@ service ConfigMgmt {
 	```
 	*/
   rpc GetOrganizations(cfgmgmt.request.Organizations) returns (google.protobuf.ListValue) {
-    option (google.api.http).get = "/cfgmgmt/organizations";
+    option (google.api.http).get = "/api/v0/cfgmgmt/organizations";
     // if you can get nodes, you are allowed to get the organization field on nodes
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
@@ -217,7 +217,7 @@ service ConfigMgmt {
 	```
 	*/
   rpc GetSourceFqdns(cfgmgmt.request.SourceFqdns) returns (google.protobuf.ListValue) {
-    option (google.api.http).get = "/cfgmgmt/source_fqdns";
+    option (google.api.http).get = "/api/v0/cfgmgmt/source_fqdns";
     // if you can get nodes, you are allowed to get the source fqdn field on nodes
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
@@ -234,13 +234,13 @@ service ConfigMgmt {
 	```
 	*/
   rpc GetAttributes (cfgmgmt.request.Node) returns (cfgmgmt.response.NodeAttribute) {
-    option (google.api.http).get = "/cfgmgmt/nodes/{node_id}/attribute";
+    option (google.api.http).get = "/api/v0/cfgmgmt/nodes/{node_id}/attribute";
     option (chef.automate.api.iam.policy).resource = "infra:nodes:{node_id}";
     option (chef.automate.api.iam.policy).action = "infra:nodes:get";
   };
 
   rpc GetVersion(common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
-    option (google.api.http).get =  "/cfgmgmt/version";
+    option (google.api.http).get =  "/api/v0/cfgmgmt/version";
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -260,7 +260,7 @@ service ConfigMgmt {
 	```
 	*/
   rpc GetPolicyCookbooks(cfgmgmt.request.PolicyRevision) returns (cfgmgmt.response.PolicyCookbooks) {
-    option (google.api.http).get =  "/cfgmgmt/policy_revision/{revision_id}";
+    option (google.api.http).get =  "/api/v0/cfgmgmt/policy_revision/{revision_id}";
     option (chef.automate.api.iam.policy).resource = "infra:nodes:{revision_id}";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
@@ -276,7 +276,7 @@ service ConfigMgmt {
   ```
   */
   rpc GetErrors(cfgmgmt.request.Errors) returns (cfgmgmt.response.Errors) {
-    option (google.api.http).get = "/cfgmgmt/errors";
+    option (google.api.http).get = "/api/v0/cfgmgmt/errors";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }
@@ -345,7 +345,57 @@ service ConfigMgmt {
   ```
   */
   rpc GetNodeMetadataCounts(cfgmgmt.request.NodeMetadataCounts) returns (cfgmgmt.response.NodeMetadataCounts) {
-    option (google.api.http).get = "/cfgmgmt/node_metadata_counts";
+    option (google.api.http).get = "/api/v0/cfgmgmt/node_metadata_counts";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  }
+
+    /*
+  GetNodeRunsDailyStatusTimeSeries
+
+  Provides the status of runs for each 24-hour duration. For multiple runs in one 24-hour duration, 
+  the most recent failed run will be returned. If there are no failed runs the most recent successful 
+  run will be returned. If no runs are found in the 24-hour duration, the status will be "missing" 
+  and no run information will be returned.
+
+    Example:
+  request
+  ```
+  cfgmgmt/node_runs_daily_status_time_series?node_id=507bd518-5c18-4c2d-a445-60fe7dde9961&days_ago=3
+  ```
+  response
+  ```
+  {
+    "durations": [
+      {
+        "start": "2020-04-25T19:00:00Z",
+        "end": "2020-04-26T18:59:59Z",
+        "status": "missing",
+        "run_id": ""
+      },
+      {
+        "start": "2020-04-26T19:00:00Z",
+        "end": "2020-04-27T18:59:59Z",
+        "status": "missing",
+        "run_id": ""
+      },
+      {
+        "start": "2020-04-27T19:00:00Z",
+        "end": "2020-04-28T18:59:59Z",
+        "status": "failure",
+        "run_id": "b7904f41-68b5-44ec-9da6-cf2481ff8600"
+      }
+    ]
+  }
+  ```
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc GetNodeRunsDailyStatusTimeSeries(cfgmgmt.request.NodeRunsDailyStatusTimeSeries) returns (cfgmgmt.response.NodeRunsDailyStatusTimeSeries) {
+    option (google.api.http).get = "/api/v0/cfgmgmt/node_runs_daily_status_time_series";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }

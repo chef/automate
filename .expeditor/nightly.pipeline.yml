@@ -2,7 +2,7 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: d7387a20e796eeb7f55a0362dc7b80f7e6daefdf32aec8108fda3ba50ac74246
+        image_sha256: 18ead979bf43d70b47209078eb24d232a9f639dc843547c0bbeb49c0bcad3aad
         workdir: /go/src/github.com/chef/automate
 
 steps:
@@ -94,6 +94,15 @@ steps:
       executor:
         linux:
           single-use: true
+          privileged: true
+
+  - label: "[integration] a1 legacy token"
+    command:
+      - integration/run_test integration/tests/a1_legacy_token.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
           privileged: true
 
   # TODO(ssd) 2019-12-13: This test is broken given the current design

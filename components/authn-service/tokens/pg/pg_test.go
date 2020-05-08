@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/tokens/pg"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -58,15 +58,15 @@ func setup(t *testing.T) (tokens.Storage, *sql.DB) {
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
-	mockV2Authz := authz_v2.NewAuthorizationServerMock()
-	mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-	authz_v2.RegisterAuthorizationServer(grpcAuthz, mockV2Authz)
+	mockAuthz := authz.NewAuthorizationServerMock()
+	mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
+	authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
-	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
+	authzClient := authz.NewAuthorizationClient(authzConn)
 
-	backend, err := pgCfg.Open(nil, l, authzV2Client)
+	backend, err := pgCfg.Open(nil, l, authzClient)
 	require.NoError(t, err)
 
 	db := openDB(t, pgCfg.PGURL)
@@ -76,8 +76,8 @@ func setup(t *testing.T) (tokens.Storage, *sql.DB) {
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,
-	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
-	return &authz_v2.ValidateProjectAssignmentResp{}, nil
+	*authz.ValidateProjectAssignmentReq) (*authz.ValidateProjectAssignmentResp, error) {
+	return &authz.ValidateProjectAssignmentResp{}, nil
 }
 
 func initializePG() (*pg.Config, error) {

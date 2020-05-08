@@ -27,6 +27,11 @@ func msgDistributor(in <-chan message.ChefRun,
 
 	go func() {
 		for msg := range in {
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+				continue
+			}
+
 			sendMessage(pipeInChannels, msg)
 		}
 		close(out)
@@ -37,6 +42,10 @@ func msgDistributor(in <-chan message.ChefRun,
 
 func sendMessage(pipeInChannels []chan message.ChefRun, msg message.ChefRun) {
 	for {
+		if err := msg.Ctx.Err(); err != nil {
+			msg.FinishProcessing(err)
+			return
+		}
 		messageProcessed := distributeMessage(pipeInChannels, msg)
 
 		if messageProcessed {
@@ -70,7 +79,7 @@ func mergeOutChannels(pipeOutChannels []<-chan message.ChefRun) chan message.Che
 	for _, pipeOut := range pipeOutChannels {
 		go func(pipeOut <-chan message.ChefRun) {
 			for msg := range pipeOut {
-				mergedOut <- msg
+				message.PropagateChefRun(mergedOut, &msg)
 			}
 		}(pipeOut)
 	}

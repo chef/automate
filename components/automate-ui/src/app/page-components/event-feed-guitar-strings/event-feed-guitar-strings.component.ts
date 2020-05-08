@@ -10,7 +10,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { reduce } from 'lodash/fp';
 import * as d3 from 'd3';
 import { GuitarString,

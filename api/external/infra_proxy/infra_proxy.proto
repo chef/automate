@@ -26,161 +26,160 @@ import "api/external/infra_proxy/response/nodes.proto";
 import "api/external/infra_proxy/response/policyfiles.proto";
 
 import "api/external/common/version/version.proto";
-
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service InfraProxy {
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
-    option (google.api.http).get = "/infra/version";
+    option (google.api.http).get = "/api/v0/infra/version";
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
   };
 
   rpc GetServers (infra_proxy.request.GetServers) returns (infra_proxy.response.GetServers) {
-    option (google.api.http).get = "/infra/servers";
+    option (google.api.http).get = "/api/v0/infra/servers";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:list";
   };
   rpc GetServer (infra_proxy.request.GetServer) returns (infra_proxy.response.GetServer) {
-    option (google.api.http).get = "/infra/servers/{id}";
+    option (google.api.http).get = "/api/v0/infra/servers/{id}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{id}";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc GetServerByName (infra_proxy.request.GetServerByName) returns (infra_proxy.response.GetServer) {
-    option (google.api.http).get = "/infra/servers/{name}";
+    option (google.api.http).get = "/api/v0/infra/servers/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{name}";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc CreateServer (infra_proxy.request.CreateServer) returns (infra_proxy.response.CreateServer) {
-    option (google.api.http).post = "/infra/servers";
+    option (google.api.http).post = "/api/v0/infra/servers";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:create";
   };
   rpc UpdateServer (infra_proxy.request.UpdateServer) returns (infra_proxy.response.UpdateServer) {
-    option (google.api.http).put = "/infra/servers/{id}";
+    option (google.api.http).put = "/api/v0/infra/servers/{id}";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{id}";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
   };
   rpc DeleteServer (infra_proxy.request.DeleteServer) returns (infra_proxy.response.DeleteServer) {
-    option (google.api.http).delete = "/infra/servers/{id}";
+    option (google.api.http).delete = "/api/v0/infra/servers/{id}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{id}";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:delete";
   };
 
   rpc GetOrgs (infra_proxy.request.GetOrgs) returns (infra_proxy.response.GetOrgs) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgs:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc GetOrg (infra_proxy.request.GetOrg) returns (infra_proxy.response.GetOrg) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{id}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{id}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{id}";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgs:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc GetOrgByName (infra_proxy.request.GetOrgByName) returns (infra_proxy.response.GetOrg) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{name}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{name}";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgs:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc CreateOrg (infra_proxy.request.CreateOrg) returns (infra_proxy.response.CreateOrg) {
-    option (google.api.http).post = "/infra/servers/{server_id}/orgs";
+    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgs:create";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
   };
   rpc UpdateOrg (infra_proxy.request.UpdateOrg) returns (infra_proxy.response.UpdateOrg) {
-    option (google.api.http).put = "/infra/servers/{server_id}/orgs/{id}";
+    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{id}";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{id}";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgs:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
   };
   rpc DeleteOrg (infra_proxy.request.DeleteOrg) returns (infra_proxy.response.DeleteOrg) {
-    option (google.api.http).delete = "/infra/servers/{server_id}/orgs/{id}";
+    option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{id}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{id}";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgs:delete";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
   };
 
   rpc GetCookbooks (infra_proxy.request.Cookbooks) returns (infra_proxy.response.Cookbooks) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/cookbooks";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgCookbooks:list";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc GetCookbookVersions (infra_proxy.request.CookbookVersions) returns (infra_proxy.response.CookbookVersions) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgCookbooks:list";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc GetCookbook (infra_proxy.request.Cookbook) returns (infra_proxy.response.Cookbook) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgCookbooks:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc GetCookbookFileContent (infra_proxy.request.CookbookFileContent) returns (infra_proxy.response.CookbookFileContent) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgCookbooks:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
 
   rpc GetRoles (infra_proxy.request.Roles) returns (infra_proxy.response.Roles) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/roles";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgRoles:list";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc GetRole (infra_proxy.request.Role) returns (infra_proxy.response.Role) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/roles/{name}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgRoles:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
 
   rpc GetClients (infra_proxy.request.Clients) returns (infra_proxy.response.Clients) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/clients";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:clients";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgClients:list";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc GetClient (infra_proxy.request.Client) returns (infra_proxy.response.Client) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/clients/{name}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
-    option (chef.automate.api.iam.policy).action = "infra:serverOrgClients:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   }
 
   rpc GetDataBags (infra_proxy.request.DataBags) returns (infra_proxy.response.DataBags) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgDataBags:list";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc GetDataBagItem (infra_proxy.request.DataBag) returns (infra_proxy.response.DataBag) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgDataBags:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
 
   rpc GetEnvironments (infra_proxy.request.Environments) returns (infra_proxy.response.Environments) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/environments";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgEnvironments:list";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc GetEnvironment (infra_proxy.request.Environment) returns (infra_proxy.response.Environment) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgEnvironments:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
 
   rpc GetAffectedNodes (infra_proxy.request.AffectedNodes) returns (infra_proxy.response.AffectedNodes) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgNodes:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
 
   rpc GetPolicyfiles (infra_proxy.request.Policyfiles) returns (infra_proxy.response.Policyfiles) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/policyfiles";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgPolicyfiles:list";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc GetPolicyfile (infra_proxy.request.Policyfile) returns (infra_proxy.response.Policyfile) {
-    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgPolicyfiles:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
 }

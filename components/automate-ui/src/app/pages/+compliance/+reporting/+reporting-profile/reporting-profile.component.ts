@@ -10,7 +10,7 @@ import { StatsService } from '../../shared/reporting/stats.service';
 import { ReportQueryService, ReportQuery, ReturnParams } from '../../shared/reporting/report-query.service';
 import { ScanResultsService } from '../../shared/reporting/scan-results.service';
 import { paginationOverride } from '../shared';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { FilterC } from '../../+reporting/types';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 

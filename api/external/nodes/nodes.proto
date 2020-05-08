@@ -43,7 +43,7 @@ service NodesService {
 	*/
 	rpc Create(Node) returns (Id) {
 		option (google.api.http) = {
-			post: "/nodes"
+			post: "/api/v0/nodes"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -64,7 +64,7 @@ service NodesService {
 	*/
 	rpc Read(Id) returns (Node) {
 		option (google.api.http) = {
-			get: "/nodes/id/{id}"
+			get: "/api/v0/nodes/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes:{id}"
@@ -86,7 +86,7 @@ service NodesService {
 	*/
 	rpc Update(Node) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
-			put: "/nodes/id/{id}"
+			put: "/api/v0/nodes/id/{id}"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -107,7 +107,7 @@ service NodesService {
 	*/
 	rpc Delete(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
-			delete: "/nodes/id/{id}"
+			delete: "/api/v0/nodes/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes:{id}"
@@ -128,7 +128,7 @@ service NodesService {
 	*/
 	rpc BulkDeleteById(Ids) returns (BulkDeleteResponse) {
 		option (google.api.http) = {
-			post: "/nodes/delete/ids"
+			post: "/api/v0/nodes/delete/ids"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -169,7 +169,7 @@ service NodesService {
 	*/
 	rpc List(Query) returns (Nodes) {
 		option (google.api.http) = {
-			post: "/nodes/search"
+			post: "/api/v0/nodes/search"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -190,7 +190,7 @@ service NodesService {
 	*/
 	rpc Rerun(Id) returns (RerunResponse) {
 		option (google.api.http) = {
-			get: "/nodes/rerun/id/{id}"
+			get: "/api/v0/nodes/rerun/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "infra:nodes:{id}"
@@ -219,7 +219,7 @@ service NodesService {
 	*/
 	rpc BulkDelete(Query) returns (BulkDeleteResponse) {
 		option (google.api.http) = {
-			post: "/nodes/delete"
+			post: "/api/v0/nodes/delete"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -258,7 +258,7 @@ service NodesService {
 	*/
 	rpc BulkCreate(Nodes) returns (Ids) {
 		option (google.api.http) = {
-			post: "/nodes/bulk-create"
+			post: "/api/v0/nodes/bulk-create"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {

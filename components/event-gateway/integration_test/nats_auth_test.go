@@ -17,7 +17,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/interservice/authn"
-	policies "github.com/chef/automate/api/interservice/authz/v2"
+	policies "github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 

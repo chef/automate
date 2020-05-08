@@ -328,7 +328,7 @@ func (s *Server) startHTTPServer() error {
 	if err != nil {
 		return errors.Wrap(err, "registering v0 REST gateway services")
 	}
-	mux.Handle("/", prettifier(v0Mux))
+	mux.Handle("/api/", prettifier(v0Mux))
 
 	versionedMux, cancelVersioned, err := versionedRESTMux(
 		grpcURILocal,
@@ -343,11 +343,18 @@ func (s *Server) startHTTPServer() error {
 		cancelUnversioned()
 		cancelVersioned()
 	}
-	mux.Handle("/apis/", http.StripPrefix("/apis", prettifier(versionedMux)))
+
+	// TODO(sr): there's no need to differentiate the muxes anymore
+	mux.Handle("/apis/", prettifier(versionedMux))
+
+	// /!\ Anything NOT part of versionedMux or unversionedMux (i.e. provided by grpc-gateway)
+	//     needs to deal with AUTHENTICATION and AUTHORIZATION on its own (likely by calling
+	//     authRequest); or needs to ensure that it's not part of the public API (by choosing a
+	//     prefix that isn't forward by automate-load-balancer, i.e. not /apis/ or /api/).
 
 	// custom mux route for data-collector
 	// Note: automate-load-balancer rewrites
-	//   /data-collector/v0(.*) => /events/data-collector
+	//   /data-collector/v0(.*) => /api/v0/events/data-collector
 	// and drops everything that is matched -- there will be no trailing
 	// slashes, and no further paths
 	dataCollectorForPOST := func(w http.ResponseWriter, r *http.Request) {
@@ -357,22 +364,22 @@ func (s *Server) startHTTPServer() error {
 		}
 		v0Mux.ServeHTTP(w, r)
 	}
-	mux.HandleFunc("/events/data-collector", dataCollectorForPOST)
+	mux.HandleFunc("/api/v0/events/data-collector", dataCollectorForPOST)
 
-	// "GET /events/data-collector/" is used by erchef's /_status endpoint
+	// "GET /api/v0/events/data-collector/" is used by erchef's /_status endpoint
 	// Note: erchef's data_collector:ping/0 uses data_collector_http:get("/"),
-	// which ends up requesting /events/data-collector/ (trailing slash) AND
+	// which ends up requesting /api/v0/events/data-collector/ (trailing slash) AND
 	// queries automate-gateway directly, so nginx doesn't help us.
-	mux.HandleFunc("/events/data-collector/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/v0/events/data-collector/", func(w http.ResponseWriter, r *http.Request) {
 		// grpc-gateway-generated handler code doesn't match this with a trailing /
-		r.URL.Path = "/events/data-collector"
+		r.URL.Path = "/api/v0/events/data-collector"
 		dataCollectorForPOST(w, r)
 	})
 
 	// register custom route for profile upload; corresponds to:
 	// https://github.com/chef/automate/blob/master/components/automate-gateway/api/compliance/profiles/profiles.proto
 	// `rpc Create (stream ProfilePostRequest) returns (CheckResult) {};`
-	mux.HandleFunc("/compliance/profiles", s.ProfileCreateHandler)
+	mux.HandleFunc("/api/v0/compliance/profiles", s.ProfileCreateHandler)
 
 	profileTarHandlerUnlessDELETE := func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
@@ -385,53 +392,53 @@ func (s *Server) startHTTPServer() error {
 	// custom mux route for profile tar download; corresponds to:
 	// https://github.com/chef/automate/blob/master/components/automate-gateway/api/compliance/profiles/profiles.proto
 	// `rpc ReadTar(ProfileDetails) returns (stream ProfileData) {};`
-	mux.HandleFunc("/compliance/profiles/tar", profileTarHandlerUnlessDELETE)
+	mux.HandleFunc("/api/v0/compliance/profiles/tar", profileTarHandlerUnlessDELETE)
 
 	// for legacy endpoints:
 	// compliance/profiles/{owner}/{name}/tar,
 	// compliance/profiles/{owner}/{name}/version/{version}/tar
 	// these are used by the audit cookbook/inspec/chef-server
-	mux.HandleFunc("/compliance/profiles/", profileTarHandlerUnlessDELETE) // legacy route
+	mux.HandleFunc("/api/v0/compliance/profiles/", profileTarHandlerUnlessDELETE) // legacy route
 
-	// redirect profiles/search to the v0Mux (needed b/c of above mux on `/compliance/profiles/`)
-	mux.Handle("/compliance/profiles/search", v0Mux)
+	// redirect profiles/search to the v0Mux (needed b/c of above mux on `/api/v0/compliance/profiles/`)
+	mux.Handle("/api/v0/compliance/profiles/search", v0Mux)
 
-	// redirect profiles/search to the v0Mux (needed b/c of above mux on `/compliance/profiles/`)
-	mux.Handle("/compliance/profiles/metasearch", v0Mux)
+	// redirect profiles/search to the v0Mux (needed b/c of above mux on `/api/v0/compliance/profiles/`)
+	mux.Handle("/api/v0/compliance/profiles/metasearch", v0Mux)
 
-	// redirect profiles/read to the v0Mux (needed b/c of above mux on `/compliance/profiles/`)
-	mux.Handle("/compliance/profiles/read/", v0Mux)
+	// redirect profiles/read to the v0Mux (needed b/c of above mux on `/api/v0/compliance/profiles/`)
+	mux.Handle("/api/v0/compliance/profiles/read/", v0Mux)
 
 	// custom mux route for export (ignores its request method)
 	// needed b/c gateway does not support stream; corresponds to
 	// https://github.com/chef/automate/blob/master/api/interservice/compliance/reporting/reporting.proto#L15
 	// `rpc Export(Query) returns (stream ExportData) {};`
-	mux.HandleFunc("/compliance/reporting/export", s.ReportExportHandler)
+	mux.HandleFunc("/api/v0/compliance/reporting/export", s.ReportExportHandler)
 
 	// custom mux route for export of all reports for a single node
-	mux.HandleFunc("/compliance/reporting/node/export", s.NodeExportHandler)
+	mux.HandleFunc("/api/v0/compliance/reporting/node/export", s.NodeExportHandler)
 
 	// custom mux route for export (ignores its request method)
 	// needed b/c gateway does not support stream; corresponds to
 	// https://github.com/chef/automate/blob/master/api/interservice/cfgmgmt/service/cfgmgmt.proto
 	// `rpc NodeExport(NodeExport) returns (stream ExportData) {};`
-	mux.HandleFunc("/cfgmgmt/nodes/export", s.configMgmtNodeExportHandler)
+	mux.HandleFunc("/api/v0/cfgmgmt/nodes/export", s.configMgmtNodeExportHandler)
 
 	// rpc ReportExport(ReportExport) returns (stream ReportExportData);
-	mux.HandleFunc("/cfgmgmt/reports/export", s.configMgmtReportExportHandler)
+	mux.HandleFunc("/api/v0/cfgmgmt/reports/export", s.configMgmtReportExportHandler)
 
 	// "GET /status" is used for monitoring
 	// We made it a custom handler in order to be able to return 500 when some services are down.
-	mux.HandleFunc("/status", s.DeploymentStatusHandler)
+	mux.HandleFunc("/api/v0/status", s.DeploymentStatusHandler)
 
 	// register open api endpoint definitions
-	mux.Handle("/openapi/", http.StripPrefix("/openapi", openAPIServicesHandler()))
+	mux.Handle("/api/v0/openapi/", http.StripPrefix("/api/v0/openapi", openAPIServicesHandler()))
 
 	// attach open api ui
-	mux.Handle("/openapi/ui/", http.StripPrefix("/openapi/ui", serveOpenAPIUI(s.Config.OpenAPIUIDir)))
+	mux.Handle("/api/v0/openapi/ui/", http.StripPrefix("/api/v0/openapi/ui", serveOpenAPIUI(s.Config.OpenAPIUIDir)))
 
 	// Register Prometheus metrics handler.
-	mux.Handle("/metrics", promhttp.Handler())
+	mux.Handle("/api/v0/metrics", promhttp.Handler())
 
 	// start https server
 	uri := fmt.Sprintf("%s:%d", s.Config.Hostname, s.Config.Port)

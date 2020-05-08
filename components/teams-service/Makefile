@@ -40,10 +40,17 @@ proto:
 test:
 	@go test $(verbose) $(packages) -p 1 --parallel 1 -cover
 
-test_with_db:
+PG_URL ?= "postgresql://postgres@127.0.0.1:5432/teams_test?sslmode=disable&password=docker"
+
+test_with_db: db_container
 	@docker ps | grep teams-postgres || (echo "Docker postgres not up. Run make setup_docker_pg and try this command again."; exit 1)
-	@PGTZ=UTC PG_URL="postgresql://postgres@127.0.0.1:5432/teams_test?sslmode=disable&password=docker" go test $(packages) -p 1 --parallel 1 -cover
+	@PGTZ=UTC PG_URL=$(PG_URL) go test $(packages) -p 1 --parallel 1 -cover
 	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
+
+.PHONY: db_container
+db_container:
+	@docker ps | grep teams-postgres || (echo "Docker postgres not up. Run make setup_docker_pg and try this command again."; exit 1)
+	psql -d $(PG_URL) -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\""
 
 setup_docker_pg:
 	docker run --name teams-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=teams_test -e POSTGRES_PASSWORD=docker -p 5432:5432 -d postgres:9

@@ -42,7 +42,7 @@ service ReportingService {
 	*/
 	rpc ListReports(Query) returns (Reports) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/reports"
+			post: "/api/v0/compliance/reporting/reports"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -67,7 +67,7 @@ service ReportingService {
 	*/
 	rpc ListReportIds(Query) returns (ReportIds) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/report-ids"
+			post: "/api/v0/compliance/reporting/report-ids"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -90,7 +90,7 @@ service ReportingService {
 	*/
 	rpc ListControlItems(ControlItemRequest) returns (ControlItems) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/controls"
+			post: "/api/v0/compliance/reporting/controls"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -113,7 +113,7 @@ service ReportingService {
 	*/
 	rpc ReadReport(Query) returns (Report) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/reports/id/{id}"
+			post: "/api/v0/compliance/reporting/reports/id/{id}"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -168,7 +168,7 @@ service ReportingService {
 	*/
 	rpc ListSuggestions(SuggestionRequest) returns (Suggestions) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/suggestions"
+			post: "/api/v0/compliance/reporting/suggestions"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -191,7 +191,7 @@ service ReportingService {
 	*/
 	rpc ListProfiles(Query) returns (ProfileMins) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/profiles"
+			post: "/api/v0/compliance/reporting/profiles"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -218,7 +218,7 @@ service ReportingService {
 	*/
 	rpc ReadNode(Id) returns (Node) {
 		option (google.api.http) = {
-			get: "/compliance/reporting/nodes/id/{id}"
+			get: "/api/v0/compliance/reporting/nodes/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:nodes:{id}"
@@ -263,7 +263,7 @@ service ReportingService {
 	*/
 	rpc ListNodes(Query) returns (Nodes) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/nodes/search"
+			post: "/api/v0/compliance/reporting/nodes/search"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -274,7 +274,7 @@ service ReportingService {
 
 	rpc GetVersion(google.protobuf.Empty) returns (common.version.VersionInfo) {
 		option (google.api.http) = {
-			get: "/compliance/reporting/version"
+			get: "/api/v0/compliance/reporting/version"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "system:service:version"

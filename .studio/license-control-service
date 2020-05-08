@@ -19,8 +19,7 @@ document "telemetry_status" <<DOC
   Reports on the state of telemetry (enabled/disabled) along with other assorted meta-data.
 DOC
 function telemetry_status() {
-  install_if_missing core/jq-static jq
-  gateway_get /telemetry/config | jq
+  gateway_get '/api/v0/telemetry/config?pretty'
 }
 
 document "remove_dev_license" <<DOC

@@ -5,7 +5,7 @@ import { SuggestionsService } from './suggestions.service';
 import { StatsService } from './stats.service';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 const COMPLIANCE_URL = environment.compliance_url;
 

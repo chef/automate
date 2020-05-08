@@ -82,7 +82,7 @@ run_testssl() {
     mypath="$mypath:$(hab pkg path core/net-tools)/bin"
     mypath="$mypath:$(hab pkg path core/bind)/bin"
     mypath="$mypath:$PATH"
-    PATH="$mypath" ./testssl.sh --parallel --quiet -n none --color 0 --severity LOW --warnings off --jsonfile "$2" --fast --add-ca /hab/svc/deployment-service/data/root.crt --file "$1"
+    PATH="$mypath" ./testssl.sh --parallel --quiet -n none --color 0 --severity LOW --warnings off --disable-rating --jsonfile "$2" --fast --add-ca /hab/svc/deployment-service/data/root.crt --file "$1"
 }
 
 install_testssl_prereqs() {

@@ -20,6 +20,11 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 	out := make(chan message.Compliance, 100)
 	go func() {
 		for msg := range in {
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessingCompliance(err)
+				continue
+			}
+
 			dl, _ := msg.Ctx.Deadline()
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "ctx_dealine": dl.UTC().Format(time.RFC3339)}).Debug("Processing ComplianceShared")
 
@@ -67,7 +72,7 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 			}
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "total_sum": totalSum}).Debug("Finished ComplianceShared")
 
-			out <- msg
+			message.Propagate(out, &msg)
 		}
 		close(out)
 	}()
@@ -78,6 +83,10 @@ func ComplianceSummary(in <-chan message.Compliance) <-chan message.Compliance {
 	out := make(chan message.Compliance, 100)
 	go func() {
 		for msg := range in {
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessingCompliance(err)
+				continue
+			}
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processing Compliance Summary")
 			msg.InspecSummary = &relaxting.ESInSpecSummary{
 				NodeID:           msg.Report.NodeUuid,
@@ -105,7 +114,7 @@ func ComplianceSummary(in <-chan message.Compliance) <-chan message.Compliance {
 			msg.InspecSummary.Statistics.Duration = msg.Report.Statistics.Duration
 
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "profiles": msg.InspecSummary.Profiles}).Debug("Processed Compliance Summary")
-			out <- msg
+			message.Propagate(out, &msg)
 		}
 		close(out)
 	}()

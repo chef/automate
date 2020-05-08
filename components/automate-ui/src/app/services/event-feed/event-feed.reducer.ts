@@ -27,7 +27,7 @@ import {
   GET_SUGGESTIONS_SUCCESS,
   GET_SUGGESTIONS_ERROR,
   EventFeedAction } from './event-feed.actions';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 import {
  set,

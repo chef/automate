@@ -51,7 +51,7 @@ export class PendingEditsBarComponent implements OnDestroy {
     this.store.select(allPerms)
       .pipe(takeUntil(this.isDestroyed))
       .subscribe(perms =>
-        this.isAuthorized = get(['/iam/v2/projects', 'get'], perms)
+        this.isAuthorized = get(['/apis/iam/v2/projects', 'get'], perms)
       );
   }
 

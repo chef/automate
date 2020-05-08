@@ -3442,61 +3442,61 @@ func RegisterInfraProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
-	pattern_InfraProxy_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"infra", "version"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "infra", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetServers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"infra", "servers"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetServers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "infra", "servers"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetServerByName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"infra", "servers", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetServerByName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "infra", "servers", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_CreateServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"infra", "servers"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_CreateServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "infra", "servers"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_UpdateServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_UpdateServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_DeleteServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_DeleteServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetOrgs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"infra", "servers", "server_id", "orgs"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetOrgs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v0", "infra", "servers", "server_id", "orgs"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetOrgByName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"infra", "servers", "server_id", "orgs", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetOrgByName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_CreateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"infra", "servers", "server_id", "orgs"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_CreateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v0", "infra", "servers", "server_id", "orgs"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_UpdateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_UpdateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_DeleteOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_DeleteOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetCookbooks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"infra", "servers", "server_id", "orgs", "org_id", "cookbooks"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetCookbooks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "cookbooks"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetCookbookVersions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetCookbookVersions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetCookbook_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name", "version"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetCookbook_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetCookbookFileContent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name", "version", "file-content"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetCookbookFileContent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 2, 10}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name", "version", "file-content"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"infra", "servers", "server_id", "orgs", "org_id", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "roles", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "roles", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"infra", "servers", "server_id", "orgs", "org_id", "clients"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "clients"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "clients", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "clients", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetDataBags_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "data_bags", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetDataBags_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "data_bags", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetDataBagItem_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"infra", "servers", "server_id", "orgs", "org_id", "data_bags", "name", "item"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetDataBagItem_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "data_bags", "name", "item"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetEnvironments_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"infra", "servers", "server_id", "orgs", "org_id", "environments"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetEnvironments_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "environments"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetEnvironment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "environments", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetEnvironment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "environments", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetAffectedNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"infra", "servers", "server_id", "orgs", "org_id", "affected-nodes", "chef_type", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetAffectedNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "affected-nodes", "chef_type", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetPolicyfiles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"infra", "servers", "server_id", "orgs", "org_id", "policyfiles"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetPolicyfiles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "policyfiles"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetPolicyfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "policyfiles", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetPolicyfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "policyfiles", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

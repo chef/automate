@@ -32,30 +32,30 @@ message VersionRequest {
 service ChefIngester {
 	rpc ProcessChefRun (api.ingest.request.Run) returns (api.ingest.response.ProcessChefRunResponse) {
 		option (google.api.http) = {
-			post: "/events/chef/run"
+			post: "/api/v0/events/chef/run"
 			body: "*"
 		};
 	};
 	rpc ProcessChefAction (api.ingest.request.Action) returns (api.ingest.response.ProcessChefActionResponse) {
 		option (google.api.http) = {
-			post: "/events/chef/action"
+			post: "/api/v0/events/chef/action"
 			body: "*"
 		};
 	};
 	rpc ProcessLivenessPing(api.ingest.request.Liveness) returns (api.ingest.response.ProcessLivenessResponse) {
 	  option (google.api.http) = {
-			post: "/events/chef/liveness"
+			post: "/api/v0/events/chef/liveness"
 			body: "*"
 		};
 	};
 	rpc ProcessMultipleNodeDeletes (api.ingest.request.MultipleNodeDeleteRequest) returns (api.ingest.response.ProcessMultipleNodeDeleteResponse);
 	rpc ProcessNodeDelete (api.ingest.request.Delete) returns (api.ingest.response.ProcessNodeDeleteResponse) {
 		option (google.api.http) = {
-			post: "/events/chef/nodedelete"
+			post: "/api/v0/events/chef/nodedelete"
 			body: "*"
 		};
 	};
 	rpc GetVersion (VersionRequest) returns (Version) {
-		option (google.api.http).get = "/ingest/version";
+		option (google.api.http).get = "/api/v0/ingest/version";
 	};
 }

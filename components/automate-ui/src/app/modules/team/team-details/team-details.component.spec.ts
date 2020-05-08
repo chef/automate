@@ -14,10 +14,10 @@ import {
   defaultRouterState,
   defaultRouterRouterState
 } from 'app/ngrx.reducers';
+import { using } from 'app/testing/spec-helpers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { PolicyEntityInitialState } from 'app/entities/policies/policy.reducer';
-import { Project } from 'app/entities/projects/project.model';
-import { GetProjectsSuccess, GetProjects } from 'app/entities/projects/project.actions';
+import { GetProjects } from 'app/entities/projects/project.actions';
 import {
   GetTeamSuccess,
   GetTeamUsersSuccess,
@@ -50,8 +50,7 @@ const declarations: any[] = [
   MockComponent({ selector: 'chef-heading' }),
   MockComponent({ selector: 'chef-subheading' }),
   MockComponent({ selector: 'chef-loading-spinner' }),
-  MockComponent({ selector: 'app-projects-dropdown',
-    inputs: ['projects', 'disabled'], outputs: ['onProjectChecked'] }),
+  MockComponent({ selector: 'app-projects-dropdown', inputs: ['checkedProjectIDs'] }),
   MockComponent({ selector: 'chef-tab-selector',
     inputs: ['value', 'routerLink', 'fragment']
   }),
@@ -152,34 +151,35 @@ describe('TeamDetailsComponent', () => {
     expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
   });
 
-  it('initializes dropdown with those included on the team checked', () => {
-    spyOn(store, 'dispatch').and.callThrough();
-    const teamProjects = ['b-proj', 'd-proj'];
-    const team: Team = { id: targetId, guid: 'any', name: 'any', projects: teamProjects };
-    store.dispatch(new GetTeamSuccess(team));
-    expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
+  using([
+    ['no projects', []],
+    ['one project', ['proj-one']],
+    ['multiple projects', ['p1', 'p2', 'p3', 'p4']]
+  ], function (description: string, projects: string[]) {
+    it(`initializes dropdown with those included on the team for ${description}`, () => {
+      const team: Team = { id: targetId, guid: 'any', name: 'any', projects };
+      store.dispatch(new GetTeamSuccess(team));
 
-    const projectList = [
-      genProject('a-proj'),
-      genProject('b-proj'),
-      genProject('c-proj'),
-      genProject('d-proj')
-    ];
-    store.dispatch(new GetProjectsSuccess({ projects: projectList }));
-
-    projectList.forEach(p => {
-      expect(component.projects[p.id].checked).toEqual(teamProjects.includes(p.id));
+      expect(component.team.projects).toEqual(projects);
     });
-   });
+  });
 
-  function genProject(id: string): Project {
-    return {
-      id,
-      status: 'NO_RULES', // unused
-      name: id, // unused
-      type: 'CUSTOM' // unused
-    };
-  }
+  using([
+    ['no projects', []],
+    ['one project', ['proj-one']],
+    ['multiple projects', ['p1', 'p2', 'p3', 'p4']]
+  ], function (description: string, projects: string[]) {
+    it(`transfers result from closing dropdown into form for ${description}`, () => {
+      const originalProjects = ['to-be-overwritten'];
+      const team: Team = { id: targetId, guid: 'any', name: 'any', projects: originalProjects };
+      store.dispatch(new GetTeamSuccess(team));
+      expect(component.team.projects).toEqual(originalProjects);
+
+      component.onProjectDropdownClosing(projects);
+
+      expect(component.updateForm.controls.projects.value).toEqual(projects);
+    });
+  });
 });
 
 export class GetRoute implements Action {

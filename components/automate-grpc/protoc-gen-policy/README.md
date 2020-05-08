@@ -8,7 +8,7 @@ Example (from `components/automate-gateway/api/iam/v2/teams.proto`):
 ```go
   rpc CreateTeam (CreateTeamReq) returns (CreateTeamResp) {
     option (google.api.http) = {
-      post: "/iam/v2/teams"
+      post: "/api/v0/iam/v2/teams"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "iam:teams";

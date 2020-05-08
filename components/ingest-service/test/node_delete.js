@@ -6,7 +6,7 @@ var helpers = require('./helpers.js');
 // An endpoint just for sending delete messages, possibly to be used on a CLI
 // distinct from the /events/chef/action endpoint, but should use the same pipeline
 function endpoint() {
-  return helpers.REST_SERVICE_URI + '/events/chef/nodedelete';
+  return helpers.REST_SERVICE_URI + '/api/v0/events/chef/nodedelete';
 }
 
 function nodeStateUrl() {
@@ -14,7 +14,7 @@ function nodeStateUrl() {
 }
 
 function chefRunEndpoint() {
-  return helpers.REST_SERVICE_URI + '/events/chef/run';
+  return helpers.REST_SERVICE_URI + '/api/v0/events/chef/run';
 }
 
 describe("/events/chef/nodedelete", function () {

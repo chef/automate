@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/iam/v2/introspect": {
+    "/apis/iam/v2/introspect": {
       "get": {
         "operationId": "IntrospectAll",
         "responses": {
@@ -54,7 +54,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/introspect_some": {
+    "/apis/iam/v2/introspect_some": {
       "post": {
         "operationId": "IntrospectSome",
         "responses": {

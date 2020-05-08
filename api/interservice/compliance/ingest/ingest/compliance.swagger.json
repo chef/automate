@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/events/compliance/report": {
+    "/api/v0/events/compliance/report": {
       "post": {
         "operationId": "ProcessComplianceReport",
         "responses": {

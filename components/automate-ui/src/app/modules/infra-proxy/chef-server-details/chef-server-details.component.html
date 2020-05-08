@@ -114,7 +114,7 @@
             <chef-tbody>
               <chef-tr *ngFor="let org of orgs">
                 <chef-td>
-                  <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'org', org.id, 'cookbooks']">{{ org.name }}</a>
+                  <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'org', org.id]">{{ org.name }}</a>
                 </chef-td>
                 <chef-td>{{ org.admin_user }}</chef-td>
                 <chef-td class="three-dot-column">

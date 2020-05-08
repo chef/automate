@@ -18,7 +18,7 @@ import { Status } from '../../services/event-feed/event-feed.reducer';
 import { Chicklet, SearchBarCategoryItem } from '../../types/types';
 import { sumBy } from 'lodash';
 import { initialState } from '../../services/event-feed/event-feed.reducer';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { some, pickBy } from 'lodash/fp';
 import {
   eventFeedState

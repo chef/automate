@@ -20,7 +20,7 @@ import "api/external/ingest/response/liveness.proto";
 service ChefIngester {
   rpc ProcessChefRun (ingest.request.Run) returns (ingest.response.ProcessChefRunResponse) {
     option (google.api.http) = {
-      post: "/ingest/events/chef/run"
+      post: "/api/v0/ingest/events/chef/run"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "ingest:nodes:{entity_uuid}:runs";
@@ -28,7 +28,7 @@ service ChefIngester {
   };
   rpc ProcessChefAction (ingest.request.Action) returns (ingest.response.ProcessChefActionResponse) {
     option (google.api.http) = {
-      post: "/ingest/events/chef/action"
+      post: "/api/v0/ingest/events/chef/action"
       body: "*"
     };
     // actions can be anything a user does on chef server
@@ -38,7 +38,7 @@ service ChefIngester {
   };
   rpc ProcessNodeDelete (ingest.request.Delete) returns (ingest.response.ProcessNodeDeleteResponse) {
     option (google.api.http) = {
-      post: "/ingest/events/chef/nodedelete"
+      post: "/api/v0/ingest/events/chef/nodedelete"
       body: "*"
     };
     // special action that marks a node for deletion
@@ -50,7 +50,7 @@ service ChefIngester {
   };
   rpc ProcessMultipleNodeDeletes (ingest.request.MultipleNodeDeleteRequest) returns (ingest.response.ProcessMultipleNodeDeleteResponse) {
     option (google.api.http) = {
-      post: "/ingest/events/chef/node-multiple-deletes"
+      post: "/api/v0/ingest/events/chef/node-multiple-deletes"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "ingest:nodes";
@@ -58,14 +58,14 @@ service ChefIngester {
   };
   rpc ProcessLivenessPing(ingest.request.Liveness) returns (ingest.response.ProcessLivenessResponse) {
     option (google.api.http) = {
-      post: "/ingest/events/chef/liveness"
+      post: "/api/v0/ingest/events/chef/liveness"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "ingest:nodes:{entity_uuid}:liveness";
     option (chef.automate.api.iam.policy).action = "ingest:nodes:create";
   }
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
-    option (google.api.http).get = "/ingest/version";
+    option (google.api.http).get = "/api/v0/ingest/version";
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
   };

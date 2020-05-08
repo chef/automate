@@ -2,14 +2,16 @@ package processor
 
 import (
 	chef "github.com/chef/automate/api/external/ingest/request"
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
 // BuildActionProjectTagger - Build a project tagger for Chef Actions
-func BuildActionProjectTagger(authzClient iam_v2.ProjectsClient) message.ChefActionPipe {
+func BuildActionProjectTagger(authzClient authz.ProjectsClient) message.ChefActionPipe {
 	return func(in <-chan message.ChefAction) <-chan message.ChefAction {
 		return actionBundleProjectTagger(in, authzClient)
 	}
@@ -21,19 +23,36 @@ func BuildActionProjectTagger(authzClient iam_v2.ProjectsClient) message.ChefAct
 // these rules for all the messages that are currently in the queue. The 'bundleSize' is the number
 // of messages that can use the current project rules from authz.
 func actionBundleProjectTagger(in <-chan message.ChefAction,
-	authzClient iam_v2.ProjectsClient) <-chan message.ChefAction {
+	authzClient authz.ProjectsClient) <-chan message.ChefAction {
 	out := make(chan message.ChefAction, 100)
 	go func() {
+		nextNumToDrop := 1
 		bundleSize := 0
-		var projectRulesCollection map[string]*iam_v2.ProjectRules
+		var projectRulesCollection map[string]*authz.ProjectRules
 		for msg := range in {
+			if msg.Ctx.Err() != nil {
+				msg.FinishProcessing(msg.Ctx.Err())
+				continue
+			}
 			if bundleSize <= 0 {
-				bundleSize = len(in)
+				nextBundleSize := len(in)
 				log.WithFields(log.Fields{
 					"message_id": msg.ID,
-					"bundleSize": bundleSize,
+					"bundleSize": nextBundleSize,
 				}).Debug("BundleProjectTagging - Update Project rules")
-				projectRulesCollection = getProjectRulesFromAuthz(msg.Ctx, authzClient)
+				var err error
+				projectRulesCollection, err = getProjectRulesFromAuthz(authzClient)
+				if err != nil {
+					msg.FinishProcessing(err)
+					dropChefActionMessages(in, err, nextNumToDrop-1)
+					nextNumToDrop *= 2
+					if nextNumToDrop > maxDropOnError {
+						nextNumToDrop = maxDropOnError
+					}
+					continue
+				}
+				bundleSize = nextBundleSize
+				nextNumToDrop = 1
 			} else {
 				// Skip
 				bundleSize--
@@ -41,7 +60,7 @@ func actionBundleProjectTagger(in <-chan message.ChefAction,
 
 			msg.InternalChefAction.Projects = findMatchingProjectsForAction(msg.Action, projectRulesCollection)
 
-			out <- msg
+			message.PropagateChefAction(out, &msg)
 		}
 		close(out)
 	}()
@@ -49,7 +68,21 @@ func actionBundleProjectTagger(in <-chan message.ChefAction,
 	return out
 }
 
-func findMatchingProjectsForAction(action *chef.Action, projects map[string]*iam_v2.ProjectRules) []string {
+func dropChefActionMessages(in <-chan message.ChefAction, err error, numToDrop int) {
+	var numDropped int
+	err = errors.Wrap(err, "bulk dropping message")
+	for numDropped = 0; numDropped < numToDrop; numDropped++ {
+		select {
+		case m := <-in:
+			m.FinishProcessing(err)
+		default:
+			break
+		}
+	}
+	logrus.Warnf("Dropped %d messages", numDropped)
+}
+
+func findMatchingProjectsForAction(action *chef.Action, projects map[string]*authz.ProjectRules) []string {
 	matchingProjects := make([]string, 0)
 
 	for projectName, project := range projects {
@@ -62,9 +95,9 @@ func findMatchingProjectsForAction(action *chef.Action, projects map[string]*iam
 }
 
 // Only one rule has to be true for the project to match (ORed together).
-func actionMatchesRules(action *chef.Action, rules []*iam_v2.ProjectRule) bool {
+func actionMatchesRules(action *chef.Action, rules []*authz.ProjectRule) bool {
 	for _, rule := range rules {
-		if rule.Type == iam_v2.ProjectRuleTypes_EVENT && actionMatchesAllConditions(action, rule.Conditions) {
+		if rule.Type == authz.ProjectRuleTypes_EVENT && actionMatchesAllConditions(action, rule.Conditions) {
 			return true
 		}
 	}
@@ -74,18 +107,18 @@ func actionMatchesRules(action *chef.Action, rules []*iam_v2.ProjectRule) bool {
 
 // All the conditions must be true for a rule to be true (ANDed together).
 // If there are no conditions then the rule is false
-func actionMatchesAllConditions(action *chef.Action, conditions []*iam_v2.Condition) bool {
+func actionMatchesAllConditions(action *chef.Action, conditions []*authz.Condition) bool {
 	if len(conditions) == 0 {
 		return false
 	}
 
 	for _, condition := range conditions {
 		switch condition.Attribute {
-		case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER:
+		case authz.ProjectRuleConditionAttributes_CHEF_SERVER:
 			if !stringutils.SliceContains(condition.Values, action.RemoteHostname) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION:
+		case authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION:
 			if !stringutils.SliceContains(condition.Values, action.OrganizationName) {
 				return false
 			}

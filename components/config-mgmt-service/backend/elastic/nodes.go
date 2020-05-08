@@ -238,7 +238,8 @@ func (es Backend) GetNodes(page int, perPage int, sortField string,
 }
 
 // GetNodesCounts - get the number of successful, failure, and missing nodes
-func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCounts, error) {
+func (es Backend) GetNodesCounts(filters map[string][]string,
+	startDate string, endDate string) (backend.NodesCounts, error) {
 	var ns = *new(backend.NodesCounts)
 
 	// Adding the exists = true filter to the list of filters, because nodes
@@ -246,11 +247,17 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 	// even after the node no longer exists
 	filters["exists"] = []string{"true"}
 
-	boolQuery := newBoolQueryFromFilters(filters)
+	mainQuery := newBoolQueryFromFilters(filters)
+
+	rangeQuery, ok := newRangeQuery(startDate, endDate, NodeCheckin)
+
+	if ok {
+		mainQuery = mainQuery.Must(rangeQuery)
+	}
 
 	searchTerm := "status"
 
-	statusNodesBuckets, err := es.getAggregationBucket(boolQuery, IndexNodeState, searchTerm)
+	statusNodesBuckets, err := es.getAggregationBucket(mainQuery, IndexNodeState, searchTerm)
 	if err != nil {
 		return ns, err
 	}

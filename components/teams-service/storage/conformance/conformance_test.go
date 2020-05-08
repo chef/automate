@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/memstore"
 	"github.com/chef/automate/components/teams-service/storage/postgres"
@@ -87,17 +87,17 @@ func TestStorage(t *testing.T) {
 		authzConnFactory := secureconn.NewFactory(*authzCerts)
 		grpcAuthz := authzConnFactory.NewServer()
 
-		mockV2Authz := authz_v2.NewAuthorizationServerMock()
-		mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-		authz_v2.RegisterAuthorizationServer(grpcAuthz, mockV2Authz)
+		mockAuthz := authz.NewAuthorizationServerMock()
+		mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
+		authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
 
 		authzServer := grpctest.NewServer(grpcAuthz)
 		authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 		require.NoError(t, err)
 
-		authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
+		authzAuthorizationClient := authz.NewAuthorizationClient(authzConn)
 
-		adp, err := postgres.New(l, *migrationConfig, true, authzV2AuthorizationClient)
+		adp, err := postgres.New(l, *migrationConfig, authzAuthorizationClient)
 		require.NoError(t, err)
 		adapters["postgres"] = adp
 
@@ -591,6 +591,6 @@ func testPurgeProjectUniversal(ctx context.Context, t *testing.T, s storage.Stor
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,
-	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
-	return &authz_v2.ValidateProjectAssignmentResp{}, nil
+	*authz.ValidateProjectAssignmentReq) (*authz.ValidateProjectAssignmentResp, error) {
+	return &authz.ValidateProjectAssignmentResp{}, nil
 }

@@ -788,23 +788,23 @@ func RegisterReportingServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_ReportingService_ListReports_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"compliance", "reporting", "reports"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ReportingService_ListReports_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "compliance", "reporting", "reports"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ReportingService_ListReportIds_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"compliance", "reporting", "report-ids"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ReportingService_ListReportIds_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "compliance", "reporting", "report-ids"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ReportingService_ListControlItems_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"compliance", "reporting", "controls"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ReportingService_ListControlItems_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "compliance", "reporting", "controls"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ReportingService_ReadReport_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3}, []string{"compliance", "reporting", "reports", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ReportingService_ReadReport_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 5}, []string{"api", "v0", "compliance", "reporting", "reports", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ReportingService_ListSuggestions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"compliance", "reporting", "suggestions"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ReportingService_ListSuggestions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "compliance", "reporting", "suggestions"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ReportingService_ListProfiles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"compliance", "reporting", "profiles"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ReportingService_ListProfiles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "compliance", "reporting", "profiles"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ReportingService_ReadNode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3}, []string{"compliance", "reporting", "nodes", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ReportingService_ReadNode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 5}, []string{"api", "v0", "compliance", "reporting", "nodes", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ReportingService_ListNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"compliance", "reporting", "nodes", "search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ReportingService_ListNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v0", "compliance", "reporting", "nodes", "search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ReportingService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"compliance", "reporting", "version"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ReportingService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "compliance", "reporting", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

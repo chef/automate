@@ -125,11 +125,11 @@ export class PolicyEffects {
   @Effect()
   addPolicyMembersSuccess$ = this.actions$.pipe(
     ofType<AddPolicyMembersSuccess>(PolicyActionTypes.ADD_MEMBERS_SUCCESS),
-    map(({ payload: { members_added: added } }) => {
+    map(({ payload: { id, members_added: added } }) => {
       const addedStr = added.length === 1 ? added[0].displayName : `${added.length} members`;
       return new CreateNotification({
           type: Type.info,
-          message: `Added ${addedStr}.`
+          message: `Added ${addedStr} to "${id}" policy.`
       });
     }));
 

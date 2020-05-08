@@ -12,7 +12,6 @@
       [conflictErrorEvent]="conflictErrorEvent"
       objectNoun="token"
       [createForm]="createTokenForm"
-      [assignableProjects]="dropdownProjects"
       (close)="closeCreateModal()"
       (createClicked)="createToken()">
     </app-create-object-modal>
@@ -28,7 +27,7 @@
 
     <div class="page-body">
       <chef-toolbar>
-        <app-authorized [anyOf]="['/iam/v2/tokens', 'post']">
+        <app-authorized [anyOf]="['/apis/iam/v2/tokens', 'post']">
           <div *ngIf="(apiTokenCount$ | async) === 0" class="empty-state">
             <p>Create the first token to get started!</p>
           </div>
@@ -37,7 +36,7 @@
           </div>
         </app-authorized>
       </chef-toolbar>
-      <app-authorized [allOf]="['/iam/v2/tokens', 'get']">
+      <app-authorized [allOf]="['/apis/iam/v2/tokens', 'get']">
         <chef-table *ngIf="(apiTokenCount$ | async) > 0">
           <chef-thead>
             <chef-tr>
@@ -70,10 +69,10 @@
                   <mat-option (onSelectionChange)="notifyCopy($event)" data-cy="copy-token">
                     <chef-clipboard plain value={{token.value}} label="Copy Token" icon=""></chef-clipboard>
                   </mat-option>
-                  <!-- <app-authorized [allOf]="[`/iam/v2/tokens/{id}`, 'put', token.id]"> -->
+                  <!-- <app-authorized [allOf]="[`/apis/iam/v2/tokens/{id}`, 'put', token.id]"> -->
                   <mat-option (onSelectionChange)="toggleActive($event, token)">Toggle Status</mat-option>
                   <!-- </app-authorized> -->
-                  <!-- <app-authorized [allOf]="[`/iam/v2/tokens/{id}`, 'delete', token.id]"> -->
+                  <!-- <app-authorized [allOf]="[`/apis/iam/v2/tokens/{id}`, 'delete', token.id]"> -->
                   <mat-option (onSelectionChange)="startTokenDelete($event, token)" data-cy="delete">Delete Token</mat-option>
                   <!-- </app-authorized> -->
                 </mat-select>

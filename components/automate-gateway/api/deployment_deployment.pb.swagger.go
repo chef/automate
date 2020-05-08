@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/deployment/service_versions": {
+    "/api/v0/deployment/service_versions": {
       "get": {
         "operationId": "ServiceVersions",
         "responses": {
@@ -30,7 +30,7 @@ func init() {
         ]
       }
     },
-    "/version": {
+    "/api/v0/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {

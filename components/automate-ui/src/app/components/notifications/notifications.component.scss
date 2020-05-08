@@ -1,8 +1,7 @@
 @import "~styles/variables";
 
-.notifications,
-.license-banner {
-  a {
-    color: $chef-white;
-  }
+:host {
+  position: absolute;
+  top: 0;
+  width: 100%;
 }

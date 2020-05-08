@@ -9,5 +9,5 @@ message User {
     // Unique ID. Cannot be changed. Used to log in.
     string id = 2;
     // Unique ID used to add local users to local teams. Cannot be changed.
-    string membership_id = 3; 
+    string membership_id = 3;
 }

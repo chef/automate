@@ -17,8 +17,7 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
 	api "github.com/chef/automate/api/interservice/authn"
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	tokenMock "github.com/chef/automate/components/authn-service/tokens/mock"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -69,35 +68,41 @@ func defaultMockPurgeFunc(context.Context,
 }
 
 func newTestGRPCServer(ctx context.Context,
-	t *testing.T, config Config) (*grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
+	t *testing.T, config Config) (*grpc.ClientConn, func(), *authz.PoliciesServerMock) {
 	t.Helper()
 
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
-	mockCommon := authz.NewSubjectPurgeServerMock()
-	mockCommon.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-	authz.RegisterSubjectPurgeServer(grpcAuthz, mockCommon)
+
+	mockPolicies := authz.NewPoliciesServerMock()
+	mockPolicies.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
+	authz.RegisterPoliciesServer(grpcAuthz, mockPolicies)
+
+	mockAuthz := authz.NewAuthorizationServerMock()
+	authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
+
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
-	authzSubjectClient := authz.NewSubjectPurgeClient(authzConn)
-	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
+
+	authzClient := authz.NewAuthorizationClient(authzConn)
+	policiesClient := authz.NewPoliciesClient(authzConn)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authn-service")
-	serv, err := NewServer(ctx, config, authzV2Client)
+	serv, err := NewServer(ctx, config)
 	if err != nil {
 		t.Fatalf("instantiate server: %s", err)
 	}
 
-	authnServer := grpctest.NewServer(serv.NewGRPCServer(authzSubjectClient, authzV2Client))
+	authnServer := grpctest.NewServer(serv.NewGRPCServer(policiesClient, authzClient))
 
 	connFactory := secureconn.NewFactory(*serviceCerts)
 	conn, err := connFactory.Dial("authn-service", authnServer.URL)
 	if err != nil {
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
-	return conn, func() { authnServer.Close(); authzServer.Close() }, mockCommon
+	return conn, func() { authnServer.Close(); authzServer.Close() }, mockPolicies
 }
 
 func TestTokenGRPC(t *testing.T) {

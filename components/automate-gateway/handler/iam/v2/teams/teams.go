@@ -3,7 +3,7 @@ package teams
 import (
 	"context"
 
-	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/teams"
 
 	// Teams Service Gateway Requests/Response/Service definitions
 	gwcommon "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"

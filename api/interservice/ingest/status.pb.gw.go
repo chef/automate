@@ -197,9 +197,9 @@ func RegisterIngestStatusHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_IngestStatus_GetHealth_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"health"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_IngestStatus_GetHealth_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "health"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_IngestStatus_GetMigrationStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"migration"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_IngestStatus_GetMigrationStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "migration"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

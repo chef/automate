@@ -24,6 +24,11 @@ func ChefActionTransmogrify(in <-chan message.ChefAction) <-chan message.ChefAct
 				"buffer_size": len(out)},
 			).Debug("Transforming ChefAction")
 
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+				continue
+			}
+
 			recordedAt, err := time.Parse(time.RFC3339, msg.Action.GetRecordedAt())
 			if err != nil {
 				grpcErr := status.Errorf(
@@ -104,7 +109,7 @@ func ChefActionTransmogrify(in <-chan message.ChefAction) <-chan message.ChefAct
 				}
 			}
 
-			out <- msg
+			message.PropagateChefAction(out, &msg)
 		}
 		close(out)
 	}()

@@ -2,15 +2,18 @@ import {
   Component, EventEmitter, Input, Output, OnInit, OnDestroy, OnChanges, SimpleChanges
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-
-import { IdMapper } from 'app/helpers/auth/id-mapper';
-import { Project } from 'app/entities/projects/project.model';
-import {
-  ProjectChecked,
-  ProjectCheckedMap
-} from 'app/components/projects-dropdown/projects-dropdown.component';
+import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { IdMapper } from 'app/helpers/auth/id-mapper';
+import {
+  Project, ProjectConstants, ProjectCheckedMap
+} from 'app/entities/projects/project.model';
+import { PolicyChecked } from 'app/entities/policies/policy.model';
+import { GetPolicies } from 'app/entities/policies/policy.actions';
+import { allPolicies } from 'app/entities/policies/policy.selectors';
 
 @Component({
   selector: 'app-create-object-modal',
@@ -22,7 +25,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Input() creating = false;
   @Input() objectNoun: string;
   @Input() createProjectModal = false;
-  @Input() assignableProjects: Project[] = [];
   @Input() createForm: FormGroup; // NB: The form must contain 'name' and 'id' fields
   @Input() conflictErrorEvent: EventEmitter<boolean>; // TC: This element assumes 'id' is the
                                                       // only create field that can conflict.
@@ -30,12 +32,17 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Output() createClicked = new EventEmitter<Project[]>();
 
   public projects: ProjectCheckedMap = {};
+  public policies: PolicyChecked[] = [];
   public modifyID = false; // Whether the edit ID form is open or not.
   public conflictError = false;
   public addPolicies = true;
   public projectsUpdatedEvent = new EventEmitter();
+  public policiesUpdatedEvent = new EventEmitter();
+  public UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   private isDestroyed = new Subject<boolean>();
+
+  constructor(private store: Store<NgrxStateAtom>) { }
 
   ngOnInit(): void {
     this.conflictErrorEvent.pipe(takeUntil(this.isDestroyed))
@@ -44,6 +51,11 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
       // Open the ID input on conflict so user can resolve it.
       this.modifyID = isConflict;
     });
+
+    this.store.select(allPolicies)
+      .pipe(takeUntil(this.isDestroyed))
+      // OK to leave `checked` undefined--will be initialized upon `visible`
+      .subscribe(policies => this.policies = policies as PolicyChecked[]);
   }
 
   ngOnDestroy() {
@@ -52,35 +64,33 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // update project dropdown if list changes
-    if (changes.assignableProjects) {
-      this.projects = {};
-      changes.assignableProjects.currentValue.forEach((proj: Project) =>
-        this.projects[proj.id] = { ...proj, checked: false });
-    }
-    // clear checked projects when opening
     if (changes.visible && (changes.visible.currentValue as boolean)) {
-      Object.values(this.projects).forEach(p => p.checked = false);
+
+      this.store.dispatch(new GetPolicies()); // refresh in case of updates
+
+      Object.values(this.projects).forEach(p => p.checked = false); // reset projects
       this.projectsUpdatedEvent.emit();
+
+      Object.values(this.policies).forEach(p => p.checked = false); // reset policies
+      this.policiesUpdatedEvent.emit();
+
       if (this.createProjectModal) {
-        this.updatePolicyCheckbox(true); // always set to checked upon opening
+        this.updatePolicyCheckbox(true); // default to checked upon opening
       }
     }
   }
 
-  onProjectChecked(project: ProjectChecked): void {
-    this.projects[project.id].checked = project.checked;
-    const projectsSelected = Object.keys(this.projects).filter(id => this.projects[id].checked);
+  onProjectDropdownClosing(projectsSelected: string[]): void {
     this.createForm.controls.projects.setValue(projectsSelected);
+  }
+
+  onPolicyDropdownClosing(policiesSelected: string[]): void {
+    this.createForm.controls.policies.setValue(policiesSelected);
   }
 
   updatePolicyCheckbox(event: boolean): void {
     this.addPolicies = event;
     this.createForm.controls.addPolicies.setValue(this.addPolicies);
-  }
-
-  dropdownDisabled(): boolean {
-    return Object.values(this.projects).length === 0;
   }
 
   handleNameInput(event: KeyboardEvent): void {

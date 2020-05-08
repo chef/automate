@@ -1,5 +1,5 @@
 import { initialState } from './event-feed.reducer';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 describe('eventFeedReducer', () => {
   it('ensure the end date is at the end of the local time zone\'s day', () => {

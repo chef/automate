@@ -48,6 +48,10 @@ chef-form-field {
 
 chef-radio chef-option {
   display: inline-block;
+
+  &:first-child {
+    padding-left: 0;
+  }
 }
 
 section {

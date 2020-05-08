@@ -1084,33 +1084,33 @@ func RegisterApplicationsServiceHandlerClient(ctx context.Context, mux *runtime.
 }
 
 var (
-	pattern_ApplicationsService_GetServiceGroups_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"applications", "service-groups"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetServiceGroups_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "applications", "service-groups"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetServiceGroupsHealthCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"applications", "service_groups_health_counts"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetServiceGroupsHealthCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "applications", "service_groups_health_counts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"applications", "services"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "applications", "services"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetServicesDistinctValues_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"applications", "services-distinct-values"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetServicesDistinctValues_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "applications", "services-distinct-values"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetServicesBySG_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"applications", "service-groups", "service_group_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetServicesBySG_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "applications", "service-groups", "service_group_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetServicesStats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"applications", "stats"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetServicesStats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "applications", "stats"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetDisconnectedServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"applications", "disconnected_services"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetDisconnectedServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "applications", "disconnected_services"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_DeleteDisconnectedServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"applications", "delete_disconnected_services"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_DeleteDisconnectedServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "applications", "delete_disconnected_services"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_DeleteServicesByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"applications", "delete_services_by_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_DeleteServicesByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "applications", "delete_services_by_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"applications", "version"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "applications", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"retention", "service_groups", "disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v0", "retention", "service_groups", "disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_UpdateDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"retention", "service_groups", "disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_UpdateDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v0", "retention", "service_groups", "disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetDeleteDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"retention", "service_groups", "delete_disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetDeleteDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v0", "retention", "service_groups", "delete_disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_UpdateDeleteDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"retention", "service_groups", "delete_disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_UpdateDeleteDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v0", "retention", "service_groups", "delete_disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

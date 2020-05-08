@@ -17,7 +17,7 @@ import {
   RespEventCount,
   GuitarStringCollection
 } from '../../types/types';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { find } from 'lodash';
 import { initialState } from '../../services/event-feed/event-feed.reducer';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';

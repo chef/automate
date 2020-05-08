@@ -200,6 +200,70 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByTags() {
 	suite.Equal("Taco Node", fetchedNodes[0].Name)
 }
 
+func (suite *NodesIntegrationSuite) TestGetNodesCanSort() {
+	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Platform: "ubuntu", PlatformVersion: "14.04", LastContact: ptypes.TimestampNow(),
+		Tags: []*common.Kv{{Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	timestamp, err := ptypes.TimestampProto(time.Now().Add(time.Minute * -10))
+	node2, err := suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "aws-ec2", Platform: "ubuntu", PlatformVersion: "16.04", LastContact: timestamp,
+		Tags: []*common.Kv{{Key: "nachos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	node3, err := suite.Database.AddNode(&nodes.Node{Name: "No Nacho Node", Manager: "azure-vm", Platform: "centos", PlatformVersion: "7",
+		Tags: []*common.Kv{{Key: "nachos", Value: "no"}, {Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	// sort by name
+	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 3, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
+	suite.Equal("Nacho Node", fetchedNodes[0].GetName())
+	suite.Equal("No Nacho Node", fetchedNodes[1].GetName())
+
+	// sort by manager
+	fetchedNodes, count, err = suite.Database.GetNodes("manager", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 3, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
+	suite.Equal("automate", fetchedNodes[0].GetManager())
+	suite.Equal("aws-ec2", fetchedNodes[1].GetManager())
+	suite.Equal("azure-vm", fetchedNodes[2].GetManager())
+
+	// sort by platform
+	fetchedNodes, count, err = suite.Database.GetNodes("platform", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 3, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
+	suite.Equal("centos", fetchedNodes[0].GetPlatform())
+	suite.Equal("ubuntu", fetchedNodes[1].GetPlatform())
+	suite.Equal("ubuntu", fetchedNodes[2].GetPlatform())
+
+	// sort by state
+	stopped := manager.NodeState{
+		Id:    node2,
+		State: manager.NodeState_STOPPED,
+	}
+	err = suite.Database.ChangeNodeState(&stopped)
+	suite.Require().NoError(err)
+
+	missing := manager.NodeState{
+		Id:    node3,
+		State: manager.NodeState_MISSING,
+	}
+	err = suite.Database.ChangeNodeState(&missing)
+	suite.Require().NoError(err)
+
+	fetchedNodes, count, err = suite.Database.GetNodes("state", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 3, Unreachable: 2, Reachable: 0, Unknown: 1}, count)
+	suite.Equal("", fetchedNodes[0].GetState())
+	suite.Equal("MISSING", fetchedNodes[1].GetState())
+	suite.Equal("STOPPED", fetchedNodes[2].GetState())
+}
+
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByMultipleTags() {
 	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate",
 		Tags: []*common.Kv{{Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})

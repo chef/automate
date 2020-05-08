@@ -10,8 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/teams-service/server"
 	"github.com/chef/automate/components/teams-service/service"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
@@ -129,9 +128,9 @@ Please pass a config file as the only argument to this command.`))
 	if err != nil {
 		fail(errors.Wrapf(err, "failed to dial authz-service at (%s)", cfg.AuthzAddress))
 	}
-	authzClient := authz.NewSubjectPurgeClient(authzConn)
-	authzV2PoliciesClient := authz_v2.NewPoliciesClient(authzConn)
-	authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
+
+	authzPoliciesClient := authz.NewPoliciesClient(authzConn)
+	authzAuthorizationClient := authz.NewAuthorizationClient(authzConn)
 
 	mustBeADirectory(cfg.MigrationsPath)
 	u, err := url.Parse(cfg.PGURL)
@@ -145,9 +144,8 @@ Please pass a config file as the only argument to this command.`))
 		Logger: l,
 	}
 
-	service, err := service.NewPostgresService(l, connFactory,
-		migrationConfig, authzClient, authzV2PoliciesClient,
-		authzV2AuthorizationClient)
+	service, err := service.NewPostgresService(l, connFactory, migrationConfig, authzPoliciesClient, authzAuthorizationClient)
+
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}

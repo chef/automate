@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 @Component({
   selector: 'app-demo-calendar',

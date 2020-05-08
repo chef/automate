@@ -6,7 +6,7 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: d7387a20e796eeb7f55a0362dc7b80f7e6daefdf32aec8108fda3ba50ac74246
+        image_sha256: 18ead979bf43d70b47209078eb24d232a9f639dc843547c0bbeb49c0bcad3aad
         workdir: /go/src/github.com/chef/automate
 
 steps:
@@ -143,7 +143,7 @@ steps:
 
   # The nodemanager tests require access to AWS and Azure accounts as
   # they test against the actual API endpoints of those services.
-  - label: "nodemanager-integration-tests"
+  - label: "nodemanager-integration"
     command:
       - . scripts/verify_setup.sh
       - |
@@ -184,7 +184,7 @@ steps:
 
   # The license_usage_nodes_test appears to require AWS access. We
   # might consider splitting this into two different tests.
-  - label: "gateway-integration-tests"
+  - label: "gateway-integration"
     command:
       - . scripts/verify_setup.sh
       - hab studio run "source scripts/verify_studio_init.sh && start_all_services && go_test ./components/automate-gateway/integration/..."
@@ -500,7 +500,7 @@ steps:
   - label: "airgap a1migration"
     command:
       - integration/run_test integration/tests/airgap_a1migration.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
@@ -530,7 +530,7 @@ steps:
   - label: "product airgap"
     command:
       - integration/run_test integration/tests/airgap_product.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
@@ -564,7 +564,7 @@ steps:
   - label: "airgap backup"
     command:
       - integration/run_test integration/tests/airgap_backup.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 30
     expeditor:
       executor:
         linux:
@@ -610,7 +610,7 @@ steps:
   - label: "backup to s3"
     command:
       - integration/run_test integration/tests/backup_s3.sh
-    timeout_in_minutes: 30
+    timeout_in_minutes: 35
     expeditor:
       accounts:
         - aws/chef-cd
@@ -819,7 +819,7 @@ steps:
           single-use: true
           privileged: true
 
-  - label: "builder smoke tests"
+  - label: "builder smoke"
     command:
       - integration/run_test integration/tests/bldr_smoke.sh
     timeout_in_minutes: 25

@@ -5,7 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { Store, StoreModule } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { JobsListComponent } from './jobs-list.component';

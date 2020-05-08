@@ -4,7 +4,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CookieModule } from 'ngx-cookie';
 import { of as observableOf } from 'rxjs';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { Router } from '@angular/router';
 import { ReportingOverviewComponent } from './reporting-overview.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';

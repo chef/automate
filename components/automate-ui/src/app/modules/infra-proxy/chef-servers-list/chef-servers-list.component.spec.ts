@@ -3,6 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
@@ -21,15 +22,19 @@ describe('ChefServersListComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({
-        selector: 'app-create-chef-server-modal',
-        inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
-        outputs: ['close', 'createClicked']
+          selector: 'app-create-chef-server-modal',
+          inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
+          outputs: ['close', 'createClicked']
         }),
-        MockComponent({ selector: 'app-delete-object-modal',
-        inputs: ['default', 'visible', 'objectNoun', 'objectName'],
-        outputs: ['close', 'deleteClicked'] }),
-        MockComponent({ selector: 'chef-button',
-                inputs: ['disabled', 'routerLink'] }),
+        MockComponent({
+          selector: 'app-delete-object-modal',
+          inputs: ['default', 'visible', 'objectNoun', 'objectName'],
+          outputs: ['close', 'deleteClicked']
+        }),
+        MockComponent({
+          selector: 'chef-button',
+          inputs: ['disabled', 'routerLink']
+        }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),
@@ -58,9 +63,9 @@ describe('ChefServersListComponent', () => {
         RouterTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
-      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -75,13 +80,13 @@ describe('ChefServersListComponent', () => {
 
   describe('create server', () => {
     let store: Store<NgrxStateAtom>;
-    const server = <Server> {
-        id: '1',
-        name: 'new server',
-        description: 'new server description',
-        fqdn: 'xyz.com',
-        ip_address: '1.1.1.1'
-      };
+    const server = <Server>{
+      id: '1',
+      name: 'new server',
+      description: 'new server description',
+      fqdn: 'xyz.com',
+      ip_address: '1.1.1.1'
+    };
 
     beforeEach(() => {
       store = TestBed.inject(Store);
@@ -112,7 +117,7 @@ describe('ChefServersListComponent', () => {
       component.createChefServerForm.controls['ip_address'].setValue(server.ip_address);
       component.createChefServer();
 
-      store.dispatch(new CreateServerSuccess({'server': server}));
+      store.dispatch(new CreateServerSuccess({ 'server': server }));
 
       component.sortedChefServers$.subscribe(servers => {
         expect(servers).toContain(server);
@@ -208,5 +213,59 @@ describe('ChefServersListComponent', () => {
 
     });
   });
+
+  describe('delete modal', () => {
+    const mockEvent = { isUserInput: true } as MatOptionSelectionChange;
+
+    it('With no orgs, selecting delete from control menu opens the delete modal', () => {
+      expect(component.deleteModalVisible).toBe(false);
+      component.startServerDelete(mockEvent, genServer('uuid-111', 0));
+      expect(component.deleteModalVisible).toBe(true);
+    });
+
+    it('closes upon sending request to back-end', () => {
+      component.startServerDelete(mockEvent, genServer('uuid-111', 0));
+      expect(component.deleteModalVisible).toBe(true);
+      component.deleteServer();
+      expect(component.deleteModalVisible).toBe(false);
+    });
+
+  });
+
+  describe('message modal', () => {
+    const mockEvent = { isUserInput: true } as MatOptionSelectionChange;
+
+    it('With one org, selecting delete from control menu opens the message modal', () => {
+      expect(component.messageModalVisible).toBe(false);
+      component.startServerDelete(mockEvent, genServer('uuid-111', 1));
+      expect(component.messageModalVisible).toBe(true);
+    });
+
+    it('With multiple orgs, selecting delete from control menu opens the message modal', () => {
+      expect(component.messageModalVisible).toBe(false);
+      component.startServerDelete(mockEvent, genServer('uuid-111', 1));
+      expect(component.messageModalVisible).toBe(true);
+    });
+
+    it('closes upon request', () => {
+      component.startServerDelete(mockEvent, genServer('uuid-111', 4));
+      expect(component.messageModalVisible).toBe(true);
+      component.closeMessageModal();
+      expect(component.messageModalVisible).toBe(false);
+    });
+
+  });
+
+  function genServer(id: string, orgs_count: number): Server {
+    return {
+      id,
+      orgs_count,
+      name: 'Demo Server',
+      description: 'Demo Description',
+      fqdn: 'http://demo.com/',
+      ip_address: '192.168.2.1'
+    };
+  }
+
 });
 

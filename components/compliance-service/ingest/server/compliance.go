@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	ingest_api "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	automate_event "github.com/chef/automate/api/interservice/event"
@@ -34,9 +34,11 @@ type ComplianceIngestServer struct {
 var MinimumSupportedInspecVersion = semver.MustParse("2.0.0")
 
 func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.NodeManagerServiceClient,
-	automateURL string, notifierClient notifier.Notifier, authzProjectsClient iam_v2.ProjectsClient) *ComplianceIngestServer {
+	automateURL string, notifierClient notifier.Notifier, authzProjectsClient authz.ProjectsClient,
+	messageBufferSize int) *ComplianceIngestServer {
 
-	compliancePipeline := pipeline.NewCompliancePipeline(esClient, authzProjectsClient, mgrClient)
+	compliancePipeline := pipeline.NewCompliancePipeline(esClient,
+		authzProjectsClient, mgrClient, messageBufferSize)
 
 	return &ComplianceIngestServer{
 		compliancePipeline: compliancePipeline,

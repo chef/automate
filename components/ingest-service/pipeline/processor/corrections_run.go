@@ -16,9 +16,14 @@ func ChefRunCorrections(in <-chan message.ChefRun) <-chan message.ChefRun {
 				"buffer_size": len(out),
 			}).Debug("Corrections ChefRun")
 
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+				continue
+			}
+
 			cleanUpErrorTitle(&msg)
 
-			out <- msg
+			message.PropagateChefRun(out, &msg)
 		}
 		close(out)
 	}()

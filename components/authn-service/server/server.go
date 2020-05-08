@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"net/textproto"
@@ -13,9 +14,8 @@ import (
 	"google.golang.org/grpc/grpclog"
 
 	api "github.com/chef/automate/api/interservice/authn"
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	"github.com/chef/automate/lib/grpc/health"
@@ -23,6 +23,10 @@ import (
 	wrap "github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/version"
+)
+
+const (
+	IngestPolicyID = "ingest-access"
 )
 
 // Config holds the server's configuration options.
@@ -44,19 +48,20 @@ type Server struct {
 	// Map of authenticator IDs to authenticators.
 	// Note: dex wraps this with a ResourceVersion, but that is due to storing
 	// connectors in the database -- we don't do this
-	TokenStorage       tokens.Storage
-	authenticators     map[string]authenticator.Authenticator
-	logger             *zap.Logger
-	connFactory        *secureconn.Factory
-	teamsClient        teams.TeamsClient
-	authzSubjectClient authz.SubjectPurgeClient
-	authzV2Client      authz_v2.AuthorizationClient
-	health             *health.Service
+	TokenStorage   tokens.Storage
+	authenticators map[string]authenticator.Authenticator
+	logger         *zap.Logger
+	connFactory    *secureconn.Factory
+	teamsClient    teams.TeamsClient
+	policiesClient authz.PoliciesClient
+	authzClient    authz.AuthorizationClient
+	health         *health.Service
 }
 
 // NewServer constructs a server from the provided config.
-func NewServer(ctx context.Context, c Config, authzV2Client authz_v2.AuthorizationClient) (*Server, error) {
-	return newServer(ctx, c, authzV2Client)
+func NewServer(ctx context.Context, c Config) (*Server, error) {
+
+	return newServer(ctx, c)
 }
 
 // Serve tells authn to start responding to GRPC and HTTP1 requests. On success, it never returns.
@@ -65,7 +70,7 @@ func (s *Server) Serve(grpcEndpoint, http1Endpoint string) error {
 	if err != nil {
 		return err
 	}
-	server := s.NewGRPCServer(s.authzSubjectClient, s.authzV2Client)
+	server := s.NewGRPCServer(s.policiesClient, s.authzClient)
 
 	opts := []runtime.ServeMuxOption{
 		runtime.WithIncomingHeaderMatcher(headerMatcher),
@@ -103,7 +108,8 @@ func (s *Server) ServeHTTP1(pbmux *runtime.ServeMux, http1Endpoint string) error
 	return http.ListenAndServe(http1Endpoint, httpmux)
 }
 
-func newServer(ctx context.Context, c Config, authzV2Client authz_v2.AuthorizationClient) (*Server, error) {
+func newServer(ctx context.Context, c Config) (*Server, error) {
+
 	// Users shouldn't see this, but gives you a clearer error message if you
 	// don't configure things correctly in testing.
 	if c.ServiceCerts == nil {
@@ -133,10 +139,12 @@ func newServer(ctx context.Context, c Config, authzV2Client authz_v2.Authorizati
 	if err != nil {
 		return nil, errors.Wrapf(err, "dial authz-service (%s)", c.AuthzAddress)
 	}
+	authzClient := authz.NewAuthorizationClient(authzConn)
+	policiesClient := authz.NewPoliciesClient(authzConn)
 
 	var ts tokens.Storage
 	if c.Token != nil {
-		ts, err = c.Token.Open(c.ServiceCerts, c.Logger, authzV2Client)
+		ts, err = c.Token.Open(c.ServiceCerts, c.Logger, authzClient)
 		if err != nil {
 			return nil, errors.Wrap(err, "initialize tokens adapter")
 		}
@@ -144,35 +152,48 @@ func newServer(ctx context.Context, c Config, authzV2Client authz_v2.Authorizati
 		c.Logger.Debug("no tokens adapter defined")
 	}
 
+	s := &Server{
+		TokenStorage:   ts,
+		authzClient:    authzClient,
+		policiesClient: policiesClient,
+		authenticators: authenticators,
+		logger:         c.Logger,
+		connFactory:    factory,
+		teamsClient:    teams.NewTeamsClient(teamsConn),
+		health:         health.NewService(),
+	}
+
+	// make grpc-go log through zap
+	grpclog.SetLoggerV2(wrap.WrapZapGRPC(s.logger))
+
 	// Add the legacy data collector token as a secret if it was defined in the config.
 	if c.LegacyDataCollectorToken != "" {
-		if _, err := ts.GetTokenIDWithValue(ctx, c.LegacyDataCollectorToken); err != nil {
-
+		var tokenID string
+		if existingID, err := ts.GetTokenIDWithValue(ctx, c.LegacyDataCollectorToken); err != nil {
 			// If we couldn't find the legacy data collector token, create it.
 			if _, ok := errors.Cause(err).(*tokens.NotFoundError); ok {
-				_, err = ts.CreateLegacyTokenWithValue(ctx, c.LegacyDataCollectorToken)
+				var token *tokens.Token
+				token, err = ts.CreateLegacyTokenWithValue(ctx, c.LegacyDataCollectorToken)
+				tokenID = token.ID
 			}
 
 			if err != nil {
 				return nil, errors.Wrap(err,
 					"could not populate the legacy data collector token")
 			}
+		} else {
+			tokenID = existingID
+		}
+
+		_, err := policiesClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
+			Id:      IngestPolicyID,
+			Members: []string{fmt.Sprintf("token:%s", tokenID)},
+		})
+		if err != nil {
+			s.logger.Warn(errors.Wrap(err, "there was an error granting the legacy data collector token ingest access").Error())
+			s.logger.Warn(fmt.Sprintf("please manually add token with ID %q to the policy with ID %q", tokenID, IngestPolicyID))
 		}
 	}
-
-	s := &Server{
-		TokenStorage:       ts,
-		authzSubjectClient: authz.NewSubjectPurgeClient(authzConn),
-		authzV2Client:      authzV2Client,
-		authenticators:     authenticators,
-		logger:             c.Logger,
-		connFactory:        factory,
-		teamsClient:        teams.NewTeamsClient(teamsConn),
-		health:             health.NewService(),
-	}
-
-	// make grpc-go log through zap
-	grpclog.SetLoggerV2(wrap.WrapZapGRPC(s.logger))
 
 	return s, nil
 }

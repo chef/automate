@@ -13,7 +13,7 @@ defmodule Notifications.Formatters.Slack.Compliance do
                                     "InSpec found a critical control failure on node #{c.node_name}")
     %{
       username: "Chef Automate",
-      icon_url: "https://docs.chef.io/_static/chef_logo_v2.png",
+      icon_url: "https://docs.chef.io/images/chef-icon.png",
       text: msg,
       attachments: [attachment_note(c)],
     }

@@ -1,128 +1,216 @@
-import { TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { By } from '@angular/platform-browser';
-import { Observable, of as observableOf } from 'rxjs';
-import { Store, StoreModule } from '@ngrx/store';
-import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
-
-import { Destination } from './destination';
-import { DatafeedService } from '../../services/data-feed/data-feed.service';
-import { TelemetryService } from '../../services/telemetry/telemetry.service';
-import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { DatafeedComponent } from './data-feed.component';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MockComponent } from 'ng2-mock-component';
+import { StoreModule, Store } from '@ngrx/store';
+import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
+import { DataFeedComponent } from './data-feed.component';
+import { DestinationRequests } from 'app/entities/destinations/destination.requests';
+import { HttpClient, HttpHandler } from '@angular/common/http';
+import { Destination } from 'app/entities/destinations/destination.model';
+import { CreateDestinationSuccess, CreateDestinationFailure } from 'app/entities/destinations/destination.actions';
+import { HttpStatus } from 'app/types/types';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
-describe('DatafeedComponent', () => {
-  let store: Store<NgrxStateAtom>;
-  const destinations: Destination[] = [
-    new Destination(1, 'name1', 'http://foo.com', 'secret_id1'),
-    new Destination(2, 'name2', 'http://bar.com', 'secret_id2'),
-    new Destination(3, 'name3', 'http://bar.com', 'secret_id2')
-  ];
+describe('DataFeedComponent', () => {
+  let component: DataFeedComponent;
+  let fixture: ComponentFixture<DataFeedComponent>;
 
-  // CSS identifiers
-  const cardId = '#destinations-cards';
-  const listId = '#destinations-list';
-
-  class MockTelemetryService {
-    track() { }
-  }
-
-  class MockDatafeedService {
-    fetchDestinations(): Observable<Destination[]> {
-      return observableOf(destinations);
-    }
-
-    deleteDestination(destination) {
-    return observableOf(destination);
-    }
-  }
-
-  class MockDeleteDialog {
-    afterClosed() {
-      return observableOf('delete');
-    }
-  }
-
-  class MockMdDialog {
-    open(_dialogType) {
-      return new MockDeleteDialog();
-    }
-  }
-
-  class MockMdSnackBar {
-    open(_message, _m, _time) { }
-  }
-
-  let telemetryService: TelemetryService;
-  let fixture, component;
-
-  beforeEach(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
+      declarations: [
+        DataFeedComponent,
+        MockComponent({
+        selector: 'app-create-data-feed-modal',
+        inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
+        outputs: ['close', 'createClicked']
+        }),
+        MockComponent({ selector: 'app-delete-object-modal',
+        inputs: ['default', 'visible', 'objectNoun', 'objectName'],
+        outputs: ['close', 'deleteClicked'] }),
+        MockComponent({ selector: 'chef-button',
+                inputs: ['disabled', 'routerLink'] }),
+        MockComponent({ selector: 'chef-error' }),
+        MockComponent({ selector: 'chef-form-field' }),
+        MockComponent({ selector: 'chef-heading' }),
+        MockComponent({ selector: 'chef-icon' }),
+        MockComponent({ selector: 'chef-loading-spinner' }),
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
+        MockComponent({ selector: 'chef-page-header' }),
+        MockComponent({ selector: 'chef-subheading' }),
+        MockComponent({ selector: 'chef-toolbar' }),
+        MockComponent({ selector: 'chef-table' }),
+        MockComponent({ selector: 'chef-thead' }),
+        MockComponent({ selector: 'chef-tbody' }),
+        MockComponent({ selector: 'chef-tr' }),
+        MockComponent({ selector: 'chef-th' }),
+        MockComponent({ selector: 'chef-td' }),
+        MockComponent({ selector: 'a', inputs: ['routerLink'] })
+      ],
+      providers: [
+        FeatureFlagsService,
+        DestinationRequests,
+        HttpClient,
+        HttpHandler
+      ],
       imports: [
+        FormsModule,
+        ReactiveFormsModule,
         RouterTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
-      declarations: [
-        DatafeedComponent
-      ],
-      providers: [
-        { provide: MatDialog, useClass: MockMdDialog },
-        { provide: TelemetryService, useClass: MockTelemetryService },
-        { provide: DatafeedService, useClass: MockDatafeedService },
-        { provide: MatSnackBar, useClass: MockMdSnackBar},
-        FeatureFlagsService
-      ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
-    }).compileComponents();
-    store = TestBed.inject(Store);
-    spyOn(store, 'dispatch').and.callThrough();
-    fixture = TestBed.createComponent(DatafeedComponent);
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(DataFeedComponent);
     component = fixture.componentInstance;
-    telemetryService = TestBed.inject(TelemetryService);
     fixture.detectChanges();
   });
 
-  describe ('in list view', () => {
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  describe('create data feed', () => {
+    let store: Store<NgrxStateAtom>;
+    const username = 'test';
+    const password = 'test123';
+    const destination = <Destination> {
+      id: '1',
+      name: 'new data feed',
+      secret: 'testSecret',
+      url: 'http://foo.com'
+    };
+
     beforeEach(() => {
-      component.cardView = false;
-      fixture.detectChanges();
+      store = TestBed.inject(Store);
     });
 
-    it ('shows only the table', () => {
-      const listViewElement = fixture.debugElement.query(By.css(listId));
-      const cardViewElement = fixture.debugElement.query(By.css(cardId));
-      expect(listViewElement.name).toBe('chef-table');
-      expect(cardViewElement).toBeNull();
+    it('openCreateModal opens modal', () => {
+      expect(component.createModalVisible).toBe(false);
+      component.openCreateModal();
+      expect(component.createModalVisible).toBe(true);
     });
 
-    it('shows expected item count', () => {
-      const tableBody = getElementByCss(`${listId} chef-tbody`);
-      expect(tableBody.children.length).toBe(destinations.length);
+    it('opening create modal resets name, url, username and password to empty string', () => {
+      component.createDataFeedForm.controls['name'].setValue('any');
+      component.createDataFeedForm.controls['url'].setValue('any');
+      component.createDataFeedForm.controls['username'].setValue('any');
+      component.createDataFeedForm.controls['password'].setValue('any');
+      component.openCreateModal();
+      expect(component.createDataFeedForm.controls['name'].value).toBe(null);
+      expect(component.createDataFeedForm.controls['url'].value).toBe(null);
+      expect(component.createDataFeedForm.controls['username'].value).toBe(null);
+      expect(component.createDataFeedForm.controls['password'].value).toBe(null);
+    });
+
+    it('on success, closes modal and adds new data feed', () => {
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['username'].setValue(username);
+      component.createDataFeedForm.controls['password'].setValue(password);
+      component.createDataFeed();
+
+      store.dispatch(new CreateDestinationSuccess(destination));
+      component.sortedDestinations$.subscribe(destinations => {
+        component.closeCreateModal();
+        expect(destinations).toContain(destination);
+      });
+    });
+
+    it('on conflict error, modal is open with conflict error', () => {
+      spyOn(component.conflictErrorEvent, 'emit');
+      component.openCreateModal();
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['username'].setValue(username);
+      component.createDataFeedForm.controls['password'].setValue(password);
+      component.createDataFeed();
+
+      const conflict = <HttpErrorResponse>{
+        status: HttpStatus.CONFLICT,
+        ok: false
+      };
+      store.dispatch(new CreateDestinationFailure(conflict));
+
+      expect(component.createModalVisible).toBe(true);
+      expect(component.conflictErrorEvent.emit).toHaveBeenCalled();
+    });
+
+    it('on create error, modal is closed with failure banner', () => {
+      spyOn(component.conflictErrorEvent, 'emit');
+      component.openCreateModal();
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['username'].setValue(username);
+      component.createDataFeedForm.controls['password'].setValue(password);
+      component.createDataFeed();
+
+      const error = <HttpErrorResponse>{
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        ok: false
+      };
+      store.dispatch(new CreateDestinationFailure(error));
+
+      expect(component.createModalVisible).toBe(false);
+      expect(component.conflictErrorEvent.emit).toHaveBeenCalledWith(false);
     });
 
   });
 
-  describe('sending telemetry', () => {
-    beforeEach(() => {
-      spyOn(telemetryService, 'track');
+  describe('create data feed form validation', () => {
+
+    it('- url field validity', () => {
+      component.openCreateModal();
+
+      let errors = {};
+      const url = component.createDataFeedForm.controls['url'];
+      expect(url.valid).toBeFalsy();
+
+      // url field is required
+      errors = url.errors || {};
+      expect(errors['required']).toBeTruthy();
+
+      // Set url to invalid inputs
+      url.setValue('http://foo.bar-.-.');
+      errors = url.errors || {};
+      expect(errors['pattern']).toBeTruthy();
+
+      url.setValue('http://foo.bar..com/');
+      errors = url.errors || {};
+      expect(errors['pattern']).toBeTruthy();
+
+      url.setValue('http://...foo.bar.com/');
+      errors = url.errors || {};
+      expect(errors['pattern']).toBeTruthy();
+
+      url.setValue('http://...foo.bar com/');
+      errors = url.errors || {};
+      expect(errors['pattern']).toBeTruthy();
+
+      // Set url to valid inputs
+      url.setValue('http://fo_o.bar/');
+      errors = url.errors || {};
+      expect(errors['pattern']).toBeFalsy();
+
+      url.setValue('https://bit.ly/2OWGwiL');
+      errors = url.errors || {};
+      expect(errors['pattern']).toBeFalsy();
+
+      url.setValue('http://demo.com/');
+      errors = url.errors || {};
+      expect(errors['pattern']).toBeFalsy();
+
+      url.setValue('https://example_test.co.in/2OWGwiL');
+      errors = url.errors || {};
+      expect(errors['pattern']).toBeFalsy();
+
     });
-
-    it('ensure telemetry is sent on deleting a rule', () => {
-      component.deleteDestination(new Destination(0, '', '', ''));
-
-      expect(telemetryService.track).toHaveBeenCalled();
-    });
-
   });
-
-  function getElementByCss(cssString: string) {
-    return fixture
-      .debugElement
-      .query(By.css(cssString))
-      .nativeElement;
-  }
-
 });

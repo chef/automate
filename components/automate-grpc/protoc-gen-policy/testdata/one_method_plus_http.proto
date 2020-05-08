@@ -13,7 +13,7 @@ message Bar {
 }
 service Mock {
   rpc MockMethod (Foo) returns (Bar) {
-    option (google.api.http).get = "/auth/foo/baz";
+    option (google.api.http).get = "/api/v0/auth/foo/baz";
     option (chef.automate.api.iam.policy).resource = "mock:foo:{bar}";
     option (chef.automate.api.iam.policy).action = "action:item:verb";
   };

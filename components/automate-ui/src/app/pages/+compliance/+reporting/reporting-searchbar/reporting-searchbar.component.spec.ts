@@ -2,7 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ReportingSearchbarComponent } from './reporting-searchbar.component';
 import { using } from 'app/testing/spec-helpers';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import {
   ReportQueryService
 } from 'app/pages/+compliance/shared/reporting';

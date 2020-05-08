@@ -1,3 +1,6 @@
+#shellcheck disable=SC2034
+#shellcheck disable=SC2154
+
 pkg_name=automate-workflow-web
 pkg_origin=chef
 pkg_version="1.0.0"

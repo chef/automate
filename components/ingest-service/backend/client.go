@@ -5,7 +5,7 @@ import (
 
 	elastic "gopkg.in/olivere/elastic.v6"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	project_update_lib "github.com/chef/automate/lib/authz"
 )
 
@@ -70,15 +70,15 @@ type Client interface {
 	// @param (context, bulkableRequests)
 	SendBulkRequest(context.Context, []elastic.BulkableRequest) error
 	// @param (context, projectRules)
-	UpdateNodeProjectTags(context.Context, map[string]*iam_v2.ProjectRules) (string, error)
+	UpdateNodeProjectTags(context.Context, map[string]*authz.ProjectRules) (string, error)
 	// @param (context, projectRules)
-	UpdateActionProjectTags(context.Context, map[string]*iam_v2.ProjectRules) (string, error)
+	UpdateActionProjectTags(context.Context, map[string]*authz.ProjectRules) (string, error)
 	// @param (context, jobID)
 	JobStatus(context.Context, string) (project_update_lib.JobStatus, error)
 	// @param (context, jobID)
 	JobCancel(context.Context, string) error
 
-	UpdateProjectTags(context.Context, map[string]*iam_v2.ProjectRules) ([]string, error)
+	UpdateProjectTags(context.Context, map[string]*authz.ProjectRules) ([]string, error)
 
 	// Migration contracts
 	ReindexInsightstoConvergeHistory(context.Context, string, string) error

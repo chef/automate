@@ -8,7 +8,7 @@
             </chef-subheading>
           </chef-page-header>
           <section class="page-body">
-            <app-authorized [allOf]="['/iam/v2/policies', 'get']">
+            <app-authorized [allOf]="['/apis/iam/v2/policies', 'get']">
               <chef-table>
                 <chef-thead>
                   <chef-tr>
@@ -26,7 +26,7 @@
                       <chef-td class="type-column">{{ policy.type | iamType }}</chef-td>
                       <chef-td class="status-column">{{ status(policy) | capitalize }}</chef-td>
                       <chef-td class="three-dot-column">
-                      <!-- <app-authorized [allOf]="[`/iam/v2/policies/{id}`, 'delete', policy.id]"> -->
+                      <!-- <app-authorized [allOf]="[`/apis/iam/v2/policies/{id}`, 'delete', policy.id]"> -->
                         <mat-select panelClass="chef-control-menu" *ngIf="policy.type !== 'CHEF_MANAGED'">
                           <mat-option (onSelectionChange)="startPolicyDelete($event, policy)">Delete Policy</mat-option>
                         </mat-select>

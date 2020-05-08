@@ -44,7 +44,6 @@ import { InfraProxyModule } from 'app/modules/infra-proxy/infra-proxy.module';
 import { AttributesService } from './services/attributes/attributes.service';
 import { ChefSessionService } from './services/chef-session/chef-session.service';
 import { ConfigService } from './services/config/config.service';
-import { DatafeedService } from './services/data-feed/data-feed.service';
 import { EventFeedService } from './services/event-feed/event-feed.service';
 import { FeatureFlagsService } from './services/feature-flags/feature-flags.service';
 import { HttpClientAuthInterceptor } from './services/http/http-client-auth.interceptor';
@@ -68,9 +67,14 @@ import { TelemetryService } from './services/telemetry/telemetry.service';
 import { ApiTokenRequests } from './entities/api-tokens/api-token.requests';
 import { AutomateSettingsRequests } from './entities/automate-settings/automate-settings.requests';
 import { CookbookRequests } from './entities/cookbooks/cookbook.requests';
+import { CookbookDetailsRequests } from './entities/cookbooks/cookbook-details.requests';
+import { CookbookVersionsRequests } from './entities/cookbooks/cookbook-versions.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
+import { DestinationRequests } from './entities/destinations/destination.requests';
+import { NodesRequests } from './entities/nodes/nodes.requests';
+import { InfraRoleRequests } from './entities/infra-roles/infra-role.requests';
 import { JobRequests } from './entities/jobs/job.requests';
 import { LicenseStatusRequests } from './entities/license/license.requests';
 import { ManagerRequests } from './entities/managers/manager.requests';
@@ -98,21 +102,19 @@ import { ApplicationsComponent } from './pages/applications/applications.compone
 import { AttributesComponent } from './page-components/attributes/attributes.component';
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
+import { CreateDataFeedModalComponent } from './pages/create-data-feed-modal/create-data-feed-modal.component';
 import {
   ClientRunsTableComponent
 } from './page-components/client-runs-table/client-runs-table.component';
 import {
   ConvergeRadialGraphComponent
 } from './page-components/converge-radial-graph/converge-radial-graph.component';
-import { DatafeedFormComponent } from './pages/data-feed-form/data-feed-form.component';
-import { DatafeedComponent } from './pages/data-feed/data-feed.component';
+import { DataFeedDetailsComponent } from './pages/data-feed-details/data-feed-details.component';
+import { DataFeedComponent } from './pages/data-feed/data-feed.component';
 import { DateSelectorComponent } from './page-components/date-selector/date-selector.component';
 import {
   DeletableNodeControlComponent
 } from './page-components/deletable-node-control/deletable-node-control.component';
-import {
-  DeleteDatafeedDialogComponent
-} from './page-components/delete-data-feed-dialog/delete-data-feed-dialog.component';
 import {
   DeleteNotificationDialogComponent
 } from './page-components/delete-notification-dialog/delete-notification-dialog.component';
@@ -197,11 +199,11 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ClientRunsComponent,
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
-    DatafeedComponent,
-    DatafeedFormComponent,
+    CreateDataFeedModalComponent,
+    DataFeedComponent,
+    DataFeedDetailsComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
-    DeleteDatafeedDialogComponent,
     DeleteNotificationDialogComponent,
     DeltaViewerComponent,
     EventFeedComponent,
@@ -246,7 +248,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     WelcomeModalComponent
   ],
   entryComponents: [
-    DeleteDatafeedDialogComponent,
     DeleteNotificationDialogComponent
   ],
   imports: [
@@ -284,10 +285,13 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ChefSessionService,
     ConfigService,
     ClientRunsRequests,
+    CookbookDetailsRequests,
     CookbookRequests,
+    CookbookVersionsRequests,
     CredentialRequests,
-    DatafeedService,
     DesktopRequests,
+    DestinationRequests,
+    NodesRequests,
     EventFeedService,
     FeatureFlagsService,
     HistorySelection,
@@ -296,6 +300,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
       useClass: HttpClientAuthInterceptor,
       multi: true
     },
+    InfraRoleRequests,
     JobRequests,
     LayoutSidebarService,
     LicenseStatusRequests,

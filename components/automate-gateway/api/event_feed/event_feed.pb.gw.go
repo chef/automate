@@ -374,13 +374,13 @@ func RegisterEventFeedHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 }
 
 var (
-	pattern_EventFeed_GetEventFeed_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"eventfeed"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_EventFeed_GetEventFeed_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "eventfeed"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EventFeed_GetEventTypeCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"event_type_counts"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_EventFeed_GetEventTypeCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "event_type_counts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EventFeed_GetEventTaskCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"event_task_counts"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_EventFeed_GetEventTaskCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "event_task_counts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EventFeed_GetEventStringBuckets_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"eventstrings"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_EventFeed_GetEventStringBuckets_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "eventstrings"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

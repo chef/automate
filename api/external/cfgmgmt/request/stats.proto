@@ -15,6 +15,10 @@ message NodesCounts {
   };
   // List of filters to be applied to the node count results.
   repeated string filter = 1;
+  // Earliest node check-in.
+  string start = 2;
+  // Latest node check-in
+  string end = 3;
 }
 
 message RunsCounts {

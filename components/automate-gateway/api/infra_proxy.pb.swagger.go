@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/infra/servers": {
+    "/api/v0/infra/servers": {
       "get": {
         "operationId": "GetServers",
         "responses": {
@@ -54,7 +54,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{id}": {
+    "/api/v0/infra/servers/{id}": {
       "get": {
         "operationId": "GetServer",
         "responses": {
@@ -130,7 +130,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{name}": {
+    "/api/v0/infra/servers/{name}": {
       "get": {
         "operationId": "GetServerByName",
         "responses": {
@@ -154,7 +154,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs": {
+    "/api/v0/infra/servers/{server_id}/orgs": {
       "get": {
         "operationId": "GetOrgs",
         "responses": {
@@ -210,7 +210,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{id}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{id}": {
       "get": {
         "operationId": "GetOrg",
         "responses": {
@@ -310,7 +310,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{name}": {
       "get": {
         "operationId": "GetOrgByName",
         "responses": {
@@ -342,7 +342,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}": {
       "get": {
         "operationId": "GetAffectedNodes",
         "responses": {
@@ -395,7 +395,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/clients": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients": {
       "get": {
         "operationId": "GetClients",
         "responses": {
@@ -425,7 +425,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
       "get": {
         "operationId": "GetClient",
         "responses": {
@@ -461,7 +461,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
       "get": {
         "operationId": "GetCookbooks",
         "responses": {
@@ -493,7 +493,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
       "get": {
         "operationId": "GetCookbookVersions",
         "responses": {
@@ -532,7 +532,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
       "get": {
         "operationId": "GetCookbook",
         "responses": {
@@ -578,7 +578,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
       "get": {
         "operationId": "GetCookbookFileContent",
         "responses": {
@@ -631,7 +631,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
       "get": {
         "operationId": "GetDataBags",
         "responses": {
@@ -670,7 +670,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
       "get": {
         "operationId": "GetDataBagItem",
         "responses": {
@@ -716,7 +716,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/environments": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments": {
       "get": {
         "operationId": "GetEnvironments",
         "responses": {
@@ -748,7 +748,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
       "get": {
         "operationId": "GetEnvironment",
         "responses": {
@@ -787,7 +787,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
       "get": {
         "operationId": "GetPolicyfiles",
         "responses": {
@@ -819,7 +819,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
       "get": {
         "operationId": "GetPolicyfile",
         "responses": {
@@ -865,7 +865,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/roles": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
         "operationId": "GetRoles",
         "responses": {
@@ -895,7 +895,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/roles/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}": {
       "get": {
         "operationId": "GetRole",
         "responses": {
@@ -931,7 +931,7 @@ func init() {
         ]
       }
     },
-    "/infra/version": {
+    "/api/v0/infra/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {
@@ -1722,6 +1722,13 @@ func init() {
         "override_attributes": {
           "type": "string",
           "description": "Stringified JSON of the override attributes."
+        },
+        "expanded_run_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
+          },
+          "description": "Expanded run-list associated with the policy."
         }
       }
     },

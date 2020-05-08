@@ -39,6 +39,24 @@ type RoleListResult struct {
 	Rows  []*Role `json:"rows"`
 }
 
+// GetRoleList gets roles list from Chef Infra Server search API.
+func (c *ChefClient) GetRoleList() (RoleListResult, error) {
+	var result RoleListResult
+	newReq, err := c.client.NewRequest("GET", "search/role", nil)
+	if err != nil {
+		return result, status.Error(codes.Internal, err.Error())
+	}
+
+	res, err := c.client.Do(newReq, &result)
+	if err != nil {
+		return result, status.Error(codes.Internal, err.Error())
+	}
+
+	defer res.Body.Close() // nolint: errcheck
+
+	return result, nil
+}
+
 // GetRoles get roles list
 func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Roles, error) {
 
@@ -47,19 +65,10 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	result := RoleListResult{}
-	// Fetch roles using search API
-	newReq, err := client.client.NewRequest("GET", "search/role", nil)
+	result, err := client.GetRoleList()
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-
-	res, err := client.client.Do(newReq, &result)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	defer res.Body.Close() // nolint: errcheck
 
 	return &response.Roles{
 		Roles: fromAPIToListRoles(result),
@@ -75,20 +84,8 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
-	result := RoleListResult{}
-	newReq, err := c.client.NewRequest("GET", "search/role", nil)
+	result, err := c.GetRoleList()
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	res1, err := c.client.Do(newReq, &result)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	defer res1.Body.Close() // nolint: errcheck
-
-	if result.Total == 0 {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
@@ -163,7 +160,7 @@ func findRoleFromRoleList(name string, result *RoleListResult) *Role {
 func toResponseExpandedRunList(role *Role, result *RoleListResult) ([]*response.ExpandedRunList, error) {
 	envResExpandedRunList := make([]*response.ExpandedRunList, len(role.EnvRunList)+1)
 
-	runList, err := expandRunlistFromRole(role.RunList, result)
+	runList, err := GetExpandRunlistFromRole(role.RunList, result)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +171,7 @@ func toResponseExpandedRunList(role *Role, result *RoleListResult) ([]*response.
 	}
 	index := 0
 	for key, value := range role.EnvRunList {
-		eRunList, err := expandRunlistFromRole(value, result)
+		eRunList, err := GetExpandRunlistFromRole(value, result)
 		if err != nil {
 			return nil, err
 		}
@@ -189,7 +186,8 @@ func toResponseExpandedRunList(role *Role, result *RoleListResult) ([]*response.
 	return envResExpandedRunList, nil
 }
 
-func expandRunlistFromRole(runlist []string, result *RoleListResult) ([]*response.RunList, error) {
+// GetExpandRunlistFromRole expands the run-list based on role's run-list
+func GetExpandRunlistFromRole(runlist []string, result *RoleListResult) ([]*response.RunList, error) {
 	runList := make([]*response.RunList, len(runlist))
 	for i, item := range runlist {
 
@@ -205,7 +203,7 @@ func expandRunlistFromRole(runlist []string, result *RoleListResult) ([]*respons
 
 		if newItem.IsRole() {
 			currentRole := findRoleFromRoleList(newItem.Name, result)
-			newRunList.Children, _ = expandRunlistFromRole(currentRole.RunList, result)
+			newRunList.Children, _ = GetExpandRunlistFromRole(currentRole.RunList, result)
 		}
 
 		runList[i] = &newRunList

@@ -6,7 +6,7 @@ package secrets
 import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.secrets.SecretsService/Create", "secrets:secrets", "secrets:secrets:create", "POST", "/secrets", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.secrets.SecretsService/Create", "secrets:secrets", "secrets:secrets:create", "POST", "/api/v0/secrets", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Secret); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -23,7 +23,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.secrets.SecretsService/Read", "secrets:secrets:{id}", "secrets:secrets:get", "GET", "/secrets/id/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.secrets.SecretsService/Read", "secrets:secrets:{id}", "secrets:secrets:get", "GET", "/api/v0/secrets/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Id); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -36,7 +36,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.secrets.SecretsService/Update", "secrets:secrets:{id}", "secrets:secrets:update", "PATCH", "/secrets/id/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.secrets.SecretsService/Update", "secrets:secrets:{id}", "secrets:secrets:update", "PATCH", "/api/v0/secrets/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Secret); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -53,7 +53,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.secrets.SecretsService/Delete", "secrets:secrets:{id}", "secrets:secrets:delete", "DELETE", "/secrets/id/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.secrets.SecretsService/Delete", "secrets:secrets:{id}", "secrets:secrets:delete", "DELETE", "/api/v0/secrets/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Id); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -66,7 +66,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.secrets.SecretsService/List", "secrets:secrets", "secrets:secrets:list", "POST", "/secrets/search", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.secrets.SecretsService/List", "secrets:secrets", "secrets:secrets:list", "POST", "/api/v0/secrets/search", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Query); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
