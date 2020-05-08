@@ -12,13 +12,15 @@
     </select>
   </div>
 
-  <chef-table>
-    <!-- <chef-thead>
+  <app-simple-line-graph [data]="days"></app-simple-line-graph>
+
+  <!-- <chef-table>
+    <chef-thead>
       <chef-tr>
         <chef-th>Days Ago</chef-th>
         <chef-th>Percentage of Total</chef-th>
       </chef-tr>
-    </chef-thead> -->
+    </chef-thead>
     <chef-tbody>
       <chef-tr *ngFor="let day of days">
         <chef-td [ngSwitch]="day.daysAgo">
@@ -29,5 +31,5 @@
         <chef-td>{{ day.percentage | number:'1.0-0' }}%</chef-td>
       </chef-tr>
     </chef-tbody>
-  </chef-table>
+  </chef-table> -->
 </div>
