@@ -156,6 +156,40 @@ Installations require elevated privileges, so run the commands as the superuser 
 
 1. [Set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
 
+## How to Add Chef Infra Server to a Chef Automate Installation
+
+Patch an existing Chef Automate installation to add Chef Infra Server:
+
+1. Create a `patch.toml` file to add `infra-server` to the list of products to deploy:
+
+    ```toml
+       [deployment.v1.svc]
+       products=["automate", "infra-server"]
+    ```
+
+2. Apply the patch to the Chef Automate installation:
+
+    ```shell
+       sudo chef-automate config ./patch.toml
+    ```
+   The command output shows the Chef Infra Server services being added:
+
+    ```shell
+       Updating deployment configuration
+
+       Applying deployment configuration
+         Installed automate-cs-bookshelf
+         Installed automate-cs-oc-bifrost
+         Installed automate-cs-oc-erchef
+         Installed automate-cs-nginx
+         Started automate-cs-bookshelf
+         Started automate-cs-oc-bifrost
+         Started automate-cs-oc-erchef
+         Started automate-cs-nginx
+         Started automate-load-balancer
+       Success: Configuration patched
+    ```
+
 ## Use `knife` with Chef Infra Server
 
 The [`knife` command-line utility](https://docs.chef.io/workstation/knife/) provides an interface to interact with a Chef Infra Server from a workstation.
@@ -193,13 +227,13 @@ On the workstation:
 1. Install [Chef Workstation](https://docs.chef.io/workstation/install_workstation/).
 
 1. Create a Chef repository by using the `chef generate repo` subcommand.
-     For example, create a Chef repository named `chef-repo` by running: 
+     For example, create a Chef repository named `chef-repo` by running:
      ```shell
      chef generate repo chef-repo
      ```
      Replace `chef-repo` with your desired repository name.
 
-1. Within your named Chef repository, create a `.chef` directory with the `mkdir` command. For example: 
+1. Within your named Chef repository, create a `.chef` directory with the `mkdir` command. For example:
     ```shell
       mkdir /chef-repo/.chef
     ```
