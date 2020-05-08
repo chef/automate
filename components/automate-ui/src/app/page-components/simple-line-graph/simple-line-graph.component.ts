@@ -15,6 +15,9 @@ import {
 
 export class SimpleLineGraphComponent implements OnChanges {
 
+  // labels too high
+  // disappearing render
+
   constructor(
     private chart: ElementRef
   ) {}
@@ -24,6 +27,7 @@ export class SimpleLineGraphComponent implements OnChanges {
   @Input() width = 900;
   @Input() height = 156; // we want a 116px height on the ticks, this minus margins
   private locked: number = null;
+  private t = 1000; // transition speed
 
   get margin() {
     return { right: 20, left: 20, top: 20, bottom: 20 };
@@ -108,6 +112,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.renderRings();
     this.renderLabelButtons();
     this.relock();
+    this.t = 1000;  // reset the standard transition speed to 1000 since it could be zero
   }
 
   private renderLine(): void {
@@ -117,7 +122,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     const theLine = this.svgSelection.selectAll('.line').data([this.data], d => d.daysAgo);
     theLine.exit().remove();
     theLine.enter().append('path').attr('class', 'line').merge(theLine)
-      .transition().duration(1000)
+      .transition().duration(this.t)
     .attr('d', line);
   }
 
@@ -128,7 +133,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     points.enter().append('circle')
         .attr('class', (_d, i) => `point elem-${i}`)
         .merge(points)
-        .transition().duration(1000)
+        .transition().duration(this.t)
         .attr('percent', ( d => d.percentage ) )
         .attr('cx', d => this.xScale(d.daysAgo))
         .attr('cy', d => this.yScale(d.percentage))
@@ -189,7 +194,7 @@ export class SimpleLineGraphComponent implements OnChanges {
       .merge(labels)
       .transition().duration(0)
         .style('bottom', `${this.margin.bottom / 2}px`)
-      .transition().duration(1000)
+      .transition().duration(this.t)
         .style('bottom', `${this.margin.bottom / 2}px`)
         .style('left', d => {
           if ( this.xData.length > 7 ) {
@@ -249,7 +254,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     grid.exit().remove();
     grid.enter().append('g').attr('class', 'grid')
       .attr('transform', `translate(0, ${this.height - this.margin.bottom})`)
-      .merge(grid).transition().duration(1000)
+      .merge(grid).transition().duration(this.t)
       .call(xGrid);
 
     // create the Y axis
@@ -259,7 +264,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     y.exit().remove();
     y.enter().append('g').attr('class', 'y-axis')
       .attr('transform', `translate(${this.margin.left}, 0)`)
-      .merge(y).transition().duration(1000)
+      .merge(y).transition().duration(this.t)
       .call(yAxis);
 
     // create the X axis
@@ -271,7 +276,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     x.exit().remove();
     x.enter().append('g').attr('class', 'x-axis')
       .attr('transform', `translate(0, ${this.height - this.margin.bottom})`)
-      .merge(x).transition().duration(1000)
+      .merge(x).transition().duration(this.t)
       .call(xAxis);
 
     // remove zero from bottom of chart on X axis
@@ -325,6 +330,7 @@ export class SimpleLineGraphComponent implements OnChanges {
   }
 
   onResize(): void {
+    this.t = 0; // turn off transitions for resize events;
     this.renderChart();
   }
 
