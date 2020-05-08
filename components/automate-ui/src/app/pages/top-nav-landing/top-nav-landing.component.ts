@@ -5,7 +5,7 @@ import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 @Component({
   selector: 'app-top-nav-landing',
   templateUrl: './top-nav-landing.component.html',
-  styleUrls: []
+  styleUrls: ['./top-nav-landing.component.scss']
 })
 export class TopNavLandingComponent {
 
