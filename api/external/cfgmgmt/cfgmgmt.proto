@@ -70,7 +70,7 @@ service ConfigMgmt {
   };
 
   /*
-  List Node Status Count
+  List Node Status Counts
 
   Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
   Supports filtering.
