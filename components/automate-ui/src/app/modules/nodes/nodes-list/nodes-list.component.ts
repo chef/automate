@@ -58,13 +58,6 @@ export class NodesListComponent implements OnInit, OnDestroy {
     this.store.dispatch(actions.getNodes(params));
   }
 
-  orderFor(sortKey) {
-    if (sortKey === this.nodesListSort) {
-      return this.nodesListSortOrder;
-    }
-    return 'none';
-  }
-
   onSortToggled(event) {
     let {sort, order} = event.detail;
     if (order === 'none') {
@@ -73,7 +66,11 @@ export class NodesListComponent implements OnInit, OnDestroy {
       return;
     }
     this.nodesListSort = sort;
-    this.nodesListSortOrder = order.toUpperCase();
+    if (this.nodesListSortOrder === 'ASC') {
+      this.nodesListSortOrder = 'DESC';
+    } else {
+      this.nodesListSortOrder = 'ASC';
+    }
     const params = {
       page: this.nodesList.page, per_page: 100,
       sort: this.nodesListSort, order: this.nodesListSortOrder,
