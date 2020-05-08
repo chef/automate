@@ -54,25 +54,6 @@
   }
 }
 
-.permission-denied-banner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba($chef-white, 0.85);
-  z-index: 190;
-  padding-top: 77px;
-  text-align: center;
-  font-weight: bold;
-
-  & > p {
-    font-size: 18px;
-    line-height: 1.6;
-    color: $chef-primary-dark;
-  }
-}
-
 @media screen and (max-width: 769px) {
   .container {
     margin-left: $sidebar-small-width;

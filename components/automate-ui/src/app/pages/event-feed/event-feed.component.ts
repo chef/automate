@@ -47,7 +47,7 @@ export class EventFeedComponent implements OnInit, OnDestroy {
   eventsLoading = false;
   errorLoadingEvents = false;
   loadedEmptySetOfEvents = false;
-  permissionDenied = false;
+  permissionDenied = false; // not currently used
   guitarStringCollection: GuitarStringCollection = initialState.guitarStringCollection;
   @ViewChild('guitarStrings', { static: true }) guitarStrings;
   resetTimescaleDisabled = true;
