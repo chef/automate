@@ -76,5 +76,9 @@ describe('OrgDetailsComponent', () => {
     component.onSelectedTab({ target: { value: 'roles' } });
     expect(component.tabValue).toBe('roles');
     expect(router.navigate).toHaveBeenCalled();
+
+    component.onSelectedTab({ target: { value: 'data-bags' } });
+    expect(component.tabValue).toBe('data-bags');
+    expect(router.navigate).toHaveBeenCalled();
   });
 });

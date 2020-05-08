@@ -14,7 +14,7 @@ export const getAllStatus = createSelector(
   (state) => state.getAllStatus
 );
 
-export const infraRoleFromRoute = createSelector(
+export const dataBagsFromRoute = createSelector(
   dataBagsState,
   routeParams,
   (state, { name }) => find({ name }, state)

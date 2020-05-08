@@ -14,31 +14,31 @@ import {
   DataBagsActionTypes
 } from './data-bags.action';
 
-import { InfraRoleRequests } from './data-bags.requests';
+import { DataBagsRequests } from './data-bags.requests';
 
 @Injectable()
 export class DataBagsEffects {
   constructor(
     private actions$: Actions,
-    private requests: InfraRoleRequests
+    private requests: DataBagsRequests
   ) { }
 
   @Effect()
-  getRoles$ = this.actions$.pipe(
+  getDataBags$ = this.actions$.pipe(
       ofType(DataBagsActionTypes.GET_ALL),
       mergeMap(({ payload: { server_id, org_id } }: GetDataBags) =>
-        this.requests.getRoles(server_id, org_id).pipe(
+        this.requests.getDataBags(server_id, org_id).pipe(
           map((resp: DataBagsSuccessPayload) => new GetDataBagsSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetDataBagsFailure(error))))));
 
   @Effect()
-  getRolesFailure$ = this.actions$.pipe(
+  getDataBagsFailure$ = this.actions$.pipe(
       ofType(DataBagsActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetDataBagsFailure) => {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,
-          message: `Could not get infra roles: ${msg || payload.error}`
+          message: `Could not get infra data bags: ${msg || payload.error}`
         });
       }));
 

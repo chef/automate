@@ -26,6 +26,12 @@ import {
   allInfraRoles,
   getAllStatus as getAllRolesForOrgStatus
 } from 'app/entities/infra-roles/infra-role.selectors';
+import { GetDataBags } from 'app/entities/data-bags/data-bags.action';
+import { DataBags } from 'app/entities/data-bags/data-bags.model';
+import {
+  allDataBags,
+  getAllStatus as getAllDataBagsForOrgStatus
+} from 'app/entities/data-bags/data-bags.selectors';
 
 export type OrgTabName = 'cookbooks' | 'roles' | 'details' | 'data-bags';
 
@@ -39,6 +45,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public org: Org;
   public cookbooks: Cookbook[] = [];
   public roles: InfraRole[] = [];
+  public dataBags: DataBags[] = [];
   public loading$: Observable<boolean>;
   public sortedCookbooks$: Observable<Cookbook[]>;
   public saveSuccessful = false;
@@ -53,6 +60,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
 
   cookbooksListLoading = true;
   rolesListLoading = true;
+  dataBagsListLoading = true;
 
   constructor(
     private fb: FormBuilder,
@@ -61,11 +69,11 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     private router: Router
   ) {
     this.updateOrgForm = this.fb.group({
-      name: new FormControl({value: ''}, [Validators.required]),
-      admin_user: new FormControl({value: ''}, [Validators.required]),
-      admin_key: new FormControl({value: ''}, [Validators.required])
+      name: new FormControl({ value: '' }, [Validators.required]),
+      admin_user: new FormControl({ value: '' }, [Validators.required]),
+      admin_key: new FormControl({ value: '' }, [Validators.required])
     });
-   }
+  }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
@@ -73,28 +81,28 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     this.store.select(routeURL).pipe(
       takeUntil(this.isDestroyed)
     )
-    .subscribe((url: string) => {
-      this.url = url;
-      const [, fragment] = url.split('#');
-      switch (fragment) {
-        case 'details': {
-          this.tabValue = 'details';
-          break;
+      .subscribe((url: string) => {
+        this.url = url;
+        const [, fragment] = url.split('#');
+        switch (fragment) {
+          case 'details': {
+            this.tabValue = 'details';
+            break;
+          }
+          case 'cookbooks': {
+            this.tabValue = 'cookbooks';
+            break;
+          }
+          case 'roles': {
+            this.tabValue = 'roles';
+            break;
+          }
+          case 'data-bags': {
+            this.tabValue = 'data-bags';
+            break;
+          }
         }
-        case 'cookbooks': {
-          this.tabValue = 'cookbooks';
-          break;
-        }
-        case 'roles': {
-          this.tabValue = 'roles';
-          break;
-        }
-        case 'data-bags': {
-          this.tabValue = 'data-bags';
-          break;
-        }
-      }
-    });
+      });
 
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
@@ -111,19 +119,24 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetRoles({
         server_id: server_id, org_id: org_id
       }));
+      this.store.dispatch(new GetDataBags({
+        server_id: server_id, org_id: org_id
+      }));
     });
 
     combineLatest([
       this.store.select(getStatus),
       this.store.select(updateStatus),
       this.store.select(getAllCookbooksForOrgStatus),
-      this.store.select(getAllRolesForOrgStatus)
+      this.store.select(getAllRolesForOrgStatus),
+      this.store.select(getAllDataBagsForOrgStatus)
     ]).pipe(
       takeUntil(this.isDestroyed)
-    ).subscribe(([getOrgSt, updateSt, getCookbooksSt, getRolesSt]) => {
-        this.isLoading =
-          !allLoaded([getOrgSt, getCookbooksSt, getRolesSt]) || updateSt === EntityStatus.loading;
-      });
+    ).subscribe(([getOrgSt, updateSt, getCookbooksSt, getRolesSt, getDataBagsSt]) => {
+      this.isLoading =
+        !allLoaded([getOrgSt, getCookbooksSt, getRolesSt, getDataBagsSt])
+        || (updateSt === EntityStatus.loading);
+    });
 
     combineLatest([
       this.store.select(getStatus),
@@ -148,7 +161,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
       filter(([_getCookbooksSt, allCookbooksState]) =>
         !isNil(allCookbooksState)),
       takeUntil(this.isDestroyed)
-    ).subscribe(([ _getCookbooksSt, allCookbooksState]) => {
+    ).subscribe(([_getCookbooksSt, allCookbooksState]) => {
       this.cookbooks = allCookbooksState;
       this.cookbooksListLoading = false;
     });
@@ -162,9 +175,23 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
       filter(([_getRolesSt, allInfraRolesState]) =>
         !isNil(allInfraRolesState)),
       takeUntil(this.isDestroyed)
-    ).subscribe(([ _getRolesSt, allInfraRolesState]) => {
+    ).subscribe(([_getRolesSt, allInfraRolesState]) => {
       this.roles = allInfraRolesState;
       this.rolesListLoading = false;
+    });
+
+    combineLatest([
+      this.store.select(getAllDataBagsForOrgStatus),
+      this.store.select(allDataBags)
+    ]).pipe(
+      filter(([getDataBagsSt, _allDataBagsState]) =>
+      getDataBagsSt === EntityStatus.loadingSuccess),
+      filter(([_getDataBagsSt, allDataBagsState]) =>
+        !isNil(allDataBagsState)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([_getDataBagsSt, allDataBagsState]) => {
+      this.dataBags = allDataBagsState;
+      this.dataBagsListLoading = false;
     });
 
     this.store.select(updateStatus).pipe(
@@ -191,7 +218,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     const admin_user: string = this.updateOrgForm.controls.admin_user.value.trim();
     const admin_key: string = this.updateOrgForm.controls.admin_key.value.trim();
     this.store.dispatch(new UpdateOrg({
-      org: {...this.org, name, admin_user, admin_key}
+      org: { ...this.org, name, admin_user, admin_key }
     }));
   }
 

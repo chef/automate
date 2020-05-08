@@ -25,7 +25,7 @@
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
         <chef-option value='cookbooks' data-cy="cookbooks-tab">Cookbooks</chef-option>
         <chef-option value='roles' data-cy="roles-tab">Roles</chef-option>
-        <chef-option value='roles' data-cy="data-bags-tab">Data Bags</chef-option>
+        <chef-option value='data-bags' data-cy="data-bags-tab">Data Bags</chef-option>
         <chef-option value='details' data-cy="details-tab">Details</chef-option>
         </chef-tab-selector>
       </chef-page-header>
@@ -117,6 +117,23 @@
                 </chef-td>
                 <chef-td>{{ role.description == '' ?  'N/A' : role.description }}</chef-td>
                 <chef-td>{{ role.environments.join(", ") }}</chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
+        </ng-container>
+      </section>
+      <section class="page-body" *ngIf="tabValue === 'data-bags'">
+        <chef-loading-spinner *ngIf="dataBagsListLoading" size="50"></chef-loading-spinner>
+        <ng-container *ngIf="!dataBagsListLoading">
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th>Name</chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr *ngFor="let dataBag of dataBags">
+                <chef-td>{{ dataBag.name }}</chef-td>
               </chef-tr>
             </chef-tbody>
           </chef-table>

@@ -11,6 +11,7 @@ import { CredentialsEffects } from './pages/+compliance/+credentials/credentials
 // CredentialEffect is for the credential entities. Don't confuse it with CredentialsEffects.
 // CredentialsEffects will be removed when the credentials page is refactored.
 import { CredentialEffects } from './entities/credentials/credential.effects';
+import { DataBagsEffects } from './entities/data-bags/data-bags.effects';
 import { DesktopEffects } from './entities/desktop/desktop.effects';
 import { DestinationEffects } from './entities/destinations/destination.effects';
 import { EventFeedEffects } from './services/event-feed/event-feed.effects';
@@ -45,6 +46,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       CookbookVersionsEffects,
       CredentialsEffects,
       CredentialEffects,
+      DataBagsEffects,
       DesktopEffects,
       DestinationEffects,
       EventFeedEffects,

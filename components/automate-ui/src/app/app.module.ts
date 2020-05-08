@@ -71,6 +71,7 @@ import { CookbookDetailsRequests } from './entities/cookbooks/cookbook-details.r
 import { CookbookVersionsRequests } from './entities/cookbooks/cookbook-versions.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
+import { DataBagsRequests } from './entities/data-bags/data-bags.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
 import { DestinationRequests } from './entities/destinations/destination.requests';
 import { NodesRequests } from './entities/nodes/nodes.requests';
@@ -289,6 +290,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     CookbookRequests,
     CookbookVersionsRequests,
     CredentialRequests,
+    DataBagsRequests,
     DesktopRequests,
     DestinationRequests,
     NodesRequests,

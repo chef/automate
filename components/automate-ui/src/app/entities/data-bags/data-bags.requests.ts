@@ -5,7 +5,7 @@ import { environment as env } from 'environments/environment';
 import { DataBagsSuccessPayload } from './data-bags.action';
 
 @Injectable()
-export class InfraRoleRequests {
+export class DataBagsRequests {
 
   constructor(private http: HttpClient) { }
 
