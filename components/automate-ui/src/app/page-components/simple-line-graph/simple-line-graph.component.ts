@@ -1,5 +1,5 @@
 import {
-  Component, Input, OnChanges, ViewChild, ElementRef, SimpleChanges
+  Component, Input, OnChanges, ViewChild, ElementRef, SimpleChanges, OnInit
 } from '@angular/core';
 import * as d3 from 'd3';
 import {
@@ -13,16 +13,16 @@ import {
   styleUrls: ['./simple-line-graph.component.scss']
 })
 
-export class SimpleLineGraphComponent implements OnChanges {
+export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   // labels too high
   // disappearing render
 
   constructor(
     private chart: ElementRef
-  ) {}
+  ) { }
 
-  @ViewChild('svg', {static: true}) svg: ElementRef;
+  @ViewChild('svg', { static: true }) svg: ElementRef;
   @Input() data: DayPercentage[] = [];
   @Input() width = 900;
   @Input() height = 156; // we want a 116px height on the ticks, this minus margins
@@ -73,8 +73,8 @@ export class SimpleLineGraphComponent implements OnChanges {
 
   get yScale() {
     return d3.scaleLinear()
-             .range(this.rangeY)
-             .domain(this.domainY);
+      .range(this.rangeY)
+      .domain(this.domainY);
   }
 
   //////// SELECTIONS ////////
@@ -97,15 +97,15 @@ export class SimpleLineGraphComponent implements OnChanges {
   // returns a function that when passed our data, will return an svg path
   get createPath() {
     return d3.line()
-              .x(d => this.xScale( d.daysAgo) )
-              .y(d => this.yScale( d.percentage) );
+      .x(d => this.xScale(d.daysAgo))
+      .y(d => this.yScale(d.percentage));
   }
 
   get viewBox() {
     return `0 0 ${this.width} ${this.height}`;
   }
 
-    ////////////////// RENDER FUNCTIONS ////////////////////
+  ////////////////// RENDER FUNCTIONS ////////////////////
   private renderChart() {
     this.AllUnlockDeactivate();
     this.resizeChart();
@@ -127,7 +127,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     theLine.exit().remove();
     theLine.enter().append('path').attr('class', 'line').merge(theLine)
       .transition().duration(this.t)
-    .attr('d', line);
+      .attr('d', line);
   }
 
   private renderPoints(): void {
@@ -135,13 +135,13 @@ export class SimpleLineGraphComponent implements OnChanges {
       .data(this.data, d => d.daysAgo);
     points.exit().remove();
     points.enter().append('circle')
-        .attr('class', (_d, i) => `point elem-${i}`)
-        .merge(points)
-        .transition().duration(this.t)
-        .attr('percent', ( d => d.percentage ) )
-        .attr('cx', d => this.xScale(d.daysAgo))
-        .attr('cy', d => this.yScale(d.percentage))
-        .attr('r', 4);
+      .attr('class', (_d, i) => `point elem-${i}`)
+      .merge(points)
+      .transition().duration(this.t)
+      .attr('percent', (d => d.percentage))
+      .attr('cx', d => this.xScale(d.daysAgo))
+      .attr('cy', d => this.yScale(d.percentage))
+      .attr('r', 4);
   }
 
   private renderRings(): void {
@@ -174,10 +174,10 @@ export class SimpleLineGraphComponent implements OnChanges {
       .text(d => `Checked in ${Math.round(d.percentage)}%`)
       .style('left', (d, i: number) => {
         const left = thisScale(d.daysAgo);
-        if ( i === 0 ) { return `${localWidth + this.margin.right}px`; }
+        if (i === 0) { return `${localWidth + this.margin.right}px`; }
         return `${left}px`;
       })
-      .style('top', d => `${this.yScale(d.percentage) + this.margin.top}px`);
+      .style('top', d => `${this.yScale(d.percentage) - 10}px`);
   }
 
   private renderLabelButtons(): void {
@@ -197,23 +197,20 @@ export class SimpleLineGraphComponent implements OnChanges {
       })
       .attr('class', (_d, i: number) => `graph-button elem-${i}`)
       .merge(labels)
-      // .transition().duration(0)
-        // .style('bottom', `${this.margin.bottom / 2}px`)
       .transition().duration(this.t)
-        // .style('bottom', `${this.margin.bottom / 2}px`)
-        .style('left', d => {
-          if ( this.xData.length > 7 ) {
-            return `${this.xScale(d.daysAgo) - 30}px`;
-          } else {
-            return `${thisScale(d.daysAgo) - 30}px`;
-          }
-        })
+      .style('left', d => {
+        if (this.xData.length > 7) {
+          return `${this.xScale(d.daysAgo) - 30}px`;
+        } else {
+          return `${thisScale(d.daysAgo) - 30}px`;
+        }
+      })
       .call(parent => {
         parent.select('.inner')
           .text(p => this.formatLabels(p.daysAgo));
       });
 
-      // add all listeners
+    // add all listeners
     this.containerSelection.selectAll('.graph-button')
       // add class to rotate labels when more than comfortable to fit in space
       .classed('turnt', () => this.xData.length > 7)
@@ -298,7 +295,7 @@ export class SimpleLineGraphComponent implements OnChanges {
   private handleClick(d3Event): void {
     const num = this.getHoveredElement(d3Event);
     const isAlreadyLocked = d3.selectAll(`.elem-${num}`).classed('lock');
-    if ( isAlreadyLocked ) {
+    if (isAlreadyLocked) {
       d3.selectAll(`.elem-${num}`).classed('lock', false);
       this.locked = null;
     } else {
@@ -343,8 +340,14 @@ export class SimpleLineGraphComponent implements OnChanges {
     this.width = this.chart.nativeElement.getBoundingClientRect().width;
   }
 
+  ngOnInit() {
+    if (this.data && this.data.length > 0) {
+      this.renderChart();
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges) {
-    if ( changes.data && !changes.data.firstChange ) {
+    if (changes.data && !changes.data.firstChange) {
       this.renderChart();
     }
   }
