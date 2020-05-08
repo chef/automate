@@ -250,7 +250,7 @@ func (ccr *ChefClientRun) initializeNodeInfo() (sharedNodeInfo NodeInfo, err err
 		UptimeSeconds:         int64(uptimeSeconds),
 		OrganizationName:      ccr.OrganizationName,
 		Environment:           ccr.NodePayload.ChefEnvironment,
-		Platform:              getPlatformWithVersion(ccr.NodePayload),
+		Platform:              ccr.PlatformWithVersion(),
 		PlatformFamily:        EmptyStringIfNil(ccr.NodePayload.Automatic["platform_family"]),
 		PlatformVersion:       EmptyStringIfNil(ccr.NodePayload.Automatic["platform_version"]),
 		Source:                ccr.Source,
@@ -353,6 +353,10 @@ func (ccr *ChefClientRun) CloudProvider() string {
 	cloud := extractMapOrEmpty(ccr.NodePayload.Automatic, "cloud")
 
 	return EmptyStringIfNil(cloud["provider"])
+}
+
+func (ccr *ChefClientRun) Platform() string {
+	return EmptyStringIfNil(ccr.NodePayload.Automatic["platform"])
 }
 
 // ChefVersion Returns a chef version string retrieved from automatic attributes or an empty string if it is not present
@@ -561,9 +565,9 @@ func countNumberOfValueObject(object interface{}) int {
 	return count
 }
 
-func getPlatformWithVersion(nodePayload NodePayload) string {
-	platform := EmptyStringIfNil(nodePayload.Automatic["platform"])
-	platformVersion := EmptyStringIfNil(nodePayload.Automatic["platform_version"])
+func (ccr *ChefClientRun) PlatformWithVersion() string {
+	platform := ccr.Platform()
+	platformVersion := EmptyStringIfNil(ccr.NodePayload.Automatic["platform_version"])
 
 	platformAndVersion := ""
 

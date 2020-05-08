@@ -32,7 +32,7 @@ func nodeManagerPublisher(in <-chan message.ChefRun, nodeManagerClient manager.N
 				continue
 			}
 
-			nodeMetadata, err := gatherInfoForNode(msg.Node)
+			nodeMetadata, err := gatherInfoForNode(msg)
 			if err != nil {
 				log.Errorf("unable parse node data to be send to manager. aborting attempt to send info to mgr for node %s -- %v", msg.Node.NodeName, err)
 				out <- msg
@@ -51,7 +51,9 @@ func nodeManagerPublisher(in <-chan message.ChefRun, nodeManagerClient manager.N
 	return out
 }
 
-func gatherInfoForNode(node backend.Node) (*manager.NodeMetadata, error) {
+func gatherInfoForNode(msg message.ChefRun) (*manager.NodeMetadata, error) {
+	node := msg.Node
+
 	// convert node check in time to proto timestamp
 	timestamp, err := ptypes.TimestampProto(node.Checkin)
 	if err != nil {
@@ -75,11 +77,14 @@ func gatherInfoForNode(node backend.Node) (*manager.NodeMetadata, error) {
 			Value: tag,
 		}
 	}
+	if node.Environment != "" {
+		tags = append(tags, &common.Kv{Key: "environment", Value: node.Environment})
+	}
 
 	return &manager.NodeMetadata{
 		Uuid:            node.EntityUuid,
 		Name:            node.NodeName,
-		PlatformName:    node.Platform,
+		PlatformName:    msg.Platform,
 		PlatformRelease: node.PlatformVersion,
 		LastContact:     timestamp,
 		SourceId:        node.CloudID,

@@ -1,0 +1,183 @@
+@import "~styles/variables";
+
+:host {
+  display: block;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+::ng-deep {
+  svg {
+    background: $chef-white;
+    padding: .5em;
+  }
+
+  path,
+  line,
+  .tick,
+  .grid {
+    stroke: $eggplant-light-1;
+    stroke-width: 1px;
+  }
+
+  .line {
+    fill: transparent;
+    stroke: black;
+    stroke-width: 1px;
+  }
+
+  .y-axis {
+    transform: translateX(20px);
+  }
+
+  .x-axis {
+    .tick line {
+      display: none;
+    }
+  }
+
+  circle.point {
+    fill: $eggplant-dark-2;
+  }
+
+  .ring {
+    position: absolute;
+    stroke-width: 1;
+    fill: none;
+    stroke: url(#chef-gradient-purple);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: 1s;
+
+    &.active {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  .graph-button {
+    display: flex;
+    position: absolute;
+    z-index: 5;
+    background: transparent;
+    padding: 1px;
+    border: none;
+    border-radius: 4px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 1s;
+
+    &.active {
+      background: #3023AE;
+      background: linear-gradient(315deg, #3023AE, #C86DD7);
+      transition: background 500ms, color 500ms;
+    }
+
+    &.turnt {
+      transition: transform 1s; // keep in sync with label transition duration in ts file
+      font-size: 8px;
+      transform: rotate(-45deg) translate(-10px, 10px);
+    }
+
+    .inner {
+      display: flex;
+      border: none;
+      border-radius: 3px;
+      background: $chef-white;
+      height: 16px;
+      font-size: 10px;
+      font-family: 'muli';
+      padding: 2px;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      transition: background 500ms, color 500ms;
+    }
+  }
+
+
+  .graph-tooltip {
+    position: absolute;
+    min-height: 40px;
+    font-size: 12px;
+    padding: 8px 10px;
+    padding-left: 16px; // extra 8px to account for ::before gradient
+    background: $chef-white;
+    border-radius: $chef-border-radius;
+    box-shadow: 0 0 1em 0 rgba(0, 0, 0, .21);
+    opacity: 0;
+    visibility: hidden;
+    transition: 500ms;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 100%;
+      background: #3023AE;
+      background: linear-gradient(315deg, #3023AE, #C86DD7);
+      border-bottom-left-radius: $chef-border-radius;
+      border-top-left-radius: $chef-border-radius;
+    }
+
+    &::after {
+      display: block;
+      content: '';
+      width: 0.75em;
+      height: 0.75em;
+      position: absolute;
+      background-color: $chef-white;
+      transform: translateX(-50%) translateY(-50%) rotate(45deg);
+      top: 100%;
+      left: calc(50% - .75em);
+    }
+
+    &.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(-10px);
+    }
+  }
+
+  // lock styles
+  circle.point.lock {
+    fill: #3023AE;
+    fill: url('#chef-gradient-purple');
+  }
+
+  .graph-button.lock {
+    background: #3023AE;
+    background: linear-gradient(315deg, #3023AE, #C86DD7);
+
+    .inner {
+      color: white;
+      background-color: transparent;
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  .graph-tooltip.lock {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .ring.lock  {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  // linear gradient
+  #stop1 {
+    stop-color: #C86DD7;
+  }
+
+  #stop2 {
+    stop-color: #3023AE;
+  }
+}

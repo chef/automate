@@ -48,7 +48,7 @@ EOF
   if out=$(chef-automate backup list "$root_backup_dir" 2>&1); then
     return 1
   else
-    grep "read/write/exec" <<< "$out"
+    grep "read/write/exec" <<< "$out" || return 1
   fi
 
   # Commands with hab dir succeed
