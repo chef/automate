@@ -68,10 +68,63 @@ chef-tr:hover {
   cursor: pointer;
 }
 
-chef-tr:hover,
-chef-tr.selected {
-  chef-th,
-  chef-td {
+:host.fullscreened {
+  chef-tr:hover,
+  chef-tr.selected {
+    chef-th,
+    chef-td {
+      background: $chef-lightest-grey;
+    }
+  }
+
+  // chef-th {
+  //   background: $chef-white;
+  //   font-weight: 400;
+  //   text-transform: uppercase;
+  // }
+}
+
+:host:not(.fullscreened) {
+  chef-thead {
+    display: none;
+  }
+
+  chef-tr {
+    flex-flow: row wrap;
+    border: 1px solid $chef-grey;
+    border-radius: $global-radius;
+    padding: 0 1em;
+    margin-bottom: 1em;
+  }
+
+  chef-tbody chef-tr:hover,
+  chef-tbody chef-tr.selected {
     background: $chef-lightest-grey;
+  }
+
+  chef-td {
+    flex-basis: 33.33%;
+    border: none;
+    border-radius: 0;
+    padding: 1em 0;
+    font-size: 12px;
+  }
+
+  chef-td[data-label] {
+    flex-direction: column;
+    align-items: flex-start;
+
+    &::before {
+      content: attr(data-label) '';
+      display: block;
+      text-transform: uppercase;
+    }
+  }
+
+  chef-td:nth-child(1),
+  chef-td:nth-child(2) {
+    flex-basis: 50%;
+    border-bottom: 1px solid $chef-grey;
+    font-size: 14px;
   }
 }

@@ -37,23 +37,29 @@
   <!-- <pre>{{ termFilters | json }}</pre> -->
   <h4>Total: {{totalDesktops}}</h4>
   <chef-table>
-    <!-- <chef-thead>
+    <chef-thead>
       <chef-tr>
-        <chef-th (click)="sortOn('name')" class="table-title">Desktop Name</chef-th>
-        <chef-th (click)="sortOn('check-in')" class="table-title">Last Check-in</chef-th>
-        <chef-th (click)="sortOn('platform')" class="table-title">Platform</chef-th>
+        <chef-th (click)="sortOn('name')">Desktop Name</chef-th>
+        <chef-th (click)="sortOn('check-in')">Last Check-in</chef-th>
+        <chef-th (click)="sortOn('platform')">Platform</chef-th>
+        <chef-th (click)="sortOn('platformVersion')">Platform Version</chef-th>
+        <chef-th (click)="sortOn('domain')">Domain</chef-th>
       </chef-tr>
-    </chef-thead> -->
+    </chef-thead>
     <chef-tbody>
       <chef-tr
         *ngFor="let desktop of desktops"
         [ngClass]="{'selected': selectedDesktop?.id === desktop.id}"
         (click)="desktopSelected.emit(desktop)">
-        <chef-td>{{ desktop.name }}</chef-td>
+        <chef-td>
+          <chef-icon>desktop_windows</chef-icon> {{ desktop.name }}
+        </chef-td>
         <chef-td>
           <chef-icon [ngClass]="desktop.status">{{ desktop.status | chefStatusIcon }}</chef-icon> {{ desktop.checkin | timeFromNow }}
         </chef-td>
-        <chef-td>{{ desktop.platform }}</chef-td>
+        <chef-td data-label="Platform">{{ desktop.platform }}</chef-td>
+        <chef-td data-label="Platform Version">10.08</chef-td>
+        <chef-td data-label="Domain">sales</chef-td>
       </chef-tr>
     </chef-tbody>
   </chef-table>
