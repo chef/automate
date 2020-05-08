@@ -82,6 +82,10 @@ export class SimpleLineGraphComponent implements OnChanges {
     return d3.select('app-simple-line-graph');
   }
 
+  get labelContainerSelection() {
+    return d3.select('.label-container');
+  }
+
   get svgSelection() {
     return d3.select(this.svg.nativeElement);
   }
@@ -147,6 +151,7 @@ export class SimpleLineGraphComponent implements OnChanges {
     rings.enter().append('circle')
       .attr('class', (_d, i) => `ring elem-${i}`)
       .merge(rings)
+      .transition().duration(this.t)
       .attr('cx', d => this.xScale(d.daysAgo))
       .attr('cy', d => this.yScale(d.percentage))
       .attr('r', 10);
@@ -182,7 +187,7 @@ export class SimpleLineGraphComponent implements OnChanges {
       .domain(this.domainX)
       .range(thisRange);
 
-    const labels = this.containerSelection.selectAll('.graph-button')
+    const labels = this.labelContainerSelection.selectAll('.graph-button')
       .data(this.data, d => d.daysAgo);
     labels.exit().remove();
     labels.enter().append('button')
@@ -192,10 +197,10 @@ export class SimpleLineGraphComponent implements OnChanges {
       })
       .attr('class', (_d, i: number) => `graph-button elem-${i}`)
       .merge(labels)
-      .transition().duration(0)
-        .style('bottom', `${this.margin.bottom / 2}px`)
+      // .transition().duration(0)
+        // .style('bottom', `${this.margin.bottom / 2}px`)
       .transition().duration(this.t)
-        .style('bottom', `${this.margin.bottom / 2}px`)
+        // .style('bottom', `${this.margin.bottom / 2}px`)
         .style('left', d => {
           if ( this.xData.length > 7 ) {
             return `${this.xScale(d.daysAgo) - 30}px`;
