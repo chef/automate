@@ -37,12 +37,12 @@ Name | ID| Actions
 Owner              | owner         | \*
 Project Owner      | project-owner | infra:nodes:\*, infra:nodeManagers:\*, compliance:\*, event:\*, ingest:\*, secrets:\*, iam:projects:list, iam:projects:get, iam:projects:assign, iam:policies:list, iam:policies:get, iam:policyMembers:\*, iam:teams:list, iam:teams:get, iam:teamUsers:\*, iam:users:get, iam:users:list, applications:\*
 Editor             | editor        | infra:infraServers:list, infra:infraServers:get, infra:nodes:\*, infra:nodeManagers:\*, compliance:\*, event:\*, ingest:\*, secrets:\*, iam:projects:list, iam:projects:get, iam:projects:assign, applications:\*
-Viewer             | viewer        | infra:infraServers:list, infra:infraServers:get, secrets:\*:get, secrets:\*:list, infra:nodes:get, infra:nodes:list, infra:nodeManagers:get, infra:nodeManagers:list, compliance:\*:get, compliance:\*:list, event:\*:get, event:\*:list, ingest:\*:get, ingest:\*:list, iam:projects:list, iam:projects:get, applications:\*:get, applications:\*:list
+Viewer             | viewer        | infra:infraServers:list, infra:infraServers:get, secrets:\*:get, secrets:\*:list, infra:nodes:get, infra:nodes:list, infra:nodeManagers:get, infra:nodeManagers:list, compliance:\*:get, compliance:\*:list, event:\*:get, event:\*:list, ingest:\*:get, ingest:\*:list, iam:projects:list, iam:projects:get, applications:\*:get, applications:\*:list, compliance:reports:export
 Ingest             | ingest        | infra:ingest:\*, compliance:profiles:get, compliance:profiles:list
 
 ### Custom Roles
 
-Custom roles are roles that any user with the permission for `iam:roles:update` can change. 
+Custom roles are roles that any user with the permission for `iam:roles:update` can change.
 In addition to the Chef-managed roles above, Chef Automate includes two custom roles by default.
 
 Role              | Description
