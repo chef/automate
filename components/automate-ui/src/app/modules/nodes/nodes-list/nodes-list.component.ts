@@ -36,7 +36,10 @@ export class NodesListComponent implements OnInit, OnDestroy {
       withLatestFrom(this.store.select(selectors.nodesList)),
       takeUntil(this.isDestroyed))
       .subscribe(([_i]) => {
-        const params = {page: this.nodesList.page, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+        const params = {
+          page: this.nodesList.page, per_page: 100,
+          sort: this.nodesListSort, order: this.nodesListSortOrder,
+          filters: this.nodesListFilters};
         this.store.dispatch(actions.getNodes(params));
       });
   }
@@ -45,10 +48,13 @@ export class NodesListComponent implements OnInit, OnDestroy {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
-  
+
   onPageChange(event) {
     this.nodesList.page = event;
-    const params = {page: this.nodesList.page, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+    const params = {
+      page: this.nodesList.page, per_page: 100,
+      sort: this.nodesListSort, order: this.nodesListSortOrder,
+      filters: this.nodesListFilters};
     this.store.dispatch(actions.getNodes(params));
   }
 
@@ -68,13 +74,19 @@ export class NodesListComponent implements OnInit, OnDestroy {
     }
     this.nodesListSort = sort;
     this.nodesListSortOrder = order.toUpperCase();
-    const params = {page: this.nodesList.page, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+    const params = {
+      page: this.nodesList.page, per_page: 100,
+      sort: this.nodesListSort, order: this.nodesListSortOrder,
+      filters: this.nodesListFilters};
     this.store.dispatch(actions.getNodes(params));
   }
 
   filterFor(type, item) {
     this.nodesListFilters.push({key: type, values: [item]});
-    const params = {page: 1, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+    const params = {
+      page: 1, per_page: 100,
+      sort: this.nodesListSort, order: this.nodesListSortOrder,
+      filters: this.nodesListFilters};
     this.store.dispatch(actions.getNodes(params));
   }
 
@@ -83,11 +95,11 @@ export class NodesListComponent implements OnInit, OnDestroy {
     this.nodesListFilters.forEach((filter) => {
       filter.values.forEach((val) => {
         if (filter.exclude) {
-        filters.push(filter.key + ":" + val + ":negated=true"); 
+        filters.push(filter.key + ':' + val + ':negated=true');
         } else {
-          filters.push(filter.key + ":" + val + ":negated=false"); 
+          filters.push(filter.key + ':' + val + ':negated=false');
         }
-      })
+      });
     });
     filters = filters.filter(function( element ) {
       return element !== undefined;
@@ -96,10 +108,10 @@ export class NodesListComponent implements OnInit, OnDestroy {
   }
 
   isMatchingFilter(stringFilter) {
-    let arr = stringFilter.split(":");
-    for(let i = 0 ; i < this.nodesListFilters.length; i++) {
+    const arr = stringFilter.split(':');
+    for (let i = 0 ; i < this.nodesListFilters.length; i++) {
       if (this.nodesListFilters[i].key === arr[0]) {
-        for(let j = 0 ; j < this.nodesListFilters[i].values.length; j++) {
+        for (let j = 0 ; j < this.nodesListFilters[i].values.length; j++) {
           if (this.nodesListFilters[i].values[j] === arr[1]) {
             return {filter: this.nodesListFilters[i]};
           }
@@ -110,23 +122,31 @@ export class NodesListComponent implements OnInit, OnDestroy {
   }
 
   negateFilter(filter) {
-    const filterToNegate = this.isMatchingFilter(filter)
+    const filterToNegate = this.isMatchingFilter(filter);
     if (filterToNegate !== undefined) {
-      this.nodesListFilters = reject(this.nodesListFilters, function(item) { return item === filterToNegate.filter; });
+      this.nodesListFilters = reject(
+        this.nodesListFilters, function(item) { return item === filterToNegate.filter; });
       filterToNegate.filter['exclude'] = true;
       this.nodesListFilters.push(filterToNegate.filter);
-      const params = {page: 1, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+      const params = {
+        page: 1, per_page: 100,
+        sort: this.nodesListSort, order: this.nodesListSortOrder,
+        filters: this.nodesListFilters};
       this.store.dispatch(actions.getNodes(params));
-    }  
+    }
   }
 
   removeFilter(filter) {
-    const filterToRemove = this.isMatchingFilter(filter)
+    const filterToRemove = this.isMatchingFilter(filter);
     if (filterToRemove !== undefined) {
-      this.nodesListFilters = reject(this.nodesListFilters, function(item) { return item === filterToRemove.filter; });
-      const params = {page: 1, per_page: 100, sort: this.nodesListSort, order: this.nodesListSortOrder, filters: this.nodesListFilters};
+      this.nodesListFilters = reject(
+        this.nodesListFilters, function(item) { return item === filterToRemove.filter; });
+      const params = {
+        page: 1, per_page: 100,
+        sort: this.nodesListSort, order: this.nodesListSortOrder,
+        filters: this.nodesListFilters};
       this.store.dispatch(actions.getNodes(params));
-    }  
+    }
   }
 
   trackBy(node) {
