@@ -296,6 +296,23 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/DeleteRole", "infra:infraServers:{server_id}:orgs:{org_id}:roles", "infra:infraServers:update", "DELETE", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.Role); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetClients", "infra:infraServers:{server_id}:orgs:{org_id}:clients", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Clients); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
