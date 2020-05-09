@@ -2,6 +2,7 @@ package pgdb_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -78,33 +79,9 @@ func (suite *NodeManagersAndNodesDBSuite) TestUpdateOrInsertInstanceSourceStateI
 	if err != nil {
 		suite.FailNow(err.Error())
 	}
-	filter = &common.Filter{
-		Key:    "state",
-		Values: []string{"TERMINATED"},
-	}
-	terminatedNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{filter})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
-	suite.Equal(1, len(terminatedNodes))
-
-	// now that instance state has been set to terminated, it cannot be changed
-	_, err = suite.Database.UpdateOrInsertInstanceSourceStateInDb(runningInstanceState, mgrID, "12345678", "aws-ec2")
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
-	terminatedNodes, _, err = suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{filter})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
-	suite.Equal(1, len(terminatedNodes))
-
-	// test that node that was added is readable/in a good state
-	_, err = suite.Database.GetNode(ctx, terminatedNodes[0].Id)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
-	_, err = suite.Database.DeleteNode(terminatedNodes[0].Id)
+	// try to find the node; not findable
+	_, err = suite.Database.GetNode(ctx, runningNodes[0].Id)
+	suite.EqualError(err, fmt.Sprintf("Not found for id: %s", runningNodes[0].Id))
 
 	// try to send in a new node with state of terminated, no nodes added
 	terminatedInstanceState = pgdb.InstanceState{ID: "i-9346723", State: "terminated", Region: "eu-west-1"}
@@ -116,7 +93,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestUpdateOrInsertInstanceSourceStateI
 		Key:    "state",
 		Values: []string{"TERMINATED"},
 	}
-	terminatedNodes, _, err = suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{filter})
+	terminatedNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{filter})
 	if err != nil {
 		suite.FailNow(err.Error())
 	}

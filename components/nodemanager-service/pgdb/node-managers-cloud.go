@@ -40,6 +40,11 @@ WHERE nodes.source_id = $1 AND nodes.source_region = $2 AND nodes.source_account
 RETURNING id;
 `
 
+const sqlDeleteNodeByCloudInfo = `
+DELETE from nodes
+WHERE nodes.source_id = $1 AND nodes.source_region = $2 AND nodes.source_account_id = $3;
+`
+
 const sqlInsertManagerNode = `
 INSERT INTO nodes
   (id, manager, source_id, target_config, name, source_region, source_account_id)
@@ -330,9 +335,12 @@ func (db *DB) UpdateOrInsertInstanceSourceStateInDb(instance InstanceState, mgrI
 		name = instance.ID
 	}
 	switch instanceState {
-	case "TERMINATED", "STOPPED":
-		// if the instance state we're getting is terminated or stopped, we only want to update the node if we already
-		// have it in the system. it's silly to *add* nodes that are already terminated/stopped here.
+	case "TERMINATED":
+		// remove the node if terminated
+		_, err = db.Exec(sqlDeleteNodeByCloudInfo, instance.ID, instance.Region, sourceAcctID)
+	case "STOPPED":
+		// if the instance state we're getting is stopped, we only want to update the node if we already
+		// have it in the system. it's silly to *add* nodes that are already stopped here.
 		id, err = db.SelectStr(sqlUpdateInstanceSourceStateAndStatus, instance.ID, instance.Region, sourceAcctID, instanceState, "unreachable", nowTime, connectionErr)
 	case "RUNNING":
 		id, err = db.SelectStr(sqlUpsertInstanceSourceState, uuid, name, instance.ID, instanceState, instance.Region, sourceAcctID, tcByte, nowTime, mgrType)
