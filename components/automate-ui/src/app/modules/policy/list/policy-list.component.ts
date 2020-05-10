@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
@@ -10,7 +11,6 @@ import { DeletePolicy, GetPolicies } from 'app/entities/policies/policy.actions'
 import { allPolicies, getAllStatus } from 'app/entities/policies/policy.selectors';
 import { Policy } from 'app/entities/policies/policy.model';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
   selector: 'app-policy-list',
@@ -58,7 +58,7 @@ export class PolicyListComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public startPolicyDelete($event: ChefKeyboardEvent, policy: Policy): void {
+  public startPolicyDelete($event: MatOptionSelectionChange, policy: Policy): void {
     if ($event.isUserInput) {
       this.deleteModalVisible = true;
       this.policyToDelete = policy;

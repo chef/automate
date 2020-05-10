@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Store } from '@ngrx/store';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
@@ -15,7 +16,6 @@ import {
   Policy, Member, Type, stringToMember
 } from 'app/entities/policies/policy.model';
 import { RemovePolicyMembers } from 'app/entities/policies/policy.actions';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 
 export type PolicyTabName = 'definition' | 'members';
 
@@ -114,7 +114,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
     return JSON.stringify(policy, null, '  ');
   }
 
-  removeMember($event: ChefKeyboardEvent, member: Member): void {
+  removeMember($event: MatOptionSelectionChange, member: Member): void {
     if ($event.isUserInput) {
       this.store.dispatch(new RemovePolicyMembers({
         id: this.policy.id,

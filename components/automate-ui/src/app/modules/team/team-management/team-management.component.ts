@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { Validators, FormGroup, FormBuilder } from '@angular/forms';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { map, filter, takeUntil } from 'rxjs/operators';
@@ -19,7 +20,6 @@ import { CreateTeam, DeleteTeam, GetTeams } from 'app/entities/teams/team.action
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
 import { ProjectConstants } from 'app/entities/projects/project.model';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
   selector: 'app-team-management',
@@ -108,7 +108,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public startTeamDelete($event: ChefKeyboardEvent, team: Team): void {
+  public startTeamDelete($event: MatOptionSelectionChange, team: Team): void {
     if ($event.isUserInput) {
       this.teamToDelete = team;
       this.deleteModalVisible = true;

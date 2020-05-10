@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 
@@ -10,7 +11,6 @@ import { loading } from 'app/entities/entities';
 import { GetRoles, DeleteRole } from 'app/entities/roles/role.actions';
 import { allRoles, getAllStatus } from 'app/entities/roles/role.selectors';
 import { Role } from 'app/entities/roles/role.model';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
   selector: 'app-roles-list',
@@ -48,7 +48,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public startRoleDelete($event: ChefKeyboardEvent, role: Role): void {
+  public startRoleDelete($event: MatOptionSelectionChange, role: Role): void {
     if ($event.isUserInput) {
       this.roleToDelete = role;
       this.deleteModalVisible = true;

@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
@@ -10,7 +11,6 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-
 import { pending, EntityStatus, allLoaded } from 'app/entities/entities';
 import {
   getStatus, serverFromRoute, updateStatus
@@ -25,7 +25,6 @@ import {
   getAllStatus as getAllOrgsForServerStatus,
   deleteStatus as deleteOrgStatus
 } from 'app/entities/orgs/org.selectors';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 
 export type ChefServerTabName = 'orgs' | 'details';
 
@@ -188,7 +187,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.conflictErrorEvent.emit(false);
   }
 
-  public startOrgDelete($event: ChefKeyboardEvent, org: Org): void {
+  public startOrgDelete($event: MatOptionSelectionChange, org: Org): void {
     if ($event.isUserInput) {
       this.orgToDelete = org;
       this.deleteModalVisible = true;
