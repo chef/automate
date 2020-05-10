@@ -92,9 +92,6 @@ document "load_compliance_reports" <<DOC
   Loads compliance report.
 DOC
 function load_compliance_reports() {
-    pushd components/compliance-service/test_data/audit_reports &> /dev/null
-    ./send_to_data_collector.sh https://a2-dev.test "$(get_admin_token)"
-    popd &> /dev/null
     generate_chef_run_example | jq '.entity_uuid = "34cbbb4c-c502-4971-b193-00e987b4678c"' | jq '.node_name = "debian(2)-zeta-linux(f)-apache(p)-failed"' | send_chef_data_raw
     generate_chef_run_failure_example | jq '.entity_uuid = "9b9f4e51-b049-4b10-9555-10578916e149"' | jq '.node_name = "centos-beta"' | send_chef_data_raw
     generate_chef_run_example | jq '.entity_uuid = "9b9f4e51-b049-4b10-9555-10578916e112"' | jq '.node_name = "redhat(2)-alpha-nginx(f)-apache(f)-failed"' | send_chef_data_raw
@@ -105,6 +102,9 @@ function load_compliance_reports() {
     generate_chef_run_failure_example | jq '.entity_uuid = "9b9f4e51-b049-4b10-9555-10578916e666"' | jq '.node_name = "ubuntu(1)-alpha-myprofile(s)-skipped"' | send_chef_data_raw
     generate_chef_run_failure_example | jq '.entity_uuid = "34cbbb55-c502-4971-2222-999999999999"' | jq '.node_name = "osx(1)-omega-pro2(w)-waived"' | send_chef_data_raw
     generate_chef_run_failure_example | jq '.entity_uuid = "34cbbb4c-c502-4971-1111-888888888888"' | jq '.node_name = "osx(2)-omega-pro1(f)-pro2(w)-failed"' | send_chef_data_raw
+    pushd components/compliance-service/test_data/audit_reports &> /dev/null
+    ./send_to_data_collector.sh https://a2-dev.test "$(get_admin_token)"
+    popd &> /dev/null
 }
 
 document "load_scan_jobs" <<DOC
