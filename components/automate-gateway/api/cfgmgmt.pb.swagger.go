@@ -1196,14 +1196,14 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "List of projects the node belongs to. This is a concept introduced with IAMv2."
+          "description": "List of projects the node belongs to."
         },
         "versioned_cookbooks": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.VersionedCookbook"
           },
-          "title": "List of versioned cookbooks associated with the node"
+          "description": "List of versioned cookbooks associated with the node."
         },
         "ip6address": {
           "type": "string",

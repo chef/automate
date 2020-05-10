@@ -588,9 +588,9 @@ type Run struct {
 	PolicyRevision string `protobuf:"bytes,32,opt,name=policy_revision,json=policyRevision,proto3" json:"policy_revision,omitempty"`
 	// Expanded run list for the node.
 	ExpandedRunList *ExpandedRunList `protobuf:"bytes,33,opt,name=expanded_run_list,json=expandedRunList,proto3" json:"expanded_run_list,omitempty"`
-	// List of projects the node belongs to. This is a concept introduced with IAMv2.
+	// List of projects the node belongs to.
 	Projects []string `protobuf:"bytes,34,rep,name=projects,proto3" json:"projects,omitempty"`
-	// List of versioned cookbooks associated with the node
+	// List of versioned cookbooks associated with the node.
 	VersionedCookbooks []*VersionedCookbook `protobuf:"bytes,35,rep,name=versioned_cookbooks,json=versionedCookbooks,proto3" json:"versioned_cookbooks,omitempty"`
 	// IP 6 Address for the node.
 	Ip6Address string `protobuf:"bytes,36,opt,name=ip6address,proto3" json:"ip6address,omitempty"`

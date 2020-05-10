@@ -424,7 +424,7 @@ type Node struct {
 	State string `protobuf:"bytes,26,opt,name=state,proto3" json:"state,omitempty"`
 	// Prefix for node name. The full node name is the prefix + the host.
 	NamePrefix string `protobuf:"bytes,27,opt,name=name_prefix,json=namePrefix,proto3" json:"name_prefix,omitempty"`
-	// List of projects associated with the node. Projects are a concept introduced in IAMv2.
+	// List of projects associated with the node.
 	Projects []string `protobuf:"bytes,28,rep,name=projects,proto3" json:"projects,omitempty"`
 	// Most recent node data from the last Chef Infra run results.
 	RunData *LastContactData `protobuf:"bytes,29,opt,name=run_data,json=runData,proto3" json:"run_data,omitempty"`

@@ -1091,7 +1091,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "The projects the node is assigned to. This is a resource-scoped access control feature of IAMv2."
+          "description": "The projects the node is assigned to."
         }
       }
     },
