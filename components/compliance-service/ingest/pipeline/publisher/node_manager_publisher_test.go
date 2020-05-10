@@ -78,6 +78,7 @@ func TestGatherInfoForNode(t *testing.T) {
 			{Key: "chef-tag", Value: "database"},
 			{Key: "environment", Value: "test-env"},
 		},
+		ManagerType: "chef",
 	}, nodeMetadata)
 }
 
@@ -128,6 +129,7 @@ func TestGatherInfoForNodeCollectsProjectsDataIfScanJob(t *testing.T) {
 		Tags: []*common.Kv{
 			{Key: "environment", Value: "test-env"},
 		},
+		ManagerType: "",
 	}, nodeMetadata)
 }
 

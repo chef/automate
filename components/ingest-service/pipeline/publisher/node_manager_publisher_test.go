@@ -74,6 +74,7 @@ func TestGatherInfoForNode(t *testing.T) {
 			{Key: "chef_tags", Values: []string{"application", "database"}},
 			{Key: "chef_server", Values: []string{"chef-server-2"}},
 		},
+		ManagerType: "chef",
 	}, nodeMetadata)
 }
 
