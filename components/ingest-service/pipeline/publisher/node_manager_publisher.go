@@ -98,6 +98,7 @@ func gatherInfoForNode(msg message.ChefRun) (*manager.NodeMetadata, error) {
 			EndTime: timestamp,
 			Status:  status,
 		},
+		ManagerType: "chef",
 	}, nil
 }
 
