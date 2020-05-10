@@ -80,6 +80,7 @@ message NodeMetadata {
 	repeated chef.automate.domain.nodemanager.nodes.ProjectsData projects_data = 13;
 	repeated string projects = 14;
 	string manager_id = 15;
+	string manager_type = 16;
 }
 
 message Fields {
