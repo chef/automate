@@ -16,8 +16,6 @@ describe('OrgEditComponent', () => {
       declarations: [
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),
