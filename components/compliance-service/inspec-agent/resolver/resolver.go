@@ -107,6 +107,7 @@ type nodeInfo struct {
 	SSM               bool   // true means we should treat this as a ssm job (remote scan job)
 	MachineIdentifier string // special identifier used when querying azure api, the resource group name
 	Tags              []*common.Kv
+	ManagerType       string // type of mgr associated with node (aws-api, aws-ec2, automate, chef, azure-api, azure-ec2, gcp-api)
 }
 
 func assembleJob(job *jobs.Job, node nodeInfo, secrets []*inspec.Secrets, tc inspec.TargetBaseConfig) (*types.InspecJob, error) {
@@ -145,6 +146,7 @@ func assembleJob(job *jobs.Job, node nodeInfo, secrets []*inspec.Secrets, tc ins
 		SourceID:          node.CloudID,
 		SourceAccountID:   node.CloudAccountID,
 		ManagerID:         node.ManagerID,
+		ManagerType:       node.ManagerType,
 		MachineIdentifier: node.MachineIdentifier,
 		Tags:              node.Tags,
 	}, nil
@@ -182,6 +184,7 @@ func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManag
 				Name:           node.Name,
 				Environment:    "azure-api",
 				ManagerID:      m.Id,
+				ManagerType:    "azure-api",
 				CloudAccountID: m.AccountId,
 			}
 			tc := inspec.TargetBaseConfig{
@@ -242,6 +245,7 @@ func (r *Resolver) handleGcpApiNodes(ctx context.Context, m *manager.NodeManager
 			Name:           node.Name,
 			Environment:    "gcp-api",
 			ManagerID:      m.Id,
+			ManagerType:    "gcp-api",
 			CloudAccountID: m.AccountId,
 		}
 		tc := inspec.TargetBaseConfig{
@@ -354,6 +358,7 @@ func assembleAwsApiNodeInfo(node *nodes.Node, m *manager.NodeManager, awsCreds a
 		Name:           node.Name,
 		Environment:    "aws-api",
 		ManagerID:      m.Id,
+		ManagerType:    "aws-api",
 		CloudAccountID: m.AccountId,
 	}
 	// we want to prioritize using the region as it was saved
@@ -428,6 +433,7 @@ func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.No
 				Name:           name,
 				Environment:    "aws-api",
 				ManagerID:      m.Id,
+				ManagerType:    "aws-api",
 				CloudAccountID: m.AccountId,
 			}
 			tc := inspec.TargetBaseConfig{
@@ -596,6 +602,7 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 					Name:              nodeDetails.Name,
 					Environment:       nodeDetails.Environment,
 					ManagerID:         m.Id,
+					ManagerType:       m.Type,
 					SSM:               ssmJob,
 					CloudAccountID:    m.AccountId,
 					Tags:              node.Tags,
@@ -795,6 +802,7 @@ func (r *Resolver) resolveStaticJobInfo(job *jobs.Job, node *nodes.Node, tc insp
 		Profiles:     job.Profiles,
 		Tags:         node.Tags,
 		ManagerID:    mgrtypes.AutomateManagerID,
+		ManagerType:  "automate",
 	}
 	return agentJob
 }
