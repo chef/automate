@@ -156,6 +156,9 @@
         "run_time_limit": {
           "type": "number",
           "format": "float"
+        },
+        "automate_manager_type": {
+          "type": "string"
         }
       }
     },
