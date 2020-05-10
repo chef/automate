@@ -1,6 +1,8 @@
 package pgdb
 
 import (
+	"strings"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -17,6 +19,13 @@ const sqlFindNodeTag = `
 SELECT exists(select 1 from nodes_tags where node_id = $1 AND tag_id = $2);
 `
 
+func formatTag(keyValue *common.Kv) common.Kv {
+	// remove quotes from inside tag key/value, if any (e.g. "Dot.Comma,Big;\"Trouble")
+	key := strings.Replace(keyValue.Key, "\"", "", -1)
+	val := strings.Replace(keyValue.Value, "\"", "", -1)
+	return common.Kv{Key: key, Value: val}
+}
+
 func (trans *DBTrans) addTags(tags []*common.Kv) ([]string, error) {
 	tagIDs := make([]string, 0, len(tags))
 	tagArr := make([]interface{}, 0, len(tags))
@@ -28,11 +37,12 @@ func (trans *DBTrans) addTags(tags []*common.Kv) ([]string, error) {
 			return tagIDs, errors.Wrap(err, "addTags unable to check for tag existence in db")
 		}
 		if len(id) == 0 {
+			kv := formatTag(keyValue)
 			// create tag and add to tag array if not exists
 			tag := tag{
 				ID:    createUUID(),
-				Key:   keyValue.Key,
-				Value: keyValue.Value,
+				Key:   kv.Key,
+				Value: kv.Value,
 			}
 			tagArr = append(tagArr, &tag)
 			id = tag.ID

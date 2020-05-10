@@ -127,20 +127,12 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 		return errors.Wrap(err, "ProcessIncomingNode unable to marshal projects data")
 	}
 
-	var mgrType string
-	if node.ManagerId != "" {
-		mgrType, err = db.SelectStr(sqlGetManagerTypeFromId, node.ManagerId)
-		if err != nil {
-			logrus.Warnf("unable to find manager for node")
-		}
-	}
-
 	err = Transact(db, func(tx *DBTrans) error {
 		logrus.Debugf("processing node %s with cloud info %s %s %s", node.GetName(), node.GetSourceId(), node.GetSourceAccountId(), node.GetSourceRegion())
 		nodeDetails := nodeDetails{
 			nodeState:           nodeState,
 			lastContact:         lastContact,
-			mgrType:             mgrType,
+			mgrType:             node.GetManagerType(),
 			lastContactDataByte: lastContactDataByte,
 			projectsDataByte:    projectsDataByte,
 		}

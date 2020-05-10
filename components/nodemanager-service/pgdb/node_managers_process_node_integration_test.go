@@ -816,6 +816,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeCorrectlyAssoci
 		ScanData: &nodes.LastContactData{
 			Id: "12345-9999-002323",
 		},
+		ManagerType: "chef",
 	}
 	err := suite.Database.ProcessIncomingNode(node)
 	if err != nil {
@@ -826,7 +827,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeCorrectlyAssoci
 		suite.FailNow(err.Error())
 	}
 	suite.Equal("my node", readNode.Name)
-	suite.Equal("", readNode.Manager)
+	suite.Equal("chef", readNode.Manager)
 	suite.Equal([]string{}, readNode.ManagerIds)
 
 	// create Automate manager, send node in with automate manager id, ensure it is correctly attributed
@@ -838,6 +839,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeCorrectlyAssoci
 	_, err = suite.Database.AddNodeManager(&mgr, "")
 	node.Uuid = "1223-4254-2424-1345"
 	node.ManagerId = mgrtypes.AutomateManagerID
+	node.ManagerType = "automate"
 	err = suite.Database.ProcessIncomingNode(node)
 	if err != nil {
 		suite.FailNow(err.Error())
@@ -858,6 +860,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeCorrectlyAssoci
 	}
 	node.Uuid = "1223-4254-2424-1115"
 	node.ManagerId = mgrID
+	node.ManagerType = "aws-ec2"
 	err = suite.Database.ProcessIncomingNode(node)
 	if err != nil {
 		suite.FailNow(err.Error())
