@@ -166,9 +166,9 @@ message Run {
   string                    policy_revision          = 32;
   // Expanded run list for the node.
   ExpandedRunList           expanded_run_list        = 33;
-  // List of projects the node belongs to. This is a concept introduced with IAMv2.
+  // List of projects the node belongs to.
   repeated string           projects                 = 34;
-  // List of versioned cookbooks associated with the node
+  // List of versioned cookbooks associated with the node.
   repeated VersionedCookbook versioned_cookbooks     = 35;
   // IP 6 Address for the node.
   string                    ip6address               = 36;

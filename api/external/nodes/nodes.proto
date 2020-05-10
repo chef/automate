@@ -353,7 +353,7 @@ message Node {
 	string state = 26;
 	// Prefix for node name. The full node name is the prefix + the host.
 	string name_prefix = 27;
-	// List of projects associated with the node. Projects are a concept introduced in IAMv2.
+	// List of projects associated with the node.
 	repeated string projects = 28;
 	// Most recent node data from the last Chef Infra run results.
 	LastContactData run_data = 29;
