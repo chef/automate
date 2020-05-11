@@ -5,7 +5,7 @@ options:
 - name: admin
   default_value: "false"
   usage: |
-    Generate a token and grant it admin-level permission
+    Generate a token and add it to the chef-managed admin policy
 - name: help
   shorthand: h
   default_value: "false"
