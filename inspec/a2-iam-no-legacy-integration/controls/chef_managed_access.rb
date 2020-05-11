@@ -133,7 +133,8 @@ control 'iam-chef-managed-access-1' do
           'reporting/stats/trend', # ReadTrend
           'reporting/stats/profiles', # ReadProfiles
           'reporting/stats/failures', # ReadFailures
-          'scanner/jobs/search' # List
+          'scanner/jobs/search', # List
+          'reporting/export' # ExportReport as json/csv
         ]
       }.each do |method, urls|
         urls.each do |url|
@@ -166,7 +167,6 @@ control 'iam-chef-managed-access-1' do
         ],
         'POST': [
           'scanner/jobs', # Create job
-          'reporting/export' # ExportReport as json/csv
         ]
       }.each do |method, urls|
         urls.each do |url|

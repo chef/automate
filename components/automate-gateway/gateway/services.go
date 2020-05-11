@@ -559,7 +559,7 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 	// request body.
 	const (
 		resource = "compliance:reporting:reports"
-		action   = "compliance:reports:export"
+		action   = "compliance:reports:list"
 	)
 
 	ctx, err := s.authRequest(r, resource, action)
@@ -622,7 +622,7 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 func (s *Server) NodeExportHandler(w http.ResponseWriter, r *http.Request) {
 	const (
 		resource = "compliance:reporting:nodes:{id}"
-		action   = "compliance:reportNodes:export"
+		action   = "compliance:reportNodes:list"
 	)
 
 	ctx, err := s.authRequest(r, resource, action)
