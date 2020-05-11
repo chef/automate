@@ -7,7 +7,7 @@ describe('App', () => {
     browser.waitForAngularEnabled(false);
     browser.get('/');
 
-    expect(browser.getCurrentUrl()).toMatch(/http:\/\/localhost:\d+\//);
+    expect(browser.getCurrentUrl()).toMatch(/http:\/\/localhost:\d+\/$/);
   });
 });
 
