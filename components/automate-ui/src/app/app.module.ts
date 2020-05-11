@@ -17,7 +17,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { StoreModule } from '@ngrx/store';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { NgrxEffectsModule } from './ngrx.effects';
-import { ngrxReducers, RouterSerializer, runtimeChecks } from './ngrx.reducers';
+import { ngrxReducers, RouterSerializer, runtimeChecks, actionSanitizer, stateSanitizer } from './ngrx.reducers';
 
 // angular material stuff
 import {
@@ -284,7 +284,8 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     StoreRouterConnectingModule.forRoot({
       serializer: RouterSerializer
     }),
-    !environment.production ? StoreDevtoolsModule.instrument({ maxAge: 25 }) : []
+    environment.production ? []
+      : StoreDevtoolsModule.instrument({ maxAge: 25 /* states */, actionSanitizer, stateSanitizer })
   ],
   providers: [
     AdminKeyRequests,

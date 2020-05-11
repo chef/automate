@@ -304,3 +304,26 @@ export const ngrxReducers = {
   users: userEntity.userEntityReducer,
   userSelf: userSelfEntity.userSelfEntityReducer
 };
+
+export const actionSanitizer = action => {
+  const uiRouterActions = /@ui-router.+/g;
+  return uiRouterActions.test(action.type)
+    ? { type: action.type, transition: sanitizeUIRouterTransition(action.transition) }
+    : action;
+};
+export const stateSanitizer = (state): any => {
+  if (state.router && state.router.last && state.router.last) {
+    return {
+      ...state,
+      router: sanitizeUIRouterTransition(state.router.last)
+    };
+  }
+  return state;
+};
+const sanitizeUIRouterTransition = (transition): any => ({
+  params: transition.router && transition.router.globals && transition.router.globals.params,
+  current: transition.router && transition.router.globals && transition.router.globals.current,
+  targetState: transition.targetState && transition.targetState().state(),
+  from: transition.from && transition.from(),
+  to: transition.to && transition.to()
+});
