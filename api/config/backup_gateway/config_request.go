@@ -63,6 +63,21 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 					c.V1.Sys.Gateway.Backup.S3 = globalS3
 				}
 			}
+		case "gcs":
+			if globalGCS := b.GetGcs(); globalGCS != nil {
+				// It's possible that a user may have configured GCS backups at
+				// both the global and backup-gateway levels. If so, merge the global
+				// configuration into the existing bgw backup config.
+				// Otherwise, copy the global configuration.
+				merged := &ac.Backups_GCS{}
+				bgwgcs := c.GetV1().GetSys().GetGateway().GetBackup().GetGcs()
+				if bgwgcs != nil {
+					ac.Merge(bgwgcs, globalGCS, merged) // nolint errcheck
+					c.V1.Sys.Gateway.Backup.Gcs = merged
+				} else {
+					c.V1.Sys.Gateway.Backup.Gcs = globalGCS
+				}
+			}
 		default:
 			if path := g.GetV1().GetBackups().GetFilesystem().GetPath().GetValue(); path != "" {
 				// Set the base path to the directory containing the backups so

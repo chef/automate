@@ -304,6 +304,9 @@ func (s *server) backupGatewayLocationSpec() (backup.LocationSpecification, erro
 	case "s3":
 		bucket = s.deployment.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetName().GetValue()
 		basePath = s.deployment.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetBasePath().GetValue()
+	case "gcs":
+		bucket = s.deployment.Config.GetGlobal().GetV1().GetBackups().GetGcs().GetBucket().GetName().GetValue()
+		basePath = s.deployment.Config.GetGlobal().GetV1().GetBackups().GetGcs().GetBucket().GetBasePath().GetValue()
 	default:
 		bucket = "backups"
 	}
