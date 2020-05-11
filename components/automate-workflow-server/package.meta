@@ -1,4 +1,5 @@
 {
   "name": "chef/automate-workflow-server",
+  "uses_platform_scaffolding": false,
   "binlinks": ["workflow-ctl"]
 }
