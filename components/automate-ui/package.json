@@ -35,6 +35,7 @@
     "@angular/platform-browser-dynamic": "^9.1.4",
     "@angular/platform-server": "^9.1.4",
     "@angular/router": "^9.1.4",
+    "@carbon/grid": "^10.10.0",
     "@ngrx/effects": "^9.1.0",
     "@ngrx/entity": "^9.1.0",
     "@ngrx/router-store": "^9.1.0",

@@ -3,7 +3,6 @@
 .page-title {
   color: var(--chef-primary-dark);
   margin-top: 0;
-  margin-bottom: 12px;
   font-weight: inherit;
   font-style: inherit;
   font-size: 18px;
@@ -24,26 +23,149 @@
   font-weight: 100;
 }
 
-.item {
-  margin: 8px;
-  padding: 3px;
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -16px -16px 16px -16px;
+  padding: 10px 16px;
+  border-top-left-radius: $global-radius;
+  border-top-right-radius: $global-radius;
+  border-bottom: 1px solid $chef-grey;
+
+  chef-button {
+    margin: 0;
+  }
 }
 
-chef-icon {
-  margin-right: 1em;
+.sub-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  chef-button {
+    margin: 0;
+  }
 }
 
-.table-title {
-  text-align: left;
+.selected-filters {
+  chef-button {
+    margin: 0 10px 0 0;
+  }
 }
 
-#x {
-  margin-right: 5px;
-  margin-top: 5px;
-  position: absolute;
-  background: grey;
-  color: black;
-  top: -10px;
-  right: -10px;
-  border: 1px solid black;
+.filters {
+  margin: 1em 0;
+
+  .filter-group-heading {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #394261;
+  }
+
+  .filter-group-options {
+    --pill-background-color: $chef-white;
+
+    > chef-pill {
+      display: inline-flex;
+      padding: 8px;
+      margin: 0 8px 8px 0;
+      border: 1px solid $chef-grey;
+    }
+
+    chef-checkbox {
+      --pill-background-color: #{$chef-grey};
+
+      chef-pill {
+        margin-left: 8px;
+        padding: 0 8px;
+      }
+
+      ::ng-deep .check-wrap {
+        border: 1px solid $chef-grey;
+      }
+    }
+  }
+}
+
+:host.fullscreened {
+  .filters {
+    display: flex;
+    flex-flow: row wrap;
+  }
+
+  .filter-group {
+    flex: 0 1 50%;
+  }
+}
+
+chef-table {
+  chef-icon {
+    margin-right: 8px;
+  }
+}
+
+chef-tr:hover {
+  cursor: pointer;
+}
+
+:host.fullscreened {
+  chef-tr:hover,
+  chef-tr.selected {
+    chef-th,
+    chef-td {
+      background: $chef-lightest-grey;
+    }
+  }
+
+  // chef-th {
+  //   background: $chef-white;
+  //   font-weight: 400;
+  //   text-transform: uppercase;
+  // }
+}
+
+:host:not(.fullscreened) {
+  chef-thead {
+    display: none;
+  }
+
+  chef-tr {
+    flex-flow: row wrap;
+    border: 1px solid $chef-grey;
+    border-radius: $global-radius;
+    padding: 0 1em;
+    margin-bottom: 1em;
+  }
+
+  chef-tbody chef-tr:hover,
+  chef-tbody chef-tr.selected {
+    background: $chef-lightest-grey;
+  }
+
+  chef-td {
+    flex-basis: 33.33%;
+    border: none;
+    border-radius: 0;
+    padding: 1em 0;
+    font-size: 12px;
+  }
+
+  chef-td[data-label] {
+    flex-direction: column;
+    align-items: flex-start;
+
+    &::before {
+      content: attr(data-label) '';
+      display: block;
+      text-transform: uppercase;
+    }
+  }
+
+  chef-td:nth-child(1),
+  chef-td:nth-child(2) {
+    flex-basis: 50%;
+    border-bottom: 1px solid $chef-grey;
+    font-size: 14px;
+  }
 }

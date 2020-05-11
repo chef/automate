@@ -1,0 +1,221 @@
+<div class="content-container">
+  <div class="header">
+    <div class="heading">
+      <div class="page-title">{{ desktop.name }}</div>
+      <!-- <div class="update-time">{{ desktop.name }}</div> -->
+    </div>
+    <div class="heading-actions">
+      <chef-button secondary (click)="fullscreenToggled.emit()">
+        <chef-icon *ngIf="!fullscreened">fullscreen</chef-icon>
+        <chef-icon *ngIf="fullscreened">fullscreen_exit</chef-icon>
+      </chef-button>
+      <chef-button secondary (click)="close()">
+        <chef-icon>close</chef-icon>
+      </chef-button>
+    </div>
+  </div>
+
+  <div class="checkin-history">
+    <div class="header">
+      <h3>Check-in History</h3>
+      <div class="heading-actions">
+        <chef-button secondary (click)="showCheckinDebug = !showCheckinDebug">
+          <chef-icon>settings</chef-icon>
+        </chef-button>
+        <chef-button secondary (click)="checkinNumDays = (checkinNumDays === 14 ? 28 : 14)">
+          <span>Last {{ (checkinNumDays === 14 ? 2 : 4) }} Weeks</span>
+          <chef-icon>expand_more</chef-icon>
+        </chef-button>
+        <chef-button secondary>
+          <span>Download</span>
+          <chef-icon>expand_more</chef-icon>
+        </chef-button>
+        <!-- <select>
+          <option>Last 2 weeks</option>
+          <option>Last 4 weeks</option>
+        </select> -->
+        <!-- <select>
+          <option>Download</option>
+          <option>CSV</option>
+          <option>JSON</option>
+        </select> -->
+        <!-- <chef-button secondary>
+          <chef-icon>settings</chef-icon>
+        </chef-button> -->
+      </div>
+    </div>
+    <div class="debug-actions" *ngIf="showCheckinDebug">
+      <div class="button-toggle">
+        <chef-button secondary (click)="checkinTableType = 'grid'">
+          <chef-icon>view_module</chef-icon>
+        </chef-button>
+        <chef-button secondary (click)="checkinTableType = 'list'">
+          <chef-icon>view_list</chef-icon>
+        </chef-button>
+        <chef-button secondary (click)="checkinTableType = 'json'">
+          <chef-icon>code</chef-icon>
+        </chef-button>
+        <span>{{ checkinTableType }}</span>
+      </div>
+
+      <div class="button-toggle">
+        <span>{{ checkinGridFlexType }}</span>
+        <chef-button secondary (click)="checkinGridFlexType = 'wrap'">
+          <chef-icon>wrap_text</chef-icon>
+        </chef-button>
+        <chef-button secondary (click)="checkinGridFlexType = 'stretch'">
+          <chef-icon>dehaze</chef-icon>
+        </chef-button>
+      </div>
+    </div>
+    <chef-table class="checkin-history-table {{showCheckinDebug ? 'outline' : ''}}" [ngClass]="[checkinTableType, checkinGridFlexType]" *ngIf="checkinTableType !== 'json'">
+      <chef-thead>
+        <chef-tr>
+          <chef-th class="status-cell">Status</chef-th>
+          <chef-th class="date-cell">Date</chef-th>
+          <chef-th class="relative-date-cell"></chef-th>
+        </chef-tr>
+      </chef-thead>
+      <chef-tbody>
+        <chef-tr *ngFor="let item of checkinHistory; index as i">
+          <chef-td class="status-cell" [id]="'checkin-item-'+i+'text'">
+            <chef-icon>{{ item.icon }}</chef-icon>
+            <span>{{ item.text | titlecase }}</span>
+            <chef-tooltip
+              [ngClass]="['checkin-tooltip', item.text]"
+              [attr.for]="'checkin-item-'+i+'text'">
+              <p class="checkin-tooltip-info">
+                <span class="checkin-tooltip-text">{{ item.text | titlecase }}</span>
+                <span class="checkin-tooltip-date">{{ item.date | datetime: DateTime.RFC2822 }}</span>
+              </p>
+              <a class="checkin-tooltip-link" href="">View Client Run Details <chef-icon>open_in_new</chef-icon></a>
+            </chef-tooltip>
+          </chef-td>
+          <chef-td class="date-cell">
+            <span>{{ item.date | datetime: DateTime.RFC2822 }}</span>
+          </chef-td>
+          <chef-td class="relative-date-cell" [ngSwitch]="i">
+            <span *ngSwitchCase="0">Today</span>
+            <span *ngSwitchCase="7">1 week ago</span>
+            <span *ngSwitchDefault>{{ ceil(i / 7) }} weeks ago</span>
+            <!-- <span *ngSwitchDefault>{{ item.date | timeFromNow }}</span> -->
+          </chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+    <chef-snippet
+      *ngIf="checkinTableType === 'json'"
+      class="checkin-history-json"
+      [code]="checkinHistory | json"
+      lang="json">
+    </chef-snippet>
+  </div>
+
+  <div class="detail-info">
+    <h3>Overview</h3>
+    <chef-table>
+      <chef-tbody>
+        <chef-tr>
+          <chef-th>Host Name</chef-th>
+          <chef-td>{{ desktop.name }}</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>Chef Infra Server</chef-th>
+          <chef-td>fakechefserver.eastus.cloudapp.azure.com</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>Node ID</chef-th>
+          <chef-td>{{ desktop.id }}</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>Platform Version</chef-th>
+          <chef-td>{{ desktop.platform }}</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>Total Memory</chef-th>
+          <chef-td>16.64GB</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>Domain</chef-th>
+          <chef-td>chef.io</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>IP Address</chef-th>
+          <chef-td>192.168.5.30</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>IPV6 Address</chef-th>
+          <chef-td>fe80:20c:29ff:fe2a:76e5</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>MAC Address</chef-th>
+          <chef-td>00:0C:29:2A:76:E5</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>Uptime</chef-th>
+          <chef-td>{{ desktop.uptimeSeconds }}</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>Time Zone</chef-th>
+          <chef-td>GMT</chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+
+    <h3>Chef Infra Client</h3>
+    <chef-table>
+      <chef-tbody>
+        <chef-tr>
+          <chef-th>Version</chef-th>
+          <chef-td>{{ desktop.chefVersion }}</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>Last Run End Time</chef-th>
+          <chef-td>{{ desktop.checkin }}</chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+
+    <h3>System</h3>
+    <chef-table>
+      <chef-tbody>
+        <chef-tr>
+          <chef-th>Manufacturer</chef-th>
+          <chef-td>LENOVO</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>Serial Number</chef-th>
+          <chef-td>R90QS96N</chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+
+    <h3>Virtualization</h3>
+    <chef-table>
+      <chef-tbody>
+        <chef-tr>
+          <chef-th>System</chef-th>
+          <chef-td>vmware</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>Role</chef-th>
+          <chef-td>guest</chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+
+    <h3>Kernel</h3>
+    <chef-table>
+      <chef-tbody>
+        <chef-tr>
+          <chef-th>Version</chef-th>
+          <chef-td>10.0.18362</chef-td>
+        </chef-tr>
+        <chef-tr>
+          <chef-th>Release</chef-th>
+          <chef-td>10.0.18362</chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+  </div>
+</div>

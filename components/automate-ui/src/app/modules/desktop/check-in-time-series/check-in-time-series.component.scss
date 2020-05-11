@@ -3,7 +3,6 @@
 .page-title {
   color: var(--chef-primary-dark);
   margin-top: 0;
-  margin-bottom: 12px;
   font-weight: inherit;
   font-style: inherit;
   font-size: 18px;
@@ -22,4 +21,18 @@
   font-family: Muli;
   font-size: 13px;
   font-weight: 100;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  select {
+    display: block;
+  }
+}
+
+chef-tr:last-child {
+  margin-bottom: 0;
 }

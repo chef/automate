@@ -61,6 +61,12 @@ export class DashboardComponent implements OnInit {
   public pageSize$: Observable<number>;
   public termFilters$: Observable<TermFilter[]>;
   public insightVisible = false;
+  public insightFullscreened = false;
+  public desktopDetailVisible = false;
+  public desktopDetailFullscreened = false;
+  public gridVisible = false;
+
+  public selectedDesktop: Desktop;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -162,7 +168,23 @@ export class DashboardComponent implements OnInit {
   }
 
   insightClose() {
+    this.desktopDetailClose();
+    this.insightFullscreened = false;
     this.insightVisible = false;
+  }
+
+  insightFullscreen() {
+    this.insightFullscreened = !this.insightFullscreened;
+  }
+
+  desktopDetailClose() {
+    this.selectedDesktop = undefined;
+    this.desktopDetailFullscreened = false;
+    this.desktopDetailVisible = false;
+  }
+
+  desktopDetailFullscreen() {
+    this.desktopDetailFullscreened = !this.desktopDetailFullscreened;
   }
 
   public onPageChange(pageNumber: number) {
@@ -175,6 +197,17 @@ export class DashboardComponent implements OnInit {
       { type: Terms.ErrorType, value: errorItem.type }];
     this.store.dispatch(new UpdateDesktopFilterTerm({ terms }));
     this.insightVisible = true;
+  }
+
+  public onDurationSelected(_durationItem: any): void {
+    this.store.dispatch(new UpdateDesktopFilterCurrentPage({ page: 1 }));
+    this.insightVisible = true;
+  }
+
+  public onDesktopSelected(desktop: Desktop) {
+    this.selectedDesktop = desktop;
+    this.desktopDetailVisible = true;
+    this.insightFullscreened = false;
   }
 
   public onTermFilterSelected(term: TermFilter): void {

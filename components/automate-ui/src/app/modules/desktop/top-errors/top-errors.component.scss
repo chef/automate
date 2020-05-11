@@ -3,7 +3,6 @@
 .page-title {
   color: var(--chef-primary-dark);
   margin-top: 0;
-  margin-bottom: 12px;
   font-weight: inherit;
   font-style: inherit;
   font-size: 18px;
@@ -22,4 +21,58 @@
   font-weight: inherit;
   font-style: inherit;
   font-size: 10px;
+}
+
+chef-tr {
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    chef-td:not(:last-child) {
+      background: $chef-lightest-grey;
+    }
+  }
+}
+
+chef-td:not(:last-child) {
+  border-top: 1px solid $chef-grey;
+  border-bottom: 1px solid $chef-grey;
+}
+
+chef-td:nth-child(1) {
+  border-left: 1px solid $chef-grey;
+  border-top-left-radius: $global-radius;
+  border-bottom-left-radius: $global-radius;
+  flex-basis: 55%;
+}
+
+chef-td:nth-child(2) {
+  border-right: 1px solid $chef-grey;
+  border-top-right-radius: $global-radius;
+  border-bottom-right-radius: $global-radius;
+  flex-basis: 20%;
+  justify-content: flex-end;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  chef-icon {
+    margin-left: 8px;
+  }
+}
+
+chef-td:last-child {
+  flex-basis: 25%;
+  padding-right: 0;
+  border-color: transparent;
+
+  app-chart-progress-bar {
+    width: 100%;
+    margin: 0;
+  }
 }

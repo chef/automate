@@ -1,26 +1,23 @@
 <div class="content-container">
-  <div class="page-title">Daily Check-in</div>
-  <div class="update-time">Updated {{ lastUpdatedMessage }}</div>
-  <div>
-    <div class="item">
-      <div class="title">Unknown %</div>
-      <div class="total">{{ unknownPercentage | number:'1.0-0' }}%</div>
+  <div class="header">
+    <div class="heading">
+      <div class="page-title">Daily Check-in</div>
+      <div class="update-time">Updated {{ lastUpdatedMessage }}</div>
     </div>
-    <div class="item">
-      <div class="title">Checked-in %</div>
-      <div class="total">{{ checkedInPercentage | number:'1.0-0' }}%</div>
-    </div>
-    <div class="item">
-      <div class="title">Checked-in Count</div>
-      <div class="total">{{ checkedInCount }}</div>
-    </div>
-    <div class="item">
-      <div class="title">Unknown Count</div>
-      <div class="total">{{ unknownCount }}</div>
-    </div>
-    <div class="item">
-      <div class="title">Total Count</div>
-      <div class="total">{{ totalCount }}</div>
-    </div>
+    <app-chart-progress-bar size="large" [value]="unknownCount" [max]="totalCount"></app-chart-progress-bar>
   </div>
+  <chef-phat-radio>
+    <chef-option value='unknown'>
+      <div class="title">Unknown</div>
+      <div class="total">{{ unknownCount }}</div>
+    </chef-option>
+    <chef-option value='checked-in'>
+      <div class="title">Checked-in</div>
+      <div class="total">{{ checkedInCount }}</div>
+    </chef-option>
+    <chef-option value='total'>
+      <div class="title">Total</div>
+      <div class="total">{{ totalCount }}</div>
+    </chef-option>
+  </chef-phat-radio>
 </div>

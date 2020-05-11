@@ -1,37 +1,35 @@
 <header role="banner">
   <nav role="navigation" class="navigation-wrapper">
-    <div class="left-nav"  role="menubar">
-      <div role="menuitem" class="logo-wrapper">
-        <a tabindex="0" routerLink="/" class="logo" title="logo link to homepage"></a>
-      </div>
-      <div class="navigation-menu">
-        <div role="menuitem" class="nav-link"><a routerLink="/dashboards/event-feed" routerLinkActive="active" tabindex="0">Dashboards</a></div>
+    <div role="menuitem" class="logo-wrapper">
+      <a tabindex="0" routerLink="/" class="logo" title="logo link to homepage"></a>
+    </div>
+    <div class="navigation-menu">
+      <div role="menuitem" class="nav-link"><a routerLink="/dashboards/event-feed" routerLinkActive="active" tabindex="0">Dashboards</a></div>
 
-        <app-authorized [allOf]="[['/api/v0/applications/services', 'get'], ['/api/v0/applications/service-groups', 'get']]">
-          <div role="menuitem" class="nav-link"><a routerLink="/applications/service-groups" routerLinkActive="active" tabindex="0">Applications</a></div>
-        </app-authorized>
+      <app-authorized [allOf]="[['/api/v0/applications/services', 'get'], ['/api/v0/applications/service-groups', 'get']]">
+        <div role="menuitem" class="nav-link"><a routerLink="/applications/service-groups" routerLinkActive="active" tabindex="0">Applications</a></div>
+      </app-authorized>
 
-        <app-authorized [allOf]="[['/api/v0/cfgmgmt/nodes', 'get'], ['/api/v0/cfgmgmt/stats/node_counts', 'get']]">
-          <div role="menuitem" class="nav-link"><a routerLink="/infrastructure" routerLinkActive="active" tabindex="0">Infrastructure</a></div>
-        </app-authorized>
+      <app-authorized [allOf]="[['/api/v0/cfgmgmt/nodes', 'get'], ['/api/v0/cfgmgmt/stats/node_counts', 'get']]">
+        <div role="menuitem" class="nav-link"><a routerLink="/infrastructure" routerLinkActive="active" tabindex="0">Infrastructure</a></div>
+      </app-authorized>
 
-        <app-authorized
-          [anyOf]="[['/api/v0/compliance/reporting/stats/summary', 'post'], ['/api/v0/compliance/reporting/stats/failures', 'post'],
-            ['/api/v0/compliance/reporting/stats/trend', 'post'], ['/api/v0/compliance/scanner/jobs', 'post'],
-            ['/api/v0/compliance/scanner/jobs/search', 'post'], ['/api/v0/compliance/profiles/search', 'post']]">
-          <div role="menuitem" class="nav-link"><a routerLink="/compliance" routerLinkActive="active" tabindex="0">Compliance</a></div>
-        </app-authorized>
+      <app-authorized
+        [anyOf]="[['/api/v0/compliance/reporting/stats/summary', 'post'], ['/api/v0/compliance/reporting/stats/failures', 'post'],
+          ['/api/v0/compliance/reporting/stats/trend', 'post'], ['/api/v0/compliance/scanner/jobs', 'post'],
+          ['/api/v0/compliance/scanner/jobs/search', 'post'], ['/api/v0/compliance/profiles/search', 'post']]">
+        <div role="menuitem" class="nav-link"><a routerLink="/compliance" routerLinkActive="active" tabindex="0">Compliance</a></div>
+      </app-authorized>
 
-        <div role="menuitem" class="nav-link"><a routerLink="/desktop" routerLinkActive="active" tabindex="0">Desktop</a></div>
+      <div role="menuitem" class="nav-link"><a routerLink="/desktop" routerLinkActive="active" tabindex="0">Desktops</a></div>
 
-        <app-authorized
-          [anyOf]="[['/api/v0/datafeed/destinations', 'post'], ['/api/v0/notifications/rules', 'get'], ['/api/v0/secrets/search', 'post'],
-            ['/api/v0/nodemanagers/search', 'post'], ['/api/v0/retention/nodes/status', 'get'],
-            ['/apis/iam/v2/users', 'get'], ['/apis/iam/v2/teams', 'get'], ['/apis/iam/v2/tokens', 'get'],
-            ['/apis/iam/v2/policies', 'get'], ['/apis/iam/v2/roles', 'get'], ['/apis/iam/v2/projects', 'get']] ">
-          <div role="menuitem" class="nav-link"><a routerLink="/settings" routerLinkActive="active" tabindex="0">Settings</a></div>
-        </app-authorized>
-      </div>
+      <app-authorized
+        [anyOf]="[['/api/v0/datafeed/destinations', 'post'], ['/api/v0/notifications/rules', 'get'], ['/api/v0/secrets/search', 'post'],
+          ['/api/v0/nodemanagers/search', 'post'], ['/api/v0/retention/nodes/status', 'get'],
+          ['/apis/iam/v2/users', 'get'], ['/apis/iam/v2/teams', 'get'], ['/apis/iam/v2/tokens', 'get'],
+          ['/apis/iam/v2/policies', 'get'], ['/apis/iam/v2/roles', 'get'], ['/apis/iam/v2/projects', 'get']] ">
+        <div role="menuitem" class="nav-link"><a routerLink="/settings" routerLinkActive="active" tabindex="0">Settings</a></div>
+      </app-authorized>
     </div>
     <div class="right-nav" role="menubar">
       <app-projects-filter></app-projects-filter>

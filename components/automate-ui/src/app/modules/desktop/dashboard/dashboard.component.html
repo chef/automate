@@ -1,7 +1,9 @@
 <div class="content-container">
   <div class="bx--grid full-height" [ngClass]="{'insight-visible': insightVisible}">
     <div class="bx--row full-height">
-      <div [ngClass]="{'bx--col-lg-16': !insightVisible, 'bx--col-lg-8 full-height scrollable': insightVisible}">
+      <div 
+        *ngIf="!desktopDetailVisible && !insightFullscreened"
+        [ngClass]="{'bx--col-lg-16': !insightVisible, 'bx--col-lg-8 full-height scrollable': insightVisible}">
         <div class="bx--grid bx--no-gutter">
           <div class="bx--row">
             <div class="bx--col-lg-16">
@@ -12,13 +14,6 @@
           </div>
           <div class="bx--row">
             <div [ngClass]="{'bx--col-lg-8': !insightVisible, 'bx--col-lg-16': insightVisible}">
-              <app-top-errors
-                [topErrorsItems] = "topErrorsItems$ | async"
-                [lastUpdated] = "topErrorsUpdated$ | async"
-                (errorSelected)="onErrorSelected($event)">
-              </app-top-errors>
-            </div>
-            <div [ngClass]="{'bx--col-lg-8': !insightVisible, 'bx--col-lg-16': insightVisible}">
               <app-daily-check-in
                 [unknownPercentage] = "unknownPercentage$ | async"
                 [checkedInPercentage] = "checkedInPercentage$ | async"
@@ -28,8 +23,6 @@
                 [checkedInCount] = "checkedInCount$ | async">
               </app-daily-check-in>
             </div>
-          </div>
-          <div class="bx--row">
             <div [ngClass]="{'bx--col-lg-8': !insightVisible, 'bx--col-lg-16': insightVisible}">
               <app-check-in-time-series
                 [days] = "days$ | async"
@@ -38,51 +31,63 @@
                 (daysAgoChanged)="handleDaysAgoChange($event)">
               </app-check-in-time-series>
             </div>
+          </div>
+          <div class="bx--row">
             <div [ngClass]="{'bx--col-lg-8': !insightVisible, 'bx--col-lg-16': insightVisible}">
               <app-unknown-desktop-duration-counts
                 [countedDurationItems] = "unknownDesktopCountedDurationItems$ | async"
-                [lastUpdated] = "unknownDesktopCountedDurationUpdated$ | async">
+                [lastUpdated] = "unknownDesktopCountedDurationUpdated$ | async"
+                (durationSelected)="onDurationSelected($event)">
               </app-unknown-desktop-duration-counts>
+            </div>
+            <div [ngClass]="{'bx--col-lg-8': !insightVisible, 'bx--col-lg-16': insightVisible}">
+              <app-top-errors
+                [topErrorsItems] = "topErrorsItems$ | async"
+                [lastUpdated] = "topErrorsUpdated$ | async"
+                (errorSelected)="onErrorSelected($event)">
+              </app-top-errors>
             </div>
           </div>
         </div>
       </div>
-      <div class="bx--col-lg-8 full-height scrollable" *ngIf="insightVisible">
+      <div
+        *ngIf="insightVisible && !desktopDetailFullscreened"
+        class="full-height scrollable"
+        [ngClass]="{'bx--col-lg-16': insightFullscreened, 'bx--col-lg-8': !insightFullscreened}">
         <app-insight
           [desktops] = "desktops$ | async"
+          [selectedDesktop]="selectedDesktop"
           [totalDesktops] = "totalDesktopCount$ | async"
           [pageSize] = "pageSize$ | async"
           [currentPage] = "currentPage$ | async"
           [termFilters] = "termFilters$ | async"
+          [fullscreened]="insightFullscreened"
           (pageChange)="onPageChange($event)"
           (termFilterSelected)="onTermFilterSelected($event)"
+          (desktopSelected)="onDesktopSelected($event)"
           (closed)="insightClose()"
+          (fullscreenToggled)="insightFullscreen()"
           (sortChange)="onSortChange($event)">
         </app-insight>
+      </div>
+      <div
+        *ngIf="desktopDetailVisible && !insightFullscreened"
+        class="full-height scrollable"
+        [ngClass]="{'bx--col-lg-16': desktopDetailFullscreened, 'bx--col-lg-8': !desktopDetailFullscreened}">
+        <app-desktop-detail
+          [desktop] = "selectedDesktop"
+          [totalDesktops] = "totalDesktopCount$ | async"
+          [pageSize] = "pageSize$ | async"
+          [currentPage] = "currentPage$ | async"
+          [termFilters] = "termFilters$ | async"
+          [fullscreened]="desktopDetailFullscreened"
+          (pageChange)="onPageChange($event)"
+          (termFilterSelected)="onTermFilterSelected($event)"
+          (closed)="desktopDetailClose()"
+          (fullscreenToggled)="desktopDetailFullscreen()"
+          (sortChange)="onSortChange($event)">
+        </app-desktop-detail>
       </div>
     </div>
   </div>
 </div>
-<!-- <div class="bx--grid" id="grid-overlay">
-  <div class="bx--row">
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-    <div class="bx--col"></div>
-  </div>
-</div> -->

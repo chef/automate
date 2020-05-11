@@ -1,30 +1,129 @@
 <div class="content-container">
-  <button (click)="close()" id="x">X</button>
-  <div class="page-title">Insight</div>
-  <ul>
-    <li *ngFor="let term of termFilters">
-      <button (click)="termFilterClicked(term)" id="filter-item">
+  <div class="header">
+    <div class="heading">
+      <div class="page-title">Error: Chef::ExampleError1: Error 1 occurred</div>
+      <!-- <div class="update-time">Error: Chef::ExampleError1: Error 1 occurred</div> -->
+    </div>
+    <div class="heading-actions">
+      <chef-button secondary (click)="fullscreenToggled.emit()">
+        <chef-icon *ngIf="!fullscreened">fullscreen</chef-icon>
+        <chef-icon *ngIf="fullscreened">fullscreen_exit</chef-icon>
+      </chef-button>
+      <chef-button secondary (click)="close()">
+        <chef-icon>close</chef-icon>
+      </chef-button>
+    </div>
+  </div>
+  <div class="sub-header">
+    <!-- <pre>{{ termFilters | json }}</pre> -->
+    <!-- <li *ngFor="let term of termFilters">
+      <button (click)="termFilterClicked(term)" id="filter-item"> style="--pill-background-color: black; --pill-text-color: white"
         {{term.type}}: {{term.value}}
       </button>
-    </li>
-  </ul>
-  <div>Total: {{totalDesktops}}</div>
-  <table>
-    <thead>
-      <tr >
-        <th (click)="sortOn('name')" class="table-title">DESKTOP NAME</th>
-        <th (click)="sortOn('check-in')" class="table-title">LAST CHECK-IN TIME</th>
-        <th (click)="sortOn('platform')" class="table-title">PLATFORM</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let desktop of desktops">
-        <td>{{ desktop.name }}</td>
-        <td><chef-icon>{{ desktop.status | chefStatusIcon }}</chef-icon> {{ desktop.checkin | timeFromNow }}</td>
-        <td>{{ desktop.platform }}</td>
-      </tr>
-    </tbody>
-  </table>
+    </li> -->
+    <div class="selected-filters">
+      <!-- <chef-button secondary *ngFor="let term of termFilters"> -->
+      <chef-button secondary>
+        <chef-icon>close</chef-icon>
+        <span>{{termFilters[1]?.value}}</span>
+      </chef-button>
+    </div>
+    <chef-button secondary>
+      <span>Attributes</span>
+      <chef-icon>expand_more</chef-icon>
+    </chef-button>
+  </div>
+  <div class="filters">
+    <div class="filter-group">
+      <div class="filter-group-heading">Top 3 Platforms</div>
+      <div class="filter-group-options">
+        <chef-pill>
+          <chef-checkbox>windows <chef-pill>10</chef-pill>
+          </chef-checkbox>
+        </chef-pill>
+        <chef-pill>
+          <chef-checkbox>ubuntu<chef-pill>60</chef-pill>
+          </chef-checkbox>
+        </chef-pill>
+        <chef-pill>
+          <chef-checkbox>linux<chef-pill>30</chef-pill>
+          </chef-checkbox>
+        </chef-pill>
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group-heading">Top 3 Version</div>
+      <div class="filter-group-options">
+        <chef-pill>
+          <chef-checkbox>10.01 <chef-pill>10</chef-pill>
+          </chef-checkbox>
+        </chef-pill>
+        <chef-pill>
+          <chef-checkbox>16.04<chef-pill>60</chef-pill>
+          </chef-checkbox>
+        </chef-pill>
+        <chef-pill>
+          <chef-checkbox>16.02<chef-pill>30</chef-pill>
+          </chef-checkbox>
+        </chef-pill>
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group-heading">Top 3 Domain</div>
+      <div class="filter-group-options">
+        <chef-pill>
+          <chef-checkbox>chef.io <chef-pill>10</chef-pill>
+          </chef-checkbox>
+        </chef-pill>
+        <chef-pill>
+          <chef-checkbox>habitat.sh<chef-pill>60</chef-pill>
+          </chef-checkbox>
+        </chef-pill>
+        <chef-pill>
+          <chef-checkbox>opscode.com<chef-pill>30</chef-pill>
+          </chef-checkbox>
+        </chef-pill>
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group-heading">Last Run</div>
+      <div class="filter-group-options">
+        <chef-pill>
+          <chef-checkbox>Error <chef-pill>10</chef-pill>
+          </chef-checkbox>
+        </chef-pill>
+      </div>
+    </div>
+  </div>
+
+  <h4>Total: {{totalDesktops}}</h4>
+  <chef-table>
+    <chef-thead>
+      <chef-tr>
+        <chef-th (click)="sortOn('name')">Desktop Name</chef-th>
+        <chef-th (click)="sortOn('check-in')">Last Check-in</chef-th>
+        <chef-th (click)="sortOn('platform')">Platform</chef-th>
+        <chef-th (click)="sortOn('platformVersion')">Platform Version</chef-th>
+        <chef-th (click)="sortOn('domain')">Domain</chef-th>
+      </chef-tr>
+    </chef-thead>
+    <chef-tbody>
+      <chef-tr
+        *ngFor="let desktop of desktops"
+        [ngClass]="{'selected': selectedDesktop?.id === desktop.id}"
+        (click)="desktopSelected.emit(desktop)">
+        <chef-td>
+          <chef-icon>desktop_windows</chef-icon> {{ desktop.name }}
+        </chef-td>
+        <chef-td>
+          <chef-icon [ngClass]="desktop.status">{{ desktop.status | chefStatusIcon }}</chef-icon> {{ desktop.checkin | timeFromNow }}
+        </chef-td>
+        <chef-td data-label="Platform">{{ desktop.platform }}</chef-td>
+        <chef-td data-label="Platform Version">10.08</chef-td>
+        <chef-td data-label="Domain">sales</chef-td>
+      </chef-tr>
+    </chef-tbody>
+  </chef-table>
   <app-page-picker
     [total]="totalDesktops"
     [perPage]="pageSize"

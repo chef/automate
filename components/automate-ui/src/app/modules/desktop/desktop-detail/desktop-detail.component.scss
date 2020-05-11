@@ -1,0 +1,434 @@
+@import "~styles/variables";
+
+.page-title {
+  color: var(--chef-primary-dark);
+  margin-top: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 18px;
+}
+
+.update-time {
+  color: var(--chef-primary-dark);
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 10px;
+}
+
+.content-container {
+  font-family: Muli;
+  font-size: 13px;
+  font-weight: 100;
+
+  > .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: -16px -16px 16px -16px;
+    padding: 10px 16px;
+    border-top-left-radius: $global-radius;
+    border-top-right-radius: $global-radius;
+    border-bottom: 1px solid $chef-grey;
+
+    chef-button {
+      margin: 0;
+    }
+  }
+}
+
+h3 {
+  margin-bottom: 1rem;
+}
+
+.detail-info {
+  chef-table {
+    border: 1px solid $chef-grey;
+    border-radius: $global-radius;
+    margin-bottom: 2rem;
+    overflow: hidden;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    chef-tr {
+      margin-bottom: 0;
+
+      chef-th,
+      chef-td,
+      chef-th:first-child,
+      chef-td:first-child,
+      chef-th:last-child,
+      chef-td:last-child  {
+        border: none;
+        border-radius: 0;
+        background: $chef-white;
+      }
+
+      chef-th {
+        font-weight: 400;
+        text-transform: uppercase;
+      }
+
+      &:nth-child(odd) {
+        chef-th,
+        chef-td {
+          background: $chef-lightest-grey;
+        }
+      }
+    }
+  }
+}
+
+.checkin-history {
+  margin-bottom: 2rem;
+
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    chef-button {
+      margin: 0;
+    }
+  }
+}
+
+.debug-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  background: $chef-lightest-grey;
+  overflow: hidden;
+  border-radius: $global-radius;
+  border: 1px solid $chef-grey;
+
+  chef-button {
+    #{--background-color}: $chef-lightest-grey;
+    margin: 0;
+
+    &:hover {
+      #{--background-color}: $chef-light-grey;
+    }
+  }
+
+  .button-toggle {
+    display: flex;
+    align-items: center;
+
+    chef-button {
+      border-radius: 0;
+      border: none;
+      border-right: 1px solid $chef-grey;
+    }
+
+    &:last-child chef-button {
+      border-right: none;
+      border-left: 1px solid $chef-grey;
+    }
+
+    > span {
+      margin: 0 8px;
+    }
+  }
+}
+
+.checkin-history-table.grid {
+  chef-thead {
+    display: none;
+  }
+
+  chef-tbody {
+    display: flex;
+    flex-flow: row wrap;
+  }
+
+  chef-tr {
+    display: flex;
+    flex-flow: column nowrap;
+    margin: 0;
+    width: auto;
+  }
+
+  chef-td {
+    display: flex;
+    justify-content: center;
+    border: none;
+    border-radius: 0;
+    width: auto;
+    overflow: visible;
+    padding: 10px 0;
+
+    > span {
+      display: none;
+    }
+
+    &.date-cell {
+      display: none;
+    }
+
+    &.relative-date-cell {
+      order: 2;
+      position: relative;
+      border-top: 1px solid $chef-grey;
+
+      span {
+        position: absolute;
+        white-space: nowrap;
+        font-size: 12px;
+      }
+    }
+
+    &.status-cell {
+      cursor: pointer;
+
+      > chef-icon {
+        font-size: 26px;
+        padding: 0 2px;
+      }
+    }
+  }
+
+  chef-tr:nth-child(7n + 1) {
+    chef-td {
+      &.relative-date-cell {
+        > span {
+          display: block;
+        }
+
+        &::before {
+          content: '';
+          display: block;
+          width: 1px;
+          height: 10px;
+          background: $chef-grey;
+          position: absolute;
+          top: -10px;
+        }
+      }
+    }
+  }
+
+  chef-tr:first-child {
+    chef-td {
+      &.relative-date-cell {
+        border-top-color: transparent;
+        justify-content: flex-start;
+
+        span {
+          transform: translateX(15px);
+        }
+
+        &::before {
+          transform: translateX(15px);
+        }
+
+        &::after {
+          content: '';
+          display: block;
+          position: absolute;
+          background: $chef-grey;
+          height: 1px;
+          width: 50%;
+          top: -1px;
+          left: 50%;
+        }
+      }
+    }
+  }
+
+  chef-tr:last-child {
+    chef-td {
+      &.relative-date-cell {
+        border-top-color: transparent;
+
+        &::after {
+          content: '';
+          display: block;
+          position: absolute;
+          background: $chef-grey;
+          height: 1px;
+          width: 50%;
+          top: -1px;
+          right: 50%;
+        }
+      }
+    }
+  }
+
+  &.stretch {
+    chef-tbody {
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      position: relative;
+
+      &::before {
+        content: '';
+        display: block;
+        height: 1px;
+        background: $chef-grey;
+        position: absolute;
+        left: 15px;
+        right: 15px;
+        bottom: 20px;
+        z-index: 100;
+
+        @media (max-width: 66rem) {
+          left: 11px;
+          right: 11px;
+        }
+
+        @media (max-width: 47rem) {
+          left: 7px;
+          right: 7px;
+        }
+      }
+    }
+
+    // chef-tr {
+    //   flex-grow: 1;
+    // }
+
+    chef-tr:first-child {
+      chef-td {
+        &.relative-date-cell {
+          span,
+          &::before {
+            @media (max-width: 66rem) {
+              transform: translateX(11px);
+            }
+
+            @media (max-width: 47rem) {
+              transform: translateX(7px);
+            }
+          }
+        }
+      }
+    }
+
+    chef-tr:last-child {
+      chef-td {
+        &.relative-date-cell {
+          justify-content: flex-end;
+
+          span,
+          &::before {
+            transform: translateX(-15px);
+
+            @media (max-width: 66rem) {
+              transform: translateX(-11px);
+            }
+
+            @media (max-width: 47rem) {
+              transform: translateX(-7px);
+            }
+          }
+        }
+      }
+    }
+
+    chef-td.status-cell {
+      > chef-icon {
+        @media (max-width: 66rem) {
+          font-size: 18px;
+        }
+
+        @media (max-width: 47rem) {
+          font-size: 14px;
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  &.outline {
+    chef-tr {
+      outline: 1px dashed pink;
+      outline-offset: -1px;
+    }
+  }
+}
+
+.checkin-history-table.list {
+  .status-cell {
+    flex-basis: 30%;
+
+    > chef-icon {
+      margin-right: 14px;
+    }
+  }
+
+  .relative-date-cell {
+    flex-basis: 20%;
+    color: transparent;
+  }
+
+  .date-cell {
+    flex-basis: 50%;
+  }
+
+  chef-tr:nth-child(7n + 1) {
+    .relative-date-cell {
+      color: inherit;
+    }
+  }
+
+  .checkin-tooltip {
+    display: none;
+  }
+}
+
+.checkin-history-json {
+  border: 1px solid $chef-grey;
+  border-radius: $global-radius;
+  overflow: hidden;
+}
+
+.checkin-tooltip {
+  border-left: 8px solid;
+  border-right: 8px solid transparent;
+  padding-right: calc(1em - 8px);
+
+  &.error {
+    border-left-color: #E61F36;
+  }
+
+  &.converged {
+    border-left-color: #23AE9A;
+  }
+
+  &.unchanged {
+    border-left-color: #23AE9A;
+  }
+
+  &.unknown {
+    border-left-color: $chef-unknown;
+  }
+}
+
+.checkin-tooltip-info,
+.checkin-tooltip-link {
+  font-size: 14px;
+  white-space: nowrap;
+  margin: 0;
+  
+  &:last-child {
+    display: block;
+    margin-top: 1em;
+  }
+
+  chef-icon {
+    color: inherit;
+    margin-left: 0.5em;
+  }
+}
+
+.checkin-tooltip.unknown {
+  .checkin-tooltip-date,
+  .checkin-tooltip-link {
+    display: none;
+  }
+}

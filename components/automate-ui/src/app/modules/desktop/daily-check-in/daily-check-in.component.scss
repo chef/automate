@@ -3,7 +3,6 @@
 .page-title {
   color: var(--chef-primary-dark);
   margin-top: 0;
-  margin-bottom: 12px;
   font-weight: inherit;
   font-style: inherit;
   font-size: 18px;
@@ -24,7 +23,57 @@
   font-weight: 100;
 }
 
-.item {
-  margin: 8px;
-  padding: 3px;
+app-chart-progress-bar {
+  margin: 2em 0 3em 0;
+}
+
+chef-phat-radio {
+  display: flex;
+
+  @media (max-width: 42rem) {
+    flex-direction: column;
+
+    chef-option {
+      margin: 0 0 8px 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  chef-option {
+    flex: 1;
+    display: flex;
+    height: auto;
+    width: auto;
+    box-shadow: none;
+    border: 1px solid $chef-grey;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &::before {
+      display: none;
+    }
+
+    .title {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .total {
+      font-size: 32px;
+      font-weight: bold;
+
+      &::after {
+        content: 'DESKTOP';
+        font-size: 12px;
+        font-weight: normal;
+        padding-left: 4px;
+      }
+    }
+  }
 }
