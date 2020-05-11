@@ -99,7 +99,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   }
 
   // returns a function that when passed our data, will return an svg path as a string
-  get createPath() {
+  get createPath(): d3.Path {
     return d3.line()
       .x(d => this.xScale(d.daysAgo))
       .y(d => this.yScale(d.percentage));
@@ -138,7 +138,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   private renderLine(): void {
     // create the line using path function
-    const line = this.createPath(this.data);
+    const line: d3.Geo.Path = this.createPath(this.data);
 
     const theLine = this.svgSelection.selectAll('.line').data([this.data], d => d.daysAgo);
     theLine.exit().remove();
