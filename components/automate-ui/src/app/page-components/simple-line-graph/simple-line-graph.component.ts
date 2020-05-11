@@ -55,7 +55,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     return [min, max];
   }
 
-  get xScale() {
+  get xScale(): d3.Scale.TimeScale {
     return d3.scaleTime()
       .range(this.rangeX)
       .domain(this.domainX);
@@ -75,7 +75,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     return [min, max];
   }
 
-  get yScale() {
+  get yScale(): d3.Scale.LinearScale {
     return d3.scaleLinear()
       .range(this.rangeY)
       .domain(this.domainY);
@@ -178,7 +178,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     // these numbers are specific to its container
     const localWidth = this.width - this.margin.right - this.margin.left - 34;
     const thisRange = [localWidth, -this.margin.right];
-    const thisScale = d3.scaleLinear()
+    const thisScale: d3.Scale.LinearScale = d3.scaleLinear()
       .domain(this.domainX)
       .range(thisRange);
 
@@ -200,7 +200,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   private renderLabelButtons(): void {
     // these numbers are specific to its container
     const thisRange = [this.width - 48, 53];
-    const thisScale = d3.scaleLinear()
+    const thisScale: d3.Scale.LinearScale = d3.scaleLinear()
       .domain(this.domainX)
       .range(thisRange);
 
@@ -304,12 +304,12 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .remove();
   }
 
-  private handleHover(d3Event): void {
+  private handleHover(d3Event: d3.Event): void {
     const num = this.getHoveredElement(d3Event);
     d3.selectAll(`.elem-${num}`).classed('active', true);
   }
 
-  private handleClick(d3Event): void {
+  private handleClick(d3Event: d3.Event): void {
     const num = this.getHoveredElement(d3Event);
     const isAlreadyLocked = d3.selectAll(`.elem-${num}`).classed('lock');
     if (isAlreadyLocked) {
@@ -322,7 +322,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     }
   }
 
-  private getHoveredElement(d3Event): string {
+  private getHoveredElement(d3Event: d3.Event): string {
     const classes = d3.select(d3Event.target).attr('class');
     const match = classes.match(/elem-([0-9]{1,2})/g)[0];
     const num = match.split('-')[1];
