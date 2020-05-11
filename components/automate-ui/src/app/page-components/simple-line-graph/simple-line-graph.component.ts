@@ -30,7 +30,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   @Input() data: DayPercentage[] = [];
   @Input() width = 900;
   @Input() height = 156; // we want a 116px height on the ticks, this minus margins
-  private locked: number = null;
+  private locked: string = null; // store a reference to the element being activated
   private transitionDuration = 1000; // transition speed
 
   get margin(): MarginObject {
@@ -322,7 +322,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     }
   }
 
-  private getHoveredElement(d3Event): number {
+  private getHoveredElement(d3Event): string {
     const classes = d3.select(d3Event.target).attr('class');
     const match = classes.match(/elem-([0-9]{1,2})/g)[0];
     const num = match.split('-')[1];
