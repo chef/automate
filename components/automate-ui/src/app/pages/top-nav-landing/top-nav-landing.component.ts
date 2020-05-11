@@ -16,8 +16,7 @@ export class TopNavLandingComponent {
         ['/api/v0/eventfeed', 'get', ''],
         ['/api/v0/eventstrings', 'get', ''],
         ['/api/v0/event_type_counts', 'get', ''],
-        ['/api/v0/event_task_counts', 'get', ''],
-        ['/api/v0/cfgmgmt/suggestions', 'get', '']
+        ['/api/v0/event_task_counts', 'get', '']
       ], route: '/dashboards/event-feed'
     },
     {
