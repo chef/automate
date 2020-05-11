@@ -27,7 +27,7 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service ConfigMgmt {
   /*
-  GetNodes
+  List Checked-in Nodes
 
   Returns a list of infra nodes that have checked in to Automate.
   Adding a filter makes a list of all nodes that meet the filter criteria.
@@ -52,7 +52,7 @@ service ConfigMgmt {
   };
 
   /*
-  GetRuns
+  List Run Details
 
   Returns a list of run metadata (id, start and end time, and status) for the provided node ID.
   Supports pagination.
@@ -70,7 +70,7 @@ service ConfigMgmt {
   };
 
   /*
-  GetNodesCounts
+  List Node Status Counts
 
   Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
   Supports filtering.
@@ -92,7 +92,7 @@ service ConfigMgmt {
   };
 
   /*
-  GetRunsCounts
+  List Run Status Totals
 
   Returns totals for failed and successful runs given a `node_id`.
 
@@ -113,10 +113,10 @@ service ConfigMgmt {
   };
 
   /*
-  GetCheckinCountsTimeSeries
+  List Node Checkins
 
   Returns a daily time series of unique node check-ins for the number of days requested.
-  If days ago value is empty, api will return the default 1 day ago results.
+  If `days ago` value is empty, API will return the default 1 day ago results.
 
 	Authorization Action:
 	```
@@ -130,7 +130,7 @@ service ConfigMgmt {
   };
 
   /*
-  GetMissingNodeDurationCounts
+  List Missing Nodes Count 
 
   Returns a count of missing nodes for the provided durations.
 
@@ -151,7 +151,7 @@ service ConfigMgmt {
   };
 
   /*
-  GetNodeRun
+  Show Node Run
 
   Returns the infra run report for the provided node ID and run ID.
 
@@ -167,10 +167,9 @@ service ConfigMgmt {
   };
 
   /*
-  GetSuggestions
+  List Filter Suggestions
 
-  Returns possible filter values given a valid `type` parameter. All values returned until two or more
-  characters are provided for the `text` parameter.
+  Returns possible filter values given a valid `type` parameter. All values returned until two or more characters are provided for the `text` parameter.
   Supports wildcard (* and ?).
 
   Example:
@@ -191,7 +190,7 @@ service ConfigMgmt {
   };
 
   /*
-  GetOrganizations
+  List Organizations
 
   Returns a list of all organizations associated with nodes that have checked in to Automate.
 
@@ -208,7 +207,7 @@ service ConfigMgmt {
   };
 
   /*
-  GetSourceFqdns
+  List Associated Chef Infra Servers
 
   Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.
 
@@ -225,7 +224,7 @@ service ConfigMgmt {
   };
 
   /*
-  GetAttributes
+  Show Attributes
 
   Returns the latest reported attributes for the provided node ID.
 
@@ -250,10 +249,10 @@ service ConfigMgmt {
   };
 
   /*
-  GetPolicyCookbooks
+  List Policy Cookbooks
 
-  Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.
-  Policy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.
+  Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID. 
+  Policy revision IDs are sent with an infra run report and identifies which instance of a policy the node used for this run.
 
 	Authorization Action:
 	```
@@ -267,7 +266,7 @@ service ConfigMgmt {
   };
 
   /*
-  GetErrors
+  List Errors
 
   Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.
 

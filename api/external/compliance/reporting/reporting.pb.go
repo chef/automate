@@ -414,7 +414,7 @@ type Query struct {
 	Order   Query_OrderType `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.compliance.reporting.v1.Query_OrderType" json:"order,omitempty"`
 	// Sort the list of results by a field.
 	Sort string `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
-	// The offset for paginating requests. An offset defines a place in the results in order to fetch the next page of the results.
+	// The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results.
 	Page int32 `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
 	// The number of results on each paginated request page.
 	PerPage              int32    `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
@@ -3155,14 +3155,13 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ReportingServiceClient interface {
 	//
-	//List reports
+	//List Reports
 	//
 	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	//Supports pagination, filtering, and sorting.
 	//Limited to 10k results.
 	//
-	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
-	//latest_report.end_time, latest_report.status, node_name
+	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 	//
 	//Example:
 	//```
@@ -3182,7 +3181,7 @@ type ReportingServiceClient interface {
 	//```
 	ListReports(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Reports, error)
 	//
-	//List report IDs
+	//List Report IDs
 	//
 	//List all IDs for the latest report for each node, with optional filtering.
 	//Supports filtering, but not pagination or sorting.
@@ -3196,7 +3195,7 @@ type ReportingServiceClient interface {
 	//```
 	ListReportIds(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ReportIds, error)
 	//
-	//List controls
+	//List Controls
 	//
 	//Lists controls from the last run, with optional filtering.
 	//Supports filtering, but not pagination or sorting.
@@ -3208,9 +3207,9 @@ type ReportingServiceClient interface {
 	//```
 	ListControlItems(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error)
 	//
-	//Fetch a report
+	//Show Report by ID
 	//
-	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
+	//Show a specific report by ID. Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//
@@ -3220,7 +3219,7 @@ type ReportingServiceClient interface {
 	//```
 	ReadReport(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Report, error)
 	//
-	//List suggestions
+	//List Reporting Suggestions
 	//
 	//Get suggestions for compliance reporting resources based on matching text substrings.
 	//Supports filtering, but not pagination or sorting.
@@ -3264,7 +3263,7 @@ type ReportingServiceClient interface {
 	//```
 	ListSuggestions(ctx context.Context, in *SuggestionRequest, opts ...grpc.CallOption) (*Suggestions, error)
 	//
-	//List profiles
+	//List Profiles
 	//
 	//List all profiles in use, with optional filtering.
 	//Supports pagination, filtering, and sorting.
@@ -3278,9 +3277,9 @@ type ReportingServiceClient interface {
 	Export(ctx context.Context, in *Query, opts ...grpc.CallOption) (ReportingService_ExportClient, error)
 	ExportNode(ctx context.Context, in *Query, opts ...grpc.CallOption) (ReportingService_ExportNodeClient, error)
 	//
-	//Fetch a node
+	//Show Node by ID
 	//
-	//Fetch a specific node by ID.
+	//Show a specific node by ID.
 	//Supports filtering by profile or control.
 	//Does not support pagination or sorting.
 	//
@@ -3290,7 +3289,7 @@ type ReportingServiceClient interface {
 	//```
 	ReadNode(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
 	//
-	//List nodes
+	//List Nodes
 	//
 	//List all nodes, with optional filtering, pagination, and sorting.
 	//Limited to 10k results.
@@ -3493,14 +3492,13 @@ func (c *reportingServiceClient) LicenseUsageNodes(ctx context.Context, in *Time
 // ReportingServiceServer is the server API for ReportingService service.
 type ReportingServiceServer interface {
 	//
-	//List reports
+	//List Reports
 	//
 	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	//Supports pagination, filtering, and sorting.
 	//Limited to 10k results.
 	//
-	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
-	//latest_report.end_time, latest_report.status, node_name
+	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 	//
 	//Example:
 	//```
@@ -3520,7 +3518,7 @@ type ReportingServiceServer interface {
 	//```
 	ListReports(context.Context, *Query) (*Reports, error)
 	//
-	//List report IDs
+	//List Report IDs
 	//
 	//List all IDs for the latest report for each node, with optional filtering.
 	//Supports filtering, but not pagination or sorting.
@@ -3534,7 +3532,7 @@ type ReportingServiceServer interface {
 	//```
 	ListReportIds(context.Context, *Query) (*ReportIds, error)
 	//
-	//List controls
+	//List Controls
 	//
 	//Lists controls from the last run, with optional filtering.
 	//Supports filtering, but not pagination or sorting.
@@ -3546,9 +3544,9 @@ type ReportingServiceServer interface {
 	//```
 	ListControlItems(context.Context, *ControlItemRequest) (*ControlItems, error)
 	//
-	//Fetch a report
+	//Show Report by ID
 	//
-	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
+	//Show a specific report by ID. Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//
@@ -3558,7 +3556,7 @@ type ReportingServiceServer interface {
 	//```
 	ReadReport(context.Context, *Query) (*Report, error)
 	//
-	//List suggestions
+	//List Reporting Suggestions
 	//
 	//Get suggestions for compliance reporting resources based on matching text substrings.
 	//Supports filtering, but not pagination or sorting.
@@ -3602,7 +3600,7 @@ type ReportingServiceServer interface {
 	//```
 	ListSuggestions(context.Context, *SuggestionRequest) (*Suggestions, error)
 	//
-	//List profiles
+	//List Profiles
 	//
 	//List all profiles in use, with optional filtering.
 	//Supports pagination, filtering, and sorting.
@@ -3616,9 +3614,9 @@ type ReportingServiceServer interface {
 	Export(*Query, ReportingService_ExportServer) error
 	ExportNode(*Query, ReportingService_ExportNodeServer) error
 	//
-	//Fetch a node
+	//Show Node by ID
 	//
-	//Fetch a specific node by ID.
+	//Show a specific node by ID.
 	//Supports filtering by profile or control.
 	//Does not support pagination or sorting.
 	//
@@ -3628,7 +3626,7 @@ type ReportingServiceServer interface {
 	//```
 	ReadNode(context.Context, *Id) (*Node, error)
 	//
-	//List nodes
+	//List Nodes
 	//
 	//List all nodes, with optional filtering, pagination, and sorting.
 	//Limited to 10k results.

@@ -8,6 +8,13 @@ import "api/external/common/query/parameters.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
 message Nodes {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["filter"]
+    },
+    // Example from List Checked-in Nodes: cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC&filter=name:mySO*&filter=platform:ubun*
+    example: { value: '{"filter": ["name:mySO*","platform:ubun*"], "pagination": "1", "sorting": "ASC"}' }
+  };
   // Filters to apply to the request for nodes list.
   repeated string filter = 1;
   // Pagination parameters to apply to the returned node list.
@@ -74,13 +81,14 @@ message MissingNodeDurationCounts {
     json_schema: {
       required: ["durations"]
     }
+    // Example from List Missing Nodes Count: cfgmgmt/stats/missing_node_duration_counts?durations=3d&durations=1w&durations=2w&durations=1M&durations=3M
+    example: { value: '{"durations": ["3d","1w","2w","1M","3M"]}' }
   };
   // A valid duration is any number zero or greater with one of these characters 'h', 'd', 'w', or 'M'. 
   // 'h' is hours
   // 'd' is days
   // 'w' is weeks
   // 'M' is months
-  // Examples '12h', '3d', and '1M'.
   // Will contain one or many. 
   repeated string durations = 1;
 }

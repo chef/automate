@@ -125,7 +125,7 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ConfigMgmtClient interface {
 	//
-	//GetNodes
+	//List Checked-in Nodes
 	//
 	//Returns a list of infra nodes that have checked in to Automate.
 	//Adding a filter makes a list of all nodes that meet the filter criteria.
@@ -144,7 +144,7 @@ type ConfigMgmtClient interface {
 	//```
 	GetNodes(ctx context.Context, in *request.Nodes, opts ...grpc.CallOption) (*_struct.ListValue, error)
 	//
-	//GetRuns
+	//List Run Details
 	//
 	//Returns a list of run metadata (id, start and end time, and status) for the provided node ID.
 	//Supports pagination.
@@ -156,7 +156,7 @@ type ConfigMgmtClient interface {
 	//```
 	GetRuns(ctx context.Context, in *request.Runs, opts ...grpc.CallOption) (*_struct.ListValue, error)
 	//
-	//GetNodesCounts
+	//List Node Status Counts
 	//
 	//Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
 	//Supports filtering.
@@ -172,7 +172,7 @@ type ConfigMgmtClient interface {
 	//```
 	GetNodesCounts(ctx context.Context, in *request.NodesCounts, opts ...grpc.CallOption) (*response.NodesCounts, error)
 	//
-	//GetRunsCounts
+	//List Run Status Totals
 	//
 	//Returns totals for failed and successful runs given a `node_id`.
 	//
@@ -187,10 +187,10 @@ type ConfigMgmtClient interface {
 	//```
 	GetRunsCounts(ctx context.Context, in *request.RunsCounts, opts ...grpc.CallOption) (*response.RunsCounts, error)
 	//
-	//GetCheckinCountsTimeSeries
+	//List Node Checkins
 	//
 	//Returns a daily time series of unique node check-ins for the number of days requested.
-	//If days ago value is empty, api will return the default 1 day ago results.
+	//If `days ago` value is empty, API will return the default 1 day ago results.
 	//
 	//Authorization Action:
 	//```
@@ -198,7 +198,7 @@ type ConfigMgmtClient interface {
 	//```
 	GetCheckInCountsTimeSeries(ctx context.Context, in *request.CheckInCountsTimeSeries, opts ...grpc.CallOption) (*response.CheckInCountsTimeSeries, error)
 	//
-	//GetMissingNodeDurationCounts
+	//List Missing Nodes Count
 	//
 	//Returns a count of missing nodes for the provided durations.
 	//
@@ -213,7 +213,7 @@ type ConfigMgmtClient interface {
 	//```
 	GetMissingNodeDurationCounts(ctx context.Context, in *request.MissingNodeDurationCounts, opts ...grpc.CallOption) (*response.MissingNodeDurationCounts, error)
 	//
-	//GetNodeRun
+	//Show Node Run
 	//
 	//Returns the infra run report for the provided node ID and run ID.
 	//
@@ -223,10 +223,9 @@ type ConfigMgmtClient interface {
 	//```
 	GetNodeRun(ctx context.Context, in *request.NodeRun, opts ...grpc.CallOption) (*response.Run, error)
 	//
-	//GetSuggestions
+	//List Filter Suggestions
 	//
-	//Returns possible filter values given a valid `type` parameter. All values returned until two or more
-	//characters are provided for the `text` parameter.
+	//Returns possible filter values given a valid `type` parameter. All values returned until two or more characters are provided for the `text` parameter.
 	//Supports wildcard (* and ?).
 	//
 	//Example:
@@ -240,7 +239,7 @@ type ConfigMgmtClient interface {
 	//```
 	GetSuggestions(ctx context.Context, in *query.Suggestion, opts ...grpc.CallOption) (*_struct.ListValue, error)
 	//
-	//GetOrganizations
+	//List Organizations
 	//
 	//Returns a list of all organizations associated with nodes that have checked in to Automate.
 	//
@@ -250,7 +249,7 @@ type ConfigMgmtClient interface {
 	//```
 	GetOrganizations(ctx context.Context, in *request.Organizations, opts ...grpc.CallOption) (*_struct.ListValue, error)
 	//
-	//GetSourceFqdns
+	//List Associated Chef Infra Servers
 	//
 	//Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.
 	//
@@ -260,7 +259,7 @@ type ConfigMgmtClient interface {
 	//```
 	GetSourceFqdns(ctx context.Context, in *request.SourceFqdns, opts ...grpc.CallOption) (*_struct.ListValue, error)
 	//
-	//GetAttributes
+	//Show Attributes
 	//
 	//Returns the latest reported attributes for the provided node ID.
 	//
@@ -271,10 +270,10 @@ type ConfigMgmtClient interface {
 	GetAttributes(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.NodeAttribute, error)
 	GetVersion(ctx context.Context, in *version.VersionInfoRequest, opts ...grpc.CallOption) (*version.VersionInfo, error)
 	//
-	//GetPolicyCookbooks
+	//List Policy Cookbooks
 	//
 	//Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.
-	//Policy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.
+	//Policy revision IDs are sent with an infra run report and identifies which instance of a policy the node used for this run.
 	//
 	//Authorization Action:
 	//```
@@ -282,7 +281,7 @@ type ConfigMgmtClient interface {
 	//```
 	GetPolicyCookbooks(ctx context.Context, in *request.PolicyRevision, opts ...grpc.CallOption) (*response.PolicyCookbooks, error)
 	//
-	//GetErrors
+	//List Errors
 	//
 	//Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.
 	//
@@ -617,7 +616,7 @@ func (c *configMgmtClient) GetNodeRunsDailyStatusTimeSeries(ctx context.Context,
 // ConfigMgmtServer is the server API for ConfigMgmt service.
 type ConfigMgmtServer interface {
 	//
-	//GetNodes
+	//List Checked-in Nodes
 	//
 	//Returns a list of infra nodes that have checked in to Automate.
 	//Adding a filter makes a list of all nodes that meet the filter criteria.
@@ -636,7 +635,7 @@ type ConfigMgmtServer interface {
 	//```
 	GetNodes(context.Context, *request.Nodes) (*_struct.ListValue, error)
 	//
-	//GetRuns
+	//List Run Details
 	//
 	//Returns a list of run metadata (id, start and end time, and status) for the provided node ID.
 	//Supports pagination.
@@ -648,7 +647,7 @@ type ConfigMgmtServer interface {
 	//```
 	GetRuns(context.Context, *request.Runs) (*_struct.ListValue, error)
 	//
-	//GetNodesCounts
+	//List Node Status Counts
 	//
 	//Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
 	//Supports filtering.
@@ -664,7 +663,7 @@ type ConfigMgmtServer interface {
 	//```
 	GetNodesCounts(context.Context, *request.NodesCounts) (*response.NodesCounts, error)
 	//
-	//GetRunsCounts
+	//List Run Status Totals
 	//
 	//Returns totals for failed and successful runs given a `node_id`.
 	//
@@ -679,10 +678,10 @@ type ConfigMgmtServer interface {
 	//```
 	GetRunsCounts(context.Context, *request.RunsCounts) (*response.RunsCounts, error)
 	//
-	//GetCheckinCountsTimeSeries
+	//List Node Checkins
 	//
 	//Returns a daily time series of unique node check-ins for the number of days requested.
-	//If days ago value is empty, api will return the default 1 day ago results.
+	//If `days ago` value is empty, API will return the default 1 day ago results.
 	//
 	//Authorization Action:
 	//```
@@ -690,7 +689,7 @@ type ConfigMgmtServer interface {
 	//```
 	GetCheckInCountsTimeSeries(context.Context, *request.CheckInCountsTimeSeries) (*response.CheckInCountsTimeSeries, error)
 	//
-	//GetMissingNodeDurationCounts
+	//List Missing Nodes Count
 	//
 	//Returns a count of missing nodes for the provided durations.
 	//
@@ -705,7 +704,7 @@ type ConfigMgmtServer interface {
 	//```
 	GetMissingNodeDurationCounts(context.Context, *request.MissingNodeDurationCounts) (*response.MissingNodeDurationCounts, error)
 	//
-	//GetNodeRun
+	//Show Node Run
 	//
 	//Returns the infra run report for the provided node ID and run ID.
 	//
@@ -715,10 +714,9 @@ type ConfigMgmtServer interface {
 	//```
 	GetNodeRun(context.Context, *request.NodeRun) (*response.Run, error)
 	//
-	//GetSuggestions
+	//List Filter Suggestions
 	//
-	//Returns possible filter values given a valid `type` parameter. All values returned until two or more
-	//characters are provided for the `text` parameter.
+	//Returns possible filter values given a valid `type` parameter. All values returned until two or more characters are provided for the `text` parameter.
 	//Supports wildcard (* and ?).
 	//
 	//Example:
@@ -732,7 +730,7 @@ type ConfigMgmtServer interface {
 	//```
 	GetSuggestions(context.Context, *query.Suggestion) (*_struct.ListValue, error)
 	//
-	//GetOrganizations
+	//List Organizations
 	//
 	//Returns a list of all organizations associated with nodes that have checked in to Automate.
 	//
@@ -742,7 +740,7 @@ type ConfigMgmtServer interface {
 	//```
 	GetOrganizations(context.Context, *request.Organizations) (*_struct.ListValue, error)
 	//
-	//GetSourceFqdns
+	//List Associated Chef Infra Servers
 	//
 	//Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.
 	//
@@ -752,7 +750,7 @@ type ConfigMgmtServer interface {
 	//```
 	GetSourceFqdns(context.Context, *request.SourceFqdns) (*_struct.ListValue, error)
 	//
-	//GetAttributes
+	//Show Attributes
 	//
 	//Returns the latest reported attributes for the provided node ID.
 	//
@@ -763,10 +761,10 @@ type ConfigMgmtServer interface {
 	GetAttributes(context.Context, *request.Node) (*response.NodeAttribute, error)
 	GetVersion(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
 	//
-	//GetPolicyCookbooks
+	//List Policy Cookbooks
 	//
 	//Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.
-	//Policy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.
+	//Policy revision IDs are sent with an infra run report and identifies which instance of a policy the node used for this run.
 	//
 	//Authorization Action:
 	//```
@@ -774,7 +772,7 @@ type ConfigMgmtServer interface {
 	//```
 	GetPolicyCookbooks(context.Context, *request.PolicyRevision) (*response.PolicyCookbooks, error)
 	//
-	//GetErrors
+	//List Errors
 	//
 	//Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.
 	//
