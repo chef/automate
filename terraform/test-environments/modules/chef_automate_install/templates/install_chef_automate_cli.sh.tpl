@@ -125,17 +125,17 @@ configure_retention() {
 }
 
 configure_automate_infra_views() {
-  if chef-automate dev grpcurl infra-proxy-service list | grep "chef.automate.domain.infra_proxy.service.InfraProxy" &> /dev/null; then
+  if chef-automate dev grpcurl automate-gateway list | grep "chef.automate.api.infra_proxy.InfraProxy" &> /dev/null; then
       chef_server_admin_key=$(cat "/hab/chef-server-admin-key.txt")
-      chef-automate dev grpcurl infra-proxy-service -- chef.automate.domain.infra_proxy.service.InfraProxy.CreateServer -d '{
+      chef-automate dev grpcurl automate-gateway -- chef.automate.api.infra_proxy.InfraProxy.CreateServer -d '{
         "id": "auto-deployed-chef-server",
         "name": "auto-deployed-chef-server",
         "fqdn": "localhost",
         "ip_address": "127.0.0.1",
       }'
 
-      chef-automate dev grpcurl infra-proxy-service -- chef.automate.domain.infra_proxy.service.InfraProxy.CreateOrg -d '{
-        "id": "auto-deployed-chef-server",
+      chef-automate dev grpcurl automate-gateway -- chef.automate.api.infra_proxy.InfraProxy.CreateOrg -d '{
+        "id": "auto-deployed-chef-org",
         "name": "${chef_server_org}",
         "admin_user": "${chef_server_admin_name}",
         "admin_key": "${chef_server_admin_key}",
