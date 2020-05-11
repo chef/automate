@@ -46,9 +46,9 @@
               <chef-td>
                 <a [routerLink]="['/infrastructure/chef-servers', server.id]">{{ server.name }}</a>
               </chef-td>
-              <chef-td  >{{ server.fqdn }}</chef-td>
-              <chef-td  >{{ server.ip_address }}</chef-td>
-              <chef-td  >{{ server.orgs_count }}</chef-td>
+              <chef-td>{{ server.fqdn }}</chef-td>
+              <chef-td>{{ server.ip_address }}</chef-td>
+              <chef-td>{{ server.orgs_count }}</chef-td>
               <chef-td class="three-dot-column">
                 <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
                   <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="remove-server">Remove
