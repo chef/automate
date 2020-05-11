@@ -12,7 +12,7 @@ toc = true
 Use the event feed for actionable insights and operational visibility.
 The guitar strings and improved query language help you drill into infrastructure & compliance automation events quickly to isolate errors.
 
-Permission for the `event:*` action is required to interact with the **Event Feed** page. In order to search on this page the `infra:nodes:list` action is also required.
+Users require permission for the `event:*` action to view and interact with *Event Feed*. Filter and search ability in *Event Feed* requires user permission for the `infra:nodes:list` action.
 
 ## Event Guitar Strings
 
@@ -38,7 +38,8 @@ In the event feed, events of the same type by the same user are grouped. The eve
 
 ## Filtering events
 
-To filter the event feed and event timeline by event type, Chef Infra Server, or Chef Organization, use the search bar. The search bar is only shown to folks who also have permission on the `infra:nodes:list` action. Available event type filters are clients, cookbooks, data bags, environments, nodes, policyfiles, profiles, roles, and scan jobs.
+To filter the event feed and event timeline by Event Type, Chef Infra Server, or Chef Organization, use the search bar. The search bar appears to users with permission for the `infra:nodes:list` action. Available event type filters are clients, cookbooks, data bags, environments, nodes, policyfiles, profiles, roles, and scan jobs.
+
 To filter, select Event Type, Chef Infra Server or Chef Organization in the search bar and start typing the name. You cannot filter compliance events -- profiles and scan jobs -- by organization or Chef Infra Server. Compliance events are not visible when either of these filters are applied.
 
 ![Event feed filters by server](/images/docs/event-feed-filters-servers.png)
