@@ -47,6 +47,23 @@ func (a *InfraProxyServer) GetRole(ctx context.Context, r *gwreq.Role) (*gwres.R
 	}, nil
 }
 
+// DeleteRole deletes the role
+func (a *InfraProxyServer) DeleteRole(ctx context.Context, r *gwreq.Role) (*gwres.Role, error) {
+	req := &infra_req.Role{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.DeleteRole(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Role{
+		Name: res.GetName(),
+	}, nil
+}
+
 func fromUpstreamRoles(roles []*infra_res.RoleListItem) []*gwres.RoleListItem {
 	ts := make([]*gwres.RoleListItem, len(roles))
 

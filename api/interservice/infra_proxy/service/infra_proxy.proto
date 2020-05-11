@@ -48,6 +48,7 @@ service InfraProxy {
     
     rpc GetRoles (chef.automate.domain.infra_proxy.request.Roles) returns (chef.automate.domain.infra_proxy.response.Roles) {};
     rpc GetRole (chef.automate.domain.infra_proxy.request.Role) returns (chef.automate.domain.infra_proxy.response.Role) {};
+    rpc DeleteRole (chef.automate.domain.infra_proxy.request.Role) returns (chef.automate.domain.infra_proxy.response.Role) {};
     
     rpc GetClients (chef.automate.domain.infra_proxy.request.Clients) returns (chef.automate.domain.infra_proxy.response.Clients) {};
     rpc GetClient (chef.automate.domain.infra_proxy.request.Client) returns (chef.automate.domain.infra_proxy.response.Client) {};

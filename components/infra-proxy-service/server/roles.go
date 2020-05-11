@@ -119,6 +119,28 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 
 }
 
+// DeleteRole deletes the role
+func (s *Server) DeleteRole(ctx context.Context, req *request.Role) (*response.Role, error) {
+	c, err := s.createClient(ctx, req.OrgId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+	}
+
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "must supply role name")
+	}
+
+	err = c.client.Roles.Delete(req.Name)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &response.Role{
+		Name: req.Name,
+	}, nil
+
+}
+
 // fromAPIToListRoles a response.Roles from a struct of RoleList
 func fromAPIToListRoles(result RoleListResult) []*response.RoleListItem {
 	cl := make([]*response.RoleListItem, result.Total)
