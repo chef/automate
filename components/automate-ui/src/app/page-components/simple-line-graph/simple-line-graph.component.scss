@@ -76,7 +76,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 1s;
+    transition: transform 500ms;
 
     &.active {
       background: #3023AE;
@@ -85,7 +85,7 @@
     }
 
     &.turnt {
-      transition: transform 1s; // keep in sync with label transition duration in ts file
+      transition: transform 500ms; // keep in sync with label transition duration in ts file
       font-size: 8px;
       transform: rotate(-45deg) translate(-10px, 10px);
     }
