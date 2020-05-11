@@ -599,6 +599,17 @@ var ProductMetadataJSON = `
         "automate"
       ],
       "hidden": true
+    },
+    {
+      "name": "desktop",
+      "aliases": null,
+      "type": "product",
+      "services": [],
+      "packages": null,
+      "dependencies": [
+        "automate"
+      ],
+      "hidden": false
     }
   ]
 }
