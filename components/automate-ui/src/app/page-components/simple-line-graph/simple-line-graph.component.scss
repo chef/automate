@@ -30,7 +30,7 @@
 
   .line {
     fill: transparent;
-    stroke: black;
+    stroke: $chef-black;
     stroke-width: 1px;
   }
 
@@ -79,8 +79,8 @@
     transition: transform 500ms;
 
     &.active {
-      background: #3023AE;
-      background: linear-gradient(315deg, #3023AE, #C86DD7);
+      background: $chef-dark-purple;  // fallback background
+      background: $chef-purple-gradient;
       transition: background 500ms, color 500ms;
     }
 
@@ -127,8 +127,8 @@
       left: 0;
       width: 8px;
       height: 100%;
-      background: #3023AE;
-      background: linear-gradient(315deg, #3023AE, #C86DD7);
+      background: $chef-dark-purple;
+      background: $chef-purple-gradient;
       border-bottom-left-radius: $chef-border-radius;
       border-top-left-radius: $chef-border-radius;
     }
@@ -154,13 +154,13 @@
 
   // lock styles
   circle.point.lock {
-    fill: #3023AE;
+    fill: $chef-dark-purple;
     fill: url('#chef-gradient-purple');
   }
 
   .graph-button.lock {
-    background: #3023AE;
-    background: linear-gradient(315deg, #3023AE, #C86DD7);
+    background: $chef-dark-purple;
+    background: $chef-purple-gradient;
 
     .inner {
       color: $chef-white;
@@ -182,10 +182,10 @@
 
   // linear gradient
   #stop1 {
-    stop-color: #C86DD7;
+    stop-color: $chef-light-purple;
   }
 
   #stop2 {
-    stop-color: #3023AE;
+    stop-color: $chef-dark-purple;
   }
 }
