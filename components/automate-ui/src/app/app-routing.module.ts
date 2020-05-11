@@ -55,6 +55,7 @@ import {
 
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
+import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 
 const routes: Routes = [
   {
@@ -63,8 +64,8 @@ const routes: Routes = [
     canActivate: [ChefSessionService],
     children: [{
       path: '',
-      redirectTo: 'dashboards/event-feed',
-      pathMatch: 'full'
+      pathMatch: 'full',
+      component: TopNavLandingComponent
     },
     {
       path: 'settings',
@@ -373,7 +374,7 @@ const routes: Routes = [
   // END Deprecated routes.
   {
     path: '**',
-    redirectTo: 'dashboards/event-feed'
+    redirectTo: ''
   }
 ];
 

@@ -15,7 +15,7 @@ import { allPerms } from 'app/entities/userperms/userperms.selectors';
 // Each input datum is converted to a CheckObj upon arrival.
 // Internally, this allows for more robust handling of the data.
 // (So properties must be in sync with `CheckObj`!)
-export type Check = [string, string, string | string[]];
+export type Check = [string, string] | [string, string, string | string[]];
 
 @Component({
   selector: 'app-authorized',

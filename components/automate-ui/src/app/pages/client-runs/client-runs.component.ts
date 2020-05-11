@@ -164,7 +164,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
   nodeCounts$: Observable<NodeCount>;
 
   // Does the request have the correct permissions
-  permissionDenied$: Observable<boolean>;
+  permissionDenied$: Observable<boolean>; // not currently used
 
   // Is the Error banner visible
   notificationVisible = false;

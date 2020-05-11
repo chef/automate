@@ -20,6 +20,7 @@ Specify the action to restrict user access to the specific action.
 |  Task           | Browser Tab     | IAM Action       | API endpoint  | URL       |
 | --------------- | --------------- | ---------------- | ------------- | --------- |
 | View Events | Dashboards | event:* | /event_feed | https://{{< example_fqdn "automate" >}}/dashboards/event-feed |
+| View and Search Events | Dashboards | [event:*, infra:nodes:list] | /event_feed | https://{{< example_fqdn "automate" >}}/dashboards/event-feed |
 | View Service Group Data | Applications | applications:*  | /applications/service-groups | https://{{< example_fqdn "automate" >}}/applications/service-groups |
 | View Client Runs | Infrastructure | infra:nodes:*   | /cfgmgmt/nodes | https://{{< example_fqdn "automate" >}}/infrastructure/client-runs |
 | View Chef Servers | Infrastructure | infra:infraServers:* | /infra/servers | https://{{< example_fqdn "automate" >}}/infrastructure/chef-servers |
