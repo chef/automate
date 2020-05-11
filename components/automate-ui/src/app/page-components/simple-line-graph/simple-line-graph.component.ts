@@ -31,7 +31,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   @Input() width = 900;
   @Input() height = 156; // we want a 116px height on the ticks, this minus margins
   private locked: string = null; // store a reference to the element being activated
-  private transitionDuration = 1000; // transition speed
+  private transitionDuration = 500; // transition speed
 
   get margin(): MarginObject {
     return { right: 20, left: 20, top: 20, bottom: 20 };
@@ -132,8 +132,8 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     this.renderRings();
     this.renderLabelButtons();
     this.relock();
-    // reset the standard transition speed to 1000 since it could be zero
-    this.transitionDuration = 1000;
+    // reset the standard transition speed to 500 since it could be zero
+    this.transitionDuration = 500;
   }
 
   private renderLine(): void {
