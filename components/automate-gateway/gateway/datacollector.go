@@ -24,6 +24,7 @@ import (
 	ingestProto "github.com/chef/automate/api/external/ingest/request"
 	complianceEvent "github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	inspecEvent "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	"github.com/chef/automate/components/automate-gateway/pkg/limiter"
 )
 
 type dataCollectorMsgType int
@@ -57,6 +58,18 @@ func (s *Server) dataCollectorHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
+
+	ticket, err := s.dataCollectorLimiter.TakeTicket()
+	if err != nil {
+		if errors.Is(err, limiter.ErrLimitExceeded) {
+			s.logger.Error(err.Error())
+			http.Error(w, err.Error(), http.StatusServiceUnavailable)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	defer ticket.Return()
 
 	// Read the body in bytes
 	body, err := ioutil.ReadAll(r.Body)
