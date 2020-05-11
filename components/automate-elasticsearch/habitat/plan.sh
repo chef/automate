@@ -42,6 +42,7 @@ pkg_exposes=(http-port transport-port)
 
 do_download() {
   download_file "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-s3/repository-s3-${pkg_version}.zip" "repository-s3.zip" "3dc05d6c20e683596ddabfcc3f63c9d4e9680da75bff1c904566b5508584a6d6"
+  download_file "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-gcs/repository-gcs-${pkg_version}.zip" "repository-gcs.zip" "73d9addc079609eb262a6e0415e0899f19b3867aeb13734799795e68f7a553e8"
 }
 
 do_build() {
@@ -51,6 +52,7 @@ do_build() {
 do_install() {
   cp -a "$(pkg_path_for ${vendor_origin}/elasticsearch)/es/"* "${pkg_prefix}/es/"
   "${pkg_prefix}/es/bin/elasticsearch-plugin" install -b "file://${HAB_CACHE_SRC_PATH}/repository-s3.zip"
+  "${pkg_prefix}/es/bin/elasticsearch-plugin" install -b "file://${HAB_CACHE_SRC_PATH}/repository-gcs.zip"
 }
 
 do_strip() {

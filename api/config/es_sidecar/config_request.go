@@ -17,6 +17,9 @@ func NewConfigRequest() *ConfigRequest {
 					S3: &ConfigRequest_V1_System_Backups_S3Settings{
 						Es: &ac.Backups_S3_Elasticsearch{},
 					},
+					Gcs: &ConfigRequest_V1_System_Backups_GCSSettings{
+						Es: &ac.Backups_GCS_Elasticsearch{},
+					},
 				},
 				Log: &ConfigRequest_V1_System_Log{},
 			},
@@ -144,6 +147,29 @@ func (c *ConfigRequest) applyExternalConfig(
 		if s := extS3cfg.GetSettings(); s != nil {
 			cfg.S3.Es = s
 		}
+		/*	case "gcs":
+			cfg.Backend = w.String(backend)
+			if cfg.Gcs == nil {
+				cfg.Gcs = &ConfigRequest_V1_System_Backups_GCSSettings{}
+			}
+
+			extGcscfg := override.GetGcs()
+			if b := extGcscfg.GetBucket(); b != nil {
+				cfg.Gcs.Bucket = b
+			}
+
+			if bp := extGcscfg.GetBasePath(); bp != nil {
+				cfg.Gcs.BasePath = bp
+			}
+
+			if c := extGcscfg.GetClient(); c != nil {
+				cfg.Gcs.Client = c
+			}
+
+			if s := extGcscfg.GetSettings(); s != nil {
+				cfg.Gcs.Es = s
+			}
+		*/
 	case "fs":
 		cfg.Backend = w.String(backend)
 		if cfg.Fs == nil {
@@ -205,6 +231,30 @@ func (c *ConfigRequest) applyGlobalBackupConfig(
 		}
 	}
 
+	if globalGcs := global.GetGcs(); globalGcs != nil {
+		// ES is configured to talk to minio which presents ALL buckets as 'S3' buckets so we have to pass the same config as S3
+		cfg.Backend = w.String("s3")
+
+		if cfg.GetS3() == nil {
+			cfg.S3 = &ConfigRequest_V1_System_Backups_S3Settings{}
+		}
+
+		if name := globalGcs.GetBucket().GetName(); name != nil {
+			cfg.S3.Bucket = name
+		}
+
+		if bp := globalGcs.GetBucket().GetBasePath(); bp != nil {
+			cfg.S3.BasePath = bp
+		}
+
+		if es := globalGcs.GetEs(); es != nil {
+			newEs := &ac.Backups_S3_Elasticsearch{}
+			_ = ac.Merge(cfg.S3.GetEs(), es, newEs)
+
+			cfg.S3.Es = newEs
+		}
+	}
+
 	if globalFs := global.GetFilesystem(); globalFs != nil {
 		if p := globalFs.GetPath(); p != nil {
 			cfg.Fs.RootLocation = p
@@ -226,7 +276,7 @@ func (c *ConfigRequest) applyGlobalBackupConfig(
 // old fs backend to the s3 compatible backup-gateway
 func (c *ConfigRequest) migrateToBackupGateway(cfg *ConfigRequest_V1_System_Backups) {
 	// If the backend is configured to use S3 then we need not worry about fallback
-	if cfg.GetBackend().GetValue() == "s3" {
+	if cfg.GetBackend().GetValue() == "s3" || cfg.GetBackend().GetValue() == "Gcs" {
 		return
 	}
 

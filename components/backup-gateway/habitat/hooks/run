@@ -24,9 +24,6 @@ fi
 ln -fs "{{pkg.svc_config_path}}/custom_s3.crt" "{{pkg.svc_var_path}}/config/certs/CAs/custom_s3.crt"
 {{/if}}
 
-{{#if cfg.backup.gcs.credentials}}
-export GOOGLE_APPLICATION_CREDENTIALS="{{../pkg.svc_config_path}}/google_application_credentials.json"
-
 secrets-helper generate backup-gateway.access_key 64 --if-not-exists
 secrets-helper generate backup-gateway.secret_key 64 --if-not-exists
 
@@ -44,34 +41,35 @@ exec minio gateway s3 {{cfg.gateway.backup.s3.bucket.endpoint}} \
   --address "{{sys.ip}}:{{cfg.service.port}}" \
   --quiet
 
-{{else if cfg.gateway.backup.gcs.bucket.name~}}
-exec minio gateway gcs {{cfg.gateway.backup.gcs.bucket.projectid}} \
-  --config-dir "{{pkg.svc_var_path}}/config" \
-  --address "{{sys.ip}}:{{cfg.service.port}}" \
-  --quiet
-
 {{else}}
+  {{#if cfg.gateway.backup.gcs.bucket.projectid}}
+    exec minio gateway gcs {{cfg.gateway.backup.gcs.bucket.projectid}} \
+      --config-dir "{{pkg.svc_var_path}}/config" \
+      --address "{{sys.ip}}:{{cfg.service.port}}" \
+      --quiet
+  {{else}}
 
-# Symlink the "backups" bucket to the backup filesystem path
-ln -sTnf "{{cfg.gateway.backup.filesystem.path}}" "{{pkg.svc_data_path}}/backups"
-if [ -w "{{cfg.gateway.backup.filesystem.path}}" ]; then
-  # Make sure the "backups" bucket and the minioMetaBucket (.minio.sys) are on the
-  # same device so that minio can rename files from minioMetaBucket/tmp to the
-  # to "backups" bucket.
-  mkdir -p "{{cfg.gateway.backup.filesystem.path}}/.tmp"
-  # Clean up the old .minio.sys if it exists
-  [[ ! -L "{{pkg.svc_data_path}}/.minio.sys" ]] && rm -rf "{{pkg.svc_data_path}}/.minio.sys"
-  ln -sTnf "{{cfg.gateway.backup.filesystem.path}}/.tmp" "{{pkg.svc_data_path}}/.minio.sys"
-else
-  # In disaster recovery setups where the backup volumes are mounted read-only, 
-  # we must create the (unused) tmp directory somewhere writeable.
-  echo "Starting minio server with read-only backup volume."
-  mkdir -p "{{pkg.svc_data_path}}/.minio.sys"
-fi
+    # Symlink the "backups" bucket to the backup filesystem path
+    ln -sTnf "{{cfg.gateway.backup.filesystem.path}}" "{{pkg.svc_data_path}}/backups"
+    if [ -w "{{cfg.gateway.backup.filesystem.path}}" ]; then
+      # Make sure the "backups" bucket and the minioMetaBucket (.minio.sys) are on the
+      # same device so that minio can rename files from minioMetaBucket/tmp to the
+      # to "backups" bucket.
+      mkdir -p "{{cfg.gateway.backup.filesystem.path}}/.tmp"
+      # Clean up the old .minio.sys if it exists
+      [[ ! -L "{{pkg.svc_data_path}}/.minio.sys" ]] && rm -rf "{{pkg.svc_data_path}}/.minio.sys"
+      ln -sTnf "{{cfg.gateway.backup.filesystem.path}}/.tmp" "{{pkg.svc_data_path}}/.minio.sys"
+    else
+      # In disaster recovery setups where the backup volumes are mounted read-only, 
+      # we must create the (unused) tmp directory somewhere writeable.
+      echo "Starting minio server with read-only backup volume."
+      mkdir -p "{{pkg.svc_data_path}}/.minio.sys"
+    fi
 
-exec minio server \
-  --config-dir "{{pkg.svc_var_path}}/config" \
-  --address "{{sys.ip}}:{{cfg.service.port}}" \
-  --quiet \
-  "{{pkg.svc_data_path}}"
+    exec minio server \
+      --config-dir "{{pkg.svc_var_path}}/config" \
+      --address "{{sys.ip}}:{{cfg.service.port}}" \
+      --quiet \
+      "{{pkg.svc_data_path}}"
+  {{/if ~}}  
 {{/if ~}}
