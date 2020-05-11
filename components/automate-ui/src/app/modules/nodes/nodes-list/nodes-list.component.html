@@ -52,8 +52,8 @@
           <chef-tbody *ngIf="!nodesList.loading">
             <chef-tr *ngFor="let node of nodesList.items; index as i; trackBy: trackBy;">
               <chef-td (click)="filterFor('name', node.name)"> {{ node.name }}</chef-td>
-              <chef-td (click)="filterFor('platform', node.platform)">{{ node.platform }} {{ node.platform_version }}</chef-td>
-              <chef-td (click)="filterFor('manager', node.manager)">{{ node.manager }}</chef-td>
+              <chef-td (click)="filterFor('platform_name', node.platform)">{{ node.platform }} {{ node.platform_version }}</chef-td>
+              <chef-td (click)="filterFor('manager_type', node.manager)">{{ node.manager }}</chef-td>
               <chef-td (click)="filterFor('last_contact', node.last_contact)">{{ node.last_contact }}</chef-td>
               <chef-td>
                 <chef-icon class="status-icon" [ngClass]="node.scan_data.status"
