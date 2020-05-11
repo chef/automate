@@ -53,7 +53,7 @@ func TestValidate(t *testing.T) {
 			UsernameAttr:       w.String("username"),
 			GroupsAttr:         w.String("groups"),
 			NameIdPolicyFormat: w.String("urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"),
-			AllowedGroups:      &dex.ConfigRequest_V1_ListStringValue{Values: []string{"admins", "ops"}},
+			AllowedGroups:      []string{"admins", "ops"},
 		}
 	}
 
@@ -368,6 +368,23 @@ func TestValidate(t *testing.T) {
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
 			assert.Error(t, cfg.Validate())
 		})
+	})
+
+	t.Run("allowed_groups (saml)", func(t *testing.T) {
+		valid := map[string][]string{
+			"one group":  {"admins"},
+			"two groups": {"admins", "ops"},
+			"no groups":  {}, // should this warn?
+		}
+		for k, v := range valid {
+			t.Run(k, func(t *testing.T) {
+				cfg := dex.DefaultConfigRequest()
+				saml := completeSAML()
+				saml.AllowedGroups = v
+				cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
+				assert.NoError(t, cfg.Validate())
+			})
+		}
 	})
 
 	t.Run("ca_contents", func(t *testing.T) {
