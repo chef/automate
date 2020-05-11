@@ -7,6 +7,13 @@ import {
 } from 'app/entities/desktop/desktop.model';
 
 
+export interface MarginObject {
+  top: number;
+  bottom: number;
+  right: number;
+  left: number;
+}
+
 @Component({
   selector: 'app-simple-line-graph',
   templateUrl: './simple-line-graph.component.html',
@@ -14,9 +21,6 @@ import {
 })
 
 export class SimpleLineGraphComponent implements OnChanges, OnInit {
-
-  // labels too high
-  // disappearing render
 
   constructor(
     private chart: ElementRef
@@ -27,9 +31,9 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   @Input() width = 900;
   @Input() height = 156; // we want a 116px height on the ticks, this minus margins
   private locked: number = null;
-  private t = 1000; // transition speed
+  private transitionDuration = 1000; // transition speed
 
-  get margin() {
+  get margin(): MarginObject {
     return { right: 20, left: 20, top: 20, bottom: 20 };
   }
   ////////   X AXIS ITEMS   ////////
@@ -78,35 +82,47 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   }
 
   //////// SELECTIONS ////////
-  get containerSelection() {
+  get containerSelection(): d3.Selection<HTMLElement> {
     return d3.select('app-simple-line-graph');
   }
 
-  get labelContainerSelection() {
+  get labelContainerSelection(): d3.Selection<HTMLElement> {
     return d3.select('.label-container');
   }
 
-  get svgSelection() {
+  get svgSelection(): d3.Selection<SVGElement> {
     return d3.select(this.svg.nativeElement);
   }
 
-  get axisYSelection() {
+  get axisYSelection(): d3.Selection<SVGElement> {
     return this.svgSelection.select('.y-axis');
   }
 
-  // returns a function that when passed our data, will return an svg path
+  // returns a function that when passed our data, will return an svg path as a string
   get createPath() {
     return d3.line()
       .x(d => this.xScale(d.daysAgo))
       .y(d => this.yScale(d.percentage));
   }
 
-  get viewBox() {
+  get viewBox(): string {
     return `0 0 ${this.width} ${this.height}`;
   }
 
+  ngOnInit(): void {
+    if (this.data && this.data.length > 0) {
+      this.renderChart();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.data && !changes.data.firstChange) {
+      this.renderChart();
+    }
+  }
+
   ////////////////// RENDER FUNCTIONS ////////////////////
-  private renderChart() {
+  private renderChart(): void {
     this.AllUnlockDeactivate();
     this.resizeChart();
     this.renderGrid();
@@ -116,7 +132,8 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     this.renderRings();
     this.renderLabelButtons();
     this.relock();
-    this.t = 1000;  // reset the standard transition speed to 1000 since it could be zero
+    // reset the standard transition speed to 1000 since it could be zero
+    this.transitionDuration = 1000;
   }
 
   private renderLine(): void {
@@ -126,7 +143,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     const theLine = this.svgSelection.selectAll('.line').data([this.data], d => d.daysAgo);
     theLine.exit().remove();
     theLine.enter().append('path').attr('class', 'line').merge(theLine)
-      .transition().duration(this.t)
+      .transition().duration(this.transitionDuration)
       .attr('d', line);
   }
 
@@ -137,7 +154,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     points.enter().append('circle')
       .attr('class', (_d, i) => `point elem-${i}`)
       .merge(points)
-      .transition().duration(this.t)
+      .transition().duration(this.transitionDuration)
       .attr('percent', (d => d.percentage))
       .attr('cx', d => this.xScale(d.daysAgo))
       .attr('cy', d => this.yScale(d.percentage))
@@ -151,7 +168,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     rings.enter().append('circle')
       .attr('class', (_d, i) => `ring elem-${i}`)
       .merge(rings)
-      .transition().duration(this.t)
+      .transition().duration(this.transitionDuration)
       .attr('cx', d => this.xScale(d.daysAgo))
       .attr('cy', d => this.yScale(d.percentage))
       .attr('r', 10);
@@ -197,7 +214,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       })
       .attr('class', (_d, i: number) => `graph-button elem-${i}`)
       .merge(labels)
-      .transition().duration(this.t)
+      .transition().duration(this.transitionDuration)
       .style('left', d => {
         if (this.xData.length > 7) {
           return `${this.xScale(d.daysAgo) - 30}px`;
@@ -243,7 +260,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     }
   }
 
-  private renderGrid() {
+  private renderGrid(): void {
     // create the X axis grid lines
     const xGrid = d3.axisTop()
       .ticks(this.data.length)
@@ -256,7 +273,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     grid.exit().remove();
     grid.enter().append('g').attr('class', 'grid')
       .attr('transform', `translate(0, ${this.height - this.margin.bottom})`)
-      .merge(grid).transition().duration(this.t)
+      .merge(grid).transition().duration(this.transitionDuration)
       .call(xGrid);
 
     // create the Y axis
@@ -266,7 +283,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     y.exit().remove();
     y.enter().append('g').attr('class', 'y-axis')
       .attr('transform', `translate(${this.margin.left}, 0)`)
-      .merge(y).transition().duration(this.t)
+      .merge(y).transition().duration(this.transitionDuration)
       .call(yAxis);
 
     // create the X axis
@@ -278,7 +295,7 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     x.exit().remove();
     x.enter().append('g').attr('class', 'x-axis')
       .attr('transform', `translate(0, ${this.height - this.margin.bottom})`)
-      .merge(x).transition().duration(this.t)
+      .merge(x).transition().duration(this.transitionDuration)
       .call(xAxis);
 
     // remove zero from bottom of chart on X axis
@@ -332,24 +349,12 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
   }
 
   onResize(): void {
-    this.t = 0; // turn off transitions for resize events;
+    this.transitionDuration = 0; // turn off transitions for resize events;
     this.renderChart();
   }
 
   private resizeChart(): void {
     this.width = this.chart.nativeElement.getBoundingClientRect().width;
-  }
-
-  ngOnInit() {
-    if (this.data && this.data.length > 0) {
-      this.renderChart();
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.data && !changes.data.firstChange) {
-      this.renderChart();
-    }
   }
 
 }
