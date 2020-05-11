@@ -49,7 +49,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  onPageChange(event) {
+  onPageChange(event): void {
     this.nodesList.page = event;
     const params = {
       page: this.nodesList.page, per_page: 100,
@@ -58,7 +58,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
     this.store.dispatch(actions.getNodes(params));
   }
 
-  onSortToggled(event) {
+  onSortToggled(event): void {
     let {sort, order} = event.detail;
     if (order === 'none') {
       sort = undefined;
@@ -78,7 +78,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
     this.store.dispatch(actions.getNodes(params));
   }
 
-  filterFor(type, item) {
+  filterFor(type: string, item: string): void {
     this.nodesListFilters.push({key: type, values: [item]});
     const params = {
       page: 1, per_page: 100,
@@ -87,7 +87,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
     this.store.dispatch(actions.getNodes(params));
   }
 
-  displayCurrentFilters() {
+  displayCurrentFilters(): string[] {
     let filters = [];
     this.nodesListFilters.forEach((filter) => {
       filter.values.forEach((val) => {
@@ -104,7 +104,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
     return filters;
   }
 
-  isMatchingFilter(stringFilter) {
+  isMatchingFilter(stringFilter: string): {filter: {key, values}} {
     const arr = stringFilter.split(':');
     for (let i = 0 ; i < this.nodesListFilters.length; i++) {
       if (this.nodesListFilters[i].key === arr[0]) {
@@ -118,7 +118,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
     return undefined;
   }
 
-  negateFilter(filter) {
+  negateFilter(filter: string): void {
     const filterToNegate = this.isMatchingFilter(filter);
     if (filterToNegate !== undefined) {
       this.nodesListFilters = reject(
@@ -133,7 +133,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
     }
   }
 
-  removeFilter(filter) {
+  removeFilter(filter: string): void {
     const filterToRemove = this.isMatchingFilter(filter);
     if (filterToRemove !== undefined) {
       this.nodesListFilters = reject(
@@ -154,7 +154,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
     this.store.dispatch(actions.deleteNode(node));
   }
 
-  statusIcon(status) {
+  statusIcon(status: string): string {
     switch (status) {
       case ('FAILED'): return 'report_problem';
       case ('PASSED'): return 'check_circle';
@@ -164,11 +164,11 @@ export class NodesListComponent implements OnInit, OnDestroy {
     }
   }
 
-  displayLastContact(time) {
+  displayLastContact(time: string) {
     return moment(time, DateTime.REPORT_DATE_TIME);
   }
 
-  displayNodeTags(tags) {
+  displayNodeTags(tags: [{key, value}]): string {
     let stringTags = '';
     if (tags.length > 0) {
       tags.forEach((tag) => {
