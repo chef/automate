@@ -34,7 +34,7 @@ export class DateTime {
   public static readonly EVENT_TABLE_DAY_LABEL: string = 'dddd';
 
   // Format for date labels in event feed table
-  // 24 September
+  // 24 September UTC
   public static readonly EVENT_TABLE_DATE_LABEL: string = 'D MMMM [UTC]';
 
   // Format for navigating to compliance reports with an endtime set
