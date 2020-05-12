@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
-
+import { HttpStatus } from 'app/types/types';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
@@ -21,6 +21,8 @@ import { GetServer, UpdateServer } from 'app/entities/servers/server.actions';
 import { GetOrgs, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
+  createStatus,
+  createError,
   allOrgs,
   getAllStatus as getAllOrgsForServerStatus,
   deleteStatus as deleteOrgStatus
@@ -64,6 +66,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   ) {
 
     this.orgForm = fb.group({
+      id: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
       name: ['', [Validators.required]],
       admin_user: ['', [Validators.required]],
       admin_key: ['', [Validators.required]]
@@ -82,7 +86,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
     this.updateServerForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       fqdn: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       ip_address: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
@@ -123,12 +126,28 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.server = { ...ServerState };
       this.orgs = allOrgsState;
       this.updateServerForm.controls['name'].setValue(this.server.name);
-      this.updateServerForm.controls['description'].setValue(this.server.description);
       this.updateServerForm.controls['fqdn'].setValue(this.server.fqdn);
       this.updateServerForm.controls['ip_address'].setValue(this.server.ip_address);
       this.creatingServerOrg = false;
       this.closeCreateModal();
     });
+
+    combineLatest([
+      this.store.select(createStatus),
+      this.store.select(createError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(() => this.createModalVisible),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictErrorEvent.emit(true);
+          this.creatingServerOrg = false;
+        } else {
+          // Close the modal on any error other than conflict and display in banner.
+          this.closeCreateModal();
+        }
+      });
 
     this.store.select(deleteOrgStatus).pipe(
       filter(status => this.id !== undefined && status === EntityStatus.loadingSuccess),
@@ -173,6 +192,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public createServerOrg(): void {
     this.creatingServerOrg = true;
     const serverOrg = {
+      id: this.orgForm.controls['id'].value,
       server_id: this.id,
       name: this.orgForm.controls['name'].value.trim(),
       admin_user: this.orgForm.controls['admin_user'].value.trim(),
@@ -209,7 +229,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     const updatedServer = {
       id: this.server.id,
       name: this.updateServerForm.controls.name.value.trim(),
-      description: this.updateServerForm.controls.description.value.trim(),
       fqdn: this.updateServerForm.controls.fqdn.value.trim(),
       ip_address: this.updateServerForm.controls.ip_address.value.trim()
     };

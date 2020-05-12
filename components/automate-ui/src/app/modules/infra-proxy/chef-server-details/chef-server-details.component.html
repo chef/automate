@@ -55,17 +55,6 @@
               Name is required.
             </chef-error>
           </chef-form-field>
-          <chef-form-field id="update-description">
-            <label>
-              <span class="label">Description <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="description" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
-                data-cy="update-chefServer-description">
-            </label>
-            <chef-error
-              *ngIf="(updateServerForm.get('description').hasError('required') || updateServerForm.get('description').hasError('pattern')) && updateServerForm.get('description').dirty">
-              Description is required.
-            </chef-error>
-          </chef-form-field>
           <chef-form-field id="update-fqdn">
             <label>
               <span class="label">FQDN <span aria-hidden="true">*</span></span>

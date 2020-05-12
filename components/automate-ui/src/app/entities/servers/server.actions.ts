@@ -64,8 +64,8 @@ export class GetServerFailure implements Action {
 }
 
 export interface CreateServerPayload {
+  id: string;
   name: string;
-  description: string;
   fqdn: string;
   ip_address: string;
 }

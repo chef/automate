@@ -37,7 +37,6 @@
               <chef-th>Name</chef-th>
               <chef-th>FQDN</chef-th>
               <chef-th>IP Address</chef-th>
-              <chef-th>Description</chef-th>
               <chef-th>No Of Orgs</chef-th>
               <chef-th class="three-dot-column"></chef-th>
             </chef-tr>
@@ -49,7 +48,6 @@
               </chef-td>
               <chef-td>{{ server.fqdn }}</chef-td>
               <chef-td>{{ server.ip_address }}</chef-td>
-              <chef-td>{{ server.description }}</chef-td>
               <chef-td>{{ server.orgs_count }}</chef-td>
               <chef-td class="three-dot-column">
                 <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">

@@ -84,7 +84,7 @@ export class OrgEffects {
       mergeMap(({ payload }: CreateOrg) =>
       this.requests.createOrg( payload ).pipe(
         map((resp: OrgSuccessPayload) => new CreateOrgSuccess(resp)),
-        catchError((error: HttpErrorResponse) => observableOf(new GetOrgFailure(error))))));
+        catchError((error: HttpErrorResponse) => observableOf(new CreateOrgFailure(error))))));
 
   @Effect()
   createOrgSuccess$ = this.actions$.pipe(
