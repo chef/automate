@@ -236,7 +236,13 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/config-mgmt-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/config-mgmt-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/data-feed-service",

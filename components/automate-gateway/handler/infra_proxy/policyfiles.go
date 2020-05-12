@@ -29,6 +29,7 @@ func (a *InfraProxyServer) GetPolicyfiles(ctx context.Context, r *gwreq.Policyfi
 func (a *InfraProxyServer) GetPolicyfile(ctx context.Context, r *gwreq.Policyfile) (*gwres.Policyfile, error) {
 	req := &infra_req.Policyfile{
 		OrgId:      r.OrgId,
+		ServerId:   r.ServerId,
 		Name:       r.Name,
 		RevisionId: r.RevisionId,
 	}

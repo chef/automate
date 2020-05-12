@@ -45,11 +45,6 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{id}";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
-  rpc GetServerByName (infra_proxy.request.GetServerByName) returns (infra_proxy.response.GetServer) {
-    option (google.api.http).get = "/api/v0/infra/servers/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{name}";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
-  };
   rpc CreateServer (infra_proxy.request.CreateServer) returns (infra_proxy.response.CreateServer) {
     option (google.api.http).post = "/api/v0/infra/servers";
     option (google.api.http).body = "*";
@@ -76,11 +71,6 @@ service InfraProxy {
   rpc GetOrg (infra_proxy.request.GetOrg) returns (infra_proxy.response.GetOrg) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{id}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{id}";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
-  };
-  rpc GetOrgByName (infra_proxy.request.GetOrgByName) returns (infra_proxy.response.GetOrg) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{name}";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
   rpc CreateOrg (infra_proxy.request.CreateOrg) returns (infra_proxy.response.CreateOrg) {
@@ -132,6 +122,11 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
+  rpc DeleteRole (infra_proxy.request.Role) returns (infra_proxy.response.Role) {
+    option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+  };
 
   rpc GetClients (infra_proxy.request.Clients) returns (infra_proxy.response.Clients) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients";
@@ -145,7 +140,7 @@ service InfraProxy {
   }
 
   rpc GetDataBags (infra_proxy.request.DataBags) returns (infra_proxy.response.DataBags) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
@@ -153,6 +148,11 @@ service InfraProxy {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+  };
+  rpc DeleteDataBag (infra_proxy.request.DataBag) returns (infra_proxy.response.DataBag) {
+    option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
   };
 
   rpc GetEnvironments (infra_proxy.request.Environments) returns (infra_proxy.response.Environments) {

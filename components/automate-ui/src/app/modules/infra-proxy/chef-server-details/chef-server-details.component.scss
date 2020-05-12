@@ -26,6 +26,11 @@ chef-tab-selector {
 
 form {
 
+  chef-form-field {
+    width: 300px;
+    margin-bottom: 15px;
+  }
+
   #update-name {
     width: 240px;
   }
@@ -109,5 +114,12 @@ chef-table {
     cursor: pointer;
     text-decoration: underline;
   }
+}
+
+chef-loading-spinner {
+  display: block;
+  margin: 100px auto;
+  width: 100px;
+  z-index: 199;
 }
 

@@ -14,6 +14,10 @@ message DataBagListItem {
 }
 
 message DataBag {
-    // Stringified json of the data bag item.
-    string data = 1;
+    // Data bag name.
+    string name = 1;
+    // Data bag item ID.
+    string id = 2;
+    // Stringified json of data bag item.
+    string data = 3;
 }

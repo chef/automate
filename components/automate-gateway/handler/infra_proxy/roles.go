@@ -12,7 +12,8 @@ import (
 // GetRoles fetches an array of existing roles
 func (a *InfraProxyServer) GetRoles(ctx context.Context, r *gwreq.Roles) (*gwres.Roles, error) {
 	req := &infra_req.Roles{
-		OrgId: r.OrgId,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
 	}
 	res, err := a.client.GetRoles(ctx, req)
 	if err != nil {
@@ -27,8 +28,9 @@ func (a *InfraProxyServer) GetRoles(ctx context.Context, r *gwreq.Roles) (*gwres
 // GetRole fetches an infra role details
 func (a *InfraProxyServer) GetRole(ctx context.Context, r *gwreq.Role) (*gwres.Role, error) {
 	req := &infra_req.Role{
-		OrgId: r.OrgId,
-		Name:  r.Name,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
 	}
 	res, err := a.client.GetRole(ctx, req)
 	if err != nil {
@@ -44,6 +46,23 @@ func (a *InfraProxyServer) GetRole(ctx context.Context, r *gwreq.Role) (*gwres.R
 		RunList:            res.GetRunList(),
 		ExpandedRunList:    GetUpstreamExpandedRunList(res.GetExpandedRunList()),
 		JsonClass:          res.GetJsonClass(),
+	}, nil
+}
+
+// DeleteRole deletes the role
+func (a *InfraProxyServer) DeleteRole(ctx context.Context, r *gwreq.Role) (*gwres.Role, error) {
+	req := &infra_req.Role{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.DeleteRole(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Role{
+		Name: res.GetName(),
 	}, nil
 }
 

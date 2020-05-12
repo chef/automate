@@ -20,6 +20,13 @@ backend = "elasticsearch"
 elasticsearch-url = "http://127.0.0.1:{{member.cfg.http-port}}"
 {{~/eachAlive}}
 
+[postgres]
+database = "{{cfg.storage.database}}"
+schema_path = "{{pkg.path}}/schema"
+max_open_conns = {{cfg.storage.max_open_conns}}
+max_idle_conns = {{cfg.storage.max_idle_conns}}
+
+
 [tls]
 cert_path = "{{pkg.svc_config_path}}/service.crt"
 key_path = "{{pkg.svc_config_path}}/service.key"

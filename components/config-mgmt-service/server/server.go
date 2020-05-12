@@ -38,6 +38,10 @@ func StartGRPC(c *config.Service) error {
 	grpcServer := connFactory.NewServer(tracing.GlobalServerInterceptor())
 
 	rootServer := grpcserver.NewCfgMgmtServer(c)
+	err = rootServer.ConnectPg()
+	if err != nil {
+		return err
+	}
 	gw.RegisterCfgMgmtServer(grpcServer, rootServer)
 
 	// Register reflection service on gRPC server.

@@ -55,6 +55,7 @@ import {
 
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
+import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 
 const routes: Routes = [
   {
@@ -63,8 +64,8 @@ const routes: Routes = [
     canActivate: [ChefSessionService],
     children: [{
       path: '',
-      redirectTo: 'dashboards/event-feed',
-      pathMatch: 'full'
+      pathMatch: 'full',
+      component: TopNavLandingComponent
     },
     {
       path: 'settings',
@@ -244,15 +245,15 @@ const routes: Routes = [
               component: ChefServerDetailsComponent
             },
             {
-              path: ':id/org/:orgid',
+              path: ':id/organizations/:orgid',
               component: OrgDetailsComponent
             },
             {
-              path: ':id/org/:orgid/roles/:name',
+            path: ':id/organizations/:orgid/roles/:name',
               component: InfraRoleDetailsComponent
             },
             {
-              path: ':id/org/:orgid/cookbooks/:cookbook_name',
+              path: ':id/organizations/:orgid/cookbooks/:cookbook_name',
               component: CookbookDetailsComponent
             }
           ]
@@ -373,7 +374,7 @@ const routes: Routes = [
   // END Deprecated routes.
   {
     path: '**',
-    redirectTo: 'dashboards/event-feed'
+    redirectTo: ''
   }
 ];
 

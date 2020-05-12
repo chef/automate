@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -24,6 +25,7 @@ import (
 
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authz"
+	"github.com/chef/automate/components/automate-gateway/pkg/limiter"
 	"github.com/chef/automate/components/automate-gateway/pkg/nullbackend"
 	"github.com/chef/automate/lib/grpc/debug/debug_api"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -33,11 +35,12 @@ import (
 // Server holds the state of an instance of this service
 type Server struct {
 	Config
-	clientsFactory ClientsFactory
-	connFactory    *secureconn.Factory
-	serviceKeyPair *tls.Certificate
-	rootCerts      *x509.CertPool
-	authorizer     middleware.AuthorizationHandler
+	clientsFactory       ClientsFactory
+	connFactory          *secureconn.Factory
+	serviceKeyPair       *tls.Certificate
+	rootCerts            *x509.CertPool
+	authorizer           middleware.AuthorizationHandler
+	dataCollectorLimiter limiter.Limiter
 
 	httpServer        *http.Server
 	httpMuxConnCancel func()
@@ -131,6 +134,7 @@ func (s *Server) Start() error {
 	s.logger.Info("starting automate-gateway")
 	s.loadConnFactory()
 	s.loadServiceCerts()
+	s.loadDataCollectorLimiter()
 
 	err := s.startNullBackendServer()
 	if err != nil {
@@ -158,6 +162,25 @@ func (s *Server) Start() error {
 	}
 
 	return s.startSignalHandler()
+}
+
+func (s *Server) loadDataCollectorLimiter() {
+	if s.Config.DataCollector.DisableLimiter {
+		s.logger.Info("Disabling data collector limiter")
+		s.dataCollectorLimiter = limiter.NewNoopRequestLimiter()
+	} else {
+		var maxInflightRequests int
+		if s.Config.DataCollector.LimiterMaxRequests <= 0 {
+			maxInflightRequests = runtime.NumCPU() * 60
+			if maxInflightRequests < 200 {
+				maxInflightRequests = 200
+			}
+		} else {
+			maxInflightRequests = s.Config.DataCollector.LimiterMaxRequests
+		}
+		s.logger.Infof("Limiting max data collector inflight requests to %d", maxInflightRequests)
+		s.dataCollectorLimiter = limiter.NewInflightRequestLimiter("collector-requests", maxInflightRequests)
+	}
 }
 
 func (s *Server) loadConnFactory() {

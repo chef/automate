@@ -30,7 +30,7 @@ steps:
   #
   - label: repo health
     command:
-      - hab studio run "source .studiorc && scripts/repo_health.sh"
+      - hab studio run "source .studiorc && scripts/repo_health.sh && run_studio_repo_health_checks"
     timeout_in_minutes: 10
     retry:
       automatic:

@@ -215,7 +215,12 @@
               "start_time": "2018-02-09T10:17:23+01:00",
               "message": "\nexpected: \"root\"\n     got: \"shadow\"\n\n(compared using ==)\n"
             }
-          ]
+          ],
+          "removed_results_counts": {
+            "failed": 150,
+            "skipped": 100,
+            "passed": 50
+          }
         },
         {
           "id": "os-03",

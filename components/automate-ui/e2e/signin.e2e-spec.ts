@@ -29,7 +29,7 @@ describe('Signin Process', () => {
   describe('when the user logs in', () => {
     it('redirects to / when nothing else is passed in state', () => {
       browser.get(validSigninPathWithState());
-      expect(browser.getCurrentUrl()).toMatch(/\/event-feed$/);
+      expect(browser.getCurrentUrl()).toMatch(/http:\/\/localhost:\d+\//);
     });
 
     it('redirects to /settings when passed in state', () => {

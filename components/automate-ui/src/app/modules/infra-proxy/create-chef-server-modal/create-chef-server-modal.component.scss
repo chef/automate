@@ -27,6 +27,19 @@ chef-modal {
       label {
         padding-bottom: 0;
       }
+
+      .detail {
+        color: $chef-primary-dark;
+        font-size: 12px;
+      }
+
+      #id-fields {
+        font-size: 0.75em;
+
+        .key-label {
+          font-weight: bold;
+        }
+      }
     }
 
     #button-bar {

@@ -16,7 +16,7 @@ import (
 // GetCookbooks get cookbooks list
 func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*response.Cookbooks, error) {
 
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
@@ -34,7 +34,7 @@ func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*res
 // GetCookbookVersions get cookbook with all available versions
 func (s *Server) GetCookbookVersions(ctx context.Context, req *request.CookbookVersions) (*response.CookbookVersions, error) {
 
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
@@ -57,7 +57,7 @@ func (s *Server) GetCookbookVersions(ctx context.Context, req *request.CookbookV
 // GetCookbook get cookbook detail
 func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*response.Cookbook, error) {
 
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
@@ -101,7 +101,7 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 // GetCookbookFileContent get the data file content of the cookbook
 func (s *Server) GetCookbookFileContent(ctx context.Context, req *request.CookbookFileContent) (*response.CookbookFileContent, error) {
 	var writer bytes.Buffer
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}

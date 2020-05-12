@@ -30,7 +30,7 @@
     "strictAttributeTypes": true,
     "strictSafeNavigationTypes": true,
     "strictDomLocalRefTypes": false,
-    "strictOutputEventTypes": false,
+    "strictOutputEventTypes": true,
     "strictDomEventTypes": false,
     "strictContextGenerics": true,
     "strictLiteralTypes": true,
