@@ -74,11 +74,10 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     if (!this.active) { // opening
       this.filterValue = '';
       this.filteredResources = this.resourcesInOrder;
+      this.active = true;
     } else { // closing
       this.closeDropdown();
     }
-
-    this.active = !this.active;
   }
 
   resourceChecked(checked: boolean, resource: ResourceChecked): void {
