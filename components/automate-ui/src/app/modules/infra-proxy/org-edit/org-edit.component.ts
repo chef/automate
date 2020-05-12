@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
-import { Observable, Subject, combineLatest } from 'rxjs';
+import { Subject, combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -24,7 +24,6 @@ export class OrgEditComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
 
   public org: Org;
-  public loading$: Observable<boolean>;
   public saveSuccessful = false;
   public saveInProgress = false;
   public isLoading = true;
@@ -55,9 +54,9 @@ export class OrgEditComponent implements OnInit, OnDestroy {
     ]).pipe(
       takeUntil(this.isDestroyed)
     ).subscribe(([getOrgSt, updateSt]) => {
-        this.isLoading =
-          !allLoaded([getOrgSt]) || updateSt === EntityStatus.loading;
-      });
+      this.isLoading =
+        !allLoaded([getOrgSt]) || updateSt === EntityStatus.loading;
+    });
 
     combineLatest([
       this.store.select(getStatus),
