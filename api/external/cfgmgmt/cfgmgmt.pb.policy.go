@@ -177,7 +177,35 @@ func init() {
 		return ""
 	})
 	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/CreateRollout", "ingest:unifiedEvents", "ingest:unifiedEvents:create", "POST", "/beta/cfgmgmt/rollouts/create", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
+		if m, ok := input.(*request.CreateRollout); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "policy_name":
+					return m.PolicyName
+				case "policy_node_group":
+					return m.PolicyNodeGroup
+				case "policy_revision_id":
+					return m.PolicyRevisionId
+				case "policy_domain_url":
+					return m.PolicyDomainUrl
+				case "policy_scm_url":
+					return m.PolicyScmUrl
+				case "policy_scm_web_url":
+					return m.PolicyScmWebUrl
+				case "policy_scm_commit":
+					return m.PolicyScmCommit
+				case "description":
+					return m.Description
+				case "ci_job_url":
+					return m.CiJobUrl
+				case "ci_job_id":
+					return m.CiJobId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
 	})
 	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRollouts", "infra:nodes", "infra:nodes:list", "GET", "/beta/cfgmgmt/rollouts/list", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
@@ -199,7 +227,21 @@ func init() {
 		return ""
 	})
 	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRolloutForChefRun", "infra:nodes", "infra:nodes:list", "GET", "/beta/cfgmgmt/rollouts/find", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
+		if m, ok := input.(*request.RolloutForChefRun); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "policy_name":
+					return m.PolicyName
+				case "policy_group":
+					return m.PolicyGroup
+				case "policy_revision_id":
+					return m.PolicyRevisionId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
 	})
 	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/DeleteRolloutsByAge", "infra:nodes", "infra:nodes:list", "POST", "/beta/cfgmgmt/rollouts/delete_by_age", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource

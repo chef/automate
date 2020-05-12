@@ -413,7 +413,7 @@ service ConfigMgmt {
   ingest:unifiedEvents:create
   ```
   */
-  rpc CreateRollout(cfgmgmt.request.CreateRollout) returns (cfgmgmt.response.CreateRollout) {
+  rpc CreateRollout(cfgmgmt.request.CreateRollout) returns (cfgmgmt.response.Rollout) {
     option (google.api.http) = {
       post: "/beta/cfgmgmt/rollouts/create"
       body: "*"

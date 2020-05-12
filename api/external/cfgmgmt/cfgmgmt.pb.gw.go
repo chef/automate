@@ -687,9 +687,20 @@ func local_request_ConfigMgmt_CreateRollout_0(ctx context.Context, marshaler run
 
 }
 
+var (
+	filter_ConfigMgmt_GetRollouts_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
 func request_ConfigMgmt_GetRollouts_0(ctx context.Context, marshaler runtime.Marshaler, client ConfigMgmtClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.Rollouts
 	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ConfigMgmt_GetRollouts_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	msg, err := client.GetRollouts(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -700,14 +711,29 @@ func local_request_ConfigMgmt_GetRollouts_0(ctx context.Context, marshaler runti
 	var protoReq request.Rollouts
 	var metadata runtime.ServerMetadata
 
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ConfigMgmt_GetRollouts_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
 	msg, err := server.GetRollouts(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
+var (
+	filter_ConfigMgmt_GetRolloutsProgress_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
 func request_ConfigMgmt_GetRolloutsProgress_0(ctx context.Context, marshaler runtime.Marshaler, client ConfigMgmtClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.RolloutsProgress
 	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ConfigMgmt_GetRolloutsProgress_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	msg, err := client.GetRolloutsProgress(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -717,6 +743,10 @@ func request_ConfigMgmt_GetRolloutsProgress_0(ctx context.Context, marshaler run
 func local_request_ConfigMgmt_GetRolloutsProgress_0(ctx context.Context, marshaler runtime.Marshaler, server ConfigMgmtServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.RolloutsProgress
 	var metadata runtime.ServerMetadata
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ConfigMgmt_GetRolloutsProgress_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	msg, err := server.GetRolloutsProgress(ctx, &protoReq)
 	return msg, metadata, err
@@ -777,9 +807,20 @@ func local_request_ConfigMgmt_GetRolloutById_0(ctx context.Context, marshaler ru
 
 }
 
+var (
+	filter_ConfigMgmt_GetRolloutForChefRun_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
 func request_ConfigMgmt_GetRolloutForChefRun_0(ctx context.Context, marshaler runtime.Marshaler, client ConfigMgmtClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.RolloutForChefRun
 	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ConfigMgmt_GetRolloutForChefRun_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	msg, err := client.GetRolloutForChefRun(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -789,6 +830,10 @@ func request_ConfigMgmt_GetRolloutForChefRun_0(ctx context.Context, marshaler ru
 func local_request_ConfigMgmt_GetRolloutForChefRun_0(ctx context.Context, marshaler runtime.Marshaler, server ConfigMgmtServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.RolloutForChefRun
 	var metadata runtime.ServerMetadata
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ConfigMgmt_GetRolloutForChefRun_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	msg, err := server.GetRolloutForChefRun(ctx, &protoReq)
 	return msg, metadata, err

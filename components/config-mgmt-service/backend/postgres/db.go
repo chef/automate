@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 
+	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -15,7 +16,8 @@ import (
 
 type Postgres struct {
 	*config.Postgres
-	db *sql.DB
+	db     *sql.DB
+	mapper *gorp.DbMap
 }
 
 func Open(config *config.Postgres) (*Postgres, error) {
@@ -58,6 +60,8 @@ func (db *Postgres) Connect() error {
 	if db.MaxOpenConns > 0 {
 		dbMap.SetMaxOpenConns(db.MaxOpenConns)
 	}
+
+	db.mapper = &gorp.DbMap{Db: dbMap, Dialect: gorp.PostgresDialect{}}
 
 	return nil
 }

@@ -20,36 +20,233 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type CreateRollout struct {
+type SCMType int32
+
+const (
+	SCMType_UNKNOWN_SCM SCMType = 0
+	SCMType_GIT         SCMType = 1
+)
+
+var SCMType_name = map[int32]string{
+	0: "UNKNOWN_SCM",
+	1: "GIT",
+}
+
+var SCMType_value = map[string]int32{
+	"UNKNOWN_SCM": 0,
+	"GIT":         1,
+}
+
+func (x SCMType) String() string {
+	return proto.EnumName(SCMType_name, int32(x))
+}
+
+func (SCMType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_d3bb6ceeab2493f2, []int{0}
+}
+
+type SCMWebType int32
+
+const (
+	SCMWebType_UNKNOWN_SCM_WEB SCMWebType = 0
+	SCMWebType_GITHUB          SCMWebType = 1
+)
+
+var SCMWebType_name = map[int32]string{
+	0: "UNKNOWN_SCM_WEB",
+	1: "GITHUB",
+}
+
+var SCMWebType_value = map[string]int32{
+	"UNKNOWN_SCM_WEB": 0,
+	"GITHUB":          1,
+}
+
+func (x SCMWebType) String() string {
+	return proto.EnumName(SCMWebType_name, int32(x))
+}
+
+func (SCMWebType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_d3bb6ceeab2493f2, []int{1}
+}
+
+type Rollout struct {
+	// The name of the policy, i.e., the `name` attribute in the Policyfile
+	PolicyName string `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
+	// The group of nodes which are targeted by the rollout. In the Chef Server
+	// case, this is the policy_group to which the user is pushing the policy.
+	PolicyNodeGroup string `protobuf:"bytes,2,opt,name=policy_node_group,json=policyNodeGroup,proto3" json:"policy_node_group,omitempty"`
+	// The revision_id of the compiled policy being rolled out
+	PolicyRevisionId string `protobuf:"bytes,3,opt,name=policy_revision_id,json=policyRevisionId,proto3" json:"policy_revision_id,omitempty"`
+	// In the Chef Server case, the policy domain URL is the Chef Server URL
+	// with the `/organizations/:orgname` portion of the URL path included. In
+	// general, this can be a URL for any content storage/distribution service,
+	// as long as the combination of policy_name and policy_node_group is unique
+	// on that system.
+	//
+	// The set of nodes configured to fetch policy content from the
+	// policy_domain_url and configured with the same policy_name and
+	// policy_node_group form the target set of nodes for a rollout and are
+	// expected to apply the policy revision described by the rollout.
+	PolicyDomainUrl string `protobuf:"bytes,4,opt,name=policy_domain_url,json=policyDomainUrl,proto3" json:"policy_domain_url,omitempty"`
+	// The source control system used with the policyfile
+	ScmType SCMType `protobuf:"varint,5,opt,name=scm_type,json=scmType,proto3,enum=chef.automate.api.cfgmgmt.response.SCMType" json:"scm_type,omitempty"`
+	// The software/service used to host the source code repository
+	ScmWebType SCMWebType `protobuf:"varint,6,opt,name=scm_web_type,json=scmWebType,proto3,enum=chef.automate.api.cfgmgmt.response.SCMWebType" json:"scm_web_type,omitempty"`
+	// The URL used to obtain a copy of the source code repository
+	PolicyScmUrl string `protobuf:"bytes,7,opt,name=policy_scm_url,json=policyScmUrl,proto3" json:"policy_scm_url,omitempty"`
+	// The URL used to view the source code repository via the web
+	PolicyScmWebUrl string `protobuf:"bytes,8,opt,name=policy_scm_web_url,json=policyScmWebUrl,proto3" json:"policy_scm_web_url,omitempty"`
+	// The source control system's identifier for the repository version. This
+	// should be the version where the policy's lockfile was committed.
+	PolicyScmCommit string `protobuf:"bytes,9,opt,name=policy_scm_commit,json=policyScmCommit,proto3" json:"policy_scm_commit,omitempty"`
+	// A free-form description of the rollout, as given by the user.
+	Description string `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
+	// If the rollout was initiated via Ci/CD or similar system, the web URL
+	// for the job that initiated the rollout.
+	CiJobUrl string `protobuf:"bytes,11,opt,name=ci_job_url,json=ciJobUrl,proto3" json:"ci_job_url,omitempty"`
+	// If the rollout was initiated by Ci/CD or similar system, the id of the job
+	// that initiated the rollout. Should include the Ci system's nickname or
+	// other identifying information users would need to associate the job ID to
+	// the Ci/CD system.
+	CiJobId              string   `protobuf:"bytes,12,opt,name=ci_job_id,json=ciJobId,proto3" json:"ci_job_id,omitempty"`
+	Id                   string   `protobuf:"bytes,13,opt,name=id,proto3" json:"id,omitempty"`
+	StartTime            string   `protobuf:"bytes,14,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EndTime              string   `protobuf:"bytes,15,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *CreateRollout) Reset()         { *m = CreateRollout{} }
-func (m *CreateRollout) String() string { return proto.CompactTextString(m) }
-func (*CreateRollout) ProtoMessage()    {}
-func (*CreateRollout) Descriptor() ([]byte, []int) {
+func (m *Rollout) Reset()         { *m = Rollout{} }
+func (m *Rollout) String() string { return proto.CompactTextString(m) }
+func (*Rollout) ProtoMessage()    {}
+func (*Rollout) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d3bb6ceeab2493f2, []int{0}
 }
 
-func (m *CreateRollout) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CreateRollout.Unmarshal(m, b)
+func (m *Rollout) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Rollout.Unmarshal(m, b)
 }
-func (m *CreateRollout) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CreateRollout.Marshal(b, m, deterministic)
+func (m *Rollout) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Rollout.Marshal(b, m, deterministic)
 }
-func (m *CreateRollout) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CreateRollout.Merge(m, src)
+func (m *Rollout) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Rollout.Merge(m, src)
 }
-func (m *CreateRollout) XXX_Size() int {
-	return xxx_messageInfo_CreateRollout.Size(m)
+func (m *Rollout) XXX_Size() int {
+	return xxx_messageInfo_Rollout.Size(m)
 }
-func (m *CreateRollout) XXX_DiscardUnknown() {
-	xxx_messageInfo_CreateRollout.DiscardUnknown(m)
+func (m *Rollout) XXX_DiscardUnknown() {
+	xxx_messageInfo_Rollout.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_CreateRollout proto.InternalMessageInfo
+var xxx_messageInfo_Rollout proto.InternalMessageInfo
+
+func (m *Rollout) GetPolicyName() string {
+	if m != nil {
+		return m.PolicyName
+	}
+	return ""
+}
+
+func (m *Rollout) GetPolicyNodeGroup() string {
+	if m != nil {
+		return m.PolicyNodeGroup
+	}
+	return ""
+}
+
+func (m *Rollout) GetPolicyRevisionId() string {
+	if m != nil {
+		return m.PolicyRevisionId
+	}
+	return ""
+}
+
+func (m *Rollout) GetPolicyDomainUrl() string {
+	if m != nil {
+		return m.PolicyDomainUrl
+	}
+	return ""
+}
+
+func (m *Rollout) GetScmType() SCMType {
+	if m != nil {
+		return m.ScmType
+	}
+	return SCMType_UNKNOWN_SCM
+}
+
+func (m *Rollout) GetScmWebType() SCMWebType {
+	if m != nil {
+		return m.ScmWebType
+	}
+	return SCMWebType_UNKNOWN_SCM_WEB
+}
+
+func (m *Rollout) GetPolicyScmUrl() string {
+	if m != nil {
+		return m.PolicyScmUrl
+	}
+	return ""
+}
+
+func (m *Rollout) GetPolicyScmWebUrl() string {
+	if m != nil {
+		return m.PolicyScmWebUrl
+	}
+	return ""
+}
+
+func (m *Rollout) GetPolicyScmCommit() string {
+	if m != nil {
+		return m.PolicyScmCommit
+	}
+	return ""
+}
+
+func (m *Rollout) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *Rollout) GetCiJobUrl() string {
+	if m != nil {
+		return m.CiJobUrl
+	}
+	return ""
+}
+
+func (m *Rollout) GetCiJobId() string {
+	if m != nil {
+		return m.CiJobId
+	}
+	return ""
+}
+
+func (m *Rollout) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *Rollout) GetStartTime() string {
+	if m != nil {
+		return m.StartTime
+	}
+	return ""
+}
+
+func (m *Rollout) GetEndTime() string {
+	if m != nil {
+		return m.EndTime
+	}
+	return ""
+}
 
 type Rollouts struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -113,37 +310,6 @@ func (m *RolloutsProgress) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RolloutsProgress proto.InternalMessageInfo
 
-type Rollout struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Rollout) Reset()         { *m = Rollout{} }
-func (m *Rollout) String() string { return proto.CompactTextString(m) }
-func (*Rollout) ProtoMessage()    {}
-func (*Rollout) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d3bb6ceeab2493f2, []int{3}
-}
-
-func (m *Rollout) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Rollout.Unmarshal(m, b)
-}
-func (m *Rollout) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Rollout.Marshal(b, m, deterministic)
-}
-func (m *Rollout) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Rollout.Merge(m, src)
-}
-func (m *Rollout) XXX_Size() int {
-	return xxx_messageInfo_Rollout.Size(m)
-}
-func (m *Rollout) XXX_DiscardUnknown() {
-	xxx_messageInfo_Rollout.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Rollout proto.InternalMessageInfo
-
 type DeleteRolloutsByAge struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -154,7 +320,7 @@ func (m *DeleteRolloutsByAge) Reset()         { *m = DeleteRolloutsByAge{} }
 func (m *DeleteRolloutsByAge) String() string { return proto.CompactTextString(m) }
 func (*DeleteRolloutsByAge) ProtoMessage()    {}
 func (*DeleteRolloutsByAge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d3bb6ceeab2493f2, []int{4}
+	return fileDescriptor_d3bb6ceeab2493f2, []int{3}
 }
 
 func (m *DeleteRolloutsByAge) XXX_Unmarshal(b []byte) error {
@@ -185,7 +351,7 @@ func (m *ArchiveRollouts) Reset()         { *m = ArchiveRollouts{} }
 func (m *ArchiveRollouts) String() string { return proto.CompactTextString(m) }
 func (*ArchiveRollouts) ProtoMessage()    {}
 func (*ArchiveRollouts) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d3bb6ceeab2493f2, []int{5}
+	return fileDescriptor_d3bb6ceeab2493f2, []int{4}
 }
 
 func (m *ArchiveRollouts) XXX_Unmarshal(b []byte) error {
@@ -207,10 +373,11 @@ func (m *ArchiveRollouts) XXX_DiscardUnknown() {
 var xxx_messageInfo_ArchiveRollouts proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*CreateRollout)(nil), "chef.automate.api.cfgmgmt.response.CreateRollout")
+	proto.RegisterEnum("chef.automate.api.cfgmgmt.response.SCMType", SCMType_name, SCMType_value)
+	proto.RegisterEnum("chef.automate.api.cfgmgmt.response.SCMWebType", SCMWebType_name, SCMWebType_value)
+	proto.RegisterType((*Rollout)(nil), "chef.automate.api.cfgmgmt.response.Rollout")
 	proto.RegisterType((*Rollouts)(nil), "chef.automate.api.cfgmgmt.response.Rollouts")
 	proto.RegisterType((*RolloutsProgress)(nil), "chef.automate.api.cfgmgmt.response.RolloutsProgress")
-	proto.RegisterType((*Rollout)(nil), "chef.automate.api.cfgmgmt.response.Rollout")
 	proto.RegisterType((*DeleteRolloutsByAge)(nil), "chef.automate.api.cfgmgmt.response.DeleteRolloutsByAge")
 	proto.RegisterType((*ArchiveRollouts)(nil), "chef.automate.api.cfgmgmt.response.ArchiveRollouts")
 }
@@ -220,17 +387,38 @@ func init() {
 }
 
 var fileDescriptor_d3bb6ceeab2493f2 = []byte{
-	// 185 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0xcf, 0xbf, 0x6a, 0xc3, 0x30,
-	0x10, 0x06, 0xf0, 0xad, 0x7f, 0x0e, 0x8a, 0x5b, 0x97, 0xbe, 0x80, 0xe6, 0x22, 0x0d, 0x85, 0xd2,
-	0xd5, 0x4d, 0x1e, 0x20, 0x64, 0xcc, 0x26, 0x8b, 0xb3, 0x2c, 0x90, 0x7c, 0xe2, 0x74, 0x0e, 0xc9,
-	0xdb, 0x87, 0x24, 0x56, 0xb2, 0x65, 0xfb, 0x38, 0xee, 0x07, 0xdf, 0x07, 0xdf, 0x36, 0x07, 0x83,
-	0x07, 0x41, 0x9e, 0x6c, 0x34, 0x6e, 0xf0, 0xc9, 0x27, 0x31, 0x8c, 0x25, 0xd3, 0x54, 0xd0, 0x30,
-	0xc5, 0x48, 0xb3, 0x14, 0x9d, 0x99, 0x84, 0x5a, 0xe5, 0x46, 0x1c, 0xb4, 0x9d, 0x85, 0x92, 0x15,
-	0xd4, 0x36, 0x07, 0xbd, 0x10, 0x5d, 0x89, 0x6a, 0xe0, 0x6d, 0xc5, 0x68, 0x05, 0xb7, 0x57, 0xab,
-	0x00, 0x5e, 0x96, 0x58, 0x54, 0x0b, 0xef, 0x35, 0x6f, 0x98, 0x3c, 0x63, 0x29, 0xea, 0x15, 0x9e,
-	0xeb, 0xeb, 0x17, 0x7c, 0xae, 0x31, 0xe2, 0xcd, 0x96, 0xff, 0x63, 0xe7, 0x51, 0x7d, 0x40, 0xd3,
-	0xb1, 0x1b, 0xc3, 0xfe, 0x7e, 0xff, 0xdb, 0xfd, 0xfa, 0x20, 0xe3, 0xdc, 0x6b, 0x47, 0xc9, 0x9c,
-	0x6b, 0x99, 0x5a, 0xcb, 0x3c, 0x9c, 0xd4, 0x3f, 0x5d, 0xa6, 0xfc, 0x9c, 0x02, 0x00, 0x00, 0xff,
-	0xff, 0x2a, 0x28, 0x27, 0xc9, 0xfa, 0x00, 0x00, 0x00,
+	// 528 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x93, 0x5f, 0x6f, 0xd3, 0x3c,
+	0x14, 0xc6, 0xd7, 0x6d, 0xef, 0xd2, 0x9e, 0xee, 0x6d, 0x33, 0x4f, 0x48, 0x01, 0x81, 0xa8, 0x02,
+	0x17, 0x53, 0x37, 0x12, 0x09, 0x24, 0xc4, 0xed, 0xda, 0x41, 0x29, 0x68, 0x65, 0xea, 0x1f, 0x55,
+	0xe2, 0x26, 0x4a, 0xed, 0xb3, 0xd4, 0x28, 0x8e, 0x23, 0xdb, 0x1d, 0xf4, 0x53, 0xf3, 0x15, 0x50,
+	0x9c, 0x64, 0xab, 0xb8, 0x00, 0xee, 0xac, 0xe7, 0xf9, 0x9d, 0xe7, 0xe4, 0xc4, 0xc7, 0x70, 0x11,
+	0xe7, 0x3c, 0xc4, 0x1f, 0x06, 0x55, 0x16, 0xa7, 0x21, 0xbd, 0x4d, 0x44, 0x22, 0x4c, 0xa8, 0x50,
+	0xe7, 0x32, 0xd3, 0x18, 0x2a, 0x99, 0xa6, 0x72, 0x63, 0x74, 0x90, 0x2b, 0x69, 0x24, 0xf1, 0xe9,
+	0x1a, 0x6f, 0x83, 0x78, 0x63, 0xa4, 0x88, 0x0d, 0x06, 0x71, 0xce, 0x83, 0xaa, 0x24, 0xa8, 0x4b,
+	0xfc, 0x9f, 0x87, 0xe0, 0x4c, 0xcb, 0x32, 0xf2, 0x1c, 0xda, 0xb9, 0x4c, 0x39, 0xdd, 0x46, 0x59,
+	0x2c, 0xd0, 0x6b, 0xf4, 0x1a, 0x67, 0xad, 0x29, 0x94, 0xd2, 0x24, 0x16, 0x48, 0xfa, 0x70, 0x52,
+	0x03, 0x92, 0x61, 0x94, 0x28, 0xb9, 0xc9, 0xbd, 0x7d, 0x8b, 0x75, 0x2b, 0x4c, 0x32, 0x1c, 0x15,
+	0x32, 0xb9, 0x00, 0x52, 0xb1, 0x0a, 0xef, 0xb8, 0xe6, 0x32, 0x8b, 0x38, 0xf3, 0x0e, 0x2c, 0xec,
+	0x96, 0xce, 0xb4, 0x32, 0xc6, 0x6c, 0x27, 0x99, 0x49, 0x11, 0xf3, 0x2c, 0xda, 0xa8, 0xd4, 0x3b,
+	0xdc, 0x4d, 0xbe, 0xb2, 0xfa, 0x42, 0xa5, 0xe4, 0x03, 0x34, 0x35, 0x15, 0x91, 0xd9, 0xe6, 0xe8,
+	0xfd, 0xd7, 0x6b, 0x9c, 0x75, 0x5e, 0x9f, 0x07, 0x7f, 0x9f, 0x34, 0x98, 0x0d, 0xaf, 0xe7, 0xdb,
+	0x1c, 0xa7, 0x8e, 0xa6, 0xa2, 0x38, 0x90, 0x1b, 0x38, 0x2e, 0x72, 0xbe, 0xe3, 0xaa, 0xcc, 0x3a,
+	0xb2, 0x59, 0xc1, 0x3f, 0x66, 0x2d, 0x71, 0x65, 0xe3, 0x40, 0x53, 0x51, 0x9d, 0xc9, 0x4b, 0xe8,
+	0x54, 0x53, 0x14, 0xc1, 0xc5, 0x08, 0x8e, 0x1d, 0xe1, 0xb8, 0x54, 0x67, 0x54, 0x14, 0xdf, 0x7f,
+	0x7e, 0xff, 0x67, 0xea, 0xf6, 0x05, 0xd9, 0xdc, 0x1d, 0x76, 0x66, 0x33, 0x0b, 0xf8, 0xe1, 0xc7,
+	0x14, 0x30, 0x95, 0x42, 0x70, 0xe3, 0xb5, 0x7e, 0x63, 0x87, 0x56, 0x26, 0x3d, 0x68, 0x33, 0xd4,
+	0x54, 0xf1, 0xdc, 0x70, 0x99, 0x79, 0x60, 0xa9, 0x5d, 0x89, 0x3c, 0x05, 0xa0, 0x3c, 0xfa, 0x26,
+	0xcb, 0x96, 0x6d, 0x0b, 0x34, 0x29, 0xff, 0x24, 0x6d, 0xaf, 0x27, 0xd0, 0xaa, 0x5c, 0xce, 0xbc,
+	0x63, 0x6b, 0x3a, 0xd6, 0x1c, 0x33, 0xd2, 0x81, 0x7d, 0xce, 0xbc, 0xff, 0xad, 0xb8, 0xcf, 0x19,
+	0x79, 0x06, 0xa0, 0x4d, 0xac, 0x4c, 0x64, 0xb8, 0x40, 0xaf, 0x63, 0xf5, 0x96, 0x55, 0xe6, 0x5c,
+	0x20, 0x79, 0x0c, 0x4d, 0xcc, 0x58, 0x69, 0x76, 0xcb, 0x24, 0xcc, 0x58, 0x61, 0xf9, 0x00, 0xcd,
+	0x6a, 0xe1, 0xb4, 0x4f, 0xc0, 0xad, 0xcf, 0x37, 0x4a, 0x26, 0x0a, 0xb5, 0xf6, 0x1f, 0xc1, 0xe9,
+	0x15, 0xa6, 0x68, 0xb0, 0x76, 0x06, 0xdb, 0xcb, 0x04, 0xfd, 0x13, 0xe8, 0x5e, 0x2a, 0xba, 0xe6,
+	0x77, 0xf7, 0x7a, 0xff, 0x05, 0x38, 0xd5, 0xa5, 0x92, 0x2e, 0xb4, 0x17, 0x93, 0xcf, 0x93, 0x2f,
+	0xcb, 0x49, 0x34, 0x1b, 0x5e, 0xbb, 0x7b, 0xc4, 0x81, 0x83, 0xd1, 0x78, 0xee, 0x36, 0xfa, 0xaf,
+	0x00, 0x1e, 0x6e, 0x8b, 0x9c, 0x42, 0x77, 0x87, 0x8b, 0x96, 0xef, 0x07, 0xee, 0x1e, 0x01, 0x38,
+	0x1a, 0x8d, 0xe7, 0x1f, 0x17, 0x03, 0xb7, 0x31, 0x78, 0xf7, 0xf5, 0x6d, 0xc2, 0xcd, 0x7a, 0xb3,
+	0x0a, 0xa8, 0x14, 0x61, 0xb1, 0x0a, 0x61, 0xbd, 0x0a, 0xe1, 0x1f, 0x1f, 0xdf, 0xea, 0xc8, 0x3e,
+	0xba, 0x37, 0xbf, 0x02, 0x00, 0x00, 0xff, 0xff, 0x47, 0xeb, 0x2b, 0x4c, 0xa4, 0x03, 0x00, 0x00,
 }
