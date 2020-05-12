@@ -26,9 +26,8 @@ export class NodesRequests {
   public listNodes(payload: actions.SearchNodesPayload):
   Observable<any> {
     const url = `${environment.nodes_url}/search`;
-    const { page, per_page } = payload;
-    const filters = [];
-    const body = { filters, page, per_page };
+    const { page, per_page, order, sort, filters } = payload;
+    const body = { filters, page, per_page, order, sort };
     return this.http.post(url, body);
   }
 }
