@@ -3,9 +3,6 @@ package server
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 
@@ -60,6 +57,17 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "server",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
 	server, err := s.service.Storage.GetServer(ctx, req.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
@@ -75,9 +83,15 @@ func (s *Server) DeleteServer(ctx context.Context, req *request.DeleteServer) (*
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if req.Id == "" {
-		s.service.Logger.Debug("incomplete create server request: missing server ID")
-		return nil, status.Error(codes.InvalidArgument, "must supply server ID")
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "server",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
 	}
 
 	server, err := s.service.Storage.DeleteServer(ctx, req.Id)
@@ -95,21 +109,15 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if req.Id == "" {
-		s.service.Logger.Debug("incomplete update server request: missing server ID")
-		return nil, status.Error(codes.InvalidArgument, "must supply server ID")
-	}
-	if req.Name == "" {
-		s.service.Logger.Debug("incomplete update server request: missing server name")
-		return nil, status.Error(codes.InvalidArgument, "must supply server name")
-	}
-	if req.Fqdn == "" {
-		s.service.Logger.Debug("incomplete update server request: missing server fqdn")
-		return nil, status.Error(codes.InvalidArgument, "must supply server fqdn")
-	}
-	if req.IpAddress == "" {
-		s.service.Logger.Debug("incomplete update server request: missing server IP address")
-		return nil, status.Error(codes.InvalidArgument, "must supply server IP address")
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "server",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
 	}
 
 	server, err := s.service.Storage.EditServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
