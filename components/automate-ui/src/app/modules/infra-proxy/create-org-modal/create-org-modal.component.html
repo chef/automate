@@ -69,12 +69,14 @@
           </chef-error>
         </chef-form-field>
       </div>
-      <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-org-modal-btn" (click)="createServerOrg()">
-        <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-        <span *ngIf="!creating">Add Org</span>
-        <span *ngIf="creating">Adding Org...</span>
-      </chef-button>
-      <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
+      <div id="button-org">
+        <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-org-modal-btn" (click)="createServerOrg()">
+          <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
+          <span *ngIf="!creating">Add Org</span>
+          <span *ngIf="creating">Adding Org...</span>
+        </chef-button>
+        <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
+      </div>
     </form>
   </div>
 </chef-modal>
