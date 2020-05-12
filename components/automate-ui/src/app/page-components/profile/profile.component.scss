@@ -1,7 +1,14 @@
 @import "~styles/variables";
 @import "~styles/mixins";
+@import "@carbon/layout/scss/layout";
 
 $dropdown-width: 196px;
+
+:host {
+  display: block;
+  margin-left: 6px;
+  margin-right: -4px;
+}
 
 button {
   -webkit-appearance: none;
@@ -38,16 +45,19 @@ a, button:not(.dropdown-toggle) {
 }
 
 .dropdown-toggle {
-  margin-left: 35px;
+  display: flex;
+  align-items: center;
   padding: 10px 0;
 }
 
 .dropdown-toggle-user-icon {
   position: relative;
-  top: 6px;
-  margin-right: -5px;
   font-size: 30px;
   line-height: 10px;
+
+  @include carbon--breakpoint-down(lg) {
+    font-size: 20px;
+  }
 }
 
 .dropdown {
@@ -55,7 +65,7 @@ a, button:not(.dropdown-toggle) {
   right: 16px;
   width: $dropdown-width;
   border: 1px solid $chef-grey;
-  z-index: 1;
+  z-index: 191;
 
   &::before {
     display: block;

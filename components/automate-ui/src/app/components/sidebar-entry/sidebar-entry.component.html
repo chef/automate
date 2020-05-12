@@ -12,7 +12,7 @@
 <ng-template #sidebarEntryTemplate>
   <chef-icon class="sidebar-icon" *ngIf="icon"
     [style.transform]="'rotate(' + (iconRotation ? iconRotation : 0) + 'deg)'">{{icon}}</chef-icon>
-  <ng-content></ng-content>
+  <span class="text"><ng-content></ng-content></span>
   <chef-icon *ngIf="!openInNewPage" class="arrow">play_arrow</chef-icon>
   <chef-icon *ngIf="openInNewPage" class="open-in-new sidebar-icon">launch</chef-icon>
 </ng-template>
