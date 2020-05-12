@@ -74,6 +74,7 @@
         <span *ngIf="!creating">Add Org</span>
         <span *ngIf="creating">Adding Org...</span>
       </chef-button>
+      <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
     </form>
   </div>
 </chef-modal>
