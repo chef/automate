@@ -6,7 +6,6 @@ import {
   DayPercentage
 } from 'app/entities/desktop/desktop.model';
 
-
 export interface MarginObject {
   top: number;
   bottom: number;
@@ -19,7 +18,6 @@ export interface MarginObject {
   templateUrl: './simple-line-graph.component.html',
   styleUrls: ['./simple-line-graph.component.scss']
 })
-
 export class SimpleLineGraphComponent implements OnChanges, OnInit {
 
   constructor(
@@ -60,7 +58,6 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .range(this.rangeX)
       .domain(this.domainX);
   }
-
 
   ////////   Y AXIS ITEMS   ////////
   get rangeY(): [number, number] {
