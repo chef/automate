@@ -81,6 +81,8 @@ type InspecAgent struct {
 	AutomateFQDN        string
 	TmpDir              string
 	RemoteInspecVersion string
+	ResultMessageLimit  int
+	ControlResultsLimit int
 }
 
 // Postgres specific options
