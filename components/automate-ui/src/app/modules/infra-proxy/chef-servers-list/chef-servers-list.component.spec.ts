@@ -22,6 +22,10 @@ describe('ChefServersListComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({
+          selector: 'app-authorized',
+          inputs: ['allOf']
+        }),
+        MockComponent({
           selector: 'app-create-chef-server-modal',
           inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
           outputs: ['close', 'createClicked']

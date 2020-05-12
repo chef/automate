@@ -39,7 +39,7 @@ export class OrgEditComponent implements OnInit, OnDestroy {
       this.updateOrgForm = this.fb.group({
         name: new FormControl({value: ''}, [Validators.required]),
         admin_user: new FormControl({value: ''}, [Validators.required]),
-        admin_key: new FormControl({value: ''}, [Validators.required])
+        admin_key: new FormControl({value: ''})
       });
    }
 

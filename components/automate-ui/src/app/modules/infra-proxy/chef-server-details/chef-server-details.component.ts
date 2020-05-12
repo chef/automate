@@ -53,6 +53,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   private id: string;
   public saveSuccessful = false;
   public saveInProgress = false;
+  public orgsListLoading = true;
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
   private isDestroyed = new Subject<boolean>();
@@ -129,6 +130,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.updateServerForm.controls['fqdn'].setValue(this.server.fqdn);
       this.updateServerForm.controls['ip_address'].setValue(this.server.ip_address);
       this.creatingServerOrg = false;
+      this.orgsListLoading = false;
       this.closeCreateModal();
     });
 

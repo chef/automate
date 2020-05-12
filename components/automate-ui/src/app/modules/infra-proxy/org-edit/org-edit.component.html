@@ -25,14 +25,10 @@
     </chef-form-field>
     <chef-form-field>
       <label>
-      <span class="label">Admin Key<span aria-hidden="true">*</span></span>
+      <span class="label">Admin Key</span>
       <textarea rows="27" cols="10" chefInput placeholder="-----BEGIN RSA PRIVATE KEY -----"
         formControlName="admin_key" data-cy="update-org-admin-key"></textarea>   
       </label>
-      <chef-error
-        *ngIf="(updateOrgForm.get('admin_key').hasError('required') || updateOrgForm.get('admin_key').hasError('pattern')) && updateOrgForm.get('admin_key').dirty">
-        Admin Key is required.
-      </chef-error>
     </chef-form-field>
     <chef-form-field>
       <div id="button-bar">
