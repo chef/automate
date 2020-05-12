@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/url"
 
-	uuid "github.com/chef/automate/lib/uuid4"
 	chef "github.com/chef/go-chef"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -45,18 +44,17 @@ func NewChefClient(config *ChefConfig) (*ChefClient, error) {
 	return &ChefClient{client: client}, nil
 }
 
-func (s *Server) createClient(ctx context.Context, orgID string) (*ChefClient, error) {
+func (s *Server) createClient(ctx context.Context, orgID string, serverID string) (*ChefClient, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	UUID, err := uuid.FromString(orgID)
+	// TODO: combine get server & org query in one statement.
+	server, err := s.service.Storage.GetServer(ctx, serverID)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, service.ParseStorageError(err, serverID, "server")
 	}
 
-	// TODO: Call GetOrgByName in order to avoid separate query to fetch infra server detail
-	// Prefer LEFT OUTER join to in order to append server detail in response
-	org, err := s.service.Storage.GetOrg(ctx, UUID)
+	org, err := s.service.Storage.GetOrg(ctx, orgID, serverID)
 	if err != nil {
 		return nil, service.ParseStorageError(err, orgID, "org")
 	}
@@ -66,17 +64,7 @@ func (s *Server) createClient(ctx context.Context, orgID string) (*ChefClient, e
 		return nil, err
 	}
 
-	ServerID, err := uuid.FromString(org.ServerID)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid server: %s", err.Error())
-	}
-
-	server, err := s.service.Storage.GetServer(ctx, ServerID)
-	if err != nil {
-		return nil, service.ParseStorageError(err, ServerID, "org")
-	}
-
-	baseURL, err := targetURL(server.Fqdn, server.IpAddress, org.Name)
+	baseURL, err := targetURL(server.Fqdn, server.IPAddress, org.Name)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
 	}

@@ -14,6 +14,7 @@ func (a *InfraProxyServer) GetAffectedNodes(ctx context.Context, r *gwreq.Affect
 
 	req := &infra_req.AffectedNodes{
 		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
 		ChefType: r.ChefType,
 		Name:     r.Name,
 		Version:  r.Version,

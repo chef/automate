@@ -4,16 +4,18 @@ package chef.automate.api.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/external/infra_proxy/request";
 
 message CreateOrg {
+    // Chef organization ID.
+    string id = 1;
     // Chef organization name.
-    string name = 1;
+    string name = 2;
     // Chef organization admin user.
-    string admin_user = 2;
+    string admin_user = 3;
     // Chef organization admin key.
-    string admin_key = 3;
+    string admin_key = 4;
     // Chef Infra Server ID.
-    string server_id = 4;
+    string server_id = 5;
     // List of projects this chef organization belongs to. May be empty.
-    repeated string projects = 5;
+    repeated string projects = 6;
 }
 
 message UpdateOrg {
@@ -46,13 +48,6 @@ message GetOrgs {
 message GetOrg {
     // Chef organization ID.
     string id = 1;
-    // Chef Infra Server ID.
-    string server_id = 2;
-}
-
-message GetOrgByName {
-    // Chef organization name.
-    string name = 1;
     // Chef Infra Server ID.
     string server_id = 2;
 }

@@ -28,27 +28,14 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetServerByName", "infra:infraServers:{name}", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{name}", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*request.GetServerByName); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "name":
-					return m.Name
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
-	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/CreateServer", "infra:infraServers", "infra:infraServers:create", "POST", "/api/v0/infra/servers", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreateServer); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
+				case "id":
+					return m.Id
 				case "name":
 					return m.Name
-				case "description":
-					return m.Description
 				case "fqdn":
 					return m.Fqdn
 				case "ip_address":
@@ -68,8 +55,6 @@ func init() {
 					return m.Id
 				case "name":
 					return m.Name
-				case "description":
-					return m.Description
 				case "fqdn":
 					return m.Fqdn
 				case "ip_address":
@@ -122,25 +107,12 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetOrgByName", "infra:infraServers:{server_id}:orgs:{name}", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{name}", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*request.GetOrgByName); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "name":
-					return m.Name
-				case "server_id":
-					return m.ServerId
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
-	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/CreateOrg", "infra:infraServers:{server_id}:orgs", "infra:infraServers:update", "POST", "/api/v0/infra/servers/{server_id}/orgs", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreateOrg); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
+				case "id":
+					return m.Id
 				case "name":
 					return m.Name
 				case "admin_user":

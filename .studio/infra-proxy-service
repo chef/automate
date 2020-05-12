@@ -16,8 +16,8 @@ document "infra_service_load_sample_data" <<DOC
   Hits the create server & org endpoint inside the infra-proxy-service. (CreateServer & CreateOrg)
 
   1. -N No of records Default: 50
-  2. -S Chef server name's prefix Default: chef-server
-  3. -O Chef server org's name prefix Default: chef-org
+  2. -S Chef Infra Server name's prefix Default: chef-server
+  3. -O Chef organization's name prefix Default: chef-org
 
   Example:
   -----------------------------
@@ -51,39 +51,39 @@ function infra_service_load_sample_data() {
   
   log_line "Started Loading sample data..."
   log_line "Total number of records: $records"
-  log_line "Chef server's name prefix: $server_prefix"
-  log_line "Chef server org's name prefix: $org_prefix"
+  log_line "Chef Infra Server's name prefix: $server_prefix"
+  log_line "Chef organization's name prefix: $org_prefix"
 
   local ip_address
   local timestamp
   for _ in $(seq 1 ${records}); do
-   ip_address=$(printf "%d.%d.%d.%d" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))")
-   timestamp=$(date +%s%N)
+    ip_address=$(printf "%d.%d.%d.%d" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))")
+    timestamp=$(date +%s%N)
 
-   infra_service_create_servers_orgs "${server_prefix}-${timestamp}" \
-   "${server_prefix}-${timestamp}" \
-   "${ip_address}" \
-   "${server_prefix}-${timestamp}.com" \
-   "${org_prefix}-${timestamp}" \
-   "${org_prefix}-${timestamp}-user" \
-   "--ORG_ADMIN_KEY--"
+  infra_service_create_servers_orgs "${server_prefix}-${timestamp}-id" \
+    "${server_prefix}-${timestamp}" \
+    "${ip_address}" \
+    "${server_prefix}-${timestamp}.com" \
+    "${org_prefix}-${timestamp}-id" \
+    "${org_prefix}-${timestamp}" \
+    "${org_prefix}-${timestamp}-user" \
+    "--ORG_ADMIN_KEY--"
   done  
   log_line "Sample data loaded..."
 }
 
 function infra_service_create_servers_orgs() {
-  local server_id
-  server_id=$(chef-automate dev grpcurl automate-gateway -- -d \
+  chef-automate dev grpcurl automate-gateway -- -d \
   "$(cat << EOF
-    {"name": "$1", "description": "$2", "ip_address": "$3", "fqdn": "$4"}
+    {"id": "$1", "name": "$2", "ip_address": "$3", "fqdn": "$4"}
 EOF
-  )" chef.automate.api.infra_proxy.InfraProxy.CreateServer | jq .server.id)
+  )" chef.automate.api.infra_proxy.InfraProxy.CreateServer >/dev/null
 
   chef-automate dev grpcurl automate-gateway -- -d \
   "$(cat << EOF
-    {"name": "$5", "admin_user": "$6", "admin_key": "$7", "server_id": $server_id, "projects": []}
+    {"id": "$5", "name": "$6", "admin_user": "$7", "admin_key": "$8", "server_id": "$1", "projects": []}
 EOF
-  )" chef.automate.api.infra_proxy.InfraProxy.CreateOrg >/dev/null 2>&1
+  )" chef.automate.api.infra_proxy.InfraProxy.CreateOrg >/dev/null
 }
 
 document "infra_service_psql" <<DOC
