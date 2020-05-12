@@ -4,8 +4,7 @@ usage: chef-automate iam token create NAME [flags]
 options:
 - name: admin
   default_value: "false"
-  usage: |
-    Generate a token and add it to the chef-managed admin policy
+  usage: Generate a token and add it to the chef-managed admin policy
 - name: help
   shorthand: h
   default_value: "false"
