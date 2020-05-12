@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"sort"
 
 	chef "github.com/chef/go-chef"
@@ -61,7 +62,43 @@ func (s *Server) GetDataBagItem(ctx context.Context, req *request.DataBag) (*res
 	}
 
 	return &response.DataBag{
+		Id:   fmt.Sprint(ic.(map[string]interface{})["id"]),
+		Name: req.Name,
 		Data: string(data),
+	}, nil
+
+}
+
+// DeleteDataBag delete the data bag and data bag item
+func (s *Server) DeleteDataBag(ctx context.Context, req *request.DataBag) (*response.DataBag, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+	}
+
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "must supply data bag name")
+	}
+
+	if req.Item != "" {
+		err = c.client.DataBags.DeleteItem(req.Name, req.Item)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
+		return &response.DataBag{
+			Id:   req.Item,
+			Name: req.Name,
+		}, nil
+	}
+
+	data, err := c.client.DataBags.Delete(req.Name)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &response.DataBag{
+		Name: data.Name,
 	}, nil
 
 }
