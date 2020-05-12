@@ -1,4 +1,4 @@
-import { Component, Element, Host, Method, Prop, h } from '@stencil/core';
+import { Component, Element, Host, Method, Prop , h} from '@stencil/core';
 
 let id = 0;
 
@@ -112,6 +112,8 @@ export class ChefOption {
    */
   @Prop() optionId: string;
 
+  @Prop() disabled = false;
+
   @Element() el: HTMLElement;
 
   private width = 0;
@@ -140,7 +142,9 @@ export class ChefOption {
       <Host
         role="option"
         id={this.optionId}
-        class={this.selected ? 'selected' : ''}>
+        class={this.selected ? 'selected' : ''}
+        tabindex={this.disabled ? '-1' : '0'}
+        >
         <style>
           {`
             [selected=${this.optionId}] [${this.optionId}],

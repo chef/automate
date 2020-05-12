@@ -69,6 +69,7 @@ export class ChefStatusFilterGroup {
 
   selected: HTMLChefOptionElement;
 
+
   @Listen('click') handleClick(event) {
     const option = event.target.closest('chef-option');
     if (option) {
@@ -86,6 +87,11 @@ export class ChefStatusFilterGroup {
       this.value = this.selected.value;
     }
     this.selected.selected = true;
+
+    // add keypress listeners to all the child options
+    const theseOptions = this.el.querySelectorAll(`chef-option`);
+    theseOptions
+    .forEach(option => option.addEventListener('keypress', event => { this.handleKeypress(event); }));
   }
 
   componentDidUpdate() {
@@ -104,6 +110,12 @@ export class ChefStatusFilterGroup {
     const options: HTMLChefOptionElement[] = Array.from(this.el.querySelectorAll('chef-option'));
     options.forEach((opt) => opt.selected = false);
     return options;
+  }
+
+  handleKeypress = (event) => {
+    if (event.key === 'Enter') {
+      this.handleClick(event);
+    }
   }
 
 }
