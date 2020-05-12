@@ -8,10 +8,10 @@
 
       <ul class="nav-tabs">
         <li class="nav-tab" routerLink="/compliance/scan-jobs/jobs" routerLinkActive="active">
-          <span *ngIf="jobsCountLoaded">{{jobsCount$ | async | number}}</span> Scan jobs 
+          <span *ngIf="jobsCountLoaded">{{(jobsCount$ | async | number) === '0' ? '' : (jobsCount$ | async | number)}}</span> Scan Jobs 
         </li>
         <li class="nav-tab" routerLink="/compliance/scan-jobs/nodes" routerLinkActive="active">
-          <span *ngIf="nodesCountLoaded">{{nodesCount$ | async | number}}</span> Nodes added
+          <span *ngIf="nodesCountLoaded">{{(nodesCount$ | async | number) === '0' ? '' : (nodesCount$ | async | number)}}</span> Nodes Added
         </li>
       </ul>
 

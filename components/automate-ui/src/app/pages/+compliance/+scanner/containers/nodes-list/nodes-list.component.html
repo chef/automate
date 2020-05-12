@@ -1,96 +1,102 @@
-<chef-phat-radio
-  class="nodes-list-status-filters"
-  (change)="onStatusFilterChanged($event)"
-  [value]="statusFilter$ | async">
-  <chef-option class="filter all" value='all'>
-    <span class="filter-label">All</span>
-    <span class="filter-total">
-      <chef-icon>storage</chef-icon> {{ (nodeTotals$ | async)?.all | number }}
-    </span>
-  </chef-option>
-  <chef-option class="filter unreachable" value='unreachable'>
-    <span class="filter-label">Unreachable</span>
-    <span class="filter-total">
-      <chef-icon>report_problem</chef-icon> {{ (nodeTotals$ | async)?.unreachable | number }}
-    </span>
-  </chef-option>
-  <chef-option class="filter reachable" value='reachable'>
-    <span class="filter-label">Reachable</span>
-    <span class="filter-total">
-      <chef-icon>check_circle</chef-icon> {{ (nodeTotals$ | async)?.reachable | number }}
-    </span>
-  </chef-option>
-  <chef-option class="filter unknown" value='unknown'>
-    <span class="filter-label">Unknown</span>
-    <span class="filter-total">
-      <chef-icon>help</chef-icon> {{ (nodeTotals$ | async)?.unknown | number }}
-    </span>
-  </chef-option>
-</chef-phat-radio>
-
-<chef-table class="nodes-list-table" (sort-toggled)="onSortToggled($event)">
-  <chef-thead>
-    <chef-tr>
-      <chef-th>
-        Node
-        <chef-sort-toggle sort="name" [order]="orderFor('name')"></chef-sort-toggle>
-      </chef-th>
-      <chef-th>
-        Platform
-        <chef-sort-toggle sort="platform" [order]="orderFor('platform')"></chef-sort-toggle>
-      </chef-th>
-      <chef-th>
-        Status
-        <chef-sort-toggle sort="status" [order]="orderFor('status')"></chef-sort-toggle>
-      </chef-th>
-      <chef-th>
-        Manager
-        <chef-sort-toggle sort="manager" [order]="orderFor('manager')"></chef-sort-toggle>
-      </chef-th>
-      <chef-th></chef-th>
-    </chef-tr>
-  </chef-thead>
-
-  <chef-loading-spinner *ngIf="nodesList.loading" size="100"></chef-loading-spinner>
-
-  <chef-tbody *ngIf="!nodesList.loading">
-    <chef-tr class="empty new-row">
-      <span class="cta">Add new nodes to scan</span>
-      <span class="action">
-        <chef-button primary
-          [routerLink]="['/compliance/scan-jobs/nodes/add']">
-          Add Nodes
-        </chef-button>
+<div *ngIf="(nodeTotals$ | async)?.all > 0">
+  <chef-phat-radio
+    class="nodes-list-status-filters"
+    (change)="onStatusFilterChanged($event)"
+    [value]="statusFilter$ | async">
+    <chef-option class="filter all" value='all'>
+      <span class="filter-label">All</span>
+      <span class="filter-total">
+        <chef-icon>storage</chef-icon> {{ (nodeTotals$ | async)?.all | number }}
       </span>
-    </chef-tr>
-    <chef-tr *ngFor="let node of nodesList.items; index as i; trackBy: trackBy;">
-      <chef-td>{{ node.name }}</chef-td>
-      <chef-td>{{ node.platform }} {{ node.platform_version }}</chef-td>
-      <chef-td>
-        <chef-button [attr.id]="'rerun'+i" class="rerun-btn" tertiary (click)="rerunNode(node)">
-          <chef-icon>cached</chef-icon>
-        </chef-button>
-        <chef-tooltip [attr.for]="'rerun'+i">Check connection</chef-tooltip>
-        {{ node.status }}
-      </chef-td>
-      <chef-td>{{ node.manager }}</chef-td>
-      <chef-td>
-        <chef-button secondary caution
-          *ngIf="node.status === 'unreachable'"
-          (click)="onNodeResultsShow(node.id)">
-          Error
-        </chef-button>
-        <chef-button label="edit" secondary
-          [routerLink]="['/compliance', 'scan-jobs', 'nodes', node.id, 'edit']">
-          <chef-icon>edit</chef-icon>
-        </chef-button>
-        <chef-button label="delete" secondary caution (click)="deleteNode(node)">
-          <chef-icon>delete</chef-icon>
-        </chef-button>
-      </chef-td>
-    </chef-tr>
-  </chef-tbody>
-</chef-table>
+    </chef-option>
+    <chef-option class="filter unreachable" value='unreachable'>
+      <span class="filter-label">Unreachable</span>
+      <span class="filter-total">
+        <chef-icon>report_problem</chef-icon> {{ (nodeTotals$ | async)?.unreachable | number }}
+      </span>
+    </chef-option>
+    <chef-option class="filter reachable" value='reachable'>
+      <span class="filter-label">Reachable</span>
+      <span class="filter-total">
+        <chef-icon>check_circle</chef-icon> {{ (nodeTotals$ | async)?.reachable | number }}
+      </span>
+    </chef-option>
+    <chef-option class="filter unknown" value='unknown'>
+      <span class="filter-label">Unknown</span>
+      <span class="filter-total">
+        <chef-icon>help</chef-icon> {{ (nodeTotals$ | async)?.unknown | number }}
+      </span>
+    </chef-option>
+  </chef-phat-radio>
+</div>
+
+<chef-toolbar>
+  <app-authorized [allOf]="['/api/v0/compliance/scanner/jobs', 'post']">
+    <div *ngIf="(nodeTotals$ | async)?.all === 0" class="empty-state">
+      <p>Add the first nodes to get started!</p>
+    </div>
+    <div [ngClass]="(nodeTotals$ | async)?.all === 0 ? 'empty-state' : ''">
+      <chef-button primary [routerLink]="['/compliance/scan-jobs/nodes/add']">Add Nodes</chef-button>
+    </div>
+  </app-authorized>
+</chef-toolbar>
+
+<div *ngIf="(nodeTotals$ | async)?.all > 0">
+  <chef-table class="nodes-list-table" (sort-toggled)="onSortToggled($event)">
+    <chef-thead>
+      <chef-tr>
+        <chef-th>
+          Node
+          <chef-sort-toggle sort="name" [order]="orderFor('name')"></chef-sort-toggle>
+        </chef-th>
+        <chef-th>
+          Platform
+          <chef-sort-toggle sort="platform" [order]="orderFor('platform')"></chef-sort-toggle>
+        </chef-th>
+        <chef-th>
+          Status
+          <chef-sort-toggle sort="status" [order]="orderFor('status')"></chef-sort-toggle>
+        </chef-th>
+        <chef-th>
+          Manager
+          <chef-sort-toggle sort="manager" [order]="orderFor('manager')"></chef-sort-toggle>
+        </chef-th>
+        <chef-th></chef-th>
+      </chef-tr>
+    </chef-thead>
+
+    <chef-loading-spinner *ngIf="nodesList.loading" size="100"></chef-loading-spinner>
+
+    <chef-tbody *ngIf="!nodesList.loading">
+      <chef-tr *ngFor="let node of nodesList.items; index as i; trackBy: trackBy;">
+        <chef-td>{{ node.name }}</chef-td>
+        <chef-td>{{ node.platform }} {{ node.platform_version }}</chef-td>
+        <chef-td>
+          <chef-button [attr.id]="'rerun'+i" class="rerun-btn" tertiary (click)="rerunNode(node)">
+            <chef-icon>cached</chef-icon>
+          </chef-button>
+          <chef-tooltip [attr.for]="'rerun'+i">Check connection</chef-tooltip>
+          {{ node.status }}
+        </chef-td>
+        <chef-td>{{ node.manager }}</chef-td>
+        <chef-td>
+          <chef-button secondary caution
+            *ngIf="node.status === 'unreachable'"
+            (click)="onNodeResultsShow(node.id)">
+            Error
+          </chef-button>
+          <chef-button label="edit" secondary
+            [routerLink]="['/compliance', 'scan-jobs', 'nodes', node.id, 'edit']">
+            <chef-icon>edit</chef-icon>
+          </chef-button>
+          <chef-button label="delete" secondary caution (click)="deleteNode(node)">
+            <chef-icon>delete</chef-icon>
+          </chef-button>
+        </chef-td>
+      </chef-tr>
+    </chef-tbody>
+  </chef-table>
+</div>
 
 <app-page-picker
   class="nodes-list-paging"

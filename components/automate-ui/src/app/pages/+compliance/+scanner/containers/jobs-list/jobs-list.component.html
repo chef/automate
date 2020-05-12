@@ -1,4 +1,15 @@
-<chef-table class="jobs-list-table" (sort-toggled)="onSortToggled($event)">
+<chef-toolbar>
+  <app-authorized [allOf]="['/api/v0/compliance/scanner/jobs', 'post']">
+    <div *ngIf="jobsList.items.length === 0" class="empty-state">
+      <p>Create the first scan job to get started!</p>
+    </div>
+    <div [ngClass]="jobsList.items.length === 0 ? 'empty-state' : ''">
+      <chef-button primary [routerLink]="['/jobs/add']">Create Scan Job</chef-button>
+    </div>
+  </app-authorized>
+</chef-toolbar>
+
+<chef-table *ngIf="jobsList.items.length > 0" class="jobs-list-table" (sort-toggled)="onSortToggled($event)">
   <chef-thead>
     <chef-tr>
       <chef-th>
@@ -22,15 +33,7 @@
 
   <chef-loading-spinner *ngIf="jobsList.loading" size="100"></chef-loading-spinner>
 
-  <chef-tbody *ngIf="!jobsList.loading">
-    <app-authorized [allOf]="['/api/v0/compliance/scanner/jobs', 'post']">
-      <chef-tr class="empty new-row">
-        <span class="cta">Create a new scan job with nodes and profiles</span>
-        <span class="action">
-          <chef-button primary [routerLink]="['/jobs/add']">Create Scan Job</chef-button>
-        </span>
-      </chef-tr>
-    </app-authorized>
+  <chef-tbody *ngIf="!jobsList.loading"> 
     <chef-tr *ngFor="let job of jobsList.items; trackBy: trackBy;">
       <chef-td  *ngIf="isJobReport(job)">
         {{ job.name }}
