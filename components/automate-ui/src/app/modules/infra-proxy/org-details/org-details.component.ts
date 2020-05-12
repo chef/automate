@@ -24,8 +24,8 @@ import { GetOrg } from 'app/entities/orgs/org.actions';
 export class OrgDetailsComponent implements OnInit, OnDestroy {
   public org: Org;
   public loading$: Observable<boolean>;
-  public serverId;
-  public orgId;
+  public serverId: string;
+  public orgId: string;
   public cookbooksTab = true;
   public rolesTab = false;
   private isDestroyed = new Subject<boolean>();
