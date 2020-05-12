@@ -1,30 +1,22 @@
-import { async,
-  ComponentFixtureAutoDetect,
-  ComponentFixture,
-  TestBed
-} from '@angular/core/testing';
-import { StoreModule } from '@ngrx/store';
-import { OrgDetailsComponent } from './org-details.component';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { CookbooksComponent } from './cookbooks.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
+import { StoreModule } from '@ngrx/store';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
-class MockTelemetryService {
-  track() { }
-}
-
-describe('OrgDetailsComponent', () => {
-  let component: OrgDetailsComponent;
-  let fixture: ComponentFixture<OrgDetailsComponent>;
+describe('CookbooksComponent', () => {
+  let component: CookbooksComponent;
+  let fixture: ComponentFixture<CookbooksComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'app-tabs' }),
+        MockComponent({ selector: 'chef-error' }),
+        MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
@@ -40,16 +32,15 @@ describe('OrgDetailsComponent', () => {
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
-        OrgDetailsComponent
+        CookbooksComponent
       ],
       providers: [
-        { provide: ComponentFixtureAutoDetect, useValue: true },
-        { provide: TelemetryService, useClass: MockTelemetryService },
         FeatureFlagsService
       ],
       imports: [
+        FormsModule,
+        ReactiveFormsModule,
         RouterTestingModule,
-        HttpClientTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ]
     })
@@ -57,14 +48,12 @@ describe('OrgDetailsComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OrgDetailsComponent);
+    fixture = TestBed.createComponent(CookbooksComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    TestBed.inject(TelemetryService);
   });
 
-  /* TODO: need a add the cases for TelemetryService */
-  xit('should create', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });
