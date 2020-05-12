@@ -50,7 +50,6 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 		"auth.subjects": subjects,
 		"auth.resource": resource,
 		"auth.action":   action,
-		"iam.version":   "iam_v2",
 	})
 
 	// Note: if ANYTHING goes wrong, 403 is the error we return. This is done

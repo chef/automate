@@ -436,7 +436,7 @@
           "items": {
             "type": "string"
           },
-          "description": "List of projects associated with the node. Projects are a concept introduced in IAMv2."
+          "description": "List of projects associated with the node."
         },
         "run_data": {
           "$ref": "#/definitions/chef.automate.api.nodes.v1.LastContactData",

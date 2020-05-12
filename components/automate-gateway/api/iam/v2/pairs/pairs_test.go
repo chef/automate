@@ -179,7 +179,7 @@ func TestAuthzPairs(t *testing.T) {
 				func(t *testing.T) {
 					inputMap := getSimpleMethodInfoMap()
 
-					result, _ := pairs.InvertMapParameterized(inputMap, "/auth/users/foo@bar.com", nil)
+					result, _ := pairs.InvertMapParameterized(inputMap, "/some/path/foo@bar.com", nil)
 
 					assert.Zero(t, len(result))
 				})
@@ -213,7 +213,7 @@ func TestAuthzPairs(t *testing.T) {
 						"/chef.automate.api.Foo/GetFoo1": getInfoWithPathAndResource(
 							"/some/path", "resource1:{id}"),
 					}
-					result, _ := pairs.InvertMapParameterized(inputMap, "/auth/users/foo@bar.com", nil)
+					result, _ := pairs.InvertMapParameterized(inputMap, "/some/path/foo@bar.com", nil)
 
 					assert.Zero(t, len(result))
 				})

@@ -243,7 +243,7 @@ func (c *clientsFactory) AuthenticationClient() (authn.AuthenticationClient, err
 	return authn.NewAuthenticationClient(conn), nil
 }
 
-// AuthorizationClient returns a client for the Authorization (IAMv2) service.
+// AuthorizationClient returns a client for the Authorization service.
 // It requires the `authz` endpoint to be configured
 func (c *clientsFactory) AuthorizationClient() (authz.AuthorizationClient, error) {
 	conn, err := c.connectionByName("authz-service")

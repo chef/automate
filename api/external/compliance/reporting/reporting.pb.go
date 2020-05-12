@@ -916,7 +916,7 @@ type Report struct {
 	Roles []string `protobuf:"bytes,17,rep,name=roles,proto3" json:"roles,omitempty"`
 	// The Chef Tags associated with the node.
 	ChefTags []string `protobuf:"bytes,18,rep,name=chef_tags,json=chefTags,proto3" json:"chef_tags,omitempty"`
-	// The projects the node is assigned to. This is a resource-scoped access control feature of IAMv2.
+	// The projects the node is assigned to.
 	Projects             []string `protobuf:"bytes,20,rep,name=projects,proto3" json:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

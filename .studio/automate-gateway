@@ -606,8 +606,8 @@ function gateway_grpcurl_get() {
 document "get_api_token" <<DOC
   This will idempotently generate an API token that has enough access for data ingestion.
 
-  Note: if using IAM v2, this token will NOT be an admin token; but one that is a member
-  of the default ingest-access policy.
+  Note: this token will be a member of the chef-managed ingest-access policy, NOT the chef-managed admin policy.
+
 DOC
 function get_api_token() {
   check_if_deployinate_started || return 1
