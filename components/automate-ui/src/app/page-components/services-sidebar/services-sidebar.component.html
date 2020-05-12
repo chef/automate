@@ -64,7 +64,7 @@
           <div class ="release-line"><chef-icon>grain</chef-icon>{{ service.release || "--"}}</div>
           <div class ="channel-line">
             <chef-badge *ngIf="service.update_strategy !== 'NONE'">
-              {{ service.channel | uppercase }}: {{ service.update_strategy }}
+              {{ service.channel }}: {{ service.update_strategy }}
             </chef-badge>
             <chef-badge no-data
               [id]="'channel-tooltip-' + i"
@@ -101,7 +101,7 @@
                 <div class="healthcheck-content" [class.active]="activeErrorAccordions.includes(i)">
                   {{service.health_check_result.stderr}}
                   <div class="show-more-container">
-                    <button 
+                    <button
                     *ngIf="service.health_check_result.stderr.length > LINES_OUTPUT_3"
                     (click)="toggleMoreErrorMsg(i)"
                     class="show-more-button">
@@ -117,7 +117,7 @@
                 <div class="healthcheck-content" [class.active]="activeHealthAccordions.includes(i)">
                   {{service.health_check_result.stdout}}
                   <div class="show-more-container">
-                    <button 
+                    <button
                     *ngIf="service.health_check_result.stdout.length > LINES_OUTPUT_3"
                     class="show-more-button"
                     (click)="toggleMoreHealthMsg(i)">
