@@ -617,16 +617,17 @@ func getInspecControls(profile []byte) []*inspecEvent.Control {
 	jsonparser.ArrayEach(profile, func(control []byte, _ jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			inspecControl := &inspecEvent.Control{
-				Id:             getStringIfExists("id", control),
-				Impact:         getFloat32IfExists("impact", control),
-				Title:          getStringIfExists("title", control),
-				Code:           getStringIfExists("code", control),
-				Desc:           getStringIfExists("desc", control),
-				SourceLocation: getInspecSourceLocation(control),
-				WaiverData:     getInspecControlWaiverData(control),
-				Refs:           getStructArray("refs", control),
-				Tags:           getStructIfExists("tags", control),
-				Results:        getInspecResults(control),
+				Id:                   getStringIfExists("id", control),
+				Impact:               getFloat32IfExists("impact", control),
+				Title:                getStringIfExists("title", control),
+				Code:                 getStringIfExists("code", control),
+				Desc:                 getStringIfExists("desc", control),
+				SourceLocation:       getInspecSourceLocation(control),
+				WaiverData:           getInspecControlWaiverData(control),
+				Refs:                 getStructArray("refs", control),
+				Tags:                 getStructIfExists("tags", control),
+				Results:              getInspecResults(control),
+				RemovedResultsCounts: getInspecControlRemovedResultsCounts(control),
 			}
 			inspecControls = append(inspecControls, inspecControl)
 		}
@@ -677,6 +678,19 @@ func getInspecControlWaiverData(control []byte) *inspecEvent.WaiverData {
 			Run:                getBoolIfExists("run", sourceLocationBytes),
 			SkippedDueToWaiver: getBoolIfExists("skipped_due_to_waiver", sourceLocationBytes),
 			Message:            getStringIfExists("message", sourceLocationBytes),
+		}
+	}
+	return dataToReturn
+}
+
+func getInspecControlRemovedResultsCounts(control []byte) *inspecEvent.RemovedResultsCounts {
+	var dataToReturn *inspecEvent.RemovedResultsCounts
+	sourceLocationBytes, _, _, err := jsonparser.Get(control, "removed_results_counts")
+	if err == nil {
+		dataToReturn = &inspecEvent.RemovedResultsCounts{
+			Failed:  getInt32IfExists("failed", sourceLocationBytes),
+			Skipped: getInt32IfExists("skipped", sourceLocationBytes),
+			Passed:  getInt32IfExists("passed", sourceLocationBytes),
 		}
 	}
 	return dataToReturn
