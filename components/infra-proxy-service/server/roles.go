@@ -121,7 +121,7 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 
 // DeleteRole deletes the role
 func (s *Server) DeleteRole(ctx context.Context, req *request.Role) (*response.Role, error) {
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
