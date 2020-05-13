@@ -66,22 +66,22 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     },
     clientRunsRemoveData: {
       category: JobCategories.Infra,
-      name: 'missing_nodes',
+      name: 'periodic_purge_timeseries',
+      nested_name: NestedJobName.ConvergeHistory,
       unit: { value: 'd', disabled: false },
       threshold: [{ value: '30', disabled: false }, Validators.required],
       disabled: false
     },
     clientRunsLabelMissing: {
       category: JobCategories.Infra,
-      name: 'missing_nodes_for_deletion',
+      name: 'missing_nodes',
       unit: { value: 'd', disabled: false },
       threshold: [{ value: '30', disabled: false }, Validators.required],
       disabled: false
     },
     clientRunsRemoveNodes: {
       category: JobCategories.Infra,
-      name: 'periodic_purge_timeseries',
-      nested_name: NestedJobName.ConvergeHistory,
+      name: 'missing_nodes_for_deletion',
       unit: { value: 'd', disabled: false },
       threshold: [{ value: '30', disabled: false }, Validators.required],
       disabled: false
@@ -391,9 +391,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
     switch (job.name) {
       case InfraJobName.MissingNodesForDeletion: {
-        this.handleDisable(this.clientRunsRemoveData, job.disabled);
+        this.handleDisable(this.clientRunsRemoveNodes, job.disabled);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
-        this.clientRunsRemoveData.patchValue({
+        this.clientRunsRemoveNodes.patchValue({
           unit: formUnit,
           threshold: formThreshold,
           disabled: job.disabled
@@ -462,8 +462,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         break;
 
         case NestedJobName.ConvergeHistory: {
-          this.handleDisable(this.clientRunsRemoveNodes, _job.disabled);
-          this.clientRunsRemoveNodes.patchValue(form);
+          this.handleDisable(this.clientRunsRemoveData, _job.disabled);
+          this.clientRunsRemoveData.patchValue(form);
         }
           break;
 
