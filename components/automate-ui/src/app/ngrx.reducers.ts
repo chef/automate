@@ -12,6 +12,7 @@ import * as clientRuns from './entities/client-runs/client-runs.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
 import * as cookbookDetailsEntity from './entities/cookbooks/cookbook-details.reducer';
 import * as cookbookVersionsEntity from './entities/cookbooks/cookbook-versions.reducer';
+import * as dataBagsEntity from './entities/data-bags/data-bags.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
 import * as environmentEntity from './entities/environments/environment.reducer';
 import * as infraRoleEntity from './entities/infra-roles/infra-role.reducer';
@@ -67,6 +68,7 @@ export interface NgrxStateAtom {
   cookbooks: cookbookEntity.CookbookEntityState;
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityState;
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityState;
+  dataBags: dataBagsEntity.DataBagsEntityState;
   destinations: destinationEntity.DestinationEntityState;
   environments: environmentEntity.EnvironmentEntityState;
   infraRoles: infraRoleEntity.InfraRoleEntityState;
@@ -182,6 +184,7 @@ export const defaultInitialState = {
   cookbooks: cookbookEntity.CookbookEntityInitialState,
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityInitialState,
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityInitialState,
+  dataBags: dataBagsEntity.DataBagsEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
   environments: environmentEntity.EnvironmentEntityInitialState,
   infraRoles: infraRoleEntity.InfraRoleEntityInitialState,
@@ -231,6 +234,7 @@ export const ngrxReducers = {
   cookbookDetails: cookbookDetailsEntity.cookbookDetailsEntityReducer,
   cookbookVersions: cookbookVersionsEntity.cookbookVersionsEntityReducer,
   credentialEntity: credential.credentialReducer,
+  dataBags: dataBagsEntity.dataBagsEntityReducer,
   destinations: destinationEntity.destinationEntityReducer,
   environments: environmentEntity.environmentEntityReducer,
   infraRoles: infraRoleEntity.infraRoleEntityReducer,

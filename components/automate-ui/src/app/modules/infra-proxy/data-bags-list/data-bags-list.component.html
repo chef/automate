@@ -1,0 +1,17 @@
+<section class="databags">
+  <chef-loading-spinner *ngIf="dataBagsListLoading" size="50"></chef-loading-spinner>
+  <ng-container  *ngIf="!dataBagsListLoading">
+    <chef-table>
+      <chef-thead>
+        <chef-tr>
+          <chef-th>Name</chef-th>
+        </chef-tr>
+      </chef-thead>
+      <chef-tbody>
+        <chef-tr *ngFor="let dataBag of dataBags">
+          <chef-td>{{ dataBag.name }}</chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+  </ng-container>
+</section>
