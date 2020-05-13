@@ -490,6 +490,6 @@ document "enable_desktop" <<DOC
 DOC
 function enable_desktop() {
   check_if_deployinate_started || return 1
-  printf "[deployment.v1.svc]\n products = [\"automate\", \"desktop\"]\n" > /tmp/enable_desktop_patch.toml
+  printf "[deployment.v1.svc]\n products = [\"desktop\"]\n" > /tmp/enable_desktop_patch.toml
   chef-automate config patch /tmp/enable_desktop_patch.toml
 }
