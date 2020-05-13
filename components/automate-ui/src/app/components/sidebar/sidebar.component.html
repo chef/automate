@@ -15,6 +15,7 @@
                 [id]="'entry' + groupIndex + '-' + itemIndex"
                 [route]="menuItem.route"
                 [icon]="menuItem.icon"
+                [customIcon]="menuItem.customIcon"
                 [openInNewPage]="menuItem.openInNewPage"
               >{{ menuItem.name }}</chef-sidebar-entry>
               <chef-tooltip
@@ -31,6 +32,7 @@
                   [id]="'entry' + groupIndex + '-' + itemIndex"
                   [route]="menuItem.route"
                   [icon]="menuItem.icon"
+                  [customIcon]="menuItem.customIcon"
                   [openInNewPage]="menuItem.openInNewPage"
                 >{{ menuItem.name }}</chef-sidebar-entry>
                 <chef-tooltip

@@ -13,6 +13,8 @@ export class SidebarEntryComponent {
   @Input() iconRotation: number;
   // (optional) if true, opens the link in a new page
   @Input() openInNewPage: boolean;
+  // (optional) shows custome icon
+  @Input() customIcon: string;
 
   isExactPresent() {
     // If the exact attribute is present, its value is the empty string.

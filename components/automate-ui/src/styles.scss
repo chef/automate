@@ -342,6 +342,29 @@ input {
   top: -2px;
 }
 
+.chef-server-icon {
+  display: inline-block;
+  border: 1px solid $chef-darkest;
+  border-radius: 2px;
+  height: 16px;
+  width: 16px;
+  background-color: var(--chef-white);
+  position: relative;
+  top: 2px;
+  margin-right: 5px;
+}
+
+.chef-server-icon:before {
+  color: $chef-darkest;
+  content: 'C';
+  font-size: 9px;
+  font-weight: bolder;
+  position: absolute;
+  right: 4px;
+  text-align: center;
+  top: -3px;
+}
+
 // mat-select dropdown menu
 
 [panelClass="chef-dropdown"] {

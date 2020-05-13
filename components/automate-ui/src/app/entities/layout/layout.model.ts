@@ -39,7 +39,8 @@ export interface MenuItemGroup {
 
 export interface MenuItem {
   name: string;
-  icon: string;
+  icon?: string;
+  customIcon?: string;
   iconRotation?: number;
   route: string;
   authorized?: Authorized;
