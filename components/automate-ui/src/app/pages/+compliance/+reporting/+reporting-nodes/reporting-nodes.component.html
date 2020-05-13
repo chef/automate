@@ -10,7 +10,7 @@
   <chef-phat-radio
     class="nodes-list-status-filters"
     [value]="nodeFilterStatus"
-    (change)="filterNodeStatus($event, $event.target.value)">
+    (change)="statusFilter($event, $event.target.value)">
     <chef-option class="filter all" value='all'>
       <span class="filter-label">Total Nodes</span>
       <span class="filter-total">
@@ -85,7 +85,7 @@
       </chef-tr>
     </chef-thead>
     <chef-tbody *ngIf="!reportData.nodesListLoading">
-      <chef-tr *ngFor="let node of filteredNodes(reportData.nodesList.items)">
+      <chef-tr *ngFor="let node of reportData.nodesList.items">
         <chef-td>
           <chef-icon *ngIf="node.latest_report.status !== 'waived'" class="status-icon" [ngClass]="node.latest_report.status">
             {{ statusIcon(node.latest_report.status) }}

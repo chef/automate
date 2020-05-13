@@ -869,5 +869,6 @@ export enum ReportingFilterTypes {
   RECIPE = 'recipe',
   ROLE = 'role',
   END_TIME = 'end_time',
-  DATE_INTERVAL = 'date_interval'
+  DATE_INTERVAL = 'date_interval',
+  STATUS = 'status'
 }
