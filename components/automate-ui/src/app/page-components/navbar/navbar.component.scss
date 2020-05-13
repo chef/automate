@@ -46,7 +46,7 @@ header {
       height: ($navigation-height / 2) - 2px;
       line-height: ($navigation-height / 2) - 2px;
       border-top: 1px solid $chef-grey;
-      overflow-x: auto;
+      overflow: auto hidden;
     }
 
     app-authorized {

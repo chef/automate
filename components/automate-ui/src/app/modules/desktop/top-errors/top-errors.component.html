@@ -1,25 +1,31 @@
 <div class="content-container">
-  <div class="container">
-    <main>
-      <div class="page-title">Top 10 Errors</div>
-      <div class="update-time">Updated {{ lastUpdatedMessage }}</div>
-
-      <table>
-        <thead>
-          <tr >
-            <th>Error Message</th>
-            <th>Number of Desktops</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let topErrorsItem of topErrorsItems">
-            <td (click)="onItemClicked(topErrorsItem)">{{topErrorsItem.type}}: {{ topErrorsItem.message }}</td>
-            <td>{{ topErrorsItem.count }}</td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
-
-    </main>
-  </div>
+  <h2 class="heading-title">Top 10 Errors</h2>
+  <h6 class="heading-time">Updated {{ lastUpdatedMessage }}</h6>
+  <chef-table class="chart-list">
+    <chef-tbody>
+      <chef-tr
+        *ngFor="let item of topErrorsItems"
+        class="chart-list-item"
+        tabindex="0"
+        (click)="errorSelected.emit(item)"
+        (keyup.enter)="errorSelected.emit(item)">
+        <chef-td class="chart-list-item-label-cell">
+          {{ item.type }}: {{ item.message }}
+        </chef-td>
+        <chef-td class="chart-list-item-count-cell">
+          <span>
+            {{ item.count }}
+            <chef-icon>desktop_windows</chef-icon>
+          </span>
+        </chef-td>
+        <chef-td class="chart-list-item-chart-cell">
+          <app-chart-progress-bar
+            size="small"
+            [value]="item.count"
+            [max]="item.count">
+          </app-chart-progress-bar>
+        </chef-td>
+      </chef-tr>
+    </chef-tbody>
+  </chef-table>
 </div>

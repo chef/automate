@@ -1,31 +1,66 @@
 @import "~styles/variables";
+@import "@carbon/layout/scss/layout";
 
-.page-title {
+.heading-title {
   color: var(--chef-primary-dark);
   margin-top: 0;
-  margin-bottom: 12px;
   font-weight: inherit;
   font-style: inherit;
   font-size: 18px;
 }
 
-.content-container {
-  margin: 10px;
-  padding: 10px;
-  font-family: Muli;
-  font-size: 13px;
-  font-weight: 100;
-  background-color: $chef-med-grey;
-  border: 1px solid $chef-blue-medium;
-  border-radius: 4px;
-  width: 500px;
-}
-
-.update-time {
+.heading-time {
   color: var(--chef-primary-dark);
   margin-top: 0;
   margin-bottom: 12px;
   font-weight: inherit;
   font-style: inherit;
   font-size: 10px;
+}
+
+.chart-list-item {
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    .chart-list-item-label-cell,
+    .chart-list-item-count-cell {
+      background: $chef-lightest-grey;
+    }
+  }
+
+  .chart-list-item-label-cell {
+    flex-basis: 55%;
+  }
+
+  .chart-list-item-count-cell {
+    border-right: 1px solid $chef-grey;
+    border-top-right-radius: $global-radius;
+    border-bottom-right-radius: $global-radius;
+    flex-basis: 20%;
+    justify-content: flex-end;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    chef-icon {
+      margin-left: $spacing-03;
+    }
+  }
+
+  .chart-list-item-chart-cell {
+    flex-basis: 25%;
+    padding-right: 0;
+    border-color: transparent;
+
+    app-chart-progress-bar {
+      margin: 0;
+      width: 100%;
+    }
+  }
 }

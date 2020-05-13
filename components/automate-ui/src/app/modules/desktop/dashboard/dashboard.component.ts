@@ -60,7 +60,11 @@ export class DashboardComponent implements OnInit {
   public currentPage$: Observable<number>;
   public pageSize$: Observable<number>;
   public termFilters$: Observable<TermFilter[]>;
-  public insightVisible = false;
+  public desktopListVisible = false;
+  public desktopListFullscreened = false;
+  public desktopDetailVisible = false;
+  public desktopDetailFullscreened = false;
+  public selectedDesktop: Desktop;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -161,8 +165,27 @@ export class DashboardComponent implements OnInit {
     this.store.dispatch(new SetDaysAgoSelected({daysAgo}));
   }
 
-  insightClose() {
-    this.insightVisible = false;
+  onDesktopListClose() {
+    this.onDesktopDetailClose();
+    this.desktopListFullscreened = false;
+    this.desktopListVisible = false;
+  }
+
+  onDesktopListFullscreen() {
+    this.desktopListFullscreened = !this.desktopListFullscreened;
+    this.desktopDetailVisible = !this.desktopDetailVisible;
+  }
+
+  onDesktopDetailClose() {
+    this.selectedDesktop = undefined;
+    this.desktopDetailFullscreened = false;
+    this.desktopDetailVisible = false;
+    this.desktopListVisible = true;
+  }
+
+  onDesktopDetailFullscreen() {
+    this.desktopDetailFullscreened = !this.desktopDetailFullscreened;
+    this.desktopListVisible = !this.desktopListVisible;
   }
 
   public onPageChange(pageNumber: number) {
@@ -174,7 +197,18 @@ export class DashboardComponent implements OnInit {
       { type: Terms.ErrorMessage, value: errorItem.message },
       { type: Terms.ErrorType, value: errorItem.type }];
     this.store.dispatch(new UpdateDesktopFilterTerm({ terms }));
-    this.insightVisible = true;
+    this.desktopListVisible = true;
+  }
+
+  public onDurationSelected(_durationItem: any): void {
+    this.store.dispatch(new UpdateDesktopFilterCurrentPage({ page: 1 }));
+    this.desktopListVisible = true;
+  }
+
+  public onDesktopSelected(desktop: Desktop) {
+    this.selectedDesktop = desktop;
+    this.desktopDetailVisible = true;
+    this.desktopListFullscreened = false;
   }
 
   public onTermFilterSelected(term: TermFilter): void {
