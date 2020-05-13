@@ -3,7 +3,16 @@ syntax = "proto3";
 package chef.automate.api.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
 
+import "protoc-gen-swagger/options/annotations.proto";
+
 message NodesCounts {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["filter"]
+    },
+    // Example from List Node Status Count: cfgmgmt/stats/node_counts?filter=name:mySO*&filter=platform:ubun*
+    example: { value: '{"filter": ["name:mySO*","platform:ubun*"]}' }
+  };
   // List of filters to be applied to the node count results.
   repeated string filter = 1;
   // Earliest node check-in.
@@ -13,6 +22,13 @@ message NodesCounts {
 }
 
 message RunsCounts {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["node_id"]
+    },
+    // Example from List Run Status Totals: cfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd&start=2019-11-02
+    example: { value: '{"node_id": "821fff07-abc9-4160-96b1-83d68ae5cfdd", "start": "2019-11-02"}' }
+  };
   // List of filters to be applied to the run count results.
   repeated string filter = 1;
   // Earliest (in history) run information to return for the run counts.
