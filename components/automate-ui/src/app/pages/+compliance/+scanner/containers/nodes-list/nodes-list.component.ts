@@ -7,6 +7,7 @@ import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../../../../ngrx.reducers';
 import * as selectors from '../../state/scanner.selectors';
 import * as actions from '../../state/scanner.actions';
+import { NodeTotals } from 'app/entities/nodes/nodes.model';
 
 @Component({
   templateUrl: './nodes-list.component.html',
@@ -23,7 +24,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
 
   nodeDetail$: Observable<any>;
 
-  nodeTotals$: Observable<any>;
+  nodeTotals$: Observable<NodeTotals>;
 
   statusFilter$: Observable<string>;
 
