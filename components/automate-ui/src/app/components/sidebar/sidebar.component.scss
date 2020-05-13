@@ -1,4 +1,5 @@
 @import "~styles/variables";
+@import "@carbon/layout/scss/layout";
 
 .sidebar {
   display: block;
@@ -8,7 +9,20 @@
   width: $sidebar-width;
   height: 100%;
   background-color: $chef-white;
-  border-right: 1px solid #DFE3E5;
+  border-right: 1px solid $chef-grey;
+
+  @include carbon--breakpoint-down(lg) {
+    width: $sidebar-small-width;
+  }
+
+  chef-tooltip {
+    display: none;
+    transition-duration: 0.1s;
+
+    @include carbon--breakpoint-down(lg) {
+      display: block;
+    }
+  }
 
   .sidebar-selector {
 
@@ -73,6 +87,7 @@
         text-decoration: none;
         font-size: 16px;
         overflow: hidden;
+        white-space: nowrap;
 
         // yields required 16px gap between elements
         padding-top: 8px;
@@ -87,6 +102,7 @@
 
           .arrow {
             display: inline;
+            margin-right: -3px;
           }
         }
       }
@@ -97,7 +113,8 @@
         vertical-align: -2px;
       }
 
-      .arrow {
+      .arrow,
+      .open-in-new {
         display: none;
         margin-top: 4px;
         float: right;
@@ -105,8 +122,8 @@
       }
 
       .open-in-new {
-        font-size: 14px;
-        padding-left: 4px;
+        display: inline;
+        margin-right: -3px;
       }
 
       .group {
@@ -116,30 +133,15 @@
         font-size: 12px;
         color: #6F7878;
       }
-    }
-  }
-}
 
-@media screen and (max-width: 769px) {
-  .sidebar {
-    width: $sidebar-small-width;
+      @include carbon--breakpoint-down(lg) {
+        .menu-item-groups:not(:last-child) {
+          border-bottom: 1px solid $chef-grey;
+        }
 
-    .text {
-      display: none;
-    }
-
-    ul {
-      li {
-        padding: 0;
-      }
-    }
-
-    .sidebar-nav {
-      ul {
-        li {
-          a {
-            padding: 30px 7px 30px 7px;
-          }
+        .group,
+        .text {
+          display: none;
         }
       }
     }
