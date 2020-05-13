@@ -151,32 +151,6 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		return nil, status.Error(codes.InvalidArgument, "must supply server ID")
 	}
 
-	if req.AdminKey != "" {
-		oldOrg, err := s.service.Storage.GetOrg(ctx, req.Id, req.ServerId)
-		if err != nil {
-			return nil, service.ParseStorageError(err, *req, "org")
-		}
-
-		secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: oldOrg.CredentialID})
-		if err != nil {
-			return nil, err
-		}
-
-		newSecret := &secrets.Secret{
-			Id:   secret.GetId(),
-			Name: "infra-proxy-service-admin-key",
-			Type: "chef-server",
-			Data: []*query.Kv{
-				{Key: "key", Value: req.AdminKey},
-			},
-		}
-
-		_, err = s.service.Secrets.Update(ctx, newSecret)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	org, err := s.service.Storage.EditOrg(ctx, req.Id, req.Name, req.AdminUser, req.ServerId, req.Projects)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "org")
@@ -184,6 +158,42 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 
 	return &response.UpdateOrg{
 		Org: fromStorageOrg(org),
+	}, nil
+}
+
+// ResetOrgAdminKey updates the org admin key via PUT
+func (s *Server) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdminKey) (*response.ResetOrgAdminKey, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	org, err := s.service.Storage.GetOrg(ctx, req.Id, req.ServerId)
+	if err != nil {
+		return nil, service.ParseStorageError(err, *req, "org")
+	}
+
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.CredentialID})
+	if err != nil {
+		return nil, err
+	}
+
+	newSecret := &secrets.Secret{
+		Id:   secret.GetId(),
+		Name: "infra-proxy-service-admin-key",
+		Type: "chef-server",
+		Data: []*query.Kv{
+			{Key: "key", Value: req.AdminKey},
+		},
+	}
+
+	_, err = s.service.Secrets.Update(ctx, newSecret)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.ResetOrgAdminKey{
+		Id:       req.Id,
+		ServerId: req.ServerId,
+		Status:   "success",
 	}, nil
 }
 

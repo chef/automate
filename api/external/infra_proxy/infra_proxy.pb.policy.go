@@ -138,8 +138,6 @@ func init() {
 					return m.Name
 				case "admin_user":
 					return m.AdminUser
-				case "admin_key":
-					return m.AdminKey
 				case "server_id":
 					return m.ServerId
 				default:
@@ -157,6 +155,23 @@ func init() {
 					return m.Id
 				case "server_id":
 					return m.ServerId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/ResetOrgAdminKey", "infra:infraServers:{server_id}:orgs:{id}", "infra:infraServers:update", "PUT", "/api/v0/infra/servers/{server_id}/orgs/{id}/reset-key", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.ResetOrgAdminKey); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "id":
+					return m.Id
+				case "server_id":
+					return m.ServerId
+				case "admin_key":
+					return m.AdminKey
 				default:
 					return ""
 				}
