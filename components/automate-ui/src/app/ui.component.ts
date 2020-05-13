@@ -2,9 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, AfterViewChecked } from '@angular
 import { ActivationStart, ActivationEnd, Router, NavigationEnd } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { filter } from 'rxjs/operators';
-import { create } from 'rxjs-spy';
 
-import { environment } from 'environments/environment';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Feature } from 'app/services/feature-flags/types';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
@@ -32,8 +30,6 @@ export class UIComponent implements OnInit, AfterViewChecked {
     }
   ];
 
-  public spy;
-
   legacyFeatures: Array<Feature> = [];
   hideFullPage = true;
 
@@ -43,14 +39,6 @@ export class UIComponent implements OnInit, AfterViewChecked {
     public layoutFacade: LayoutFacadeService,
     private cdRef: ChangeDetectorRef
   ) {
-
-    if (!environment.production) {
-      // This enables rxjs-spy in the browser console,
-      // which supports analyzing, debugging, and logging any tagged Observables.
-      // Available commands are shown at https://github.com/cartant/rxjs-spy#module-log
-      this.spy = create();
-    }
-
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
       filter(event => event instanceof ActivationEnd)
