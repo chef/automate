@@ -94,6 +94,7 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
   }
 
   closeCreateModal(): void {
+    this.modifyUsername = false;
     this.visible = false;
   }
 
