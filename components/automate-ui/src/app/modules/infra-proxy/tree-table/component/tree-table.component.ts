@@ -52,6 +52,7 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
     this.searchableTree = this.tree.map(t => this.converterService.toSearchableTree(t));
     const treeTableTree = this.searchableTree.map(st => this.converterService.toTreeTableTree(st));
     this.treeTable = flatMap(treeTableTree, this.treeService.flatten);
+    this.treeCollepsed();
     this.dataSource = this.generateDataSource();
   }
 
@@ -63,6 +64,7 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
     this.searchableTree = this.tree.map(t => this.converterService.toSearchableTree(t));
     const treeTableTree = this.searchableTree.map(st => this.converterService.toTreeTableTree(st));
     this.treeTable = flatMap(treeTableTree, this.treeService.flatten);
+    this.treeCollepsed();
     this.dataSource = this.generateDataSource();
   }
 
@@ -75,7 +77,8 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
   }
 
   // A given element `el` is marked visible if every node between it and the root is expanded.
-  onNodeClick(clickedNode: TreeTableNode<T>): void {
+  onNodeClick(clickedNode: TreeTableNode<T>, $event: Event): void {
+    $event.stopPropagation();
     clickedNode.isExpanded = !clickedNode.isExpanded;
     this.treeTable.forEach(el => {
       el.isVisible = this.searchableTree.every(st => {
@@ -86,6 +89,15 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
     });
     this.dataSource = this.generateDataSource();
     this.nodeClicked.next(clickedNode);
+  }
+
+  treeCollepsed() {
+    this.treeTable.forEach((item, index) => {
+      item.isExpanded = false;
+      if (item.depth > 0 && index > 0) {
+        item.isVisible = false;
+      }
+    });
   }
 
   // Overrides default options with those specified by the user

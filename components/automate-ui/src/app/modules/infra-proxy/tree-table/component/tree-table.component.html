@@ -2,13 +2,15 @@
   <div *ngFor="let column of displayedColumns; first as isFirst;">
     <ng-container matColumnDef="{{column}}">
       <th mat-header-cell *matHeaderCellDef [ngClass]="{'vertical-separator': options.verticalSeparator}">
-        {{options.capitalisedHeader ? (column | titlecase) : column}}
+        <p *ngIf="column !== 'name'">
+          {{options.capitalisedHeader ? (column | titlecase) : column}}
+        </p>
       </th>
       <td mat-cell *matCellDef="let element" [ngClass]="{'vertical-separator': options.verticalSeparator}">
         <div *ngIf="isFirst">
           <div class="value-cell">
             <div [class]="'child-step-'+(element.depth)"></div>
-            <mat-icon [ngStyle]="{'visibility': element.children.length ? 'visible' : 'hidden'}" (click)="onNodeClick(element)">
+            <mat-icon [ngStyle]="{'visibility': element.children.length ? 'visible' : 'hidden'}" (click)="onNodeClick(element, $event)">
               {{element.isExpanded ? 'remove' : 'add'}}
             </mat-icon>
             <div [ngClass]="{'hasChildren': element.children.length}">{{element.value[column]}}</div>
