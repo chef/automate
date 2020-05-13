@@ -47,7 +47,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
           this.environmentsTab = false;
           this.rolesTab = true;
         }
-        
+
         if ( params.path.includes('environments') ) {
           this.cookbooksTab = false;
           this.rolesTab = false;

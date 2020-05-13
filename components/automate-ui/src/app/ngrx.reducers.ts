@@ -64,7 +64,7 @@ export interface NgrxStateAtom {
   apiTokens: apiToken.ApiTokenEntityState;
   automateSettings: automateSettings.AutomateSettingsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
-  cookbooks: cookbookEntity.CookbookEntityState; 
+  cookbooks: cookbookEntity.CookbookEntityState;
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityState;
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityState;
   destinations: destinationEntity.DestinationEntityState;
