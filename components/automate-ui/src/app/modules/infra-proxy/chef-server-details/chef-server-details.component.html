@@ -91,8 +91,8 @@
         <chef-loading-spinner *ngIf="orgsListLoading" size="50"></chef-loading-spinner>
         <ng-container *ngIf="!orgsListLoading">
           <chef-toolbar>
-            <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
-              <chef-button id="create-button" primary (click)="openCreateModal('create')">Add Chef Organization
+            <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs', 'post', server?.id]">
+              <chef-button id="create-button" primary (click)="openCreateModal()">Add Chef Organization
               </chef-button>
             </app-authorized>
           </chef-toolbar>
@@ -111,11 +111,11 @@
                 </chef-td>
                 <chef-td>{{ org.admin_user }}</chef-td>
                 <chef-td class="three-dot-column">
-                  <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
+                  <!-- <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{id}', 'delete', [server?.id, org.id]]"> -->
                     <mat-select panelClass="chef-control-menu" id="menu-{{org.id}}">
-                      <mat-option data-cy="delete" (onSelectionChange)="startOrgDelete($event, org)">Delete Org</mat-option>
+                    <mat-option data-cy="delete" (onSelectionChange)="startOrgDelete($event, org)">Delete Org</mat-option>
                     </mat-select>
-                  </app-authorized>
+                  <!-- </app-authorized> -->
                 </chef-td>
               </chef-tr>
             </chef-tbody>
