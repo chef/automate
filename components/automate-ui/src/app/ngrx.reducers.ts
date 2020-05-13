@@ -13,6 +13,7 @@ import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
 import * as cookbookDetailsEntity from './entities/cookbooks/cookbook-details.reducer';
 import * as cookbookVersionsEntity from './entities/cookbooks/cookbook-versions.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
+import * as environmentEntity from './entities/environments/environment.reducer';
 import * as infraRoleEntity from './entities/infra-roles/infra-role.reducer';
 import * as infraRoleDetailsEntity from './entities/infra-roles/infra-role-details.reducer';
 import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
@@ -67,8 +68,9 @@ export interface NgrxStateAtom {
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityState;
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityState;
   destinations: destinationEntity.DestinationEntityState;
-  infraroles: infraRoleEntity.InfraRoleEntityState;
-  infraroledetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
+  environments: environmentEntity.EnvironmentEntityState;
+  infraRoles: infraRoleEntity.InfraRoleEntityState;
+  infraRoleDetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
@@ -181,8 +183,9 @@ export const defaultInitialState = {
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityInitialState,
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
-  infraroles: infraRoleEntity.InfraRoleEntityInitialState,
-  infraroledetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
+  environments: environmentEntity.EnvironmentEntityInitialState,
+  infraRoles: infraRoleEntity.InfraRoleEntityInitialState,
+  infraRoleDetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
   licenseStatus: license.LicenseStatusEntityInitialState,
   managers: manager.ManagerEntityInitialState,
@@ -229,6 +232,7 @@ export const ngrxReducers = {
   cookbookVersions: cookbookVersionsEntity.cookbookVersionsEntityReducer,
   credentialEntity: credential.credentialReducer,
   destinations: destinationEntity.destinationEntityReducer,
+  environments: environmentEntity.environmentEntityReducer,
   infraRoles: infraRoleEntity.infraRoleEntityReducer,
   infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
   jobs: jobEntity.jobEntityReducer,

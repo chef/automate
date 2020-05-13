@@ -27,6 +27,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public serverId: string;
   public orgId: string;
   public cookbooksTab = true;
+  public environmentsTab = false;
   public rolesTab = false;
   private isDestroyed = new Subject<boolean>();
 
@@ -43,7 +44,14 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
       this.previousRoute$.subscribe((params: any) => {
         if ( params.path.includes('roles') ) {
           this.cookbooksTab = false;
+          this.environmentsTab = false;
           this.rolesTab = true;
+        }
+
+        if ( params.path.includes('environments') ) {
+          this.cookbooksTab = false;
+          this.rolesTab = false;
+          this.environmentsTab = true;
         }
       });
     }
@@ -83,6 +91,9 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         this.telemetryService.track('orgDetailsTab', 'roles');
         break;
       case 2:
+        this.telemetryService.track('orgDetailsTab', 'environments');
+        break;
+      case 3:
         this.telemetryService.track('orgDetailsTab', 'org-edit');
         break;
     }

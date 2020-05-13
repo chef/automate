@@ -44,6 +44,7 @@ export class CookbooksComponent implements OnInit {
     ]).pipe(
       filter(([getCookbooksSt, allCookbooksState]) =>
         getCookbooksSt === EntityStatus.loadingSuccess && !isNil(allCookbooksState))
+
     ).subscribe(([ _getCookbooksSt, allCookbooksState]) => {
       this.cookbooks = allCookbooksState;
       this.cookbooksListLoading = false;

@@ -13,6 +13,7 @@ import { CredentialsEffects } from './pages/+compliance/+credentials/credentials
 import { CredentialEffects } from './entities/credentials/credential.effects';
 import { DesktopEffects } from './entities/desktop/desktop.effects';
 import { DestinationEffects } from './entities/destinations/destination.effects';
+import { EnvironmentEffects } from './entities/environments/environment.effects';
 import { EventFeedEffects } from './services/event-feed/event-feed.effects';
 import { InfraRoleEffects } from './entities/infra-roles/infra-role.effects';
 import { JobEffects } from './entities/jobs/job.effects';
@@ -47,6 +48,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       CredentialEffects,
       DesktopEffects,
       DestinationEffects,
+      EnvironmentEffects,
       EventFeedEffects,
       InfraRoleEffects,
       JobEffects,
