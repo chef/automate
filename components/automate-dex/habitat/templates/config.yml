@@ -214,6 +214,7 @@ connectors:
       groupsAttr: {{cfg.connectors.saml.groups_attr}}
       {{- if cfg.connectors.saml.allowed_groups}}
       allowedGroups: {{cfg.connectors.saml.allowed_groups}}
+      filterGroups: true
       {{- end}}
       nameIDPolicyFormat: {{cfg.connectors.saml.name_id_policy_format}}
   {{- end}}
