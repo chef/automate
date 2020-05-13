@@ -1,5 +1,3 @@
-import { itFlaky } from '../../../support/constants';
-
 describe('team management', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'test-team-mgmt';
@@ -77,7 +75,7 @@ describe('team management', () => {
     const dropdownNameUntilEllipsisLen = 25;
     const projectDropdown = 'app-team-management app-projects-dropdown ';
 
-    itFlaky('can create a team with a default ID', () => {
+    it('can create a team with a default ID', () => {
       cy.get('[data-cy=team-create-button]').contains('Create Team').click();
       cy.get('app-team-management chef-modal').should('exist');
 
@@ -92,7 +90,7 @@ describe('team management', () => {
       cy.contains(generatedTeamID).should('exist');
     });
 
-    itFlaky('can create a team with a custom ID', () => {
+    it('can create a team with a custom ID', () => {
       cy.get('[data-cy=team-create-button]').contains('Create Team').click();
       cy.get('app-team-management chef-modal').should('exist');
 
@@ -116,7 +114,7 @@ describe('team management', () => {
         cy.applyProjectsFilter([unassigned]);
       });
 
-      itFlaky(`can create a team with no projects (unassigned)
+      it(`can create a team with no projects (unassigned)
         and cannot access projects dropdown`, () => {
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
@@ -153,7 +151,7 @@ describe('team management', () => {
         cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['teams']);
       });
 
-      itFlaky('can create a team with multiple projects', () => {
+      it('can create a team with multiple projects', () => {
         const projectSummary = '2 projects';
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
@@ -187,7 +185,7 @@ describe('team management', () => {
         cy.contains(projectSummary).should('exist');
       });
 
-      itFlaky('can create a team with one project selected', () => {
+      it('can create a team with one project selected', () => {
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
         cy.get('[data-cy=create-name]').type(teamName);
@@ -221,7 +219,7 @@ describe('team management', () => {
         cy.contains(project2ID).should('exist');
       });
 
-      itFlaky('can create a team with no projects selected (unassigned)', () => {
+      it('can create a team with no projects selected (unassigned)', () => {
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
         cy.get('[data-cy=create-name]').type(teamName);
