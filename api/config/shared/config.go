@@ -261,3 +261,32 @@ func GlobalLogLevelToZapLevel(level string) string {
 		return "info"
 	}
 }
+
+// GetStringInBetween is a helper function used to get substrings
+func GetStringInBetween(str string, start string, end string) (result string) {
+	s := strings.Index(str, start)
+	if s == -1 {
+		return
+	}
+	s += len(start)
+	e := strings.Index(str, end)
+	if e == -1 {
+		return
+	}
+	return str[s:e]
+}
+
+// PrepareGCSCredentials was created to account for the GCP
+// credentials json containing newline escape characters
+func PrepareGCSCredentials(gcscreds string) string {
+
+	// This section takes the gcscreds privkey and escapes the newline chars
+	gcscredspk := GetStringInBetween(gcscreds, "-----BEGIN PRIVATE KEY-----", "-----END PRIVATE KEY-----")
+	unescapedpk := strings.ReplaceAll(gcscredspk, "\n", `\n`)
+	gcscreds = strings.ReplaceAll(gcscreds, gcscredspk, unescapedpk)
+
+	// This section gets rid of actual newlines in the json object so it can be unmarshaled
+	gcscreds = strings.ReplaceAll(gcscreds, "\n", ``)
+
+	return gcscreds
+}
