@@ -2,6 +2,7 @@ import { of as observableOf,  Observable } from 'rxjs';
 
 import { map, filter } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -34,6 +35,8 @@ export class NotificationsComponent implements OnInit {
   permissionDenied = false; // not currently used
   // This is exposed here to allow the component HTML access to ServiceActionType
   serviceActionType = ServiceActionType;
+  public notificationToDelete: Rule;
+  public deleteModalVisible = false;
 
   constructor(
     private layoutFacade: LayoutFacadeService,
@@ -99,6 +102,22 @@ export class NotificationsComponent implements OnInit {
 
   snackBarMessage(message) {
     this.snackBar.open(message, '', { duration: 6000 } );
+  }
+
+  public startNotificationDelete($event: MatOptionSelectionChange, rule: Rule): void {
+    if ($event.isUserInput) {
+      this.notificationToDelete = rule;
+      this.deleteModalVisible = true;
+    }
+  }
+
+  public deleteNotification(): void {
+    this.closeDeleteModal();
+    this.service.deleteRule(this.notificationToDelete)
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
   }
 
   private updateSort(field: string, direction: string) {
