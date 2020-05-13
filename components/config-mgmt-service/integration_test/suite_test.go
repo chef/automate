@@ -16,12 +16,14 @@ import (
 	elastic "gopkg.in/olivere/elastic.v6"
 
 	cElastic "github.com/chef/automate/components/config-mgmt-service/backend/elastic"
+	"github.com/chef/automate/components/config-mgmt-service/backend/postgres"
 	"github.com/chef/automate/components/config-mgmt-service/config"
 	grpc "github.com/chef/automate/components/config-mgmt-service/grpcserver"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	iElastic "github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 	"github.com/chef/automate/lib/grpc/auth_context"
+	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
 // Global variables
@@ -39,6 +41,14 @@ var (
 	// res, err := cfgmgmt.GetNodesCounts(ctx, &req)
 	// ```
 	cfgmgmt *grpc.CfgMgmtServer
+)
+
+const (
+	pgDatabaseName       = "chef_config_mgmt_service"
+	A2_SVC_NAME          = "A2_SVC_NAME"
+	A2_SVC_PATH          = "A2_SVC_PATH"
+	defaultA2ServiceName = "config-mgmt-service"
+	defaultA2ServicePath = "/hab/svc/config-mgmt-service"
 )
 
 // Suite helps you manipulate various stages of your tests, it provides
@@ -130,9 +140,38 @@ func (s *Suite) GlobalTeardown() {
 //
 // This function expects ES and postgres to be already up and running.
 func newCfgMgmtServer(esBackend *cElastic.Backend) (*grpc.CfgMgmtServer, error) {
+	_, haveSvcName := os.LookupEnv(A2_SVC_NAME)
+	_, haveSvcPath := os.LookupEnv(A2_SVC_PATH)
+	if !(haveSvcName && haveSvcPath) {
+		_ = os.Setenv(A2_SVC_NAME, defaultA2ServiceName)
+		_ = os.Setenv(A2_SVC_PATH, defaultA2ServicePath)
+	}
+
+	uri, err := platform_config.PGURIFromEnvironment(pgDatabaseName)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to get pg uri from environment variables")
+	}
+
 	cfg := config.Default()
+	cfg.Postgres = config.Postgres{
+		URI:        uri,
+		Database:   pgDatabaseName,
+		SchemaPath: "/src/components/config-mgmt-service/backend/postgres/schema/sql/",
+	}
+
+	err = postgres.DestructiveReMigrateForTest(&cfg.Postgres)
+	if err != nil {
+		return nil, err
+	}
+
 	cfg.SetBackend(esBackend)
-	return grpc.NewCfgMgmtServer(cfg), nil
+	srv := grpc.NewCfgMgmtServer(cfg)
+	err = srv.ConnectPg()
+	if err != nil {
+		return nil, err
+	}
+	return srv, nil
 }
 
 // verifyIndices receives a list of indices and verifies that they exist,

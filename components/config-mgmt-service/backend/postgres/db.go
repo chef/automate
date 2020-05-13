@@ -83,3 +83,7 @@ func (db *Postgres) Migrate() error {
 func (db *Postgres) Ping() error {
 	return db.db.Ping()
 }
+
+func (db *Postgres) Close() error {
+	return db.db.Close()
+}
