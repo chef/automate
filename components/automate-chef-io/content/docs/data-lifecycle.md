@@ -171,7 +171,10 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
 }
 ```
 
-Configure the jobs by sending the JSON payload to the `configure` endpoint.
+Configure the jobs by sending the JSON payload to the `config` endpoint.
+Note that the data you send to this input is **not** the same as the data returned from the `status` endpoint.
+That is, you cannot just read the data on the `status` endpoint, change some values, and feed it back on the `config` endpoint.
+
 Save the JSON file as `config.json` in the current working directory:
 
 ```bash
