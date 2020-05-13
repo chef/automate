@@ -342,7 +342,7 @@ input {
   top: -2px;
 }
 
-.chef-server-icon {
+.chef-servers-icon {
   display: inline-block;
   border: 1px solid $chef-darkest;
   border-radius: 2px;
@@ -354,7 +354,7 @@ input {
   margin-right: 5px;
 }
 
-.chef-server-icon:before {
+.chef-servers-icon:before {
   color: $chef-darkest;
   content: 'C';
   font-size: 9px;

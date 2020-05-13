@@ -106,11 +106,11 @@
           }
         }
 
-        &:hover .chef-server-icon, &.active .chef-server-icon {
+        &:hover .chef-servers-icon, &.active .chef-servers-icon {
           border-color: $chef-primary-bright;
         }
 
-        &:hover .chef-server-icon:before, &.active .chef-server-icon:before {
+        &:hover .chef-servers-icon:before, &.active .chef-servers-icon:before {
           color: $chef-primary-bright;
         }
 
