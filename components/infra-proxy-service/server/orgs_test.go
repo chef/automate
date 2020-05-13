@@ -997,7 +997,6 @@ func TestOrgs(t *testing.T) {
 			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
 				Name:      "update-infra-org",
 				AdminUser: "admin",
-				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
 				Projects:  []string{},
 			})
@@ -1009,7 +1008,6 @@ func TestOrgs(t *testing.T) {
 				Id:        "",
 				Name:      "update-infra-org",
 				AdminUser: "admin",
-				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
 				Projects:  []string{},
 			})
@@ -1023,7 +1021,6 @@ func TestOrgs(t *testing.T) {
 			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
 				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
 				AdminUser: "admin",
-				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
 				Projects:  []string{},
 			})
@@ -1035,7 +1032,6 @@ func TestOrgs(t *testing.T) {
 				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
 				Name:      "",
 				AdminUser: "admin",
-				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
 				Projects:  []string{},
 			})
@@ -1050,7 +1046,6 @@ func TestOrgs(t *testing.T) {
 				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
 				Name:      "infra-org",
 				AdminUser: "admin",
-				AdminKey:  "--KEY--",
 				Projects:  []string{},
 			})
 			require.Nil(t, resp)
@@ -1061,7 +1056,6 @@ func TestOrgs(t *testing.T) {
 				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
 				Name:      "infra-org",
 				AdminUser: "admin",
-				AdminKey:  "--KEY--",
 				ServerId:  "",
 				Projects:  []string{},
 			})
@@ -1079,13 +1073,82 @@ func TestOrgs(t *testing.T) {
 				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
 				Name:      "infra-org",
 				AdminUser: "admin",
-				AdminKey:  "--KEY--",
 				ServerId:  "97e01ea1-976e-4626-88c8-43345c5d934f",
 				Projects:  []string{},
 			})
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err)
 		})
+		cleanupServer(ctx, t, cl, serverRes.Server.Id)
+	})
+
+	t.Run("ResetOrgAdminKey", func(t *testing.T) {
+		test.ResetState(context.Background(), t, serviceRef)
+		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+			Id:        "chef-infra-server",
+			Name:      "Chef Infra Server",
+			Fqdn:      "domain.com",
+			IpAddress: "0.0.0.0",
+		})
+		require.NoError(t, err)
+		require.NotNil(t, serverRes)
+
+		t.Run("when a valid org reset admin key request is submitted, resets the org admin key successfully", func(t *testing.T) {
+			ctx := context.Background()
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req := &request.CreateOrg{
+				Id:        "infra-org-id",
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"project1", "project2"},
+			}
+			resp, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+
+			newSecretWithID := secrets.Secret{
+				Name: "infra-proxy-service-admin-key",
+				Type: "chef-server",
+				Data: []*query.Kv{
+					{Key: "key", Value: "--NEW_KEY--"},
+				},
+			}
+			newSecretWithID.Id = "fake id"
+
+			secretsMock.EXPECT().Update(gomock.Any(), &newSecretWithID, gomock.Any())
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&newSecretWithID, nil)
+
+			newKey := "--NEW_KEY--"
+			updatedResetKeyResp, err := cl.ResetOrgAdminKey(ctx, &request.ResetOrgAdminKey{
+				Id:       resp.Org.Id,
+				ServerId: serverRes.Server.Id,
+				AdminKey: newKey,
+			})
+			require.NoError(t, err, "reset org admin key")
+			require.NotNil(t, updatedResetKeyResp)
+			assert.Equal(t, "success", updatedResetKeyResp.Status)
+
+			cleanupOrg(ctx, t, cl, resp.Org.Id, resp.Org.ServerId)
+		})
+
+		t.Run("when org to reset admin key does not exist, raise org not found", func(t *testing.T) {
+			ctx := context.Background()
+			resetReq := &request.ResetOrgAdminKey{
+				Id:       "97e01ea1-976e-4626-88c8-43345c5d934f",
+				AdminKey: "--NEW_KEY--",
+				ServerId: serverRes.Server.Id,
+			}
+			resp, err := cl.ResetOrgAdminKey(ctx, resetReq)
+
+			require.Nil(t, resp)
+			grpctest.AssertCode(t, codes.NotFound, err)
+		})
+
 		cleanupServer(ctx, t, cl, serverRes.Server.Id)
 	})
 }

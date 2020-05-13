@@ -289,6 +289,46 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{id}/reset-key": {
+      "put": {
+        "operationId": "ResetOrgAdminKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ResetOrgAdminKey"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.ResetOrgAdminKey"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}": {
       "get": {
         "operationId": "GetAffectedNodes",
@@ -1046,6 +1086,23 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.request.ResetOrgAdminKey": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "admin_key": {
+          "type": "string",
+          "description": "Chef organization admin key."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.UpdateOrg": {
       "type": "object",
       "properties": {
@@ -1060,10 +1117,6 @@ func init() {
         "admin_user": {
           "type": "string",
           "description": "Chef organization admin user."
-        },
-        "admin_key": {
-          "type": "string",
-          "description": "Chef organization admin key."
         },
         "server_id": {
           "type": "string",
@@ -1806,6 +1859,23 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileListItem"
           },
           "description": "Policyfiles list."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.ResetOrgAdminKey": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "status": {
+          "type": "string",
+          "description": "Response status."
         }
       }
     },

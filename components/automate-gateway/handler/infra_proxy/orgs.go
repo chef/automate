@@ -64,7 +64,6 @@ func (a *InfraProxyServer) UpdateOrg(ctx context.Context, r *gwreq.UpdateOrg) (*
 		Id:        r.Id,
 		Name:      r.Name,
 		AdminUser: r.AdminUser,
-		AdminKey:  r.AdminKey,
 		ServerId:  r.ServerId,
 		Projects:  r.Projects,
 	}
@@ -74,6 +73,24 @@ func (a *InfraProxyServer) UpdateOrg(ctx context.Context, r *gwreq.UpdateOrg) (*
 	}
 	return &gwres.UpdateOrg{
 		Org: fromUpstreamOrg(res.Org),
+	}, nil
+}
+
+// ResetOrgAdminKey resets the org admin key
+func (a *InfraProxyServer) ResetOrgAdminKey(ctx context.Context, r *gwreq.ResetOrgAdminKey) (*gwres.ResetOrgAdminKey, error) {
+	req := &infra_req.ResetOrgAdminKey{
+		Id:       r.Id,
+		ServerId: r.ServerId,
+		AdminKey: r.AdminKey,
+	}
+	res, err := a.client.ResetOrgAdminKey(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &gwres.ResetOrgAdminKey{
+		Id:       res.GetId(),
+		ServerId: res.GetServerId(),
+		Status:   res.GetStatus(),
 	}, nil
 }
 

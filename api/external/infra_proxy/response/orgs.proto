@@ -53,3 +53,12 @@ message Org {
     // List of projects this chef organization belongs to. May be empty.
     repeated string projects = 6;
 }
+
+message ResetOrgAdminKey {
+    // Chef organization ID. 
+    string id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Response status.
+    string status = 3;
+}

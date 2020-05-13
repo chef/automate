@@ -25,12 +25,10 @@ message UpdateOrg {
     string name = 2;
     // Chef organization admin user.
     string admin_user = 3;
-    // Chef organization admin key.
-    string admin_key = 4;
     // Chef Infra Server ID.
-    string server_id = 5;
+    string server_id = 4;
     // List of projects this chef organization belongs to. May be empty.
-    repeated string projects = 6;
+    repeated string projects = 5;
 }
 
 message DeleteOrg {
@@ -50,4 +48,13 @@ message GetOrg {
     string id = 1;
     // Chef Infra Server ID.
     string server_id = 2;
+}
+
+message ResetOrgAdminKey {
+    // Chef organization ID. 
+    string id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Chef organization admin key.
+    string admin_key = 3;
 }
