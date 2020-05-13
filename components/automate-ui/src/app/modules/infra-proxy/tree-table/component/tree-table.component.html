@@ -10,7 +10,7 @@
         <div *ngIf="isFirst">
           <div class="value-cell">
             <div [class]="'child-step-'+(element.depth)"></div>
-            <mat-icon [ngStyle]="{'visibility': element.children.length ? 'visible' : 'hidden'}" (click)="onNodeClick(element, $event)">
+            <mat-icon [ngStyle]="{'visibility': element.children.length ? 'visible' : 'hidden'}" (click)="onNodeClick(element)">
               {{element.isExpanded ? 'remove' : 'add'}}
             </mat-icon>
             <div [ngClass]="{'hasChildren': element.children.length}">{{element.value[column]}}</div>

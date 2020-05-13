@@ -77,8 +77,7 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
   }
 
   // A given element `el` is marked visible if every node between it and the root is expanded.
-  onNodeClick(clickedNode: TreeTableNode<T>, $event: Event): void {
-    $event.stopPropagation();
+  onNodeClick(clickedNode: TreeTableNode<T>): void {
     clickedNode.isExpanded = !clickedNode.isExpanded;
     this.treeTable.forEach(el => {
       el.isVisible = this.searchableTree.every(st => {
