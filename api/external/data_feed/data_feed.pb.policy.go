@@ -6,7 +6,7 @@ package data_feed
 import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/AddDestination", "datafeed:destination", "datafeed:destination:add", "POST", "/datafeed/destination", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/AddDestination", "datafeed:destination", "datafeed:destination:add", "POST", "/api/v0/datafeed/destination", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*AddDestinationRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -23,13 +23,13 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/GetDestination", "datafeed:destination:{id}", "datafeed:destination:get", "GET", "/datafeed/destination/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/GetDestination", "datafeed:destination:{id}", "datafeed:destination:get", "GET", "/api/v0/datafeed/destination/{id}", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/DeleteDestination", "destination:destination:{id}", "destination:destination:delete", "DELETE", "/datafeed/destination/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/DeleteDestination", "destination:destination:{id}", "destination:destination:delete", "DELETE", "/api/v0/datafeed/destination/{id}", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/UpdateDestination", "datafeed:destination:{id}", "datafeed:destination:update", "PATCH", "/datafeed/destination/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/UpdateDestination", "datafeed:destination:{id}", "datafeed:destination:update", "PATCH", "/api/v0/datafeed/destination/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*UpdateDestinationRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -48,10 +48,10 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/ListDestinations", "datafeed:destinations", "datafeed:destinations:list", "POST", "/datafeed/destinations", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/ListDestinations", "datafeed:destinations", "datafeed:destinations:list", "POST", "/api/v0/datafeed/destinations", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/TestDestination", "datafeed:destinations:test", "datafeed:destinations:test", "POST", "/datafeed/destinations/test", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/TestDestination", "datafeed:destinations:test", "datafeed:destinations:test", "POST", "/api/v0/datafeed/destinations/test", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*URLValidationRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

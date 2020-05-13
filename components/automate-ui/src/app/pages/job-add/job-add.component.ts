@@ -6,7 +6,7 @@ import { Observable, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { clamp, isEqual } from 'lodash/fp';
 import { RRule } from 'rrule';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 import { NgrxStateAtom } from '../../ngrx.reducers';
 

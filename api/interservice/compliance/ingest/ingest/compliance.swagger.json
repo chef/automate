@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/events/compliance/report": {
+    "/api/v0/events/compliance/report": {
       "post": {
         "operationId": "ProcessComplianceReport",
         "responses": {
@@ -211,6 +211,9 @@
         },
         "waiver_data": {
           "$ref": "#/definitions/chef.automate.domain.compliance.ingest.events.inspec.WaiverData"
+        },
+        "removed_results_counts": {
+          "$ref": "#/definitions/chef.automate.domain.compliance.ingest.events.inspec.RemovedResultsCounts"
         }
       }
     },
@@ -351,6 +354,23 @@
         },
         "skip_message": {
           "type": "string"
+        }
+      }
+    },
+    "chef.automate.domain.compliance.ingest.events.inspec.RemovedResultsCounts": {
+      "type": "object",
+      "properties": {
+        "failed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

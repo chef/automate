@@ -11,7 +11,7 @@ import (
 
 	elastic "gopkg.in/olivere/elastic.v6"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 )
@@ -32,13 +32,13 @@ func (es *Backend) CreateBulkActionRequest(action backend.InternalChefAction) el
 }
 
 func (es *Backend) UpdateActionProjectTags(ctx context.Context,
-	projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
+	projectTaggingRules map[string]*authz.ProjectRules) (string, error) {
 	return es.UpdateActionProjectTagsForIndex(ctx, fmt.Sprintf("%s-%s", mappings.Actions.Index, "*"),
 		projectTaggingRules)
 }
 
 func (es *Backend) UpdateActionProjectTagsForIndex(ctx context.Context, index string,
-	projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
+	projectTaggingRules map[string]*authz.ProjectRules) (string, error) {
 	script := `
 		ArrayList matchingProjects = new ArrayList();
 		for (def project : params.projects) {

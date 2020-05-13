@@ -6,7 +6,7 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
-import { GetCookbooksForOrg } from 'app/entities/cookbooks/cookbook.actions';
+import { GetCookbooks } from 'app/entities/cookbooks/cookbook.actions';
 import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
 import {
   allCookbooks,
@@ -34,7 +34,7 @@ export class CookbooksComponent implements OnInit {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    this.store.dispatch(new GetCookbooksForOrg({
+    this.store.dispatch(new GetCookbooks({
       server_id: this.serverId, org_id: this.orgId
     }));
 
@@ -42,8 +42,9 @@ export class CookbooksComponent implements OnInit {
       this.store.select(getAllCookbooksForOrgStatus),
       this.store.select(allCookbooks)
     ]).pipe(
-      filter(([getCookbooksSt, _allCookbooksState]) =>
-        getCookbooksSt === EntityStatus.loadingSuccess && !isNil(_allCookbooksState))
+      filter(([getCookbooksSt, allCookbooksState]) =>
+        getCookbooksSt === EntityStatus.loadingSuccess && !isNil(allCookbooksState))
+
     ).subscribe(([ _getCookbooksSt, allCookbooksState]) => {
       this.cookbooks = allCookbooksState;
       this.cookbooksListLoading = false;

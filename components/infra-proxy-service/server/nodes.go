@@ -15,7 +15,7 @@ import (
 
 // GetAffectedNodes get the nodes using chef object
 func (s *Server) GetAffectedNodes(ctx context.Context, req *request.AffectedNodes) (*response.AffectedNodes, error) {
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}

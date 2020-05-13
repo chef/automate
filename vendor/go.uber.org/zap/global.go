@@ -31,7 +31,6 @@ import (
 )
 
 const (
-	_stdLogDefaultDepth      = 2
 	_loggerWriterDepth       = 2
 	_programmerErrorTemplate = "You've found a bug in zap! Please file a bug at " +
 		"https://github.com/uber-go/zap/issues/new and reference this error: %v"
@@ -138,7 +137,7 @@ func redirectStdLogAt(l *Logger, level zapcore.Level) (func(), error) {
 	}, nil
 }
 
-func levelToFunc(logger *Logger, lvl zapcore.Level) (func(string, ...zapcore.Field), error) {
+func levelToFunc(logger *Logger, lvl zapcore.Level) (func(string, ...Field), error) {
 	switch lvl {
 	case DebugLevel:
 		return logger.Debug, nil
@@ -159,7 +158,7 @@ func levelToFunc(logger *Logger, lvl zapcore.Level) (func(string, ...zapcore.Fie
 }
 
 type loggerWriter struct {
-	logFunc func(msg string, fields ...zapcore.Field)
+	logFunc func(msg string, fields ...Field)
 }
 
 func (l *loggerWriter) Write(p []byte) (int, error) {

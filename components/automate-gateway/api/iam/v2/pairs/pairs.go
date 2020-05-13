@@ -66,7 +66,7 @@ func InvertMapParameterized(
 	for method, methodInfo := range inputMap {
 
 		// Convert abstract path in policy to be able to extract param values from concrete path.
-		// e.g. "/users/auth/{email}" => "/users/auth/([^/]*)"
+		// e.g. "/api/v0/users/auth/{email}" => "/users/auth/([^/]*)"
 		// (includes non-parameterized endpoints, too, i.e. those with no transform needed)
 		reString := toPathComponentRegex(methodInfo.HTTPEndpoint)
 

@@ -124,7 +124,7 @@ describe('team details', () => {
 
         // initial state of page
         cy.get('[data-cy=team-details-submit-button]').should('have.attr', 'aria-disabled');
-        cy.get('app-team-details app-projects-dropdown #projects-selected').contains(unassigned);
+        cy.get('app-team-details app-projects-dropdown #resources-selected').contains(unassigned);
         cy.get('app-team-details app-projects-dropdown .dropdown-button').should('be.disabled');
 
         cy.get('[data-cy=team-details-name-input]')
@@ -178,7 +178,7 @@ describe('team details', () => {
           cy.get('[data-cy=team-details-submit-button]').should('have.attr', 'aria-disabled');
 
           // initial state of dropdown
-          cy.get('app-team-details app-projects-dropdown #projects-selected')
+          cy.get('app-team-details app-projects-dropdown #resources-selected')
             .contains(`${project1Name.substring(0, dropdownNameUntilEllipsisLen)}...`);
           cy.get('app-team-details app-projects-dropdown .dropdown-button')
             .should('not.be.disabled');
@@ -194,7 +194,7 @@ describe('team details', () => {
           cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
 
           // save
-          cy.get('app-team-details app-projects-dropdown #projects-selected')
+          cy.get('app-team-details app-projects-dropdown #resources-selected')
             .contains(projectSummary);
           cy.get('[data-cy=team-details-submit-button]').click();
 
@@ -208,7 +208,7 @@ describe('team details', () => {
           cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
 
           // save
-          cy.get('app-team-details app-projects-dropdown #projects-selected')
+          cy.get('app-team-details app-projects-dropdown #resources-selected')
             .contains(unassigned);
           cy.get('[data-cy=team-details-submit-button]').click();
         });

@@ -54,6 +54,7 @@ message Control {
 	google.protobuf.Struct tags = 24;
 	repeated Result results = 25;
 	WaiverData waiver_data = 26;
+	RemovedResultsCounts removed_results_counts = 27;
 }
 
 message WaiverData {
@@ -62,6 +63,12 @@ message WaiverData {
 	bool run = 3;
 	bool skipped_due_to_waiver = 4;
 	string message = 5;
+}
+
+message RemovedResultsCounts {
+	int32 failed = 1;
+	int32 skipped = 2;
+	int32 passed = 3;
 }
 
 message Result {

@@ -30,7 +30,7 @@
             {{ user.id }}
           </chef-td>
           <chef-td class="three-dot-column">
-            <!-- <app-authorized [allOf]="['/iam/v2/users/{id}', 'delete', user.id]"> -->
+            <!-- <app-authorized [allOf]="['/apis/iam/v2/users/{id}', 'delete', user.id]"> -->
             <mat-select panelClass="chef-control-menu" data-cy="select">
               <mat-option data-cy="delete" (onSelectionChange)="deleteUser($event, user)">{{ removeText }}</mat-option>
             </mat-select>

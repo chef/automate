@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
@@ -25,6 +26,10 @@ func nodeManagerPublisher(in <-chan message.Compliance, nodeManagerClient manage
 	out := make(chan message.Compliance, maxNumberOfBundledMsgs)
 	go func() {
 		for msg := range in {
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessingCompliance(err)
+				continue
+			}
 			// send to node manager from here.
 			log.Debugf("send info about node %s to node manager", msg.Report.NodeName)
 
@@ -39,7 +44,7 @@ func nodeManagerPublisher(in <-chan message.Compliance, nodeManagerClient manage
 				log.Errorf("unable to send info about node %s to node manager", msg.Report.NodeName)
 			}
 
-			out <- msg
+			message.Propagate(out, &msg)
 		}
 		close(out)
 	}()
@@ -73,6 +78,18 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 		status = nodes.LastContactData_SKIPPED
 	}
 
+	// translate tags
+	tags := in.Report.GetTags()
+	for _, tag := range in.Report.GetChefTags() {
+		tags = append(tags, &common.Kv{
+			Key:   "chef-tag",
+			Value: tag,
+		})
+	}
+	if in.Report.GetEnvironment() != "" {
+		tags = append(tags, &common.Kv{Key: "environment", Value: in.Report.GetEnvironment()})
+	}
+
 	return &manager.NodeMetadata{
 		Uuid:            in.Report.GetNodeUuid(),
 		Name:            in.Report.GetNodeName(),
@@ -83,7 +100,7 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 		SourceId:        in.Report.GetSourceId(),
 		SourceRegion:    in.Report.GetSourceRegion(),
 		SourceAccountId: in.Report.GetSourceAccountId(),
-		Tags:            in.Report.GetTags(),
+		Tags:            tags,
 		ProjectsData:    gatherProjectsData(&in.Report),
 		Projects:        in.InspecReport.Projects,
 		ScanData: &nodes.LastContactData{

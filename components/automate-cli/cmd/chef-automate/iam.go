@@ -59,7 +59,7 @@ func newIAMCreateTokenCommand() *cobra.Command {
 		&iamCmdFlags.adminToken,
 		"admin",
 		false,
-		"Generate a token and grant it admin-level permission (IAM v2)")
+		"Generate a token and add it to the chef-managed admin policy")
 	cmd.PersistentFlags().StringVar(
 		&iamCmdFlags.tokenID,
 		"id",

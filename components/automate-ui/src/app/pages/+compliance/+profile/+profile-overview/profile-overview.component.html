@@ -1,13 +1,17 @@
 <div class="app-main-container">
   <div class="container">
     <main>
-      <chef-notification
-        *ngIf="downloadErrorVisible"
-        type="error"
-        timeout="5"
-        (dismissed)="hideDownloadError()">
-        Failed to install profile. Please try again later.
-      </chef-notification>
+      <div class="sticky-notifications">
+        <div class="sticky-inner">
+          <app-notification
+            *ngIf="downloadErrorVisible"
+            type="error"
+            timeout="5"
+            (dismissed)="hideDownloadError()">
+            Failed to install profile. Please try again later.
+          </app-notification>
+        </div>
+      </div>
 
       <chef-page-header class="profiles-header">
         <chef-heading>Profiles</chef-heading>
@@ -30,7 +34,7 @@
             </chef-option>
           </chef-tab-selector>
         </chef-page-header>
-    
+
         <div class="empty-help setup-help" *ngIf="!profilesEnabled">
           <img class="help-icon" src="/assets/img/services.svg" alt="">
           <div class="help-msg">
@@ -40,13 +44,13 @@
             <p>into <code>/etc/delivery/delivery.rb</code> and running <code>automate-ctl reconfigure</code>. The <code>automate-ctl status</code> command should now list the status of the compliance_profiles service.</p>
           </div>
         </div>
-    
+
         <!--only show content if profile store is enabled-->
         <div *ngIf="profilesEnabled" class="profiles-content">
-    
+
           <!--profiles tab-->
           <div *ngIf="selectedTab === 'installed'">
-    
+
             <chef-modal
               id="upload-modal"
               [visible]="uploadModalVisible"

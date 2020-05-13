@@ -4,25 +4,21 @@ import (
 	"context"
 	"errors"
 	"time"
-
-	uuid "github.com/chef/automate/lib/uuid4"
 )
 
 // Storage is the interface provided by our various storage backends.
 type Storage interface {
-	GetServer(context.Context, uuid.UUID) (Server, error)
-	GetServerByName(ctx context.Context, serverName string) (Server, error)
-	GetServers(context.Context) ([]Server, error)
-	StoreServer(ctx context.Context, name string, description string, fqdn string, ipAddress string) (Server, error)
-	DeleteServer(context.Context, uuid.UUID) (Server, error)
-	EditServer(context.Context, Server) (Server, error)
+	GetServer(ctx context.Context, id string) (Server, error)
+	GetServers(ctx context.Context) ([]Server, error)
+	StoreServer(ctx context.Context, id string, name string, fqdn string, ipAddress string) (Server, error)
+	DeleteServer(ctx context.Context, id string) (Server, error)
+	EditServer(ctx context.Context, id string, name string, fqdn string, ipAddress string) (Server, error)
 
-	GetOrg(context.Context, uuid.UUID) (Org, error)
-	GetOrgByName(ctx context.Context, orgName string, serverID uuid.UUID) (Org, error)
-	GetOrgs(context.Context, uuid.UUID) ([]Org, error)
-	StoreOrg(ctx context.Context, name string, adminUser string, credentialID string, serverID string, projects []string) (Org, error)
-	DeleteOrg(context.Context, uuid.UUID) (Org, error)
-	EditOrg(context.Context, Org) (Org, error)
+	GetOrg(ctx context.Context, orgID string, serverID string) (Org, error)
+	GetOrgs(ctx context.Context, serverID string) ([]Org, error)
+	StoreOrg(ctx context.Context, id string, name string, adminUser string, adminKey string, serverID string, projects []string) (Org, error)
+	DeleteOrg(ctx context.Context, orgID string, serverID string) (Org, error)
+	EditOrg(ctx context.Context, id string, name string, adminUser string, serverID string, projects []string) (Org, error)
 }
 
 // Resetter is, if exposed, used for tests to reset the storage backend to a
@@ -33,19 +29,18 @@ type Resetter interface {
 
 // Server is the struct ingested and returned by our backend implementations.
 type Server struct {
-	ID          uuid.UUID
-	Name        string
-	Description string
-	Fqdn        string
-	IpAddress   string
-	OrgsCount   int32
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID        string
+	Name      string
+	Fqdn      string
+	IPAddress string
+	OrgsCount int32
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // Org is the struct ingested and returned by our backend implementations.
 type Org struct {
-	ID           uuid.UUID
+	ID           string
 	Name         string
 	AdminUser    string
 	CredentialID string

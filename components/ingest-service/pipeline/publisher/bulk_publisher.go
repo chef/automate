@@ -37,8 +37,16 @@ func bulkRunPublisherBundler(in <-chan message.ChefRun, client backend.Client,
 	go func() {
 		bundledMsgs := []message.ChefRun{}
 		for msg := range in {
-			// Add the message to the bundle
-			bundledMsgs = append(bundledMsgs, msg)
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+			} else {
+				// Add the message to the bundle
+				bundledMsgs = append(bundledMsgs, msg)
+			}
+
+			if len(bundledMsgs) == 0 {
+				continue
+			}
 
 			// Only publish the collection of bundled messages if
 			// the inbox is empty or there are over maxNumberOfBundledRunMsgs number of messages bundled
@@ -67,7 +75,7 @@ func bulkRunPublisherBundler(in <-chan message.ChefRun, client backend.Client,
 					// elasticsearch publish was successful
 					// Send all the bundled messages to the next processor in the pipeline
 					for _, publishedMsg := range bundledMsgs {
-						out <- publishedMsg
+						message.PropagateChefRun(out, &publishedMsg)
 					}
 					bundledMsgs = []message.ChefRun{}
 					dur := time.Since(start)
@@ -95,8 +103,16 @@ func bulkActionPublisherBundler(in <-chan message.ChefAction, client backend.Cli
 	go func() {
 		bundledMsgs := []message.ChefAction{}
 		for msg := range in {
-			// Add the message to the bundle
-			bundledMsgs = append(bundledMsgs, msg)
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessing(err)
+			} else {
+				// Add the message to the bundle
+				bundledMsgs = append(bundledMsgs, msg)
+			}
+
+			if len(bundledMsgs) == 0 {
+				continue
+			}
 
 			// Only publish the collection of bundled messages if
 			// the inbox is empty or there are over maxNumberOfBundledActionMsgs number of messages bundled
@@ -124,7 +140,7 @@ func bulkActionPublisherBundler(in <-chan message.ChefAction, client backend.Cli
 					// elasticsearch publish was successful
 					// Send all the bundled messages to the next processor in the pipeline
 					for _, publishedMsg := range bundledMsgs {
-						out <- publishedMsg
+						message.PropagateChefAction(out, &publishedMsg)
 					}
 					bundledMsgs = []message.ChefAction{}
 					dur := time.Since(start)

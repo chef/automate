@@ -7,7 +7,6 @@ import { Cookbook } from './cookbook.model';
 
 export interface CookbookEntityState extends EntityState<Cookbook> {
   getAllStatus: EntityStatus;
-  getStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -18,8 +17,7 @@ export const cookbookEntityAdapter: EntityAdapter<Cookbook> = createEntityAdapte
 
 export const CookbookEntityInitialState: CookbookEntityState =
   cookbookEntityAdapter.getInitialState(<CookbookEntityState>{
-    getAllStatus: EntityStatus.notLoaded,
-    getStatus: EntityStatus.notLoaded
+    getAllStatus: EntityStatus.notLoaded
   });
 
 export function cookbookEntityReducer(
@@ -43,4 +41,4 @@ export function cookbookEntityReducer(
   }
 }
 
-export const getEntityById = (name: string) => (state: CookbookEntityState) => state.entities[name];
+export const getEntityById = (id: string) => (state: CookbookEntityState) => state.entities[id];

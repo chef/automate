@@ -7,40 +7,40 @@ import "google/api/annotations.proto";
 
 service JobScheduler {
 	rpc GetStatusJobScheduler (JobSchedulerStatusRequest) returns (JobSchedulerStatus) {
-		option (google.api.http).get = "/job/job-scheduler/status";
+		option (google.api.http).get = "/api/v0/job/job-scheduler/status";
 	};
 
 	rpc MarkNodesMissing (MarkNodesMissingRequest) returns (MarkNodesMissingResponse) {
-		option (google.api.http).post = "/job/missing-nodes/mark-nodes-missing";
+		option (google.api.http).post = "/api/v0/job/missing-nodes/mark-nodes-missing";
 	};
 
 	rpc ConfigureNodesMissingScheduler (JobSettings) returns (ConfigureNodesMissingSchedulerResponse) {
-		option (google.api.http).post = "/job/missing-nodes/config";
+		option (google.api.http).post = "/api/v0/job/missing-nodes/config";
 	};
 
 	rpc StartNodesMissingScheduler (StartNodesMissingSchedulerRequest) returns (StartNodesMissingSchedulerResponse) {
-		option (google.api.http).post = "/job/missing-nodes/start";
+		option (google.api.http).post = "/api/v0/job/missing-nodes/start";
 	};
 
 	rpc StopNodesMissingScheduler (StopNodesMissingSchedulerRequest) returns (StopNodesMissingSchedulerResponse) {
-		option (google.api.http).post = "/job/missing-nodes/stop";
+		option (google.api.http).post = "/api/v0/job/missing-nodes/stop";
 	};
 
 	// DeleteNodesScheduler
 	rpc DeleteMarkedNodes (DeleteMarkedNodesRequest) returns (DeleteMarkedNodesResponse) {
-		option (google.api.http).post = "/job/delete-nodes/delete-marked-nodes";
+		option (google.api.http).post = "/api/v0/job/delete-nodes/delete-marked-nodes";
 	};
 
 	rpc StartDeleteNodesScheduler (StartDeleteNodesSchedulerRequest) returns (StartDeleteNodesSchedulerResponse) {
-		option (google.api.http).post = "/job/delete-nodes/start";
+		option (google.api.http).post = "/api/v0/job/delete-nodes/start";
 	};
 
 	rpc StopDeleteNodesScheduler (StopDeleteNodesSchedulerRequest) returns (StopDeleteNodesSchedulerResponse) {
-		option (google.api.http).post = "/job/delete-nodes/stop";
+		option (google.api.http).post = "/api/v0/job/delete-nodes/stop";
 	};
 
 	rpc ConfigureDeleteNodesScheduler (JobSettings) returns (ConfigureDeleteNodesSchedulerResponse) {
-		option (google.api.http).post = "/job/delete-nodes/config";
+		option (google.api.http).post = "/api/v0/job/delete-nodes/config";
 	};
 
 	// MissingNodesForDeletionScheduler

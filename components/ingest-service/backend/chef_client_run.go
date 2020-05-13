@@ -241,33 +241,46 @@ func (ccr *ChefClientRun) initializeNodeInfo() (sharedNodeInfo NodeInfo, err err
 	}
 
 	sharedNodeInfo = NodeInfo{
-		EntityUuid:       ccr.EntityUUID,
-		EventAction:      "Finished",
-		NodeName:         ccr.NodeName,
-		Fqdn:             EmptyStringIfNil(ccr.NodePayload.Automatic["fqdn"]),
-		Ipaddress:        ccr.NodePayload.Automatic["ipaddress"], // Avoid returning an empty string
-		PolicyRevision:   EmptyStringIfNil(ccr.NodePayload.Automatic["policy_revision"]),
-		UptimeSeconds:    int64(uptimeSeconds),
-		OrganizationName: ccr.OrganizationName,
-		Environment:      ccr.NodePayload.ChefEnvironment,
-		Platform:         getPlatformWithVersion(ccr.NodePayload),
-		PlatformFamily:   EmptyStringIfNil(ccr.NodePayload.Automatic["platform_family"]),
-		PlatformVersion:  EmptyStringIfNil(ccr.NodePayload.Automatic["platform_version"]),
-		// Tags                 ccr. TODO: Is this compliance tags?
-		Source:             ccr.Source,
-		Status:             ccr.Status,
-		TotalResourceCount: ccr.TotalResourceCount,
-		SourceFqdn:         ccr.ChefServerFqdn,
-		ExpandedRunList:    ccr.ExpandedRunList,
-		Deprecations:       ccr.Deprecations,
-		Recipes:            ccr.RecipeNames(),
-		ChefTags:           ccr.TagNames(),
-		Roles:              ccr.RoleNames(),
-		ResourceNames:      ccr.ResourceNames(),
-		RunList:            ccr.RunList,
-		Tags:               ccr.Tags,
-		Timestamp:          time.Now().UTC(),
+		EntityUuid:            ccr.EntityUUID,
+		EventAction:           "Finished",
+		NodeName:              ccr.NodeName,
+		Fqdn:                  EmptyStringIfNil(ccr.NodePayload.Automatic["fqdn"]),
+		Ipaddress:             ccr.NodePayload.Automatic["ipaddress"], // Avoid returning an empty string
+		PolicyRevision:        EmptyStringIfNil(ccr.NodePayload.Automatic["policy_revision"]),
+		UptimeSeconds:         int64(uptimeSeconds),
+		OrganizationName:      ccr.OrganizationName,
+		Environment:           ccr.NodePayload.ChefEnvironment,
+		Platform:              ccr.PlatformWithVersion(),
+		PlatformFamily:        EmptyStringIfNil(ccr.NodePayload.Automatic["platform_family"]),
+		PlatformVersion:       EmptyStringIfNil(ccr.NodePayload.Automatic["platform_version"]),
+		Source:                ccr.Source,
+		Status:                ccr.Status,
+		TotalResourceCount:    ccr.TotalResourceCount,
+		SourceFqdn:            ccr.ChefServerFqdn,
+		ExpandedRunList:       ccr.ExpandedRunList,
+		Deprecations:          ccr.Deprecations,
+		Recipes:               ccr.RecipeNames(),
+		ChefTags:              ccr.TagNames(),
+		Roles:                 ccr.RoleNames(),
+		ResourceNames:         ccr.ResourceNames(),
+		RunList:               ccr.RunList,
+		Tags:                  ccr.Tags,
+		Timestamp:             time.Now().UTC(),
+		Ip6address:            ccr.NodePayload.Automatic["ip6address"], // Avoid returning an empty string
+		Timezone:              ccr.Timezone(),
+		Domain:                EmptyStringIfNil(ccr.NodePayload.Automatic["domain"]),
+		Hostname:              EmptyStringIfNil(ccr.NodePayload.Automatic["hostname"]),
+		Macaddress:            EmptyStringIfNil(ccr.NodePayload.Automatic["macaddress"]),
+		CloudProvider:         ccr.CloudProvider(),
+		MemoryTotal:           ccr.MemoryTotal(),
+		KernelRelease:         ccr.KernelRelease(),
+		KernelVersion:         ccr.KernelVersion(),
+		VirtualizationRole:    ccr.VirtualizationRole(),
+		VirtualizationSystem:  ccr.VirtualizationSystem(),
+		DmiSystemManufacturer: ccr.DmiSystemManufacturer(),
+		DmiSystemSerialNumber: ccr.DmiSystemSerialNumber(),
 	}
+
 	// # Chef 12 only sends [node][policy_group] whereas
 	// # Chef 13 sends [node][policy_group] and [policy_group].
 	// # If policy_group already exists as base key in Chef 13 case, don't
@@ -284,6 +297,66 @@ func (ccr *ChefClientRun) initializeNodeInfo() (sharedNodeInfo NodeInfo, err err
 	sharedNodeInfo.ChefVersion = ccr.ChefVersion()
 	sharedNodeInfo.VersionedCookbooks = VersionedCookbooks(ccr.NodePayload)
 	return // nolint: nakedret
+}
+
+func (ccr *ChefClientRun) Timezone() string {
+	time := extractMapOrEmpty(ccr.NodePayload.Automatic, "time")
+
+	return EmptyStringIfNil(time["timezone"])
+}
+
+func (ccr *ChefClientRun) DmiSystemManufacturer() string {
+	dmi := extractMapOrEmpty(ccr.NodePayload.Automatic, "dmi")
+	system := extractMapOrEmpty(dmi, "system")
+
+	return EmptyStringIfNil(system["manufacturer"])
+}
+
+func (ccr *ChefClientRun) DmiSystemSerialNumber() string {
+	dmi := extractMapOrEmpty(ccr.NodePayload.Automatic, "dmi")
+	system := extractMapOrEmpty(dmi, "system")
+
+	return EmptyStringIfNil(system["serial_number"])
+}
+
+func (ccr *ChefClientRun) VirtualizationSystem() string {
+	virtualization := extractMapOrEmpty(ccr.NodePayload.Automatic, "virtualization")
+
+	return EmptyStringIfNil(virtualization["system"])
+}
+
+func (ccr *ChefClientRun) VirtualizationRole() string {
+	virtualization := extractMapOrEmpty(ccr.NodePayload.Automatic, "virtualization")
+
+	return EmptyStringIfNil(virtualization["role"])
+}
+
+func (ccr *ChefClientRun) KernelRelease() string {
+	kernel := extractMapOrEmpty(ccr.NodePayload.Automatic, "kernel")
+
+	return EmptyStringIfNil(kernel["release"])
+}
+
+func (ccr *ChefClientRun) KernelVersion() string {
+	kernel := extractMapOrEmpty(ccr.NodePayload.Automatic, "kernel")
+
+	return EmptyStringIfNil(kernel["version"])
+}
+
+func (ccr *ChefClientRun) MemoryTotal() string {
+	memory := extractMapOrEmpty(ccr.NodePayload.Automatic, "memory")
+
+	return EmptyStringIfNil(memory["total"])
+}
+
+func (ccr *ChefClientRun) CloudProvider() string {
+	cloud := extractMapOrEmpty(ccr.NodePayload.Automatic, "cloud")
+
+	return EmptyStringIfNil(cloud["provider"])
+}
+
+func (ccr *ChefClientRun) Platform() string {
+	return EmptyStringIfNil(ccr.NodePayload.Automatic["platform"])
 }
 
 // ChefVersion Returns a chef version string retrieved from automatic attributes or an empty string if it is not present
@@ -492,9 +565,9 @@ func countNumberOfValueObject(object interface{}) int {
 	return count
 }
 
-func getPlatformWithVersion(nodePayload NodePayload) string {
-	platform := EmptyStringIfNil(nodePayload.Automatic["platform"])
-	platformVersion := EmptyStringIfNil(nodePayload.Automatic["platform_version"])
+func (ccr *ChefClientRun) PlatformWithVersion() string {
+	platform := ccr.Platform()
+	platformVersion := EmptyStringIfNil(ccr.NodePayload.Automatic["platform_version"])
 
 	platformAndVersion := ""
 

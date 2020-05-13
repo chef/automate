@@ -26,7 +26,7 @@
   <!-- App Content -->
   <div id="app-content-wrapper" [attr.hasNotifications]="layoutFacade.hasGlobalNotifications() ? true : null" [ngStyle]="layoutFacade.getContentStyle()">
     <div id="main-content-wrapper">
-      <div id="notifications-wrapper">
+      <div id="notifications-wrapper" class="sticky-notifications">
         <app-chef-notifications></app-chef-notifications>
       </div>
       <chef-loading-spinner [hidden]="!(layoutFacade.showPageLoading$ | async)" size='50' fixed></chef-loading-spinner>

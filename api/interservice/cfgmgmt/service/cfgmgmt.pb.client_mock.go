@@ -280,6 +280,26 @@ func (mr *MockCfgMgmtClientMockRecorder) GetNodeRun(arg0, arg1 interface{}, arg2
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodeRun", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetNodeRun), varargs...)
 }
 
+// GetNodeRunsDailyStatusTimeSeries mocks base method
+func (m *MockCfgMgmtClient) GetNodeRunsDailyStatusTimeSeries(arg0 context.Context, arg1 *request0.NodeRunsDailyStatusTimeSeries, arg2 ...grpc.CallOption) (*response0.NodeRunsDailyStatusTimeSeries, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetNodeRunsDailyStatusTimeSeries", varargs...)
+	ret0, _ := ret[0].(*response0.NodeRunsDailyStatusTimeSeries)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNodeRunsDailyStatusTimeSeries indicates an expected call of GetNodeRunsDailyStatusTimeSeries
+func (mr *MockCfgMgmtClientMockRecorder) GetNodeRunsDailyStatusTimeSeries(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodeRunsDailyStatusTimeSeries", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetNodeRunsDailyStatusTimeSeries), varargs...)
+}
+
 // GetNodes mocks base method
 func (m *MockCfgMgmtClient) GetNodes(arg0 context.Context, arg1 *request0.Nodes, arg2 ...grpc.CallOption) (*structpb.ListValue, error) {
 	m.ctrl.T.Helper()
@@ -947,6 +967,21 @@ func (m *MockCfgMgmtServer) GetNodeRun(arg0 context.Context, arg1 *request0.Node
 func (mr *MockCfgMgmtServerMockRecorder) GetNodeRun(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodeRun", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetNodeRun), arg0, arg1)
+}
+
+// GetNodeRunsDailyStatusTimeSeries mocks base method
+func (m *MockCfgMgmtServer) GetNodeRunsDailyStatusTimeSeries(arg0 context.Context, arg1 *request0.NodeRunsDailyStatusTimeSeries) (*response0.NodeRunsDailyStatusTimeSeries, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNodeRunsDailyStatusTimeSeries", arg0, arg1)
+	ret0, _ := ret[0].(*response0.NodeRunsDailyStatusTimeSeries)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNodeRunsDailyStatusTimeSeries indicates an expected call of GetNodeRunsDailyStatusTimeSeries
+func (mr *MockCfgMgmtServerMockRecorder) GetNodeRunsDailyStatusTimeSeries(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodeRunsDailyStatusTimeSeries", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetNodeRunsDailyStatusTimeSeries), arg0, arg1)
 }
 
 // GetNodes mocks base method

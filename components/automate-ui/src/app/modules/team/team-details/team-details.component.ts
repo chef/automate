@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { isEmpty, keyBy, at, xor, isNil, identity } from 'lodash/fp';
+import { keyBy, at, identity, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
@@ -15,15 +15,7 @@ import { EntityStatus, pending } from 'app/entities/entities';
 import { User } from 'app/entities/users/user.model';
 import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import {
-  ProjectChecked,
-  ProjectCheckedMap
-} from 'app/components/projects-dropdown/projects-dropdown.component';
 import { GetProjects } from 'app/entities/projects/project.actions';
-import {
-  allProjects,
-  getAllStatus as getAllProjectStatus
-} from 'app/entities/projects/project.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import {
   teamFromRoute,
@@ -50,7 +42,7 @@ export type TeamTabName = 'users' | 'details';
   styleUrls: ['./team-details.component.scss']
 })
 export class TeamDetailsComponent implements OnInit, OnDestroy {
-  public updateNameForm: FormGroup;
+  public updateForm: FormGroup;
   // isLoadingTeam represents the initial team load as well as subsequent updates in progress.
   public isLoadingTeam = true;
   public saveInProgress = false;
@@ -67,7 +59,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public removeText = 'Remove User';
 
   public teamId = '';
-  public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   constructor(
@@ -76,7 +67,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.updateNameForm = fb.group({
+    this.updateForm = fb.group({
       // Must stay in sync with error checks in team-details.component.html.
       // Also, initialize the form to disabled and enable after team load
       // to prevent people from typing before the team is fetched and have their
@@ -123,9 +114,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         (uStatus === EntityStatus.loading) ||
         (usersStatus === EntityStatus.loading);
       if (this.isLoadingTeam) {
-        this.updateNameForm.controls['name'].disable();
+        this.updateForm.controls.name.disable();
       } else {
-        this.updateNameForm.controls['name'].enable();
+        this.updateForm.controls.name.enable();
       }
     });
 
@@ -135,26 +126,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     ).subscribe((team) => {
       this.teamId = team.id;
       this.team = team;
-      this.updateNameForm.controls.name.setValue(this.team.name);
+      this.updateForm.controls.name.setValue(this.team.name);
       this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
       this.store.dispatch(new GetProjects());
     });
-
-    combineLatest([
-      this.store.select(allProjects),
-      this.store.select(getAllProjectStatus),
-      this.store.select(teamFromRoute)
-    ]).pipe(
-      takeUntil(this.isDestroyed),
-      filter(([_, pStatus, team]) => !pending(pStatus) && !isNil(team))
-    ).subscribe(([allowedProjects, _, team]) => {
-        this.projects = {};
-        allowedProjects
-          .forEach(p => {
-            this.projects[p.id] = { ...p, checked: team.projects.includes(p.id)
-            };
-          });
-      });
 
     combineLatest([
       this.store.select(allUsers),
@@ -184,7 +159,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         this.saveInProgress = false;
         this.saveSuccessful = (state === EntityStatus.loadingSuccess);
         if (this.saveSuccessful) {
-          this.updateNameForm.markAsPristine();
+          this.updateForm.markAsPristine();
         }
       });
  }
@@ -216,9 +191,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   saveTeam(): void {
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    this.updateNameForm.controls['name'].disable();
-    const name: string = this.updateNameForm.controls.name.value.trim();
-    const projects = Object.keys(this.projects).filter(id => this.projects[id].checked);
+    this.updateForm.controls.name.disable();
+    const name: string = this.updateForm.controls.name.value.trim();
+    const projects: string[] = this.updateForm.controls.projects.value;
     this.store.dispatch(new UpdateTeam({ ...this.team, name, projects }));
   }
 
@@ -228,28 +203,18 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
-  // updates whether the project was checked or unchecked
-  onProjectChecked(project: ProjectChecked): void {
-    this.projects[project.id].checked = project.checked;
+  onProjectDropdownClosing(selectedProjects: string[]): void {
+
+    this.updateForm.controls.projects.setValue(selectedProjects);
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
-    if (this.noProjectsUpdated()) {
-      this.updateNameForm.controls.projects.markAsPristine();
+    if (xor(this.team.projects, this.updateForm.controls.projects.value).length === 0) {
+      this.updateForm.controls.projects.markAsPristine();
     } else {
-      this.updateNameForm.controls.projects.markAsDirty();
+      this.updateForm.controls.projects.markAsDirty();
     }
 
   }
 
-  private noProjectsUpdated(): boolean {
-    const projectsUpdated = xor(
-      this.team.projects,
-      Object.keys(this.projects).filter(id => this.projects[id].checked));
-    return projectsUpdated.length === 0;
-  }
-
-  dropdownDisabled(): boolean {
-    return isEmpty(this.projects) || this.saveInProgress;
-  }
 }

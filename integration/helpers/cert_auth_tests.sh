@@ -67,7 +67,7 @@ EOF
     echo "...Checking load balancer"
     invalid_cert_test_load_balancer
     echo "...Checking gateway"
-    invalid_cert_test_gateway "https://localhost:2000/events/data-collector"
+    invalid_cert_test_gateway "https://localhost:2000/api/v0/events/data-collector"
 }
 
 invalid_cert_test_load_balancer() {
@@ -118,7 +118,7 @@ test_authorized_cert() {
 EOF
 
     authorized_cert_test "https://localhost/data-collector/v0" "401"
-    authorized_cert_test "https://localhost:2000/events/data-collector" "200"
+    authorized_cert_test "https://localhost:2000/api/v0/events/data-collector" "200"
 }
 
 authorized_cert_test() {
@@ -152,7 +152,7 @@ test_authorized_cert_in_header_unauthenticated() {
     user in a header. Only the load balancer is allowed to set it.
 EOF
     authorized_cert_in_header_unauthenticated_test "https://localhost/data-collector/v0"
-    authorized_cert_in_header_unauthenticated_test "https://localhost:2000/events/data-collector"
+    authorized_cert_in_header_unauthenticated_test "https://localhost:2000/api/v0/events/data-collector"
 }
 
 authorized_cert_in_header_unauthenticated_test() {
@@ -188,7 +188,7 @@ test_authorized_cert_in_header_authenticated() {
     is authorized to hit the endpoint. The authenticated cert is not authorized
 EOF
     authorized_cert_in_header_authenticated_test "https://localhost/data-collector/v0" "401"
-    authorized_cert_in_header_authenticated_test "https://localhost:2000/events/data-collector" "403"
+    authorized_cert_in_header_authenticated_test "https://localhost:2000/api/v0/events/data-collector" "403"
 }
 
 authorized_cert_in_header_authenticated_test() {

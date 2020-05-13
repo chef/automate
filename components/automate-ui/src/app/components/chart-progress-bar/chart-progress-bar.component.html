@@ -1,0 +1,9 @@
+<div class="chart-progress-bar" [ngClass]="size">
+  <div *ngFor="let t of threshold; index as i" class="threshold point-{{ i }}" [ngStyle]="styles.threshold[i]"></div>
+
+  <div [id]="'progress' + id" class="progress" [ngStyle]="styles.progress" [ngClass]="progressClassName"></div>
+  <chef-tooltip *ngIf="valueTooltip" [attr.for]="'progress' + id">{{ valueTooltip }}</chef-tooltip>
+
+  <div [id]="'bar' + id" class="bar" [ngStyle]="styles.bar"></div>
+  <chef-tooltip *ngIf="maxTooltip" [attr.for]="'bar' + id">{{ maxTooltip }}</chef-tooltip>
+</div>

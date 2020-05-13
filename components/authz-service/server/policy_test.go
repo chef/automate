@@ -20,7 +20,7 @@ import (
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 
-	api "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/prng"
@@ -2482,7 +2482,7 @@ func setup(t *testing.T, authorizer engine.Authorizer, writer engine.Writer) tes
 	polRefresher, err := server.NewPolicyRefresher(ctx, l, writer, memInstance)
 	require.NoError(t, err)
 
-	polV2, err := server.NewPoliciesServer(ctx, l, polRefresher, memInstance, writer)
+	pol, err := server.NewPoliciesServer(ctx, l, polRefresher, memInstance, writer)
 	require.NoError(t, err)
 
 	require.NoError(t, err)
@@ -2490,7 +2490,7 @@ func setup(t *testing.T, authorizer engine.Authorizer, writer engine.Writer) tes
 		testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockProjectPurger(true), testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
-	authzV2, err := server.NewAuthzServer(l, authorizer, projectsSrv, memInstance)
+	authz, err := server.NewAuthzServer(l, authorizer, projectsSrv, memInstance)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -2501,12 +2501,12 @@ func setup(t *testing.T, authorizer engine.Authorizer, writer engine.Writer) tes
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
 		grpc_middleware.ChainUnaryServer(
 			server.InputValidationInterceptor(),
-			polV2.EngineUpdateInterceptor(),
+			pol.EngineUpdateInterceptor(),
 		),
 	))
 
-	api.RegisterPoliciesServer(serv, polV2)
-	api.RegisterAuthorizationServer(serv, authzV2)
+	api.RegisterPoliciesServer(serv, pol)
+	api.RegisterAuthorizationServer(serv, authz)
 	api.RegisterProjectsServer(serv, projectsSrv)
 	reflection.Register(serv)
 

@@ -2,6 +2,7 @@ import { Params, RouterStateSnapshot, UrlSegment } from '@angular/router';
 import * as router from '@ngrx/router-store';
 import { set, get, pipe, map } from 'lodash/fp';
 import * as credentials from './pages/+compliance/+credentials/credentials.state';
+import * as destinationEntity from './entities/destinations/destination.reducer';
 import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
 import * as projectsFilter from './services/projects-filter/projects-filter.reducer';
@@ -9,9 +10,11 @@ import * as apiToken from './entities/api-tokens/api-token.reducer';
 import * as automateSettings from './entities/automate-settings/automate-settings.reducer';
 import * as clientRuns from './entities/client-runs/client-runs.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
+import * as cookbookDetailsEntity from './entities/cookbooks/cookbook-details.reducer';
+import * as cookbookVersionsEntity from './entities/cookbooks/cookbook-versions.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
-import * as infraRoleEntity from './entities/infra-roles/infra-role.reducer';
 import * as environmentEntity from './entities/environments/environment.reducer';
+import * as infraRoleEntity from './entities/infra-roles/infra-role.reducer';
 import * as infraRoleDetailsEntity from './entities/infra-roles/infra-role-details.reducer';
 import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
 import * as integrationsDetail from './pages/integrations/detail/integrations-detail.reducer';
@@ -34,6 +37,7 @@ import * as ruleEntity from './entities/rules/rule.reducer';
 import * as serverEntity from './entities/servers/server.reducer';
 import * as orgEntity from './entities/orgs/org.reducer';
 import * as serviceGroups from './entities/service-groups/service-groups.reducer';
+import * as nodesEntity from './entities/nodes/nodes.reducer';
 import * as teamEntity from './entities/teams/team.reducer';
 import * as userEntity from './entities/users/user.reducer';
 import * as userSelfEntity from './entities/users/userself.reducer';
@@ -60,13 +64,17 @@ export interface NgrxStateAtom {
   apiTokens: apiToken.ApiTokenEntityState;
   automateSettings: automateSettings.AutomateSettingsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
-  cookbooks: cookbookEntity.CookbookEntityState;
-  infraRoles: infraRoleEntity.InfraRoleEntityState;
+  cookbooks: cookbookEntity.CookbookEntityState; 
+  cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityState;
+  cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityState;
+  destinations: destinationEntity.DestinationEntityState;
   environments: environmentEntity.EnvironmentEntityState;
+  infraRoles: infraRoleEntity.InfraRoleEntityState;
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
+  nodes: nodesEntity.NodesEntityState;
   notifications: notificationEntity.NotificationEntityState;
   policies: policyEntity.PolicyEntityState;
   profiles: profileEntity.ProfileEntityState;
@@ -172,12 +180,16 @@ export const defaultInitialState = {
   automateSettings: automateSettings.AutomateSettingsEntityInitialState,
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
-  infraRoles: infraRoleEntity.InfraRoleEntityInitialState,
+  cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityInitialState,
+  cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityInitialState,
+  destinations: destinationEntity.DestinationEntityInitialState,
   environments: environmentEntity.EnvironmentEntityInitialState,
+  infraRoles: infraRoleEntity.InfraRoleEntityInitialState,
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
   licenseStatus: license.LicenseStatusEntityInitialState,
   managers: manager.ManagerEntityInitialState,
+  nodes: nodesEntity.NodesEntityInitialState,
   notifications: notificationEntity.InitialState,
   policies: policyEntity.PolicyEntityInitialState,
   profiles: profileEntity.ProfileEntityInitialState,
@@ -216,12 +228,16 @@ export const ngrxReducers = {
   automateSettings: automateSettings.automateSettingsEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
-  infraRoles: infraRoleEntity.infraRoleEntityReducer,
-  environments: environmentEntity.environmentEntityReducer,
-  infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
+  cookbookDetails: cookbookDetailsEntity.cookbookDetailsEntityReducer,
+  cookbookVersions: cookbookVersionsEntity.cookbookVersionsEntityReducer,
   credentialEntity: credential.credentialReducer,
+  destinations: destinationEntity.destinationEntityReducer,
+  environments: environmentEntity.environmentEntityReducer,
+  infraRoles: infraRoleEntity.infraRoleEntityReducer,
+  infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
   jobs: jobEntity.jobEntityReducer,
   managers: manager.managerEntityReducer,
+  nodes: nodesEntity.nodesEntityReducer,
   licenseStatus: license.licenseStatusEntityReducer,
   notifications: notificationEntity.notificationEntityReducer,
   policies: policyEntity.policyEntityReducer,

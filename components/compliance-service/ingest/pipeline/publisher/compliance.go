@@ -69,7 +69,7 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 			if megaErr != nil {
 				msg.FinishProcessingCompliance(status.Errorf(codes.Internal, megaErr.Error()))
 			} else {
-				out <- msg
+				message.Propagate(out, &msg)
 			}
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Published Compliance Report")
 		}

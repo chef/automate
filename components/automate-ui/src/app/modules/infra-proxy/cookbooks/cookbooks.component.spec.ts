@@ -1,6 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { CookbooksComponent } from './cookbooks.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -16,15 +14,12 @@ describe('CookbooksComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-toolbar' }),
@@ -34,8 +29,10 @@ describe('CookbooksComponent', () => {
         MockComponent({ selector: 'chef-tr' }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
+
         CookbooksComponent
       ],
       providers: [
@@ -46,8 +43,7 @@ describe('CookbooksComponent', () => {
         ReactiveFormsModule,
         RouterTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
-      ],
-      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+      ]
     })
     .compileComponents();
   }));

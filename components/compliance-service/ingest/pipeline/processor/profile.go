@@ -8,7 +8,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/ptypes/struct"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -26,6 +26,11 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 		for msg := range in {
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processing Compliance Profile")
 			var err error
+
+			if err := msg.Ctx.Err(); err != nil {
+				msg.FinishProcessingCompliance(err)
+				continue
+			}
 
 			reportProfilesShas := make([]string, len(msg.Report.Profiles))
 			reportProfilesShasMissingMetaMap := make(map[string]string, 0)
@@ -134,7 +139,7 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 			msg.Report.Profiles = compliance.FixInheritedProfiles(msg.Report.Profiles)
 
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processed Compliance Profile")
-			out <- msg
+			message.Propagate(out, &msg)
 		}
 		close(out)
 	}()

@@ -1,21 +1,54 @@
 <chef-modal [visible]="visible" (closeModal)="closeEvent()">
-  <h2 slot="title">Add Chef Org</h2>
+  <h2 slot="title">Add Chef Organization</h2>
   <div class="flex-container">
     <form [formGroup]="createForm">
-      <div class="name-margin"> 
+      <div class="input-margin">
         <chef-form-field>
           <label>
-            Org Name <span aria-hidden="true">*</span>
-            <input chefInput name="name" formControlName="name" type="text" data-cy="org-name" autocomplete="off">
+            <span class="label">Name <span aria-hidden="true">*</span></span>
+            <input chefInput name="name" formControlName="name" type="text" (keyup)="handleNameInput($event)" data-cy="org-name" autocomplete="off">
           </label>
           <chef-error
             *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
             Display Name is required.
           </chef-error>
         </chef-form-field>
+        <span class="detail light">Don't worry, {{ objectNoun }} names can be changed later.</span>
+      </div>
+      <div *ngIf="modifyID" class="id-margin">
         <chef-form-field>
           <label>
-            Admin User <span aria-hidden="true">*</span>
+            <span class="label">ID <span aria-hidden="true">*</span></span>
+            <input chefInput formControlName="id" type="text" (keyup)="handleInput($event)" id="id-input" data-cy="create-id" autocomplete="off"/>
+          </label>
+          <chef-error *ngIf="createForm.get('id').hasError('maxlength') && createForm.get('id').dirty">
+            ID must be 64 characters or less.
+          </chef-error>
+          <chef-error *ngIf="createForm.get('id').hasError('required') && createForm.get('id').dirty">
+            ID is required.
+          </chef-error>
+          <chef-error *ngIf="createForm.get('id').hasError('pattern') && createForm.get('id').dirty">
+            Only lowercase letters, numbers, hyphens, and underscores are allowed.
+          </chef-error>
+          <chef-error *ngIf="conflictError">
+            {{ objectNoun | titlecase }} ID "{{createForm.get('id').value}}" already exists.
+          </chef-error>
+        </chef-form-field>
+        <span class="detail light">{{ objectNoun | titlecase }} IDs are unique, permanent, and cannot be changed later.</span>
+      </div>
+      <div *ngIf="!modifyID" class="id-margin">
+        <div id="id-fields">
+          <span class="key-label">ID:&nbsp;</span>
+          <span data-cy="id-label">{{ this.createForm?.value.id }}</span>
+        </div>
+        <chef-toolbar>
+          <chef-button tertiary (click)="modifyID = true" id="edit-button-object-modal" data-cy="edit-button">Edit ID</chef-button>
+        </chef-toolbar>
+      </div>
+      <div class="input-margin">
+        <chef-form-field>
+          <label>
+            <span class="label">Admin User <span aria-hidden="true">*</span></span>
             <input chefInput name="admin_user" formControlName="admin_user" type="text" id="admin-input" data-cy="admin-user" autocomplete="off">
           </label>
           <chef-error
@@ -23,10 +56,12 @@
             Admin user is required.
           </chef-error>
         </chef-form-field>
+      </div>
+      <div class="input-margin">
         <chef-form-field>
           <label>
-            Admin Key <span aria-hidden="true">*</span>
-            <textarea chefInput name="admin_key" id="admin_key" formControlName="admin_key" cols="54" rows="10" autofocus></textarea>
+            <span class="label">Admin Key <span aria-hidden="true">*</span></span>
+            <textarea chefInput name="admin_key" id="admin_key" formControlName="admin_key" cols="54" rows="10" placeholder="-----BEGIN RSA PRIVATE KEY -----" autofocus></textarea>
           </label>
           <chef-error
             *ngIf="(createForm.get('admin_key').hasError('required') || createForm.get('admin_key').hasError('pattern')) && createForm.get('admin_key').dirty">
@@ -34,11 +69,14 @@
           </chef-error>
         </chef-form-field>
       </div>
-      <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-org-modal-btn" (click)="createServerOrg()">
-        <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-        <span *ngIf="!creating">Add Org</span>
-        <span *ngIf="creating">Adding Org...</span>
-      </chef-button>
+      <div id="button-org">
+        <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-org-modal-btn" (click)="createServerOrg()">
+          <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
+          <span *ngIf="!creating">Add Chef Organization</span>
+          <span *ngIf="creating">Adding Organization...</span>
+        </chef-button>
+        <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
+      </div>
     </form>
   </div>
 </chef-modal>

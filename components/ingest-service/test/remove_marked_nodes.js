@@ -4,11 +4,11 @@ var chakram = require('chakram'),
 var helpers = require('./helpers.js');
 
 function chefRunEndpoint() {
-  return helpers.REST_SERVICE_URI + '/events/chef/run';
+  return helpers.REST_SERVICE_URI + '/api/v0/events/chef/run';
 }
 
 function chefActionEndpoint() {
-  return helpers.REST_SERVICE_URI + '/events/chef/action';
+  return helpers.REST_SERVICE_URI + '/api/v0/events/chef/action';
 }
 
 function nodeAttributeUrl() {
@@ -24,7 +24,7 @@ function convergeHistoryUrl() {
 }
 
 function deleteNodeSchedulerUrl() {
-  return helpers.REST_SERVICE_URI + '/job/delete-nodes/';
+  return helpers.REST_SERVICE_URI + '/api/v0/job/delete-nodes/';
 }
 
 describe("remove marked nodes", function () {
@@ -49,7 +49,7 @@ describe("remove marked nodes", function () {
       chefAction.set('node_id', entityUuid2);
       chefAction.set('task', 'delete');
 
-      // not sure why I need to do the cleanup in the test? 
+      // not sure why I need to do the cleanup in the test?
       return chakram.all([helpers.ESCleanupDocuments(),
         // configure the delete scheduler to not have a threshold
         chakram.post(deleteNodeSchedulerUrl() + 'config?every=1m&threshold=0m&running=false')]).then(function(responses) {
@@ -64,26 +64,26 @@ describe("remove marked nodes", function () {
             expect(responses[1]).to.have.status(200);
             expect(responses[2]).to.have.status(200);
             return chakram.all([
-              helpers.NodeStateRefresh(), 
-              helpers.NodeAttributeRefresh(), 
+              helpers.NodeStateRefresh(),
+              helpers.NodeAttributeRefresh(),
               helpers.ConvergeHistoryRefresh()]).then(function(responses) {
               // mark a node for delete
               return chakram.post(chefActionEndpoint(), chefAction.json()).then(function(response) {
                 expect(response).to.have.status(200);
                 return chakram.all([
-                  helpers.NodeStateRefresh(), 
-                  helpers.NodeAttributeRefresh(), 
+                  helpers.NodeStateRefresh(),
+                  helpers.NodeAttributeRefresh(),
                   helpers.ConvergeHistoryRefresh()]).then(function(responses) {
                   // send remove marked nodes
                   return chakram.post(deleteNodeSchedulerUrl() + 'delete-marked-nodes').then(function(response) {
                     expect(response).to.have.status(200);
 
                     return chakram.all([
-                      helpers.NodeStateRefresh(), 
-                      helpers.NodeAttributeRefresh(), 
+                      helpers.NodeStateRefresh(),
+                      helpers.NodeAttributeRefresh(),
                       helpers.ConvergeHistoryRefresh()]).then(function(responses) {
                       return chakram.all([
-                        chakram.get(nodeStateUrl()), 
+                        chakram.get(nodeStateUrl()),
                         chakram.get(nodeAttributeUrl()),
                         chakram.get(convergeHistoryUrl())
                         ]).then(function(responses) {
@@ -99,7 +99,7 @@ describe("remove marked nodes", function () {
                         let source2 = nodeStateResponse.body.hits.hits[1]._source
                         expect(source1.entity_uuid === entityUuid1 || source2.entity_uuid === entityUuid1).to.equal(true);
                         expect(source1.entity_uuid === entityUuid3 || source2.entity_uuid === entityUuid3).to.equal(true);
-                        
+
                         expect(convergeHistoryResponse).to.have.status(200);
                         expect(convergeHistoryResponse.body.hits.total).to.equal(2);
 
@@ -156,29 +156,29 @@ describe("remove marked nodes", function () {
         expect(responses[2]).to.have.status(200);
         expect(responses[3]).to.have.status(200);
         return chakram.all([
-          helpers.NodeStateRefresh(), 
-          helpers.NodeAttributeRefresh(), 
+          helpers.NodeStateRefresh(),
+          helpers.NodeAttributeRefresh(),
           helpers.ConvergeHistoryRefresh()]).then(function(responses) {
           // mark a node for delete
           return chakram.all([
-            chakram.post(chefActionEndpoint(), chefAction1.json()), 
+            chakram.post(chefActionEndpoint(), chefAction1.json()),
             chakram.post(chefActionEndpoint(), chefAction2.json())]).then(function(responses) {
             expect(responses[0]).to.have.status(200);
             expect(responses[1]).to.have.status(200);
             return chakram.all([
-              helpers.NodeStateRefresh(), 
-              helpers.NodeAttributeRefresh(), 
+              helpers.NodeStateRefresh(),
+              helpers.NodeAttributeRefresh(),
               helpers.ConvergeHistoryRefresh()]).then(function(responses) {
               // send remove marked nodes
               return chakram.post(deleteNodeSchedulerUrl() + 'delete-marked-nodes').then(function(response) {
                 expect(response).to.have.status(200);
 
                 return chakram.all([
-                  helpers.NodeStateRefresh(), 
-                  helpers.NodeAttributeRefresh(), 
+                  helpers.NodeStateRefresh(),
+                  helpers.NodeAttributeRefresh(),
                   helpers.ConvergeHistoryRefresh()]).then(function(responses) {
                   return chakram.all([
-                    chakram.get(nodeStateUrl()), 
+                    chakram.get(nodeStateUrl()),
                     chakram.get(nodeAttributeUrl()),
                     chakram.get(convergeHistoryUrl())
                     ]).then(function(responses) {
@@ -192,7 +192,7 @@ describe("remove marked nodes", function () {
 
                     let source = nodeStateResponse.body.hits.hits[0]._source
                     expect(source.entity_uuid).to.equal(entityUuid3);
-                    
+
                     expect(nodeAttributeResponse).to.have.status(200);
                     expect(nodeAttributeResponse.body.hits.total).to.equal(1);
 
@@ -230,25 +230,25 @@ describe("remove marked nodes", function () {
         return chakram.post(chefRunEndpoint(), chefRun.json()).then(function(response) {
           expect(response).to.have.status(200);
           return chakram.all([
-            helpers.NodeStateRefresh(), 
-            helpers.NodeAttributeRefresh(), 
+            helpers.NodeStateRefresh(),
+            helpers.NodeAttributeRefresh(),
             helpers.ConvergeHistoryRefresh()]).then(function(responses) {
             // mark the node
             return chakram.post(chefActionEndpoint(), chefAction.json()).then(function(response) {
               return chakram.all([
-                helpers.NodeStateRefresh(), 
-                helpers.NodeAttributeRefresh(), 
+                helpers.NodeStateRefresh(),
+                helpers.NodeAttributeRefresh(),
                 helpers.ConvergeHistoryRefresh()]).then(function(responses) {
                   // send remove marked nodes
                 return chakram.post(deleteNodeSchedulerUrl() + 'delete-marked-nodes').then(function(response) {
                   expect(response).to.have.status(200);
-                  
+
                   return chakram.all([
-                    helpers.NodeStateRefresh(), 
-                    helpers.NodeAttributeRefresh(), 
+                    helpers.NodeStateRefresh(),
+                    helpers.NodeAttributeRefresh(),
                     helpers.ConvergeHistoryRefresh()]).then(function(responses) {
                     return chakram.all([
-                      chakram.get(nodeStateUrl()), 
+                      chakram.get(nodeStateUrl()),
                       chakram.get(nodeAttributeUrl()),
                       chakram.get(convergeHistoryUrl())
                       ]).then(function(responses) {
@@ -262,7 +262,7 @@ describe("remove marked nodes", function () {
 
                       let source = nodeStateResponse.body.hits.hits[0]._source
                       expect(source.entity_uuid).to.equal(entityUuid);
-                      
+
                       expect(nodeAttributeResponse).to.have.status(200);
                       expect(nodeAttributeResponse.body.hits.total).to.equal(1);
 

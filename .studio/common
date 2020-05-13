@@ -3,6 +3,15 @@
 # This file is the place we will put all the common functionality that
 # two or more components share/require (ex. install elasticsearch)
 
+document "run_studio_repo_health_checks" <<DOC
+  Run repo health checks that are implemented in the .studio helpers
+DOC
+
+function run_studio_repo_health_checks() {
+  echo "Checking for packages missing required metadata"
+  verify_components_have_platform_config || return 1
+}
+
 document "clean_all_compiled_protos" <<DOC
   Delete all the files with extensions matching '*pb*go' in the repo (except in vendor/)
 DOC
@@ -107,8 +116,8 @@ function compile_client_mocks() {
     set -e
     pushd /src/api/interservice || return 1
       mockgen_debug -source event/event.pb.go -destination event/event.pb.client_mock.go -package event -self_package github.com/chef/automate/api/interservice/event
-      mockgen_debug -source authz/v2/project.pb.go -destination authz/v2/project.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
-      mockgen_debug -source authz/v2/authz.pb.go -destination authz/v2/authz.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
+      mockgen_debug -source authz/project.pb.go -destination authz/project.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
+      mockgen_debug -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
       mockgen_debug -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
       mockgen_debug -source compliance/ingest/ingest/compliance.pb.go -destination compliance/ingest/ingest/compliance.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/compliance/ingest/ingest
       # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt because of
@@ -193,6 +202,56 @@ function link_component_bin() {
 
 function desired_golang_ident() {
     echo "core/go/$(cat /src/GOLANG_VERSION)"
+}
+
+function verify_components_have_platform_config() {
+  for component in components/*; do
+    verify_component_has_platform_config "$component" || return 1
+  done
+}
+
+function verify_component_has_platform_config() {
+  if [[ -z $1 ]]; then
+      error "Missing component name argument to ${FUNCNAME[0]}"
+      return 1
+  fi
+
+  install_if_missing core/jq-static jq
+
+  local component_dir=$1
+  local component_name; component_name="\"$(basename "$component_dir")\""
+
+  local hab_hooks; hab_hooks="$component_dir/habitat/hooks"
+
+  if [[ ! -d "$hab_hooks" ]]; then
+    echo "SKIP: $component_name has no hab hooks, platform config not needed"
+    return 0
+  fi
+
+  if ! grep -q pg-helper "$hab_hooks"/*; then
+    echo "SKIP: $component_name doesn't use pg-helper, platform config not needed"
+    return 0
+  fi
+
+
+  local package_meta; package_meta="$component_dir"/package.meta
+
+  if [[ ! -f "$package_meta" ]]; then
+    error "$component_name uses \`pg-helper\`, but doesn't have a package metadata file"
+    error "Create the $package_meta file and rebuild the generated files in automate-deployment"
+    error "for more information, consult the ProductMetadata documentation: https://godoc.org/github.com/chef/automate/lib/product"
+    return 1
+  fi
+
+  if jq '.uses_platform_scaffolding | type' "$package_meta" | grep -q null; then
+    error "$component_name uses \`pg-helper\` in habitat hooks but doesn't specify \`uses_platform_scaffolding\` in package.meta"
+    error "Set \"uses_platform_scaffolding\" to \`true\` or \`false\` in $package_meta"
+    error "for more information, consult the ProductMetadata documentation: https://godoc.org/github.com/chef/automate/lib/product"
+    return 1
+  fi
+
+  echo "OK:   $component_name platform config integration looks correct"
+  return 0
 }
 
 function start_sup() {

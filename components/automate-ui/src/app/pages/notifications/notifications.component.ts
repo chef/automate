@@ -31,7 +31,7 @@ export class NotificationsComponent implements OnInit {
   pageSize = 10;
   sortField: string;
   sortDir: FieldDirection;
-  permissionDenied = false;
+  permissionDenied = false; // not currently used
   // This is exposed here to allow the component HTML access to ServiceActionType
   serviceActionType = ServiceActionType;
 

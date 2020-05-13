@@ -14,7 +14,7 @@
           <chef-td>
             <a [routerLink]="['/infrastructure','chef-servers', serverId, 'org', orgId, 'roles', role.name]">{{ role.name }}</a>
           </chef-td>
-          <chef-td>{{ role.description == '' ?  'N/A' : role.description }}</chef-td>
+          <chef-td>{{ role.description === '' ?  'N/A' : role.description }}</chef-td>
           <chef-td>{{ role.environments.join(", ") }}</chef-td>
         </chef-tr>
       </chef-tbody>

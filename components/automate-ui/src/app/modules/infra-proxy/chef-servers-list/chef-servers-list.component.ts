@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Store, select } from '@ngrx/store';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { Store } from '@ngrx/store';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { Regex } from 'app/helpers/auth/regex';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { isNil } from 'lodash/fp';
+
 import { HttpStatus } from 'app/types/types';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { loading, EntityStatus, pending } from 'app/entities/entities';
@@ -30,22 +31,25 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public serverToDelete: Server;
   public deleteModalVisible = false;
+  public messageModalVisible = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.loading$ = store.pipe(select(getStatus), map(loading));
+    this.loading$ = store.select(getStatus).pipe(map(loading));
 
-    this.sortedChefServers$ = store.pipe(
-      select(allServers),
-      map(servers => ChefSorters.naturalSort(servers, 'name')));
+    this.sortedChefServers$ = store.select(allServers)
+    .pipe(
+      map(servers => ChefSorters.naturalSort(servers, 'name')
+      ));
 
     this.createChefServerForm = this.fb.group({
       // Must stay in sync with error checks in create-chef-server-modal.component.html
+      id: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       fqdn: ['', [Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.VALID_FQDN)
@@ -60,8 +64,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     this.store.dispatch(new GetServers());
-    this.store.pipe(
-      select(saveStatus),
+    this.store.select(saveStatus)
+    .pipe(
       takeUntil(this.isDestroyed),
       filter(state => this.createModalVisible && !pending(state)))
       .subscribe(state => {
@@ -106,8 +110,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   public createChefServer(): void {
     this.creatingChefServer = true;
     const server = {
+      id: this.createChefServerForm.controls['id'].value,
       name: this.createChefServerForm.controls['name'].value.trim(),
-      description: this.createChefServerForm.controls['description'].value.trim(),
       fqdn: this.createChefServerForm.controls['fqdn'].value.trim(),
       ip_address: this.createChefServerForm.controls['ip_address'].value.trim()
     };
@@ -120,10 +124,14 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
     this.conflictErrorEvent.emit(false);
   }
 
-  public startServerDelete($event: ChefKeyboardEvent, server: Server): void {
+  public startServerDelete($event: MatOptionSelectionChange, server: Server): void {
     if ($event.isUserInput) {
-      this.serverToDelete = server;
-      this.deleteModalVisible = true;
+      if (server.orgs_count > 0) {
+        this.messageModalVisible = true;
+      } else {
+        this.serverToDelete = server;
+        this.deleteModalVisible = true;
+      }
     }
   }
 
@@ -134,5 +142,9 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+  }
+
+  public closeMessageModal(): void {
+    this.messageModalVisible = false;
   }
 }

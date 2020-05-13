@@ -87,7 +87,7 @@ describe('team management', () => {
 
       cy.get('[data-cy=save-button]').click();
       cy.get('app-team-management chef-modal').should('not.be.visible');
-      cy.get('chef-notification.info').should('be.visible');
+      cy.get('app-notification.info').should('be.visible');
       cy.contains(teamName).should('exist');
       cy.contains(generatedTeamID).should('exist');
     });
@@ -105,8 +105,7 @@ describe('team management', () => {
 
       cy.get('[data-cy=save-button]').click();
       cy.get('app-team-management chef-modal').should('not.be.visible');
-      cy.get('#main-content-wrapper').scrollTo('top');
-      cy.get('chef-notification.info').should('be.visible');
+      cy.get('app-notification.info').should('be.visible');
       cy.contains(teamName).should('exist');
       cy.contains(customTeamID).should('exist');
     });
@@ -125,7 +124,7 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(generatedTeamID);
 
         // initial state of dropdown
-        cy.get(projectDropdown + '#projects-selected')
+        cy.get(projectDropdown + '#resources-selected')
           .contains(unassigned);
         cy.get(projectDropdown + '.dropdown-button')
           .should('have.attr', 'disabled');
@@ -133,8 +132,7 @@ describe('team management', () => {
         // save team
         cy.get('[data-cy=save-button]').click();
         cy.get('app-team-management chef-modal').should('not.be.visible');
-        cy.get('#main-content-wrapper').scrollTo('top');
-        cy.get('chef-notification.info').should('be.visible');
+        cy.get('app-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
         cy.contains(unassigned).should('exist');
@@ -163,7 +161,7 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(generatedTeamID);
 
         // initial state of dropdown
-        cy.get(projectDropdown + '#projects-selected').contains(unassigned);
+        cy.get(projectDropdown + '#resources-selected').contains(unassigned);
         cy.get(projectDropdown + '.dropdown-button').should('not.have.attr', 'disabled');
 
         // open projects dropdown
@@ -177,14 +175,13 @@ describe('team management', () => {
 
         // close projects dropdown
         cy.get(projectDropdown + '.dropdown-button').click();
-        cy.get(projectDropdown + '#projects-selected')
+        cy.get(projectDropdown + '#resources-selected')
           .contains(projectSummary);
 
         // save team
         cy.get('[data-cy=save-button]').click();
         cy.get('app-team-management chef-modal').should('not.be.visible');
-        cy.get('#main-content-wrapper').scrollTo('top');
-        cy.get('chef-notification.info').should('be.visible');
+        cy.get('app-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
         cy.contains(projectSummary).should('exist');
@@ -197,7 +194,7 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(generatedTeamID);
 
         // initial state of dropdown
-        cy.get(projectDropdown + '#projects-selected').contains(unassigned);
+        cy.get(projectDropdown + '#resources-selected').contains(unassigned);
         cy.get(projectDropdown + '.dropdown-button').should('not.have.attr', 'disabled');
 
         // open projects dropdown
@@ -211,14 +208,14 @@ describe('team management', () => {
 
         // close projects dropdown
         cy.get(projectDropdown + '.dropdown-button').click();
-        cy.get(projectDropdown + '#projects-selected')
+        cy.get(projectDropdown + '#resources-selected')
           .contains(`${project2Name.substring(0, dropdownNameUntilEllipsisLen)}...`);
 
         // save team
         cy.get('[data-cy=save-button]').click();
         cy.get('app-team-management chef-modal').should('not.be.visible');
         cy.get('#main-content-wrapper').scrollTo('top');
-        cy.get('chef-notification.info').should('be.visible');
+        cy.get('app-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
         cy.contains(project2ID).should('exist');
@@ -231,7 +228,7 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(generatedTeamID);
 
         // initial state of dropdown
-        cy.get(projectDropdown + '#projects-selected').contains(unassigned);
+        cy.get(projectDropdown + '#resources-selected').contains(unassigned);
         cy.get(projectDropdown + '.dropdown-button').should('not.have.attr', 'disabled');
 
         // open projects dropdown
@@ -245,13 +242,13 @@ describe('team management', () => {
 
         // close projects dropdown
         cy.get('app-projects-dropdown .dropdown-button').click();
-        cy.get('app-projects-dropdown #projects-selected').contains(unassigned);
+        cy.get('app-projects-dropdown #resources-selected').contains(unassigned);
 
         // save team
         cy.get('[data-cy=save-button]').click();
         cy.get('app-team-management app-team-management chef-modal').should('not.be.visible');
         cy.get('#main-content-wrapper').scrollTo('top');
-        cy.get('chef-notification.info').should('be.visible');
+        cy.get('app-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
         cy.contains(unassigned).should('exist');

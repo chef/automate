@@ -12,8 +12,8 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/status"
 
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/local-user-service/password"
 	"github.com/chef/automate/components/local-user-service/users"
 	"github.com/chef/automate/lib/grpc/health"
@@ -45,7 +45,7 @@ type Server struct {
 	teamsClient     teams.TeamsClient
 	a1UserData      string
 	a1UserRolesData string
-	authzClient     authz.SubjectPurgeClient
+	authzClient     authz.PoliciesClient
 }
 
 // NewServer constructs a server from the provided config.
@@ -97,7 +97,7 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		teamsClient:     teams.NewTeamsClient(conn),
 		a1UserData:      c.A1UserData,
 		a1UserRolesData: c.A1UserRolesData,
-		authzClient:     authz.NewSubjectPurgeClient(authzConn),
+		authzClient:     authz.NewPoliciesClient(authzConn),
 		health:          health.NewService(),
 	}
 

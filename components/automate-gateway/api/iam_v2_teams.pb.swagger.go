@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/iam/v2/teams": {
+    "/apis/iam/v2/teams": {
       "get": {
         "summary": "Lists all local teams",
         "description": "Lists all local teams.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -64,7 +64,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/teams/{id}": {
+    "/apis/iam/v2/teams/{id}": {
       "get": {
         "summary": "Get a team",
         "description": "Returns the details for a team.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -152,7 +152,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/teams/{id}/users": {
+    "/apis/iam/v2/teams/{id}/users": {
       "get": {
         "summary": "Gets local team membership",
         "description": "Lists all users of a local team. Users are listed by their membership_id.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -178,10 +178,10 @@ func init() {
         ]
       }
     },
-    "/iam/v2/teams/{id}/users:add": {
+    "/apis/iam/v2/teams/{id}/users:add": {
       "post": {
         "summary": "Adds local team membership",
-        "description": "Adds a list of users to a local team. Users are added by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Adds a list of users to a local team. Users are added by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "AddTeamMembers",
         "responses": {
           "200": {
@@ -218,10 +218,10 @@ func init() {
         ]
       }
     },
-    "/iam/v2/teams/{id}/users:remove": {
+    "/apis/iam/v2/teams/{id}/users:remove": {
       "post": {
         "summary": "Removes local team membership",
-        "description": "Removes a list of users from a local team. Users are removed by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:delete\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Removes a list of users from a local team. Users are removed by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "RemoveTeamMembers",
         "responses": {
           "200": {
@@ -258,7 +258,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/users/{membership_id}/teams": {
+    "/apis/iam/v2/users/{membership_id}/teams": {
       "get": {
         "summary": "Gets team membership for a user",
         "description": "Lists all local teams for a specific user. You must use their membership_id in the request URL.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:userTeams:get\n` + "`" + `` + "`" + `` + "`" + `",

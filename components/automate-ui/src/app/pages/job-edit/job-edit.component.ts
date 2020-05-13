@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { clamp, find, isEqual } from 'lodash/fp';
 import { RRule } from 'rrule';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 import { NgrxStateAtom } from '../../ngrx.reducers';
 

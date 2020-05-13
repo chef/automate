@@ -20,10 +20,14 @@ describe('ChefServerDetailsComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({
+          selector: 'app-authorized',
+          inputs: ['allOf']
+        }),
+        MockComponent({
           selector: 'app-create-org-modal',
           inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
           outputs: ['close', 'createClicked']
-          }),
+        }),
         MockComponent({ selector: 'chef-button',
           inputs: ['disabled', 'routerLink'] }),
         MockComponent({ selector: 'mat-select' }),
@@ -57,7 +61,7 @@ describe('ChefServerDetailsComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -73,12 +77,12 @@ describe('ChefServerDetailsComponent', () => {
   describe('create org', () => {
     let store: Store<NgrxStateAtom>;
     const org: Org = {
-        id: '1',
-        name: 'new org',
-        admin_user: 'new org user',
-        admin_key: 'new admin key',
-        server_id: '39cabe9d-996e-42cd-91d0-4335b2480aaf'
-      };
+      id: '1',
+      name: 'new org',
+      admin_user: 'new org user',
+      admin_key: 'new admin key',
+      server_id: '39cabe9d-996e-42cd-91d0-4335b2480aaf'
+    };
 
     beforeEach(() => {
       store = TestBed.inject(Store);
@@ -92,6 +96,7 @@ describe('ChefServerDetailsComponent', () => {
 
     it('opening create modal resets name, admin_user and admin_key to empty string', () => {
       component.openCreateModal('create');
+      expect(component.orgForm.controls['id'].value).toEqual('');
       expect(component.orgForm.controls['name'].value).toEqual('');
       expect(component.orgForm.controls['admin_user'].value).toEqual('');
       expect(component.orgForm.controls['admin_key'].value).toEqual('');
@@ -100,6 +105,7 @@ describe('ChefServerDetailsComponent', () => {
     it('on conflict error, modal remains open and displays conflict error', () => {
       spyOn(component.conflictErrorEvent, 'emit');
       component.openCreateModal('create');
+      component.orgForm.controls['id'].setValue(org.id);
       component.orgForm.controls['name'].setValue(org.name);
       component.orgForm.controls['admin_user'].setValue(org.admin_user);
       component.orgForm.controls['admin_key'].setValue(org.admin_key);
@@ -117,6 +123,7 @@ describe('ChefServerDetailsComponent', () => {
     it('on success, closes modal and adds new server', () => {
       spyOn(component.conflictErrorEvent, 'emit');
       component.openCreateModal('create');
+      component.orgForm.controls['id'].setValue(org.id);
       component.orgForm.controls['name'].setValue(org.name);
       component.orgForm.controls['admin_user'].setValue(org.admin_user);
       component.orgForm.controls['admin_key'].setValue(org.admin_key);
@@ -129,6 +136,7 @@ describe('ChefServerDetailsComponent', () => {
     it('on create error, modal is closed (because error is handled by failure banner)', () => {
       spyOn(component.conflictErrorEvent, 'emit');
       component.openCreateModal('create');
+      component.orgForm.controls['id'].setValue(org.id);
       component.orgForm.controls['name'].setValue(org.name);
       component.orgForm.controls['admin_user'].setValue(org.admin_user);
       component.orgForm.controls['admin_key'].setValue(org.admin_key);
@@ -141,7 +149,7 @@ describe('ChefServerDetailsComponent', () => {
 
       store.dispatch(new CreateOrgFailure(error));
 
-      expect(component.createModalVisible).toBe(true);
+      expect(component.createModalVisible).toBe(false);
     });
   });
 });

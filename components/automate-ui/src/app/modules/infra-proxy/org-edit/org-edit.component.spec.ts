@@ -1,6 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { OrgEditComponent } from './org-edit.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -16,15 +14,13 @@ describe('OrgEditComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-toolbar' }),
@@ -34,8 +30,9 @@ describe('OrgEditComponent', () => {
         MockComponent({ selector: 'chef-tr' }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
         OrgEditComponent
       ],
       providers: [
@@ -46,8 +43,7 @@ describe('OrgEditComponent', () => {
         ReactiveFormsModule,
         RouterTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
-      ],
-      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+      ]
     })
     .compileComponents();
   }));

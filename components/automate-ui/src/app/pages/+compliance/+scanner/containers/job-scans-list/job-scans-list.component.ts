@@ -4,7 +4,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../../../../ngrx.reducers';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import * as selectors from '../../state/scanner.selectors';
 import * as actions from '../../state/scanner.actions';

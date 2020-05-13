@@ -21,8 +21,8 @@ type Client interface {
 	NodeExists(nodeID string, projectFilters map[string][]string) (bool, error)
 	// @params (page, perPage, sortField, ascending, filters, startDate, endDate)
 	GetNodes(int, int, string, bool, map[string][]string, string, string) ([]Node, error)
-	// @params (filters)
-	GetNodesCounts(map[string][]string) (NodesCounts, error)
+	// @params (filters, startDate, endDate)
+	GetNodesCounts(map[string][]string, string, string) (NodesCounts, error)
 	// @params (node_id, page, per_page, filters, start, end)
 	GetRuns(string, int, int, map[string][]string, string, string) ([]AbridgedConverge, error)
 	// @params (filters nodeID start end)
@@ -69,6 +69,7 @@ type Client interface {
 	GetMissingNodeDurationCounts(durations []string) ([]CountedDuration, error)
 	GetNodeMetadataCounts(filters map[string][]string, types []string, startDate,
 		endDate string) ([]TypeCount, error)
+	GetNodeRunsDailyStatusTimeSeries(string, time.Time, time.Time) ([]RunDurationStatus, error)
 }
 
 // Types that we consume from the ingest-service
@@ -77,7 +78,7 @@ type Client interface {
 // service since it is the origin of our data. Therefore we will just import
 // them as our own so we can call them as `backend.Type`
 type Run ingest.Run
-type Node ingest.Node
+type Node ingest.UpsertNode
 type NodeAttribute ingest.NodeAttribute
 type ChefError ingest.ChefError
 type ExpandedRunList ingest.ExpandedRunList
@@ -96,6 +97,13 @@ type CountPeroid struct {
 	Start time.Time
 	End   time.Time
 	Count int
+}
+
+type RunDurationStatus struct {
+	Start  time.Time
+	End    time.Time
+	Status string
+	RunID  string
 }
 
 type TypeCount struct {

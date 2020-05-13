@@ -31,7 +31,7 @@
           <app-tab tabTitle="Roles" #roles_tab  [active]="rolesTab">
             <app-infra-roles *ngIf="roles_tab.active" [serverId]="serverId" [orgId]="orgId"></app-infra-roles>
           </app-tab>
-          <app-tab tabTitle="Environments" #environments_tab  [active]="false">
+          <app-tab tabTitle="Environments" #environments_tab  [active]="environmentsTab">
             <app-environments *ngIf="environments_tab.active" [serverId]="serverId" [orgId]="orgId"></app-environments>
           </app-tab>
           <app-tab tabTitle="Details" #details_tab [active]="false">

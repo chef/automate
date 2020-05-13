@@ -151,7 +151,7 @@ describe('HttpClientAuthInterceptor', () => {
           const options = { params: { unfiltered: String(setting) } };
           httpClient.get('/endpoint', options).subscribe(done);
 
-          const httpRequest = httpMock.expectOne(`/endpoint?unfiltered=${setting}`);
+          const httpRequest = httpMock.expectOne('/endpoint');
           httpRequest.flush('response');
 
           const headerKeys = httpRequest.request.headers.keys();
@@ -162,18 +162,17 @@ describe('HttpClientAuthInterceptor', () => {
           }
         });
 
-        // Uncomment test after https://github.com/angular/angular/issues/18812 is fixed.
-        // it('strips unfiltered param when set to ' + setting, done => {
-        //   const options = { params: { unfiltered: String(setting), dummy: 'foobar' } };
-        //   httpClient.get('/endpoint', options).subscribe(done);
+        it('strips unfiltered param when set to ' + setting, done => {
+          const options = { params: { unfiltered: String(setting), dummy: 'foobar' } };
+          httpClient.get('/endpoint', options).subscribe(done);
 
-        //   const httpRequest = httpMock.expectOne('/endpoint?dummy=foobar');
-        //   httpRequest.flush('response');
+          const httpRequest = httpMock.expectOne('/endpoint?dummy=foobar');
+          httpRequest.flush('response');
 
-        //   // This assertion is completely redundant with the expectOne above,
-        //   // but having it adds to clarity.
-        //   expect(httpRequest.request.params.get('unfiltered')).toBeFalsy();
-        // });
+          // This assertion is completely redundant with the expectOne above,
+          // but having it adds to clarity.
+          expect(httpRequest.request.params.get('unfiltered')).toBeFalsy();
+        });
       });
     });
   });

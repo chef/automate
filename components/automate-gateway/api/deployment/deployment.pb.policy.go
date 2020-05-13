@@ -6,10 +6,10 @@ package deployment
 import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.deployment.Deployment/GetVersion", "system:service:version", "system:serviceVersion:get", "GET", "/version", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.deployment.Deployment/GetVersion", "system:service:version", "system:serviceVersion:get", "GET", "/api/v0/version", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.deployment.Deployment/ServiceVersions", "system:service:version", "system:serviceVersion:list", "GET", "/deployment/service_versions", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.deployment.Deployment/ServiceVersions", "system:service:version", "system:serviceVersion:list", "GET", "/api/v0/deployment/service_versions", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
 }

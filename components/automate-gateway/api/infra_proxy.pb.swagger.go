@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/infra/servers": {
+    "/api/v0/infra/servers": {
       "get": {
         "operationId": "GetServers",
         "responses": {
@@ -54,7 +54,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{id}": {
+    "/api/v0/infra/servers/{id}": {
       "get": {
         "operationId": "GetServer",
         "responses": {
@@ -68,6 +68,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -90,6 +91,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -112,6 +114,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -130,31 +133,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{name}": {
-      "get": {
-        "operationId": "GetServerByName",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetServer"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "name",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "InfraProxy"
-        ]
-      }
-    },
-    "/infra/servers/{server_id}/orgs": {
+    "/api/v0/infra/servers/{server_id}/orgs": {
       "get": {
         "operationId": "GetOrgs",
         "responses": {
@@ -210,7 +189,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{id}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{id}": {
       "get": {
         "operationId": "GetOrg",
         "responses": {
@@ -310,39 +289,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{name}": {
-      "get": {
-        "operationId": "GetOrgByName",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetOrg"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "server_id",
-            "description": "Chef Infra Server ID.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "name",
-            "description": "Chef organization name.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "InfraProxy"
-        ]
-      }
-    },
-    "/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}": {
       "get": {
         "operationId": "GetAffectedNodes",
         "responses": {
@@ -395,7 +342,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/clients": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients": {
       "get": {
         "operationId": "GetClients",
         "responses": {
@@ -425,7 +372,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
       "get": {
         "operationId": "GetClient",
         "responses": {
@@ -461,7 +408,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
       "get": {
         "operationId": "GetCookbooks",
         "responses": {
@@ -493,7 +440,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
       "get": {
         "operationId": "GetCookbookVersions",
         "responses": {
@@ -532,7 +479,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
       "get": {
         "operationId": "GetCookbook",
         "responses": {
@@ -578,7 +525,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
       "get": {
         "operationId": "GetCookbookFileContent",
         "responses": {
@@ -631,7 +578,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags": {
       "get": {
         "operationId": "GetDataBags",
         "responses": {
@@ -660,8 +607,8 @@ func init() {
           {
             "name": "name",
             "description": "Data bag name.",
-            "in": "path",
-            "required": true,
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -670,7 +617,53 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
+      "delete": {
+        "operationId": "DeleteDataBag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBag"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Data bag name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "item",
+            "description": "Data bag item name.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
       "get": {
         "operationId": "GetDataBagItem",
         "responses": {
@@ -716,7 +709,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/environments": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments": {
       "get": {
         "operationId": "GetEnvironments",
         "responses": {
@@ -748,7 +741,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
       "get": {
         "operationId": "GetEnvironment",
         "responses": {
@@ -787,7 +780,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
       "get": {
         "operationId": "GetPolicyfiles",
         "responses": {
@@ -819,7 +812,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
       "get": {
         "operationId": "GetPolicyfile",
         "responses": {
@@ -865,7 +858,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/roles": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
         "operationId": "GetRoles",
         "responses": {
@@ -895,7 +888,7 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/roles/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}": {
       "get": {
         "operationId": "GetRole",
         "responses": {
@@ -929,9 +922,43 @@ func init() {
         "tags": [
           "InfraProxy"
         ]
+      },
+      "delete": {
+        "operationId": "DeleteRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Role"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
       }
     },
-    "/infra/version": {
+    "/api/v0/infra/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {
@@ -969,6 +996,10 @@ func init() {
     "chef.automate.api.infra_proxy.request.CreateOrg": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
         "name": {
           "type": "string",
           "description": "Chef organization name."
@@ -997,17 +1028,21 @@ func init() {
     "chef.automate.api.infra_proxy.request.CreateServer": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
+        "id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
         },
-        "description": {
-          "type": "string"
+        "name": {
+          "type": "string",
+          "description": "Chef Infra Server name."
         },
         "fqdn": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server FQDN."
         },
         "ip_address": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server IP address."
         }
       }
     },
@@ -1047,19 +1082,20 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server ID."
         },
         "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server name."
         },
         "fqdn": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server FQDN."
         },
         "ip_address": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server IP address."
         }
       }
     },
@@ -1389,13 +1425,22 @@ func init() {
       "type": "object",
       "properties": {
         "server": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
+          "description": "Chef Infra Server."
         }
       }
     },
     "chef.automate.api.infra_proxy.response.DataBag": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "description": "Data bag name."
+        },
+        "id": {
+          "type": "string",
+          "description": "Data bag item ID."
+        },
         "data": {
           "type": "string",
           "description": "Stringified json of data bag item."
@@ -1436,7 +1481,8 @@ func init() {
       "type": "object",
       "properties": {
         "server": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
+          "description": "Chef Infra Server."
         }
       }
     },
@@ -1538,7 +1584,8 @@ func init() {
       "type": "object",
       "properties": {
         "server": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
+          "description": "Chef Infra Server."
         }
       }
     },
@@ -1549,7 +1596,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
-          }
+          },
+          "description": "List of Chef Infra Servers."
         }
       }
     },
@@ -1722,6 +1770,13 @@ func init() {
         "override_attributes": {
           "type": "string",
           "description": "Stringified JSON of the override attributes."
+        },
+        "expanded_run_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
+          },
+          "description": "Expanded run-list associated with the policy."
         }
       }
     },
@@ -1896,23 +1951,25 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server ID."
         },
         "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server name."
         },
         "fqdn": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server FQDN."
         },
         "ip_address": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server IP address."
         },
         "orgs_count": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Chef organizations count associated with Chef Infra Server."
         }
       }
     },
@@ -1938,7 +1995,8 @@ func init() {
       "type": "object",
       "properties": {
         "server": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
+          "description": "Chef Infra Server."
         }
       }
     }

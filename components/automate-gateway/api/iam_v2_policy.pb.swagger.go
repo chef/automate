@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/iam/v2/introspect_projects": {
+    "/apis/iam/v2/introspect_projects": {
       "get": {
         "operationId": "IntrospectAllProjects",
         "responses": {
@@ -30,7 +30,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/policies": {
+    "/apis/iam/v2/policies": {
       "get": {
         "summary": "Lists all policies",
         "description": "Lists all policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -80,7 +80,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/policies/{id}": {
+    "/apis/iam/v2/policies/{id}": {
       "get": {
         "summary": "Gets a policy",
         "description": "Returns the details for a policy.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -171,7 +171,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/policies/{id}/members": {
+    "/apis/iam/v2/policies/{id}/members": {
       "get": {
         "summary": "Lists policy members",
         "description": "Lists all members of a specific policy.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:policyMembers:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -237,7 +237,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/policies/{id}/members:add": {
+    "/apis/iam/v2/policies/{id}/members:add": {
       "post": {
         "summary": "Adds policy members",
         "description": "Adds members to the member list of a specific policy.\nYou may use this endpoint to update members of either Custom or Chef-managed policies.\n\nEnsure each element of the members array is in the correct\n[Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:policyMembers:create\n` + "`" + `` + "`" + `` + "`" + `",
@@ -278,7 +278,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/policies/{id}/members:remove": {
+    "/apis/iam/v2/policies/{id}/members:remove": {
       "post": {
         "summary": "Removes policy members",
         "description": "Removes members from the member list of a specific policy. Silently ignores\nmembers that are not already part of the member list.\nYou may use this endpoint to update members of either Custom or Chef-managed policies.\n\nEnsure each element of the members array is in the correct\n[Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.\n\nThe removed members will still exist within Chef Automate, but are no longer associated with this policy.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:policyMembers:delete\n` + "`" + `` + "`" + `` + "`" + `",
@@ -319,7 +319,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/policy_version": {
+    "/apis/iam/v2/policy_version": {
       "get": {
         "summary": "Gets IAM version",
         "description": "Returns the major and minor version of IAM that your automate installation is running.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -337,7 +337,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/projects": {
+    "/apis/iam/v2/projects": {
       "get": {
         "summary": "Lists all projects",
         "description": "Lists all projects.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -356,7 +356,7 @@ func init() {
       },
       "post": {
         "summary": "Creates a project",
-        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.\n\nWhen a project is created, the system also creates three policies associated with the new project, \none for each of the following roles: editor, viewer, and project owner.\nYou can optionally pass the ` + "`" + `skip_policies` + "`" + ` flag set to ` + "`" + `true` + "`" + ` to skip the creation of these policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.\n\nWhen a project is created, the system also creates three policies associated with the new project,\none for each of the following roles: editor, viewer, and project owner.\nYou can optionally pass the ` + "`" + `skip_policies` + "`" + ` flag set to ` + "`" + `true` + "`" + ` to skip the creation of these policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateProject",
         "responses": {
           "200": {
@@ -387,7 +387,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/projects/{id}": {
+    "/apis/iam/v2/projects/{id}": {
       "get": {
         "summary": "Gets a project",
         "description": "Returns the details for a project.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -478,7 +478,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/roles": {
+    "/apis/iam/v2/roles": {
       "get": {
         "summary": "Lists all roles",
         "description": "Lists all *Chef-managed* and *Custom* roles.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -528,7 +528,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/roles/{id}": {
+    "/apis/iam/v2/roles/{id}": {
       "get": {
         "summary": "Gets a role",
         "description": "Returns the details for a role.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:get\n` + "`" + `` + "`" + `` + "`" + `",

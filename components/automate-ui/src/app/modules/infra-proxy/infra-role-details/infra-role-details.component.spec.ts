@@ -1,6 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
@@ -28,6 +29,7 @@ class MockAttributesService {
 }
 
 describe('InfraRoleDetailsComponent', () => {
+  let router: Router;
   let component: InfraRoleDetailsComponent;
   let fixture: ComponentFixture<InfraRoleDetailsComponent>;
   let element;
@@ -100,6 +102,7 @@ describe('InfraRoleDetailsComponent', () => {
     component = fixture.componentInstance;
     element = fixture.debugElement;
     fixture.detectChanges();
+    router = TestBed.inject(Router);
     component.attributes = new RoleAttributes(role);
   });
 
@@ -111,14 +114,16 @@ describe('InfraRoleDetailsComponent', () => {
     expect(component.tabValue).toBe('runList');
   });
 
-  it('show run_list section when run_list tab is selected', () => {
+  it('shows/hides sections when based on selection', () => {
+    spyOn(router, 'navigate');
+
     component.onSelectedTab({ target: { value: 'runList' } });
     expect(component.tabValue).toBe('runList');
-  });
+    expect(router.navigate).toHaveBeenCalled();
 
-  it('show attributes section when attributes tab is selected', () => {
     component.onSelectedTab({ target: { value: 'attributes' } });
     expect(component.tabValue).toBe('attributes');
+    expect(router.navigate).toHaveBeenCalled();
   });
 
   describe('empty state', () => {

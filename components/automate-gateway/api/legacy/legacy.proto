@@ -20,7 +20,7 @@ service LegacyDataCollector {
 	// Since this is for legacy-support only, we don't bother much about having
 	// google.protobuf.Empty as argument.
 	rpc Status (google.protobuf.Empty) returns (StatusResponse) {
-		option (google.api.http).get = "/events/data-collector";
+		option (google.api.http).get = "/api/v0/events/data-collector";
 		option (chef.automate.api.iam.policy).resource = "ingest:status";
 		option (chef.automate.api.iam.policy).action = "ingest:status:get";
 	};

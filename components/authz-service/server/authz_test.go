@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	api "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/storage"
@@ -22,9 +22,9 @@ import (
  * which actually use the OPA engine.                                        *
  ************ ************ ************ ************ ************ ************/
 
-func TestV2p1ProjectsAuthorized(t *testing.T) {
+func TestProjectsAuthorized(t *testing.T) {
 	eng := responderEngine{}
-	ctx, ts := setupV2p1AuthTests(t, &eng)
+	ctx, ts := setupAuthTests(t, &eng)
 
 	t.Run("authorized", func(t *testing.T) {
 		cases := map[string]struct {
@@ -68,7 +68,7 @@ func TestFilterAuthorizedPairs(t *testing.T) {
 		pairs: []engine.Pair{
 			{Action: "iam:users:create", Resource: "iam:users"},
 		}}
-	ctx, ts := setupV2p1AuthTests(t, &eng)
+	ctx, ts := setupAuthTests(t, &eng)
 
 	t.Run("returns engine response", func(t *testing.T) {
 		resp, err := ts.authz.FilterAuthorizedPairs(ctx, &api.FilterAuthorizedPairsReq{
@@ -87,7 +87,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 	t.Run("returns engine response", func(t *testing.T) {
 		expProjects = []string{"project-1", "project-2", "project-3"}
 		eng = responderEngine{projects: expProjects}
-		ctx, ts := setupV2p1AuthTests(t, &eng)
+		ctx, ts := setupAuthTests(t, &eng)
 
 		resp, err := ts.authz.FilterAuthorizedProjects(ctx,
 			&api.FilterAuthorizedProjectsReq{
@@ -100,7 +100,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 	t.Run("if engine returns all projects, returns list of all projects and unassigned", func(t *testing.T) {
 		expProjects = []string{constants.AllProjectsID}
 		eng = responderEngine{projects: expProjects}
-		ctx, ts := setupV2p1AuthTests(t, &eng)
+		ctx, ts := setupAuthTests(t, &eng)
 		addProjectToStore(t, ts.projectCache, "project-1", "Numero 1", storage.Custom)
 		addProjectToStore(t, ts.projectCache, "project-2", "Numero 2", storage.Custom)
 		allProjects := []string{"project-1", "project-2", "(unassigned)"}
@@ -114,7 +114,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 	})
 }
 
-func setupV2p1AuthTests(t *testing.T, eng *responderEngine) (context.Context, testSetup) {
+func setupAuthTests(t *testing.T, eng *responderEngine) (context.Context, testSetup) {
 	ctx := context.Background()
 	ts := setup(t, eng, nil)
 	return ctx, ts

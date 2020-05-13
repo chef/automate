@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/elasticutil"
@@ -50,7 +50,7 @@ func (backend *ESClient) ListProjectUpdateTasks(ctx context.Context) ([]project_
 }
 
 func (backend *ESClient) RunProjectUpdateTask(ctx context.Context, projectUpdateID string,
-	params map[string]string, projectTaggingRules map[string]*iam_v2.ProjectRules) (
+	params map[string]string, projectTaggingRules map[string]*authz.ProjectRules) (
 	project_update_lib.SerializedProjectUpdateTaskID,
 	project_update_lib.SerializedProjectUpdateTaskStatus,
 	error) {

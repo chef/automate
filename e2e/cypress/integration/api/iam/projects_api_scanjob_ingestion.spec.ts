@@ -60,7 +60,7 @@ describe('ScanJob Ingestion project tagging', () => {
       body: projectWithNodeRules.rule
     });
 
-    cy.applyRulesAndWait(100);
+    cy.applyRulesAndWait();
   });
 
   after(() => {
@@ -207,7 +207,7 @@ describe('ScanJob Ingestion project tagging', () => {
           }
         }).then(() => {
           // wait for the scan job to run and the report to be ingested
-          cy.waitForComplianceNode(nodeID, nodeStart, nodeEnd, 100);
+          cy.waitForComplianceNode(nodeID, nodeStart, nodeEnd);
 
           // Ensure the compliance node is tagged with the correct project
           // by fetching the node with the expected project filter

@@ -13,6 +13,14 @@ import (
 
 type CompliancePipe func(<-chan Compliance) <-chan Compliance
 
+func Propagate(out chan<- Compliance, msg *Compliance) {
+	select {
+	case out <- *msg:
+	case <-msg.Ctx.Done():
+		msg.FinishProcessingCompliance(msg.Ctx.Err())
+	}
+}
+
 type Compliance struct {
 	QueueTime      time.Time
 	Report         compliance.Report

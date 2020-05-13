@@ -9,7 +9,7 @@ import {
 } from '../../shared/reporting';
 import { ActivatedRoute, Router } from '@angular/router';
 import { union } from 'lodash/fp';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 type Tab = 'Node Status' | 'Profile Status';
 

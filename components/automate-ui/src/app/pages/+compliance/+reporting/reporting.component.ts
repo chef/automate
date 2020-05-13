@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Subject, Observable } from 'rxjs';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import {
   StatsService,
   SuggestionsService,

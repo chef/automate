@@ -1,13 +1,14 @@
 <ng-container *ngFor="let notification of notifications">
-  <chef-notification
+  <app-notification
     [className]="'license-banner'"
     [type]="'error'"
-    [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
+    [timeout]="notification.timeout" 
+    (dismissed)="handleNotificationDismissal(notification.id)">
     {{ notification.message }}
     <ng-container>
       <button class="link" (click)="onTriggerBannerLicenseApply()">Apply a license</button>
       or
       <a href="https://www.chef.io/contact-us/" target="_blank">contact Chef</a> to continue to use Chef Automate.
     </ng-container>
-  </chef-notification>
+  </app-notification>
 </ng-container>

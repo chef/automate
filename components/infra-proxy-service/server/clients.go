@@ -15,7 +15,7 @@ import (
 // GetClients get clients list
 func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*response.Clients, error) {
 
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
@@ -32,7 +32,7 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 
 // GetClient get client
 func (s *Server) GetClient(ctx context.Context, req *request.Client) (*response.Client, error) {
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}

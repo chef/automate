@@ -38,9 +38,6 @@ setup_docker_pg:
 kill_docker_pg:
 	docker rm -f infra-proxy-postgres || true
 
-truncate_servers:
-	docker exec -it infra-proxy-postgres psql -U postgres -d infra_proxy_test -c "TRUNCATE table servers CASCADE;"
-
 # this command lists all the changes since master, and looks for modifications
 # to the migration files -- if there's any of (M)odify, (R)ename, or (D)elete,
 # it will trigger an error

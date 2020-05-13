@@ -16,7 +16,7 @@ import (
 // GetEnvironments get environments list
 func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments) (*response.Environments, error) {
 
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
@@ -33,7 +33,7 @@ func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments)
 
 // GetEnvironment gets the environment details
 func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}

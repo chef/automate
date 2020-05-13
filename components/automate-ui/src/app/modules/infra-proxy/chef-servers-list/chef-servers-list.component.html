@@ -5,25 +5,33 @@
         <chef-heading>Chef Servers</chef-heading>
         <chef-subheading>Manage Chef Servers with Chef Automate.</chef-subheading>
       </chef-page-header>
-      <app-create-chef-server-modal
-        [visible]="createModalVisible"
+      <app-create-chef-server-modal 
+        [visible]="createModalVisible" 
         [creating]="creatingChefServer"
-        [createForm]="createChefServerForm"
-        (close)="closeCreateModal()"
+        [createForm]="createChefServerForm" 
+        (close)="closeCreateModal()" 
         [conflictErrorEvent]="conflictErrorEvent"
         (createClicked)="createChefServer()">
       </app-create-chef-server-modal>
-      <app-delete-object-modal
-        [visible]="deleteModalVisible"
-        objectNoun="server"
+      <app-delete-object-modal 
+        [visible]="deleteModalVisible" 
+        objectNoun="server" 
         [objectName]="serverToDelete?.name"
-        (close)="closeDeleteModal()"
-        (deleteClicked)="deleteServer()"
+        (close)="closeDeleteModal()" 
+        (deleteClicked)="deleteServer()" 
         objectAction="Delete">
       </app-delete-object-modal>
+      <app-message-modal 
+        [title]="'Could Not Delete Server'" 
+        [visible]="messageModalVisible"
+        (close)="closeMessageModal()">
+        Before you can delete this server, delete all organizations attached to it.
+      </app-message-modal>
       <div class="page-body">
         <chef-toolbar>
-          <chef-button primary (click)="openCreateModal()">Add Chef Server</chef-button>
+          <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
+            <chef-button primary (click)="openCreateModal()">Add Chef Server</chef-button>
+          </app-authorized>
         </chef-toolbar>
         <chef-table>
           <chef-thead>
@@ -31,24 +39,25 @@
               <chef-th>Name</chef-th>
               <chef-th>FQDN</chef-th>
               <chef-th>IP Address</chef-th>
-              <chef-th>Description</chef-th>
               <chef-th>No Of Orgs</chef-th>
               <chef-th class="three-dot-column"></chef-th>
             </chef-tr>
           </chef-thead>
           <chef-tbody>
-            <chef-tr *ngFor= "let server of sortedChefServers$ | async">
-              <chef-td >
+            <chef-tr *ngFor="let server of sortedChefServers$ | async">
+              <chef-td>
                 <a [routerLink]="['/infrastructure/chef-servers', server.id]">{{ server.name }}</a>
               </chef-td>
-              <chef-td  >{{ server.fqdn }}</chef-td>
-              <chef-td  >{{ server.ip_address }}</chef-td>
-              <chef-td  >{{ server.description }}</chef-td>
-              <chef-td  >{{ server.orgs_count }}</chef-td>
+              <chef-td>{{ server.fqdn }}</chef-td>
+              <chef-td>{{ server.ip_address }}</chef-td>
+              <chef-td>{{ server.orgs_count }}</chef-td>
               <chef-td class="three-dot-column">
-                <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
-                  <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="remove-server">Remove Chef Server</mat-option>
-                </mat-select>
+                <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
+                  <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
+                    <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="remove-server">Remove
+                      Chef Server</mat-option>
+                  </mat-select>
+                </app-authorized>  
               </chef-td>
             </chef-tr>
           </chef-tbody>

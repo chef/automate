@@ -11,27 +11,27 @@ import "api/external/ingest/request/job_scheduler.proto";
 
 service JobScheduler {
   rpc GetStatusJobScheduler (ingest.request.GetStatusJobScheduler) returns (ingest.response.JobSchedulerStatus) {
-    option (google.api.http).get = "/retention/nodes/status";
+    option (google.api.http).get = "/api/v0/retention/nodes/status";
     option (chef.automate.api.iam.policy).resource = "retention:nodes";
     option (chef.automate.api.iam.policy).action = "retention:nodes:get";
   };
 
   rpc ConfigureNodesMissingScheduler (ingest.request.SchedulerConfig) returns (ingest.response.ConfigureNodesMissingScheduler) {
-    option (google.api.http).post = "/retention/nodes/missing-nodes/config";
+    option (google.api.http).post = "/api/v0/retention/nodes/missing-nodes/config";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "retention:nodes";
     option (chef.automate.api.iam.policy).action = "retention:nodes:update";
   };
 
   rpc ConfigureDeleteNodesScheduler (ingest.request.SchedulerConfig) returns (ingest.response.ConfigureDeleteNodesScheduler) {
-    option (google.api.http).post = "/retention/nodes/delete-nodes/config";
+    option (google.api.http).post = "/api/v0/retention/nodes/delete-nodes/config";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "retention:nodes";
     option (chef.automate.api.iam.policy).action = "retention:nodes:update";
   };
 
   rpc ConfigureMissingNodesForDeletionScheduler (ingest.request.SchedulerConfig) returns (ingest.response.ConfigureMissingNodesForDeletionScheduler) {
-    option (google.api.http).post = "/retention/nodes/missing-nodes-deletion/config";
+    option (google.api.http).post = "/api/v0/retention/nodes/missing-nodes-deletion/config";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "retention:nodes";
     option (chef.automate.api.iam.policy).action = "retention:nodes:update";

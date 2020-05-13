@@ -10,11 +10,15 @@ import { MatSelectModule  } from '@angular/material/select';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 
+// Chart components
+import { ChartProgressBarComponent } from './chart-progress-bar/chart-progress-bar.component';
+
 // Components
 import { AuthorizedComponent } from './authorized/authorized.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { CalendarComponent } from './calendar/calendar.component';
+import { ChefNotificationComponent } from './notification/notification.component';
 import { ChefNotificationsComponent } from './notifications/notifications.component';
 import { ConfirmApplyStartModalComponent } from './confirm-apply-start-modal/confirm-apply-start-modal.component';
 import { ConfirmApplyStopModalComponent } from './confirm-apply-stop-modal/confirm-apply-stop-modal.component';
@@ -43,6 +47,7 @@ import { PagePickerComponent } from './page-picker/page-picker.component';
 import { PendingEditsBarComponent } from './pending-edits-bar/pending-edits-bar.component';
 import { ProcessProgressBarComponent } from './process-progress-bar/process-progress-bar.component';
 import { ProjectsDropdownComponent } from './projects-dropdown/projects-dropdown.component';
+import { ResourceDropdownComponent } from './resource-dropdown/resource-dropdown.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { SidebarEntryComponent } from './sidebar-entry/sidebar-entry.component';
 import { TabComponent } from './tab/tab.component';
@@ -77,11 +82,15 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     MatProgressBarModule,
     MatButtonModule,
 
+    // Charts
+    ChartProgressBarComponent,
+
     // Components
     AuthorizedComponent,
     BreadcrumbsComponent,
     BreadcrumbComponent,
     CalendarComponent,
+    ChefNotificationComponent,
     ChefNotificationsComponent,
     ConfirmApplyStartModalComponent,
     ConfirmApplyStopModalComponent,
@@ -99,6 +108,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     PendingEditsBarComponent,
     ProcessProgressBarComponent,
     ProjectsDropdownComponent,
+    ResourceDropdownComponent,
     SidebarComponent,
     SidebarEntryComponent,
     TabComponent,
@@ -116,10 +126,13 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     InputDirective
   ],
   declarations: [
+    ChartProgressBarComponent,
+    // components
     AuthorizedComponent,
     BreadcrumbsComponent,
     BreadcrumbComponent,
     CalendarComponent,
+    ChefNotificationComponent,
     ChefNotificationsComponent,
     ConfirmApplyStartModalComponent,
     ConfirmApplyStopModalComponent,
@@ -140,6 +153,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     PendingEditsBarComponent,
     ProcessProgressBarComponent,
     ProjectsDropdownComponent,
+    ResourceDropdownComponent,
     SidebarComponent,
     SidebarEntryComponent,
     TabComponent,

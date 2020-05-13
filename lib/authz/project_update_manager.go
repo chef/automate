@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/lib/cereal"
 	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 )
@@ -16,7 +16,7 @@ const (
 
 type EsClient interface {
 	JobCancel(context.Context, string) error
-	UpdateProjectTags(context.Context, map[string]*iam_v2.ProjectRules) ([]string, error)
+	UpdateProjectTags(context.Context, map[string]*authz.ProjectRules) ([]string, error)
 	JobStatus(context.Context, string) (JobStatus, error)
 }
 

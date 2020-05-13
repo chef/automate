@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	elastic "gopkg.in/olivere/elastic.v6"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -42,7 +42,7 @@ func (es *Backend) Initializing() bool {
 	return !es.initialized
 }
 
-func (es *Backend) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) ([]string, error) {
+func (es *Backend) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*authz.ProjectRules) ([]string, error) {
 	log.Debug("starting project updater")
 
 	esNodeJobID, err := es.UpdateNodeProjectTags(ctx, projectTaggingRules)

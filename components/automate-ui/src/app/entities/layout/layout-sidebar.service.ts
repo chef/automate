@@ -8,7 +8,7 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { clientRunsWorkflowEnabled } from 'app/entities/client-runs/client-runs.selectors';
 import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
 import { UpdateSidebars } from './layout.actions';
-import { Sidebars } from './layout.model';
+import { Sidebars, MenuItem } from './layout.model';
 import { MenuItemGroup } from 'app/entities/layout/layout.model';
 
 @Injectable({
@@ -32,7 +32,7 @@ export class LayoutSidebarService {
         this.updateSidebars();
     }
 
-    populateSidebar() {
+    private populateSidebar() {
       const sidebars: Sidebars = {
         active: '',
         dashboards: [{
@@ -74,7 +74,7 @@ export class LayoutSidebarService {
               icon: 'storage',
               route: '/infrastructure/chef-servers',
               authorized: {
-                anyOf: [['/infra/servers', 'get']]
+                anyOf: [['/api/v0/infra/servers', 'get']]
               },
               visible$: new BehaviorSubject(this.chefInfraServerViewsFeatureFlagOn)
             },
@@ -94,9 +94,9 @@ export class LayoutSidebarService {
               icon: 'equalizer',
               route: '/compliance/reports',
               authorized: {
-                allOf: [['/compliance/reporting/stats/summary', 'post'],
-                ['/compliance/reporting/stats/failures', 'post'],
-                ['/compliance/reporting/stats/trend', 'post']]
+                allOf: [['/api/v0/compliance/reporting/stats/summary', 'post'],
+                ['/api/v0/compliance/reporting/stats/failures', 'post'],
+                ['/api/v0/compliance/reporting/stats/trend', 'post']]
               }
             },
             {
@@ -104,7 +104,7 @@ export class LayoutSidebarService {
               icon: 'wifi_tethering',
               route: '/compliance/scan-jobs',
               authorized: {
-                allOf: ['/compliance/scanner/jobs/search', 'post']
+                allOf: ['/api/v0/compliance/scanner/jobs/search', 'post']
               }
             },
             {
@@ -112,7 +112,7 @@ export class LayoutSidebarService {
               icon: 'library_books',
               route: '/compliance/compliance-profiles',
               authorized: {
-                allOf: [['/compliance/profiles/search', 'post']]
+                allOf: [['/api/v0/compliance/profiles/search', 'post']]
               }
             }
           ]
@@ -126,15 +126,15 @@ export class LayoutSidebarService {
                 icon: 'notifications',
                 route: '/settings/notifications',
                 authorized: {
-                  anyOf: ['/notifications/rules', 'get']
+                  anyOf: ['/api/v0/notifications/rules', 'get']
                 }
               },
               {
                 name: 'Data Feeds',
                 icon: 'assignment',
-                route: '/settings/data-feed',
+                route: '/settings/data-feeds',
                 authorized: {
-                  anyOf: ['/datafeed/destinations', 'post']
+                  anyOf: ['/api/v0/datafeed/destinations', 'post']
                 },
                 visible$: new BehaviorSubject(this.ServiceNowFeatureFlagOn)
               },
@@ -143,7 +143,7 @@ export class LayoutSidebarService {
                 icon: 'storage',
                 route: '/settings/data-lifecycle',
                 authorized: {
-                  anyOf: ['/retention/nodes/status', 'get']
+                  anyOf: ['/api/v0/retention/nodes/status', 'get']
                 }
               }
             ]
@@ -156,7 +156,7 @@ export class LayoutSidebarService {
                 icon: 'settings_input_component',
                 route: '/settings/node-integrations',
                 authorized: {
-                  anyOf: ['/nodemanagers/search', 'post']
+                  anyOf: ['/api/v0/nodemanagers/search', 'post']
                 }
               },
               {
@@ -165,7 +165,7 @@ export class LayoutSidebarService {
                 iconRotation: 90,
                 route: '/settings/node-credentials',
                 authorized: {
-                  anyOf: ['/secrets/search', 'post']
+                  anyOf: ['/api/v0/secrets/search', 'post']
                 }
               }
             ]
@@ -178,7 +178,7 @@ export class LayoutSidebarService {
                 icon: 'person',
                 route: '/settings/users',
                 authorized: {
-                  allOf: ['/iam/v2/users', 'get']
+                  allOf: ['/apis/iam/v2/users', 'get']
                 }
               },
               {
@@ -186,7 +186,7 @@ export class LayoutSidebarService {
                 icon: 'people',
                 route: '/settings/teams',
                 authorized: {
-                  allOf: ['/iam/v2/teams', 'get']
+                  allOf: ['/apis/iam/v2/teams', 'get']
                 }
               },
               {
@@ -194,7 +194,7 @@ export class LayoutSidebarService {
                 icon: 'vpn_key',
                 route: '/settings/tokens',
                 authorized: {
-                  allOf: ['/iam/v2/tokens', 'get']
+                  allOf: ['/apis/iam/v2/tokens', 'get']
                 }
               }
             ]
@@ -207,7 +207,7 @@ export class LayoutSidebarService {
                 icon: 'security',
                 route: '/settings/policies',
                 authorized: {
-                  allOf: ['/iam/v2/policies', 'get']
+                  allOf: ['/apis/iam/v2/policies', 'get']
                 }
               },
               {
@@ -215,7 +215,7 @@ export class LayoutSidebarService {
                 icon: 'assignment_ind',
                 route: '/settings/roles',
                 authorized: {
-                  allOf: ['/iam/v2/roles', 'get']
+                  allOf: ['/apis/iam/v2/roles', 'get']
                 }
               },
               {
@@ -223,7 +223,7 @@ export class LayoutSidebarService {
                 icon: 'work',
                 route: '/settings/projects',
                 authorized: {
-                  allOf: ['/iam/v2/projects', 'get']
+                  allOf: ['/apis/iam/v2/projects', 'get']
                 }
               }
             ]
@@ -254,17 +254,15 @@ export class LayoutSidebarService {
               this.setVisibleValuesToObservables(menuItem);
             });
           }
-          menuGroup.visible$ = menuGroup.visible$ ? menuGroup.visible$ : new BehaviorSubject(true);
+          menuGroup.visible$ = menuGroup.visible$ || new BehaviorSubject(true);
         });
       });
       return sidebars;
     }
 
-    private setVisibleValuesToObservables(item: any): void {
+    private setVisibleValuesToObservables(item: MenuItem | MenuItemGroup): void {
       if (item.visible$ === undefined) {
         item.visible$ = new BehaviorSubject(true);
-      } else if (!item.visible$.subscribe) {
-        item.visible$ = new BehaviorSubject(item.visible$);
       }
     }
 

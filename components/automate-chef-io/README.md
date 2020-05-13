@@ -288,7 +288,7 @@ Given a GRPC endpoint defined like this in the proto files:
 ```go
 >.rpc ListReports(Query) returns (Reports) {
 >.>.option (google.api.http) = {
->.>.>.post: "/compliance/reporting/reports"
+>.>.>.post: "/api/v0/compliance/reporting/reports"
 >.>.>.body: "*"
 >.>.};
 >.};
@@ -310,7 +310,7 @@ Given a GRPC endpoint defined like this in the proto files:
   */
   rpc ListReports(Query) returns (Reports) {
     option (google.api.http) = {
-      post: "/compliance/reporting/reports"
+      post: "/api/v0/compliance/reporting/reports"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -324,7 +324,7 @@ Given a GRPC endpoint defined like this in the proto files:
 ```go
 rpc ListReports(Query) returns (Reports) {
     option (google.api.http) = {
-      post: "/compliance/reporting/reports"
+      post: "/api/v0/compliance/reporting/reports"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {

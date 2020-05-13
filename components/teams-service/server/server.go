@@ -11,8 +11,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 
-	grpc_v2 "github.com/chef/automate/api/interservice/teams/v2"
-	v2 "github.com/chef/automate/components/teams-service/server/v2"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/teams-service/service"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/tracing"
@@ -30,7 +29,7 @@ func NewGRPCServer(s *service.Service) *grpc.Server {
 		),
 	)
 	health.RegisterHealthServer(g, health.NewService())
-	grpc_v2.RegisterTeamsServer(g, v2.NewServer(s))
+	teams.RegisterTeamsServer(g, NewTeamServer(s))
 	reflection.Register(g)
 	return g
 }

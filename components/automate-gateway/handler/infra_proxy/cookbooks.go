@@ -12,7 +12,8 @@ import (
 // GetCookbooks fetches an array of existing cookbooks
 func (a *InfraProxyServer) GetCookbooks(ctx context.Context, r *gwreq.Cookbooks) (*gwres.Cookbooks, error) {
 	req := &infra_req.Cookbooks{
-		OrgId: r.OrgId,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
 	}
 	res, err := a.client.GetCookbooks(ctx, req)
 	if err != nil {
@@ -27,8 +28,9 @@ func (a *InfraProxyServer) GetCookbooks(ctx context.Context, r *gwreq.Cookbooks)
 // GetCookbookVersions fetches an array of existing cookbook versions
 func (a *InfraProxyServer) GetCookbookVersions(ctx context.Context, r *gwreq.CookbookVersions) (*gwres.CookbookVersions, error) {
 	req := &infra_req.CookbookVersions{
-		OrgId: r.OrgId,
-		Name:  r.Name,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
 	}
 	res, err := a.client.GetCookbookVersions(ctx, req)
 	if err != nil {
@@ -44,9 +46,10 @@ func (a *InfraProxyServer) GetCookbookVersions(ctx context.Context, r *gwreq.Coo
 // GetCookbook fetches the detail of existing cookbook
 func (a *InfraProxyServer) GetCookbook(ctx context.Context, r *gwreq.Cookbook) (*gwres.Cookbook, error) {
 	req := &infra_req.Cookbook{
-		OrgId:   r.OrgId,
-		Name:    r.Name,
-		Version: r.Version,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+		Version:  r.Version,
 	}
 	res, err := a.client.GetCookbook(ctx, req)
 	if err != nil {
@@ -78,10 +81,11 @@ func (a *InfraProxyServer) GetCookbook(ctx context.Context, r *gwreq.Cookbook) (
 func (a *InfraProxyServer) GetCookbookFileContent(ctx context.Context, r *gwreq.CookbookFileContent) (*gwres.CookbookFileContent, error) {
 
 	req := &infra_req.CookbookFileContent{
-		OrgId:   r.OrgId,
-		Name:    r.Name,
-		Version: r.Version,
-		Url:     r.Url,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+		Version:  r.Version,
+		Url:      r.Url,
 	}
 	res, err := a.client.GetCookbookFileContent(ctx, req)
 	if err != nil {

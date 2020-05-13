@@ -79,6 +79,11 @@ CONFIG="$CONFIG --host {{sys.ip}}"
 CONFIG="$CONFIG --reports-retention-days {{cfg.retention.compliance_report_days}}"
 {{~/if}}
 
+# Configure the message buffer size if provided
+{{~#if cfg.service.message_buffer_size}}
+CONFIG="$CONFIG --message-buffer-size {{cfg.service.message_buffer_size}}"
+{{~/if}}
+
 # get auth binding, used for retrieving token for inspec reporting directly to automate
 {{~#eachAlive bind.authn-service.members as |authn|}}
 {{~#if @last}}

@@ -9,13 +9,13 @@ import { AuthorizedChecker, CheckObj } from 'app/helpers/auth/authorized';
 import { allPerms } from 'app/entities/userperms/userperms.selectors';
 
 // Data arrives in this form for user convenience,
-// i.e. just [allOf]="['/iam/v2/users', 'get']
+// i.e. just [allOf]="['/apis/iam/v2/users', 'get']
 // rather than having to build a more verbose object like:
-// [allOf]="{ endpoint: '/iam/v2/users', verb: 'get'}
+// [allOf]="{ endpoint: '/apis/iam/v2/users', verb: 'get'}
 // Each input datum is converted to a CheckObj upon arrival.
 // Internally, this allows for more robust handling of the data.
 // (So properties must be in sync with `CheckObj`!)
-export type Check = [string, string, string | string[]];
+export type Check = [string, string] | [string, string, string | string[]];
 
 @Component({
   selector: 'app-authorized',

@@ -1,0 +1,110 @@
+<div class="content-container">
+    <div class="container">
+      <main>
+        NOTE:<br>
+        THIS IS AN EXPERIMENTAL VIEW, ONLY INTENDED TO BE USED FOR DEVELOPMENT.<br>
+        THIS IS NOT INTENDED FOR CUSTOMER USE (yet).<br>
+        currently applied filters: <br>
+        <chef-tr *ngFor="let filter of displayCurrentFilters(); index as i; trackBy: trackBy;">
+          <chef-td> {{filter}} 
+            <button (click)="negateFilter(filter)"> negate filter </button>
+            <button (click)="removeFilter(filter)"> remove filter </button>
+          </chef-td>
+        </chef-tr>
+        <chef-table class="nodes-list-table" (sort-toggled)="onSortToggled($event)">
+          <chef-thead>
+            <chef-tr>
+              <chef-th>
+                Node
+                <chef-sort-toggle sort="name"></chef-sort-toggle>
+              </chef-th>
+              <chef-th>
+                Platform
+                <chef-sort-toggle sort="platform"></chef-sort-toggle>
+              </chef-th>
+              <chef-th>
+                Manager
+                <chef-sort-toggle sort="manager"></chef-sort-toggle>
+              </chef-th>
+              <chef-th>
+                Last Contact
+                <chef-sort-toggle sort="last_contact"></chef-sort-toggle>
+              </chef-th>
+              <chef-th>
+                Last Scans
+              </chef-th>
+              <chef-th>
+                Last Runs
+              </chef-th>
+              <chef-th>
+                Last Known State
+                <chef-sort-toggle sort="state"></chef-sort-toggle>
+              </chef-th>
+              <chef-th>
+                Tags
+              </chef-th>
+              <chef-th></chef-th>
+            </chef-tr>
+          </chef-thead>
+        
+          <chef-loading-spinner *ngIf="nodesList.loading" size="100"></chef-loading-spinner>
+
+          <chef-tbody *ngIf="!nodesList.loading">
+            <chef-tr *ngFor="let node of nodesList.items; index as i; trackBy: trackBy;">
+              <chef-td (click)="filterFor('name', node.name)"> {{ node.name }}</chef-td>
+              <chef-td (click)="filterFor('platform_name', node.platform)">{{ node.platform }} {{ node.platform_version }}</chef-td>
+              <chef-td (click)="filterFor('manager_type', node.manager)">{{ node.manager }}</chef-td>
+              <chef-td (click)="filterFor('last_contact', node.last_contact)">{{ node.last_contact }}</chef-td>
+              <chef-td>
+                <chef-icon class="status-icon" [ngClass]="node.scan_data.status"
+                (click)="filterFor('last_scan_status', node.scan_data.status)">
+                  {{ statusIcon(node.scan_data.status) }}
+                </chef-icon>
+                <chef-icon class="status-icon" [ngClass]="node.scan_data.penultimate_status"
+                (click)="filterFor('last_scan_penultimate_status', node.scan_data.penultimate_status)">
+                  {{ statusIcon(node.scan_data.penultimate_status) }}
+                </chef-icon> 
+                <chef-tooltip >
+                  <p>Scan Data:</p>
+                  <a [routerLink]="['/compliance/reports/nodes', node.id]">{{node.scan_data.end_time}</a>
+                </chef-tooltip>  
+              </chef-td>
+              <chef-td>
+                <chef-icon class="status-icon" [ngClass]="node.run_data.status"
+                (click)="filterFor('last_run_status', node.run_data.status)">
+                  {{ statusIcon(node.run_data.status) }}
+                </chef-icon>
+                <chef-icon class="status-icon" [ngClass]="node.run_data.penultimate_status"
+                (click)="filterFor('last_run_penultimate_status', node.run_data.penultimate_status)">
+                  {{ statusIcon(node.run_data.penultimate_status) }}
+                </chef-icon> 
+                <chef-tooltip>
+                  <p>Run Data:</p>
+                  <a [routerLink]="['/infrastructure/client-runs', node.id, 'runs', node.run_data.id]">{{node.run_data.end_time}</a>
+                </chef-tooltip>  
+              </chef-td>    
+              <chef-td (click)="filterFor('state', node.state)">{{ node.state }}</chef-td>
+              <chef-td>{{ displayNodeTags(node.tags) }}</chef-td>
+              <chef-td>
+                <chef-button label="edit" secondary
+                  [routerLink]="['/compliance', 'scan-jobs', 'nodes', node.id, 'edit']">
+                  <chef-icon>edit</chef-icon>
+                </chef-button>
+                <chef-button label="delete" secondary caution (click)="deleteNode(node)">
+                  <chef-icon>delete</chef-icon>
+                </chef-button>
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      <app-page-picker
+        class="nodes-list-paging"
+        [total]="nodesList.total"
+        [perPage]="nodesList.per_page"
+        [page]="nodesList.page"
+        (pageChanged)="onPageChange($event)">
+      </app-page-picker>
+      </main>
+    </div>
+  </div>
+  

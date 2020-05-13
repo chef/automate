@@ -6,7 +6,7 @@
     <span *ngIf="updateProjectsFailed" class="info">
       Project update failed. Review system status from the command line with <pre>chef-automate status</pre> and try again.
     </span>
-    <app-authorized [allOf]="['/iam/v2/apply-rules', 'post']">
+    <app-authorized [allOf]="['/apis/iam/v2/apply-rules', 'post']">
       <button mat-button (click)="openConfirmUpdateStartModal()">Update Projects</button>
     </app-authorized>
   </div>

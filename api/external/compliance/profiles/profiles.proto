@@ -26,7 +26,7 @@ service ProfilesService {
 	*/
 	rpc Read (ProfileDetails) returns (Profile) {
 		option (google.api.http) = {
-			get: "/compliance/profiles/read/{owner}/{name}/version/{version}"
+			get: "/api/v0/compliance/profiles/read/{owner}/{name}/version/{version}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:profiles:{owner}"
@@ -49,7 +49,7 @@ service ProfilesService {
 	*/
 	rpc ReadFromMarket (ProfileDetails) returns (Profile) {
 		option (google.api.http) = {
-			get: "/compliance/market/read/{name}/version/{version}"
+			get: "/api/v0/compliance/market/read/{name}/version/{version}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:profiles:market"
@@ -75,7 +75,7 @@ service ProfilesService {
 	*/
 	rpc Delete (ProfileDetails) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
-				delete: "/compliance/profiles/{owner}/{name}/version/{version}"
+				delete: "/api/v0/compliance/profiles/{owner}/{name}/version/{version}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:profiles:{owner}"
@@ -115,7 +115,7 @@ service ProfilesService {
 	*/
 	rpc List (Query) returns (Profiles) {
 		option (google.api.http) = {
-				post: "/compliance/profiles/search"
+				post: "/api/v0/compliance/profiles/search"
 				body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -138,7 +138,7 @@ service ProfilesService {
 	*/
 	rpc MetaSearch(Sha256) returns (Missing) {
         option (google.api.http) = {
-                post: "/compliance/profiles/metasearch"
+                post: "/api/v0/compliance/profiles/metasearch"
                 body: "*"
         };
         option (chef.automate.api.iam.policy) = {

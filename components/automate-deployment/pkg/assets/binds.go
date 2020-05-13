@@ -51,7 +51,7 @@ cereal-service BINDING_MODE strict
 compliance-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service event-service nodemanager-service pg-sidecar-service secrets-service
 compliance-service OPTIONAL authn-service es-sidecar-service notifications-service
 compliance-service BINDING_MODE strict
-config-mgmt-service REQUIRED automate-es-gateway
+config-mgmt-service REQUIRED automate-es-gateway automate-pg-gateway pg-sidecar-service
 config-mgmt-service BINDING_MODE strict
 data-feed-service REQUIRED automate-pg-gateway cereal-service compliance-service config-mgmt-service pg-sidecar-service secrets-service
 data-feed-service BINDING_MODE strict

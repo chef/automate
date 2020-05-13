@@ -14,7 +14,7 @@ pkg_deps=(
   core/bash
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # We need to pin here to get a build from unstable
-  "habitat/builder-api/8850/20200330144923"
+  "habitat/builder-api/8850/20200421223841"
 )
 
 pkg_binds=(

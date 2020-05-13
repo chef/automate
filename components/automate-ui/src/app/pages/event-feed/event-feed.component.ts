@@ -18,7 +18,7 @@ import { Status } from '../../services/event-feed/event-feed.reducer';
 import { Chicklet, SearchBarCategoryItem } from '../../types/types';
 import { sumBy } from 'lodash';
 import { initialState } from '../../services/event-feed/event-feed.reducer';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { some, pickBy } from 'lodash/fp';
 import {
   eventFeedState
@@ -47,7 +47,7 @@ export class EventFeedComponent implements OnInit, OnDestroy {
   eventsLoading = false;
   errorLoadingEvents = false;
   loadedEmptySetOfEvents = false;
-  permissionDenied = false;
+  permissionDenied = false; // not currently used
   guitarStringCollection: GuitarStringCollection = initialState.guitarStringCollection;
   @ViewChild('guitarStrings', { static: true }) guitarStrings;
   resetTimescaleDisabled = true;

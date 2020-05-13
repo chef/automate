@@ -16,11 +16,12 @@ import (
 	"github.com/golang/mock/gomock"
 
 	"github.com/chef/automate/api/interservice/authn"
-	authz "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	compliance_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	ingest "github.com/chef/automate/api/interservice/ingest"
 	middleware_authz "github.com/chef/automate/components/automate-gateway/gateway/middleware/authz"
 	mock_gateway "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_gateway"
+	"github.com/chef/automate/components/automate-gateway/pkg/limiter"
 	"github.com/chef/automate/components/notifications-client/notifier"
 )
 
@@ -116,6 +117,7 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 	gw := New(cfg)
 	gw.clientsFactory = mockClientsFactory
 	gw.authorizer = middleware_authz.AuthorizationHandler(mockAuthorizationClient)
+	gw.dataCollectorLimiter = limiter.NewNoopRequestLimiter()
 
 	return *gw
 }

@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/tokens/mock"
 	"github.com/chef/automate/components/authn-service/tokens/pg"
@@ -80,13 +80,13 @@ func TestToken(t *testing.T) {
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
-	mockV2Authz := authz_v2.NewAuthorizationServerMock()
-	mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-	authz_v2.RegisterAuthorizationServer(grpcAuthz, mockV2Authz)
+	mockAuthz := authz.NewAuthorizationServerMock()
+	mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
+	authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
-	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
+	authzClient := authz.NewAuthorizationClient(authzConn)
 
 	// Note: because the pg adapter doesn't let us set the stage so easily,
 	//       these overlap a bit: most _create_ 1+ tokens first
@@ -118,7 +118,7 @@ func TestToken(t *testing.T) {
 				// TODO 2017/09/02 sr: this is pretty inefficient, we'll run the pg
 				//  migrations for each and every test case. Since the overall
 				//  performance still isn't that bad, I'll leave it at that for now.
-				adp, err := adpCfg.Open(nil, logger, authzV2Client)
+				adp, err := adpCfg.Open(nil, logger, authzClient)
 				if err != nil {
 					// The logic to determine if we want to ignore this PG connection
 					// failure is as follows:
@@ -331,6 +331,6 @@ func insertProjectsIntoNewContext(projects []string) context.Context {
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,
-	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
-	return &authz_v2.ValidateProjectAssignmentResp{}, nil
+	*authz.ValidateProjectAssignmentReq) (*authz.ValidateProjectAssignmentResp, error) {
+	return &authz.ValidateProjectAssignmentResp{}, nil
 }

@@ -1111,35 +1111,35 @@ func RegisterDataLifecycleHandlerClient(ctx context.Context, mux *runtime.ServeM
 }
 
 var (
-	pattern_DataLifecycle_GetStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"data-lifecycle", "status"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_GetStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "data-lifecycle", "status"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_SetConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"data-lifecycle", "config"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_SetConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "data-lifecycle", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_Run_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"data-lifecycle", "run"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_Run_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "data-lifecycle", "run"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_GetInfraStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "infra", "status"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_GetInfraStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "infra", "status"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_RunInfra_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "infra", "run"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_RunInfra_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "infra", "run"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_SetInfraConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "infra", "config"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_SetInfraConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "infra", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_GetServicesStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "services", "status"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_GetServicesStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "services", "status"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_RunServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "services", "run"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_RunServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "services", "run"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_SetServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_SetServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_GetEventFeedStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "event-feed", "status"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_GetEventFeedStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "event-feed", "status"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_RunEventFeed_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "event-feed", "run"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_RunEventFeed_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "event-feed", "run"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_SetEventFeedConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "event-feed", "config"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_SetEventFeedConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "event-feed", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_GetComplianceStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "compliance", "status"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_GetComplianceStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "compliance", "status"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_RunCompliance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "compliance", "run"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_RunCompliance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "compliance", "run"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DataLifecycle_SetComplianceConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data-lifecycle", "compliance", "config"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DataLifecycle_SetComplianceConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "data-lifecycle", "compliance", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

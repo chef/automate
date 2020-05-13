@@ -6,7 +6,7 @@ package jobs
 import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Create", "compliance:scanner:jobs", "compliance:scannerJobs:create", "POST", "/compliance/scanner/jobs", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Create", "compliance:scanner:jobs", "compliance:scannerJobs:create", "POST", "/api/v0/compliance/scanner/jobs", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Job); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -29,7 +29,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Read", "compliance:scanner:jobs:{id}", "compliance:scannerJobs:get", "GET", "/compliance/scanner/jobs/id/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Read", "compliance:scanner:jobs:{id}", "compliance:scannerJobs:get", "GET", "/api/v0/compliance/scanner/jobs/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Id); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -44,7 +44,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Update", "compliance:scanner:jobs:{id}", "compliance:scannerJobs:update", "PUT", "/compliance/scanner/jobs/id/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Update", "compliance:scanner:jobs:{id}", "compliance:scannerJobs:update", "PUT", "/api/v0/compliance/scanner/jobs/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Job); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -67,7 +67,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Delete", "compliance:scanner:jobs:{id}", "compliance:scannerJobs:delete", "DELETE", "/compliance/scanner/jobs/id/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Delete", "compliance:scanner:jobs:{id}", "compliance:scannerJobs:delete", "DELETE", "/api/v0/compliance/scanner/jobs/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Id); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -82,7 +82,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/List", "compliance:scanner:jobs", "compliance:scannerJobs:list", "POST", "/compliance/scanner/jobs/search", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/List", "compliance:scanner:jobs", "compliance:scannerJobs:list", "POST", "/api/v0/compliance/scanner/jobs/search", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Query); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -95,7 +95,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Rerun", "compliance:scanner:jobs:{id}", "compliance:scannerJobs:rerun", "GET", "/compliance/scanner/jobs/rerun/id/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Rerun", "compliance:scanner:jobs:{id}", "compliance:scannerJobs:rerun", "GET", "/api/v0/compliance/scanner/jobs/rerun/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Id); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

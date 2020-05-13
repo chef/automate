@@ -24,9 +24,10 @@ import { GetOrg } from 'app/entities/orgs/org.actions';
 export class OrgDetailsComponent implements OnInit, OnDestroy {
   public org: Org;
   public loading$: Observable<boolean>;
-  public serverId;
-  public orgId;
+  public serverId: string;
+  public orgId: string;
   public cookbooksTab = true;
+  public environmentsTab = false;
   public rolesTab = false;
   private isDestroyed = new Subject<boolean>();
 
@@ -43,7 +44,14 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
       this.previousRoute$.subscribe((params: any) => {
         if ( params.path.includes('roles') ) {
           this.cookbooksTab = false;
+          this.environmentsTab = false;
           this.rolesTab = true;
+        }
+        
+        if ( params.path.includes('environments') ) {
+          this.cookbooksTab = false;
+          this.rolesTab = false;
+          this.environmentsTab = true;
         }
       });
     }

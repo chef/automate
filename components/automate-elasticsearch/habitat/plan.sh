@@ -45,7 +45,7 @@ do_download() {
 }
 
 do_build() {
-  :
+  return 0
 }
 
 do_install() {
@@ -54,5 +54,5 @@ do_install() {
 }
 
 do_strip() {
-  :
+  return 0
 }

@@ -123,60 +123,6 @@ func local_request_InfraProxy_GetServer_0(ctx context.Context, marshaler runtime
 
 }
 
-func request_InfraProxy_GetServerByName_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.GetServerByName
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
-	}
-
-	protoReq.Name, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
-	}
-
-	msg, err := client.GetServerByName(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func local_request_InfraProxy_GetServerByName_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.GetServerByName
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
-	}
-
-	protoReq.Name, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
-	}
-
-	msg, err := server.GetServerByName(ctx, &protoReq)
-	return msg, metadata, err
-
-}
-
 func request_InfraProxy_CreateServer_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.CreateServer
 	var metadata runtime.ServerMetadata
@@ -461,82 +407,6 @@ func local_request_InfraProxy_GetOrg_0(ctx context.Context, marshaler runtime.Ma
 	}
 
 	msg, err := server.GetOrg(ctx, &protoReq)
-	return msg, metadata, err
-
-}
-
-func request_InfraProxy_GetOrgByName_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.GetOrgByName
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["server_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "server_id")
-	}
-
-	protoReq.ServerId, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "server_id", err)
-	}
-
-	val, ok = pathParams["name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
-	}
-
-	protoReq.Name, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
-	}
-
-	msg, err := client.GetOrgByName(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func local_request_InfraProxy_GetOrgByName_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.GetOrgByName
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["server_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "server_id")
-	}
-
-	protoReq.ServerId, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "server_id", err)
-	}
-
-	val, ok = pathParams["name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
-	}
-
-	protoReq.Name, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
-	}
-
-	msg, err := server.GetOrgByName(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -1382,6 +1252,104 @@ func local_request_InfraProxy_GetRole_0(ctx context.Context, marshaler runtime.M
 
 }
 
+func request_InfraProxy_DeleteRole_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.Role
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["server_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "server_id")
+	}
+
+	protoReq.ServerId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "server_id", err)
+	}
+
+	val, ok = pathParams["org_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org_id")
+	}
+
+	protoReq.OrgId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org_id", err)
+	}
+
+	val, ok = pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+
+	protoReq.Name, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+
+	msg, err := client.DeleteRole(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_InfraProxy_DeleteRole_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.Role
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["server_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "server_id")
+	}
+
+	protoReq.ServerId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "server_id", err)
+	}
+
+	val, ok = pathParams["org_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org_id")
+	}
+
+	protoReq.OrgId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org_id", err)
+	}
+
+	val, ok = pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+
+	protoReq.Name, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+
+	msg, err := server.DeleteRole(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_InfraProxy_GetClients_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.Clients
 	var metadata runtime.ServerMetadata
@@ -1556,6 +1524,10 @@ func local_request_InfraProxy_GetClient_0(ctx context.Context, marshaler runtime
 
 }
 
+var (
+	filter_InfraProxy_GetDataBags_0 = &utilities.DoubleArray{Encoding: map[string]int{"server_id": 0, "org_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+)
+
 func request_InfraProxy_GetDataBags_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.DataBags
 	var metadata runtime.ServerMetadata
@@ -1589,15 +1561,11 @@ func request_InfraProxy_GetDataBags_0(ctx context.Context, marshaler runtime.Mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org_id", err)
 	}
 
-	val, ok = pathParams["name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-
-	protoReq.Name, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_InfraProxy_GetDataBags_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.GetDataBags(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1638,15 +1606,8 @@ func local_request_InfraProxy_GetDataBags_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org_id", err)
 	}
 
-	val, ok = pathParams["name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
-	}
-
-	protoReq.Name, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_InfraProxy_GetDataBags_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.GetDataBags(ctx, &protoReq)
@@ -1770,6 +1731,119 @@ func local_request_InfraProxy_GetDataBagItem_0(ctx context.Context, marshaler ru
 	}
 
 	msg, err := server.GetDataBagItem(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+var (
+	filter_InfraProxy_DeleteDataBag_0 = &utilities.DoubleArray{Encoding: map[string]int{"server_id": 0, "org_id": 1, "name": 2}, Base: []int{1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 1, 1, 2, 3, 4}}
+)
+
+func request_InfraProxy_DeleteDataBag_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.DataBag
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["server_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "server_id")
+	}
+
+	protoReq.ServerId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "server_id", err)
+	}
+
+	val, ok = pathParams["org_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org_id")
+	}
+
+	protoReq.OrgId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org_id", err)
+	}
+
+	val, ok = pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+
+	protoReq.Name, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_InfraProxy_DeleteDataBag_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.DeleteDataBag(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_InfraProxy_DeleteDataBag_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.DataBag
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["server_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "server_id")
+	}
+
+	protoReq.ServerId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "server_id", err)
+	}
+
+	val, ok = pathParams["org_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org_id")
+	}
+
+	protoReq.OrgId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org_id", err)
+	}
+
+	val, ok = pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+
+	protoReq.Name, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_InfraProxy_DeleteDataBag_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.DeleteDataBag(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -2337,26 +2411,6 @@ func RegisterInfraProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxy_GetServerByName_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_InfraProxy_GetServerByName_0(rctx, inboundMarshaler, server, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_InfraProxy_GetServerByName_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("POST", pattern_InfraProxy_CreateServer_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -2454,26 +2508,6 @@ func RegisterInfraProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux,
 		}
 
 		forward_InfraProxy_GetOrg_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_InfraProxy_GetOrgByName_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_InfraProxy_GetOrgByName_0(rctx, inboundMarshaler, server, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_InfraProxy_GetOrgByName_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2657,6 +2691,26 @@ func RegisterInfraProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
+	mux.Handle("DELETE", pattern_InfraProxy_DeleteRole_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_InfraProxy_DeleteRole_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_InfraProxy_DeleteRole_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_InfraProxy_GetClients_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -2734,6 +2788,26 @@ func RegisterInfraProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux,
 		}
 
 		forward_InfraProxy_GetDataBagItem_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("DELETE", pattern_InfraProxy_DeleteDataBag_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_InfraProxy_DeleteDataBag_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_InfraProxy_DeleteDataBag_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -2938,26 +3012,6 @@ func RegisterInfraProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxy_GetServerByName_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_InfraProxy_GetServerByName_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_InfraProxy_GetServerByName_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("POST", pattern_InfraProxy_CreateServer_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -3055,26 +3109,6 @@ func RegisterInfraProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 		}
 
 		forward_InfraProxy_GetOrg_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_InfraProxy_GetOrgByName_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_InfraProxy_GetOrgByName_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_InfraProxy_GetOrgByName_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3258,6 +3292,26 @@ func RegisterInfraProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
+	mux.Handle("DELETE", pattern_InfraProxy_DeleteRole_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_InfraProxy_DeleteRole_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_InfraProxy_DeleteRole_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_InfraProxy_GetClients_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -3335,6 +3389,26 @@ func RegisterInfraProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 		}
 
 		forward_InfraProxy_GetDataBagItem_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("DELETE", pattern_InfraProxy_DeleteDataBag_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_InfraProxy_DeleteDataBag_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_InfraProxy_DeleteDataBag_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3442,61 +3516,61 @@ func RegisterInfraProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
-	pattern_InfraProxy_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"infra", "version"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "infra", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetServers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"infra", "servers"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetServers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "infra", "servers"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetServerByName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"infra", "servers", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_CreateServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "infra", "servers"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_CreateServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"infra", "servers"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_UpdateServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_UpdateServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_DeleteServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_DeleteServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetOrgs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v0", "infra", "servers", "server_id", "orgs"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetOrgs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"infra", "servers", "server_id", "orgs"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_CreateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v0", "infra", "servers", "server_id", "orgs"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetOrgByName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"infra", "servers", "server_id", "orgs", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_UpdateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_CreateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"infra", "servers", "server_id", "orgs"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_DeleteOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_UpdateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetCookbooks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "cookbooks"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_DeleteOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"infra", "servers", "server_id", "orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetCookbookVersions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetCookbooks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"infra", "servers", "server_id", "orgs", "org_id", "cookbooks"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetCookbook_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetCookbookVersions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetCookbookFileContent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 2, 10}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name", "version", "file-content"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetCookbook_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name", "version"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetCookbookFileContent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"infra", "servers", "server_id", "orgs", "org_id", "cookbooks", "name", "version", "file-content"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "roles", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"infra", "servers", "server_id", "orgs", "org_id", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_DeleteRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "roles", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "roles", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "clients"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"infra", "servers", "server_id", "orgs", "org_id", "clients"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "clients", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "clients", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetDataBags_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "data_bags"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetDataBags_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "data_bags", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetDataBagItem_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "data_bags", "name", "item"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetDataBagItem_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"infra", "servers", "server_id", "orgs", "org_id", "data_bags", "name", "item"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_DeleteDataBag_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "data_bags", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetEnvironments_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"infra", "servers", "server_id", "orgs", "org_id", "environments"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetEnvironments_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "environments"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetEnvironment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "environments", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetEnvironment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "environments", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetAffectedNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"infra", "servers", "server_id", "orgs", "org_id", "affected-nodes", "chef_type", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetAffectedNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "affected-nodes", "chef_type", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetPolicyfiles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"infra", "servers", "server_id", "orgs", "org_id", "policyfiles"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetPolicyfiles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "policyfiles"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetPolicyfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"infra", "servers", "server_id", "orgs", "org_id", "policyfiles", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetPolicyfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v0", "infra", "servers", "server_id", "orgs", "org_id", "policyfiles", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -3505,8 +3579,6 @@ var (
 	forward_InfraProxy_GetServers_0 = runtime.ForwardResponseMessage
 
 	forward_InfraProxy_GetServer_0 = runtime.ForwardResponseMessage
-
-	forward_InfraProxy_GetServerByName_0 = runtime.ForwardResponseMessage
 
 	forward_InfraProxy_CreateServer_0 = runtime.ForwardResponseMessage
 
@@ -3517,8 +3589,6 @@ var (
 	forward_InfraProxy_GetOrgs_0 = runtime.ForwardResponseMessage
 
 	forward_InfraProxy_GetOrg_0 = runtime.ForwardResponseMessage
-
-	forward_InfraProxy_GetOrgByName_0 = runtime.ForwardResponseMessage
 
 	forward_InfraProxy_CreateOrg_0 = runtime.ForwardResponseMessage
 
@@ -3538,6 +3608,8 @@ var (
 
 	forward_InfraProxy_GetRole_0 = runtime.ForwardResponseMessage
 
+	forward_InfraProxy_DeleteRole_0 = runtime.ForwardResponseMessage
+
 	forward_InfraProxy_GetClients_0 = runtime.ForwardResponseMessage
 
 	forward_InfraProxy_GetClient_0 = runtime.ForwardResponseMessage
@@ -3545,6 +3617,8 @@ var (
 	forward_InfraProxy_GetDataBags_0 = runtime.ForwardResponseMessage
 
 	forward_InfraProxy_GetDataBagItem_0 = runtime.ForwardResponseMessage
+
+	forward_InfraProxy_DeleteDataBag_0 = runtime.ForwardResponseMessage
 
 	forward_InfraProxy_GetEnvironments_0 = runtime.ForwardResponseMessage
 

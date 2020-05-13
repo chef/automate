@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/ingest/events/chef/action": {
+    "/api/v0/ingest/events/chef/action": {
       "post": {
         "operationId": "ProcessChefAction",
         "responses": {
@@ -37,7 +37,7 @@
         ]
       }
     },
-    "/ingest/events/chef/liveness": {
+    "/api/v0/ingest/events/chef/liveness": {
       "post": {
         "operationId": "ProcessLivenessPing",
         "responses": {
@@ -63,7 +63,7 @@
         ]
       }
     },
-    "/ingest/events/chef/node-multiple-deletes": {
+    "/api/v0/ingest/events/chef/node-multiple-deletes": {
       "post": {
         "operationId": "ProcessMultipleNodeDeletes",
         "responses": {
@@ -89,7 +89,7 @@
         ]
       }
     },
-    "/ingest/events/chef/nodedelete": {
+    "/api/v0/ingest/events/chef/nodedelete": {
       "post": {
         "operationId": "ProcessNodeDelete",
         "responses": {
@@ -115,7 +115,7 @@
         ]
       }
     },
-    "/ingest/events/chef/run": {
+    "/api/v0/ingest/events/chef/run": {
       "post": {
         "operationId": "ProcessChefRun",
         "responses": {
@@ -141,7 +141,7 @@
         ]
       }
     },
-    "/ingest/version": {
+    "/api/v0/ingest/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {

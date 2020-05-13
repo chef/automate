@@ -18,16 +18,17 @@ import { InfraRoleDetailsComponent } from './modules/infra-proxy/infra-role-deta
 import { JobAddComponent } from './pages/job-add/job-add.component';
 import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
+import { DataFeedComponent } from './pages/data-feed/data-feed.component';
+import { DataFeedDetailsComponent } from './pages/data-feed-details/data-feed-details.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
-import { DatafeedComponent } from './pages/data-feed/data-feed.component';
-import { DatafeedFormComponent } from './pages/data-feed-form/data-feed-form.component';
 import { SigninComponent } from './pages/signin/signin.component';
 
 // Components
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
 import { ChefServerDetailsComponent } from './modules/infra-proxy/chef-server-details/chef-server-details.component';
+import { CookbookDetailsComponent } from './modules/infra-proxy/cookbook-details/cookbook-details.component';
 import { NodeDetailsComponent } from './pages/node-details/node-details.component';
 import {
   NodeNoRunsDetailsComponent
@@ -54,6 +55,7 @@ import {
 
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
+import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 
 const routes: Routes = [
   {
@@ -62,8 +64,8 @@ const routes: Routes = [
     canActivate: [ChefSessionService],
     children: [{
       path: '',
-      redirectTo: 'dashboards/event-feed',
-      pathMatch: 'full'
+      pathMatch: 'full',
+      component: TopNavLandingComponent
     },
     {
       path: 'settings',
@@ -176,19 +178,15 @@ const routes: Routes = [
           ]
         },
         {
-          path: 'data-feed',
+          path: 'data-feeds',
           children: [
             {
               path: '',
-              component: DatafeedComponent
+              component: DataFeedComponent
             },
             {
-              path: 'form',
-              component: DatafeedFormComponent
-            },
-            {
-              path: 'form/:id',
-              component: DatafeedFormComponent
+              path: ':id',
+              component: DataFeedDetailsComponent
             }
           ]
         }
@@ -247,12 +245,16 @@ const routes: Routes = [
               component: ChefServerDetailsComponent
             },
             {
-              path: ':id/org/:orgid',
+              path: ':id/organizations/:orgid',
               component: OrgDetailsComponent
             },
             {
-            path: ':id/org/:orgid/roles/:name',
+            path: ':id/organizations/:orgid/roles/:name',
               component: InfraRoleDetailsComponent
+            },
+            {
+              path: ':id/organizations/:orgid/cookbooks/:cookbook_name',
+              component: CookbookDetailsComponent
             }
           ]
         }
@@ -279,6 +281,10 @@ const routes: Routes = [
     {
       path: 'desktop',
       loadChildren: () => import('./modules/desktop/desktop.module').then(m => m.DesktopModule)
+    },
+    {
+      path: 'nodes',
+      loadChildren: () => import('./modules/nodes/nodes.module').then(m => m.NodesModule)
     },
     {
       path: 'profiles',
@@ -368,7 +374,7 @@ const routes: Routes = [
   // END Deprecated routes.
   {
     path: '**',
-    redirectTo: 'dashboards/event-feed'
+    redirectTo: ''
   }
 ];
 

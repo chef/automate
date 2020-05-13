@@ -1,9 +1,5 @@
 <div class="content-container">
-  <div *ngIf="permissionDenied" class="permission-denied-banner">
-    <p>You do not have permission to view everything on this page.</p>
-    <p>Please contact an administrator for permission.</p>
-  </div>
-  <div class="container">
+ <div class="container">
     <main>
       <chef-page-header>
         <chef-heading>Notifications</chef-heading>
@@ -14,7 +10,7 @@
         <chef-alert type="error" *ngIf="errorLoading">There was an error loading notifications.</chef-alert>
 
         <chef-toolbar>
-          <app-authorized [anyOf]="['/notifications/rules', 'post']">
+          <app-authorized [anyOf]="['/api/v0/notifications/rules', 'post']">
             <div *ngIf="(rules$ | async)?.length === 0" class="empty-state">
               <p>Create the first notification to get started!</p>
             </div>
@@ -23,11 +19,11 @@
             </div>
           </app-authorized>
         </chef-toolbar>
-        <app-authorized [anyOf]="['/notifications/rules', 'get']">
+        <app-authorized [anyOf]="['/api/v0/notifications/rules', 'get']">
           <chef-table *ngIf="(rules$ | async)?.length > 0" id="notifications-list">
             <chef-thead>
               <chef-tr>
-                <chef-th class="sort" tabindex="0" 
+                <chef-th class="sort" tabindex="0"
                   role="button"
                   (keyup.enter)="toggleSort('node_name')"
                   (click)="toggleSort('node_name')">

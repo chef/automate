@@ -1,33 +1,20 @@
-import { Component, EventEmitter, Input, Output, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 
-import { ChefSorters } from 'app/helpers/auth/sorter';
-import { ProjectConstants, Project } from 'app/entities/projects/project.model';
-
-const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
-
-// Extend the project model with the checked field.
-// This represents whether the project's checkbox is unchecked or not
-// in this component's UI
-export interface ProjectChecked extends Project {
-  checked: boolean;
-}
-
-export interface ProjectCheckedMap {
-  [id: string]: ProjectChecked;
-}
+import { ProjectConstants } from 'app/entities/projects/project.model';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
+import { ResourceChecked } from '../resource-dropdown/resource-dropdown.component';
 
 @Component({
   selector: 'app-projects-dropdown',
   templateUrl: './projects-dropdown.component.html',
   styleUrls: ['./projects-dropdown.component.scss']
 })
-export class ProjectsDropdownComponent implements OnInit, OnChanges {
-  // The map of ProjectChecked by id. Any checked changes propagated via
-  // onProjectChecked. Updates should be applied to parent component state.
-  @Input() projects: ProjectCheckedMap = {};
-
-  // Setting disabled to true means the dropdown will be unusable and will have a grey background
-  @Input() disabled = false;
+export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
 
   // Used to re-synchronize summary label if the set of checked items has changed.
   // This optional input is needed only when re-displaying the project dropdown
@@ -35,105 +22,56 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   // Other consumers, e.g. team-details.component use it only for a single resource.
   @Input() projectsUpdated: EventEmitter<boolean>;
 
-  // Emits a project that changed as a result of a check or uncheck.
-  @Output() onProjectChecked = new EventEmitter<ProjectChecked>();
+  @Input() checkedProjectIDs: string[] = [];
 
-  // filteredProjects is merely a container to hold the projectsArray
-  // that can be altered
-  public filteredProjects: ProjectChecked[] = [];
-  public active = false;
-  public label = UNASSIGNED_PROJECT_ID;
-  public filterValue = '';
+  // Emits checked set of ids upon completion.
+  @Output() onDropdownClosing = new EventEmitter<string[]>();
+
+  // Label to use when none are selected
+  public noneSelectedLabel = ProjectConstants.UNASSIGNED_PROJECT_ID;
+
+  public projects: ResourceChecked[];
+
+  private isDestroyed = new Subject<boolean>();
+
+  constructor(private store: Store<NgrxStateAtom>) { }
 
   ngOnInit(): void {
-    if (this.projectsUpdated) { // an optional setting
-      this.projectsUpdated.subscribe(() => {
-        this.updateLabel();
+    this.store.select(assignableProjects)
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe((assignable: ProjectsFilterOption[]) => {
+        this.projects =
+          assignable.map(p => {
+            return <ResourceChecked>{
+              id: p.value,
+              name: p.label,
+              type: p.type,
+              checked: this.checkedProjectIDs
+                && this.checkedProjectIDs.includes(p.value)
+            };
+          });
       });
-    }
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.updateLabel();
-    // only update the projects list on initialization/the first change
-    if (changes.projects && changes.projects.firstChange) {
-      this.filteredProjects = this.projectsArray;
+    if (changes.checkedProjectIDs && changes.checkedProjectIDs.currentValue && this.projects) {
+      // Need to trigger OnChanges in ResourceDropdownComponent
+      // so we cannot just update the checked property of the existing array elements.
+      this.projects = this.projects
+        .map(p => ({
+          ...p,
+          checked: (changes.checkedProjectIDs.currentValue as string[]).includes(p.id)
+        }));
     }
   }
 
-  get projectsArray(): ProjectChecked[] {
-    return ChefSorters.naturalSort(Object.values(this.projects), 'name');
+  onProjectDropdownClosing(ids: string[]): void {
+    this.onDropdownClosing.emit(ids);
   }
 
-  toggleDropdown(event: MouseEvent): void {
-    event.stopPropagation();
-    if (this.disabled) {
-      return;
-    }
-    if (!this.active) {
-      this.filterValue = '';
-      this.filteredProjects = this.projectsArray;
-    }
-
-    this.active = !this.active;
-  }
-
-  projectChecked(checked: boolean, project: ProjectChecked): void {
-    project.checked = checked;
-    this.updateLabel();
-    this.onProjectChecked.emit(project);
-  }
-
-  closeDropdown(): void {
-    if (this.active) {
-      this.active = false;
-    }
-  }
-
-  handleFilterKeyUp(): void {
-    this.filteredProjects = this.filterProjects(this.filterValue);
-  }
-
-  filterProjects(value: string): ProjectChecked[]  {
-    return this.projectsArray.filter(project =>
-      project.id.toLowerCase().indexOf(value.toLowerCase()) > -1
-    );
-  }
-
-  moveFocus(event: KeyboardEvent): void {
-    event.preventDefault();
-    let nextElement: HTMLElement;
-
-    const targetElement = <Element>event.target;
-    if (event.key === 'ArrowUp') {
-      nextElement = <HTMLElement>targetElement.previousElementSibling;
-    } else if (event.key === 'ArrowDown') {
-      nextElement = <HTMLElement>targetElement.nextElementSibling;
-    }
-
-    if (nextElement == null) {
-      return;
-    } else {
-      nextElement.focus();
-    }
-  }
-
-  private updateLabel(): void {
-    const checkedProjects = Object.values(this.projects).filter(p => p.checked);
-    switch (checkedProjects.length) {
-      case 1: {
-        const onlyProject = checkedProjects[0];
-        this.label = onlyProject.name;
-        break;
-      }
-      case 0: {
-        this.label = UNASSIGNED_PROJECT_ID;
-        break;
-      }
-      default: {
-        this.label = `${checkedProjects.length} projects`;
-        break;
-      }
-    }
-  }
 }

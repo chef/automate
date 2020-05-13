@@ -5,6 +5,7 @@ export interface Policy {
   type: IAMType;
   members: string[];
   statements?: Statement[];
+  projects: string[];
 }
 
 export interface Statement {
@@ -12,12 +13,23 @@ export interface Statement {
   role?: string;
   actions?: string[];
   resources?: string[];
+  projects: string[];
+}
+
+export interface PolicyChecked extends Policy {
+  checked: boolean;
+}
+
+export interface PolicyCheckedMap {
+  [id: string]: PolicyChecked;
 }
 
 export type IAMType = 'CHEF_MANAGED' | 'CUSTOM';
 
+// NB: It is strongly encourage to use stringToMember
+// to construct a Member rather than building one manually.
 export interface Member {
-  name: string;
+  name: string; // member expression, e.g. "user:local:bob" or "teams:*"
   displayName: string;
   displayType: string;
   type: Type;
@@ -62,6 +74,8 @@ export enum Type {
   Unknown
 }
 
+// This converts a member expression to a Member.
+// Example member expressions: user:local:bob, token:12345, team:*
 export function stringToMember(memberString: string): Member {
   const member: Member = {
     name: memberString,

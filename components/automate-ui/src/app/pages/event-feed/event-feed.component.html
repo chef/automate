@@ -1,9 +1,4 @@
 <div class="content-container">
-  <div *ngIf="permissionDenied" class="permission-denied-banner">
-    <p>It looks like you don't have permission to access this page.</p>
-    <p>If this is a mistake, then reach out to your administrator.</p>
-  </div>
-
   <div class="container">
     <main>
       <div class="event-feed-container">
@@ -11,19 +6,21 @@
           <chef-page-header>
             <chef-heading>Event Feed</chef-heading>
             <chef-subheading>Displays events for the past week. Use <em>SHIFT+R</em>  to reset the time scale.</chef-subheading>
-            <app-search-bar
-            [numberOfFilters]="numberOfSearchBarFilters$ | async"
-            [categories]="categoryTypes"
-            [dynamicSuggestions]="suggestions$ | async"
-            (suggestValues)="onSuggestValues($event)"
-            (itemSelected)="onFilterAdded($event)"
-            (filtersButtonClick)="toggleFilters()">
-            </app-search-bar>
-            <app-search-bar-filter-bar *ngIf="filtersVisible"
-              [filters]="searchBarFilters$ | async"
-              (filtersCleared)="onFiltersClear($event)"
-              (filterRemoved)="onFilterRemoved($event)">
-            </app-search-bar-filter-bar>
+            <app-authorized [allOf]="['/api/v0/cfgmgmt/suggestions', 'get']">
+              <app-search-bar
+                [numberOfFilters]="numberOfSearchBarFilters$ | async"
+                [categories]="categoryTypes"
+                [dynamicSuggestions]="suggestions$ | async"
+                (suggestValues)="onSuggestValues($event)"
+                (itemSelected)="onFilterAdded($event)"
+                (filtersButtonClick)="toggleFilters()">
+              </app-search-bar>
+              <app-search-bar-filter-bar *ngIf="filtersVisible"
+                [filters]="searchBarFilters$ | async"
+                (filtersCleared)="onFiltersClear($event)"
+                (filterRemoved)="onFilterRemoved($event)">
+              </app-search-bar-filter-bar>
+            </app-authorized>
           </chef-page-header>
         </div>
         <div class="page-body">

@@ -5,7 +5,7 @@ import { StatsService } from './stats.service';
 import { ReportDataService } from './report-data.service';
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 import { ReportQuery } from './report-query.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 class MockTelemetryService {
   track() { }

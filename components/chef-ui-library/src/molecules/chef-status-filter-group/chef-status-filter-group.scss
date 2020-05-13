@@ -44,7 +44,7 @@ chef-status-filter-group {
 
     &.general {
       chef-icon {
-        color: #212334;
+        color: var(--chef-primary-dark);
       }
     }
 
@@ -91,7 +91,7 @@ chef-status-filter-group {
       .filter-label,
       .lean-filter-label,
       .filter-total {
-        color: #212334;
+        color: var(--chef-primary-dark);
       }
 
       &.general {
