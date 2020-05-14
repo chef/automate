@@ -39,10 +39,11 @@ EOF
 do_test_deploy() {
     # we want to ensure that the token can be used to ingest data
     local response_code
-    response_code=$(hab_curl -fsS -k -H "api-token: $token" "https://localhost/data-collector/v0" \
+    response_code=$(hab_curl -s -k -H "api-token: $token" "https://localhost/data-collector/v0" \
       -d '{}' -o /dev/null -w '%{response_code}')
     if ! grep -q 400 <<< "$response_code"; then
       log_error "unexpected response code \"$response_code\" (expected 400)"
       return 1
     fi
+    log_info "got expected response code (400)"
 }
