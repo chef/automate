@@ -52,6 +52,7 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
     this.searchableTree = this.tree.map(t => this.converterService.toSearchableTree(t));
     const treeTableTree = this.searchableTree.map(st => this.converterService.toTreeTableTree(st));
     this.treeTable = flatMap(treeTableTree, this.treeService.flatten);
+    this.treeCollapsed();
     this.dataSource = this.generateDataSource();
   }
 
@@ -63,6 +64,7 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
     this.searchableTree = this.tree.map(t => this.converterService.toSearchableTree(t));
     const treeTableTree = this.searchableTree.map(st => this.converterService.toTreeTableTree(st));
     this.treeTable = flatMap(treeTableTree, this.treeService.flatten);
+    this.treeCollapsed();
     this.dataSource = this.generateDataSource();
   }
 
@@ -86,6 +88,15 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
     });
     this.dataSource = this.generateDataSource();
     this.nodeClicked.next(clickedNode);
+  }
+
+  treeCollapsed() {
+    this.treeTable.forEach((item, index) => {
+      item.isExpanded = false;
+      if (item.depth > 0 && index > 0) {
+        item.isVisible = false;
+      }
+    });
   }
 
   // Overrides default options with those specified by the user

@@ -12,9 +12,9 @@
       <chef-tbody>
         <chef-tr *ngFor="let role of roles">
           <chef-td>
-            <a [routerLink]="['/infrastructure','chef-servers', serverId, 'org', orgId, 'roles', role.name]">{{ role.name }}</a>
+            <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'roles', role.name]">{{ role.name }}</a>
           </chef-td>
-          <chef-td>{{ role.description === '' ?  'N/A' : role.description }}</chef-td>
+          <chef-td>{{ role.description === '' ?  '...' : role.description }}</chef-td>
           <chef-td>{{ role.environments.join(", ") }}</chef-td>
         </chef-tr>
       </chef-tbody>
