@@ -23,6 +23,7 @@ import (
 	ingest_inspec "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	"github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"
@@ -36,6 +37,12 @@ var ListenPort int = 2133
 
 // ControlResultsLimit used for configuring inspec exec command, passed in via config flag
 var ControlResultsLimit int = 50
+
+// RunTimeLimit used for report post processing to reduce the size of the report.
+var RunTimeLimit float32 = 1.0
+
+// Set from compliance.go to call the ElasticSearch backend
+var ESClient *ingestic.ESClient
 
 var (
 	ScanJobWorkflowName = cereal.NewWorkflowName("scan-job-workflow")
@@ -531,9 +538,22 @@ func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, cont
 	logrus.Debugf("hand-over report to ingest service")
 
 	removeResults(reportID, report.Profiles, ControlResultsLimit)
-	// strip profile meta if missing from the backend
 
-	_, err := t.ingestClient.ProcessComplianceReport(ctx, &report)
+	allReportProfileIds := make([]string, len(report.Profiles))
+	for i, profile := range report.Profiles {
+		allReportProfileIds[i] = profile.Sha256
+	}
+	esProfilesMissingMeta, err := ESClient.ProfilesMissing(allReportProfileIds)
+	if err != nil {
+		return errors.Wrap(err, "Report profiles processing error")
+	}
+	profilesMissingMeta := make(map[string]struct{}, 0)
+	for _, profileId := range esProfilesMissingMeta {
+		profilesMissingMeta[profileId] = struct{}{}
+	}
+	stripProfilesMetadata(&report, profilesMissingMeta, RunTimeLimit)
+
+	_, err = t.ingestClient.ProcessComplianceReport(ctx, &report)
 	if err != nil {
 		return errors.Wrap(err, "Report processing error")
 	}
@@ -756,6 +776,8 @@ func doExec(job *types.InspecJob) (jsonBytes []byte, err *inspec.Error) {
 	return jsonBytes, nil
 }
 
+// The purpose of this function is to remove the results from a control once they
+// exceed `limit`. This avoids large reports that cannot be ingested.
 func removeResults(reportId string, profiles []*ingest_inspec.Profile, limit int) {
 	for _, profile := range profiles {
 		if profile.Controls != nil {
@@ -785,6 +807,55 @@ func removeResults(reportId string, profiles []*ingest_inspec.Profile, limit int
 				}
 			}
 		}
+	}
+}
+
+// The purpose of this function is to remove the profiles metadata (control title, desc, code, etc)
+// for profiles that already exist in the Automate profiles index.
+func stripProfilesMetadata(report *ingest_events_compliance_api.Report, missingProfiles map[string]struct{}, runTimeLimit float32) {
+	if report.Profiles == nil {
+		return
+	}
+	for _, profile := range report.Profiles {
+		// If the profile is not in the ones missing in the backend, we can proceed with the metadata removal
+		if _, ok := missingProfiles[profile.Sha256]; ok {
+			continue
+		}
+		// Profile 'Name' is a required property. By not sending it in the report, we make it clear to the ingestion backend that the profile metadata has been stripped from this profile in the report.
+		// Profile 'title' and 'version' are still kept for troubleshooting purposes in the backend.
+		profile.Name = ""
+		profile.Groups = nil
+		profile.CopyrightEmail = ""
+		profile.Copyright = ""
+		profile.Summary = ""
+		profile.Supports = nil
+		profile.License = ""
+		profile.Maintainer = ""
+		profile.Depends = nil
+		if profile.Controls == nil {
+			continue
+		}
+		for _, control := range profile.Controls {
+			control.Code = ""
+			control.Desc = ""
+			// TODO: Add here control.Descriptions when the field makes it into the structs
+			control.Impact = 0
+			control.Refs = nil
+			control.Tags = nil
+			control.Title = ""
+			control.SourceLocation = nil
+			control.WaiverData = nil
+			if control.Results == nil {
+				continue
+			}
+			for _, result := range control.Results {
+				if result.RunTime < runTimeLimit {
+					result.RunTime = 0
+					result.StartTime = ""
+				}
+			}
+		}
+		report.RunTimeLimit = runTimeLimit
 	}
 }
 

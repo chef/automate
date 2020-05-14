@@ -122,6 +122,7 @@ func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFa
 
 	inspec.ResultMessageLimit = conf.InspecAgent.ResultMessageLimit
 	runner.ControlResultsLimit = conf.InspecAgent.ControlResultsLimit
+	runner.RunTimeLimit = conf.InspecAgent.RunTimeLimit
 
 	inspec.TmpDir = conf.InspecAgent.TmpDir
 	// Let's have something sensible if the temp dir is not specified
@@ -172,6 +173,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	nodeManagerServiceClient := getManagerConnection(connFactory, conf.Manager.Endpoint)
 	ingesticESClient := ingestic.NewESClient(esClient)
 	ingesticESClient.InitializeStore(context.Background())
+	runner.ESClient = ingesticESClient
 
 	s := connFactory.NewServer(tracing.GlobalServerInterceptor())
 
