@@ -71,7 +71,7 @@ export class LayoutSidebarService {
             },
             {
               name: 'Chef Servers',
-              customIcon: 'chef-servers',
+              customIcon: 'chef-servers-icon',
               route: '/infrastructure/chef-servers',
               authorized: {
                 anyOf: [['/api/v0/infra/servers', 'get']]
