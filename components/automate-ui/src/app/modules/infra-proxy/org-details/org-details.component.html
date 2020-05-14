@@ -33,6 +33,9 @@
           </app-tab>
           <app-tab tabTitle="Environments" #environments_tab  [active]="environmentsTab">
             <app-environments *ngIf="environments_tab.active" [serverId]="serverId" [orgId]="orgId"></app-environments>
+          </app-tab>  
+          <app-tab tabTitle="Data Bags" #data_bags_tab  [active]="dataBagsTab">
+            <app-data-bags-list *ngIf="data_bags_tab.active" [serverId]="serverId" [orgId]="orgId"></app-data-bags-list>
           </app-tab>
           <app-tab tabTitle="Details" #details_tab [active]="false">
             <app-org-edit *ngIf="details_tab.active" [serverId]="serverId" [orgId]="orgId"></app-org-edit> 

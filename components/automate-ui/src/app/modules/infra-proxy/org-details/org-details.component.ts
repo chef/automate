@@ -29,6 +29,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public cookbooksTab = true;
   public environmentsTab = false;
   public rolesTab = false;
+  public dataBagsTab = false;
   private isDestroyed = new Subject<boolean>();
 
   previousRoute$: Observable<RouterState>;
@@ -45,6 +46,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         if ( params.path.includes('roles') ) {
           this.cookbooksTab = false;
           this.environmentsTab = false;
+          this.dataBagsTab = false;
           this.rolesTab = true;
         }
 
@@ -94,6 +96,9 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         this.telemetryService.track('orgDetailsTab', 'environments');
         break;
       case 3:
+        this.telemetryService.track('orgDetailsTab', 'dataBags');
+        break;
+      case 4:
         this.telemetryService.track('orgDetailsTab', 'org-edit');
         break;
     }
