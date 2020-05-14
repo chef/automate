@@ -236,9 +236,6 @@ func TestValidateProductDeployment(t *testing.T) {
 	t.Run("error on base collection", func(t *testing.T) {
 		assert.Error(t, ValidateProductDeployment([]string{"automate", "core"}))
 	})
-	t.Run("error unspecified product dependencies", func(t *testing.T) {
-		assert.Error(t, ValidateProductDeployment([]string{"workflow"}))
-	})
 	t.Run("specified product dependencies", func(t *testing.T) {
 		assert.NoError(t, ValidateProductDeployment([]string{"automate", "workflow"}))
 		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "workflow"}))
