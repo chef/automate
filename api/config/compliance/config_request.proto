@@ -46,6 +46,7 @@ message ConfigRequest {
 
 			message Profiles {
 				reserved 1;
+				google.protobuf.BoolValue install_market_profiles = 2;
 			}
 
 			message Storage {

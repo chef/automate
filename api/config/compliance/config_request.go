@@ -12,10 +12,11 @@ func NewConfigRequest() *ConfigRequest {
 	return &ConfigRequest{
 		V1: &ConfigRequest_V1{
 			Sys: &ConfigRequest_V1_System{
-				Mlsa:    &config.Mlsa{},
-				Service: &ConfigRequest_V1_System_Service{},
-				Logger:  &ConfigRequest_V1_System_Logger{},
-				Agent:   &ConfigRequest_V1_System_Agent{},
+				Mlsa:     &config.Mlsa{},
+				Service:  &ConfigRequest_V1_System_Service{},
+				Logger:   &ConfigRequest_V1_System_Logger{},
+				Agent:    &ConfigRequest_V1_System_Agent{},
+				Profiles: &ConfigRequest_V1_System_Profiles{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -89,5 +90,17 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 
 	if logFormat := g.GetV1().GetLog().GetFormat().GetValue(); logFormat != "" {
 		c.V1.Sys.Logger.Format.Value = logFormat
+	}
+}
+
+func (c *ConfigRequest) ConfigureProduct(productConfig *config.ProductConfig) {
+	c.V1.Sys.Profiles.InstallMarketProfiles = w.Bool(true)
+	if len(productConfig.Products) > 0 {
+		for _, product := range productConfig.Products {
+			if product == "desktop" {
+				c.V1.Sys.Profiles.InstallMarketProfiles = w.Bool(false)
+				return
+			}
+		}
 	}
 }
