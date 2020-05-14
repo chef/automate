@@ -42,6 +42,7 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.nodeFilterStatus = this.route.queryParams['_value'].status || 'all';
     this.reportQuery.state.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(this.getData.bind(this));
@@ -61,7 +62,7 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
     delete queryParams['page'];
 
     if ( includes(status, this.allowedStatus) ) {
-      queryParams['status'] = [status];
+      queryParams['status'] = status;
       this.telemetryService.track('applicationsStatusFilter',
         { entity: 'reportingNodes', statusFilter: status});
     }

@@ -60,8 +60,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     ReportingFilterTypes.PROFILE_WITH_VERSION,
     ReportingFilterTypes.PROFILE_NAME,
     ReportingFilterTypes.RECIPE,
-    ReportingFilterTypes.ROLE,
-    ReportingFilterTypes.STATUS
+    ReportingFilterTypes.ROLE
   ];
 
   // Query search bar
