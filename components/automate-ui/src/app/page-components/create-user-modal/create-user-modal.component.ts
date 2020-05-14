@@ -60,6 +60,7 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
         this.passwordError = false;
         this.createUserForm.reset();
         this.visible = true;
+        this.modifyUsername = false;
       });
 
     this.store.select(createStatus).pipe(
@@ -94,7 +95,6 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
   }
 
   closeCreateModal(): void {
-    this.modifyUsername = false;
     this.visible = false;
   }
 
