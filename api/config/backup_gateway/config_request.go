@@ -78,8 +78,11 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 					c.V1.Sys.Gateway.Backup.Gcs = globalGCS
 				}
 				// Escape /n in cred string
-				credstring := c.GetV1().GetSys().GetGateway().GetBackup().GetGcs().GetCredentials().GetJson().Value
-				c.V1.Sys.Gateway.Backup.Gcs.Credentials.Json = w.String(ac.PrepareGCSCredentials(credstring))
+				if c.V1.Sys.Gateway.Backup.Gcs.Credentials != nil {
+					credstring := c.GetV1().GetSys().GetGateway().GetBackup().GetGcs().GetCredentials().GetJson().Value
+					c.V1.Sys.Gateway.Backup.Gcs.Credentials.Json = w.String(ac.PrepareGCSCredentials(credstring))
+				}
+
 			}
 		default:
 			if path := g.GetV1().GetBackups().GetFilesystem().GetPath().GetValue(); path != "" {
