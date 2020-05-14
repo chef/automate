@@ -176,7 +176,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/CreateRollout", "ingest:unifiedEvents", "ingest:unifiedEvents:create", "POST", "/beta/cfgmgmt/rollouts/create", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/CreateRollout", "ingest:unifiedEvents", "ingest:unifiedEvents:create", "POST", "/api/beta/cfgmgmt/rollouts/create", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreateRollout); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -207,13 +207,13 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRollouts", "infra:nodes", "infra:nodes:list", "GET", "/beta/cfgmgmt/rollouts/list", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRollouts", "infra:nodes", "infra:nodes:list", "GET", "/api/beta/cfgmgmt/rollouts/list", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRolloutsProgress", "infra:nodes", "infra:nodes:list", "GET", "/beta/cfgmgmt/rollouts/progress", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRolloutsProgress", "infra:nodes", "infra:nodes:list", "GET", "/api/beta/cfgmgmt/rollouts/progress", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRolloutById", "infra:nodes", "infra:nodes:list", "GET", "/beta/cfgmgmt/rollouts/rollout/{rollout_id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRolloutById", "infra:nodes", "infra:nodes:list", "GET", "/api/beta/cfgmgmt/rollouts/rollout/{rollout_id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.RolloutById); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -226,7 +226,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRolloutForChefRun", "infra:nodes", "infra:nodes:list", "GET", "/beta/cfgmgmt/rollouts/find", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRolloutForChefRun", "infra:nodes", "infra:nodes:list", "GET", "/api/beta/cfgmgmt/rollouts/find", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.RolloutForChefRun); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -243,10 +243,10 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/DeleteRolloutsByAge", "infra:nodes", "infra:nodes:list", "POST", "/beta/cfgmgmt/rollouts/delete_by_age", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/DeleteRolloutsByAge", "infra:nodes", "infra:nodes:list", "POST", "/api/beta/cfgmgmt/rollouts/delete_by_age", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/ArchiveRollouts", "infra:nodes", "infra:nodes:list", "POST", "/beta/cfgmgmt/rollouts/archive", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/ArchiveRollouts", "infra:nodes", "infra:nodes:list", "POST", "/api/beta/cfgmgmt/rollouts/archive", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
 }

@@ -415,7 +415,7 @@ service ConfigMgmt {
   */
   rpc CreateRollout(cfgmgmt.request.CreateRollout) returns (cfgmgmt.response.Rollout) {
     option (google.api.http) = {
-      post: "/beta/cfgmgmt/rollouts/create"
+      post: "/api/beta/cfgmgmt/rollouts/create"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "ingest:unifiedEvents";
@@ -433,7 +433,7 @@ service ConfigMgmt {
   ```
   */
   rpc GetRollouts(cfgmgmt.request.Rollouts) returns (cfgmgmt.response.Rollouts) {
-    option (google.api.http).get = "/beta/cfgmgmt/rollouts/list";
+    option (google.api.http).get = "/api/beta/cfgmgmt/rollouts/list";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }
@@ -453,7 +453,7 @@ service ConfigMgmt {
   ```
   */
   rpc GetRolloutsProgress(cfgmgmt.request.RolloutsProgress) returns (cfgmgmt.response.RolloutsProgress) {
-    option (google.api.http).get = "/beta/cfgmgmt/rollouts/progress";
+    option (google.api.http).get = "/api/beta/cfgmgmt/rollouts/progress";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
@@ -469,7 +469,7 @@ service ConfigMgmt {
   ```
   */
   rpc GetRolloutById(cfgmgmt.request.RolloutById) returns (cfgmgmt.response.Rollout) {
-    option (google.api.http).get = "/beta/cfgmgmt/rollouts/rollout/{rollout_id}";
+    option (google.api.http).get = "/api/beta/cfgmgmt/rollouts/rollout/{rollout_id}";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
@@ -485,7 +485,7 @@ service ConfigMgmt {
   ```
   */
   rpc GetRolloutForChefRun(cfgmgmt.request.RolloutForChefRun) returns (cfgmgmt.response.Rollout) {
-    option (google.api.http).get = "/beta/cfgmgmt/rollouts/find";
+    option (google.api.http).get = "/api/beta/cfgmgmt/rollouts/find";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
@@ -502,7 +502,7 @@ service ConfigMgmt {
   */
   rpc DeleteRolloutsByAge(cfgmgmt.request.DeleteRolloutsByAge) returns (cfgmgmt.response.DeleteRolloutsByAge) {
     option (google.api.http) = {
-      post: "/beta/cfgmgmt/rollouts/delete_by_age"
+      post: "/api/beta/cfgmgmt/rollouts/delete_by_age"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
@@ -521,7 +521,7 @@ service ConfigMgmt {
   */
   rpc ArchiveRollouts(cfgmgmt.request.ArchiveRollouts) returns (cfgmgmt.response.ArchiveRollouts) {
     option (google.api.http) = {
-      post: "/beta/cfgmgmt/rollouts/archive"
+      post: "/api/beta/cfgmgmt/rollouts/archive"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "infra:nodes";

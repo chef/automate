@@ -1910,19 +1910,19 @@ var (
 
 	pattern_ConfigMgmt_GetNodeRunsDailyStatusTimeSeries_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "cfgmgmt", "node_runs_daily_status_time_series"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_CreateRollout_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"beta", "cfgmgmt", "rollouts", "create"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ConfigMgmt_CreateRollout_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "beta", "cfgmgmt", "rollouts", "create"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetRollouts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"beta", "cfgmgmt", "rollouts", "list"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ConfigMgmt_GetRollouts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "beta", "cfgmgmt", "rollouts", "list"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetRolloutsProgress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"beta", "cfgmgmt", "rollouts", "progress"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ConfigMgmt_GetRolloutsProgress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "beta", "cfgmgmt", "rollouts", "progress"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetRolloutById_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"beta", "cfgmgmt", "rollouts", "rollout", "rollout_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ConfigMgmt_GetRolloutById_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "beta", "cfgmgmt", "rollouts", "rollout", "rollout_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetRolloutForChefRun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"beta", "cfgmgmt", "rollouts", "find"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ConfigMgmt_GetRolloutForChefRun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "beta", "cfgmgmt", "rollouts", "find"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_DeleteRolloutsByAge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"beta", "cfgmgmt", "rollouts", "delete_by_age"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ConfigMgmt_DeleteRolloutsByAge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "beta", "cfgmgmt", "rollouts", "delete_by_age"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_ArchiveRollouts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"beta", "cfgmgmt", "rollouts", "archive"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ConfigMgmt_ArchiveRollouts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "beta", "cfgmgmt", "rollouts", "archive"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

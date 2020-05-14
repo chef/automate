@@ -40,6 +40,26 @@ func (m *MockCfgMgmtClient) EXPECT() *MockCfgMgmtClientMockRecorder {
 	return m.recorder
 }
 
+// CreateRollout mocks base method
+func (m *MockCfgMgmtClient) CreateRollout(arg0 context.Context, arg1 *request.CreateRollout, arg2 ...grpc.CallOption) (*response.Rollout, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateRollout", varargs...)
+	ret0, _ := ret[0].(*response.Rollout)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRollout indicates an expected call of CreateRollout
+func (mr *MockCfgMgmtClientMockRecorder) CreateRollout(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRollout", reflect.TypeOf((*MockCfgMgmtClient)(nil).CreateRollout), varargs...)
+}
+
 // GetAttributes mocks base method
 func (m *MockCfgMgmtClient) GetAttributes(arg0 context.Context, arg1 *request0.Node, arg2 ...grpc.CallOption) (*response0.NodeAttribute, error) {
 	m.ctrl.T.Helper()
@@ -378,6 +398,46 @@ func (mr *MockCfgMgmtClientMockRecorder) GetPolicyCookbooks(arg0, arg1 interface
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyCookbooks", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetPolicyCookbooks), varargs...)
+}
+
+// GetRolloutById mocks base method
+func (m *MockCfgMgmtClient) GetRolloutById(arg0 context.Context, arg1 *request.RolloutById, arg2 ...grpc.CallOption) (*response.Rollout, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetRolloutById", varargs...)
+	ret0, _ := ret[0].(*response.Rollout)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRolloutById indicates an expected call of GetRolloutById
+func (mr *MockCfgMgmtClientMockRecorder) GetRolloutById(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRolloutById", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetRolloutById), varargs...)
+}
+
+// GetRollouts mocks base method
+func (m *MockCfgMgmtClient) GetRollouts(arg0 context.Context, arg1 *request.Rollouts, arg2 ...grpc.CallOption) (*response.Rollouts, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetRollouts", varargs...)
+	ret0, _ := ret[0].(*response.Rollouts)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRollouts indicates an expected call of GetRollouts
+func (mr *MockCfgMgmtClientMockRecorder) GetRollouts(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRollouts", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetRollouts), varargs...)
 }
 
 // GetRuns mocks base method
@@ -789,6 +849,21 @@ func (m *MockCfgMgmtServer) EXPECT() *MockCfgMgmtServerMockRecorder {
 	return m.recorder
 }
 
+// CreateRollout mocks base method
+func (m *MockCfgMgmtServer) CreateRollout(arg0 context.Context, arg1 *request.CreateRollout) (*response.Rollout, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateRollout", arg0, arg1)
+	ret0, _ := ret[0].(*response.Rollout)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRollout indicates an expected call of CreateRollout
+func (mr *MockCfgMgmtServerMockRecorder) CreateRollout(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRollout", reflect.TypeOf((*MockCfgMgmtServer)(nil).CreateRollout), arg0, arg1)
+}
+
 // GetAttributes mocks base method
 func (m *MockCfgMgmtServer) GetAttributes(arg0 context.Context, arg1 *request0.Node) (*response0.NodeAttribute, error) {
 	m.ctrl.T.Helper()
@@ -1042,6 +1117,36 @@ func (m *MockCfgMgmtServer) GetPolicyCookbooks(arg0 context.Context, arg1 *reque
 func (mr *MockCfgMgmtServerMockRecorder) GetPolicyCookbooks(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyCookbooks", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetPolicyCookbooks), arg0, arg1)
+}
+
+// GetRolloutById mocks base method
+func (m *MockCfgMgmtServer) GetRolloutById(arg0 context.Context, arg1 *request.RolloutById) (*response.Rollout, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRolloutById", arg0, arg1)
+	ret0, _ := ret[0].(*response.Rollout)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRolloutById indicates an expected call of GetRolloutById
+func (mr *MockCfgMgmtServerMockRecorder) GetRolloutById(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRolloutById", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetRolloutById), arg0, arg1)
+}
+
+// GetRollouts mocks base method
+func (m *MockCfgMgmtServer) GetRollouts(arg0 context.Context, arg1 *request.Rollouts) (*response.Rollouts, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRollouts", arg0, arg1)
+	ret0, _ := ret[0].(*response.Rollouts)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRollouts indicates an expected call of GetRollouts
+func (mr *MockCfgMgmtServerMockRecorder) GetRollouts(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRollouts", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetRollouts), arg0, arg1)
 }
 
 // GetRuns mocks base method
