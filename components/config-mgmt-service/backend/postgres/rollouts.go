@@ -33,12 +33,13 @@ type Rollout struct {
 	EndTime   *time.Time `db:"end_time"`
 }
 
-const setEndTime = `
-	UPDATE rollouts AS r
-SET end_time = NOW()
-WHERE policy_name = $1
-  AND policy_node_group = $2
-	AND policy_domain_url = $3
+const getAllRollouts = `
+  SELECT *
+    FROM rollouts AS r
+ORDER BY policy_domain_url ASC,
+         policy_name ASC,
+				 policy_node_group ASC,
+				 start_time DESC
 `
 
 // CreateRollout takes the given rollout attributes and attempts to store the
@@ -62,6 +63,15 @@ func (p *Postgres) FindRolloutByID(ctx context.Context, id int32) (*Rollout, err
 	createdRollout := row.(*Rollout)
 
 	return createdRollout, nil
+}
+
+func (p *Postgres) GetRollouts(ctx context.Context) ([]*Rollout, error) {
+	var rollouts []*Rollout
+	_, err := p.mapper.Select(&rollouts, getAllRollouts)
+	if err != nil {
+		return nil, err
+	}
+	return rollouts, nil
 }
 
 func (p *Postgres) FindRolloutByNodeSegmentAndTime(nodeSegment *NodeSegment, time *time.Time) (*Rollout, error) {

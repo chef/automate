@@ -1368,7 +1368,15 @@ func init() {
       "description": "A \"Rollout\" represents the process of distributing Chef Infra code (with\nPolicyfiles) to a set of nodes. It's used to track which nodes have run the\nlatest version of the Chef Infra code assigned to them and also provide the\nuser insights about the code by aggregating Chef Client run results\naccording to the version of Chef Infra code applied. Metadata about the code\nis stored in order to provide the user with convenient references back to\nsystems they already use (such as SCM and Ci/CD systems) to manage their code.\n\nNodes are segmented by a triple of policy name, policy group, and policy domain URL:\npolicy name generally describes what kind of system it is, e.g., a database server\npolicy group generally describes where the system fits in the user's code\nlifecycle, e.g., \"QA\" or \"production\"\npolicy domain URL identifies the system that distributes the Chef Infra code\nand is the owner of the namespaces for policy name and group. E.g., a Chef\nServer URL with the ` + "`" + `/organizations/:orgname` + "`" + ` part.\n\nThere is one (or zero) revision(s) of the Chef Infra code applied to any\nsegment at a time. Rollouts track the changes to which revision of the code is\napplied to the node segments over time."
     },
     "chef.automate.api.cfgmgmt.response.Rollouts": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "rollouts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout"
+          }
+        }
+      }
     },
     "chef.automate.api.cfgmgmt.response.RolloutsProgress": {
       "type": "object"

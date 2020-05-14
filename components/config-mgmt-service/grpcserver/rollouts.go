@@ -62,8 +62,20 @@ func (s *CfgMgmtServer) GetRolloutById(ctx context.Context, req *request.Rollout
 	return rolloutToAPI(rollout), nil
 }
 
-func (s *CfgMgmtServer) GetRollouts(ctx context.Context, in *request.Rollouts) (*response.Rollouts, error) {
-	return nil, nil
+func (s *CfgMgmtServer) GetRollouts(ctx context.Context, req *request.Rollouts) (*response.Rollouts, error) {
+	if len(req.GetFilter()) > 0 {
+		return nil, status.Error(codes.Unimplemented, "NOT IMPLEMENTED")
+	}
+	rolloutsInDB, err := s.pg.GetRollouts(ctx)
+	if err != nil {
+		return nil, err
+	}
+	resRollouts := make([]*response.Rollout, len(rolloutsInDB))
+	for i, r := range rolloutsInDB {
+		resRollouts[i] = rolloutToAPI(r)
+	}
+
+	return &response.Rollouts{Rollouts: resRollouts}, nil
 }
 
 func dbNewRolloutReq(r *request.CreateRollout) *postgres.NewRollout {

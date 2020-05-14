@@ -20,6 +20,8 @@ type Postgres struct {
 	mapper *gorp.DbMap
 }
 
+const clearAllRows = `DELETE FROM rollouts;`
+
 func Open(config *config.Postgres) (*Postgres, error) {
 	pg := New(config)
 
@@ -91,6 +93,6 @@ func (p *Postgres) Close() error {
 }
 
 func (p *Postgres) Clear() error {
-	_, err := p.db.Exec("DELETE FROM rollouts;")
+	_, err := p.db.Exec(clearAllRows)
 	return err
 }

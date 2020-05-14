@@ -164,6 +164,10 @@ func TestRolloutCreate(t *testing.T) {
 
 		assert.Empty(t, fetched1.EndTime)
 		assert.Empty(t, fetched2.EndTime)
+
+		list, err := cfgmgmt.GetRollouts(ctx, &request.Rollouts{})
+		require.NoError(t, err)
+		assert.Len(t, list.Rollouts, 2)
 	})
 	t.Run("creating a second rollout with the same target node segment sets end_time on the older one", func(t *testing.T) {
 		cleanup(t)
@@ -182,6 +186,10 @@ func TestRolloutCreate(t *testing.T) {
 
 		assert.NotEmpty(t, fetched1.EndTime, "EndTime was not set on the rollout when it was replaced with a newer one")
 		assert.Empty(t, fetched2.EndTime)
+
+		list, err := cfgmgmt.GetRollouts(ctx, &request.Rollouts{})
+		require.NoError(t, err)
+		assert.Len(t, list.Rollouts, 2)
 	})
 	t.Run("creating a rollout with the same target node segment and policy revision fails", func(t *testing.T) {
 		cleanup(t)
@@ -191,6 +199,10 @@ func TestRolloutCreate(t *testing.T) {
 		require.NoError(t, err)
 		_, err = cfgmgmt.CreateRollout(ctx, &req2)
 		require.Error(t, err)
+
+		list, err := cfgmgmt.GetRollouts(ctx, &request.Rollouts{})
+		require.NoError(t, err)
+		assert.Len(t, list.Rollouts, 1)
 	})
 	t.Run("rolling back to an old policy revision works", func(t *testing.T) {
 		cleanup(t)
@@ -205,5 +217,9 @@ func TestRolloutCreate(t *testing.T) {
 		require.NoError(t, err)
 		_, err = cfgmgmt.CreateRollout(ctx, &req3)
 		require.NoError(t, err)
+
+		list, err := cfgmgmt.GetRollouts(ctx, &request.Rollouts{})
+		require.NoError(t, err)
+		assert.Len(t, list.Rollouts, 3)
 	})
 }
