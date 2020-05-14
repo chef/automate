@@ -20,6 +20,7 @@ import { InfraRoleEffects } from './entities/infra-roles/infra-role.effects';
 import { JobEffects } from './entities/jobs/job.effects';
 import { LicenseStatusEffects } from './entities/license/license.effects';
 import { ManagerEffects } from './entities/managers/manager.effects';
+import { NotificationRuleEffects } from './entities/notification_rules/notification_rule.effects';
 import { NodesEffects } from './entities/nodes/nodes.effects';
 import { OrgEffects } from './entities/orgs/org.effects';
 import { PolicyEffects } from './entities/policies/policy.effects';
@@ -56,6 +57,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       JobEffects,
       LicenseStatusEffects,
       ManagerEffects,
+      NotificationRuleEffects,
       NodesEffects,
       OrgEffects,
       PolicyEffects,

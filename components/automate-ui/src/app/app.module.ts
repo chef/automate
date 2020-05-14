@@ -79,6 +79,7 @@ import { InfraRoleRequests } from './entities/infra-roles/infra-role.requests';
 import { JobRequests } from './entities/jobs/job.requests';
 import { LicenseStatusRequests } from './entities/license/license.requests';
 import { ManagerRequests } from './entities/managers/manager.requests';
+import { NotificationRuleRequests } from './entities/notification_rules/notification_rule.requests';
 import { NodesRequests } from './entities/nodes/nodes.requests';
 import { PolicyRequests } from './entities/policies/policy.requests';
 import { ProfileRequests } from './entities/profiles/profile.requests';
@@ -317,6 +318,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     NodeNoRunsDetailsResolverService,
     NodeDetailsService,
     NodeRunsService,
+    NotificationRuleRequests,
     PolicyRequests,
     ProfileRequests,
     ProjectRequests,

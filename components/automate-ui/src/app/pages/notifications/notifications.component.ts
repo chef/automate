@@ -5,7 +5,8 @@ import { Component, OnInit } from '@angular/core';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { Rule, ServiceActionType } from './rule';
 import { SortDirection } from '../../types/types';
@@ -14,6 +15,10 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import {
   DeleteNotificationDialogComponent
 } from 'app/page-components/delete-notification-dialog/delete-notification-dialog.component';
+
+import {
+  DeleteNotificationRule
+} from 'app/entities/notification_rules/notification_rule.action';
 
 export interface FieldDirection {
   node_name: SortDirection;
@@ -39,6 +44,7 @@ export class NotificationsComponent implements OnInit {
   public deleteModalVisible = false;
 
   constructor(
+    private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
     private service: RulesService,
     public dialog: MatDialog,
@@ -113,7 +119,8 @@ export class NotificationsComponent implements OnInit {
 
   public deleteNotification(): void {
     this.closeDeleteModal();
-    this.service.deleteRule(this.notificationToDelete)
+    this.store.dispatch(new DeleteNotificationRule({rule: this.notificationToDelete}));
+
   }
 
   public closeDeleteModal(): void {
