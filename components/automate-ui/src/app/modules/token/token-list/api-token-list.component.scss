@@ -10,9 +10,13 @@
   }
 }
 
-::ng-deep .chef-control-menu {
+::ng-deep .mat-select-panel {
   position: relative;
   margin-top: 12px;
-  right: 80px;
+  right: 24px;
   width: 54px;
+}
+
+::ng-deep .mat-select-panel-wrap {
+  margin-left: -75px;
 }
