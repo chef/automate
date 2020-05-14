@@ -91,7 +91,11 @@ export class ChefStatusFilterGroup {
     // add keypress listeners to all the child options
     const theseOptions = this.el.querySelectorAll(`chef-option`);
     theseOptions
-    .forEach(option => option.addEventListener('keypress', event => { this.handleKeypress(event); }));
+    .forEach(option => {
+      option.addEventListener('keypress', event => { this.handleKeypress(event); });
+      option.setAttribute('tabindex', '0');
+    });
+
   }
 
   componentDidUpdate() {
