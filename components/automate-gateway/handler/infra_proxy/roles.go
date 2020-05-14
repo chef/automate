@@ -9,6 +9,27 @@ import (
 	infra_res "github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
+// CreateRole fetches an infra role details
+func (a *InfraProxyServer) CreateRole(ctx context.Context, r *gwreq.CreateRole) (*gwres.Role, error) {
+	req := &infra_req.CreateRole{
+		OrgId:              r.OrgId,
+		ServerId:           r.ServerId,
+		Name:               r.Name,
+		Description:        r.Description,
+		DefaultAttributes:  r.DefaultAttributes,
+		OverrideAttributes: r.OverrideAttributes,
+		RunList:            r.RunList,
+	}
+	res, err := a.client.CreateRole(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Role{
+		Name: res.GetName(),
+	}, nil
+}
+
 // GetRoles fetches an array of existing roles
 func (a *InfraProxyServer) GetRoles(ctx context.Context, r *gwreq.Roles) (*gwres.Roles, error) {
 	req := &infra_req.Roles{

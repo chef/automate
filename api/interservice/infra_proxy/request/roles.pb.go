@@ -21,7 +21,9 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Roles struct {
-	OrgId                string   `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty" toml:"org_id,omitempty" mapstructure:"org_id,omitempty"`
+	// Chef organization ID.
+	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty" toml:"org_id,omitempty" mapstructure:"org_id,omitempty"`
+	// Chef Infra Server ID.
 	ServerId             string   `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty" toml:"server_id,omitempty" mapstructure:"server_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -68,8 +70,11 @@ func (m *Roles) GetServerId() string {
 }
 
 type Role struct {
-	OrgId                string   `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty" toml:"org_id,omitempty" mapstructure:"org_id,omitempty"`
-	ServerId             string   `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty" toml:"server_id,omitempty" mapstructure:"server_id,omitempty"`
+	// Chef organization ID.
+	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty" toml:"org_id,omitempty" mapstructure:"org_id,omitempty"`
+	// Chef Infra Server ID.
+	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty" toml:"server_id,omitempty" mapstructure:"server_id,omitempty"`
+	// Role name.
 	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -122,9 +127,163 @@ func (m *Role) GetName() string {
 	return ""
 }
 
+type CreateRole struct {
+	// Chef organization ID.
+	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty" toml:"org_id,omitempty" mapstructure:"org_id,omitempty"`
+	// Chef Infra Server ID.
+	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty" toml:"server_id,omitempty" mapstructure:"server_id,omitempty"`
+	// Role name.
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+	// Role description.
+	Description string `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty" toml:"description,omitempty" mapstructure:"description,omitempty"`
+	// Role default attributes.
+	DefaultAttributes string `protobuf:"bytes,5,opt,name=default_attributes,json=defaultAttributes,proto3" json:"default_attributes,omitempty" toml:"default_attributes,omitempty" mapstructure:"default_attributes,omitempty"`
+	// Role override attributes.
+	OverrideAttributes string `protobuf:"bytes,6,opt,name=override_attributes,json=overrideAttributes,proto3" json:"override_attributes,omitempty" toml:"override_attributes,omitempty" mapstructure:"override_attributes,omitempty"`
+	// Role run list.
+	RunList []string `protobuf:"bytes,7,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty" toml:"run_list,omitempty" mapstructure:"run_list,omitempty"`
+	// Environment base run list.
+	EnvRunLists          []*EnvRunList `protobuf:"bytes,8,rep,name=env_run_lists,json=envRunLists,proto3" json:"env_run_lists,omitempty" toml:"env_run_lists,omitempty" mapstructure:"env_run_lists,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte        `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32         `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *CreateRole) Reset()         { *m = CreateRole{} }
+func (m *CreateRole) String() string { return proto.CompactTextString(m) }
+func (*CreateRole) ProtoMessage()    {}
+func (*CreateRole) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2bc8a5c34f7a8836, []int{2}
+}
+
+func (m *CreateRole) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateRole.Unmarshal(m, b)
+}
+func (m *CreateRole) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateRole.Marshal(b, m, deterministic)
+}
+func (m *CreateRole) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateRole.Merge(m, src)
+}
+func (m *CreateRole) XXX_Size() int {
+	return xxx_messageInfo_CreateRole.Size(m)
+}
+func (m *CreateRole) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateRole.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateRole proto.InternalMessageInfo
+
+func (m *CreateRole) GetOrgId() string {
+	if m != nil {
+		return m.OrgId
+	}
+	return ""
+}
+
+func (m *CreateRole) GetServerId() string {
+	if m != nil {
+		return m.ServerId
+	}
+	return ""
+}
+
+func (m *CreateRole) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *CreateRole) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *CreateRole) GetDefaultAttributes() string {
+	if m != nil {
+		return m.DefaultAttributes
+	}
+	return ""
+}
+
+func (m *CreateRole) GetOverrideAttributes() string {
+	if m != nil {
+		return m.OverrideAttributes
+	}
+	return ""
+}
+
+func (m *CreateRole) GetRunList() []string {
+	if m != nil {
+		return m.RunList
+	}
+	return nil
+}
+
+func (m *CreateRole) GetEnvRunLists() []*EnvRunList {
+	if m != nil {
+		return m.EnvRunLists
+	}
+	return nil
+}
+
+type EnvRunList struct {
+	// Environment name.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+	// List of the run list.
+	RunList              []string `protobuf:"bytes,2,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty" toml:"run_list,omitempty" mapstructure:"run_list,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *EnvRunList) Reset()         { *m = EnvRunList{} }
+func (m *EnvRunList) String() string { return proto.CompactTextString(m) }
+func (*EnvRunList) ProtoMessage()    {}
+func (*EnvRunList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2bc8a5c34f7a8836, []int{3}
+}
+
+func (m *EnvRunList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_EnvRunList.Unmarshal(m, b)
+}
+func (m *EnvRunList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_EnvRunList.Marshal(b, m, deterministic)
+}
+func (m *EnvRunList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EnvRunList.Merge(m, src)
+}
+func (m *EnvRunList) XXX_Size() int {
+	return xxx_messageInfo_EnvRunList.Size(m)
+}
+func (m *EnvRunList) XXX_DiscardUnknown() {
+	xxx_messageInfo_EnvRunList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EnvRunList proto.InternalMessageInfo
+
+func (m *EnvRunList) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *EnvRunList) GetRunList() []string {
+	if m != nil {
+		return m.RunList
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Roles)(nil), "chef.automate.domain.infra_proxy.request.Roles")
 	proto.RegisterType((*Role)(nil), "chef.automate.domain.infra_proxy.request.Role")
+	proto.RegisterType((*CreateRole)(nil), "chef.automate.domain.infra_proxy.request.CreateRole")
+	proto.RegisterType((*EnvRunList)(nil), "chef.automate.domain.infra_proxy.request.EnvRunList")
 }
 
 func init() {
@@ -132,18 +291,27 @@ func init() {
 }
 
 var fileDescriptor_2bc8a5c34f7a8836 = []byte{
-	// 201 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x90, 0x31, 0x6b, 0xc3, 0x30,
-	0x10, 0x85, 0x71, 0x6b, 0x9b, 0x5a, 0xa3, 0xa0, 0x60, 0xe8, 0x52, 0x3c, 0x79, 0x92, 0x0a, 0x1d,
-	0x4b, 0x29, 0x74, 0xf3, 0xd2, 0xc1, 0x63, 0x17, 0x23, 0x5b, 0x67, 0x5b, 0x50, 0xe9, 0xdc, 0xb3,
-	0x1c, 0x92, 0x7f, 0x1f, 0xa4, 0x24, 0x90, 0x31, 0x64, 0x3b, 0xde, 0xe3, 0xe3, 0xf8, 0x1e, 0x7b,
-	0x53, 0x8b, 0x91, 0xc6, 0x79, 0xa0, 0x15, 0x68, 0x67, 0x06, 0x90, 0xc6, 0x8d, 0xa4, 0xba, 0x85,
-	0x70, 0x7f, 0x90, 0x04, 0xff, 0x1b, 0xac, 0x5e, 0x12, 0xfe, 0xc1, 0x2a, 0x16, 0x42, 0x8f, 0xbc,
-	0x1e, 0x66, 0x18, 0x85, 0xda, 0x3c, 0x5a, 0xe5, 0x41, 0x68, 0xb4, 0xca, 0x38, 0x71, 0x45, 0x89,
-	0x33, 0x55, 0x7d, 0xb0, 0xac, 0x0d, 0x20, 0x7f, 0x66, 0x39, 0xd2, 0xd4, 0x19, 0x5d, 0x26, 0xaf,
-	0x49, 0x5d, 0xb4, 0x19, 0xd2, 0xd4, 0x68, 0xfe, 0xc2, 0x8a, 0xf0, 0x14, 0x28, 0x34, 0x0f, 0xb1,
-	0x79, 0x3a, 0x05, 0x8d, 0xae, 0x7e, 0x58, 0x1a, 0xe0, 0x7b, 0x58, 0xce, 0x59, 0xea, 0x94, 0x85,
-	0xf2, 0x31, 0xe6, 0xf1, 0xfe, 0xfe, 0xfa, 0xfd, 0x9c, 0x8c, 0x9f, 0xb7, 0x5e, 0x0c, 0x68, 0x65,
-	0x70, 0x90, 0x17, 0x07, 0x79, 0xcb, 0x06, 0x7d, 0x1e, 0xf5, 0xdf, 0x8f, 0x01, 0x00, 0x00, 0xff,
-	0xff, 0xed, 0x2b, 0x99, 0xa8, 0x32, 0x01, 0x00, 0x00,
+	// 341 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x92, 0x4f, 0x4b, 0xf3, 0x40,
+	0x10, 0xc6, 0xe9, 0xff, 0x76, 0xca, 0x7b, 0x78, 0xf7, 0xe5, 0x85, 0x88, 0x97, 0x90, 0x53, 0x2e,
+	0xee, 0x8a, 0x7a, 0x2b, 0x22, 0x2a, 0x1e, 0x0a, 0xe2, 0x21, 0x27, 0xf1, 0x12, 0xb6, 0xc9, 0xb4,
+	0x5d, 0x68, 0x76, 0xe3, 0xec, 0x26, 0xe8, 0x67, 0xf4, 0x4b, 0x49, 0xb6, 0x7f, 0x8c, 0xb7, 0x22,
+	0xde, 0x86, 0xf9, 0x3d, 0xcf, 0xec, 0xc3, 0xec, 0xc0, 0xb9, 0x2c, 0x95, 0x50, 0xda, 0x21, 0x59,
+	0xa4, 0x5a, 0x65, 0x28, 0x94, 0x5e, 0x92, 0x4c, 0x4b, 0x32, 0x6f, 0xef, 0x82, 0xf0, 0xb5, 0x42,
+	0xeb, 0x04, 0x99, 0x0d, 0x5a, 0x5e, 0x92, 0x71, 0x86, 0xc5, 0xd9, 0x1a, 0x97, 0x5c, 0x56, 0xce,
+	0x14, 0xd2, 0x21, 0xcf, 0x4d, 0x21, 0x95, 0xe6, 0x2d, 0x17, 0xdf, 0xb9, 0xa2, 0x19, 0x0c, 0x92,
+	0xc6, 0xc8, 0xfe, 0xc3, 0xd0, 0xd0, 0x2a, 0x55, 0x79, 0xd0, 0x09, 0x3b, 0xf1, 0x24, 0x19, 0x18,
+	0x5a, 0xcd, 0x73, 0x76, 0x0a, 0x93, 0xe6, 0x51, 0xa4, 0x86, 0x74, 0x3d, 0x19, 0x6f, 0x1b, 0xf3,
+	0x3c, 0x7a, 0x82, 0x7e, 0x63, 0xfe, 0x89, 0x97, 0x31, 0xe8, 0x6b, 0x59, 0x60, 0xd0, 0xf3, 0x7d,
+	0x5f, 0x47, 0x1f, 0x5d, 0x80, 0x7b, 0x42, 0xe9, 0xf0, 0x37, 0xc7, 0xb2, 0x10, 0xa6, 0x39, 0xda,
+	0x8c, 0x54, 0xe9, 0x94, 0xd1, 0x41, 0xdf, 0xa3, 0x76, 0x8b, 0x9d, 0x01, 0xcb, 0x71, 0x29, 0xab,
+	0x8d, 0x4b, 0xa5, 0x73, 0xa4, 0x16, 0x95, 0x43, 0x1b, 0x0c, 0xbc, 0xf0, 0xef, 0x8e, 0xdc, 0x1e,
+	0x00, 0x13, 0xf0, 0xcf, 0xd4, 0x48, 0xa4, 0x72, 0x6c, 0xeb, 0x87, 0x5e, 0xcf, 0xf6, 0xa8, 0x65,
+	0x38, 0x81, 0x31, 0x55, 0x3a, 0xdd, 0x28, 0xeb, 0x82, 0x51, 0xd8, 0x8b, 0x27, 0xc9, 0x88, 0x2a,
+	0xfd, 0xa8, 0xac, 0x63, 0xcf, 0xf0, 0x07, 0x75, 0x9d, 0xee, 0xb1, 0x0d, 0xc6, 0x61, 0x2f, 0x9e,
+	0x5e, 0x5c, 0xf1, 0x63, 0xbf, 0x90, 0x3f, 0xe8, 0x3a, 0xd9, 0x0e, 0x4b, 0xa6, 0x78, 0xa8, 0x6d,
+	0x34, 0x03, 0xf8, 0x42, 0x87, 0xc5, 0x74, 0x5a, 0x8b, 0x69, 0xc7, 0xea, 0x7e, 0x8b, 0x75, 0x77,
+	0xf3, 0x72, 0xbd, 0x52, 0x6e, 0x5d, 0x2d, 0x78, 0x66, 0x0a, 0xd1, 0x64, 0x11, 0xfb, 0x2c, 0xe2,
+	0x98, 0x73, 0x5c, 0x0c, 0xfd, 0x25, 0x5e, 0x7e, 0x06, 0x00, 0x00, 0xff, 0xff, 0xb6, 0xb5, 0xda,
+	0x9f, 0xbd, 0x02, 0x00, 0x00,
 }
