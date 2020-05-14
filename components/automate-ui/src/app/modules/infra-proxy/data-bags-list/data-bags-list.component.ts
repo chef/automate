@@ -1,11 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest } from 'rxjs';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
+
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { GetDataBags } from 'app/entities/data-bags/data-bags.action';
 import { DataBags } from 'app/entities/data-bags/data-bags.model';
 import {

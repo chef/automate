@@ -1,11 +1,12 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { DataBagsListComponent } from './data-bags-list.component';
-import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MockComponent } from 'ng2-mock-component';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { StoreModule } from '@ngrx/store';
+import { MockComponent } from 'ng2-mock-component';
+
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { DataBagsListComponent } from './data-bags-list.component';
 
 describe('DataBagsListComponent', () => {
   let component: DataBagsListComponent;
