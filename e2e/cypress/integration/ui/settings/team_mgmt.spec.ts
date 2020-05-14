@@ -3,17 +3,21 @@ describe('team management', () => {
   const cypressPrefix = 'test-team-mgmt';
   const teamName = `${cypressPrefix} team ${now}`;
   const customTeamID = `${cypressPrefix}-custom-id-${now}`;
+  const generatedTeamID = teamName.split(' ').join('-');
+  const unassignedTeam1ID = `${cypressPrefix}-unassigned-1-${now}`;
+  const unassignedTeam2ID = `${cypressPrefix}-unassigned-2-${now}`;
+  const teamIDWithSomeProjects = `${cypressPrefix}-some-projects-${now}`;
+  const teamIDWithOneProject = `${cypressPrefix}-one-project-${now}`;
+
   const project1ID = `${cypressPrefix}-project1-${now}`;
   const project1Name = `${cypressPrefix} project1 ${now}`;
   const project2ID = `${cypressPrefix}-project2-${now}`;
   const project2Name = `${cypressPrefix} project2 ${now}`;
-  const generatedTeamID = teamName.split(' ').join('-');
   const unassigned = '(unassigned)';
 
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['teams', 'projects']);
 
       cy.request({
         auth: { bearer: admin.id_token },
@@ -50,14 +54,16 @@ describe('team management', () => {
 
   afterEach(() => {
     cy.saveStorage();
-    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['teams']);
   });
 
   after(() => {
-    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'teams']);
   });
 
-  describe('no custom initial page state', () => {
+  describe('teams list page', () => {
+    const dropdownNameUntilEllipsisLen = 25;
+    const projectDropdown = 'app-team-management app-projects-dropdown ';
+
     it('lists system teams', () => {
       cy.get('[data-cy=team-create-button]').contains('Create Team');
       cy.get('#table-container chef-th').contains('ID');
@@ -69,11 +75,6 @@ describe('team management', () => {
           .parent().parent().find('mat-select').as('control-menu');
       });
     });
-  });
-
-  describe('teams list page', () => {
-    const dropdownNameUntilEllipsisLen = 25;
-    const projectDropdown = 'app-team-management app-projects-dropdown ';
 
     it('can create a team with a default ID', () => {
       cy.get('[data-cy=team-create-button]').contains('Create Team').click();
@@ -126,8 +127,8 @@ describe('team management', () => {
         and cannot access projects dropdown`, () => {
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
-        cy.get('[data-cy=create-name]').type(teamName);
-        cy.get('[data-cy=id-label]').contains(generatedTeamID);
+        cy.get('[data-cy=create-name]').type(unassignedTeam1ID);
+        cy.get('[data-cy=id-label]').contains(unassignedTeam1ID);
 
         // initial state of dropdown
         cy.get(projectDropdown + '#resources-selected')
@@ -142,8 +143,7 @@ describe('team management', () => {
         cy.get('app-notification.info').should('be.visible');
         cy.get('app-notification.info chef-icon').click();
 
-        cy.contains(teamName).should('exist');
-        cy.contains(generatedTeamID).should('exist');
+        cy.contains(unassignedTeam1ID).should('exist');
         cy.contains(unassigned).should('exist');
       });
     });
@@ -154,20 +154,12 @@ describe('team management', () => {
         cy.applyProjectsFilter([unassigned, project1Name, project2Name]);
       });
 
-      after(() => {
-        cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
-      });
-
-      afterEach(() => {
-        cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['teams']);
-      });
-
       it('can create a team with multiple projects', () => {
         const projectSummary = '2 projects';
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
-        cy.get('[data-cy=create-name]').type(teamName);
-        cy.get('[data-cy=id-label]').contains(generatedTeamID);
+        cy.get('[data-cy=create-name]').type(teamIDWithSomeProjects);
+        cy.get('[data-cy=id-label]').contains(teamIDWithSomeProjects);
 
         // initial state of dropdown
         cy.get(projectDropdown + '#resources-selected').contains(unassigned);
@@ -194,16 +186,15 @@ describe('team management', () => {
         cy.get('app-notification.info').should('be.visible');
         cy.get('app-notification.info chef-icon').click();
 
-        cy.contains(teamName).should('exist');
-        cy.contains(generatedTeamID).should('exist');
+        cy.contains(teamIDWithSomeProjects).should('exist');
         cy.contains(projectSummary).should('exist');
       });
 
       it('can create a team with one project selected', () => {
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
-        cy.get('[data-cy=create-name]').type(teamName);
-        cy.get('[data-cy=id-label]').contains(generatedTeamID);
+        cy.get('[data-cy=create-name]').type(teamIDWithOneProject);
+        cy.get('[data-cy=id-label]').contains(teamIDWithOneProject);
 
         // initial state of dropdown
         cy.get(projectDropdown + '#resources-selected').contains(unassigned);
@@ -231,16 +222,16 @@ describe('team management', () => {
         cy.get('app-notification.info').should('be.visible');
         cy.get('app-notification.info chef-icon').click();
 
-        cy.contains(teamName).should('exist');
-        cy.contains(generatedTeamID).should('exist');
+        // TODO: find row
+        cy.contains(teamIDWithOneProject).should('exist');
         cy.contains(project2ID).should('exist');
       });
 
       it('can create a team with no projects selected (unassigned)', () => {
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
-        cy.get('[data-cy=create-name]').type(teamName);
-        cy.get('[data-cy=id-label]').contains(generatedTeamID);
+        cy.get('[data-cy=create-name]').type(unassignedTeam2ID);
+        cy.get('[data-cy=id-label]').contains(unassignedTeam2ID);
 
         // initial state of dropdown
         cy.get(projectDropdown + '#resources-selected').contains(unassigned);
@@ -267,8 +258,8 @@ describe('team management', () => {
         cy.get('app-notification.info').should('be.visible');
         cy.get('app-notification.info chef-icon').click();
 
-        cy.contains(teamName).should('exist');
-        cy.contains(generatedTeamID).should('exist');
+        // TODO: find row
+        cy.contains(unassignedTeam2ID).should('exist');
         cy.contains(unassigned).should('exist');
       });
     });
