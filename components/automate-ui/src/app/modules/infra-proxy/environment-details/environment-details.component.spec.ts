@@ -1,6 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
@@ -28,6 +29,7 @@ class MockAttributesService {
 }
 
 describe('EnvironmentDetailsComponent', () => {
+  let router: Router;
   let component: EnvironmentDetailsComponent;
   let fixture: ComponentFixture<EnvironmentDetailsComponent>;
   let element;
@@ -96,6 +98,7 @@ describe('EnvironmentDetailsComponent', () => {
     component = fixture.componentInstance;
     element = fixture.debugElement;
     fixture.detectChanges();
+    router = TestBed.inject(Router);
     component.attributes = new RoleAttributes(role);
   });
 
@@ -107,14 +110,16 @@ describe('EnvironmentDetailsComponent', () => {
     expect(component.tabValue).toBe('cookbookConstraints');
   });
 
-  it('show cookbook_constraints section when run_list tab is selected', () => {
-    component.onSelectedTab({ target: { value: 'cookbookConstraints' } });
-    expect(component.tabValue).toBe('cookbookConstraints');
-  });
+  it('shows/hides sections when based on selection', () => {
+    spyOn(router, 'navigate');
 
-  it('show attributes section when attributes tab is selected', () => {
+    component.onSelectedTab({ target: { value: 'cookbookConstraints' } });
+    expect(component.tabValue).toBe('runList');
+    expect(router.navigate).toHaveBeenCalled();
+
     component.onSelectedTab({ target: { value: 'attributes' } });
     expect(component.tabValue).toBe('attributes');
+    expect(router.navigate).toHaveBeenCalled();
   });
 
   describe('AttributesComponent', () => {
