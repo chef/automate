@@ -1,4 +1,4 @@
-import { Component, Element, Host, Method, Prop , h} from '@stencil/core';
+import { Component, Element, Host, Method, Prop , h } from '@stencil/core';
 
 let id = 0;
 
