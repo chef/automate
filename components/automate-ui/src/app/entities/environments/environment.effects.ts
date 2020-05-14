@@ -11,7 +11,10 @@ import {
   GetEnvironmentsSuccess,
   EnvironmentsSuccessPayload,
   GetEnvironmentsFailure,
-  EnvironmentActionTypes
+  EnvironmentActionTypes,
+  GetEnvironment,
+  GetEnvironmentSuccess,
+  GetEnvironmentFailure
 } from './environment.action';
 
 import { EnvironmentRequests } from './environment.requests';
@@ -25,22 +28,41 @@ export class EnvironmentEffects {
 
   @Effect()
   getEnvironments$ = this.actions$.pipe(
-      ofType(EnvironmentActionTypes.GET_ALL),
-      mergeMap(({ payload: { server_id, org_id } }: GetEnvironments) =>
-        this.requests.getEnvironments(server_id, org_id).pipe(
-          map((resp: EnvironmentsSuccessPayload) => new GetEnvironmentsSuccess(resp)),
-          catchError((error: HttpErrorResponse) =>
-          observableOf(new GetEnvironmentsFailure(error))))));
+    ofType(EnvironmentActionTypes.GET_ALL),
+    mergeMap(({ payload: { server_id, org_id } }: GetEnvironments) =>
+      this.requests.getEnvironments(server_id, org_id).pipe(
+        map((resp: EnvironmentsSuccessPayload) => new GetEnvironmentsSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+        observableOf(new GetEnvironmentsFailure(error))))));
 
   @Effect()
   getEnvironmentsFailure$ = this.actions$.pipe(
-      ofType(EnvironmentActionTypes.GET_ALL_FAILURE),
-      map(({ payload }: GetEnvironmentsFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not get environments: ${msg || payload.error}`
-        });
-      }));
+    ofType(EnvironmentActionTypes.GET_ALL_FAILURE),
+    map(({ payload }: GetEnvironmentsFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get environments: ${msg || payload.error}`
+      });
+    }));
 
+  @Effect()
+  getEnvironment$ = this.actions$.pipe(
+    ofType(EnvironmentActionTypes.GET),
+    mergeMap(({ payload: { server_id, org_id, name } }: GetEnvironment) =>
+      this.requests.getEnvironment(server_id, org_id, name).pipe(
+        map((resp) => new GetEnvironmentSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+        observableOf(new GetEnvironmentFailure(error))))));
+
+  @Effect()
+  getEnvironmentFailure$ = this.actions$.pipe(
+    ofType(EnvironmentActionTypes.GET_FAILURE),
+    map(({ payload }: GetEnvironmentFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get environment: ${msg || payload.error}`
+      });
+    }));
 }
