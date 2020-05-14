@@ -114,7 +114,7 @@ describe('EnvironmentDetailsComponent', () => {
     spyOn(router, 'navigate');
 
     component.onSelectedTab({ target: { value: 'cookbookConstraints' } });
-    expect(component.tabValue).toBe('runList');
+    expect(component.tabValue).toBe('cookbookConstraints');
     expect(router.navigate).toHaveBeenCalled();
 
     component.onSelectedTab({ target: { value: 'attributes' } });
