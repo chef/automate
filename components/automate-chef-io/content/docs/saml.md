@@ -59,6 +59,7 @@ sso_url = "<your SSO URL>"                  # required
 email_attr = "<your email attribute>"       # required
 username_attr = "<your username attribute>" # required
 groups_attr = "<your groups attribute>"     # optional
+allowed_groups = ["group1", "group 2"]      # optional
 entity_issuer = "<your entity issuer>"      # optional
 name_id_policy_format = "<see below>"       # optional
 ```
@@ -81,6 +82,14 @@ k2WFcoiiKyeIznNScx/K6AeykKR/lPrJedanSA==
 The `groups_attr` setting is optional. However, if it is not provided,
 users authenticating via SAML will not be members of any teams.
 {{% /warning %}}
+
+When `allowed_groups` is set, only users with at least on of the configured
+groups are able to sign into Chef Automate using SAML.
+Furthermore, all of the user's groups that are _not_ in the list are discarded,
+and not available to Chef Automate.
+If the configuration example above was applied, only users in either "group1"
+or "group2" are allowed to sign in. In Chef Automate, those groups would appear
+as `team:saml:group1` and `team:saml:group2` respectively.
 
 Chef Automate supports using SAML to authenticate users and apply permissions to SAML groups. See [IAM Overview]({{< relref "iam-v2-overview.md" >}}).
 
