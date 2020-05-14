@@ -70,49 +70,25 @@ func (SCMWebType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_8cacd55819479c9d, []int{1}
 }
 
+// CreateRollout is a request to create a new Rollout. All
+// fields have the same meaning as with the response Rollout
+// type.
 type CreateRollout struct {
-	// The name of the policy, i.e., the `name` attribute in the Policyfile
-	PolicyName string `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
-	// The group of nodes which are targeted by the rollout. In the Chef Server
-	// case, this is the policy_group to which the user is pushing the policy.
-	PolicyNodeGroup string `protobuf:"bytes,2,opt,name=policy_node_group,json=policyNodeGroup,proto3" json:"policy_node_group,omitempty"`
-	// The revision_id of the compiled policy being rolled out
-	PolicyRevisionId string `protobuf:"bytes,3,opt,name=policy_revision_id,json=policyRevisionId,proto3" json:"policy_revision_id,omitempty"`
-	// In the Chef Server case, the policy domain URL is the Chef Server URL
-	// with the `/organizations/:orgname` portion of the URL path included. In
-	// general, this can be a URL for any content storage/distribution service,
-	// as long as the combination of policy_name and policy_node_group is unique
-	// on that system.
-	//
-	// The set of nodes configured to fetch policy content from the
-	// policy_domain_url and configured with the same policy_name and
-	// policy_node_group form the target set of nodes for a rollout and are
-	// expected to apply the policy revision described by the rollout.
-	PolicyDomainUrl string `protobuf:"bytes,4,opt,name=policy_domain_url,json=policyDomainUrl,proto3" json:"policy_domain_url,omitempty"`
-	// The source control system used with the policyfile
-	ScmType SCMType `protobuf:"varint,5,opt,name=scm_type,json=scmType,proto3,enum=chef.automate.api.cfgmgmt.request.SCMType" json:"scm_type,omitempty"`
-	// The software/service used to host the source code repository
-	ScmWebType SCMWebType `protobuf:"varint,6,opt,name=scm_web_type,json=scmWebType,proto3,enum=chef.automate.api.cfgmgmt.request.SCMWebType" json:"scm_web_type,omitempty"`
-	// The URL used to obtain a copy of the source code repository
-	PolicyScmUrl string `protobuf:"bytes,7,opt,name=policy_scm_url,json=policyScmUrl,proto3" json:"policy_scm_url,omitempty"`
-	// The URL used to view the source code repository via the web
-	PolicyScmWebUrl string `protobuf:"bytes,8,opt,name=policy_scm_web_url,json=policyScmWebUrl,proto3" json:"policy_scm_web_url,omitempty"`
-	// The source control system's identifier for the repository version. This
-	// should be the version where the policy's lockfile was committed.
-	PolicyScmCommit string `protobuf:"bytes,9,opt,name=policy_scm_commit,json=policyScmCommit,proto3" json:"policy_scm_commit,omitempty"`
-	// A free-form description of the rollout, as given by the user.
-	Description string `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
-	// If the rollout was initiated via Ci/CD or similar system, the web URL
-	// for the job that initiated the rollout.
-	CiJobUrl string `protobuf:"bytes,11,opt,name=ci_job_url,json=ciJobUrl,proto3" json:"ci_job_url,omitempty"`
-	// If the rollout was initiated by Ci/CD or similar system, the id of the job
-	// that initiated the rollout. Should include the Ci system's nickname or
-	// other identifying information users would need to associate the job ID to
-	// the Ci/CD system.
-	CiJobId              string   `protobuf:"bytes,12,opt,name=ci_job_id,json=ciJobId,proto3" json:"ci_job_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	PolicyName           string     `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
+	PolicyNodeGroup      string     `protobuf:"bytes,2,opt,name=policy_node_group,json=policyNodeGroup,proto3" json:"policy_node_group,omitempty"`
+	PolicyRevisionId     string     `protobuf:"bytes,3,opt,name=policy_revision_id,json=policyRevisionId,proto3" json:"policy_revision_id,omitempty"`
+	PolicyDomainUrl      string     `protobuf:"bytes,4,opt,name=policy_domain_url,json=policyDomainUrl,proto3" json:"policy_domain_url,omitempty"`
+	ScmType              SCMType    `protobuf:"varint,5,opt,name=scm_type,json=scmType,proto3,enum=chef.automate.api.cfgmgmt.request.SCMType" json:"scm_type,omitempty"`
+	ScmWebType           SCMWebType `protobuf:"varint,6,opt,name=scm_web_type,json=scmWebType,proto3,enum=chef.automate.api.cfgmgmt.request.SCMWebType" json:"scm_web_type,omitempty"`
+	PolicyScmUrl         string     `protobuf:"bytes,7,opt,name=policy_scm_url,json=policyScmUrl,proto3" json:"policy_scm_url,omitempty"`
+	PolicyScmWebUrl      string     `protobuf:"bytes,8,opt,name=policy_scm_web_url,json=policyScmWebUrl,proto3" json:"policy_scm_web_url,omitempty"`
+	PolicyScmCommit      string     `protobuf:"bytes,9,opt,name=policy_scm_commit,json=policyScmCommit,proto3" json:"policy_scm_commit,omitempty"`
+	Description          string     `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
+	CiJobUrl             string     `protobuf:"bytes,11,opt,name=ci_job_url,json=ciJobUrl,proto3" json:"ci_job_url,omitempty"`
+	CiJobId              string     `protobuf:"bytes,12,opt,name=ci_job_id,json=ciJobId,proto3" json:"ci_job_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
 }
 
 func (m *CreateRollout) Reset()         { *m = CreateRollout{} }

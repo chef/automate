@@ -13,6 +13,28 @@ enum SCMWebType {
   GITHUB = 1;
 }
 
+/*
+A "Rollout" represents the process of distributing Chef Infra code (with
+Policyfiles) to a set of nodes. It's used to track which nodes have run the
+latest version of the Chef Infra code assigned to them and also provide the
+user insights about the code by aggregating Chef Client run results
+according to the version of Chef Infra code applied. Metadata about the code
+is stored in order to provide the user with convenient references back to
+systems they already use (such as SCM and Ci/CD systems) to manage their code.
+
+Nodes are segmented by a triple of policy name, policy group, and policy domain URL:
+* policy name generally describes what kind of system it is, e.g., a database server
+* policy group generally describes where the system fits in the user's code
+  lifecycle, e.g., "QA" or "production"
+* policy domain URL identifies the system that distributes the Chef Infra code
+  and is the owner of the namespaces for policy name and group. E.g., a Chef
+  Server URL with the `/organizations/:orgname` part.
+
+There is one (or zero) revision(s) of the Chef Infra code applied to any
+segment at a time. Rollouts track the changes to which revision of the code is
+applied to the node segments over time.
+
+*/
 message Rollout {
   // The name of the policy, i.e., the `name` attribute in the Policyfile
   string policy_name = 1;

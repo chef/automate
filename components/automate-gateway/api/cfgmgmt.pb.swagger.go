@@ -886,54 +886,43 @@ func init() {
       "type": "object",
       "properties": {
         "policy_name": {
-          "type": "string",
-          "title": "The name of the policy, i.e., the ` + "`" + `name` + "`" + ` attribute in the Policyfile"
+          "type": "string"
         },
         "policy_node_group": {
-          "type": "string",
-          "description": "The group of nodes which are targeted by the rollout. In the Chef Server\ncase, this is the policy_group to which the user is pushing the policy."
+          "type": "string"
         },
         "policy_revision_id": {
-          "type": "string",
-          "title": "The revision_id of the compiled policy being rolled out"
+          "type": "string"
         },
         "policy_domain_url": {
-          "type": "string",
-          "description": "In the Chef Server case, the policy domain URL is the Chef Server URL\nwith the ` + "`" + `/organizations/:orgname` + "`" + ` portion of the URL path included. In\ngeneral, this can be a URL for any content storage/distribution service,\nas long as the combination of policy_name and policy_node_group is unique\non that system.\n\nThe set of nodes configured to fetch policy content from the\npolicy_domain_url and configured with the same policy_name and\npolicy_node_group form the target set of nodes for a rollout and are\nexpected to apply the policy revision described by the rollout."
+          "type": "string"
         },
         "scm_type": {
-          "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.SCMType",
-          "title": "The source control system used with the policyfile"
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.SCMType"
         },
         "scm_web_type": {
-          "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.SCMWebType",
-          "title": "The software/service used to host the source code repository"
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.SCMWebType"
         },
         "policy_scm_url": {
-          "type": "string",
-          "title": "The URL used to obtain a copy of the source code repository"
+          "type": "string"
         },
         "policy_scm_web_url": {
-          "type": "string",
-          "title": "The URL used to view the source code repository via the web"
+          "type": "string"
         },
         "policy_scm_commit": {
-          "type": "string",
-          "description": "The source control system's identifier for the repository version. This\nshould be the version where the policy's lockfile was committed."
+          "type": "string"
         },
         "description": {
-          "type": "string",
-          "description": "A free-form description of the rollout, as given by the user."
+          "type": "string"
         },
         "ci_job_url": {
-          "type": "string",
-          "description": "If the rollout was initiated via Ci/CD or similar system, the web URL\nfor the job that initiated the rollout."
+          "type": "string"
         },
         "ci_job_id": {
-          "type": "string",
-          "description": "If the rollout was initiated by Ci/CD or similar system, the id of the job\nthat initiated the rollout. Should include the Ci system's nickname or\nother identifying information users would need to associate the job ID to\nthe Ci/CD system."
+          "type": "string"
         }
-      }
+      },
+      "description": "CreateRollout is a request to create a new Rollout. All\nfields have the same meaning as with the response Rollout\ntype."
     },
     "chef.automate.api.cfgmgmt.request.DeleteRolloutsByAge": {
       "type": "object"
@@ -1375,7 +1364,8 @@ func init() {
         "end_time": {
           "type": "string"
         }
-      }
+      },
+      "description": "A \"Rollout\" represents the process of distributing Chef Infra code (with\nPolicyfiles) to a set of nodes. It's used to track which nodes have run the\nlatest version of the Chef Infra code assigned to them and also provide the\nuser insights about the code by aggregating Chef Client run results\naccording to the version of Chef Infra code applied. Metadata about the code\nis stored in order to provide the user with convenient references back to\nsystems they already use (such as SCM and Ci/CD systems) to manage their code.\n\nNodes are segmented by a triple of policy name, policy group, and policy domain URL:\npolicy name generally describes what kind of system it is, e.g., a database server\npolicy group generally describes where the system fits in the user's code\nlifecycle, e.g., \"QA\" or \"production\"\npolicy domain URL identifies the system that distributes the Chef Infra code\nand is the owner of the namespaces for policy name and group. E.g., a Chef\nServer URL with the ` + "`" + `/organizations/:orgname` + "`" + ` part.\n\nThere is one (or zero) revision(s) of the Chef Infra code applied to any\nsegment at a time. Rollouts track the changes to which revision of the code is\napplied to the node segments over time."
     },
     "chef.automate.api.cfgmgmt.response.Rollouts": {
       "type": "object"
