@@ -95,7 +95,6 @@ export class ChefStatusFilterGroup {
       option.addEventListener('keypress', event => { this.handleKeypress(event); });
       option.setAttribute('tabindex', '0');
     });
-
   }
 
   componentDidUpdate() {

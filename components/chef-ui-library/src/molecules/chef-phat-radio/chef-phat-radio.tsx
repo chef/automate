@@ -47,6 +47,14 @@ export class ChefPhatRadio {
       this.value = this.selected.value;
     }
     this.selected.selected = true;
+
+    // add keypress listeners to all the child options
+    const theseOptions = this.el.querySelectorAll(`chef-option`);
+    theseOptions
+      .forEach(option => {
+        option.addEventListener('keypress', event => { this.handleKeypress(event); });
+        option.setAttribute('tabindex', '0');
+      });
   }
 
   componentDidUpdate() {
@@ -65,6 +73,12 @@ export class ChefPhatRadio {
     const options: HTMLChefOptionElement[] = Array.from(this.el.querySelectorAll('chef-option'));
     options.forEach((opt) => opt.selected = false);
     return options;
+  }
+
+  handleKeypress = (event) => {
+    if (event.key === 'Enter') {
+      this.handleClick(event);
+    }
   }
 
 }
