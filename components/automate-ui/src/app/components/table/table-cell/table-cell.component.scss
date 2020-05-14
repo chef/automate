@@ -10,6 +10,7 @@
   border-bottom: 1px solid $chef-grey;
   border-top: 1px solid $chef-grey;
   overflow: hidden;
+  word-break: break-word;
 
   &.text-right {
     text-align: right;
