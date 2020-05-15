@@ -1,7 +1,8 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { EnvironmentDetailsEntityState, environmentDetailsEntityAdapter } from './environment-details.reducer';
-import { routeParams } from 'app/route.selectors';
 import { find } from 'lodash/fp';
+
+import { routeParams } from 'app/route.selectors';
+import { EnvironmentDetailsEntityState, environmentDetailsEntityAdapter } from './environment-details.reducer';
 
 export const environmentState =
 createFeatureSelector<EnvironmentDetailsEntityState>('environmentDetails');
