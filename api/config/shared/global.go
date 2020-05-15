@@ -144,13 +144,24 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 
 		// The user might be relying on IAM for GCP credentials. Here we'll
 		// make sure that if credentials are provided
-		if bu.GetGcs().GetCredentials() != nil {
+		if bu.GetGcs().GetCredentials() == nil {
+			cfgErr.AddMissingKey("global.v1.backups.gcs.credentials")
+		} else {
 			json := bu.GetGcs().GetCredentials().GetJson().GetValue()
+			path := bu.GetGcs().GetCredentials().GetPath().GetValue()
 
-			if json == "" {
-				cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.json")
+			// IF json or path are NOT EMPTY check if JSON is empty and then ERROR?!
+			if json != "" || path != "" {
+				if json == "" && path != "" {
+					cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.json")
+				}
+
+				if path == "" && json != "" {
+					cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.path")
+				}
 			}
 		}
+
 	default:
 		// Make sure that if a backup location is specified that is valid. If
 		// none is given the default configuration "filesystem" location will
