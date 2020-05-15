@@ -105,6 +105,15 @@
             margin-right: -3px;
           }
         }
+
+        &:hover .chef-servers-icon, &.active .chef-servers-icon {
+          border-color: $chef-primary-bright;
+        }
+
+        &:hover .chef-servers-icon:before, &.active .chef-servers-icon:before {
+          color: $chef-primary-bright;
+        }
+
       }
 
       .sidebar-icon {
