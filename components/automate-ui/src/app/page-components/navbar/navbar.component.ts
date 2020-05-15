@@ -1,4 +1,6 @@
 import { Component, isDevMode } from '@angular/core';
+import { isProductDeployed } from 'app/staticConfig';
+
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
@@ -11,5 +13,9 @@ export class NavbarComponent {
 
   isDevMode() {
     return isDevMode();
+  }
+
+  isDesktopView(): boolean {
+    return isProductDeployed('desktop');
   }
 }

@@ -20,6 +20,12 @@ export class TopNavLandingComponent {
       ], route: '/dashboards/event-feed'
     },
     {
+      allOfCheck: [
+        ['/api/v0/cfgmgmt/nodes', 'get'],
+        ['/api/v0/cfgmgmt/stats/node_counts', 'get']
+      ], route: '/desktop'
+    },
+    {
       anyOfCheck: [
         ['/api/v0/applications/services', 'get'],
         ['/api/v0/applications/service-groups', 'get']
