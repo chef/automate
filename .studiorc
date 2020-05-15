@@ -189,7 +189,7 @@ check_if_deployinate_started() {
   fi
 
   if ! chef-automate status > /dev/null 2>&1; then
-    error "The current status of your deploy is unhealthy."
+    error "The current status of your deployment is unhealthy."
     log_line "If you have yet to do so, run '${GREEN}chef-automate dev deployinate${NC}' to deploy Automate."
     log_line "If you have already deployed, there is an issue with your deploy."
     log_line "You can check the logs with '${YELLOW}sl${NC}' and the status with '${YELLOW}chef-automate status${NC}'."
