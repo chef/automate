@@ -7,12 +7,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>{{ issuer }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{{ url "static/main.css" }}" rel="stylesheet">
-    <link href="{{ url "theme/styles.css" }}" rel="stylesheet">
+    <link href="{{ url .ReqPath "static/main.css" }}" rel="stylesheet">
+    <link href="{{ url .ReqPath "theme/styles.css" }}" rel="stylesheet">
   </head>
   <div class="theme-panel">
     <div class="logo">
-      <img class="theme-navbar__logo" src="{{url "static/img/automate-blue-d9789f4b.svg" }}">
+      <img class="theme-navbar__logo" src="{{url .ReqPath "static/img/automate-blue-d9789f4b.svg" }}">
     </div>
     <div>
       {{ range $c := .Connectors }}

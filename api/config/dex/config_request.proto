@@ -123,6 +123,7 @@ message ConfigRequest {
 			google.protobuf.StringValue groups_attr = 5;
 			google.protobuf.StringValue entity_issuer = 6;
 			google.protobuf.StringValue name_id_policy_format = 7;
+			repeated string allowed_groups = 8;
 		}
 	}
 }
