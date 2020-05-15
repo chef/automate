@@ -85,11 +85,3 @@ message Rollouts {
   repeated Rollout rollouts = 1;
 }
 
-message RolloutsProgress {
-}
-
-message DeleteRolloutsByAge {
-}
-
-message ArchiveRollouts {
-}

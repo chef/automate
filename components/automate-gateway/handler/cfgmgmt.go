@@ -431,10 +431,6 @@ func (a *CfgMgmtServer) GetRollouts(ctx context.Context, req *cfgReq.Rollouts) (
 
 	return a.cfgMgmtClient.GetRollouts(ctx, req)
 }
-func (a *CfgMgmtServer) GetRolloutsProgress(context.Context, *cfgReq.RolloutsProgress) (*cfgRes.RolloutsProgress, error) {
-	// TODO
-	return nil, nil
-}
 func (a *CfgMgmtServer) GetRolloutById(ctx context.Context, req *cfgReq.RolloutById) (*cfgRes.Rollout, error) {
 	log.WithFields(log.Fields{
 		"request": req.String(),
@@ -444,14 +440,6 @@ func (a *CfgMgmtServer) GetRolloutById(ctx context.Context, req *cfgReq.RolloutB
 	return a.cfgMgmtClient.GetRolloutById(ctx, req)
 }
 func (a *CfgMgmtServer) GetRolloutForChefRun(context.Context, *cfgReq.RolloutForChefRun) (*cfgRes.Rollout, error) {
-	// TODO
-	return nil, nil
-}
-func (a *CfgMgmtServer) DeleteRolloutsByAge(context.Context, *cfgReq.DeleteRolloutsByAge) (*cfgRes.DeleteRolloutsByAge, error) {
-	// TODO
-	return nil, nil
-}
-func (a *CfgMgmtServer) ArchiveRollouts(context.Context, *cfgReq.ArchiveRollouts) (*cfgRes.ArchiveRollouts, error) {
 	// TODO
 	return nil, nil
 }

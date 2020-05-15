@@ -14,34 +14,6 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/api/beta/cfgmgmt/rollouts/archive": {
-      "post": {
-        "summary": "ArchiveRollouts",
-        "description": "Marks the selected rollouts as \"hidden\" so they will not be shown in the UI.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "ArchiveRollouts",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ArchiveRollouts"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.ArchiveRollouts"
-            }
-          }
-        ],
-        "tags": [
-          "ConfigMgmt"
-        ]
-      }
-    },
     "/api/beta/cfgmgmt/rollouts/create": {
       "post": {
         "summary": "CreateRollout",
@@ -62,34 +34,6 @@ func init() {
             "required": true,
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.CreateRollout"
-            }
-          }
-        ],
-        "tags": [
-          "ConfigMgmt"
-        ]
-      }
-    },
-    "/api/beta/cfgmgmt/rollouts/delete_by_age": {
-      "post": {
-        "summary": "DeleteRolloutsByAge",
-        "description": "Deletes all rollouts older than the specified age.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "DeleteRolloutsByAge",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.DeleteRolloutsByAge"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.DeleteRolloutsByAge"
             }
           }
         ],
@@ -146,37 +90,6 @@ func init() {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollouts"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "filter",
-            "description": "Filters to apply to the request for the rollouts list.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "ConfigMgmt"
-        ]
-      }
-    },
-    "/api/beta/cfgmgmt/rollouts/progress": {
-      "get": {
-        "summary": "GetRolloutsProgress",
-        "description": "Provides the progress of rollouts. \n\nFor each Chef Server, Policy Name, and\nPolicy Group, provides a count of nodes according to which policy revision\nthe node applied on its most recent run. \n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetRolloutsProgress",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RolloutsProgress"
             }
           }
         },
@@ -879,9 +792,6 @@ func init() {
     }
   },
   "definitions": {
-    "chef.automate.api.cfgmgmt.request.ArchiveRollouts": {
-      "type": "object"
-    },
     "chef.automate.api.cfgmgmt.request.CreateRollout": {
       "type": "object",
       "properties": {
@@ -924,9 +834,6 @@ func init() {
       },
       "description": "CreateRollout is a request to create a new Rollout. All\nfields have the same meaning as with the response Rollout\ntype."
     },
-    "chef.automate.api.cfgmgmt.request.DeleteRolloutsByAge": {
-      "type": "object"
-    },
     "chef.automate.api.cfgmgmt.request.SCMType": {
       "type": "string",
       "enum": [
@@ -942,9 +849,6 @@ func init() {
         "GITHUB"
       ],
       "default": "UNKNOWN_SCM_WEB"
-    },
-    "chef.automate.api.cfgmgmt.response.ArchiveRollouts": {
-      "type": "object"
     },
     "chef.automate.api.cfgmgmt.response.CheckInCounts": {
       "type": "object",
@@ -1027,9 +931,6 @@ func init() {
           "title": "The number of nodes for this duration"
         }
       }
-    },
-    "chef.automate.api.cfgmgmt.response.DeleteRolloutsByAge": {
-      "type": "object"
     },
     "chef.automate.api.cfgmgmt.response.Deprecation": {
       "type": "object",
@@ -1377,9 +1278,6 @@ func init() {
           }
         }
       }
-    },
-    "chef.automate.api.cfgmgmt.response.RolloutsProgress": {
-      "type": "object"
     },
     "chef.automate.api.cfgmgmt.response.Run": {
       "type": "object",

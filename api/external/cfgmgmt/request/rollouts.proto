@@ -36,11 +36,6 @@ message Rollouts {
   repeated string filter = 1;
 }
 
-message RolloutsProgress {
-  // Filters to apply to the request for the rollouts list.
-  repeated string filter = 1;
-}
-
 message RolloutById {
   string rollout_id = 1;
 }
@@ -51,8 +46,3 @@ message RolloutForChefRun {
   string policy_revision_id = 3;
 }
 
-message DeleteRolloutsByAge {
-}
-
-message ArchiveRollouts {
-}

@@ -439,26 +439,6 @@ service ConfigMgmt {
   }
 
   /*
-  GetRolloutsProgress
-
-  Provides the progress of rollouts. 
-
-  For each Chef Server, Policy Name, and
-  Policy Group, provides a count of nodes according to which policy revision
-  the node applied on its most recent run. 
-
-  Authorization Action:
-  ```
-  infra:nodes:list
-  ```
-  */
-  rpc GetRolloutsProgress(cfgmgmt.request.RolloutsProgress) returns (cfgmgmt.response.RolloutsProgress) {
-    option (google.api.http).get = "/api/beta/cfgmgmt/rollouts/progress";
-    option (chef.automate.api.iam.policy).resource = "infra:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
-  };
-
-  /*
   GetRolloutById
 
   Returns the rollout with the given Id
@@ -490,41 +470,4 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
 
-  /*
-  DeleteRolloutsByAge
-
-  Deletes all rollouts older than the specified age.
-
-  Authorization Action:
-  ```
-  infra:nodes:list
-  ```
-  */
-  rpc DeleteRolloutsByAge(cfgmgmt.request.DeleteRolloutsByAge) returns (cfgmgmt.response.DeleteRolloutsByAge) {
-    option (google.api.http) = {
-      post: "/api/beta/cfgmgmt/rollouts/delete_by_age"
-      body: "*"
-    };
-    option (chef.automate.api.iam.policy).resource = "infra:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
-  }
-
-  /*
-  ArchiveRollouts
-
-  Marks the selected rollouts as "hidden" so they will not be shown in the UI.
-
-  Authorization Action:
-  ```
-  infra:nodes:list
-  ```
-  */
-  rpc ArchiveRollouts(cfgmgmt.request.ArchiveRollouts) returns (cfgmgmt.response.ArchiveRollouts) {
-    option (google.api.http) = {
-      post: "/api/beta/cfgmgmt/rollouts/archive"
-      body: "*"
-    };
-    option (chef.automate.api.iam.policy).resource = "infra:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
-  }
 }
