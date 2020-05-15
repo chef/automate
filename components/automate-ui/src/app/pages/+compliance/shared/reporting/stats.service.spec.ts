@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
@@ -12,7 +13,6 @@ const COMPLIANCE_URL = environment.compliance_url;
 describe('StatsService', () => {
   let httpTestingController: HttpTestingController;
   let service: StatsService;
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -20,6 +20,7 @@ describe('StatsService', () => {
         StatsService
       ],
       imports: [
+        RouterTestingModule,
         HttpClientTestingModule
       ]
     });

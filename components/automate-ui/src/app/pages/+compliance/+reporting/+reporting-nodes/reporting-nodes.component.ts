@@ -2,9 +2,11 @@ import { takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { groupBy } from 'lodash';
+import { includes } from 'lodash/fp';
 import * as moment from 'moment/moment';
 import { FilterC } from '../types';
 import { paginationOverride } from '../shared';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import {
   StatsService,
   ReportQueryService,
@@ -25,10 +27,9 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
   layerTwoData: any = {};
   control: any = {};
   nodeFilterStatus = 'all';
-
   scanResultsPane = 0;
   openControls = {};
-
+  private allowedStatus = ['failed', 'passed', 'skipped', 'waived'];
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   constructor(
@@ -36,10 +37,12 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
     public reportQuery: ReportQueryService,
     public reportData: ReportDataService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private telemetryService: TelemetryService
   ) {}
 
   ngOnInit() {
+    this.nodeFilterStatus = this.route.queryParams['_value'].status || 'all';
     this.reportQuery.state.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(this.getData.bind(this));
@@ -50,18 +53,25 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  filterNodeStatus(_event, status) {
+  public statusFilter(_event, status: string): void {
     this.nodeFilterStatus = status;
+
+    const queryParams = {...this.route.snapshot.queryParams};
+
+    delete queryParams['status'];
+    delete queryParams['page'];
+
+    if ( includes(status, this.allowedStatus) ) {
+      queryParams['status'] = status;
+      this.telemetryService.track('applicationsStatusFilter',
+        { entity: 'reportingNodes', statusFilter: status});
+    }
+
+    this.router.navigate([], {queryParams});
   }
 
   isNodeStatusSelected(status): boolean {
     return this.nodeFilterStatus === status;
-  }
-
-  filteredNodes(nodes) {
-    return this.nodeFilterStatus === 'all'
-      ? nodes
-      : nodes.filter((node) => node.latest_report.status === this.nodeFilterStatus);
   }
 
   onNodesListPageChanged(event) {
