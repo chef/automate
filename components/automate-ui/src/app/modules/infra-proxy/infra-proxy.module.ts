@@ -21,6 +21,7 @@ import { JsonTreeTableComponent } from './json-tree-table/json-tree-table.compon
 import { OrgDetailsComponent } from './org-details/org-details.component';
 import { OrgEditComponent } from './org-edit/org-edit.component';
 import { PolicyFilesComponent } from './policy-files/policy-files.component';
+import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
 
 @NgModule({
@@ -40,7 +41,8 @@ import { TreeTableModule } from './tree-table/tree-table.module';
     InfraRoleDetailsComponent,
     OrgDetailsComponent,
     OrgEditComponent,
-    PolicyFilesComponent
+    PolicyFilesComponent,
+    ResetAdminKeyComponent
   ],
   imports: [
     CommonModule,

@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { EffectsModule } from '@ngrx/effects';
 
+import { AdminKeyEffects } from './entities/reset-admin-key/reset-admin-key.effects';
 import { ApiTokenEffects } from './entities/api-tokens/api-token.effects';
 import { AutomateSettingsEffects } from './entities/automate-settings/automate-settings.effects';
 import { ClientRunsEffects } from './entities/client-runs/client-runs.effects';
@@ -42,6 +43,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
 @NgModule({
   imports: [
     EffectsModule.forRoot([
+      AdminKeyEffects,
       ApiTokenEffects,
       AutomateSettingsEffects,
       ClientRunsEffects,
