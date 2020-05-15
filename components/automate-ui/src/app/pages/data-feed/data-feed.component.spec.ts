@@ -177,40 +177,20 @@ describe('DataFeedComponent', () => {
       errors = url.errors || {};
       expect(errors['required']).toBeTruthy();
 
+      url.setValue('');
+      errors = url.errors || {};
+      expect(errors['required']).toBeTruthy();
+
       // Set url to invalid inputs
-      url.setValue('http://foo.bar-.-.');
+      url.setValue('  ');
       errors = url.errors || {};
       expect(errors['pattern']).toBeTruthy();
-
-      url.setValue('http://foo.bar..com/');
-      errors = url.errors || {};
-      expect(errors['pattern']).toBeTruthy();
-
-      url.setValue('http://...foo.bar.com/');
-      errors = url.errors || {};
-      expect(errors['pattern']).toBeTruthy();
-
-      url.setValue('http://...foo.bar com/');
-      errors = url.errors || {};
-      expect(errors['pattern']).toBeTruthy();
+      expect(errors['required']).toBeFalsy();
 
       // Set url to valid inputs
-      url.setValue('http://fo_o.bar/');
+      url.setValue('any');
       errors = url.errors || {};
       expect(errors['pattern']).toBeFalsy();
-
-      url.setValue('https://bit.ly/2OWGwiL');
-      errors = url.errors || {};
-      expect(errors['pattern']).toBeFalsy();
-
-      url.setValue('http://demo.com/');
-      errors = url.errors || {};
-      expect(errors['pattern']).toBeFalsy();
-
-      url.setValue('https://example_test.co.in/2OWGwiL');
-      errors = url.errors || {};
-      expect(errors['pattern']).toBeFalsy();
-
     });
   });
 });
