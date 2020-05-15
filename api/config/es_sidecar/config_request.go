@@ -147,29 +147,28 @@ func (c *ConfigRequest) applyExternalConfig(
 		if s := extS3cfg.GetSettings(); s != nil {
 			cfg.S3.Es = s
 		}
-		/*	case "gcs":
-			cfg.Backend = w.String(backend)
-			if cfg.Gcs == nil {
-				cfg.Gcs = &ConfigRequest_V1_System_Backups_GCSSettings{}
-			}
+	case "gcs":
+		cfg.Backend = w.String(backend)
+		if cfg.Gcs == nil {
+			cfg.Gcs = &ConfigRequest_V1_System_Backups_GCSSettings{}
+		}
 
-			extGcscfg := override.GetGcs()
-			if b := extGcscfg.GetBucket(); b != nil {
-				cfg.Gcs.Bucket = b
-			}
+		extGcscfg := override.GetGcs()
+		if b := extGcscfg.GetBucket(); b != nil {
+			cfg.Gcs.Bucket = b
+		}
 
-			if bp := extGcscfg.GetBasePath(); bp != nil {
-				cfg.Gcs.BasePath = bp
-			}
+		if bp := extGcscfg.GetBasePath(); bp != nil {
+			cfg.Gcs.BasePath = bp
+		}
 
-			if c := extGcscfg.GetClient(); c != nil {
-				cfg.Gcs.Client = c
-			}
+		if c := extGcscfg.GetClient(); c != nil {
+			cfg.Gcs.Client = c
+		}
 
-			if s := extGcscfg.GetSettings(); s != nil {
-				cfg.Gcs.Es = s
-			}
-		*/
+		if s := extGcscfg.GetSettings(); s != nil {
+			cfg.Gcs.Es = s
+		}
 	case "fs":
 		cfg.Backend = w.String(backend)
 		if cfg.Fs == nil {
