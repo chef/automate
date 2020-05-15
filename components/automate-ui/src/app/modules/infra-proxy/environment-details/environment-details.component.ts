@@ -31,9 +31,9 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   public url: string;
   public conflictErrorEvent = new EventEmitter<boolean>();
   public modalType: string;
-  public serverId;
-  public orgId;
-  public name;
+  public serverId: string;
+  public orgId: string;
+  public name: string;
   public show = false;
   public hasCookbookConstraints = false;
   private isDestroyed = new Subject<boolean>();

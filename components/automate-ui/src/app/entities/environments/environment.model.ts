@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import { merge } from 'lodash/fp';
 
 export interface Environment {
   name: string;
@@ -25,7 +25,9 @@ export class EnvironmentAttributes {
       (resp.default_attributes && JSON.parse(resp.default_attributes)) || {};
     this.override_attributes =
       (resp.override_attributes && JSON.parse(resp.override_attributes)) || {};
-    this.all = {...this.default_attributes, ...this.override_attributes};
+      this.all = merge(
+        this.default_attributes,
+        this.override_attributes);
   }
 }
 

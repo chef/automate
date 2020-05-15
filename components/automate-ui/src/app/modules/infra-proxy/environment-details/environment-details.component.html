@@ -55,7 +55,6 @@
         </div>
       </section>
       <section class="page-body" *ngIf="tabValue === 'attributes'">
-        <chef-loading-spinner *ngIf="environmentDetailsLoading" size="50"></chef-loading-spinner>
         <div class="expand-collapse">
           <span class="action" (click)="tree.expand()">
             <chef-icon>add_circle</chef-icon>
