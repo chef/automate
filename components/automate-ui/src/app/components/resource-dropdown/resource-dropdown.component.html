@@ -10,7 +10,7 @@
     </div>
     <chef-icon aria-hidden>keyboard_arrow_down</chef-icon>
   </button>
-  <chef-click-outside (clickOutside)="closeDropdown()">
+  <chef-click-outside (clickOutside)="handleClickOutside()">
     <chef-dropdown [attr.visible]="active">
 
       <div id="filter-container">

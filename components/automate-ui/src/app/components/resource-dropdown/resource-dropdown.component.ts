@@ -85,12 +85,16 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     this.updateLabel();
   }
 
-  closeDropdown(): void {
+  handleClickOutside(): void {
     if (this.active) {
-      this.active = false;
-      this.onDropdownClosing.emit(
-        this.resources.filter(r => r.checked).map(r => r.id));
+      this.closeDropdown();
     }
+  }
+
+  closeDropdown(): void {
+    this.active = false;
+    this.onDropdownClosing.emit(
+      this.resources.filter(r => r.checked).map(r => r.id));
   }
 
   handleFilterKeyUp(): void {
