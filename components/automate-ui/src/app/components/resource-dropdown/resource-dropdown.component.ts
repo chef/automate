@@ -42,6 +42,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // that can be altered
   public filteredResources: ResourceChecked[] = [];
   public active = false;
+  private activating = false;
   public label = this.noneSelectedLabel;
   public filterValue = '';
 
@@ -73,7 +74,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     if (!this.active) { // opening
       this.filterValue = '';
       this.filteredResources = this.resourcesInOrder;
-      this.active = true;
+      this.activating = true;
     } else { // closing
       this.closeDropdown();
     }
@@ -87,6 +88,10 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   handleClickOutside(): void {
     if (this.active) {
       this.closeDropdown();
+    }
+    if (this.activating) {
+      this.active = true;
+      this.activating = false;
     }
   }
 
