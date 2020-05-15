@@ -28,9 +28,6 @@
             *ngIf="createForm.get('url').hasError('required') && createForm.get('url').dirty">
             Data Feed URL is required.
             </chef-error>
-            <chef-error *ngIf="createForm.get('url').hasError('pattern')">
-              Data Feed URL is invalid.
-            </chef-error>
           </chef-form-field>
         </div>
         <div class="margin">
