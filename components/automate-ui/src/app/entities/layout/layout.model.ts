@@ -13,6 +13,7 @@ export interface Sidebars {
   compliance?: MenuItemGroup[];
   settings?: MenuItemGroup[];
   profile?: MenuItemGroup[];
+  desktop?: MenuItemGroup[];
 }
 
 // MenuItemGroup {

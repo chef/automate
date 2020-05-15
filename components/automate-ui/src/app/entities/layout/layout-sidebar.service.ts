@@ -35,6 +35,16 @@ export class LayoutSidebarService {
     private populateSidebar() {
       const sidebars: Sidebars = {
         active: '',
+        desktop: [{
+          name: 'Desktop',
+          items: [
+            {
+              name: 'Desktop',
+              icon: 'today',
+              route: '/desktop'
+            }
+          ]
+        }],
         dashboards: [{
           name: 'Dashboards',
           items: [

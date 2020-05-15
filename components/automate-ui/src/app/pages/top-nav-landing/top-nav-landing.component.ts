@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RoutePerms } from 'app/components/landing/landing.component';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { isProductDeployed } from 'app/staticConfig';
 
 @Component({
   selector: 'app-top-nav-landing',
@@ -58,7 +59,18 @@ export class TopNavLandingComponent {
     }
   ];
 
-  constructor(public layoutFacade: LayoutFacadeService) { }
+  constructor(public layoutFacade: LayoutFacadeService) {
+    if ( isProductDeployed('desktop') ) {
+      this.routeList.unshift(
+        {
+          allOfCheck: [
+            ['/api/v0/cfgmgmt/nodes', 'get'],
+            ['/api/v0/cfgmgmt/stats/node_counts', 'get']
+          ], route: '/desktop'
+        }
+      );
+    }
+  }
 
   SetPageCoverage = () => this.layoutFacade.showFullPagePlusTopBar();
 }
