@@ -127,7 +127,7 @@ describe('EnvironmentDetailsComponent', () => {
       expect(element.query(By.css('.jsontree_value_object'))).toBeNull();
     });
 
-    it('fetches attributes and returns a EnvironmentAttributes object', async(() => {
+    it('fetches attributes and returns an EnvironmentAttributes object', async(() => {
       fixture.whenStable().then(() => {
         expect(component.retrieve('default_attributes')).toEqual(retrieve_default);
       });
