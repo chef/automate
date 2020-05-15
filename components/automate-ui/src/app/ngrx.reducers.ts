@@ -23,7 +23,6 @@ import * as integrationsEdit from './pages/integrations/edit/integrations-edit.r
 import * as license from './entities/license/license.reducer';
 import * as layout from './entities/layout/layout.reducer';
 import * as notificationEntity from './entities/notifications/notification.reducer';
-import * as notificationRuleEntity from './entities/notification_rules/notification_rule.reducer';
 import * as credential from './entities/credentials/credential.reducer';
 import * as jobAdd from './pages/job-add/job-add.reducer';
 import * as jobEdit from './pages/job-edit/job-edit.reducer';
@@ -79,7 +78,6 @@ export interface NgrxStateAtom {
   managers: manager.ManagerEntityState;
   nodes: nodesEntity.NodesEntityState;
   notifications: notificationEntity.NotificationEntityState;
-  notificationRules: notificationRuleEntity.NotificationRuleEntityState
   policies: policyEntity.PolicyEntityState;
   profiles: profileEntity.ProfileEntityState;
   projects: projectEntity.ProjectEntityState;
@@ -196,7 +194,6 @@ export const defaultInitialState = {
   managers: manager.ManagerEntityInitialState,
   nodes: nodesEntity.NodesEntityInitialState,
   notifications: notificationEntity.InitialState,
-  notificationRules: notificationRuleEntity.NotificationRuleEntityInitialState,
   policies: policyEntity.PolicyEntityInitialState,
   profiles: profileEntity.ProfileEntityInitialState,
   projects: projectEntity.ProjectEntityInitialState,
@@ -247,7 +244,6 @@ export const ngrxReducers = {
   nodes: nodesEntity.nodesEntityReducer,
   licenseStatus: license.licenseStatusEntityReducer,
   notifications: notificationEntity.notificationEntityReducer,
-  notificationRules: notificationRuleEntity.notificationRuleEntityReducer,
   policies: policyEntity.policyEntityReducer,
   profiles: profileEntity.profileEntityReducer,
   projects: projectEntity.projectEntityReducer,
