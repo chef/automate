@@ -3,6 +3,7 @@ package runner
 import (
 	"testing"
 
+	ingest_inspec "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/stretchr/testify/assert"
@@ -62,4 +63,137 @@ func TestPotentialTargetConfigs(t *testing.T) {
 			Password: "d",
 		},
 	}, targetConfigs[1])
+}
+
+func TestRemoveResults(t *testing.T) {
+	profiles := []*ingest_inspec.Profile{
+		{
+			Title: "Test Profile 1",
+			Controls: []*ingest_inspec.Control{
+				{
+					Id: "p1c1",
+					Results: []*ingest_inspec.Result{
+						{
+							Message: "Resource is as expected",
+							Status:  "passed",
+						},
+						{Status: "passed"},
+						{Status: "failed"},
+						{Status: "skipped"},
+						{Status: "failed"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "failed"},
+						{Status: "passed"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "failed"},
+						{Status: "passed"},
+						{Status: "failed"},
+						{Status: "skipped"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "skipped"},
+						{Status: "failed"},
+						{Status: "passed"},
+						{Status: "passed"},
+						{Status: "passed"},
+						{Status: "passed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+					},
+				},
+				{
+					Id: "p1c2",
+				},
+			},
+		},
+		{
+			Title: "Test Profile 2",
+		},
+	}
+
+	removeResults("test-report-id", profiles, 25)
+	assert.Equal(t, []*ingest_inspec.Profile{
+		{
+			Title: "Test Profile 1",
+			Controls: []*ingest_inspec.Control{
+				{
+					Id: "p1c1",
+					Results: []*ingest_inspec.Result{
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "skipped"},
+						{Status: "passed"},
+						{Status: "passed"},
+					},
+					RemovedResultsCounts: &ingest_inspec.RemovedResultsCounts{
+						Passed: 6,
+					},
+				},
+				{
+					Id: "p1c2",
+				},
+			},
+		},
+		{
+			Title: "Test Profile 2",
+		},
+	}, profiles)
+
+	removeResults("test-report-id", profiles, 4)
+	assert.Equal(t, []*ingest_inspec.Profile{
+		{
+			Title: "Test Profile 1",
+			Controls: []*ingest_inspec.Control{
+				{
+					Id: "p1c1",
+					Results: []*ingest_inspec.Result{
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+						{Status: "failed"},
+					},
+					RemovedResultsCounts: &ingest_inspec.RemovedResultsCounts{
+						Failed:  8,
+						Skipped: 11,
+						Passed:  2,
+					},
+				},
+				{
+					Id: "p1c2",
+				},
+			},
+		},
+		{
+			Title: "Test Profile 2",
+		},
+	}, profiles)
+
 }

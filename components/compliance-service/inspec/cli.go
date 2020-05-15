@@ -17,6 +17,9 @@ import (
 // BackendCache used for configuring inspec exec command, passed in via config flag
 var BackendCache bool
 
+// ResultMessageLimit used for configuring inspec exec command, passed in via config flag
+var ResultMessageLimit int
+
 // TmpDir is used for setting the location of the /tmp dir to be used by inspec for caching
 var TmpDir string
 
@@ -58,6 +61,8 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 	// Using "json-automate" as it provides better inherited profiles report
 	target.Reporter["json-automate"] = Reporter{}
 	target.BackendCache = BackendCache
+	target.ResultIncludeBacktrace = false
+	target.ResultMessageLimit = ResultMessageLimit
 
 	env["HOME"] = os.Getenv("HOME")
 
@@ -81,9 +86,9 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 		// ensuring that stdout ends with json character }
 		if stdOut[len(stdOut)-1] != '}' {
 			if len(stdOut) >= 80 {
-				stdOutErr += fmt.Sprintf("Expected InSpec STDOUT to end with '}' but found %q. Last 80 chars of STDOUT: %s\n", stdOut[len(stdOut)-1], stdOut[len(stdOut)-80:])
+				stdOutErr += fmt.Sprintf("Expected InSpec STDOUT to end with '}' but found %q. Last 80 chars of STDOUT: `%s`\n", stdOut[len(stdOut)-1], stdOut[len(stdOut)-80:])
 			} else {
-				stdOutErr += fmt.Sprintf("Expected InSpec STDOUT to end with '}' but found %q. STDOUT: %s\n", stdOut[len(stdOut)-1], stdOut)
+				stdOutErr += fmt.Sprintf("Expected InSpec STDOUT to end with '}' but found %q. STDOUT: `%s`\n", stdOut[len(stdOut)-1], stdOut)
 			}
 		}
 	}
@@ -297,6 +302,10 @@ func getInspecError(stdOut string, stdErr string, err error, target *TargetConfi
 				"Failed to run commands on "+target.Hostname+
 					": User is not in sudoers file."+"\n\n"+notInSudoersErr)
 		}
+	}
+
+	if err == nil {
+		err = errors.New("unknown error")
 	}
 
 	if err.Error() == "execute timeout" {

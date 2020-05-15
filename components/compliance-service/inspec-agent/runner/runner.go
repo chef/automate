@@ -17,7 +17,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	"sort"
+
 	ingest_events_compliance_api "github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
+	ingest_inspec "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	"github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
@@ -30,6 +33,9 @@ import (
 )
 
 var ListenPort int = 2133
+
+// ControlResultsLimit used for configuring inspec exec command, passed in via config flag
+var ControlResultsLimit int = 50
 
 var (
 	ScanJobWorkflowName = cereal.NewWorkflowName("scan-job-workflow")
@@ -426,7 +432,7 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 	}
 
 	cleanupKeys(job.TargetConfig.KeyFiles)
-	logrus.Debugf("job %s finished", job.JobID)
+	logrus.Debugf("job '%s' finished", job.JobID)
 
 	if job.NodeStatus == types.StatusRunning {
 		job.NodeStatus = types.StatusFailed
@@ -450,7 +456,7 @@ func (t *InspecJobTask) handleCompletedJob(ctx context.Context, job types.Inspec
 			// reporter config when we assembled the script
 			err := t.scannerServer.UpdateResult(ctx, &job, nil, jobInfo.InspecErr, job.Reporter.ReportUUID)
 			if err != nil {
-				logrus.Errorf("error trying to update node %s (%s) during scan job %s with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
+				logrus.Errorf("error trying to update node '%s' (%s) during scan job '%s' with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
 			}
 		default:
 			return types.StatusFailed, errors.Errorf("unknown job type: %s", job.JobType)
@@ -460,27 +466,27 @@ func (t *InspecJobTask) handleCompletedJob(ctx context.Context, job types.Inspec
 		case types.JobTypeDetect:
 			detectInfoByte, err := json.Marshal(jobInfo.DetectInfo)
 			if err != nil {
-				logrus.Errorf("error trying to marshal detectInfo for job %s", job.JobID)
+				logrus.Errorf("error trying to marshal detectInfo for job '%s'", job.JobID)
 				job.NodeStatus = types.StatusFailed
 				jobInfo.InspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
 			}
 			err = t.scannerServer.UpdateResult(ctx, &job, detectInfoByte, jobInfo.InspecErr, "")
 			if err != nil {
-				logrus.Errorf("error trying to update node %s (%s) during scan job %s with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
+				logrus.Errorf("error trying to update node '%s' (%s) during scan job '%s' with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
 			}
 		case types.JobTypeExec:
 			if job.NodeStatus == types.StatusCompleted {
 				jobInfo.ReportID = uuid.Must(uuid.NewV4()).String()
 				err := t.reportIt(ctx, &job, jobInfo.ExecInfo, jobInfo.ReportID)
 				if err != nil {
-					logrus.Errorf("worker error reporting on node %s (%s) during scan job %s: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
+					logrus.Errorf("worker error reporting on node '%s' (%s) during scan job '%s': %s", job.NodeName, job.NodeID, job.JobName, err.Error())
 					job.NodeStatus = types.StatusFailed
 					jobInfo.InspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
 				}
 			}
 			err := t.scannerServer.UpdateResult(ctx, &job, nil, jobInfo.InspecErr, jobInfo.ReportID)
 			if err != nil {
-				logrus.Errorf("error trying to update node %s (%s) during scan job %s with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
+				logrus.Errorf("error trying to update node '%s' (%s) during scan job '%s' with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
 			}
 		default:
 			return types.StatusFailed, errors.Errorf("unknown job type: %+v", job.JobType)
@@ -488,9 +494,9 @@ func (t *InspecJobTask) handleCompletedJob(ctx context.Context, job types.Inspec
 	}
 	err := t.scannerServer.UpdateNode(ctx, &job, jobInfo.DetectInfo)
 	if err != nil {
-		logrus.Errorf("error trying to update node %s (%s) during scan job %s: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
+		logrus.Errorf("error trying to update node '%s' (%s) during scan job '%s': %s", job.NodeName, job.NodeID, job.JobName, err.Error())
 	}
-	logrus.Debugf("finished job %s (%s) with status %s", job.JobName, job.JobID, job.NodeStatus)
+	logrus.Debugf("finished job '%s' (%s) with status '%s'", job.JobName, job.JobID, job.NodeStatus)
 	return job.NodeStatus, nil
 }
 
@@ -523,6 +529,9 @@ func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, cont
 	}
 	report.Tags = job.Tags
 	logrus.Debugf("hand-over report to ingest service")
+
+	removeResults(reportID, report.Profiles, ControlResultsLimit)
+	// strip profile meta if missing from the backend
 
 	_, err := t.ingestClient.ProcessComplianceReport(ctx, &report)
 	if err != nil {
@@ -745,6 +754,38 @@ func doExec(job *types.InspecJob) (jsonBytes []byte, err *inspec.Error) {
 
 	job.NodeStatus = types.StatusCompleted
 	return jsonBytes, nil
+}
+
+func removeResults(reportId string, profiles []*ingest_inspec.Profile, limit int) {
+	for _, profile := range profiles {
+		if profile.Controls != nil {
+			for _, control := range profile.Controls {
+				if control.Results != nil {
+					if len(control.Results) > limit {
+						logrus.Debugf("Control '%s' for report '%s' has %d results and will be trimmed based on the value (%d) of 'control-results-limit'", control.Id, reportId, len(control.Results), limit)
+						// Sort results in this non-alphabetical order: failed, skipped, passed. This order is needed
+						// to ensure the overall status of the control is still calculated correctly in ingestion
+						sort.Slice(control.Results, func(i, j int) bool {
+							return control.Results[i].Status == "failed" || (control.Results[i].Status == "skipped" && control.Results[j].Status == "passed")
+						})
+						chopped := ingest_inspec.RemovedResultsCounts{}
+						for i := limit; i < len(control.Results); i++ {
+							switch control.Results[i].Status {
+							case "failed":
+								chopped.Failed += 1
+							case "skipped":
+								chopped.Skipped += 1
+							case "passed":
+								chopped.Passed += 1
+							}
+						}
+						control.RemovedResultsCounts = &chopped
+						control.Results = control.Results[0:limit]
+					}
+				}
+			}
+		}
+	}
 }
 
 func potentialTargetConfigs(job *types.InspecJob) []inspec.TargetConfig {

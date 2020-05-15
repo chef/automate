@@ -119,6 +119,10 @@ func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFa
 	} else {
 		inspec.BackendCache = backendCacheBool
 	}
+
+	inspec.ResultMessageLimit = conf.InspecAgent.ResultMessageLimit
+	runner.ControlResultsLimit = conf.InspecAgent.ControlResultsLimit
+
 	inspec.TmpDir = conf.InspecAgent.TmpDir
 	// Let's have something sensible if the temp dir is not specified
 	if inspec.TmpDir == "" {
