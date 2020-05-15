@@ -21,6 +21,11 @@ type ChefIngestServerConfig struct {
 	ChefIngestRunPipelineConfig  ChefIngestRunPipelineConfig
 }
 
+type JobsConfig struct {
+	MissingNodesForDeletionRunningDefault bool
+	NodesMissingRunningDefault            bool
+}
+
 type Opts struct {
 	Host                          string
 	Port                          int
@@ -38,6 +43,7 @@ type Opts struct {
 	NodeManagerAddress            string
 	ChefIngestServerConfig        ChefIngestServerConfig
 	CerealAddress                 string
+	Jobs                          JobsConfig
 }
 
 // SetLogLevel sets the log level for the service

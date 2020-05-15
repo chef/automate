@@ -82,3 +82,17 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 		c.V1.Sys.Log.Format.Value = logFormat
 	}
 }
+
+func (c *ConfigRequest) ConfigureProduct(productConfig *ac.ProductConfig) {
+	c.V1.Sys.Service.NodesMissingRunningDefault = w.Bool(true)
+	c.V1.Sys.Service.MissingNodesForDeletionRunningDefault = w.Bool(true)
+	if len(productConfig.Products) > 0 {
+		for _, product := range productConfig.Products {
+			if product == "desktop" {
+				c.V1.Sys.Service.NodesMissingRunningDefault = w.Bool(false)
+				c.V1.Sys.Service.MissingNodesForDeletionRunningDefault = w.Bool(false)
+				return
+			}
+		}
+	}
+}

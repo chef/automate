@@ -37,6 +37,16 @@ CONFIG="$CONFIG --number-of-run-msg-publishers {{cfg.service.number_of_run_msg_p
 CONFIG="$CONFIG --message-buffer-size {{cfg.service.message_buffer_size}}"
 {{~/if}}
 
+missing_nodes_for_deletion_running_default="{{cfg.service.missing_nodes_for_deletion_running_default}}"
+if [ -n "$missing_nodes_for_deletion_running_default" ]; then
+  CONFIG="$CONFIG --missing-nodes-for-deletion-running-default $missing_nodes_for_deletion_running_default"
+fi
+
+nodes_missing_running_default="{{cfg.service.nodes_missing_running_default}}"
+if [ -n "$nodes_missing_running_default" ]; then
+  CONFIG="$CONFIG --nodes-missing-running-default $nodes_missing_running_default"
+fi
+
 # If we have a config pointing to an specific host,
 # lets use it, otherwise use the ipaddress of the server
 #
