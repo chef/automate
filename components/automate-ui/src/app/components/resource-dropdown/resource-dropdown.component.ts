@@ -66,8 +66,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     return ChefSorters.naturalSort(this.resources, 'name');
   }
 
-  toggleDropdown(event: MouseEvent): void {
-    event.stopPropagation();
+  toggleDropdown(): void {
     if (this.disabled) {
       return;
     }
