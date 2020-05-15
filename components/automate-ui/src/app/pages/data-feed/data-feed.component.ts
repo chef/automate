@@ -66,14 +66,10 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.createDataFeedForm = this.fb.group({
       // Must stay in sync with error checks in create-data-feed-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      url: ['', [Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK),
-        Validators.pattern(Regex.patterns.VALID_FQDN)
-      ]],
+      // Note that URL here may be FQDN -or- IP!
+      url: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      password: ['', [Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK)
-      ]]
+      password: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }
 

@@ -25,7 +25,7 @@
               <input chefInput formControlName="url" type="text" id="url-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
             <chef-error
-            *ngIf="createForm.get('url').hasError('required') && createForm.get('url').dirty">
+            *ngIf="(createForm.get('url').hasError('required') || createForm.get('url').hasError('pattern')) && createForm.get('url').dirty">
             Data Feed URL is required.
             </chef-error>
           </chef-form-field>
@@ -65,7 +65,7 @@
             <chef-icon class="url-failed-icon">warning</chef-icon>
             <span>Unable to connect, check URL, username and password.</span>
           </div>
-          
+
           <div class="url-success" *ngIf="hookStatus === urlState.Success">
             <chef-icon class="url-success-icon">done</chef-icon>
             <span class="status-heading">Data feed test connected successfully!</span>
