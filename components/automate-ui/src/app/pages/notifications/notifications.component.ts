@@ -1,18 +1,13 @@
-import { of as observableOf,  Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
-import { map, filter } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { Rule, ServiceActionType } from './rule';
 import { SortDirection } from '../../types/types';
 import { RulesService } from '../../services/rules/rules.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
-import {
-  DeleteNotificationDialogComponent
-} from 'app/page-components/delete-notification-dialog/delete-notification-dialog.component';
 
 export interface FieldDirection {
   node_name: SortDirection;
@@ -25,7 +20,7 @@ export interface FieldDirection {
   styleUrls: ['./notifications.component.scss']
 })
 export class NotificationsComponent implements OnInit {
-  rules$: Observable<Rule[]> = observableOf([]);
+  rules$: Observable<Rule[]>;
   errorLoading = false;
   currentPage = 1;
   pageSize = 10;
@@ -34,12 +29,12 @@ export class NotificationsComponent implements OnInit {
   permissionDenied = false; // not currently used
   // This is exposed here to allow the component HTML access to ServiceActionType
   serviceActionType = ServiceActionType;
+  public notificationToDelete: Rule;
+  public deleteModalVisible = false;
 
   constructor(
     private layoutFacade: LayoutFacadeService,
     private service: RulesService,
-    public dialog: MatDialog,
-    public snackBar: MatSnackBar,
     private telemetryService: TelemetryService
   ) { }
 
@@ -73,6 +68,7 @@ export class NotificationsComponent implements OnInit {
     this.sortField = field;
     this.updateSort(field, this.sortDir[field]);
   }
+
   sortIcon(field: string): string {
     if (field === this.sortField) {
       return 'sort-' + this.sortDir[field];
@@ -81,24 +77,22 @@ export class NotificationsComponent implements OnInit {
     }
   }
 
-
-  deleteRule(rule: Rule) {
-    const dialogRef2 = this.dialog.open(DeleteNotificationDialogComponent);
-    dialogRef2.afterClosed().pipe(
-      filter((result: any) => result === 'delete' ))
-      .subscribe(_result => {
-        this.service.deleteRule(rule).subscribe(_res => {
-          this.snackBarMessage(`Rule '${rule.name}' was deleted.`);
-          this.refreshRules();
-        }, err => {
-          const body = err;
-          this.snackBarMessage(`Could not delete rule '${rule.name}': ${body}`);
-        });
-      });
+  public startNotificationDelete($event: MatOptionSelectionChange, rule: Rule): void {
+    if ($event.isUserInput) {
+      this.notificationToDelete = rule;
+      this.deleteModalVisible = true;
+    }
   }
 
-  snackBarMessage(message) {
-    this.snackBar.open(message, '', { duration: 6000 } );
+  public deleteNotification(): void {
+    this.closeDeleteModal();
+    this.service.deleteRule(this.notificationToDelete).subscribe(_res => {
+      this.refreshRules();
+    });
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
   }
 
   private updateSort(field: string, direction: string) {
