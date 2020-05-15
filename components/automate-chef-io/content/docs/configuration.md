@@ -79,7 +79,7 @@ The only supported `deployment_type` is `local`.
 
 You cannot change the admin username, name, and password set during initial deployment.
 
-To change the admin password after deployment, use the Automate UI.
+To change the admin password after deployment, use the Chef Automate UI.
 Sign in as the admin user, navigate to the _Users_ page under the **Settings** tab.
 Select "Local Administrator" to show the admin's _User Details_ page.
 Navigate to the _Reset Password_ tab.
@@ -303,7 +303,7 @@ heapsize = "16g"
 To configure PostgreSQL for your Chef Automate installation, create a TOML file that contains the partial configuration below.
 Uncomment and change settings as needed, with the following caveats:
 
-* These configuration settings affect only the Automate-deployed PostgreSQL database. They do not affect an [externally-deployed PostgreSQL database]({{< relref "install.md#configuring-an-external-postgresql-database" >}}).
+* These configuration settings affect only the Chef Automate-deployed PostgreSQL database. They do not affect an [externally-deployed PostgreSQL database]({{< relref "install.md#configuring-an-external-postgresql-database" >}}).
 * Chef Automate uses TLS mutual authentication to communicate with its PostgreSQL database.
 
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
@@ -384,6 +384,19 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 # key = "-----BEGIN RSA PRIVATE KEY-----\n<your load balancer private key>\n-----END RSA PRIVATE KEY-----\n"
 ```
 
+#### Buffer Size
+
+This conversation was marked as resolved by kagarmoe
+
+Configure message buffer ingest size:
+
+```toml
+[compliance.v1.sys.service]
+message_buffer_size = 200
+[ingest.v1.sys.service]
+message_buffer_size = 200
+```
+
 #### Compliance Configuration
 
 To configure your Chef Automate InSpec agent scans, create a TOML file that contains the partial configuration below.
@@ -405,6 +418,20 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 # run_time_limit = 0.5
 ```
 
+#### Configure maximum number of inflight data collector requests
+
+You can now specify the maximum number of inflight data collector requests. The default value is sixty times the number of the machine's available CPUs.
+
+```toml
+    [gateway.v1.sys.data_collector.limiter]
+    # Setting disable to true will allow an unbounded number of
+    # data collector requests to remain inflight concurrently.
+    disable = false
+    # max_inflight_requests will set the maximum number of
+    # concurrent inflight data collector requests. By default,
+    # this value is 60 * runtime.CpuCount()
+    max_inflight_requests = 100
+```
 
 ### Troubleshooting
 
