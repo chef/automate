@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { CookieModule } from 'ngx-cookie';
 import { SuggestionsService } from './suggestions.service';
@@ -16,6 +17,7 @@ describe('SuggestionsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
+        RouterTestingModule,
         CookieModule.forRoot(),
         HttpClientTestingModule
       ],
