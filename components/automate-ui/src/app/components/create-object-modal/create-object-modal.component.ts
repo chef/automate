@@ -32,6 +32,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Output() createClicked = new EventEmitter<Project[]>();
 
   public projects: ProjectCheckedMap = {};
+  public checkedProjectIDs: string[] = []; // resets project dropdown btwn modal openings
   public policies: PolicyChecked[] = [];
   public modifyID = false; // Whether the edit ID form is open or not.
   public conflictError = false;
@@ -110,11 +111,13 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
 
   closeEvent(): void {
     this.modifyID = false;
+    this.checkedProjectIDs = [];
     this.close.emit();
   }
 
   createObject(): void {
     this.createClicked.emit();
+    this.checkedProjectIDs = [];
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
