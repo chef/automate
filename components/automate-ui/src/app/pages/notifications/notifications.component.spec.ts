@@ -1,7 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { Store, StoreModule } from '@ngrx/store';
@@ -41,22 +39,6 @@ describe('NotificationsComponent', () => {
     }
   }
 
-  class MockDeleteDialog {
-    afterClosed() {
-      return observableOf('delete');
-    }
-  }
-
-  class MockMdDialog {
-    open(_dialogType) {
-      return new MockDeleteDialog();
-    }
-  }
-
-  class MockMdSnackBar {
-    open(_message, _m, _time) { }
-  }
-
   let telemetryService: TelemetryService;
   let fixture, component;
 
@@ -70,10 +52,8 @@ describe('NotificationsComponent', () => {
         NotificationsComponent
       ],
       providers: [
-        { provide: MatDialog, useClass: MockMdDialog },
         { provide: TelemetryService, useClass: MockTelemetryService },
         { provide: RulesService, useClass: MockRulesService },
-        { provide: MatSnackBar, useClass: MockMdSnackBar},
         FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
@@ -112,7 +92,7 @@ describe('NotificationsComponent', () => {
     });
 
     it('ensure telemetry is sent on deleting a rule', () => {
-      component.deleteRule(new Rule('', '', null, '', ServiceActionType.SLACK, '', false));
+      component.deleteNotification();
 
       expect(telemetryService.track).toHaveBeenCalled();
     });

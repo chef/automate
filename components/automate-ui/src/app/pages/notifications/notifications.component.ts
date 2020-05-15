@@ -3,8 +3,6 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { Rule, ServiceActionType } from './rule';
 import { SortDirection } from '../../types/types';
@@ -37,8 +35,6 @@ export class NotificationsComponent implements OnInit {
   constructor(
     private layoutFacade: LayoutFacadeService,
     private service: RulesService,
-    public dialog: MatDialog,
-    public snackBar: MatSnackBar,
     private telemetryService: TelemetryService
   ) { }
 
