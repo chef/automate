@@ -54,7 +54,7 @@ Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
   if (projectsToFilterOn.length > 0) {
     // check all desired checkboxes
     projectsToFilterOn.forEach(proj => {
-      cy.get(`app-projects-filter chef-checkbox[title="${proj}"] chef-icon`).click();
+      cy.get(`app-projects-filter chef-checkbox[title="${proj}"]`).click();
       cy.get(`app-projects-filter chef-checkbox[title="${proj}"]`)
         .should('have.attr', 'aria-checked', 'true');
     });
@@ -62,7 +62,11 @@ Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
 
   // apply projects filter
   cy.get('app-projects-filter chef-button#projects-filter-apply-changes')
-    .should('not.be.disabled').click();
+    // we force the click here in case Apply button was disabled due to no net change
+    // i.e. in the case that proj1, proj2 are selected,
+    // selection is cleared,
+    // and proj1, proj2 are selected again
+    .click({force: true});
 });
 
 Cypress.Commands.add('generateAdminToken', (idToken: string) => {
