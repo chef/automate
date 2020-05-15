@@ -398,9 +398,9 @@ func muxFromRegisterMap(grpcURI string, dopts []grpc.DialOption, localEndpoints 
 		//           interactive console, so we'd want to tell them if they feed us garbage.
 		runtime.WithMarshalerOption("application/json+pretty",
 			&m{JSONPb: &runtime.JSONPb{OrigName: true, EmitDefaults: true, Indent: "  "}, unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: false}}),
-		runtime.WithMarshalerOption("application/json+strict",
+		runtime.WithMarshalerOption("application/json+lax", &runtime.JSONPb{OrigName: true, EmitDefaults: true}),
+		runtime.WithMarshalerOption(runtime.MIMEWildcard,
 			&m{JSONPb: &runtime.JSONPb{OrigName: true, EmitDefaults: true}, unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: false}}),
-		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{OrigName: true, EmitDefaults: true}),
 		runtime.WithMetadata(middleware.CertificatePasser),
 	}
 	gwmux := runtime.NewServeMux(opts...)
