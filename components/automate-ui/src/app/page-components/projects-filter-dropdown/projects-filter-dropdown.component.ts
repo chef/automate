@@ -99,7 +99,7 @@ export class ProjectsFilterDropdownComponent {
     this.checkInitialEquality();
   }
 
-  handleArrowUp(event: KeyboardEvent) {
+  handleArrowUp(event: Event) {
     event.preventDefault();
 
     const element = (event.target as Element).previousElementSibling;
@@ -108,7 +108,7 @@ export class ProjectsFilterDropdownComponent {
     }
   }
 
-  handleArrowDown(event: KeyboardEvent) {
+  handleArrowDown(event: Event) {
     event.preventDefault();
 
     const element = (event.target as Element).nextElementSibling;
