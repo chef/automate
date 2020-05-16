@@ -117,6 +117,15 @@ describe('team management', () => {
       cy.contains(customTeamID).should('exist');
     });
 
+    it('can cancel creating a team', () => {
+      cy.get('[data-cy=team-create-button]').contains('Create Team').click();
+      cy.get('app-team-management chef-modal').should('exist');
+
+      cy.get('chef-button').contains('Cancel').should('be.visible').click();
+
+      cy.get('app-team-management chef-modal').should('not.be.visible');
+    });
+
 
     context('when only the unassigned project is selected', () => {
       beforeEach(() => {
