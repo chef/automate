@@ -117,12 +117,29 @@ describe('team management', () => {
       cy.contains(customTeamID).should('exist');
     });
 
+    it('fails to create a team with a duplicate ID', () => {
+      cy.get('[data-cy=team-create-button]').contains('Create Team').click();
+      cy.get('app-team-management chef-modal').should('exist');
+
+      cy.get('[data-cy=create-name]').type(teamName);
+
+      cy.get('[data-cy=id-label]').contains(generatedTeamID);
+
+      cy.get('[data-cy=save-button]').click();
+      cy.get('app-team-management chef-modal chef-error').contains('already exists')
+        .should('be.visible');
+
+      // here we exit with the chef-modal exit button in the top right corner
+      cy.get('app-team-management chef-modal chef-button.close').first().click();
+    });
+
     it('can cancel creating a team', () => {
       cy.get('[data-cy=team-create-button]').contains('Create Team').click();
       cy.get('app-team-management chef-modal').should('exist');
 
       cy.get('chef-button').contains('Cancel').should('be.visible').click();
 
+      // here we exit with the Cancel button
       cy.get('app-team-management chef-modal').should('not.be.visible');
     });
 
