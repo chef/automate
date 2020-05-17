@@ -20,7 +20,6 @@ require (
 	github.com/briandowns/spinner v0.0.0-20180123222039-b3ed21e9d3b2
 	github.com/buger/goterm v0.0.0-20180307092342-c9def0117b24
 	github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44
-	github.com/chef/go-chef v0.4.1-0.20200409082755-21937e140680 // indirect
 	github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816
 	github.com/ckaznocha/protoc-gen-lint v0.2.1
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
@@ -44,6 +43,7 @@ require (
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.4.3
 	github.com/golang/protobuf v1.4.0
+	github.com/gopherjs/gopherjs v0.0.0-20191106031601-ce3c9ade29de // indirect
 	github.com/gorilla/handlers v1.3.0 // indirect
 	github.com/gorilla/mux v1.7.4
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
@@ -92,6 +92,7 @@ require (
 	github.com/schollz/closestmatch v2.1.1-0.20170908204616-19d3b334fdfc+incompatible
 	github.com/segmentio/backo-go v0.0.0-20160424052352-204274ad699c // indirect
 	github.com/sirupsen/logrus v1.5.0
+	github.com/smartystreets/assertions v1.0.1 // indirect
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.4.0
