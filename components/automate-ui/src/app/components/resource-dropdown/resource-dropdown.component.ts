@@ -41,8 +41,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // filteredResources is merely a container to hold the resources
   // that can be altered
   public filteredResources: ResourceChecked[] = [];
-  public active = false;
-  private activating = false;
+  public dropdownState: 'closed' | 'opening' | 'open' = 'closed';
   public label = this.noneSelectedLabel;
   public filterValue = '';
 
@@ -71,10 +70,12 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     if (this.disabled) {
       return;
     }
-    if (!this.active) { // opening
+    if (this.dropdownState === 'closed') { // opening
       this.filterValue = '';
       this.filteredResources = this.resourcesInOrder;
-      this.activating = true;
+      // we cannot go directly to 'open' because handleClickOutside,
+      // firing next on the same event that arrived here, would then immediately close it.
+      this.dropdownState = 'opening';
     } else { // closing
       this.closeDropdown();
     }
@@ -86,17 +87,19 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   }
 
   handleClickOutside(): void {
-    if (this.active) {
+    // Arriving here, the main goal is to close this dropdown if it is open.
+    if (this.dropdownState === 'open') {
       this.closeDropdown();
     }
-    if (this.activating) {
-      this.active = true;
-      this.activating = false;
+    // Now that we have checked the above,
+    // it is safe to complete opening if the click occurred when the dropdown was closed.
+    if (this.dropdownState === 'opening') {
+      this.dropdownState = 'open';
     }
   }
 
   closeDropdown(): void {
-    this.active = false;
+    this.dropdownState = 'closed';
     this.onDropdownClosing.emit(
       this.resources.filter(r => r.checked).map(r => r.id));
   }

@@ -2,7 +2,7 @@
 <div class="dropdown-wrap">
   <button class="dropdown-button" attr.aria-label="Select {{ objectNounPlural }}"
     (click)="toggleDropdown()"
-    [ngClass]="{'active': active}"
+    [ngClass]="{'active': dropdownState === 'open'}"
     [disabled]="disabled"
     (keydown.arrowup)="moveFocus($event)"
     (keydown.arrowdown)="moveFocus($event)">
@@ -11,7 +11,7 @@
     <chef-icon aria-hidden>keyboard_arrow_down</chef-icon>
   </button>
   <chef-click-outside (clickOutside)="handleClickOutside()">
-    <chef-dropdown [attr.visible]="active">
+    <chef-dropdown [attr.visible]="dropdownState === 'open'">
 
       <div id="filter-container">
         <input chefInput type="text" [(ngModel)]="filterValue" placeholder="Filter {{ objectNounPlural }}..."

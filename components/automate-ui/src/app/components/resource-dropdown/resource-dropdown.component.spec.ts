@@ -31,7 +31,7 @@ describe('ResourceDropdownComponent', () => {
 
   describe('dropdown', () => {
     beforeEach(() => {
-      component.active = true;
+      component.dropdownState = 'open';
       component.filteredResources = [
         {
           name: 'Project 1',
