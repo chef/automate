@@ -48,6 +48,23 @@ func (a *InfraProxyServer) GetEnvironment(ctx context.Context, r *gwreq.Environm
 	}, nil
 }
 
+// DeleteEnvironment deletes the environment
+func (a *InfraProxyServer) DeleteEnvironment(ctx context.Context, r *gwreq.Environment) (*gwres.Environment, error) {
+	req := &infra_req.Environment{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.DeleteEnvironment(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Environment{
+		Name: res.GetName(),
+	}, nil
+}
+
 func fromUpstreamEnvironments(environments []*infra_res.EnvironmentListItem) []*gwres.EnvironmentListItem {
 	ts := make([]*gwres.EnvironmentListItem, len(environments))
 
