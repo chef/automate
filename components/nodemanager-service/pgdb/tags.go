@@ -19,11 +19,18 @@ const sqlFindNodeTag = `
 SELECT exists(select 1 from nodes_tags where node_id = $1 AND tag_id = $2);
 `
 
-func formatTag(keyValue *common.Kv) common.Kv {
-	// remove quotes from inside tag key/value, if any (e.g. "Dot.Comma,Big;\"Trouble")
-	key := strings.Replace(keyValue.Key, "\"", "", -1)
-	val := strings.Replace(keyValue.Value, "\"", "", -1)
-	return common.Kv{Key: key, Value: val}
+func validateTag(keyValue *common.Kv) bool {
+	// if a tag key or value has a double quote in it, things will break when we try to list
+	// the nodes. remove tag kv is double quote is found in string (e.g. "Dot.Comma,Big;\"Trouble")
+	if strings.Contains(keyValue.Key, "\"") {
+		logrus.Warnf("cannot add tag with quote inside string. invalid tag key: %s", keyValue.Key)
+		return false
+	}
+	if strings.Contains(keyValue.Value, "\"") {
+		logrus.Warnf("cannot add tag with quote inside string. invalid tag value: %s", keyValue.Value)
+		return false
+	}
+	return true
 }
 
 func (trans *DBTrans) addTags(tags []*common.Kv) ([]string, error) {
@@ -37,15 +44,16 @@ func (trans *DBTrans) addTags(tags []*common.Kv) ([]string, error) {
 			return tagIDs, errors.Wrap(err, "addTags unable to check for tag existence in db")
 		}
 		if len(id) == 0 {
-			kv := formatTag(keyValue)
-			// create tag and add to tag array if not exists
-			tag := tag{
-				ID:    createUUID(),
-				Key:   kv.Key,
-				Value: kv.Value,
+			if validateTag(keyValue) {
+				// create tag and add to tag array if not exists
+				tag := tag{
+					ID:    createUUID(),
+					Key:   keyValue.Key,
+					Value: keyValue.Value,
+				}
+				tagArr = append(tagArr, &tag)
+				id = tag.ID
 			}
-			tagArr = append(tagArr, &tag)
-			id = tag.ID
 		}
 		// add id of tag to tagIDs
 		tagIDs = append(tagIDs, id)
