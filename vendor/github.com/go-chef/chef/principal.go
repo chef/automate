@@ -8,19 +8,15 @@ type PrincipalService struct {
 
 // Principal represents the native Go version of the deserialized Principal type
 type Principal struct {
+	Principals []Principals `json:"principals"`
+}
+
+type Principals struct {
 	Name      string `json:"name"`
 	Type      string `json:"type"`
 	PublicKey string `json:"public_key"`
 	AuthzId   string `json:"authz_id"`
 	OrgMember bool   `json:"org_member"`
-}
-
-func NewPrincipal(name, typ, publicKey string) Principal {
-	return Principal{
-		Name:      name,
-		Type:      typ,
-		PublicKey: publicKey,
-	}
 }
 
 // Get gets a principal from the Chef server.

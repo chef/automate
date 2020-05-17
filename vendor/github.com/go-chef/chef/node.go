@@ -16,9 +16,10 @@ type Node struct {
 	DefaultAttributes   map[string]interface{} `json:"default,omitempty"`
 	OverrideAttributes  map[string]interface{} `json:"override,omitempty"`
 	JsonClass           string                 `json:"json_class,omitempty"`
-	RunList             []string               `json:"run_list,omitempty"`
-	PolicyName          string                 `json:"policy_name,omitempty"`
-	PolicyGroup         string                 `json:"policy_group,omitempty"`
+	//TODO: use the RunList struct for this
+	RunList     []string `json:"run_list,omitempty"`
+	PolicyName  string   `json:"policy_name,omitempty"`
+	PolicyGroup string   `json:"policy_group,omitempty"`
 }
 
 type NodeResult struct {
@@ -53,6 +54,15 @@ func (e *NodeService) Get(name string) (node Node, err error) {
 	return
 }
 
+// Head gets a node from the Chef server. Does not return a json body.
+//
+// Chef API docs: https://docs.chef.io/api_chef_server.html#nodes-name
+func (e *NodeService) Head(name string) (err error) {
+	url := fmt.Sprintf("nodes/%s", name)
+	err = e.client.magicRequestDecoder("HEAD", url, nil, nil)
+	return
+}
+
 // Post creates a Node on the chef server
 //
 // Chef API docs: https://docs.chef.io/api_chef_server.html#nodes
@@ -69,6 +79,7 @@ func (e *NodeService) Post(node Node) (data *NodeResult, err error) {
 // Put updates a node on the Chef server.
 //
 // Chef API docs: https://docs.chef.io/api_chef_server.html#nodes-name
+// TODO: We might want to change the name. name and data should be separate structures
 func (e *NodeService) Put(n Node) (node Node, err error) {
 	url := fmt.Sprintf("nodes/%s", n.Name)
 	body, err := JSONReader(n)

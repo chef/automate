@@ -6,6 +6,7 @@ type ACLService struct {
 	client *Client
 }
 
+//TODO: No ACL endpoints are documented
 // ACL represents the native Go version of the deserialized ACL type
 type ACL map[string]ACLitems
 

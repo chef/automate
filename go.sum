@@ -152,6 +152,8 @@ github.com/ghodss/yaml v0.0.0-20180820084758-c7ce16629ff4/go.mod h1:4dBDuWmgqj2H
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39 h1:8aiwjJixH9Dws9c0mE6yeghmrVhe6csuB+onSjeW31Q=
 github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
+github.com/go-chef/chef v0.20.1 h1:7j653Pk7CrTGALp7xxVI2W7wdj4Y/dq7p3wkhcnwUDw=
+github.com/go-chef/chef v0.20.1/go.mod h1:y3ffcKqjT0vdGFnUx+1yVORHV+gPxeZ5fd0kjkDVpto=
 github.com/go-delve/delve v1.3.1 h1:LI0X4aAE0N7ay8uR48aMJ6GNTxamIpcxi1THjwJjenI=
 github.com/go-delve/delve v1.3.1/go.mod h1:LLw6qJfIsRK9WcwV2IRRqsdlgrqzOeuGrQOCOIhDpt8=
 github.com/go-gorp/gorp v2.0.1-0.20180410155428-6032c66e0f5f+incompatible h1:cWM8mu5v0FdhuVs0oqlVI5IcEXfTaAw9Xu025fBqkeQ=
@@ -516,6 +518,8 @@ github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
+github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H4=
+github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/teambition/rrule-go v0.0.0-20170616063102-9d6a7aa3e9f9 h1:/91R2/2jlnc9rDwklx2EBTqQKiv4LPxN34/6SrQSGRo=
 github.com/teambition/rrule-go v0.0.0-20170616063102-9d6a7aa3e9f9/go.mod h1:r4KySnNhHcj3VzvHTNZjkzH4ezda5qgB7M6nd9lrRcU=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=

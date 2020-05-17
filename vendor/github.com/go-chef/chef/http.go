@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
@@ -40,27 +41,31 @@ type Client struct {
 	BaseURL *url.URL
 	client  *http.Client
 
-	ACLs             *ACLService
-	Associations     *AssociationService
-	AuthenticateUser *AuthenticateUserService
-	Clients          *ApiClientService
-	Cookbooks        *CookbookService
-	DataBags         *DataBagService
-	Environments     *EnvironmentService
-	Groups           *GroupService
-	License          *LicenseService
-	Nodes            *NodeService
-	Organizations    *OrganizationService
-	Principals       *PrincipalService
-	Roles            *RoleService
-	Sandboxes        *SandboxService
-	Search           *SearchService
-	Status           *StatusService
-	Universe         *UniverseService
-	UpdatedSince     *UpdatedSinceService
-	Users            *UserService
-	Policies         *PolicyService
-	PolicyGroups     *PolicyGroupService
+	ACLs              *ACLService
+	Associations      *AssociationService
+	AuthenticateUser  *AuthenticateUserService
+	Clients           *ApiClientService
+	Containers        *ContainerService
+	Cookbooks         *CookbookService
+	CookbookArtifacts *CBAService
+	DataBags          *DataBagService
+	Environments      *EnvironmentService
+	Groups            *GroupService
+	License           *LicenseService
+	Nodes             *NodeService
+	Organizations     *OrganizationService
+	Policies          *PolicyService
+	PolicyGroups      *PolicyGroupService
+	Principals        *PrincipalService
+	RequiredRecipe    *RequiredRecipeService
+	Roles             *RoleService
+	Sandboxes         *SandboxService
+	Search            *SearchService
+	Stats             *StatsService
+	Status            *StatusService
+	Universe          *UniverseService
+	UpdatedSince      *UpdatedSinceService
+	Users             *UserService
 }
 
 // Config contains the configuration options for a chef client. This structure is used primarily in the NewClient() constructor in order to setup a proper client object
@@ -87,6 +92,10 @@ type Config struct {
 /*
 An ErrorResponse reports one or more errors caused by an API request.
 Thanks to https://github.com/google/go-github
+
+The Response structure includes:
+        Status string
+	StatusCode int
 */
 type ErrorResponse struct {
 	Response *http.Response // HTTP response that caused this error
@@ -132,6 +141,18 @@ func (r *ErrorResponse) Error() string {
 		r.Response.StatusCode)
 }
 
+func (r *ErrorResponse) StatusCode() int {
+	return r.Response.StatusCode
+}
+
+func (r *ErrorResponse) StatusMethod() string {
+	return r.Response.Request.Method
+}
+
+func (r *ErrorResponse) StatusURL() *url.URL {
+	return r.Response.Request.URL
+}
+
 // NewClient is the client generator used to instantiate a client for talking to a chef-server
 // It is a simple constructor for the Client struct intended as a easy interface for issuing
 // signed requests
@@ -172,24 +193,51 @@ func NewClient(cfg *Config) (*Client, error) {
 	c.AuthenticateUser = &AuthenticateUserService{client: c}
 	c.Associations = &AssociationService{client: c}
 	c.Clients = &ApiClientService{client: c}
+	c.Containers = &ContainerService{client: c}
 	c.Cookbooks = &CookbookService{client: c}
+	c.CookbookArtifacts = &CBAService{client: c}
 	c.DataBags = &DataBagService{client: c}
 	c.Environments = &EnvironmentService{client: c}
 	c.Groups = &GroupService{client: c}
 	c.License = &LicenseService{client: c}
 	c.Nodes = &NodeService{client: c}
 	c.Organizations = &OrganizationService{client: c}
+	c.Policies = &PolicyService{client: c}
+	c.PolicyGroups = &PolicyGroupService{client: c}
+	c.RequiredRecipe = &RequiredRecipeService{client: c}
 	c.Principals = &PrincipalService{client: c}
 	c.Roles = &RoleService{client: c}
 	c.Sandboxes = &SandboxService{client: c}
 	c.Search = &SearchService{client: c}
+	c.Stats = &StatsService{client: c}
 	c.Status = &StatusService{client: c}
 	c.UpdatedSince = &UpdatedSinceService{client: c}
 	c.Universe = &UniverseService{client: c}
 	c.Users = &UserService{client: c}
-	c.Policies = &PolicyService{client: c}
-	c.PolicyGroups = &PolicyGroupService{client: c}
 	return c, nil
+}
+
+// basicRequestDecoder performs a request on an endpoint, and decodes the response into the passed in Type
+// basicRequestDecoder is the same code as magic RequestDecoder with the addition of a generated Authentication: Basic header
+// to the http request
+func (c *Client) basicRequestDecoder(method, path string, body io.Reader, v interface{}, user string, password string) error {
+	req, err := c.NewRequest(method, path, body)
+	if err != nil {
+		return err
+	}
+
+	basicAuthHeader(req, user, password)
+
+	debug("\n\nRequest: %+v \n", req)
+	res, err := c.Do(req, v)
+	if res != nil {
+		defer res.Body.Close()
+	}
+	debug("Response: %+v\n", res)
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 // magicRequestDecoder performs a request on an endpoint, and decodes the response into the passed in Type
@@ -245,6 +293,19 @@ func (c *Client) NewRequest(method string, requestUrl string, body io.Reader) (*
 	return req, nil
 }
 
+// basicAuth does base64 encoding of a user and password
+func basicAuth(user string, password string) string {
+	creds := user + ":" + password
+	return base64.StdEncoding.EncodeToString([]byte(creds))
+}
+
+// basicAuthHeader adds an Authentication Basic header to the request
+// The user and password values should be clear text. They will be
+// base64 encoded for the header.
+func basicAuthHeader(r *http.Request, user string, password string) {
+	r.Header.Add("authorization", "Basic "+basicAuth(user, password))
+}
+
 // CheckResponse receives a pointer to a http.Response and generates an Error via unmarshalling
 func CheckResponse(r *http.Response) error {
 	if c := r.StatusCode; 200 <= c && c <= 299 {
@@ -256,6 +317,18 @@ func CheckResponse(r *http.Response) error {
 		json.Unmarshal(data, errorResponse)
 	}
 	return errorResponse
+}
+
+//  ChefError tries to unwind a chef client err return embedded in an error
+//  Unwinding allows easy access the StatusCode, StatusMethod and StatusURL functions
+func ChefError(err error) (cerr *ErrorResponse, nerr error) {
+	if err == nil {
+		return cerr, err
+	}
+	if cerr, ok := err.(*ErrorResponse); ok {
+		return cerr, err
+	}
+	return cerr, err
 }
 
 // Do is used either internally via our magic request shite or a user may use it
@@ -271,23 +344,76 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 		return res, err
 	}
 
-	var resbuf bytes.Buffer
-	restee := io.TeeReader(res.Body, &resbuf)
-	if v != nil {
-		if w, ok := v.(io.Writer); ok {
-			io.Copy(w, restee)
-		} else {
-			err = json.NewDecoder(restee).Decode(v)
-			if debug_on() {
-				resbody, _ := ioutil.ReadAll(&resbuf)
-				debug("Response body: %+v\n", string(resbody))
-			}
-			if err != nil {
-				return res, err
-			}
+	var resBuf bytes.Buffer
+	resTee := io.TeeReader(res.Body, &resBuf)
+
+	// no response interface specified
+	if v == nil {
+		if debug_on() {
+			// show the response body as a string
+			resbody, _ := ioutil.ReadAll(resTee)
+			debug("Response body: %+v\n", string(resbody))
 		}
+		debug("No response body requested\n")
+		return res, nil
+	}
+
+	// response interface, v, is an io writer
+	if w, ok := v.(io.Writer); ok {
+		debug("Response output desired is an io Writer\n")
+		_, err = io.Copy(w, resTee)
+		return res, err
+	}
+
+	// response content-type specifies JSON encoded - decode it
+	if hasJsonContentType(res) {
+		err = json.NewDecoder(resTee).Decode(v)
+		if debug_on() {
+			// show the response body as a string
+			resbody, _ := ioutil.ReadAll(&resBuf)
+			debug("Response body: %+v\n", string(resbody))
+		}
+		debug("Response body specifies content as JSON: %+v Err:\n", v, err)
+		if err != nil {
+			return res, err
+		}
+		return res, nil
+	}
+
+	// response interface, v, is type string and the content is plain text
+	if _, ok := v.(*string); ok && hasTextContentType(res) {
+		resbody, _ := ioutil.ReadAll(resTee)
+		if err != nil {
+			return res, err
+		}
+		out := string(resbody)
+		debug("Response body parsed as string: %+v\n", out)
+		*v.(*string) = out
+		return res, nil
+	}
+
+	// Default response: Content-Type is not JSON. Assume v is a struct and decode the response as json
+	err = json.NewDecoder(resTee).Decode(v)
+	if debug_on() {
+		// show the response body as a string
+		resbody, _ := ioutil.ReadAll(&resBuf)
+		debug("Response body: %+v\n", string(resbody))
+	}
+	debug("Response body defaulted to JSON parsing: %+v Err:\n", v, err)
+	if err != nil {
+		return res, err
 	}
 	return res, nil
+}
+
+func hasJsonContentType(res *http.Response) bool {
+	contentType := res.Header.Get("Content-Type")
+	return contentType == "application/json"
+}
+
+func hasTextContentType(res *http.Response) bool {
+	contentType := res.Header.Get("Content-Type")
+	return contentType == "text/plain"
 }
 
 // SignRequest modifies headers of an http.Request
