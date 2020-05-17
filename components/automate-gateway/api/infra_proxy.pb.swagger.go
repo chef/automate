@@ -396,12 +396,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -426,18 +428,21 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Client name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1168,39 +1173,29 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Client name."
         },
         "client_name": {
-          "type": "string"
+          "type": "string",
+          "description": "Client name return by Chef Infra Server API."
         },
         "org_name": {
-          "type": "string"
-        },
-        "admin": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "string",
+          "description": "Chef organization name."
         },
         "validator": {
           "type": "boolean",
-          "format": "boolean"
-        },
-        "certificate": {
-          "type": "string"
-        },
-        "public_key": {
-          "type": "string"
-        },
-        "private_key": {
-          "type": "string"
-        },
-        "uri": {
-          "type": "string"
+          "format": "boolean",
+          "description": "Boolean indicates client type is validator or not."
         },
         "json_class": {
-          "type": "string"
+          "type": "string",
+          "description": "Client JSON class."
         },
         "chef_type": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef object type."
         }
       }
     },
@@ -1208,7 +1203,8 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Client name."
         }
       }
     },
@@ -1219,7 +1215,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientListItem"
-          }
+          },
+          "description": "Client list."
         }
       }
     },
