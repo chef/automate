@@ -49,7 +49,7 @@
             Also create owner, editor, and viewer policies for this project.
           </chef-checkbox>
         </div>
-        <div class="dropdown-margin" style="padding-left: 5em;" *ngIf="objectNoun === 'token'">
+        <div class="dropdown-margin" *ngIf="objectNoun === 'token'">
           <app-resource-dropdown
             [resources]="policies"
             [resourcesUpdated]="policiesUpdatedEvent"
