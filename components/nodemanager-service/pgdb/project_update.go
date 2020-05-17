@@ -200,7 +200,6 @@ SELECT
   n.projects_data
 FROM nodes n
 WHERE
-  n.manager = '' AND
   n.id > $1 AND
   n.id < $2
 ORDER BY id asc
