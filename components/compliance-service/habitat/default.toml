@@ -23,3 +23,6 @@ manual_polling_interval = 1440
 workers = 10
 buffer_size = 1000
 remote_inspec_version = "4.12.0"
+
+[profiles]
+install_market_profiles = true
