@@ -49,10 +49,8 @@ export class ChefPhatRadio {
     this.selected.selected = true;
 
     // add keypress listeners to all the child options
-    const theseOptions = this.el.querySelectorAll(`chef-option`);
-    theseOptions
-      .forEach(option => {
-        option.addEventListener('keypress', event => { this.handleKeypress(event); });
+    options.forEach(option => {
+        option.addEventListener('keypress', this.handleKeypress);
         option.setAttribute('tabindex', '0');
       });
   }
@@ -75,7 +73,7 @@ export class ChefPhatRadio {
     return options;
   }
 
-  handleKeypress = (event) => {
+  handleKeypress(event) {
     if (event.key === 'Enter') {
       this.handleClick(event);
     }
