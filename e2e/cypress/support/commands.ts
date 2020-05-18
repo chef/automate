@@ -40,9 +40,10 @@ Cypress.Commands.add('logout', () => {
   return cy.url().should('include', '/dex/auth');
 });
 
-// applyProjectsFilter will deselect any selected projects from the filter,
+// applyProjectsFilter will deselect all projects in the filter,
 // check any projects by NAME (not id) passed -- if any -- and apply any changes.
-// if there are no resulting changes to apply, it will simply click out of the filter.
+// Preferring reliability over "natural" user behavior for this helper, we use forced clicks
+// since the state of the dropdown may differ across the tests where it is called.
 Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
   cy.get('app-projects-filter button#projects-filter-button').click();
 
