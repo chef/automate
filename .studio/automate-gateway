@@ -141,7 +141,7 @@ function send_chef_action_example() {
   tmp_action_json="$(jq --arg event_task "$event_task" \
                         --arg rfc_time "$rfc_time" \
                         --arg event_type "$event_type" \
-                        --arg random_key "$(head -c 100 /dev/urandom | tr -cd 'a-zA-Z')" \
+                        --arg random_key "this_is_surely_not_a_known_key" \
                         '.task = $event_task |
                          .recorded_at = $rfc_time |
                          .entity_type = $event_type |
@@ -340,7 +340,7 @@ function uniqify_chef_run_report() {
      --arg run_uuid "$run_uuid" \
      --arg node_name "$node_name" \
      --arg node_uuid "$node_uuid" \
-     --arg random_key "$(head -c 100 /dev/urandom | tr -cd 'a-zA-Z')" \
+     --arg random_key "this_is_surely_not_a_known_field" \
      '.end_time = $rfc_time |
       .start_time = $rfc_time |
       .entity_uuid = $node_uuid |
