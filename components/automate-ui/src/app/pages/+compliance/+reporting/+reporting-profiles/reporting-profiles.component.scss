@@ -2,7 +2,7 @@
 
 .profiles-list-status-filters {
   display: flex;
-  margin: 35px;
+  margin: 35px 35px 16px;
   align-items: center;
 
   ::ng-deep .filter {
@@ -83,7 +83,7 @@
 }
 
 .reporting-profiles-table {
-  padding: 2em 35px 0;
+  padding: 0 35px;
 
   chef-th,
   chef-td {
