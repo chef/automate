@@ -59,7 +59,7 @@ func (p *postgres) getOrg(ctx context.Context, q querier, orgID string, serverID
 	err := q.QueryRowContext(ctx,
 		`SELECT o.id, o.name, o.admin_user, o.credential_id, o.server_id, o.projects, o.updated_at, o.created_at
 		FROM orgs o
-		WHERE o.id = $1`, orgID).
+		WHERE o.id = $1 AND o.server_id = $2`, orgID, serverID).
 		Scan(&org.ID, &org.Name, &org.AdminUser, &org.CredentialID, &org.ServerID, pq.Array(&org.Projects), &org.CreatedAt, &org.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
@@ -76,8 +76,8 @@ func (p *postgres) DeleteOrg(ctx context.Context, orgID string, serverID string)
 
 	var org storage.Org
 	err = p.db.QueryRowContext(ctx,
-		`DELETE FROM orgs WHERE id = $1 AND projects_match(projects, $2::TEXT[])
-		RETURNING id, name, admin_user, credential_id, server_id, projects, created_at, updated_at`, orgID, pq.Array(projectsFilter)).
+		`DELETE FROM orgs WHERE id = $1 AND server_id = $2 AND projects_match(projects, $3::TEXT[])
+		RETURNING id, name, admin_user, credential_id, server_id, projects, created_at, updated_at`, orgID, serverID, pq.Array(projectsFilter)).
 		Scan(&org.ID, &org.Name, &org.AdminUser, &org.CredentialID, &org.ServerID, pq.Array(&org.Projects), &org.CreatedAt, &org.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
@@ -133,9 +133,9 @@ func (p *postgres) EditOrg(ctx context.Context, id string, name string, adminUse
 	err = tx.QueryRowContext(ctx,
 		`UPDATE orgs
 		SET name = $2, admin_user = $3, projects = $4, updated_at = now()
-		WHERE id = $1 AND projects_match(projects, $5::TEXT[])
+		WHERE id = $1 AND server_id = $5 AND projects_match(projects, $6::TEXT[])
 		RETURNING id, name, admin_user, credential_id, server_id, projects, created_at, updated_at;`,
-		id, name, adminUser, pq.Array(projects), pq.Array(projectsFilter)).
+		id, name, adminUser, pq.Array(projects), serverID, pq.Array(projectsFilter)).
 		Scan(&o.ID, &o.Name, &o.AdminUser, &o.CredentialID, &o.ServerID, pq.Array(&o.Projects), &o.CreatedAt, &o.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
@@ -157,7 +157,7 @@ func (p *postgres) GetOrgs(ctx context.Context, serverID string) ([]storage.Org,
 
 	var orgs []storage.Org
 	rows, err := p.db.QueryContext(ctx,
-		`SELECT o.id, o.name, o.admin_user, o.server_id
+		`SELECT o.id, o.name, o.admin_user, o.credential_id, o.server_id, o.projects
 		FROM orgs o
 		WHERE o.server_id = $1 AND projects_match(o.projects, $2::TEXT[])`,
 		serverID, pq.Array(projectsFilter))
@@ -172,7 +172,7 @@ func (p *postgres) GetOrgs(ctx context.Context, serverID string) ([]storage.Org,
 
 	for rows.Next() {
 		org := storage.Org{}
-		if err := rows.Scan(&org.ID, &org.Name, &org.AdminUser, &org.ServerID); err != nil {
+		if err := rows.Scan(&org.ID, &org.Name, &org.AdminUser, &org.CredentialID, &org.ServerID, pq.Array(&org.Projects)); err != nil {
 			return nil, err // TODO: don't fail it all? handle this more gracefully?
 		}
 		orgs = append(orgs, org)

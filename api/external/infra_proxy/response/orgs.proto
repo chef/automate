@@ -20,23 +20,12 @@ message UpdateOrg {
 
 message GetOrgs {
     // Chef organization list.
-    repeated OrgListItem orgs = 1;
+    repeated Org orgs = 1;
 }
 
 message GetOrg {
     // Chef organization.
     Org org = 1;
-}
-
-message OrgListItem {
-    // Chef organization ID.
-    string id = 1;
-    // Chef organization name.
-    string name = 2;
-    // Chef organization admin user.
-    string admin_user = 3;
-    // Chef Infra Server ID.
-    string server_id = 4;
 }
 
 message Org {

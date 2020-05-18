@@ -210,16 +210,11 @@ func fromStorageOrg(s storage.Org) *response.Org {
 }
 
 // Create a response.OrgsList from an array of storage.Org
-func fromStorageToListOrgs(sl []storage.Org) []*response.OrgListItem {
-	tl := make([]*response.OrgListItem, len(sl))
+func fromStorageToListOrgs(sl []storage.Org) []*response.Org {
+	tl := make([]*response.Org, len(sl))
 
 	for i, org := range sl {
-		tl[i] = &response.OrgListItem{
-			Id:        org.ID,
-			Name:      org.Name,
-			AdminUser: org.AdminUser,
-			ServerId:  org.ServerID,
-		}
+		tl[i] = fromStorageOrg(org)
 	}
 
 	return tl

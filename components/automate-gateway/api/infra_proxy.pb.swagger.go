@@ -1624,7 +1624,7 @@ func init() {
         "orgs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.OrgListItem"
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
           },
           "description": "Chef organization list."
         }
@@ -1746,27 +1746,6 @@ func init() {
             "type": "string"
           },
           "description": "List of projects this chef organization belongs to. May be empty."
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.response.OrgListItem": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Chef organization ID."
-        },
-        "name": {
-          "type": "string",
-          "description": "Chef organization name."
-        },
-        "admin_user": {
-          "type": "string",
-          "description": "Chef organization admin user."
-        },
-        "server_id": {
-          "type": "string",
-          "description": "Chef Infra Server ID."
         }
       }
     },
