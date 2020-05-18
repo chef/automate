@@ -333,6 +333,7 @@ document "load_desktop_reports" <<DOC
   Loads desktop reports.
 DOC
 function load_desktop_reports() {
+  # load some nodes, use an es script to set check in time to a long time ago
   chef_load_nodes 15
   curl -X POST "$ELASTICSEARCH_URL/node-state/_update_by_query?pretty" -H 'Content-Type: application/json' -d'
   {
@@ -342,16 +343,18 @@ function load_desktop_reports() {
   }
   }
   '
-  for file in cat dev-docs/adding-data/sample-reports/desktop-report-{1,2,3}.json; do
-    curl --insecure -H "api-token: $(get_admin_token)" -X POST "https://a2-dev.test/data-collector/v0" -H "Content-Type: application/json" -d "$file"
-  end
+  # send in some chef infra run reports from actual desktops
+  for file in dev-docs/adding-data/sample-reports/desktop-report-{1,2,3}.json; do
+    cat $file | curl --insecure -H "api-token: $(get_admin_token)" -X POST "https://a2-dev.test/data-collector/v0" -H "Content-Type: application/json" -d @-
+  done
+  # send in a bunch of errored infra runs
   for _ in {1..30}; do
     m=$((RANDOM % 4))
     n=$((RANDOM % 10))
     generate_chef_run_failure_example |\
       jq --arg msg "Error $n occurred" \
-        --arg type "Chef::ExampleError$m" \
-        '.error.message = $msg | .error.class = $type' |\
+        --arg errtype "Chef::ExampleError$m" \
+        '.error.message = $msg | .error.class = $errtype' |\
       send_chef_data_raw
   done
 }
