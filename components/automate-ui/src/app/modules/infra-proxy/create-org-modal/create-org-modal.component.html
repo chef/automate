@@ -69,6 +69,12 @@
           </chef-error>
         </chef-form-field>
       </div>
+      <div class="input-margin">
+        <app-projects-dropdown
+          (onDropdownClosing)="onProjectDropdownClosing($event)"
+          [projectsUpdated]="projectsUpdatedEvent">
+        </app-projects-dropdown>
+      </div>
       <div id="button-org">
         <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-org-modal-btn" (click)="createServerOrg()">
           <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>

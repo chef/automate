@@ -101,6 +101,7 @@
               <chef-tr>
                 <chef-th>Name</chef-th>
                 <chef-th>Admin</chef-th>
+                <chef-th >Projects</chef-th>
                 <chef-th class="three-dot-column"></chef-th>
               </chef-tr>
             </chef-thead>
@@ -110,6 +111,11 @@
                   <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'organizations', org.id]">{{ org.name }}</a>
                 </chef-td>
                 <chef-td>{{ org.admin_user }}</chef-td>
+                <chef-td class="projects-column">
+                  <ng-container *ngIf="org.projects.length === 0">{{ unassigned }}</ng-container>
+                  <ng-container *ngIf="org.projects.length === 1">{{ org.projects[0] }}</ng-container>
+                  <ng-container *ngIf="org.projects.length > 1">{{ org.projects.length }} projects</ng-container>
+                </chef-td>
                 <chef-td class="three-dot-column">
                   <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
                     <mat-select panelClass="chef-control-menu" id="menu-{{org.id}}">

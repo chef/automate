@@ -30,6 +30,12 @@
         formControlName="admin_key" data-cy="update-org-admin-key"></textarea>   
       </label>
     </chef-form-field>
+    <chef-form-field id='projects-container'>
+      <app-projects-dropdown
+        [checkedProjectIDs]="org?.projects"
+        (onDropdownClosing)="onProjectDropdownClosing($event)">
+      </app-projects-dropdown>
+    </chef-form-field>
     <chef-form-field>
       <div id="button-bar">
         <chef-button [disabled]="isLoading || !updateOrgForm.valid || !updateOrgForm.dirty" primary

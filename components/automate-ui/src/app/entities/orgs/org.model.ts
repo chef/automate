@@ -4,4 +4,5 @@ export interface Org {
   name: string;
   admin_user: string;
   admin_key: string;
+  projects?: string[];
 }
