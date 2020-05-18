@@ -852,6 +852,8 @@ control 'iam-api-1' do
           ]
         }
 
+        staged_custom_rule = staged(CUSTOM_RULE)
+
         after(:each) do
           resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE[:project_id]}/rules/#{CUSTOM_RULE[:id]}", http_method: 'DELETE')
           expect(resp.http_status.to_s).to match(/200|404/)
@@ -863,11 +865,11 @@ control 'iam-api-1' do
             request_body: CUSTOM_RULE.to_json
           )
           expect(resp.http_status).to eq 200
-          expect(resp.parsed_response_body[:rule]).to eq(staged(CUSTOM_RULE))
+          expect(resp.parsed_response_body[:rule]).to eq(staged_custom_rule)
 
           resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE[:project_id]}/rules/#{CUSTOM_RULE[:id]}")
           expect(resp.http_status).to eq 200
-          expect(resp.parsed_response_body[:rule]).to eq(resp_rule)
+          expect(resp.parsed_response_body[:rule]).to eq(staged_custom_rule)
         end
       end
     end
@@ -917,6 +919,10 @@ control 'iam-api-1' do
           }
         ]
       }
+
+      staged_custom_rule_1 = staged(CUSTOM_RULE_1)
+      staged_custom_rule_2 = staged(CUSTOM_RULE_2)
+      staged_custom_rule_3 = staged(CUSTOM_RULE_3)
 
       before(:all) do
         resp = automate_api_request("/apis/iam/v2/projects",
@@ -979,7 +985,7 @@ control 'iam-api-1' do
       it "GET /iam/v2/projects/:project_id/rules/:id returns a specific rule" do
         resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE_1[:project_id]}/rules/#{CUSTOM_RULE_1[:id]}")
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rule]).to eq(staged(CUSTOM_RULE_1))
+        expect(resp.parsed_response_body[:rule]).to eq(staged_custom_rule_1)
       end
 
       it "GET /iam/v2/projects/:id/rules returns any staged rules and applied rules with no staged changes for the project" do
@@ -995,18 +1001,33 @@ control 'iam-api-1' do
               values: ["brand new server"]
             }
            ]
-         }
+        }
+
+        staged_updated_rule = {
+          id: CUSTOM_RULE_2[:id],
+          name: "updated display name",
+          project_id: CUSTOM_RULE_2[:project_id],
+          type: "EVENT",
+          conditions: [
+            {
+              attribute: "CHEF_SERVER",
+              operator: "EQUALS",
+              values: ["brand new server"]
+            }
+           ],
+           status: 'STAGED'
+        }
 
         resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE_2[:project_id]}/rules/#{CUSTOM_RULE_2[:id]}",
           http_method: 'PUT',
           request_body: updated_rule.to_json
         )
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rule]).to eq(staged(updated_rule))
+        expect(resp.parsed_response_body[:rule]).to eq(staged_updated_rule)
 
         resp = automate_api_request("/apis/iam/v2/projects/#{custom_project_id}/rules")
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rules]).to match_array([staged(CUSTOM_RULE_1), staged(updated_rule)])
+        expect(resp.parsed_response_body[:rules]).to match_array([staged_custom_rule_1, staged_updated_rule])
         expect(resp.parsed_response_body[:status]).to eq("EDITS_PENDING")
       end
 
@@ -1023,18 +1044,33 @@ control 'iam-api-1' do
               values: ["new tag"]
             }
            ]
-         }
+        }
+
+        staged_updated_rule = {
+          id: CUSTOM_RULE_1[:id],
+          name: "updated display name",
+          project_id: CUSTOM_RULE_1[:project_id],
+          type: "NODE",
+          conditions: [
+            {
+              attribute: "CHEF_TAG",
+              operator: "EQUALS",
+              values: ["new tag"]
+            }
+           ],
+           status: 'STAGED'
+        }
 
         resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE_1[:project_id]}/rules/#{CUSTOM_RULE_1[:id]}",
           http_method: 'PUT',
           request_body: updated_rule.to_json
         )
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rule]).to eq(staged(updated_rule))
+        expect(resp.parsed_response_body[:rule]).to eq(staged_updated_rule)
 
         resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE_1[:project_id]}/rules/#{CUSTOM_RULE_1[:id]}")
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rule]).to eq(staged(updated_rule))
+        expect(resp.parsed_response_body[:rule]).to eq(staged_updated_rule)
       end
 
       it "DELETE /iam/v2/projects/:project_id/rules/:id deletes the specific rule" do
