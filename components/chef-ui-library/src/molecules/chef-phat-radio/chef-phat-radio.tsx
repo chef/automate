@@ -50,7 +50,7 @@ export class ChefPhatRadio {
 
     // add keypress listeners to all the child options
     options.forEach(option => {
-        option.addEventListener('keypress', this.handleKeypress);
+        option.addEventListener('keypress', (event) => this.handleKeypress(event));
         option.setAttribute('tabindex', '0');
       });
   }
