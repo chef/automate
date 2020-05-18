@@ -62,7 +62,7 @@ describe('team management', () => {
 
   describe('teams list page', () => {
     const dropdownNameUntilEllipsisLen = 25;
-    const projectDropdown = 'app-team-management app-projects-dropdown ';
+    const projectDropdownPrefix = 'app-team-management app-projects-dropdown';
 
     it('lists system teams', () => {
       cy.get('[data-cy=team-create-button]').contains('Create Team');
@@ -157,9 +157,9 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(unassignedTeam1ID);
 
         // initial state of dropdown
-        cy.get(projectDropdown + '#resources-selected')
+        cy.get(`${projectDropdownPrefix} #resources-selected`)
           .contains(unassigned);
-        cy.get(projectDropdown + '.dropdown-button')
+        cy.get(`${projectDropdownPrefix} .dropdown-button`)
           .should('have.attr', 'disabled');
 
         // save team
@@ -188,21 +188,21 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(teamIDWithSomeProjects);
 
         // initial state of dropdown
-        cy.get(projectDropdown + '#resources-selected').contains(unassigned);
-        cy.get(projectDropdown + '.dropdown-button').should('not.have.attr', 'disabled');
+        cy.get(`${projectDropdownPrefix} #resources-selected`).contains(unassigned);
+        cy.get(`${projectDropdownPrefix} .dropdown-button`).should('not.have.attr', 'disabled');
 
         // open projects dropdown
-        cy.get(projectDropdown + '.dropdown-button').click();
+        cy.get(`${projectDropdownPrefix} .dropdown-button`).click();
 
         // dropdown contains both custom projects, click them both
-        cy.get(projectDropdown + `chef-checkbox[title="${project1Name}"]`)
+        cy.get(`${projectDropdownPrefix} chef-checkbox[title="${project1Name}"]`)
           .should('have.attr', 'aria-checked', 'false').click();
-        cy.get(projectDropdown + `chef-checkbox[title="${project2Name}"]`)
+        cy.get(`${projectDropdownPrefix} chef-checkbox[title="${project2Name}"]`)
           .should('have.attr', 'aria-checked', 'false').click();
 
         // close projects dropdown
-        cy.get(projectDropdown + '.dropdown-button').click();
-        cy.get(projectDropdown + '#resources-selected')
+        cy.get(`${projectDropdownPrefix} .dropdown-button`).click();
+        cy.get(`${projectDropdownPrefix} #resources-selected`)
           .contains(projectSummary);
 
         // save team
@@ -223,21 +223,21 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(teamIDWithOneProject);
 
         // initial state of dropdown
-        cy.get(projectDropdown + '#resources-selected').contains(unassigned);
-        cy.get(projectDropdown + '.dropdown-button').should('not.have.attr', 'disabled');
+        cy.get(`${projectDropdownPrefix} #resources-selected`).contains(unassigned);
+        cy.get(`${projectDropdownPrefix} .dropdown-button`).should('not.have.attr', 'disabled');
 
         // open projects dropdown
-        cy.get(projectDropdown + '.dropdown-button').click();
+        cy.get(`${projectDropdownPrefix} .dropdown-button`).click();
 
         // dropdown contains both custom projects, click one
-        cy.get(projectDropdown + `chef-checkbox[title="${project1Name}"]`)
+        cy.get(`${projectDropdownPrefix} chef-checkbox[title="${project1Name}"]`)
           .should('have.attr', 'aria-checked', 'false');
-        cy.get(projectDropdown + `chef-checkbox[title="${project2Name}"]`)
+        cy.get(`${projectDropdownPrefix} chef-checkbox[title="${project2Name}"]`)
           .should('have.attr', 'aria-checked', 'false').click();
 
         // close projects dropdown
-        cy.get(projectDropdown + '.dropdown-button').click();
-        cy.get(projectDropdown + '#resources-selected')
+        cy.get(`${projectDropdownPrefix} .dropdown-button`).click();
+        cy.get(`${projectDropdownPrefix} #resources-selected`)
           .contains(`${project2Name.substring(0, dropdownNameUntilEllipsisLen)}...`);
 
         // save team
@@ -260,16 +260,16 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(unassignedTeam2ID);
 
         // initial state of dropdown
-        cy.get(projectDropdown + '#resources-selected').contains(unassigned);
-        cy.get(projectDropdown + '.dropdown-button').should('not.have.attr', 'disabled');
+        cy.get(`${projectDropdownPrefix} #resources-selected`).contains(unassigned);
+        cy.get(`${projectDropdownPrefix} .dropdown-button`).should('not.have.attr', 'disabled');
 
         // open projects dropdown
-        cy.get(projectDropdown + '.dropdown-button').click();
+        cy.get(`${projectDropdownPrefix} .dropdown-button`).click();
 
         // dropdown contains both custom projects, none clicked
-        cy.get(projectDropdown + `chef-checkbox[title="${project1Name}"]`)
+        cy.get(`${projectDropdownPrefix} chef-checkbox[title="${project1Name}"]`)
           .should('have.attr', 'aria-checked', 'false');
-        cy.get(projectDropdown + `chef-checkbox[title="${project2Name}"]`)
+        cy.get(`${projectDropdownPrefix} chef-checkbox[title="${project2Name}"]`)
           .should('have.attr', 'aria-checked', 'false');
 
         // close projects dropdown
