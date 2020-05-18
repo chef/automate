@@ -2119,7 +2119,7 @@
                                 "itchannel"
                             ],
                             "itchannel": {
-                                "url": "https://hooks.slack.com/services/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"
+                                "url": "https://some-url"
                             }
                         },
                         "timeout": 15,
