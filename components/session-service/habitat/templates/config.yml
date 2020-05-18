@@ -26,6 +26,7 @@ log-level: {{ cfg.conf.logger.level }}
 log-format: {{ cfg.conf.logger.format }}
 database: {{ cfg.conf.storage.database }}
 migrations-path: {{ cfg.pkg_path }}/migrations
+persistent: {{ cfg.conf.service.persistent }}
 
 tls:
   cert_path: {{svc_config_path}}/service.crt

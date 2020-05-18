@@ -37,6 +37,8 @@ message ConfigRequest {
 				google.protobuf.StringValue bldr_signin_url = 5;
 				google.protobuf.StringValue bldr_client_id = 6;
 				google.protobuf.StringValue bldr_client_secret = 7;
+
+				google.protobuf.BoolValue persistent = 8;
 			}
 
 			message Oidc {

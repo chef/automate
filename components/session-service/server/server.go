@@ -77,7 +77,8 @@ func New(
 	oidcCfg oidc.Config,
 	bldrClient *BldrClient,
 	signInURL *url.URL,
-	serviceCerts *certs.ServiceCerts) (*Server, error) {
+	serviceCerts *certs.ServiceCerts,
+	persistent bool) (*Server, error) {
 
 	oidcClient, err := oidc.New(oidcCfg, 1, serviceCerts, l)
 	if err != nil {
@@ -93,7 +94,7 @@ func New(
 		return nil, errors.Wrap(err, "init store")
 	}
 
-	scsManager := createSCSManager(store)
+	scsManager := createSCSManager(store, persistent)
 
 	s := Server{
 		log:               l,
@@ -118,14 +119,15 @@ func NewInMemory(
 	oidcCfg oidc.Config,
 	signInURL *url.URL,
 	bldrClient *BldrClient,
-	serviceCerts *certs.ServiceCerts) (*Server, error) {
+	serviceCerts *certs.ServiceCerts,
+	persistent bool) (*Server, error) {
 
 	oidcClient, err := oidc.New(oidcCfg, 0, serviceCerts, l)
 	if err != nil {
 		return nil, errors.Wrap(err, "OIDC client")
 	}
 
-	scsManager := createSCSManager(memstore.New(time.Hour))
+	scsManager := createSCSManager(memstore.New(time.Hour), persistent)
 
 	s := Server{
 		log:               l,
@@ -672,9 +674,11 @@ func generateRelayState() (string, error) {
 	return base64.URLEncoding.EncodeToString(bs), nil
 }
 
-func createSCSManager(store scs.Store) *scs.Manager {
+func createSCSManager(store scs.Store, persistent bool) *scs.Manager {
 	manager := scs.NewManager(store)
-	manager.Persist(true)
+	if persistent {
+		manager.Persist(true)
+	}
 	manager.Secure(true)
 
 	return manager
