@@ -13,6 +13,10 @@
       display: none;
     }
 
+    &:last-child {
+      margin-right: 0;
+    }
+
     .option-content {
       display: flex;
       padding: 0;
