@@ -34,7 +34,7 @@ var conf = config.Compliance{
 		TmpDir:              os.Getenv("TMPDIR"),
 		ResultMessageLimit:  10000,
 		ControlResultsLimit: 50,
-		RunTimeLimit:        1.0,
+		RunTimeLimit:        1.0, // Value in seconds
 	},
 	ElasticSearch: config.ElasticSearch{},
 	ElasticSearchSidecar: config.ElasticSearchSidecar{
@@ -125,7 +125,7 @@ func init() {
 	runCmd.Flags().StringVar(&conf.InspecAgent.RemoteInspecVersion, "remote-inspec-version", conf.InspecAgent.RemoteInspecVersion, "Option to specify the version of inspec to use for remote(e.g. AWS SSM) scan jobs")
 	runCmd.Flags().IntVar(&conf.InspecAgent.ResultMessageLimit, "result-message-limit", conf.InspecAgent.ResultMessageLimit, "A control result message that exceeds this character limit will be truncated")
 	runCmd.Flags().IntVar(&conf.InspecAgent.ControlResultsLimit, "control-results-limit", conf.InspecAgent.ControlResultsLimit, "The array of results per control will be truncated at this limit to avoid large reports that cannot be processed")
-	runCmd.Flags().Float32Var(&conf.InspecAgent.RunTimeLimit, "run-time-limit", conf.InspecAgent.RunTimeLimit, "Control results that have a `run_time` below this limit will be stripped of the `start_time` and `run_time` fields")
+	runCmd.Flags().Float32Var(&conf.InspecAgent.RunTimeLimit, "run-time-limit", conf.InspecAgent.RunTimeLimit, "Control results that have a `run_time` (in seconds) below this limit will be stripped of the `start_time` and `run_time` fields")
 
 	// Legacy Automate Headers/User Info
 	runCmd.Flags().StringVar(&conf.Delivery.Enterprise, "delivery-ent", conf.Delivery.Enterprise, "Automate Enterprise")
