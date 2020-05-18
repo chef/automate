@@ -71,7 +71,7 @@ steps:
   - label: "[integration] chef server backup"
     command:
       - integration/run_test integration/tests/chef_server_backup.sh
-    timeout_in_minutes: 30 # longer timeout for chef-server
+    timeout_in_minutes: 40 # longer timeout for chef-server
     expeditor:
       executor:
         linux:
