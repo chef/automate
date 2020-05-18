@@ -246,22 +246,20 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     // are filtered out via those status filters we have a special state that
     // says, e.g., "none of the services returned warning" that we want to
     // show.
-    this.store.select(serviceGroupsStatus).subscribe((sgStatus) => {
-      if (sgStatus === 'loadingSuccess') {
-        this.store.select(selectedServiceGroupStatus).subscribe((sSgStatus) => {
-          if (sSgStatus === 'loadingSuccess') {
-            this.serviceGroupsList$.subscribe((serviceGroups) => {
-              if (serviceGroups.length > 0) {
-                this.store.select(selectedServiceGroupHealth).subscribe((sgHealth) => {
-                  if (sgHealth.total === 0) {
-                    this.onServiceGroupSelect(null, serviceGroups[0].id);
-                  }
-                });
-              }
-            });
-          }
-        });
-      }
+    this.store.select(selectedServiceGroupStatus).subscribe((sSgStatus) => {
+      this.store.select(serviceGroupsStatus).subscribe((sgStatus) => {
+        if (sgStatus === 'loadingSuccess' && sSgStatus === 'loadingSuccess') {
+          this.serviceGroupsList$.subscribe((serviceGroups) => {
+            if (serviceGroups.length > 0) {
+              this.store.select(selectedServiceGroupHealth).subscribe((sgHealth) => {
+                if (sgHealth.total === 0) {
+                  this.onServiceGroupSelect(null, serviceGroups[0].id);
+                }
+              });
+            }
+          });
+        }
+      });
     });
 
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupsState,

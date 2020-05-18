@@ -53,7 +53,7 @@
         </chef-option>
       </chef-status-filter-group>
     </div>
-    <ul>
+    <ul *ngIf="(services$ | async)?.length > 0">
       <li class="service-item" *ngFor="let service of services$ | async; let i = index">
         <div class="header">
           <div class ="fqdn-line"><chef-icon>storage</chef-icon> <p class="fqdn-data">{{ service.fqdn || "--"}}</p></div>
