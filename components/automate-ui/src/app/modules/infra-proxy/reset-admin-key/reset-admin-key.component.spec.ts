@@ -15,7 +15,9 @@ describe('ResetAdminKeyComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-heading' }),
+        MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-page-header' }),
@@ -43,7 +45,8 @@ describe('ResetAdminKeyComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('resets  admin_key to empty string', () => {
+    component.saveSuccessful = true;
+    expect(component.resetKeyForm.controls['admin_key'].value).toEqual('');
   });
 });

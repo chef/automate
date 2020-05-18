@@ -79,7 +79,7 @@ var a2Config = config{
 		{regex: `components/automate-deployment/testdata/hab_responses/all_up.json`},
 		{regex: `components/automate-deployment/tools/upgrade-test-scaffold/upgrade-test-scaffold.go`},
 		{regex: `components/automate-ui/src/app/pages/\+compliance/\+credentials/components/credentials-form.html`},
-		{regex: `components/automate-ui/src/app/modules/infra-proxy/org-details/org-details.component.html`},
+		{regex: `components/automate-ui/src/app/modules/infra-proxy/reset-admin-key/reset-admin-key.component.html`},
 		{regex: `components/automate-ui/src/app/modules/infra-proxy/create-org-modal/create-org-modal.component.html`},
 		{regex: `components/automate-ui/src/app/modules/infra-proxy/org-edit/org-edit.component.html`},
 		{regex: `components/automate-minio/habitat/config/private.key`},
