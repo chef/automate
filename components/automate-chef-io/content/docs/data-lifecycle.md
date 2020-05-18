@@ -175,7 +175,7 @@ Configure the jobs by sending the JSON payload to the `config` endpoint.
 
 {{% info %}}
 The data sent to the `config` endpoint intentionally follows a different format than the data returned from the `status` endpoint.
-You cannot read the data on the `status` endpoint, change some values, and feed it back on the `config` endpoint.
+You cannot read the data on the `status` endpoint, change some values, and feed the modified data back on the `config` endpoint.
 {{% /info %}}
 
 Save the JSON file as `config.json` in the current working directory:
