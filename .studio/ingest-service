@@ -345,6 +345,7 @@ function load_desktop_reports() {
   '
   # send in some chef infra run reports from actual desktops
   for file in dev-docs/adding-data/sample-reports/desktop-report-{1,2,3}.json; do
+    # shellcheck disable=SC2002
     cat $file | curl --insecure -H "api-token: $(get_admin_token)" -X POST "https://a2-dev.test/data-collector/v0" -H "Content-Type: application/json" -d @-
   done
   # send in a bunch of errored infra runs
