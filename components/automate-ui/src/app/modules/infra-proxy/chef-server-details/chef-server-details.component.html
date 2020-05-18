@@ -36,7 +36,7 @@
       </app-create-org-modal>
       <app-delete-object-modal
         [visible]="deleteModalVisible"
-        objectNoun="org"
+        objectNoun="organization"
         [objectName]="orgToDelete?.name"
         (close)="closeDeleteModal()"
         (deleteClicked)="deleteOrg()"
@@ -113,7 +113,7 @@
                 <chef-td class="three-dot-column">
                   <!-- <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{id}', 'delete', [server?.id, org.id]]"> -->
                     <mat-select panelClass="chef-control-menu" id="menu-{{org.id}}">
-                    <mat-option data-cy="delete" (onSelectionChange)="startOrgDelete($event, org)">Delete Org</mat-option>
+                    <mat-option data-cy="delete" (onSelectionChange)="startOrgDelete($event, org)">Delete Organization</mat-option>
                     </mat-select>
                   <!-- </app-authorized> -->
                 </chef-td>
