@@ -3,7 +3,7 @@
 # license: All rights reserved
 
 # This test suite is meant to verify APIs return 403 or not, given legacy policy permissions.
-# Please don't test for API behavior beyond that; 
+# Please don't test for API behavior beyond that;
 # only for whether the invoker is authorized or not to make the call.
 
 require_relative '../../constants'
@@ -14,7 +14,7 @@ NON_ADMIN_USERNAME = 'inspec_test_non_admin'
 
 control 'iam-legacy-access-control-1' do
   title 'IAM access control with legacy policies'
-  desc 'Verify proper access for both admin and users who are not members of any policies. 
+  desc 'Verify proper access for both admin and users who are not members of any policies.
   V1 Legacy policies gave all users default permissions to most APIs, besides the IAM APIs.'
 
   describe 'IAM access control with migrated legacy policies' do
@@ -69,9 +69,9 @@ control 'iam-legacy-access-control-1' do
       legacy_policy_ids = legacy_policies.map { |p| p[:id] }
 
       expected_policies = [
-        "events-access-legacy", 
-        "ingest-access-legacy", 
-        "nodes-access-legacy", 
+        "events-access-legacy",
+        "ingest-access-legacy",
+        "nodes-access-legacy",
         "node-managers-access-legacy",
         "secrets-access-legacy",
         "compliance-profile-access-legacy",
@@ -177,6 +177,7 @@ control 'iam-legacy-access-control-1' do
                 http_method: 'PUT',
                 user: user,
                 request_body: test_object.to_json,
+                request_headers: { 'Content-Type': 'application/json+lax' } # we're messy with the payloads here
               ).http_status.to_s == url + ":PUT:403"
             ).to be(expect_403_response)
           end
@@ -203,9 +204,9 @@ control 'iam-legacy-access-control-1' do
         let(:failure_test_id) { 'does-not-exist' }
         let(:test_object) do
           {
-            'id': "inspec_test_team-#{TIMESTAMP}",
-            'name': 'This team was created by inspec tests. DELETE ME.',
-            'projects': []
+            id: "inspec_test_team-#{TIMESTAMP}",
+            name: 'This team was created by inspec tests. DELETE ME.',
+            projects: []
           }
         end
 
@@ -247,9 +248,9 @@ control 'iam-legacy-access-control-1' do
         let(:test_id) { "inspec_test_user-#{TIMESTAMP}" }
         let(:test_object) do
           {
-            'name': test_id,
-            'id': test_id,
-            'password': 'chefautomate',
+            name: test_id,
+            id: test_id,
+            password: 'chefautomate',
           }
         end
 
@@ -264,9 +265,9 @@ control 'iam-legacy-access-control-1' do
         let(:failure_test_id) { 'does-not-exist' }
         let(:test_object) do
           {
-            'id': "inspec_test_token_2-#{TIMESTAMP}",
-            'name': 'This token was created by inspec tests. DELETE ME.',
-            'projects': []
+            id: "inspec_test_token_2-#{TIMESTAMP}",
+            name: 'This token was created by inspec tests. DELETE ME.',
+            projects: []
           }
         end
 
@@ -281,17 +282,17 @@ control 'iam-legacy-access-control-1' do
         let(:failure_test_id) { 'does-not-exist' }
         let(:test_object) do
           {
-            'id': "inspec_test_policy-#{TIMESTAMP}",
-            'name': 'This policy was created by inspec tests. DELETE ME.',
-            "members": ["user:local:inspec", "team:local:inspec"],
-            "statements": [
+            id: "inspec_test_policy-#{TIMESTAMP}",
+            name: 'This policy was created by inspec tests. DELETE ME.',
+            members: ['user:local:inspec', 'team:local:inspec'],
+            statements: [
               {
-                "effect": "ALLOW",
-                "actions": ["do:some:thing"],
-                "projects": ["*"]
+                effect: 'ALLOW',
+                actions: ['do:some:thing'],
+                projects: ['*']
               }
             ],
-            'projects': []
+            projects: []
           }
         end
 
@@ -306,10 +307,10 @@ control 'iam-legacy-access-control-1' do
         let(:failure_test_id) { 'does-not-exist' }
         let(:test_object) do
           {
-            'id': "inspec_test_role-#{TIMESTAMP}",
-            'name': 'This role was created by inspec tests. DELETE ME.',
-            'actions': ['do:a:thing'],
-            'projects': []
+            id: "inspec_test_role-#{TIMESTAMP}",
+            name: 'This role was created by inspec tests. DELETE ME.',
+            actions: ['do:a:thing'],
+            projects: []
           }
         end
 
@@ -324,9 +325,9 @@ control 'iam-legacy-access-control-1' do
         let(:failure_test_id) { 'does-not-exist' }
         let(:test_object) do
           {
-            'id': "inspec_test_project-#{TIMESTAMP}",
-            'name': 'This project was created by inspec tests. DELETE ME.',
-            'skip_policies': true
+            id: "inspec_test_project-#{TIMESTAMP}",
+            name: 'This project was created by inspec tests. DELETE ME.',
+            skip_policies: true
           }
         end
 
@@ -341,11 +342,12 @@ control 'iam-legacy-access-control-1' do
         let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
         let(:failure_test_id) { 'does-not-exist' }
         let(:test_object) do
-          { "rule": {
-              "name": "test!!!",
-              "event": "CCRFailure",
-              "SlackAlert": {
-                "url": "http://testing"
+          {
+            rule: {
+              name: 'test!!!',
+              event: 'CCRFailure',
+              SlackAlert: {
+                url: 'http://testing'
                 }
               }
             }
@@ -415,7 +417,7 @@ control 'iam-legacy-access-control-1' do
             request_body: {}
           )
           # to save time on this test we don't post any data
-          # this results int a bad request 
+          # this results int a bad request
           # but we only care that it doesn't get a 403
           expect(node_request.http_status).to eq 400
 

@@ -20,7 +20,7 @@ control 'iam-api-1' do
   TEAM_ID = "inspec-team-#{TIMESTAMP}"
   POLICY_ID = "inspec-custom-policy-#{TIMESTAMP}"
   ROLE_ID = "inspec-custom-role-#{TIMESTAMP}"
-  
+
   describe "tokens API" do
 
     project_id = "inspec-token-project-#{TIMESTAMP}"
@@ -121,7 +121,7 @@ control 'iam-api-1' do
           id: TOKEN_ID_3,
           name: TOKEN_ID_3
         }.to_json
-      ) 
+      )
       expect(resp.http_status).to eq 200
     end
 
@@ -136,7 +136,7 @@ control 'iam-api-1' do
           }.to_json
       )
       expect(response.http_status).to eq 409
-    end 
+    end
 
     it "LIST tokens returns list of tokens" do
       resp = automate_api_request("/apis/iam/v2/tokens")
@@ -411,7 +411,6 @@ control 'iam-api-1' do
             request_body: {
               name: updatedName,
               password: "newpassword",
-              previous_password: "wrongagain"
             }.to_json
           )
           expect(resp.http_status).to eq 404
@@ -496,7 +495,7 @@ control 'iam-api-1' do
           }.to_json
       )
       expect(response.http_status).to eq 409
-    end 
+    end
 
     it "GET team responds properly to happy path inputs" do
       resp = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}")
@@ -595,7 +594,7 @@ control 'iam-api-1' do
         response = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}")
         expect(response.http_status).to eq 404
 
-        response = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}", 
+        response = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}",
           http_method: 'PUT',
           request_body: {
             name: "updated inspec team",
@@ -650,7 +649,7 @@ control 'iam-api-1' do
           }.to_json
       )
       expect(response.http_status).to eq 409
-    end 
+    end
 
     it "LIST roles responds properly" do
       resp = automate_api_request("/apis/iam/v2/roles")
@@ -687,7 +686,7 @@ control 'iam-api-1' do
         response = automate_api_request("/apis/iam/v2/roles/#{ROLE_ID}")
         expect(response.http_status).to eq 404
 
-        response = automate_api_request("/apis/iam/v2/roles/#{ROLE_ID}", 
+        response = automate_api_request("/apis/iam/v2/roles/#{ROLE_ID}",
           http_method: 'PUT',
           request_body: {
             name: "updated inspec role",
@@ -775,6 +774,13 @@ control 'iam-api-1' do
   end
 
   describe "project rules API" do
+
+    def staged(rule)
+      resp_rule = rule.clone
+      resp_rule[:status] = 'STAGED'
+      resp_rule
+    end
+
     context "when the project does not exist" do
       describe "GET /iam/v2/projects/:id/rules" do
         it "returns Not Found" do
@@ -843,9 +849,10 @@ control 'iam-api-1' do
               operator: "MEMBER_OF",
               values: ["tag1", "tag2"]
             }
-          ],
-          status: "STAGED"
+          ]
         }
+
+        staged_custom_rule = staged(CUSTOM_RULE)
 
         after(:each) do
           resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE[:project_id]}/rules/#{CUSTOM_RULE[:id]}", http_method: 'DELETE')
@@ -858,11 +865,11 @@ control 'iam-api-1' do
             request_body: CUSTOM_RULE.to_json
           )
           expect(resp.http_status).to eq 200
-          expect(resp.parsed_response_body[:rule]).to eq(CUSTOM_RULE)
+          expect(resp.parsed_response_body[:rule]).to eq(staged_custom_rule)
 
           resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE[:project_id]}/rules/#{CUSTOM_RULE[:id]}")
           expect(resp.http_status).to eq 200
-          expect(resp.parsed_response_body[:rule]).to eq(CUSTOM_RULE)
+          expect(resp.parsed_response_body[:rule]).to eq(staged_custom_rule)
         end
       end
     end
@@ -882,8 +889,7 @@ control 'iam-api-1' do
             operator: "MEMBER_OF",
             values: ["tag1", "tag2"]
           }
-        ],
-        status: "STAGED"
+        ]
       }
 
       CUSTOM_RULE_2 = {
@@ -897,8 +903,7 @@ control 'iam-api-1' do
             operator: "EQUALS",
             values: ["server1"]
           }
-        ],
-        status: "STAGED"
+        ]
       }
 
       CUSTOM_RULE_3 = {
@@ -912,9 +917,12 @@ control 'iam-api-1' do
             operator: "EQUALS",
             values: ["org1"]
           }
-        ],
-        status: "STAGED"
+        ]
       }
+
+      staged_custom_rule_1 = staged(CUSTOM_RULE_1)
+      staged_custom_rule_2 = staged(CUSTOM_RULE_2)
+      staged_custom_rule_3 = staged(CUSTOM_RULE_3)
 
       before(:all) do
         resp = automate_api_request("/apis/iam/v2/projects",
@@ -977,7 +985,7 @@ control 'iam-api-1' do
       it "GET /iam/v2/projects/:project_id/rules/:id returns a specific rule" do
         resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE_1[:project_id]}/rules/#{CUSTOM_RULE_1[:id]}")
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rule]).to eq(CUSTOM_RULE_1)
+        expect(resp.parsed_response_body[:rule]).to eq(staged_custom_rule_1)
       end
 
       it "GET /iam/v2/projects/:id/rules returns any staged rules and applied rules with no staged changes for the project" do
@@ -992,20 +1000,34 @@ control 'iam-api-1' do
               operator: "EQUALS",
               values: ["brand new server"]
             }
+           ]
+        }
+
+        staged_updated_rule = {
+          id: CUSTOM_RULE_2[:id],
+          name: "updated display name",
+          project_id: CUSTOM_RULE_2[:project_id],
+          type: "EVENT",
+          conditions: [
+            {
+              attribute: "CHEF_SERVER",
+              operator: "EQUALS",
+              values: ["brand new server"]
+            }
            ],
-           status: "STAGED"
-         }
+           status: 'STAGED'
+        }
 
         resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE_2[:project_id]}/rules/#{CUSTOM_RULE_2[:id]}",
           http_method: 'PUT',
           request_body: updated_rule.to_json
         )
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rule]).to eq(updated_rule)
+        expect(resp.parsed_response_body[:rule]).to eq(staged_updated_rule)
 
         resp = automate_api_request("/apis/iam/v2/projects/#{custom_project_id}/rules")
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rules]).to match_array([CUSTOM_RULE_1, updated_rule])
+        expect(resp.parsed_response_body[:rules]).to match_array([staged_custom_rule_1, staged_updated_rule])
         expect(resp.parsed_response_body[:status]).to eq("EDITS_PENDING")
       end
 
@@ -1021,20 +1043,34 @@ control 'iam-api-1' do
               operator: "EQUALS",
               values: ["new tag"]
             }
+           ]
+        }
+
+        staged_updated_rule = {
+          id: CUSTOM_RULE_1[:id],
+          name: "updated display name",
+          project_id: CUSTOM_RULE_1[:project_id],
+          type: "NODE",
+          conditions: [
+            {
+              attribute: "CHEF_TAG",
+              operator: "EQUALS",
+              values: ["new tag"]
+            }
            ],
-           status: "STAGED"
-         }
+           status: 'STAGED'
+        }
 
         resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE_1[:project_id]}/rules/#{CUSTOM_RULE_1[:id]}",
           http_method: 'PUT',
           request_body: updated_rule.to_json
         )
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rule]).to eq(updated_rule)
+        expect(resp.parsed_response_body[:rule]).to eq(staged_updated_rule)
 
         resp = automate_api_request("/apis/iam/v2/projects/#{CUSTOM_RULE_1[:project_id]}/rules/#{CUSTOM_RULE_1[:id]}")
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rule]).to eq(updated_rule)
+        expect(resp.parsed_response_body[:rule]).to eq(staged_updated_rule)
       end
 
       it "DELETE /iam/v2/projects/:project_id/rules/:id deletes the specific rule" do
@@ -1092,31 +1128,31 @@ control 'iam-api-1' do
       expect(resp.http_status).to eq 200
     end
 
-    describe 'list default policies' do 
+    describe 'list default policies' do
       it 'includes the IAM v2 default policies' do
         resp = automate_api_request('/apis/iam/v2/policies')
         expect(resp.http_status).to eq 200
-  
+
         policy_ids = resp.parsed_response_body[:policies].map { |u| u[:id] }
         expect(policy_ids).to include("administrator-access")
         expect(policy_ids).to include("ingest-access")
         expect(policy_ids).to include("editor-access")
         expect(policy_ids).to include("viewer-access")
       end
-  
+
       it 'the editors default policy includes editor team' do
         resp = automate_api_request('/apis/iam/v2/policies')
         expect(resp.http_status).to eq 200
-  
+
         all_policies = resp.parsed_response_body[:policies]
         policies = all_policies.select{ |p| /^team:local:editors$/.match(p[:members][0]) }
         expect(policies.length).to eq 1
       end
-  
+
       it 'the viewers default policy includes viewer team' do
         resp = automate_api_request('/apis/iam/v2/policies')
         expect(resp.http_status).to eq 200
-  
+
         all_policies = resp.parsed_response_body[:policies]
         policies = all_policies.select{ |p| /^team:local:viewers$/.match(p[:members][0]) }
         expect(policies.length).to eq 1

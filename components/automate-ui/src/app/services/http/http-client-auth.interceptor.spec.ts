@@ -35,6 +35,16 @@ describe('HttpClientAuthInterceptor', () => {
         .toEqual(`Bearer ${chefSession.id_token}`);
     });
 
+    it('sets the lax API header all requests', done => {
+      httpClient.get('/endpoint').subscribe(done);
+
+      const httpRequest = httpMock.expectOne('/endpoint');
+      httpRequest.flush('response');
+
+      expect(httpRequest.request.headers.get('Content-Type'))
+        .toEqual('application/json+lax');
+    });
+
     it('when a 401 response is intercepted logs out the session', done => {
       spyOn(chefSession, 'logout');
       httpClient.get('/endpoint').subscribe({ error: done });

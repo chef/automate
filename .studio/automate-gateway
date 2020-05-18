@@ -138,8 +138,14 @@ function send_chef_action_example() {
   rfc_time=$(date --rfc-3339=seconds  -d "$((RANDOM % 144)) hour ago" | sed 's/ /T/' | sed 's/\+.*/Z/')
 
   # Update the 'recorded_at' time from the ChefAction Example; and set entity_type and task
-  tmp_action_json="$(jq --arg event_task "$event_task" --arg rfc_time "$rfc_time" --arg event_type "$event_type" \
-    '.task = $event_task | .recorded_at = $rfc_time | .entity_type = $event_type' < $examples_path/chef_action.json)"
+  tmp_action_json="$(jq --arg event_task "$event_task" \
+                        --arg rfc_time "$rfc_time" \
+                        --arg event_type "$event_type" \
+                        --arg random_key "this_is_surely_not_a_known_key" \
+                        '.task = $event_task |
+                         .recorded_at = $rfc_time |
+                         .entity_type = $event_type |
+                         .[$random_key] = "foo"' < $examples_path/chef_action.json)"
 
   # note: this needs to be fed in via stdin, as passing it in as --data "$tmp_action_json"
   # will exceed argmax
@@ -329,12 +335,19 @@ function uniqify_chef_run_report() {
 
   local examples_path="/src/components/ingest-service/examples"
 
-  # Update the IDs, names, and dates
+  # Update the IDs, names, and dates, and some random field
   jq --arg rfc_time "$rfc_time" \
      --arg run_uuid "$run_uuid" \
      --arg node_name "$node_name" \
      --arg node_uuid "$node_uuid" \
-     '.end_time = $rfc_time | .start_time = $rfc_time | .entity_uuid = $node_uuid | .id = $run_uuid | .run_id = $run_uuid | .node_name = $node_name'
+     --arg random_key "this_is_surely_not_a_known_field" \
+     '.end_time = $rfc_time |
+      .start_time = $rfc_time |
+      .entity_uuid = $node_uuid |
+      .id = $run_uuid |
+      .run_id = $run_uuid |
+      .node_name = $node_name |
+      .[$random_key] = "foo"'
 }
 
 document "delete_multiple_nodes" <<DOC

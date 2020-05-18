@@ -369,7 +369,7 @@ func init() {
         },
         "type": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType",
-          "description": "Whether the rule is ` + "`" + `STAGED` + "`" + ` (not in effect) or ` + "`" + `APPLIED` + "`" + ` (in effect)."
+          "description": "Whether the rule affects nodes (` + "`" + `NODE` + "`" + `) or events (` + "`" + `EVENT` + "`" + `)."
         },
         "conditions": {
           "type": "array",
@@ -583,7 +583,7 @@ func init() {
         },
         "type": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType",
-          "description": "Whether the rule applies to ingested ` + "`" + `NODE` + "`" + ` or ` + "`" + `EVENT resources.\nCannot be changed."
+          "description": "Whether the rule applies to ingested ` + "`" + `NODE` + "`" + ` or ` + "`" + `EVENT` + "`" + ` resources.\nCannot be changed."
         },
         "conditions": {
           "type": "array",

@@ -29,7 +29,7 @@ type CreateRuleReq struct {
 	ProjectId string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	// Name for the project rule.
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	// Whether the rule is `STAGED` (not in effect) or `APPLIED` (in effect).
+	// Whether the rule affects nodes (`NODE`) or events (`EVENT`).
 	Type common.RuleType `protobuf:"varint,4,opt,name=type,proto3,enum=chef.automate.api.iam.v2.RuleType" json:"type,omitempty"`
 	// Conditions that ingested resources must match to belong to the project.
 	// Will contain one or more.
@@ -106,7 +106,7 @@ type UpdateRuleReq struct {
 	ProjectId string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	// Name for the project rule.
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	// Whether the rule applies to ingested `NODE` or `EVENT resources.
+	// Whether the rule applies to ingested `NODE` or `EVENT` resources.
 	// Cannot be changed.
 	Type common.RuleType `protobuf:"varint,4,opt,name=type,proto3,enum=chef.automate.api.iam.v2.RuleType" json:"type,omitempty"`
 	// Conditions that ingested resources must match to belong to the project.

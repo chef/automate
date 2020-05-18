@@ -35,6 +35,11 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
     //           Right now, we're throwing the ID token across the internet for telemetry,
     //           where it's not needed. It would be nice to _not_ do that.
     let headers = request.headers.set('Authorization', `Bearer ${this.chefSession.id_token}`);
+    // TODO(sr): Sadly, our UI code depends on the API ignoring unknown fields in the
+    //           request payloads in many places. We should not send any of those. But
+    //           Fixing that blows the scope of my little API validation adventure, so
+    //           we take a shortcut: ask the API not to be too strict on us.
+    headers = headers.set('Content-Type', 'application/json+lax');
     // Check and then remove `unfiltered` param; it is a piggybacked parameter
     // needed by this interceptor, not to be passed on.
     // It allows certain URLs to suppress sending the projects filter.

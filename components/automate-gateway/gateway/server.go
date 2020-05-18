@@ -375,6 +375,10 @@ func (s *Server) startHTTPServer() error {
 	//     authRequest); or needs to ensure that it's not part of the public API (by choosing a
 	//     prefix that isn't forward by automate-load-balancer, i.e. not /apis/ or /api/).
 
+	// opt-out of strict input validation, effectively allowing for unknown fields present in
+	// request payloads
+	mux.Handle("/api/v0/ingest/events/chef/", prettifier(laxValidation(v0Mux)))
+
 	// custom mux route for data-collector
 	// Note: automate-load-balancer rewrites
 	//   /data-collector/v0(.*) => /api/v0/events/data-collector
@@ -531,5 +535,12 @@ func prettifier(h http.Handler) http.Handler {
 		if _, ok := r.URL.Query()["pretty"]; ok {
 			r.Header.Set("Accept", "application/json+pretty")
 		}
+	})
+}
+
+func laxValidation(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Set("Content-Type", "application/json+lax")
+		h.ServeHTTP(w, r)
 	})
 }

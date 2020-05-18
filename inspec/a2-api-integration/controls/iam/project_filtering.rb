@@ -18,22 +18,19 @@ control 'iam-project-filtering-1' do
           id: CUSTOM_ROLE_ID_1,
           name: "Test Role 1",
           actions: ["test:some:action", "test:other:action"],
-          projects: [CUSTOM_PROJECT_ID_1, CUSTOM_PROJECT_ID_2],
-          type: "CUSTOM"
+          projects: [CUSTOM_PROJECT_ID_1, CUSTOM_PROJECT_ID_2]
   }
   CUSTOM_ROLE_2 = {
           id: CUSTOM_ROLE_ID_2,
           name: "Test Role 2",
           actions: ["test:other:action"],
-          projects: [CUSTOM_PROJECT_ID_2],
-          type: "CUSTOM"
+          projects: [CUSTOM_PROJECT_ID_2]
   }
   CUSTOM_ROLE_3 = {
           id: CUSTOM_ROLE_ID_3,
           name: "Test Role 2",
           actions: ["test:other:action"],
-          projects: [],
-          type: "CUSTOM"
+          projects: []
   }
 
   CUSTOM_ROLES = [ CUSTOM_ROLE_1, CUSTOM_ROLE_2, CUSTOM_ROLE_3 ]
@@ -207,9 +204,10 @@ control 'iam-project-filtering-1' do
 
       describe 'ListRoles' do
 
-        it 'returns roles for allowed projects' do resp = automate_api_request(
+        it 'returns roles for allowed projects' do
+          resp = automate_api_request(
             "/apis/iam/v2/roles",
-            request_headers: { 'projects': CUSTOM_PROJECT_ID_2 },
+            request_headers: { projects: CUSTOM_PROJECT_ID_2 },
             )
           expect(resp.http_status).to eq 200
           expect(resp.parsed_response_body[:roles].length).to eq 2
@@ -218,12 +216,10 @@ control 'iam-project-filtering-1' do
         end
 
         it 'returns 403 due to explicitly denied project' do
-          puts "about to sleep"
           resp = automate_api_request(
             "/apis/iam/v2/roles",
-            request_headers: { 'projects': CUSTOM_PROJECT_ID_1 },
+            request_headers: { projects: CUSTOM_PROJECT_ID_1 },
             )
-          puts "request finished"
           expect(resp.http_status).to eq 403
         end
 
