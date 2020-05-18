@@ -83,6 +83,7 @@ type InspecAgent struct {
 	RemoteInspecVersion string
 	ResultMessageLimit  int
 	ControlResultsLimit int
+	RunTimeLimit        float32
 }
 
 // Postgres specific options
