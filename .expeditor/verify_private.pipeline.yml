@@ -131,7 +131,7 @@ steps:
   - label: "applications-service"
     command:
       - . scripts/verify_setup.sh
-      - hab studio run "source scripts/verify_studio_init.sh && start_applications_service_deps && applications_integration"
+      - hab studio run "source scripts/verify_studio_init.sh && start_applications_service_deps && applications_set_service_seq_to_int_max && applications_integration"
     timeout_in_minutes: 20
     expeditor:
       executor:
