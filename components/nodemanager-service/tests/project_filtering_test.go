@@ -184,8 +184,7 @@ func TestReadProjectFilteringIngestedNodes(t *testing.T) {
 	}
 }
 
-// All manually added nodes should be returned because they are not included in project filtering.
-func TestListProjectFilteringIngestedNodes(t *testing.T) {
+func TestListProjectFilteringAllNodes(t *testing.T) {
 	db, err := createPGDB()
 	require.NoError(t, err)
 
@@ -375,17 +374,10 @@ func TestListProjectFilteringIngestedNodes(t *testing.T) {
 
 				// Get all the node IDs returned.
 				actualNodeIDs := []string{}
-				actualManualNodeIDs := []string{}
 				for _, node := range nodesResponse.Nodes {
-					if node.Manager == "" {
+					if node.Manager == "" || node.Manager == "chef" {
 						actualNodeIDs = append(actualNodeIDs, node.Id)
-					} else {
-						actualManualNodeIDs = append(actualManualNodeIDs, node.Id)
 					}
-				}
-
-				for _, nodeID := range manualNodeIds {
-					assert.Contains(t, actualManualNodeIDs, nodeID)
 				}
 
 				assert.ElementsMatch(t, actualNodeIDs, test.expectedIngestedNodeIDs)
