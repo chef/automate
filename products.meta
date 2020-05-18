@@ -188,6 +188,12 @@
       "services": [
         "chef/automate-prometheus"
       ]
+    },
+    {
+      "name": "desktop",
+      "type": "product",
+      "dependencies": ["automate"],
+      "services": []
     }
   ]
 }

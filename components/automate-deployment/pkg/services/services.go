@@ -102,13 +102,6 @@ func ValidateProductDeployment(products []string) error {
 		}
 	}
 
-	for requiredCollectionName, requiredCollection := range requiredCollectionSet {
-		if desiredCollectionSet[requiredCollectionName] == nil &&
-			requiredCollection.Type == product.ProductType {
-			return errors.Errorf("You must deploy %q to deploy %s", requiredCollectionName, strings.Join(products, ", "))
-		}
-	}
-
 	return nil
 }
 

@@ -484,3 +484,12 @@ function build_all_changed_components() {
     done
   popd >/dev/null
 }
+
+document "enable_desktop" <<DOC
+  Enable the Desktop view
+DOC
+function enable_desktop() {
+  check_if_deployinate_started || return 1
+  printf "[deployment.v1.svc]\n products = [\"desktop\"]\n" > /tmp/enable_desktop_patch.toml
+  chef-automate config patch /tmp/enable_desktop_patch.toml
+}
