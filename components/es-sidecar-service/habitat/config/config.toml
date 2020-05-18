@@ -86,6 +86,7 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
   {{~/if}}
 {{~/if}}
 
+{{~#if cfg.backups.gcs.bucket}}
 [backups.gcs]
   name = "{{cfg.backups.gcs.bucket}}"
   {{~#if cfg.backups.gcs.client_name}}
