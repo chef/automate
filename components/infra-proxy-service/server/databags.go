@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sort"
 
-	chef "github.com/chef/go-chef"
+	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 

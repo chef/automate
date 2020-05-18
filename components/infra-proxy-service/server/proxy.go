@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/url"
 
-	chef "github.com/chef/go-chef"
+	chef "github.com/go-chef/chef"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

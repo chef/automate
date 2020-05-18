@@ -4,7 +4,7 @@ import (
 	"context"
 	"sort"
 
-	chef "github.com/chef/go-chef"
+	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -43,17 +43,12 @@ func (s *Server) GetClient(ctx context.Context, req *request.Client) (*response.
 	}
 
 	return &response.Client{
-		Name:        ic.Name,
-		ClientName:  ic.ClientName,
-		OrgName:     ic.OrgName,
-		Admin:       ic.Admin,
-		Validator:   ic.Validator,
-		Certificate: ic.Certificate,
-		PublicKey:   ic.PublicKey,
-		PrivateKey:  ic.PrivateKey,
-		Uri:         ic.Uri,
-		JsonClass:   ic.JsonClass,
-		ChefType:    ic.ChefType,
+		Name:       ic.Name,
+		ClientName: ic.ClientName,
+		OrgName:    ic.OrgName,
+		Validator:  ic.Validator,
+		JsonClass:  ic.JsonClass,
+		ChefType:   ic.ChefType,
 	}, nil
 
 }

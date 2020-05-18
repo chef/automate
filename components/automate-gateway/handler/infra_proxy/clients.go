@@ -38,17 +38,12 @@ func (a *InfraProxyServer) GetClient(ctx context.Context, r *gwreq.Client) (*gwr
 	}
 
 	return &gwres.Client{
-		Name:        res.GetName(),
-		ClientName:  res.GetClientName(),
-		OrgName:     res.GetOrgName(),
-		Admin:       res.GetAdmin(),
-		Validator:   res.GetValidator(),
-		Certificate: res.GetCertificate(),
-		PublicKey:   res.GetPublicKey(),
-		PrivateKey:  res.GetPrivateKey(),
-		Uri:         res.GetUri(),
-		JsonClass:   res.GetJsonClass(),
-		ChefType:    res.GetChefType(),
+		Name:       res.GetName(),
+		ClientName: res.GetClientName(),
+		OrgName:    res.GetOrgName(),
+		Validator:  res.GetValidator(),
+		JsonClass:  res.GetJsonClass(),
+		ChefType:   res.GetChefType(),
 	}, nil
 }
 
