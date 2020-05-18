@@ -155,6 +155,12 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
+  rpc CreateDataBag (infra_proxy.request.CreateDataBag) returns (infra_proxy.response.CreateDataBag) {
+    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags";
+    option (google.api.http).body = "*";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+  };
   rpc DeleteDataBag (infra_proxy.request.DataBag) returns (infra_proxy.response.DataBag) {
     option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";

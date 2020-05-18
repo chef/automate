@@ -14,6 +14,31 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
+// CreateDataBag creates a data bag
+func (s *Server) CreateDataBag(ctx context.Context, req *request.CreateDataBag) (*response.CreateDataBag, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+	}
+
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "must supply data bag name")
+	}
+
+	_, err = c.client.DataBags.Create(
+		&chef.DataBag{
+			Name: req.Name,
+		})
+
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return &response.CreateDataBag{
+		Name: req.Name,
+	}, nil
+}
+
 // GetDataBags get data bags list
 func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*response.DataBags, error) {
 
