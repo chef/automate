@@ -39,13 +39,7 @@ import { DesktopRoutingModule } from './desktop-routing.module';
     CheckInTimeSeriesComponent,
     DailyCheckInComponent,
     DashboardComponent,
-<<<<<<< HEAD
     DesktopDetailComponent,
-    CheckInTimeSeriesComponent,
-    TopErrorsComponent,
-    UnknownDesktopDurationCountsComponent,
-=======
->>>>>>> Alphabetize imports
     InsightComponent,
     SimpleLineGraphComponent,
     TopErrorsComponent,
