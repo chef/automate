@@ -254,7 +254,7 @@ EOH
   berks upload -b /tmp/.Berksfile -c /tmp/.berks.config.json
 
   # add record to automate infra views to pre-populate deployed chef server.
-  configure_automate_infra_views
+  # configure_automate_infra_views
 
   if [[ "${enable_workflow}" == "true" ]]; then
     if ! chef-server-ctl user-list | grep delivery &> /dev/null; then
