@@ -37,6 +37,9 @@
           <app-tab tabTitle="Data Bags" #data_bags_tab  [active]="dataBagsTab">
             <app-data-bags-list *ngIf="data_bags_tab.active" [serverId]="serverId" [orgId]="orgId"></app-data-bags-list>
           </app-tab>
+          <app-tab tabTitle="Clients" #clients_tab  [active]="clientsTab">
+            <app-clients *ngIf="clients_tab.active" [serverId]="serverId" [orgId]="orgId"></app-clients>
+          </app-tab>
           <app-tab tabTitle="Details" #details_tab [active]="false">
             <app-org-edit *ngIf="details_tab.active" [serverId]="serverId" [orgId]="orgId"></app-org-edit> 
           </app-tab>

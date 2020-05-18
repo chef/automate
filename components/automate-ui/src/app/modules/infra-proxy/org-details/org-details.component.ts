@@ -30,6 +30,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public environmentsTab = false;
   public rolesTab = false;
   public dataBagsTab = false;
+  public clientsTab = false;
   private isDestroyed = new Subject<boolean>();
 
   previousRoute$: Observable<RouterState>;
@@ -99,6 +100,9 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         this.telemetryService.track('orgDetailsTab', 'dataBags');
         break;
       case 4:
+        this.telemetryService.track('orgDetailsTab', 'clients');
+        break;
+      case 5:
         this.telemetryService.track('orgDetailsTab', 'org-edit');
         break;
     }
