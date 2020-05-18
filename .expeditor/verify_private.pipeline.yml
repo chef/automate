@@ -325,7 +325,7 @@ steps:
   - label: "config-mgmt-service"
     command:
       - . scripts/verify_setup.sh
-      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deploy-some chef/automate-elasticsearch --with-deps && config_mgmt_integration"
+      - hab studio run "source scripts/verify_studio_init.sh && start_config_mgmt_service_deps && config_mgmt_integration"
     timeout_in_minutes: 20
     retry:
       automatic:

@@ -11,6 +11,15 @@ function start_config_mgmt_service() {
   chef-automate dev deploy-some "$HAB_ORIGIN"/config-mgmt-service --with-deps
 }
 
+document "start_config_mgmt_service_deps" <<DOC
+  Start the applications service's deps so integration tests can run
+DOC
+function start_config_mgmt_service_deps() {
+  start_deployment_service
+  chef-automate dev deploy-some --with-deps "$(app_service_origin)/config-mgmt-service"
+  chef-automate dev remove-some "$(app_service_origin)/config-mgmt-service"
+}
+
 # Run Integration tests for the config-mgmt-service
 document "config_mgmt_integration" <<DOC
   Runs the integration tests for the config-mgmt-service
