@@ -328,3 +328,22 @@ function ingest_grpcurl_configure_purge() {
     }
   }"
 }
+
+document "load_desktop_reports" <<DOC
+  Loads desktop reports.
+DOC
+function load_desktop_reports() {
+  chef_load_nodes 15
+  curl -X POST "$ELASTICSEARCH_URL/node-state/_update_by_query?pretty" -H 'Content-Type: application/json' -d'
+  {
+  "script": {
+  "source": "ctx._source[\u0027checkin\u0027] = \u00272020-02-15T02:43:43Z\u0027",
+  "lang": "painless"
+  }
+  }
+  '
+  cat dev-docs/adding-data/sample-reports/desktop-report-1.json | curl --insecure -H "api-token: $(get_admin_token)" -X POST "https://a2-dev.test/data-collector/v0" -H "Content-Type: application/json" -d @-
+  cat dev-docs/adding-data/sample-reports/desktop-report-2.json | curl --insecure -H "api-token: $(get_admin_token)" -X POST "https://a2-dev.test/data-collector/v0" -H "Content-Type: application/json" -d @-
+  cat dev-docs/adding-data/sample-reports/desktop-report-3.json | curl --insecure -H "api-token: $(get_admin_token)" -X POST "https://a2-dev.test/data-collector/v0" -H "Content-Type: application/json" -d @-
+  for _ in {1..30} ; do   m=$((RANDOM % 4));   n=$((RANDOM % 10));   generate_chef_run_failure_example |     jq --arg msg "Error $n occurred" --arg type "Chef::ExampleError$m" '.error.message = $msg | .error.class = $type' |     send_chef_data_raw; done
+}

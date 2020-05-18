@@ -25,6 +25,12 @@ from hab studio:
 
 `applications_populate_database` 
 
+## Adding desktops data to desktops page
+
+from hab studio:
+
+`load_desktop_reports` 
+
 ## Adding nodes to populate compliance reporting
 
 from hab studio:
