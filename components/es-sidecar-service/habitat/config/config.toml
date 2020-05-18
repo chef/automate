@@ -86,6 +86,32 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
   {{~/if}}
 {{~/if}}
 
+{{~#if cfg.backups.gcs.bucket}}
+[backups.gcs]
+  name = "{{cfg.backups.gcs.bucket}}"
+  {{~#if cfg.backups.gcs.client_name}}
+  client = "{{cfg.backups.gcs.client}}"
+  {{~/if}}
+  {{~#if cfg.backups.gcs.base_path}}
+  base_path = "{{cfg.backups.gcs.base_path}}"
+  {{~/if}}
+  {{~#if cfg.backups.gcs.es.compress}}
+  compress = {{cfg.backups.gcs.es.compress}}
+  {{~/if}}
+  {{~#if cfg.backups.gcs.es.application_name}}
+  server_side_encryption = "{{cfg.backups.gcs.es.application_name}}"
+  {{~/if}}
+  {{~#if cfg.backups.gcs.es.max_snapshot_bytes_per_sec}}
+  max_snapshot_bytes_per_sec = "{{cfg.backups.gcs.es.max_snapshot_bytes_per_sec}}"
+  {{~/if}}
+  {{~#if cfg.backups.gcs.es.max_restore_bytes_per_sec}}
+  max_restore_bytes_per_sec = "{{cfg.backups.gcs.es.max_restore_bytes_per_sec}}"
+  {{~/if}}
+  {{~#if cfg.backups.gcs.es.chunk_size}}
+  chunk_size = "{{cfg.backups.gcs.es.chunk_size}}"
+  {{~/if}}
+{{~/if}}
+
 [tls]
   cert_path = "{{pkg.svc_config_path}}/service.crt"
   key_path = "{{pkg.svc_config_path}}/service.key"

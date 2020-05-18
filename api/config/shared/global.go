@@ -144,21 +144,20 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 
 		// The user might be relying on IAM for GCP credentials. Here we'll
 		// make sure that if credentials are provided
-		if bu.GetGcs().GetCredentials() == nil {
-			cfgErr.AddMissingKey("global.v1.backups.gcs.credentials")
-		} else {
-			json := bu.GetGcs().GetCredentials().GetJson().GetValue()
-			path := bu.GetGcs().GetCredentials().GetPath().GetValue()
-
-			// IF json or path are NOT EMPTY check if JSON is empty and then ERROR?!
-			if json != "" || path != "" {
-				if json == "" && path != "" {
-					cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.json")
-				}
-
-				if path == "" && json != "" {
-					cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.path")
-				}
+		json := bu.GetGcs().GetCredentials().GetJson().GetValue()
+		path := bu.GetGcs().GetCredentials().GetPath().GetValue()
+		if path == "" && json == "" {
+			cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.json")
+			cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.path")
+		} else if path != "" && json != "" {
+			cfgErr.AddInvalidValue("global.v1.backups.gcs.credentials", "Must use either json or path not both")
+		} else if path != "" {
+			ok, err := fileutils.Readable("hab", path)
+			if err == nil && !ok {
+				cfgErr.AddInvalidValue(
+					"global.v1.backups.gcs.credentials.path",
+					fmt.Sprintf("the 'hab' user must have read permissions to path: %s", path),
+				)
 			}
 		}
 
