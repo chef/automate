@@ -415,6 +415,35 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context, request *sharedReq.S
 	return s.cfgMgmtClient.GetSuggestions(ctx, &sugRequest)
 }
 
+func (a *CfgMgmtServer) CreateRollout(ctx context.Context, req *cfgReq.CreateRollout) (*cfgRes.Rollout, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.CreateRollout(ctx, req)
+}
+func (a *CfgMgmtServer) GetRollouts(ctx context.Context, req *cfgReq.Rollouts) (*cfgRes.Rollouts, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.GetRollouts(ctx, req)
+}
+func (a *CfgMgmtServer) GetRolloutById(ctx context.Context, req *cfgReq.RolloutById) (*cfgRes.Rollout, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.GetRolloutById(ctx, req)
+}
+func (a *CfgMgmtServer) GetRolloutForChefRun(context.Context, *cfgReq.RolloutForChefRun) (*cfgRes.Rollout, error) {
+	// TODO
+	return nil, nil
+}
+
 func (a *CfgMgmtServer) NodeExport(*cfgReq.NodeExport, cfgService.ConfigMgmt_NodeExportServer) error {
 	// Please see components/automate-gateway/services.go configMgmtNodeExportHandler for implementation
 	return nil

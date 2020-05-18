@@ -13,6 +13,7 @@ import "api/interservice/cfgmgmt/response/event.proto";
 import "api/interservice/cfgmgmt/response/eventstrings.proto";
 import "api/interservice/cfgmgmt/response/inventory_nodes.proto";
 import "api/external/cfgmgmt/response/errors.proto";
+import "api/external/cfgmgmt/response/rollouts.proto";
 
 import "api/interservice/cfgmgmt/request/root.proto";
 import "api/interservice/cfgmgmt/request/stats.proto";
@@ -24,6 +25,7 @@ import "api/interservice/cfgmgmt/request/eventstrings.proto";
 import "api/interservice/cfgmgmt/request/inventory_nodes.proto";
 import "api/interservice/cfgmgmt/request/node_export.proto";
 import "api/external/cfgmgmt/request/errors.proto";
+import "api/external/cfgmgmt/request/rollouts.proto";
 
 service CfgMgmt {
 	rpc GetVersion (chef.automate.domain.cfgmgmt.request.VersionInfo) returns (chef.automate.domain.cfgmgmt.response.VersionInfo);
@@ -50,4 +52,7 @@ service CfgMgmt {
 	rpc GetMissingNodeDurationCounts(chef.automate.domain.cfgmgmt.request.MissingNodeDurationCounts) returns (chef.automate.domain.cfgmgmt.response.MissingNodeDurationCounts);
 	rpc GetNodeMetadataCounts(chef.automate.domain.cfgmgmt.request.NodeMetadataCounts) returns (chef.automate.domain.cfgmgmt.response.NodeMetadataCounts);
 	rpc GetNodeRunsDailyStatusTimeSeries(chef.automate.domain.cfgmgmt.request.NodeRunsDailyStatusTimeSeries) returns (chef.automate.domain.cfgmgmt.response.NodeRunsDailyStatusTimeSeries);
+  rpc CreateRollout(chef.automate.api.cfgmgmt.request.CreateRollout) returns (chef.automate.api.cfgmgmt.response.Rollout);
+  rpc GetRollouts(chef.automate.api.cfgmgmt.request.Rollouts) returns (chef.automate.api.cfgmgmt.response.Rollouts);
+  rpc GetRolloutById(chef.automate.api.cfgmgmt.request.RolloutById) returns (chef.automate.api.cfgmgmt.response.Rollout);
 }

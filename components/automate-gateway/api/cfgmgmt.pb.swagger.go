@@ -14,6 +14,129 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/beta/cfgmgmt/rollouts/create": {
+      "post": {
+        "summary": "CreateRollout",
+        "description": "Creates a Rollout record. A rollout represents the process of nodes acquiring\nthe latest policy revision pushed to a policy group.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ningest:unifiedEvents:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "CreateRollout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.CreateRollout"
+            }
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/api/beta/cfgmgmt/rollouts/find": {
+      "get": {
+        "summary": "GetRolloutForChefRun",
+        "description": "Returns the rollout for the given Chef Server/org, policy group, policy name, and policy revision\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetRolloutForChefRun",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "policy_name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "policy_group",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "policy_revision_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/api/beta/cfgmgmt/rollouts/list": {
+      "get": {
+        "summary": "GetRollouts",
+        "description": "Gives a list of rollouts\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetRollouts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollouts"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "description": "Filters to apply to the request for the rollouts list.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/api/beta/cfgmgmt/rollouts/rollout/{rollout_id}": {
+      "get": {
+        "summary": "GetRolloutById",
+        "description": "Returns the rollout with the given Id\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetRolloutById",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "rollout_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/api/v0/cfgmgmt/errors": {
       "get": {
         "summary": "List Errors",
@@ -669,6 +792,64 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.cfgmgmt.request.CreateRollout": {
+      "type": "object",
+      "properties": {
+        "policy_name": {
+          "type": "string"
+        },
+        "policy_node_group": {
+          "type": "string"
+        },
+        "policy_revision_id": {
+          "type": "string"
+        },
+        "policy_domain_url": {
+          "type": "string"
+        },
+        "scm_type": {
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.SCMType"
+        },
+        "scm_web_type": {
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.SCMWebType"
+        },
+        "policy_scm_url": {
+          "type": "string"
+        },
+        "policy_scm_web_url": {
+          "type": "string"
+        },
+        "policy_scm_commit": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "ci_job_url": {
+          "type": "string"
+        },
+        "ci_job_id": {
+          "type": "string"
+        }
+      },
+      "description": "CreateRollout is a request to create a new Rollout. All\nfields have the same meaning as with the response Rollout\ntype."
+    },
+    "chef.automate.api.cfgmgmt.request.SCMType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_SCM",
+        "GIT"
+      ],
+      "default": "UNKNOWN_SCM"
+    },
+    "chef.automate.api.cfgmgmt.request.SCMWebType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_SCM_WEB",
+        "GITHUB"
+      ],
+      "default": "UNKNOWN_SCM_WEB"
+    },
     "chef.automate.api.cfgmgmt.response.CheckInCounts": {
       "type": "object",
       "properties": {
@@ -1024,6 +1205,80 @@ func init() {
         }
       }
     },
+    "chef.automate.api.cfgmgmt.response.Rollout": {
+      "type": "object",
+      "properties": {
+        "policy_name": {
+          "type": "string",
+          "title": "The name of the policy, i.e., the ` + "`" + `name` + "`" + ` attribute in the Policyfile"
+        },
+        "policy_node_group": {
+          "type": "string",
+          "description": "The group of nodes which are targeted by the rollout. In the Chef Server\ncase, this is the policy_group to which the user is pushing the policy."
+        },
+        "policy_revision_id": {
+          "type": "string",
+          "title": "The revision_id of the compiled policy being rolled out"
+        },
+        "policy_domain_url": {
+          "type": "string",
+          "description": "In the Chef Server case, the policy domain URL is the Chef Server URL\nwith the ` + "`" + `/organizations/:orgname` + "`" + ` portion of the URL path included. In\ngeneral, this can be a URL for any content storage/distribution service,\nas long as the combination of policy_name and policy_node_group is unique\non that system.\n\nThe set of nodes configured to fetch policy content from the\npolicy_domain_url and configured with the same policy_name and\npolicy_node_group form the target set of nodes for a rollout and are\nexpected to apply the policy revision described by the rollout."
+        },
+        "scm_type": {
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.SCMType",
+          "title": "The source control system used with the policyfile"
+        },
+        "scm_web_type": {
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.SCMWebType",
+          "title": "The software/service used to host the source code repository"
+        },
+        "policy_scm_url": {
+          "type": "string",
+          "title": "The URL used to obtain a copy of the source code repository"
+        },
+        "policy_scm_web_url": {
+          "type": "string",
+          "title": "The URL used to view the source code repository via the web"
+        },
+        "policy_scm_commit": {
+          "type": "string",
+          "description": "The source control system's identifier for the repository version. This\nshould be the version where the policy's lockfile was committed."
+        },
+        "description": {
+          "type": "string",
+          "description": "A free-form description of the rollout, as given by the user."
+        },
+        "ci_job_url": {
+          "type": "string",
+          "description": "If the rollout was initiated via Ci/CD or similar system, the web URL\nfor the job that initiated the rollout."
+        },
+        "ci_job_id": {
+          "type": "string",
+          "description": "If the rollout was initiated by Ci/CD or similar system, the id of the job\nthat initiated the rollout. Should include the Ci system's nickname or\nother identifying information users would need to associate the job ID to\nthe Ci/CD system."
+        },
+        "id": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "end_time": {
+          "type": "string"
+        }
+      },
+      "description": "A \"Rollout\" represents the process of distributing Chef Infra code (with\nPolicyfiles) to a set of nodes. It's used to track which nodes have run the\nlatest version of the Chef Infra code assigned to them and also provide the\nuser insights about the code by aggregating Chef Client run results\naccording to the version of Chef Infra code applied. Metadata about the code\nis stored in order to provide the user with convenient references back to\nsystems they already use (such as SCM and Ci/CD systems) to manage their code.\n\nNodes are segmented by a triple of policy name, policy group, and policy domain URL:\npolicy name generally describes what kind of system it is, e.g., a database server\npolicy group generally describes where the system fits in the user's code\nlifecycle, e.g., \"QA\" or \"production\"\npolicy domain URL identifies the system that distributes the Chef Infra code\nand is the owner of the namespaces for policy name and group. E.g., a Chef\nServer URL with the ` + "`" + `/organizations/:orgname` + "`" + ` part.\n\nThere is one (or zero) revision(s) of the Chef Infra code applied to any\nsegment at a time. Rollouts track the changes to which revision of the code is\napplied to the node segments over time."
+    },
+    "chef.automate.api.cfgmgmt.response.Rollouts": {
+      "type": "object",
+      "properties": {
+        "rollouts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout"
+          }
+        }
+      }
+    },
     "chef.automate.api.cfgmgmt.response.Run": {
       "type": "object",
       "properties": {
@@ -1317,6 +1572,22 @@ func init() {
           "description": "Total count of failed run reports that have landed in Automate for the node."
         }
       }
+    },
+    "chef.automate.api.cfgmgmt.response.SCMType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_SCM",
+        "GIT"
+      ],
+      "default": "UNKNOWN_SCM"
+    },
+    "chef.automate.api.cfgmgmt.response.SCMWebType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_SCM_WEB",
+        "GITHUB"
+      ],
+      "default": "UNKNOWN_SCM_WEB"
     },
     "chef.automate.api.cfgmgmt.response.TypeCount": {
       "type": "object",

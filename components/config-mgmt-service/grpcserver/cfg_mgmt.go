@@ -47,6 +47,14 @@ func (s *CfgMgmtServer) ConnectPg() error {
 	return nil
 }
 
+func (s *CfgMgmtServer) PgConnection() *postgres.Postgres {
+	return s.pg
+}
+
+func (s *CfgMgmtServer) ClearPg() error {
+	return s.pg.Clear()
+}
+
 // GetPolicyCookbooks returns a list of cookbook name, policy
 // identifier and name of policy based on revision id
 func (s *CfgMgmtServer) GetPolicyCookbooks(ctx context.Context,

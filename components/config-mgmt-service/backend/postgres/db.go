@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 
+	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -15,8 +16,11 @@ import (
 
 type Postgres struct {
 	*config.Postgres
-	db *sql.DB
+	db     *sql.DB
+	mapper *gorp.DbMap
 }
+
+const clearAllRows = `DELETE FROM rollouts;`
 
 func Open(config *config.Postgres) (*Postgres, error) {
 	pg := New(config)
@@ -41,41 +45,54 @@ func New(config *config.Postgres) *Postgres {
 	return &Postgres{Postgres: config}
 }
 
-func (db *Postgres) Connect() error {
+func (p *Postgres) Connect() error {
 	log.WithFields(log.Fields{
-		"uri": db.URI,
+		"uri": p.URI,
 	}).Info("Connecting to PostgreSQL")
 
-	dbMap, err := libdb.PGOpen(db.URI)
+	dbMap, err := libdb.PGOpen(p.URI)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to open database with uri: %s", db.URI)
+		return errors.Wrapf(err, "Failed to open database with uri: %s", p.URI)
 	}
-	db.db = dbMap
+	p.db = dbMap
 
-	if db.MaxIdleConns > 0 {
-		dbMap.SetMaxIdleConns(db.MaxIdleConns)
+	if p.MaxIdleConns > 0 {
+		dbMap.SetMaxIdleConns(p.MaxIdleConns)
 	}
-	if db.MaxOpenConns > 0 {
-		dbMap.SetMaxOpenConns(db.MaxOpenConns)
+	if p.MaxOpenConns > 0 {
+		dbMap.SetMaxOpenConns(p.MaxOpenConns)
 	}
+
+	p.mapper = &gorp.DbMap{Db: dbMap, Dialect: gorp.PostgresDialect{}}
+	p.mapper.AddTableWithName(Rollout{}, "rollouts").SetKeys(true, "Id")
+	p.mapper.AddTableWithName(NewRollout{}, "rollouts").SetKeys(true, "Id")
 
 	return nil
 }
 
-func (db *Postgres) Migrate() error {
+func (p *Postgres) Migrate() error {
 	logger := logger.NewLogrusStandardLogger()
 	log.SetLevel(log.DebugLevel)
-	if err := migrator.Migrate(db.URI, db.SchemaPath, logger, true); err != nil {
+	if err := migrator.Migrate(p.URI, p.SchemaPath, logger, true); err != nil {
 		log.WithError(err).WithFields(log.Fields{
-			"uri":         db.URI,
-			"schema_path": db.SchemaPath,
+			"uri":         p.URI,
+			"schema_path": p.SchemaPath,
 		}).Error("Failed migrating database")
-		return errors.Wrapf(err, "Unable to create database schema. [path:%s]", db.SchemaPath)
+		return errors.Wrapf(err, "Unable to create database schema. [path:%s]", p.SchemaPath)
 	}
 	return nil
 }
 
 // ping will verify if the database mapped with gorp is available
-func (db *Postgres) Ping() error {
-	return db.db.Ping()
+func (p *Postgres) Ping() error {
+	return p.db.Ping()
+}
+
+func (p *Postgres) Close() error {
+	return p.db.Close()
+}
+
+func (p *Postgres) Clear() error {
+	_, err := p.db.Exec(clearAllRows)
+	return err
 }
