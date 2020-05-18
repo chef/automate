@@ -7,6 +7,7 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { ChefComponentsModule } from 'app/components/chef-components.module';
 import { ChefServerDetailsComponent } from './chef-server-details/chef-server-details.component';
 import { ChefServersListComponent } from './chef-servers-list/chef-servers-list.component';
+import { ClientsComponent } from './clients/clients.component';
 import { CookbooksComponent } from './cookbooks/cookbooks.component';
 import { CookbookDetailsComponent } from './cookbook-details/cookbook-details.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
@@ -24,6 +25,7 @@ import { TreeTableModule } from './tree-table/tree-table.module';
   declarations: [
     ChefServersListComponent,
     ChefServerDetailsComponent,
+    ClientsComponent,
     CookbooksComponent,
     CookbookDetailsComponent,
     CreateChefServerModalComponent,
