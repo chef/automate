@@ -8,7 +8,7 @@ import {
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { throwError as observableThrowError, Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, mergeMap, take } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
@@ -31,10 +31,8 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // TODO(sr): Can we check if the request is sent to some external API?
-    //           Right now, we're throwing the ID token across the internet for telemetry,
-    //           where it's not needed. It would be nice to _not_ do that.
-    let headers = request.headers.set('Authorization', `Bearer ${this.chefSession.id_token}`);
+    let headers = request.headers;
+
     // TODO(sr): Sadly, our UI code depends on the API ignoring unknown fields in the
     //           request payloads in many places. We should not send any of those. But
     //           Fixing that blows the scope of my little API validation adventure, so
@@ -49,13 +47,23 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
     if (this.projects && filtered) {
       headers = headers.set('projects', this.projects);
     }
-    return next
-      .handle(request.clone({ headers, params })).pipe(
-        catchError((error: HttpErrorResponse) => {
-          if (error.status === 401) {
-            this.chefSession.logout();
-          }
-          return observableThrowError(error);
-        }));
+
+    return this.chefSession.token_provider.pipe(
+      take(1),
+      mergeMap(id_token => {
+        // TODO(sr): Can we check if the request is sent to some external API?
+        //           Right now, we're throwing the ID token across the internet for telemetry,
+        //           where it's not needed. It would be nice to _not_ do that.
+        headers = headers.set('Authorization', `Bearer ${id_token}`);
+        return next
+          .handle(request.clone({ headers, params })).pipe(
+            catchError((error: HttpErrorResponse) => {
+              if (error.status === 401) {
+                this.chefSession.logout();
+              }
+              return observableThrowError(error);
+            }));
+      })
+    );
   }
 }

@@ -1,15 +1,19 @@
 import { Injectable } from '@angular/core';
+import { HttpHeaders, HttpClient, HttpBackend, HttpErrorResponse } from '@angular/common/http';
 import { isNull, isNil } from 'lodash';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { Observable, ReplaySubject, timer } from 'rxjs';
+import { map, mergeMap, filter } from 'rxjs/operators';
+
 
 import { environment } from '../../../environments/environment';
 import { Jwt } from 'app/helpers/jwt/jwt';
 
 import {
   SetUserSelfID
- } from 'app/entities/users/userself.actions';
+} from 'app/entities/users/userself.actions';
 
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
@@ -26,9 +30,7 @@ export interface ChefSessionUser {
 }
 
 const sessionKey = 'chef-automate-user';
-const HTTP_STATUS_OK = 200;
 const HTTP_STATUS_UNAUTHORIZED = 401;
-const XHR_DONE = 4;
 
 // TODO 2017/11/06 sr: ChefSessionService implementing the route guard is a bit
 // of a hack. Something created for the purpose of route-guarding alone would
@@ -36,6 +38,9 @@ const XHR_DONE = 4;
 @Injectable()
 export class ChefSessionService implements CanActivate {
   private user: ChefSessionUser;
+  private httpHandler: HttpClient;
+  private isRefreshing: boolean;
+  private tokenProvider: ReplaySubject<string>;
 
   // Session state keys - We use session storage to save state here because
   // the application can be reinitialized multiple time during a single session.
@@ -43,12 +48,16 @@ export class ChefSessionService implements CanActivate {
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor(private store: Store<NgrxStateAtom>) {
+  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
+    this.tokenProvider = new ReplaySubject(1);
     if (USE_DEFAULT_SESSION) {
       this.setDefaultSession();
+      this.tryInitializeSession();
     } else {
+      this.tryInitializeSession();
+      this.httpHandler = new HttpClient(handler);
       const minute = 60 * 1000; // try to refresh session every minute
 
       // Note 2017/12/13 (sr): This has to be more frequent then our token
@@ -61,36 +70,45 @@ export class ChefSessionService implements CanActivate {
       // and components/session-service and chef-session-service -- it would
       // make sense to try to refresh the session if we get a 401 from the API,
       // before giving up and calling logout().
-      window.setInterval(() => {
-        /* Using XMLHttpRequest instead of angular/http to avoid
-           dependency hell. */
-        const xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = this.refreshSessionCallback.bind(this);
-        xhr.open('GET', '/session/refresh', true);
-        xhr.responseType = 'json';
-        xhr.setRequestHeader('Authorization', `Bearer ${this.id_token}`);
-        xhr.send(null);
-      }, minute);
+      timer(0, minute).pipe(
+        filter(() => !this.isRefreshing),
+        mergeMap(() => {
+          this.isRefreshing = true;
+          return this.refresh();
+        })
+      ).subscribe(
+        token => {
+          this.ingestIDToken(token);
+          this.isRefreshing = false;
+        },
+        error => {
+          this.isRefreshing = false;
+          if (error instanceof HttpErrorResponse) {
+            if (error.status == HTTP_STATUS_UNAUTHORIZED) {
+              this.logout();
+            } else {
+              console.log(`Session refresh failed: ${error.statusText}`);
+            }
+          } else {
+            console.log(error);
+          }
+        }
+      );
     }
-
-    this.tryInitializeSession();
   }
 
-  refreshSessionCallback(event): void {
-    const xhr = <XMLHttpRequest>event.target;
-    if (xhr.readyState === XHR_DONE) {
-      if (xhr.status === HTTP_STATUS_OK) {
-        this.ingestIDToken(xhr.response.id_token);
-      } else if (xhr.status === HTTP_STATUS_UNAUTHORIZED) {
-        this.logout();
-      } else {
-        // TODO 2017/12/15 (sr): is there anything we could do that's better than
-        // this?
-        // NOTE 2019/06/27 (sr): this defaults to OK when using HTTP2; not worth
-        // messing with, though, this all needs to be redone.
-        console.log(`Session refresh failed: ${xhr.statusText}`);
-      }
-    }
+  private refresh(): Observable<string> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.id_token}`
+      })
+    };
+    return this.httpHandler.get('/session/refresh', httpOptions).pipe(
+      map(obj => {
+        return obj['id_token'];
+      }),
+    );
   }
 
   ingestIDToken(idToken: string): void {
@@ -148,12 +166,13 @@ export class ChefSessionService implements CanActivate {
       id_token,
       isLocalUser
     };
+    this.tokenProvider.next(id_token);
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
   }
 
   // deleteSession removes the session information from localStorage
   deleteSession(): void {
-   localStorage.removeItem(sessionKey);
+    localStorage.removeItem(sessionKey);
   }
 
   // hasSession checks if there's session info in localStorage
@@ -211,6 +230,10 @@ export class ChefSessionService implements CanActivate {
     return this.user.id_token;
   }
 
+  get token_provider(): ReplaySubject<string> {
+    return this.tokenProvider;
+  }
+
   get telemetry_enabled(): boolean {
     return this.user.telemetry_enabled;
   }
@@ -248,12 +271,12 @@ export class ChefSessionService implements CanActivate {
 
   setDefaultSession(): void {
     localStorage.setItem(sessionKey,
-                         JSON.stringify({
-                           'uuid': 'test_subject',
-                           'username': 'testchefuser',
-                           'fullname': 'Test User',
-                           'groups': ['group1', 'group2', 'group3'],
-                           'id_token': 'test_id_token'
-                         }));
+      JSON.stringify({
+        'uuid': 'test_subject',
+        'username': 'testchefuser',
+        'fullname': 'Test User',
+        'groups': ['group1', 'group2', 'group3'],
+        'id_token': 'test_id_token'
+      }));
   }
 }
