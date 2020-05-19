@@ -55,7 +55,7 @@ export class OrgEffects {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,
-          message: `Could not get orgs: ${msg || payload.error}`
+          message: `Could not get organizations: ${msg || payload.error}`
         });
       }));
 
@@ -74,7 +74,7 @@ export class OrgEffects {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,
-          message: `Could not get org: ${msg || payload.error}`
+          message: `Could not get organization: ${msg || payload.error}`
         });
       }));
 
@@ -91,7 +91,7 @@ export class OrgEffects {
       ofType(OrgActionTypes.CREATE_SUCCESS),
       map(({ payload: { org } }: CreateOrgSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Created org ${org.name}.`
+      message: `Created organization ${org.name}.`
     })));
 
   @Effect()
@@ -100,7 +100,7 @@ export class OrgEffects {
     filter(({ payload }: CreateOrgFailure) => payload.status !== HttpStatus.CONFLICT),
     map(({ payload }: CreateOrgFailure) => new CreateNotification({
         type: Type.error,
-        message: `Could not create org: ${payload.error.error || payload}`
+        message: `Could not create organization: ${payload.error.error || payload}`
       })));
 
   @Effect()
@@ -118,7 +118,7 @@ export class OrgEffects {
       map(({ payload: { name } }: DeleteOrgSuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Deleted org ${name}.`
+          message: `Deleted organization ${name}.`
         });
       }));
 
@@ -129,7 +129,7 @@ export class OrgEffects {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,
-          message: `Could not delete org: ${msg || payload.error}`
+          message: `Could not delete organization: ${msg || payload.error}`
         });
       }));
 
@@ -147,7 +147,7 @@ export class OrgEffects {
       ofType(OrgActionTypes.UPDATE_SUCCESS),
       map(({ payload: { org } }: UpdateOrgSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Updated org ${org.name}.`
+      message: `Updated organization ${org.name}.`
     })));
 
   @Effect()
@@ -157,7 +157,7 @@ export class OrgEffects {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,
-          message: `Could not update org: ${msg || payload.error}`
+          message: `Could not update organization: ${msg || payload.error}`
         });
       }));
 }

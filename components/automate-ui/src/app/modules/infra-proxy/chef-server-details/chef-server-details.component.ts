@@ -49,7 +49,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   public orgToDelete: Org;
   public deleteModalVisible = false;
-  public modalType: string;
   private id: string;
   public saveSuccessful = false;
   public saveInProgress = false;
@@ -181,9 +180,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
-  public openCreateModal(type: string): void {
+  public openCreateModal(): void {
     this.createModalVisible = true;
-    this.modalType = type;
   }
 
   public closeCreateModal(): void {
