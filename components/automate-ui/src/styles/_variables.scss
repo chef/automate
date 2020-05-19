@@ -33,6 +33,9 @@ $transparent-white: rgba(255, 255, 255, 0.85);
 //chart
 $chef-ok: $blue-de-france;
 $chef-unknown: $gray;
+$chef-light-purple: $orchid;
+$chef-dark-purple: $cornflower;
+$chef-purple-gradient: linear-gradient(315deg, $chef-dark-purple, $chef-light-purple);
 
 // logos
 $default-logo: url('/assets/img/logos/AutomateLogo-default.svg');
