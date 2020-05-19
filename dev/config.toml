@@ -83,7 +83,6 @@ shared_buffers = "1GB"
     deployment_type = "local"
     manifest_cache_expiry = "0s"
     package_cleanup_mode = "disabled"
-    products = ["desktop"]
     [deployment.v1.svc.admin_user]
       # Default admin user settings
       username = "admin"
