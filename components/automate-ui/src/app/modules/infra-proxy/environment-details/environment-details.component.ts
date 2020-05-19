@@ -109,7 +109,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   }
 
   // retrieve attributes based on their level of precedence
-  retrieve(level: string): string {
+  retrieve(level: string): string | Object {
     switch (level) {
       case this.all: {
         return this.attributes.all;
@@ -121,7 +121,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
         return this.attributes.override_attributes;
       }
       default: {
-        return '';
+        return {};
       }
     }
   }
