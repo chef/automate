@@ -19,6 +19,7 @@ type Storage interface {
 	StoreOrg(ctx context.Context, id string, name string, adminUser string, adminKey string, serverID string, projects []string) (Org, error)
 	DeleteOrg(ctx context.Context, orgID string, serverID string) (Org, error)
 	EditOrg(ctx context.Context, id string, name string, adminUser string, serverID string, projects []string) (Org, error)
+	TouchOrg(ctx context.Context, id string, serverID string) (Org, error)
 }
 
 // Resetter is, if exposed, used for tests to reset the storage backend to a

@@ -183,6 +183,21 @@ func (p *postgres) GetOrgs(ctx context.Context, serverID string) ([]storage.Org,
 	return orgs, nil
 }
 
+func (p *postgres) TouchOrg(ctx context.Context, id string, serverID string) (storage.Org, error) {
+	var o storage.Org
+	err := p.db.QueryRowContext(ctx,
+		`UPDATE orgs
+		SET updated_at = now()
+		WHERE id = $1 AND server_id = $2
+		RETURNING id, name, admin_user, credential_id, server_id, projects, created_at, updated_at;`,
+		id, serverID).
+		Scan(&o.ID, &o.Name, &o.AdminUser, &o.CredentialID, &o.ServerID, pq.Array(&o.Projects), &o.CreatedAt, &o.UpdatedAt)
+	if err != nil {
+		return storage.Org{}, p.processError(err)
+	}
+	return o, nil
+}
+
 // ProjectsListFromContext returns the project list from the context.
 // In the case that the project list was ["*"], we return an empty list,
 // since we do not wish to filter on projects.
