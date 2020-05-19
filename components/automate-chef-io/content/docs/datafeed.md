@@ -2,7 +2,7 @@
 title = "Data Feed"
 description = "Exporting Node Data from Chef Client Runs to External Data Collectors"
 date = 2020-05-05T13:19:02-07:00
-draft = true
+draft = false
 bref = ""
 toc = true
 [menu]
@@ -67,6 +67,7 @@ On the Chef Automate CLI
 1. Navigate to /hab/svc/data-feed-service/config/config.toml
 1. To change the interval for the Data Feed collection update the config parameter for *feed_interval* which defaults to 30 minutes
 1. To change the number of sets of node data sent in each individual batch to your end point update the config parameter for *node_batch_size* which defaults to 100 nodes
+1. To determine what data to include in each export use the update_nodes_only setting. By default, only data that has recently changed will be aggregated. With update_nodes_only set to false additional data is aggregated with each node that has recently changed, all the latest data is sent.
 1. To reduce the IP address range for the node data being collected and processed, if for example you only wish to send production or test node traffic, update the config parameter for *disable_cidr_filter* to false **and** update the setting for *cidr_filter* to cover the IP address range required
 
 /hab/svc/data-feed-service/config/config.toml
