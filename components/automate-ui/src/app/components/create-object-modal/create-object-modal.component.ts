@@ -15,6 +15,13 @@ import { PolicyChecked } from 'app/entities/policies/policy.model';
 import { GetPolicies } from 'app/entities/policies/policy.actions';
 import { allPolicies } from 'app/entities/policies/policy.selectors';
 
+const chefManagedPolicies = [
+  'ingest-access',
+  'administrator-access',
+  'editor-access',
+  'viewer-access'
+];
+
 @Component({
   selector: 'app-create-object-modal',
   templateUrl: './create-object-modal.component.html',
@@ -56,8 +63,13 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
 
     this.store.select(allPolicies)
       .pipe(takeUntil(this.isDestroyed))
-      // OK to leave `checked` undefined--will be initialized upon `visible`
-      .subscribe(policies => this.policies = policies as PolicyChecked[]);
+      .subscribe(policies => {
+        // OK to leave `checked` undefined--will be initialized upon `visible`
+        const pols = policies as PolicyChecked[];
+        pols.forEach(p =>
+          p.section = chefManagedPolicies.includes(p.id) ? 'Chef-managed' : 'Custom');
+        this.policies = pols;
+      });
   }
 
   ngOnDestroy() {

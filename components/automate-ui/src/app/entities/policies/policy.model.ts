@@ -18,6 +18,7 @@ export interface Statement {
 
 export interface PolicyChecked extends Policy {
   checked: boolean;
+  section: string;
 }
 
 export interface PolicyCheckedMap {

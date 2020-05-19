@@ -6,6 +6,7 @@ export interface ResourceChecked {
   id: string;
   name: string;
   checked: boolean;
+  section?: string;
 }
 
 export interface ResourceCheckedMap {
@@ -42,20 +43,21 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // that can be altered
   public filteredResources: ResourceChecked[] = [];
   public dropdownState: 'closed' | 'opening' | 'open' = 'closed';
+  public sections: Set<string>;
   public label = this.noneSelectedLabel;
   public filterValue = '';
 
   ngOnInit(): void {
     if (this.resourcesUpdated) { // an optional setting
       this.resourcesUpdated.subscribe(() => {
-        this.updateLabel();
+        this.updateSectionsAndLabel();
       });
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.resources) {
-      this.updateLabel();
+      this.updateSectionsAndLabel();
       if (changes.resources.firstChange) { // only update on initialization/first change
         this.filteredResources = this.resourcesInOrder;
       }
@@ -126,6 +128,12 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     } else {
       nextElement.focus();
     }
+  }
+
+  private updateSectionsAndLabel(): void {
+    this.updateLabel();
+    this.sections = new Set<string>();
+    this.resources.forEach(r => this.sections.add(r.section));
   }
 
   private updateLabel(): void {
