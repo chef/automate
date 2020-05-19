@@ -90,7 +90,7 @@ export class ReportDataService {
     this.statsService.getNodes(reportQuery, listParams)
       .subscribe(data => {
         this.nodesListLoading = false;
-        this.nodesListEmpty = this.isEmpty(data.items);
+        this.nodesListEmpty = this.isZero(data.total);
         this.nodesList = Object.assign({}, this.nodesList, data);
       });
   }
@@ -117,6 +117,13 @@ export class ReportDataService {
 
   isEmpty(data) {
     if (data === undefined || data.length === 0 || (data.length === 1 && data[0] === 'passed')) {
+      return true;
+    }
+    return false;
+  }
+
+  isZero(count: number): boolean {
+    if (count === 0) {
       return true;
     }
     return false;
