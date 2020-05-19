@@ -87,10 +87,9 @@ func (a *InfraProxyServer) ResetOrgAdminKey(ctx context.Context, r *gwreq.ResetO
 	if err != nil {
 		return nil, err
 	}
+
 	return &gwres.ResetOrgAdminKey{
-		Id:       res.GetId(),
-		ServerId: res.GetServerId(),
-		Status:   res.GetStatus(),
+		Org: fromUpstreamOrg(res.Org),
 	}, nil
 }
 

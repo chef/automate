@@ -1841,17 +1841,9 @@ func init() {
     "chef.automate.api.infra_proxy.response.ResetOrgAdminKey": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Chef organization ID."
-        },
-        "server_id": {
-          "type": "string",
-          "description": "Chef Infra Server ID."
-        },
-        "status": {
-          "type": "string",
-          "description": "Response status."
+        "org": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "description": "Chef organization."
         }
       }
     },

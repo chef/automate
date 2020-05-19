@@ -196,9 +196,7 @@ func (s *Server) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdmi
 	}
 
 	return &response.ResetOrgAdminKey{
-		Id:       org.ID,
-		ServerId: org.ServerID,
-		Status:   "success",
+		Org: fromStorageOrg(org),
 	}, nil
 }
 
