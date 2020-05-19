@@ -1,4 +1,8 @@
 <app-authorized not [allOf]="['/apis/iam/v2/teams/{id}', 'put', team?.id]">
+  <chef-page
+    [attr.heading]="triggerFullPageMessage()"
+    [attr.confirm-btn-text]="''"
+    (close)="closePage()">
   <div class="no-permissions">
     <p>It looks like you don't have permission to add users to this team.
       <br/>
@@ -6,6 +10,7 @@
       contact <a href="https://www.chef.io/support/" target="_blank" class="error-msg">Chef support</a> for help.
     </p>
   </div>
+  </chef-page>
 </app-authorized>
 <app-authorized [allOf]="['/apis/iam/v2/teams/{id}', 'put', team?.id]">
   <chef-page

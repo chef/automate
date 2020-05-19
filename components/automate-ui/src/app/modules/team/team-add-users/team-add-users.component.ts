@@ -9,6 +9,7 @@ import { filter as lodashFilter } from 'lodash/fp';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeState } from 'app/route.selectors';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { EntityStatus, allLoadedSuccessfully, pending } from 'app/entities/entities';
 import { User, HashMapOfUsers, userArrayToHash } from 'app/entities/users/user.model';
 import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
@@ -47,9 +48,12 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   public openUserModal = new EventEmitter<boolean>();
 
   constructor(
+    private layoutFacade: LayoutFacadeService,
     private store: Store<NgrxStateAtom>,
     private router: Router) {
   }
+
+  private fired = false;
 
   ngOnInit(): void {
     this.store.dispatch(new GetUsers());
@@ -183,4 +187,11 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
     this.openUserModal.emit(true);
   }
 
+  triggerFullPageMessage() {
+    // `fired` variable just minimizes browser's workload since that gets called continuously
+    if (!this.fired) {
+      this.layoutFacade.showFullPage();
+      this.fired = true;
+    }
+  }
 }
