@@ -103,14 +103,14 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
 
   private convertToObject(input: Check[]): CheckObj[] {
     return input.map(
-      ([endpoint, verb, paramList]: Check) =>
-        <CheckObj>{ endpoint, verb, paramList });
+      ([endpoint, verb, paramList]: Check): CheckObj =>
+        ({ endpoint, verb, paramList }));
   }
 
   private downcaseVerb(input: CheckObj[]): CheckObj[] {
     return input.map(
-      ({ endpoint, verb, paramList }: CheckObj) =>
-        <CheckObj>{ endpoint, verb: verb.toLowerCase(), paramList }
+      ({ endpoint, verb, paramList }: CheckObj): CheckObj =>
+        ({ endpoint, verb: verb.toLowerCase(), paramList })
     );
   }
 

@@ -87,7 +87,7 @@ describe('TeamDetailsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: declarations,
+      declarations,
       providers: [
         FeatureFlagsService
       ],
