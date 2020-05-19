@@ -23,6 +23,7 @@ export class CreateOrgModalComponent implements OnInit, OnChanges {
   public modifyID = false; // Whether the edit ID form is open or not.
   public projects: ProjectCheckedMap = {};
   public projectsUpdatedEvent = new EventEmitter();
+  public checkedProjectIDs: string[] = []; // resets project dropdown btwn modal openings
   public UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   ngOnInit() {
@@ -61,11 +62,13 @@ export class CreateOrgModalComponent implements OnInit, OnChanges {
 
   closeEvent(): void {
     this.modifyID = false;
+    this.checkedProjectIDs = [];
     this.close.emit();
   }
 
   createServerOrg(): void {
     this.createClicked.emit();
+    this.checkedProjectIDs = [];
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
