@@ -129,23 +129,23 @@ configure_automate_infra_views() {
       chef_server_admin_key=$(cat "/hab/chef-server-admin-key.txt")
       server_id="auto-deployed-chef-server"
       org_id="auto-deployed-chef-org"
-      if ! chef-automate dev grpcurl automate-gateway -- chef.automate.api.infra_proxy.InfraProxy.GetServer -d '{"id": "$server_id"}' | grep "$server_id" &> /dev/null; then
-          chef-automate dev grpcurl automate-gateway -- chef.automate.api.infra_proxy.InfraProxy.CreateServer -d '{
-            "id": "$server_id",
-            "name": "$server_id",
-            "fqdn": "localhost",
-            "ip_address": "127.0.0.1",
-          }'
+      if ! chef-automate dev grpcurl automate-gateway -- chef.automate.api.infra_proxy.InfraProxy.GetServer -d "{\"id\": \"$server_id\"}" 2> /dev/null | grep "$server_id" &> /dev/null; then
+          chef-automate dev grpcurl automate-gateway -- chef.automate.api.infra_proxy.InfraProxy.CreateServer -d "{
+            \"id\": \"$server_id\",
+            \"name\": \"$server_id\",
+            \"fqdn\": \"localhost\",
+            \"ip_address\": \"127.0.0.1\"
+          }"
       fi
 
-      if ! chef-automate dev grpcurl automate-gateway -- chef.automate.api.infra_proxy.InfraProxy.GetOrg -d '{"id": "$org_id", "server_id": "$server_id"}' | grep "$org_id" &> /dev/null; then
-          chef-automate dev grpcurl automate-gateway -- chef.automate.api.infra_proxy.InfraProxy.CreateOrg -d '{
-            "id": "$org_id",
-            "name": "${chef_server_org}",
-            "admin_user": "${chef_server_admin_name}",
-            "admin_key": "$chef_server_admin_key",
-            "server_id": "$server_id",
-          }'
+      if ! chef-automate dev grpcurl automate-gateway -- chef.automate.api.infra_proxy.InfraProxy.GetOrg -d "{\"id\": \"$org_id\", \"server_id\": \"$server_id\"}" 2> /dev/null | grep "$org_id" &> /dev/null; then
+          chef-automate dev grpcurl automate-gateway -- chef.automate.api.infra_proxy.InfraProxy.CreateOrg -d "{
+            \"id\": \"$org_id\",
+            \"name\": \"${chef_server_org}\",
+            \"admin_user\": \"${chef_server_admin_name}\",
+            \"admin_key\": \"$chef_server_admin_key\",
+            \"server_id\": \"$server_id\"
+          }"
       fi
   fi
 }
