@@ -427,7 +427,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	var cType, profileName, profileVersion string
 	contentTypeString := strings.Split(r.Header.Get("Content-type"), ";")
 	switch contentTypeString[0] {
-	case "application/json":
+	case "application/json", "application/json+lax":
 		cType = r.Header.Get("Content-type")
 		decoder := json.NewDecoder(r.Body)
 		var t ProfileRequest
