@@ -65,6 +65,28 @@ func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (
 
 }
 
+// DeleteEnvironment deletes the environment
+func (s *Server) DeleteEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+	}
+
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "must supply environment name")
+	}
+
+	environment, err := c.client.Environments.Delete(req.Name)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &response.Environment{
+		Name: environment.Name,
+	}, nil
+
+}
+
 // fromAPIToListEnvironments a response.Environments from a struct of Environments
 func fromAPIToListEnvironments(al chef.EnvironmentResult) []*response.EnvironmentListItem {
 	cl := make([]*response.EnvironmentListItem, len(al))
