@@ -658,6 +658,19 @@ describe File.basename(__FILE__) do
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
+    # Test filters by skipped status - expect 0 nodes, but expect counts to not be 0
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'environment', values: ['DevSec Prod beta']),
+      Reporting::ListFilter.new(type: 'status', values: ['skipped']),
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+    ])
+    expected_nodes = {
+      "total" => 2,
+      "totalFailed" => 1,
+      "totalPassed" => 1
+  }.to_json
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+
     # Test filters by env and status
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'recipe', values: ['apache_extras']),
