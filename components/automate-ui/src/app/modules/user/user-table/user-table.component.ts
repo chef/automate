@@ -13,23 +13,25 @@ export class UserTableComponent implements OnInit {
   @Input() addButtonEnabled = true;
   @Input() users: User[];
   @Input() baseUrl: string;
-  // Needed for team-create which doesn't need to check permissions
-  // because table is being populated with data that's already been checked.
-  @Input() overridePermissionsCheck = false;
   @Input() showEmptyMessage: boolean;
   @Input() showTable: boolean;
 
   @Output() addClicked = new EventEmitter();
   @Output() removeClicked = new EventEmitter<User>();
 
-  getPermissionsPath: string[];
-  createPermissionsPath: string[];
-
-  constructor() {}
+  // These will default to baseUrl + {get, post}, but can be overridden
+  // to make this work with parameterized endpoints. For an example, see
+  // team-details.component.html.
+  @Input() getPermissionsPath: string[];
+  @Input() createPermissionsPath: string[];
 
   ngOnInit(): void {
-    this.getPermissionsPath = [this.baseUrl, 'get'];
-    this.createPermissionsPath = [this.baseUrl, 'post'];
+    if (this.getPermissionsPath === undefined) {
+      this.getPermissionsPath = [this.baseUrl, 'get'];
+    }
+    if (this.createPermissionsPath === undefined) {
+      this.createPermissionsPath = [this.baseUrl, 'post'];
+    }
   }
 
   deleteUser($event: MatOptionSelectionChange, user: User) {

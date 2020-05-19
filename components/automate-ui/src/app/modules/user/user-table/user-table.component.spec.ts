@@ -1,7 +1,8 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UserTableComponent } from './user-table.component';
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MockComponent } from 'ng2-mock-component';
+import { UserTableComponent } from './user-table.component';
 
 const baseUrl = '/some/path';
 
@@ -9,13 +10,13 @@ const baseUrl = '/some/path';
   selector: 'app-test-user-table-wrapper',
   template: '<app-user-table [baseUrl]="baseUrl"></app-user-table>'
 })
-class TestUserTableWrapperComponent {
+class TestUserTableComponent {
   baseUrl = baseUrl;
 }
 
 describe('UserTableComponent', () => {
   let component: UserTableComponent;
-  let fixture: ComponentFixture<TestUserTableWrapperComponent>;
+  let fixture: ComponentFixture<TestUserTableComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -23,15 +24,14 @@ describe('UserTableComponent', () => {
         RouterTestingModule
       ],
       declarations: [
+        MockComponent({ selector: 'app-authorized', inputs: ['allOf'] }),
+        MockComponent({ selector: 'chef-toolbar' }),
         UserTableComponent,
-        TestUserTableWrapperComponent
-      ],
-      schemas: [
-        CUSTOM_ELEMENTS_SCHEMA
+        TestUserTableComponent
       ]
     })
     .compileComponents();
-    fixture = TestBed.createComponent(TestUserTableWrapperComponent);
+    fixture = TestBed.createComponent(TestUserTableComponent);
     component = fixture.debugElement.children[0].componentInstance;
     fixture.detectChanges();
   });
@@ -41,12 +41,24 @@ describe('UserTableComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('when a baseUrl is passed', () => {
-    it('should populate the permission paths', () => {
+  describe('when {get,create}PermissionsPath are not passed', () => {
+    it('should populate the permission paths using baseUrl', () => {
+      component.baseUrl = baseUrl;
       fixture.detectChanges();
-      expect(component.getPermissionsPath).toEqual([baseUrl, 'get']);
-      expect(component.createPermissionsPath).toEqual([baseUrl, 'post']);
+      expect(component.getPermissionsPath).toEqual([baseUrl, 'get']);     // TODO fails
+      expect(component.createPermissionsPath).toEqual([baseUrl, 'post']); // TODO fails
     });
   });
 
+  describe('when {get,create}PermissionsPath are not passed', () => {
+    it('should not populate the permission paths using baseUrl', () => {
+      const getPath = ['/some/parameterized/{path}', 'get', 'my-path'];
+      const postPath = ['/some/parameterized/{path}', 'post', 'my-path'];
+      component.getPermissionsPath = getPath;
+      component.createPermissionsPath = postPath;
+      fixture.detectChanges();
+      expect(component.getPermissionsPath).toEqual(getPath);
+      expect(component.createPermissionsPath).toEqual(postPath);
+    });
+  });
 });
