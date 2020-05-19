@@ -37,3 +37,8 @@ export const updateStatus = createSelector(
   notificationRuleState,
   (state) => state.updateStatus
 );
+
+export const deleteStatus = createSelector(
+  notificationRuleState,
+  (state) => state.deleteStatus
+);

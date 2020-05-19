@@ -30,6 +30,7 @@ import * as integrationsEdit from './pages/integrations/edit/integrations-edit.r
 import * as license from './entities/license/license.reducer';
 import * as layout from './entities/layout/layout.reducer';
 import * as notificationEntity from './entities/notifications/notification.reducer';
+import * as NotificationRuleEntity from './entities/notification_rules/notification_rule.reducer';
 import * as credential from './entities/credentials/credential.reducer';
 import * as jobAdd from './pages/job-add/job-add.reducer';
 import * as jobEdit from './pages/job-edit/job-edit.reducer';

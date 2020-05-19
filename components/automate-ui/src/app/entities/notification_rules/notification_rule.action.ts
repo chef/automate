@@ -14,10 +14,13 @@ export enum NotificationRuleActionTypes {
   UPDATE_FAILURE    = 'NOTIFICATION_RULES::UPDATE::FAILURE',
   SEND_TEST         = 'NOTIFICATION_RULES::SEND_TEST',
   SEND_TEST_SUCCESS = 'NOTIFICATION_RULES::SEND_TEST::SUCCESS',
-  SEND_TEST_FAILURE = 'NOTIFICATION_RULES::SEND_TEST::FAILURE'
+  SEND_TEST_FAILURE = 'NOTIFICATION_RULES::SEND_TEST::FAILURE',
+  DELETE            = 'NOTIFICATION_RULES::DELETE',
+  DELETE_SUCCESS    = 'NOTIFICATION_RULES::DELETE::SUCCESS',
+  DELETE_FAILURE    = 'NOTIFICATION_RULES::DELETE::FAILURE'
 }
 
-export interface NotificationRuleSuccessPayload {
+export interface NotificationRulesSuccessPayload {
   rules: NotificationRule[];
 }
 
@@ -81,6 +84,24 @@ export class TestNotificationFailure implements Action {
 }
 
 
+export class DeleteNotificationRule implements Action {
+  readonly type = NotificationRuleActionTypes.DELETE;
+
+  constructor(public payload: { rule: NotificationRule }) { }
+}
+
+export class DeleteNotificationRuleSuccess implements Action {
+  readonly type = NotificationRuleActionTypes.DELETE_SUCCESS;
+
+  constructor(public payload: { rule: NotificationRule }) { }
+}
+
+export class DeleteNotificationRuleFailure implements Action {
+  readonly type = NotificationRuleActionTypes.DELETE_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type NotificationRuleActions =
   | GetNotificationRules
   | GetNotificationRulesSuccess
@@ -93,4 +114,7 @@ export type NotificationRuleActions =
   | UpdateNotificationFailure
   | TestNotification
   | TestNotificationSuccess
-  | TestNotificationFailure;
+  | TestNotificationFailure
+  | DeleteNotificationRule
+  | DeleteNotificationRuleSuccess
+  | DeleteNotificationRuleFailure;

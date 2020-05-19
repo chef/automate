@@ -10,10 +10,11 @@ import { SortDirection } from 'app/types/types';
 import { RulesService } from 'app/services/rules/rules.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import {
- allRules
+  allRules
 } from 'app/entities/notification_rules/notification_rule.selectors';
 import {
-  GetNotificationRules
+  GetNotificationRules,
+  DeleteNotificationRule
 } from 'app/entities/notification_rules/notification_rule.action';
 
 export interface FieldDirection {
@@ -114,9 +115,7 @@ export class NotificationsComponent implements OnInit {
 
   public deleteNotification(): void {
     this.closeDeleteModal();
-    this.service.deleteRule(this.notificationToDelete).subscribe(_res => {
-      this.refreshRules();
-    });
+    this.store.dispatch(new DeleteNotificationRule({ rule: this.notificationToDelete}));
   }
 
   public closeDeleteModal(): void {

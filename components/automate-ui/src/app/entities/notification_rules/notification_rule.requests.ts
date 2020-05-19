@@ -35,6 +35,10 @@ export interface NotificationRulesResponse {
   rules: NotificationRule[];
 }
 
+export interface RuleResponse {
+  rule: object;
+}
+
 @Injectable()
 export class NotificationRuleRequests {
 
@@ -97,6 +101,11 @@ export class NotificationRuleRequests {
         {key: 'username', value: targetUsername},
         {key: 'password', value: targetPassword})
     };
+  }
+
+  public deleteNotificationRule(rule: NotificationRule): Observable<RuleResponse> {
+    return this.http.delete<RuleResponse>(encodeURI(
+      this.joinToNotifierUrl(['rules', rule.id])));
   }
 
   private joinToNotifierUrl(words: string[]): string {
