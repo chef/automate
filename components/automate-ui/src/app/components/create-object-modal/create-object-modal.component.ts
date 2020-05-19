@@ -15,13 +15,7 @@ import {
 import { PolicyChecked } from 'app/entities/policies/policy.model';
 import { GetPolicies } from 'app/entities/policies/policy.actions';
 import { allPolicies } from 'app/entities/policies/policy.selectors';
-
-const chefManagedPolicies = [
-  'ingest-access',
-  'administrator-access',
-  'editor-access',
-  'viewer-access'
-];
+import { ResourceCheckedSection } from '../resource-dropdown/resource-dropdown.component';
 
 @Component({
   selector: 'app-create-object-modal',
@@ -40,8 +34,8 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Output() createClicked = new EventEmitter<Project[]>();
 
   public projects: ProjectCheckedMap = {};
-  public checkedProjectIDs: string[] = []; // resets project dropdown btwn modal openings
-  public policies: PolicyChecked[] = [];
+  public checkedProjectIDs: string[] = []; // resets project dropdown between modal openings
+  public policies: ResourceCheckedSection[] = [];
   public modifyID = false; // Whether the edit ID form is open or not.
   public conflictError = false;
   public addPolicies = true;
@@ -67,12 +61,16 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
       .subscribe(policies => {
         // OK to leave `checked` undefined--will be initialized upon `visible`
         const ingestPolicy = policies.find(p => p.id === 'ingest-access') as PolicyChecked;
-        const pols = [ingestPolicy]
+        let pols = ingestPolicy ? [ingestPolicy] : [];
+        pols = pols
           .concat(
             ChefSorters.naturalSort(policies.filter(p => p.id !== 'ingest-access'), 'name'));
-        pols.forEach(p =>
-          p.section = chefManagedPolicies.includes(p.id) ? 'Chef-managed' : 'Custom');
-        this.policies = pols;
+        const chefManagedPolicies = pols.filter(p => p.type === 'CHEF_MANAGED');
+        const customPolicies = pols.filter(p => p.type !== 'CHEF_MANAGED');
+        this.policies = [
+          { title: 'Chef-managed', resources: chefManagedPolicies},
+          { title: 'Custom', resources: customPolicies}
+        ];
       });
   }
 
@@ -89,7 +87,9 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
       Object.values(this.projects).forEach(p => p.checked = false); // reset projects
       this.projectsUpdatedEvent.emit();
 
-      Object.values(this.policies).forEach(p => p.checked = false); // reset policies
+      this.policies.forEach(section =>
+        section.resources.forEach(
+          r => r.checked = false)); // reset policies
       this.policiesUpdatedEvent.emit();
 
       if (this.createProjectModal) {

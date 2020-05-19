@@ -19,10 +19,10 @@
       </div>
 
       <div id="resource-container">
-        <div *ngFor="let section of sections">
-          <span *ngIf="section">[{{ section }}]</span>
-          <span *ngFor="let resource of filteredResources">
-            <chef-checkbox *ngIf="resource.section === section"
+        <div *ngFor="let section of filteredSections">
+          <span *ngIf="section.title && section.resources.length">[{{ section.title }}]</span>
+          <span *ngFor="let resource of section.resources">
+            <chef-checkbox
               [checked]="resource.checked"
               [attr.title]="resource.name"
               (change)="resourceChecked($event.detail, resource)"
@@ -34,7 +34,7 @@
         </div>
       </div>
 
-      <div class="no-resources" *ngIf="filteredResources.length === 0">
+      <div class="no-resources" *ngIf="allResourcesCount === 0">
         <p>No {{ objectNounPlural }} found.</p>
         <p>You don't have access to any {{ objectNounPlural }} that match your search.</p>
       </div>
