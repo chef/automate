@@ -40,30 +40,34 @@ Cypress.Commands.add('logout', () => {
   return cy.url().should('include', '/dex/auth');
 });
 
-// applyProjectsFilter will deselect any selected projects from the filter,
+// applyProjectsFilter will deselect all projects in the filter,
 // check any projects by NAME (not id) passed -- if any -- and apply any changes.
-// if there are no resulting changes to apply, it will simply click out of the filter.
+// Preferring reliability over "natural" user behavior for this helper, we use forced clicks
+// since the state of the dropdown may differ across the tests where it is called.
 Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
   cy.get('app-projects-filter button#projects-filter-button').click();
-  cy.get('app-projects-filter chef-dropdown#projects-filter-dropdown')
-    .find('chef-checkbox').each(child => {
-    // deselect every checkbox
-    if (child.attr('aria-checked') === 'true') {
-      child.trigger('click');
-    }
-  });
 
-  // check all desired checkboxes
-  projectsToFilterOn.forEach(proj =>
-    cy.get(`app-projects-filter chef-checkbox[title="${proj}"]`).find('chef-icon').click());
+  // deselect all projects
+  // we add the force for when there are already no projects selected
+  // and the Clear Selection button is hidden
+  cy.get('chef-button#projects-filter-clear-selection').click({force : true});
 
-  if (projectsToFilterOn.length === 0) {
-    // no changes to apply, close projects filter
-    cy.get('app-projects-filter button#projects-filter-button').click();
-  } else {
-    // apply projects filter
-    cy.get('app-projects-filter chef-button#projects-filter-apply-changes').click();
+  if (projectsToFilterOn.length > 0) {
+    // check all desired checkboxes
+    projectsToFilterOn.forEach(proj => {
+      cy.get(`app-projects-filter chef-checkbox[title="${proj}"]`).click();
+      cy.get(`app-projects-filter chef-checkbox[title="${proj}"]`)
+        .should('have.attr', 'aria-checked', 'true');
+    });
   }
+
+  // apply projects filter
+  cy.get('app-projects-filter chef-button#projects-filter-apply-changes')
+    // we force the click here in case Apply button was disabled due to no net change
+    // i.e. in the case that proj1, proj2 are selected,
+    // selection is cleared,
+    // and proj1, proj2 are selected again
+    .click({force: true});
 });
 
 Cypress.Commands.add('generateAdminToken', (idToken: string) => {
@@ -515,7 +519,7 @@ function deleteProjects(projectIdsToDelete: string[], index: number,
   if (projectIdsToDelete.length === index) {
     if (rulesWereDeleted) {
       // Because rules were deleted we must first apply rules to be able to delete the project
-      cy.applyRulesAndWait(100);
+      cy.applyRulesAndWait();
     }
 
     // Delete all the projects after all their rules are deleted
