@@ -19,8 +19,8 @@
       <div class="field-margin" *ngIf="modifyUsername">
         <chef-form-field>
           <label>
-            <span>_Username <span aria-hidden="true">*</span></span>
-            <input chefInput formControlName="_username" type="text" (keyup)="handleUsernameInput($event)" autocomplete="off" />
+            <span id="username" class="label-text">Username <span aria-hidden="true">*</span></span>
+            <input chefInput formControlName="username" type="text" (keyup)="handleUsernameInput($event)" autocomplete="off" />
           </label>
           <chef-error *ngIf="hasAttemptedInputWithRequiredError('username')">
             Username is required.
