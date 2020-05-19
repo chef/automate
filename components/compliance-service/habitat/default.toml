@@ -23,6 +23,9 @@ manual_polling_interval = 1440
 workers = 10
 buffer_size = 1000
 remote_inspec_version = "4.12.0"
+result_message_limit = 10000
+control_results_limit = 50
+run_time_limit = 1.0
 
 [profiles]
 install_market_profiles = true
