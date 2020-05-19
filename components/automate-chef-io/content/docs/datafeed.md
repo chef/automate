@@ -33,8 +33,6 @@ By default only Admins of Chef Automate may create and manage Data Feeds.
 
 To add an endpoint for a Data Feed in Chef Automate:
 
-![Settings Page](/images/docs/settings_data_feed.png)
-
 ![Setup Data Feed Page](/images/docs/filled_form_create_data_feed.png)
 
 1. In the **Settings** tab, navigate to the _Data Feed_ page in the sidebar.
@@ -86,7 +84,7 @@ On the Chef Automate CLI
 
 ## Data Feed Output Syntax and Details
 
-Some blurb here......
+The import consists of line separated JSON strings. Each line represents the data for one node. Each line is of the format:
 
     {
     "attributes": {
