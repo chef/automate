@@ -68,6 +68,9 @@ message ConfigRequest {
 				google.protobuf.Int32Value workers = 1;
 				google.protobuf.Int32Value buffer_size = 2;
 				google.protobuf.StringValue remote_inspec_version = 3;
+				google.protobuf.Int32Value result_message_limit = 4;
+				google.protobuf.Int32Value control_results_limit = 5;
+				google.protobuf.FloatValue run_time_limit = 6;
 			}
 		}
 
