@@ -122,7 +122,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   }
 
   // retrieve attributes based on their level of precedence
-  retrieve(level: string): Object {
+  retrieve(level: string): string {
     switch (level) {
       case this.all: {
         return this.attributes.all;
@@ -134,7 +134,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
         return this.attributes.override_attributes;
       }
       default: {
-        return {};
+        return '';
       }
     }
   }

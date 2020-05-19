@@ -22,12 +22,12 @@ export class EnvironmentAttributes {
   all: string;
   constructor(resp: RespEnvironmentAttributes) {
     this.default_attributes =
-      (resp.default_attributes && JSON.parse(resp.default_attributes)) || {};
+      (resp.default_attributes && JSON.parse(resp.default_attributes)) || '';
     this.override_attributes =
-      (resp.override_attributes && JSON.parse(resp.override_attributes)) || {};
-      this.all = merge(
-        this.default_attributes,
-        this.override_attributes);
+      (resp.override_attributes && JSON.parse(resp.override_attributes)) || '';
+    this.all = merge(
+      this.default_attributes,
+      this.override_attributes);
   }
 }
 
