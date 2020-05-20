@@ -1,5 +1,3 @@
-import { merge } from 'lodash/fp';
-
 export interface InfraRole {
   name: string;
   environments: string[];
@@ -33,15 +31,16 @@ export interface ChildList {
 export class RoleAttributes {
   default_attributes: string;
   override_attributes: string;
-  all: string;
+  all: Object;
   constructor(resp: RespRoleAttributes) {
     this.default_attributes =
-      (resp.default_attributes && JSON.parse(resp.default_attributes)) || {};
+      (resp.default_attributes && JSON.parse(resp.default_attributes)) || '';
     this.override_attributes =
-      (resp.override_attributes && JSON.parse(resp.override_attributes)) || {};
-    this.all = merge(
-      this.default_attributes,
-      this.override_attributes);
+      (resp.override_attributes && JSON.parse(resp.override_attributes)) || '';
+    this.all = {
+      default_attributes: this.default_attributes,
+      override_attributes: this.override_attributes
+    };
   }
 }
 
