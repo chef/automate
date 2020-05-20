@@ -22,14 +22,20 @@ export class InsightAttributesDropdownComponent implements OnInit {
 
     const isFilteredIndex = this.selectedOptions.indexOf(filter);
     if ( isFilteredIndex >= 0 ) {
-        this.selectedOptions.splice(isFilteredIndex, 1);
-        target.classList.remove('selected');
+      this.selectedOptions.splice(isFilteredIndex, 1);
+      target.classList.remove('selected');
     } else {
       if (this.selectedOptions.length < 5) {
-      this.selectedOptions.push(filter);
-      target.classList.add('selected');
+        this.selectedOptions.push(filter);
+        target.classList.add('selected');
       }
     }
+  }
+
+  // NOT IN USE CREATE CUSTOM PIPE FOR THIS
+  public isAriaPressed(filterId: string): boolean {
+    console.log('isAriaPressed');
+    return this.selectedOptions.includes(filterId);
   }
 
 }

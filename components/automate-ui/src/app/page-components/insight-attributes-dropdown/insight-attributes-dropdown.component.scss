@@ -55,3 +55,18 @@
     }
   }
 }
+
+// checkbox overwrites
+::ng-deep chef-checkbox {
+
+  &[aria-checked=true] .check-wrap {
+    border-color: #4535D7;
+    background-color: #4535D7;
+  }
+
+  .label-wrap {
+    margin-left: 8px;
+    color: #394261;
+    letter-spacing: .25px;
+  }
+}

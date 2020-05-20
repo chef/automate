@@ -3,9 +3,14 @@
   <ul>
     <ng-container *ngFor="let option of options">
       <li class="filter-button" (click)="handleSelect($event)"
-      tabindex="0" role="button" aria-pressed="false" [attr.data-filtervalue]="option.id">
+      tabindex="0" role="button" [attr.aria-pressed]="false" [attr.data-filtervalue]="option.id">
         <span>{{ option.name }}<i class="check">&#x2713;</i></span>
       </li>
     </ng-container>
   </ul>
+</div>
+<div>
+  <chef-checkbox>
+    Save as default
+  </chef-checkbox>
 </div>
