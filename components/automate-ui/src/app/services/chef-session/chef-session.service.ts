@@ -84,7 +84,7 @@ export class ChefSessionService implements CanActivate {
         error => {
           this.isRefreshing = false;
           if (error instanceof HttpErrorResponse) {
-            if (error.status == HTTP_STATUS_UNAUTHORIZED) {
+            if (error.status === HTTP_STATUS_UNAUTHORIZED) {
               this.logout();
             } else {
               console.log(`Session refresh failed: ${error.statusText}`);
@@ -107,7 +107,7 @@ export class ChefSessionService implements CanActivate {
     return this.httpHandler.get('/session/refresh', httpOptions).pipe(
       map(obj => {
         return obj['id_token'];
-      }),
+      })
     );
   }
 
