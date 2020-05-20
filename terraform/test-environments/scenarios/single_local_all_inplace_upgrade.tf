@@ -1,5 +1,5 @@
 #
-# A simple local install of A2 with all supported products using the chef-automate CLI. 
+# A simple local install of A2 with all supported products using the chef-automate CLI.
 # It currently uses a pseudo-inplace upgrade.
 #
 
@@ -12,7 +12,7 @@ module "single_local_all_inplace_upgrade" {
 
   # Metadata
   meta_title       = "Single Local (Inplace Upgrade) with all supported products"
-  meta_description = "A2 stack with all supported products (using SAML) deployed locally as Habitat packages on a single host using the chef-automate CLI."
+  meta_description = "A2 stack with all supported products deployed locally as Habitat packages on a single host using the chef-automate CLI."
   meta_type        = "habitat"
 
   # AWS Instance Configuration
@@ -34,7 +34,6 @@ module "single_local_all_inplace_upgrade" {
     X-Topology         = "single"
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
-    X-SAML             = "saml"
   }
 }
 
@@ -59,7 +58,4 @@ module "single_local_all_inplace_upgrade_deploy" {
   enable_chef_server  = "true"
   enable_workflow     = "true"
   workflow_enterprise = "demo"
-
-  # SAML
-  saml = "true"
 }
