@@ -87,10 +87,9 @@ func (a *InfraProxyServer) ResetOrgAdminKey(ctx context.Context, r *gwreq.ResetO
 	if err != nil {
 		return nil, err
 	}
+
 	return &gwres.ResetOrgAdminKey{
-		Id:       res.GetId(),
-		ServerId: res.GetServerId(),
-		Status:   res.GetStatus(),
+		Org: fromUpstreamOrg(res.Org),
 	}, nil
 }
 
@@ -120,16 +119,11 @@ func fromUpstreamOrg(t *infra_res.Org) *gwres.Org {
 	}
 }
 
-func fromUpstreamOrgs(orgs []*infra_res.OrgListItem) []*gwres.OrgListItem {
-	ts := make([]*gwres.OrgListItem, len(orgs))
+func fromUpstreamOrgs(orgs []*infra_res.Org) []*gwres.Org {
+	ts := make([]*gwres.Org, len(orgs))
 
 	for i, org := range orgs {
-		ts[i] = &gwres.OrgListItem{
-			Id:        org.GetId(),
-			Name:      org.GetName(),
-			AdminUser: org.GetAdminUser(),
-			ServerId:  org.GetServerId(),
-		}
+		ts[i] = fromUpstreamOrg(org)
 	}
 
 	return ts

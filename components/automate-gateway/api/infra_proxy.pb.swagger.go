@@ -1725,7 +1725,7 @@ func init() {
         "orgs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.OrgListItem"
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
           },
           "description": "Chef organization list."
         }
@@ -1850,27 +1850,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.response.OrgListItem": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Chef organization ID."
-        },
-        "name": {
-          "type": "string",
-          "description": "Chef organization name."
-        },
-        "admin_user": {
-          "type": "string",
-          "description": "Chef organization admin user."
-        },
-        "server_id": {
-          "type": "string",
-          "description": "Chef Infra Server ID."
-        }
-      }
-    },
     "chef.automate.api.infra_proxy.response.Policyfile": {
       "type": "object",
       "properties": {
@@ -1963,17 +1942,9 @@ func init() {
     "chef.automate.api.infra_proxy.response.ResetOrgAdminKey": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Chef organization ID."
-        },
-        "server_id": {
-          "type": "string",
-          "description": "Chef Infra Server ID."
-        },
-        "status": {
-          "type": "string",
-          "description": "Response status."
+        "org": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "description": "Chef organization."
         }
       }
     },

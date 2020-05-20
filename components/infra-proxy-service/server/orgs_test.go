@@ -544,6 +544,36 @@ func TestOrgs(t *testing.T) {
 			grpctest.AssertCode(t, codes.NotFound, err)
 		})
 
+		t.Run("when an invalid server ID with valid org ID, return org not found", func(t *testing.T) {
+			ctx := context.Background()
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req := &request.CreateOrg{
+				Id:        "infra-org-id",
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"project1", "project2"},
+			}
+			resp, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+
+			org, err := cl.GetOrg(ctx, &request.GetOrg{
+				Id:       resp.Org.Id,
+				ServerId: "INVALID-ID",
+			})
+
+			require.Nil(t, org)
+			require.Contains(t, err.Error(), fmt.Sprintf("no org found with ID \"%s\"", resp.Org.Id))
+			grpctest.AssertCode(t, codes.NotFound, err)
+
+			cleanupOrg(ctx, t, cl, resp.Org.Id, resp.Org.ServerId)
+		})
+
 		t.Run("when the org exists, returns the org successfully", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
@@ -1124,14 +1154,13 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&newSecretWithID, nil)
 
 			newKey := "--NEW_KEY--"
-			updatedResetKeyResp, err := cl.ResetOrgAdminKey(ctx, &request.ResetOrgAdminKey{
+			updateOrg, err := cl.ResetOrgAdminKey(ctx, &request.ResetOrgAdminKey{
 				Id:       resp.Org.Id,
 				ServerId: serverRes.Server.Id,
 				AdminKey: newKey,
 			})
 			require.NoError(t, err, "reset org admin key")
-			require.NotNil(t, updatedResetKeyResp)
-			assert.Equal(t, "success", updatedResetKeyResp.Status)
+			require.NotNil(t, updateOrg)
 
 			cleanupOrg(ctx, t, cl, resp.Org.Id, resp.Org.ServerId)
 		})
