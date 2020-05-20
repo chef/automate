@@ -2,11 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
-import { catchError, mergeMap, map } from 'rxjs/operators';
+import { catchError, mergeMap, map, filter } from 'rxjs/operators';
+import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
+  CreateNotificationRule,
+  CreateNotificationRuleSuccess,
+  CreateNotificationRuleFailure,
   GetNotificationRulesSuccess,
   GetNotificationRulesFailure,
   GetNotification,
@@ -53,6 +57,32 @@ export class NotificationRuleEffects {
           message: `Could not get notifications: ${msg || payload.error}`
         });
       }));
+
+  @Effect()
+  createNotificationRule$ = this.actions$.pipe(
+      ofType(NotificationRuleActionTypes.CREATE),
+      mergeMap(({ payload, username, password }: CreateNotificationRule) =>
+      this.requests.createNotificationRule( payload, username, password ).pipe(
+        map((resp) => new CreateNotificationRuleSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new CreateNotificationRuleFailure(error))))));
+
+  @Effect()
+  createNotificationRuleSuccess$ = this.actions$.pipe(
+      ofType(NotificationRuleActionTypes.CREATE_SUCCESS),
+      map(({ payload  }: CreateNotificationRuleSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Created notification ${payload.name}.`
+    })));
+
+  @Effect()
+  createNotificationRuleFailure$ = this.actions$.pipe(
+    ofType(NotificationRuleActionTypes.CREATE_FAILURE),
+    filter(({ payload }: CreateNotificationRuleFailure) => payload.status !== HttpStatus.CONFLICT),
+    map(({ payload }: CreateNotificationRuleFailure) => new CreateNotification({
+        type: Type.error,
+        message: `Could not create notification: ${payload.error.error || payload}.`
+      })));
 
   @Effect()
   deleteNotificationRule$ = this.actions$.pipe(

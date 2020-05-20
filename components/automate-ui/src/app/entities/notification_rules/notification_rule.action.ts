@@ -9,6 +9,9 @@ export enum NotificationRuleActionTypes {
   GET               = 'NOTIFICATION_RULES::GET',
   GET_SUCCESS       = 'NOTIFICATION_RULES::GET::SUCCESS',
   GET_FAILURE       = 'NOTIFICATION_RULES::GET::FAILURE',
+  CREATE            = 'NOTIFICATION_RULES::CREATE',
+  CREATE_SUCCESS    = 'NOTIFICATION_RULES::CREATE::SUCCESS',
+  CREATE_FAILURE    = 'NOTIFICATION_RULES::CREATE::FAILURE',
   UPDATE            = 'NOTIFICATION_RULES::UPDATE',
   UPDATE_SUCCESS    = 'NOTIFICATION_RULES::UPDATE::SUCCESS',
   UPDATE_FAILURE    = 'NOTIFICATION_RULES::UPDATE::FAILURE',
@@ -20,7 +23,7 @@ export enum NotificationRuleActionTypes {
   DELETE_FAILURE    = 'NOTIFICATION_RULES::DELETE::FAILURE'
 }
 
-export interface NotificationRulesSuccessPayload {
+export interface NotificationRuleSuccessPayload {
   rules: NotificationRule[];
 }
 
@@ -46,6 +49,29 @@ export class GetNotification implements Action {
 export class GetNotificationSuccess implements Action {
   readonly type = NotificationRuleActionTypes.GET_SUCCESS;
   constructor(public payload: NotificationRule) { }
+}
+
+export interface CreateNotificationRulePayload {
+  id?: string;
+  name: string;
+  targetUrl: string;
+  secret?: string;
+}
+
+export class CreateNotificationRule implements Action {
+  readonly type = NotificationRuleActionTypes.CREATE;
+  constructor(public payload: NotificationRule,
+    public username: string, public password: string ) { }
+}
+
+export class CreateNotificationRuleSuccess implements Action {
+  readonly type = NotificationRuleActionTypes.CREATE_SUCCESS;
+  constructor(public payload) { }
+}
+
+export class CreateNotificationRuleFailure implements Action {
+  readonly type = NotificationRuleActionTypes.CREATE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
 }
 
 export class GetNotificationFailure implements Action {
@@ -83,7 +109,6 @@ export class TestNotificationFailure implements Action {
   constructor(public payload: { name: string }) { }
 }
 
-
 export class DeleteNotificationRule implements Action {
   readonly type = NotificationRuleActionTypes.DELETE;
 
@@ -109,6 +134,9 @@ export type NotificationRuleActions =
   | GetNotification
   | GetNotificationSuccess
   | GetNotificationFailure
+  | CreateNotificationRule
+  | CreateNotificationRuleSuccess
+  | CreateNotificationRuleFailure
   | UpdateNotification
   | UpdateNotificationSuccess
   | UpdateNotificationFailure

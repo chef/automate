@@ -1,15 +1,23 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, mergeMap, filter } from 'rxjs/operators';
+import { map, filter, mergeMap } from 'rxjs/operators';
 import { compact, concat } from 'lodash';
 import { identity } from 'lodash/fp';
 import { of as observableOf, Observable } from 'rxjs';
-
-import { environment } from 'environments/environment';
+import { environment } from '../../../environments/environment';
 import { NotificationRule } from './notification_rule.model';
+// import { CreateNotificationRulePayload } from './notification_rule.action';
 
 const NOTIFIER_URL = environment.notifier_url;
 const SECRETS_URL = environment.secrets_url;
+
+export interface NotificationRulesResponse {
+  rules: NotificationRule[];
+}
+
+export interface RuleResponse {
+  rule: NotificationRule;
+}
 
 interface KVData {
   key?: string;
@@ -25,18 +33,6 @@ interface Secret {
   name: string;
   type: string;
   data: Array<KVData>;
-}
-
-export interface RuleResponse {
-  rule: NotificationRule;
-}
-
-export interface NotificationRulesResponse {
-  rules: NotificationRule[];
-}
-
-export interface RuleResponse {
-  rule: object;
 }
 
 @Injectable()
@@ -56,6 +52,17 @@ export class NotificationRuleRequests {
   public getNotificationRule(id: string): Observable<NotificationRule> {
     return this.http.get<RuleResponse>(this.joinToNotifierUrl(['rules', id ])).pipe(
       map((rulesJson: RuleResponse) => NotificationRule.fromResponse(rulesJson.rule)));
+  }
+
+  public createNotificationRule(rule: NotificationRule, targetUsername: string,
+    targetPassword: string): Observable<RuleResponse> {
+
+    return this.createSecret(rule, targetUsername, targetPassword)
+      .pipe(mergeMap((secretId: string) => {
+        rule.targetSecretId = secretId;
+        return this.http.post<RuleResponse>(
+          this.joinToNotifierUrl(['rules']), rule.toRequest());
+      }));
   }
 
   public updateNotificationRule(rule: NotificationRule): Observable<RuleResponse> {
@@ -91,6 +98,24 @@ export class NotificationRuleRequests {
       this.joinToNotifierUrl(['webhook'])), { url, 'secret_id': { 'id': secretId } });
   }
 
+
+  public deleteNotificationRule(rule: NotificationRule): Observable<RuleResponse> {
+    return this.http.delete<RuleResponse>(encodeURI(
+      this.joinToNotifierUrl(['rules', rule.id])));
+  }
+
+  private createSecret(rule: NotificationRule, targetUsername: string,
+    targetPassword: string): Observable<string> {
+    if ( targetUsername.length > 0 || targetPassword.length > 0 ) {
+      const secret = this.newSecret('', rule.name, targetUsername, targetPassword);
+
+      return this.http.post<SecretId>(`${SECRETS_URL}`, secret)
+        .pipe(map(secretId => secretId.id));
+    } else {
+      return observableOf('');
+    }
+  }
+
   private newSecret(id: string, name: string, targetUsername: string,
     targetPassword: string): Secret {
     return {
@@ -101,11 +126,6 @@ export class NotificationRuleRequests {
         {key: 'username', value: targetUsername},
         {key: 'password', value: targetPassword})
     };
-  }
-
-  public deleteNotificationRule(rule: NotificationRule): Observable<RuleResponse> {
-    return this.http.delete<RuleResponse>(encodeURI(
-      this.joinToNotifierUrl(['rules', rule.id])));
   }
 
   private joinToNotifierUrl(words: string[]): string {
