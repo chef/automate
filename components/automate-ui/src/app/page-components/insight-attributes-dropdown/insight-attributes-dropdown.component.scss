@@ -26,13 +26,14 @@
       overflow: hidden;
       cursor: pointer;
       
-      &.active {
+      &.selected {
         border: 1px solid transparent;
         background-image: $chef-purple-gradient;
       }
 
       span {
-      display: block;
+      display: flex;
+      justify-content: space-between;
       padding: 7px 16px 5px;
       width: 100%;
       height: 100%;

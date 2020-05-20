@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FilterOptions, FilterableOptions } from './insight-attributes-dropdown.model';
+import { FilterOption, FilterableOptions } from './insight-attributes-dropdown.model';
 
 
 @Component({
@@ -9,9 +9,15 @@ import { FilterOptions, FilterableOptions } from './insight-attributes-dropdown.
 })
 export class InsightAttributesDropdownComponent implements OnInit {
 
-  public options: FilterOptions[] = FilterableOptions;
+  public options: FilterOption[] = FilterableOptions;
 
   ngOnInit() {
     console.log('on init');
+  }
+
+  public handleSelect(event: Event) {
+    const target = event.target as HTMLElement;
+    const filter = target.getAttribute('data-filterValue');
+    console.log(filter);
   }
 }
