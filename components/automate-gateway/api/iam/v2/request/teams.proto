@@ -21,7 +21,7 @@ message CreateTeamReq {
       json_schema: {
         required: ["id", "name"]
       },
-      example: { value: '{"id": "test-id", "name": "My Test Team", "projects": ["project1", "project2"]}'}
+      example: { value: '{"id": "my-team-id", "name": "My Test Team", "projects": ["project1", "project2"]}' }
     };
     string id = 1;
     string name = 2;
@@ -33,7 +33,7 @@ message UpdateTeamReq {
       json_schema: {
         required: ["id", "name"]
       },
-      example: { value: '{"name": "My Test Team", "projects": ["project1", "project2"]}'}
+      example: { value: '{"id": "my-team-id", "name": "My Test Team", "projects": ["project1", "project2"]}' }
     };
     string id = 1;
     string name = 2;
@@ -44,7 +44,8 @@ message DeleteTeamReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["id"]
-      }
+      },
+      example: { value: '{"id": "operators"}' }
     };
     string id = 1;
 }
@@ -54,7 +55,7 @@ message AddTeamMembersReq {
       json_schema: {
         required: ["id", "membership_ids"]
       },
-      example: { value: '{"membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
+      example: { value: '{"id": "admins", "membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}' }
     };
     string id = 1;
     repeated string membership_ids = 2;
@@ -74,7 +75,7 @@ message RemoveTeamMembersReq {
       json_schema: {
         required: ["id", "membership_ids"]
       },
-      example: { value: '{"membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
+      example: { value: '{"id": "admins", "membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}' }
     };
     string id = 1;
     repeated string membership_ids = 2;
@@ -84,7 +85,8 @@ message GetTeamsForMemberReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["membership_id"]
-      }
+      },
+      example: { value: '{"membership_id": "527ed96f-2ecb-4f8f-abd7-0bf6511459ac"}' }
     };
     string membership_id = 1;
 }
