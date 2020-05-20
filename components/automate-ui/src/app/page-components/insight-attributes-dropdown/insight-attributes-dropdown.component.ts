@@ -10,6 +10,7 @@ import { FilterOption, FilterableOptions } from './insight-attributes-dropdown.m
 export class InsightAttributesDropdownComponent implements OnInit {
 
   public options: FilterOption[] = FilterableOptions;
+  public selectedOptions: string[] = []; // these are filter ids
 
   ngOnInit() {
     console.log('on init');
@@ -18,6 +19,17 @@ export class InsightAttributesDropdownComponent implements OnInit {
   public handleSelect(event: Event) {
     const target = event.target as HTMLElement;
     const filter = target.getAttribute('data-filterValue');
-    console.log(filter);
+
+    const isFilteredIndex = this.selectedOptions.indexOf(filter);
+    if ( isFilteredIndex >= 0 ) {
+        this.selectedOptions.splice(isFilteredIndex, 1);
+        target.classList.remove('selected');
+    } else {
+      if (this.selectedOptions.length < 5) {
+      this.selectedOptions.push(filter);
+      target.classList.add('selected');
+      }
+    }
   }
+
 }

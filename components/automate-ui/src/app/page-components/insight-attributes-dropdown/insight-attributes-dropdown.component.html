@@ -4,7 +4,7 @@
     <ng-container *ngFor="let option of options">
       <li class="filter-button" (click)="handleSelect($event)"
       tabindex="0" role="button" aria-pressed="false" [attr.data-filtervalue]="option.id">
-        <span>{{ option.name }}<i>&#x2713;</i></span>
+        <span>{{ option.name }}<i class="check">&#x2713;</i></span>
       </li>
     </ng-container>
   </ul>

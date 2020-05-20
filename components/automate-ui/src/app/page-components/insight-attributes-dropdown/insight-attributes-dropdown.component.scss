@@ -25,10 +25,9 @@
       border-radius: $chef-border-radius;
       overflow: hidden;
       cursor: pointer;
-      
-      &.selected {
-        border: 1px solid transparent;
-        background-image: $chef-purple-gradient;
+
+      .check {
+        visibility: hidden;
       }
 
       span {
@@ -42,6 +41,16 @@
       color: #394261;
       letter-spacing: .25px;
       pointer-events: none;
+      }
+
+      // selected styles
+      &.selected {
+        border: 1px solid transparent;
+        background-image: $chef-purple-gradient;
+
+        .check {
+          visibility: visible;
+        }
       }
     }
   }
