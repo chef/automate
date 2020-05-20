@@ -10,14 +10,15 @@ from hab studio:
 
 from hab studio:
 
-option one: `chef_load_nodes` 
+there are two opions...
 
-option two: 
-to load infra nodes with failed runs:
-```
-for _ in {1..500} ; do   m=$((RANDOM % 4));   n=$((RANDOM % 25));   generate_chef_run_failure_example |     jq --arg msg "Error $n occurred" --arg type "Chef::ExampleError$m" '.error.message = $msg | .error.class = $type' |     send_chef_data_raw https://A2-URL $TOKEN; done
-```
-_note: play with the args to generate more varied data_
+1. `chef_load_nodes` 
+
+1. to load infra nodes with failed runs:
+    ```
+    for _ in {1..500} ; do   m=$((RANDOM % 4));   n=$((RANDOM % 25));   generate_chef_run_failure_example |     jq --arg msg "Error $n occurred" --arg type "Chef::ExampleError$m" '.error.message = $msg | .error.class = $type' |     send_chef_data_raw https://A2-URL $TOKEN; done
+    ```
+    _note: play with the args to generate more varied data_
 
 ## Adding services to apps page
 
@@ -35,12 +36,17 @@ from hab studio:
 
 from hab studio:
 
-option one: `chef_load_compliance_scans -N100 -D4 -M3 -T1000` 
-100 nodes, scanning for the past 4 days, max of 3 node scans per day, no more than 1000 total scans. modify the numbers on each of those options to meet your needs.
+there are three options...
 
-option two: `chef_load_compliance_nodes` runs the above command with the following easy default options: `-N50 -D10 -M1 -T500`
+1. `chef_load_compliance_scans -N100 -D4 -M3 -T1000`
 
-option three: `load_compliance_reports` will send the reports located in `components/compliance-service/test-data/audit-reports` to your dev enironment. these reports are populated with fields such as chef_server, organization, policy_name. these reports are especially useful when you need to test searchbar functionality for multiple search fields or resource scoped access ingest match rules.
+    100 nodes, scanning for the past 4 days, max of 3 node scans per day, no more than 1000 total scans. modify the numbers on each of those options to meet your needs.
+1. `chef_load_compliance_nodes`
+
+    runs the above command with the following easy default options: `-N50 -D10 -M1 -T500`
+1. `load_compliance_reports`
+
+    will send the reports located in `components/compliance-service/test-data/audit-reports` to your dev enironment. these reports are populated with fields such as chef_server, organization, policy_name. these reports are especially useful when you need to test searchbar functionality for multiple search fields or resource scoped access ingest match rules.
 
 ## Adding nodes to populate the nodes and scan jobs pages
 
@@ -82,13 +88,14 @@ from hab studio:
 
 ensure you have `jq` installed
 
-option one: `infra_service_load_sample_data`
-By default, 50 records of the infra servers and orgs will be added with the prefix `chef-server` and `chef-org` respectively.
-
-option two: `infra_service_load_sample_data -N 100 -S infra-server -O infra-org`
-100 records of the infra servers and orgs will be added, modify the numbers on each of those options to meet your needs.
-
-option three: look through the pinned items in slack channel #automate-infra-views and follow the instructions there (works against running chef server)
+there are three options...
+1. `infra_service_load_sample_data`
+    
+    By default, 50 records of the infra servers and orgs will be added with the prefix `chef-server` and `chef-org` respectively.
+1. `infra_service_load_sample_data -N 100 -S infra-server -O infra-org`
+    
+    100 records of the infra servers and orgs will be added, modify the numbers on each of those options to meet your needs.
+1. [internal steps](https://chefio.slack.com/archives/CPYNX33LJ/p1583485764104300) this is the only method that works against a running chef server and will allow you to get data that does not result in the cookbook error
 
 ----------------------------------------------------------------------------------
 # DELETING DATA
