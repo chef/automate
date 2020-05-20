@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RoutePerms } from 'app/components/landing/landing.component';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
 
 @Component({
   selector: 'app-top-nav-landing',
@@ -18,12 +19,6 @@ export class TopNavLandingComponent {
         ['/api/v0/event_type_counts', 'get'],
         ['/api/v0/event_task_counts', 'get']
       ], route: '/dashboards/event-feed'
-    },
-    {
-      allOfCheck: [
-        ['/api/v0/cfgmgmt/nodes', 'get'],
-        ['/api/v0/cfgmgmt/stats/node_counts', 'get']
-      ], route: '/desktop'
     },
     {
       anyOfCheck: [
@@ -64,7 +59,19 @@ export class TopNavLandingComponent {
     }
   ];
 
-  constructor(public layoutFacade: LayoutFacadeService) { }
+  constructor(public layoutFacade: LayoutFacadeService,
+    productDeployed: ProductDeployedService) {
+    if ( productDeployed.isProductDeployed('desktop') ) {
+      this.routeList.splice(1, 0,
+        {
+          allOfCheck: [
+            ['/api/v0/cfgmgmt/nodes', 'get'],
+            ['/api/v0/cfgmgmt/stats/node_counts', 'get']
+          ], route: '/desktop'
+        }
+      );
+    }
+  }
 
   SetPageCoverage = () => this.layoutFacade.showFullPagePlusTopBar();
 }

@@ -1,5 +1,5 @@
-import { Component, isDevMode } from '@angular/core';
-import { isProductDeployed } from 'app/staticConfig';
+import { Component } from '@angular/core';
+import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
 
 @Component({
   selector: 'app-navbar',
@@ -9,13 +9,9 @@ import { isProductDeployed } from 'app/staticConfig';
 
 export class NavbarComponent {
 
-  constructor() {}
+  public isDesktopView = false;
 
-  isDevMode() {
-    return isDevMode();
-  }
-
-  isDesktopView(): boolean {
-    return isProductDeployed('desktop');
+  constructor(private productDeployedService: ProductDeployedService) {
+    this.isDesktopView = this.productDeployedService.isProductDeployed('desktop');
   }
 }
