@@ -107,7 +107,6 @@ export class WelcomeModalComponent {
   // Closes the modal.
   public closeModal(): void {
     this.isVisible = false;
-    this.localStorage.putBoolean(SHOW_AT_START_PREF_KEY, this.showAtStartPref);
 
     if (this.telemetryServiceSubscription) {
       this.telemetryServiceSubscription.unsubscribe();
@@ -117,6 +116,7 @@ export class WelcomeModalComponent {
   // Shows the modal and sets the has_been_seen flag to true.
   public showModal(): void {
     this.isVisible = true;
+    this.localStorage.putBoolean(SHOW_AT_START_PREF_KEY, this.showAtStartPref);
     this.sessionStorage.putBoolean(this.chefSessionService.userWelcomeModalSeenKey(), true);
   }
 
