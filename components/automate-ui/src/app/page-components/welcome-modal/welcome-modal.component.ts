@@ -42,21 +42,21 @@ export class WelcomeModalComponent {
     private chefSessionService: ChefSessionService,
     private telemetryService: TelemetryService
   ) {
-    this.statusSubscription =
-      store.select(triggerWelcome).subscribe(this.handleTriggerWelcome.bind(this));
-
     if (this.telemetryService.hasTelemetryResponse) {
       this.isTelemetryServiceEnabled = this.telemetryService.telemetryEnabled;
+      this.statusSubscription =
+        store.select(triggerWelcome).subscribe(this.handleTriggerWelcome.bind(this));
     } else {
       this.telemetryServiceSubscription =
         this.telemetryService.enabled.subscribe(telemetryEnabled => {
           this.isTelemetryServiceEnabled = telemetryEnabled;
+          this.statusSubscription =
+            store.select(triggerWelcome).subscribe(this.handleTriggerWelcome.bind(this));
         });
     }
-}
+  }
 
   public handleTriggerWelcome(state: TriggerWelcomeStatus): void {
-
     // no code should be before the pending check!
 
     if (pendingState(state)) { return; }
@@ -91,7 +91,6 @@ export class WelcomeModalComponent {
       case null:
         // If the user has not set a preference this is their first visit
         // with this browser. So we show them the modal and store the default pref.
-        this.localStorage.putBoolean(SHOW_AT_START_PREF_KEY, this.showAtStartPref);
         this.showModal();
         break;
     }
@@ -108,6 +107,7 @@ export class WelcomeModalComponent {
   // Closes the modal.
   public closeModal(): void {
     this.isVisible = false;
+    this.localStorage.putBoolean(SHOW_AT_START_PREF_KEY, this.showAtStartPref);
 
     if (this.telemetryServiceSubscription) {
       this.telemetryServiceSubscription.unsubscribe();

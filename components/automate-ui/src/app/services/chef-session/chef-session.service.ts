@@ -148,6 +148,7 @@ export class ChefSessionService implements CanActivate {
     this.user = <ChefSessionUser>JSON.parse(localStorage.getItem(sessionKey));
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
     this.store.dispatch(new SetUserSelfID({ id: this.user.username }));
+    console.log('session initialized');
   }
 
   // setSession sets ChefSession's session data in localStorage for having it
@@ -254,6 +255,7 @@ export class ChefSessionService implements CanActivate {
   }
 
   public userWelcomeModalSeenKey(): string {
+    console.log(`uuid=${this.uuid}`);
     return !isNil(this.user) ? `${this.uuid}-${this.MODAL_HAS_BEEN_SEEN_KEY}` : null;
   }
 
