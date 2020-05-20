@@ -1,8 +1,9 @@
 <p class="instruction">Choose up to 5 attributes to display in the table:</p>
 <div>
   <ul>
-    <li *ngFor="let option of options">
-      <button class="filter-button">{{ option }}</button>
+    <li *ngFor="let option of options" class="filter-button" 
+      tabindex="0" role="button" aria-pressed="false">
+        <span>{{ option }}</span>
     </li>
   </ul>
 </div>
