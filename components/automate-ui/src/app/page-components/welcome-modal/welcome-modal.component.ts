@@ -127,7 +127,7 @@ export class WelcomeModalComponent {
     // The result of this query to sessionStorage should always result in
     // either a 'true' or a 'null' value but we are explicitly checking for
     // true here for clarity.
-    if (this.sessionStorage.getBoolean(this.chefSessionService.MODAL_HAS_BEEN_SEEN_KEY) === true) {
+    if (this.sessionStorage.getBoolean(this.chefSessionService.userWelcomeModalSeenKey()) === true) {
       // If the modal has already been seen we return early and do nothing.
       return;
     } else if (showPref) {
