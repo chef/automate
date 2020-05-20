@@ -277,7 +277,7 @@ func getNodeAttributes(ctx context.Context, client cfgmgmt.CfgMgmtClient, nodeId
 
 	nodeAttributes, err := client.GetAttributes(ctx, &cfgmgmtRequest.Node{NodeId: nodeId})
 	if err != nil {
-		log.Errorf("Error getting attributes %v", err)
+		log.Warnf("Error getting attributes %v", err)
 		return attributesJson, err
 	}
 
