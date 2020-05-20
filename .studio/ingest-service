@@ -328,21 +328,26 @@ function ingest_grpcurl_configure_purge() {
     }
   }"
 }
-
+# created
 document "load_desktop_reports" <<DOC
   Loads desktop reports.
 DOC
 function load_desktop_reports() {
   # load some nodes, use an es script to set check in time to a long time ago
-  chef_load_nodes 15
-  curl -X POST "$ELASTICSEARCH_URL/node-state/_update_by_query?pretty" -H 'Content-Type: application/json' -d'
-  {
-  "script": {
-  "source": "ctx._source[\u0027checkin\u0027] = \u00272020-02-15T02:43:43Z\u0027",
-  "lang": "painless"
-  }
-  }
-  '
+  months_ago=$(date --rfc-3339=seconds  -d "4 month ago" | sed 's/ /T/' | sed 's/\+.*/Z/')
+  for i in {0..15}
+  do
+    JSON_FILE=/src/dev-docs/adding-data/sample-reports/desktop-report-1.json generate_chef_run_example \
+      | jq --arg rfc_time "$months_ago" '.start_time = $rfc_time | .end_time = $rfc_time' \
+      | send_chef_data_raw
+  done
+
+  # Load some nodes from the last week. 
+  for i in {0..15}
+  do
+    JSON_FILE=/src/dev-docs/adding-data/sample-reports/desktop-report-2.json send_chef_run_example
+  done
+
   # send in some chef infra run reports from actual desktops
   for file in dev-docs/adding-data/sample-reports/desktop-report-{1,2,3}.json; do
     # shellcheck disable=SC2002
@@ -358,4 +363,15 @@ function load_desktop_reports() {
         '.error.message = $msg | .error.class = $errtype' |\
       send_chef_data_raw
   done
+
+  # set the date that the all the node were initially created in automate to a year ago. 
+  year_ago=$(date --rfc-3339=seconds  -d "1 year ago" | sed 's/ /T/' | sed 's/\+.*/Z/')
+  curl -X POST "$ELASTICSEARCH_URL/node-state/_update_by_query?pretty" -H 'Content-Type: application/json' -d'
+  {
+    "script": {
+      "source": "ctx._source[\u0027created\u0027] = \u0027'$year_ago'\u0027",
+      "lang": "painless"
+    }
+  }
+  '
 }
