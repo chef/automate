@@ -12,10 +12,10 @@
         <div role="menuitem" class="nav-link"><a routerLink="/dashboards/event-feed" routerLinkActive="active" tabindex="0">Dashboards</a></div>
       </app-authorized>
 
-      <app-authorized [allOf]="[
+      <app-authorized *ngIf="isDesktopView" [allOf]="[
           ['/api/v0/cfgmgmt/nodes', 'get'],
           ['/api/v0/cfgmgmt/stats/node_counts', 'get']]">
-        <div *ngIf="isDesktopView" role="menuitem" class="nav-link"><a routerLink="/desktop" routerLinkActive="active" tabindex="0">Desktop</a></div>
+        <div role="menuitem" class="nav-link"><a routerLink="/desktop" routerLinkActive="active" tabindex="0">Desktop</a></div>
       </app-authorized>
 
       <app-authorized [allOf]="[
