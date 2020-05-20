@@ -122,43 +122,4 @@ describe('ChefSessionService', () => {
       });
     });
   });
-
-  describe('#refreshSessionCallback', () => {
-    let event, xhr;
-    beforeEach(() => {
-      service.setDefaultSession();
-      service.tryInitializeSession();
-      event = {};
-      xhr = {};
-      event.target = xhr;
-      xhr.readyState = 4;
-      spyOn(service, 'ingestIDToken');
-    });
-
-    describe('when session refresh succeeds', () => {
-      beforeEach(() => {
-        xhr.status = 200;
-        xhr.response = { id_token: 'refreshed_id_token'};
-      });
-
-      it('ingests the returned ID token', () => {
-        service.refreshSessionCallback(event);
-        expect(service.ingestIDToken).toHaveBeenCalledWith('refreshed_id_token');
-      });
-    });
-
-    describe('when session refresh fails', () => {
-      beforeEach(() => {
-        xhr.status = 401;
-        spyOn(service, 'currentPath').and.returnValue('/some/path');
-        spyOn(service, 'logout');
-      });
-
-      it('does not ingest any token, but calls logout', () => {
-        service.refreshSessionCallback(event);
-        expect(service.logout).toHaveBeenCalledWith();
-        expect(service.ingestIDToken).not.toHaveBeenCalled();
-      });
-    });
-  });
 });
