@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { FilterOptions, FilterableOptions } from './insight-attributes-dropdown.model';
+
 
 @Component({
   selector: 'app-insight-attributes-dropdown',
@@ -6,6 +8,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./insight-attributes-dropdown.component.scss']
 })
 export class InsightAttributesDropdownComponent implements OnInit {
+
+  public options: FilterOptions[] = FilterableOptions;
 
   ngOnInit() {
     console.log('on init');

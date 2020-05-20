@@ -1,5 +1,35 @@
+@import "~styles/variables";
+
 :host {
   position: absolute;
-  border: 3px solid lime;
-  background: cornsilk;
+  top: 0;
+  padding: 16px;
+  border-radius: 8px; // not variable
+  background: $chef-white;
+  box-shadow: 8px 8px 24px 0 rgba(197,199,209,0.6);
+
+  .instruction {
+    //
+  }
+
+  ul {
+    columns: 2;
+    list-style-type: none;
+    padding: 0;
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .filter-button {
+      width: 100%;
+      height: 100%;
+      padding: 7px 16px 5px;
+      background: $chef-white;
+      border-radius: $chef-border-radius;
+      font-size: 14px;
+      text-align: left;
+      border: 1px solid $chef-desktop-light;
+    }
+  }
 }
