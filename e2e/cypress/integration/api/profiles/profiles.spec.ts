@@ -1,5 +1,24 @@
 
 describe('Available profile', () => {
+    // search for profile to get the version
+    let version:string
+    beforeEach(() => {
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: 'api/v0/compliance/profiles/search',
+            body: {
+            filters: [
+                {type: "name", values: ['linux-baseline']}
+            ]
+            }
+        }).then((resp: Cypress.ObjectLike) => {
+            console.log(resp.body)
+            version = resp.body.profiles[0].version;
+        })
+    });
+
+
     it('can be installed', () => {
         const cypressPrefix = 'test-install-available-profile';
         cy.request({
@@ -8,7 +27,7 @@ describe('Available profile', () => {
             url: 'api/v0/compliance/profiles?owner=admin',
             body: {
             name: 'linux-baseline',
-            version: '2.2.2'
+            version: version
             }
         }).then((resp: Cypress.ObjectLike) => {
             expect(resp.body.summary.valid).to.equal(true);
@@ -22,7 +41,7 @@ describe('Available profile', () => {
             url: 'api/v0/compliance/profiles?owner=admin',
             body: {
             name: 'linux-baseline',
-            version: '2.2.2'
+            version: version
             }
         }).then((resp: Cypress.ObjectLike) => {
             expect(resp.body.summary.valid).to.equal(true);
