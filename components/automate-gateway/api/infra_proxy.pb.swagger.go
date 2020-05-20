@@ -660,6 +660,44 @@ func init() {
         "tags": [
           "InfraProxy"
         ]
+      },
+      "post": {
+        "operationId": "CreateDataBag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateDataBag"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.CreateDataBag"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
@@ -1072,6 +1110,23 @@ func init() {
         },
         "built": {
           "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.CreateDataBag": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Data bag name."
         }
       }
     },
@@ -1496,6 +1551,15 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookVersion"
           },
           "description": "List of cookbooks with name and version."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.CreateDataBag": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Data bag name."
         }
       }
     },

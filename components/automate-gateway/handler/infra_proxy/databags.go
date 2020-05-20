@@ -9,6 +9,23 @@ import (
 	infra_res "github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
+// CreateDataBag creates a data bag
+func (a *InfraProxyServer) CreateDataBag(ctx context.Context, r *gwreq.CreateDataBag) (*gwres.CreateDataBag, error) {
+	req := &infra_req.CreateDataBag{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.CreateDataBag(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.CreateDataBag{
+		Name: res.GetName(),
+	}, nil
+}
+
 // GetDataBags fetches an array of existing data bags
 func (a *InfraProxyServer) GetDataBags(ctx context.Context, r *gwreq.DataBags) (*gwres.DataBags, error) {
 	req := &infra_req.DataBags{

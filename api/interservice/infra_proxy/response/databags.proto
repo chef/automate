@@ -21,3 +21,8 @@ message DataBag {
     // Stringified json of data bag item.
     string data = 3;
 }
+
+message CreateDataBag {
+    // Data bag name.
+    string name = 1;
+}
