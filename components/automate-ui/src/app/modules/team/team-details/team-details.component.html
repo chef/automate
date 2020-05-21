@@ -41,9 +41,14 @@
       <section class="page-body" *ngIf="team?.id && (tabValue === 'users')">
         <div id="users-list">
           <div>
-            <app-user-table [addButtonText]="addButtonText" [removeText]="removeText" [users]="users"
-              [baseUrl]="'/apis/iam/v2/teams/' + team?.id" [createPermissionsPath]="['/apis/iam/v2/teams/{id}', 'put', team?.id]"
-              [showTable]="showUsersTable()" [showEmptyMessage]="showEmptyStateMessage()"
+            <app-user-table
+              [addButtonText]="addButtonText"
+              [removeText]="removeText"
+              [users]="users"
+              [baseUrl]="'/apis/iam/v2/teams/' + team?.id"
+              [createPermissionsPath]="['/apis/iam/v2/teams/{id}', 'put', team?.id]"
+              [showTable]="showUsersTable()"
+              [showEmptyMessage]="showEmptyStateMessage()"
               (addClicked)="toggleUserMembershipView()"
               (removeClicked)="removeUser($event)">
             </app-user-table>
