@@ -1,6 +1,8 @@
 @import "~styles/variables";
+@import "@carbon/grid/scss/grid";
 
 :host {
+  @extend .bx--grid;
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
@@ -8,21 +10,61 @@
   border-radius: 8px; // not variable
   background: $chef-white;
   box-shadow: 8px 8px 24px 0 rgba(197,199,209,0.6);
+  width: 100%;
+
+  @include carbon--breakpoint-up(md) {
+    max-width: 467px;
+  }
+
+
+  * {
+    font-family: 'Inter Regular';
+  }
+
+  .bx--row {
+    margin-left: 0;
+    margin-right: 0;
+  }
 
   .instruction {
-    //
+    margin: 0;
   }
 
   ul {
-    columns: 2;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
     list-style-type: none;
     padding: 0;
+    margin-top: 15px;
     margin-bottom: 0;
+    min-height: 420px;
+    @include carbon--breakpoint-up(md) {
+      max-height: 420px;
+    }
+
+
+    .button-container {
+      width: 100%;
+      padding-left: 0;
+      padding-right: 0;
+
+      // need to shift this back at small
+      @include carbon--breakpoint-up(md) {
+        width: 50%;
+
+        &:nth-child(-n + 10) {
+          padding-right: 8px;
+        }
+      }
+
+
+
+    }
 
     .filter-button {
-      display: block;
       margin-bottom: 8px;
-      width: 100%;
+      padding: 0;
       border: 1px solid $chef-desktop-light;
       border-radius: $chef-border-radius;
       overflow: hidden;
@@ -60,45 +102,52 @@
   }
 
   .button-row {
-    display: flex;
+    @extend .bx--row;
     justify-content: space-between;
   }
-}
 
-// checkbox overwrites
-::ng-deep chef-checkbox {
-  margin-top: 0;
-  margin-bottom: 0;
 
-  &[aria-checked=true] .check-wrap {
-    border-color: #4535D7;
-    background-color: #4535D7;
+  // checkbox overwrites
+  ::ng-deep chef-checkbox {
+    margin-top: 0;
+    margin-bottom: 0;
+  
+    &[aria-checked=true] .check-wrap {
+      border-color: #4535D7;
+      background-color: #4535D7;
+    }
+  
+    &[aria-checked=false] .check-wrap {
+      border: 1px solid $chef-desktop-light;
+    }
+  
+    .label-wrap {
+      margin-left: 8px;
+      color: #394261;
+      letter-spacing: .25px;
+    }
   }
+  
+  ::ng-deep chef-button {
+    color: #2E1EC1;
+    border-radius: 8px;
+    font-weight: bold;
+  
+    &[primary] {
+      background: #DFDCFF;
+      border: none;
+      box-shadow: 2px 2px 4px 0 #B3ABFB, -2px -2px 12px 0 #ECF0F9;
+      margin-right: 0;
+    }
+  
+    &[disabled] {
+      // temp until get styles
+      background: desaturate(#DFDCFF, 80%);
+    }
 
-  &[aria-checked=false] .check-wrap {
-    border: 1px solid $chef-desktop-light;
+    button {
+      padding: 0 16px;
+    }
   }
-
-  .label-wrap {
-    margin-left: 8px;
-    color: #394261;
-    letter-spacing: .25px;
-  }
-}
-
-::ng-deep chef-button {
-  color: #2E1EC1;
-  border-radius: 8px;
-  font-weight: bold;
-
-  &[primary] {
-    background: #DFDCFF;
-    border: none;
-    box-shadow: 2px 2px 4px 0 #B3ABFB, -2px -2px 12px 0 #ECF0F9;
-  }
-
-  &[disabled] {
-    // temp until get styles
-    background: desaturate(#DFDCFF, 80%);
-  }
-}
+  
+} // end :host
