@@ -29,9 +29,9 @@ export interface ChildList {
 }
 
 export class RoleAttributes {
-  default_attributes: string;
-  override_attributes: string;
-  all: Object;
+  default_attributes: Object;
+  override_attributes: Object;
+  all: AllAttributes;
   constructor(resp: RespRoleAttributes) {
     this.default_attributes =
       (resp.default_attributes && JSON.parse(resp.default_attributes)) || '';
@@ -47,4 +47,9 @@ export class RoleAttributes {
 export interface RespRoleAttributes {
   default_attributes: string;
   override_attributes: string;
+}
+
+export interface AllAttributes {
+  default_attributes: Object;
+  override_attributes: Object;
 }

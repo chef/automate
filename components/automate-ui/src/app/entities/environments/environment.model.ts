@@ -17,7 +17,7 @@ export interface CookbookVersion {
 export class EnvironmentAttributes {
   default_attributes: Object;
   override_attributes: Object;
-  all: Object;
+  all: AllAttributes;
   constructor(resp: RespEnvironmentAttributes) {
     this.default_attributes =
       (resp.default_attributes && JSON.parse(resp.default_attributes)) || {};
@@ -33,4 +33,9 @@ export class EnvironmentAttributes {
 export interface RespEnvironmentAttributes {
   default_attributes: string;
   override_attributes: string;
+}
+
+export interface AllAttributes {
+  default_attributes: Object;
+  override_attributes: Object;
 }
