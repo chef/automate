@@ -10,12 +10,12 @@ from hab studio:
 
 from hab studio:
 
-there are two opions...
+there are two options...
 
 1. `chef_load_nodes` 
 
 1. to load infra nodes with failed runs:
-    ```
+    ```shell
     for _ in {1..500} ; do   m=$((RANDOM % 4));   n=$((RANDOM % 25));   generate_chef_run_failure_example |     jq --arg msg "Error $n occurred" --arg type "Chef::ExampleError$m" '.error.message = $msg | .error.class = $type' |     send_chef_data_raw https://A2-URL $TOKEN; done
     ```
     _note: play with the args to generate more varied data_
@@ -46,7 +46,7 @@ there are three options...
     runs the above command with the following easy default options: `-N50 -D10 -M1 -T500`
 1. `load_compliance_reports`
 
-    will send the reports located in `components/compliance-service/test-data/audit-reports` to your dev enironment. these reports are populated with fields such as chef_server, organization, policy_name. these reports are especially useful when you need to test searchbar functionality for multiple search fields or resource scoped access ingest match rules.
+    will send the reports located in `components/compliance-service/test-data/audit-reports` to your dev environment. these reports are populated with fields such as chef_server, organization, policy_name. these reports are especially useful when you need to test search bar functionality for multiple search fields or resource scoped access ingest match rules.
 
 ## Adding nodes to populate the nodes and scan jobs pages
 
@@ -66,7 +66,7 @@ AWS:
  - get your credentials: `cat ~/.aws/credentials`
 
  - use the api to add integrations using these credentials:
- ```
+ ```shell
  curl -s --insecure -H "api-token: $token_value" https://a2-dev.test/api/v0/nodemanagers -d '{
     "name": "my aws api integration with session token",
     "type": "aws-api",
@@ -92,10 +92,12 @@ there are three options...
 1. `infra_service_load_sample_data`
     
     By default, 50 records of the infra servers and orgs will be added with the prefix `chef-server` and `chef-org` respectively.
+    <sub>_*Only for servers & organizations testing does not get cookbooks, roles, data bags, environments etc data._<sub>
 1. `infra_service_load_sample_data -N 100 -S infra-server -O infra-org`
     
     100 records of the infra servers and orgs will be added, modify the numbers on each of those options to meet your needs.
-1. [internal steps](https://chefio.slack.com/archives/CPYNX33LJ/p1583485764104300) this is the only method that works against a running chef server and will allow you to get data that does not result in the cookbook error
+    <sub>_*Only for servers & organizations testing does not get cookbooks, roles, data bags, environments etc data._<sub>
+1. [internal steps](https://chefio.slack.com/archives/CPYNX33LJ/p1583485764104300) this is the only method that works against a running chef server and will allow you to get data like cookbooks, roles, data bags, environments etc.
 
 ----------------------------------------------------------------------------------
 # DELETING DATA
@@ -122,7 +124,7 @@ TBD
 
 ## Adding nodes to populate client runs
 from your hab studio:
-```
+```shell
 for _ in {1..500} ; do   m=$((RANDOM % 4));   n=$((RANDOM % 25));   generate_chef_run_failure_example |     jq --arg msg "Error $n occurred" --arg type "Chef::ExampleError$m" '.error.message = $msg | .error.class = $type' |     send_chef_data_raw https://A2-URL $TOKEN; done
 ```
 _note: play with the args to generate more varied data_
