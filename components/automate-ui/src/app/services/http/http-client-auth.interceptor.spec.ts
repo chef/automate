@@ -23,6 +23,7 @@ describe('HttpClientAuthInterceptor', () => {
       httpClient = TestBed.inject(HttpClient);
       httpMock = TestBed.inject(HttpTestingController);
       chefSession = TestBed.inject(ChefSessionService);
+
       spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
       const tokenProvider = new ReplaySubject<String>(1);
       tokenProvider.next(chefSession.id_token);
@@ -93,6 +94,9 @@ describe('HttpClientAuthInterceptor', () => {
           httpMock = TestBed.inject(HttpTestingController);
           chefSession = TestBed.inject(ChefSessionService);
           spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+          const tokenProvider = new ReplaySubject<String>(1);
+          tokenProvider.next(chefSession.id_token);
+          spyOnProperty(chefSession, 'token_provider', 'get').and.returnValue(tokenProvider);
         });
 
         it('includes checked projects', done => {
@@ -128,6 +132,9 @@ describe('HttpClientAuthInterceptor', () => {
           httpMock = TestBed.inject(HttpTestingController);
           chefSession = TestBed.inject(ChefSessionService);
           spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+          const tokenProvider = new ReplaySubject<String>(1);
+          tokenProvider.next(chefSession.id_token);
+          spyOnProperty(chefSession, 'token_provider', 'get').and.returnValue(tokenProvider);
         });
 
         it('does not include projects header', done => {
@@ -154,6 +161,9 @@ describe('HttpClientAuthInterceptor', () => {
         httpMock = TestBed.inject(HttpTestingController);
         chefSession = TestBed.inject(ChefSessionService);
         spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+        const tokenProvider = new ReplaySubject<String>(1);
+        tokenProvider.next(chefSession.id_token);
+        spyOnProperty(chefSession, 'token_provider', 'get').and.returnValue(tokenProvider);
       });
 
       using([
