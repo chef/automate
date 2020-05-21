@@ -44,7 +44,7 @@
     }
 
 
-    .button-container {
+    .filter-button-container {
       width: 100%;
       padding-left: 0;
       padding-right: 0;
@@ -84,6 +84,7 @@
       height: 100%;
       background: $chef-white;
       font-size: 14px;
+      // not yet named
       color: #394261;
       letter-spacing: .25px;
       pointer-events: none;
@@ -101,9 +102,10 @@
     }
   }
 
-  .button-row {
+  .action-button-row {
     @extend .bx--row;
     justify-content: space-between;
+    margin-top: 8px;
   }
 
 
@@ -113,6 +115,7 @@
     margin-bottom: 0;
   
     &[aria-checked=true] .check-wrap {
+      // not yet named colors
       border-color: #4535D7;
       background-color: #4535D7;
     }
@@ -132,6 +135,8 @@
     color: #2E1EC1;
     border-radius: 8px;
     font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 0;
   
     &[primary] {
       background: #DFDCFF;
@@ -150,4 +155,4 @@
     }
   }
   
-} // end :host
+}

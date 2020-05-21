@@ -3,7 +3,7 @@
 </div>
 <ul class="bx--row">
   <ng-container *ngFor="let option of options">
-    <div class="button-container">
+    <div class="filter-button-container">
       <li class="filter-button" (click)="handleSelect($event)" (keyup.enter)="handleSelect($event)"
       tabindex="0" role="button" [attr.aria-pressed]="false" [attr.data-filtervalue]="option.id">
         <span>{{ option.name }}<i class="check">&#x2713;</i></span>
@@ -11,7 +11,7 @@
     </div>
   </ng-container>
 </ul>
-<div class="button-row">
+<div class="action-button-row">
   <chef-checkbox [checked]="saveAsDefault" (change)="handleDefaultChange($event.detail)">
     Save as default
   </chef-checkbox>
