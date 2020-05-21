@@ -2,7 +2,7 @@
 <div>
   <ul>
     <ng-container *ngFor="let option of options">
-      <li class="filter-button" (click)="handleSelect($event)"
+      <li class="filter-button" (click)="handleSelect($event)" (keyup.enter)="handleSelect($event)"
       tabindex="0" role="button" [attr.aria-pressed]="false" [attr.data-filtervalue]="option.id">
         <span>{{ option.name }}<i class="check">&#x2713;</i></span>
       </li>
@@ -16,6 +16,6 @@
 
   <div>
     <chef-button tertiary (click)="handleCancel()">Cancel</chef-button>
-    <chef-button primary (click)="handleUpdate()">Update</chef-button>
+    <chef-button primary [disabled]="!hasNewValues" (click)="handleUpdate()">Update</chef-button>
   </div>
 </div>

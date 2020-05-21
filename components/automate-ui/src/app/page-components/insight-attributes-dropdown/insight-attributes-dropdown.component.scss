@@ -96,4 +96,9 @@
     border: none;
     box-shadow: 2px 2px 4px 0 #B3ABFB, -2px -2px 12px 0 #ECF0F9;
   }
+
+  &[disabled] {
+    // temp until get styles
+    background: desaturate(#DFDCFF, 80%);
+  }
 }

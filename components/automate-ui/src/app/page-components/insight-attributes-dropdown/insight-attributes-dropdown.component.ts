@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FilterOption, FilterableOptions } from './insight-attributes-dropdown.model';
+import { isEqual } from 'lodash/fp';
 
 @Component({
   selector: 'app-insight-attributes-dropdown',
@@ -15,6 +16,7 @@ export class InsightAttributesDropdownComponent implements OnInit {
 
   public options: FilterOption[] = FilterableOptions;
   public selectedOptions: string[] = []; // these are filter ids
+  public hasNewValues = false;
 
   ngOnInit() {
     // creating a reference to fall back on
@@ -36,6 +38,9 @@ export class InsightAttributesDropdownComponent implements OnInit {
         target.classList.add('selected');
       }
     }
+
+    // check if form should be valid based on new selected options
+    this.hasNewValues = !isEqual(this.lastSelectedOptions, this.selectedOptions);
   }
 
   public handleUpdate(): void {
