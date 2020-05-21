@@ -74,14 +74,12 @@ chef-alert {
 
   .fqdn-line {
     display: flex;
-    align-items: center;
     margin-bottom: 8px;
     font-size: 14px;
   }
 
   .supervisor-line {
     display: flex;
-    align-items: center;
     margin-bottom: 4px;
     font-size: 12px;
 
@@ -92,7 +90,6 @@ chef-alert {
 
   .site-line {
     display: flex;
-    align-items: center;
     font-size: 12px;
 
     b {
@@ -102,7 +99,6 @@ chef-alert {
 
   .release-line {
     display: flex;
-    align-items: center;
     margin-bottom: 8px;
     font-size: 14px;
   }
@@ -312,3 +308,21 @@ chef-alert {
   padding-right: 35px;
 }
 
+.fqdn-data {
+  margin-bottom: 0px;
+  word-break: break-all;
+}
+
+.site-data,
+.supervisor-data {
+  margin-bottom: 0px;
+  font-size: 12px;
+  padding-top: 2px;
+  word-break: break-all;
+}
+
+.release-data {
+  margin-bottom: 0px;
+  font-size: 14px;
+  word-break: break-all;
+}
