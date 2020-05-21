@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { cloneDeep } from 'lodash/fp';
 
 
 export interface ResourceChecked {
@@ -50,16 +49,16 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     if (this.resourcesUpdated) { // an optional setting
       this.resourcesUpdated.subscribe(() => {
-        this.updateSectionsAndLabel();
+        this.updateLabel();
       });
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.resources) {
-      this.updateSectionsAndLabel();
+      this.updateLabel();
       if (changes.resources.firstChange) { // only update on initialization/first change
-        this.filteredSections = cloneDeep(this.resources);
+        this.filteredSections = this.copyResources();
       }
     }
   }
@@ -70,7 +69,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     }
     if (this.dropdownState === 'closed') { // opening
       this.filterValue = '';
-      this.filteredSections = cloneDeep(this.resources);
+      this.filteredSections = this.copyResources();
       // we cannot go directly to 'open' because handleClickOutside,
       // firing next on the same event that arrived here, would then immediately close it.
       this.dropdownState = 'opening';
@@ -98,24 +97,31 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   closeDropdown(): void {
     this.dropdownState = 'closed';
-    // TODO
-    // this.onDropdownClosing.emit(
-    //   this.resources.filter(r => r.checked).map(r => r.id));
+    const flattenedIDs = [].concat(
+      ...this.resources.map(
+        section => section.resources.filter(r => r.checked).map(r => r.id)));
+    this.onDropdownClosing.emit(flattenedIDs);
   }
 
   handleFilterKeyUp(): void {
-    console.log(`received ${this.filterValue}`);
     for (let i = 0; i < this.filteredSections.length; i++) {
       this.filteredSections[i].resources =
         this.resources[i].resources.filter(r =>
           r.name.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1);
-      console.log(`section: ${this.filteredSections[i].title}`);
-      console.log(`entries: ${this.filteredSections[i].resources.map(r => r.name).join(',')}`);
     }
-    // this.filteredSections.forEach(section =>
-    //   section.resources = section.resources.filter(resource =>
-    //   resource.id.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1
-    // ));
+  }
+
+  // Not deep and not shallow!
+  // Need the individual resources to point to the same objects
+  // so that when one is checked, it is checked in BOTH structures.
+  private copyResources(): ResourceCheckedSection[] {
+    const copy: ResourceCheckedSection[] = [];
+    this.resources.forEach(section =>
+      copy.push({
+        title: section.title,
+        resources: section.resources
+      }));
+    return copy;
   }
 
   moveFocus(event: KeyboardEvent): void {
@@ -136,10 +142,6 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     }
   }
 
-  private updateSectionsAndLabel(): void {
-    this.updateLabel();
-  }
-
   private updateLabel(): void {
     const checkedResources = this.allCheckedResources;
     this.label = checkedResources.length === 0 ? this.noneSelectedLabel
@@ -147,7 +149,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
         : `${checkedResources.length} ${this.objectNounPlural}`;
   }
 
-  get allCheckedResources() {
+  private get allCheckedResources() {
     const resources: string[] = [];
     this.filteredSections.forEach(section => {
       const stuff = section.resources.filter(r => r.checked).map(r => r.name);
@@ -156,7 +158,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     return resources;
   }
 
-  get allResourcesCount() {
+  get allFilteredResourcesCount() {
     let count = 0;
     this.filteredSections.forEach(section => count += section.resources.length);
     return count;
