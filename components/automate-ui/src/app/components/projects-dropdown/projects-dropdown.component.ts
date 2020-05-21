@@ -7,7 +7,7 @@ import { assignableProjects } from 'app/services/projects-filter/projects-filter
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { ResourceChecked } from '../resource-dropdown/resource-dropdown.component';
+import { ResourceChecked, ResourceCheckedSection } from '../resource-dropdown/resource-dropdown.component';
 
 @Component({
   selector: 'app-projects-dropdown',
@@ -30,7 +30,7 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
   // Label to use when none are selected
   public noneSelectedLabel = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
-  public projects: ResourceChecked[];
+  public projects: ResourceCheckedSection[];
 
   private isDestroyed = new Subject<boolean>();
 
@@ -40,8 +40,8 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
     this.store.select(assignableProjects)
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((assignable: ProjectsFilterOption[]) => {
-        this.projects =
-          assignable.map(p => {
+        this.projects = [{
+          resources: assignable.map(p => {
             return <ResourceChecked>{
               id: p.value,
               name: p.label,
@@ -49,7 +49,8 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
               checked: this.checkedProjectIDs
                 && this.checkedProjectIDs.includes(p.value)
             };
-          });
+          })
+        }];
       });
   }
 
@@ -62,11 +63,13 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
     if (changes.checkedProjectIDs && changes.checkedProjectIDs.currentValue && this.projects) {
       // Need to trigger OnChanges in ResourceDropdownComponent
       // so we cannot just update the checked property of the existing array elements.
-      this.projects = this.projects
-        .map(p => ({
-          ...p,
-          checked: (changes.checkedProjectIDs.currentValue as string[]).includes(p.id)
-        }));
+      this.projects = [{
+        resources: this.projects[0].resources
+          .map(p => ({
+            ...p,
+            checked: (changes.checkedProjectIDs.currentValue as string[]).includes(p.id)
+          }))
+      }];
     }
   }
 
