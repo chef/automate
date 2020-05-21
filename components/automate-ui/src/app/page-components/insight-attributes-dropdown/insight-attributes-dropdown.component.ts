@@ -40,7 +40,7 @@ export class InsightAttributesDropdownComponent implements OnInit {
     }
 
     // check if form should be valid based on new selected options
-    this.hasNewValues = !isEqual(this.lastSelectedOptions, this.selectedOptions);
+    this.hasNewValues = !isEqual(this.lastSelectedOptions.sort(), this.selectedOptions.sort());
   }
 
   public handleUpdate(): void {
