@@ -300,13 +300,11 @@ Chef Habitat Builder uses the same mechanisms that Chef Automate does for [backu
 
 ### Chef Habitat Environment Variables
 
-Set the Chef Habitat Builder on-prem `HAB_BLDR_URL` environment variable with:
+Set the Chef Habitat Builder on-prem `HAB_BLDR_URL` environment variable on the command line with:
 
+```bash
+export HAB_BLDR_URL=https://{{< example_fqdn "automate" >}}/bldr/v1/
 ```
-HAB_BLDR_URL=https://{{< example_fqdn "automate" >}}/bldr/v1/
-```
-
-For more, see the Chef Habitat [environment variables](https://www.habitat.sh/docs/reference/#environment-variables) documentation.
 
 ### Logging errors
 
