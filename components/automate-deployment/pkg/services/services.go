@@ -4,6 +4,7 @@ package services
 
 import (
 	"encoding/json"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -43,6 +44,26 @@ func MetadataForPackage(pkgName string) *product.PackageMetadata {
 		return packageMetadataMap[pkgName].Metadata
 	}
 	return nil
+}
+
+func RequiredProducts(productsIn []string) []string {
+	requiredProducts := make([]string, 0, 16)
+
+	visited := map[string]bool{}
+
+	for _, collectionName := range productsIn {
+		collection := collectionMap[collectionName]
+		if collection != nil {
+			deps := getRequiredCollections(collectionName, visited)
+			for _, d := range deps {
+				if d.Type == product.ProductType {
+					requiredProducts = append(requiredProducts, d.Name)
+				}
+			}
+		}
+	}
+	sort.Strings(requiredProducts)
+	return requiredProducts
 }
 
 func ContainsCollection(needle string, haystack []string) bool {

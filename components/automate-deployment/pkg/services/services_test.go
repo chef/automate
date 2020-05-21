@@ -279,3 +279,11 @@ func TestContainsCollection(t *testing.T) {
 		assert.True(t, ContainsCollection("core", []string{"automate-full"}))
 	})
 }
+
+func TestRequiredProducts(t *testing.T) {
+	assert.Equal(t, []string{"automate", "desktop", "workflow"}, RequiredProducts([]string{"desktop", "workflow"}))
+	assert.Equal(t, []string{"automate", "desktop"}, RequiredProducts([]string{"desktop"}))
+	assert.Equal(t, []string{"automate", "builder", "desktop"}, RequiredProducts([]string{"desktop", "builder"}))
+	assert.Equal(t, []string{"automate", "builder", "desktop"}, RequiredProducts([]string{"desktop", "depot"}))
+	assert.Equal(t, []string{"automate", "builder", "desktop"}, RequiredProducts([]string{"desktop", "depot", "automate-full"}))
+}
