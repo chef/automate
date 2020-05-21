@@ -279,7 +279,7 @@ const routes: Routes = [
       ]
     },
     {
-      path: 'desktop',
+      path: '🖥',
       loadChildren: () => import('./modules/desktop/desktop.module').then(m => m.DesktopModule)
     },
     {

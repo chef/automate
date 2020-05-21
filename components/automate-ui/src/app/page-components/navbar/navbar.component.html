@@ -34,6 +34,9 @@
         <div role="menuitem" class="nav-link"><a routerLink="/compliance" routerLinkActive="active" tabindex="0">Compliance</a></div>
       </app-authorized>
 
+      <div role="menuitem" class="nav-link"><a routerLink="/🖥" routerLinkActive="active"
+          tabindex="0">🖥</a></div>
+
       <app-authorized [anyOf]="[
             ['/api/v0/datafeed/destinations', 'post'],
             ['/api/v0/notifications/rules', 'get'],
