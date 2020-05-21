@@ -19,19 +19,17 @@
       </div>
 
       <div id="resource-container">
-        <div *ngFor="let section of filteredSections">
-          <span *ngIf="section.title && section.resources.length">[{{ section.title }}]</span>
-          <span *ngFor="let resource of section.resources">
-            <chef-checkbox
-              [checked]="resource.checked"
-              [attr.title]="resource.name"
-              (change)="resourceChecked($event.detail, resource)"
-              (keydown.enter)="closeDropdown()"
-              (keydown.esc)="closeDropdown()"
-              (keydown.arrowup)="moveFocus($event)"
-              (keydown.arrowdown)="moveFocus($event)">{{ resource.name }}</chef-checkbox>
-          </span>
-        </div>
+        <ng-container *ngFor="let section of filteredSections">
+          <h3 class="resource-section" *ngIf="section.title && section.resources.length">{{ section.title }}</h3>
+          <chef-checkbox *ngFor="let resource of section.resources"
+            [checked]="resource.checked"
+            [attr.title]="resource.name"
+            (change)="resourceChecked($event.detail, resource)"
+            (keydown.enter)="closeDropdown()"
+            (keydown.esc)="closeDropdown()"
+            (keydown.arrowup)="moveFocus($event)"
+            (keydown.arrowdown)="moveFocus($event)">{{ resource.name }}</chef-checkbox>
+        </ng-container>
       </div>
 
       <div class="no-resources" *ngIf="allResourcesCount === 0">
