@@ -54,8 +54,8 @@ describe('UserTableComponent', () => {
     it('should populate the permission paths using baseUrl', () => {
       component.baseUrl = baseUrl;
       fixture.detectChanges();
-      expect(component.getPermissionsPath).toEqual([baseUrl, 'get']);     // TODO fails
-      expect(component.createPermissionsPath).toEqual([baseUrl, 'post']); // TODO fails
+      expect(component.getPermissionsPath).toEqual([baseUrl, 'get']);
+      expect(component.createPermissionsPath).toEqual([baseUrl, 'post']);
     });
   });
 
