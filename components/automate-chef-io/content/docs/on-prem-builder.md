@@ -306,7 +306,7 @@ Set the Chef Habitat Builder on-prem `HAB_BLDR_URL` environment variable with:
 HAB_BLDR_URL=https://{{< example_fqdn "automate" >}}/bldr/v1/
 ```
 
-For more, see the Chef Habitat [environment variables](https://www.habitat.sh/docs/reference/) documentation.
+For more, see the Chef Habitat [environment variables](https://www.habitat.sh/docs/reference/#environment-variables) documentation.
 
 ### Logging errors
 
