@@ -114,6 +114,7 @@ import { AttributesComponent } from './page-components/attributes/attributes.com
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import { CreateDataFeedModalComponent } from './pages/create-data-feed-modal/create-data-feed-modal.component';
+import { CreateNotificationModalComponent } from './pages/create-notification-modal/create-notification-modal.component';
 import {
   ClientRunsTableComponent
 } from './page-components/client-runs-table/client-runs-table.component';
@@ -210,6 +211,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
     CreateDataFeedModalComponent,
+    CreateNotificationModalComponent,
     DataFeedComponent,
     DataFeedDetailsComponent,
     DateSelectorComponent,

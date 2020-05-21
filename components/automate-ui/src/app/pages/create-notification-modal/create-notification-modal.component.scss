@@ -1,0 +1,81 @@
+@import "~styles/variables";
+
+chef-modal {
+
+  [slot=title] {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 1em;
+    padding-bottom: 12px;
+  }
+
+  .flex-container {
+    display: flex;
+    justify-content: center;
+
+    .margin {
+      margin-bottom: 30px;
+    }
+
+    form {
+      flex-basis: 61%;
+
+      input {
+        font-size: 1em;
+      }
+
+      label {
+        padding-bottom: 0;
+      }
+    }
+
+    #button-bar {
+      text-align: center;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .url-failed {
+    font-size: 13px;
+    text-align: center;
+    background-color: #DC267F;
+    color: #FFF;
+    border-radius: 4px;
+    padding: 2px;
+  }
+
+  .url-success {
+    font-size: 13px;
+    text-align: center;
+    background-color: #1074C4;
+    color: #FFF;
+    border-radius: 4px;
+    padding: 2px;
+  }
+
+  .url-success-icon {
+    margin: 2px;
+    background-color: #FFF;
+    color: rgb(56, 100, 242);
+    border-radius: 50px;
+  }
+}
+
+.input-desc {
+  font-size: 10px;
+  font-weight: 100;
+}
+
+.i-desc {
+  font-size: 12px;
+  font-weight: 300;
+}
+
+label {
+  font-size: 1em;
+}
