@@ -133,7 +133,8 @@
             <div class="checkbox-container">
               <chef-checkbox
               [checked]="!clientRunsLabelMissing.value.disabled"
-              (change)="handleFormActivation(clientRunsLabelMissing, $event.detail)">
+              (change)="handleFormActivation(clientRunsLabelMissing, $event.detail)"
+              disabled="isDesktopView">
               </chef-checkbox>
             </div>
           
@@ -158,7 +159,8 @@
             <div class="checkbox-container">
               <chef-checkbox
               [checked]="!clientRunsRemoveNodes.value.disabled"
-              (change)="handleFormActivation(clientRunsRemoveNodes, $event.detail)">
+              (change)="handleFormActivation(clientRunsRemoveNodes, $event.detail)"
+              disabled="isDesktopView">
               </chef-checkbox>
             </div>
             <p>Remove nodes labeled as missing after
