@@ -1,7 +1,7 @@
 
 describe('Available profile', () => {
     // search for profile to get the version
-    let version:string
+    let version: string;
     beforeEach(() => {
         cy.request({
             headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -9,13 +9,12 @@ describe('Available profile', () => {
             url: 'api/v0/compliance/profiles/search',
             body: {
             filters: [
-                {type: "name", values: ['linux-baseline']}
+                {type: 'name', values: ['linux-baseline']}
             ]
             }
         }).then((resp: Cypress.ObjectLike) => {
-            console.log(resp.body)
             version = resp.body.profiles[0].version;
-        })
+        });
     });
 
 
@@ -36,7 +35,9 @@ describe('Available profile', () => {
     it('can be installed even when lax header present', () => {
         const cypressPrefix = 'test-install-available-profile';
         cy.request({
-            headers: { 'api-token': Cypress.env('ADMIN_TOKEN'), 'content-type': 'application/json+lax' },
+            headers: {
+                'api-token': Cypress.env('ADMIN_TOKEN'),
+                'content-type': 'application/json+lax' },
             method: 'POST',
             url: 'api/v0/compliance/profiles?owner=admin',
             body: {
