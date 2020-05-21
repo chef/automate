@@ -31,11 +31,11 @@ export class InsightAttributesDropdownComponent implements OnInit {
     const isFilteredIndex = this.selectedOptions.indexOf(filter);
     if ( isFilteredIndex >= 0 ) {
       this.selectedOptions.splice(isFilteredIndex, 1);
-      target.classList.remove('selected');
+      this.updateButtonState(target, 'off');
     } else {
       if (this.selectedOptions.length < 5) {
         this.selectedOptions.push(filter);
-        target.classList.add('selected');
+        this.updateButtonState(target, 'on');
       }
     }
 
@@ -51,7 +51,9 @@ export class InsightAttributesDropdownComponent implements OnInit {
 
   public handleCancel(): void {
     this.selectedOptions.forEach(option => {
-      document.querySelector('.filter-button[data-filterValue="' + option + '"]').classList.remove('selected');
+      const target = document.querySelector('.filter-button[data-filterValue="' + option + '"]');
+      target.classList.remove('selected');
+      target.setAttribute('aria-pressed', 'off');
     });
     this.selectedOptions = [...this.lastSelectedOptions];
     this.onToggleMenu.emit();
@@ -62,10 +64,14 @@ export class InsightAttributesDropdownComponent implements OnInit {
     console.log(checkedState);
   }
 
-  // NOT IN USE CREATE CUSTOM PIPE FOR THIS
-  public isAriaPressed(filterId: string): boolean {
-    console.log('isAriaPressed');
-    return this.selectedOptions.includes(filterId);
+  private updateButtonState(target: HTMLElement, state: 'on' | 'off'): void {
+    if ( state === 'off') {
+      target.classList.remove('selected');
+      target.setAttribute('aria-pressed', 'false');
+    } else {
+      target.classList.add('selected');
+      target.setAttribute('aria-pressed', 'true');
+    }
   }
 
 }
