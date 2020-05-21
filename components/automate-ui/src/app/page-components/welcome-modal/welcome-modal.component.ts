@@ -117,7 +117,8 @@ export class WelcomeModalComponent {
   public showModal(): void {
     this.isVisible = true;
     this.localStorage.putBoolean(SHOW_AT_START_PREF_KEY, this.showAtStartPref);
-    this.sessionStorage.putBoolean(this.chefSessionService.userWelcomeModalSeenKey(), true);
+    this.sessionStorage.putBoolean(
+      this.chefSessionService.userWelcomeModalSeenKey(), true);
   }
 
   // Determines whether or not to show the modal based on the user's
@@ -127,7 +128,8 @@ export class WelcomeModalComponent {
     // The result of this query to sessionStorage should always result in
     // either a 'true' or a 'null' value but we are explicitly checking for
     // true here for clarity.
-    if (this.sessionStorage.getBoolean(this.chefSessionService.userWelcomeModalSeenKey()) === true) {
+    if (this.sessionStorage.getBoolean(
+      this.chefSessionService.userWelcomeModalSeenKey()) === true) {
       // If the modal has already been seen we return early and do nothing.
       return;
     } else if (showPref) {
