@@ -137,6 +137,3 @@ same instructions as dev env
 create a credential with your chef AD username and your key (~/.ssh/id_rsa)
 create a node with fqdn `localhost`, attach the credential (https://a2-url/compliance/scan-jobs/nodes/add)
 create a scan job using that node and profiles installed
-
-## Adding data to infra views
-use the credentials pinned in the #automate-infra-views slack channel to add a chef server and then org via the ui, at a2-url/infrastructure/chef-servers
