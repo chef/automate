@@ -9,7 +9,6 @@ export class ClientRequests {
 
   constructor(private http: HttpClient) { }
 
-  // tslint:disable-next-line: max-line-length
   public getClients(server_id: string, org_id: string):
     Observable<ClientsSuccessPayload> {
     return this.http.get<ClientsSuccessPayload>(

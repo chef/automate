@@ -25,22 +25,22 @@ export class ClientEffects {
 
   @Effect()
   getClients$ = this.actions$.pipe(
-      ofType(ClientActionTypes.GET_ALL),
-      mergeMap(({ payload: { server_id, org_id } }: GetClients) =>
-        this.requests.getClients(server_id, org_id).pipe(
-          map((resp: ClientsSuccessPayload) => new GetClientsSuccess(resp)),
-          catchError((error: HttpErrorResponse) =>
-          observableOf(new GetClientsFailure(error))))));
+    ofType(ClientActionTypes.GET_ALL),
+    mergeMap(({ payload: { server_id, org_id } }: GetClients) =>
+      this.requests.getClients(server_id, org_id).pipe(
+        map((resp: ClientsSuccessPayload) => new GetClientsSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+        observableOf(new GetClientsFailure(error))))));
 
   @Effect()
   getEnvironmentsFailure$ = this.actions$.pipe(
-      ofType(ClientActionTypes.GET_ALL_FAILURE),
-      map(({ payload }: GetClientsFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not get clients: ${msg || payload.error}`
-        });
-      }));
+    ofType(ClientActionTypes.GET_ALL_FAILURE),
+    map(({ payload }: GetClientsFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get clients: ${msg || payload.error}`
+      });
+    }));
 
 }
