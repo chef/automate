@@ -272,13 +272,7 @@ export class ChefSessionService implements CanActivate {
   }
 
   setDefaultSession(): void {
-    localStorage.setItem(sessionKey,
-      JSON.stringify({
-        'uuid': 'test_subject',
-        'username': 'testchefuser',
-        'fullname': 'Test User',
-        'groups': ['group1', 'group2', 'group3'],
-        'id_token': 'test_id_token'
-      }));
+    this.setSession('test_subject', 'Test User', 'testchefuser',
+      'test_id_token', ['group1', 'group2', 'group3'], true);
   }
 }
