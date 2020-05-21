@@ -11,6 +11,8 @@ export class InsightAttributesDropdownComponent implements OnInit {
   @Input() saveAsDefault = false;
   @Input() lastSelectedOptions: string[] = []; // these are filter ids
   @Output() onUpdateFilters: EventEmitter<any> = new EventEmitter();
+  @Output() onToggleMenu: EventEmitter<any> = new EventEmitter();
+
   public options: FilterOption[] = FilterableOptions;
   public selectedOptions: string[] = []; // these are filter ids
 
@@ -39,7 +41,7 @@ export class InsightAttributesDropdownComponent implements OnInit {
   public handleUpdate(): void {
     // emit new selected filter ids
     this.onUpdateFilters.emit(this.selectedOptions);
-
+    this.onToggleMenu.emit();
   }
 
   public handleCancel(): void {
@@ -47,6 +49,12 @@ export class InsightAttributesDropdownComponent implements OnInit {
       document.querySelector('.filter-button[data-filterValue="' + option + '"]').classList.remove('selected');
     });
     this.selectedOptions = [...this.lastSelectedOptions];
+    this.onToggleMenu.emit();
+  }
+
+  public handleDefaultChange(checkedState): void {
+    // call to save as default
+    console.log(checkedState);
   }
 
   // NOT IN USE CREATE CUSTOM PIPE FOR THIS

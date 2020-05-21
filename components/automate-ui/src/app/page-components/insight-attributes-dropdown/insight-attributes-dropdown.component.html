@@ -10,7 +10,7 @@
   </ul>
 </div>
 <div class="button-row">
-  <chef-checkbox [checked]="saveAsDefault">
+  <chef-checkbox [checked]="saveAsDefault" (change)="handleDefaultChange($event.detail)">
     Save as default
   </chef-checkbox>
 
