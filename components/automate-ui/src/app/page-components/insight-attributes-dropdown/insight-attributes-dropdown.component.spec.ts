@@ -59,7 +59,7 @@ describe('OverviewTrendComponent', () => {
   });
 
 
-  describe('when making selection to filter by', () => {
+  describe('when making selections to filter', () => {
     beforeEach(() => {
       component.options = testOptions;
       fixture.detectChanges();
@@ -108,6 +108,22 @@ describe('OverviewTrendComponent', () => {
       list[4].click();
       fixture.detectChanges();
       expect(updateButton.disabled).toBeTruthy();
+    });
+
+    it('updates selected class and aria-pressed value', () => {
+      const list = fixture.debugElement.nativeElement.querySelectorAll('.filter-button');
+      list[0].click();
+      list[1].click();
+      list[4].click();
+      fixture.detectChanges();
+
+      const allSelected = fixture.debugElement.nativeElement
+        .querySelectorAll('.filter-button.selected');
+      const allPressed = fixture.debugElement.nativeElement
+        .querySelectorAll('[aria-pressed="true"]');
+
+      expect(allSelected.length).toBe(3);
+      expect(allPressed.length).toBe(3);
     });
   });
 
