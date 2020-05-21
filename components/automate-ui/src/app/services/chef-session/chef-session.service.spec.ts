@@ -5,6 +5,7 @@ import {
   ngrxReducers,
   runtimeChecks
 } from 'app/ngrx.reducers';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('ChefSessionService', () => {
   let service: ChefSessionService;
@@ -13,7 +14,8 @@ describe('ChefSessionService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks }),
+        HttpClientTestingModule,
       ],
       providers: [
         ChefSessionService

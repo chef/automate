@@ -10,6 +10,7 @@ import {
 } from '../projects-filter/projects-filter.reducer';
 import { HttpClientAuthInterceptor } from './http-client-auth.interceptor';
 import { using } from 'app/testing/spec-helpers';
+import { ReplaySubject } from 'rxjs';
 
 describe('HttpClientAuthInterceptor', () => {
   let httpClient: HttpClient;
@@ -23,6 +24,9 @@ describe('HttpClientAuthInterceptor', () => {
       httpMock = TestBed.inject(HttpTestingController);
       chefSession = TestBed.inject(ChefSessionService);
       spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+      let tokenProvider = new ReplaySubject<String>(1);
+      tokenProvider.next(chefSession.id_token);
+      spyOnProperty(chefSession, 'token_provider', 'get').and.returnValue(tokenProvider);
     });
 
     it('includes auth token in all requests', done => {
