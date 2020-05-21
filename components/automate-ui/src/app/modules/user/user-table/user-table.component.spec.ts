@@ -25,6 +25,15 @@ describe('UserTableComponent', () => {
       ],
       declarations: [
         MockComponent({ selector: 'app-authorized', inputs: ['allOf'] }),
+        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
+        MockComponent({ selector: 'chef-table' }),
+        MockComponent({ selector: 'chef-th' }),
+        MockComponent({ selector: 'chef-tr' }),
+        MockComponent({ selector: 'chef-td' }),
+        MockComponent({ selector: 'chef-thead' }),
+        MockComponent({ selector: 'chef-tbody' }),
+        MockComponent({ selector: 'mat-option' }),
+        MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'chef-toolbar' }),
         UserTableComponent,
         TestUserTableComponent
