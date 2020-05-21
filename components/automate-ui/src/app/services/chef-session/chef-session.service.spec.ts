@@ -15,7 +15,7 @@ describe('ChefSessionService', () => {
     TestBed.configureTestingModule({
       imports: [
         StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks }),
-        HttpClientTestingModule,
+        HttpClientTestingModule
       ],
       providers: [
         ChefSessionService
