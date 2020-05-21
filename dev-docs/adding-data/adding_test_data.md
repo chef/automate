@@ -61,7 +61,7 @@ this should be done by downloading profiles from the "Available" tab under the C
 ## Adding cloud integrations
 
 AWS:
- - use the `okta_aws` functionality to get your temporary aws credentials (see details here)[https://chefio.atlassian.net/wiki/spaces/ENG/pages/94259373/SOP-001+-+Gaining+access+to+okta+AWS+accounts+via+the+AWS+API#SOP-001-GainingaccesstooktaAWSaccountsviatheAWSAPI-Step1:Installokta_aws]
+ - use the `okta_aws` functionality to get your temporary aws credentials [see details here](https://chefio.atlassian.net/wiki/spaces/ENG/pages/94259373/SOP-001+-+Gaining+access+to+okta+AWS+accounts+via+the+AWS+API#SOP-001-GainingaccesstooktaAWSaccountsviatheAWSAPI-Step1:Installokta_aws)
 
  - get your credentials: `cat ~/.aws/credentials`
 
