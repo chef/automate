@@ -316,6 +316,15 @@ message WaiverData {
 	ControlSummary waiver_summary= 4;
 }
 
+message RemovedResultsCounts {
+	// The number of results with status of `failed` that have been trimmed (removed) from a control
+	int32 failed = 1;
+	// The number of results with status of `skipped` that have been trimmed (removed) from a control
+	int32 skipped = 2;
+	// The number of results with status of `passed` that have been trimmed (removed) from a control
+	int32 passed = 3;
+}
+
 message ControlItem {
 	// The control's unique ID.
 	string id = 1;
@@ -622,6 +631,8 @@ message Control {
 	string waived_str = 11;
 	// Additional details for waived controls
 	OrigWaiverData waiver_data = 12;
+	// When the control results are removed to reduce the size of the report, this summarize the status of the trimmed results.
+	RemovedResultsCounts removed_results_counts = 13;
 }
 
 // OrigWaiverData as it originally came from the InSpec report
