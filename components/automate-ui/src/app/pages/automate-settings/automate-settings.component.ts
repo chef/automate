@@ -25,6 +25,7 @@ import {
   JobCategories
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
 
 @Component({
   templateUrl: './automate-settings.component.html',
@@ -33,77 +34,7 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
-  private defaultFormData: DefaultFormData = {
-    eventFeedRemoveData: {
-      category: JobCategories.EventFeed,
-      name: 'periodic_purge',
-      nested_name: NestedJobName.Feed,
-      unit: { value: 'd', disabled: false },
-      threshold: [{ value: '30', disabled: false}, Validators.required],
-      disabled: false
-    },
-    eventFeedServerActions: {
-      category: JobCategories.Infra,
-      name: 'periodic_purge_timeseries',
-      nested_name: NestedJobName.Actions,
-      unit: { value: 'd', disabled: false },
-      threshold: [{ value: '30', disabled: false }, Validators.required],
-      disabled: false
-    },
-    serviceGroupNoHealthChecks: {
-      category: JobCategories.Services,
-      name: '',
-      unit: { value: 'm', disabled: true},
-      threshold: [{ value: '5', disabled: true }, Validators.required],
-      disabled: false // special case: only alterable by the API so we want to show as enabled
-    },
-    serviceGroupRemoveServices: {
-      category: JobCategories.Services,
-      name: '',
-      unit: { value: 'd', disabled: true },
-      threshold: [{ value: '5', disabled: true }, Validators.required],
-      disabled: false // special case: API not ready to alter
-    },
-    clientRunsRemoveData: {
-      category: JobCategories.Infra,
-      name: 'periodic_purge_timeseries',
-      nested_name: NestedJobName.ConvergeHistory,
-      unit: { value: 'd', disabled: false },
-      threshold: [{ value: '30', disabled: false }, Validators.required],
-      disabled: false
-    },
-    clientRunsLabelMissing: {
-      category: JobCategories.Infra,
-      name: 'missing_nodes',
-      unit: { value: 'd', disabled: false },
-      threshold: [{ value: '30', disabled: false }, Validators.required],
-      disabled: false
-    },
-    clientRunsRemoveNodes: {
-      category: JobCategories.Infra,
-      name: 'missing_nodes_for_deletion',
-      unit: { value: 'd', disabled: false },
-      threshold: [{ value: '30', disabled: false }, Validators.required],
-      disabled: false
-    },
-    complianceRemoveReports: {
-      category: JobCategories.Compliance,
-      name: 'periodic_purge',
-      nested_name: NestedJobName.ComplianceReports,
-      unit: { value: 'd', disabled: false },
-      threshold: [{ value: '30', disabled: false }, Validators.required],
-      disabled: false
-    },
-    complianceRemoveScans: {
-      category: JobCategories.Compliance,
-      name: 'periodic_purge',
-      nested_name: NestedJobName.ComplianceScans,
-      unit: { value: 'd', disabled: false },
-      threshold: [{ value: '30', disabled: false }, Validators.required],
-      disabled: false
-    }
-  };
-
+  public isDesktopView = false;
 
   // Event Feed
   eventFeedRemoveData: FormGroup;
@@ -139,9 +70,13 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
     private fb: FormBuilder,
-    private telemetryService: TelemetryService
+    private telemetryService: TelemetryService,
+    private productDeployedService: ProductDeployedService
   ) {
-    const formDetails = this.defaultFormData;
+
+    this.isDesktopView = this.productDeployedService.isProductDeployed('desktop');
+
+    const formDetails = this.getDefaultFormData(this.isDesktopView);
 
 //  EventFeed
     this.eventFeedRemoveData = this.fb.group(formDetails.eventFeedRemoveData);
@@ -391,7 +326,10 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
     switch (job.name) {
       case InfraJobName.MissingNodesForDeletion: {
-        this.handleDisable(this.clientRunsRemoveNodes, job.disabled);
+        if (!this.isDesktopView) {
+          this.handleDisable(this.clientRunsRemoveNodes, job.disabled);
+        }
+
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.clientRunsRemoveNodes.patchValue({
           unit: formUnit,
@@ -402,7 +340,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       break;
 
       case InfraJobName.MissingNodes: {
-        this.handleDisable(this.clientRunsLabelMissing, job.disabled);
+        if (!this.isDesktopView) {
+          this.handleDisable(this.clientRunsLabelMissing, job.disabled);
+        }
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.clientRunsLabelMissing.patchValue({
           unit: formUnit,
@@ -478,6 +418,79 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     // We have to pass in !disabled because the function is initially build for enabling
     this.setEnabled(form.controls.unit, !disabled);
     this.setEnabled(form.controls.threshold, !disabled);
+  }
+
+  private getDefaultFormData(isDesktopView: boolean): DefaultFormData {
+    return {
+      eventFeedRemoveData: {
+        category: JobCategories.EventFeed,
+        name: 'periodic_purge',
+        nested_name: NestedJobName.Feed,
+        unit: { value: 'd', disabled: false },
+        threshold: [{ value: '30', disabled: false}, Validators.required],
+        disabled: false
+      },
+      eventFeedServerActions: {
+        category: JobCategories.Infra,
+        name: 'periodic_purge_timeseries',
+        nested_name: NestedJobName.Actions,
+        unit: { value: 'd', disabled: false },
+        threshold: [{ value: '30', disabled: false }, Validators.required],
+        disabled: false
+      },
+      serviceGroupNoHealthChecks: {
+        category: JobCategories.Services,
+        name: '',
+        unit: { value: 'm', disabled: true},
+        threshold: [{ value: '5', disabled: true }, Validators.required],
+        disabled: false // special case: only alterable by the API so we want to show as enabled
+      },
+      serviceGroupRemoveServices: {
+        category: JobCategories.Services,
+        name: '',
+        unit: { value: 'd', disabled: true },
+        threshold: [{ value: '5', disabled: true }, Validators.required],
+        disabled: false // special case: API not ready to alter
+      },
+      clientRunsRemoveData: {
+        category: JobCategories.Infra,
+        name: 'periodic_purge_timeseries',
+        nested_name: NestedJobName.ConvergeHistory,
+        unit: { value: 'd', disabled: false },
+        threshold: [{ value: '30', disabled: false }, Validators.required],
+        disabled: false
+      },
+      clientRunsLabelMissing: {
+        category: JobCategories.Infra,
+        name: 'missing_nodes',
+        unit: { value: 'd', disabled: isDesktopView },
+        threshold: [{ value: '30', disabled: isDesktopView }, Validators.required],
+        disabled: isDesktopView
+      },
+      clientRunsRemoveNodes: {
+        category: JobCategories.Infra,
+        name: 'missing_nodes_for_deletion',
+        unit: { value: 'd', disabled: isDesktopView },
+        threshold: [{ value: '30', disabled: isDesktopView }, Validators.required],
+        disabled: isDesktopView
+      },
+      complianceRemoveReports: {
+        category: JobCategories.Compliance,
+        name: 'periodic_purge',
+        nested_name: NestedJobName.ComplianceReports,
+        unit: { value: 'd', disabled: false },
+        threshold: [{ value: '30', disabled: false }, Validators.required],
+        disabled: false
+      },
+      complianceRemoveScans: {
+        category: JobCategories.Compliance,
+        name: 'periodic_purge',
+        nested_name: NestedJobName.ComplianceScans,
+        unit: { value: 'd', disabled: false },
+        threshold: [{ value: '30', disabled: false }, Validators.required],
+        disabled: false
+      }
+    };
   }
 
 }
