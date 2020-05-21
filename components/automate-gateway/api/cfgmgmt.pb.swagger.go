@@ -111,6 +111,35 @@ func init() {
         ]
       }
     },
+    "/api/beta/cfgmgmt/rollouts/progress_by_node_segment": {
+      "get": {
+        "operationId": "ListNodeSegmentsWithRolloutProgress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodeSegmentsWithRolloutProgress"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "description": "Filters to apply to the request for the node segments list.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/api/beta/cfgmgmt/rollouts/rollout/{rollout_id}": {
       "get": {
         "summary": "GetRolloutById",
@@ -932,6 +961,35 @@ func init() {
         }
       }
     },
+    "chef.automate.api.cfgmgmt.response.CurrentRolloutProgress": {
+      "type": "object",
+      "properties": {
+        "rollout": {
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout",
+          "description": "Rollout is the full rollout object, but we can change this to be a subset only."
+        },
+        "node_count": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Nodes that have run the code being rolled out thus far"
+        },
+        "latest_run_successful_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "I'm assuming it's easy to get the status when we get the counts."
+        },
+        "latest_run_failed_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "source_link": {
+          "type": "string"
+        },
+        "build_link": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.cfgmgmt.response.Deprecation": {
       "type": "object",
       "properties": {
@@ -1110,6 +1168,50 @@ func init() {
         }
       }
     },
+    "chef.automate.api.cfgmgmt.response.NodeSegmentRolloutProgress": {
+      "type": "object",
+      "properties": {
+        "policy_name": {
+          "type": "string",
+          "title": "policy_name, policy_node_group, policy_domain_url make up a \"compound\nid\" for the node segment"
+        },
+        "policy_node_group": {
+          "type": "string"
+        },
+        "policy_domain_url": {
+          "type": "string"
+        },
+        "total_nodes": {
+          "type": "integer",
+          "format": "int32",
+          "title": "total nodes in elasticsearch in the node segment"
+        },
+        "current_rollout_progress": {
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CurrentRolloutProgress"
+        },
+        "previous_rollouts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.PastRolloutProgress"
+          },
+          "title": "This is the last, say 2 or 4 rollouts before the current one (to give a\ntotal of 3 or 5)"
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.NodeSegmentsWithRolloutProgress": {
+      "type": "object",
+      "properties": {
+        "node_segment_rollout_progress": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodeSegmentRolloutProgress"
+          },
+          "description": "The NodeSegmentRolloutProgress are sorted by policy group, policy\nname, then domain URL."
+        }
+      },
+      "description": "A Node Segment is the set of Chef Infra nodes with a shared policy_name,\npolicy_node_group, and policy_domain_url.\n\nNodeSegmentsWithRolloutProgress lists all of the node segments matching the\nrequest with information about the progress and status of the code rollouts for each segment.",
+      "title": "NodeSegmentsWithRolloutProgress"
+    },
     "chef.automate.api.cfgmgmt.response.NodesCounts": {
       "type": "object",
       "properties": {
@@ -1132,6 +1234,27 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "Total count of nodes that have been labeled as 'missing' as determined by node lifecycle settings."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.PastRolloutProgress": {
+      "type": "object",
+      "properties": {
+        "rollout": {
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout",
+          "description": "Rollout is the full rollout object, but we can change this to be a subset only."
+        },
+        "latest_run_node_count": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The number of nodes in the node segment for which the last recorded CCR\nwas part of this rollout"
+        },
+        "source_link": {
+          "type": "string",
+          "title": "don't include the success/failure, it would be misleading since we\naren't including nodes that have since run the code from a newer rollout"
+        },
+        "build_link": {
+          "type": "string"
         }
       }
     },

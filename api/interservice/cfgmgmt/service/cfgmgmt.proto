@@ -55,4 +55,5 @@ service CfgMgmt {
   rpc CreateRollout(chef.automate.api.cfgmgmt.request.CreateRollout) returns (chef.automate.api.cfgmgmt.response.Rollout);
   rpc GetRollouts(chef.automate.api.cfgmgmt.request.Rollouts) returns (chef.automate.api.cfgmgmt.response.Rollouts);
   rpc GetRolloutById(chef.automate.api.cfgmgmt.request.RolloutById) returns (chef.automate.api.cfgmgmt.response.Rollout);
+  rpc ListNodeSegmentsWithRolloutProgress(chef.automate.api.cfgmgmt.request.ListNodeSegmentsWithRolloutProgress) returns (chef.automate.api.cfgmgmt.response.NodeSegmentsWithRolloutProgress);
 }

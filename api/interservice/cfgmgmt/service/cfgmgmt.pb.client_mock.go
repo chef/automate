@@ -540,6 +540,26 @@ func (mr *MockCfgMgmtClientMockRecorder) GetVersion(arg0, arg1 interface{}, arg2
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetVersion), varargs...)
 }
 
+// ListNodeSegmentsWithRolloutProgress mocks base method
+func (m *MockCfgMgmtClient) ListNodeSegmentsWithRolloutProgress(arg0 context.Context, arg1 *request.ListNodeSegmentsWithRolloutProgress, arg2 ...grpc.CallOption) (*response.NodeSegmentsWithRolloutProgress, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListNodeSegmentsWithRolloutProgress", varargs...)
+	ret0, _ := ret[0].(*response.NodeSegmentsWithRolloutProgress)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListNodeSegmentsWithRolloutProgress indicates an expected call of ListNodeSegmentsWithRolloutProgress
+func (mr *MockCfgMgmtClientMockRecorder) ListNodeSegmentsWithRolloutProgress(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListNodeSegmentsWithRolloutProgress", reflect.TypeOf((*MockCfgMgmtClient)(nil).ListNodeSegmentsWithRolloutProgress), varargs...)
+}
+
 // NodeExport mocks base method
 func (m *MockCfgMgmtClient) NodeExport(arg0 context.Context, arg1 *request0.NodeExport, arg2 ...grpc.CallOption) (CfgMgmt_NodeExportClient, error) {
 	m.ctrl.T.Helper()
@@ -1222,6 +1242,21 @@ func (m *MockCfgMgmtServer) GetVersion(arg0 context.Context, arg1 *request0.Vers
 func (mr *MockCfgMgmtServerMockRecorder) GetVersion(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetVersion), arg0, arg1)
+}
+
+// ListNodeSegmentsWithRolloutProgress mocks base method
+func (m *MockCfgMgmtServer) ListNodeSegmentsWithRolloutProgress(arg0 context.Context, arg1 *request.ListNodeSegmentsWithRolloutProgress) (*response.NodeSegmentsWithRolloutProgress, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListNodeSegmentsWithRolloutProgress", arg0, arg1)
+	ret0, _ := ret[0].(*response.NodeSegmentsWithRolloutProgress)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListNodeSegmentsWithRolloutProgress indicates an expected call of ListNodeSegmentsWithRolloutProgress
+func (mr *MockCfgMgmtServerMockRecorder) ListNodeSegmentsWithRolloutProgress(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListNodeSegmentsWithRolloutProgress", reflect.TypeOf((*MockCfgMgmtServer)(nil).ListNodeSegmentsWithRolloutProgress), arg0, arg1)
 }
 
 // NodeExport mocks base method

@@ -46,3 +46,7 @@ message RolloutForChefRun {
   string policy_revision_id = 3;
 }
 
+message ListNodeSegmentsWithRolloutProgress {
+  // Filters to apply to the request for the node segments list.
+  repeated string filter = 1;
+}

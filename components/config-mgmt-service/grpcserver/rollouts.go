@@ -78,6 +78,10 @@ func (s *CfgMgmtServer) GetRollouts(ctx context.Context, req *request.Rollouts) 
 	return &response.Rollouts{Rollouts: resRollouts}, nil
 }
 
+func (s *CfgMgmtServer) ListNodeSegmentsWithRolloutProgress(ctx context.Context, req *request.ListNodeSegmentsWithRolloutProgress) (*response.NodeSegmentsWithRolloutProgress, error) {
+	return nil, nil
+}
+
 func dbNewRolloutReq(r *request.CreateRollout) *postgres.NewRollout {
 	return &postgres.NewRollout{
 		PolicyName:       r.PolicyName,
