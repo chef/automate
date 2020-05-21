@@ -3,7 +3,7 @@
     <main>
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Servers</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', org?.server_id]">Orgs</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', org?.server_id]">Organization</chef-breadcrumb>
         {{ org?.name }}
       </chef-breadcrumbs>
       <chef-page-header>
@@ -13,12 +13,18 @@
             <tr class="detail-row">
               <th class="id-column">Name</th>
               <th class="id-column">Admin User</th>
+              <th class="projects-column">Projects</th>
             </tr>
           </thead>
           <tbody>
             <tr class="detail-row">
               <td class="id-column">{{ org?.name }}</td>
               <td class="id-column">{{ org?.admin_user }}</td>
+              <td class="projects-column" data-cy="organization-details-projects" [ngSwitch]="org?.projects.length">
+                <ng-container *ngSwitchCase="0">{{ unassigned }}</ng-container>
+                <ng-container *ngSwitchCase="1">{{ org?.projects[0] }}</ng-container>
+                <ng-container *ngSwitchDefault>{{ org?.projects.length }} projects</ng-container>
+              </td>
             </tr>
           </tbody>
         </table>
