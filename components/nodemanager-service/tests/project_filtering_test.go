@@ -17,7 +17,7 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
-func TestReadProjectFilteringIngestedNodes(t *testing.T) {
+func TestReadProjectFilteringNodes(t *testing.T) {
 	timestamp, err := ptypes.TimestampProto(time.Now())
 	require.NoError(t, err)
 
@@ -192,35 +192,35 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 
 	timestamp, err := ptypes.TimestampProto(time.Now())
 
-	// Adding a manual node
-	mgr1 := manager.NodeManager{Name: "mgr1", Type: "aws-ec2"}
-	mgrID1, err := db.AddNodeManager(&mgr1, "11111111")
+	// Adding two manual nodes
+	node1 := nodes.Node{Name: "test-manual-node-1"}
+	manualNodeID1, err := db.AddNode(&node1)
 	require.NoError(t, err)
-	defer db.DeleteNodeManager(mgrID1)
 
-	node1 := manager.ManagerNode{Id: "i-1111111", Region: "us-west-2", Host: "Node1"}
-
-	instances := []*manager.ManagerNode{&node1}
-	manualNodeIds := db.AddManagerNodesToDB(instances, mgrID1, "242403433", []*manager.CredentialsByTags{}, "aws-ec2")
+	node2 := nodes.Node{Name: "test-manual-node-2"}
+	manualNodeID2, err := db.AddNode(&node2)
 	require.NoError(t, err)
+
+	manualNodeIds := []string{manualNodeID1, manualNodeID2}
+	t.Logf("manual node ids %s %s", manualNodeID1, manualNodeID2)
 	defer func() {
 		for _, node := range manualNodeIds {
 			db.DeleteNode(node)
 		}
 	}()
 
-	assert.Equal(t, 1, len(manualNodeIds))
+	assert.Equal(t, 2, len(manualNodeIds))
 
 	cases := []struct {
-		description             string
-		ctx                     context.Context
-		ingestedNodes           []*manager.NodeMetadata
-		expectedIngestedNodeIDs []string
+		description     string
+		ctx             context.Context
+		nodes           []*manager.NodeMetadata
+		expectedNodeIDs []string
 	}{
 		{
-			description: "Two nodes matching on the same project tag",
+			description: "Three nodes matching on the same project tag",
 			ctx:         contextWithProjects([]string{"target_project"}),
-			ingestedNodes: []*manager.NodeMetadata{
+			nodes: []*manager.NodeMetadata{
 				{
 					Uuid:     "node1",
 					Projects: []string{"target_project"},
@@ -229,13 +229,18 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 					Uuid:     "node2",
 					Projects: []string{"project8", "target_project"},
 				},
+				{
+					Uuid:     manualNodeID1,
+					Projects: []string{"project8", "target_project"},
+				},
 			},
-			expectedIngestedNodeIDs: []string{"node1", "node2"},
+			// bc of the project filter we only expect the three above to match
+			expectedNodeIDs: []string{"node1", "node2", manualNodeID1},
 		},
 		{
-			description: "Two nodes matching with two project tags",
+			description: "Three nodes matching with two project tags",
 			ctx:         contextWithProjects([]string{"target_project_1", "target_project_2"}),
-			ingestedNodes: []*manager.NodeMetadata{
+			nodes: []*manager.NodeMetadata{
 				{
 					Uuid:     "node1",
 					Projects: []string{"target_project_1"},
@@ -244,13 +249,18 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 					Uuid:     "node2",
 					Projects: []string{"target_project_2"},
 				},
+				{
+					Uuid:     manualNodeID1,
+					Projects: []string{"target_project_2"},
+				},
 			},
-			expectedIngestedNodeIDs: []string{"node1", "node2"},
+			// bc of the project filter we only expect the three above to match
+			expectedNodeIDs: []string{"node1", "node2", manualNodeID1},
 		},
 		{
-			description: "Two nodes with only one with a matching project",
+			description: "Three nodes with only one with a matching project",
 			ctx:         contextWithProjects([]string{"target_project"}),
-			ingestedNodes: []*manager.NodeMetadata{
+			nodes: []*manager.NodeMetadata{
 				{
 					Uuid:     "node1",
 					Projects: []string{"target_project"},
@@ -259,14 +269,19 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 					Uuid:     "node2",
 					Projects: []string{"project8"},
 				},
+				{
+					Uuid:     manualNodeID1,
+					Projects: []string{"project8"},
+				},
 			},
-			expectedIngestedNodeIDs: []string{"node1"},
+			// bc of the project filter we only expect the one above to match
+			expectedNodeIDs: []string{"node1"},
 		},
 		{
-			description: "Three nodes with different projects and one missing a project where all match " +
+			description: "Four nodes with different projects and one missing a project where all match " +
 				"because the AllProjectsID is requested",
 			ctx: contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
-			ingestedNodes: []*manager.NodeMetadata{
+			nodes: []*manager.NodeMetadata{
 				{
 					Uuid:     "node1",
 					Projects: []string{"project3"},
@@ -279,13 +294,18 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 					Uuid:     "node3",
 					Projects: []string{},
 				},
+				{
+					Uuid:     manualNodeID1,
+					Projects: []string{},
+				},
 			},
-			expectedIngestedNodeIDs: []string{"node1", "node2", "node3"},
+			// bc we requested all projects we expect the four nodes above + the manualNodeID2
+			expectedNodeIDs: []string{"node1", "node2", "node3", manualNodeID2, manualNodeID1},
 		},
 		{
-			description: "Two nodes one with a project tag and one with none. Matching one unassigned",
+			description: "Three nodes one with a project tag and one with none. Matching two unassigned",
 			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
-			ingestedNodes: []*manager.NodeMetadata{
+			nodes: []*manager.NodeMetadata{
 				{
 					Uuid:     "node1",
 					Projects: []string{"project9"},
@@ -294,13 +314,18 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 					Uuid:     "node2",
 					Projects: []string{},
 				},
+				{
+					Uuid:     manualNodeID1,
+					Projects: []string{},
+				},
 			},
-			expectedIngestedNodeIDs: []string{"node2"},
+			// bc of the request for unassigned, we expect above three nodes + manualNodeID2
+			expectedNodeIDs: []string{"node2", manualNodeID1, manualNodeID2},
 		},
 		{
 			description: "Two nodes with projects assigned, with unassigned request no matches",
 			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
-			ingestedNodes: []*manager.NodeMetadata{
+			nodes: []*manager.NodeMetadata{
 				{
 					Uuid:     "node1",
 					Projects: []string{"project9"},
@@ -310,13 +335,14 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 					Projects: []string{"project7"},
 				},
 			},
-			expectedIngestedNodeIDs: []string{},
+			//bc of the request for unassigned, we expect only manualNodeID2
+			expectedNodeIDs: []string{manualNodeID2},
 		},
 		{
 			description: "Two nodes one unassigned and one with a node, with unassigned and macthing " +
 				"project request matching both",
 			ctx: contextWithProjects([]string{authzConstants.UnassignedProjectID, "target_project"}),
-			ingestedNodes: []*manager.NodeMetadata{
+			nodes: []*manager.NodeMetadata{
 				{
 					Uuid:     "node1",
 					Projects: []string{"target_project"},
@@ -326,13 +352,14 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 					Projects: []string{},
 				},
 			},
-			expectedIngestedNodeIDs: []string{"node1", "node2"},
+			//bc of the request for unassigned, we expect above two nodes + manualNodeID2
+			expectedNodeIDs: []string{"node1", "node2", manualNodeID2},
 		},
 		{
-			description: "Two nodes one unassigned and one with a node, with unassigned and macthing " +
+			description: "Three nodes two unassigned and one with a node, with unassigned and macthing " +
 				"project request matching both",
 			ctx: contextWithProjects([]string{authzConstants.UnassignedProjectID, "target_project"}),
-			ingestedNodes: []*manager.NodeMetadata{
+			nodes: []*manager.NodeMetadata{
 				{
 					Uuid:     "node1",
 					Projects: []string{"target_project"},
@@ -341,8 +368,13 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 					Uuid:     "node2",
 					Projects: []string{},
 				},
+				{
+					Uuid:     manualNodeID1,
+					Projects: []string{},
+				},
 			},
-			expectedIngestedNodeIDs: []string{"node1", "node2"},
+			//bc of the request for unassigned, we expect above three nodes + manualNodeID2
+			expectedNodeIDs: []string{"node1", "node2", manualNodeID1, manualNodeID2},
 		},
 	}
 
@@ -350,7 +382,7 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 		t.Run(fmt.Sprintf("Project filter: %s", test.description),
 			func(t *testing.T) {
 				// Ingest nodes
-				for _, node := range test.ingestedNodes {
+				for _, node := range test.nodes {
 					node.LastContact = timestamp
 					node.RunData = &nodes.LastContactData{
 						Id:      createUUID(),
@@ -363,7 +395,7 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 				}
 				// Delete nodes after the test is complete
 				defer func() {
-					for _, node := range test.ingestedNodes {
+					for _, node := range test.nodes {
 						db.DeleteNode(node.Uuid)
 					}
 				}()
@@ -375,12 +407,14 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 				// Get all the node IDs returned.
 				actualNodeIDs := []string{}
 				for _, node := range nodesResponse.Nodes {
-					if node.Manager == "" || node.Manager == "chef" {
-						actualNodeIDs = append(actualNodeIDs, node.Id)
-					}
+					// if node.Manager == "" || node.Manager == "chef" {
+					actualNodeIDs = append(actualNodeIDs, node.Id)
+					// }
 				}
+				t.Logf("expected: %v", test.expectedNodeIDs)
+				t.Logf("actual: %v", actualNodeIDs)
 
-				assert.ElementsMatch(t, actualNodeIDs, test.expectedIngestedNodeIDs)
+				assert.ElementsMatch(t, actualNodeIDs, test.expectedNodeIDs)
 			})
 	}
 }
