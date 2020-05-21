@@ -39,4 +39,8 @@ export class InsightComponent {
   public sortOn(fieldName: string): void {
     this.sortChange.emit(fieldName);
   }
+
+  public updateFilters(event) {
+    console.log(event);
+  }
 }

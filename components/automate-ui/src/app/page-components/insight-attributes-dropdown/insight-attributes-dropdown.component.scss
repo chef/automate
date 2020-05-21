@@ -2,7 +2,8 @@
 
 :host {
   position: absolute;
-  top: 0;
+  top: calc(100% + 8px);
+  right: 0;
   padding: 16px;
   border-radius: 8px; // not variable
   background: $chef-white;
@@ -16,6 +17,7 @@
     columns: 2;
     list-style-type: none;
     padding: 0;
+    margin-bottom: 0;
 
     .filter-button {
       display: block;
@@ -28,6 +30,8 @@
 
       .check {
         visibility: hidden;
+        // temp color
+        color: #4535D7;
       }
 
       span {
@@ -54,19 +58,42 @@
       }
     }
   }
+
+  .button-row {
+    display: flex;
+    justify-content: space-between;
+  }
 }
 
 // checkbox overwrites
 ::ng-deep chef-checkbox {
+  margin-top: 0;
+  margin-bottom: 0;
 
   &[aria-checked=true] .check-wrap {
     border-color: #4535D7;
     background-color: #4535D7;
   }
 
+  &[aria-checked=false] .check-wrap {
+    border: 1px solid $chef-desktop-light;
+  }
+
   .label-wrap {
     margin-left: 8px;
     color: #394261;
     letter-spacing: .25px;
+  }
+}
+
+::ng-deep chef-button {
+  color: #2E1EC1;
+  border-radius: 8px;
+  font-weight: bold;
+
+  &[primary] {
+    background: #DFDCFF;
+    border: none;
+    box-shadow: 2px 2px 4px 0 #B3ABFB, -2px -2px 12px 0 #ECF0F9;
   }
 }

@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FilterOption, FilterableOptions } from './insight-attributes-dropdown.model';
-
 
 @Component({
   selector: 'app-insight-attributes-dropdown',
@@ -9,11 +8,16 @@ import { FilterOption, FilterableOptions } from './insight-attributes-dropdown.m
 })
 export class InsightAttributesDropdownComponent implements OnInit {
 
+  @Input() saveAsDefault = false;
+  @Input() lastSelectedOptions: string[] = []; // these are filter ids
+  @Output() onUpdateFilters: EventEmitter<any> = new EventEmitter();
   public options: FilterOption[] = FilterableOptions;
   public selectedOptions: string[] = []; // these are filter ids
 
   ngOnInit() {
-    console.log('on init');
+    // creating a reference to fall back on
+    // will likely change after we're storing these away elsewhere
+    this.lastSelectedOptions = [...this.selectedOptions];
   }
 
   public handleSelect(event: Event) {
@@ -30,6 +34,19 @@ export class InsightAttributesDropdownComponent implements OnInit {
         target.classList.add('selected');
       }
     }
+  }
+
+  public handleUpdate(): void {
+    // emit new selected filter ids
+    this.onUpdateFilters.emit(this.selectedOptions);
+
+  }
+
+  public handleCancel(): void {
+    this.selectedOptions.forEach(option => {
+      document.querySelector('.filter-button[data-filterValue="' + option + '"]').classList.remove('selected');
+    });
+    this.selectedOptions = [...this.lastSelectedOptions];
   }
 
   // NOT IN USE CREATE CUSTOM PIPE FOR THIS

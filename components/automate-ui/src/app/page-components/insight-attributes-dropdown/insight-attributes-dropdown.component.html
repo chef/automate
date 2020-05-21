@@ -9,8 +9,13 @@
     </ng-container>
   </ul>
 </div>
-<div>
-  <chef-checkbox>
+<div class="button-row">
+  <chef-checkbox [checked]="saveAsDefault">
     Save as default
   </chef-checkbox>
+
+  <div>
+    <chef-button tertiary (click)="handleCancel()">Cancel</chef-button>
+    <chef-button primary (click)="handleUpdate()">Update</chef-button>
+  </div>
 </div>

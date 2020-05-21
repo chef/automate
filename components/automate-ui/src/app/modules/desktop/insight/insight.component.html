@@ -20,11 +20,11 @@
         <span>{{ term.value }}</span>
       </chef-button>
     </div>
-<app-insight-attributes-dropdown></app-insight-attributes-dropdown>
     <chef-button secondary>
       <span>Attributes hello</span>
       <chef-icon>expand_more</chef-icon>
     </chef-button>
+    <app-insight-attributes-dropdown (onUpdateFilters)="updateFilters($event)"></app-insight-attributes-dropdown>
   </div>
   <div class="filters">
     <div class="filter-group">
