@@ -56,12 +56,12 @@
     <ul>
       <li class="service-item" *ngFor="let service of services$ | async; let i = index">
         <div class="header">
-          <div class ="fqdn-line"><chef-icon>storage</chef-icon> {{ service.fqdn || "--"}}</div>
-          <div class ="supervisor-line"><b>Supervisor:</b> {{ service.supervisor_id || "--"}}</div>
-          <div class ="site-line"><b>Site:</b> {{ service.site  || "--"}}</div>
+          <div class ="fqdn-line"><chef-icon>storage</chef-icon> <p class="fqdn-data">{{ service.fqdn || "--"}}</p></div>
+          <div class ="supervisor-line"><strong>Supervisor:</strong><p class="supervisor-data">{{ service.supervisor_id || "--"}}</p></div>
+          <div class ="site-line"><strong>Site:</strong> <p class="site-data">{{ service.site  || "--"}}</p></div>
         </div>
         <div class="body">
-          <div class ="release-line"><chef-icon>grain</chef-icon>{{ service.release || "--"}}</div>
+          <div class ="release-line"><chef-icon>grain</chef-icon><p class="release-data">{{ service.release || "--"}}</p></div>
           <div class ="channel-line">
             <chef-badge *ngIf="service.update_strategy !== 'NONE'">
               {{ service.channel }}: {{ service.update_strategy }}
