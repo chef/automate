@@ -15,6 +15,7 @@ import * as cookbookVersionsEntity from './entities/cookbooks/cookbook-versions.
 import * as dataBagsEntity from './entities/data-bags/data-bags.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
 import * as environmentEntity from './entities/environments/environment.reducer';
+import * as environmentDetailsEntity from './entities/environments/environment-details.reducer';
 import * as infraRoleEntity from './entities/infra-roles/infra-role.reducer';
 import * as infraRoleDetailsEntity from './entities/infra-roles/infra-role-details.reducer';
 import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
@@ -71,6 +72,7 @@ export interface NgrxStateAtom {
   dataBags: dataBagsEntity.DataBagsEntityState;
   destinations: destinationEntity.DestinationEntityState;
   environments: environmentEntity.EnvironmentEntityState;
+  environmentDetails: environmentDetailsEntity.EnvironmentDetailsEntityState;
   infraRoles: infraRoleEntity.InfraRoleEntityState;
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
   jobs: jobEntity.JobEntityState;
@@ -187,6 +189,7 @@ export const defaultInitialState = {
   dataBags: dataBagsEntity.DataBagsEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
   environments: environmentEntity.EnvironmentEntityInitialState,
+  environmentDetails: environmentDetailsEntity.EnvironmentEntityInitialState,
   infraRoles: infraRoleEntity.InfraRoleEntityInitialState,
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
@@ -237,6 +240,7 @@ export const ngrxReducers = {
   dataBags: dataBagsEntity.dataBagsEntityReducer,
   destinations: destinationEntity.destinationEntityReducer,
   environments: environmentEntity.environmentEntityReducer,
+  environmentDetails: environmentDetailsEntity.environmentDetailsEntityReducer,
   infraRoles: infraRoleEntity.infraRoleEntityReducer,
   infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
   jobs: jobEntity.jobEntityReducer,

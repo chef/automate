@@ -1,0 +1,71 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-loading-spinner *ngIf="environmentDetailsLoading" size="50" fixed></chef-loading-spinner>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Environments</chef-breadcrumb>
+         {{environment?.name}}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <chef-heading>{{environment?.name}}</chef-heading>
+        <table>
+          <thead>
+            <tr class="detail-row">
+              <th class="id-column">Name</th>
+              <th class="id-column">Chef Type</th>
+              <th class="id-column">JSON</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="detail-row">
+              <td class="id-column">{{environment?.name}}</td>
+              <td class="id-column">{{environment?.chef_type}}</td>
+              <td class="id-column">{{environment?.json_class}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+          <chef-option value='cookbookConstraints' data-cy="cookbookConstraints-tab">Cookbook Constraints</chef-option>
+          <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      <section class="page-body" *ngIf="tabValue === 'cookbookConstraints'">
+        <div *ngIf="show">
+          <div *ngIf="hasCookbookConstraints">
+            <chef-table>
+              <chef-thead>
+                <chef-tr>
+                  <chef-th>Version</chef-th>
+                </chef-tr>
+              </chef-thead>
+              <chef-tbody>
+                <chef-tr *ngFor= "let version of cookbookVersions">
+                  <chef-td  >{{ version }}</chef-td>
+                </chef-tr>
+              </chef-tbody>
+            </chef-table>
+          </div>
+          <div *ngIf="!hasCookbookConstraints" class="center">
+            <p>Cookbook constraints are not available for the <b>{{environment.name}}</b> environment.</p>
+          </div>
+        </div>
+      </section>
+      <section class="page-body" *ngIf="tabValue === 'attributes'">
+        <div class="expand-collapse">
+          <span class="action" (click)="tree.expand()">
+            <chef-icon>add_circle</chef-icon>
+            <span>Expand All</span>
+          </span>
+          <span class="separator">|</span>
+          <span class="action" (click)="tree.collapse()">
+            <chef-icon>remove_circle</chef-icon>
+            <span>Collapse All</span>
+          </span>
+        </div>
+        <app-json-tree-table class="json-tree-container" #tree [json]="selectedAttrs"></app-json-tree-table>
+      </section>
+    </main>
+  </div>
+</div>

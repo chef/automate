@@ -29,6 +29,9 @@ import { AutomateSettingsComponent } from './pages/automate-settings/automate-se
 import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
 import { ChefServerDetailsComponent } from './modules/infra-proxy/chef-server-details/chef-server-details.component';
 import { CookbookDetailsComponent } from './modules/infra-proxy/cookbook-details/cookbook-details.component';
+import {
+  EnvironmentDetailsComponent
+} from './modules/infra-proxy/environment-details/environment-details.component';
 import { NodeDetailsComponent } from './pages/node-details/node-details.component';
 import {
   NodeNoRunsDetailsComponent
@@ -249,12 +252,16 @@ const routes: Routes = [
               component: OrgDetailsComponent
             },
             {
-            path: ':id/organizations/:orgid/roles/:name',
+              path: ':id/organizations/:orgid/cookbooks/:cookbook_name',
+              component: CookbookDetailsComponent
+            },
+            {
+              path: ':id/organizations/:orgid/roles/:name',
               component: InfraRoleDetailsComponent
             },
             {
-              path: ':id/organizations/:orgid/cookbooks/:cookbook_name',
-              component: CookbookDetailsComponent
+              path: ':id/organizations/:orgid/environments/:name',
+              component: EnvironmentDetailsComponent
             }
           ]
         }
