@@ -2,7 +2,6 @@ package publisher
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/common"
@@ -93,7 +92,7 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 
 	mgrType := in.Report.GetAutomateManagerType()
 	if in.Report.GetSourceFqdn() != "" {
-		mgrType = fmt.Sprintf("chef")
+		mgrType = "chef"
 	}
 	return &manager.NodeMetadata{
 		Uuid:            in.Report.GetNodeUuid(),
