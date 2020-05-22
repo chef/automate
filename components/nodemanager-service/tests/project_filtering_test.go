@@ -193,6 +193,12 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 
 	timestamp, err := ptypes.TimestampProto(time.Now())
 
+	// delete all nodes for a clean state
+	nodesResponse, err := nodeManager.List(context.Background(), &nodes.Query{})
+	for _, node := range nodesResponse.GetNodes() {
+		db.DeleteNode(node.Id)
+	}
+
 	// Adding two manual nodes
 	node1 := nodes.Node{Name: "test-manual-node-1"}
 	manualNodeID1, err := db.AddNode(&node1)
