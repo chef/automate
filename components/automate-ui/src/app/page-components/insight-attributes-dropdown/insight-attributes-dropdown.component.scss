@@ -9,7 +9,7 @@
   padding: 16px;
   border-radius: 8px; // not variable
   background: $chef-white;
-  box-shadow: 8px 8px 24px 0 rgba(197,199,209,0.6);
+  box-shadow: 8px 8px 24px 0 rgba(197, 199, 209, 0.6);
   width: 100%;
   transform-origin: top right;
 
@@ -78,17 +78,17 @@
       }
 
       span {
-      display: flex;
-      justify-content: space-between;
-      padding: 7px 16px 5px;
-      width: 100%;
-      height: 100%;
-      background: $chef-white;
-      font-size: 14px;
-      // not yet named
-      color: #394261;
-      letter-spacing: .25px;
-      pointer-events: none;
+        display: flex;
+        justify-content: space-between;
+        padding: 7px 16px 5px;
+        width: 100%;
+        height: 100%;
+        background: $chef-white;
+        font-size: 14px;
+        // not yet named
+        color: #394261;
+        letter-spacing: .25px;
+        pointer-events: none;
       }
 
       // selected styles
@@ -114,38 +114,38 @@
   ::ng-deep chef-checkbox {
     margin-top: 0;
     margin-bottom: 0;
-  
+
     &[aria-checked=true] .check-wrap {
       // not yet named colors
       border-color: #4535D7;
       background-color: #4535D7;
     }
-  
+
     &[aria-checked=false] .check-wrap {
       border: 1px solid $chef-desktop-light;
     }
-  
+
     .label-wrap {
       margin-left: 8px;
       color: #394261;
       letter-spacing: .25px;
     }
   }
-  
+
   ::ng-deep chef-button {
     color: #2E1EC1;
     border-radius: 8px;
     font-weight: bold;
     margin-top: 0;
     margin-bottom: 0;
-  
+
     &[primary] {
       background: #DFDCFF;
       border: none;
       box-shadow: 2px 2px 4px 0 #B3ABFB, -2px -2px 12px 0 #ECF0F9;
       margin-right: 0;
     }
-  
+
     &[disabled] {
       // temp until get styles
       background: desaturate(#DFDCFF, 80%);
@@ -155,5 +155,5 @@
       padding: 0 16px;
     }
   }
-  
+
 }
