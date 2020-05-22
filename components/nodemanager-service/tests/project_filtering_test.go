@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -202,7 +203,7 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 	require.NoError(t, err)
 
 	manualNodeIds := []string{manualNodeID1, manualNodeID2}
-	t.Logf("manual node ids %s %s", manualNodeID1, manualNodeID2)
+	logrus.Infof("manual node ids %s %s", manualNodeID1, manualNodeID2)
 	defer func() {
 		for _, node := range manualNodeIds {
 			db.DeleteNode(node)
@@ -407,12 +408,10 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 				// Get all the node IDs returned.
 				actualNodeIDs := []string{}
 				for _, node := range nodesResponse.Nodes {
-					// if node.Manager == "" || node.Manager == "chef" {
 					actualNodeIDs = append(actualNodeIDs, node.Id)
-					// }
 				}
-				t.Logf("expected: %v", test.expectedNodeIDs)
-				t.Logf("actual: %v", actualNodeIDs)
+				logrus.Infof("expected: %v", test.expectedNodeIDs)
+				logrus.Infof("actual: %v", actualNodeIDs)
 
 				assert.ElementsMatch(t, actualNodeIDs, test.expectedNodeIDs)
 			})
