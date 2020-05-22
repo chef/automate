@@ -17,7 +17,6 @@ export class CreateOrgModalComponent implements OnInit, OnChanges {
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter();
   @Input() createForm: FormGroup;
-  @Input() objectNoun: string;
 
   public conflictError = false;
   public modifyID = false; // Whether the edit ID form is open or not.

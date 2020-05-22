@@ -32,10 +32,10 @@
               Only lowercase letters, numbers, hyphens, and underscores are allowed.
             </chef-error>
             <chef-error *ngIf="conflictError">
-              {{ objectNoun | titlecase }} ID "{{createForm.get('id').value}}" already exists.
+              Organization ID "{{createForm.get('id').value}}" already exists.
             </chef-error>
           </chef-form-field>
-          <span class="detail light">{{ objectNoun | titlecase }} IDs are unique, permanent, and cannot be changed later.</span>
+          <span class="detail light">Organization IDs are unique, permanent, and cannot be changed later.</span>
         </div>
         <div *ngIf="!modifyID" class="id-margin">
           <div id="id-fields">
