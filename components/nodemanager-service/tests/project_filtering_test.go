@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
+	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	nodesserver "github.com/chef/automate/components/nodemanager-service/server/nodes"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
@@ -27,25 +28,18 @@ func TestReadProjectFilteringNodes(t *testing.T) {
 
 	nodeManager := nodesserver.New(db, nil, "")
 
-	// Adding a manual node
-	mgr1 := manager.NodeManager{Name: "mgr1", Type: "aws-ec2"}
-	mgrID1, err := db.AddNodeManager(&mgr1, "11111111")
+	// add a couple manually added nodes
+	manualNodeIds, err := refreshManuallyAddedNodes(nodeManager, db)
 	require.NoError(t, err)
-	defer db.DeleteNodeManager(mgrID1)
 
-	node1 := manager.ManagerNode{Id: "i-1111111", Region: "us-west-2", Host: "Node1"}
-
-	instances := []*manager.ManagerNode{&node1}
-	manualNodeIds := db.AddManagerNodesToDB(instances, mgrID1, "242403433", []*manager.CredentialsByTags{}, "aws-ec2")
-	require.NoError(t, err)
 	defer func() {
 		for _, node := range manualNodeIds {
 			db.DeleteNode(node)
 		}
 	}()
-
-	assert.Equal(t, 1, len(manualNodeIds))
-	manualNodeID := manualNodeIds[0]
+	assert.Equal(t, 2, len(manualNodeIds))
+	manualNodeID1 := manualNodeIds[0]
+	manualNodeID2 := manualNodeIds[1]
 
 	cases := []struct {
 		description     string
@@ -147,7 +141,7 @@ func TestReadProjectFilteringNodes(t *testing.T) {
 				ctx := contextWithProjects(test.requestProjects)
 
 				// Create Ingest node
-				node := &manager.NodeMetadata{
+				ingestNode := &manager.NodeMetadata{
 					Uuid:        "node1",
 					Projects:    test.nodeProjects,
 					LastContact: timestamp,
@@ -159,30 +153,90 @@ func TestReadProjectFilteringNodes(t *testing.T) {
 				}
 
 				// ingest node
-				err = db.ProcessIncomingNode(node)
+				err = db.ProcessIncomingNode(ingestNode)
 				require.NoError(t, err)
 
 				// Delete created node after the test is complete
-				defer db.DeleteNode(node.Uuid)
+				defer db.DeleteNode(ingestNode.Uuid)
+
+				// Ingest manually added node
+				manualNode := &manager.NodeMetadata{
+					Uuid:        manualNodeID1,
+					Projects:    test.nodeProjects,
+					LastContact: timestamp,
+					JobUuid:     "1234",
+					RunData: &nodes.LastContactData{
+						Id:      createUUID(),
+						EndTime: timestamp,
+						Status:  nodes.LastContactData_PASSED,
+					},
+				}
+
+				// ingest node
+				err = db.ProcessIncomingNode(manualNode)
+				require.NoError(t, err)
+
+				// Delete created node after the test is complete
+				defer db.DeleteNode(manualNode.Uuid)
 
 				// Call Read to get the ingested node with project filtering context.
-				nodeResponse, err := nodeManager.Read(ctx, &nodes.Id{
-					Id: node.Uuid,
+				ingestNodeResponse, err := nodeManager.Read(ctx, &nodes.Id{
+					Id: ingestNode.Uuid,
 				})
-
 				if test.isError {
 					assert.Error(t, err)
 				} else {
 					require.NoError(t, err)
-					assert.Equal(t, node.Uuid, nodeResponse.Id)
+					assert.Equal(t, ingestNode.Uuid, ingestNodeResponse.Id)
 				}
 
-				// Test that we can read the manually added node for all cases.
-				manualNodeResponse, err := nodeManager.Read(ctx, &nodes.Id{Id: manualNodeID})
-				require.NoError(t, err)
-				assert.Equal(t, manualNodeID, manualNodeResponse.Id)
+				// Call Read to get the manually added ingested node with project filtering context
+				manualNodeResponse, err := nodeManager.Read(ctx, &nodes.Id{
+					Id: manualNode.Uuid,
+				})
+				if test.isError {
+					assert.Error(t, err)
+				} else {
+					require.NoError(t, err)
+					assert.Equal(t, manualNode.Uuid, manualNodeResponse.Id)
+				}
+
+				// Test that we can read the second manually added node only for cases
+				// when unassigned or all projects are requested
+				if contains(test.requestProjects, authzConstants.AllProjectsExternalID) ||
+					contains(test.requestProjects, authzConstants.UnassignedProjectID) {
+					manualNodeResponse, err = nodeManager.Read(ctx, &nodes.Id{Id: manualNodeID2})
+					require.NoError(t, err)
+					assert.Equal(t, manualNodeID2, manualNodeResponse.Id)
+				}
 			})
 	}
+}
+
+func refreshManuallyAddedNodes(nodeManager nodes.NodesServiceServer, db *pgdb.DB) ([]string, error) {
+	// delete all nodes for a clean state
+	nodesResponse, err := nodeManager.List(context.Background(), &nodes.Query{})
+	for _, node := range nodesResponse.GetNodes() {
+		db.DeleteNode(node.Id)
+	}
+
+	// Adding two manual nodes
+	node1 := nodes.Node{Name: "test-manual-node-1"}
+	manualNodeID1, err := db.AddNode(&node1)
+
+	node2 := nodes.Node{Name: "test-manual-node-2"}
+	manualNodeID2, err := db.AddNode(&node2)
+
+	return []string{manualNodeID1, manualNodeID2}, err
+}
+
+func contains(slice []string, match string) bool {
+	for _, item := range slice {
+		if item == match {
+			return true
+		}
+	}
+	return false
 }
 
 func TestListProjectFilteringAllNodes(t *testing.T) {
@@ -193,30 +247,18 @@ func TestListProjectFilteringAllNodes(t *testing.T) {
 
 	timestamp, err := ptypes.TimestampProto(time.Now())
 
-	// delete all nodes for a clean state
-	nodesResponse, err := nodeManager.List(context.Background(), &nodes.Query{})
-	for _, node := range nodesResponse.GetNodes() {
-		db.DeleteNode(node.Id)
-	}
-
-	// Adding two manual nodes
-	node1 := nodes.Node{Name: "test-manual-node-1"}
-	manualNodeID1, err := db.AddNode(&node1)
+	// add a couple manually added nodes
+	manualNodeIds, err := refreshManuallyAddedNodes(nodeManager, db)
 	require.NoError(t, err)
 
-	node2 := nodes.Node{Name: "test-manual-node-2"}
-	manualNodeID2, err := db.AddNode(&node2)
-	require.NoError(t, err)
-
-	manualNodeIds := []string{manualNodeID1, manualNodeID2}
-	logrus.Infof("manual node ids %s %s", manualNodeID1, manualNodeID2)
 	defer func() {
 		for _, node := range manualNodeIds {
 			db.DeleteNode(node)
 		}
 	}()
-
 	assert.Equal(t, 2, len(manualNodeIds))
+	manualNodeID1 := manualNodeIds[0]
+	manualNodeID2 := manualNodeIds[1]
 
 	cases := []struct {
 		description     string

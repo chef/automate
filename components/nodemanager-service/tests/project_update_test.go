@@ -28,7 +28,7 @@ func runProjectUpdate(t *testing.T, db *pgdb.DB, projectRules map[string]*authz.
 	}
 }
 
-func TestProjectUpdateDoesNotUpdateManagedNodes(t *testing.T) {
+func TestProjectUpdateDoesUpdateManagedNodes(t *testing.T) {
 	ctx := context.Background()
 	db, err := createPGDB()
 	require.NoError(t, err)
@@ -70,14 +70,15 @@ func TestProjectUpdateDoesNotUpdateManagedNodes(t *testing.T) {
 			require.NoError(t, err)
 			defer db.DeleteNode(nodeID)
 
-			// Update project
+			// run project update
 			runProjectUpdate(t, db, projectRules)
 
-			// Get node
+			// Get node, expect it to not be assigned to a project yet
 			processedNode, err := db.GetNode(ctx, nodeID)
 			require.NoError(t, err)
+			require.ElementsMatch(t, []string{}, processedNode.Projects)
 
-			// ingest node scan now, still no change
+			// ingest node scan now
 			nodeScan := &manager.NodeMetadata{
 				Uuid:        nodeID,
 				LastContact: timestamp,
@@ -86,18 +87,22 @@ func TestProjectUpdateDoesNotUpdateManagedNodes(t *testing.T) {
 					EndTime: timestamp,
 					Status:  nodes.LastContactData_PASSED,
 				},
-				ProjectsData: projectsData, // this shouldn't actually happen, b/c the report to
-				// nodemanager function does not include projects data if the node has a job id (scan job)
+				JobUuid:      "1234",
+				ProjectsData: projectsData,
 			}
 
 			// Ingest node
 			err = db.ProcessIncomingNode(nodeScan)
 
+			// run project update again, now that node has been ingested
+			runProjectUpdate(t, db, projectRules)
+
 			// get node again
 			processedNode, err = db.GetNode(ctx, nodeID)
 			require.NoError(t, err)
 
-			require.ElementsMatch(t, []string{}, processedNode.Projects)
+			// expect it to be assigned to a project now
+			require.ElementsMatch(t, []string{"targetProject"}, processedNode.Projects)
 		})
 
 }
