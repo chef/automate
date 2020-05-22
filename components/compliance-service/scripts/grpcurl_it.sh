@@ -14,8 +14,11 @@ CURL_OPTS_MANAGER="--insecure -cert $SSL_CERT -key $SSL_KEY $HOST:$MANAGER_PORT 
 RAND_NR=$((RANDOM%100))
 
 # grpcurl $CURL_COMP list
+# See all the Methods of a Service
 # grpcurl $CURL_COMP describe chef.automate.domain.compliance.jobs.JobsService
+# See the Job message struct
 # grpcurl $CURL_COMP describe chef.automate.domain.compliance.jobs.Job
+grpcurl $CURL_COMP describe chef.automate.domain.compliance.reporting.ReportingService.ListReports
 
 echo && echo "Compliance Service version:"
 grpcurl $CURL_OPTS_COMP.version.VersionService/Version
@@ -59,6 +62,24 @@ EOM
 
 # List all nodes
 # grpcurl $CURL_OPTS_MANAGER.nodes.NodesService/List
+# Get one report for a specific node
+REPORT_ID=`grpcurl -d @ $CURL_OPTS_COMP.reporting.ReportingService/ListReports <<EOM  | jq -r .reports[0].id
+{
+  "id": "$NODE_ID"
+}
+EOM
+`
+
+if [ -n "$REPORT_ID" ]; then
+  echo && echo "Showing the first 5 lines of report '$REPORT_ID' ..."
+  grpcurl -d @ $CURL_OPTS_COMP.reporting.ReportingService/ReadReport <<EOM | head -5
+  {
+    "id": "$REPORT_ID"
+  }
+EOM
+else
+  echo "Node '$NODE_ID' has no complete reports to show..."
+fi
 
 # List all jobs
 # grpcurl $CURL_OPTS_COMP.jobs.JobsService/List

@@ -125,6 +125,11 @@ func TestConvertControlFiltersByTagOnlyMatch(t *testing.T) {
 			SkippedDueToWaiver: false,
 			Message:            "Some message",
 		},
+		RemovedResultsCounts: &ESInSpecReportControlRemovedResultsCounts{
+			Failed:  11,
+			Passed:  12,
+			Skipped: 13,
+		},
 	}
 
 	filters["control_tag:cci"] = []string{""}
@@ -147,6 +152,11 @@ func TestConvertControlFiltersByTagOnlyMatch(t *testing.T) {
 			Justification:      "Some reason",
 			SkippedDueToWaiver: false,
 			Message:            "Some message",
+		},
+		RemovedResultsCounts: &reportingapi.RemovedResultsCounts{
+			Failed:  11,
+			Passed:  12,
+			Skipped: 13,
 		},
 	}, convertedControl)
 }

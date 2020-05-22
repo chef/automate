@@ -580,6 +580,13 @@ func convertControl(profileControlsMap map[string]*reportingapi.Control, reportC
 		Results:        minResults,
 		WaivedStr:      reportControlMin.WaivedStr,
 	}
+	if reportControlMin.RemovedResultsCounts != nil {
+		convertedControl.RemovedResultsCounts = &reportingapi.RemovedResultsCounts{
+			Failed:  int32(reportControlMin.RemovedResultsCounts.Failed),
+			Skipped: int32(reportControlMin.RemovedResultsCounts.Skipped),
+			Passed:  int32(reportControlMin.RemovedResultsCounts.Passed),
+		}
+	}
 	if reportControlMin.WaiverData != nil {
 		convertedControl.WaiverData = &reportingapi.OrigWaiverData{
 			ExpirationDate:     reportControlMin.WaiverData.ExpirationDate,
