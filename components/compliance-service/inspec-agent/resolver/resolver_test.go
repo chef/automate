@@ -39,6 +39,7 @@ func TestAssembleAwsApiNodeInfo(t *testing.T) {
 		Environment:    "aws-api",
 		ManagerID:      "12300",
 		CloudAccountID: "1234",
+		ManagerType:    "aws-api",
 	}, nodeDetails)
 
 	assert.Equal(t, inspec.TargetBaseConfig{
