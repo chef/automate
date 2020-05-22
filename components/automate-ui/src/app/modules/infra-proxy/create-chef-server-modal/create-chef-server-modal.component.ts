@@ -14,7 +14,6 @@ export class CreateChefServerModalComponent implements OnInit {
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter();
   @Input() createForm: FormGroup;
-  @Input() objectNoun: string;
   public modifyID = false; // Whether the edit ID form is open or not.
 
   public conflictError = false;
