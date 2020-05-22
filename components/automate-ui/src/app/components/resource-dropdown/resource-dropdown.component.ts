@@ -150,7 +150,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   private get allCheckedResources() {
     const resources: string[] = [];
-    this.filteredResources.forEach(section => {
+    this.resources.forEach(section => {
       const stuff = section.itemList.filter(r => r.checked).map(r => r.name);
       resources.push(...stuff);
     });
