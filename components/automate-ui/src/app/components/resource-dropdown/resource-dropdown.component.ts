@@ -5,12 +5,11 @@ export interface ResourceChecked {
   id: string;
   name: string;
   checked: boolean;
-  section?: string;
 }
 
 export interface ResourceCheckedSection {
   title?: string;
-  resources: ResourceChecked[];
+  itemList: ResourceChecked[];
 }
 
 @Component({
@@ -39,9 +38,9 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // Emits checked set of resource IDs upon completion.
   @Output() onDropdownClosing = new EventEmitter<string[]>();
 
-  // filteredSections is merely a container to hold the resources
+  // filteredResources is merely a container to hold the resources
   // that can be altered
-  public filteredSections: ResourceCheckedSection[] = [];
+  public filteredResources: ResourceCheckedSection[] = [];
   public dropdownState: 'closed' | 'opening' | 'open' = 'closed';
   public label = this.noneSelectedLabel;
   public filterValue = '';
@@ -58,7 +57,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     if (changes.resources) {
       this.updateLabel();
       if (changes.resources.firstChange) { // only update on initialization/first change
-        this.filteredSections = this.copyResources();
+        this.filteredResources = this.copyResources();
       }
     }
   }
@@ -69,7 +68,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     }
     if (this.dropdownState === 'closed') { // opening
       this.filterValue = '';
-      this.filteredSections = this.copyResources();
+      this.filteredResources = this.copyResources();
       // we cannot go directly to 'open' because handleClickOutside,
       // firing next on the same event that arrived here, would then immediately close it.
       this.dropdownState = 'opening';
@@ -99,14 +98,14 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     this.dropdownState = 'closed';
     const flattenedIDs = [].concat(
       ...this.resources.map(
-        section => section.resources.filter(r => r.checked).map(r => r.id)));
+        resource => resource.itemList.filter(r => r.checked).map(r => r.id)));
     this.onDropdownClosing.emit(flattenedIDs);
   }
 
   handleFilterKeyUp(): void {
-    for (let i = 0; i < this.filteredSections.length; i++) {
-      this.filteredSections[i].resources =
-        this.resources[i].resources.filter(r =>
+    for (let i = 0; i < this.filteredResources.length; i++) {
+      this.filteredResources[i].itemList =
+        this.resources[i].itemList.filter(r =>
           r.name.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1);
     }
   }
@@ -119,7 +118,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     this.resources.forEach(section =>
       copy.push({
         title: section.title,
-        resources: section.resources
+        itemList: section.itemList
       }));
     return copy;
   }
@@ -151,8 +150,8 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   private get allCheckedResources() {
     const resources: string[] = [];
-    this.filteredSections.forEach(section => {
-      const stuff = section.resources.filter(r => r.checked).map(r => r.name);
+    this.filteredResources.forEach(section => {
+      const stuff = section.itemList.filter(r => r.checked).map(r => r.name);
       resources.push(...stuff);
     });
     return resources;
@@ -160,7 +159,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   get allFilteredResourcesCount() {
     let count = 0;
-    this.filteredSections.forEach(section => count += section.resources.length);
+    this.filteredResources.forEach(section => count += section.itemList.length);
     return count;
   }
 

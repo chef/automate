@@ -41,7 +41,7 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((assignable: ProjectsFilterOption[]) => {
         this.projects = [{
-          resources: assignable.map(p => {
+          itemList: assignable.map(p => {
             return <ResourceChecked>{
               id: p.value,
               name: p.label,
@@ -64,7 +64,7 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
       // Need to trigger OnChanges in ResourceDropdownComponent
       // so we cannot just update the checked property of the existing array elements.
       this.projects = [{
-        resources: this.projects[0].resources
+        itemList: this.projects[0].itemList
           .map(p => ({
             ...p,
             checked: (changes.checkedProjectIDs.currentValue as string[]).includes(p.id)

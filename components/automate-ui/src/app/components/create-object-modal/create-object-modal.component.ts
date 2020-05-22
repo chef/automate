@@ -68,8 +68,8 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
         const chefManagedPolicies = pols.filter(p => p.type === 'CHEF_MANAGED');
         const customPolicies = pols.filter(p => p.type !== 'CHEF_MANAGED');
         this.policies = [
-          { title: 'Chef-managed', resources: chefManagedPolicies},
-          { title: 'Custom', resources: customPolicies}
+          { title: 'Chef-managed', itemList: chefManagedPolicies},
+          { title: 'Custom', itemList: customPolicies}
         ];
       });
   }
@@ -87,9 +87,8 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
       Object.values(this.projects).forEach(p => p.checked = false); // reset projects
       this.projectsUpdatedEvent.emit();
 
-      this.policies.forEach(section =>
-        section.resources.forEach(
-          r => r.checked = false)); // reset policies
+      this.policies.forEach(policy =>
+        policy.itemList.forEach(p => p.checked = false)); // reset policies
       this.policiesUpdatedEvent.emit();
 
       if (this.createProjectModal) {

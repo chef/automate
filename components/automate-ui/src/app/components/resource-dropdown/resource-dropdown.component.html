@@ -19,9 +19,9 @@
       </div>
 
       <div id="resource-container">
-        <ng-container *ngFor="let section of filteredSections">
-          <h3 class="resource-section" *ngIf="section.title && section.resources.length">{{ section.title }}</h3>
-          <chef-checkbox *ngFor="let resource of section.resources"
+        <ng-container *ngFor="let section of filteredResources">
+          <h3 class="resource-section" *ngIf="section.title && section.itemList.length">{{ section.title }}</h3>
+          <chef-checkbox *ngFor="let resource of section.itemList"
             [checked]="resource.checked"
             [attr.title]="resource.name"
             (change)="resourceChecked($event.detail, resource)"
