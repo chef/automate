@@ -1,4 +1,4 @@
-import { RespAttributes, AllAttributes} from '../infra-roles/infra-role.model'
+import { RespAttributes, AllAttributes } from '../infra-roles/infra-role.model';
 
 export interface Environment {
   name: string;
