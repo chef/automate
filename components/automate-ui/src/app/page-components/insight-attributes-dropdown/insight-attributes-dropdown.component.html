@@ -1,23 +1,25 @@
-<div class="bx--row">
-  <p class="instruction">Choose up to 5 attributes to display in the table:</p>
-</div>
-<ul class="bx--row">
-  <ng-container *ngFor="let option of options">
-    <div class="filter-button-container">
-      <li class="filter-button" (click)="handleSelect($event)" (keyup.enter)="handleSelect($event)"
-      tabindex="0" role="button" [attr.aria-pressed]="false" [attr.data-filtervalue]="option.id">
-        <span>{{ option.name }}<i class="check">&#x2713;</i></span>
-      </li>
-    </div>
-  </ng-container>
-</ul>
-<div class="action-button-row">
-  <chef-checkbox [checked]="saveAsDefault" (change)="handleDefaultChange($event.detail)">
-    Save as default
-  </chef-checkbox>
+<div [@childAnim]>
+  <div class="bx--row">
+    <p class="instruction">Choose up to 5 attributes to display in the table:</p>
+  </div>
+  <ul class="bx--row">
+    <ng-container *ngFor="let option of options">
+      <div class="filter-button-container">
+        <li class="filter-button" (click)="handleSelect($event)" (keyup.enter)="handleSelect($event)"
+        tabindex="0" role="button" [attr.aria-pressed]="false" [attr.data-filtervalue]="option.id">
+          <span>{{ option.name }}<i class="check">&#x2713;</i></span>
+        </li>
+      </div>
+    </ng-container>
+  </ul>
+  <div class="action-button-row">
+    <chef-checkbox [checked]="saveAsDefault" (change)="handleDefaultChange($event.detail)">
+      Save as default
+    </chef-checkbox>
 
-  <div>
-    <chef-button tertiary (click)="handleCancel()">Cancel</chef-button>
-    <chef-button primary [disabled]="!hasNewValues" (click)="handleUpdate()">Update</chef-button>
+    <div>
+      <chef-button tertiary (click)="handleCancel()">Cancel</chef-button>
+      <chef-button primary [disabled]="!hasNewValues" (click)="handleUpdate()">Update</chef-button>
+    </div>
   </div>
 </div>

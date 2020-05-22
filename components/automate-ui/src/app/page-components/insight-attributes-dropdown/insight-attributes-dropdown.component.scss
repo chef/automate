@@ -11,6 +11,7 @@
   background: $chef-white;
   box-shadow: 8px 8px 24px 0 rgba(197,199,209,0.6);
   width: 100%;
+  transform-origin: top right;
 
   @include carbon--breakpoint-up(md) {
     max-width: 467px;
