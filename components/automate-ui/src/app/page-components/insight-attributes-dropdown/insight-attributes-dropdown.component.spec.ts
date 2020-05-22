@@ -1,6 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { InsightAttributesDropdownComponent } from './insight-attributes-dropdown.component';
 
 import { FilterName } from './insight-attributes-dropdown.model';
@@ -21,6 +22,7 @@ describe('OverviewTrendComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule
       ],
       declarations: [
         InsightAttributesDropdownComponent
