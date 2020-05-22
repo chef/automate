@@ -142,28 +142,27 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   }
 
   private updateLabel(): void {
-    const checkedResources = this.allCheckedResources;
+    const checkedResources = this.allCheckedResourceNames;
     this.label = checkedResources.length === 0 ? this.noneSelectedLabel
       : checkedResources.length === 1 ? checkedResources[0]
         : `${checkedResources.length} ${this.objectNounPlural}`;
   }
 
-  private get allCheckedResources() {
-    const resources: string[] = [];
-    this.resources.forEach(section => {
-      const stuff = section.itemList.filter(r => r.checked).map(r => r.name);
-      resources.push(...stuff);
-    });
-    return resources;
+  private get allCheckedResourceNames(): string[] {
+    return [].concat(
+      ...this.resources.map(
+        resource => resource.itemList.filter(r => r.checked).map(r => r.name)));
   }
 
-  get allFilteredResourcesCount() {
-    let count = 0;
-    this.filteredResources.forEach(section => count += section.itemList.length);
-    return count;
+  get allFilteredResourcesCount(): number {
+    return this.filteredResources.reduce((sum, group) => sum + group.itemList.length, 0);
+  }
+
+  private get allResourcesCount(): number {
+    return this.resources.reduce((sum, group) => sum + group.itemList.length, 0);
   }
 
   get disabled(): boolean {
-    return this.resources.length === 0;
+    return this.resources.length === 0 || this.allResourcesCount === 0;
   }
 }

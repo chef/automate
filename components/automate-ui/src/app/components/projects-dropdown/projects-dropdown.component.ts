@@ -60,16 +60,19 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.checkedProjectIDs && changes.checkedProjectIDs.currentValue && this.projects) {
-      // Need to trigger OnChanges in ResourceDropdownComponent
-      // so we cannot just update the checked property of the existing array elements.
-      this.projects = [{
-        itemList: this.projects[0].itemList
-          .map(p => ({
-            ...p,
-            checked: (changes.checkedProjectIDs.currentValue as string[]).includes(p.id)
-          }))
-      }];
+    if (changes.checkedProjectIDs) {
+      // cannot proceed unless we have gotten the available projects list from the back end
+      if (this.projects) {
+        // Need to trigger OnChanges in ResourceDropdownComponent
+        // so we cannot just update the checked property of the existing array elements.
+        this.projects = [{
+          itemList: this.projects[0].itemList
+            .map(p => ({
+              ...p,
+              checked: (changes.checkedProjectIDs.currentValue as string[]).includes(p.id)
+            }))
+        }];
+      }
     }
   }
 
