@@ -316,7 +316,7 @@ func (srv *Server) validateNodeUpdate(ctx context.Context, in *nodes.Node) error
 	switch node.Manager {
 	case "aws-api", "azure-api", "gcp-api":
 		return &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update %s node", in.Manager)}
-	case "":
+	case "", "chef":
 		if in.Name != "" && in.Name != node.Name {
 			return &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update name of ingested node")}
 		} else if in.Tags != nil {
