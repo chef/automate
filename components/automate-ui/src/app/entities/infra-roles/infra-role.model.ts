@@ -32,7 +32,7 @@ export class RoleAttributes {
   default_attributes: Object;
   override_attributes: Object;
   all: AllAttributes;
-  constructor(resp: RespRoleAttributes) {
+  constructor(resp: RespAttributes) {
     this.default_attributes =
       (resp.default_attributes && JSON.parse(resp.default_attributes)) || '';
     this.override_attributes =
@@ -44,7 +44,7 @@ export class RoleAttributes {
   }
 }
 
-export interface RespRoleAttributes {
+export interface RespAttributes {
   default_attributes: string;
   override_attributes: string;
 }

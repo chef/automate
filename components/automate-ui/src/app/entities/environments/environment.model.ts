@@ -1,3 +1,5 @@
+import { RespAttributes, AllAttributes} from '../infra-roles/infra-role.model'
+
 export interface Environment {
   name: string;
   chef_type: string;
@@ -18,7 +20,7 @@ export class EnvironmentAttributes {
   default_attributes: Object;
   override_attributes: Object;
   all: AllAttributes;
-  constructor(resp: RespEnvironmentAttributes) {
+  constructor(resp: RespAttributes) {
     this.default_attributes =
       (resp.default_attributes && JSON.parse(resp.default_attributes)) || {};
     this.override_attributes =
@@ -28,14 +30,4 @@ export class EnvironmentAttributes {
       override_attributes: this.override_attributes
     };
   }
-}
-
-export interface RespEnvironmentAttributes {
-  default_attributes: string;
-  override_attributes: string;
-}
-
-export interface AllAttributes {
-  default_attributes: Object;
-  override_attributes: Object;
 }
