@@ -9,7 +9,6 @@ import { takeUntil } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
-import { PolicyChecked } from 'app/entities/policies/policy.model';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { GetPolicies } from 'app/entities/policies/policy.actions';
 import { allPolicies } from 'app/entities/policies/policy.selectors';
@@ -56,14 +55,14 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     this.store.select(allPolicies)
       .pipe(takeUntil(this.isDestroyed))
       .subscribe(policies => {
-        // OK to leave `checked` undefined--will be initialized upon `visible`
-        const ingestPolicy = policies.find(p => p.id === 'ingest-access') as PolicyChecked;
-        let pols = ingestPolicy ? [ingestPolicy] : [];
-        pols = pols
-          .concat(
-            ChefSorters.naturalSort(policies.filter(p => p.id !== 'ingest-access'), 'name'));
-        const chefManagedPolicies = pols.filter(p => p.type === 'CHEF_MANAGED');
+        const pols = ChefSorters.naturalSort(
+          policies.filter(p => p.id !== 'ingest-access'), 'name');
         const customPolicies = pols.filter(p => p.type !== 'CHEF_MANAGED');
+        const chefManagedPolicies = pols.filter(p => p.type === 'CHEF_MANAGED');
+        const ingestPolicy = policies.find(p => p.id === 'ingest-access');
+        if (ingestPolicy) {
+          chefManagedPolicies.unshift(ingestPolicy);
+        }
         this.policies = [
           { title: 'Chef-managed', itemList: chefManagedPolicies},
           { title: 'Custom', itemList: customPolicies}
