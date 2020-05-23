@@ -355,6 +355,10 @@
         "waiver_data": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.OrigWaiverData",
           "title": "Additional details for waived controls"
+        },
+        "removed_results_counts": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.RemovedResultsCounts",
+          "description": "When the control results are removed to reduce the size of the report, this summarize the status of the trimmed results."
         }
       }
     },
@@ -995,6 +999,26 @@
         "ref": {
           "type": "string",
           "description": "A description of the external document."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.RemovedResultsCounts": {
+      "type": "object",
+      "properties": {
+        "failed": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The number of results with status of `failed` that have been trimmed (removed) from a control"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The number of results with status of `skipped` that have been trimmed (removed) from a control"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The number of results with status of `passed` that have been trimmed (removed) from a control"
         }
       }
     },
