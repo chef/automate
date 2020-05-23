@@ -21,10 +21,6 @@ export interface PolicyChecked extends Policy {
   section: string;
 }
 
-export interface PolicyCheckedMap {
-  [id: string]: PolicyChecked;
-}
-
 export type IAMType = 'CHEF_MANAGED' | 'CUSTOM';
 
 // NB: It is strongly encourage to use stringToMember
