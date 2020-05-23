@@ -70,37 +70,38 @@ describe('CreateObjectModalComponent', () => {
   });
 
   it('upon opening, checked status of all projects is set to false', () => {
-    component.projects = {
-      'proj1':
-        { id: 'proj1', name: 'proj1', type: 'CHEF_MANAGED', status: 'NO_RULES', checked: true },
-      'proj3':
-        { id: 'proj3', name: 'proj3', type: 'CUSTOM', status: 'EDITS_PENDING', checked: false },
-      'proj2':
-        { id: 'proj2', name: 'proj2', type: 'CUSTOM', status: 'RULES_APPLIED', checked: true }
-    };
+    component.checkedProjectIDs = ['proj1', 'proj2', 'proj3'];
 
     component.ngOnChanges(
       { visible: new SimpleChange(false, true, true) });
 
-    Object.values(component.projects).forEach(p => {
-      expect(p.checked).toBe(false);
-    });
+    // By resetting this list, that triggers ProjectsDropdownComponent to set all projects false
+    expect(component.checkedProjectIDs.length).toEqual(0);
   });
 
   it('upon opening, checked status of all policies is set to false', () => {
     component.policies = [
-        { id: 'proj1', name: 'proj1', type: 'CHEF_MANAGED', members: [], projects: [],
-          checked: true },
-        { id: 'proj3', name: 'proj3', type: 'CUSTOM', members: [], projects: [], checked: false },
-        { id: 'proj2', name: 'proj2', type: 'CUSTOM', members: [], projects: [], checked: true }
+      {
+        title: 'section1',
+        itemList: [
+          { id: 'proj1', name: 'proj1', checked: true }
+        ]
+      },
+      {
+        title: 'section2',
+        itemList: [
+          { id: 'proj1', name: 'proj1', checked: true },
+          { id: 'proj3', name: 'proj3', checked: false },
+          { id: 'proj2', name: 'proj2', checked: true }
+        ]
+      }
     ];
 
     component.ngOnChanges(
       { visible: new SimpleChange(false, true, true) });
 
-    Object.values(component.policies).forEach(p => {
-      expect(p.checked).toBe(false);
-    });
+    component.policies.forEach(p =>
+      p.itemList.forEach(i => expect(i.checked).toBe(false)));
   });
 
   it('upon opening, dispatches a call to refresh policies', () => {

@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, SimpleChange } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
@@ -31,5 +31,23 @@ describe('ProjectsDropdownComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('upon opening, checked status of all projects is set to false', () => {
+    component.projects = [
+      {
+        itemList: [
+          { id: 'proj1', name: 'proj1', checked: true },
+          { id: 'proj3', name: 'proj3', checked: false },
+          { id: 'proj2', name: 'proj2', checked: true }
+        ]
+      }];
+
+    component.ngOnChanges(
+      { checkedProjectIDs: new SimpleChange([], [], true) });
+
+    component.projects.forEach(p =>
+      p.itemList.forEach(i => expect(i.checked).toBe(false)));
+  });
+
 
 });
