@@ -9,10 +9,8 @@ import { takeUntil } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
-import {
-  Project, ProjectConstants, ProjectCheckedMap
-} from 'app/entities/projects/project.model';
 import { PolicyChecked } from 'app/entities/policies/policy.model';
+import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { GetPolicies } from 'app/entities/policies/policy.actions';
 import { allPolicies } from 'app/entities/policies/policy.selectors';
 import { ResourceCheckedSection } from '../resource-dropdown/resource-dropdown.component';
@@ -33,7 +31,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter<Project[]>();
 
-  public projects: ProjectCheckedMap = {};
   public checkedProjectIDs: string[] = []; // resets project dropdown between modal openings
   public policies: ResourceCheckedSection[] = [];
   public modifyID = false; // Whether the edit ID form is open or not.
@@ -84,7 +81,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
 
       this.store.dispatch(new GetPolicies()); // refresh in case of updates
 
-      Object.values(this.projects).forEach(p => p.checked = false); // reset projects
+      this.checkedProjectIDs = []; // reset projects
       this.projectsUpdatedEvent.emit();
 
       this.policies.forEach(policy =>
@@ -134,13 +131,11 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
 
   closeEvent(): void {
     this.modifyID = false;
-    this.checkedProjectIDs = [];
     this.close.emit();
   }
 
   createObject(): void {
     this.createClicked.emit();
-    this.checkedProjectIDs = [];
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
