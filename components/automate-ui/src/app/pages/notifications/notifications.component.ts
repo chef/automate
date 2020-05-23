@@ -1,17 +1,27 @@
-import { Observable } from 'rxjs';
-
-import { map } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
+import { Store, select } from '@ngrx/store';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { Rule, ServiceActionType } from './rule';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NotificationRule, ServiceActionType } from 'app/entities/notification_rules/notification_rule.model';
 import { SortDirection } from '../../types/types';
 import { RulesService } from '../../services/rules/rules.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
+import {
+ allRules
+} from 'app/entities/notification_rules/notification_rule.selectors';
+import {
+  GetNotificationRules
+} from 'app/entities/notification_rules/notification_rule.action';
+
 export interface FieldDirection {
-  node_name: SortDirection;
+  name: SortDirection;
   alert_type: SortDirection;
+  failure_type: SortDirection;
+  webhook_url: SortDirection;
 }
 
 @Component({
@@ -20,7 +30,7 @@ export interface FieldDirection {
   styleUrls: ['./notifications.component.scss']
 })
 export class NotificationsComponent implements OnInit {
-  rules$: Observable<Rule[]>;
+  rules$: Observable<NotificationRule[]>;
   errorLoading = false;
   currentPage = 1;
   pageSize = 10;
@@ -29,18 +39,21 @@ export class NotificationsComponent implements OnInit {
   permissionDenied = false; // not currently used
   // This is exposed here to allow the component HTML access to ServiceActionType
   serviceActionType = ServiceActionType;
-  public notificationToDelete: Rule;
+  public notificationToDelete: NotificationRule;
   public deleteModalVisible = false;
 
   constructor(
+    private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
     private service: RulesService,
     private telemetryService: TelemetryService
-  ) { }
+  ) {
+    this.rules$ = store.pipe(select(allRules));
+  }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
-    this.rules$ = this.service.fetchRules();
+    this.store.dispatch(new GetNotificationRules());
     this.rules$.subscribe(rules => {
         this.sendCountToTelemetry(rules);
       },
@@ -54,7 +67,7 @@ export class NotificationsComponent implements OnInit {
     );
 
     this.resetSortDir();
-    this.toggleSort('node_name');
+    this.toggleSort('name');
   }
 
   toggleSort(field: string) {
@@ -77,7 +90,7 @@ export class NotificationsComponent implements OnInit {
     }
   }
 
-  public startNotificationDelete($event: MatOptionSelectionChange, rule: Rule): void {
+  public startNotificationDelete($event: MatOptionSelectionChange, rule: NotificationRule): void {
     if ($event.isUserInput) {
       this.notificationToDelete = rule;
       this.deleteModalVisible = true;
@@ -97,16 +110,25 @@ export class NotificationsComponent implements OnInit {
 
   private updateSort(field: string, direction: string) {
     this.rules$ = this.rules$.pipe(map(rules => {
-      let sortedRules: Rule[] = [];
-      if (field === 'node_name') {
-        sortedRules = rules.sort((r1: Rule, r2: Rule) => {
+      let sortedRules: NotificationRule[] = [];
+      if (field === 'name') {
+        sortedRules = rules.sort((r1: NotificationRule, r2: NotificationRule) => {
           return r1.name.localeCompare(r2.name);
         });
       } else if (field === 'alert_type') {
-        sortedRules = rules.sort((r1: Rule, r2: Rule) => {
+        sortedRules = rules.sort((r1: NotificationRule, r2: NotificationRule) => {
+          return r1.targetType.localeCompare(r2.targetType);
+        });
+      } else if (field === 'failure_type') {
+        sortedRules = rules.sort((r1: NotificationRule, r2: NotificationRule) => {
           return r1.AlertTypeLabels[r1.ruleType].localeCompare(r2.AlertTypeLabels[r2.ruleType]);
         });
+      } else if (field === 'webhook_url') {
+        sortedRules = rules.sort((r1: NotificationRule, r2: NotificationRule) => {
+          return r1.targetUrl.localeCompare(r2.targetUrl);
+        });
       }
+
       if (direction === 'asc') {
         return sortedRules;
       } else {
@@ -117,14 +139,16 @@ export class NotificationsComponent implements OnInit {
 
   private resetSortDir(): void {
     this.sortDir = {
-      node_name: 'asc',
-      alert_type: 'asc'
+      name: 'asc',
+      alert_type: 'asc',
+      failure_type: 'asc',
+      webhook_url: 'asc'
     };
   }
 
-  private sendCountToTelemetry(rules: Rule[]) {
+  private sendCountToTelemetry(rules: NotificationRule[]) {
     const ruleCount = rules.reduce(
-      (acc, rule: Rule) => {
+      (acc, rule: NotificationRule) => {
         if (rule.ruleType === 'CCRFailure') {
           acc['ccrRuleCount'] += 1;
         } else if (rule.ruleType === 'ComplianceFailure') {

@@ -44,20 +44,9 @@
   }
 }
 
-chef-icon#sort-desc {
+::ng-deep .asc-icon,
+::ng-deep .desc-icon {
   color: $chef-primary-dark;
-
-  &::after {
-    color: $chef-dark-grey;
-  }
-}
-
-chef-icon#sort-asc {
-  color: $chef-dark-grey;
-
-  &::after {
-    color: $chef-primary-dark;
-  }
 }
 
 .actions {
