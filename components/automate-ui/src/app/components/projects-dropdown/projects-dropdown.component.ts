@@ -7,7 +7,7 @@ import { assignableProjects } from 'app/services/projects-filter/projects-filter
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { ResourceChecked, ResourceCheckedSection } from '../resource-dropdown/resource-dropdown.component';
+import { ResourceCheckedSection } from '../resource-dropdown/resource-dropdown.component';
 
 @Component({
   selector: 'app-projects-dropdown',
@@ -42,7 +42,7 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
       .subscribe((assignable: ProjectsFilterOption[]) => {
         this.projects = [{
           itemList: assignable.map(p => {
-            return <ResourceChecked>{
+            return {
               id: p.value,
               name: p.label,
               type: p.type,
