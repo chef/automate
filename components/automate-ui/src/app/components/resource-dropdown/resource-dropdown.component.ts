@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { cloneDeep } from 'lodash/fp';
 
 
 export interface ResourceChecked {
@@ -38,9 +39,14 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // Emits checked set of resource IDs upon completion.
   @Output() onDropdownClosing = new EventEmitter<string[]>();
 
-  // filteredResources is merely a container to hold the resources
-  // that can be altered
+  // Provides a level of indirection so that we do not lose *unsaved* checked items:
+  // (a) while dropdown is open
+  // (b) when dropdown is closed then re-opened
+  public snapshotResources: ResourceCheckedSection[] = [];
+
+  // Transitory subset of snapshotResources for display based on user's entered filter.
   public filteredResources: ResourceCheckedSection[] = [];
+
   public dropdownState: 'closed' | 'opening' | 'open' = 'closed';
   public label = this.noneSelectedLabel;
   public filterValue = '';
@@ -56,10 +62,10 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.resources) {
-      this.updateLabel();
       if (changes.resources.firstChange) { // only update on initialization/first change
-        this.filteredResources = this.copyResources();
+        this.setResources();
       }
+      this.updateLabel();
       this.disabled = this.isDisabled();
     }
   }
@@ -70,7 +76,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     }
     if (this.dropdownState === 'closed') { // opening
       this.filterValue = '';
-      this.filteredResources = this.copyResources();
+      this.setResources();
       // we cannot go directly to 'open' because handleClickOutside,
       // firing next on the same event that arrived here, would then immediately close it.
       this.dropdownState = 'opening';
@@ -99,7 +105,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   closeDropdown(): void {
     this.dropdownState = 'closed';
     const flattenedIDs = [].concat(
-      ...this.resources.map(
+      ...this.snapshotResources.map(
         resource => resource.itemList.filter(r => r.checked).map(r => r.id)));
     this.onDropdownClosing.emit(flattenedIDs);
   }
@@ -107,22 +113,29 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   handleFilterKeyUp(): void {
     for (let i = 0; i < this.filteredResources.length; i++) {
       this.filteredResources[i].itemList =
-        this.resources[i].itemList.filter(r =>
+        this.snapshotResources[i].itemList.filter(r =>
           r.name.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1);
     }
   }
 
-  // Not deep and not shallow!
-  // Need the individual resources to point to the same objects
-  // so that when one is checked, it is checked in BOTH structures.
-  private copyResources(): ResourceCheckedSection[] {
-    const copy: ResourceCheckedSection[] = [];
-    this.resources.forEach(section =>
-      copy.push({
-        title: section.title,
-        itemList: section.itemList
-      }));
-    return copy;
+  private setResources(): void {
+
+    // Freeze resources from updating while dropdown is open.
+    // Otherwise, when the next introspect_projects occurs,
+    // all checkboxes in the open dropdown will be cleared!
+    if (this.checkedResourcesCount === 0) {
+      this.snapshotResources = cloneDeep(this.resources);
+    }
+
+    // Not deep and not shallow!
+    // Need the individual resources to point to the same objects
+    // so that when one is checked, it is checked in BOTH structures.
+    this.filteredResources = [].concat(
+      ...this.snapshotResources.map(section =>
+        ({
+          title: section.title,
+          itemList: section.itemList
+        })));
   }
 
   moveFocus(event: KeyboardEvent): void {
@@ -150,22 +163,30 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
         : `${checkedResources.length} ${this.objectNounPlural}`;
   }
 
+  // Context is a *closed* dropdown, so use the raw resources, not the last snapshot
   private isDisabled(): boolean {
     return this.resources.length === 0 || this.allResourcesCount === 0;
   }
 
+  private get allResourcesCount(): number {
+    return this.resources.reduce(
+      (sum, group) => sum + group.itemList.length, 0);
+  }
+
+  private get checkedResourcesCount(): number {
+    return this.snapshotResources.reduce(
+      (sum, group) => sum + group.itemList.filter(r => r.checked).length, 0);
+  }
+
   private get allCheckedResourceNames(): string[] {
     return [].concat(
-      ...this.resources.map(
+      ...this.snapshotResources.map(
         resource => resource.itemList.filter(r => r.checked).map(r => r.name)));
   }
 
   get allFilteredResourcesCount(): number {
-    return this.filteredResources.reduce((sum, group) => sum + group.itemList.length, 0);
-  }
-
-  private get allResourcesCount(): number {
-    return this.resources.reduce((sum, group) => sum + group.itemList.length, 0);
+    return this.filteredResources.reduce(
+      (sum, group) => sum + group.itemList.length, 0);
   }
 
 }
