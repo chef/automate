@@ -44,6 +44,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   public dropdownState: 'closed' | 'opening' | 'open' = 'closed';
   public label = this.noneSelectedLabel;
   public filterValue = '';
+  public disabled = false;
 
   ngOnInit(): void {
     if (this.resourcesUpdated) { // an optional setting
@@ -59,6 +60,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
       if (changes.resources.firstChange) { // only update on initialization/first change
         this.filteredResources = this.copyResources();
       }
+      this.disabled = this.isDisabled();
     }
   }
 
@@ -148,6 +150,10 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
         : `${checkedResources.length} ${this.objectNounPlural}`;
   }
 
+  private isDisabled(): boolean {
+    return this.resources.length === 0 || this.allResourcesCount === 0;
+  }
+
   private get allCheckedResourceNames(): string[] {
     return [].concat(
       ...this.resources.map(
@@ -162,7 +168,4 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     return this.resources.reduce((sum, group) => sum + group.itemList.length, 0);
   }
 
-  get disabled(): boolean {
-    return this.resources.length === 0 || this.allResourcesCount === 0;
-  }
 }
