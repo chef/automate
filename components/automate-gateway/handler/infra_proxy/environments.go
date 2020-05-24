@@ -48,6 +48,28 @@ func (a *InfraProxyServer) GetEnvironment(ctx context.Context, r *gwreq.Environm
 	}, nil
 }
 
+// CreateEnvironment creates the environment
+func (a *InfraProxyServer) CreateEnvironment(ctx context.Context, r *gwreq.CreateEnvironment) (*gwres.Environment, error) {
+	req := &infra_req.CreateEnvironment{
+		OrgId:              r.OrgId,
+		ServerId:           r.ServerId,
+		Name:               r.Name,
+		Description:        r.Description,
+		CookbookVersions:   r.CookbookVersions,
+		DefaultAttributes:  r.DefaultAttributes,
+		OverrideAttributes: r.OverrideAttributes,
+		JsonClass:          r.JsonClass,
+	}
+	res, err := a.client.CreateEnvironment(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Environment{
+		Name: res.GetName(),
+	}, nil
+}
+
 // DeleteEnvironment deletes the environment
 func (a *InfraProxyServer) DeleteEnvironment(ctx context.Context, r *gwreq.Environment) (*gwres.Environment, error) {
 	req := &infra_req.Environment{

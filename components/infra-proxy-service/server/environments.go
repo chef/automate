@@ -56,10 +56,70 @@ func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (
 		Name:               en.Name,
 		ChefType:           en.ChefType,
 		Description:        en.Description,
-		CookbookVersions:   fromAPIToListEnvCookbookVersions(en.CookbookVersions),
+		CookbookVersions:   en.CookbookVersions,
 		JsonClass:          en.JsonClass,
 		DefaultAttributes:  string(defaultAttributes),
 		OverrideAttributes: string(overrideAttributes),
+	}, nil
+
+}
+
+// CreateEnvironment creates the environment
+func (s *Server) CreateEnvironment(ctx context.Context, req *request.CreateEnvironment) (*response.Environment, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "must supply environment name")
+	}
+
+	cookbooks := req.CookbookVersions
+	if len(cookbooks) == 0 {
+		cookbooks = map[string]string{}
+	}
+
+	var defAtt interface{}
+	var ovrAtt interface{}
+
+	defIn := req.DefaultAttributes
+	if defIn == "" {
+		defIn = "{}"
+	}
+
+	overIn := req.OverrideAttributes
+	if overIn == "" {
+		overIn = "{}"
+	}
+	defaultAttributes := json.RawMessage(defIn)
+	overrideAttributes := json.RawMessage(overIn)
+
+	err = json.Unmarshal(defaultAttributes, &defAtt)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = json.Unmarshal(overrideAttributes, &ovrAtt)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	_, err = c.client.Environments.Create(&chef.Environment{
+		Name:               req.Name,
+		Description:        req.Description,
+		DefaultAttributes:  defAtt,
+		OverrideAttributes: ovrAtt,
+		CookbookVersions:   cookbooks,
+		JsonClass:          req.JsonClass,
+	})
+
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.Environment{
+		Name: req.Name,
 	}, nil
 
 }
@@ -102,14 +162,5 @@ func fromAPIToListEnvironments(al chef.EnvironmentResult) []*response.Environmen
 		return cl[i].Name < cl[j].Name
 	})
 
-	return cl
-}
-
-func fromAPIToListEnvCookbookVersions(cookbooks map[string]string) []string {
-	cl := make([]string, len(cookbooks))
-
-	for i, c := range cl {
-		cl[i] = c
-	}
 	return cl
 }
