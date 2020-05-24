@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 	"net/url"
 
 	chef "github.com/go-chef/chef"
@@ -38,7 +40,7 @@ func NewChefClient(config *ChefConfig) (*ChefClient, error) {
 	})
 
 	if err != nil {
-		return nil, errors.Wrap(err, err.Error())
+		return nil, errors.Errorf("The user or client who made the request could not be authenticated. Verify the user/client name, and that the correct key was used to sign the request.")
 	}
 
 	return &ChefClient{client: client}, nil
@@ -108,4 +110,26 @@ func GetOrgAdminKeyFrom(secret *secrets.Secret) string {
 	}
 
 	return adminKey
+}
+
+// ParseAPIError parses common Chef Infra Server API errors into a user-readable format.
+func ParseAPIError(err error, v interface{}, noun string) error {
+	chefError, _ := chef.ChefError(err)
+	if chefError != nil {
+		switch chefError.StatusCode() {
+		case http.StatusBadRequest:
+			return status.Errorf(codes.InvalidArgument, "The contents of the request are not formatted correctly.")
+		case http.StatusUnauthorized:
+			return status.Errorf(codes.Unauthenticated, "The user or client who made the request could not be authenticated. Verify the user/client name, and that the correct key was used to sign the request.")
+		case http.StatusForbidden:
+			return status.Errorf(codes.PermissionDenied, "The user who made the request is not authorized to perform the action.")
+		case http.StatusConflict:
+			return status.Errorf(codes.AlreadyExists, "%s with name %q already exists", noun, fmt.Sprint(v))
+		case http.StatusNotFound:
+			return status.Errorf(codes.NotFound, "no %s found with name %q", noun, fmt.Sprint(v))
+		default:
+			return status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	return err
 }

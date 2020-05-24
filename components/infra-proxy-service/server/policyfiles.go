@@ -14,16 +14,14 @@ import (
 
 // GetPolicyfiles gets a list of all policy files
 func (s *Server) GetPolicyfiles(ctx context.Context, req *request.Policyfiles) (*response.Policyfiles, error) {
-
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	policyGroups, err := c.client.PolicyGroups.List()
-
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err, "", "policyfile")
 	}
 
 	return &response.Policyfiles{
@@ -35,12 +33,12 @@ func (s *Server) GetPolicyfiles(ctx context.Context, req *request.Policyfiles) (
 func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*response.Policyfile, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	policy, err := c.client.Policies.GetRevisionDetails(req.Name, req.RevisionId)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err, "", "policyfile")
 	}
 
 	defaultAttrs, err := json.Marshal(policy.DefaultAttributes)
@@ -55,7 +53,7 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 
 	result, err := c.GetRoleList()
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, ParseAPIError(err, "", "role")
 	}
 
 	runList, err := GetExpandRunlistFromRole(policy.RunList, &result)

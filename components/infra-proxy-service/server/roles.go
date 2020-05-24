@@ -119,15 +119,14 @@ func (c *ChefClient) GetRoleList() (RoleListResult, error) {
 
 // GetRoles get roles list
 func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Roles, error) {
-
 	client, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	result, err := client.GetRoleList()
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, ParseAPIError(err, "", "role")
 	}
 
 	return &response.Roles{
@@ -141,12 +140,12 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	result, err := c.GetRoleList()
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, ParseAPIError(err, req.Name, "role")
 	}
 
 	role := findRoleFromRoleList(req.Name, &result)
@@ -183,7 +182,7 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 func (s *Server) DeleteRole(ctx context.Context, req *request.Role) (*response.Role, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	if req.Name == "" {
@@ -192,7 +191,7 @@ func (s *Server) DeleteRole(ctx context.Context, req *request.Role) (*response.R
 
 	err = c.client.Roles.Delete(req.Name)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, ParseAPIError(err, req.Name, "role")
 	}
 
 	return &response.Role{

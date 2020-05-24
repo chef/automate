@@ -18,12 +18,12 @@ func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*res
 
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	cookbookList, err := c.client.Cookbooks.List()
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err, "", "cookbook")
 	}
 
 	return &response.Cookbooks{
@@ -36,12 +36,12 @@ func (s *Server) GetCookbookVersions(ctx context.Context, req *request.CookbookV
 
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	res, err := c.client.Cookbooks.GetAvailableVersions(req.Name, "")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err, req.Name, "cookbook")
 	}
 
 	cookbook, success := res[req.Name]
@@ -59,11 +59,10 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	if req.Name == "" {
-		s.service.Logger.Debug("Cookbook Fetch: missing cookbook name")
 		return nil, status.Error(codes.InvalidArgument, "must supply cookbook name")
 	}
 
@@ -74,7 +73,7 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 
 	cookbook, err := c.client.Cookbooks.GetVersion(req.Name, version)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err, req.Name, "cookbook")
 	}
 
 	return &response.Cookbook{
@@ -103,7 +102,7 @@ func (s *Server) GetCookbookFileContent(ctx context.Context, req *request.Cookbo
 	var writer bytes.Buffer
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	clientReq, err := c.client.NewRequest("GET", req.Url, nil)
