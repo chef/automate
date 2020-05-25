@@ -53,8 +53,11 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   public disabled = false;
 
   ngOnInit(): void {
-    if (this.resourcesUpdated) { // an optional setting
+    // an optional setting allowing caller to force reset to initial state
+    if (this.resourcesUpdated) {
       this.resourcesUpdated.subscribe(() => {
+        this.snapshotResources = cloneDeep(this.resources);
+        this.resetFilteredResources();
         this.updateLabel();
       });
     }
@@ -63,7 +66,9 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.resources) {
       if (changes.resources.firstChange) { // only update on initialization/first change
-        this.setResources();
+        this.snapshotResources = cloneDeep(this.resources);
+        this.resetFilteredResources();
+      } else {
       }
       this.updateLabel();
       this.disabled = this.isDisabled();
@@ -76,7 +81,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     }
     if (this.dropdownState === 'closed') { // opening
       this.filterValue = '';
-      this.setResources();
+      this.resetFilteredResources();
       // we cannot go directly to 'open' because handleClickOutside,
       // firing next on the same event that arrived here, would then immediately close it.
       this.dropdownState = 'opening';
@@ -118,14 +123,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     }
   }
 
-  private setResources(): void {
-
-    // Freeze resources from updating while dropdown is open.
-    // Otherwise, when the next introspect_projects occurs,
-    // all checkboxes in the open dropdown will be cleared!
-    if (this.checkedResourcesCount === 0) {
-      this.snapshotResources = cloneDeep(this.resources);
-    }
+  private resetFilteredResources(): void {
 
     // Not deep and not shallow!
     // Need the individual resources to point to the same objects
@@ -171,11 +169,6 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   private get allResourcesCount(): number {
     return this.resources.reduce(
       (sum, group) => sum + group.itemList.length, 0);
-  }
-
-  private get checkedResourcesCount(): number {
-    return this.snapshotResources.reduce(
-      (sum, group) => sum + group.itemList.filter(r => r.checked).length, 0);
   }
 
   private get allCheckedResourceNames(): string[] {
