@@ -6,7 +6,8 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { ngrxReducers, runtimeChecks, NgrxStateAtom } from 'app/ngrx.reducers';
 import { using } from 'app/testing/spec-helpers';
-import { GetPolicies } from 'app/entities/policies/policy.actions';
+import { GetPolicies, GetPoliciesSuccessPayload, GetPoliciesSuccess } from 'app/entities/policies/policy.actions';
+import { Policy, IAMType } from 'app/entities/policies/policy.model';
 import { CreateObjectModalComponent } from './create-object-modal.component';
 
 describe('CreateObjectModalComponent', () => {
@@ -69,7 +70,7 @@ describe('CreateObjectModalComponent', () => {
     });
   });
 
-  it('upon opening, checked status of all projects is set to false', () => {
+  it('upon opening, checked status of all PROJECTS is set to false', () => {
     component.checkedProjectIDs = ['proj1', 'proj2', 'proj3'];
 
     component.ngOnChanges(
@@ -79,7 +80,7 @@ describe('CreateObjectModalComponent', () => {
     expect(component.checkedProjectIDs.length).toEqual(0);
   });
 
-  it('upon opening, checked status of all policies is set to false', () => {
+  it('upon opening, checked status of all POLICIES is set to false', () => {
     component.policies = [
       {
         title: 'section1',
@@ -132,5 +133,88 @@ describe('CreateObjectModalComponent', () => {
     expect(component.createForm.controls.addPolicies.value).toEqual(true);
     expect(component.createForm.controls.addTeams.value).toEqual(true);
   });
+
+  describe('ordering', () => {
+
+    it('segregates chef-managed and custom policies into separate sections', () => {
+      const policies: GetPoliciesSuccessPayload = {
+        policies: [
+          genPolicy('zz', 'CHEF_MANAGED'),
+          genPolicy('cc', 'CUSTOM'),
+          genPolicy('aa', 'CHEF_MANAGED'),
+          genPolicy('dd', 'CUSTOM'),
+          genPolicy('bb', 'CUSTOM')
+        ]
+      };
+      store.dispatch(new GetPoliciesSuccess(policies));
+      fixture.detectChanges();
+
+      const chefPolicies = component.policies[0];
+      const customPolicies = component.policies[1];
+      expect(chefPolicies.itemList.map(p => p.name)).toEqual(['aa', 'zz']);
+      expect(customPolicies.itemList.map(p => p.name)).toEqual(['bb', 'cc', 'dd']);
+    });
+
+    it('uses standard sort for custom policies', () => {
+      const policies: GetPoliciesSuccessPayload = {
+        policies: [
+          genPolicy('zz', 'CUSTOM'),
+          genPolicy('cc', 'CUSTOM'),
+          genPolicy('aa', 'CUSTOM'),
+          genPolicy('bb', 'CUSTOM')
+        ]
+      };
+      store.dispatch(new GetPoliciesSuccess(policies));
+      fixture.detectChanges();
+
+      const customPolicies = component.policies[1];
+      expect(customPolicies.itemList.map(p => p.name))
+        .toEqual(['aa', 'bb', 'cc', 'zz']);
+    });
+
+    it('uses standard sort for chef-managed policies OTHER THAN ingest', () => {
+      const policies: GetPoliciesSuccessPayload = {
+        policies: [
+          genPolicy('zz', 'CHEF_MANAGED'),
+          genPolicy('cc', 'CHEF_MANAGED'),
+          genPolicy('aa', 'CHEF_MANAGED'),
+          genPolicy('bb', 'CHEF_MANAGED')
+        ]
+      };
+      store.dispatch(new GetPoliciesSuccess(policies));
+      fixture.detectChanges();
+
+      const chefPolicies = component.policies[0];
+      expect(chefPolicies.itemList.map(p => p.name))
+        .toEqual(['aa', 'bb', 'cc', 'zz']);
+    });
+
+    it('puts ingest at the top of chef-managed', () => {
+      const policies: GetPoliciesSuccessPayload = {
+        policies: [
+          genPolicy('zz', 'CHEF_MANAGED'),
+          genPolicy('ingest-access', 'CHEF_MANAGED'),
+          genPolicy('aa', 'CHEF_MANAGED'),
+          genPolicy('bb', 'CHEF_MANAGED')
+        ]
+      };
+      store.dispatch(new GetPoliciesSuccess(policies));
+      fixture.detectChanges();
+
+      const chefPolicies = component.policies[0];
+      expect(chefPolicies.itemList.map(p => p.name))
+        .toEqual(['ingest-access', 'aa', 'bb', 'zz']);
+    });
+  });
+
+  function genPolicy(id: string, type?: IAMType): Policy {
+    return {
+      id,
+      name: id,
+      type: type,
+      members: [],
+      projects: []
+    };
+  }
 
 });

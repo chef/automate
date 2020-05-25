@@ -3,12 +3,15 @@ import { FormsModule } from '@angular/forms';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProjectsDropdownComponent } from './projects-dropdown.component';
-import { StoreModule } from '@ngrx/store';
-import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
+import { StoreModule, Store } from '@ngrx/store';
+import { ngrxReducers, runtimeChecks, NgrxStateAtom } from 'app/ngrx.reducers';
+import { LoadOptionsSuccess } from 'app/services/projects-filter/projects-filter.actions';
+import { ProjectsFilterOptionTuple } from 'app/services/projects-filter/projects-filter.reducer';
 
 describe('ProjectsDropdownComponent', () => {
   let component: ProjectsDropdownComponent;
   let fixture: ComponentFixture<ProjectsDropdownComponent>;
+  let store: Store<NgrxStateAtom>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -25,6 +28,7 @@ describe('ProjectsDropdownComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ProjectsDropdownComponent);
     component = fixture.componentInstance;
+    store = TestBed.inject(Store);
     fixture.detectChanges();
   });
 
@@ -49,5 +53,26 @@ describe('ProjectsDropdownComponent', () => {
       p.itemList.forEach(i => expect(i.checked).toBe(false)));
   });
 
+  it('receives projects in sorted order', () => {
+    const payload: ProjectsFilterOptionTuple = {
+      fetched: [
+        { label: 'zz-proj', checked: true, value: '', type: '' },
+        { label: 'c-proj', checked: true, value: '', type: '' },
+        { label: 'a-proj', checked: true, value: '', type: '' },
+        { label: 'b-proj', checked: true, value: '', type: '' }
+      ],
+      restored: []
+    };
+    const expectedNames = payload.fetched.map(p => p.label);
 
+    store.dispatch(new LoadOptionsSuccess(payload));
+
+    expect(component.projects[0].itemList.map(p => p.name))
+      .toEqual([
+        expectedNames[2],
+        expectedNames[3],
+        expectedNames[1],
+        expectedNames[0]
+      ]);
+  });
 });
