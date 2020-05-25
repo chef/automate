@@ -19,7 +19,7 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 
 	clients, err := c.client.Clients.List()
 	if err != nil {
-		return nil, ParseAPIError(err, "", "client")
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Clients{
@@ -36,7 +36,7 @@ func (s *Server) GetClient(ctx context.Context, req *request.Client) (*response.
 
 	ic, err := c.client.Clients.Get(req.Name)
 	if err != nil {
-		return nil, ParseAPIError(err, req.Name, "client")
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Client{

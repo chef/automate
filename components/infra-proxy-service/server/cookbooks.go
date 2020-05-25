@@ -23,7 +23,7 @@ func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*res
 
 	cookbookList, err := c.client.Cookbooks.List()
 	if err != nil {
-		return nil, ParseAPIError(err, "", "cookbook")
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Cookbooks{
@@ -41,7 +41,7 @@ func (s *Server) GetCookbookVersions(ctx context.Context, req *request.CookbookV
 
 	res, err := c.client.Cookbooks.GetAvailableVersions(req.Name, "")
 	if err != nil {
-		return nil, ParseAPIError(err, req.Name, "cookbook")
+		return nil, ParseAPIError(err)
 	}
 
 	cookbook, success := res[req.Name]
@@ -73,7 +73,7 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 
 	cookbook, err := c.client.Cookbooks.GetVersion(req.Name, version)
 	if err != nil {
-		return nil, ParseAPIError(err, req.Name, "cookbook")
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Cookbook{

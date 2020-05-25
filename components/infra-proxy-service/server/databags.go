@@ -31,7 +31,7 @@ func (s *Server) CreateDataBag(ctx context.Context, req *request.CreateDataBag) 
 		})
 
 	if err != nil {
-		return nil, ParseAPIError(err, req.Name, "databag")
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.CreateDataBag{
@@ -49,7 +49,7 @@ func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*respo
 	if req.Name != "" {
 		dataBags, err := c.client.DataBags.ListItems(req.Name)
 		if err != nil {
-			return nil, ParseAPIError(err, req.Name, "databag")
+			return nil, ParseAPIError(err)
 		}
 
 		return &response.DataBags{
@@ -60,7 +60,7 @@ func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*respo
 
 	dataBags, err := c.client.DataBags.List()
 	if err != nil {
-		return nil, ParseAPIError(err, "", "databag")
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.DataBags{
@@ -77,7 +77,7 @@ func (s *Server) GetDataBagItem(ctx context.Context, req *request.DataBag) (*res
 
 	ic, err := c.client.DataBags.GetItem(req.Name, req.Item)
 	if err != nil {
-		return nil, ParseAPIError(err, req.Name, "databag")
+		return nil, ParseAPIError(err)
 	}
 
 	data, err := json.Marshal(ic)
@@ -118,7 +118,7 @@ func (s *Server) DeleteDataBag(ctx context.Context, req *request.DataBag) (*resp
 
 	data, err := c.client.DataBags.Delete(req.Name)
 	if err != nil {
-		return nil, ParseAPIError(err, req.Name, "databag")
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.DataBag{

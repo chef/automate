@@ -56,7 +56,7 @@ func (c *ChefClient) fetchAffectedNodes(ctx context.Context, chefType, name, ver
 
 	res, err := c.client.Search.PartialExec("node", url, query)
 	if err != nil {
-		return nil, ParseAPIError(err, name, "node")
+		return nil, ParseAPIError(err)
 	}
 
 	return &res, nil

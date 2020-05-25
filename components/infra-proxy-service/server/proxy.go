@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
 
@@ -113,22 +112,22 @@ func GetOrgAdminKeyFrom(secret *secrets.Secret) string {
 }
 
 // ParseAPIError parses common Chef Infra Server API errors into a user-readable format.
-func ParseAPIError(err error, v interface{}, noun string) error {
+func ParseAPIError(err error) error {
 	chefError, _ := chef.ChefError(err)
 	if chefError != nil {
 		switch chefError.StatusCode() {
 		case http.StatusBadRequest:
-			return status.Errorf(codes.InvalidArgument, "The contents of the request are not formatted correctly.")
+			return status.Errorf(codes.InvalidArgument, chefError.StatusMsg())
 		case http.StatusUnauthorized:
-			return status.Errorf(codes.Unauthenticated, "The user or client who made the request could not be authenticated. Verify the user/client name, and that the correct key was used to sign the request.")
+			return status.Errorf(codes.Unauthenticated, chefError.StatusMsg())
 		case http.StatusForbidden:
-			return status.Errorf(codes.PermissionDenied, "The user who made the request is not authorized to perform the action.")
+			return status.Errorf(codes.PermissionDenied, chefError.StatusMsg())
 		case http.StatusConflict:
-			return status.Errorf(codes.AlreadyExists, "%s with name %q already exists", noun, fmt.Sprint(v))
+			return status.Errorf(codes.AlreadyExists, chefError.StatusMsg())
 		case http.StatusNotFound:
-			return status.Errorf(codes.NotFound, "no %s found with name %q", noun, fmt.Sprint(v))
+			return status.Errorf(codes.NotFound, chefError.StatusMsg())
 		default:
-			return status.Error(codes.InvalidArgument, err.Error())
+			return status.Error(codes.InvalidArgument, chefError.StatusMsg())
 		}
 	}
 	return err

@@ -21,7 +21,7 @@ func (s *Server) GetPolicyfiles(ctx context.Context, req *request.Policyfiles) (
 
 	policyGroups, err := c.client.PolicyGroups.List()
 	if err != nil {
-		return nil, ParseAPIError(err, "", "policyfile")
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Policyfiles{
@@ -38,7 +38,7 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 
 	policy, err := c.client.Policies.GetRevisionDetails(req.Name, req.RevisionId)
 	if err != nil {
-		return nil, ParseAPIError(err, "", "policyfile")
+		return nil, ParseAPIError(err)
 	}
 
 	defaultAttrs, err := json.Marshal(policy.DefaultAttributes)
@@ -53,7 +53,7 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 
 	result, err := c.GetRoleList()
 	if err != nil {
-		return nil, ParseAPIError(err, "", "role")
+		return nil, ParseAPIError(err)
 	}
 
 	runList, err := GetExpandRunlistFromRole(policy.RunList, &result)

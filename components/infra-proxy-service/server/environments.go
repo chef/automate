@@ -22,7 +22,7 @@ func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments)
 
 	environments, err := c.client.Environments.List()
 	if err != nil {
-		return nil, ParseAPIError(err, "", "environment")
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Environments{
@@ -39,7 +39,7 @@ func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (
 
 	en, err := c.client.Environments.Get(req.Name)
 	if err != nil {
-		return nil, ParseAPIError(err, req.Name, "environment")
+		return nil, ParseAPIError(err)
 	}
 
 	defaultAttributes, err := json.Marshal(en.DefaultAttributes)
@@ -77,7 +77,7 @@ func (s *Server) DeleteEnvironment(ctx context.Context, req *request.Environment
 
 	environment, err := c.client.Environments.Delete(req.Name)
 	if err != nil {
-		return nil, ParseAPIError(err, req.Name, "environment")
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Environment{

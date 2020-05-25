@@ -104,12 +104,12 @@ func (c *ChefClient) GetRoleList() (RoleListResult, error) {
 	var result RoleListResult
 	newReq, err := c.client.NewRequest("GET", "search/role", nil)
 	if err != nil {
-		return result, status.Error(codes.Internal, err.Error())
+		return result, ParseAPIError(err)
 	}
 
 	res, err := c.client.Do(newReq, &result)
 	if err != nil {
-		return result, status.Error(codes.Internal, err.Error())
+		return result, ParseAPIError(err)
 	}
 
 	defer res.Body.Close() // nolint: errcheck
@@ -126,7 +126,7 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 
 	result, err := client.GetRoleList()
 	if err != nil {
-		return nil, ParseAPIError(err, "", "role")
+		return nil, err
 	}
 
 	return &response.Roles{
@@ -145,10 +145,13 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 
 	result, err := c.GetRoleList()
 	if err != nil {
-		return nil, ParseAPIError(err, req.Name, "role")
+		return nil, err
 	}
 
 	role := findRoleFromRoleList(req.Name, &result)
+	if role == nil {
+		return nil, status.Errorf(codes.NotFound, "no %s found with name %q", "role", req.Name)
+	}
 
 	defaultAttributes, err := json.Marshal(role.DefaultAttributes)
 	if err != nil {
@@ -191,7 +194,7 @@ func (s *Server) DeleteRole(ctx context.Context, req *request.Role) (*response.R
 
 	err = c.client.Roles.Delete(req.Name)
 	if err != nil {
-		return nil, ParseAPIError(err, req.Name, "role")
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Role{
@@ -284,9 +287,10 @@ func GetExpandRunlistFromRole(runlist []string, result *RoleListResult) ([]*resp
 
 		if newItem.IsRole() {
 			currentRole := findRoleFromRoleList(newItem.Name, result)
-			newRunList.Children, _ = GetExpandRunlistFromRole(currentRole.RunList, result)
+			if currentRole != nil {
+				newRunList.Children, _ = GetExpandRunlistFromRole(currentRole.RunList, result)
+			}
 		}
-
 		runList[i] = &newRunList
 	}
 	return runList, nil
