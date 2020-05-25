@@ -4,7 +4,7 @@
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'org', orgId]">clients</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">clients</chef-breadcrumb>
          {{client?.name}}
       </chef-breadcrumbs>
       <chef-page-header>
@@ -33,7 +33,6 @@
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
         <chef-loading-spinner *ngIf="clientDetailsLoading" size="50"></chef-loading-spinner>
-        
       </section>
     </main>
   </div>

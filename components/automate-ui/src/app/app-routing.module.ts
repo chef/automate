@@ -270,7 +270,7 @@ const routes: Routes = [
               component: DataBagsDetailsComponent
             },
             {
-              path: ':id/org/:orgid/clients/:name',
+              path: ':id/organizations/:orgid/clients/:name',
               component: ClientDetailsComponent
             }
           ]
