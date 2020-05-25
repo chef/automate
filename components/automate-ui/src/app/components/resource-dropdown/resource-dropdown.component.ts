@@ -46,6 +46,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   // Transitory subset of snapshotResources for display based on user's entered filter.
   public filteredResources: ResourceCheckedSection[] = [];
+  public allFilteredResourcesCount = 0;
 
   public dropdownState: 'closed' | 'opening' | 'open' = 'closed';
   public label = this.noneSelectedLabel;
@@ -121,6 +122,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
         this.snapshotResources[i].itemList.filter(r =>
           r.name.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1);
     }
+    this.allFilteredResourcesCount = this.calculateAllFilteredResourcesCount();
   }
 
   private resetFilteredResources(): void {
@@ -134,6 +136,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
           title: section.title,
           itemList: section.itemList
         })));
+    this.allFilteredResourcesCount = this.calculateAllFilteredResourcesCount();
   }
 
   moveFocus(event: KeyboardEvent): void {
@@ -166,6 +169,11 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     return this.resources.length === 0 || this.allResourcesCount === 0;
   }
 
+  private calculateAllFilteredResourcesCount(): number {
+    return this.filteredResources.reduce(
+      (sum, group) => sum + group.itemList.length, 0);
+  }
+
   private get allResourcesCount(): number {
     return this.resources.reduce(
       (sum, group) => sum + group.itemList.length, 0);
@@ -175,11 +183,6 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     return [].concat(
       ...this.snapshotResources.map(
         resource => resource.itemList.filter(r => r.checked).map(r => r.name)));
-  }
-
-  get allFilteredResourcesCount(): number {
-    return this.filteredResources.reduce(
-      (sum, group) => sum + group.itemList.length, 0);
   }
 
 }
