@@ -97,7 +97,6 @@ func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*resp
 	return &response.Role{
 		Name: req.Name,
 	}, nil
-
 }
 
 // GetRoleList gets roles list from Chef Infra Server search API.

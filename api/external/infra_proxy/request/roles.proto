@@ -34,13 +34,13 @@ message CreateRole {
     string override_attributes = 6;
     // Role run list.
     repeated string run_list = 7;
-    // Environment base run list.
+    // Environment based run list.
     repeated EnvRunList env_run_lists = 8;
 }
 
 message EnvRunList {
     // Environment name.
     string name = 1;
-    // List of the run list.
+    // Role run list.
     repeated string run_list = 2;
 }

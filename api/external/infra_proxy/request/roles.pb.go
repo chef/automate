@@ -142,7 +142,7 @@ type CreateRole struct {
 	OverrideAttributes string `protobuf:"bytes,6,opt,name=override_attributes,json=overrideAttributes,proto3" json:"override_attributes,omitempty"`
 	// Role run list.
 	RunList []string `protobuf:"bytes,7,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`
-	// Environment base run list.
+	// Environment based run list.
 	EnvRunLists          []*EnvRunList `protobuf:"bytes,8,rep,name=env_run_lists,json=envRunLists,proto3" json:"env_run_lists,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
@@ -233,7 +233,7 @@ func (m *CreateRole) GetEnvRunLists() []*EnvRunList {
 type EnvRunList struct {
 	// Environment name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// List of the run list.
+	// Role run list.
 	RunList              []string `protobuf:"bytes,2,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

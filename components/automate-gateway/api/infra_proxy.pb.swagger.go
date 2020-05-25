@@ -1247,7 +1247,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.request.EnvRunList"
           },
-          "description": "Environment base run list."
+          "description": "Environment based run list."
         }
       }
     },
@@ -1284,7 +1284,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "List of the run list."
+          "description": "Role run list."
         }
       }
     },
