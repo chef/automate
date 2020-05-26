@@ -155,8 +155,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
           } else if (changeConfigurationSelector.status === 'loadingSuccess') {
             this.showSuccessNotification();
             this.saving = false;
-            // After a successful Save, we flip shouldResetValues to true
-            // to update the resetOrigin values
+            // After a successful save, trigger a notification to FormControlDirective
+            // to consider the newly updated values as the new "original" values
             this.shouldResetValues = true;
             this.automateSettingsForm.markAsPristine();
           }
@@ -316,7 +316,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
           break;
       }
     });
-    // AfterInit, we need to apply this for resetOrigin to reset the values of formcontrolDirective
+    // After a successful load of initial values, trigger a notification
+    // to FormControlDirective to treat them as the "original" values.
     this.shouldResetValues = true;
     this.automateSettingsForm.markAsPristine();
   }
