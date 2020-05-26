@@ -66,6 +66,10 @@ chef-tooltip {
   &.visible {
     opacity: 1;
     transition-property: opacity;
+
+    &.interactable {
+      pointer-events: all;
+    }
   }
 
   &.follow {
