@@ -37,17 +37,34 @@
 
   <!-- new styles being used only for desktop at the moment -->
   <ng-container *ngIf="forDesktop">
-    <chef-button secondary class="page-picker-item page-picker-prev" (click)="onItemTap(prev)" [disabled]="isNull(prev)">
-      <chef-icon>chevron_left</chef-icon>
-    </chef-button>
-    <!-- <chef-button *ngFor="let item of selectablePages; trackBy: trackBy" class="page-picker-item"
-      [attr.primary]="item === page" [attr.secondary]="item !== page" [attr.disabled]="selectablePages.length <= 1"
-      (click)="onItemTap(item)">
-      {{ item }}
-    </chef-button> -->
-    <chef-button secondary class="page-picker-item page-picker-next" (click)="onItemTap(next)" [disabled]="isNull(next)">
-      <chef-icon>chevron_right</chef-icon>
-    </chef-button>
+    <div class="information-container">
+    <!-- info goes here -->
+    </div>
+    <div class="arrow-field-container">
+      <div class="arrow-field-item dropdown">
+        <mat-form-field appearance="none">
+          <mat-select panelClass="chef-dropdown">
+            <mat-option *ngFor="let item of selectablePages; trackBy: trackBy" class="page-picker-item"
+            (onSelectionChange)="handleSelectItem($event, item)"
+            [attr.primary]="item === page" 
+            [attr.secondary]="item !== page" 
+            [attr.disabled]="selectablePages.length <= 1"
+            [value]="item">{{ item }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="arrow-field-item of-pages-container">
+        <span>of {{ selectablePages.length }} pages</span>
+      </div>
+      <div class="arrow-field-item">
+        <chef-button secondary class="page-picker-item page-picker-prev" (click)="onItemTap(prev)" [disabled]="isNull(prev)">
+          <chef-icon>chevron_left</chef-icon>
+        </chef-button>
+        <chef-button secondary class="page-picker-item page-picker-next" (click)="onItemTap(next)" [disabled]="isNull(next)">
+          <chef-icon>chevron_right</chef-icon>
+        </chef-button>
+      </div>
+    </div>
   </ng-container>
 
 </ng-container>

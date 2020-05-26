@@ -59,4 +59,10 @@ export class PagePickerComponent implements OnChanges {
     return item;
   }
 
+  handleSelectItem(event, value): void {
+    if (event.isUserInput) {
+      this.pageChanged.emit(value)
+    }
+  }
+
 }
