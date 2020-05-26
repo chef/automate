@@ -108,6 +108,7 @@ describe('CreateObjectModalComponent', () => {
   it('upon opening, dispatches a call to refresh policies', () => {
     spyOn(store, 'dispatch');
 
+    component.objectNoun = 'token';
     component.ngOnChanges(
       { visible: new SimpleChange(false, true, true) });
 

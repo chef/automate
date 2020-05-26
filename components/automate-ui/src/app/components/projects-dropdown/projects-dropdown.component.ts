@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
-
-import { ProjectConstants } from 'app/entities/projects/project.model';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
-import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { ProjectConstants } from 'app/entities/projects/project.model';
+import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { ResourceCheckedSection } from '../resource-dropdown/resource-dropdown.component';
+import { ResourceCheckedSection } from 'app/components/resource-dropdown/resource-dropdown.component';
 
 @Component({
   selector: 'app-projects-dropdown',
@@ -61,7 +61,7 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.checkedProjectIDs) {
-      // cannot proceed unless we have gotten the available projects list from the back end
+      // cannot proceed unless we have received the available projects list from the back end
       if (this.projects) {
         // Need to trigger OnChanges in ResourceDropdownComponent
         // so we cannot just update the checked property of the existing array elements.

@@ -42,7 +42,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // Provides a level of indirection so that we do not lose *unsaved* checked items:
   // (a) while dropdown is open
   // (b) when dropdown is closed then re-opened
-  public snapshotResources: ResourceCheckedSection[] = [];
+  private snapshotResources: ResourceCheckedSection[] = [];
 
   // Transitory subset of snapshotResources for display based on user's entered filter.
   public filteredResources: ResourceCheckedSection[] = [];
@@ -69,9 +69,8 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
       if (changes.resources.firstChange) { // only update on initialization/first change
         this.snapshotResources = cloneDeep(this.resources);
         this.resetFilteredResources();
-      } else {
+        this.updateLabel();
       }
-      this.updateLabel();
       this.disabled = this.isDisabled();
     }
   }

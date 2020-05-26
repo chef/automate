@@ -1,12 +1,12 @@
 import { CUSTOM_ELEMENTS_SCHEMA, SimpleChange } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ProjectsDropdownComponent } from './projects-dropdown.component';
 import { StoreModule, Store } from '@ngrx/store';
+
 import { ngrxReducers, runtimeChecks, NgrxStateAtom } from 'app/ngrx.reducers';
 import { LoadOptionsSuccess } from 'app/services/projects-filter/projects-filter.actions';
 import { ProjectsFilterOptionTuple } from 'app/services/projects-filter/projects-filter.reducer';
+import { ProjectsDropdownComponent } from './projects-dropdown.component';
 
 describe('ProjectsDropdownComponent', () => {
   let component: ProjectsDropdownComponent;

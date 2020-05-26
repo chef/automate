@@ -4,7 +4,7 @@ import {
 import { FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefSorters } from 'app/helpers/auth/sorter';
@@ -12,7 +12,9 @@ import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { GetPolicies } from 'app/entities/policies/policy.actions';
 import { allPolicies } from 'app/entities/policies/policy.selectors';
-import { ResourceCheckedSection } from '../resource-dropdown/resource-dropdown.component';
+import { ResourceCheckedSection } from 'app/components/resource-dropdown/resource-dropdown.component';
+
+const INGEST_POLICY_ID = 'ingest-access';
 
 @Component({
   selector: 'app-create-object-modal',
@@ -53,13 +55,14 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     });
 
     this.store.select(allPolicies)
-      .pipe(takeUntil(this.isDestroyed))
+      .pipe(filter(list => list.length > 0),
+        takeUntil(this.isDestroyed))
       .subscribe(policies => {
         const pols = ChefSorters.naturalSort(
-          policies.filter(p => p.id !== 'ingest-access'), 'name');
+          policies.filter(p => p.id !== INGEST_POLICY_ID), 'name');
         const customPolicies = pols.filter(p => p.type !== 'CHEF_MANAGED');
         const chefManagedPolicies = pols.filter(p => p.type === 'CHEF_MANAGED');
-        const ingestPolicy = policies.find(p => p.id === 'ingest-access');
+        const ingestPolicy = policies.find(p => p.id === INGEST_POLICY_ID);
         if (ingestPolicy) {
           chefManagedPolicies.unshift(ingestPolicy);
         }
@@ -78,7 +81,9 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.visible && (changes.visible.currentValue as boolean)) {
 
-      this.store.dispatch(new GetPolicies()); // refresh in case of updates
+      if (this.objectNoun === 'token') {
+        this.store.dispatch(new GetPolicies()); // refresh in case of updates
+      }
 
       this.checkedProjectIDs = []; // reset projects
       this.projectsUpdatedEvent.emit();
