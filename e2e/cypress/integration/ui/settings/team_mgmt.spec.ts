@@ -143,6 +143,26 @@ describe('team management', () => {
       cy.get('app-team-management chef-modal').should('not.be.visible');
     });
 
+    it('can delete a team', () => {
+      cy.get('app-team-management chef-td').contains(customTeamID).parent()
+        .find('.mat-select-trigger').as('controlMenu');
+
+      // we throw in a `should` so cypress retries until introspection allows menu to be shown
+      cy.get('@controlMenu').scrollIntoView().should('be.visible')
+        .click();
+      cy.get('[data-cy=delete-team]').should('be.visible')
+        .click();
+
+      // accept dialog
+      cy.get('app-team-management chef-button').contains('Delete Team').click();
+
+      // verify success notification and then dismiss it
+      cy.get('app-notification.info').contains('Deleted team');
+      cy.get('app-notification.info chef-icon').click();
+
+      cy.get('app-team-management chef-tbody chef-td')
+        .contains(customTeamID).should('not.exist');
+    });
 
     context('when only the unassigned project is selected', () => {
       beforeEach(() => {
