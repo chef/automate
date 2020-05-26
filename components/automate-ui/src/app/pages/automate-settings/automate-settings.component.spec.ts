@@ -131,7 +131,8 @@ describe('AutomateSettingsComponent', () => {
           StoreModule.forRoot(ngrxReducers, { runtimeChecks })
         ],
         declarations: [
-          AutomateSettingsComponent
+          AutomateSettingsComponent,
+          MockComponent({ selector: 'input', inputs: ['resetOrigin'] })
         ],
         providers: [
           FormBuilder,
