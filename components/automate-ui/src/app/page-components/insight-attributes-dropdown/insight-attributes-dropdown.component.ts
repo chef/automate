@@ -7,10 +7,10 @@ import { isEqual } from 'lodash/fp';
 // Animations
 const menuOpenAnim = trigger('menuOpenAnim', [
   transition(':enter', [
-    style({ opacity: 0, transform: 'scale(0)' }),
+    style({ opacity: 0, transform: 'translateY(-8px) scale(0)' }),
     group([
       query('@childAnim', animateChild()),
-      animate('220ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+      animate('220ms ease-out', style({ opacity: 1, transform: 'translateY(0px) scale(1)' }))
     ])
   ]),
   transition(':leave', [
@@ -22,7 +22,7 @@ const menuOpenAnim = trigger('menuOpenAnim', [
 const childAnim = trigger('childAnim', [
   transition(':enter', [
     style({ opacity: 0 }),
-    animate('220ms 170ms', style({ opacity: 1 }))
+    animate('50ms 170ms', style({ opacity: 1 }))
   ])
 ]);
 
