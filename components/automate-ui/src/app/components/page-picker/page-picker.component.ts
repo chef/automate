@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, HostBinding } from '@angular/core';
 
 @Component({
   selector: 'app-page-picker',
@@ -7,10 +7,13 @@ import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core
 })
 export class PagePickerComponent implements OnChanges {
 
+  @HostBinding('class.forDesktop') get isForDesktop() { return this.forDesktop; }
+
   @Input() total: number;
   @Input() perPage: number;
   @Input() page: number;
   @Input() maxPageItems = 10;
+  @Input() forDesktop = false;
 
   @Output() pageChanged = new EventEmitter<number>();
 
