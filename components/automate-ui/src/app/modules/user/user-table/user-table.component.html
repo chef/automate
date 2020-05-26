@@ -7,7 +7,10 @@
     </app-authorized>
     <app-authorized not [allOf]="createPermissionsPath">
       <div class="empty-state">
-        <p>You see a list. It's empty.</p>
+        <p>It looks like this team has no users and you<br/>
+          don't have permission to add them.<br/><br/>
+          If this is a mistake, then reach out to your administrator.
+        </p>
       </div>
     </app-authorized>
   </ng-container>
