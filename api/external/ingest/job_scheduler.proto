@@ -6,8 +6,8 @@ option go_package = "github.com/chef/automate/api/external/ingest";
 import "google/api/annotations.proto";
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
-import "api/external/ingest/response/job_scheduler.proto";
-import "api/external/ingest/request/job_scheduler.proto";
+import "external/ingest/response/job_scheduler.proto";
+import "external/ingest/request/job_scheduler.proto";
 
 service JobScheduler {
   rpc GetStatusJobScheduler (ingest.request.GetStatusJobScheduler) returns (ingest.response.JobSchedulerStatus) {

@@ -4,7 +4,7 @@ syntax = "proto3";
 package chef.automate.infra.postgresql;
 option go_package = "github.com/chef/automate/api/config/postgresql;pg";
 
-import "api/config/shared/tls.proto";
+import "config/shared/tls.proto";
 import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 

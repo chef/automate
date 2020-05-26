@@ -4,9 +4,9 @@ package chef.automate.domain.compliance.ingest.ingest;
 option go_package = "github.com/chef/automate/api/interservice/compliance/ingest/ingest";
 
 import "google/api/annotations.proto";
-import "api/interservice/compliance/ingest/events/compliance/compliance.proto";
+import "interservice/compliance/ingest/events/compliance/compliance.proto";
 import "google/protobuf/empty.proto";
-import "api/interservice/event/event.proto";
+import "interservice/event/event.proto";
 import "google/protobuf/timestamp.proto";
 
 service ComplianceIngester {

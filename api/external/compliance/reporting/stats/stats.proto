@@ -5,7 +5,7 @@ option go_package = "github.com/chef/automate/api/external/compliance/reporting/
 
 import "google/api/annotations.proto";
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-import "api/external/compliance/reporting/reporting.proto";
+import "external/compliance/reporting/reporting.proto";
 
 service StatsService {
 	/*

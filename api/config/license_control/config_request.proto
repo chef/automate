@@ -4,8 +4,8 @@ package chef.automate.domain.license_control;
 option go_package = "github.com/chef/automate/api/config/license_control";
 
 import "google/protobuf/wrappers.proto";
-import "api/config/shared/global.proto";
-import "api/config/shared/tls.proto";
+import "config/shared/global.proto";
+import "config/shared/tls.proto";
 import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 
 message ConfigRequest {

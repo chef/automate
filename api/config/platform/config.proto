@@ -3,7 +3,7 @@ syntax = "proto3";
 
 package chef.automate.platform;
 option go_package = "github.com/chef/automate/api/config/platform";
-import "api/config/shared/global.proto";
+import "config/shared/global.proto";
 
 message Config {
 	message TLS {

@@ -3,8 +3,8 @@ syntax = "proto3";
 package chef.automate.domain.compliance.ingest.events.compliance;
 option go_package = "github.com/chef/automate/api/interservice/compliance/ingest/events/compliance";
 
-import "api/interservice/compliance/ingest/events/inspec/inspec.proto";
-import "api/interservice/compliance/common/common.proto";
+import "interservice/compliance/ingest/events/inspec/inspec.proto";
+import "interservice/compliance/common/common.proto";
 
 message Report {
 	// inspec full json report fields
