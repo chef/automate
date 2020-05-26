@@ -1,0 +1,11 @@
+build:
+  roots:
+    - api
+    - lib
+    - third_party/googleapis
+    - components/automate-grpc/
+    - vendor/github.com/envoyproxy/protoc-gen-validate
+    - vendor/github.com/grpc-ecosystem/grpc-gateway/
+  excludes:
+    - components/automate-grpc/protoc-gen-policy/testdata/ # testdata causing duplicate symbols
+    - vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/ # duplicate symbols with third_party/gooogleapis
