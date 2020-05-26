@@ -285,7 +285,7 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 #### Setting Elasticsearch Heap
 
 The Elasticsearch heap size can, and in most cases should, be set to 50% of the available system
-memory. However, there are important caveats covered in the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html)
+memory. However, there are important caveats covered in the [Elasticsearch heap size documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html)
 which should be carefully reviewed and considered.
 
 For the purposes of an example, a system with 32GB of memory can have its Elasticsearch heap
