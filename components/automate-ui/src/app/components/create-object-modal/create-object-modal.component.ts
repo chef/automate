@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import {
   Project, ProjectConstants, ProjectCheckedMap
@@ -65,7 +66,10 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
       .pipe(takeUntil(this.isDestroyed))
       .subscribe(policies => {
         // OK to leave `checked` undefined--will be initialized upon `visible`
-        const pols = policies as PolicyChecked[];
+        const ingestPolicy = policies.find(p => p.id === 'ingest-access') as PolicyChecked;
+        const pols = [ingestPolicy]
+          .concat(
+            ChefSorters.naturalSort(policies.filter(p => p.id !== 'ingest-access'), 'name'));
         pols.forEach(p =>
           p.section = chefManagedPolicies.includes(p.id) ? 'Chef-managed' : 'Custom');
         this.policies = pols;

@@ -59,13 +59,9 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     if (changes.resources) {
       this.updateSectionsAndLabel();
       if (changes.resources.firstChange) { // only update on initialization/first change
-        this.filteredResources = this.resourcesInOrder;
+        this.filteredResources = this.resources;
       }
     }
-  }
-
-  get resourcesInOrder(): ResourceChecked[] {
-    return ChefSorters.naturalSort(this.resources, 'name');
   }
 
   toggleDropdown(): void {
@@ -74,7 +70,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     }
     if (this.dropdownState === 'closed') { // opening
       this.filterValue = '';
-      this.filteredResources = this.resourcesInOrder;
+      this.filteredResources = this.resources;
       // we cannot go directly to 'open' because handleClickOutside,
       // firing next on the same event that arrived here, would then immediately close it.
       this.dropdownState = 'opening';
@@ -107,7 +103,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   }
 
   handleFilterKeyUp(): void {
-    this.filteredResources = this.resourcesInOrder.filter(resource =>
+    this.filteredResources = this.resources.filter(resource =>
       resource.id.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1
     );
   }
