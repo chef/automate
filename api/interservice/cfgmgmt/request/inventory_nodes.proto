@@ -4,7 +4,7 @@ package chef.automate.domain.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
 
 import "google/protobuf/timestamp.proto";
-import "api/interservice/cfgmgmt/request/parameters.proto";
+import "interservice/cfgmgmt/request/parameters.proto";
 
 message InventoryNodes {
   google.protobuf.Timestamp start       = 1;

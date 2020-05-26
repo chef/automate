@@ -3,7 +3,7 @@ syntax="proto3";
 package chef.automate.domain.event_feed.api;
 option go_package = "github.com/chef/automate/api/interservice/event_feed";
 
-import "api/interservice/event/event.proto";
+import "interservice/event/event.proto";
 import "google/protobuf/timestamp.proto";
 
 service EventFeedService {

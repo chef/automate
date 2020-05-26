@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "google/api/annotations.proto";
 import "validate/validate.proto";
-import "api/external/common/version/version.proto";
+import "external/common/version/version.proto";
 
 package chef.automate.domain.teams;
 option go_package = "github.com/chef/automate/api/interservice/teams";

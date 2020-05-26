@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "validate/validate.proto";
-import "api/external/common/version/version.proto";
+import "external/common/version/version.proto";
 
 package chef.automate.domain.authz;
 option go_package = "github.com/chef/automate/api/interservice/authz";
