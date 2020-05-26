@@ -35,7 +35,7 @@ require (
 	github.com/fatih/color v1.9.0
 	github.com/felixge/httpsnoop v1.0.0 // indirect
 	github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39
-	github.com/go-chef/chef v0.20.1
+	github.com/go-chef/chef v0.21.0
 	github.com/go-delve/delve v1.3.1
 	github.com/go-gorp/gorp v2.0.1-0.20180410155428-6032c66e0f5f+incompatible
 	github.com/gocarina/gocsv v0.0.0-20170928100509-7099e67763c2

@@ -99,6 +99,14 @@ The Response structure includes:
 */
 type ErrorResponse struct {
 	Response *http.Response // HTTP response that caused this error
+	// extracted error message converted to string if possible
+	ErrorMsg string
+	// json body raw byte stream from an error
+	ErrorText []byte
+}
+
+type ErrorMsg struct {
+	Error interface{} `json:"error"`
 }
 
 // Buffer creates a  byte.Buffer copy from a io.Reader resets read on reader to 0,0
@@ -135,20 +143,35 @@ func (body *Body) ContentType() string {
 	return http.DetectContentType(body.Buffer().Bytes())
 }
 
+// Error implements the error interface method for ErrorResponse
 func (r *ErrorResponse) Error() string {
 	return fmt.Sprintf("%v %v: %d",
 		r.Response.Request.Method, r.Response.Request.URL,
 		r.Response.StatusCode)
 }
 
+// StatusCode returns the status code from the http response embedded in the ErrorResponse
 func (r *ErrorResponse) StatusCode() int {
 	return r.Response.StatusCode
 }
 
+// StatusMsg returns the error msg string from the http response. The message is a best
+// effort value and depends on the Chef Server json return format
+func (r *ErrorResponse) StatusMsg() string {
+	return r.ErrorMsg
+}
+
+// StatusText returns the raw json response included in the http response
+func (r *ErrorResponse) StatusText() []byte {
+	return r.ErrorText
+}
+
+// StatusMethod returns the method used from the http response embedded in the ErrorResponse
 func (r *ErrorResponse) StatusMethod() string {
 	return r.Response.Request.Method
 }
 
+// StatusURL returns the URL used from the http response embedded in the ErrorResponse
 func (r *ErrorResponse) StatusURL() *url.URL {
 	return r.Response.Request.URL
 }
@@ -315,8 +338,35 @@ func CheckResponse(r *http.Response) error {
 	data, err := ioutil.ReadAll(r.Body)
 	if err == nil && data != nil {
 		json.Unmarshal(data, errorResponse)
+		errorResponse.ErrorText = data
+		errorResponse.ErrorMsg = extractErrorMsg(data)
 	}
 	return errorResponse
+}
+
+// extractErrorMsg makes a best faith effort to extract the error message text
+// from the response body returned from the Chef Server. Error messages are
+// typically formatted in a json body as {"error": ["msg"]}
+func extractErrorMsg(data []byte) string {
+	errorMsg := &ErrorMsg{}
+	json.Unmarshal(data, errorMsg)
+	switch t := errorMsg.Error.(type) {
+	case []interface{}:
+		// Return the string as a byte stream
+		var rmsg string
+		for _, val := range t {
+			switch inval := val.(type) {
+			case string:
+				rmsg = rmsg + inval + "\n"
+			default:
+				debug("Unknown type  %+v data %+v\n", inval, val)
+			}
+			return strings.TrimSpace(rmsg)
+		}
+	default:
+		debug("Unknown type  %+v data %+v msg %+v\n", t, string(data), errorMsg.Error)
+	}
+	return ""
 }
 
 //  ChefError tries to unwind a chef client err return embedded in an error

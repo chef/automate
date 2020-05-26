@@ -150,8 +150,8 @@ github.com/ghodss/yaml v0.0.0-20180820084758-c7ce16629ff4/go.mod h1:4dBDuWmgqj2H
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39 h1:8aiwjJixH9Dws9c0mE6yeghmrVhe6csuB+onSjeW31Q=
 github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
-github.com/go-chef/chef v0.20.1 h1:7j653Pk7CrTGALp7xxVI2W7wdj4Y/dq7p3wkhcnwUDw=
-github.com/go-chef/chef v0.20.1/go.mod h1:y3ffcKqjT0vdGFnUx+1yVORHV+gPxeZ5fd0kjkDVpto=
+github.com/go-chef/chef v0.21.0 h1:sfAgY3dZjYLlGphs1rSk/QjmQdiV4BVInr32+Tw5r74=
+github.com/go-chef/chef v0.21.0/go.mod h1:y3ffcKqjT0vdGFnUx+1yVORHV+gPxeZ5fd0kjkDVpto=
 github.com/go-delve/delve v1.3.1 h1:LI0X4aAE0N7ay8uR48aMJ6GNTxamIpcxi1THjwJjenI=
 github.com/go-delve/delve v1.3.1/go.mod h1:LLw6qJfIsRK9WcwV2IRRqsdlgrqzOeuGrQOCOIhDpt8=
 github.com/go-gorp/gorp v2.0.1-0.20180410155428-6032c66e0f5f+incompatible h1:cWM8mu5v0FdhuVs0oqlVI5IcEXfTaAw9Xu025fBqkeQ=
