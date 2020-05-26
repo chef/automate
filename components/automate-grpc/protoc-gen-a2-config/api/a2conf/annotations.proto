@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package chef.automate.api;
 
-import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/port.proto";
+import "protoc-gen-a2-config/api/a2conf/port.proto";
 import "google/protobuf/descriptor.proto";
 
 option go_package = "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf";

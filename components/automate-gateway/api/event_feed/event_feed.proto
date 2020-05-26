@@ -9,7 +9,7 @@ import "components/automate-gateway/api/event_feed/response/event.proto";
 import "components/automate-gateway/api/event_feed/response/eventstrings.proto";
 
 import "google/api/annotations.proto";
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "protoc-gen-policy/iam/annotations.proto";
 
 service EventFeed {
   rpc GetEventFeed(event_feed.request.EventFilter) returns (event_feed.response.Events) {
