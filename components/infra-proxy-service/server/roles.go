@@ -39,6 +39,66 @@ type RoleListResult struct {
 	Rows  []*Role `json:"rows"`
 }
 
+// CreateRole creates the role
+func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*response.Role, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+	}
+
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "must supply role name")
+	}
+
+	runList := req.RunList
+	if len(runList) == 0 {
+		runList = []string{}
+	}
+
+	var defAtt interface{}
+	var ovrAtt interface{}
+
+	defIn := req.DefaultAttributes
+	if defIn == "" {
+		defIn = "{}"
+	}
+
+	overIn := req.OverrideAttributes
+	if overIn == "" {
+		overIn = "{}"
+	}
+	defaultAttributes := json.RawMessage(defIn)
+	overrideAttributes := json.RawMessage(overIn)
+
+	err = json.Unmarshal(defaultAttributes, &defAtt)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = json.Unmarshal(overrideAttributes, &ovrAtt)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	_, err = c.client.Roles.Create(
+		&chef.Role{
+			Name:               req.Name,
+			Description:        req.Description,
+			RunList:            runList,
+			DefaultAttributes:  defAtt,
+			OverrideAttributes: ovrAtt,
+			EnvRunList:         chef.EnvRunList{},
+		})
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &response.Role{
+		Name: req.Name,
+	}, nil
+}
+
 // GetRoleList gets roles list from Chef Infra Server search API.
 func (c *ChefClient) GetRoleList() (RoleListResult, error) {
 	var result RoleListResult

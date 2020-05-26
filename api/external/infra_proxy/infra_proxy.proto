@@ -128,6 +128,12 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
+  rpc CreateRole (infra_proxy.request.CreateRole) returns (infra_proxy.response.Role) {
+    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles";
+    option (google.api.http).body = "*";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+  };
   rpc DeleteRole (infra_proxy.request.Role) returns (infra_proxy.response.Role) {
     option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
