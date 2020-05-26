@@ -1,8 +1,15 @@
 <app-authorized [allOf]="getPermissionsPath">
   <ng-container *ngIf="showEmptyMessage">
-    <div class="empty-state">
-      <p>Add some users to get started!</p>
-    </div>
+    <app-authorized [allOf]="createPermissionsPath">
+      <div class="empty-state">
+        <p>Add some users to get started!</p>
+      </div>
+    </app-authorized>
+    <app-authorized not [allOf]="createPermissionsPath">
+      <div class="empty-state">
+        <p>You see a list. It's empty.</p>
+      </div>
+    </app-authorized>
   </ng-container>
   <chef-toolbar>
     <app-authorized [allOf]="createPermissionsPath">
