@@ -61,7 +61,7 @@ func ContainsCollection(needle string, haystack []string) bool {
 			}
 			deps := getRequiredCollections(collectionName, visited)
 			for _, d := range deps {
-				if d.Type != product.ProductType && desiredCollection == d {
+				if desiredCollection == d {
 					return true
 				}
 			}

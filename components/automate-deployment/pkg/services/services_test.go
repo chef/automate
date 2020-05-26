@@ -260,9 +260,6 @@ func TestContainsCollection(t *testing.T) {
 	t.Run("returns false if desired collection is not in the list", func(t *testing.T) {
 		assert.False(t, ContainsCollection("workflow", []string{"automate", "chef-server"}))
 	})
-	t.Run("returns false if desired collection is not in the list and not a base dependency", func(t *testing.T) {
-		assert.False(t, ContainsCollection("automate", []string{"workflow"}))
-	})
 	t.Run("returns false list is empty", func(t *testing.T) {
 		assert.False(t, ContainsCollection("core", []string{}))
 		assert.False(t, ContainsCollection("core", nil))
@@ -277,5 +274,8 @@ func TestContainsCollection(t *testing.T) {
 	t.Run("returns true if a base component is implicitly included", func(t *testing.T) {
 		assert.True(t, ContainsCollection("core", []string{"automate"}))
 		assert.True(t, ContainsCollection("core", []string{"automate-full"}))
+	})
+	t.Run("automate is part of desktop", func(t *testing.T) {
+		assert.True(t, ContainsCollection("automate", []string{"desktop"}))
 	})
 }
