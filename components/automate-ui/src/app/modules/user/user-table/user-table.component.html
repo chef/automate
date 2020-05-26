@@ -7,11 +7,8 @@
     </app-authorized>
     <app-authorized not [allOf]="createPermissionsPath">
       <div class="empty-state">
-        <p>It looks like this team has no users and you<br/>
-          don't have permission to add them.<br/><br/>
-          If this is a mistake, then reach out to your administrator.
-        </p>
-      </div>
+        <ng-content></ng-content>
+     </div>
     </app-authorized>
   </ng-container>
   <chef-toolbar>

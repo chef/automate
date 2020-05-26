@@ -51,6 +51,10 @@
               [showEmptyMessage]="showEmptyStateMessage()"
               (addClicked)="toggleUserMembershipView()"
               (removeClicked)="removeUser($event)">
+              <p>It looks like this team has no users and you<br/>
+                don't have permission to add them.<br/><br/>
+                If this is a mistake, then reach out to your administrator.
+              </p>
             </app-user-table>
           </div>
         </div>
