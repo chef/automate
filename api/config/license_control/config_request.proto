@@ -6,7 +6,7 @@ option go_package = "github.com/chef/automate/api/config/license_control";
 import "google/protobuf/wrappers.proto";
 import "config/shared/global.proto";
 import "config/shared/tls.proto";
-import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "protoc-gen-a2-config/api/a2conf/annotations.proto";
 
 message ConfigRequest {
 	option (chef.automate.api.service_config) = {name: "license-control-service"};

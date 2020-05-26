@@ -8,7 +8,7 @@ import "google/api/annotations.proto";
 import "components/automate-gateway/api/iam/v2/request/introspect.proto";
 import "components/automate-gateway/api/iam/v2/response/introspect.proto";
 
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "protoc-gen-policy/iam/annotations.proto";
 
 service Authorization {
   rpc IntrospectAll (IntrospectAllReq) returns (IntrospectResp) {

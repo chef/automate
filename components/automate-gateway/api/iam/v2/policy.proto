@@ -9,7 +9,7 @@ import "protoc-gen-swagger/options/annotations.proto";
 import "components/automate-gateway/api/iam/v2/request/policy.proto";
 import "components/automate-gateway/api/iam/v2/response/policy.proto";
 
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "protoc-gen-policy/iam/annotations.proto";
 
 service Policies {
 
