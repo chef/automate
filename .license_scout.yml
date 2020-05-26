@@ -89,6 +89,11 @@ allowed_licenses:
   - Zlib
 
 fallbacks:
+  ruby:
+    - name: unf
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/knu/ruby-unf/master/LICENSE
+
   golang:
     - name: github.com/kevinburke/go-bindata
       license_id: CC0-1.0
