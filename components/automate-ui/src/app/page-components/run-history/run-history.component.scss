@@ -161,6 +161,14 @@ app-date-selector {
       background-color: lighten($gray, 10%);
     }
   }
+
+  chef-button {
+    padding: 5px;
+  }
+}
+
+.date-selector {
+  padding-right: 20px;
 }
 
 .no-runs-small {
