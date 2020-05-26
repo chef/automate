@@ -116,6 +116,11 @@ variable "enable_workflow" {
   description = "Enable A2 Workflow feature."
 }
 
+variable "enable_desktop" {
+  default     = "false"
+  description = "Enable Desktop view on A2."
+}
+
 variable "workflow_enterprise" {
   default     = "demo"
   description = "A2 Workflow enterprise name."
