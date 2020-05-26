@@ -43,7 +43,7 @@ type RoleListResult struct {
 func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*response.Role, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	if req.Name == "" {
@@ -91,7 +91,7 @@ func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*resp
 		})
 
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Role{
