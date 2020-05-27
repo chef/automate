@@ -16,7 +16,6 @@ describe('SidebarComponent', () => {
   let fixture: ComponentFixture<SidebarComponent>;
   // let element: HTMLElement;
   let layoutFacade: LayoutFacadeService;
-  let featureFlags: FeatureFlagsService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
