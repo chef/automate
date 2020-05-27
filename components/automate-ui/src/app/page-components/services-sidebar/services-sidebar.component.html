@@ -21,32 +21,32 @@
   <div *ngIf="serviceGroupsId && (serviceGroupsStatus$ | async) === 'loadingSuccess'">
     <div class="status-filter-bar">
       <chef-status-filter-group [value]="selectedHealth" lean>
-        <chef-option class="filter general" value="total" (click)="updateHealthFilter('total')" selected>
+        <chef-option class="filter general" value="total" (click)="updateHealthFilter('total')" (keyup.enter)="updateHealthFilter('total')" selected>
           <chef-icon class="filter-icon">grain</chef-icon>
           <div class="filter-label">Total</div>
           <div class="filter-total">{{ serviceGroupsHealthSummary.total }}</div>
         </chef-option>
-        <chef-option class="filter critical" value='critical' (click)="updateHealthFilter('critical')">
+        <chef-option class="filter critical" value='critical' (click)="updateHealthFilter('critical')" (keyup.enter)="updateHealthFilter('critical')">
           <chef-icon class="filter-icon">warning</chef-icon>
           <div class="filter-label">Critical</div>
           <div class="filter-total">{{ serviceGroupsHealthSummary.critical }}</div>
         </chef-option>
-        <chef-option class="filter warning" value='warning' (click)="updateHealthFilter('warning')">
+        <chef-option class="filter warning" value='warning' (click)="updateHealthFilter('warning')" (keyup.enter)="updateHealthFilter('warning')">
           <chef-icon class="filter-icon">error</chef-icon>
           <div class="filter-label">Warning</div>
           <div class="filter-total">{{ serviceGroupsHealthSummary.warning }}</div>
         </chef-option>
-        <chef-option class="filter disconnected" value='disconnected' (click)="updateHealthFilter('disconnected')">
+        <chef-option class="filter disconnected" value='disconnected' (click)="updateHealthFilter('disconnected')" (keyup.enter)="updateHealthFilter('disconnected')">
           <chef-icon class="filter-icon"></chef-icon>
           <div class="filter-label">Disconnected</div>
           <div class="filter-total">{{ serviceGroupsHealthSummary.disconnected }}</div>
         </chef-option>
-        <chef-option class="filter success" value='ok' (click)="updateHealthFilter('ok')">
+        <chef-option class="filter success" value='ok' (click)="updateHealthFilter('ok')" (keyup.enter)="updateHealthFilter('ok')">
           <chef-icon class="filter-icon">check_circle</chef-icon>
           <div class="filter-label">OK</div>
           <div class="filter-total">{{ serviceGroupsHealthSummary.ok }}</div>
         </chef-option>
-        <chef-option class="filter unknown" value='unknown' (click)="updateHealthFilter('unknown')">
+        <chef-option class="filter unknown" value='unknown' (click)="updateHealthFilter('unknown')" (keyup.enter)="updateHealthFilter('unknown')">
           <chef-icon class="filter-icon">help</chef-icon>
           <div class="filter-label">Unknown</div>
           <div class="filter-total">{{ serviceGroupsHealthSummary.unknown }}</div>
