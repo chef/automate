@@ -47,6 +47,13 @@
           </chef-toolbar>
         </div>
         <div class="input-margin">
+          <app-projects-dropdown
+            [checkedProjectIDs]="checkedProjectIDs"
+            (onDropdownClosing)="onProjectDropdownClosing($event)"
+            [projectsUpdated]="projectsUpdatedEvent">
+          </app-projects-dropdown>
+        </div>
+        <div class="input-margin">
           <chef-form-field>
             <label>
               <span class="label">Admin User <span aria-hidden="true">*</span></span>
@@ -69,13 +76,6 @@
               Admin key is required.
             </chef-error>
           </chef-form-field>
-        </div>
-        <div class="input-margin">
-          <app-projects-dropdown
-            [checkedProjectIDs]="checkedProjectIDs"
-            (onDropdownClosing)="onProjectDropdownClosing($event)"
-            [projectsUpdated]="projectsUpdatedEvent">
-          </app-projects-dropdown>
         </div>
       </div>
       <div id="button-org">

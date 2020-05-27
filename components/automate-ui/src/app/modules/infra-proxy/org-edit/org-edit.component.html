@@ -12,6 +12,12 @@
         Display Name is required.
       </chef-error>
     </chef-form-field>
+    <chef-form-field id='projects-container'>
+      <app-projects-dropdown
+        [checkedProjectIDs]="org?.projects"
+        (onDropdownClosing)="onProjectDropdownClosing($event)">
+      </app-projects-dropdown>
+    </chef-form-field>
     <chef-form-field>
       <label>
       <span class="label">Admin User <span aria-hidden="true">*</span></span>
@@ -29,12 +35,6 @@
       <textarea rows="27" cols="10" chefInput placeholder="-----BEGIN RSA PRIVATE KEY -----"
         formControlName="admin_key" data-cy="update-org-admin-key"></textarea>   
       </label>
-    </chef-form-field>
-    <chef-form-field id='projects-container'>
-      <app-projects-dropdown
-        [checkedProjectIDs]="org?.projects"
-        (onDropdownClosing)="onProjectDropdownClosing($event)">
-      </app-projects-dropdown>
     </chef-form-field>
     <chef-form-field>
       <div id="button-bar">
