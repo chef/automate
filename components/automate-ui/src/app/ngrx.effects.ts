@@ -13,6 +13,7 @@ import { CredentialsEffects } from './pages/+compliance/+credentials/credentials
 // CredentialsEffects will be removed when the credentials page is refactored.
 import { CredentialEffects } from './entities/credentials/credential.effects';
 import { DataBagsEffects } from './entities/data-bags/data-bags.effects';
+import { DataBagDetailsEffects } from './entities/data-bags/data-bag-details.effects';
 import { DesktopEffects } from './entities/desktop/desktop.effects';
 import { DestinationEffects } from './entities/destinations/destination.effects';
 import { EnvironmentEffects } from './entities/environments/environment.effects';
@@ -52,6 +53,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       CredentialsEffects,
       CredentialEffects,
       DataBagsEffects,
+      DataBagDetailsEffects,
       DesktopEffects,
       DestinationEffects,
       EnvironmentEffects,

@@ -13,4 +13,10 @@ export class DataBagsRequests {
     return this.http.get<DataBagsSuccessPayload>(
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/data_bags`);
   }
+
+  public getDataBagDetails(server_id: string, org_id: string, name: string)
+  : Observable<DataBagsSuccessPayload> {
+    return this.http.get<DataBagsSuccessPayload>(
+      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/data_bags?name=${name}`);
+  }
 }

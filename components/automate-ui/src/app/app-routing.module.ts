@@ -29,6 +29,7 @@ import { AutomateSettingsComponent } from './pages/automate-settings/automate-se
 import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
 import { ChefServerDetailsComponent } from './modules/infra-proxy/chef-server-details/chef-server-details.component';
 import { CookbookDetailsComponent } from './modules/infra-proxy/cookbook-details/cookbook-details.component';
+import { DataBagsDetailsComponent } from './modules/infra-proxy/data-bags-details/data-bags-details.component';
 import {
   EnvironmentDetailsComponent
 } from './modules/infra-proxy/environment-details/environment-details.component';
@@ -262,6 +263,10 @@ const routes: Routes = [
             {
               path: ':id/organizations/:orgid/environments/:name',
               component: EnvironmentDetailsComponent
+            },
+            {
+              path: ':id/organizations/:orgid/data_bags/:name',
+              component: DataBagsDetailsComponent
             }
           ]
         }

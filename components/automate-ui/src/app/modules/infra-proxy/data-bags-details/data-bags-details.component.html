@@ -1,0 +1,15 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-loading-spinner *ngIf="dataBagsDetailsLoading" size="50" fixed></chef-loading-spinner>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Data Bags</chef-breadcrumb>
+        {{ dataBagsName }}
+      </chef-breadcrumbs>
+      <chef-page-header>
+      </chef-page-header>
+    </main>
+  </div>
+</div>
