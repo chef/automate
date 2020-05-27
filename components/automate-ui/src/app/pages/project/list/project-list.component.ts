@@ -85,9 +85,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.store.pipe(
       select(createStatus),
       takeUntil(this.isDestroyed),
-      filter(state => {
-        return this.creatingProject && state === EntityStatus.loadingSuccess;
-      }))
+      filter(state => this.creatingProject && state === EntityStatus.loadingSuccess))
       .subscribe(() => {
         this.creatingProject = false;
 
