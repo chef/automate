@@ -16,7 +16,6 @@ import { MenuItemGroup } from 'app/entities/layout/layout.model';
 })
 export class LayoutSidebarService {
     public chefInfraServerViewsFeatureFlagOn: boolean;
-    public ServiceNowFeatureFlagOn: boolean;
     private activeSidebar: string;
     private workflowEnabled$: Observable<boolean>;
     private sidebars: Sidebars;
@@ -26,7 +25,6 @@ export class LayoutSidebarService {
         private clientRunsStore: Store<fromClientRuns.ClientRunsEntityState>,
         private featureFlagsService: FeatureFlagsService
     ) {
-        this.ServiceNowFeatureFlagOn = this.featureFlagsService.getFeatureStatus('servicenow_cmdb');
         this.chefInfraServerViewsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('chefInfraServerViews');
         this.workflowEnabled$ = this.clientRunsStore.select(clientRunsWorkflowEnabled);
         this.updateSidebars();
@@ -135,8 +133,7 @@ export class LayoutSidebarService {
                 route: '/settings/data-feeds',
                 authorized: {
                   anyOf: ['/api/v0/datafeed/destinations', 'post']
-                },
-                visible$: new BehaviorSubject(this.ServiceNowFeatureFlagOn)
+                }
               },
               {
                 name: 'Data Lifecycle',

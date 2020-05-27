@@ -45,7 +45,6 @@ describe('SidebarComponent', () => {
     // element = fixture.debugElement.nativeElement;
 
     // enable all feature flags, if any, for testing
-    featureFlags.setFeature('servicenow_cmdb', true);
 
     fixture.detectChanges();
   });
