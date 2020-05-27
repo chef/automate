@@ -104,19 +104,17 @@ function infra_service_load_chef_repo() {
 
   chef_server_hostname=${CONTAINER_HOSTNAME:-a2-dev.test}
   chef_server_ip_address="127.0.0.1"
-  chef_server_url="https://${chef_server_hostname}/organizations/test"
   chef_server_pivotal_key_path="/hab/svc/automate-cs-oc-erchef/data/pivotal.pem"
   chef_server_pivotal_rb_path="/tmp/.pivotal.rb"
   chef_server_client_rb_path="/tmp/.client.rb"
   chef_server_test_admin_key_path_path="/tmp/.admin_key.pem"
   chef_server_berksfile_path="/tmp/.Berksfile"
   chef_server_berksfile_config_path="/tmp/.berks.config.json"
+  chef_server_test_validator_path="/tmp/.tests_validator.pem"
   chef_server_test_node_name="test-admin"
   chef_server_test_admin_user_name="test-admin"
   chef_server_test_admin_user_email="admin@test.com"
-  chef_server_test_user_name="test-user"
-  chef_server_test_user_email="test-user@test.com"
-  chef_server_test_user_password="S3cur3!"
+  chef_server_test_admin_user_password="S3cur3!"
   chef_server_test_org_name="test"
   chef_repo_path="/src/dev-docs/adding-data/infra/chef-repo"
   infra_service_server_id="local-dev"
@@ -151,6 +149,8 @@ chef_server_url        'https://${chef_server_hostname}/organizations/${chef_ser
 node_name              '${chef_server_test_node_name}'
 ssl_verify_mode        :verify_none
 client_key             '${chef_server_test_admin_key_path_path}'
+validation_client_name 'test-validator'
+validation_key         '${chef_server_test_validator_path}'
 EOH
 
   cat << EOH > ${chef_server_berksfile_config_path}
@@ -177,7 +177,7 @@ EOH
       ${chef_server_test_admin_user_name} \
       ${chef_server_test_admin_user_name} \
       ${chef_server_test_admin_user_email} \
-      ${chef_server_test_user_password} \
+      ${chef_server_test_admin_user_password} \
         -c ${chef_server_pivotal_rb_path} \
         -d \
         -f ${chef_server_test_admin_key_path_path}
