@@ -17,6 +17,7 @@ export class PagePickerComponent implements OnChanges {
 
   @Output() pageChanged = new EventEmitter<number>();
 
+  maxPageOptions = [10, 20, 50];
   selectablePages = [];
   first = 1;
   prev = 1;
@@ -75,7 +76,14 @@ export class PagePickerComponent implements OnChanges {
 
   handleSelectItem(event, value): void {
     if (event.isUserInput) {
-      this.pageChanged.emit(value)
+      this.pageChanged.emit(value);
+    }
+  }
+
+  handleSelectMaxPageItems(event, value): void {
+    if (event.isUserInput) {
+      console.log(value);
+      console.log('fire event to update store value of pageSize');
     }
   }
 
