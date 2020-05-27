@@ -38,21 +38,21 @@
   <!-- new styles being used only for desktop at the moment -->
   <ng-container *ngIf="forDesktop">
     <div class="information-container">
-    <!-- info goes here --><span>{{ itemStartCount }} - {{ itemEndCount }} of {{ total }} items</span>
+      <span>{{ itemStartCount }} - {{ itemEndCount }} of {{ total }} items</span>
     </div>
     <div class="arrow-field-container">
       <div class="arrow-field-item dropdown">
         <mat-form-field appearance="none">
           <mat-select panelClass="chef-dropdown" [(ngModel)]="page">
-            <mat-option *ngFor="let item of selectablePages; trackBy: trackBy"
+            <mat-option *ngFor="let item of totalPages; trackBy: trackBy"
             (onSelectionChange)="handleSelectItem($event, item)"
-            [attr.disabled]="selectablePages.length <= 1"
+            [attr.disabled]="totalPages.length <= 1"
             [value]="item">{{ item }}</mat-option>
           </mat-select>
         </mat-form-field>
       </div>
       <div class="arrow-field-item of-pages-container">
-        <span>of {{ selectablePages.length }} pages</span>
+        <span>of {{ totalPages.length }} pages</span>
       </div>
       <div class="arrow-field-item">
         <chef-button secondary class="page-picker-item page-picker-prev" (click)="onItemTap(prev)" [disabled]="isNull(prev)">

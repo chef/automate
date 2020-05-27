@@ -28,8 +28,13 @@ export class PagePickerComponent implements OnChanges {
   }
 
   get itemEndCount() {
-    const lastItemCount = this.page * this.maxPageItems;
+    const lastItemCount = this.page === this.last ? this.total : this.page * this.maxPageItems;
     return lastItemCount.toString();
+  }
+
+  get totalPages() {
+    const pageCount = Math.ceil(this.total / this.maxPageItems);
+    return Array(pageCount).fill(0).map((_x, i) => i + 1);
   }
 
   ngOnChanges() {
