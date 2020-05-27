@@ -21,7 +21,7 @@
         <chef-button secondary (click)="showCheckinDebug = !showCheckinDebug">
           <chef-icon>settings</chef-icon>
         </chef-button>
-        <chef-button secondary (click)="checkinNumDays = (checkinNumDays === 14 ? 28 : 14)">
+        <chef-button secondary (click)="updateCheckInDays()">
           <span>Last {{ (checkinNumDays === 14 ? 2 : 4) }} Weeks</span>
           <chef-icon>expand_more</chef-icon>
         </chef-button>
@@ -64,37 +64,31 @@
         </chef-tr>
       </chef-thead>
       <chef-tbody>
-        <chef-tr *ngFor="let item of checkinHistory; index as i">
-          <chef-td class="status-cell" [id]="'checkin-item-'+i+'text'">
-            <chef-icon>{{ item.icon }}</chef-icon>
-            <span>{{ item.text | titlecase }}</span>
+        <chef-tr *ngFor="let history of checkInHistory; index as i">
+          <chef-td class="status-cell">
+            <chef-icon [id]="'checkin-item-'+i+'text'" [ngClass]="history.status">
+              {{ historyIcons[history.status] }}
+            </chef-icon>
+            <span>{{ history.status | titlecase }}</span>
             <chef-tooltip
-              [ngClass]="['checkin-tooltip', item.text]"
+              [ngClass]="['checkin-tooltip', history.status]"
               [attr.for]="'checkin-item-'+i+'text'">
               <p class="checkin-tooltip-info">
-                <span class="checkin-tooltip-text">{{ item.text | titlecase }}</span>
-                <span class="checkin-tooltip-date">{{ item.date | datetime: DateTime.RFC2822 }}</span>
+                <span class="checkin-tooltip-text">{{ history.status | titlecase }}</span>
+                <span class="checkin-tooltip-date">{{ history.end | datetime: DateTime.RFC2822 }}</span>
               </p>
               <a class="checkin-tooltip-link" href="">View Client Run Details <chef-icon>open_in_new</chef-icon></a>
             </chef-tooltip>
           </chef-td>
           <chef-td class="date-cell">
-            <span>{{ item.date | datetime: DateTime.RFC2822 }}</span>
+            <span>{{ history.end | datetime: DateTime.RFC2822 }}</span>
           </chef-td>
-          <chef-td class="relative-date-cell" [ngSwitch]="i">
-            <span *ngSwitchCase="0">Today</span>
-            <span *ngSwitchCase="7">1 week ago</span>
-            <span *ngSwitchDefault>{{ ceil(i / 7) }} weeks ago</span>
+          <chef-td class="relative-date-cell">
+            <span>{{ history.label }}</span>
           </chef-td>
         </chef-tr>
       </chef-tbody>
     </chef-table>
-    <chef-snippet
-      *ngIf="checkinTableType === 'json'"
-      class="checkin-history-json"
-      [code]="checkinHistory | json"
-      lang="json">
-    </chef-snippet>
   </div>
 
   <div class="detail-info">

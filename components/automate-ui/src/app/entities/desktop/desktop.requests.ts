@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { reduce } from 'lodash/fp';
 import { DailyCheckInCountCollection, DailyCheckInCount,
+  NodeRunsDailyStatusCollection,
   TopErrorsCollection, TopErrorsItem,
   CountedDurationCollection, CountedDurationItem, Desktop, Filter } from './desktop.model';
 
@@ -19,6 +20,17 @@ interface RespDailyCheckInCount {
   end: Date;
   count: number;
   total: number;
+}
+
+interface RespNodeRunsDailyStatusCollection {
+  durations: RespNodeRunsDailyStatus[];
+}
+
+interface RespNodeRunsDailyStatus {
+  start: Date;
+  end: Date;
+  status: string;
+  run_id: string;
 }
 
 interface RespTopNodeErrors {
@@ -73,6 +85,14 @@ export class DesktopRequests {
       `${CONFIG_MGMT_URL}/stats/checkin_counts_timeseries?days_ago=${daysAgo}`)
       .pipe(map(respDailyCheckInCountCollection =>
         this.createDailyCheckInCountCollection(respDailyCheckInCountCollection)));
+  }
+
+  public getDailyNodeRunsStatusCountCollection(nodeId: string, daysAgo: number):
+    Observable<NodeRunsDailyStatusCollection> {
+      return this.http.get<RespNodeRunsDailyStatusCollection>(
+        `${CONFIG_MGMT_URL}/node_runs_daily_status_time_series?node_id=${nodeId}&days_ago=${daysAgo}`)
+        .pipe(map(respNodeRunsDailyStatusCollection =>
+          this.createNodeRunsDailyStatusCollection(respNodeRunsDailyStatusCollection)));
   }
 
   public getTopErrorsCollection(): Observable<TopErrorsCollection> {
@@ -206,4 +226,12 @@ export class DesktopRequests {
     };
   }
 
+  private createNodeRunsDailyStatusCollection(
+    respNodeRunsDailyStatusCollection: RespNodeRunsDailyStatusCollection):
+      NodeRunsDailyStatusCollection {
+      return {
+        buckets: respNodeRunsDailyStatusCollection.durations,
+        updated: new Date()
+      };
+  }
 }

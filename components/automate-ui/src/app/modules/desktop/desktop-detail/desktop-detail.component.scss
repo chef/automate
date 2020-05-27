@@ -122,6 +122,24 @@ h3 {
       display: none;
     }
 
+    span:last-child {
+      display: block;
+    }
+
+    chef-icon {
+      &.converged, &.unchanged {
+        color: #4FC293;
+      }
+
+      &.missing, &.unknown {
+        color: #7C8296;
+      }
+
+      &.failure, &.error {
+        color: #EB372C;
+      }
+    }
+
     &.date-cell {
       display: none;
     }
@@ -134,7 +152,8 @@ h3 {
       span {
         position: absolute;
         white-space: nowrap;
-        font-size: 12px;
+        font-size: 10px;
+        text-transform: uppercase;
       }
     }
 
@@ -142,7 +161,7 @@ h3 {
       cursor: pointer;
 
       > chef-icon {
-        font-size: 26px;
+        font-size: 30px;
         padding: 0 2px;
       }
     }
