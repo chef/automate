@@ -82,6 +82,12 @@ On the Chef Automate CLI
     disable_cidr_filter = true\
     cidr_filter = "0.0.0.0/0"
 
+To debug any issues with the Data Feed Service in Automate, update the following section by changing the *log_level* to debug:
+
+    [log]
+    log_format = "text"
+    log_level = "debug"
+
 ## Data Feed Output Syntax and Details
 
 The import consists of line separated JSON strings. Each line represents the data for one node. Each line is of the format:
