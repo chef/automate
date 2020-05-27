@@ -90,7 +90,7 @@ The deployment process writes login credentials to the `automate-credentials.tom
 
 ### Open Chef Automate
 
-Navigate to `https://<chef-automate-fqdn>` in a browser and log in to Chef Automate with
+Navigate to `https://{{< example_fqdn "automate" >}}` in a browser and log in to Chef Automate with
 the credentials provided in `automate-credentials.toml`.
 
 Once you log in, Chef Automate prompts you for a license.
