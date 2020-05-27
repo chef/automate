@@ -19,7 +19,7 @@
       align-items: center;
       justify-content: flex-end;
       height: 49px;
-      width: 255px;
+      min-width: 255px;
       box-shadow: 2px 2px 4px 0 #C5C7D1, -2px -2px 12px 0 #ECF0F9;
       border-radius: $chef-border-radius;
 
@@ -45,7 +45,7 @@
         justify-content: space-between;
         margin-right: 16px;
         height: 49px;
-        width: 193px;
+        min-width: 193px;
         border-radius: $chef-border-radius;
         box-shadow: 2px 2px 4px 0 #C5C7D1, -2px -2px 12px 0 #ECF0F9;
 
