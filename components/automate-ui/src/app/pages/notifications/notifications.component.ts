@@ -85,7 +85,7 @@ export class NotificationsComponent implements OnInit {
     if (field === this.sortField) {
       return 'sort-' + this.sortDir[field];
     } else {
-      return 'sort-asc';
+      return 'none';
     }
   }
 
