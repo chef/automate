@@ -11,6 +11,16 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { UploadService } from 'app/services/profiles/upload.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
+import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
+
+class MockProductDeployedService {
+
+  constructor() {}
+
+  isProductDeployed(_product: string): boolean {
+    return false;
+  }
+}
 
 class MockProfilesService {
   getAllProfiles(): Observable<Array<Object>> {
@@ -49,7 +59,8 @@ describe('ProfilesOverviewComponent', () => {
         {provide: ProfilesService, useClass: MockProfilesService},
         {provide: ChefSessionService, useValue: mockSession},
         {provide: UploadService, useClass: MockUploadService},
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: ProductDeployedService, useClass: MockProductDeployedService }
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

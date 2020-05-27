@@ -18,6 +18,7 @@ import { UploadService } from 'app/services/profiles/upload.service';
 import { AvailableProfilesService } from 'app/services/profiles/available-profiles.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { find } from 'lodash';
+import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
 
 interface Profile {
     name: String;
@@ -72,6 +73,8 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   // Empty Page
   profilesEmpty = false;
 
+  public isDesktopView = false;
+
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   constructor(
@@ -79,8 +82,11 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
     private availableProfilesService: AvailableProfilesService,
     private uploadService: UploadService,
     private chefSessionService: ChefSessionService,
-    private layoutFacade: LayoutFacadeService
-  ) {}
+    private layoutFacade: LayoutFacadeService,
+    private productDeployedService: ProductDeployedService
+  ) {
+    this.isDesktopView = this.productDeployedService.isProductDeployed('desktop');
+  }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Compliance);

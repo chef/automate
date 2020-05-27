@@ -29,7 +29,7 @@
             <chef-option value='installed'>
               <span *ngIf="userProfilesDataLoaded">{{ filteredProfiles.length }}</span> Profiles
             </chef-option>
-            <chef-option value='available'>
+            <chef-option *ngIf="!isDesktopView" value='available'>
               <span *ngIf="availableProfilesDataLoaded">{{ filteredAvailableProfiles.length }}</span> Available
             </chef-option>
           </chef-tab-selector>
