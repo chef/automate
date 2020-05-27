@@ -19,7 +19,7 @@
 
     <div>
       <chef-button tertiary (click)="handleCancel()">Cancel</chef-button>
-      <chef-button primary [disabled]="!hasNewValues" (click)="handleUpdate()">Update</chef-button>
+      <chef-button primary [disabled]="disableSubmit" (click)="handleUpdate()">Update</chef-button>
     </div>
   </div>
 </div>

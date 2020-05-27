@@ -43,12 +43,19 @@ export class InsightAttributesDropdownComponent implements OnInit {
 
   public options: FilterOption[] = FilterableOptions;
   public selectedOptions: string[] = []; // these are filter ids
+  private initialDefaultSavePref = false;
   public hasNewValues = false;
+  public saveDefaultChanged = false;
 
   ngOnInit() {
     // creating a reference to fall back on
     // will likely change after we're storing these away elsewhere
     this.lastSelectedOptions = [...this.selectedOptions];
+    this.initialDefaultSavePref = this.saveAsDefault;
+  }
+
+  get disableSubmit() {
+    return this.saveDefaultChanged || this.hasNewValues ? false : true;
   }
 
   public handleSelect(event: Event) {
@@ -91,6 +98,7 @@ export class InsightAttributesDropdownComponent implements OnInit {
 
   public handleSaveAsDefaultChange(): void {
     this.saveAsDefault = !this.saveAsDefault;
+    this.saveDefaultChanged = this.saveAsDefault !== this.initialDefaultSavePref ? true : false;
   }
 
   private updateButtonState(target: HTMLElement, state: 'on' | 'off'): void {

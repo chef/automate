@@ -50,7 +50,6 @@
       padding-left: 0;
       padding-right: 0;
 
-      // need to shift this back at small
       @include carbon--breakpoint-up(md) {
         width: 50%;
 
