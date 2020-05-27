@@ -374,7 +374,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     this.authorizedChecker = new AuthorizedChecker(this.store);
     this.authorizedChecker.setPermissions([
       {
-        endpoint: '/ingest/events/chef/node-multiple-deletes',
+        endpoint: '/api/v0/ingest/events/chef/node-multiple-deletes',
         paramList: [],
         verb: 'post'
       }
