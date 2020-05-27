@@ -43,11 +43,9 @@
     <div class="arrow-field-container">
       <div class="arrow-field-item dropdown">
         <mat-form-field appearance="none">
-          <mat-select panelClass="chef-dropdown">
-            <mat-option *ngFor="let item of selectablePages; trackBy: trackBy" class="page-picker-item"
+          <mat-select panelClass="chef-dropdown" [(ngModel)]="page">
+            <mat-option *ngFor="let item of selectablePages; trackBy: trackBy"
             (onSelectionChange)="handleSelectItem($event, item)"
-            [attr.primary]="item === page" 
-            [attr.secondary]="item !== page" 
             [attr.disabled]="selectablePages.length <= 1"
             [value]="item">{{ item }}</mat-option>
           </mat-select>

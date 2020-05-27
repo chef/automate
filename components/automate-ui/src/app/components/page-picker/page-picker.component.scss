@@ -75,13 +75,25 @@
         border-bottom-right-radius: $chef-border-radius;
         border-top-right-radius: $chef-border-radius;
       }
+
+      &:focus-within {
+        position: relative;
+        z-index: 2;
+      }
     }
 
     [panelClass="chef-dropdown"] {
       width: 60px;
       height: 49px;
       padding: 16px 4px 15px 16px;
-      border: none;
+      border-color: transparent;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+
+      &:focus {
+        border-color: #3864F2;
+        outline: none;
+      }
     }
 
   } // end desktop
