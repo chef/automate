@@ -7,7 +7,7 @@ import { InsightAttributesDropdownComponent } from './insight-attributes-dropdow
 import { FilterName } from './insight-attributes-dropdown.model';
 
 const testOptions = [
-  { name: FilterName.Platform, id: 'platform_filter' },
+  { name: FilterName.PlatformVersion, id: 'platform_version_filter' },
   { name: FilterName.Domain, id: 'domain_filter' },
   { name: FilterName.MacAddress, id: 'macaddress_filter' },
   { name: FilterName.CloudProvider, id: 'cloud_provider_filter' },
@@ -74,7 +74,7 @@ describe('OverviewTrendComponent', () => {
       list[4].click();
 
       expect(component.selectedOptions.length).toBe(3);
-      expect(component.selectedOptions).toContain('platform_filter');
+      expect(component.selectedOptions).toContain('platform_version_filter');
       expect(component.selectedOptions).toContain('domain_filter');
       expect(component.selectedOptions).toContain('hostname_filter');
       expect(component.selectedOptions).not.toContain('macaddress_filter');
@@ -91,8 +91,8 @@ describe('OverviewTrendComponent', () => {
     });
 
     it('enables the submit when filters are different than previous selection', () => {
-      component.selectedOptions = ['platform_filter', 'domain_filter'];
-      component.lastSelectedOptions = ['platform_filter', 'domain_filter'];
+      component.selectedOptions = ['platform_version_filter', 'domain_filter'];
+      component.lastSelectedOptions = ['platform_version_filter', 'domain_filter'];
       const updateButton = fixture.debugElement.nativeElement.querySelector('chef-button[primary]');
       const list = fixture.debugElement.nativeElement.querySelectorAll('.filter-button');
 

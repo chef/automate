@@ -34,7 +34,7 @@ const childAnim = trigger('childAnim', [
 })
 export class InsightAttributesDropdownComponent implements OnInit {
 
-  @Input() saveAsDefault = false;
+  @Input() saveAsDefault = true;
   @Input() lastSelectedOptions: string[] = []; // these are filter ids
   @Output() onUpdateFilters: EventEmitter<any> = new EventEmitter();
   @Output() onToggleMenu: EventEmitter<any> = new EventEmitter();
@@ -72,7 +72,10 @@ export class InsightAttributesDropdownComponent implements OnInit {
 
   public handleUpdate(): void {
     // emit new selected filter ids
-    this.onUpdateFilters.emit(this.selectedOptions);
+    this.onUpdateFilters.emit({
+      filters: this.selectedOptions,
+      saveAsDefault: this.saveAsDefault
+    });
     this.onToggleMenu.emit();
   }
 
@@ -86,9 +89,8 @@ export class InsightAttributesDropdownComponent implements OnInit {
     this.onToggleMenu.emit();
   }
 
-  public handleDefaultChange(checkedState): void {
-    // call to save as default
-    console.log(checkedState);
+  public handleSaveAsDefaultChange(): void {
+    this.saveAsDefault = !this.saveAsDefault;
   }
 
   private updateButtonState(target: HTMLElement, state: 'on' | 'off'): void {

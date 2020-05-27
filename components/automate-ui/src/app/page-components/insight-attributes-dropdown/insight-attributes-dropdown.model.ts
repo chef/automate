@@ -4,7 +4,6 @@ export interface FilterOption {
 }
 
 export enum FilterName {
-  Platform = 'Platform',
   PlatformVersion = 'Platform Version',
   Domain = 'Domain',
   Tag = 'Tag',
@@ -20,14 +19,13 @@ export enum FilterName {
   KernelVersion = 'Kernel Version',
   Hostname = 'Hostname',
   Timezone = 'Timezone',
-  LastCheckInTime = 'Last Check In Time',
+  LastCheckInTime = 'Last Check-in Time',
   DMIsystemManufacturer = 'DMI System Manufacturer',
   DMIsystemSerialNumber = 'DMI System Serial Number',
   CloudProvider = 'Cloud Provider'
 }
 
 export const FilterableOptions: FilterOption[] = [
-  { name: FilterName.Platform, id: 'platform' },
   { name: FilterName.PlatformVersion, id: 'platform_version'},
   { name: FilterName.Domain, id: 'domain'},
   { name: FilterName.Tag, id: 'tag'},
