@@ -1,0 +1,20 @@
+{
+  "name": "role",
+  "description": "",
+  "json_class": "Chef::Role",
+  "chef_type": "role",
+  "default_attributes": {
+    "apache2": {
+      "max_children": "50"
+    }
+  },
+  "override_attributes": {
+
+  },
+  "run_list": [
+    "recipe[starter::default]"
+  ],
+  "env_run_lists": {
+
+  }
+}

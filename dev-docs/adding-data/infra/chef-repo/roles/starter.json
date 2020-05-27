@@ -1,0 +1,19 @@
+{
+  "name": "starter",
+  "description": "An example Chef role",
+  "json_class": "Chef::Role",
+  "chef_type": "role",
+  "default_attributes": {
+
+  },
+  "override_attributes": {
+
+  },
+  "run_list": [
+    "role[role]",
+    "recipe[starter]"
+  ],
+  "env_run_lists": {
+
+  }
+}
