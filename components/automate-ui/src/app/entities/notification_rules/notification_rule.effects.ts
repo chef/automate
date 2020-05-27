@@ -5,13 +5,11 @@ import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map } from 'rxjs/operators';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
-
 import {
   GetNotificationRulesSuccess,
   GetNotificationRulesFailure,
   NotificationRuleActionTypes
 } from './notification_rule.action';
-
 import { NotificationRuleRequests } from './notification_rule.requests';
 
 @Injectable()
@@ -37,7 +35,7 @@ export class NotificationRuleEffects {
       const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not get notifications: ${msg || payload.error}`
+        message: `Could not get notifications: ${msg}`
       });
     }));
 

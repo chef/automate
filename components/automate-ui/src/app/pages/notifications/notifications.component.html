@@ -23,28 +23,28 @@
           <chef-table *ngIf="(rules$ | async)?.length > 0" id="notifications-list">
             <chef-thead>
               <chef-tr>
-                <chef-th class="sort" tabindex="0"
+                <chef-th class="sort"
                   role="button"
                   (keyup.enter)="toggleSort('name')"
                   (click)="toggleSort('name')">
                   <span>Name</span>
                   <chef-sort-toggle sort="name" [order]="sortIcon('')"></chef-sort-toggle>
                 </chef-th>
-                <chef-th class="sort" tabindex="0"
+                <chef-th class="sort"
                   role="button"
                   (keyup.enter)="toggleSort('alert_type')"
                   (click)="toggleSort('alert_type')">
                   <span>Webhook Type</span>
                   <chef-sort-toggle sort="alert_type" [order]="sortIcon('')"></chef-sort-toggle>
                 </chef-th>
-                <chef-th class="sort" tabindex="0"
+                <chef-th class="sort"
                   role="button"
                   (keyup.enter)="toggleSort('failure_type')"
                   (click)="toggleSort('failure_type')">
                   <span>Failure Type</span>
                   <chef-sort-toggle sort="failure_type" [order]="sortIcon('')"></chef-sort-toggle>
                 </chef-th>
-                <chef-th class="sort" tabindex="0"
+                <chef-th class="sort"
                   role="button"
                   (keyup.enter)="toggleSort('webhook_url')"
                   (click)="toggleSort('webhook_url')">
@@ -56,7 +56,7 @@
             </chef-thead>
 
             <chef-tbody>
-              <chef-tr tabindex="0" *ngFor="let rule of rules$ | async |
+              <chef-tr *ngFor="let rule of rules$ | async |
                 slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
                 <chef-td>
                   <a [routerLink]="['/settings/notifications/form', rule.id]">{{ rule.name }}</a>
@@ -66,10 +66,10 @@
                   {{ rule.targetType }}
                 </chef-td>
                 <chef-td>
-                  {{rule.AlertTypeLabels[rule.ruleType]}}
+                  {{ rule.AlertTypeLabels[rule.ruleType] }}
                 </chef-td>
                 <chef-td>
-                  {{rule.targetUrl}}
+                  {{ rule.targetUrl }}
                 </chef-td>
                 <chef-td class="actions three-dot-column">
                   <mat-select panelClass="chef-control-menu">

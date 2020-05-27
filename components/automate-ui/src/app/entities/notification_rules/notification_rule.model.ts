@@ -12,7 +12,7 @@ export interface RuleInterface {
   name: string; // name of the rule
   ruleType: RuleType; // Compliance or CCR
   targetUrl: string; // URL of the webhook or slack notification
-  targetType: ServiceActionType; // Slack or Custom
+  targetType: ServiceActionType;
 }
 
 
