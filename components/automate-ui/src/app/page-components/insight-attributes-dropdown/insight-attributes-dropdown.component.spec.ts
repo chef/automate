@@ -60,7 +60,6 @@ describe('OverviewTrendComponent', () => {
     });
   });
 
-
   describe('when making selections to filter', () => {
     beforeEach(() => {
       component.options = testOptions;

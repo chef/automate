@@ -3,7 +3,6 @@ import { trigger, transition, style, animate, query, group, animateChild } from 
 import { FilterOption, FilterableOptions } from './insight-attributes-dropdown.model';
 import { isEqual } from 'lodash/fp';
 
-
 // Animations
 const menuOpenAnim = trigger('menuOpenAnim', [
   transition(':enter', [
