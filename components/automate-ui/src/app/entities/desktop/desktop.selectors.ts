@@ -14,9 +14,24 @@ export const dailyCheckInCountCollection = createSelector(
   (state) => state.dailyCheckInCountCollection
 );
 
+export const getSelected = createSelector(
+  desktopState,
+  (state) => state.selected
+);
+
 export const getSelectedDaysAgo = createSelector(
   desktopState,
-  (state) => state.selectedDaysAgo
+  (state) => state.selected.daysAgo
+);
+
+export const getSelectedDesktop = createSelector(
+  desktopState,
+  (state) => state.selected.desktop
+);
+
+export const getDailyNodeRuns = createSelector(
+  desktopState,
+  (state) => state.dailyNodeRuns
 );
 
 export const topErrorsCollection = createSelector(

@@ -1,35 +1,44 @@
 import { Action } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { DailyCheckInCountCollection,
+import { DailyCheckInCountCollection, NodeRunsDailyStatusCollection,
   TopErrorsCollection, CountedDurationCollection, Desktop, TermFilter } from './desktop.model';
 
 export enum DesktopActionTypes {
-  GET_DAILY_CHECK_IN_TIME_SERIES              = 'DESKTOP::GET::DAILY_CHECK_IN_TIME_SERIES',
-  GET_DAILY_CHECK_IN_TIME_SERIES_SUCCESS      = 'DESKTOP::GET::DAILY_CHECK_IN_TIME_SERIES::SUCCESS',
-  GET_DAILY_CHECK_IN_TIME_SERIES_FAILURE      = 'DESKTOP::GET::DAILY_CHECK_IN_TIME_SERIES::FAILURE',
-  SET_DAYS_AGO_SELECTED                       = 'DESKTOP::SET::DAYS_AGO_SELECTED',
-  GET_TOP_ERRORS_COLLECTION                   = 'DESKTOP::GET::TOP_ERRORS_COLLECTION',
-  GET_TOP_ERRORS_COLLECTION_SUCCESS           = 'DESKTOP::GET::TOP_ERRORS_COLLECTION::SUCCESS',
-  GET_TOP_ERRORS_COLLECTION_FAILURE           = 'DESKTOP::GET::TOP_ERRORS_COLLECTION::FAILURE',
-  GET_UNKNOWN_DESKTOP_DURATION_COUNTS         = 'DESKTOP::GET::UNKNOWN_DESKTOP_DURATION_COUNT',
-  GET_UNKNOWN_DESKTOP_DURATION_COUNTS_SUCCESS = 'DESKTOP::GET::UNKNOWN_DESKTOP_DURATION_COUNT::SUCCESS',
-  GET_UNKNOWN_DESKTOP_DURATION_COUNTS_FAILURE = 'DESKTOP::GET::UNKNOWN_DESKTOP_DURATION_COUNT::FAILURE',
-  GET_DESKTOPS                                = 'DESKTOP::GET::DESKTOPS',
-  GET_DESKTOPS_SUCCESS                        = 'DESKTOP::GET::DESKTOPS::SUCCESS',
-  GET_DESKTOPS_FAILURE                        = 'DESKTOP::GET::DESKTOPS::FAILURE',
-  GET_DESKTOPS_TOTAL                          = 'DESKTOP::GET::DESKTOPS_TOTAL',
-  GET_DESKTOPS_TOTAL_SUCCESS                  = 'DESKTOP::GET::DESKTOPS_TOTAL::SUCCESS',
-  GET_DESKTOPS_TOTAL_FAILURE                  = 'DESKTOP::GET::DESKTOPS_TOTAL::FAILURE',
-  UPDATE_DESKTOPS_FILTER_CURRENT_PAGE         = 'DESKTOP::UPDATE::DESKTOPS_FILTER_CURRENT_PAGE',
-  ADD_DESKTOPS_FILTER_TERM                    = 'DESKTOP::ADD::DESKTOPS_FILTER_TERM',
-  UPDATE_DESKTOPS_FILTER_TERMS                = 'DESKTOP::UPDATE::DESKTOPS_FILTER_TERMS',
-  REMOVE_DESKTOPS_FILTER_TERM                 = 'DESKTOP::REMOVE::DESKTOPS_FILTER_TERM',
-  UPDATE_DESKTOPS_SORT_TERM                   = 'DESKTOP::UPDATE::DESKTOPS_SORT_TERM'
+  GET_DAILY_CHECK_IN_TIME_SERIES                  = 'DESKTOP::GET::DAILY_CHECK_IN_TIME_SERIES',
+  GET_DAILY_CHECK_IN_TIME_SERIES_SUCCESS          = 'DESKTOP::GET::DAILY_CHECK_IN_TIME_SERIES::SUCCESS',
+  GET_DAILY_CHECK_IN_TIME_SERIES_FAILURE          = 'DESKTOP::GET::DAILY_CHECK_IN_TIME_SERIES::FAILURE',
+  GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES          = 'DESKTOP::GET::DAILY_NODE_RUNS_STATUS_TIME_SERIES',
+  GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES_SUCCESS  = 'DESKTOP::GET::DAILY_NODE_RUNS_STATUS_TIME_SERIES::SUCCESS',
+  GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES_FAILURE  = 'DESKTOP::GET::DAILY_NODE_RUNS_STATUS_TIME_SERIES::FAILURE',
+  GET_TOP_ERRORS_COLLECTION                       = 'DESKTOP::GET::TOP_ERRORS_COLLECTION',
+  GET_TOP_ERRORS_COLLECTION_SUCCESS               = 'DESKTOP::GET::TOP_ERRORS_COLLECTION::SUCCESS',
+  GET_TOP_ERRORS_COLLECTION_FAILURE               = 'DESKTOP::GET::TOP_ERRORS_COLLECTION::FAILURE',
+  GET_UNKNOWN_DESKTOP_DURATION_COUNTS             = 'DESKTOP::GET::UNKNOWN_DESKTOP_DURATION_COUNT',
+  GET_UNKNOWN_DESKTOP_DURATION_COUNTS_SUCCESS     = 'DESKTOP::GET::UNKNOWN_DESKTOP_DURATION_COUNT::SUCCESS',
+  GET_UNKNOWN_DESKTOP_DURATION_COUNTS_FAILURE     = 'DESKTOP::GET::UNKNOWN_DESKTOP_DURATION_COUNT::FAILURE',
+  GET_DESKTOPS                                    = 'DESKTOP::GET::DESKTOPS',
+  GET_DESKTOPS_SUCCESS                            = 'DESKTOP::GET::DESKTOPS::SUCCESS',
+  GET_DESKTOPS_FAILURE                            = 'DESKTOP::GET::DESKTOPS::FAILURE',
+  GET_DESKTOPS_TOTAL                              = 'DESKTOP::GET::DESKTOPS_TOTAL',
+  GET_DESKTOPS_TOTAL_SUCCESS                      = 'DESKTOP::GET::DESKTOPS_TOTAL::SUCCESS',
+  GET_DESKTOPS_TOTAL_FAILURE                      = 'DESKTOP::GET::DESKTOPS_TOTAL::FAILURE',
+  SET_SELECTED_DESKTOP                            = 'DESKTOP::SET::DESKTOP',
+  SET_SELECTED_DAYS_AGO                           = 'DESKTOP::SET::DAYS_AGO',
+  UPDATE_DESKTOPS_FILTER_CURRENT_PAGE             = 'DESKTOP::UPDATE::DESKTOPS_FILTER_CURRENT_PAGE',
+  ADD_DESKTOPS_FILTER_TERM                        = 'DESKTOP::ADD::DESKTOPS_FILTER_TERM',
+  UPDATE_DESKTOPS_FILTER_TERMS                    = 'DESKTOP::UPDATE::DESKTOPS_FILTER_TERMS',
+  REMOVE_DESKTOPS_FILTER_TERM                     = 'DESKTOP::REMOVE::DESKTOPS_FILTER_TERM',
+  UPDATE_DESKTOPS_SORT_TERM                       = 'DESKTOP::UPDATE::DESKTOPS_SORT_TERM'
 }
 
-export class SetDaysAgoSelected implements Action {
-  readonly type = DesktopActionTypes.SET_DAYS_AGO_SELECTED;
+export class SetSelectedDesktop implements Action {
+  readonly type = DesktopActionTypes.SET_SELECTED_DESKTOP;
+  constructor(public payload: {desktop: Desktop}) { }
+}
+
+export class SetSelectedDaysAgo implements Action {
+  readonly type = DesktopActionTypes.SET_SELECTED_DAYS_AGO;
   constructor(public payload: {daysAgo: number}) { }
 }
 
@@ -44,6 +53,21 @@ export class GetDailyCheckInTimeSeriesSuccess implements Action {
 
 export class GetDailyCheckInTimeSeriesFailure implements Action {
   readonly type = DesktopActionTypes.GET_DAILY_CHECK_IN_TIME_SERIES_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
+export class GetDailyNodeRunsStatusTimeSeries implements Action {
+  readonly type = DesktopActionTypes.GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES;
+  constructor(public nodeId: string, public daysAgo: number ) { }
+}
+
+export class GetDailyNodeRunsStatusTimeSeriesSuccess implements Action {
+  readonly type = DesktopActionTypes.GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES_SUCCESS;
+  constructor(public payload: NodeRunsDailyStatusCollection) { }
+}
+
+export class GetDailyNodeRunsStatusTimeSeriesFailure implements Action {
+  readonly type = DesktopActionTypes.GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES_FAILURE;
   constructor(public payload: HttpErrorResponse) { }
 }
 
@@ -129,10 +153,14 @@ export class UpdateDesktopSortTerm implements Action {
 }
 
 export type DesktopActions =
-  | SetDaysAgoSelected
+  | SetSelectedDaysAgo
+  | SetSelectedDesktop
   | GetDailyCheckInTimeSeries
   | GetDailyCheckInTimeSeriesSuccess
   | GetDailyCheckInTimeSeriesFailure
+  | GetDailyNodeRunsStatusTimeSeries
+  | GetDailyNodeRunsStatusTimeSeriesSuccess
+  | GetDailyNodeRunsStatusTimeSeriesFailure
   | GetTopErrorsCollection
   | GetTopErrorsCollectionSuccess
   | GetTopErrorsCollectionFailure

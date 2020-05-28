@@ -9,6 +9,9 @@ import {
   GetDailyCheckInTimeSeries,
   GetDailyCheckInTimeSeriesSuccess,
   GetDailyCheckInTimeSeriesFailure,
+  GetDailyNodeRunsStatusTimeSeries,
+  GetDailyNodeRunsStatusTimeSeriesSuccess,
+  GetDailyNodeRunsStatusTimeSeriesFailure,
   DesktopActionTypes,
   GetTopErrorsCollection,
   GetTopErrorsCollectionSuccess,
@@ -38,7 +41,7 @@ export class DesktopEffects {
 
   @Effect()
   setDaysAgoSelected$ = this.actions$.pipe(
-    ofType(DesktopActionTypes.SET_DAYS_AGO_SELECTED),
+    ofType(DesktopActionTypes.SET_SELECTED_DAYS_AGO),
     map(() => new GetDailyCheckInTimeSeries())
   );
 
@@ -65,6 +68,27 @@ export class DesktopEffects {
         message: `Could not get time series: ${msg || error}`
       });
     }));
+
+  @Effect()
+    getDailyNodeRunsStatusTimeSeries$ =
+      this.actions$.pipe(ofType<GetDailyNodeRunsStatusTimeSeries>(
+        DesktopActionTypes.GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES),
+        mergeMap(({ nodeId, daysAgo }) =>
+          this.requests.getDailyNodeRunsStatusCountCollection(nodeId, daysAgo).pipe(
+            map(dailyNodeRunsStatusCountCollection =>
+              new GetDailyNodeRunsStatusTimeSeriesSuccess(dailyNodeRunsStatusCountCollection)),
+              catchError((error) => of(new GetDailyNodeRunsStatusTimeSeriesFailure(error))))));
+
+    @Effect()
+    getDailyNodeRunsStatusSeriesFailure$ = this.actions$.pipe(
+      ofType(DesktopActionTypes.GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES_FAILURE),
+      map(({ payload: { error } }: GetDailyNodeRunsStatusTimeSeriesFailure) => {
+        const msg = error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not get time series: ${msg || error}`
+        });
+      }));
 
   @Effect()
   getTopErrorCollection$ =

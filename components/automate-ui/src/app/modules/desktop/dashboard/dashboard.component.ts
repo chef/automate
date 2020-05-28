@@ -8,7 +8,8 @@ import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import {
   GetDailyCheckInTimeSeries,
-  SetDaysAgoSelected,
+  SetSelectedDesktop,
+  SetSelectedDaysAgo,
   GetTopErrorsCollection,
   GetUnknownDesktopDurationCounts,
   GetDesktops,
@@ -162,7 +163,7 @@ export class DashboardComponent implements OnInit {
   }
 
   handleDaysAgoChange(daysAgo: number) {
-    this.store.dispatch(new SetDaysAgoSelected({daysAgo}));
+    this.store.dispatch(new SetSelectedDaysAgo({daysAgo}));
   }
 
   onDesktopListClose() {
@@ -207,6 +208,7 @@ export class DashboardComponent implements OnInit {
 
   public onDesktopSelected(desktop: Desktop) {
     this.selectedDesktop = desktop;
+    this.store.dispatch(new SetSelectedDesktop({desktop}));
     this.desktopDetailVisible = true;
     this.desktopListFullscreened = false;
   }

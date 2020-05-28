@@ -1,18 +1,28 @@
 import { set, pipe, concat, remove } from 'lodash/fp';
-
 import { EntityStatus } from '../entities';
 import { DesktopActionTypes, DesktopActions } from './desktop.actions';
-import { DailyCheckInCountCollection, TopErrorsCollection,
-  CountedDurationCollection, Desktop, Filter, TermFilter, SortOrder, Terms } from './desktop.model';
+import {
+  DailyCheckInCountCollection,
+  TopErrorsCollection,
+  CountedDurationCollection,
+  DailyNodeRuns,
+  Desktop,
+  Filter,
+  TermFilter,
+  SortOrder,
+  Selected,
+  Terms
+} from './desktop.model';
 
 export interface DesktopEntityState {
   dailyCheckInCountCollection: DailyCheckInCountCollection;
   getDailyCheckInTimeSeriesStatus: EntityStatus;
-  selectedDaysAgo: number;
+  selected: Selected;
   topErrorCollection: TopErrorsCollection;
   getTopErrorCollectionStatus: EntityStatus;
   unknownDesktopDurationCounts: CountedDurationCollection;
   getUnknownDesktopDurationCountsStatus: EntityStatus;
+  dailyNodeRuns: DailyNodeRuns;
   desktops: Desktop[];
   getDesktopsStatus: EntityStatus;
   desktopsTotal: number;
@@ -23,7 +33,10 @@ export interface DesktopEntityState {
 export const desktopEntityInitialState: DesktopEntityState = {
   dailyCheckInCountCollection: { buckets: [], updated: new Date(0)},
   getDailyCheckInTimeSeriesStatus: EntityStatus.notLoaded,
-  selectedDaysAgo: 3,
+  selected: {
+    desktop: undefined,
+    daysAgo: 3
+  },
   topErrorCollection: {items: [], updated: new Date(0)},
   getTopErrorCollectionStatus: EntityStatus.notLoaded,
   unknownDesktopDurationCounts: {items: [], updated: new Date(0)},
@@ -32,6 +45,12 @@ export const desktopEntityInitialState: DesktopEntityState = {
   getDesktopsStatus: EntityStatus.notLoaded,
   desktopsTotal: 0,
   getDesktopsTotalStatus: EntityStatus.notLoaded,
+  dailyNodeRuns: {
+    durations: { buckets: [], updated: new Date(0)},
+    daysAgo: 14,
+    nodeId: '',
+    status: EntityStatus.notLoaded
+  },
   getDesktopsFilter: {
     currentPage: 1,
     pageSize: 10,
@@ -45,8 +64,11 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
   action: DesktopActions) {
 
   switch (action.type) {
-    case DesktopActionTypes.SET_DAYS_AGO_SELECTED:
-      return set('selectedDaysAgo', action.payload.daysAgo, state);
+    case DesktopActionTypes.SET_SELECTED_DESKTOP:
+      return set('selected.desktop', action.payload.desktop, state);
+
+    case DesktopActionTypes.SET_SELECTED_DAYS_AGO:
+      return set('selected.daysAgo', action.payload.daysAgo, state);
 
     case DesktopActionTypes.GET_DAILY_CHECK_IN_TIME_SERIES:
       return set('getDailyCheckInTimeSeriesStatus', EntityStatus.loading, state);
@@ -58,6 +80,20 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
 
     case DesktopActionTypes.GET_DAILY_CHECK_IN_TIME_SERIES_FAILURE:
       return set('getDailyCheckInTimeSeriesStatus', EntityStatus.loadingFailure, state);
+
+    case DesktopActionTypes.GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES:
+      return pipe(
+        set('dailyNodeRuns.status', EntityStatus.loading),
+        set('dailyNodeRuns.nodeId', action.nodeId),
+        set('dailyNodeRuns.daysAgo', action.daysAgo))(state);
+
+    case DesktopActionTypes.GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES_SUCCESS:
+      return pipe(
+        set('dailyNodeRuns.status', EntityStatus.loadingSuccess),
+        set('dailyNodeRuns.durations', action.payload))(state);
+
+    case DesktopActionTypes.GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES_FAILURE:
+      return set('dailyNodeRuns.status', EntityStatus.loadingFailure, state);
 
     case DesktopActionTypes.GET_TOP_ERRORS_COLLECTION:
       return set('getTopErrorCollectionStatus', EntityStatus.loading, state);
