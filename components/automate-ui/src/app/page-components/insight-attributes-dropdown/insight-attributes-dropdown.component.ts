@@ -1,35 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter, HostBinding } from '@angular/core';
-import { trigger, transition, style, animate, query, group, animateChild } from '@angular/animations';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FilterOption, FilterableOptions } from './insight-attributes-dropdown.model';
 import { isEqual } from 'lodash/fp';
-
-// Animations
-const menuOpenAnim = trigger('menuOpenAnim', [
-  transition(':enter', [
-    style({ opacity: 0, transform: 'translateY(-8px) scale(0)' }),
-    group([
-      query('@childAnim', animateChild()),
-      animate('220ms ease-out', style({ opacity: 1, transform: 'translateY(0px) scale(1)' }))
-    ])
-  ]),
-  transition(':leave', [
-    style({ opacity: 1 }),
-    animate('195ms ease-in', style({ opacity: 0 }))
-  ])
-]);
-
-const childAnim = trigger('childAnim', [
-  transition(':enter', [
-    style({ opacity: 0 }),
-    animate('50ms 170ms', style({ opacity: 1 }))
-  ])
-]);
 
 @Component({
   selector: 'app-insight-attributes-dropdown',
   templateUrl: './insight-attributes-dropdown.component.html',
-  styleUrls: ['./insight-attributes-dropdown.component.scss'],
-  animations: [ menuOpenAnim, childAnim ]
+  styleUrls: ['./insight-attributes-dropdown.component.scss']
 })
 export class InsightAttributesDropdownComponent implements OnInit {
 
@@ -37,8 +13,6 @@ export class InsightAttributesDropdownComponent implements OnInit {
   @Input() lastSelectedOptions: string[] = []; // these are filter ids
   @Output() onUpdateFilters: EventEmitter<any> = new EventEmitter();
   @Output() onToggleMenu: EventEmitter<any> = new EventEmitter();
-
-  @HostBinding('@menuOpenAnim') menuOpenAnim;
 
   public options: FilterOption[] = FilterableOptions;
   public selectedOptions: string[] = []; // these are filter ids
