@@ -27,7 +27,7 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
   public showCheckinDebug = false;
   public checkinTableType = 'grid';
   public checkinGridFlexType = 'wrap';
-  public checkinNumDays = 14;
+  public checkinNumDays = 15;
   // These are Material Icon names from https://material.io/resources/icons/
   public historyIcons = {
     converged: 'check_box',
@@ -63,14 +63,14 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
   }
 
   updateCheckInDays() {
-    this.checkinNumDays = (this.checkinNumDays === 14 ? 28 : 14);
+    this.checkinNumDays = (this.checkinNumDays === 15 ? 29 : 15);
     this.getCheckInHistory();
   }
 
   addCheckInLabels(checkInHistory: DailyNodeRunsStatus[]): DailyNodeRunsStatus[] {
     let numWeeks = Math.floor(checkInHistory.length / 7);
     checkInHistory.forEach((history: DailyNodeRunsStatus, index: number) => {
-      const isStartOfWeek = index % 7 === 0;
+      const isStartOfWeek = (index % 7 === 0) && numWeeks > 0;
       const startOfWeekLabelText = numWeeks > 1 ? `${numWeeks} weeks ago` : `${numWeeks} week ago`;
       const isToday = index === (checkInHistory.length - 1);
       const labelText = isToday ? 'Today' : '';
@@ -78,10 +78,6 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
       if (isStartOfWeek) { --numWeeks; }
     });
     return checkInHistory;
-  }
-
-  getRunDetailsUrl(runId: string): string {
-    return `/infrastructure/client-runs/${this.desktop.id}/runs/${runId}`;
   }
 
   public close(): void {

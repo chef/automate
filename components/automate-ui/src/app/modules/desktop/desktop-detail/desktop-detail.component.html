@@ -16,13 +16,10 @@
 
   <div class="checkin-history">
     <div class="checkin-history-header">
-      <h3>Check-in History <span *ngIf="showCheckinDebug">(debug)</span></h3>
+      <h3>Check-in History</h3>
       <div class="heading-actions">
-        <chef-button secondary (click)="showCheckinDebug = !showCheckinDebug">
-          <chef-icon>settings</chef-icon>
-        </chef-button>
         <chef-button secondary (click)="updateCheckInDays()">
-          <span>Last {{ (checkinNumDays === 14 ? 2 : 4) }} Weeks</span>
+          <span>Last {{ (checkinNumDays === 15 ? 2 : 4) }} Weeks</span>
           <chef-icon>expand_more</chef-icon>
         </chef-button>
         <chef-button secondary>
@@ -31,31 +28,7 @@
         </chef-button>
       </div>
     </div>
-    <div class="debug-actions" *ngIf="showCheckinDebug">
-      <div class="button-toggle">
-        <chef-button secondary (click)="checkinTableType = 'grid'">
-          <chef-icon>view_module</chef-icon>
-        </chef-button>
-        <chef-button secondary (click)="checkinTableType = 'list'">
-          <chef-icon>view_list</chef-icon>
-        </chef-button>
-        <chef-button secondary (click)="checkinTableType = 'json'">
-          <chef-icon>code</chef-icon>
-        </chef-button>
-        <span>{{ checkinTableType }}</span>
-      </div>
-
-      <div class="button-toggle">
-        <span>{{ checkinGridFlexType }}</span>
-        <chef-button secondary (click)="checkinGridFlexType = 'wrap'">
-          <chef-icon>wrap_text</chef-icon>
-        </chef-button>
-        <chef-button secondary (click)="checkinGridFlexType = 'stretch'">
-          <chef-icon>dehaze</chef-icon>
-        </chef-button>
-      </div>
-    </div>
-    <chef-table class="checkin-history-table {{showCheckinDebug ? 'outline' : ''}}" [ngClass]="[checkinTableType, checkinGridFlexType]" *ngIf="checkinTableType !== 'json'">
+    <chef-table class="checkin-history-table grid">
       <chef-thead>
         <chef-tr>
           <chef-th class="status-cell">Status</chef-th>
@@ -78,7 +51,12 @@
                 <span class="checkin-tooltip-text">{{ history.status | titlecase }}</span>
                 <span class="checkin-tooltip-date">{{ history.end | datetime: DateTime.RFC2822 }}</span>
               </p>
-              <a *ngIf="history.run_id" class="checkin-tooltip-link" target="_blank" href="{{ getRunDetailsUrl(history.run_id) }}">View Client Run Details <chef-icon>open_in_new</chef-icon></a>
+              <a *ngIf="history.run_id"
+                class="checkin-tooltip-link"
+                target="_blank"
+                [routerLink]="['/infrastructure/client-runs', desktop.id, 'runs', history.run_id]"
+                >View Client Run Details <chef-icon>open_in_new</chef-icon>
+              </a>
             </chef-tooltip>
           </chef-td>
           <chef-td class="date-cell">

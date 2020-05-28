@@ -163,8 +163,7 @@ h3 {
     }
   }
 
-  chef-tr:nth-child(7n + 1),
-  chef-tr:last-child {
+  chef-tr:nth-child(7n + 1) {
     chef-td {
       &.relative-date-cell {
         > span {
@@ -191,11 +190,11 @@ h3 {
         justify-content: flex-start;
 
         span {
-          transform: translateX(15px);
+          transform: translateX(17px);
         }
 
         &::before {
-          transform: translateX(15px);
+          transform: translateX(17px);
         }
 
         &::after {
@@ -230,128 +229,6 @@ h3 {
       }
     }
   }
-
-  &.stretch {
-    chef-tbody {
-      flex-flow: row nowrap;
-      justify-content: space-between;
-      position: relative;
-
-      &::before {
-        display: block;
-        height: 1px;
-        background: $chef-grey;
-        position: absolute;
-        left: 15px;
-        right: 15px;
-        bottom: 20px;
-        content: '';
-
-        @include carbon--breakpoint-down(lg) {
-          left: 11px;
-          right: 11px;
-        }
-
-        @include carbon--breakpoint-down(md) {
-          left: 7px;
-          right: 7px;
-        }
-      }
-    }
-
-    chef-tr:first-child {
-      chef-td {
-        &.relative-date-cell {
-          span,
-          &::before {
-            @include carbon--breakpoint-down(lg) {
-              transform: translateX(11px);
-            }
-
-            @include carbon--breakpoint-down(md) {
-              transform: translateX(7px);
-            }
-          }
-        }
-      }
-    }
-
-    chef-tr:last-child {
-      chef-td {
-        &.relative-date-cell {
-          justify-content: flex-end;
-
-          span,
-          &::before {
-            transform: translateX(-15px);
-
-            @include carbon--breakpoint-down(lg) {
-              transform: translateX(-11px);
-            }
-
-            @include carbon--breakpoint-down(md) {
-              transform: translateX(-7px);
-            }
-          }
-        }
-      }
-    }
-
-    chef-td.status-cell {
-      > chef-icon {
-        @include carbon--breakpoint-down(lg) {
-          font-size: 18px;
-        }
-
-        @include carbon--breakpoint-down(md) {
-          font-size: 14px;
-          padding: 0;
-        }
-      }
-    }
-  }
-
-  &.outline {
-    chef-tr {
-      outline: 1px dashed pink;
-      outline-offset: -1px;
-    }
-  }
-}
-
-.checkin-history-table.list {
-  .status-cell {
-    flex-basis: 30%;
-
-    > chef-icon {
-      margin-right: $spacing-05;
-    }
-  }
-
-  .relative-date-cell {
-    flex-basis: 20%;
-    color: transparent;
-  }
-
-  .date-cell {
-    flex-basis: 50%;
-  }
-
-  chef-tr:nth-child(7n + 1) {
-    .relative-date-cell {
-      color: inherit;
-    }
-  }
-
-  .checkin-tooltip {
-    display: none;
-  }
-}
-
-.checkin-history-json {
-  border: 1px solid $chef-grey;
-  border-radius: $global-radius;
-  overflow: hidden;
 }
 
 .checkin-tooltip {
@@ -376,16 +253,16 @@ h3 {
   }
 }
 
+.checkin-tooltip-link {
+  display: block;
+  margin-top: $spacing-05;
+}
+
 .checkin-tooltip-info,
 .checkin-tooltip-link {
   margin: 0;
   font-size: 14px;
   white-space: nowrap;
-
-  &:last-child {
-    display: block;
-    margin-top: $spacing-05;
-  }
 
   chef-icon {
     margin-left: $spacing-03;
@@ -393,49 +270,9 @@ h3 {
   }
 }
 
-.checkin-tooltip.unknown {
+.checkin-tooltip.missing {
   .checkin-tooltip-date,
   .checkin-tooltip-link {
     display: none;
-  }
-}
-
-.debug-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: $spacing-05;
-  background: $chef-lightest-grey;
-  overflow: hidden;
-  border-radius: $global-radius;
-  border: 1px solid $chef-grey;
-
-  chef-button {
-    #{--background-color}: $chef-lightest-grey;
-    margin: 0;
-
-    &:hover {
-      #{--background-color}: $chef-light-grey;
-    }
-  }
-
-  .button-toggle {
-    display: flex;
-    align-items: center;
-
-    chef-button {
-      border-radius: 0;
-      border: none;
-      border-right: 1px solid $chef-grey;
-    }
-
-    &:last-child chef-button {
-      border-right: none;
-      border-left: 1px solid $chef-grey;
-    }
-
-    > span {
-      margin: 0 $spacing-03;
-    }
   }
 }
