@@ -97,7 +97,7 @@ func readGzipFile(filePath string) ([]string, error) {
 	return lines, scanner.Err()
 }
 
-func sortedUniqueify(in []string) []string {
+func sortedUniquify(in []string) []string {
 	if len(in) == 0 {
 		return in
 	}
@@ -165,5 +165,5 @@ func smallStringListGen() gopter.Gen {
 		).Map(func(r []rune) string {
 			return string(r)
 		}),
-	).Map(sortStrings).Map(sortedUniqueify)
+	).Map(sortStrings).Map(sortedUniquify)
 }

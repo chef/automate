@@ -16,7 +16,7 @@ type copyOpts struct {
 // Opt is a functional option
 type Opt func(*copyOpts)
 
-// NoRecursive will not recusively traverse directories if the function supports it
+// NoRecursive will not recursively traverse directories if the function supports it
 func NoRecursive() Opt {
 	return func(c *copyOpts) {
 		c.recursive = false

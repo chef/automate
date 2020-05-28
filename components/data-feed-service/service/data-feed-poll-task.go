@@ -124,7 +124,7 @@ func (d *DataFeedPollTask) getFeedTimes(params DataFeedPollTaskParams, now time.
 	/*
 	 * If automate has been down for a significant period of time a due schedule may already be enqueued
 	 * and not updated by the manager update call on data-feed-service startup.
-	 * In that case we need to determine if the next feed interval is stale and re-initialise it
+	 * In that case we need to determine if the next feed interval is stale and re-initialize it
 	 */
 	feedStart := params.FeedStart
 	feedEnd := params.FeedEnd
@@ -139,7 +139,7 @@ func (d *DataFeedPollTask) getFeedTimes(params DataFeedPollTaskParams, now time.
 		log.WithFields(log.Fields{
 			"start": feedStart.Format("15:04:05"),
 			"end":   feedEnd.Format("15:04:05"),
-		}).Debug("Initialise Feed interval")
+		}).Debug("Initialize Feed interval")
 	} else {
 		log.WithFields(log.Fields{
 			"start": feedStart.Format("15:04:05"),

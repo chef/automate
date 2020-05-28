@@ -374,6 +374,6 @@ func (c *testContext) CleanupAdminToken() error {
 	}
 
 	// DoLBRequest only catches 500s and 403
-	// for any other non-200 status code, we assume something unexpected occured
+	// for any other non-200 status code, we assume something unexpected occurred
 	return errors.Errorf("Unexpected response when cleaning up the diagnostics admin token: %d %s", resp.StatusCode, r.Msg)
 }

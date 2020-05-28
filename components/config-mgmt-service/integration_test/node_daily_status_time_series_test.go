@@ -228,7 +228,7 @@ func TestGetNodeDailyStatusTimeSeriesBackend(t *testing.T) {
 						Status: "success",
 					},
 				},
-				{ // choosen
+				{ // chosen
 					StartTime: parseTime(t, "2020-03-14T20:01:00Z"),
 					EndTime:   parseTime(t, "2020-03-14T20:02:59Z"),
 					RunID:     "88",
@@ -254,7 +254,7 @@ func TestGetNodeDailyStatusTimeSeriesBackend(t *testing.T) {
 				Checkin: parseTime(t, "2020-03-12T16:02:59Z"),
 			},
 			runs: []iBackend.Run{
-				{ // choosen
+				{ // chosen
 					StartTime: parseTime(t, "2020-03-14T13:01:00Z"),
 					EndTime:   parseTime(t, "2020-03-14T13:02:59Z"),
 					RunID:     "77",
@@ -296,7 +296,7 @@ func TestGetNodeDailyStatusTimeSeriesBackend(t *testing.T) {
 				Checkin: parseTime(t, "2020-03-12T16:02:59Z"),
 			},
 			runs: []iBackend.Run{
-				{ // choosen
+				{ // chosen
 					StartTime: parseTime(t, "2020-03-14T14:01:00Z"),
 					EndTime:   parseTime(t, "2020-03-14T14:02:59Z"),
 					RunID:     "77",
@@ -362,7 +362,7 @@ func TestGetNodeDailyStatusTimeSeriesBackend(t *testing.T) {
 						Status: "success",
 					},
 				},
-				{ // choosen
+				{ // chosen
 					StartTime: parseTime(t, "2020-03-14T20:01:00Z"),
 					EndTime:   parseTime(t, "2020-03-14T20:02:59Z"),
 					RunID:     "88",

@@ -156,12 +156,12 @@ func formatSnapshotIntegrity(snapshots []*SnapshotIntegrity) string {
 
 }
 
-// Format formats the backup intregrity status response
+// Format formats the backup integrity status response
 func (res *BackupIntegrityShowResponse) Format() string {
 	return formatSnapshotIntegrity(res.GetSnapshots())
 }
 
-// Format formats the backup intregrity response
+// Format formats the backup integrity response
 func (res *ValidateBackupIntegrityResponse) Format() string {
 	return formatSnapshotIntegrity(res.GetSnapshots())
 }

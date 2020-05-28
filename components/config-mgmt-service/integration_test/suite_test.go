@@ -80,7 +80,7 @@ func (s *Suite) GlobalSetup() error {
 	var haveURL bool
 	elasticsearchUrl, haveURL = os.LookupEnv("ELASTICSEARCH_URL")
 	if !haveURL {
-		return errors.New("The enviroment variable ELASTICSEARCH_URL must be set for integration tests to run")
+		return errors.New("The environment variable ELASTICSEARCH_URL must be set for integration tests to run")
 	}
 
 	// set global esBackend
@@ -135,7 +135,7 @@ func (s *Suite) GlobalTeardown() {
 	}
 }
 
-// newCfgMgmtServer initialices a CfgMgmtServer with the default config
+// newCfgMgmtServer initializes a CfgMgmtServer with the default config
 // and points to our preferred backend that is elasticsearch.
 //
 // This function expects ES and postgres to be already up and running.

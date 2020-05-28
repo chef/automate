@@ -511,7 +511,7 @@ func (c *ClientConfig) expandEndpoints() {
 		c.Endpoints = map[string]ConnectionOptions{}
 	}
 
-	// If we've been given a null backend socket and we're missing and enpoint
+	// If we've been given a null backend socket and we're missing an endpoint
 	// target for a service then we'll configure it to use the null backend.
 	if c.NullBackendSock != "" {
 		for _, service := range grpcServices {
