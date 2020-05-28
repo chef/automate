@@ -24,9 +24,8 @@ header {
   .logo-wrapper {
     margin-left: 16px;
 
-    a.logo {
+    a.logo img {
       display: block;
-      background: $default-logo transparent no-repeat center;
       width: 160px;
       height: $navigation-height;
 
