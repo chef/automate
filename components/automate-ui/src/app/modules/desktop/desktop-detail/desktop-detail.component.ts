@@ -22,7 +22,6 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
   @Output() fullscreenToggled: EventEmitter<void> = new EventEmitter();
 
   public checkInHistory: DailyNodeRunsStatus[];
-  public ceil = Math.ceil;
   public DateTime = DateTime;
   public showCheckinDebug = false;
   public checkinTableType = 'grid';
