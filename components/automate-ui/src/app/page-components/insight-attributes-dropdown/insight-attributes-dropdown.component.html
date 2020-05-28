@@ -4,8 +4,13 @@
   <ul class="bx--row">
     <ng-container *ngFor="let option of options">
       <div class="filter-button-container">
-        <li class="filter-button" (click)="handleSelect($event)" (keyup.enter)="handleSelect($event)"
-        tabindex="0" role="button" [attr.aria-pressed]="false" [attr.data-filtervalue]="option.id">
+        <li class="filter-button"
+          (click)="handleSelect($event)"
+          (keyup.enter)="handleSelect($event)"
+          tabindex="0"
+          role="button"
+          [attr.aria-pressed]="false"
+          [attr.data-filtervalue]="option.id">
           <span>{{ option.name }}<i class="check">&#x2713;</i></span>
         </li>
       </div>
@@ -21,3 +26,4 @@
       <chef-button primary [disabled]="disableSubmit" (click)="handleUpdate()">Update</chef-button>
     </div>
   </div>
+  

@@ -61,7 +61,7 @@ export class InsightAttributesDropdownComponent implements OnInit {
 
   public handleCancel(): void {
     this.selectedOptions.forEach(option => {
-      const target = document.querySelector('.filter-button[data-filterValue="' + option + '"]');
+      const target = document.querySelector(`.filter-button[data-filterValue="${option}"]`);
       target.classList.remove('selected');
       target.setAttribute('aria-pressed', 'off');
     });

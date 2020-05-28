@@ -15,7 +15,9 @@ import {
   UnknownDesktopDurationCountsComponent
 } from './unknown-desktop-duration-counts/unknown-desktop-duration-counts.component';
 import { InsightComponent } from './insight/insight.component';
-import { InsightAttributesDropdownComponent } from 'app/page-components/insight-attributes-dropdown/insight-attributes-dropdown.component';
+import {
+  InsightAttributesDropdownComponent
+} from 'app/page-components/insight-attributes-dropdown/insight-attributes-dropdown.component';
 import { DesktopRoutingModule } from './desktop-routing.module';
 
 @NgModule({
