@@ -123,7 +123,7 @@ describe('chef-phat-radio', () => {
     let html, page;
     beforeEach(async () => {
       html = `
-        <chef-phat-radio can-deselect="true">
+        <chef-phat-radio deselectable>
           <chef-option value='opt1'>Option 1</chef-option>
           <chef-option value='opt2'>Option 2</chef-option>
           <chef-option value='opt3'>Option 3</chef-option>
