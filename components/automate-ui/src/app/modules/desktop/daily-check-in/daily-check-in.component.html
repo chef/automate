@@ -6,7 +6,7 @@
     </div>
     <app-chart-progress-bar size="large" [value]="unknownCount" [max]="totalCount"></app-chart-progress-bar>
   </div>
-  <chef-phat-radio [canDeselect]="true">
+  <chef-phat-radio deselectable>
     <chef-option value='unknown' tabindex="0">
       <div class="title">Unknown</div>
       <div class="total">{{ unknownCount }}</div>

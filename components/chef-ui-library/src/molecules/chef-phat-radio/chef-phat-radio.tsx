@@ -11,6 +11,13 @@ import find from 'lodash/fp/find';
  *   <chef-option value='opt2'>Option 2</chef-option>
  *   <chef-option value='opt3'>Option 3</chef-option>
  * </chef-phat-radio>
+ *
+ * @example
+ * <chef-phat-radio deselectable value="opt2">
+ *   <chef-option value='opt1'>Option 1</chef-option>
+ *   <chef-option value='opt2'>Option 2</chef-option>
+ *   <chef-option value='opt3'>Option 3</chef-option>
+ * </chef-phat-radio>
  */
 @Component({
   tag: 'chef-phat-radio',
@@ -22,9 +29,11 @@ export class ChefPhatRadio {
    * The value of the currently toggled option.
    */
   @Prop({ mutable: true }) value = '';
-  // canDeselect is an optional property that when true allows users
-  // to deselect all options by clicking on the currently selected option.
-  @Prop() canDeselect: boolean;
+
+  /**
+   * An optional property that when true allows users to deselect an option by selecting a currently selected option
+   */
+  @Prop() deselectable = false;
 
   @Element() el: HTMLElement;
 
@@ -39,7 +48,7 @@ export class ChefPhatRadio {
     const isSameOption = this.value === option.value;
 
     if (option) {
-    this.value = this.canDeselect && isSameOption ? '' : option.value;
+    this.value = this.deselectable && isSameOption ? '' : option.value;
     this.change.emit();
     this.input.emit();
     }
@@ -50,7 +59,7 @@ export class ChefPhatRadio {
     this.selected = find(['value', this.value], options);
     // When option to deselect is true, we also do not want to make a default
     // selection upon load, so we return early unless a value has been explicity set by prop
-    if (!this.selected && this.canDeselect) {
+    if (!this.selected && this.deselectable) {
       return;
     } else if (!this.selected) {
       this.selected = this.el.querySelector('chef-option[selected]') || options[0];
@@ -62,7 +71,7 @@ export class ChefPhatRadio {
   componentDidUpdate() {
     this.clearOptions();
     // Return early if the update is empty, because this means we are deselecting
-    if (this.canDeselect && this.value === '') { return; }
+    if (this.deselectable && this.value === '') { return; }
 
     this.selected = this.el.querySelector(`chef-option[value='${this.value}']`);
     this.selected.selected = true;
