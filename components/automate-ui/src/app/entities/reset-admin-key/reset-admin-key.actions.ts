@@ -9,14 +9,16 @@ export enum AdminKeyActionTypes {
   UPDATE_FAILURE = 'ADMINKEY::UPDATE::FAILURE'
 }
 
-export interface AdminKeySuccessPayload {
-  adminKey: AdminKey;
+export interface UpdateAdminKeyPayload {
+  server_id: string;
+  org_id: string;
+  admin_key: AdminKey;
 }
 
 export class UpdateAdminKey implements Action {
   readonly type = AdminKeyActionTypes.UPDATE;
 
-  constructor(public payload: {server_id: string, org_id: string, admin_Key: AdminKey} ) { }
+  constructor(public payload: UpdateAdminKeyPayload) { }
 }
 
 export class UpdateAdminKeySuccess implements Action {

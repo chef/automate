@@ -29,7 +29,7 @@ export function adminKeyEntityReducer(
     case AdminKeyActionTypes.UPDATE_SUCCESS:
       return set(UPDATE_STATUS, EntityStatus.loadingSuccess,
         adminKeyEntityAdapter.updateOne({
-          id: action.payload.status,
+          id: action.payload.org.name,
           changes: action.payload
         }, state));
 

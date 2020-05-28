@@ -5,7 +5,7 @@ import { AdminKeyEntityState, adminKeyEntityAdapter } from './reset-admin-key.re
 export const adminKeyState = createFeatureSelector<AdminKeyEntityState>('adminKey');
 
 export const {
-  selectAll: allAdminKey,
+  selectAll: allAdminKeys,
   selectEntities: adminKeyEntities
 } = adminKeyEntityAdapter.getSelectors(adminKeyState);
 

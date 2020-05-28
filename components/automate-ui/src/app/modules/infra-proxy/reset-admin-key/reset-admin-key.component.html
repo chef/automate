@@ -4,13 +4,13 @@
       <form [formGroup]="resetKeyForm">
         <chef-form-field>
           <label>
-            <span class="label">New Admin Key<span aria-hidden="true">*</span></span>
+            <span class="label">New Admin Key <span aria-hidden="true">*</span></span>
             <textarea rows="27" cols="10" chefInput placeholder="-----BEGIN RSA PRIVATE KEY -----"
             formControlName="admin_key" data-cy="update-org-admin-key"></textarea> 
           </label>
           <chef-error
             *ngIf="(resetKeyForm.get('admin_key').hasError('required') || resetKeyForm.get('admin_key').hasError('pattern')) && resetKeyForm.get('admin_key').dirty">
-            Admin key is required.
+            New admin key is required.
           </chef-error>
         </chef-form-field>
         <chef-form-field>
@@ -21,8 +21,6 @@
               <span *ngIf="saveInProgress">Saving...</span>
               <span *ngIf="!saveInProgress">Reset Admin Key</span> 
             </chef-button>
-            <span id="saved-note" *ngIf="saveSuccessful && !resetKeyForm.dirty">All changes
-            saved.</span>
           </div>
         </chef-form-field>
       </form>

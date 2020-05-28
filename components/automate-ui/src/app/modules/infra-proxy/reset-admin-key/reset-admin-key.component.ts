@@ -1,8 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { Subject, combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { Regex } from 'app/helpers/auth/regex';
+import { Subject } from 'rxjs';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { filter, takeUntil } from 'rxjs/operators';
 import { EntityStatus, pending } from 'app/entities/entities';
@@ -18,7 +19,7 @@ import { UpdateAdminKey } from 'app/entities/reset-admin-key/reset-admin-key.act
   styleUrls: ['./reset-admin-key.component.scss']
 })
 
-export class ResetAdminKeyComponent implements OnInit {
+export class ResetAdminKeyComponent implements OnInit, OnDestroy {
   @Input() serverId: string;
   @Input() orgId: string;
 
@@ -35,19 +36,17 @@ export class ResetAdminKeyComponent implements OnInit {
     private layoutFacade: LayoutFacadeService
   ) {
     this.resetKeyForm = this.fb.group({
-      admin_key: ['', [Validators.required]]
+      admin_key: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    combineLatest([
-      this.store.select(updateStatus)
-    ]).pipe(
+    this.store.select(updateStatus).pipe(
       takeUntil(this.isDestroyed)
-    ).subscribe(([updateSt]) => {
-      this.isLoading = updateSt === EntityStatus.loading;
+    ).subscribe(([status]) => {
+      this.isLoading = status === EntityStatus.loading;
     });
 
     this.store.select(updateStatus).pipe(
@@ -68,7 +67,12 @@ export class ResetAdminKeyComponent implements OnInit {
     this.saveInProgress = true;
     const admin_key: string = this.resetKeyForm.controls.admin_key.value.trim();
     this.store.dispatch(new UpdateAdminKey({
-      server_id: this.serverId, org_id: this.orgId, admin_Key: {admin_key}
+      server_id: this.serverId, org_id: this.orgId, admin_key: {admin_key}
     }));
+  }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }
