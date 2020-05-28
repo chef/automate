@@ -19,7 +19,6 @@ $chef-info-alert: $fuchsia;
 $chef-info-alert-light: $fuchsia-light;
 $chef-info-alert-dark: $fuchsia-dark;
 //greyscale
-
 $chef-dark-grey: $sirocco;
 $chef-darker: $darksea;
 $chef-darkest: $charcoal;
@@ -30,6 +29,10 @@ $chef-lightest-grey: $haze;
 $chef-white: $white;
 $chef-black: $black;
 $transparent-white: rgba(255, 255, 255, 0.85);
+//status
+$status-error: $rose;
+$status-success: $winter-green;
+$status-unknown: $lavender-dark-3;
 //chart
 $chef-ok: $blue-de-france;
 $chef-unknown: $gray;

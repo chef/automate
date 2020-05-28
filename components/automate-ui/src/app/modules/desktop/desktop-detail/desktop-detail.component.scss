@@ -122,21 +122,17 @@ h3 {
       display: none;
     }
 
-    span:last-child {
-      display: block;
-    }
-
     chef-icon {
       &.converged, &.unchanged {
-        color: #4FC293;
+        color: $status-success;
       }
 
       &.missing, &.unknown {
-        color: #7C8296;
+        color: $lavender-dark-3;
       }
 
       &.failure, &.error {
-        color: #EB372C;
+        color: $status-error;
       }
     }
 
@@ -167,7 +163,8 @@ h3 {
     }
   }
 
-  chef-tr:nth-child(7n + 1) {
+  chef-tr:nth-child(7n + 1),
+  chef-tr:last-child {
     chef-td {
       &.relative-date-cell {
         > span {
@@ -362,20 +359,20 @@ h3 {
   border-right: $spacing-03 solid transparent;
   padding-right: $spacing-03;
 
-  &.error {
-    border-left-color: #E61F36;
+  &.error, &.failure {
+    border-left-color: $status-error;
   }
 
   &.converged {
-    border-left-color: #23AE9A;
+    border-left-color: $status-success;
   }
 
   &.unchanged {
-    border-left-color: #23AE9A;
+    border-left-color: $status-success;
   }
 
-  &.unknown {
-    border-left-color: $chef-unknown;
+  &.unknown, &.missing {
+    border-left-color: $status-unknown;
   }
 }
 

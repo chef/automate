@@ -72,12 +72,13 @@
             <span>{{ history.status | titlecase }}</span>
             <chef-tooltip
               [ngClass]="['checkin-tooltip', history.status]"
-              [attr.for]="'checkin-item-'+i+'text'">
+              [attr.for]="'checkin-item-'+i+'text'"
+              interactable>
               <p class="checkin-tooltip-info">
                 <span class="checkin-tooltip-text">{{ history.status | titlecase }}</span>
                 <span class="checkin-tooltip-date">{{ history.end | datetime: DateTime.RFC2822 }}</span>
               </p>
-              <a class="checkin-tooltip-link" href="">View Client Run Details <chef-icon>open_in_new</chef-icon></a>
+              <a class="checkin-tooltip-link" [routerLink]="['/infrastructure/client-runs', desktop.id, 'runs', history.run_id]">View Client Run Details <chef-icon>open_in_new</chef-icon></a>
             </chef-tooltip>
           </chef-td>
           <chef-td class="date-cell">

@@ -1,23 +1,19 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { Desktop, DailyNodeRunsStatus } from 'app/entities/desktop/desktop.model';
+import { takeUntil } from 'rxjs/operators';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { Subject, Subscription } from 'rxjs';
 import { GetDailyNodeRunsStatusTimeSeries } from 'app/entities/desktop/desktop.actions';
 import { getDailyNodeRuns } from 'app/entities/desktop/desktop.selectors';
-
-// const checkinHistory = Array.from(new Array(29)).map((_v, i) => {
-//   const historyType = historyTypes[Math.floor(Math.random() * historyTypes.length)];
-//   const date = new Date();
-//   return { ...historyType, date: new Date(date.setDate(date.getDate() - i)) };
-// });
 
 @Component({
   selector: 'app-desktop-detail',
   templateUrl: './desktop-detail.component.html',
   styleUrls: ['./desktop-detail.component.scss']
 })
-export class DesktopDetailComponent implements OnInit {
+export class DesktopDetailComponent implements OnInit, OnDestroy {
 
   @Input() desktop: Desktop;
   @Input() fullscreened = false;
@@ -32,6 +28,7 @@ export class DesktopDetailComponent implements OnInit {
   public checkinTableType = 'grid';
   public checkinGridFlexType = 'wrap';
   public checkinNumDays = 14;
+  // These are Material Icon names from https://material.io/resources/icons/
   public historyIcons = {
     converged: 'check_box',
     unchanged: 'indeterminate_check_box',
@@ -40,17 +37,27 @@ export class DesktopDetailComponent implements OnInit {
     unknown: 'help',
     missing: 'help'
   };
+  private subscription: Subscription;
+  private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>
   ) {
-    this.store.select(getDailyNodeRuns).subscribe((dailyNodeRuns) => {
+    this.subscription = this.store.select(getDailyNodeRuns).pipe(
+      takeUntil(this.isDestroyed)
+      ).subscribe((dailyNodeRuns) => {
       this.checkInHistory = this.addCheckInLabels(dailyNodeRuns.durations.buckets);
     });
   }
 
   ngOnInit() {
     this.getCheckInHistory();
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   getCheckInHistory() {
