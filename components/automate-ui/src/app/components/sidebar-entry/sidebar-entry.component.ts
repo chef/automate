@@ -15,7 +15,7 @@ export class SidebarEntryComponent {
 
   // (optional) both icon and custom icon are optional.
   // icon is use to show material icon provided in service
-  // customeIcon is use to show customised icon.
+  // customIcon is use to show customized icon.
   // In custom icon we have to pass class name as a value to property from layout-sidebar service.
   @Input() icon: string;
   @Input() customIcon: string;

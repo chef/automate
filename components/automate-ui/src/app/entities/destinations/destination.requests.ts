@@ -5,7 +5,7 @@ import { map, mergeMap } from 'rxjs/operators';
 import { environment } from 'environments/environment';
 import { compact, concat } from 'lodash';
 import { Destination } from './destination.model';
-import { CreateDesinationPayload } from './destination.actions';
+import { CreateDestinationPayload } from './destination.actions';
 
 export interface DestinationsResponse {
   destinations: Destination[];
@@ -49,7 +49,7 @@ export class DestinationRequests {
     .pipe(map((destinationsJson: Destination) => destinationsJson));
   }
 
-  public createDestination(destinationData: CreateDesinationPayload,
+  public createDestination(destinationData: CreateDestinationPayload,
     targetUsername: string, targetPassword: string):
     Observable<DestinationResponse> {
     return this.createSecret(destinationData, targetUsername, targetPassword)
@@ -70,7 +70,7 @@ export class DestinationRequests {
       this.joinToDataFeedUrl(['destination', id.toString()])));
   }
 
-  private createSecret(destination: CreateDesinationPayload, targetUsername: string,
+  private createSecret(destination: CreateDestinationPayload, targetUsername: string,
     targetPassword: string): Observable<string> {
     if ( targetUsername.length > 0 || targetPassword.length > 0 ) {
       const secret = this.newSecret('', destination.name, targetUsername, targetPassword);

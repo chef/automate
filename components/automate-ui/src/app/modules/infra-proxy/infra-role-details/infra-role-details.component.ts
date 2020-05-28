@@ -45,7 +45,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   arrayOfNodesTree: Node<ChildList>[];
   roleDetailsLoading = true;
   treeOptions: Options<ChildList> = {
-    capitalisedHeader: true
+    capitalizedHeader: true
   };
 
   public attributes = new RoleAttributes({
