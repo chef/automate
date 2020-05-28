@@ -20,7 +20,7 @@ Chef Automate will not deploy the Chef Infra Server add-ons Chef Manage and Push
 
 {{% warning %}}
 
-Supermarket cannot authenticate users on Chef Infra Server that is deployed
+Supermarket cannot authenticate users on Chef Infra Server deployed
 with Chef Automate.
 
 {{% /warning %}}
@@ -109,7 +109,7 @@ Installations require elevated privileges, so run the commands as the superuser 
        sudo chef-automate init-config
     ```
 
-1. Add a stanza to the configuration file to disable Automate data collection:
+1. Add a stanza to the configuration file to disable Chef Automate data collection:
 
     ```toml
        [erchef.v1.sys.data_collector]
@@ -172,7 +172,8 @@ Patch an existing Chef Automate installation to add Chef Infra Server:
     ```shell
        sudo chef-automate config ./patch.toml
     ```
-   The command output shows the Chef Infra Server services being added:
+
+   The command output shows the added Chef Infra Server services:
 
     ```shell
        Updating deployment configuration
@@ -212,7 +213,7 @@ On the Chef Infra Server host:
       sudo chef-server-ctl org-create SHORT_NAME 'FULL_ORGANIZATION_NAME' --association_user USER_NAME --filename ORGANIZATION-validator.pem
     ```
 
-    The short name must begin with a lower-case letter or digit, may contain only lower-case letters, digits, hyphens, and underscores, and must be between 1 and 255 characters. For example: `4thcoffee`.
+    The short name must begin with a lower-case letter or digit, may contain lower-case letters, digits, hyphens, and underscores, and must be between 1 and 255 characters. For example: `4thcoffee`.
 
     The full organization name must begin with a non-white space character and must be between 1 and 1023 characters. For example: `'Fourth Coffee, Inc.'`.
 
@@ -228,15 +229,19 @@ On the workstation:
 
 1. Create a Chef repository by using the `chef generate repo` subcommand.
      For example, create a Chef repository named `chef-repo` by running:
+
      ```shell
      chef generate repo chef-repo
      ```
+
      Replace `chef-repo` with your desired repository name.
 
 1. Within your named Chef repository, create a `.chef` directory with the `mkdir` command. For example:
+
     ```shell
       mkdir /chef-repo/.chef
     ```
+
 1. Copy `ORGANIZATION-validator.pem` and `USER_NAME.pem` to the `.chef` directory.
 
 1. In the `.chef` directory, create a `config.rb` file that contains:
@@ -254,7 +259,8 @@ On the workstation:
       cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
       cookbook_path            ["#{current_dir}/../cookbooks"]
     ```
-    If your installation is airgapped, [create a bootstrap
+
+    For airgapped installations, [create a bootstrap
     template](https://docs.chef.io/install_chef_air_gap/#create-a-bootstrap-template) and
     [add it](https://docs.chef.io/install_chef_air_gap/#configure-knife) to your `config.rb`.
 
