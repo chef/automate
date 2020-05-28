@@ -10,19 +10,24 @@ toc = true
 The Chef Automate _Desktop_ dashboard displays status information about all desktops connected to Chef Automate.
 Desktop information populates this dashboard after a Chef Infra Client run has executed.
 
-Node counts in the _Desktop_ dashboard may include liveness agents. Desktop information appears in a series of displays. The _Desktop_ dashbaord does not support project filtering.
+## Setting Up the Desktop Dashboard
 
-## Setting Up The Desktop Dashboard
-
-Include a `--product desktop` flag to enable the Desktop dashboard when [installing Chef Automate](https://automate.chef.io/docs/infra-server/). The Desktop dashboard has no supported compliance profiles, and no compliance profiles will be included in installation when using the `--product desktop` flag.
+Enable the Desktop dashboard with: `chef-automate deploy --product automate --product infra-server --product desktop`.
+For more information, see [Install Chef Infra Server with Automate](https://automate.chef.io/docs/infra-server/).
+The Desktop dashboard has no supported compliance profiles, and installation with the `--product desktop` flag includes no compliance profiles.
 
 {{< info >}}
-When installing Chef Automate with the `--product desktop` flag, _Data Lifecycle_ settings will be set to not mark nodes as missing and to not delete missing nodes by default. We encourage users to not modify these specific settings, and not defeat the monitoring purpose of the Desktop dashboard.
+When installing Chef Automate with the `--product desktop` flag, _Data Lifecycle_ settings will set by default to not mark nodes as missing and to not delete missing nodes.
+We encourage users to not change these specific settings, and not defeat the monitoring purpose of the Desktop dashboard.
 {{< /info >}}
 
 ## Desktop Dashboard Display
 
-Within Chef Automate, the _Desktop_ dashboard uses four panels to summarize information - _Daily Check-in_ _Check-in History_, _Top 10 Errors_, and _Time since Last Check-in_. Selecting rows within these displays will list relevant desktops and selecting an singular desktop reveals its detailed information.
+Within Chef Automate, the _Desktop_ dashboard uses four panels to summarize information: _Daily Check-in_ _Check-in History_, _Top 10 Errors_, and _Time since Last Check-in_.
+Selecting rows within these displays will list relevant desktops and selecting an singular desktop reveals its detailed information.
+
+The _Desktop_ dashboard does not support project filtering.
+Node counts in the _Desktop_ dashboard may include liveness agents.
 
 ### Daily Check-in
 
@@ -40,20 +45,22 @@ The timescale options are "Last 3 Days," "Last 7 Days," and "Last 14 Days".
 
 ### Top 10 Errors
 
-The _Top 10 Errors_ display shows the most common errors that have occurred across all desktops over the last twenty-four hours, and a count of the machines that experienced each error.
-Selecting an error opens the list view of the desktops (Insight) with the error to enable further investigation.
+The _Top 10 Errors_ display shows the ten most common errors that have occurred across all desktops over the last twenty-four hours, and a count of the machines that experienced each error.
+Selecting an error opens the Filter Desktop List with the applied error filter to enable further investigation.
 
-### Time since Last Check-in
+### Time Since Last Check-in
 
-The _Time since Last Check-in_ display shows a count of desktops with an `unknown` status for a defined timefame.
-Selecting a time frame row will reveal a summary of associated Desktops.
+The _Time since Last Check-in_ display shows a count of desktops with an `unknown` status for defined timefames.
+Selecting a row will reveal a Filtered Desktop List of desktops for the selected timeframe.
 
-### Insight (Desktop List)
+### Filtered Desktop Lists
 
-Users can click on rows in both _Time since Last Check-in_ and _Top 10 Errors_ to activate this summary list.
-The Insight Desktop List displays a list of desktops filtered according to the selected timeframe or error in the previous display.
+The Filtered Desktop List displays a list of desktops filtered according to the selected timeframe or error in the previous display.
+Selecting rows in either _Time since Last Check-in_ or _Top 10 Errors_ activates this summary list.
 
-Apply further filters to this initial list if desired. Filters are populated according to available desktop information and include the fields of "platform," "version," "domain," and "last run status."
+Apply more filters to this initial list if desired.
+Specific filter values populate according to available desktop information and include the categories of "platform," "version," "domain," and "last run status."
+
 Select an individual desktop row to display the individual desktop's node details.
 
 #### Node Details

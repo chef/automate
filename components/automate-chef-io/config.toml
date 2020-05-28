@@ -118,7 +118,7 @@ url = "/docs/event-feed"
 
 [[menu.docs]]
 name = "Desktop"
-weight = 40
+weight = 45
 identifier = "desktop"
 url = "/docs/desktop"
 
