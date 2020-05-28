@@ -37,41 +37,49 @@
 
   <!-- new styles being used only for desktop at the moment -->
   <ng-container *ngIf="forDesktop">
-    <div class="information-container">
-      <div class="per-page-container">
-        <span class="items-per">Items per page: </span>
-          <mat-form-field appearance="none">
-            <mat-select panelClass="chef-dropdown" [(ngModel)]="maxPageItems">
-              <mat-option *ngFor="let amount of maxPageOptions" [value]="amount" 
-              (onSelectionChange)="handleSelectMaxPageItems($event, amount)">{{ amount }}</mat-option>
-            </mat-select>
-          </mat-form-field>
+
+    <div class="bx--row">
+      <div class="column information-container ">
+        <div class="per-page-container">
+          <span class="items-per">Items per page: </span>
+            <mat-form-field appearance="none">
+              <mat-select panelClass="chef-dropdown" [(ngModel)]="maxPageItems">
+                <mat-option *ngFor="let amount of maxPageOptions" [value]="amount" 
+                (onSelectionChange)="handleSelectMaxPageItems($event, amount)">{{ amount }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+        </div>
+        <span>{{ itemStartCount }} - {{ itemEndCount }} of {{ total }} items</span>
       </div>
-      <span>{{ itemStartCount }} - {{ itemEndCount }} of {{ total }} items</span>
-    </div>
-    <div class="arrow-field-container">
-      <div class="arrow-field-item dropdown">
-        <mat-form-field appearance="none">
-          <mat-select panelClass="chef-dropdown" [(ngModel)]="page">
-            <mat-option *ngFor="let item of totalPages; trackBy: trackBy"
-            (onSelectionChange)="handleSelectItem($event, item)"
-            [attr.disabled]="totalPages.length <= 1"
-            [value]="item">{{ item }}</mat-option>
-          </mat-select>
-        </mat-form-field>
+
+      <div class="column column2">
+        <div class="arrow-field-container">
+          <div class="arrow-field-item dropdown">
+            <mat-form-field appearance="none">
+              <mat-select panelClass="chef-dropdown" [(ngModel)]="page">
+                <mat-option *ngFor="let item of totalPages; trackBy: trackBy"
+                (onSelectionChange)="handleSelectItem($event, item)"
+                [attr.disabled]="totalPages.length <= 1"
+                [value]="item">{{ item }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="arrow-field-item of-pages-container">
+            <span>of {{ totalPages.length }} pages</span>
+          </div>
+          <div class="arrow-field-item">
+            <chef-button secondary class="page-picker-item page-picker-prev" (click)="onItemTap(prev)" [disabled]="isNull(prev)">
+              <chef-icon>chevron_left</chef-icon>
+            </chef-button>
+            <chef-button secondary class="page-picker-item page-picker-next" (click)="onItemTap(next)" [disabled]="isNull(next)">
+              <chef-icon>chevron_right</chef-icon>
+            </chef-button>
+          </div>
+        </div>
       </div>
-      <div class="arrow-field-item of-pages-container">
-        <span>of {{ totalPages.length }} pages</span>
-      </div>
-      <div class="arrow-field-item">
-        <chef-button secondary class="page-picker-item page-picker-prev" (click)="onItemTap(prev)" [disabled]="isNull(prev)">
-          <chef-icon>chevron_left</chef-icon>
-        </chef-button>
-        <chef-button secondary class="page-picker-item page-picker-next" (click)="onItemTap(next)" [disabled]="isNull(next)">
-          <chef-icon>chevron_right</chef-icon>
-        </chef-button>
-      </div>
-    </div>
+
+    </div> <!-- end row -->
+
   </ng-container>
 
 </ng-container>

@@ -1,4 +1,5 @@
 @import "~styles/variables";
+@import "@carbon/grid/scss/grid";
 
 :host {
   display: flex;
@@ -10,8 +11,30 @@
 
   // desktop styles
   &.forDesktop {
+    @extend .bx--grid;
     justify-content: space-between;
     background: $chef-white;
+    padding-left: 0;
+    padding-right: 0;
+
+    .bx--row {
+      margin-left: 0;
+      margin-right: 0;
+      width: 100%;
+    }
+
+    .column {
+      @extend .bx--col-lg-8;
+      @extend .bx--col-md-4;
+      @extend .bx--col-sm-4;
+      display: flex;
+      padding-left: 0;
+      padding-right: 0;
+
+      &.column2 {
+        justify-content: flex-end;
+      }
+    }
     
     .arrow-field-container {
       display: flex;
@@ -27,7 +50,7 @@
         display: flex;
 
         &.dropdown {
-          flex-grow: 1;
+          // flex-grow: 1;
         }
       }
     }
@@ -37,21 +60,21 @@
       flex-flow: row nowrap;
       align-items: center;
       font-size: 14px;
+    }
 
-      .per-page-container {
-        display: flex;
-        flex-flow: row nowrap;
-        align-items: center;
-        justify-content: space-between;
-        margin-right: 16px;
-        height: 49px;
-        min-width: 193px;
-        border-radius: $chef-border-radius;
-        box-shadow: 2px 2px 4px 0 #C5C7D1, -2px -2px 12px 0 #ECF0F9;
+    .per-page-container {
+      display: none;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-right: 16px;
+      height: 49px;
+      min-width: 193px;
+      border-radius: $chef-border-radius;
+      box-shadow: 2px 2px 4px 0 #C5C7D1, -2px -2px 12px 0 #ECF0F9;
 
-        span.items-per {
-          padding: 16px 4px 15px 16px;
-        }
+      span.items-per {
+        padding: 16px 4px 15px 16px;
       }
     }
 
@@ -61,6 +84,17 @@
         font-size: 14px;
       }
     }
+
+  // full screen styles
+  &.fullScreened {
+    .per-page-container {
+      display: flex;
+
+      @include carbon--breakpoint-down(lg) {
+        display: none;
+      }
+    }
+  }
 
 
   ::ng-deep {

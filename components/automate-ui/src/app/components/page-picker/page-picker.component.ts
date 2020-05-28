@@ -7,13 +7,12 @@ import { Component, EventEmitter, Input, OnChanges, Output, HostBinding } from '
 })
 export class PagePickerComponent implements OnChanges {
 
-  @HostBinding('class.forDesktop') get isForDesktop() { return this.forDesktop; }
-
   @Input() total: number;
   @Input() perPage: number;
   @Input() page: number;
   @Input() maxPageItems = 10;
-  @Input() forDesktop = false;
+  @Input() @HostBinding('class.forDesktop') forDesktop = false;
+  @Input() @HostBinding('class.fullScreened') fullScreened = false;
 
   @Output() pageChanged = new EventEmitter<number>();
 
