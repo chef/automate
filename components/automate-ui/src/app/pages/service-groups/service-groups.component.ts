@@ -1,4 +1,4 @@
-import { map, takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
+import { map, takeUntil, withLatestFrom, distinctUntilChanged, filter } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, Observable, combineLatest } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -252,16 +252,15 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       this.store.select(serviceGroupsList),
       this.store.select(selectedServiceGroupHealth)
     ]).pipe(
+      filter(([sSgStatus, sgStatus, serviceGroups, sgHealth]) =>
+        sgStatus === EntityStatus.loadingSuccess
+        && sSgStatus === EntityStatus.loadingSuccess
+        && serviceGroups.length > 0
+        && sgHealth.total === 0
+      ),
       takeUntil(this.isDestroyed)
-    ).subscribe(([sSgStatus, sgStatus, serviceGroups, sgHealth]) => {
-      if (sgStatus === 'loadingSuccess' && sSgStatus === 'loadingSuccess') {
-          if (serviceGroups.length > 0) {
-              if (sgHealth.total === 0) {
-                this.onServiceGroupSelect(null, serviceGroups[0].id);
-              }
-          }
-      }
-    });
+    ).subscribe(([_sSgStatus, _sgStatus, serviceGroups, _sgHealth]) =>
+        this.onServiceGroupSelect(null, serviceGroups[0].id));
 
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupsState,
       (serviceGroups) => serviceGroups.filters.status));
