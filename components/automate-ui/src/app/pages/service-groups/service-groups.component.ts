@@ -1,6 +1,6 @@
 import { map, takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, combineLatest } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -246,20 +246,21 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     // are filtered out via those status filters we have a special state that
     // says, e.g., "none of the services returned warning" that we want to
     // show.
-    this.store.select(selectedServiceGroupStatus).subscribe((sSgStatus) => {
-      this.store.select(serviceGroupsStatus).subscribe((sgStatus) => {
-        if (sgStatus === 'loadingSuccess' && sSgStatus === 'loadingSuccess') {
-          this.serviceGroupsList$.subscribe((serviceGroups) => {
-            if (serviceGroups.length > 0) {
-              this.store.select(selectedServiceGroupHealth).subscribe((sgHealth) => {
-                if (sgHealth.total === 0) {
-                  this.onServiceGroupSelect(null, serviceGroups[0].id);
-                }
-              });
-            }
-          });
-        }
-      });
+    combineLatest([
+      this.store.select(selectedServiceGroupStatus),
+      this.store.select(serviceGroupsStatus),
+      this.store.select(serviceGroupsList),
+      this.store.select(selectedServiceGroupHealth)
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([sSgStatus, sgStatus, serviceGroups, sgHealth]) => {
+      if (sgStatus === 'loadingSuccess' && sSgStatus === 'loadingSuccess') {
+          if (serviceGroups.length > 0) {
+              if (sgHealth.total === 0) {
+                this.onServiceGroupSelect(null, serviceGroups[0].id);
+              }
+          }
+      }
     });
 
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupsState,
