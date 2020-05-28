@@ -1,5 +1,5 @@
 +++
-title = "Data Feed"
+title = "Data Feeds"
 description = "Exporting Node Data from Chef Client Runs to External Data Collectors"
 date = 2020-05-05T13:19:02-07:00
 draft = false
@@ -11,7 +11,7 @@ toc = true
     weight = 10
 +++
 
-## About Automate Data Feed
+## About Automate Data Feeds
 
 The Data Feed service is used to send node data to a 3rd party service. This can be useful when updating Configuration Management Databases, external Security Dashboards and ITSM platforms.
 The following types of information are sent:
@@ -20,7 +20,7 @@ The following types of information are sent:
  - Configuration information about each node being managed, this includes Chef Client Run status, Runlists, Cookbooks, Recipes being run against each node
  - Compliance information about each node that shows the compliance state, this includes passed and failed controls for each profile executed against that node
 
-The Data Feed is not a Data Tap, it operates by doing the following:
+A Data Feed is not a Data Tap, it operates by doing the following:
 
 - Every 30 minutes (configurable) the data-feed-service will aggregate the client runs and compliance reports from the previous 30 minutes and send this to the registered destinations.
 - If there are no destinations, aggregation will not occur.
@@ -35,7 +35,7 @@ To add an endpoint for a Data Feed in Chef Automate:
 
 ![Setup Data Feed Page](/images/docs/filled_form_create_data_feed.png)
 
-1. In the **Settings** tab, navigate to the _Data Feed_ page in the sidebar.
+1. In the **Settings** tab, navigate to the _Data Feeds_ page in the sidebar.
 1. Select **Create Data Feed**.
 1. Enter a unique Data Feed name.
 1. Enter the URL for your Data Feed End Point, including any specific port details
@@ -47,15 +47,15 @@ To add an endpoint for a Data Feed in Chef Automate:
 
 To edit an Endpoint for a Data Feed in Chef Automate:
 
-1. From the _Data Feed_ page, select the Data Feed name to open its detail page.
-1. Edit the DataFeed name or URL.
+1. From the _Data Feeds_ page, select the Data Feed name to open its detail page.
+1. Edit the Data Feed name or URL.
 1. Use the **Save** button to save the Data Feed.
 
 ### Delete a Data Feed Endpoint
 
 To delete an Endpoint for a Data Feed in Chef Automate:
 
-1. From the _Data Feed_ page, select **Delete Data Feed** from the menu at the end of the table row.
+1. From the _Data Feeds_ page, select **Delete Data Feed** from the menu at the end of the table row.
 1. Confirm that you wish to permanently delete this Data Feed by using the **Delete Data Feed** button.
 
 ## Configuring Global Data Feed Behaviour
