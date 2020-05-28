@@ -9,7 +9,7 @@
   right: 0;
   padding: $spacing-05;
   width: 100%;
-  border-radius: $spacing-03; // not variable
+  border-radius: $spacing-03;
   background: $chef-white;
   box-shadow: $spacing-03 $spacing-03 24px 0 rgba(197, 199, 209, 0.6);
 
@@ -74,10 +74,7 @@
         width: 100%;
         height: 100%;
         background: $chef-white;
-        font-size: 14px;
-        // not yet named
-        // color: #394261;
-        // letter-spacing: .25px;
+        font-size: 12px;
         pointer-events: none;
       }
 
