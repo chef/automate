@@ -43,8 +43,8 @@ export class PolicyFilesComponent implements OnInit {
       this.store.select(getAllPolicyFilesForOrgStatus),
       this.store.select(allPolicyFiles)
     ]).pipe(
-      filter(([getPolicyFilesSt, _allPolicyFilesState]) =>
-      getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(_allPolicyFilesState))
+      filter(([getPolicyFilesSt, allPolicyFilesState]) =>
+      getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(allPolicyFilesState))
     ).subscribe(([ _getPolicyFilesSt, allPolicyFilesState]) => {
       this.policyFiles = allPolicyFilesState;
       this.policyFilesListLoading = false;

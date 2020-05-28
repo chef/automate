@@ -9,7 +9,6 @@ export class PolicyFileRequests {
 
   constructor(private http: HttpClient) { }
 
-  // tslint:disable-next-line: max-line-length
   public getPolicyFiles(server_id: string, org_id: string):
     Observable<PolicyFilesSuccessPayload> {
     return this.http.get<PolicyFilesSuccessPayload>(
