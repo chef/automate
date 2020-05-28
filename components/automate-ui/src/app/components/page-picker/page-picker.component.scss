@@ -33,6 +33,10 @@
 
       &.column2 {
         justify-content: flex-end;
+
+        @include carbon--breakpoint-down(md) {
+          margin-top: 15px;
+        }
       }
     }
     
@@ -42,16 +46,11 @@
       align-items: center;
       justify-content: flex-end;
       height: 49px;
-      min-width: 255px;
-      box-shadow: 2px 2px 4px 0 #C5C7D1, -2px -2px 12px 0 #ECF0F9;
       border-radius: $chef-border-radius;
+      // box-shadow: 2px 2px 4px 0 #C5C7D1, -2px -2px 12px 0 #ECF0F9;
 
       .arrow-field-item {
         display: flex;
-
-        &.dropdown {
-          // flex-grow: 1;
-        }
       }
     }
 
@@ -71,7 +70,7 @@
       height: 49px;
       min-width: 193px;
       border-radius: $chef-border-radius;
-      box-shadow: 2px 2px 4px 0 #C5C7D1, -2px -2px 12px 0 #ECF0F9;
+      // box-shadow: 2px 2px 4px 0 #C5C7D1, -2px -2px 12px 0 #ECF0F9;
 
       span.items-per {
         padding: 16px 4px 15px 16px;
@@ -119,13 +118,13 @@
 
     chef-button {
       // overwrites
-      margin: 0;
-      border-radius: 0;
-      border: none;
+      // margin: 0;
+      // border-radius: 0;
+      // border: none;
       // styles
       width: 49px;
       height: 49px;
-      border-left: 1px solid #DEE6F7;
+      // border-left: 1px solid #DEE6F7;
 
       &:last-child {
         border-bottom-right-radius: $chef-border-radius;
@@ -140,7 +139,8 @@
 
     [panelClass="chef-dropdown"] {
       height: 49px;
-      border-color: transparent;
+      width: 60px; // old style
+      // border-color: transparent;
 
       &:focus {
         border-color: #3864F2;
@@ -149,17 +149,17 @@
     }
 
     .arrow-field-item [panelClass="chef-dropdown"] {
-      width: 60px;
+      // width: 60px;
       padding: 16px 4px 17px 16px;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
+      // border-top-right-radius: 0;
+      // border-bottom-right-radius: 0;
     }
 
     .information-container [panelClass="chef-dropdown"] {
-      width: 69px;
+      // width: 69px;
       padding: 16px 12px 15px 4px;
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
+      // border-top-left-radius: 0;
+      // border-bottom-left-radius: 0;
     }
 
   } // end desktop
