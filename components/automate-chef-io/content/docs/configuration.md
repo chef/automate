@@ -277,20 +277,25 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 [elasticsearch.v1.sys.runtime]
 # max_locked_memory = "unlimited"
 # es_java_opts = ""
-# NOTE: heapsize should be set to 50% of available RAM up to 32g
-# See: https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html
-# heapsize = "1g"
+# NOTE: see https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html
+# for important guidance regarding the configuration of the heap size setting
+# heapsize = "4g"
 ```
 
 #### Setting Elasticsearch Heap
 
-Per the Elasticsearch documentation, the [Elasticsearch heap size](https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html) should be up to 50% of the available RAM, up to 32GB.
-To set the Elasticsearch heap size, create a TOML file that contains the partial configuration below.
-Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+The Elasticsearch heap size can, and in most cases should, be set to 50% of the available system
+memory. However, there are important caveats covered in the [Elasticsearch heap size documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html)
+which should be carefully reviewed and considered.
+
+For the purposes of an example, a system with 32GB of memory can have its Elasticsearch heap
+size set to `16g`; to do so, one would first create a TOML file that contains the partial
+configuration below, uncomment and change settings as neededand, then issue a `chef-automate config patch </path/to/your-file.toml>` to
+deploy the change.
 
 ```toml
 [elasticsearch.v1.sys.runtime]
-# heapsize = "<your Elasticsearch heapsize>"
+heapsize = "16g"
 ```
 
 #### PostgreSQL
