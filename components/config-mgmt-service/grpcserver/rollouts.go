@@ -9,6 +9,7 @@ import (
 
 	"github.com/chef/automate/api/external/cfgmgmt/request"
 	"github.com/chef/automate/api/external/cfgmgmt/response"
+	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/backend/postgres"
 
 	"google.golang.org/grpc/codes"
@@ -79,7 +80,94 @@ func (s *CfgMgmtServer) GetRollouts(ctx context.Context, req *request.Rollouts) 
 }
 
 func (s *CfgMgmtServer) ListNodeSegmentsWithRolloutProgress(ctx context.Context, req *request.ListNodeSegmentsWithRolloutProgress) (*response.NodeSegmentsWithRolloutProgress, error) {
-	return nil, nil
+	if len(req.GetFilter()) > 0 {
+		return nil, status.Error(codes.Unimplemented, "NOT IMPLEMENTED")
+	}
+	nodeSegmentsRollouts, err := s.pg.ListNodeSegmentsForRolloutProgress()
+	if err != nil {
+		return nil, err
+	}
+
+	nodeSegmentsCCRs, err := s.client.GetLatestRunRolloutBreakdownCounts()
+	if err != nil {
+		return nil, err
+	}
+
+	res := response.NodeSegmentsWithRolloutProgress{}
+
+	for _, nsRollouts := range nodeSegmentsRollouts {
+		nodeSegmentKey := backend.NodeSegment{
+			PolicyName:      nsRollouts.PolicyName,
+			PolicyNodeGroup: nsRollouts.PolicyNodeGroup,
+			PolicyDomainURL: nsRollouts.PolicyDomainURL,
+		}
+
+		ccrData, haveSegmentData := nodeSegmentsCCRs.BySegment[nodeSegmentKey]
+		// no CCR data for this node segment
+		if !haveSegmentData {
+			ccrData = &backend.NodeSegmentRevisionsStatus{
+				NodeSegment:      nodeSegmentKey,
+				ByPolicyRevision: make(map[string]*backend.PolicyRevisionNodeStatus),
+			}
+		}
+
+		rolloutProgress := mergeCCRDataIntoRollouts(nsRollouts, ccrData)
+		res.NodeSegmentRolloutProgress = append(res.NodeSegmentRolloutProgress, rolloutProgress)
+	}
+
+	return &res, nil
+}
+
+func mergeCCRDataIntoRollouts(ns *postgres.NodeSegmentWithRollouts, ccrs *backend.NodeSegmentRevisionsStatus) *response.NodeSegmentRolloutProgress {
+	// We should not have a case were there are zero rollouts
+	currentRollout := ns.Rollouts[0]
+	currentRevisionID := currentRollout.PolicyRevisionId
+
+	currentRolloutCCR, haveCurrentRolloutCCR := ccrs.ByPolicyRevision[currentRevisionID]
+	if !haveCurrentRolloutCCR {
+		currentRolloutCCR = &backend.PolicyRevisionNodeStatus{
+			PolicyRevisionID: currentRevisionID,
+		}
+	}
+
+	currentRolloutRes := &response.CurrentRolloutProgress{
+		Rollout: &response.Rollout{
+			PolicyRevisionId: currentRevisionID,
+		},
+		NodeCount:                int32(currentRolloutCCR.Total),
+		LatestRunSuccessfulCount: int32(currentRolloutCCR.Success),
+		LatestRunFailedCount:     int32(currentRolloutCCR.Failure),
+	}
+
+	var pastRollouts []*response.PastRolloutProgress
+
+	if len(ns.Rollouts) > 1 {
+		for _, rollout := range ns.Rollouts[1:] {
+			rolloutRevisionID := rollout.PolicyRevisionId
+			ccrsForRollout, haveCCRData := ccrs.ByPolicyRevision[rolloutRevisionID]
+
+			if !haveCCRData {
+				ccrsForRollout = &backend.PolicyRevisionNodeStatus{}
+			}
+
+			pastRollout := &response.PastRolloutProgress{
+				Rollout: &response.Rollout{
+					PolicyRevisionId: rolloutRevisionID,
+				},
+				LatestRunNodeCount: int32(ccrsForRollout.Total),
+			}
+
+			pastRollouts = append(pastRollouts, pastRollout)
+		}
+	}
+
+	return &response.NodeSegmentRolloutProgress{
+		PolicyName:             ns.PolicyName,
+		PolicyNodeGroup:        ns.PolicyNodeGroup,
+		PolicyDomainUrl:        ns.PolicyDomainURL,
+		CurrentRolloutProgress: currentRolloutRes,
+		PreviousRollouts:       pastRollouts,
+	}
 }
 
 func dbNewRolloutReq(r *request.CreateRollout) *postgres.NewRollout {

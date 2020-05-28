@@ -5,12 +5,6 @@ import (
 	"time"
 )
 
-type NodeSegment struct {
-	PolicyName      string
-	PolicyNodeGroup string
-	PolicyDomainURL string
-}
-
 type NewRollout struct {
 	Id               int32  `db:"id, primarykey, autoincrement"`
 	PolicyName       string `db:"policy_name"`
