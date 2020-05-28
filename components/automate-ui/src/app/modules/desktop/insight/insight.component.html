@@ -24,9 +24,10 @@
       <span>Attributes</span>
       <chef-icon>expand_more</chef-icon>
     </chef-button>
-    <app-insight-attributes-dropdown *ngIf="attributesMenuOpen" 
-    (onUpdateFilters)="updateFilters($event)"
-    (onToggleMenu)="toggleAttributeMenu()"
+    <app-insight-attributes-dropdown 
+      *ngIf="attributesMenuOpen" 
+      (onUpdateFilters)="updateFilters($event)"
+      (onToggleMenu)="toggleAttributeMenu()"
     ></app-insight-attributes-dropdown>
   </div>
   <div class="filters">
