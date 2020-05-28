@@ -112,7 +112,7 @@ describe('CreateObjectModalComponent', () => {
     expect(store.dispatch).toHaveBeenCalledWith(new GetPolicies());
   });
 
-  it('upon opening, "also create" checkboxs are checked', () => {
+  it('upon opening, "also create" checkboxes are checked', () => {
     component.createForm = new FormBuilder().group({
       name: '',
       addPolicies: '',
