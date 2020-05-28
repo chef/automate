@@ -24,6 +24,8 @@ export class InsightComponent {
   @Output() sortChange: EventEmitter<string> = new EventEmitter();
   @Output() desktopSelected: EventEmitter<Desktop> = new EventEmitter();
 
+  public attributesMenuOpen = false;
+
   public close(): void {
     this.closed.emit();
   }
@@ -38,5 +40,13 @@ export class InsightComponent {
 
   public sortOn(fieldName: string): void {
     this.sortChange.emit(fieldName);
+  }
+
+  public toggleAttributeMenu(): void {
+    this.attributesMenuOpen = !this.attributesMenuOpen;
+  }
+
+  public updateFilters(event) {
+    console.log(event);
   }
 }

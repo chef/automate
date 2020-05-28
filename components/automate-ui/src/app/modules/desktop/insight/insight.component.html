@@ -20,10 +20,15 @@
         <span>{{ term.value }}</span>
       </chef-button>
     </div>
-    <chef-button secondary>
+    <chef-button secondary (click)="toggleAttributeMenu()">
       <span>Attributes</span>
       <chef-icon>expand_more</chef-icon>
     </chef-button>
+    <app-insight-attributes-dropdown 
+      *ngIf="attributesMenuOpen" 
+      (onUpdateFilters)="updateFilters($event)"
+      (onToggleMenu)="toggleAttributeMenu()"
+    ></app-insight-attributes-dropdown>
   </div>
   <div class="filters">
     <div class="filter-group">
