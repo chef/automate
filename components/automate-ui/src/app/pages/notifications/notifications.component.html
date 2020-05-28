@@ -63,7 +63,7 @@
                 </chef-td>
                 <chef-td class="{{rule.targetType}}">
                   <img src="assets/img/logo-{{rule.targetType}}.png" alt="{{rule.targetType}} logo" />
-                  {{ rule.targetType }}
+                  {{ rule.targetType.slice(0, -5) }}
                 </chef-td>
                 <chef-td>
                   {{ rule.AlertTypeLabels[rule.ruleType] }}
