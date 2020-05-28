@@ -154,7 +154,7 @@ export class UserEffects {
     map(( { payload: user }: CreateUserSuccess)  =>
       new CreateNotification({
         type: Type.info,
-        message: `Created user: ${user.id}.`
+        message: `Created user ${user.id}.`
       })
     ));
 
