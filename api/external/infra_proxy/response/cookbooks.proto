@@ -11,7 +11,7 @@ message Cookbooks {
 message CookbookVersions {
     // Name of the cookbook.
     string name = 1;
-    // List of all versions avaiable for cookbook.
+    // List of all versions available for cookbook.
     repeated string versions = 2;
 }
 

@@ -1643,7 +1643,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "List of all versions avaiable for cookbook."
+          "description": "List of all versions available for cookbook."
         }
       }
     },
