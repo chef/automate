@@ -59,9 +59,7 @@ export class ChefPhatRadio {
     this.selected = find(['value', this.value], options);
     // When option to deselect is true, we also do not want to make a default
     // selection upon load, so we return early unless a value has been explicity set by prop
-    if (!this.selected && this.deselectable) {
-      return;
-    } else if (!this.selected) {
+    if (!this.selected && !this.deselectable) {
       this.selected = this.el.querySelector('chef-option[selected]') || options[0];
       this.value = this.selected.value;
     }
