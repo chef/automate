@@ -58,6 +58,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
       .pipe(filter(list => list.length > 0),
         takeUntil(this.isDestroyed))
       .subscribe(policies => {
+        // separate into two sections, with ingest on top of chef-managed section
         const pols = ChefSorters.naturalSort(
           policies.filter(p => p.id !== INGEST_POLICY_ID), 'name');
         const customPolicies = pols.filter(p => p.type !== 'CHEF_MANAGED');
