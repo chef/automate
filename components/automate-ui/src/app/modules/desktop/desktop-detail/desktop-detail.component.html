@@ -78,7 +78,7 @@
                 <span class="checkin-tooltip-text">{{ history.status | titlecase }}</span>
                 <span class="checkin-tooltip-date">{{ history.end | datetime: DateTime.RFC2822 }}</span>
               </p>
-              <a class="checkin-tooltip-link" [routerLink]="['/infrastructure/client-runs', desktop.id, 'runs', history.run_id]">View Client Run Details <chef-icon>open_in_new</chef-icon></a>
+              <a *ngIf="history.run_id" class="checkin-tooltip-link" target="_blank" href="{{ getRunDetailsUrl(history.run_id) }}">View Client Run Details <chef-icon>open_in_new</chef-icon></a>
             </chef-tooltip>
           </chef-td>
           <chef-td class="date-cell">

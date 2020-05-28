@@ -4,7 +4,7 @@ import { takeUntil } from 'rxjs/operators';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { GetDailyNodeRunsStatusTimeSeries } from 'app/entities/desktop/desktop.actions';
 import { getDailyNodeRuns } from 'app/entities/desktop/desktop.selectors';
 
@@ -37,13 +37,12 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
     unknown: 'help',
     missing: 'help'
   };
-  private subscription: Subscription;
-  private isDestroyed: Subject<boolean> = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>
   ) {
-    this.subscription = this.store.select(getDailyNodeRuns).pipe(
+    this.store.select(getDailyNodeRuns).pipe(
       takeUntil(this.isDestroyed)
       ).subscribe((dailyNodeRuns) => {
       this.checkInHistory = this.addCheckInLabels(dailyNodeRuns.durations.buckets);
@@ -55,7 +54,6 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
@@ -80,6 +78,10 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
       if (isStartOfWeek) { --numWeeks; }
     });
     return checkInHistory;
+  }
+
+  getRunDetailsUrl(runId: string): string {
+    return `/infrastructure/client-runs/${this.desktop.id}/runs/${runId}`;
   }
 
   public close(): void {
