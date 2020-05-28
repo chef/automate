@@ -298,6 +298,14 @@ To finish up, return to your Chef Habitat Builder on-prem installation and view 
 
 Chef Habitat Builder uses the same mechanisms that Chef Automate does for [backups]({{< relref "backup.md" >}}), [log management]({{< relref "log-management.md" >}}), and [uninstalling]({{< relref "troubleshooting.md#uninstalling-chef-automate" >}}).
 
+### Chef Habitat Environment Variables
+
+Set the Chef Habitat Builder on-prem `HAB_BLDR_URL` environment variable on the command line with:
+
+```bash
+export HAB_BLDR_URL=https://{{< example_fqdn "automate" >}}/bldr/v1/
+```
+
 ### Logging errors
 
 To change the log level for Chef Habitat Builder only, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
