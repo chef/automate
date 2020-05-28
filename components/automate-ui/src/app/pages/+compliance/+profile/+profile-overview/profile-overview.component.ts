@@ -73,7 +73,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   // Empty Page
   profilesEmpty = false;
 
-  public isDesktopView = false;
+  public isAvailableProfilesVisible = false;
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -85,7 +85,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService,
     private productDeployedService: ProductDeployedService
   ) {
-    this.isDesktopView = this.productDeployedService.isProductDeployed('desktop');
+    this.isAvailableProfilesVisible = !this.productDeployedService.isProductDeployed('desktop');
   }
 
   ngOnInit() {
@@ -291,5 +291,9 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
     this.layoutFacade.ShowPageLoading(false);
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  selectTab(tabToSelect: 'installed' | 'available') {
+    this.selectedTab = tabToSelect;
   }
 }

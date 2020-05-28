@@ -15,9 +15,23 @@
 
 .profiles-content {
   margin: 35px;
+}
 
-  .empty-help {
+a {
+  cursor: pointer;
+}
+
+.empty-state {
+  text-align: center;
+  chef-button {
     margin: 0;
+    left: 50%;
+  }
+
+  p {
+    font-size: 18px;
+    font-weight: 400;
+    margin-top: 42px;
   }
 }
 

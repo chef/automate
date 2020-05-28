@@ -25,11 +25,11 @@
             (input)="onSearchInput($event)"/>
         </div>
 
-        <chef-tab-selector class="profiles-tabs" [value]="selectedTab" (change)="onTabChange($event)">
+        <chef-tab-selector *ngIf="isAvailableProfilesVisible" class="profiles-tabs" [value]="selectedTab" (change)="onTabChange($event)">
             <chef-option value='installed'>
               <span *ngIf="userProfilesDataLoaded">{{ filteredProfiles.length }}</span> Profiles
             </chef-option>
-            <chef-option *ngIf="!isDesktopView" value='available'>
+            <chef-option value='available'>
               <span *ngIf="availableProfilesDataLoaded">{{ filteredAvailableProfiles.length }}</span> Available
             </chef-option>
           </chef-tab-selector>
@@ -88,18 +88,35 @@
           </chef-modal>
 
           <app-authorized [allOf]="['streaming::/compliance/profiles', 'post']">
-            <chef-toolbar>
-              <chef-button primary (click)="showUploadModal()" *ngIf="!profilesEmpty">
+            <div *ngIf="profilesEmpty" class="empty-state">
+              <div class="empty-state" *ngIf="isAvailableProfilesVisible" >
+                <p>Get a profile from the <a (click)="selectTab('available')">Available tab</a> or upload your own profile to get started!</p>
+              </div>
+              <div class="empty-state" *ngIf="!isAvailableProfilesVisible" >
+                <p>Upload a profile to get started!</p>
+              </div>
+              <chef-button primary (click)="showUploadModal()" >
                 <chef-icon>cloud_upload</chef-icon>
                 <span>Upload Profile</span>
               </chef-button>
-            </chef-toolbar>
-
-            <div class="empty-help" *ngIf="profilesEmpty">
-              <img class="help-icon" src="/assets/img/profiles.svg" alt="">
-              <div class="help-msg">
-                <p>Seems like you need to install some profiles!</p>
-                <p>Install pre-packaged compliance profiles from the "Available" tab or <a (click)="showUploadModal()">upload your own</a>.</p>
+            </div>
+            <div *ngIf="!profilesEmpty">
+              <chef-toolbar>
+                <chef-button primary (click)="showUploadModal()" >
+                  <chef-icon>cloud_upload</chef-icon>
+                  <span>Upload Profile</span>
+                </chef-button>
+              </chef-toolbar>
+            </div>
+          </app-authorized>
+          <app-authorized not [allOf]="['streaming::/compliance/profiles', 'post']">
+            <div *ngIf="profilesEmpty">
+              <div class="empty-state" *ngIf="isAvailableProfilesVisible" >
+                <p>Get a profile from the <a (click)="selectTab('available')">Available tab</a>!</p>
+              </div>
+              <div class="empty-state" *ngIf="!isAvailableProfilesVisible" >
+                <p>It looks like no one has uploaded any profiles yet and you don't have permission to upload them.
+                  If this is a mistake, then reach out to your administrator.</p>
               </div>
             </div>
           </app-authorized>
