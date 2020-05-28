@@ -38,7 +38,7 @@ To download the `chef-automate` command line tool, run the following command in 
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 ```
 
-## How to Install Chef Automate and Chef Infra Server on the Same Host
+## Install Chef Automate and Chef Infra Server on the Same Host
 
 Use either a command line interface or a configuration file to install Chef Automate and Chef Infra Server on the same host.
 Installations require elevated privileges, so run the commands as the superuser or use `sudo` at the start of each command.
@@ -91,9 +91,9 @@ Installations require elevated privileges, so run the commands as the superuser 
 
 1. [Set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
 
-## Install Standalone Chef Infra Server through Chef Automate
+## Install A Standalone Chef Infra Server
 
-Use either a command line interface or a configuration file to install Chef Infra Server through Chef Automate.
+Use either a command line interface or a configuration file to install Chef Infra Server using the Chef Automate `deploy` command.
 
 Refer to the Chef Infra Server [hardware requirements](https://docs.chef.io/install_server_pre/) for guidance on memory and number of CPUs.
 
@@ -124,7 +124,7 @@ Installations require elevated privileges, so run the commands as the superuser 
 
 1. [Set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
 
-### Configuration File Install of Standalone Chef Infra Server
+### Install a Standalone Chef Infra Server with a Configuration File
 
 Installing Chef Infra Server through Chef Automate using a configuration file also requires the use of the Chef Automate CLI.
 When Chef Automate deploys the Chef Infra Server, it automatically configures the Chef Infra Server to collect data to send to Chef Automate.
@@ -156,7 +156,7 @@ Installations require elevated privileges, so run the commands as the superuser 
 
 1. [Set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
 
-## How to Add Chef Infra Server to a Chef Automate Installation
+## Add a New Chef Infra Server to an Existing Chef Automate Installation
 
 Patch an existing Chef Automate installation to add Chef Infra Server:
 
@@ -191,7 +191,7 @@ Patch an existing Chef Automate installation to add Chef Infra Server:
        Success: Configuration patched
     ```
 
-## Use `knife` with Chef Infra Server
+## Set Up the Chef Infra Server
 
 The [`knife` command-line utility](https://docs.chef.io/workstation/knife/) provides an interface to interact with a Chef Infra Server from a workstation.
 
