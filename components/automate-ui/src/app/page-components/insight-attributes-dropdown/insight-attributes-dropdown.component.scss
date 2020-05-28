@@ -12,7 +12,6 @@
   border-radius: $spacing-03; // not variable
   background: $chef-white;
   box-shadow: $spacing-03 $spacing-03 24px 0 rgba(197, 199, 209, 0.6);
-  transform-origin: top right;
 
   @include carbon--breakpoint-up(md) {
     max-width: 467px;
@@ -58,15 +57,14 @@
     .filter-button {
       margin-bottom: $spacing-03;
       padding: 0;
-      border: 1px solid $chef-desktop-light;
+      border: 1px solid $chef-grey;
       border-radius: $chef-border-radius;
       overflow: hidden;
       cursor: pointer;
 
       .check {
         visibility: hidden;
-        // temp color
-        color: #4535D7;
+        color: $chef-primary-bright;
       }
 
       span {
@@ -78,17 +76,14 @@
         background: $chef-white;
         font-size: 14px;
         // not yet named
-        color: #394261;
-        letter-spacing: .25px;
+        // color: #394261;
+        // letter-spacing: .25px;
         pointer-events: none;
       }
 
       // selected styles
       &.selected {
         border: 1px solid $chef-primary-bright;
-        // styles for purple gradient border
-        // border: 1px solid transparent;
-        // background-image: $chef-purple-gradient;
 
         .check {
           visibility: visible;
@@ -102,50 +97,4 @@
     justify-content: space-between;
     margin-top: $spacing-03;
   }
-
-  // checkbox overwrites
-  // ::ng-deep chef-checkbox {
-  //   margin-top: 0;
-  //   margin-bottom: 0;
-
-  //   &[aria-checked=true] .check-wrap {
-  //     // not yet named colors
-  //     border-color: #4535D7;
-  //     background-color: #4535D7;
-  //   }
-
-  //   &[aria-checked=false] .check-wrap {
-  //     border: 1px solid $chef-desktop-light;
-  //   }
-
-  //   .label-wrap {
-  //     margin-left: $spacing-03;
-  //     color: #394261;
-  //     letter-spacing: .25px;
-  //   }
-  // }
-
-  // ::ng-deep chef-button {
-  //   color: #2E1EC1;
-  //   border-radius: $spacing-03;
-  //   font-weight: bold;
-  //   margin-top: 0;
-  //   margin-bottom: 0;
-
-  //   &[primary] {
-  //     background: #DFDCFF;
-  //     border: none;
-  //     box-shadow: 2px 2px 4px 0 #B3ABFB, -2px -2px 12px 0 #ECF0F9;
-  //     margin-right: 0;
-  //   }
-
-  //   &[disabled] {
-  //     // temp until get styles
-  //     background: desaturate(#DFDCFF, 80%);
-  //   }
-
-  //   button {
-  //     padding: 0 $spacing-05;
-  //   }
-  // }
 }
