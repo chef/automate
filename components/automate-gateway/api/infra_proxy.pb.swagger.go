@@ -992,15 +992,55 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      },
+      "post": {
+        "operationId": "CreateRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Role"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.CreateRole"
+            }
           }
         ],
         "tags": [
@@ -1022,18 +1062,21 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Role name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1056,18 +1099,21 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Role name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1162,6 +1208,49 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.request.CreateRole": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Role name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Role description."
+        },
+        "default_attributes": {
+          "type": "string",
+          "description": "Role default attributes."
+        },
+        "override_attributes": {
+          "type": "string",
+          "description": "Role override attributes."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Role run list."
+        },
+        "env_run_lists": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.request.EnvRunList"
+          },
+          "description": "Environment based run list."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.CreateServer": {
       "type": "object",
       "properties": {
@@ -1180,6 +1269,22 @@ func init() {
         "ip_address": {
           "type": "string",
           "description": "Chef Infra Server IP address."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.EnvRunList": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Environment name."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Role run list."
         }
       }
     },

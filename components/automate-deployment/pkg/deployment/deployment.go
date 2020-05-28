@@ -167,9 +167,7 @@ func ContainsCollection(c *dc.ConfigRequest, collectionName string) bool {
 func CollectionsForConfig(c *dc.ConfigRequest) []string {
 	var collections []string
 	if len(c.GetV1().GetSvc().GetProducts()) > 0 {
-		c := c.GetV1().GetSvc().GetProducts()
-		collections = make([]string, len(c))
-		copy(collections, c)
+		collections = services.RequiredProducts(c.GetV1().GetSvc().GetProducts())
 	} else {
 		collections = []string{services.AutomateCollectionName}
 

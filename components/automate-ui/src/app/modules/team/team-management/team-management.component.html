@@ -57,7 +57,9 @@
                     <chef-td class="three-dot-column">
                       <!-- <app-authorized [allOf]="['/apis/iam/v2/teams/{id}', 'delete', team.id]"> -->
                       <mat-select panelClass="chef-control-menu">
-                        <mat-option (onSelectionChange)="startTeamDelete($event, team)">Delete Team</mat-option>
+                        <mat-option (onSelectionChange)="startTeamDelete($event, team)" data-cy="delete-team">
+                          Delete Team
+                        </mat-option>
                       </mat-select>
                       <!-- <app-authorized -->
                     </chef-td>

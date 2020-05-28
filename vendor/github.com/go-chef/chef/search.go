@@ -3,6 +3,7 @@ package chef
 import (
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -40,6 +41,12 @@ type SearchResult struct {
 	Rows  []interface{}
 }
 
+var inc = 1000
+
+func (e SearchService) PageSize(setting int) {
+	inc = setting
+}
+
 // Do will execute the search query on the client
 func (q SearchQuery) Do(client *Client) (res SearchResult, err error) {
 	fullUrl := fmt.Sprintf("search/%s", q)
@@ -75,7 +82,7 @@ func (e SearchService) NewQuery(idx, statement string) (query SearchQuery, err e
 		// These are the defaults in chef: https://github.com/opscode/chef/blob/master/lib/chef/search/query.rb#L102-L105
 		SortBy: "X_CHEF_id_CHEF_X asc",
 		Start:  0,
-		Rows:   1000,
+		Rows:   inc,
 	}
 
 	return
@@ -96,16 +103,18 @@ func (e SearchService) Exec(idx, statement string) (res SearchResult, err error)
 		// These are the defaults in chef: https://github.com/opscode/chef/blob/master/lib/chef/search/query.rb#L102-L105
 		SortBy: "X_CHEF_id_CHEF_X asc",
 		Start:  0,
-		Rows:   1000,
+		Rows:   inc,
 	}
 
 	res, err = query.Do(e.client)
+	if err != nil {
+		return
+	}
 	start := res.Start
-	inc := 1000
 	total := res.Total
 
 	for start+inc <= total {
-		query.Start = query.Start + 1000
+		query.Start = query.Start + inc
 		start = query.Start
 		ares, err := query.Do(e.client)
 		if err != nil {
@@ -122,14 +131,14 @@ func (e SearchService) PartialExec(idx, statement string, params map[string]inte
 		Index: idx,
 		Query: statement,
 		// These are the defaults in chef: https://github.com/opscode/chef/blob/master/lib/chef/search/query.rb#L102-L105
+		// SortBy: "X_CHEF_id_CHEF_X asc",
 		SortBy: "X_CHEF_id_CHEF_X asc",
 		Start:  0,
-		Rows:   1000,
+		Rows:   inc,
 	}
 
 	fullUrl := fmt.Sprintf("search/%s", query)
-
-	body, err := JSONReader(params)
+	body, err := JSONSeeker(params)
 	if err != nil {
 		debug("Problem encoding params for body")
 		return
@@ -140,21 +149,26 @@ func (e SearchService) PartialExec(idx, statement string, params map[string]inte
 		return
 	}
 
+	start := res.Start
 	// the total rows available for this query across all pages
 	total := res.Total
-	// the maximum number of rows in each page
-	inc := query.Rows
 	paged_res := SearchResult{}
 
-	for start := res.Start; start+inc <= total; start += inc {
-		query.Start = start + inc
-		fullUrl = fmt.Sprintf("search/%s", query)
-
-		err = e.client.magicRequestDecoder("POST", fullUrl, body, &paged_res)
+	for start+inc <= total {
+		query.Start = query.Start + inc
+		start = query.Start
+		body.Seek(0, io.SeekStart)
 		if err != nil {
+			fmt.Printf("Seek error %+v\n", err)
 			return
 		}
-		// accumulate this page of results into the primary SearchResult instance
+		fullUrl := fmt.Sprintf("search/%s", query)
+		err = e.client.magicRequestDecoder("POST", fullUrl, body, &paged_res)
+		if err != nil {
+			fmt.Printf("Partial search error %+v\n", err)
+			return
+		}
+		// add this page of results to the primary SearchResult instance
 		res.Rows = append(res.Rows, paged_res.Rows...)
 	}
 	return

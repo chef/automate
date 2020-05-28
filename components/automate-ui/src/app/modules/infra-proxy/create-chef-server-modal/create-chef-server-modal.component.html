@@ -13,7 +13,7 @@
             Display Name is required.
           </chef-error>
           </chef-form-field>
-          <span class="detail light">Don't worry, {{ objectNoun }} names can be changed later.</span>
+          <span class="detail light">Don't worry, server names can be changed later.</span>
         </div>
         <div *ngIf="modifyID" class="id-margin">
           <chef-form-field>
@@ -31,10 +31,10 @@
               Only lowercase letters, numbers, hyphens, and underscores are allowed.
             </chef-error>
             <chef-error *ngIf="conflictError">
-              {{ objectNoun | titlecase }} ID "{{createForm.get('id').value}}" already exists.
+              Server ID "{{createForm.get('id').value}}" already exists.
             </chef-error>
           </chef-form-field>
-          <span class="detail light">{{ objectNoun | titlecase }} IDs are unique, permanent, and cannot be changed later.</span>
+          <span class="detail light">Server IDs are unique, permanent, and cannot be changed later.</span>
         </div>
         <div *ngIf="!modifyID" class="id-margin">
           <div id="id-fields">

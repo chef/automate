@@ -117,6 +117,12 @@ identifier = "event_feed"
 url = "/docs/event-feed"
 
 [[menu.docs]]
+name = "Desktop"
+weight = 45
+identifier = "desktop"
+url = "/docs/desktop"
+
+[[menu.docs]]
 name = "Client Runs"
 weight = 50
 identifier = "client_runs"

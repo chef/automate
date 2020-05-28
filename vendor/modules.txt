@@ -160,7 +160,7 @@ github.com/felixge/httpsnoop
 github.com/fsnotify/fsnotify
 # github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39
 github.com/ghodss/yaml
-# github.com/go-chef/chef v0.20.1
+# github.com/go-chef/chef v0.21.0
 github.com/go-chef/chef
 # github.com/go-delve/delve v1.3.1
 github.com/go-delve/delve/cmd/dlv
