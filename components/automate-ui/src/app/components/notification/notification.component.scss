@@ -8,7 +8,6 @@
   color: $chef-white;
   background-color: $chef-dark-grey;
   padding: 0.5em;
-  padding-right: 1.5em;
   overflow: hidden;
 
   p {
@@ -43,14 +42,7 @@
   }
 
   chef-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 30px;
-    width: 30px;
+    margin-left: auto;
     cursor: pointer;
   }
 
