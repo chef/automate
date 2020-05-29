@@ -19,11 +19,11 @@
       <div>
         {{ range $c := .Connectors }}
         <form class="theme-form-row" method="post" action="{{ $c.URL }}">
-            {{ if eq $c.ID "local" }}
-            <button type="submit" class="dex-btn-text"><span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>Sign in as a local user</button>
-            {{ else }}
-            <button type="submit" class="dex-btn-text"><span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>Sign in with {{ $c.Name }}</button>
-            {{ end }}
+          {{ if eq $c.ID "local" }}
+          <button type="submit" class="dex-btn-text"><span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>Sign in as a local user</button>
+          {{ else }}
+          <button type="submit" class="dex-btn-text"><span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>Sign in with {{ $c.Name }}</button>
+          {{ end }}
         </form>
         {{ end }}
       </div>
