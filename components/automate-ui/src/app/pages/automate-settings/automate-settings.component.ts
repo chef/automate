@@ -59,6 +59,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   // Are settings currently saving
   saving = false;
 
+  // Change origin boolean for formControl directive
+  shouldResetValues = false;
+
   // Notification bits
   notificationVisible = false;
   notificationType = 'info';
@@ -151,8 +154,11 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
             this.saving = false;
           } else if (changeConfigurationSelector.status === 'loadingSuccess') {
             this.showSuccessNotification();
-            this.automateSettingsForm.markAsPristine();
             this.saving = false;
+            // After a successful save, trigger a notification to FormControlDirective
+            // to consider the newly updated values as the new "original" values
+            this.shouldResetValues = true;
+            this.automateSettingsForm.markAsPristine();
           }
         });
   }
@@ -200,6 +206,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   // Apply the changes that the user updated in the forms
   public applyChanges() {
     this.saving = true;
+    this.shouldResetValues = false;
     // Note: Services are currently not enabled through the form
     const jobs: IngestJob[] = [
       // Event Feed
@@ -287,7 +294,6 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
   // Update forms until we get the job scheduler status
   public updateForm(jobSchedulerStatus: JobSchedulerStatus) {
-
     if (jobSchedulerStatus === null) {
       return;
     }
@@ -310,6 +316,10 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
           break;
       }
     });
+    // After a successful load of initial values, trigger a notification
+    // to FormControlDirective to treat them as the "original" values.
+    this.shouldResetValues = true;
+    this.automateSettingsForm.markAsPristine();
   }
 
   // Splits a packed threshold into a number and a unit, where unit is a single character

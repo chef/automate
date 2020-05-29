@@ -6,6 +6,7 @@ import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from '@angul
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MockComponent } from 'ng2-mock-component';
 
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import {
@@ -75,7 +76,8 @@ describe('AutomateSettingsComponent', () => {
           StoreModule.forRoot(ngrxReducers, { runtimeChecks })
         ],
         declarations: [
-          AutomateSettingsComponent
+          AutomateSettingsComponent,
+          MockComponent({ selector: 'input', inputs: ['resetOrigin'] })
         ],
         providers: [
           FormBuilder,
@@ -129,7 +131,8 @@ describe('AutomateSettingsComponent', () => {
           StoreModule.forRoot(ngrxReducers, { runtimeChecks })
         ],
         declarations: [
-          AutomateSettingsComponent
+          AutomateSettingsComponent,
+          MockComponent({ selector: 'input', inputs: ['resetOrigin'] })
         ],
         providers: [
           FormBuilder,
