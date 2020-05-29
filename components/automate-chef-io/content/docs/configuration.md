@@ -383,6 +383,17 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 # key = "-----BEGIN RSA PRIVATE KEY-----\n<your load balancer private key>\n-----END RSA PRIVATE KEY-----\n"
 ```
 
+#### Buffer Size
+
+Configure message buffer ingest size:
+
+```toml
+[compliance.v1.sys.service]
+message_buffer_size = 200
+[ingest.v1.sys.service]
+message_buffer_size = 200
+```
+
 #### Compliance Configuration
 
 To configure your Chef Automate InSpec agent scans, create a TOML file that contains the partial configuration below.
