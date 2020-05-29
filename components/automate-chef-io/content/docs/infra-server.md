@@ -20,7 +20,7 @@ Chef Automate will not deploy the Chef Infra Server add-ons Chef Manage and Push
 
 {{% warning %}}
 
-Supermarket cannot authenticate users on Chef Infra Server that is deployed
+Supermarket cannot authenticate users on Chef Infra Server deployed
 with Chef Automate.
 
 {{% /warning %}}
@@ -38,7 +38,7 @@ To download the `chef-automate` command line tool, run the following command in 
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 ```
 
-## How to Install Chef Automate and Chef Infra Server on the Same Host
+## Install Chef Automate and Chef Infra Server on the Same Host
 
 Use either a command line interface or a configuration file to install Chef Automate and Chef Infra Server on the same host.
 Installations require elevated privileges, so run the commands as the superuser or use `sudo` at the start of each command.
@@ -91,9 +91,9 @@ Installations require elevated privileges, so run the commands as the superuser 
 
 1. [Set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
 
-## Install Standalone Chef Infra Server through Chef Automate
+## Install A Standalone Chef Infra Server
 
-Use either a command line interface or a configuration file to install Chef Infra Server through Chef Automate.
+Use either a command line interface or a configuration file to install Chef Infra Server using the Chef Automate `deploy` command.
 
 Refer to the Chef Infra Server [hardware requirements](https://docs.chef.io/install_server_pre/) for guidance on memory and number of CPUs.
 
@@ -109,7 +109,7 @@ Installations require elevated privileges, so run the commands as the superuser 
        sudo chef-automate init-config
     ```
 
-1. Add a stanza to the configuration file to disable Automate data collection:
+1. Add a stanza to the configuration file to disable Chef Automate data collection:
 
     ```toml
        [erchef.v1.sys.data_collector]
@@ -124,7 +124,7 @@ Installations require elevated privileges, so run the commands as the superuser 
 
 1. [Set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
 
-### Configuration File Install of Standalone Chef Infra Server
+### Install a Standalone Chef Infra Server with a Configuration File
 
 Installing Chef Infra Server through Chef Automate using a configuration file also requires the use of the Chef Automate CLI.
 When Chef Automate deploys the Chef Infra Server, it automatically configures the Chef Infra Server to collect data to send to Chef Automate.
@@ -156,7 +156,42 @@ Installations require elevated privileges, so run the commands as the superuser 
 
 1. [Set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
 
-## Use `knife` with Chef Infra Server
+## Add a New Chef Infra Server to an Existing Chef Automate Installation
+
+Patch an existing Chef Automate installation to add Chef Infra Server:
+
+1. Create a `patch.toml` file to add `infra-server` to the list of products to deploy:
+
+    ```toml
+       [deployment.v1.svc]
+       products=["automate", "infra-server"]
+    ```
+
+2. Apply the patch to the Chef Automate installation:
+
+    ```shell
+       sudo chef-automate config ./patch.toml
+    ```
+
+   The command output shows the added Chef Infra Server services:
+
+    ```shell
+       Updating deployment configuration
+
+       Applying deployment configuration
+         Installed automate-cs-bookshelf
+         Installed automate-cs-oc-bifrost
+         Installed automate-cs-oc-erchef
+         Installed automate-cs-nginx
+         Started automate-cs-bookshelf
+         Started automate-cs-oc-bifrost
+         Started automate-cs-oc-erchef
+         Started automate-cs-nginx
+         Started automate-load-balancer
+       Success: Configuration patched
+    ```
+
+## Set Up the Chef Infra Server
 
 The [`knife` command-line utility](https://docs.chef.io/workstation/knife/) provides an interface to interact with a Chef Infra Server from a workstation.
 
@@ -178,7 +213,7 @@ On the Chef Infra Server host:
       sudo chef-server-ctl org-create SHORT_NAME 'FULL_ORGANIZATION_NAME' --association_user USER_NAME --filename ORGANIZATION-validator.pem
     ```
 
-    The short name must begin with a lower-case letter or digit, may contain only lower-case letters, digits, hyphens, and underscores, and must be between 1 and 255 characters. For example: `4thcoffee`.
+    The short name must begin with a lower-case letter or digit, may contain lower-case letters, digits, hyphens, and underscores, and must be between 1 and 255 characters. For example: `4thcoffee`.
 
     The full organization name must begin with a non-white space character and must be between 1 and 1023 characters. For example: `'Fourth Coffee, Inc.'`.
 
@@ -193,16 +228,20 @@ On the workstation:
 1. Install [Chef Workstation](https://docs.chef.io/workstation/install_workstation/).
 
 1. Create a Chef repository by using the `chef generate repo` subcommand.
-     For example, create a Chef repository named `chef-repo` by running: 
+     For example, create a Chef repository named `chef-repo` by running:
+
      ```shell
      chef generate repo chef-repo
      ```
+
      Replace `chef-repo` with your desired repository name.
 
-1. Within your named Chef repository, create a `.chef` directory with the `mkdir` command. For example: 
+1. Within your named Chef repository, create a `.chef` directory with the `mkdir` command. For example:
+
     ```shell
       mkdir /chef-repo/.chef
     ```
+
 1. Copy `ORGANIZATION-validator.pem` and `USER_NAME.pem` to the `.chef` directory.
 
 1. In the `.chef` directory, create a `config.rb` file that contains:
@@ -220,7 +259,8 @@ On the workstation:
       cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
       cookbook_path            ["#{current_dir}/../cookbooks"]
     ```
-    If your installation is airgapped, [create a bootstrap
+
+    For airgapped installations, [create a bootstrap
     template](https://docs.chef.io/install_chef_air_gap/#create-a-bootstrap-template) and
     [add it](https://docs.chef.io/install_chef_air_gap/#configure-knife) to your `config.rb`.
 

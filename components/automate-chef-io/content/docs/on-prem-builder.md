@@ -162,7 +162,39 @@ product configuration to include the complete Chef Automate stack. For example:
       Started automate-load-balancer
     Success: Configuration patched
     ```
+#### Add Chef Habitat Builder to a Chef Automate Installation
 
+Patch an existing Chef Automate installation to add Chef Habitat Builder:
+
+1. Create a `patch.toml` file to add `builder` to the list of products to deploy:
+
+    ```toml
+       [deployment.v1.svc]
+       products=["automate", "builder"]
+    ```
+
+2. Apply the patch to the Chef Automate installation:
+
+    ```shell
+       sudo chef-automate config ./patch.toml
+    ```
+   The command output shows the Chef Habitat Builder services being added:
+
+    ```shell
+       Updating deployment configuration
+
+       Applying deployment configuration
+         Installed automate-minio
+         Installed automate-builder-memcached
+         Installed automate-builder-api
+         Installed automate-builder-api-proxy
+         Started automate-minio
+         Started automate-builder-memcached
+         Started automate-builder-api
+         Started automate-builder-api-proxy
+         Started automate-load-balancer
+       Success: Configuration patched
+    ```
 ### Sign in to Chef Automate and the Chef Habitat Builder
 
 1. View your login credentials in the terminal with:
