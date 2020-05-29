@@ -22,7 +22,12 @@ Bootstrapping Chef Habitat Builder requires:
 * An outward bound HTTPS connection
 * An existing Chef Habitat [public Builder](https://bldr.habitat.sh) account.
 
-## System requirements
+##
+### Unsupported Topologies
+
+* High Availability/DR/Multinode Builder
+
+## System Requirements
 
 This guide demonstrates the ease of authenticating between Chef Automate and Chef Habitat Builder on-prem by installing both components on the same host.
 Outside the boundaries of this proof-of-concept, we recommend against running installations of Chef Automate and Chef Habitat Builder on the same host. Please contact your Chef representative before using this implementation in production
@@ -46,6 +51,33 @@ Roughly 80 GB of the disk space is designated for Chef Automate; the rest is use
 Chef Habitat Builder and the artifacts it stores. The current implementation uses Minio for
 Chef Habitat artifact storage; we do not support using Artifactory for artifact storage.
 
+### Hardware Sizing Considerations
+
+The frequency at which Habitat Supervisors poll the on-premises Chef Builder API for changes can be controlled by two Environment variables in the Chef Habitat Supervisor's runtime.
+
+| Variable | Default | Description |
+| --- | --- | ---|
+| `HAB_SUP_UPDATE_MS` | 60000 | Frequency in milliseconds governing how often to check for Supervisor updates when running with an [update strategy](https://www.habitat.sh/docs/using-habitat/#using-updates) |
+| `HAB_UPDATE_STRATEGY_FREQUENCY_MS` | 60000 | Frequency in milliseconds governing how often to check for Service updates when running with an [update strategy](https://www.habitat.sh/docs/using-habitat/#using-updates) |
+
+These variables greatly influence the polling rate that the Chef Builder API will have to handle.
+
+The following table can be used as a planning guide for appropriately sizing hardware at differing client workloads.
+
+`Clients` refers to the total number of Chef Habitat Supervisors and total number of Service Instances being managed with an update strategy.
+
+`Interval` refers to the value of `HAB_SUP_UPDATE_MS` and `HAB_UPDATE_STRATEGY_FREQUENCY_MS` and assumes they are both set to the same value.
+
+| Clients | Interval | Server Spec |
+| --- | --- | --- | ---|
+| 2,000 | 60,000 | 4 vCPU x 16GB RAM (m4.xlarge) |
+| 20,000 | 600,000 | 4 vCPU x 16GB RAM (m4.xlarge) |
+| 4,000 | 60,000 | 8 vCPU x 32GB RAM (m4.2xlarge) |
+| 40,000 | 600,000 | 8 vCPU x 32GB RAM (m4.2xlarge) |
+| 8,000 | 60,0000 | 16 vCPU x 64GB RAM (m4.4xlarge) |
+| 80,000 | 600,000 | 16 vCPU x 64GB RAM (m4.4xlarge) |
+
+
 ### Operating System
 
 Chef Automate and Chef Habitat Builder require:
@@ -57,9 +89,32 @@ Chef Automate and Chef Habitat Builder require:
 * The shell that starts Automate should have a max open files setting of at least 65535
 * Run the installation and bootstrapping procedures as the superuser or use `sudo` at the start of each command.
 
-### Unsupported Topologies
+To operate optimally at larger scales, several OS optimizations can be made to improve performance. The following is an example
+of how to make this tuning changes for a RHEL based system:
 
-* high-availability/DR/multinode Builder
+```
+cat > /etc/sysctl.d/00-chef.conf <<EOF
+fs.file-max=500000
+vm.swappiness=10
+vm.max_map_count=262144
+vm.dirty_ratio=20
+vm.dirty_background_ratio=30
+vm.dirty_expire_centisecs=30000
+net.ipv4.ip_local_port_range=10300 65024
+net.ipv4.tcp_max_syn_backlog=60000
+net.ipv4.tcp_tw_reuse=1
+net.core.somaxconn=1024
+EOF
+
+sysctl -p /etc/sysctl.d/00-chef.conf
+
+cat > /etc/security/limits.d/20-nproc.conf<<EOF
+*   soft  nproc     65536
+*   hard  nproc     65536
+*   soft  nofile    1048576
+*   hard  nofile    1048576
+EOF
+```
 
 ## Get Started with Chef Automate and Chef Habitat On-prem
 
