@@ -289,7 +289,7 @@ memory. However, you should review and consider the important caveats covered in
 
 For example, a system with 32GB of memory can have its Elasticsearch heap
 size set to `16g`; to do so, one would first create a TOML file that contains the partial
-configuration below, then run `chef-automate config patch </path/to/your-file.toml>` to
+configuration below, and then run `chef-automate config patch </path/to/your-file.toml>` to
 deploy the change.
 
 ```toml
