@@ -157,10 +157,6 @@ chef-loading-spinner {
     background-color: darken($chef-primary-bright, 14%);
   }
 
-  &::before {
-    content: 'Select Files';
-  }
-
   input[type='file'] {
     position: absolute;
     left: -999em;
