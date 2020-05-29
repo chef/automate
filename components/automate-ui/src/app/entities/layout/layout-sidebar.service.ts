@@ -8,7 +8,7 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { clientRunsWorkflowEnabled } from 'app/entities/client-runs/client-runs.selectors';
 import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
 import { UpdateSidebars } from './layout.actions';
-import { Sidebars } from './layout.model';
+import { Sidebars, MenuItem } from './layout.model';
 import { MenuItemGroup } from 'app/entities/layout/layout.model';
 
 @Injectable({
@@ -32,7 +32,7 @@ export class LayoutSidebarService {
         this.updateSidebars();
     }
 
-    populateSidebar() {
+    private populateSidebar() {
       const sidebars: Sidebars = {
         active: '',
         dashboards: [{
@@ -71,7 +71,7 @@ export class LayoutSidebarService {
             },
             {
               name: 'Chef Servers',
-              icon: 'storage',
+              customIcon: 'chef-servers-icon',
               route: '/infrastructure/chef-servers',
               authorized: {
                 anyOf: [['/api/v0/infra/servers', 'get']]
@@ -254,17 +254,15 @@ export class LayoutSidebarService {
               this.setVisibleValuesToObservables(menuItem);
             });
           }
-          menuGroup.visible$ = menuGroup.visible$ ? menuGroup.visible$ : new BehaviorSubject(true);
+          menuGroup.visible$ = menuGroup.visible$ || new BehaviorSubject(true);
         });
       });
       return sidebars;
     }
 
-    private setVisibleValuesToObservables(item: any): void {
+    private setVisibleValuesToObservables(item: MenuItem | MenuItemGroup): void {
       if (item.visible$ === undefined) {
         item.visible$ = new BehaviorSubject(true);
-      } else if (!item.visible$.subscribe) {
-        item.visible$ = new BehaviorSubject(item.visible$);
       }
     }
 

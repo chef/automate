@@ -1,16 +1,17 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
-import { Store, select } from '@ngrx/store';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { filter, takeUntil, map } from 'rxjs/operators';
-import { Regex } from 'app/helpers/auth/regex';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { Store, select } from '@ngrx/store';
 import { Observable, combineLatest, Subject } from 'rxjs';
+import { filter, takeUntil, map } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
+
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus, pending } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { ChefKeyboardEvent } from 'app/types/material-types';
-import { Destination } from '../../entities/destinations/destination.model';
+import { Destination } from 'app/entities/destinations/destination.model';
 import {
   allDestinations,
   getStatus,
@@ -65,14 +66,10 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.createDataFeedForm = this.fb.group({
       // Must stay in sync with error checks in create-data-feed-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      url: ['', [Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK),
-        Validators.pattern(Regex.patterns.VALID_FQDN)
-      ]],
+      // Note that URL here may be FQDN -or- IP!
+      url: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      password: ['', [Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK)
-      ]]
+      password: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }
 
@@ -142,14 +139,14 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.conflictErrorEvent.emit(false);
   }
 
-  public startDataFeedDelete($event: ChefKeyboardEvent, destination: Destination): void {
+  public startDataFeedDelete($event: MatOptionSelectionChange, destination: Destination): void {
     if ($event.isUserInput) {
       this.dataFeedToDelete = destination;
       this.deleteModalVisible = true;
     }
   }
 
-  public startDataFeedSendTest($event: ChefKeyboardEvent, destination: Destination) {
+  public startDataFeedSendTest($event: MatOptionSelectionChange, destination: Destination) {
     if ($event.isUserInput) {
       this.store.dispatch(new TestDestination({destination}));
     }

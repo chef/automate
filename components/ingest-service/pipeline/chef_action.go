@@ -6,7 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/chef/automate/components/ingest-service/pipeline/processor"
@@ -20,7 +20,7 @@ type ChefActionPipeline struct {
 }
 
 // NewChefActionPipeline Create a new chef action pipeline
-func NewChefActionPipeline(client backend.Client, authzClient iam_v2.ProjectsClient,
+func NewChefActionPipeline(client backend.Client, authzClient authz.ProjectsClient,
 	maxNumberOfBundledActionMsgs int, messageBufferSize int) ChefActionPipeline {
 	var (
 		in            = make(chan message.ChefAction, messageBufferSize)

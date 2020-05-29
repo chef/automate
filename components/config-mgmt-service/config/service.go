@@ -6,7 +6,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"path"
@@ -17,6 +16,7 @@ import (
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/backend/elastic"
 	"github.com/chef/automate/components/config-mgmt-service/backend/mock"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/version"
 )
@@ -30,9 +30,18 @@ type Service struct {
 	Host         string `json:"host" mapstructure:"host"`
 	Port         int    `json:"port" mapstructure:"port"`
 	LogLevel     string `json:"log_level" mapstructure:"log_level"`
+	Postgres     `json:"postgres" mapstructure:"postgres"`
 	client       backend.Client
 	TLSConfig    certs.TLSConfig `mapstructure:"tls"`
 	serviceCerts *certs.ServiceCerts
+}
+
+type Postgres struct {
+	URI          string `mapstructure:"uri"`
+	Database     string `mapstructure:"database"`
+	SchemaPath   string `mapstructure:"schema_path"`
+	MaxOpenConns int    `mapstructure:"max_open_conns"`
+	MaxIdleConns int    `mapstructure:"max_idle_conns"`
 }
 
 // Default returns a blank Service instance with default parameters
@@ -76,13 +85,14 @@ func ConfigFromViper() (*Service, error) {
 
 	// Setup the Elasticsearch backend
 	var backend backend.Client
-	switch viper.GetString("backend") {
+	selectedBackend := viper.GetString("backend")
+	switch selectedBackend {
 	case "elasticsearch":
 		backend = elastic.New(viper.GetString("elasticsearch-url"))
 	case "mock":
 		backend = mock.New()
 	default:
-		err := errors.New("Unavailable backend machanism")
+		err := fmt.Errorf("Invalid backend machanism %q set in configuration", selectedBackend)
 		log.Error(err)
 		return cfg, err
 	}
@@ -100,6 +110,15 @@ func ConfigFromViper() (*Service, error) {
 		return cfg, err
 	}
 	cfg.serviceCerts = serviceCerts
+
+	if cfg.Postgres.URI == "" {
+		var err error
+		cfg.Postgres.URI, err = platform_config.PGURIFromEnvironment(cfg.Postgres.Database)
+		if err != nil {
+			log.WithError(err).Error("Failed to get pg uri")
+			return nil, err
+		}
+	}
 
 	// Log level
 	cfg.SetLogLevel()

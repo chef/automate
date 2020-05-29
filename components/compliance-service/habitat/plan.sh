@@ -29,7 +29,7 @@ pkg_binds_optional=(
   [authn-service]="port"
   [notifications-service]="port"
 )
-inspec_release="chef/inspec/4.18.104/20200421173550"
+inspec_release="chef/inspec/4.18.114/20200514030048"
 pkg_deps=(
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   "${inspec_release}"
@@ -45,7 +45,7 @@ else
   # WARNING: chef/automate-compliance-profiles is managed by Expeditor
   # See .expeditor/update-compliance-profiles.sh for details
   pkg_deps+=(
-      chef/automate-compliance-profiles/1.0.0/20200430115140
+      chef/automate-compliance-profiles/1.0.0/20200528145659
   )
 fi
 

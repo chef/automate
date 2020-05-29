@@ -2,10 +2,10 @@ package server
 
 import (
 	"context"
+	"net/http"
 	"net/url"
 
-	uuid "github.com/chef/automate/lib/uuid4"
-	chef "github.com/chef/go-chef"
+	chef "github.com/go-chef/chef"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -39,24 +39,23 @@ func NewChefClient(config *ChefConfig) (*ChefClient, error) {
 	})
 
 	if err != nil {
-		return nil, errors.Wrap(err, err.Error())
+		return nil, errors.Errorf("The user or client who made the request could not be authenticated. Verify the user/client name, and that the correct key was used to sign the request.")
 	}
 
 	return &ChefClient{client: client}, nil
 }
 
-func (s *Server) createClient(ctx context.Context, orgID string) (*ChefClient, error) {
+func (s *Server) createClient(ctx context.Context, orgID string, serverID string) (*ChefClient, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	UUID, err := uuid.FromString(orgID)
+	// TODO: combine get server & org query in one statement.
+	server, err := s.service.Storage.GetServer(ctx, serverID)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, service.ParseStorageError(err, serverID, "server")
 	}
 
-	// TODO: Call GetOrgByName in order to avoid separate query to fetch infra server detail
-	// Prefer LEFT OUTER join to in order to append server detail in response
-	org, err := s.service.Storage.GetOrg(ctx, UUID)
+	org, err := s.service.Storage.GetOrg(ctx, orgID, serverID)
 	if err != nil {
 		return nil, service.ParseStorageError(err, orgID, "org")
 	}
@@ -66,17 +65,7 @@ func (s *Server) createClient(ctx context.Context, orgID string) (*ChefClient, e
 		return nil, err
 	}
 
-	ServerID, err := uuid.FromString(org.ServerID)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid server: %s", err.Error())
-	}
-
-	server, err := s.service.Storage.GetServer(ctx, ServerID)
-	if err != nil {
-		return nil, service.ParseStorageError(err, ServerID, "org")
-	}
-
-	baseURL, err := targetURL(server.Fqdn, server.IpAddress, org.Name)
+	baseURL, err := targetURL(server.Fqdn, server.IPAddress, org.Name)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
 	}
@@ -120,4 +109,26 @@ func GetOrgAdminKeyFrom(secret *secrets.Secret) string {
 	}
 
 	return adminKey
+}
+
+// ParseAPIError parses common Chef Infra Server API errors into a user-readable format.
+func ParseAPIError(err error) error {
+	chefError, _ := chef.ChefError(err)
+	if chefError != nil {
+		switch chefError.StatusCode() {
+		case http.StatusBadRequest:
+			return status.Errorf(codes.InvalidArgument, chefError.StatusMsg())
+		case http.StatusUnauthorized:
+			return status.Errorf(codes.Unauthenticated, chefError.StatusMsg())
+		case http.StatusForbidden:
+			return status.Errorf(codes.PermissionDenied, chefError.StatusMsg())
+		case http.StatusConflict:
+			return status.Errorf(codes.AlreadyExists, chefError.StatusMsg())
+		case http.StatusNotFound:
+			return status.Errorf(codes.NotFound, chefError.StatusMsg())
+		default:
+			return status.Error(codes.InvalidArgument, chefError.StatusMsg())
+		}
+	}
+	return err
 }

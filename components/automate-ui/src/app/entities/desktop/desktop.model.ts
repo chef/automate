@@ -11,6 +11,11 @@ export enum SortOrder {
   Descending = 'DESC'
 }
 
+export interface Selected {
+  desktop: Desktop;
+  daysAgo: number;
+}
+
 export interface DailyCheckInCountCollection {
   buckets: DailyCheckInCount[];
   updated: Date;
@@ -21,6 +26,26 @@ export interface DailyCheckInCount {
   end: Date;
   checkInCount: number;
   total: number;
+}
+
+export interface DailyNodeRuns {
+  durations: NodeRunsDailyStatusCollection;
+  daysAgo: number;
+  nodeId: string;
+  status: string;
+}
+
+export interface DailyNodeRunsStatus {
+  start: Date;
+  end: Date;
+  status: string;
+  run_id: string;
+  label?: string;
+}
+
+export interface NodeRunsDailyStatusCollection {
+  buckets: DailyNodeRunsStatus[];
+  updated: Date;
 }
 
 export interface DayPercentage {

@@ -3,6 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { interval as observableInterval, of as observableOf, Observable } from 'rxjs';
 import { catchError, mergeMap, map, tap } from 'rxjs/operators';
+import { intersectionBy } from 'lodash/fp';
+
 
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from './projects-filter.reducer';
@@ -57,11 +59,20 @@ export class ProjectsFilterEffects {
 
   private loadOptionsAction$(): () => Observable<ProjectsFilterActions> {
     return () => this.requests.fetchOptions().pipe(
-      map((fetched: AuthorizedProjectsResponse) => {
-        const converted = this.convertResponse(fetched.projects);
-        const restored = this.projectsFilter.restoreOptions() || [];
+      map((resp: AuthorizedProjectsResponse) => {
+        const fetched = this.convertResponse(resp.projects);
+        let restored = this.projectsFilter.restoreOptions() || [];
+
+        // throw out any LocalStorage keys that no longer exist.
+        // intersectionBy chooses results from the first array so
+        // restored's checked results are preserved.
+        restored = intersectionBy('value', restored, fetched);
+
+        // don't reload the page, but persist to localstorage
+        this.projectsFilter.updateLocalStorage(restored);
+
         return new LoadOptionsSuccess({
-          fetched: converted,
+          fetched,
           restored
         });
       }),

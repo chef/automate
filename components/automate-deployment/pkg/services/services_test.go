@@ -236,9 +236,6 @@ func TestValidateProductDeployment(t *testing.T) {
 	t.Run("error on base collection", func(t *testing.T) {
 		assert.Error(t, ValidateProductDeployment([]string{"automate", "core"}))
 	})
-	t.Run("error unspecified product dependencies", func(t *testing.T) {
-		assert.Error(t, ValidateProductDeployment([]string{"workflow"}))
-	})
 	t.Run("specified product dependencies", func(t *testing.T) {
 		assert.NoError(t, ValidateProductDeployment([]string{"automate", "workflow"}))
 		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "workflow"}))
@@ -263,9 +260,6 @@ func TestContainsCollection(t *testing.T) {
 	t.Run("returns false if desired collection is not in the list", func(t *testing.T) {
 		assert.False(t, ContainsCollection("workflow", []string{"automate", "chef-server"}))
 	})
-	t.Run("returns false if desired collection is not in the list and not a base dependency", func(t *testing.T) {
-		assert.False(t, ContainsCollection("automate", []string{"workflow"}))
-	})
 	t.Run("returns false list is empty", func(t *testing.T) {
 		assert.False(t, ContainsCollection("core", []string{}))
 		assert.False(t, ContainsCollection("core", nil))
@@ -281,4 +275,15 @@ func TestContainsCollection(t *testing.T) {
 		assert.True(t, ContainsCollection("core", []string{"automate"}))
 		assert.True(t, ContainsCollection("core", []string{"automate-full"}))
 	})
+	t.Run("automate is part of desktop", func(t *testing.T) {
+		assert.True(t, ContainsCollection("automate", []string{"desktop"}))
+	})
+}
+
+func TestRequiredProducts(t *testing.T) {
+	assert.Equal(t, []string{"automate", "desktop", "workflow"}, RequiredProducts([]string{"desktop", "workflow"}))
+	assert.Equal(t, []string{"automate", "desktop"}, RequiredProducts([]string{"desktop"}))
+	assert.Equal(t, []string{"automate", "builder", "desktop"}, RequiredProducts([]string{"desktop", "builder"}))
+	assert.Equal(t, []string{"automate", "builder", "desktop"}, RequiredProducts([]string{"desktop", "depot"}))
+	assert.Equal(t, []string{"automate", "builder", "desktop"}, RequiredProducts([]string{"desktop", "depot", "automate-full"}))
 }

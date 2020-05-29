@@ -1,0 +1,20 @@
+@import "~styles/variables";
+
+.no-permissions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba($chef-white, 0.85);
+  z-index: 190;
+  padding-top: 77px;
+  text-align: center;
+  font-weight: normal;
+
+  & > p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: $chef-primary-dark;
+  }
+}

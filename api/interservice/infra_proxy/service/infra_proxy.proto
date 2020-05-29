@@ -32,31 +32,35 @@ service InfraProxy {
     rpc UpdateServer    (chef.automate.domain.infra_proxy.request.UpdateServer) returns (chef.automate.domain.infra_proxy.response.UpdateServer) {};
     rpc GetServers      (chef.automate.domain.infra_proxy.request.GetServers) returns (chef.automate.domain.infra_proxy.response.GetServers) {};
     rpc GetServer       (chef.automate.domain.infra_proxy.request.GetServer) returns (chef.automate.domain.infra_proxy.response.GetServer) {};
-    rpc GetServerByName (chef.automate.domain.infra_proxy.request.GetServerByName) returns (chef.automate.domain.infra_proxy.response.GetServer) {};
 
     rpc CreateOrg    (chef.automate.domain.infra_proxy.request.CreateOrg) returns (chef.automate.domain.infra_proxy.response.CreateOrg) {};
     rpc DeleteOrg    (chef.automate.domain.infra_proxy.request.DeleteOrg) returns (chef.automate.domain.infra_proxy.response.DeleteOrg) {};
     rpc UpdateOrg    (chef.automate.domain.infra_proxy.request.UpdateOrg) returns (chef.automate.domain.infra_proxy.response.UpdateOrg) {};
     rpc GetOrgs      (chef.automate.domain.infra_proxy.request.GetOrgs) returns (chef.automate.domain.infra_proxy.response.GetOrgs) {};
     rpc GetOrg       (chef.automate.domain.infra_proxy.request.GetOrg) returns (chef.automate.domain.infra_proxy.response.GetOrg) {};
-    rpc GetOrgByName (chef.automate.domain.infra_proxy.request.GetOrgByName) returns (chef.automate.domain.infra_proxy.response.GetOrg) {};
+    rpc ResetOrgAdminKey (chef.automate.domain.infra_proxy.request.ResetOrgAdminKey) returns (chef.automate.domain.infra_proxy.response.ResetOrgAdminKey) {};
 
     rpc GetCookbooks (chef.automate.domain.infra_proxy.request.Cookbooks) returns (chef.automate.domain.infra_proxy.response.Cookbooks) {};
     rpc GetCookbookVersions (chef.automate.domain.infra_proxy.request.CookbookVersions) returns (chef.automate.domain.infra_proxy.response.CookbookVersions) {};
     rpc GetCookbook  (chef.automate.domain.infra_proxy.request.Cookbook) returns (chef.automate.domain.infra_proxy.response.Cookbook) {};
     rpc GetCookbookFileContent (chef.automate.domain.infra_proxy.request.CookbookFileContent) returns (chef.automate.domain.infra_proxy.response.CookbookFileContent) {};
-    
+
     rpc GetRoles (chef.automate.domain.infra_proxy.request.Roles) returns (chef.automate.domain.infra_proxy.response.Roles) {};
     rpc GetRole (chef.automate.domain.infra_proxy.request.Role) returns (chef.automate.domain.infra_proxy.response.Role) {};
-    
+    rpc CreateRole (chef.automate.domain.infra_proxy.request.CreateRole) returns (chef.automate.domain.infra_proxy.response.Role) {};
+    rpc DeleteRole (chef.automate.domain.infra_proxy.request.Role) returns (chef.automate.domain.infra_proxy.response.Role) {};
+
     rpc GetClients (chef.automate.domain.infra_proxy.request.Clients) returns (chef.automate.domain.infra_proxy.response.Clients) {};
     rpc GetClient (chef.automate.domain.infra_proxy.request.Client) returns (chef.automate.domain.infra_proxy.response.Client) {};
 
     rpc GetDataBags (chef.automate.domain.infra_proxy.request.DataBags) returns (chef.automate.domain.infra_proxy.response.DataBags) {};
     rpc GetDataBagItem (chef.automate.domain.infra_proxy.request.DataBag) returns (chef.automate.domain.infra_proxy.response.DataBag) {};
+    rpc CreateDataBag (chef.automate.domain.infra_proxy.request.CreateDataBag) returns (chef.automate.domain.infra_proxy.response.CreateDataBag) {};
+    rpc DeleteDataBag (chef.automate.domain.infra_proxy.request.DataBag) returns (chef.automate.domain.infra_proxy.response.DataBag) {};
 
     rpc GetEnvironments (chef.automate.domain.infra_proxy.request.Environments) returns (chef.automate.domain.infra_proxy.response.Environments) {};
     rpc GetEnvironment (chef.automate.domain.infra_proxy.request.Environment) returns (chef.automate.domain.infra_proxy.response.Environment) {};
+    rpc DeleteEnvironment (chef.automate.domain.infra_proxy.request.Environment) returns (chef.automate.domain.infra_proxy.response.Environment) {};
 
     rpc GetAffectedNodes  (chef.automate.domain.infra_proxy.request.AffectedNodes) returns (chef.automate.domain.infra_proxy.response.AffectedNodes) {};
 

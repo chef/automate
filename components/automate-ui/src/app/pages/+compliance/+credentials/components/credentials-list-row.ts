@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Credential } from '../credentials.state';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { DateTime } from '../../../../helpers/datetime/datetime';
 import { CredentialsLogic } from '../credentials.logic';
 

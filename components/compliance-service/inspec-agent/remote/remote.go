@@ -13,7 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
@@ -23,7 +23,7 @@ import (
 
 type RemoteJob struct {
 	TokensMgmtClient authn.TokensMgmtClient
-	PoliciesClient   v2.PoliciesClient
+	PoliciesClient   authz.PoliciesClient
 	AutomateFQDN     string
 }
 
@@ -49,7 +49,7 @@ func RunSSMJob(ctx context.Context, ssmJob *types.InspecJob) *inspec.Error {
 		return translateToInspecErr(err)
 	}
 	// add token to ingest policy
-	_, err = RemoteJobInfo.PoliciesClient.AddPolicyMembers(ctx, &v2.AddPolicyMembersReq{
+	_, err = RemoteJobInfo.PoliciesClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
 		Id:      constants.IngestPolicyID,
 		Members: []string{fmt.Sprintf("token:%s", tokenID)},
 	})

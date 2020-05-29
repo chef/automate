@@ -74,6 +74,16 @@ func readCliParams() *serveropts.Opts {
 		version.GitSHA,
 	))
 
+	missingNodesForDeletionRunningDefault := true
+	if viper.GetString("missing-nodes-for-deletion-running-default") == "false" {
+		missingNodesForDeletionRunningDefault = false
+	}
+
+	nodesMissingRunningDefault := true
+	if viper.GetString("nodes-missing-running-default") == "false" {
+		nodesMissingRunningDefault = false
+	}
+
 	return &serveropts.Opts{
 		Host:                          viper.GetString("host"),
 		Port:                          viper.GetInt("port"),
@@ -97,6 +107,10 @@ func readCliParams() *serveropts.Opts {
 				NumberOfMsgsTransformers: viper.GetInt("number-of-run-msgs-transformers"),
 				NumberOfPublishers:       viper.GetInt("number-of-run-msg-publishers"),
 			},
+		},
+		Jobs: serveropts.JobsConfig{
+			MissingNodesForDeletionRunningDefault: missingNodesForDeletionRunningDefault,
+			NodesMissingRunningDefault:            nodesMissingRunningDefault,
 		},
 		ConnFactory: factory,
 	}
@@ -126,5 +140,7 @@ func init() {
 	serveCmd.Flags().String("key", "key.pem", "SSL Private key for gRPC server")
 	serveCmd.Flags().String("cert", "cert.pem", "SSL Certificate for gRPC server")
 	serveCmd.Flags().String("root-cert", "cacert.pem", "Root SSL CA Certificate for gRPC server")
+	serveCmd.Flags().String("missing-nodes-for-deletion-running-default", "true", "Default value for running the missing nodes for deletion job")
+	serveCmd.Flags().String("nodes-missing-running-default", "true", "Default value for running the nodes missing job")
 	viper.BindPFlags(serveCmd.Flags()) // nolint: errcheck
 }

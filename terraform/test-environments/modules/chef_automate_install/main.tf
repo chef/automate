@@ -241,6 +241,7 @@ EOF
   manifest_cache_expiry = "0s"
   products = ${jsonencode(compact(list(
       "automate",
+      var.enable_desktop ? "desktop" : "",
       var.enable_chef_server ? "chef-server" : "",
       var.enable_workflow ? "workflow" : "",
       var.enable_builder ? "builder" : "")))}

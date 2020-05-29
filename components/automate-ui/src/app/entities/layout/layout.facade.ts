@@ -113,6 +113,13 @@ export class LayoutFacadeService {
     this.layout.userNotifications.display = false;
   }
 
+  showFullPagePlusTopBar(): void {
+    this.contentHeight = '100vh';
+    this.layout.header.display = true;
+    this.layout.sidebar.display = false;
+    this.layout.userNotifications.display = false;
+  }
+
   hideFullPage(): void {
     this.updateDisplay();
     this.layout.header.display = true;
@@ -120,7 +127,7 @@ export class LayoutFacadeService {
     this.layout.userNotifications.display = true;
   }
 
-  showSidebar(sidebarName: string) {
+  showSidebar(sidebarName: Sidebar) {
     this.layoutSidebarService.updateSidebars(sidebarName);
   }
 

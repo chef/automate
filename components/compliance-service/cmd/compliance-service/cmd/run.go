@@ -26,12 +26,15 @@ var conf = config.Compliance{
 		MigrationsPath:   "dao/pgdb/migration/sql/",
 	},
 	InspecAgent: config.InspecAgent{
-		JobBufferSize: 1000,
-		JobWorkers:    10,
-		BackendCache:  "true",
-		AuthnTarget:   "0.0.0.0:10113",
-		AutomateFQDN:  "localhost",
-		TmpDir:        os.Getenv("TMPDIR"),
+		JobBufferSize:       1000,
+		JobWorkers:          10,
+		BackendCache:        "true",
+		AuthnTarget:         "0.0.0.0:10113",
+		AutomateFQDN:        "localhost",
+		TmpDir:              os.Getenv("TMPDIR"),
+		ResultMessageLimit:  10000,
+		ControlResultsLimit: 50,
+		RunTimeLimit:        1.0, // Value in seconds
 	},
 	ElasticSearch: config.ElasticSearch{},
 	ElasticSearchSidecar: config.ElasticSearchSidecar{
@@ -120,6 +123,9 @@ func init() {
 	runCmd.Flags().StringVar(&conf.InspecAgent.AutomateFQDN, "automate-fqdn", conf.InspecAgent.AutomateFQDN, "Target fqdn for inspec reporting to automate")
 	runCmd.Flags().StringVar(&conf.InspecAgent.TmpDir, "inspec-tmp-dir", conf.InspecAgent.TmpDir, "location of /tmp dir to be used by inspec for caching")
 	runCmd.Flags().StringVar(&conf.InspecAgent.RemoteInspecVersion, "remote-inspec-version", conf.InspecAgent.RemoteInspecVersion, "Option to specify the version of inspec to use for remote(e.g. AWS SSM) scan jobs")
+	runCmd.Flags().IntVar(&conf.InspecAgent.ResultMessageLimit, "result-message-limit", conf.InspecAgent.ResultMessageLimit, "A control result message that exceeds this character limit will be truncated")
+	runCmd.Flags().IntVar(&conf.InspecAgent.ControlResultsLimit, "control-results-limit", conf.InspecAgent.ControlResultsLimit, "The array of results per control will be truncated at this limit to avoid large reports that cannot be processed")
+	runCmd.Flags().Float32Var(&conf.InspecAgent.RunTimeLimit, "run-time-limit", conf.InspecAgent.RunTimeLimit, "Control results that have a `run_time` (in seconds) below this limit will be stripped of the `start_time` and `run_time` fields")
 
 	// Legacy Automate Headers/User Info
 	runCmd.Flags().StringVar(&conf.Delivery.Enterprise, "delivery-ent", conf.Delivery.Enterprise, "Automate Enterprise")

@@ -15,7 +15,7 @@ import {
   PolicyCookbooks } from '../../types/types';
 
 import { environment } from '../../../environments/environment';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 const CONFIG_MGMT_URL = environment.config_mgmt_url;
 
 @Injectable()

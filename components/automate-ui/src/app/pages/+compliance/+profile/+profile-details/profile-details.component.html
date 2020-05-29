@@ -6,29 +6,33 @@
         {{ profile?.title }}
       </chef-breadcrumbs>
 
-      <chef-notification
-        *ngIf="downloadErrorVisible"
-        type="error"
-        timeout="5"
-        (dismissed)="hideDownloadError()">
-        Failed to download profile. Please try again later.
-      </chef-notification>
+      <div class="sticky-notifications">
+        <div class="sticky-inner">
+          <app-notification
+            *ngIf="downloadErrorVisible"
+            type="error"
+            timeout="5"
+            (dismissed)="hideDownloadError()">
+            Failed to download profile.Please try again later.
+          </app-notification>
 
-      <chef-notification
-        *ngIf="deleteErrorVisible"
-        type="error"
-        timeout="5"
-        (dismissed)="hideDeleteError()">
-        Failed to delete profile. Please try again later.
-      </chef-notification>
+          <app-notification
+            *ngIf="deleteErrorVisible"
+            type="error"
+            timeout="5"
+            (dismissed)="hideDeleteError()">
+            Failed to delete profile. Please try again later.
+          </app-notification>
 
-      <chef-notification
-        *ngIf="installErrorVisible"
-        type="error"
-        timeout="5"
-        (dismissed)="hideInstallError()">
-        Failed to install profile. Please try again later.
-      </chef-notification>
+          <app-notification
+            *ngIf="installErrorVisible"
+            type="error"
+            timeout="5"
+            (dismissed)="hideInstallError()">
+            Failed to install profile. Please try again later.
+          </app-notification>
+        </div>
+      </div>
 
       <ng-container class="applications-container" *ngIf="!showLoadingIcon">
         <chef-page-header>

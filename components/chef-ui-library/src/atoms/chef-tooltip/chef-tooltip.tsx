@@ -79,6 +79,17 @@ import debounce from 'lodash/fp/debounce';
  *    angels name lenore. nameless here for evermore. and the silken sad uncertain
  *    rustling of each purple curtain thrilled me, filled me with fantastic terrors
  * </p>
+ *
+ * @example
+ * <chef-tooltip interactable for='interactable-example'>
+ *   The contents of this tooltip can be interacted with.
+ * </chef-tooltip>
+ * <chef-button primary id='interactable-example'>Interactable Tooltip</chef-button>
+ * <p>
+ *   By default, tooltip content can't be interacted with because the tooltip will hide
+ *   after leaving the tooltip target. Applying an <code>interactable</code> attribute
+ *   will prevent the tooltip from hiding while the mouse cursor is within the tooltip.
+ * </p>
  */
 @Component({
   tag: 'chef-tooltip',
@@ -112,6 +123,11 @@ export class ChefTooltip {
    */
   @Prop() follow = false;
 
+  /**
+   * If set the tooltip will allow the mouse cursor to interact with its content.
+   */
+  @Prop() interactable = false;
+
   @State() visible = false;
   @State() _screenPosition = [0, 0];
 
@@ -142,6 +158,7 @@ export class ChefTooltip {
     const styles = { left: `${x}px`, top: `${y}px` };
     const classNames = [
       this.visible ? 'visible' : '',
+      this.interactable ? 'interactable' : '',
       this.position,
       this.follow ? 'follow' : ''
     ].join(' ');
@@ -176,11 +193,21 @@ export class ChefTooltip {
   }
 
   setupStaticPositioning(ref: HTMLElement) {
-    let transitionTimeoutID;
+    let transitionTimeoutID, hideTimeoutID;
     const transitionDuration = parseFloat(getComputedStyle(this.el).transitionDuration) * 1000;
 
-    const handleMouseEnter = () => {
+    const hideTooltip = () => {
+      hideTimeoutID = setTimeout(() => this.visible = false, this.delay);
+      transitionTimeoutID = setTimeout(handleTransitionComplete, transitionDuration);
+    };
+
+    const cancelHideTooltip = () => {
+      clearTimeout(hideTimeoutID);
       clearTimeout(transitionTimeoutID);
+    };
+
+    const handleMouseEnter = () => {
+      cancelHideTooltip();
       addEventListener('scroll', handleScroll);
     };
 
@@ -193,11 +220,23 @@ export class ChefTooltip {
 
     const handleMouseLeave = () => {
       handleMouseMove.cancel();
-      this.visible = false;
-      transitionTimeoutID = setTimeout(handleTransitionComplete, transitionDuration);
+      hideTooltip();
     };
 
     const handleTransitionComplete = () => removeEventListener('scroll', handleScroll);
+
+    const handleTooltipEnter = () => {
+      cancelHideTooltip();
+    };
+
+    const handleTooltipLeave = () => {
+      hideTooltip();
+    };
+
+    if (this.interactable) {
+      this.el.addEventListener('mouseenter', handleTooltipEnter);
+      this.el.addEventListener('mouseleave', handleTooltipLeave);
+    }
 
     ref.addEventListener('mouseenter', handleMouseEnter);
     ref.addEventListener('mousemove', handleMouseMove);

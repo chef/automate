@@ -175,23 +175,23 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 			}
 
 		}
-		//take status out of filters similar to why we remove them from suggestions.. we want to always see what's available in this context
-		delete(filters, "status")
-		// get node counts of passed/failed/skipped/waived nodes to append to totals response
-		nodeSummary, err := backend.GetStatsSummaryNodes(filters)
-		if err != nil {
-			return nil, emptyTotals, errors.Wrapf(err, "%s error retrieving node count totals: ", myName)
-		}
-
-		total := nodeSummary.Compliant + nodeSummary.Noncompliant + nodeSummary.Skipped + nodeSummary.Waived
-		return nodes, TotalNodeCounts{
-			Total:   total,
-			Passed:  nodeSummary.Compliant,
-			Failed:  nodeSummary.Noncompliant,
-			Skipped: nodeSummary.Skipped,
-			Waived:  nodeSummary.Waived,
-		}, nil
 	}
+	//take status out of filters similar to why we remove them from suggestions.. we want to always see what's available in this context
+	delete(filters, "status")
+	// get node counts of passed/failed/skipped/waived nodes to append to totals response
+	nodeSummary, err := backend.GetStatsSummaryNodes(filters)
+	if err != nil {
+		return nil, emptyTotals, errors.Wrapf(err, "%s error retrieving node count totals: ", myName)
+	}
+
+	total := nodeSummary.Compliant + nodeSummary.Noncompliant + nodeSummary.Skipped + nodeSummary.Waived
+	return nodes, TotalNodeCounts{
+		Total:   total,
+		Passed:  nodeSummary.Compliant,
+		Failed:  nodeSummary.Noncompliant,
+		Skipped: nodeSummary.Skipped,
+		Waived:  nodeSummary.Waived,
+	}, nil
 
 	logrus.Debugf("%s Found no nodes\n", myName)
 	return nodes, emptyTotals, nil

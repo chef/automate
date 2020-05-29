@@ -30,9 +30,12 @@
             <chef-icon>check_circle</chef-icon>
             <div>{{stats(selectedStatus.Success)}}</div>
           </button>
-          <div>
+          <div class="date-selector">
             <app-date-selector (select)="dateSelected($event)" [initialDateTerm]="defaultSelectionTerm"> </app-date-selector>
           </div>
+          <chef-button secondary (click)="onDownloadRunsReport()">
+            <chef-icon>cloud_download</chef-icon>
+          </chef-button>
         </div>
       </div>
 

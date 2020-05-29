@@ -3,7 +3,7 @@ import { Component,
          Output,
          EventEmitter,
          ChangeDetectionStrategy } from '@angular/core';
-import * as m from 'moment';
+import * as moment from 'moment/moment';
 import { concat,
          range,
          rangeRight,
@@ -17,8 +17,8 @@ import { concat,
 })
 export class CalendarComponent {
 
-  private _date: m.Moment = m.utc();
-  private _selected: m.Moment = m.utc();
+  private _date: moment.Moment = moment.utc();
+  private _selected: moment.Moment = moment.utc();
 
   private _month: string;
   private _year: number;
@@ -34,9 +34,9 @@ export class CalendarComponent {
 
   @Input()
   set date(input) {
-    const date = m.isMoment(input) ? input : m.utc(input);
+    const date = moment.isMoment(input) ? input : moment.utc(input);
     this._date = date;
-    this._month = m.months(date.month());
+    this._month = moment.months(date.month());
     this._year = date.year();
   }
   get date() {
@@ -45,7 +45,7 @@ export class CalendarComponent {
 
   @Input()
   set selected(input) {
-    const date = m.isMoment(input) ? input : m.utc(input);
+    const date = moment.isMoment(input) ? input : moment.utc(input);
     this._selected = date;
   }
   get selected() {
@@ -58,7 +58,7 @@ export class CalendarComponent {
     this.date.month(input);
     // Set the normalized internal month to its string
     // representation for display.
-    this._month = m.months(this.date.month());
+    this._month = moment.months(this.date.month());
   }
   get month(): string {
     return this._month;
@@ -79,10 +79,10 @@ export class CalendarComponent {
     const vy = this.date.year();
     const sm = this.selected.month();
     const sy = this.selected.year();
-    const today = m.utc().month() === this.date.month() ? m.utc().date() : null;
+    const today = moment.utc().month() === this.date.month() ? moment.utc().date() : null;
     const selected = (vm === sm && vy === sy) ? this.selected.date() : null;
-    const tag = (marker) => (d: m.Moment) => [marker, d];
-    const tagActive = (d: m.Moment) => {
+    const tag = (marker) => (d: moment.Moment) => [marker, d];
+    const tagActive = (d: moment.Moment) => {
       switch (d.date()) {
       case selected:
         return tag('a s')(d);
@@ -101,13 +101,13 @@ export class CalendarComponent {
   // returns the names of the weekdays in a minimal form:
   // [Mo, Tu, We, Th, Fr, Sa, Su]
   get weekdays(): string[] {
-    return m.weekdaysMin();
+    return moment.weekdaysMin();
   }
 
   // When the first of the month is on any day other than the first
   // day of the week, we need to fill in those extra days. This
   // method returns the last few days of the previous month.
-  private daysBefore(): m.Moment[] {
+  private daysBefore(): moment.Moment[] {
     const lastMonth = this
       .date
       .clone()
@@ -125,7 +125,7 @@ export class CalendarComponent {
   }
 
   // Returns the range of dates during the month
-  private daysDuring(): m.Moment[] {
+  private daysDuring(): moment.Moment[] {
     const daysInThisMonth = this
       .date
       .daysInMonth();
@@ -135,7 +135,7 @@ export class CalendarComponent {
 
   // Returns the first few days of the next month to fill out
   // the rest of the week.
-  private daysAfter(): m.Moment[] {
+  private daysAfter(): moment.Moment[] {
     const nextMonth = this
       .date
       .clone()

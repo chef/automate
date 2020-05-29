@@ -427,6 +427,155 @@ var nodeProps = `
 	"created": {
 		"type": "date",
 		"format": "strict_date_optional_time||epoch_millis"
+	},
+	"cloud_provider": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
+	"timezone": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
+	"kernel_release": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
+	"kernel_version": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
+	"virtualization_system": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
+	"virtualization_role": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
+	"dmi_system_manufacturer": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
+	"dmi_system_serial_number": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
+	"domain": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
+	"hostname": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
+	"macaddress": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
+	"memory_total": {
+		"type": "keyword"
+	},
+	"ip6address": {
+		"type": "ip"
 	}
 }`
 

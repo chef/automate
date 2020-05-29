@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@import "@carbon/grid/scss/grid";
 @import "assets/chef-ui-library/chef/chef.css";
 @import "assets/chef-ui-library/collection/assets/fonts/material-icons/material-icons.css";
 @import "assets/chef-ui-library/collection/styles/variables.example.css";
@@ -14,6 +15,24 @@
     chef-side-panel {
       top: 107px;
     }
+  }
+}
+
+
+// These are used to wrap a collection of notifications.
+// An outer container of sticky-notifications causes the notifications to stick to the
+// upper scrollable window the user scrolls.
+.sticky-notifications {
+  position: sticky;
+  top: 0;
+  z-index: 95;
+
+  // An inner container of sticky-inner ensures the notification content will overlay
+  // page content and not push it down.
+  .sticky-inner {
+    position: absolute;
+    top: 0;
+    width: 100%;
   }
 }
 
@@ -33,31 +52,6 @@
   main {
     padding-left: 0;
     padding-right: 0;
-  }
-}
-
-.permission-denied-banner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba($chef-white, 0.85);
-  z-index: 190;
-  padding-top: 38vh;
-  text-align: center;
-  font-weight: bold;
-
-  & > p {
-    margin: 0;
-    line-height: 1.6;
-    color: $chef-dark-grey;
-  }
-}
-
-@media screen and (max-width: 769px) {
-  .container {
-    margin-left: $sidebar-small-width;
   }
 }
 
@@ -317,7 +311,7 @@ input {
       background-color: var(--chef-white);
 
       &:after {
-        color: #212334;
+        color: $chef-primary-dark;
       }
     }
   }
@@ -346,6 +340,29 @@ input {
   right: 3px;
   text-align: center;
   top: -2px;
+}
+
+.chef-servers-icon {
+  display: inline-block;
+  border: 1px solid $chef-darkest;
+  border-radius: 2px;
+  height: 16px;
+  width: 16px;
+  background-color: var(--chef-white);
+  position: relative;
+  top: 2px;
+  margin-right: 5px;
+}
+
+.chef-servers-icon:before {
+  color: $chef-darkest;
+  content: 'C';
+  font-size: 9px;
+  font-weight: bolder;
+  position: absolute;
+  right: 4px;
+  text-align: center;
+  top: -3px;
 }
 
 // mat-select dropdown menu

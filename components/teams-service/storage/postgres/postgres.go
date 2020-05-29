@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/db"
@@ -23,7 +23,7 @@ var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 type postgres struct {
 	db          *sql.DB
 	logger      logger.Logger
-	authzClient authz_v2.AuthorizationClient
+	authzClient authz.AuthorizationClient
 }
 
 type querier interface {
@@ -32,7 +32,7 @@ type querier interface {
 
 // New instantiates and returns a postgres storage implementation
 func New(logger logger.Logger, migrationConfig migration.Config,
-	authzClient authz_v2.AuthorizationClient) (storage.Storage, error) {
+	authzClient authz.AuthorizationClient) (storage.Storage, error) {
 
 	if err := migrationConfig.Migrate(); err != nil {
 		return nil, errors.Wrap(err, "database migrations")
@@ -92,7 +92,7 @@ func (p *postgres) validateTeamInputs(ctx context.Context,
 			codes.InvalidArgument,
 			"a team name is required and must contain at least one non-whitespace character")
 	}
-	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz.ValidateProjectAssignmentReq{
 		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 		OldProjects:     oldProjects,
 		NewProjects:     updatedProjects,
@@ -429,7 +429,7 @@ func (p *postgres) GetUserIDsForTeam(ctx context.Context, id string) ([]string, 
 
 	var userIDs []string
 	row := p.db.QueryRowContext(ctx,
-		`SELECT array_agg(user_id) 
+		`SELECT array_agg(user_id)
 		FROM teams_users_associations INNER JOIN teams
 		ON teams.db_id=teams_users_associations.team_db_id
 		WHERE id = $1 AND projects_match(projects, $2::TEXT[])`,

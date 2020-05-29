@@ -4,12 +4,43 @@ package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
 
 message Roles {
-    string org_id    = 1;
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
     string server_id = 2;
 }
 
 message Role {
-    string org_id    = 1;
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
     string server_id = 2;
-    string name      = 3;
+    // Role name.
+    string name = 3;
+}
+
+message CreateRole {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Role name.
+    string name = 3;
+    // Role description.
+    string description = 4;
+    // Role default attributes.
+    string default_attributes = 5;
+    // Role override attributes.
+    string override_attributes = 6;
+    // Role run list.
+    repeated string run_list = 7;
+    // Environment based run list.
+    repeated EnvRunList env_run_lists = 8;
+}
+
+message EnvRunList {
+    // Environment name.
+    string name = 1;
+    // Role run list.
+    repeated string run_list = 2;
 }

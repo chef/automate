@@ -257,19 +257,20 @@ type Secrets struct {
 }
 
 type TargetBaseConfig struct {
-	Backend        string              `json:"backend,omitempty"`
-	Hostname       string              `json:"host,omitempty"`
-	Port           int                 `json:"port,omitempty"`
-	LoginPath      string              `json:"login_path,omitempty"` // winrm
-	Sudo           bool                `json:"sudo,omitempty"`
-	Format         string              `json:"format,omitempty"`
-	Reporter       map[string]Reporter `json:"reporter,omitempty"`
-	Ssl            bool                `json:"ssl,omitempty"`
-	SslSelfSigned  bool                `json:"self_signed,omitempty"`
-	BackendCache   bool                `json:"backend_cache,omitempty"`
-	Region         string              `json:"region,omitempty"`
-	SubscriptionId string              `json:"subscription_id,omitempty"`
-	AttributesJson *json.RawMessage    `json:"attributes,omitempty"`
+	Backend                string              `json:"backend,omitempty"`
+	Hostname               string              `json:"host,omitempty"`
+	Port                   int                 `json:"port,omitempty"`
+	LoginPath              string              `json:"login_path,omitempty"` // winrm
+	Sudo                   bool                `json:"sudo,omitempty"`
+	Reporter               map[string]Reporter `json:"reporter,omitempty"`
+	Ssl                    bool                `json:"ssl,omitempty"`
+	SslSelfSigned          bool                `json:"self_signed,omitempty"`
+	BackendCache           bool                `json:"backend_cache,omitempty"`
+	Region                 string              `json:"region,omitempty"`
+	SubscriptionId         string              `json:"subscription_id,omitempty"`
+	AttributesJson         *json.RawMessage    `json:"attributes,omitempty"`
+	ResultIncludeBacktrace bool                `json:"attributes,reporter_backtrace_inclusion"`
+	ResultMessageLimit     int                 `json:"attributes,reporter_message_truncation"`
 }
 
 // TargetConfig is inspec's JSON config options

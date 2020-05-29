@@ -1,12 +1,15 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
 import { runtimeChecks, ngrxReducers, NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { CreateTokenSuccess, CreateTokenFailure } from 'app/entities/api-tokens/api-token.actions';
+import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 import { ApiTokenListComponent } from './api-token-list.component';
 
 describe('ApiTokenListComponent', () => {
@@ -90,18 +93,48 @@ describe('ApiTokenListComponent', () => {
     });
 
     it('create token with no policies dispatches action just to create token', () => {
+      component.createModalVisible = true;
       spyOn(store, 'dispatch').and.callThrough();
       component.createTokenForm.controls.policies.setValue(null);
       component.createToken();
       expect(store.dispatch).toHaveBeenCalledTimes(1);
+
+      store.dispatch(new CreateTokenSuccess({ 'id': 't1', 'projects': [] } as ApiToken));
+      fixture.detectChanges();
+
+      const setupCallsToDispatch = 2;
+      expect(store.dispatch).toHaveBeenCalledTimes(setupCallsToDispatch);
+
     });
 
-    it('create token with 2 policies dispatches actions to create token plus each policy', () => {
-      const policies = ['p1', 'p2'];
+    it('successful create token with policies dispatches create plus each add-to-policy', () => {
+      const policies = ['p1', 'p2', 'p3', 'p4'];
+      component.createModalVisible = true;
       spyOn(store, 'dispatch').and.callThrough();
       component.createTokenForm.controls.policies.setValue(policies);
       component.createToken();
-      expect(store.dispatch).toHaveBeenCalledTimes(1 + policies.length);
+      expect(store.dispatch).toHaveBeenCalledTimes(1);
+
+      store.dispatch(new CreateTokenSuccess({ 'id': 't1', 'projects': [] } as ApiToken));
+      fixture.detectChanges();
+
+      const setupCallsToDispatch = 2;
+      expect(store.dispatch).toHaveBeenCalledTimes(setupCallsToDispatch + policies.length);
+    });
+
+    it('failed create token with policies dispatches create but no add-to-policy', () => {
+      const policies = ['p1', 'p2', 'p3', 'p4'];
+      component.createModalVisible = true;
+      spyOn(store, 'dispatch').and.callThrough();
+      component.createTokenForm.controls.policies.setValue(policies);
+      component.createToken();
+      expect(store.dispatch).toHaveBeenCalledTimes(1);
+
+      store.dispatch(new CreateTokenFailure({} as HttpErrorResponse));
+      fixture.detectChanges();
+
+      const setupCallsToDispatch = 2;
+      expect(store.dispatch).toHaveBeenCalledTimes(setupCallsToDispatch);
     });
   });
 });

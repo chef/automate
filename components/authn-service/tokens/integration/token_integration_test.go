@@ -16,8 +16,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	tokenauthn "github.com/chef/automate/components/authn-service/authenticator/tokens"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/server"
@@ -109,10 +108,10 @@ func TestChefClientAuthn(t *testing.T) {
 		ServiceCerts: serviceCerts,
 	}
 
-	subjectPurgeClient, authorizationClient, close := newAuthzMock(t)
+	authorizationClient, policiesClient, close := newAuthzMock(t)
 	defer close()
 
-	serv, err := server.NewServer(ctx, config, authorizationClient)
+	serv, err := server.NewServer(ctx, config)
 	if err != nil {
 		// SKIP these tests if there's no PG_URL given -- and never skip during CI!
 		if pgCfg == nil {
@@ -127,7 +126,7 @@ func TestChefClientAuthn(t *testing.T) {
 
 	// start services: local mgmt REST interface, and proxy service, and
 	// authenticate endpoint
-	g := grpctest.NewServer(serv.NewGRPCServer(subjectPurgeClient, authorizationClient))
+	g := grpctest.NewServer(serv.NewGRPCServer(policiesClient, authorizationClient))
 	defer g.Close()
 
 	connFactory := secureconn.NewFactory(*serviceCerts)
@@ -232,22 +231,24 @@ func TestChefClientAuthn(t *testing.T) {
 	}
 }
 
-func newAuthzMock(t *testing.T) (authz.SubjectPurgeClient, authz_v2.AuthorizationClient, func()) {
+func newAuthzMock(t *testing.T) (authz.AuthorizationClient, authz.PoliciesClient, func()) {
 	t.Helper()
 	certs := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*certs)
 	g := connFactory.NewServer()
-	mockV2Authz := authz_v2.NewAuthorizationServerMock()
-	mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-	mockCommon := authz.NewSubjectPurgeServerMock()
-	mockCommon.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-	authz.RegisterSubjectPurgeServer(g, mockCommon)
-	authz_v2.RegisterAuthorizationServer(g, mockV2Authz)
+	mockAuthz := authz.NewAuthorizationServerMock()
+	mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
+	authz.RegisterAuthorizationServer(g, mockAuthz)
+
+	mockPolicies := authz.NewPoliciesServerMock()
+	mockPolicies.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
+	authz.RegisterPoliciesServer(g, mockPolicies)
+
 	authzServer := grpctest.NewServer(g)
 	conn, err := connFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
 
-	return authz.NewSubjectPurgeClient(conn), authz_v2.NewAuthorizationClient(conn), authzServer.Close
+	return authz.NewAuthorizationClient(conn), authz.NewPoliciesClient(conn), authzServer.Close
 }
 
 func defaultMockPurgeFunc(context.Context,
@@ -256,6 +257,6 @@ func defaultMockPurgeFunc(context.Context,
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,
-	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
-	return &authz_v2.ValidateProjectAssignmentResp{}, nil
+	*authz.ValidateProjectAssignmentReq) (*authz.ValidateProjectAssignmentResp, error) {
+	return &authz.ValidateProjectAssignmentResp{}, nil
 }

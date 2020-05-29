@@ -2,7 +2,7 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: 3a8cf6a47fdd7a6a8f819142411fc4005ea938f745e53a2813d9396e1fe1911a
+        image_sha256: 18ead979bf43d70b47209078eb24d232a9f639dc843547c0bbeb49c0bcad3aad
         workdir: /go/src/github.com/chef/automate
 
 steps:
@@ -71,7 +71,7 @@ steps:
   - label: "[integration] chef server backup"
     command:
       - integration/run_test integration/tests/chef_server_backup.sh
-    timeout_in_minutes: 30 # longer timeout for chef-server
+    timeout_in_minutes: 40 # longer timeout for chef-server
     expeditor:
       executor:
         linux:
@@ -94,6 +94,15 @@ steps:
       executor:
         linux:
           single-use: true
+          privileged: true
+
+  - label: "[integration] a1 legacy token"
+    command:
+      - integration/run_test integration/tests/a1_legacy_token.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
           privileged: true
 
   # TODO(ssd) 2019-12-13: This test is broken given the current design

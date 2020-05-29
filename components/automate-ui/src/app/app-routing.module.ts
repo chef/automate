@@ -28,6 +28,10 @@ import { SigninComponent } from './pages/signin/signin.component';
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
 import { ChefServerDetailsComponent } from './modules/infra-proxy/chef-server-details/chef-server-details.component';
+import { CookbookDetailsComponent } from './modules/infra-proxy/cookbook-details/cookbook-details.component';
+import {
+  EnvironmentDetailsComponent
+} from './modules/infra-proxy/environment-details/environment-details.component';
 import { NodeDetailsComponent } from './pages/node-details/node-details.component';
 import {
   NodeNoRunsDetailsComponent
@@ -54,6 +58,7 @@ import {
 
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
+import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 
 const routes: Routes = [
   {
@@ -62,8 +67,8 @@ const routes: Routes = [
     canActivate: [ChefSessionService],
     children: [{
       path: '',
-      redirectTo: 'dashboards/event-feed',
-      pathMatch: 'full'
+      pathMatch: 'full',
+      component: TopNavLandingComponent
     },
     {
       path: 'settings',
@@ -243,12 +248,20 @@ const routes: Routes = [
               component: ChefServerDetailsComponent
             },
             {
-              path: ':id/org/:orgid',
+              path: ':id/organizations/:orgid',
               component: OrgDetailsComponent
             },
             {
-            path: ':id/org/:orgid/roles/:name',
+              path: ':id/organizations/:orgid/cookbooks/:cookbook_name',
+              component: CookbookDetailsComponent
+            },
+            {
+              path: ':id/organizations/:orgid/roles/:name',
               component: InfraRoleDetailsComponent
+            },
+            {
+              path: ':id/organizations/:orgid/environments/:name',
+              component: EnvironmentDetailsComponent
             }
           ]
         }
@@ -368,7 +381,7 @@ const routes: Routes = [
   // END Deprecated routes.
   {
     path: '**',
-    redirectTo: 'dashboards/event-feed'
+    redirectTo: ''
   }
 ];
 

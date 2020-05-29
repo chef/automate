@@ -12,7 +12,8 @@ import (
 // GetEnvironments fetches an array of existing environments
 func (a *InfraProxyServer) GetEnvironments(ctx context.Context, r *gwreq.Environments) (*gwres.Environments, error) {
 	req := &infra_req.Environments{
-		OrgId: r.OrgId,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
 	}
 	res, err := a.client.GetEnvironments(ctx, req)
 	if err != nil {
@@ -27,8 +28,9 @@ func (a *InfraProxyServer) GetEnvironments(ctx context.Context, r *gwreq.Environ
 // GetEnvironment fetches the environment details
 func (a *InfraProxyServer) GetEnvironment(ctx context.Context, r *gwreq.Environment) (*gwres.Environment, error) {
 	req := &infra_req.Environment{
-		OrgId: r.OrgId,
-		Name:  r.Name,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
 	}
 	res, err := a.client.GetEnvironment(ctx, req)
 	if err != nil {
@@ -43,6 +45,23 @@ func (a *InfraProxyServer) GetEnvironment(ctx context.Context, r *gwreq.Environm
 		JsonClass:          res.GetJsonClass(),
 		DefaultAttributes:  res.GetDefaultAttributes(),
 		OverrideAttributes: res.GetOverrideAttributes(),
+	}, nil
+}
+
+// DeleteEnvironment deletes the environment
+func (a *InfraProxyServer) DeleteEnvironment(ctx context.Context, r *gwreq.Environment) (*gwres.Environment, error) {
+	req := &infra_req.Environment{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.DeleteEnvironment(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Environment{
+		Name: res.GetName(),
 	}, nil
 }
 

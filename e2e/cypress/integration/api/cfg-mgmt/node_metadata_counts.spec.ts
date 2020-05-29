@@ -19,12 +19,8 @@ describe('Config-mgmt node_metadata_counts', () => {
       node.end_time = runEndDate.toISOString();
       node.node.automatic.platform = 'windows';
       node.status = 'failure';
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+
+      cy.sendToDataCollector(node);
     });
     cy.fixture('converge/avengers1.json').then((node: any) => {
       const runEndDate = Cypress.moment().subtract(12, 'hour');
@@ -37,12 +33,8 @@ describe('Config-mgmt node_metadata_counts', () => {
       node.end_time = runEndDate.toISOString();
       node.node.automatic.platform = 'linux';
       node.status = 'success';
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+
+      cy.sendToDataCollector(node);
     });
     cy.fixture('converge/avengers1.json').then((node: any) => {
       const runEndDate = Cypress.moment().subtract(12, 'hour');
@@ -55,25 +47,21 @@ describe('Config-mgmt node_metadata_counts', () => {
       node.end_time = runEndDate.toISOString();
       node.node.automatic.platform = 'macos';
       node.status = 'failure';
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+
+      cy.sendToDataCollector(node);
     });
 
     // Wait for nodes to be ingested
-    waitUntilNodeIsIngested(10, clientRunsNodeId1);
-    waitUntilNodeIsIngested(10, clientRunsNodeId2);
-    waitUntilNodeIsIngested(10, clientRunsNodeId3);
+    cy.waitForClientRunsNode(clientRunsNodeId1);
+    cy.waitForClientRunsNode(clientRunsNodeId2);
+    cy.waitForClientRunsNode(clientRunsNodeId3);
   });
 
   after(() => {
     // delete all nodes created
-    deleteNode(10, clientRunsNodeId1);
-    deleteNode(10, clientRunsNodeId2);
-    deleteNode(10, clientRunsNodeId3);
+    cy.deleteClientRunsNode(clientRunsNodeId1);
+    cy.deleteClientRunsNode(clientRunsNodeId2);
+    cy.deleteClientRunsNode(clientRunsNodeId3);
   });
 
   it('Get and test the node field value counts', () => {
@@ -110,50 +98,3 @@ describe('Config-mgmt node_metadata_counts', () => {
     });
   });
 });
-
-function waitUntilNodeIsIngested(attempts: number, clientRunsNodeId: string): void {
-  if (attempts === -1) {
-    throw new Error('node was never ingested');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
-  }).then((response) => {
-    if (response.body.length === 1 && response.body[0].id === clientRunsNodeId) {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be ingested`);
-      cy.wait(1000);
-      waitUntilNodeIsIngested(--attempts, clientRunsNodeId);
-    }
-  });
-}
-
-function deleteNode(attempts: number, clientRunsNodeId: string): void {
-  if (attempts === -1) {
-    throw new Error('node was never deleted');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
-  }).then((response: any) => {
-    if (response.body.length === 0) {
-      return;
-    } else {
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: 'api/v0/ingest/events/chef/node-multiple-deletes',
-        body: {
-          node_ids: [
-            clientRunsNodeId
-          ]
-        },
-        failOnStatusCode: true
-      });
-      cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be deleted`);
-      cy.wait(1000);
-      deleteNode(--attempts, clientRunsNodeId);
-    }
-  });
-}

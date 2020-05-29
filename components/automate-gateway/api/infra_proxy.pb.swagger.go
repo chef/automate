@@ -68,6 +68,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -90,6 +91,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -112,6 +114,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -123,30 +126,6 @@ func init() {
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateServer"
             }
-          }
-        ],
-        "tags": [
-          "InfraProxy"
-        ]
-      }
-    },
-    "/api/v0/infra/servers/{name}": {
-      "get": {
-        "operationId": "GetServerByName",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetServer"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "name",
-            "in": "path",
-            "required": true,
-            "type": "string"
           }
         ],
         "tags": [
@@ -310,14 +289,14 @@ func init() {
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{name}": {
-      "get": {
-        "operationId": "GetOrgByName",
+    "/api/v0/infra/servers/{server_id}/orgs/{id}/reset-key": {
+      "put": {
+        "operationId": "ResetOrgAdminKey",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetOrg"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ResetOrgAdminKey"
             }
           }
         },
@@ -330,11 +309,19 @@ func init() {
             "type": "string"
           },
           {
-            "name": "name",
-            "description": "Chef organization name.",
+            "name": "id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.ResetOrgAdminKey"
+            }
           }
         ],
         "tags": [
@@ -409,12 +396,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -439,18 +428,21 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Client name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -631,7 +623,7 @@ func init() {
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags": {
       "get": {
         "operationId": "GetDataBags",
         "responses": {
@@ -660,8 +652,92 @@ func init() {
           {
             "name": "name",
             "description": "Data bag name.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      },
+      "post": {
+        "operationId": "CreateDataBag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateDataBag"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.CreateDataBag"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
+      "delete": {
+        "operationId": "DeleteDataBag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBag"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Data bag name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "item",
+            "description": "Data bag item name.",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -751,6 +827,43 @@ func init() {
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
       "get": {
         "operationId": "GetEnvironment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environment"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Environment name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteEnvironment",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -879,15 +992,55 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      },
+      "post": {
+        "operationId": "CreateRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Role"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.CreateRole"
+            }
           }
         ],
         "tags": [
@@ -909,18 +1062,58 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Role name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Role"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Role name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -966,52 +1159,24 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.request.CreateOrg": {
+    "chef.automate.api.infra_proxy.request.CreateDataBag": {
       "type": "object",
       "properties": {
-        "name": {
+        "org_id": {
           "type": "string",
-          "description": "Chef organization name."
-        },
-        "admin_user": {
-          "type": "string",
-          "description": "Chef organization admin user."
-        },
-        "admin_key": {
-          "type": "string",
-          "description": "Chef organization admin key."
+          "description": "Chef organization ID."
         },
         "server_id": {
           "type": "string",
           "description": "Chef Infra Server ID."
         },
-        "projects": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "List of projects this chef organization belongs to. May be empty."
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.request.CreateServer": {
-      "type": "object",
-      "properties": {
         "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "fqdn": {
-          "type": "string"
-        },
-        "ip_address": {
-          "type": "string"
+          "type": "string",
+          "description": "Data bag name."
         }
       }
     },
-    "chef.automate.api.infra_proxy.request.UpdateOrg": {
+    "chef.automate.api.infra_proxy.request.CreateOrg": {
       "type": "object",
       "properties": {
         "id": {
@@ -1043,23 +1208,149 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.request.CreateRole": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Role name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Role description."
+        },
+        "default_attributes": {
+          "type": "string",
+          "description": "Role default attributes."
+        },
+        "override_attributes": {
+          "type": "string",
+          "description": "Role override attributes."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Role run list."
+        },
+        "env_run_lists": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.request.EnvRunList"
+          },
+          "description": "Environment based run list."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.CreateServer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Chef Infra Server name."
+        },
+        "fqdn": {
+          "type": "string",
+          "description": "Chef Infra Server FQDN."
+        },
+        "ip_address": {
+          "type": "string",
+          "description": "Chef Infra Server IP address."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.EnvRunList": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Environment name."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Role run list."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.ResetOrgAdminKey": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "admin_key": {
+          "type": "string",
+          "description": "Chef organization admin key."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.UpdateOrg": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Chef organization name."
+        },
+        "admin_user": {
+          "type": "string",
+          "description": "Chef organization admin user."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of projects this chef organization belongs to. May be empty."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.UpdateServer": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server ID."
         },
         "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server name."
         },
         "fqdn": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server FQDN."
         },
         "ip_address": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server IP address."
         }
       }
     },
@@ -1079,39 +1370,29 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Client name."
         },
         "client_name": {
-          "type": "string"
+          "type": "string",
+          "description": "Client name return by Chef Infra Server API."
         },
         "org_name": {
-          "type": "string"
-        },
-        "admin": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "string",
+          "description": "Chef organization name."
         },
         "validator": {
           "type": "boolean",
-          "format": "boolean"
-        },
-        "certificate": {
-          "type": "string"
-        },
-        "public_key": {
-          "type": "string"
-        },
-        "private_key": {
-          "type": "string"
-        },
-        "uri": {
-          "type": "string"
+          "format": "boolean",
+          "description": "Boolean indicates client type is validator or not."
         },
         "json_class": {
-          "type": "string"
+          "type": "string",
+          "description": "Client JSON class."
         },
         "chef_type": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef object type."
         }
       }
     },
@@ -1119,7 +1400,8 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Client name."
         }
       }
     },
@@ -1130,7 +1412,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientListItem"
-          }
+          },
+          "description": "Client list."
         }
       }
     },
@@ -1376,6 +1659,15 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.CreateDataBag": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Data bag name."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.CreateOrg": {
       "type": "object",
       "properties": {
@@ -1389,13 +1681,22 @@ func init() {
       "type": "object",
       "properties": {
         "server": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
+          "description": "Chef Infra Server."
         }
       }
     },
     "chef.automate.api.infra_proxy.response.DataBag": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "description": "Data bag name."
+        },
+        "id": {
+          "type": "string",
+          "description": "Data bag item ID."
+        },
         "data": {
           "type": "string",
           "description": "Stringified json of data bag item."
@@ -1436,7 +1737,8 @@ func init() {
       "type": "object",
       "properties": {
         "server": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
+          "description": "Chef Infra Server."
         }
       }
     },
@@ -1528,7 +1830,7 @@ func init() {
         "orgs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.OrgListItem"
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
           },
           "description": "Chef organization list."
         }
@@ -1538,7 +1840,8 @@ func init() {
       "type": "object",
       "properties": {
         "server": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
+          "description": "Chef Infra Server."
         }
       }
     },
@@ -1549,7 +1852,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
-          }
+          },
+          "description": "List of Chef Infra Servers."
         }
       }
     },
@@ -1651,27 +1955,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.response.OrgListItem": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Chef organization ID."
-        },
-        "name": {
-          "type": "string",
-          "description": "Chef organization name."
-        },
-        "admin_user": {
-          "type": "string",
-          "description": "Chef organization admin user."
-        },
-        "server_id": {
-          "type": "string",
-          "description": "Chef Infra Server ID."
-        }
-      }
-    },
     "chef.automate.api.infra_proxy.response.Policyfile": {
       "type": "object",
       "properties": {
@@ -1758,6 +2041,15 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileListItem"
           },
           "description": "Policyfiles list."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.ResetOrgAdminKey": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org",
+          "description": "Chef organization."
         }
       }
     },
@@ -1903,23 +2195,25 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server ID."
         },
         "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server name."
         },
         "fqdn": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server FQDN."
         },
         "ip_address": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef Infra Server IP address."
         },
         "orgs_count": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Chef organizations count associated with Chef Infra Server."
         }
       }
     },
@@ -1945,7 +2239,8 @@ func init() {
       "type": "object",
       "properties": {
         "server": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
+          "description": "Chef Infra Server."
         }
       }
     }

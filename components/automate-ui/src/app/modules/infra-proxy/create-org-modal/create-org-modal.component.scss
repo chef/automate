@@ -13,8 +13,8 @@ chef-modal {
     display: flex;
     justify-content: center;
 
-    .margin {
-      margin-bottom: 30px;
+    .input-margin {
+      margin-bottom: 5px;
     }
 
     form {
@@ -27,9 +27,22 @@ chef-modal {
       label {
         padding-bottom: 0;
       }
+
+      .detail {
+        color: $chef-primary-dark;
+        font-size: 12px;
+      }
+
+      #id-fields {
+        font-size: 0.75em;
+
+        .key-label {
+          font-weight: bold;
+        }
+      }
     }
 
-    #button-bar {
+    #button-org {
       text-align: center;
 
       chef-loading-spinner {
@@ -40,7 +53,7 @@ chef-modal {
     }
 
     #admin_key {
-      height: 200px;
+      height: 140px;
     }
   }
 }

@@ -1,6 +1,7 @@
-import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChange } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, OnChanges, Output, EventEmitter, SimpleChange } from '@angular/core';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { maxBy } from 'lodash/fp';
 import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
 
 import {
@@ -16,6 +17,8 @@ export class UnknownDesktopDurationCountsComponent  implements OnInit, OnDestroy
 
   @Input() countedDurationItems: CountedDurationItem[];
   @Input() lastUpdated: Date;
+
+  @Output() durationSelected: EventEmitter<any> = new EventEmitter();
 
   private isDestroyed = new Subject<boolean>();
   public lastUpdatedMessage = '-';
@@ -41,6 +44,10 @@ export class UnknownDesktopDurationCountsComponent  implements OnInit, OnDestroy
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  get countedDurationItemsMax() {
+    return maxBy('count', this.countedDurationItems);
   }
 
   // Make this more general once we don't have hard coded durations.

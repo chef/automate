@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/status"
 
 	ver_api "github.com/chef/automate/api/external/common/version"
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/teams-service/service"
 	"github.com/chef/automate/components/teams-service/storage"
 )

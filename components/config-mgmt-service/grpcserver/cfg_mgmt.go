@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
 	"github.com/chef/automate/components/config-mgmt-service/backend"
+	"github.com/chef/automate/components/config-mgmt-service/backend/postgres"
 	"github.com/chef/automate/components/config-mgmt-service/config"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
 	"github.com/chef/automate/components/config-mgmt-service/params"
@@ -25,6 +26,7 @@ import (
 type CfgMgmtServer struct {
 	client backend.Client
 	cs     *config.Service
+	pg     *postgres.Postgres
 }
 
 // NewCfgMgmtServer creates a new server instance and it automatically
@@ -34,6 +36,23 @@ func NewCfgMgmtServer(cs *config.Service) *CfgMgmtServer {
 		client: cs.GetBackend(),
 		cs:     cs,
 	}
+}
+
+func (s *CfgMgmtServer) ConnectPg() error {
+	pg, err := postgres.Open(&s.cs.Postgres)
+	if err != nil {
+		return err
+	}
+	s.pg = pg
+	return nil
+}
+
+func (s *CfgMgmtServer) PgConnection() *postgres.Postgres {
+	return s.pg
+}
+
+func (s *CfgMgmtServer) ClearPg() error {
+	return s.pg.Clear()
 }
 
 // GetPolicyCookbooks returns a list of cookbook name, policy
@@ -106,12 +125,18 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context,
 		return nodesCounts, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
+	// Date Range
+	if !params.ValidateDateTimeRange(request.GetStart(), request.GetEnd()) {
+		return nodesCounts, status.Errorf(codes.InvalidArgument,
+			"Invalid start/end time. (format: YYYY-MM-DD'T'HH:mm:ssZ)")
+	}
+
 	filters, err = filterByProjects(ctx, filters)
 	if err != nil {
 		return nodesCounts, errors.GrpcErrorFromErr(codes.Internal, err)
 	}
 
-	state, err := s.client.GetNodesCounts(filters)
+	state, err := s.client.GetNodesCounts(filters, request.GetStart(), request.GetEnd())
 	if err != nil {
 		return nodesCounts, errors.GrpcErrorFromErr(codes.Internal, err)
 	}

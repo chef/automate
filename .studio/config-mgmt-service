@@ -8,7 +8,16 @@ DOC
 function start_config_mgmt_service() {
   build components/config-mgmt-service/
   start_deployment_service
-  chef-automate dev deploy-some $HAB_ORIGIN/config-mgmt-service --with-deps
+  chef-automate dev deploy-some "$HAB_ORIGIN"/config-mgmt-service --with-deps
+}
+
+document "start_config_mgmt_service_deps" <<DOC
+  Start the applications service's deps so integration tests can run
+DOC
+function start_config_mgmt_service_deps() {
+  start_deployment_service
+  chef-automate dev deploy-some --with-deps "$(app_service_origin)/config-mgmt-service"
+  chef-automate dev remove-some "$(app_service_origin)/config-mgmt-service"
 }
 
 # Run Integration tests for the config-mgmt-service
@@ -68,4 +77,89 @@ DOC
 function config_mgmt_grpcurl_get_suggestions() {
   chef-automate dev grpcurl config-mgmt-service -- -d '{"type": "'"$1"'", "text": "'"$2"'"}' \
 	  chef.automate.domain.cfgmgmt.service.CfgMgmt.GetSuggestions
+}
+
+document "config_mgmt_list_rollouts" <<DOC
+  List the rollout objects on the Automate server via the JSON/REST API.
+
+  See config_mgmt_list_rollouts_raw if you don't want pretty print.
+DOC
+function config_mgmt_list_rollouts() {
+  config_mgmt_list_rollouts_raw | jq .
+}
+
+function config_mgmt_list_rollouts_raw() {
+  local api_token; api_token="$(get_admin_token)"
+  curl -fsS \
+       --insecure \
+       -H "api-token: ${api_token}" \
+       "https://localhost/api/beta/cfgmgmt/rollouts/list"
+}
+
+document "config_mgmt_create_rollout" << DOC
+  Create a rollout object on the automate server via the JSON REST API.
+
+  The function \`config_mgmt_rollout_json\` creates the payload;
+  \`config_mgmt_send_to_create_rollout_pretty\` sends it to the API.
+
+  To send a modified payload, you could run:
+  \`config_mgmt_rollout_json | YOUR_JQ_MAGIC_HERE | config_mgmt_send_to_create_rollout_pretty\`
+DOC
+function config_mgmt_create_rollout() {
+  config_mgmt_rollout_json | config_mgmt_send_to_create_rollout_pretty
+}
+
+function config_mgmt_send_to_create_rollout_pretty() {
+  local response
+  response=$(config_mgmt_send_to_create_rollout_raw)
+  success=$?
+  if [[ $success ]]; then
+    echo "$response" | jq .
+  else
+    echo "$response"
+  fi
+  return $success
+}
+
+function config_mgmt_send_to_create_rollout_raw() {
+  local api_token; api_token="$(get_admin_token)"
+  curl -fsS \
+       --insecure \
+       -H "api-token: ${api_token}" \
+       -X POST \
+       --data "@-" \
+       "https://localhost/api/beta/cfgmgmt/rollouts/create"
+  
+}
+
+document "config_mgmt_rollout_json" <<DOC
+  Generates a JSON payload that can be sent to the /cfgmgmt/rollouts/create
+  JSON/REST API. It uses a static template and updates the policy_revision_id
+  with a random hex string
+DOC
+function config_mgmt_rollout_json() {
+  # shellcheck disable=SC2016
+  config_mgmt_rollout_json_static | 
+    jq --arg policy_revision_id "$(head -c 200 /dev/urandom | tr -cd '0-9a-f')" \
+       --arg description "example created on $(date)" \
+    '.policy_revision_id = $policy_revision_id | .description = $description'
+}
+
+function config_mgmt_rollout_json_static() {
+  echo '
+      {
+        "policy_name": "example-policy-name",
+        "policy_node_group": "example-policy-node-group",
+        "policy_revision_id": "111222333aaabbbccc",
+        "policy_domain_url": "https://chef-server.example/organizations/example_org",
+        "scm_type": "GIT",
+        "scm_web_type": "GITHUB",
+        "policy_scm_url": "git@github.com:chef/automate.git",
+        "policy_scm_web_url": "https://github.com/chef/automate.git",
+        "policy_scm_commit": "1ca3deb611fa1ab5bbf28cfb55179011e16d4a3e",
+        "description": "example",
+        "ci_job_url": "chef-automate-master-verify#42",
+        "ci_job_id": "https://buildkite.com/chef-oss/chef-automate-master-verify/builds/42"
+      }
+'
 }

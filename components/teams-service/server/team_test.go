@@ -12,9 +12,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -61,7 +60,7 @@ func TestTeamsGRPC(t *testing.T) {
 
 func runAllServerTests(
 	t *testing.T, serv *team_serv.TeamServer, serviceRef *service.Service,
-	authzMock *authz.SubjectPurgeServerMock, cl teams.TeamsClient, close func()) {
+	authzMock *authz.PoliciesServerMock, cl teams.TeamsClient, close func()) {
 
 	t.Helper()
 	defer close()
@@ -2051,7 +2050,7 @@ func cleanupTeam(t *testing.T, cl teams.TeamsClient, id string) {
 // Pass nil for migrationConfig if you want in-memory server.
 func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
 	migrationConfig *migration.Config) (*team_serv.TeamServer, *service.Service,
-	*grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
+	*grpc.ClientConn, func(), *authz.PoliciesServerMock) {
 
 	t.Helper()
 
@@ -2062,31 +2061,27 @@ func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
 
-	mockCommon := authz.NewSubjectPurgeServerMock()
-	mockCommon.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-	authz.RegisterSubjectPurgeServer(grpcAuthz, mockCommon)
+	mockPolicies := authz.NewPoliciesServerMock()
+	mockPolicies.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
+	authz.RegisterPoliciesServer(grpcAuthz, mockPolicies)
 
-	mockPolicies := authz_v2.NewPoliciesServerMock()
-	authz_v2.RegisterPoliciesServer(grpcAuthz, mockPolicies)
-
-	mockAuthz := authz_v2.NewAuthorizationServerMock()
+	mockAuthz := authz.NewAuthorizationServerMock()
 	mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-	authz_v2.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
+	authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
 
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
 
-	authzClient := authz.NewSubjectPurgeClient(authzConn)
-	authzPoliciesClient := authz_v2.NewPoliciesClient(authzConn)
-	authzAuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
+	authzPoliciesClient := authz.NewPoliciesClient(authzConn)
+	authzAuthorizationClient := authz.NewAuthorizationClient(authzConn)
 
 	var serviceRef *service.Service
 	if migrationConfig == nil {
-		serviceRef, err = service.NewInMemoryService(l, connFactory, authzClient)
+		serviceRef, err = service.NewInMemoryService(l, connFactory, authzPoliciesClient)
 	} else {
 		serviceRef, err = service.NewPostgresService(l, connFactory,
-			*migrationConfig, authzClient, authzPoliciesClient, authzAuthorizationClient)
+			*migrationConfig, authzPoliciesClient, authzAuthorizationClient)
 	}
 	if err != nil {
 		t.Fatalf("could not create server: %s", err)
@@ -2103,7 +2098,8 @@ func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
 	if err != nil {
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
-	return teamServer, serviceRef, conn, func() { g.Close(); authzServer.Close() }, mockCommon
+
+	return teamServer, serviceRef, conn, func() { g.Close(); authzServer.Close() }, mockPolicies
 }
 
 func resetState(ctx context.Context, t *testing.T, serviceRef *service.Service) {
@@ -2121,8 +2117,8 @@ func defaultMockPurgeFunc(context.Context,
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,
-	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
-	return &authz_v2.ValidateProjectAssignmentResp{}, nil
+	*authz.ValidateProjectAssignmentReq) (*authz.ValidateProjectAssignmentResp, error) {
+	return &authz.ValidateProjectAssignmentResp{}, nil
 }
 
 func insertProjectsIntoNewContext(projects []string) context.Context {

@@ -23,7 +23,7 @@ func NewServer(users local_user.UsersMgmtClient) *Server {
 func (p *Server) CreateUser(
 	ctx context.Context, in *pb_req.CreateUserReq) (*pb_resp.CreateUserResp, error) {
 
-	// Note: This is where we're mapping data models: externally, an IAM v2
+	// Note: This is where we're mapping data models: externally, an IAM
 	// user has two properties: an ID (what they login with, equivalent to
 	// their username), and a display name (called "name") here.
 	// What l-u-s gets as Name will be the name, what it gets as Email will

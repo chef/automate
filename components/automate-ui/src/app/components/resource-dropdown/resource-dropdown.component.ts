@@ -41,7 +41,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // filteredResources is merely a container to hold the resources
   // that can be altered
   public filteredResources: ResourceChecked[] = [];
-  public active = false;
+  public dropdownState: 'closed' | 'opening' | 'open' = 'closed';
   public label = this.noneSelectedLabel;
   public filterValue = '';
 
@@ -66,19 +66,19 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     return ChefSorters.naturalSort(this.resources, 'name');
   }
 
-  toggleDropdown(event: MouseEvent): void {
-    event.stopPropagation();
+  toggleDropdown(): void {
     if (this.disabled) {
       return;
     }
-    if (!this.active) { // opening
+    if (this.dropdownState === 'closed') { // opening
       this.filterValue = '';
       this.filteredResources = this.resourcesInOrder;
+      // we cannot go directly to 'open' because handleClickOutside,
+      // firing next on the same event that arrived here, would then immediately close it.
+      this.dropdownState = 'opening';
     } else { // closing
       this.closeDropdown();
     }
-
-    this.active = !this.active;
   }
 
   resourceChecked(checked: boolean, resource: ResourceChecked): void {
@@ -86,12 +86,22 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     this.updateLabel();
   }
 
-  closeDropdown(): void {
-    if (this.active) {
-      this.active = false;
-      this.onDropdownClosing.emit(
-        this.resources.filter(r => r.checked).map(r => r.id));
+  handleClickOutside(): void {
+    // Arriving here, the main goal is to close this dropdown if it is open.
+    if (this.dropdownState === 'open') {
+      this.closeDropdown();
     }
+    // Now that we have checked the above,
+    // it is safe to complete opening if the click occurred when the dropdown was closed.
+    if (this.dropdownState === 'opening') {
+      this.dropdownState = 'open';
+    }
+  }
+
+  closeDropdown(): void {
+    this.dropdownState = 'closed';
+    this.onDropdownClosing.emit(
+      this.resources.filter(r => r.checked).map(r => r.id));
   }
 
   handleFilterKeyUp(): void {

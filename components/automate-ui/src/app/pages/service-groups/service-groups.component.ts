@@ -1,6 +1,6 @@
-import { map, takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
+import { map, takeUntil, withLatestFrom, distinctUntilChanged, filter } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, combineLatest } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -246,23 +246,21 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     // are filtered out via those status filters we have a special state that
     // says, e.g., "none of the services returned warning" that we want to
     // show.
-    this.store.select(serviceGroupsStatus).subscribe((sgStatus) => {
-      if (sgStatus === 'loadingSuccess') {
-        this.store.select(selectedServiceGroupStatus).subscribe((sSgStatus) => {
-          if (sSgStatus === 'loadingSuccess') {
-            this.serviceGroupsList$.subscribe((serviceGroups) => {
-              if (serviceGroups.length > 0) {
-                this.store.select(selectedServiceGroupHealth).subscribe((sgHealth) => {
-                  if (sgHealth.total === 0) {
-                    this.onServiceGroupSelect(null, serviceGroups[0].id);
-                  }
-                });
-              }
-            });
-          }
-        });
-      }
-    });
+    combineLatest([
+      this.store.select(selectedServiceGroupStatus),
+      this.store.select(serviceGroupsStatus),
+      this.store.select(serviceGroupsList),
+      this.store.select(selectedServiceGroupHealth)
+    ]).pipe(
+      filter(([sSgStatus, sgStatus, serviceGroups, sgHealth]) =>
+        sgStatus === EntityStatus.loadingSuccess
+        && sSgStatus === EntityStatus.loadingSuccess
+        && serviceGroups.length > 0
+        && sgHealth.total === 0
+      ),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([_sSgStatus, _sgStatus, serviceGroups, _sgHealth]) =>
+        this.onServiceGroupSelect(null, serviceGroups[0].id));
 
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupsState,
       (serviceGroups) => serviceGroups.filters.status));

@@ -6,7 +6,7 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: 3a8cf6a47fdd7a6a8f819142411fc4005ea938f745e53a2813d9396e1fe1911a
+        image_sha256: 18ead979bf43d70b47209078eb24d232a9f639dc843547c0bbeb49c0bcad3aad
         workdir: /go/src/github.com/chef/automate
 
 steps:
@@ -131,7 +131,7 @@ steps:
   - label: "applications-service"
     command:
       - . scripts/verify_setup.sh
-      - hab studio run "source scripts/verify_studio_init.sh && start_applications_service_deps && applications_integration"
+      - hab studio run "source scripts/verify_studio_init.sh && start_applications_service_deps && applications_set_service_seq_to_int_max && applications_integration"
     timeout_in_minutes: 20
     expeditor:
       executor:
@@ -325,7 +325,7 @@ steps:
   - label: "config-mgmt-service"
     command:
       - . scripts/verify_setup.sh
-      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deploy-some chef/automate-elasticsearch --with-deps && config_mgmt_integration"
+      - hab studio run "source scripts/verify_studio_init.sh && start_config_mgmt_service_deps && config_mgmt_integration"
     timeout_in_minutes: 20
     retry:
       automatic:

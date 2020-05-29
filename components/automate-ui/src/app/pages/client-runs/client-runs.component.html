@@ -1,18 +1,17 @@
-<div class="content-container">
-  <div *ngIf="permissionDenied$ | async" class="permission-denied-banner">
-    <p>You do not currently have permission to view this page.</p>
-    <p>Please contact your administrator for permission.</p>
-  </div>
-
+<div class="content-container" [ngClass]="loading(loadedStatus$ | async) ? 'lock-scrolling' : ''">
   <div class="container">
-    
-    <chef-notification
-      *ngIf="notificationVisible"
-      [type]="'error'"
-      [timeout]="8"
-      (dismissed)="hideNotification()">
-      Failed to retrieve data.
-    </chef-notification>
+
+    <div class="sticky-notifications">
+      <div class="sticky-inner">
+        <app-notification
+          *ngIf="notificationVisible"
+          [type]="'error'"
+          [timeout]="8"
+          (dismissed)="hideNotification()">
+          Failed to retrieve data.
+        </app-notification>
+      </div>
+    </div>
     <main>
       <div class="node-list-container">
         <chef-page-header>

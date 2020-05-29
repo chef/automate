@@ -19,12 +19,12 @@ describe('LandingComponent', () => {
   const targetRoute = '/settings/teams';
   const routePerms: RoutePerms[] = [
     {
-      allOfCheck: [['/apis/iam/v2/teams', 'get', '']],
-      anyOfCheck: [['/apis/iam/v2/something-else', 'get', '']],
+      allOfCheck: [['/apis/iam/v2/teams', 'get']],
+      anyOfCheck: [['/apis/iam/v2/something-else', 'get']],
       route: '/settings/teams'
     },
-    { anyOfCheck: [['/apis/iam/v2/tokens', 'get', '']], route: '/settings/tokens' },
-    { allOfCheck: [['/apis/iam/v2/users', 'get', '']], route: '/settings/users' }
+    { anyOfCheck: [['/apis/iam/v2/tokens', 'get']], route: '/settings/tokens' },
+    { allOfCheck: [['/apis/iam/v2/users', 'get']], route: '/settings/users' }
   ];
 
 
@@ -103,9 +103,9 @@ describe('LandingComponent', () => {
   describe('with second page allowed and all others denied', () => {
     const targetIndex = 1;
     const newRoutePerms: RoutePerms[] = [
-      { allOfCheck: [['/apis/iam/v2/teams', 'get', '']], route: '/settings/teams' },
-      { anyOfCheck: [['/apis/iam/v2/tokens', 'get', '']], route: '/settings/tokens' },
-      { allOfCheck: [['/apis/iam/v2/users', 'get', '']], route: '/settings/users' }
+      { allOfCheck: [['/apis/iam/v2/teams', 'get']], route: '/settings/teams' },
+      { anyOfCheck: [['/apis/iam/v2/tokens', 'get']], route: '/settings/tokens' },
+      { allOfCheck: [['/apis/iam/v2/users', 'get']], route: '/settings/users' }
     ];
 
     beforeEach(async(() => {

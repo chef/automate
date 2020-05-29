@@ -72,10 +72,8 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
     this.updateForm = this.fb.group({
       // Must stay in sync with error checks in data-feed-details.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      url: ['', [Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK),
-        Validators.pattern(Regex.patterns.VALID_FQDN)
-      ]]
+      // Note that URL here may be FQDN -or- IP!
+      url: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
 
     this.store.pipe(

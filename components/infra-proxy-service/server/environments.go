@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"sort"
 
-	chef "github.com/chef/go-chef"
+	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -15,15 +15,14 @@ import (
 
 // GetEnvironments get environments list
 func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments) (*response.Environments, error) {
-
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	environments, err := c.client.Environments.List()
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Environments{
@@ -33,14 +32,14 @@ func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments)
 
 // GetEnvironment gets the environment details
 func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	en, err := c.client.Environments.Get(req.Name)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err)
 	}
 
 	defaultAttributes, err := json.Marshal(en.DefaultAttributes)
@@ -61,6 +60,28 @@ func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (
 		JsonClass:          en.JsonClass,
 		DefaultAttributes:  string(defaultAttributes),
 		OverrideAttributes: string(overrideAttributes),
+	}, nil
+
+}
+
+// DeleteEnvironment deletes the environment
+func (s *Server) DeleteEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "must supply environment name")
+	}
+
+	environment, err := c.client.Environments.Delete(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.Environment{
+		Name: environment.Name,
 	}, nil
 
 }

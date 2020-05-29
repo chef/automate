@@ -35,11 +35,8 @@
           <chef-form-field>
             <label>Data Feed URL <span aria-hidden="true">*</span></label>
             <input chefInput formControlName="url" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="url-input"/>
-            <chef-error *ngIf="urlCtrl.hasError('required')">
+            <chef-error *ngIf="(urlCtrl.hasError('required') || urlCtrl.hasError('pattern')) && urlCtrl.dirty">
               Data Feed URL is required.
-            </chef-error>
-            <chef-error *ngIf="urlCtrl.hasError('pattern')">
-              Data Feed URL is invalid.
             </chef-error>
           </chef-form-field>
         </form>

@@ -69,7 +69,9 @@ export function serviceGroupsEntityReducer(
   switch (action.type) {
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS:
-      return set('status', EntityStatus.loading, state);
+      return pipe(
+        set('status', EntityStatus.loading),
+        set('list', {}))(state);
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUCCESS:
       return pipe(
@@ -103,12 +105,13 @@ export function serviceGroupsEntityReducer(
       return set('selectedGroup.services.filters', action.payload, state);
 
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP:
-      return set('selectedGroup.services.status', EntityStatus.loading, state);
+      return pipe(
+        set('selectedGroup.services.status', EntityStatus.loading),
+        set('selectedGroup.services.list', []))(state);
 
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP_SUCCESS:
       return pipe(
         set('selectedGroup.name', action.payload.group),
-        set('selectedGroup.services.status', EntityStatus.loadingSuccess),
         set('selectedGroup.services.healthSummary', action.payload.services_health_counts),
         set('selectedGroup.services.list', action.payload.services))(state);
 

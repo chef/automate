@@ -89,9 +89,10 @@ describe('CreateObjectModalComponent', () => {
 
   it('upon opening, checked status of all policies is set to false', () => {
     component.policies = [
-        { id: 'proj1', name: 'proj1', type: 'CHEF_MANAGED', members: [], checked: true },
-        { id: 'proj3', name: 'proj3', type: 'CUSTOM', members: [], checked: false },
-        { id: 'proj2', name: 'proj2', type: 'CUSTOM', members: [], checked: true }
+        { id: 'proj1', name: 'proj1', type: 'CHEF_MANAGED', members: [], projects: [],
+          checked: true },
+        { id: 'proj3', name: 'proj3', type: 'CUSTOM', members: [], projects: [], checked: false },
+        { id: 'proj2', name: 'proj2', type: 'CUSTOM', members: [], projects: [], checked: true }
     ];
 
     component.ngOnChanges(

@@ -12,7 +12,7 @@ toc = true
 
 ## Overview
 
-Chef Automate Identity and Access Management roles are named groups of actions used to define [policies]({{< relref "policies.md" >}}). Actions describe what is allowed by users in Automate.
+Chef Automate Identity and Access Management roles are named groups of actions used to define [policies]({{< relref "policies.md" >}}). Actions describe what is allowed by users in Automate. [IAM Actions]({{< relref "iam-actions.md" >}}) describes the associated action or actions required to access certain pages in the browser.
 
 Users require permission for the `iam:roles` action to interact with roles. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 
@@ -29,6 +29,16 @@ Editor        | **Do** everything in the system *except* IAM and license applica
 Owner         | **Do** everything in the system *including* IAM
 Project Owner | Editor + **view** and **assign** projects
 Ingest        | Ingest data into the system
+
+#### Actions for Chef-Managed Roles
+
+Name | ID| Actions
+-----------------------|-----|--------
+Owner              | owner         | \*
+Project Owner      | project-owner | infra:nodes:\*, infra:nodeManagers:\*, compliance:\*, event:\*, ingest:\*, secrets:\*, iam:projects:list, iam:projects:get, iam:projects:assign, iam:policies:list, iam:policies:get, iam:policyMembers:\*, iam:teams:list, iam:teams:get, iam:teamUsers:\*, iam:users:get, iam:users:list, applications:\*
+Editor             | editor        | infra:infraServers:list, infra:infraServers:get, infra:nodes:\*, infra:nodeManagers:\*, compliance:\*, event:\*, ingest:\*, secrets:\*, iam:projects:list, iam:projects:get, iam:projects:assign, applications:\*
+Viewer             | viewer        | infra:infraServers:list, infra:infraServers:get, secrets:\*:get, secrets:\*:list, infra:nodes:get, infra:nodes:list, infra:nodeManagers:get, infra:nodeManagers:list, compliance:\*:get, compliance:\*:list, event:\*:get, event:\*:list, ingest:\*:get, ingest:\*:list, iam:projects:list, iam:projects:get, applications:\*:get, applications:\*:list
+Ingest             | ingest        | infra:ingest:\*, compliance:profiles:get, compliance:profiles:list
 
 ### Custom Roles
 
@@ -47,6 +57,25 @@ You can edit these custom roles like other user-created custom roles.
 ### Creating Roles
 
 _Custom_ roles can only be created using the [Roles API]({{< relref "api/#tag/roles" >}}).
+
+#### Example Custom Role
+
+```json
+{
+  "name": "Advocate",
+  "id": "advocate-role",
+  "actions": [
+    "infra:*",
+    "compliance:*",
+    "teams:*",
+    "users:*"
+  ],
+  "projects": [
+    "east-region",
+    "west-region"
+  ]
+}
+```
 
 ### Changing Role Details
 

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -24,6 +25,7 @@ import (
 
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authz"
+	"github.com/chef/automate/components/automate-gateway/pkg/limiter"
 	"github.com/chef/automate/components/automate-gateway/pkg/nullbackend"
 	"github.com/chef/automate/lib/grpc/debug/debug_api"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -33,11 +35,12 @@ import (
 // Server holds the state of an instance of this service
 type Server struct {
 	Config
-	clientsFactory ClientsFactory
-	connFactory    *secureconn.Factory
-	serviceKeyPair *tls.Certificate
-	rootCerts      *x509.CertPool
-	authorizer     middleware.AuthorizationHandler
+	clientsFactory       ClientsFactory
+	connFactory          *secureconn.Factory
+	serviceKeyPair       *tls.Certificate
+	rootCerts            *x509.CertPool
+	authorizer           middleware.AuthorizationHandler
+	dataCollectorLimiter limiter.Limiter
 
 	httpServer        *http.Server
 	httpMuxConnCancel func()
@@ -131,6 +134,7 @@ func (s *Server) Start() error {
 	s.logger.Info("starting automate-gateway")
 	s.loadConnFactory()
 	s.loadServiceCerts()
+	s.loadDataCollectorLimiter()
 
 	err := s.startNullBackendServer()
 	if err != nil {
@@ -158,6 +162,25 @@ func (s *Server) Start() error {
 	}
 
 	return s.startSignalHandler()
+}
+
+func (s *Server) loadDataCollectorLimiter() {
+	if s.Config.DataCollector.DisableLimiter {
+		s.logger.Info("Disabling data collector limiter")
+		s.dataCollectorLimiter = limiter.NewNoopRequestLimiter()
+	} else {
+		var maxInflightRequests int
+		if s.Config.DataCollector.LimiterMaxRequests <= 0 {
+			maxInflightRequests = runtime.NumCPU() * 60
+			if maxInflightRequests < 200 {
+				maxInflightRequests = 200
+			}
+		} else {
+			maxInflightRequests = s.Config.DataCollector.LimiterMaxRequests
+		}
+		s.logger.Infof("Limiting max data collector inflight requests to %d", maxInflightRequests)
+		s.dataCollectorLimiter = limiter.NewInflightRequestLimiter("collector-requests", maxInflightRequests)
+	}
 }
 
 func (s *Server) loadConnFactory() {
@@ -352,6 +375,10 @@ func (s *Server) startHTTPServer() error {
 	//     authRequest); or needs to ensure that it's not part of the public API (by choosing a
 	//     prefix that isn't forward by automate-load-balancer, i.e. not /apis/ or /api/).
 
+	// opt-out of strict input validation, effectively allowing for unknown fields present in
+	// request payloads
+	mux.Handle("/api/v0/ingest/events/chef/", prettifier(laxValidation(v0Mux)))
+
 	// custom mux route for data-collector
 	// Note: automate-load-balancer rewrites
 	//   /data-collector/v0(.*) => /api/v0/events/data-collector
@@ -429,9 +456,7 @@ func (s *Server) startHTTPServer() error {
 
 	// "GET /status" is used for monitoring
 	// We made it a custom handler in order to be able to return 500 when some services are down.
-	// Note: this is not supposed to be called through automate-load-balancer, since it's not
-	// prefixed with /api/v0.
-	mux.HandleFunc("/status", s.DeploymentStatusHandler)
+	mux.HandleFunc("/api/v0/status", s.DeploymentStatusHandler)
 
 	// register open api endpoint definitions
 	mux.Handle("/api/v0/openapi/", http.StripPrefix("/api/v0/openapi", openAPIServicesHandler()))
@@ -510,5 +535,12 @@ func prettifier(h http.Handler) http.Handler {
 		if _, ok := r.URL.Query()["pretty"]; ok {
 			r.Header.Set("Accept", "application/json+pretty")
 		}
+	})
+}
+
+func laxValidation(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Set("Content-Type", "application/json+lax")
+		h.ServeHTTP(w, r)
 	})
 }

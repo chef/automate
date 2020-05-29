@@ -16,7 +16,7 @@ import (
 // composedService is a more user friendly and clear representation of a service.
 // it is composed by values from other tables inside the database (JOINs)
 type composedService struct {
-	ID                  int32     `db:"id"`
+	ID                  int64     `db:"id"`
 	SupMemberID         string    `db:"sup_member_id"`
 	Origin              string    `db:"origin"`
 	Name                string    `db:"name"`

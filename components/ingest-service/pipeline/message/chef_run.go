@@ -30,6 +30,7 @@ type ChefRun struct {
 	NodeRun          backend.Run
 	NodeAttribute    backend.NodeAttribute
 	BulkableRequests []elastic.BulkableRequest
+	Platform         string
 	Ctx              context.Context
 	errc             chan<- error
 }
@@ -43,6 +44,7 @@ func NewChefRun(ctx context.Context, run *chef.Run, err chan<- error) ChefRun {
 		backend.Run{},
 		backend.NodeAttribute{},
 		[]elastic.BulkableRequest{},
+		"",
 		ctx,
 		err,
 	}

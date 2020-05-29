@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { EntityStatus } from '../entities';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { DateTime } from '../../helpers/datetime/datetime';
 
 // Example JSON returned from gateway:

@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
@@ -77,6 +78,18 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 		status = nodes.LastContactData_SKIPPED
 	}
 
+	// translate tags
+	tags := in.Report.GetTags()
+	for _, tag := range in.Report.GetChefTags() {
+		tags = append(tags, &common.Kv{
+			Key:   "chef-tag",
+			Value: tag,
+		})
+	}
+	if in.Report.GetEnvironment() != "" {
+		tags = append(tags, &common.Kv{Key: "environment", Value: in.Report.GetEnvironment()})
+	}
+
 	return &manager.NodeMetadata{
 		Uuid:            in.Report.GetNodeUuid(),
 		Name:            in.Report.GetNodeName(),
@@ -87,7 +100,7 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 		SourceId:        in.Report.GetSourceId(),
 		SourceRegion:    in.Report.GetSourceRegion(),
 		SourceAccountId: in.Report.GetSourceAccountId(),
-		Tags:            in.Report.GetTags(),
+		Tags:            tags,
 		ProjectsData:    gatherProjectsData(&in.Report),
 		Projects:        in.InspecReport.Projects,
 		ScanData: &nodes.LastContactData{

@@ -1,9 +1,13 @@
-<chef-notification
-  *ngIf="(serviceGroupsStatus$ | async) === 'loadingFailure'"
-  [type]="'error'"
-  [timeout]="10">
-  {{ (serviceGroupsError$ | async).status }}: {{ (serviceGroupsError$ | async).error.message }}
-</chef-notification>
+<div class="sticky-notifications">
+  <div class="sticky-inner">
+    <app-notification
+      *ngIf="(serviceGroupsStatus$ | async) === 'loadingFailure'"
+      [type]="'error'"
+      [timeout]="10">
+      {{ (serviceGroupsError$ | async).status }}: {{ (serviceGroupsError$ | async).error.message }}
+    </app-notification>
+  </div>
+</div>
 <chef-page-header>
   <chef-heading>Service Groups</chef-heading>
   <chef-subheading>Service groups are Habitat services ordered by package identifiers and configurations.</chef-subheading>
@@ -38,32 +42,32 @@
 </chef-page-header>
 <div class="page-body">
   <chef-status-filter-group [value]="selectedStatus">
-    <chef-option class="filter general" value="total" (click)="statusFilter('total')" selected>
+    <chef-option class="filter general" value="total" (click)="statusFilter('total')" (keyup.enter)="statusFilter('total')" selected>
       <chef-icon class="filter-icon">group_work</chef-icon>
       <div class="filter-label">Total</div>
       <div class="filter-total">{{ sgHealthSummary["total"] }}</div>
     </chef-option>
-    <chef-option class="filter critical" value='critical' (click)="statusFilter('critical')">
+    <chef-option class="filter critical" value='critical' (click)="statusFilter('critical')" (keyup.enter)="statusFilter('critical')">
       <chef-icon class="filter-icon">warning</chef-icon>
       <div class="filter-label">Critical</div>
       <div class="filter-total">{{ sgHealthSummary["critical"] }}</div>
     </chef-option>
-    <chef-option class="filter warning" value='warning' (click)="statusFilter('warning')">
+    <chef-option class="filter warning" value='warning' (click)="statusFilter('warning')" (keyup.enter)="statusFilter('warning')">
       <chef-icon class="filter-icon">error</chef-icon>
       <div class="filter-label">Warning</div>
       <div class="filter-total">{{ sgHealthSummary["warning"] }}</div>
     </chef-option>
-    <chef-option class="filter disconnected" value='disconnected' (click)="statusFilter('disconnected')">
+    <chef-option class="filter disconnected" value='disconnected' (click)="statusFilter('disconnected')" (keyup.enter)="statusFilter('disconnected')">
       <chef-icon class="filter-icon"></chef-icon>
       <div class="filter-label">Disconnected</div>
       <div class="filter-total">{{ sgHealthSummary["disconnected"] }}</div>
     </chef-option>
-    <chef-option class="filter success" value='ok' (click)="statusFilter('ok')">
+    <chef-option class="filter success" value='ok' (click)="statusFilter('ok')" (keyup.enter)="statusFilter('ok')">
       <chef-icon class="filter-icon">check_circle</chef-icon>
       <div class="filter-label">OK</div>
       <div class="filter-total">{{ sgHealthSummary["ok"] }}</div>
     </chef-option>
-    <chef-option class="filter unknown" value='unknown' (click)="statusFilter('unknown')">
+    <chef-option class="filter unknown" value='unknown' (click)="statusFilter('unknown')" (keyup.enter)="statusFilter('unknown')">
       <chef-icon class="filter-icon">help</chef-icon>
       <div class="filter-label">Unknown</div>
       <div class="filter-total">{{ sgHealthSummary["unknown"] }}</div>

@@ -178,6 +178,34 @@ func TestCCRToNode(t *testing.T) {
 	assert.Contains(t, translatedNode.Cookbooks, "apt")
 	assert.Contains(t, translatedNode.Cookbooks, "aws")
 	assert.Equal(t, run.TotalResourceCount, translatedNode.NodeInfo.TotalResourceCount)
+
+	cloud := run.NodePayload.Automatic["cloud"].(map[string]interface{})
+	assert.Equal(t, cloud["provider"], translatedNode.NodeInfo.CloudProvider)
+
+	kernel := run.NodePayload.Automatic["kernel"].(map[string]interface{})
+	assert.Equal(t, kernel["release"], translatedNode.NodeInfo.KernelRelease)
+	assert.Equal(t, kernel["version"], translatedNode.NodeInfo.KernelVersion)
+
+	virtualization := run.NodePayload.Automatic["virtualization"].(map[string]interface{})
+	assert.Equal(t, virtualization["system"], translatedNode.NodeInfo.VirtualizationSystem)
+	assert.Equal(t, virtualization["role"], translatedNode.NodeInfo.VirtualizationRole)
+
+	dmi := run.NodePayload.Automatic["dmi"].(map[string]interface{})
+	dmiSystem := dmi["system"].(map[string]interface{})
+	assert.Equal(t, dmiSystem["manufacturer"], translatedNode.NodeInfo.DmiSystemManufacturer)
+	assert.Equal(t, dmiSystem["serial_number"], translatedNode.NodeInfo.DmiSystemSerialNumber)
+
+	time := run.NodePayload.Automatic["time"].(map[string]interface{})
+	assert.Equal(t, time["timezone"], translatedNode.NodeInfo.Timezone)
+
+	assert.Equal(t, run.NodePayload.Automatic["domain"], translatedNode.NodeInfo.Domain)
+	assert.Equal(t, run.NodePayload.Automatic["hostname"], translatedNode.NodeInfo.Hostname)
+	assert.Equal(t, run.NodePayload.Automatic["macaddress"], translatedNode.NodeInfo.Macaddress)
+
+	memory := run.NodePayload.Automatic["memory"].(map[string]interface{})
+	assert.Equal(t, memory["total"], translatedNode.NodeInfo.MemoryTotal)
+
+	assert.Equal(t, run.NodePayload.Automatic["ip6address"], translatedNode.Ip6address)
 }
 
 func TestCountNumberOfValuesMapSimple(t *testing.T) {
@@ -315,6 +343,33 @@ func TestCCRToRun(t *testing.T) {
 	}
 	assert.Contains(t, translatedRun.VersionedCookbooks, vCookbooks[0])
 	assert.Contains(t, translatedRun.VersionedCookbooks, vCookbooks[1])
+
+	cloud := run.NodePayload.Automatic["cloud"].(map[string]interface{})
+	assert.Equal(t, cloud["provider"], translatedRun.NodeInfo.CloudProvider)
+
+	kernel := run.NodePayload.Automatic["kernel"].(map[string]interface{})
+	assert.Equal(t, kernel["release"], translatedRun.NodeInfo.KernelRelease)
+	assert.Equal(t, kernel["version"], translatedRun.NodeInfo.KernelVersion)
+
+	virtualization := run.NodePayload.Automatic["virtualization"].(map[string]interface{})
+	assert.Equal(t, virtualization["system"], translatedRun.NodeInfo.VirtualizationSystem)
+	assert.Equal(t, virtualization["role"], translatedRun.NodeInfo.VirtualizationRole)
+
+	dmi := run.NodePayload.Automatic["dmi"].(map[string]interface{})
+	dmiSystem := dmi["system"].(map[string]interface{})
+	assert.Equal(t, dmiSystem["manufacturer"], translatedRun.NodeInfo.DmiSystemManufacturer)
+	assert.Equal(t, dmiSystem["serial_number"], translatedRun.NodeInfo.DmiSystemSerialNumber)
+
+	time := run.NodePayload.Automatic["time"].(map[string]interface{})
+	assert.Equal(t, time["timezone"], translatedRun.NodeInfo.Timezone)
+	assert.Equal(t, run.NodePayload.Automatic["domain"], translatedRun.NodeInfo.Domain)
+	assert.Equal(t, run.NodePayload.Automatic["hostname"], translatedRun.NodeInfo.Hostname)
+	assert.Equal(t, run.NodePayload.Automatic["macaddress"], translatedRun.NodeInfo.Macaddress)
+
+	memory := run.NodePayload.Automatic["memory"].(map[string]interface{})
+	assert.Equal(t, memory["total"], translatedRun.NodeInfo.MemoryTotal)
+
+	assert.Equal(t, run.NodePayload.Automatic["ip6address"], translatedRun.Ip6address)
 }
 
 func TestCCRPlatformWithVersionNormal(t *testing.T) {

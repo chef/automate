@@ -43,7 +43,19 @@ func init() {
 		return ""
 	})
 	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetNodesCounts", "infra:nodes", "infra:nodes:list", "GET", "/api/v0/cfgmgmt/stats/node_counts", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
+		if m, ok := input.(*request.NodesCounts); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "start":
+					return m.Start
+				case "end":
+					return m.End
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
 	})
 	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRunsCounts", "infra:nodes", "infra:nodes:list", "GET", "/api/v0/cfgmgmt/stats/run_counts", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.RunsCounts); ok {
@@ -157,6 +169,70 @@ func init() {
 				switch want {
 				case "node_id":
 					return m.NodeId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/CreateRollout", "ingest:unifiedEvents", "ingest:unifiedEvents:create", "POST", "/api/beta/cfgmgmt/rollouts/create", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.CreateRollout); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "policy_name":
+					return m.PolicyName
+				case "policy_node_group":
+					return m.PolicyNodeGroup
+				case "policy_revision_id":
+					return m.PolicyRevisionId
+				case "policy_domain_url":
+					return m.PolicyDomainUrl
+				case "policy_scm_url":
+					return m.PolicyScmUrl
+				case "policy_scm_web_url":
+					return m.PolicyScmWebUrl
+				case "policy_scm_commit":
+					return m.PolicyScmCommit
+				case "description":
+					return m.Description
+				case "ci_job_url":
+					return m.CiJobUrl
+				case "ci_job_id":
+					return m.CiJobId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRollouts", "infra:nodes", "infra:nodes:list", "GET", "/api/beta/cfgmgmt/rollouts/list", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRolloutById", "infra:nodes", "infra:nodes:list", "GET", "/api/beta/cfgmgmt/rollouts/rollout/{rollout_id}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.RolloutById); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "rollout_id":
+					return m.RolloutId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRolloutForChefRun", "infra:nodes", "infra:nodes:list", "GET", "/api/beta/cfgmgmt/rollouts/find", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.RolloutForChefRun); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "policy_name":
+					return m.PolicyName
+				case "policy_group":
+					return m.PolicyGroup
+				case "policy_revision_id":
+					return m.PolicyRevisionId
 				default:
 					return ""
 				}

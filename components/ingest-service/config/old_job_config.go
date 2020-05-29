@@ -3,6 +3,7 @@ package config
 import (
 	"io/ioutil"
 
+	"github.com/chef/automate/components/ingest-service/serveropts"
 	toml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 )
@@ -34,6 +35,11 @@ type JobConfig struct {
 }
 
 type OldJobConfig struct {
+	Config            *Config
+	DefaultJobConfigs []JobConfig
+}
+
+type Config struct {
 	JobsConfig []JobConfig `toml:"jobs_config"`
 }
 
@@ -43,46 +49,51 @@ type OldJobConfig struct {
 // configuration is used if the configuration for a given index cannot
 // be found.
 func (c *OldJobConfig) ConfigForJob(jobIndex int) (JobConfig, error) {
-	if c != nil && jobIndex < len(c.JobsConfig) {
-		return c.JobsConfig[jobIndex], nil
-	} else if jobIndex < len(defaultJobConfig) {
-		return defaultJobConfig[jobIndex], nil
+	if c != nil && jobIndex < len(c.Config.JobsConfig) {
+		return c.Config.JobsConfig[jobIndex], nil
+	} else if jobIndex < len(c.DefaultJobConfigs) {
+		return c.DefaultJobConfigs[jobIndex], nil
 	}
 	return JobConfig{}, errors.New("no default configuration for job")
 }
 
-var defaultJobConfig = []JobConfig{
-	DeleteNodes: {
-		ID:        DeleteNodes,
-		Threshold: "1d",
-		Every:     "15m",
-		Running:   false,
-	},
-	NodesMissing: {
-		ID:        NodesMissing,
-		Threshold: "1d",
-		Every:     "15m",
-		Running:   true,
-	},
-	MissingNodesForDeletion: {
-		ID:        MissingNodesForDeletion,
-		Threshold: "30d",
-		Every:     "15m",
-		Running:   true,
-	},
+// NewOldJobConfig - Create a OldJobConfig
+func NewOldJobConfig(opts serveropts.JobsConfig) *OldJobConfig {
+	return &OldJobConfig{
+		Config: &Config{},
+		DefaultJobConfigs: []JobConfig{
+			DeleteNodes: {
+				ID:        DeleteNodes,
+				Threshold: "1d",
+				Every:     "15m",
+				Running:   false,
+			},
+			NodesMissing: {
+				ID:        NodesMissing,
+				Threshold: "1d",
+				Every:     "15m",
+				Running:   opts.NodesMissingRunningDefault,
+			},
+			MissingNodesForDeletion: {
+				ID:        MissingNodesForDeletion,
+				Threshold: "30d",
+				Every:     "15m",
+				Running:   opts.MissingNodesForDeletionRunningDefault,
+			},
+		},
+	}
 }
 
-func OldJobConfigFromFile(configFile string) (*OldJobConfig, error) {
-	config := &OldJobConfig{}
+func (c *OldJobConfig) FromFile(configFile string) error {
 	tomlData, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to read old job config")
+		return errors.Wrap(err, "unable to read old job config")
 	}
 
-	err = toml.Unmarshal(tomlData, config)
+	err = toml.Unmarshal(tomlData, c.Config)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to parse old job config")
+		return errors.Wrap(err, "unable to parse old job config")
 	}
 
-	return config, nil
+	return nil
 }

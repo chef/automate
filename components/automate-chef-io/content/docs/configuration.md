@@ -17,14 +17,14 @@ The `chef-automate` CLI provides commands to help you work with your existing Ch
 * `chef-automate config patch </path/to/partial-config.toml>` updates an existing Chef Automate configuration by merging the contents of`</path/to/partial-config.toml>` with your current Chef Automate configuration, and applying any changes. This command is enough in most situations
 * `chef-automate config set </path/to/full-config.toml>` replaces the current Chef Automate configuration with the provided configuration, and applies any changes. Use this command to replace your Chef Automate configuration
 
-Update your Chef Automate configuration by generating a section of a configuration, and applying it with `chef-automate config patch`. 
+Update your Chef Automate configuration by generating a section of a configuration, and applying it with `chef-automate config patch`.
 The rest of this document describes how to make common configuration changes.
 
 ## Use Cases
 
 ### Minimal Configuration
 
-The `chef-automate init-config` command generates an annotated Chef Automate configuration file with the basic settings needed to deploy Chef Automate. 
+The `chef-automate init-config` command generates an annotated Chef Automate configuration file with the basic settings needed to deploy Chef Automate.
 This section describes those settings and how to change them on an existing Chef Automate installation.
 
 #### Chef Automate FQDN
@@ -40,12 +40,12 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 #### Install Channel
 
-Chef Automate consists of [Habitat](https://www.habitat.sh/) packages installed from a release channel. 
+Chef Automate consists of [Habitat](https://www.habitat.sh/) packages installed from a release channel.
 The default channel is `current`.
 
 #### Upgrade Strategy
 
-The upgrade strategy determines when a Chef Automate installation upgrades. 
+The upgrade strategy determines when a Chef Automate installation upgrades.
 The upgrade strategy settings include:
 
 * `at-once` (default) upgrades the installation after detecting new packages in the install channel
@@ -72,7 +72,7 @@ This command will upgrade Chef Automate to the latest version from your install 
 
 #### Deployment Type
 
-Do not change `deployment_type`. 
+Do not change `deployment_type`.
 The only supported `deployment_type` is `local`.
 
 #### Settings
@@ -81,9 +81,9 @@ You cannot change the admin username, name, and password set during initial depl
 
 To change the admin password after deployment, use the Automate UI.
 Sign in as the admin user, navigate to the _Users_ page under the **Settings** tab.
-Select "Local Administrator" to show the admin's _User Details_ page. 
-Navigate to the _Reset Password_ tab. 
-Enter your previous password, and enter and confirm your new password in the interface. 
+Select "Local Administrator" to show the admin's _User Details_ page.
+Navigate to the _Reset Password_ tab.
+Enter your previous password, and enter and confirm your new password in the interface.
 Select the **Reset Password** button to save your changes.
 
 To change the admin password from the command-line, first [fetch the admin user record](https://automate.chef.io/docs/api/), copy the User ID, and then use:
@@ -277,25 +277,30 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 [elasticsearch.v1.sys.runtime]
 # max_locked_memory = "unlimited"
 # es_java_opts = ""
-# NOTE: heapsize should be set to 50% of available RAM up to 32g
-# See: https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html
-# heapsize = "1g"
+# NOTE: see https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html
+# for important guidance regarding the configuration of the heap size setting
+# heapsize = "4g"
 ```
 
 #### Setting Elasticsearch Heap
 
-Per the Elasticsearch documentation, the [Elasticsearch heap size](https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html) should be up to 50% of the available RAM, up to 32GB. 
-To set the Elasticsearch heap size, create a TOML file that contains the partial configuration below.
-Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+The Elasticsearch heap size can, and in most cases should, be set to 50% of the available system
+memory. However, there are important caveats covered in the [Elasticsearch heap size documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html)
+which should be carefully reviewed and considered.
+
+For the purposes of an example, a system with 32GB of memory can have its Elasticsearch heap
+size set to `16g`; to do so, one would first create a TOML file that contains the partial
+configuration below, uncomment and change settings as neededand, then issue a `chef-automate config patch </path/to/your-file.toml>` to
+deploy the change.
 
 ```toml
 [elasticsearch.v1.sys.runtime]
-# heapsize = "<your Elasticsearch heapsize>"
+heapsize = "16g"
 ```
 
 #### PostgreSQL
 
-To configure PostgreSQL for your Chef Automate installation, create a TOML file that contains the partial configuration below. 
+To configure PostgreSQL for your Chef Automate installation, create a TOML file that contains the partial configuration below.
 Uncomment and change settings as needed, with the following caveats:
 
 * These configuration settings affect only the Automate-deployed PostgreSQL database. They do not affect an [externally-deployed PostgreSQL database]({{< relref "install.md#configuring-an-external-postgresql-database" >}}).
@@ -324,7 +329,7 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 #### Load Balancer
 
-To configure your Chef Automate installation's load balancer, create a TOML file that contains the partial configuration below. 
+To configure your Chef Automate installation's load balancer, create a TOML file that contains the partial configuration below.
 Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
@@ -388,6 +393,27 @@ Configure message buffer ingest size:
 message_buffer_size = 200
 [ingest.v1.sys.service]
 message_buffer_size = 200
+```
+
+#### Compliance Configuration
+
+To configure your Chef Automate InSpec agent scans, create a TOML file that contains the partial configuration below.
+Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+
+```toml
+[compliance.v1.sys.agent]
+## Max number of inspec workers to run in parallel for detect and scan jobs. Default: 10
+# workers = 20
+## Max number of detect and scan jobs that can be accepted in the jobs workers queue. Default: 1000
+# buffer_size = 2000
+## Option to specify the version of inspec to use for remote(e.g. AWS SSM) scan jobs
+# remote_inspec_version = "4.3.2"
+## A control result message that exceeds this character limit will be truncated. Default: 10000
+# result_message_limit = 20000
+## The array of results per control will be truncated at this limit to avoid large reports that cannot be processed. Default: 50
+# control_results_limit = 100
+## Control results that have a `run_time` (in seconds) below this limit will be stripped of the `start_time` and `run_time` fields. Default: 1.0
+# run_time_limit = 0.5
 ```
 
 ### Troubleshooting

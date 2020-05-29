@@ -14,7 +14,7 @@ import (
 	version "github.com/chef/automate/api/external/common/version"
 
 	// Authz Service Requests/Response/Service definitions
-	authz "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 
 	// Gateway Requests/Response/Service definitions
 	"github.com/chef/automate/components/automate-gateway/api/iam/v2/pairs"

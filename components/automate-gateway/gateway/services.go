@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
@@ -366,11 +368,39 @@ func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFe
 	return muxFromRegisterMap(grpcURI, dopts, endpointMap)
 }
 
+type m struct {
+	*runtime.JSONPb
+	unmarshaler *jsonpb.Unmarshaler
+}
+
+type decoderWrapper struct {
+	*json.Decoder
+	*jsonpb.Unmarshaler
+}
+
+func (n *m) NewDecoder(r io.Reader) runtime.Decoder {
+	d := json.NewDecoder(r)
+	return &decoderWrapper{Decoder: d, Unmarshaler: n.unmarshaler}
+}
+
+func (d *decoderWrapper) Decode(v interface{}) error {
+	p, ok := v.(proto.Message)
+	if !ok { // if it's not decoding into a proto.Message, there's no notion of unknown fields
+		return d.Decoder.Decode(v)
+	}
+	return d.UnmarshalNext(d.Decoder, p) // uses m's jsonpb.Unmarshaler configuration
+}
+
 func muxFromRegisterMap(grpcURI string, dopts []grpc.DialOption, localEndpoints map[string]registerFunc) (*runtime.ServeMux, func(), error) {
 	opts := []runtime.ServeMuxOption{
 		runtime.WithIncomingHeaderMatcher(headerMatcher),
-		runtime.WithMarshalerOption("application/json+pretty", &runtime.JSONPb{OrigName: true, EmitDefaults: true, Indent: "  "}),
-		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{OrigName: true, EmitDefaults: true}),
+		// Note(sr): pretty implies strict -- the assumption is that pretty is used by API usage from an
+		//           interactive console, so we'd want to tell them if they feed us garbage.
+		runtime.WithMarshalerOption("application/json+pretty",
+			&m{JSONPb: &runtime.JSONPb{OrigName: true, EmitDefaults: true, Indent: "  "}, unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: false}}),
+		runtime.WithMarshalerOption("application/json+lax", &runtime.JSONPb{OrigName: true, EmitDefaults: true}),
+		runtime.WithMarshalerOption(runtime.MIMEWildcard,
+			&m{JSONPb: &runtime.JSONPb{OrigName: true, EmitDefaults: true}, unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: false}}),
 		runtime.WithMetadata(middleware.CertificatePasser),
 	}
 	gwmux := runtime.NewServeMux(opts...)
@@ -397,7 +427,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	var cType, profileName, profileVersion string
 	contentTypeString := strings.Split(r.Header.Get("Content-type"), ";")
 	switch contentTypeString[0] {
-	case "application/json":
+	case "application/json", "application/json+lax":
 		cType = r.Header.Get("Content-type")
 		decoder := json.NewDecoder(r.Body)
 		var t ProfileRequest
@@ -559,7 +589,7 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 	// request body.
 	const (
 		resource = "compliance:reporting:reports"
-		action   = "compliance:reports:export"
+		action   = "compliance:reports:list"
 	)
 
 	ctx, err := s.authRequest(r, resource, action)
@@ -622,7 +652,7 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 func (s *Server) NodeExportHandler(w http.ResponseWriter, r *http.Request) {
 	const (
 		resource = "compliance:reporting:nodes:{id}"
-		action   = "compliance:reportNodes:export"
+		action   = "compliance:reportNodes:list"
 	)
 
 	ctx, err := s.authRequest(r, resource, action)

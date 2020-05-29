@@ -32,58 +32,61 @@ func init() {
 }
 
 var fileDescriptor_59a1fd4cbd8b9945 = []byte{
-	// 817 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x98, 0xcf, 0x6f, 0x13, 0x3b,
-	0x10, 0xc7, 0x37, 0x97, 0xbe, 0x57, 0xbf, 0xbe, 0x82, 0x8c, 0xc4, 0xc1, 0xdc, 0x7c, 0x82, 0x03,
-	0xbb, 0x69, 0x92, 0x26, 0x05, 0x54, 0x10, 0x4d, 0x21, 0xea, 0xa5, 0xad, 0x8a, 0xe0, 0xc0, 0x05,
-	0x39, 0xc9, 0x24, 0x5d, 0x35, 0x59, 0x07, 0xaf, 0x53, 0x25, 0x42, 0x42, 0x42, 0x42, 0xe2, 0xca,
-	0x95, 0x3f, 0x8d, 0xff, 0x06, 0xed, 0x7a, 0x7f, 0x78, 0xdb, 0xaa, 0xf5, 0x2c, 0xa7, 0xd6, 0xd5,
-	0x7e, 0xf6, 0xfb, 0xf5, 0xcc, 0x78, 0x76, 0x5c, 0xd2, 0x15, 0x8b, 0x30, 0x08, 0x23, 0x0d, 0x2a,
-	0x06, 0x75, 0x19, 0x8e, 0x20, 0x08, 0xa3, 0x89, 0x12, 0x9f, 0x16, 0x4a, 0xae, 0xd6, 0xc1, 0x0d,
-	0x7f, 0xf3, 0x17, 0x4a, 0x6a, 0x49, 0x1f, 0x8f, 0xce, 0x61, 0xe2, 0x8b, 0xa5, 0x96, 0x73, 0xa1,
-	0xc1, 0x1f, 0xcb, 0xb9, 0x08, 0x23, 0xdf, 0x7e, 0x2e, 0x63, 0xd9, 0x93, 0x44, 0x01, 0x56, 0x1a,
-	0x54, 0x24, 0x66, 0xc1, 0x48, 0xce, 0xe7, 0x32, 0x0a, 0x2e, 0x41, 0xc5, 0x61, 0xf9, 0xd3, 0xbc,
-	0x94, 0xb5, 0x6e, 0x35, 0xa3, 0xe0, 0xf3, 0x12, 0x62, 0x9d, 0x9a, 0x02, 0x15, 0x67, 0x4c, 0xe0,
-	0xc4, 0x48, 0x35, 0xcd, 0x81, 0x8e, 0x13, 0x30, 0x92, 0xf2, 0x62, 0x28, 0xe5, 0x45, 0x4e, 0x35,
-	0x9d, 0x28, 0x25, 0x67, 0x10, 0xa3, 0x36, 0x33, 0x9a, 0x85, 0x10, 0xe9, 0x9c, 0x69, 0x3b, 0x31,
-	0x63, 0xa1, 0xc5, 0x50, 0x14, 0x1b, 0xea, 0x39, 0x41, 0x10, 0x5d, 0x86, 0x4a, 0x46, 0x73, 0x4b,
-	0xcd, 0x6d, 0x4f, 0x91, 0x1c, 0x17, 0x7b, 0xea, 0x3a, 0x11, 0x0b, 0x39, 0x0b, 0x47, 0xeb, 0x49,
-	0x58, 0xc6, 0xe2, 0xae, 0x7d, 0xc5, 0x0b, 0x19, 0xc5, 0x70, 0x25, 0xb3, 0x4d, 0x37, 0xc8, 0x4a,
-	0xed, 0xae, 0x1b, 0x71, 0x35, 0xb7, 0x3b, 0x6e, 0x98, 0x9d, 0x5c, 0xc7, 0x0d, 0x55, 0xb3, 0xdb,
-	0x71, 0x83, 0xae, 0xa4, 0x77, 0xcf, 0x8d, 0xba, 0x21, 0xbf, 0x8e, 0xfb, 0xb2, 0x13, 0xdc, 0x73,
-	0x43, 0xae, 0x65, 0xb8, 0xf5, 0xfb, 0x11, 0x21, 0x47, 0xc9, 0xa3, 0xa7, 0xc9, 0x93, 0x34, 0x26,
-	0x64, 0x00, 0xfa, 0x83, 0x39, 0xdd, 0xb4, 0xe3, 0x57, 0xbb, 0x85, 0x58, 0x84, 0xbe, 0x69, 0x04,
-	0x7e, 0xde, 0x00, 0xb2, 0x47, 0x8f, 0xa2, 0x89, 0x3c, 0x33, 0x65, 0xc4, 0x9e, 0xa2, 0x28, 0xee,
-	0xd1, 0x6f, 0x0d, 0xb2, 0xd5, 0x57, 0x20, 0x34, 0xbc, 0x4b, 0x0b, 0x89, 0x76, 0xfd, 0x3b, 0xbb,
-	0x54, 0x56, 0xb3, 0xbe, 0xcd, 0xb1, 0x9e, 0x0b, 0x67, 0x42, 0x51, 0x01, 0x33, 0x0f, 0x87, 0x30,
-	0x83, 0x3a, 0x1e, 0x6c, 0x0e, 0xe5, 0xc1, 0x06, 0x33, 0x0f, 0xef, 0x17, 0xe3, 0x5a, 0x71, 0xb0,
-	0x39, 0x94, 0x07, 0x1b, 0xe4, 0x1e, 0xfd, 0x92, 0x16, 0x80, 0x59, 0xc6, 0xd7, 0x0a, 0xe0, 0x16,
-	0x03, 0x25, 0xc5, 0x76, 0x11, 0xf2, 0x25, 0xc6, 0x3d, 0xba, 0x22, 0x9b, 0xc5, 0x9a, 0xb6, 0x6b,
-	0x68, 0xb3, 0x4e, 0x1d, 0x69, 0xee, 0xd1, 0xef, 0x0d, 0x72, 0xaf, 0x58, 0x1f, 0xac, 0x8f, 0xc5,
-	0x1c, 0xe8, 0xb3, 0x1a, 0x06, 0x0c, 0x5a, 0xdb, 0xc6, 0x8a, 0x6c, 0x9a, 0xba, 0x3c, 0x51, 0x53,
-	0x4c, 0x00, 0x0a, 0x08, 0xa5, 0x5c, 0x50, 0x46, 0xd9, 0x54, 0x23, 0x52, 0xb9, 0x80, 0x50, 0xca,
-	0x05, 0x65, 0x94, 0x4d, 0x0d, 0x22, 0x95, 0x0b, 0x08, 0xa5, 0x5c, 0x50, 0xdc, 0xa3, 0x8a, 0xfc,
-	0x33, 0x00, 0x7d, 0xa2, 0xa6, 0x31, 0xdd, 0x41, 0xe5, 0x3a, 0x41, 0x58, 0x0b, 0x97, 0xe3, 0x84,
-	0xe1, 0x1e, 0x95, 0x64, 0xc3, 0x2c, 0x68, 0x13, 0x2b, 0xc9, 0x76, 0xd0, 0x8a, 0xe9, 0x81, 0xde,
-	0x32, 0xbf, 0x67, 0x55, 0xdd, 0xc5, 0xca, 0x66, 0x25, 0xfd, 0x17, 0xe2, 0xfd, 0xfc, 0xbb, 0x8d,
-	0x2a, 0xe9, 0x1c, 0xc2, 0x95, 0x74, 0x4e, 0x71, 0x8f, 0xfe, 0x6c, 0x90, 0x07, 0x96, 0x7a, 0xf6,
-	0xcd, 0x89, 0xe9, 0x73, 0xbc, 0x89, 0x9c, 0x65, 0x2f, 0x6a, 0x78, 0xc9, 0xe1, 0xb4, 0xd6, 0xff,
-	0xb3, 0x1c, 0xd1, 0x16, 0xde, 0x09, 0x6b, 0xd7, 0x70, 0xc0, 0x3d, 0xfa, 0xab, 0x41, 0x1e, 0x5a,
-	0xd2, 0x6f, 0xc3, 0x19, 0xf4, 0x65, 0xa4, 0x21, 0xd2, 0x74, 0x1f, 0xef, 0xc2, 0xc2, 0xd9, 0xcb,
-	0x1a, 0x86, 0x2c, 0x3e, 0x3d, 0x13, 0xff, 0x0e, 0x40, 0x9f, 0x25, 0x63, 0x1a, 0x0d, 0xdc, 0xcd,
-	0xa4, 0x00, 0x6b, 0x22, 0xe4, 0x53, 0x82, 0x7b, 0x74, 0x96, 0x1e, 0xfc, 0x64, 0x45, 0x7d, 0x9c,
-	0x1e, 0x0b, 0x90, 0x72, 0xdc, 0xa3, 0xcb, 0xf4, 0x93, 0xda, 0x37, 0x23, 0x25, 0xa6, 0xd3, 0x64,
-	0x08, 0xaa, 0xd3, 0x64, 0x4c, 0xda, 0xdd, 0x36, 0x0b, 0x59, 0x4c, 0xb3, 0x31, 0x04, 0xea, 0xbc,
-	0x1b, 0xa4, 0xa8, 0xef, 0x43, 0xa1, 0xc5, 0x81, 0x98, 0xc6, 0x98, 0xfa, 0xce, 0x19, 0x54, 0x7d,
-	0xe7, 0x10, 0xf7, 0xe8, 0x9a, 0x6c, 0x97, 0xca, 0x47, 0x1a, 0xe6, 0x98, 0x40, 0x67, 0x18, 0x2a,
-	0xd0, 0x19, 0x53, 0xce, 0x0e, 0x6f, 0xac, 0x41, 0x1e, 0xd3, 0x65, 0x6d, 0x0e, 0x35, 0xb9, 0xd9,
-	0xa0, 0x99, 0x1e, 0xb7, 0xab, 0x36, 0xe8, 0x6e, 0x2d, 0x17, 0xac, 0x5b, 0xcf, 0x04, 0xf7, 0xe8,
-	0x8f, 0x06, 0xb9, 0x3f, 0x00, 0xfd, 0x7a, 0x32, 0x81, 0x91, 0x86, 0xf1, 0x71, 0x72, 0x43, 0xa1,
-	0x3d, 0x77, 0x17, 0x15, 0x90, 0xed, 0x21, 0x7c, 0x54, 0xc8, 0x32, 0x1a, 0xa7, 0xe5, 0x85, 0x07,
-	0x13, 0x0d, 0x0b, 0x43, 0x45, 0xc3, 0xe2, 0xb8, 0x47, 0xbf, 0x92, 0xff, 0x2b, 0x16, 0x30, 0xe3,
-	0x74, 0x49, 0xa1, 0xc6, 0xe9, 0x12, 0xe3, 0xde, 0xc1, 0xab, 0x8f, 0xfb, 0xd3, 0x50, 0x9f, 0x2f,
-	0x87, 0xc9, 0xf5, 0x2b, 0x48, 0x5e, 0x12, 0xe4, 0x2f, 0x09, 0x5c, 0xfe, 0x7d, 0x34, 0xdc, 0x48,
-	0xef, 0x88, 0xed, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x6e, 0xd6, 0x19, 0xcb, 0x6d, 0x12, 0x00,
+	// 865 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x98, 0xcf, 0x6b, 0x13, 0x41,
+	0x14, 0xc7, 0x37, 0x97, 0x6a, 0xc7, 0xb6, 0xd6, 0x11, 0x3c, 0xec, 0x45, 0xd8, 0x93, 0x1e, 0xdc,
+	0x4d, 0x93, 0x34, 0x29, 0x4a, 0x95, 0xfe, 0xd0, 0x50, 0x04, 0x5b, 0x2a, 0x7a, 0xf0, 0x22, 0x9b,
+	0xe4, 0x25, 0x1d, 0x9a, 0xcc, 0xc4, 0xd9, 0x49, 0x49, 0x10, 0x04, 0x41, 0xf0, 0x24, 0x78, 0xf5,
+	0x0f, 0xf3, 0xff, 0x91, 0xdd, 0xd9, 0x1f, 0x93, 0x6d, 0x69, 0xe7, 0xed, 0xa1, 0x9e, 0xc2, 0x86,
+	0xfd, 0xec, 0xf7, 0x3b, 0xef, 0x7d, 0xe7, 0x65, 0x36, 0xa4, 0x1d, 0x4e, 0x59, 0xc0, 0xb8, 0x02,
+	0x19, 0x81, 0xbc, 0x60, 0x7d, 0x08, 0x18, 0x1f, 0xca, 0xf0, 0xf3, 0x54, 0x8a, 0xf9, 0x22, 0xb8,
+	0xe2, 0x3b, 0x7f, 0x2a, 0x85, 0x12, 0xf4, 0x49, 0xff, 0x0c, 0x86, 0x7e, 0x38, 0x53, 0x62, 0x12,
+	0x2a, 0xf0, 0x07, 0x62, 0x12, 0x32, 0xee, 0x9b, 0xf7, 0xa5, 0xac, 0xfb, 0x34, 0x56, 0x80, 0xb9,
+	0x02, 0xc9, 0xc3, 0x71, 0xd0, 0x17, 0x93, 0x89, 0xe0, 0xc1, 0x05, 0xc8, 0x88, 0x15, 0x9f, 0xfa,
+	0xa1, 0x6e, 0xe3, 0x5a, 0x33, 0x12, 0xbe, 0xcc, 0x20, 0x52, 0x89, 0x29, 0x90, 0x51, 0xca, 0x04,
+	0x56, 0x8c, 0x90, 0xa3, 0x0c, 0x68, 0x59, 0x01, 0x7d, 0x21, 0xce, 0x7b, 0x42, 0x9c, 0x67, 0x54,
+	0xdd, 0x8a, 0x92, 0x62, 0x0c, 0x11, 0x6a, 0x31, 0xfd, 0x31, 0x03, 0xae, 0x32, 0xa6, 0x69, 0xc5,
+	0x0c, 0x42, 0x15, 0xf6, 0xc2, 0x7c, 0x41, 0x1d, 0x2b, 0x08, 0xf8, 0x05, 0x93, 0x82, 0x4f, 0x0c,
+	0x35, 0xbb, 0x35, 0x71, 0x31, 0xc8, 0xd7, 0xd4, 0xb6, 0x22, 0xa6, 0x62, 0xcc, 0xfa, 0x8b, 0x21,
+	0x2b, 0x6a, 0x71, 0xd3, 0xba, 0xa2, 0xa9, 0xe0, 0x11, 0x94, 0x3a, 0x5b, 0xb7, 0x83, 0x8c, 0xd6,
+	0x6e, 0xdb, 0x11, 0xe5, 0xde, 0x6e, 0xd9, 0x61, 0x66, 0x73, 0x2d, 0x17, 0xb4, 0xdc, 0xdd, 0x96,
+	0x1d, 0x54, 0x6a, 0xef, 0x8e, 0x1d, 0x75, 0x45, 0x7f, 0x2d, 0xd7, 0x65, 0x36, 0xb8, 0x63, 0x87,
+	0x5c, 0xea, 0x70, 0xe3, 0xef, 0x63, 0x42, 0x8e, 0xe2, 0x5b, 0x4f, 0xe2, 0x3b, 0x69, 0x44, 0x48,
+	0x17, 0xd4, 0x47, 0xbd, 0xbb, 0x69, 0xcb, 0x5f, 0x9e, 0x16, 0xe1, 0x94, 0xf9, 0x7a, 0x10, 0xf8,
+	0xd9, 0x00, 0x48, 0x6f, 0x3d, 0xe2, 0x43, 0x71, 0xaa, 0x63, 0xe4, 0x3e, 0x43, 0x51, 0x9e, 0x43,
+	0xbf, 0xd7, 0xc8, 0xda, 0x81, 0x84, 0x50, 0xc1, 0xfb, 0x24, 0x48, 0xb4, 0xed, 0xdf, 0x38, 0xa5,
+	0xd2, 0xcc, 0xfa, 0x26, 0xe7, 0x76, 0x6c, 0x38, 0x5d, 0x8a, 0x25, 0x30, 0xf5, 0x70, 0x08, 0x63,
+	0xa8, 0xe2, 0xc1, 0xe4, 0x50, 0x1e, 0x4c, 0x30, 0xf5, 0xf0, 0x61, 0x3a, 0xa8, 0x54, 0x07, 0x93,
+	0x43, 0x79, 0x30, 0x41, 0xcf, 0xa1, 0x5f, 0x93, 0x00, 0xe8, 0xcb, 0xe8, 0x52, 0x00, 0xae, 0x31,
+	0x50, 0x50, 0xee, 0x36, 0x42, 0xbe, 0xc0, 0x3c, 0x87, 0xce, 0xc9, 0x6a, 0x7e, 0x4d, 0x9b, 0x15,
+	0xb4, 0xdd, 0x56, 0x15, 0x69, 0xad, 0xac, 0x03, 0x71, 0x2c, 0x47, 0x18, 0xe5, 0x1c, 0x42, 0x29,
+	0xe7, 0x94, 0x56, 0xd6, 0x31, 0x40, 0x2a, 0xe7, 0x10, 0x4a, 0x39, 0xa7, 0xb4, 0xb2, 0x6e, 0x3e,
+	0x52, 0x39, 0x87, 0x50, 0xca, 0x39, 0xe5, 0x39, 0x54, 0x92, 0x3b, 0x5d, 0x50, 0xc7, 0x72, 0x14,
+	0xd1, 0x2d, 0x54, 0x97, 0x63, 0xc4, 0x6d, 0xe0, 0x7a, 0x1c, 0x33, 0x9e, 0x43, 0x05, 0x59, 0xd1,
+	0x17, 0xb4, 0x8e, 0x95, 0x74, 0xb7, 0xd0, 0x8a, 0x9e, 0x43, 0x7f, 0xd5, 0xc8, 0xe6, 0x29, 0x44,
+	0xc9, 0xe5, 0xde, 0x60, 0xc2, 0xf8, 0x5b, 0x58, 0xd0, 0xe7, 0xf6, 0xda, 0x65, 0xd6, 0x7d, 0x81,
+	0x70, 0x51, 0x86, 0x93, 0x9d, 0xbd, 0xd6, 0x05, 0x75, 0x90, 0xfd, 0x86, 0xa2, 0x52, 0x9e, 0x41,
+	0xb8, 0x94, 0x67, 0x94, 0xe7, 0xd0, 0xdf, 0x35, 0xf2, 0xd0, 0x50, 0x4f, 0xe7, 0x7f, 0x84, 0xa9,
+	0x47, 0x99, 0x45, 0xd5, 0xa3, 0x0c, 0x27, 0xf1, 0xbf, 0x67, 0x38, 0xa2, 0x0d, 0xbc, 0x13, 0xb7,
+	0x59, 0xc1, 0x81, 0xe7, 0xd0, 0x3f, 0x35, 0xf2, 0xc8, 0x90, 0x7e, 0xc3, 0xc6, 0x70, 0x20, 0xb8,
+	0x02, 0xae, 0xe8, 0x2e, 0xde, 0x85, 0x81, 0xbb, 0x2f, 0x2b, 0x18, 0x32, 0xf8, 0x64, 0x9b, 0xdc,
+	0xed, 0x82, 0x3a, 0x8d, 0x8f, 0x4c, 0x34, 0x40, 0x84, 0x35, 0x06, 0xdc, 0x3a, 0x26, 0xa1, 0x31,
+	0xe1, 0x39, 0x74, 0x9c, 0xcc, 0x82, 0xf8, 0x8a, 0xfa, 0x38, 0x3d, 0x37, 0x40, 0xca, 0x79, 0x0e,
+	0x9d, 0x11, 0xa2, 0x87, 0x6f, 0x22, 0xd8, 0xc2, 0x0e, 0xfa, 0xaa, 0xb2, 0x82, 0x10, 0x3d, 0x79,
+	0x6f, 0x71, 0x9d, 0x71, 0xc2, 0xf4, 0x31, 0x16, 0x33, 0x64, 0x53, 0x04, 0x35, 0x64, 0x53, 0x26,
+	0x19, 0xec, 0xab, 0xb9, 0x2c, 0x66, 0xce, 0x6a, 0x02, 0x35, 0x67, 0x35, 0x92, 0xef, 0xe3, 0xc3,
+	0x50, 0x85, 0xfb, 0xe1, 0x28, 0xc2, 0xec, 0xe3, 0x8c, 0x41, 0xed, 0xe3, 0x0c, 0xf2, 0x1c, 0xba,
+	0x20, 0x1b, 0x85, 0xf2, 0x91, 0x82, 0x09, 0xa6, 0xd0, 0x29, 0x86, 0x2a, 0x74, 0xca, 0x78, 0x0e,
+	0xfd, 0x51, 0x23, 0xeb, 0x3a, 0x92, 0xe9, 0x77, 0xb4, 0x83, 0xcd, 0x72, 0x66, 0x60, 0x07, 0x7d,
+	0x70, 0x29, 0x6c, 0xcc, 0xc9, 0xba, 0xce, 0x75, 0xe6, 0xe2, 0x36, 0x0b, 0x70, 0xbf, 0x0b, 0xea,
+	0xb5, 0xf1, 0xf6, 0x84, 0x39, 0x2e, 0x9b, 0x1c, 0xea, 0xb8, 0x6c, 0x82, 0xfa, 0xc8, 0xbe, 0xb1,
+	0x6c, 0x83, 0x6e, 0x57, 0x72, 0xe1, 0xb6, 0xab, 0x99, 0xd0, 0xa5, 0x78, 0xa0, 0xbb, 0xf0, 0x5f,
+	0x6d, 0xfc, 0xac, 0x91, 0xcd, 0x2e, 0xa8, 0xbd, 0xe1, 0x10, 0xfa, 0x0a, 0x06, 0xef, 0xe2, 0xb7,
+	0x53, 0x4c, 0x2a, 0x97, 0x40, 0x54, 0x2a, 0x97, 0xc8, 0xa2, 0x29, 0x27, 0xc5, 0xcb, 0x2e, 0xa6,
+	0x1a, 0x06, 0x86, 0xaa, 0x86, 0xc1, 0x79, 0x0e, 0xfd, 0x46, 0xd6, 0x97, 0x2c, 0x60, 0x7e, 0x6b,
+	0x0a, 0x0a, 0xf5, 0x2a, 0x55, 0x60, 0x9e, 0xb3, 0xff, 0xea, 0xd3, 0xee, 0x88, 0xa9, 0xb3, 0x59,
+	0x2f, 0x7e, 0xf5, 0x0e, 0xe2, 0x87, 0x04, 0xd9, 0x43, 0x02, 0x9b, 0xbf, 0x0e, 0x7b, 0x2b, 0xc9,
+	0xff, 0x03, 0xcd, 0x7f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x03, 0x1b, 0x15, 0x72, 0x69, 0x14, 0x00,
 	0x00,
 }
 
@@ -105,25 +108,29 @@ type InfraProxyClient interface {
 	UpdateServer(ctx context.Context, in *request.UpdateServer, opts ...grpc.CallOption) (*response.UpdateServer, error)
 	GetServers(ctx context.Context, in *request.GetServers, opts ...grpc.CallOption) (*response.GetServers, error)
 	GetServer(ctx context.Context, in *request.GetServer, opts ...grpc.CallOption) (*response.GetServer, error)
-	GetServerByName(ctx context.Context, in *request.GetServerByName, opts ...grpc.CallOption) (*response.GetServer, error)
 	CreateOrg(ctx context.Context, in *request.CreateOrg, opts ...grpc.CallOption) (*response.CreateOrg, error)
 	DeleteOrg(ctx context.Context, in *request.DeleteOrg, opts ...grpc.CallOption) (*response.DeleteOrg, error)
 	UpdateOrg(ctx context.Context, in *request.UpdateOrg, opts ...grpc.CallOption) (*response.UpdateOrg, error)
 	GetOrgs(ctx context.Context, in *request.GetOrgs, opts ...grpc.CallOption) (*response.GetOrgs, error)
 	GetOrg(ctx context.Context, in *request.GetOrg, opts ...grpc.CallOption) (*response.GetOrg, error)
-	GetOrgByName(ctx context.Context, in *request.GetOrgByName, opts ...grpc.CallOption) (*response.GetOrg, error)
+	ResetOrgAdminKey(ctx context.Context, in *request.ResetOrgAdminKey, opts ...grpc.CallOption) (*response.ResetOrgAdminKey, error)
 	GetCookbooks(ctx context.Context, in *request.Cookbooks, opts ...grpc.CallOption) (*response.Cookbooks, error)
 	GetCookbookVersions(ctx context.Context, in *request.CookbookVersions, opts ...grpc.CallOption) (*response.CookbookVersions, error)
 	GetCookbook(ctx context.Context, in *request.Cookbook, opts ...grpc.CallOption) (*response.Cookbook, error)
 	GetCookbookFileContent(ctx context.Context, in *request.CookbookFileContent, opts ...grpc.CallOption) (*response.CookbookFileContent, error)
 	GetRoles(ctx context.Context, in *request.Roles, opts ...grpc.CallOption) (*response.Roles, error)
 	GetRole(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.Role, error)
+	CreateRole(ctx context.Context, in *request.CreateRole, opts ...grpc.CallOption) (*response.Role, error)
+	DeleteRole(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.Role, error)
 	GetClients(ctx context.Context, in *request.Clients, opts ...grpc.CallOption) (*response.Clients, error)
 	GetClient(ctx context.Context, in *request.Client, opts ...grpc.CallOption) (*response.Client, error)
 	GetDataBags(ctx context.Context, in *request.DataBags, opts ...grpc.CallOption) (*response.DataBags, error)
 	GetDataBagItem(ctx context.Context, in *request.DataBag, opts ...grpc.CallOption) (*response.DataBag, error)
+	CreateDataBag(ctx context.Context, in *request.CreateDataBag, opts ...grpc.CallOption) (*response.CreateDataBag, error)
+	DeleteDataBag(ctx context.Context, in *request.DataBag, opts ...grpc.CallOption) (*response.DataBag, error)
 	GetEnvironments(ctx context.Context, in *request.Environments, opts ...grpc.CallOption) (*response.Environments, error)
 	GetEnvironment(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.Environment, error)
+	DeleteEnvironment(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.Environment, error)
 	GetAffectedNodes(ctx context.Context, in *request.AffectedNodes, opts ...grpc.CallOption) (*response.AffectedNodes, error)
 	GetPolicyfiles(ctx context.Context, in *request.Policyfiles, opts ...grpc.CallOption) (*response.Policyfiles, error)
 	GetPolicyfile(ctx context.Context, in *request.Policyfile, opts ...grpc.CallOption) (*response.Policyfile, error)
@@ -191,15 +198,6 @@ func (c *infraProxyClient) GetServer(ctx context.Context, in *request.GetServer,
 	return out, nil
 }
 
-func (c *infraProxyClient) GetServerByName(ctx context.Context, in *request.GetServerByName, opts ...grpc.CallOption) (*response.GetServer, error) {
-	out := new(response.GetServer)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/GetServerByName", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *infraProxyClient) CreateOrg(ctx context.Context, in *request.CreateOrg, opts ...grpc.CallOption) (*response.CreateOrg, error) {
 	out := new(response.CreateOrg)
 	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/CreateOrg", in, out, opts...)
@@ -245,9 +243,9 @@ func (c *infraProxyClient) GetOrg(ctx context.Context, in *request.GetOrg, opts 
 	return out, nil
 }
 
-func (c *infraProxyClient) GetOrgByName(ctx context.Context, in *request.GetOrgByName, opts ...grpc.CallOption) (*response.GetOrg, error) {
-	out := new(response.GetOrg)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/GetOrgByName", in, out, opts...)
+func (c *infraProxyClient) ResetOrgAdminKey(ctx context.Context, in *request.ResetOrgAdminKey, opts ...grpc.CallOption) (*response.ResetOrgAdminKey, error) {
+	out := new(response.ResetOrgAdminKey)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/ResetOrgAdminKey", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -308,6 +306,24 @@ func (c *infraProxyClient) GetRole(ctx context.Context, in *request.Role, opts .
 	return out, nil
 }
 
+func (c *infraProxyClient) CreateRole(ctx context.Context, in *request.CreateRole, opts ...grpc.CallOption) (*response.Role, error) {
+	out := new(response.Role)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/CreateRole", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *infraProxyClient) DeleteRole(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.Role, error) {
+	out := new(response.Role)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/DeleteRole", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *infraProxyClient) GetClients(ctx context.Context, in *request.Clients, opts ...grpc.CallOption) (*response.Clients, error) {
 	out := new(response.Clients)
 	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/GetClients", in, out, opts...)
@@ -344,6 +360,24 @@ func (c *infraProxyClient) GetDataBagItem(ctx context.Context, in *request.DataB
 	return out, nil
 }
 
+func (c *infraProxyClient) CreateDataBag(ctx context.Context, in *request.CreateDataBag, opts ...grpc.CallOption) (*response.CreateDataBag, error) {
+	out := new(response.CreateDataBag)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/CreateDataBag", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *infraProxyClient) DeleteDataBag(ctx context.Context, in *request.DataBag, opts ...grpc.CallOption) (*response.DataBag, error) {
+	out := new(response.DataBag)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/DeleteDataBag", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *infraProxyClient) GetEnvironments(ctx context.Context, in *request.Environments, opts ...grpc.CallOption) (*response.Environments, error) {
 	out := new(response.Environments)
 	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/GetEnvironments", in, out, opts...)
@@ -356,6 +390,15 @@ func (c *infraProxyClient) GetEnvironments(ctx context.Context, in *request.Envi
 func (c *infraProxyClient) GetEnvironment(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.Environment, error) {
 	out := new(response.Environment)
 	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/GetEnvironment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *infraProxyClient) DeleteEnvironment(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.Environment, error) {
+	out := new(response.Environment)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.service.InfraProxy/DeleteEnvironment", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -397,25 +440,29 @@ type InfraProxyServer interface {
 	UpdateServer(context.Context, *request.UpdateServer) (*response.UpdateServer, error)
 	GetServers(context.Context, *request.GetServers) (*response.GetServers, error)
 	GetServer(context.Context, *request.GetServer) (*response.GetServer, error)
-	GetServerByName(context.Context, *request.GetServerByName) (*response.GetServer, error)
 	CreateOrg(context.Context, *request.CreateOrg) (*response.CreateOrg, error)
 	DeleteOrg(context.Context, *request.DeleteOrg) (*response.DeleteOrg, error)
 	UpdateOrg(context.Context, *request.UpdateOrg) (*response.UpdateOrg, error)
 	GetOrgs(context.Context, *request.GetOrgs) (*response.GetOrgs, error)
 	GetOrg(context.Context, *request.GetOrg) (*response.GetOrg, error)
-	GetOrgByName(context.Context, *request.GetOrgByName) (*response.GetOrg, error)
+	ResetOrgAdminKey(context.Context, *request.ResetOrgAdminKey) (*response.ResetOrgAdminKey, error)
 	GetCookbooks(context.Context, *request.Cookbooks) (*response.Cookbooks, error)
 	GetCookbookVersions(context.Context, *request.CookbookVersions) (*response.CookbookVersions, error)
 	GetCookbook(context.Context, *request.Cookbook) (*response.Cookbook, error)
 	GetCookbookFileContent(context.Context, *request.CookbookFileContent) (*response.CookbookFileContent, error)
 	GetRoles(context.Context, *request.Roles) (*response.Roles, error)
 	GetRole(context.Context, *request.Role) (*response.Role, error)
+	CreateRole(context.Context, *request.CreateRole) (*response.Role, error)
+	DeleteRole(context.Context, *request.Role) (*response.Role, error)
 	GetClients(context.Context, *request.Clients) (*response.Clients, error)
 	GetClient(context.Context, *request.Client) (*response.Client, error)
 	GetDataBags(context.Context, *request.DataBags) (*response.DataBags, error)
 	GetDataBagItem(context.Context, *request.DataBag) (*response.DataBag, error)
+	CreateDataBag(context.Context, *request.CreateDataBag) (*response.CreateDataBag, error)
+	DeleteDataBag(context.Context, *request.DataBag) (*response.DataBag, error)
 	GetEnvironments(context.Context, *request.Environments) (*response.Environments, error)
 	GetEnvironment(context.Context, *request.Environment) (*response.Environment, error)
+	DeleteEnvironment(context.Context, *request.Environment) (*response.Environment, error)
 	GetAffectedNodes(context.Context, *request.AffectedNodes) (*response.AffectedNodes, error)
 	GetPolicyfiles(context.Context, *request.Policyfiles) (*response.Policyfiles, error)
 	GetPolicyfile(context.Context, *request.Policyfile) (*response.Policyfile, error)
@@ -443,9 +490,6 @@ func (*UnimplementedInfraProxyServer) GetServers(ctx context.Context, req *reque
 func (*UnimplementedInfraProxyServer) GetServer(ctx context.Context, req *request.GetServer) (*response.GetServer, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetServer not implemented")
 }
-func (*UnimplementedInfraProxyServer) GetServerByName(ctx context.Context, req *request.GetServerByName) (*response.GetServer, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetServerByName not implemented")
-}
 func (*UnimplementedInfraProxyServer) CreateOrg(ctx context.Context, req *request.CreateOrg) (*response.CreateOrg, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateOrg not implemented")
 }
@@ -461,8 +505,8 @@ func (*UnimplementedInfraProxyServer) GetOrgs(ctx context.Context, req *request.
 func (*UnimplementedInfraProxyServer) GetOrg(ctx context.Context, req *request.GetOrg) (*response.GetOrg, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrg not implemented")
 }
-func (*UnimplementedInfraProxyServer) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*response.GetOrg, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetOrgByName not implemented")
+func (*UnimplementedInfraProxyServer) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdminKey) (*response.ResetOrgAdminKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetOrgAdminKey not implemented")
 }
 func (*UnimplementedInfraProxyServer) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*response.Cookbooks, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCookbooks not implemented")
@@ -482,6 +526,12 @@ func (*UnimplementedInfraProxyServer) GetRoles(ctx context.Context, req *request
 func (*UnimplementedInfraProxyServer) GetRole(ctx context.Context, req *request.Role) (*response.Role, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRole not implemented")
 }
+func (*UnimplementedInfraProxyServer) CreateRole(ctx context.Context, req *request.CreateRole) (*response.Role, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRole not implemented")
+}
+func (*UnimplementedInfraProxyServer) DeleteRole(ctx context.Context, req *request.Role) (*response.Role, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRole not implemented")
+}
 func (*UnimplementedInfraProxyServer) GetClients(ctx context.Context, req *request.Clients) (*response.Clients, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetClients not implemented")
 }
@@ -494,11 +544,20 @@ func (*UnimplementedInfraProxyServer) GetDataBags(ctx context.Context, req *requ
 func (*UnimplementedInfraProxyServer) GetDataBagItem(ctx context.Context, req *request.DataBag) (*response.DataBag, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDataBagItem not implemented")
 }
+func (*UnimplementedInfraProxyServer) CreateDataBag(ctx context.Context, req *request.CreateDataBag) (*response.CreateDataBag, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDataBag not implemented")
+}
+func (*UnimplementedInfraProxyServer) DeleteDataBag(ctx context.Context, req *request.DataBag) (*response.DataBag, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDataBag not implemented")
+}
 func (*UnimplementedInfraProxyServer) GetEnvironments(ctx context.Context, req *request.Environments) (*response.Environments, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEnvironments not implemented")
 }
 func (*UnimplementedInfraProxyServer) GetEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEnvironment not implemented")
+}
+func (*UnimplementedInfraProxyServer) DeleteEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteEnvironment not implemented")
 }
 func (*UnimplementedInfraProxyServer) GetAffectedNodes(ctx context.Context, req *request.AffectedNodes) (*response.AffectedNodes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAffectedNodes not implemented")
@@ -622,24 +681,6 @@ func _InfraProxy_GetServer_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _InfraProxy_GetServerByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(request.GetServerByName)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(InfraProxyServer).GetServerByName(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/chef.automate.domain.infra_proxy.service.InfraProxy/GetServerByName",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InfraProxyServer).GetServerByName(ctx, req.(*request.GetServerByName))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _InfraProxy_CreateOrg_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(request.CreateOrg)
 	if err := dec(in); err != nil {
@@ -730,20 +771,20 @@ func _InfraProxy_GetOrg_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _InfraProxy_GetOrgByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(request.GetOrgByName)
+func _InfraProxy_ResetOrgAdminKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.ResetOrgAdminKey)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(InfraProxyServer).GetOrgByName(ctx, in)
+		return srv.(InfraProxyServer).ResetOrgAdminKey(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.infra_proxy.service.InfraProxy/GetOrgByName",
+		FullMethod: "/chef.automate.domain.infra_proxy.service.InfraProxy/ResetOrgAdminKey",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InfraProxyServer).GetOrgByName(ctx, req.(*request.GetOrgByName))
+		return srv.(InfraProxyServer).ResetOrgAdminKey(ctx, req.(*request.ResetOrgAdminKey))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -856,6 +897,42 @@ func _InfraProxy_GetRole_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InfraProxy_CreateRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.CreateRole)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InfraProxyServer).CreateRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.infra_proxy.service.InfraProxy/CreateRole",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InfraProxyServer).CreateRole(ctx, req.(*request.CreateRole))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InfraProxy_DeleteRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.Role)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InfraProxyServer).DeleteRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.infra_proxy.service.InfraProxy/DeleteRole",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InfraProxyServer).DeleteRole(ctx, req.(*request.Role))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _InfraProxy_GetClients_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(request.Clients)
 	if err := dec(in); err != nil {
@@ -928,6 +1005,42 @@ func _InfraProxy_GetDataBagItem_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InfraProxy_CreateDataBag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.CreateDataBag)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InfraProxyServer).CreateDataBag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.infra_proxy.service.InfraProxy/CreateDataBag",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InfraProxyServer).CreateDataBag(ctx, req.(*request.CreateDataBag))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InfraProxy_DeleteDataBag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.DataBag)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InfraProxyServer).DeleteDataBag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.infra_proxy.service.InfraProxy/DeleteDataBag",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InfraProxyServer).DeleteDataBag(ctx, req.(*request.DataBag))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _InfraProxy_GetEnvironments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(request.Environments)
 	if err := dec(in); err != nil {
@@ -960,6 +1073,24 @@ func _InfraProxy_GetEnvironment_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InfraProxyServer).GetEnvironment(ctx, req.(*request.Environment))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InfraProxy_DeleteEnvironment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.Environment)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InfraProxyServer).DeleteEnvironment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.infra_proxy.service.InfraProxy/DeleteEnvironment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InfraProxyServer).DeleteEnvironment(ctx, req.(*request.Environment))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1047,10 +1178,6 @@ var _InfraProxy_serviceDesc = grpc.ServiceDesc{
 			Handler:    _InfraProxy_GetServer_Handler,
 		},
 		{
-			MethodName: "GetServerByName",
-			Handler:    _InfraProxy_GetServerByName_Handler,
-		},
-		{
 			MethodName: "CreateOrg",
 			Handler:    _InfraProxy_CreateOrg_Handler,
 		},
@@ -1071,8 +1198,8 @@ var _InfraProxy_serviceDesc = grpc.ServiceDesc{
 			Handler:    _InfraProxy_GetOrg_Handler,
 		},
 		{
-			MethodName: "GetOrgByName",
-			Handler:    _InfraProxy_GetOrgByName_Handler,
+			MethodName: "ResetOrgAdminKey",
+			Handler:    _InfraProxy_ResetOrgAdminKey_Handler,
 		},
 		{
 			MethodName: "GetCookbooks",
@@ -1099,6 +1226,14 @@ var _InfraProxy_serviceDesc = grpc.ServiceDesc{
 			Handler:    _InfraProxy_GetRole_Handler,
 		},
 		{
+			MethodName: "CreateRole",
+			Handler:    _InfraProxy_CreateRole_Handler,
+		},
+		{
+			MethodName: "DeleteRole",
+			Handler:    _InfraProxy_DeleteRole_Handler,
+		},
+		{
 			MethodName: "GetClients",
 			Handler:    _InfraProxy_GetClients_Handler,
 		},
@@ -1115,12 +1250,24 @@ var _InfraProxy_serviceDesc = grpc.ServiceDesc{
 			Handler:    _InfraProxy_GetDataBagItem_Handler,
 		},
 		{
+			MethodName: "CreateDataBag",
+			Handler:    _InfraProxy_CreateDataBag_Handler,
+		},
+		{
+			MethodName: "DeleteDataBag",
+			Handler:    _InfraProxy_DeleteDataBag_Handler,
+		},
+		{
 			MethodName: "GetEnvironments",
 			Handler:    _InfraProxy_GetEnvironments_Handler,
 		},
 		{
 			MethodName: "GetEnvironment",
 			Handler:    _InfraProxy_GetEnvironment_Handler,
+		},
+		{
+			MethodName: "DeleteEnvironment",
+			Handler:    _InfraProxy_DeleteEnvironment_Handler,
 		},
 		{
 			MethodName: "GetAffectedNodes",

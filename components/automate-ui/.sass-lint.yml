@@ -15,13 +15,6 @@ rules:
   extends-before-mixins: 2
   extends-before-declarations: 2
 
-  # Mixinss
-  mixins-before-declarations:
-    - 2
-    - exclude:
-        - breakpoint
-        - mq
-
   # Line Spacing
   one-declaration-per-line: 2
   empty-line-between-blocks: 2

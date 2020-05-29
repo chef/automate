@@ -1,0 +1,30 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-loading-spinner *ngIf="cookbookVersionsLoading" size="50" fixed></chef-loading-spinner>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Cookbooks</chef-breadcrumb>
+        {{ cookbookName }}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <chef-heading>{{ cookbookName }}</chef-heading>
+        <div class="version-dropdown">
+          <label>Version</label>
+          <chef-select *ngIf="cookbook"
+            (change)="handleCookbookVersionChange($event)">
+            <chef-option *ngFor="let version of cookbook.versions" [value]="version">{{ version }}</chef-option>
+          </chef-select>
+        </div>
+        <chef-tab-selector [value]="tabValue">
+          <chef-option value='details' data-cy="details-tab">Details</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      <section class="page-body">
+        <chef-loading-spinner *ngIf="cookbookDetailsLoading" size="50"></chef-loading-spinner>
+        <chef-markdown *ngIf="readFileContent" [text]="readFileContent.content"></chef-markdown>
+      </section>
+    </main>
+  </div>
+</div>

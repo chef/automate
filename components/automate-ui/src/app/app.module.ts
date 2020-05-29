@@ -57,6 +57,7 @@ import {
 } from './services/node-details/node-noruns-details-resolver.service';
 import { NodeRunsService } from './services/node-details/node-runs.service';
 import { ProjectService } from './entities/projects/project.service';
+import { ProductDeployedService } from './services/product-deployed/product-deployed.service';
 import { ProjectsFilterService } from './services/projects-filter/projects-filter.service';
 import { RulesService } from './services/rules/rules.service';
 import { RunHistoryStore } from './services/run-history-store/run-history.store';
@@ -67,15 +68,20 @@ import { TelemetryService } from './services/telemetry/telemetry.service';
 import { ApiTokenRequests } from './entities/api-tokens/api-token.requests';
 import { AutomateSettingsRequests } from './entities/automate-settings/automate-settings.requests';
 import { CookbookRequests } from './entities/cookbooks/cookbook.requests';
+import { CookbookDetailsRequests } from './entities/cookbooks/cookbook-details.requests';
+import { CookbookVersionsRequests } from './entities/cookbooks/cookbook-versions.requests';
+import { ClientRequests } from './entities/clients/client.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
+import { DataBagsRequests } from './entities/data-bags/data-bags.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
 import { DestinationRequests } from './entities/destinations/destination.requests';
-import { NodesRequests } from './entities/nodes/nodes.requests';
+import { EnvironmentRequests } from './entities/environments/environment.requests';
 import { InfraRoleRequests } from './entities/infra-roles/infra-role.requests';
 import { JobRequests } from './entities/jobs/job.requests';
 import { LicenseStatusRequests } from './entities/license/license.requests';
 import { ManagerRequests } from './entities/managers/manager.requests';
+import { NodesRequests } from './entities/nodes/nodes.requests';
 import { PolicyRequests } from './entities/policies/policy.requests';
 import { ProfileRequests } from './entities/profiles/profile.requests';
 import { ProjectRequests } from './entities/projects/project.requests';
@@ -183,6 +189,7 @@ import {
 import {
   TelemetryCheckboxComponent
 } from './page-components/telemetry-checkbox/telemetry-checkbox.component';
+import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 import { UIComponent } from 'app/ui.component';
 
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
@@ -242,6 +249,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     SettingsLandingComponent,
     SigninComponent,
     TelemetryCheckboxComponent,
+    TopNavLandingComponent,
     UIComponent,
     WelcomeModalComponent
   ],
@@ -283,11 +291,15 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ChefSessionService,
     ConfigService,
     ClientRunsRequests,
+    CookbookDetailsRequests,
     CookbookRequests,
+    CookbookVersionsRequests,
+    ClientRequests,
     CredentialRequests,
+    DataBagsRequests,
     DesktopRequests,
     DestinationRequests,
-    NodesRequests,
+    EnvironmentRequests,
     EventFeedService,
     FeatureFlagsService,
     HistorySelection,
@@ -303,11 +315,13 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     LocalStorageService,
     ManagerRequests,
     MetadataService,
+    NodesRequests,
     NodeDetailsResolverService,
     NodeNoRunsDetailsResolverService,
     NodeDetailsService,
     NodeRunsService,
     PolicyRequests,
+    ProductDeployedService,
     ProfileRequests,
     ProjectRequests,
     ProjectService,

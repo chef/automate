@@ -21,8 +21,7 @@ import (
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/tracing"
 
-	"github.com/chef/automate/api/interservice/authz/common"
-	api "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -89,11 +88,6 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize policy server")
 	}
 
-	subjectPurgeServer, err := NewSubjectPurgeServer(ctx, l, polServer)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize subject purge server")
-	}
-
 	// This function determines the log level based on the returned status code:
 	// We divert from the default only by pushing non-error-returns into debug
 	// logs. See DefaultCodeToLevel for the rest of the mapping.
@@ -131,7 +125,6 @@ func NewGRPCServer(ctx context.Context,
 	api.RegisterPoliciesServer(g, polServer)
 	api.RegisterProjectsServer(g, projectsServer)
 	api.RegisterAuthorizationServer(g, authzServer)
-	common.RegisterSubjectPurgeServer(g, subjectPurgeServer)
 	reflection.Register(g)
 
 	if err := cerealManager.Start(ctx); err != nil {

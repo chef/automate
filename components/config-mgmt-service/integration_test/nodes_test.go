@@ -466,6 +466,1307 @@ func TestGetNodesStartEndDateTimeFilter(t *testing.T) {
 	}
 }
 
+func TestGetNodesFilters(t *testing.T) {
+
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     request.Nodes
+		expected    []string
+	}{
+		{
+			description: "cloud provider",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not_matched",
+						CloudProvider: "azure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 1",
+						CloudProvider: "ec2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 2",
+						CloudProvider: "ec2",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"cloud_provider:ec2"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "cloud provider case insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched",
+						CloudProvider: "Azure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match 1",
+						CloudProvider: "ec2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match 2",
+						CloudProvider: "ec2",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"cloud_provider:azure"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "cloud provider case insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched",
+						CloudProvider: "azure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match 1",
+						CloudProvider: "ec2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match 2",
+						CloudProvider: "ec2",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"cloud_provider:AZURE"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "cloud provider regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not_matched",
+						CloudProvider: "azure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 1",
+						CloudProvider: "ec2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 2",
+						CloudProvider: "ec1",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"cloud_provider:ec*"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+
+		// Timezone
+		{
+			description: "timezone",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not_matched",
+						Timezone: "PDT",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "match 1",
+						Timezone: "EDT",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "match 2",
+						Timezone: "EDT",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"timezone:EDT"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "timezone insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched",
+						Timezone: "Pdt",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not match",
+						Timezone: "EDT",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not match",
+						Timezone: "EDT",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"timezone:pdt"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "timezone insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched",
+						Timezone: "pdt",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not match",
+						Timezone: "EDT",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not match",
+						Timezone: "EDT",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"timezone:PDT"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "timezone regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 1",
+						Timezone: "9:00",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 2",
+						Timezone: "9:30",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not match",
+						Timezone: "1:00",
+					},
+				},
+			},
+			request: request.Nodes{
+				// '%3A' = ':'
+				Filter: []string{"timezone:9%3A*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+
+		// Kernel Release
+		{
+			description: "Kernel Release",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not_matched",
+						KernelRelease: "3.9.0",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 1",
+						KernelRelease: "3.10.0",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 2",
+						KernelRelease: "3.10.0",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"kernel_release:3.10.0"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "Kernel Release insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched",
+						KernelRelease: "3.9.0El7",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match",
+						KernelRelease: "3.10.0",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match",
+						KernelRelease: "3.10.0",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"kernel_release:3.9.0el7"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "Kernel Release insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched",
+						KernelRelease: "3.9.0el7",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match",
+						KernelRelease: "3.10.0",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not match",
+						KernelRelease: "3.10.0",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"kernel_release:3.9.0El7"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "Kernel Release regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not matched",
+						KernelRelease: "3.11.0el7",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched 1",
+						KernelRelease: "3.10.2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched 2",
+						KernelRelease: "3.10.4",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"kernel_release:3.10.*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+
+		// Kernel Version
+		{
+			description: "Kernel Version",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not_matched",
+						KernelVersion: "#1 SMP Thu Jan 29 18:37:38 EST 2015",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 1",
+						KernelVersion: "Darwin Kernel Version 15.5.0: Tue Apr 19 18:36:36 PDT 2016; root:xnu-3248.50.21~8/RELEASE_X86_64",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "match 2",
+						KernelVersion: "Darwin Kernel Version 15.5.0: Tue Apr 19 18:36:36 PDT 2016; root:xnu-3248.50.21~8/RELEASE_X86_64",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"kernel_version:Darwin%20Kernel%20Version%2015.5.0%3A%20Tue%20Apr%2019%2018%3A36%3A36%20PDT%202016%3B%20root%3Axnu-3248.50.21~8%2FRELEASE_X86_64"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "Kernel Version insensitive",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not matched",
+						KernelVersion: "#1 SMP Thu Jan 29 18:37:38 EST 2015",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not matched",
+						KernelVersion: "#1 SMP Thu Jan 29 18:37:38 EST 2015",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched",
+						KernelVersion: "Darwin Kernel Version 15.5.0: Tue Apr 19 18:36:36 PDT 2016; root:xnu-3248.50.21~8/RELEASE_X86_64",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"kernel_version:darwin%20kernel%20version%2015.5.0%3A%20Tue%20Apr%2019%2018%3A36%3A36%20PDT%202016%3B%20root%3Axnu-3248.50.21~8%2FRELEASE_X86_64"},
+			},
+			expected: []string{"matched"},
+		},
+		{
+			description: "Kernel Version regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "not matched",
+						KernelVersion: "Darwin Kernel Version 16.5.0: Tue Apr 19 18:36:36 PDT 2016; root:xnu-3248.50.21~8/RELEASE_X86_64",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched 1",
+						KernelVersion: "Darwin Kernel Version 15.6.0: Tue Apr 19 18:36:36 PDT 2016; root:xnu-3248.50.21~8/RELEASE_X86_64",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "matched 2",
+						KernelVersion: "Darwin Kernel Version 15.5.0: Tue Apr 19 18:36:36 PDT 2016; root:xnu-3248.50.21~8/RELEASE_X86_64",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"kernel_version:Darwin%20Kernel%20Version%2015.*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+
+		// Virtualization System
+		{
+			description: "Virtualization System",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "not_matched",
+						VirtualizationSystem: "citrix",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "match 1",
+						VirtualizationSystem: "xen",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "match 2",
+						VirtualizationSystem: "xen",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"virtualization_system:xen"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "Virtualization System insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "not_matched",
+						VirtualizationSystem: "citrix",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "match 1",
+						VirtualizationSystem: "Xen",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "match 2",
+						VirtualizationSystem: "xen",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"virtualization_system:xen"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "Virtualization System insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "not_matched",
+						VirtualizationSystem: "citrix",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "match 1",
+						VirtualizationSystem: "Xen",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "match 2",
+						VirtualizationSystem: "xen",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"virtualization_system:Xen"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "Virtualization System regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "not_matched",
+						VirtualizationSystem: "citrix",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "matched 1",
+						VirtualizationSystem: "xen-2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:             "matched 2",
+						VirtualizationSystem: "xen-1",
+					},
+				},
+			},
+			request: request.Nodes{
+				// '%3A' = ':'
+				Filter: []string{"virtualization_system:xen-*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+
+		// Virtualization Role
+		{
+			description: "Virtualization Role",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "not_matched",
+						VirtualizationRole: "guest",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "match 1",
+						VirtualizationRole: "admin",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "match 2",
+						VirtualizationRole: "admin",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"virtualization_role:admin"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "Virtualization Role insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "not_matched",
+						VirtualizationRole: "guest",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "match 1",
+						VirtualizationRole: "Admin",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "match 2",
+						VirtualizationRole: "admin",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"virtualization_role:admin"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "Virtualization Role insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "not_matched",
+						VirtualizationRole: "guest",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "matched 1",
+						VirtualizationRole: "Admin",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "matched 2",
+						VirtualizationRole: "admin",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"virtualization_role:Admin"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "Virtualization Role regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "not_matched",
+						VirtualizationRole: "guest",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "matched 1",
+						VirtualizationRole: "admin-1",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:           "matched 2",
+						VirtualizationRole: "admin-2",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"virtualization_role:admin-*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+
+		// DMI System Manufacturer
+		{
+			description: "DMI System Manufacturer",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "not_matched",
+						DmiSystemManufacturer: "citrix",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "match 1",
+						DmiSystemManufacturer: "xen",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "match 2",
+						DmiSystemManufacturer: "xen",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"dmi_system_manufacturer:xen"},
+			},
+			expected: []string{"match 1", "match 2"},
+		},
+		{
+			description: "DMI System Manufacturer insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "not_matched",
+						DmiSystemManufacturer: "citrix",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 1",
+						DmiSystemManufacturer: "Xen",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 2",
+						DmiSystemManufacturer: "xen",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"dmi_system_manufacturer:xen"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "DMI System Manufacturer insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "not_matched",
+						DmiSystemManufacturer: "citrix",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 1",
+						DmiSystemManufacturer: "Xen",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 2",
+						DmiSystemManufacturer: "xen",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"dmi_system_manufacturer:Xen"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "DMI System Manufacturer regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "not_matched",
+						DmiSystemManufacturer: "citrix",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 1",
+						DmiSystemManufacturer: "xen-1",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 2",
+						DmiSystemManufacturer: "xen-2",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"dmi_system_manufacturer:xen-*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+
+		// Dmi System Serial Number
+		{
+			description: "Dmi System Serial Number",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "not_matched",
+						DmiSystemSerialNumber: "ec2e0f80-06cc-d659-e439-34147116b49f",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 1",
+						DmiSystemSerialNumber: "d37f97fc-8bdc-11ea-bc55-0242ac130003",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 2",
+						DmiSystemSerialNumber: "d37f97fc-8bdc-11ea-bc55-0242ac130003",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"dmi_system_serial_number:d37f97fc-8bdc-11ea-bc55-0242ac130003"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "DMI System Serial Number insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "not_matched",
+						DmiSystemSerialNumber: "ec2e0f80-06cc-d659-e439-34147116b49f",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 1",
+						DmiSystemSerialNumber: "D37f97fc-8bdc-11ea-bc55-0242ac130003",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 2",
+						DmiSystemSerialNumber: "d37f97fc-8bdc-11ea-bc55-0242ac130003",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"dmi_system_serial_number:d37f97fc-8bdc-11ea-bc55-0242ac130003"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "DMI System Serial Number insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "not_matched",
+						DmiSystemSerialNumber: "ec2e0f80-06cc-d659-e439-34147116b49f",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 1",
+						DmiSystemSerialNumber: "d37f97fc-8bdc-11ea-bc55-0242ac130003",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 2",
+						DmiSystemSerialNumber: "D37f97fc-8bdc-11ea-bc55-0242ac130003",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"dmi_system_serial_number:D37f97fc-8bdc-11ea-bc55-0242ac130003"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "DMI System Serial Number regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "not_matched",
+						DmiSystemSerialNumber: "ec2e0f80-06cc-d659-e439-34147116b49f",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 1",
+						DmiSystemSerialNumber: "d37f97fc-8bdc-21ea-bc55-0242ac130003",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:              "matched 2",
+						DmiSystemSerialNumber: "d37f97fc-8bdc-11ea-bc55-0242ac130003",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"dmi_system_serial_number:d37f97fc-8bdc-*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+
+		// Domain
+		{
+			description: "Domain",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not_matched",
+						Domain:   "us-east-2.compute.internal",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 1",
+						Domain:   "us-west-1.compute.internal",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 2",
+						Domain:   "us-west-1.compute.internal",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"domain:us-west-1.compute.internal"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "Domain insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not_matched",
+						Domain:   "us-east-2.compute.internal",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 1",
+						Domain:   "Us-west-1.compute.internal",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 2",
+						Domain:   "us-west-1.compute.internal",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"domain:us-west-1.compute.internal"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "Domain insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not_matched",
+						Domain:   "us-east-2.compute.internal",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 1",
+						Domain:   "Us-west-1.compute.internal",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 2",
+						Domain:   "us-west-1.compute.internal",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"domain:Us-west-1.compute.internal"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "Domain regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not_matched",
+						Domain:   "us-east-2.compute.internal",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 1",
+						Domain:   "us-west-2.compute.internal",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 2",
+						Domain:   "us-west-1.compute.internal",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"domain:us-west-*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+
+		// Hostname
+		{
+			description: "Hostname",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not_matched",
+						Hostname: "ip-127-208-184-142",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 1",
+						Hostname: "ip-127-208-184-141",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 2",
+						Hostname: "ip-127-208-184-141",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"hostname:ip-127-208-184-141"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "Hostname insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not_matched",
+						Hostname: "ip-127-208-184-142",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 1",
+						Hostname: "Ip-127-208-184-141",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 2",
+						Hostname: "ip-127-208-184-141",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"hostname:ip-127-208-184-141"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "Hostname insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not_matched",
+						Hostname: "ip-127-208-184-142",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 1",
+						Hostname: "Ip-127-208-184-141",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 2",
+						Hostname: "ip-127-208-184-141",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"hostname:Ip-127-208-184-141"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "Hostname regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "not_matched",
+						Hostname: "ip-126-208-184-142",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 1",
+						Hostname: "ip-127-108-184-141",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "matched 2",
+						Hostname: "ip-127-208-184-141",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"hostname:ip-127-*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+
+		// Macaddress
+		{
+			description: "Macaddress",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "not_matched",
+						Macaddress: "02:3F:B5:7E:AD:AA",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 1",
+						Macaddress: "02:3F:B5:7E:AD:FF",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 2",
+						Macaddress: "02:3F:B5:7E:AD:FF",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"macaddress:02%3A3F%3AB5%3A7E%3AAD%3AFF"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "Macaddress insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "not_matched",
+						Macaddress: "02:3F:B5:7E:AD:AA",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 1",
+						Macaddress: "02:3F:B5:7E:AD:ff",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 2",
+						Macaddress: "02:3F:B5:7E:AD:FF",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"macaddress:02%3A3F%3AB5%3A7E%3AAD%3AFF"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "Macaddress insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "not_matched",
+						Macaddress: "02:3F:B5:7E:AD:AA",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 1",
+						Macaddress: "02:3F:B5:7E:AD:ff",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 2",
+						Macaddress: "02:3F:B5:7E:AD:FF",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"macaddress:02%3A3F%3AB5%3A7E%3AAD%3Aff"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "Macaddress regex",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "not_matched",
+						Macaddress: "01:3F:B5:7E:AD:AA",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 1",
+						Macaddress: "02:3F:B5:7E:AD:CC",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 2",
+						Macaddress: "02:3F:B5:7E:AD:FF",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"macaddress:02%3A3F%3AB5%3A7E%3AAD%3A*"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+
+		// Ip6address
+		{
+			description: "IP 6 Address",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "not_matched",
+						Ip6address: "aa80::3f:b5ff:fe7e:adaa",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 1",
+						Ip6address: "fe80::3f:b5ff:fe7e:adff",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 2",
+						Ip6address: "fe80::3f:b5ff:fe7e:adff",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"ip6address:fe80%3A%3A3f%3Ab5ff%3Afe7e%3Aadff"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "IP 6 Address insensitive node",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "not_matched",
+						Ip6address: "aa80::3f:b5ff:fe7e:adaa",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 1",
+						Ip6address: "Fe80::3f:b5ff:fe7e:adFF",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 2",
+						Ip6address: "fe80::3f:b5ff:fe7e:adff",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"ip6address:fe80%3A%3A3f%3Ab5ff%3Afe7e%3Aadff"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+		{
+			description: "IP 6 Address insensitive parameter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "not_matched",
+						Ip6address: "aa80::3f:b5ff:fe7e:adaa",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 1",
+						Ip6address: "Fe80::3f:b5ff:fe7e:adFF",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "matched 2",
+						Ip6address: "fe80::3f:b5ff:fe7e:adff",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"ip6address:Fe80%3A%3A3f%3Ab5ff%3Afe7e%3Aadff"},
+			},
+			expected: []string{"matched 1", "matched 2"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Filter on %s", test.description), func(t *testing.T) {
+
+			// Adding required node data
+			for index := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add nodes
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+
+			// call GetNodes
+			res, err := cfgmgmt.GetNodes(context.Background(), &test.request)
+			assert.NoError(t, err)
+
+			names := getFieldValues(res, "name")
+
+			// Test what nodes are returned.
+			assert.ElementsMatch(t, test.expected, names)
+		})
+	}
+}
+
 func TestGetNodesRegexWithExactSameField(t *testing.T) {
 
 	cases := []struct {
@@ -2343,7 +3644,6 @@ func TestGetRunsProjectFilter(t *testing.T) {
 			suite.IngestRuns(test.runs)
 			defer suite.DeleteAllDocuments()
 
-			// call GetNodes
 			res, err := cfgmgmt.GetRuns(test.ctx, &test.request)
 
 			assert.NoError(t, err)

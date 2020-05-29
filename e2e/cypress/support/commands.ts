@@ -3,6 +3,16 @@ import { eventExist } from '../support/helpers';
 // Cypress Commands: any action that could be taken in any test
 // any command added in here must also have its signature added to index.d.ts
 
+
+Cypress.Commands.add('sendToDataCollector', (report: any) => {
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    method: 'POST',
+    url: '/data-collector/v0',
+    body: report
+  });
+});
+
 Cypress.Commands.add('login', (url: string, username: string) => {
   // CYPRESS_BASE_URL environment variable must be set
   cy.visit(url);
@@ -30,30 +40,34 @@ Cypress.Commands.add('logout', () => {
   return cy.url().should('include', '/dex/auth');
 });
 
-// applyProjectsFilter will deselect any selected projects from the filter,
+// applyProjectsFilter will deselect all projects in the filter,
 // check any projects by NAME (not id) passed -- if any -- and apply any changes.
-// if there are no resulting changes to apply, it will simply click out of the filter.
+// Preferring reliability over "natural" user behavior for this helper, we use forced clicks
+// since the state of the dropdown may differ across the tests where it is called.
 Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
   cy.get('app-projects-filter button#projects-filter-button').click();
-  cy.get('app-projects-filter chef-dropdown#projects-filter-dropdown')
-    .find('chef-checkbox').each(child => {
-    // deselect every checkbox
-    if (child.attr('aria-checked') === 'true') {
-      child.trigger('click');
-    }
-  });
 
-  // check all desired checkboxes
-  projectsToFilterOn.forEach(proj =>
-    cy.get(`app-projects-filter chef-checkbox[title="${proj}"]`).find('chef-icon').click());
+  // deselect all projects
+  // we add the force for when there are already no projects selected
+  // and the Clear Selection button is hidden
+  cy.get('chef-button#projects-filter-clear-selection').click({force : true});
 
-  if (projectsToFilterOn.length === 0) {
-    // no changes to apply, close projects filter
-    cy.get('app-projects-filter button#projects-filter-button').click();
-  } else {
-    // apply projects filter
-    cy.get('app-projects-filter chef-button#projects-filter-apply-changes').click();
+  if (projectsToFilterOn.length > 0) {
+    // check all desired checkboxes
+    projectsToFilterOn.forEach(proj => {
+      cy.get(`app-projects-filter chef-checkbox[title="${proj}"]`).click();
+      cy.get(`app-projects-filter chef-checkbox[title="${proj}"]`)
+        .should('have.attr', 'aria-checked', 'true');
+    });
   }
+
+  // apply projects filter
+  cy.get('app-projects-filter chef-button#projects-filter-apply-changes')
+    // we force the click here in case Apply button was disabled due to no net change
+    // i.e. in the case that proj1, proj2 are selected,
+    // selection is cleared,
+    // and proj1, proj2 are selected again
+    .click({force: true});
 });
 
 Cypress.Commands.add('generateAdminToken', (idToken: string) => {
@@ -158,17 +172,24 @@ Cypress.Commands.add('cleanupIAMObjectsByIDPrefixes',
   });
 });
 
-Cypress.Commands.add('applyRulesAndWait', (attempts: number) => {
+Cypress.Commands.add('applyRulesAndWait', () => {
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'POST',
     url: '/apis/iam/v2/apply-rules'
   });
 
-  waitUntilApplyRulesNotRunning(attempts);
+  waitUntilApplyRulesNotRunning(100);
 });
 
-Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string, maxRetries: number) => {
+Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string) => {
+  waitForNodemanagerNodeLoop(nodeId, 10);
+});
+
+function waitForNodemanagerNodeLoop(nodeId: string, attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error('nodemanager node was never ingested');
+  }
   cy.request({
     headers: {
       projects: ['*'],
@@ -183,18 +204,23 @@ Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string, maxRetries: numb
     }
   })
   .then((resp: Cypress.ObjectLike) => {
-    // to avoid getting stuck in an infinite loop
-    expect(maxRetries).to.not.be.equal(0);
     if (resp.body.nodes && resp.body.nodes.length > 0 &&
       resp.body.nodes.some((node: any) => node.id === nodeId)) {
       return;
     }
     cy.wait(1000);
-    cy.waitForNodemanagerNode(nodeId, maxRetries - 1);
+    waitForNodemanagerNodeLoop(nodeId, attemptsLeft - 1);
   });
+}
+
+Cypress.Commands.add('waitForClientRunsNode', (nodeId: string) => {
+  waitForClientRunsNodeLoop(nodeId, 10);
 });
 
-Cypress.Commands.add('waitForClientRunsNode', (nodeId: string, maxRetries: number) => {
+function waitForClientRunsNodeLoop(nodeId: string, attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error('client runs node was never created');
+  }
   cy
   .request({
     headers: {
@@ -205,20 +231,23 @@ Cypress.Commands.add('waitForClientRunsNode', (nodeId: string, maxRetries: numbe
     url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${nodeId}`
   })
   .then((resp: Cypress.ObjectLike) => {
-    // to avoid getting stuck in an infinite loop
-    if (maxRetries === 0) {
-      return;
-    }
-    if (resp.body && resp.body.length > 0 ) {
+    if (resp.body.length === 1 && resp.body[0].id === nodeId) {
       return;
     }
     cy.wait(1000);
-    cy.waitForClientRunsNode(nodeId, maxRetries - 1);
+    waitForClientRunsNodeLoop(nodeId, attemptsLeft - 1);
   });
+}
+
+Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, end: string) => {
+  waitForComplianceNodeLoop(nodeId, start, end, 100);
 });
 
-Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, end: string,
-  maxRetries: number) => {
+function waitForComplianceNodeLoop(nodeId: string, start: string, end: string,
+  attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error(`Compliance node with ID ${nodeId} was not created`);
+  }
   cy.request({
     headers: {
       projects: ['*'],
@@ -239,18 +268,23 @@ Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, en
     }
   })
   .then((resp: Cypress.ObjectLike) => {
-    // to avoid getting stuck in an infinite loop
-    expect(maxRetries, `Looking for compliance node with ID ${nodeId}`).to.not.be.equal(0);
     if (resp.body.nodes && resp.body.nodes.length > 0 && resp.body.nodes[0].id === nodeId ) {
       return;
     }
     cy.wait(1000);
-    cy.waitForComplianceNode(nodeId, start, end, maxRetries - 1);
+    waitForComplianceNodeLoop(nodeId, start, end, attemptsLeft - 1);
   });
+}
+
+Cypress.Commands.add('waitForAction', (entityName: string, start: string, end: string) => {
+  waitForActionLoop(entityName, start, end, 30);
 });
 
-Cypress.Commands.add('waitForAction', (entityName: string, start: string, end: string,
-  maxRetries: number) => {
+function waitForActionLoop(entityName: string, start: string, end: string,
+  attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error(`Action with entity name ${entityName} was not created`);
+  }
   cy.request({
     headers: {
       projects: ['*'],
@@ -258,21 +292,153 @@ Cypress.Commands.add('waitForAction', (entityName: string, start: string, end: s
     },
     method: 'GET',
     url: `api/v0/eventfeed?collapse=false&page_size=100&start=${start}&end=${end}`
-  })
-    .then((resp: Cypress.ObjectLike) => {
-      // to avoid getting stuck in an infinite loop
-      if (maxRetries === 0) {
-        expect(0).to.equal(1);
-        return;
-      }
+  }).then((resp: Cypress.ObjectLike) => {
       if (resp.body.events && resp.body.events.length > 0 &&
         eventExist(entityName, resp.body.events)) {
         return;
       }
       cy.wait(1000);
-      cy.waitForAction(entityName, start, end, maxRetries - 1);
-    });
+      waitForActionLoop(entityName, start, end, attemptsLeft - 1);
+  });
+}
+
+Cypress.Commands.add('deleteClientRunsNode', (clientRunsNodeId: string, attempts: number) => {
+  deleteClientRunsNodeLoop(clientRunsNodeId, 10);
 });
+
+function deleteClientRunsNodeLoop(clientRunsNodeId: string,
+  attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error('client runs node was never deleted');
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
+  }).then((response) => {
+    if (response.body.length === 0) {
+      return;
+    } else {
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: 'api/v0/ingest/events/chef/node-multiple-deletes',
+        body: {
+          node_ids: [
+            clientRunsNodeId
+          ]
+        },
+        failOnStatusCode: true
+      });
+      cy.log(`${attemptsLeft} attempts remaining: waiting for node` +
+        ` ${clientRunsNodeId} to be deleted`);
+      cy.wait(1000);
+      deleteClientRunsNodeLoop(clientRunsNodeId, attemptsLeft - 1);
+    }
+  });
+}
+
+// This function is only waiting for the node to be deleted. It is not deleting it.
+Cypress.Commands.add('waitUntilNodemanagerNodeIsDeleted', (nodeName: string) => {
+  waitUntilNodemanagerNodeIsDeletedLoop(nodeName, 10);
+});
+
+function waitUntilNodemanagerNodeIsDeletedLoop(nodeName: string,
+  attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error(`nodemanager node with name ${nodeName} was never deleted`);
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    method: 'POST',
+    url: '/api/v0/nodes/search',
+    body: {
+      filters: [
+        {key: 'manager_id', values: ['']},
+        {key: 'name', 'values': [nodeName]}
+      ]
+    }
+  }).then((response) => {
+    if (response.body.nodes.length === 0) {
+      return;
+    } else {
+      cy.log(`${attemptsLeft} attempts remaining: waiting for nodemanager node to be deleted`);
+      cy.wait(1000);
+      waitUntilNodemanagerNodeIsDeletedLoop(nodeName, attemptsLeft - 1);
+    }
+  });
+}
+
+Cypress.Commands.add('waitUntilConfigMgmtNodeIsDeleted', (clientRunsNodeId: string) => {
+  waitUntilConfigMgmtNodeIsDeletedLoop(clientRunsNodeId, 10);
+});
+
+function waitUntilConfigMgmtNodeIsDeletedLoop(clientRunsNodeId: string, attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error(`infra node with ID ${clientRunsNodeId} was not deleted`);
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
+  }).then((response) => {
+    if (response.body.length === 0) {
+      return;
+    } else {
+      cy.log(`${attemptsLeft} attempts remaining: waiting for node` +
+        ` ${clientRunsNodeId} to be deleted`);
+      cy.wait(1000);
+      waitUntilConfigMgmtNodeIsDeletedLoop(clientRunsNodeId, attemptsLeft - 1);
+    }
+  });
+}
+
+Cypress.Commands.add('waitUntilRunIsIngested', (clientRunsNodeId: string, runId: string) => {
+  waitUntilRunIsIngestedLoop(clientRunsNodeId, runId, 10);
+});
+
+function waitUntilRunIsIngestedLoop(clientRunsNodeId: string,
+  runId: string, attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error(`run with ID ${clientRunsNodeId} was never ingested`);
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: `/api/v0/cfgmgmt/nodes/${clientRunsNodeId}/runs/${runId}`,
+    failOnStatusCode: false
+  }).then((response) => {
+    if (response.status !== 404 && response.body.id === runId) {
+      return;
+    } else {
+      cy.log(`${attemptsLeft} attempts remaining: waiting for run ${runId} to be ingested`);
+      cy.wait(1000);
+      waitUntilRunIsIngestedLoop(clientRunsNodeId, runId, attemptsLeft - 1);
+    }
+  });
+}
+
+Cypress.Commands.add('waitUntilNodeIsMissing', (clientRunsNodeId: string) => {
+  waitUntilNodeIsMissingLoop(clientRunsNodeId, 10);
+});
+
+function waitUntilNodeIsMissingLoop(clientRunsNodeId: string, attemptsLeft: number) {
+  if (attemptsLeft === -1) {
+    throw new Error('infra node was never marked missing');
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${clientRunsNodeId}`
+  }).then((response) => {
+    if (response.body.length === 1 && response.body[0].id === clientRunsNodeId &&
+      response.body[0].status === 'missing') {
+      return;
+    } else {
+      cy.log(
+        `${attemptsLeft} attempts remaining: waiting for node ${clientRunsNodeId}` +
+        'to have status missing');
+      cy.wait(1000);
+      waitUntilNodeIsMissingLoop(clientRunsNodeId, attemptsLeft - 1);
+    }
+  });
+}
 
 // the helpers below are used only in the Cypress commands defined in this file
 // other helpers for use in tests can be found in helpers.ts
@@ -353,7 +519,7 @@ function deleteProjects(projectIdsToDelete: string[], index: number,
   if (projectIdsToDelete.length === index) {
     if (rulesWereDeleted) {
       // Because rules were deleted we must first apply rules to be able to delete the project
-      cy.applyRulesAndWait(100);
+      cy.applyRulesAndWait();
     }
 
     // Delete all the projects after all their rules are deleted

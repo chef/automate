@@ -12,7 +12,8 @@ import (
 // GetClients fetches an array of existing clients
 func (a *InfraProxyServer) GetClients(ctx context.Context, r *gwreq.Clients) (*gwres.Clients, error) {
 	req := &infra_req.Clients{
-		OrgId: r.OrgId,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
 	}
 	res, err := a.client.GetClients(ctx, req)
 	if err != nil {
@@ -27,8 +28,9 @@ func (a *InfraProxyServer) GetClients(ctx context.Context, r *gwreq.Clients) (*g
 // GetClient fetches an infra client details
 func (a *InfraProxyServer) GetClient(ctx context.Context, r *gwreq.Client) (*gwres.Client, error) {
 	req := &infra_req.Client{
-		OrgId: r.OrgId,
-		Name:  r.Name,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
 	}
 	res, err := a.client.GetClient(ctx, req)
 	if err != nil {
@@ -36,17 +38,12 @@ func (a *InfraProxyServer) GetClient(ctx context.Context, r *gwreq.Client) (*gwr
 	}
 
 	return &gwres.Client{
-		Name:        res.GetName(),
-		ClientName:  res.GetClientName(),
-		OrgName:     res.GetOrgName(),
-		Admin:       res.GetAdmin(),
-		Validator:   res.GetValidator(),
-		Certificate: res.GetCertificate(),
-		PublicKey:   res.GetPublicKey(),
-		PrivateKey:  res.GetPrivateKey(),
-		Uri:         res.GetUri(),
-		JsonClass:   res.GetJsonClass(),
-		ChefType:    res.GetChefType(),
+		Name:       res.GetName(),
+		ClientName: res.GetClientName(),
+		OrgName:    res.GetOrgName(),
+		Validator:  res.GetValidator(),
+		JsonClass:  res.GetJsonClass(),
+		ChefType:   res.GetChefType(),
 	}, nil
 }
 

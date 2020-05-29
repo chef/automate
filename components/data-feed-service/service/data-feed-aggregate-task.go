@@ -115,14 +115,12 @@ func (d *DataFeedAggregateTask) buildDatafeed(ctx context.Context, nodeIDs map[s
 
 		nodeData, err := d.getNodeClientData(ctx, ip, nodeID, updatedNodesOnly)
 		if err != nil {
-			log.Errorf("Error getting node data %v", err)
-			continue
+			log.Warnf("Error getting node data %v", err)
 		}
 
 		report, err := d.getNodeComplianceData(ctx, ip, nodeID, updatedNodesOnly)
 		if err != nil {
-			log.Errorf("Error getting compliance data %v", err)
-			continue
+			log.Warnf("Error getting compliance data %v", err)
 		}
 		// update the message with the full report
 		if report != nil {
@@ -155,7 +153,7 @@ func (d *DataFeedAggregateTask) getNodeClientData(ctx context.Context, ipaddress
 		filters := []string{"ipaddress:" + ipaddress}
 		_, macAddress, hostname, err := getNodeHostFields(ctx, d.cfgMgmt, filters)
 		if err != nil {
-			log.Errorf("Error getting node macaddress and hostname %v", err)
+			log.Warnf("Error getting node macaddress and hostname %v", err)
 		}
 		nodeDataContent := make(map[string]interface{})
 		nodeDataContent["macaddress"] = macAddress

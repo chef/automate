@@ -7,7 +7,7 @@ import (
 	"io"
 	"time"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -293,7 +293,7 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 	return errors.Wrap(err, "setDailyLatestToFalse")
 }
 
-func (backend *ESClient) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) ([]string, error) {
+func (backend *ESClient) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*authz.ProjectRules) ([]string, error) {
 	logrus.Debug("starting project updater")
 
 	esReportJobID, err := backend.UpdateReportProjectsTags(ctx, projectTaggingRules)
@@ -312,12 +312,12 @@ func (backend *ESClient) UpdateProjectTags(ctx context.Context, projectTaggingRu
 	return []string{esReportJobID, esSummaryJobID}, nil
 }
 
-func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
+func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTaggingRules map[string]*authz.ProjectRules) (string, error) {
 	index := fmt.Sprintf("%s-%s", mappings.ComplianceRepDate.Index, "*")
 	return backend.UpdateReportProjectsTagsForIndex(ctx, index, projectTaggingRules)
 }
 
-func (backend *ESClient) UpdateReportProjectsTagsForIndex(ctx context.Context, index string, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
+func (backend *ESClient) UpdateReportProjectsTagsForIndex(ctx context.Context, index string, projectTaggingRules map[string]*authz.ProjectRules) (string, error) {
 
 	script := `
 		ArrayList matchingProjects = new ArrayList();
@@ -457,12 +457,12 @@ func (backend *ESClient) UpdateReportProjectsTagsForIndex(ctx context.Context, i
 	return startTaskResult.TaskId, nil
 }
 
-func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
+func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectTaggingRules map[string]*authz.ProjectRules) (string, error) {
 	index := fmt.Sprintf("%s-%s", mappings.ComplianceSumDate.Index, "*")
 	return backend.UpdateSummaryProjectsTagsForIndex(ctx, index, projectTaggingRules)
 }
 
-func (backend *ESClient) UpdateSummaryProjectsTagsForIndex(ctx context.Context, index string, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
+func (backend *ESClient) UpdateSummaryProjectsTagsForIndex(ctx context.Context, index string, projectTaggingRules map[string]*authz.ProjectRules) (string, error) {
 
 	script := `
 		ArrayList matchingProjects = new ArrayList();
@@ -701,7 +701,7 @@ func getPercentageComplete(status interface{}) (float64, bool) {
 	return (created + deleted + updated + conflicts + noops) / total, true
 }
 
-func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2.ProjectRules) map[string]interface{} {
+func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.ProjectRules) map[string]interface{} {
 	esProjectCollection := make([]map[string]interface{}, len(projectTaggingRules))
 	projectIndex := 0
 	for projectName, projectRules := range projectTaggingRules {
@@ -718,19 +718,19 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2
 				policyGroups := []string{}
 				policyNames := []string{}
 				switch condition.Attribute {
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER:
+				case authz.ProjectRuleConditionAttributes_CHEF_SERVER:
 					chefServers = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION:
+				case authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION:
 					organizations = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT:
+				case authz.ProjectRuleConditionAttributes_ENVIRONMENT:
 					environments = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE:
+				case authz.ProjectRuleConditionAttributes_CHEF_ROLE:
 					roles = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_TAG:
+				case authz.ProjectRuleConditionAttributes_CHEF_TAG:
 					chefTags = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP:
+				case authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP:
 					policyGroups = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME:
+				case authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME:
 					policyNames = condition.Values
 				}
 				esConditionCollection[conditionIndex] = map[string]interface{}{

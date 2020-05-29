@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 
 	ver_api "github.com/chef/automate/api/external/common/version"
-	api "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/storage"
@@ -30,11 +30,11 @@ type authzServer struct {
 	store    storage.Storage
 }
 
-// NewPostgresAuthzServer returns a new IAM v2 Authz server.
+// NewPostgresAuthzServer returns a new Authz server.
 func NewPostgresAuthzServer(l logger.Logger, e engine.Authorizer, p api.ProjectsServer) (api.AuthorizationServer, error) {
 	s := postgres.GetInstance()
 	if s == nil {
-		return nil, errors.New("postgres v2 singleton not yet initialized for authz server")
+		return nil, errors.New("postgres singleton not yet initialized for authz server")
 	}
 	return NewAuthzServer(l, e, p, s)
 }

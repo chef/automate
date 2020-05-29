@@ -15,14 +15,13 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service ReportingService {
 	/*
-	List reports
+	List Reports
 
 	Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	Supports pagination, filtering, and sorting.
 	Limited to 10k results.
 
-	Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
-	latest_report.end_time, latest_report.status, node_name
+	Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 
 	Example:
 	```
@@ -53,7 +52,7 @@ service ReportingService {
 	};
 
 	/*
-	List report IDs
+	List Report IDs
 
 	List all IDs for the latest report for each node, with optional filtering.
 	Supports filtering, but not pagination or sorting.
@@ -78,7 +77,7 @@ service ReportingService {
 	};
 
 	/*
-	List controls
+	List Controls
 
 	Lists controls from the last run, with optional filtering.
 	Supports filtering, but not pagination or sorting.
@@ -101,9 +100,9 @@ service ReportingService {
 	};
 
 	/*
-	Fetch a report
+	Show Report by ID
 
-	Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
+	Show a specific report by ID. Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.
 
@@ -124,7 +123,7 @@ service ReportingService {
 	};
 
 	/*
-	List suggestions
+	List Reporting Suggestions
 
 	Get suggestions for compliance reporting resources based on matching text substrings.
 	Supports filtering, but not pagination or sorting.
@@ -179,7 +178,7 @@ service ReportingService {
 	};
 
 	/*
-	List profiles
+	List Profiles
 
 	List all profiles in use, with optional filtering.
 	Supports pagination, filtering, and sorting.
@@ -206,9 +205,9 @@ service ReportingService {
 	rpc ExportNode(Query) returns (stream chef.automate.api.common.ExportData) {};
 
 	/*
-	Fetch a node
+	Show Node by ID
 
-	Fetch a specific node by ID.
+	Show a specific node by ID.
 	Supports filtering by profile or control.
 	Does not support pagination or sorting.
 
@@ -228,7 +227,7 @@ service ReportingService {
 	};
 
 	/*
-	List nodes
+	List Nodes
 
 	List all nodes, with optional filtering, pagination, and sorting.
 	Limited to 10k results.
@@ -317,6 +316,15 @@ message WaiverData {
 	ControlSummary waiver_summary= 4;
 }
 
+message RemovedResultsCounts {
+	// The number of results with status of `failed` that have been trimmed (removed) from a control
+	int32 failed = 1;
+	// The number of results with status of `skipped` that have been trimmed (removed) from a control
+	int32 skipped = 2;
+	// The number of results with status of `passed` that have been trimmed (removed) from a control
+	int32 passed = 3;
+}
+
 message ControlItem {
 	// The control's unique ID.
 	string id = 1;
@@ -365,7 +373,7 @@ message Query {
 	OrderType order = 21;
 	// Sort the list of results by a field.
 	string sort = 22;
-	// The offset for paginating requests. An offset defines a place in the results in order to fetch the next page of the results.
+	// The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results.
 	int32 page = 23;
 	// The number of results on each paginated request page.
 	int32 per_page = 24;
@@ -468,7 +476,7 @@ message Report {
 	repeated string roles = 17;
 	// The Chef Tags associated with the node.
 	repeated string chef_tags = 18;
-	// The projects the node is assigned to. This is a resource-scoped access control feature of IAMv2.
+	// The projects the node is assigned to.
 	repeated string projects = 20;
 }
 
@@ -623,6 +631,8 @@ message Control {
 	string waived_str = 11;
 	// Additional details for waived controls
 	OrigWaiverData waiver_data = 12;
+	// When the control results are removed to reduce the size of the report, this summarize the status of the trimmed results.
+	RemovedResultsCounts removed_results_counts = 13;
 }
 
 // OrigWaiverData as it originally came from the InSpec report

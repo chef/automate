@@ -3,11 +3,11 @@ import { fakeServer } from './helpers/fake_server';
 import { enableWelcomeModal, disableWelcomeModal } from './helpers/welcome_modal';
 
 describe('App', () => {
-  it('lands on the event feed page', () => {
+  it('starts on the top-level domain (before permission-based routing occurs)', () => {
     browser.waitForAngularEnabled(false);
     browser.get('/');
 
-    expect(browser.getCurrentUrl()).toMatch(/\/event-feed$/);
+    expect(browser.getCurrentUrl()).toMatch(/http:\/\/localhost:\d+\/$/);
   });
 });
 
@@ -74,7 +74,8 @@ xdescribe('Welcome Modal', () => {
   });
 });
 
-describe('Main Navigation', () => {
+// TODO: all unavailable due to authz introspection guards
+xdescribe('Main Navigation', () => {
   beforeAll(disableWelcomeModal);
 
   xit('redirects to Client Runs', () => {
@@ -83,14 +84,12 @@ describe('Main Navigation', () => {
     expect(browser.getCurrentUrl()).toMatch(/infrastructure\/client-runs/);
   });
 
-  it('redirects to Event Feed', () => {
+  xit('redirects to Event Feed', () => {
     browser.waitForAngularEnabled(false);
     element(by.linkText('Dashboards')).click();
     expect(browser.getCurrentUrl()).toMatch(/dashboards\/event-feed/);
   });
 
-  // TODO: this now depends on authz introspection -- it's hidden in the e2e
-  // situation, it seems
   xit('redirects to Admin', () => {
     browser.waitForAngularEnabled(false);
     element(by.linkText('Admin')).click();

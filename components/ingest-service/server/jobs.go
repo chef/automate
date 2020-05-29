@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/config"
+	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/datalifecycle/purge"
@@ -58,8 +59,10 @@ func InitializeJobManager(c *cereal.Manager, client backend.Client, esSidecarCli
 	return nil
 }
 
-func MigrateJobsSchedule(ctx context.Context, c *cereal.Manager, oldConfigFile string) error {
-	jc, err := config.OldJobConfigFromFile(oldConfigFile)
+func MigrateJobsSchedule(ctx context.Context, c *cereal.Manager, oldConfigFile string,
+	opts serveropts.JobsConfig) error {
+	jc := config.NewOldJobConfig(opts)
+	err := jc.FromFile(oldConfigFile)
 	if err != nil {
 		log.WithError(err).Warn("failed to read old job config from disk, defaults will be used")
 	}

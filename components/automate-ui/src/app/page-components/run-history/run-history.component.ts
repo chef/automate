@@ -12,7 +12,7 @@ import { NodeRunsService } from '../../services/node-details/node-runs.service';
 import { HistorySelection } from '../../helpers/history-selection/history-selection';
 import { RunHistoryStore } from '../../services/run-history-store/run-history.store';
 import { Subscription } from 'rxjs';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { saveAs } from 'file-saver';
 import {
   finalize

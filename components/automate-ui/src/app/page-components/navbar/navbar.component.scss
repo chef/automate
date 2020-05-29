@@ -1,77 +1,71 @@
 @import "~styles/variables";
+@import "@carbon/layout/scss/layout";
+
+:host {
+  display: block;
+  background-color: $white;
+  height: $navigation-height;
+  border-bottom: 1px solid $chef-grey;
+}
 
 header {
   position: relative;
+}
 
-  .cl-link {
-    display: flex;
-    position: fixed;
-    align-items: center;
-    color: $white;
-    bottom: 0;
-    right: 0;
-    background-color: $chef-primary;
-    padding: 0.25em 1em 0.25em 0.5em;
-    border-radius: $global-radius 0 0 0;
-    opacity: 0.5;
-    font-weight: bold;
-    text-decoration: none;
+.navigation-wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
 
-    &:hover {
-      opacity: 1;
-    }
+  @include carbon--breakpoint-down(lg) {
+    flex-flow: row wrap;
+  }
 
-    span {
-      padding-left: 0.5em;
+  .logo-wrapper {
+    margin-left: 16px;
+
+    a.logo img {
+      display: block;
+      width: 160px;
+      height: $navigation-height;
+
+      @include carbon--breakpoint-down(lg) {
+        height: $navigation-height / 2;
+      }
     }
   }
 
-  .navigation-wrapper {
+  .navigation-menu {
     display: flex;
-    justify-content: space-between;
-    padding-top: 2px 36px 0 0;
-    background-color: $white;
-    box-sizing: padding-box;
-    z-index: 200;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: $navigation-height;
-    border-bottom: 1px solid #DFE3E5;
+    align-items: center;
 
-    .left-nav {
-      display: flex;
+    @include carbon--breakpoint-down(lg) {
+      order: 3;
+      width: 100%;
+      height: ($navigation-height / 2) - 2px;
+      line-height: ($navigation-height / 2) - 2px;
+      border-top: 1px solid $chef-grey;
+      overflow: auto hidden;
     }
 
-    .right-nav {
-      display: flex;
-      align-items: center;
-      padding-right: 16px;
-    }
-
-    .logo-wrapper {
-      margin: 0 21px 0 20px;
-
-      a.logo {
-        display: block;
-        background: $default-logo transparent no-repeat center;
-        width: 160px;
-        height: $navigation-height;
-      }
-    }
-
-    .navigation-menu {
-      display: flex;
-      align-items: center;
+    app-authorized {
+      display: block;
     }
 
     .nav-link {
       padding-left: 35px;
 
+      @include carbon--breakpoint-down(lg) {
+        padding-left: 16px;
+      }
+
       a {
         color: $chef-primary-dark;
         text-decoration: none;
+
+        @include carbon--breakpoint-down(lg) {
+          font-size: 14px;
+        }
       }
 
       a:hover, a.active {
@@ -80,35 +74,10 @@ header {
     }
   }
 
-  .nav-icon-link {
-    display: inline-block;
-    margin: 0 0 0 16px;
-    padding: 0.36em 0;
-    text-align: center;
-    color: $chef-primary-bright;
-    font-size: 18px;
-    height: 32px;
-    width: 32px;
-    border: 1px solid $chef-primary-bright;
-    border-radius: 50%;
-
-    &.active {
-      background-color: $chef-primary-bright;
-      color: $chef-white;
-    }
-
-    &.key-icon {
-      padding: 0.42em 0;
-      font-size: 16px;
-    }
+  .right-nav {
+    display: flex;
+    margin-left: auto;
+    align-items: center;
+    padding-right: 16px;
   }
-}
-
-chef-tooltip {
-  font-size: 14px;
-}
-
-.rotated-icon {
-  transform: rotate(90deg) scaleX(1);
-  -webkit-transform: rotate(90deg) scaleX(1);
 }

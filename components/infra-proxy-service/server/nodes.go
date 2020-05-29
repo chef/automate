@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	chef "github.com/chef/go-chef"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	chef "github.com/go-chef/chef"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
@@ -15,14 +13,14 @@ import (
 
 // GetAffectedNodes get the nodes using chef object
 func (s *Server) GetAffectedNodes(ctx context.Context, req *request.AffectedNodes) (*response.AffectedNodes, error) {
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	res, err := c.fetchAffectedNodes(ctx, req.ChefType, req.Name, req.Version)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, err
 	}
 
 	return &response.AffectedNodes{
@@ -58,7 +56,7 @@ func (c *ChefClient) fetchAffectedNodes(ctx context.Context, chefType, name, ver
 
 	res, err := c.client.Search.PartialExec("node", url, query)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, ParseAPIError(err)
 	}
 
 	return &res, nil

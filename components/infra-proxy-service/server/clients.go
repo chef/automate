@@ -4,9 +4,7 @@ import (
 	"context"
 	"sort"
 
-	chef "github.com/chef/go-chef"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	chef "github.com/go-chef/chef"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
@@ -14,15 +12,14 @@ import (
 
 // GetClients get clients list
 func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*response.Clients, error) {
-
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	clients, err := c.client.Clients.List()
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Clients{
@@ -32,28 +29,23 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 
 // GetClient get client
 func (s *Server) GetClient(ctx context.Context, req *request.Client) (*response.Client, error) {
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	ic, err := c.client.Clients.Get(req.Name)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Client{
-		Name:        ic.Name,
-		ClientName:  ic.ClientName,
-		OrgName:     ic.OrgName,
-		Admin:       ic.Admin,
-		Validator:   ic.Validator,
-		Certificate: ic.Certificate,
-		PublicKey:   ic.PublicKey,
-		PrivateKey:  ic.PrivateKey,
-		Uri:         ic.Uri,
-		JsonClass:   ic.JsonClass,
-		ChefType:    ic.ChefType,
+		Name:       ic.Name,
+		ClientName: ic.ClientName,
+		OrgName:    ic.OrgName,
+		Validator:  ic.Validator,
+		JsonClass:  ic.JsonClass,
+		ChefType:   ic.ChefType,
 	}, nil
 
 }

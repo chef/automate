@@ -41,7 +41,6 @@ setup_gobin() {
     vendor_hash=$(cat \
       /src/vendor/modules.txt \
       /src/components/automate-grpc/protoc-gen-policy/policy/policy.go \
-      /src/components/automate-grpc/protoc-gen-policy/api/policy.proto \
       /src/components/automate-grpc/protoc-gen-policy/iam/policy.proto \
     | sha256sum | cut -c1-16)
     export GOBIN_BASE="/src/bin"
@@ -154,7 +153,7 @@ fi
 
 document "start_all_services" <<DOC
   Simple wrapper for 'start_deployment_service' and 'chef-automate dev deployinate'.
-  Also applies a license (if present), creates IAM v2 dev users, and upgrades IAM to v2.
+  Also applies a license (if present) and creates IAM dev users.
 DOC
 start_all_services() {
   start_deployment_service
@@ -190,7 +189,7 @@ check_if_deployinate_started() {
   fi
 
   if ! chef-automate status > /dev/null 2>&1; then
-    error "The current status of your deploy is unhealthy."
+    error "The current status of your deployment is unhealthy."
     log_line "If you have yet to do so, run '${GREEN}chef-automate dev deployinate${NC}' to deploy Automate."
     log_line "If you have already deployed, there is an issue with your deploy."
     log_line "You can check the logs with '${YELLOW}sl${NC}' and the status with '${YELLOW}chef-automate status${NC}'."

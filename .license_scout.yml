@@ -198,6 +198,9 @@ fallbacks:
     - name: net-telnet
       license_id: Ruby
       license_content: https://raw.githubusercontent.com/ruby/net-telnet/master/LICENSE.txt
+    - name: unf
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/knu/ruby-unf/master/LICENSE
 
 exceptions:
   habitat:

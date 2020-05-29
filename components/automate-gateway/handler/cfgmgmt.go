@@ -224,6 +224,8 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context, request *cfgReq.Node
 
 	cfgMgmtRequest := &cmsReq.NodesCounts{
 		Filter: request.Filter,
+		Start:  request.Start,
+		End:    request.End,
 	}
 
 	cfgmgmtNodesCounts, err := s.cfgMgmtClient.GetNodesCounts(ctx, cfgMgmtRequest)
@@ -413,6 +415,35 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context, request *sharedReq.S
 	return s.cfgMgmtClient.GetSuggestions(ctx, &sugRequest)
 }
 
+func (a *CfgMgmtServer) CreateRollout(ctx context.Context, req *cfgReq.CreateRollout) (*cfgRes.Rollout, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.CreateRollout(ctx, req)
+}
+func (a *CfgMgmtServer) GetRollouts(ctx context.Context, req *cfgReq.Rollouts) (*cfgRes.Rollouts, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.GetRollouts(ctx, req)
+}
+func (a *CfgMgmtServer) GetRolloutById(ctx context.Context, req *cfgReq.RolloutById) (*cfgRes.Rollout, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.GetRolloutById(ctx, req)
+}
+func (a *CfgMgmtServer) GetRolloutForChefRun(context.Context, *cfgReq.RolloutForChefRun) (*cfgRes.Rollout, error) {
+	// TODO
+	return nil, nil
+}
+
 func (a *CfgMgmtServer) NodeExport(*cfgReq.NodeExport, cfgService.ConfigMgmt_NodeExportServer) error {
 	// Please see components/automate-gateway/services.go configMgmtNodeExportHandler for implementation
 	return nil
@@ -425,41 +456,54 @@ func (a *CfgMgmtServer) ReportExport(*cfgReq.ReportExport, cfgService.ConfigMgmt
 
 func toResponseRun(run *cmsRes.Run) *cfgRes.Run {
 	return &cfgRes.Run{
-		Id:                   run.Id,
-		NodeId:               run.NodeId,
-		NodeName:             run.NodeName,
-		Organization:         run.Organization,
-		StartTime:            run.StartTime,
-		EndTime:              run.EndTime,
-		Source:               run.Source,
-		Status:               run.Status,
-		TotalResourceCount:   run.TotalResourceCount,
-		UpdatedResourceCount: run.UpdatedResourceCount,
-		ChefVersion:          run.ChefVersion,
-		UptimeSeconds:        run.UptimeSeconds,
-		Environment:          run.Environment,
-		Fqdn:                 run.Fqdn,
-		SourceFqdn:           run.SourceFqdn,
-		Ipaddress:            run.Ipaddress,
-		RunList:              run.RunList,
-		Tags:                 run.Tags,
-		ResourceNames:        run.ResourceNames,
-		Recipes:              run.Recipes,
-		ChefTags:             run.ChefTags,
-		Cookbooks:            run.Cookbooks,
-		Platform:             run.Platform,
-		PlatformFamily:       run.PlatformFamily,
-		PlatformVersion:      run.PlatformVersion,
-		Roles:                run.Roles,
-		PolicyName:           run.PolicyName,
-		PolicyGroup:          run.PolicyGroup,
-		PolicyRevision:       run.PolicyRevision,
-		ExpandedRunList:      toResponseExpandedRunList(run.ExpandedRunList),
-		Resources:            toResponseResources(run.Resources),
-		Deprecations:         toResponseDeprecations(run.Deprecations),
-		Error:                toResponseError(run.Error),
-		Projects:             run.Projects,
-		VersionedCookbooks:   toVersionsCookbooks(run.VersionedCookbooks),
+		Id:                    run.Id,
+		NodeId:                run.NodeId,
+		NodeName:              run.NodeName,
+		Organization:          run.Organization,
+		StartTime:             run.StartTime,
+		EndTime:               run.EndTime,
+		Source:                run.Source,
+		Status:                run.Status,
+		TotalResourceCount:    run.TotalResourceCount,
+		UpdatedResourceCount:  run.UpdatedResourceCount,
+		ChefVersion:           run.ChefVersion,
+		UptimeSeconds:         run.UptimeSeconds,
+		Environment:           run.Environment,
+		Fqdn:                  run.Fqdn,
+		SourceFqdn:            run.SourceFqdn,
+		Ipaddress:             run.Ipaddress,
+		RunList:               run.RunList,
+		Tags:                  run.Tags,
+		ResourceNames:         run.ResourceNames,
+		Recipes:               run.Recipes,
+		ChefTags:              run.ChefTags,
+		Cookbooks:             run.Cookbooks,
+		Platform:              run.Platform,
+		PlatformFamily:        run.PlatformFamily,
+		PlatformVersion:       run.PlatformVersion,
+		Roles:                 run.Roles,
+		PolicyName:            run.PolicyName,
+		PolicyGroup:           run.PolicyGroup,
+		PolicyRevision:        run.PolicyRevision,
+		ExpandedRunList:       toResponseExpandedRunList(run.ExpandedRunList),
+		Resources:             toResponseResources(run.Resources),
+		Deprecations:          toResponseDeprecations(run.Deprecations),
+		Error:                 toResponseError(run.Error),
+		Projects:              run.Projects,
+		VersionedCookbooks:    toVersionsCookbooks(run.VersionedCookbooks),
+		Timezone:              run.Timezone,
+		CloudProvider:         run.CloudProvider,
+		KernelRelease:         run.KernelRelease,
+		KernelVersion:         run.KernelVersion,
+		VirtualizationSystem:  run.VirtualizationSystem,
+		VirtualizationRole:    run.VirtualizationRole,
+		DmiSystemManufacturer: run.DmiSystemManufacturer,
+		DmiSystemSerialNumber: run.DmiSystemSerialNumber,
+		Domain:                run.Domain,
+		Hostname:              run.Hostname,
+		Macaddress:            run.Macaddress,
+		MemoryTotal:           run.MemoryTotal,
+		Ip6Address:            run.Ip6Address,
 	}
 }
 

@@ -1,5 +1,5 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
-import { ChefKeyboardEvent } from 'app/types/material-types';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { User } from 'app/entities/users/user.model';
 
 @Component({
@@ -32,7 +32,7 @@ export class UserTableComponent implements OnInit {
     this.createPermissionsPath = [this.baseUrl, 'post'];
   }
 
-  deleteUser($event: ChefKeyboardEvent, user: User) {
+  deleteUser($event: MatOptionSelectionChange, user: User) {
     if ($event.isUserInput) {
       this.removeClicked.emit(user);
     }

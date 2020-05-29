@@ -1,34 +1,34 @@
 <div class="resources-rollup">
-  <div class="rollup-item total" (click)="filter('total')" [ngClass]="{active: active === 'total'}">
+  <button class="rollup-item total" (click)="filter('total')" [ngClass]="{active: active === 'total'}">
     <div class="rollup-title">
       <h3 class="title">Total Resources</h3>
     </div>
     <span class="count"><chef-icon>list</chef-icon> {{resourcesTotal}}</span>
-  </div>
-  <div class="rollup-item failure" (click)="filter('failed')" [ngClass]="{active: active === 'failed'}">
+  </button>
+  <button class="rollup-item failure" (click)="filter('failed')" [ngClass]="{active: active === 'failed'}">
     <div class="rollup-title">
       <h3 class="title">Failed</h3>
     </div>
     <span class="count"><chef-icon>warning</chef-icon> {{failedTotal}}</span>
-  </div>
-  <div class="rollup-item success" (click)="filter('success')" [ngClass]="{active: active ===  'success'}">
+  </button>
+  <button class="rollup-item success" (click)="filter('success')" [ngClass]="{active: active ===  'success'}">
     <div class="rollup-title">
       <h3 class="title">Successful</h3>
     </div>
     <span class="count"><chef-icon>check_circle</chef-icon> {{successTotal}}</span>
-  </div>
-  <div class="rollup-item unchanged" (click)="filter('unchanged')" [ngClass]="{active: active === 'unchanged'}">
+  </button>
+  <button class="rollup-item unchanged" (click)="filter('unchanged')" [ngClass]="{active: active === 'unchanged'}">
     <div class="rollup-title">
       <h3 class="title">Unchanged</h3>
     </div>
     <span class="count"><chef-icon>remove_circle</chef-icon> {{unchangedTotal}}</span>
-  </div>
-  <div class="rollup-item missing" (click)="filter('unprocessed')" [ngClass]="{active: active ===  'unprocessed'}">
+  </button>
+  <button class="rollup-item missing" (click)="filter('unprocessed')" [ngClass]="{active: active ===  'unprocessed'}">
     <div class="rollup-title">
       <h3 class="title">Unprocessed</h3>
     </div>
     <span class="count"><chef-icon>help</chef-icon> {{unprocessedTotal}}</span>
-  </div>
+  </button>
 </div>
 <!--
   TODO: when the chef-table component includes pagination and sorting,

@@ -87,7 +87,7 @@ func HabitatUpdateStrategyToStorageFormat(strategy habitat.UpdateStrategy) Updat
 }
 
 type Service struct {
-	ID                  int32
+	ID                  int64
 	SupMemberID         string
 	Origin              string
 	Name                string

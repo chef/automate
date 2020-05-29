@@ -36,7 +36,7 @@ import {
   UpdateNodeFilters, GetWorkflowEnabled, GetNodeSuggestions, DeleteNodes, UpdateColumns
 } from '../../entities/client-runs/client-runs.actions';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { saveAs } from 'file-saver';
 import { AuthorizedChecker } from 'app/helpers/auth/authorized';
 import {
@@ -164,7 +164,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
   nodeCounts$: Observable<NodeCount>;
 
   // Does the request have the correct permissions
-  permissionDenied$: Observable<boolean>;
+  permissionDenied$: Observable<boolean>; // not currently used
 
   // Is the Error banner visible
   notificationVisible = false;
@@ -374,7 +374,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     this.authorizedChecker = new AuthorizedChecker(this.store);
     this.authorizedChecker.setPermissions([
       {
-        endpoint: '/ingest/events/chef/node-multiple-deletes',
+        endpoint: '/api/v0/ingest/events/chef/node-multiple-deletes',
         paramList: [],
         verb: 'post'
       }

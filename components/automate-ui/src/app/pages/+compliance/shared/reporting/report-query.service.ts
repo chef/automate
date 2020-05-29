@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { FilterC } from '../../+reporting/types';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { ReportingFilterTypes } from 'app/types/types';

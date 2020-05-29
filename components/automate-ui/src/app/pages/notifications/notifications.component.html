@@ -1,9 +1,5 @@
 <div class="content-container">
-  <div *ngIf="permissionDenied" class="permission-denied-banner">
-    <p>You do not have permission to view everything on this page.</p>
-    <p>Please contact an administrator for permission.</p>
-  </div>
-  <div class="container">
+ <div class="container">
     <main>
       <chef-page-header>
         <chef-heading>Notifications</chef-heading>
@@ -53,14 +49,21 @@
                 </chef-td>
                 <chef-td class="actions three-dot-column">
                   <mat-select panelClass="chef-control-menu">
-                    <mat-option (onSelectionChange)="deleteRule(rule)">Delete Notification</mat-option>
+                    <mat-option (onSelectionChange)="startNotificationDelete($event, rule)" data-cy="remove-notification">Delete Notification</mat-option>
                   </mat-select>
                 </chef-td>
               </chef-tr>
             </chef-tbody>
           </chef-table>
         </app-authorized>
-
+        <app-delete-object-modal
+          [visible]="deleteModalVisible"
+          objectNoun="notification"
+          [objectName]="notificationToDelete?.name"
+          (close)="closeDeleteModal()"
+          (deleteClicked)="deleteNotification()"
+          objectAction="Delete">
+        </app-delete-object-modal>
         <app-page-picker
           [total]="(rules$ | async)?.length"
           [perPage]="pageSize"

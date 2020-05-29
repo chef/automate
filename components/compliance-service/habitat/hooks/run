@@ -30,6 +30,7 @@ mkdir -p "{{pkg.svc_data_path}}/profiles"
 # cleanup old migration files
 rm -rf "{{pkg.svc_static_path}}/migrations" {{pkg.svc_static_path}}/*.sql
 
+INSTALL_MARKET_PROFILES={{cfg.profiles.install_market_profiles}}
 {{!--
 # we use bash to test for the existence of the automate-compliance-profiles path
 # because the handlebars combo of `#if pkgPathFor "chef/automate-compliance-profiles"`
@@ -38,7 +39,7 @@ rm -rf "{{pkg.svc_static_path}}/migrations" {{pkg.svc_static_path}}/*.sql
 --}}
 profiles_package_path="{{pkgPathFor "chef/automate-compliance-profiles"}}"
 profiles_market_path="{{pkgPathFor "chef/automate-compliance-profiles"}}/market"
-if [ "$profiles_package_path" != "" ] &&
+if [ "$profiles_package_path" != "" ] && [ $INSTALL_MARKET_PROFILES == true ] &&
    [ -d $profiles_package_path ]; then
   CONFIG="--market-path $profiles_market_path"
 fi
@@ -56,6 +57,9 @@ CONFIG="$CONFIG --manager-manual-poll {{cfg.nodemanager.manual_polling_interval}
 CONFIG="$CONFIG --job-workers {{cfg.agent.workers}}"
 CONFIG="$CONFIG --job-buffer-size {{cfg.agent.buffer_size}}"
 CONFIG="$CONFIG --remote-inspec-version {{cfg.agent.remote_inspec_version}}"
+CONFIG="$CONFIG --result-message-limit {{cfg.agent.result_message_limit}}"
+CONFIG="$CONFIG --control-results-limit {{cfg.agent.control_results_limit}}"
+CONFIG="$CONFIG --run-time-limit {{cfg.agent.run_time_limit}}"
 
 # Mutual TLS Configuration
 CONFIG="$CONFIG --cert {{pkg.svc_config_path}}/service.crt"

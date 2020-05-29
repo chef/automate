@@ -14,7 +14,7 @@ import (
 	"golang.org/x/text/unicode/rangetable"
 	"google.golang.org/grpc/codes"
 
-	api "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/auth_context"

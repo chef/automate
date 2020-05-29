@@ -1,13 +1,17 @@
 <div class="app-main-container">
   <div class="container">
     <main>
-      <chef-notification
-        *ngIf="downloadErrorVisible"
-        type="error"
-        timeout="5"
-        (dismissed)="hideDownloadError()">
-        Failed to install profile. Please try again later.
-      </chef-notification>
+      <div class="sticky-notifications">
+        <div class="sticky-inner">
+          <app-notification
+            *ngIf="downloadErrorVisible"
+            type="error"
+            timeout="5"
+            (dismissed)="hideDownloadError()">
+            Failed to install profile. Please try again later.
+          </app-notification>
+        </div>
+      </div>
 
       <chef-page-header class="profiles-header">
         <chef-heading>Profiles</chef-heading>

@@ -11,7 +11,7 @@ import {
   switchMap
 } from 'rxjs/operators';
 import { of } from 'rxjs';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { IndexedEntities } from 'app/entities/entities';
