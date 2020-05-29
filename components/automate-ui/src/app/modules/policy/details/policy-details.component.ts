@@ -19,9 +19,6 @@ import { RemovePolicyMembers } from 'app/entities/policies/policy.actions';
 
 export type PolicyTabName = 'definition' | 'members';
 
-// from https://stackoverflow.com/a/50689136
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
 const POLICY_DETAILS_ROUTE = /^\/settings\/policies/;
 
 @Component({
