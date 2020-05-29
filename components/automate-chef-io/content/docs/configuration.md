@@ -79,7 +79,7 @@ The only supported `deployment_type` is `local`.
 
 You cannot change the admin username, name, and password set during initial deployment.
 
-To change the admin password after deployment, use the Automate UI.
+To change the admin password after deployment, use the Chef Automate UI.
 Sign in as the admin user, navigate to the _Users_ page under the **Settings** tab.
 Select "Local Administrator" to show the admin's _User Details_ page.
 Navigate to the _Reset Password_ tab.
@@ -285,8 +285,7 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 #### Setting Elasticsearch Heap
 
 The Elasticsearch heap size can, and in most cases should, be set to 50% of the available system
-memory. However, there are important caveats covered in the [Elasticsearch heap size documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html)
-which should be carefully reviewed and considered.
+memory. However, you should review and consider the important caveats covered in the [Elasticsearch heap size documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html).
 
 For the purposes of an example, a system with 32GB of memory can have its Elasticsearch heap
 size set to `16g`; to do so, one would first create a TOML file that contains the partial
@@ -303,7 +302,7 @@ heapsize = "16g"
 To configure PostgreSQL for your Chef Automate installation, create a TOML file that contains the partial configuration below.
 Uncomment and change settings as needed, with the following caveats:
 
-* These configuration settings affect only the Automate-deployed PostgreSQL database. They do not affect an [externally-deployed PostgreSQL database]({{< relref "install.md#configuring-an-external-postgresql-database" >}}).
+* These configuration settings affect only the Chef Automate-deployed PostgreSQL database. They do not affect an [externally-deployed PostgreSQL database]({{< relref "install.md#configuring-an-external-postgresql-database" >}}).
 * Chef Automate uses TLS mutual authentication to communicate with its PostgreSQL database.
 
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
@@ -414,6 +413,21 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 # control_results_limit = 100
 ## Control results that have a `run_time` (in seconds) below this limit will be stripped of the `start_time` and `run_time` fields. Default: 1.0
 # run_time_limit = 0.5
+```
+
+#### Configure Inflight Data Collector Request Maximum
+
+You can specify the maximum number of inflight data collector requests. The default value is sixty times the number of the machine's available CPUs.
+
+```toml
+    [gateway.v1.sys.data_collector.limiter]
+    # Setting disable to true will allow an unbounded number of
+    # data collector requests to remain inflight concurrently.
+    disable = false
+    # max_inflight_requests will set the maximum number of
+    # concurrent inflight data collector requests. By default,
+    # this value is 60 * runtime.CpuCount()
+    max_inflight_requests = 100
 ```
 
 ### Troubleshooting
