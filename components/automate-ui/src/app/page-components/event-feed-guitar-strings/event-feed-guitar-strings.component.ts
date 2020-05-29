@@ -326,12 +326,6 @@ export class EventFeedGuitarStringsComponent implements OnInit, OnChanges {
     this.updateGraphic();
   }
 
-  @HostListener('window:keydown', ['$event']) onKeyDown(e) {
-    if (e.shiftKey && e.key === 'R') {
-      this.resetSliders();
-    }
-  }
-
   // Tooltips: Build the sentence that goes in the tooltips
   getTooltipText(item: GuitarStringItem, isMultiple: boolean, guitarString: GuitarString) {
     let text = '';
