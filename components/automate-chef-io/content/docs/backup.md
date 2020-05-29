@@ -52,7 +52,7 @@ Some users prefer to store backups offline in single-file archives. Such archive
 include both the configuration data and the reporting data contained in the standard
 backup.
 
-The [configured]({{< ref "backup.md#backup-to-filesystem" >}}) backup directory contains both the timestamp-based directory for the configuration, and the reporting data stored in the `automate-elasticsearch-data` directory.
+The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}) contains both the timestamp-based directory for the configuration, and the reporting data stored in the `automate-elasticsearch-data` directory.
 You must archive both of these directory types in any single-file backups you create.
 
 A timestamp-based directory can be distinguished from the `automate-elasticsearch-data` directory by its file name format, such as `20180518010336`.
@@ -188,69 +188,81 @@ where `bucket_name` is the name of the S3 bucket `base_path` an optional path wi
 
 Restore Chef Automate to an instance on which Automate is not already installed.
 
-### Restore From a Filesystem Backup
-
-#### Prerequisites
+### Prerequisites
 
 1. On the restore host, download and unzip the Chef Automate command-line tool:
-    ```shell
+
+   ```shell
         curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     ```
 
-1. Ensure access for Chef Automate to a backup directory in the [configured location]({{< ref
-"backup.md#backup-to-filesystem" >}}):
+1. **Filesystem backups** require access for Chef Automate to a backup directory in the [configured location]({{< ref
+"backup.md#backup-to-a-filesystem" >}}):
 
      1. To restore a network-attached filesystem backup, mount the shared backup directory to the same mount point configured at the time of the backup.
      1. To restore a backup directory that is not a network-attached filesystem, copy the backup directory to the location that was [configured]({{< ref
-"backup.md#backup-to-filesystem" >}}) at the time of the backup.
-     1. For restoring a single-file backup archive, copy your archive to the restore host and extract it to the [configured backup directory]({{< ref "backup.md#backup-to-filesystem" >}}).
+"backup.md#backup-to-a-filesystem" >}}) at the time of the backup.
+     1. For restoring a single-file backup archive, copy your archive to the restore host and extract it to the [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}).
+
+1. *(different FQDN only)* To restore to a host whose FQDN differs from that of the host on which the backup was
+   taken, create a `patch.toml` file to provide at restore time that specifies the new FQDN:
+
+    ```toml
+         [global.v1]
+         fqdn = "<new-fqdn>"
+
+         # To provide a cert and key for the restore host, uncomment and fill
+         # these sections.
+         # [[global.v1.frontend_tls]]
+         # The TLS certificate for the load balancer frontend.
+         # cert = """-----BEGIN CERTIFICATE-----
+         # <certificate-for-new-fqdn>
+         # -----END CERTIFICATE-----
+         # """
+
+         # The TLS RSA key for the load balancer frontend.
+         # key = """-----BEGIN RSA PRIVATE KEY-----
+         # <key-for-new-fqdn>
+         # -----END RSA PRIVATE KEY-----
+         # """
+    ```
+
+### Restore From a Filesystem Backup
 
 #### Restore in an Internet-Connected Environment
 
-If you have [configured the backup directory]({{< ref "backup.md#backup-to-filesystem" >}}) to a directory other than the default directory (`/var/opt/chef-automate/backups`) you must supply the backup directory. Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
-
-To restore on a new host:
+If you have [configured the backup directory]({{< relref "backup.md#backup-to-a-filesystem" >}}) to a directory other than the default directory (`/var/opt/chef-automate/backups`) you must supply the backup directory. Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
 
 ```shell
-chef-automate backup restore </path/to/backups/>BACKUP_ID
+chef-automate backup restore </path/to/backups/>BACKUP_ID [--patch-config </path/to/patch.toml>] [--skip-preflight]
 ```
 
-To restore on an existing Chef Automate host:
-
-```shell
-chef-automate backup restore </path/to/backups/>BACKUP_ID --skip-preflight
-```
+Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host whose
+FQDN is different than that of the one on which the backup was taken. Use the `--skip-preflight` option to restore to a host on which a Chef Automate installation exists.
 
 #### Restore in an Airgapped Environment
 
 To restore a backup of an [airgapped installation]({{< relref "airgapped-installation.md" >}}), you must specify the [Airgap Installation Bundle]({{< relref "airgapped-installation.md#create-an-airgap-installation-bundle" >}}) used by the installation.
-If you have [configured the backup directory]({{< ref "backup.md#backup-to-filesystem" >}}) to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate uses the most recent backup in the backup directory.
-
-To restore on a new host:
+If you have [configured the backup directory]({{< relref "backup.md#backup-to-a-filesystem" >}}) to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate uses the most recent backup in the backup directory.
 
 ```shell
-chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID
+chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID [--patch-config </path/to/patch.toml>] [--skip-preflight]
 ```
 
-To restore on an existing Chef Automate host:
-
-```shell
-chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID --skip-preflight
-```
+Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host whose
+FQDN is different than that of the one on which the backup was taken. Use the `--skip-preflight` option to restore to a host on which a Chef Automate installation exists.
 
 ### Restore From an S3 Backup
 
-To restore on a new host:
+To restore from an S3 backup, run
 
 ```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID [--patch-config </path/to/patch.toml>] [--skip-preflight]
 ```
 
-To restore on an existing Chef Automate host:
-
-```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
-```
+Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host whose
+FQDN is different than that of the one on which the backup was taken. Use the
+`--skip-preflight` option to restore to a host on which a Chef Automate installation exists.
 
 A successful restore shows the timestamp of the backup used at the end of the status output:
 
@@ -293,41 +305,5 @@ y
 Success: Backups deleted
 ```
 
-## Troubleshooting
-
-### Update the FQDN
-
-Chef Automate's restore process expects to run on a host with the same FQDN as the host FQDN at the time of the backup.
-If the restore runs on a host with a different FQDN, you will need to patch the FQDN and TLS certificate at the end of the restore process.
-
-1. On the restored host, generate a configuration file on the host:
-
-    ```shell
-    chef-automate init-config
-    ```
-
-2. Create a `patch.toml` file that contains the FQDN, TLS certificate, and TLS key entries from the generated configuration:
-
-   ```toml
-    [global.v1]
-    fqdn = "<new-fqdn>"
-
-    [[global.v1.frontend_tls]]
-    # The TLS certificate for the load balancer frontend.
-    cert = """-----BEGIN CERTIFICATE-----
-    <certificate-for-new-fqdn>
-    -----END CERTIFICATE-----
-    """
-
-    # The TLS RSA key for the load balancer frontend.
-    key = """-----BEGIN RSA PRIVATE KEY-----
-    <key-for-new-fqdn>
-    -----END RSA PRIVATE KEY-----
-    """
-   ```
-
-3. Patch the restored Chef Automate installation with the new FQDN, TLS certificate, and TLS key configuration entries:
-
-   ```shell
-   chef-automate config patch </path/to/patch.toml>
-   ```
+## References
+[`chef-automate backup` command reference]({{< ref "cli-chef-automate/#chef-automate-backup" >}})
