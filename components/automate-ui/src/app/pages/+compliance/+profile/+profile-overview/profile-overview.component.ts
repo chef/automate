@@ -2,7 +2,8 @@ import { combineLatest as observableCombineLatest,
          throwError as observableThrowError,
          forkJoin as observableForkJoin,
          Subject,
-         Observable } from 'rxjs';
+         Observable, 
+         of} from 'rxjs';
 
 import { map, takeUntil, catchError } from 'rxjs/operators';
 import {
@@ -144,6 +145,11 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
 
   // load profiles available to the user
   loadAvailableProfiles() {
+    if (!this.isAvailableProfilesVisible) {
+      this.availableListLoading = false;
+      this.availableProfilesDataLoaded = true;
+      return of([]);
+    }
     this.availableListLoading = true;
     return this.availableProfilesService.getAllProfiles().pipe(
       map(availableProfiles => {
