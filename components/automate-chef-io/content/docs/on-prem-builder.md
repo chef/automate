@@ -56,7 +56,7 @@ Chef Habitat artifact storage; we do not support using Artifactory for artifact 
 The frequency at which Habitat Supervisors poll the on-premises Chef Builder API for changes can be controlled by two Environment variables in the Chef Habitat Supervisor's runtime.
 
 | Variable | Default | Description |
-| --- | --- | ---|
+| --- | --- | --- |
 | `HAB_SUP_UPDATE_MS` | 60000 | Frequency in milliseconds governing how often to check for Supervisor updates when running with an [update strategy](https://www.habitat.sh/docs/using-habitat/#using-updates) |
 | `HAB_UPDATE_STRATEGY_FREQUENCY_MS` | 60000 | Frequency in milliseconds governing how often to check for Service updates when running with an [update strategy](https://www.habitat.sh/docs/using-habitat/#using-updates) |
 
@@ -69,7 +69,7 @@ The following table can be used as a planning guide for appropriately sizing har
 `Interval` refers to the value of `HAB_SUP_UPDATE_MS` and `HAB_UPDATE_STRATEGY_FREQUENCY_MS` and assumes they are both set to the same value.
 
 | Clients | Interval | Server Spec |
-| --- | --- | --- | ---|
+| --- | --- | --- |
 | 2,000 | 60,000 | 4 vCPU x 16GB RAM (m4.xlarge) |
 | 20,000 | 600,000 | 4 vCPU x 16GB RAM (m4.xlarge) |
 | 4,000 | 60,000 | 8 vCPU x 32GB RAM (m4.2xlarge) |
