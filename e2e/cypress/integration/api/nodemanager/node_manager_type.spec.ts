@@ -31,7 +31,7 @@ describe('Nodemanager ', () => {
             url: `api/v0/nodes/id/${clientRunsNodeId1}`
         }).then((resp: Cypress.ObjectLike) => {
             console.log(resp.body);
-            expect(resp.body.manager).to.equal("chef");
+            expect(resp.body.manager).to.equal('chef');
         });
     });
   });
