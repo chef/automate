@@ -2,6 +2,11 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FilterOption, FilterableOptions } from './insight-attributes-dropdown.model';
 import { isEqual } from 'lodash/fp';
 
+export interface FilterUpdate {
+  filters: string[];
+  saveAsDefault: boolean;
+}
+
 @Component({
   selector: 'app-insight-attributes-dropdown',
   templateUrl: './insight-attributes-dropdown.component.html',
@@ -11,8 +16,8 @@ export class InsightAttributesDropdownComponent implements OnInit {
 
   @Input() saveAsDefault = true;
   @Input() lastSelectedOptions: string[] = []; // these are filter ids
-  @Output() onUpdateFilters: EventEmitter<any> = new EventEmitter();
-  @Output() onToggleMenu: EventEmitter<any> = new EventEmitter();
+  @Output() onUpdateFilters: EventEmitter<FilterUpdate> = new EventEmitter();
+  @Output() onToggleMenu: EventEmitter<null> = new EventEmitter();
 
   public options: FilterOption[] = FilterableOptions;
   public selectedOptions: string[] = []; // these are filter ids
