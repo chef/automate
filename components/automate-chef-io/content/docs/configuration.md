@@ -381,7 +381,7 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 
 #### Buffer Size
 
-Configure buffer size when ingesting.
+Configure message buffer ingest size:
 
 ```toml
 [compliance.v1.sys.service]
