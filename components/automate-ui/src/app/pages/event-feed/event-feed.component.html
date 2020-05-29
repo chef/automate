@@ -5,7 +5,7 @@
         <div class="event-feed-upper">
           <chef-page-header>
             <chef-heading>Event Feed</chef-heading>
-            <chef-subheading>Displays events for the past week. Use <em>SHIFT+R</em>  to reset the time scale.</chef-subheading>
+            <chef-subheading>Displays events for the past week.</chef-subheading>
             <app-authorized [allOf]="['/api/v0/cfgmgmt/suggestions', 'get']">
               <app-search-bar
                 [numberOfFilters]="numberOfSearchBarFilters$ | async"
