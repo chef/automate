@@ -399,7 +399,7 @@ func NewLoggingStream(stream ArtifactStream, out io.Writer) ArtifactStream {
 	}
 }
 
-// CountingStream is a stream that keeps track of the number of items procuced
+// CountingStream is a stream that keeps track of the number of items procured
 type CountingStream interface {
 	ArtifactStream
 	Count() int64

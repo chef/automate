@@ -66,7 +66,7 @@ export class GetDestinationFailure implements Action {
   constructor(public payload: HttpErrorResponse, public id: string) { }
 }
 
-export interface CreateDesinationPayload {
+export interface CreateDestinationPayload {
   id?: string;
   name: string;
   url: string;
@@ -75,7 +75,7 @@ export interface CreateDesinationPayload {
 
 export class CreateDestination implements Action {
   readonly type = DestinationActionTypes.CREATE;
-  constructor(public payload: CreateDesinationPayload,
+  constructor(public payload: CreateDestinationPayload,
     public username: string, public password: string ) { }
 }
 

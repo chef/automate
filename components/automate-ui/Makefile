@@ -87,7 +87,7 @@ page-component/%:
 # Adapted from Makefile.common_go
 spell:
 	@pushd ../.. > /dev/null; \
-	./scripts/spellcheck.sh --wordsOnly components/automate-ui; \
+	./scripts/spellcheck.sh components/automate-ui; \
 	EXIT_CODE=$$?; \
 	popd > /dev/null; \
 	exit $$EXIT_CODE

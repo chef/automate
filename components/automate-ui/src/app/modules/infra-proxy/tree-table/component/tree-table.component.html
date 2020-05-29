@@ -3,7 +3,7 @@
     <ng-container matColumnDef="{{column}}">
       <th mat-header-cell *matHeaderCellDef [ngClass]="{'vertical-separator': options.verticalSeparator}">
         <p *ngIf="column !== 'name'">
-          {{options.capitalisedHeader ? (column | titlecase) : column}}
+          {{options.capitalizedHeader ? (column | titlecase) : column}}
         </p>
       </th>
       <td mat-cell *matCellDef="let element" [ngClass]="{'vertical-separator': options.verticalSeparator}">

@@ -1328,7 +1328,7 @@ func TestDeleteServicesByID(t *testing.T) {
 		// and it is the one we DIDN'T delete:
 		assert.Equal(t, beforeDelete.GetServices()[1].Id, afterDelete.GetServices()[0].Id)
 	})
-	t.Run("when the request specifies serveral services", func(t *testing.T) {
+	t.Run("when the request specifies several services", func(t *testing.T) {
 		// returns the service, it's not there on subsequent GET (i.e., it's really deleted)
 
 		suite.IngestServices(mockHabServices)

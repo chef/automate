@@ -604,8 +604,8 @@ func mergeIntoFile(a ArtifactStream, b ArtifactStream) (ArtifactStream, error) {
 	return NewLineReaderStream(tmpFile), nil
 }
 
-// openGzipFile returns an artifact stream of an uncrompressed gzip file, the
-// file contents checkum, and any error encountered.
+// openGzipFile returns an artifact stream of an uncompressed gzip file, the
+// file contents checksum, and any error encountered.
 func (repo *ArtifactRepo) openGzipFile(ctx context.Context, name string) (*os.File, string, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()

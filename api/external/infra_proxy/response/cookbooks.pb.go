@@ -63,7 +63,7 @@ func (m *Cookbooks) GetCookbooks() []*CookbookVersion {
 type CookbookVersions struct {
 	// Name of the cookbook.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// List of all versions avaiable for cookbook.
+	// List of all versions available for cookbook.
 	Versions             []string `protobuf:"bytes,2,rep,name=versions,proto3" json:"versions,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

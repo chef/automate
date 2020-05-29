@@ -21,7 +21,7 @@ export interface NodeInTree<T> extends SearchableNode<T> {
 
 export interface Options<T> {
   verticalSeparator?: boolean;
-  capitalisedHeader?: boolean;
+  capitalizedHeader?: boolean;
   highlightRowOnHover?: boolean;
   customColumnOrder?: Array<keyof T> & string[];
   elevation?: number;
