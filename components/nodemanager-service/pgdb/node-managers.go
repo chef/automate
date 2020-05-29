@@ -339,22 +339,13 @@ func validateNodeManagerFilters(filters []*common.Filter) error {
 		switch filter.Key {
 		case "manager_type":
 			for _, item := range filter.Values {
-				if !isValidManagerType(item) {
-					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid manager type filter: %s. manager_type must be one of the following: 'aws-ec2', 'aws-api', 'azure-api'", item)}
+				if !isValidNodeManagerType(item) {
+					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid manager type filter: %s. manager_type must be one of the following: 'aws-ec2', 'aws-api', 'azure-api', 'chef', '', 'azure-vm', 'gcp-api' ", item)}
 				}
 			}
 		}
 	}
 	return nil
-}
-
-func isValidManagerType(managerType string) bool {
-	switch managerType {
-	case "aws-ec2", "aws-api", "azure-api":
-		return true
-	default:
-		return false
-	}
 }
 
 func (db *DB) DeleteNodeManager(id string) error {
