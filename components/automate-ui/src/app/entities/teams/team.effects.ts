@@ -113,10 +113,12 @@ export class TeamEffects {
   @Effect()
   createTeamSuccess$ = this.actions$.pipe(
     ofType<CreateTeamSuccess>(TeamActionTypes.CREATE_SUCCESS),
-    map(() => new CreateNotification({
+    map(( { payload: resp }: CreateTeamSuccess) =>
+    new CreateNotification({
       type: Type.info,
-      message: 'Created a new team.'
-    })));
+      message: `Created team ${resp.id}.`
+    })
+  ));
 
   @Effect()
   createTeamFailure$ = this.actions$.pipe(

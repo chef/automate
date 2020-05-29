@@ -112,18 +112,24 @@ describe('CreateObjectModalComponent', () => {
     expect(store.dispatch).toHaveBeenCalledWith(new GetPolicies());
   });
 
-  it('upon opening, "also create policies" checkbox is checked', () => {
+  it('upon opening, "also create" checkboxes are checked', () => {
     component.createForm = new FormBuilder().group({
       name: '',
-      addPolicies: ''
+      addPolicies: '',
+      addTeams: ''
     });
-    component.createForm.controls.addPolicies.setValue(false); // force it to start at false
+
+    // force them to start at false
+    component.createForm.controls.addPolicies.setValue(false);
+    component.createForm.controls.addTeams.setValue(false);
+
     component.createProjectModal = true;
 
     component.ngOnChanges(
       { visible: new SimpleChange(false, true, true) });
 
     expect(component.createForm.controls.addPolicies.value).toEqual(true);
+    expect(component.createForm.controls.addTeams.value).toEqual(true);
   });
 
 });

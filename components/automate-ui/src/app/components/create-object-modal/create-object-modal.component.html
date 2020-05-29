@@ -45,8 +45,11 @@
           </chef-toolbar>
         </div>
         <div class="checkbox-margin" *ngIf="createProjectModal">
-          <chef-checkbox (change)="updatePolicyCheckbox($event.detail)" [checked]="addPolicies">
-            Also create owner, editor, and viewer policies for this project.
+          <chef-checkbox id="add-policy-checkbox" (change)="updatePolicyCheckbox($event.detail)" [checked]="addPolicies">
+            Also create owner, editor, and viewer <b>policies</b> for this project.
+          </chef-checkbox>
+          <chef-checkbox (change)="updateTeamCheckbox($event.detail)" [checked]="addTeams">
+            Also create owner, editor, and viewer <b>teams</b> for this project.
           </chef-checkbox>
         </div>
         <div class="dropdown-margin" *ngIf="objectNoun === 'token'">
