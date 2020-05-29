@@ -74,7 +74,7 @@ The following table can be used as a planning guide for appropriately sizing har
 | 20,000 | 600,000 | 4 vCPU x 16GB RAM (m4.xlarge) |
 | 4,000 | 60,000 | 8 vCPU x 32GB RAM (m4.2xlarge) |
 | 40,000 | 600,000 | 8 vCPU x 32GB RAM (m4.2xlarge) |
-| 8,000 | 60,0000 | 16 vCPU x 64GB RAM (m4.4xlarge) |
+| 8,000 | 60,000 | 16 vCPU x 64GB RAM (m4.4xlarge) |
 | 80,000 | 600,000 | 16 vCPU x 64GB RAM (m4.4xlarge) |
 
 
