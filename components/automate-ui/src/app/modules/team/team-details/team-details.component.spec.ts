@@ -36,7 +36,9 @@ const declarations: any[] = [
       'addButtonEnabled',
       'showEmptyMessage',
       'showTable',
-      'overridePermissionsCheck']
+      'getPermissionsPath',
+      'createPermissionsPath'
+    ]
   }),
   MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
   MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
@@ -87,7 +89,7 @@ describe('TeamDetailsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: declarations,
+      declarations,
       providers: [
         FeatureFlagsService
       ],

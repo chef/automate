@@ -281,7 +281,7 @@ describe('AuthorizedComponent', () => {
 
   function genCheck(path?: string, method?: string, paramList?: string | string[]): Check {
     const methods = ['get', 'put', 'post', 'delete', 'patch'];
-    return <Check>[
+    return [
       path || `/${faker.lorem.word()}/${faker.lorem.word()}/${faker.lorem.word()}`,
       method || faker.random.arrayElement(methods),
       paramList || []

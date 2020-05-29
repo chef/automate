@@ -41,12 +41,20 @@
       <section class="page-body" *ngIf="team?.id && (tabValue === 'users')">
         <div id="users-list">
           <div>
-            <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
-            since the path to permission on here is /apis/iam/v2/teams/:id/users we'll have to show everything for now. -->
-            <app-user-table [addButtonText]="addButtonText" [removeText]="removeText" [users]="users"
-              [baseUrl]="'/apis/iam/v2/users/' + team?.id" [overridePermissionsCheck]=true [showTable]="showUsersTable()"
-              [showEmptyMessage]="showEmptyStateMessage()" (addClicked)="toggleUserMembershipView()"
+            <app-user-table
+              [addButtonText]="addButtonText"
+              [removeText]="removeText"
+              [users]="users"
+              [baseUrl]="'/apis/iam/v2/teams/' + team?.id"
+              [createPermissionsPath]="['/apis/iam/v2/teams/{id}', 'put', team?.id]"
+              [showTable]="showUsersTable()"
+              [showEmptyMessage]="showEmptyStateMessage()"
+              (addClicked)="toggleUserMembershipView()"
               (removeClicked)="removeUser($event)">
+              <p>It looks like this team has no users and you<br/>
+                don't have permission to add them.<br/><br/>
+                If this is a mistake, then reach out to your administrator.
+              </p>
             </app-user-table>
           </div>
         </div>

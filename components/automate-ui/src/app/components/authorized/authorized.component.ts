@@ -19,7 +19,7 @@ export type Check = [string, string] | [string, string, string | string[]];
 
 @Component({
   selector: 'app-authorized',
-  template: '<ng-content *ngIf="visible || overrideVisible"></ng-content>'
+  template: '<ng-content *ngIf="visible"></ng-content>'
 })
 export class AuthorizedComponent implements OnInit, OnDestroy {
 
@@ -40,11 +40,6 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
 
   // Include the bare `not` attribute in your HTML element to negate the check.
   @Input() not?: boolean;
-
-  // If you wish to override the permissions check and set content to visible anyway.
-  // Defaults to false. Useful when trying to generalize components that contain
-  // this component.
-  @Input() overrideVisible = false;
 
   // if you wish to output visible
   @Output() isAuthorized: EventEmitter<boolean> = new EventEmitter();
@@ -103,14 +98,14 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
 
   private convertToObject(input: Check[]): CheckObj[] {
     return input.map(
-      ([endpoint, verb, paramList]: Check) =>
-        <CheckObj>{ endpoint, verb, paramList });
+      ([endpoint, verb, paramList]: Check): CheckObj =>
+        ({ endpoint, verb, paramList }));
   }
 
   private downcaseVerb(input: CheckObj[]): CheckObj[] {
     return input.map(
-      ({ endpoint, verb, paramList }: CheckObj) =>
-        <CheckObj>{ endpoint, verb: verb.toLowerCase(), paramList }
+      ({ endpoint, verb, paramList }: CheckObj): CheckObj =>
+        ({ endpoint, verb: verb.toLowerCase(), paramList })
     );
   }
 

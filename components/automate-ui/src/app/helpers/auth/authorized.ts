@@ -42,9 +42,7 @@ export class AuthorizedChecker {
         filter(perms => !isEmpty(perms)),
         filter(() => !isEmpty(this.allOf) || !isEmpty(this.anyOf)),
         filter(perms => this.permsPopulated(perms)),
-        rxjsMap(perms => {
-          return this.evalPerms(perms);
-        }));
+        rxjsMap(perms => this.evalPerms(perms)));
   }
 
   public setPermissions(allOf: CheckObj[], anyOf: CheckObj[]): void {

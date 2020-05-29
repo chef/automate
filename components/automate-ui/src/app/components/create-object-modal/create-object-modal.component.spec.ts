@@ -28,7 +28,7 @@ describe('CreateObjectModalComponent', () => {
         MockComponent({ selector: 'app-resource-dropdown',
           inputs: ['resources', 'resourcesUpdated', 'objectNounPlural'] }),
         MockComponent({ selector: 'app-projects-dropdown',
-          inputs: ['projects', 'projectsUpdated'] })
+          inputs: ['projects', 'projectsUpdated', 'checkedProjectIDs'] })
       ],
      imports: [
         ReactiveFormsModule,

@@ -289,6 +289,7 @@ func init() {
     "chef.automate.api.iam.v2.AddTeamMembersReq": {
       "type": "object",
       "example": {
+        "id": "admins",
         "membership_ids": [
           "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
           "353a62d4-85fa-4423-b12a-f6608a562ae9"
@@ -330,7 +331,7 @@ func init() {
     "chef.automate.api.iam.v2.CreateTeamReq": {
       "type": "object",
       "example": {
-        "id": "test-id",
+        "id": "my-team-id",
         "name": "My Test Team",
         "projects": [
           "project1",
@@ -490,6 +491,7 @@ func init() {
     "chef.automate.api.iam.v2.RemoveTeamMembersReq": {
       "type": "object",
       "example": {
+        "id": "admins",
         "membership_ids": [
           "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
           "353a62d4-85fa-4423-b12a-f6608a562ae9"
@@ -548,6 +550,7 @@ func init() {
     "chef.automate.api.iam.v2.UpdateTeamReq": {
       "type": "object",
       "example": {
+        "id": "my-team-id",
         "name": "My Test Team",
         "projects": [
           "project1",
