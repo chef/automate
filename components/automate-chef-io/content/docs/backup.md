@@ -196,7 +196,7 @@ Restore Chef Automate to an instance on which Automate is not already installed.
         curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     ```
 
-1. *(filesystem backups only)* Ensure access for Chef Automate to a backup directory in the [configured location]({{< ref
+1. **Filesystem backups** require access for Chef Automate to a backup directory in the [configured location]({{< ref
 "backup.md#backup-to-a-filesystem" >}}):
 
      1. To restore a network-attached filesystem backup, mount the shared backup directory to the same mount point configured at the time of the backup.
