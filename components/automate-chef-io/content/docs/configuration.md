@@ -386,8 +386,6 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 
 #### Buffer Size
 
-This conversation was marked as resolved by kagarmoe
-
 Configure message buffer ingest size:
 
 ```toml
@@ -418,9 +416,9 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 # run_time_limit = 0.5
 ```
 
-#### Configure maximum number of inflight data collector requests
+#### Configure Inflight Data Collector Request Maximum
 
-You can now specify the maximum number of inflight data collector requests. The default value is sixty times the number of the machine's available CPUs.
+You can specify the maximum number of inflight data collector requests. The default value is sixty times the number of the machine's available CPUs.
 
 ```toml
     [gateway.v1.sys.data_collector.limiter]
