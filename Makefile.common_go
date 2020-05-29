@@ -43,7 +43,7 @@ fmt-check:
 
 spell:
 	@pushd $(REPOROOT) > /dev/null; \
-	./scripts/spellcheck.sh --wordsOnly $(COMPONENT_DIR); \
+	./scripts/spellcheck.sh $(COMPONENT_DIR); \
 	EXIT_CODE=$$?; \
 	popd > /dev/null; \
 	exit $$EXIT_CODE
