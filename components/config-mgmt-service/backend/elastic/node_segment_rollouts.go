@@ -38,11 +38,20 @@ func (es Backend) GetLatestRunRolloutBreakdownCounts() (*b.NodeSegmentRolloutPro
 			PolicyNodeGroup: ns[pgroupField].(string),
 			PolicyDomainURL: fmt.Sprintf("https://%s/organizations/%s", ns[chefServerField], ns[chefOrgField]),
 		}
-		segmentWithStatus := &b.NodeSegmentRevisionsStatus{NodeSegment: segment, ByPolicyRevision: make(map[string]*b.PolicyRevisionNodeStatus)}
+
+		var nodesInSegment int32
+		json.Unmarshal(*s.Aggregations["doc_count"], &nodesInSegment)
+
+		segmentWithStatus := &b.NodeSegmentRevisionsStatus{
+			NodeSegment:      segment,
+			NodesInSegment:   nodesInSegment,
+			ByPolicyRevision: make(map[string]*b.PolicyRevisionNodeStatus),
+		}
 
 		allSegments.BySegment[segment] = segmentWithStatus
 
 		nodesPolicyRevCounts, havePolicyRevAgg := s.Aggregations.Terms(pRevField)
+
 		if !havePolicyRevAgg {
 			return nil, errors.New("elasticsearch result did not contain expected aggregation data for policy_revision")
 		}

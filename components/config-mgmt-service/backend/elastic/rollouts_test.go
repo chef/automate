@@ -77,12 +77,19 @@ func TestRolloutAggregate(t *testing.T) {
 	fmt.Println("=========== Rollouts ===========")
 	fmt.Printf("NODE SEGMENTS: %d\n", len(res.NodeSegmentRolloutProgress))
 	for _, ns := range res.NodeSegmentRolloutProgress {
+		current := ns.CurrentRolloutProgress
 		fmt.Printf("## %s::%s @ %s\n", ns.PolicyName, ns.PolicyNodeGroup, ns.PolicyDomainUrl)
-		fmt.Println("  ### Current rollout status:")
-		fmt.Printf("  %+v\n", ns.CurrentRolloutProgress)
+		fmt.Printf("  Total nodes: %d, %d on latest revision\n", ns.TotalNodes, current.NodeCount)
+		fmt.Printf("  ### Current rollout #%s started %s\n", current.Rollout.Id, current.Rollout.StartTime)
+		fmt.Printf("  - nodes:           %d (successful: %d, failed: %d)\n", current.NodeCount, current.LatestRunSuccessfulCount, current.LatestRunFailedCount)
+		fmt.Printf("  - policy revision: %s\n", current.Rollout.PolicyRevisionId)
+		fmt.Printf("  - desc:            %q\n", current.Rollout.Description)
 		fmt.Printf("  ### Past rollouts: %d\n", len(ns.PreviousRollouts))
 		for _, r := range ns.PreviousRollouts {
-			fmt.Printf("  %+v\n", r)
+			fmt.Printf("    ### rollout #%s started %s\n", r.Rollout.Id, r.Rollout.StartTime)
+			fmt.Printf("    - policy revision: %s\n", r.Rollout.PolicyRevisionId)
+			fmt.Printf("    - desc:            %q\n", r.Rollout.Description)
+			fmt.Printf("    - nodes still on this revision: %d\n", r.LatestRunNodeCount)
 		}
 	}
 	fmt.Println("........... RESPONSE ...........")

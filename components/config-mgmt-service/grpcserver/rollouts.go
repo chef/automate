@@ -131,9 +131,7 @@ func mergeCCRDataIntoRollouts(ns *postgres.NodeSegmentWithRollouts, ccrs *backen
 	}
 
 	currentRolloutRes := &response.CurrentRolloutProgress{
-		Rollout: &response.Rollout{
-			PolicyRevisionId: currentRevisionID,
-		},
+		Rollout:                  rolloutToAPI(currentRollout),
 		NodeCount:                int32(currentRolloutCCR.Total),
 		LatestRunSuccessfulCount: int32(currentRolloutCCR.Success),
 		LatestRunFailedCount:     int32(currentRolloutCCR.Failure),
@@ -151,9 +149,7 @@ func mergeCCRDataIntoRollouts(ns *postgres.NodeSegmentWithRollouts, ccrs *backen
 			}
 
 			pastRollout := &response.PastRolloutProgress{
-				Rollout: &response.Rollout{
-					PolicyRevisionId: rolloutRevisionID,
-				},
+				Rollout:            rolloutToAPI(rollout),
 				LatestRunNodeCount: int32(ccrsForRollout.Total),
 			}
 
@@ -165,6 +161,7 @@ func mergeCCRDataIntoRollouts(ns *postgres.NodeSegmentWithRollouts, ccrs *backen
 		PolicyName:             ns.PolicyName,
 		PolicyNodeGroup:        ns.PolicyNodeGroup,
 		PolicyDomainUrl:        ns.PolicyDomainURL,
+		TotalNodes:             ccrs.NodesInSegment,
 		CurrentRolloutProgress: currentRolloutRes,
 		PreviousRollouts:       pastRollouts,
 	}

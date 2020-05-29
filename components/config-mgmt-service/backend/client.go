@@ -215,6 +215,7 @@ type NodeSegmentRolloutProgress struct {
 
 type NodeSegmentRevisionsStatus struct {
 	NodeSegment
+	NodesInSegment   int32
 	ByPolicyRevision map[string]*PolicyRevisionNodeStatus
 }
 

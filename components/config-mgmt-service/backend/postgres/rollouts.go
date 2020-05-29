@@ -19,6 +19,7 @@ type NewRollout struct {
 	Description      string `db:"description"`
 	CiJobId          string `db:"ci_job_id"`
 	CiJobUrl         string `db:"ci_job_url"`
+	OrderIndex       int    `db:"order_index"` // present in query for last N rollouts per segment
 }
 
 type Rollout struct {
