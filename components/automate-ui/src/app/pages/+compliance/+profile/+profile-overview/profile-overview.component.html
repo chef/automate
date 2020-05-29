@@ -17,7 +17,7 @@
         <chef-heading>Profiles</chef-heading>
         <chef-subheading>Compliance profiles manage security and compliance scans.</chef-subheading>
 
-        <div class="profiles-search">
+        <div class="profiles-search" *ngIf="!profilesEmpty || isAvailableProfilesVisible">
           <input
             chefInput
             type="text"
@@ -88,36 +88,31 @@
           </chef-modal>
 
           <app-authorized [allOf]="['streaming::/compliance/profiles', 'post']">
-            <div *ngIf="profilesEmpty" class="empty-state">
-              <div class="empty-state" *ngIf="isAvailableProfilesVisible" >
-                <p>Get a profile from the <a (click)="selectTab('available')">Available tab</a> or upload your own profile to get started!</p>
+            <chef-toolbar>
+              <div *ngIf="profilesEmpty" class="empty-state">
+                  <div *ngIf="isAvailableProfilesVisible" >
+                    <p>Get a profile from the <a (click)="selectTab('available')">Available tab</a> or upload your own profile to get started!</p>
+                  </div>
+                  <div *ngIf="!isAvailableProfilesVisible" >
+                    <p>Upload a profile to get started!</p>
+                  </div>
+                  <chef-button primary (click)="showUploadModal()" >
+                    <chef-icon>cloud_upload</chef-icon>
+                    <span>Upload Profile</span>
+                  </chef-button>
               </div>
-              <div class="empty-state" *ngIf="!isAvailableProfilesVisible" >
-                <p>Upload a profile to get started!</p>
+              <div *ngIf="!profilesEmpty">
+                  <chef-button primary (click)="showUploadModal()" >
+                    <chef-icon>cloud_upload</chef-icon>
+                    <span>Upload Profile</span>
+                  </chef-button>
               </div>
-              <chef-button primary (click)="showUploadModal()" >
-                <chef-icon>cloud_upload</chef-icon>
-                <span>Upload Profile</span>
-              </chef-button>
-            </div>
-            <div *ngIf="!profilesEmpty">
-              <chef-toolbar>
-                <chef-button primary (click)="showUploadModal()" >
-                  <chef-icon>cloud_upload</chef-icon>
-                  <span>Upload Profile</span>
-                </chef-button>
-              </chef-toolbar>
-            </div>
+            </chef-toolbar>
           </app-authorized>
           <app-authorized not [allOf]="['streaming::/compliance/profiles', 'post']">
-            <div *ngIf="profilesEmpty">
-              <div class="empty-state" *ngIf="isAvailableProfilesVisible" >
-                <p>Get a profile from the <a (click)="selectTab('available')">Available tab</a>!</p>
-              </div>
-              <div class="empty-state" *ngIf="!isAvailableProfilesVisible" >
-                <p>It looks like no one has uploaded any profiles yet and you don't have permission to upload them. <br/>
-                If this is a mistake, then reach out to your administrator.</p>
-              </div>
+            <div *ngIf="profilesEmpty" class="empty-state">
+              <p>It looks like no one has uploaded any profiles yet and you don't have permission to upload them. <br/>
+              If this is a mistake, then reach out to your administrator.</p>
             </div>
           </app-authorized>
 
