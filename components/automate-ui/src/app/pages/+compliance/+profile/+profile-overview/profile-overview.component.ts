@@ -1,9 +1,11 @@
-import { combineLatest as observableCombineLatest,
-         throwError as observableThrowError,
-         forkJoin as observableForkJoin,
-         Subject,
-         Observable, 
-         of} from 'rxjs';
+import {
+  combineLatest as observableCombineLatest,
+  throwError as observableThrowError,
+  forkJoin as observableForkJoin,
+  Subject,
+  Observable,
+  of
+} from 'rxjs';
 
 import { map, takeUntil, catchError } from 'rxjs/operators';
 import {
