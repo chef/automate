@@ -82,6 +82,7 @@ import { JobRequests } from './entities/jobs/job.requests';
 import { LicenseStatusRequests } from './entities/license/license.requests';
 import { ManagerRequests } from './entities/managers/manager.requests';
 import { NodesRequests } from './entities/nodes/nodes.requests';
+import { NotificationRuleRequests } from './entities/notification_rules/notification_rule.requests';
 import { PolicyRequests } from './entities/policies/policy.requests';
 import { ProfileRequests } from './entities/profiles/profile.requests';
 import { ProjectRequests } from './entities/projects/project.requests';
@@ -316,6 +317,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ManagerRequests,
     MetadataService,
     NodesRequests,
+    NotificationRuleRequests,
     NodeDetailsResolverService,
     NodeNoRunsDetailsResolverService,
     NodeDetailsService,

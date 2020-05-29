@@ -3,7 +3,7 @@
     <main>
       <chef-page-header>
         <chef-heading>Notifications</chef-heading>
-        <chef-subheading>Notifications for Inspec compliance scans and Chef Infra Client runs.</chef-subheading>
+        <chef-subheading>Webhook notifications for Infra Client run failures and InSpec compliance scan failures.</chef-subheading>
       </chef-page-header>
 
       <div class="page-body">
@@ -23,29 +23,53 @@
           <chef-table *ngIf="(rules$ | async)?.length > 0" id="notifications-list">
             <chef-thead>
               <chef-tr>
-                <chef-th class="sort" tabindex="0"
+                <chef-th class="sort"
                   role="button"
-                  (keyup.enter)="toggleSort('node_name')"
-                  (click)="toggleSort('node_name')">
-                  <div class="text-and-sort-icons">
-                    <span>Notification Name</span>
-                    <chef-icon aria-hidden="true" id="{{sortIcon('node_name')}}" class="sort-icon">arrow_drop_up</chef-icon>
-                  </div>
+                  (keyup.enter)="toggleSort('name')"
+                  (click)="toggleSort('name')">
+                  <span>Name</span>
+                  <chef-sort-toggle sort="name" [order]="sortIcon('')"></chef-sort-toggle>
                 </chef-th>
-                <chef-th>Alert Type</chef-th>
+                <chef-th class="sort"
+                  role="button"
+                  (keyup.enter)="toggleSort('alert_type')"
+                  (click)="toggleSort('alert_type')">
+                  <span>Webhook Type</span>
+                  <chef-sort-toggle sort="alert_type" [order]="sortIcon('')"></chef-sort-toggle>
+                </chef-th>
+                <chef-th class="sort"
+                  role="button"
+                  (keyup.enter)="toggleSort('failure_type')"
+                  (click)="toggleSort('failure_type')">
+                  <span>Failure Type</span>
+                  <chef-sort-toggle sort="failure_type" [order]="sortIcon('')"></chef-sort-toggle>
+                </chef-th>
+                <chef-th class="sort"
+                  role="button"
+                  (keyup.enter)="toggleSort('webhook_url')"
+                  (click)="toggleSort('webhook_url')">
+                  <span>Webhook URL</span>
+                  <chef-sort-toggle sort="webhook_url" [order]="sortIcon('')"></chef-sort-toggle>
+                </chef-th>
                 <chef-th aria-hidden="true" class="three-dot-column"></chef-th>
               </chef-tr>
             </chef-thead>
 
             <chef-tbody>
-              <chef-tr tabindex="0" *ngFor="let rule of rules$ | async |
+              <chef-tr *ngFor="let rule of rules$ | async |
                 slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
-                <chef-td class="{{rule.targetType}}">
-                  <img src="assets/img/logo-{{rule.targetType}}.svg" alt="{{rule.targetType}} logo" />
+                <chef-td>
                   <a [routerLink]="['/settings/notifications/form', rule.id]">{{ rule.name }}</a>
                 </chef-td>
+                <chef-td class="{{rule.targetType}}">
+                  <img src="assets/img/logo-{{rule.targetType}}.png" alt="{{rule.targetType}} logo" />
+                  {{ rule.targetType.slice(0, -5) }}
+                </chef-td>
                 <chef-td>
-                  {{rule.AlertTypeLabels[rule.ruleType]}}
+                  {{ rule.AlertTypeLabels[rule.ruleType] }}
+                </chef-td>
+                <chef-td>
+                  {{ rule.targetUrl }}
                 </chef-td>
                 <chef-td class="actions three-dot-column">
                   <mat-select panelClass="chef-control-menu">
