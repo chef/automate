@@ -32,6 +32,10 @@ button {
   line-height: 33px;
 }
 
+button.sign-in {
+    display: inline;
+}
+
 div.logo {
   margin-bottom: 30px;
 }
