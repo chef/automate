@@ -179,13 +179,13 @@
   <!-- Loading State: Displayed only when the main status is loading -->
   <div class="empty-status" *ngIf="(serviceGroupsStatus$ | async) === 'loading'">
     <chef-loading-spinner size='50'></chef-loading-spinner>
-    <h3>Loading service groups...</h3>
+    <p class="display3">Loading service groups...</p>
   </div>
 
   <!-- LoadingFailure State: Displayed only when the main status is a failure -->
   <div class="empty-status" *ngIf="(serviceGroupsStatus$ | async) === 'loadingFailure'">
     <chef-loading-spinner size='50'></chef-loading-spinner>
-    <h3>Loading service groups...</h3>
+    <p class="display3">Loading service groups...</p>
   </div>
 
   <!--
@@ -194,11 +194,11 @@
     response is empty, when there are NO service-groups to display.
   -->
   <div class="empty-status" *ngIf="(serviceGroupsStatus$ | async) === 'loadingSuccess' && sgHealthSummary.total === 0">
-    <h3>Add service groups</h3>
+    <p class="display3">Add service groups</p>
     <p>Find out more about <a href="https://automate.chef.io/docs/applications-setup/" target="_blank">adding service groups.</a></p>
   </div>
   <div class="empty-status" *ngIf="(serviceGroupsStatus$ | async) === 'loadingSuccess' && sgHealthSummary.total !== 0 && (serviceGroupsList$ | async).length === 0">
-    <h3>None of the service groups returned {{ selectedStatus$ | async }}</h3>
+    <p class="display3">None of the service groups returned {{ selectedStatus$ | async }}</p>
   </div>
 </div>
 <app-services-sidebar

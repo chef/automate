@@ -74,7 +74,7 @@
           <div class="side-panel-header">
             <chef-icon class="header-icon">equalizer</chef-icon>
             <div class="header-text">
-              <h4><strong>{{ (jobDetail$ | async)?.results?.length }} errors for job:</strong></h4>
+              <h2 class="display4">{{ (jobDetail$ | async)?.results?.length }} Job Errors</h2>
               <p>{{ (jobDetail$ | async)?.name }}</p>
             </div>
             <chef-button secondary (click)="onJobResultsHide($event)">
