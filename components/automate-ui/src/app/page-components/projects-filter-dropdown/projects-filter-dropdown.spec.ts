@@ -45,7 +45,7 @@ describe('ProjectsFilterDropdownComponent', () => {
 
     it('has an "aria-label"', () => {
       label = fixture.nativeElement.querySelector('.dropdown-label');
-      expect(label.getAttribute('aria-label')).toEqual('Projects filter');
+      expect(label.getAttribute('aria-label')).toEqual('Filter projects');
     });
 
     describe('when .selectionCountVisible is false', () => {
