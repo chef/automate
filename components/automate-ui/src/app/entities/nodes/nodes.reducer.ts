@@ -38,7 +38,7 @@ export const NodesEntityInitialState: NodesEntityState = nodesEntityAdapter.getI
     total: 0,
     per_page: 100,
     page: 1,
-    sort: 'name',
+    sort: 'last_contact',
     order: 'DESC',
     filters: []
   },
