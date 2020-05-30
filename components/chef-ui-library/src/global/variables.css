@@ -14,7 +14,7 @@
   --royal-blue: #3864F2;
   --malibu: #648FFF;
   --pink: #DC267F;
-  --violet: #C22DD5;
+  --violet: #A424B4;
   --indigo: #785EF0;
   --science-blue: #0075DB;
   --sirocco: #6F7878;
@@ -47,17 +47,17 @@
 
   /* ** THESE SEMANTIC COLOR VARIABLES ARE FREE TO BE USED WITHIN AUTOMATE ** */
   /* primary */
-  --chef-primary: var(--chef-orange);
+  --chef-primary: var(--mahogany);
   --chef-primary-dark: var(--ebony-clay);
   --chef-primary-bright: var(--royal-blue);
   --chef-primary-light: var(--malibu);
   --chef-primary-hover: var(--blue);
   /* secondary */
-  --chef-critical: var(--pink);
-  --chef-warning: var(--atomic-tangerine);
+  --chef-critical: var(--maroon);
+  --chef-warning: var(--mahogany);
   --chef-major: var(--violet);
   --chef-minor: var(--indigo);
-  --chef-success: var(--science-blue);
+  --chef-success: var(--medium-teal-blue);
   /* tertiary */
   --chef-info-alert: var(--fuchsia);
   --chef-info-alert-light: var(--fuchsia-light);
