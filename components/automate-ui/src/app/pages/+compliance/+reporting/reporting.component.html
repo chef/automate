@@ -154,10 +154,10 @@
         [visible]="downloadStatusVisible"
         (closeModal)="hideDownloadStatus()">
         <ng-container *ngIf="downloadInProgress">
-          <h2 id="download-title" class="display4" slot="title">Downloading report...</h2>
+          <h2 id="download-report" class="display4" slot="title">Downloading report...</h2>
         </ng-container>
         <ng-container *ngIf="downloadFailed">
-          <h2 id="download-title" class="display4" slot="title">Download failed.</h2>
+          <h2 id="download-failed" class="display4" slot="title">Download failed.</h2>
         </ng-container>
         <chef-loading-spinner *ngIf="downloadInProgress" size="50"></chef-loading-spinner>
       </chef-modal>
