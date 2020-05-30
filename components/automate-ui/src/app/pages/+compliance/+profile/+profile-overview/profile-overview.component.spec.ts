@@ -5,18 +5,19 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ProfileOverviewComponent } from './profile-overview.component';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  CUSTOM_ELEMENTS_SCHEMA,
+  DebugElement
+} from '@angular/core';
 import { Observable, throwError, of as observableOf } from 'rxjs';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { UploadService } from 'app/services/profiles/upload.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
+import { MockComponent } from 'ng2-mock-component';
 
 class MockProductDeployedService {
-
-  constructor() {}
-
   isProductDeployed(_product: string): boolean {
     return false;
   }
@@ -53,7 +54,11 @@ describe('ProfilesOverviewComponent', () => {
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
-        ProfileOverviewComponent
+        ProfileOverviewComponent,
+        // This returns true for all app-authorized checks on the page.
+        MockComponent({ selector: 'app-authorized',
+          inputs: ['allOf'],
+          template: '<ng-content *ngIf="true"></ng-content>' })
       ],
       providers: [
         {provide: ProfilesService, useClass: MockProfilesService},
@@ -69,6 +74,65 @@ describe('ProfilesOverviewComponent', () => {
     fixture = TestBed.createComponent(ProfileOverviewComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement;
+  });
+
+  it('0 profiles allowed upload permissions', () => {
+    fixture.detectChanges();
+
+    // 0 profiles
+    component.profilesEmpty = true;
+    fixture.detectChanges();
+
+    // has upload permissions. Using the app-authorized true in the declarations
+
+
+    // Search bar is visible
+    const inputs: DebugElement[] = fixture.debugElement.queryAll(By.css('input'));
+    expect(inputs.length > 0).toEqual(true);
+    expect(inputs.some( input => {
+      return input.attributes['placeholder'] === 'Search profiles...';
+    })).toEqual(true);
+
+    // tabs are visble.
+    const selectors: DebugElement[] = fixture.debugElement.queryAll(By.css('.profiles-tabs'));
+    expect(selectors.length > 0).toEqual(true);
+
+    // profile list table is hidden
+    const tables: DebugElement[] = fixture.debugElement.queryAll(By.css('.profiles-table'));
+    expect(tables.length).toEqual(0);
+
+    // upload button is visible
+    const buttons: DebugElement[] = fixture.debugElement.queryAll(By.css('.upload-button'));
+    expect(buttons.length).toEqual(1);
+  });
+
+  it('one or more profiles allowed upload permissions', () => {
+    fixture.detectChanges();
+
+    // one or more profiles
+    component.profilesEmpty = false;
+    fixture.detectChanges();
+
+    // has upload permissions. Using the app-authorized true in the declarations
+
+    // Search bar is visible
+    const inputs: DebugElement[] = fixture.debugElement.queryAll(By.css('input'));
+    expect(inputs.length > 0).toEqual(true);
+    expect(inputs.some( input => {
+      return input.attributes['placeholder'] === 'Search profiles...';
+    })).toEqual(true);
+
+    // tabs are visble.
+    const selectors: DebugElement[] = fixture.debugElement.queryAll(By.css('.profiles-tabs'));
+    expect(selectors.length > 0).toEqual(true);
+
+    // profile list table is visible
+    const tables: DebugElement[] = fixture.debugElement.queryAll(By.css('.profiles-table'));
+    expect(tables.length).toEqual(1);
+
+    // upload button is visible
+    const buttons: DebugElement[] = fixture.debugElement.queryAll(By.css('.upload-button'));
+    expect(buttons.length).toEqual(1);
   });
 
   it('sets profilesListLoading to true', () => {
