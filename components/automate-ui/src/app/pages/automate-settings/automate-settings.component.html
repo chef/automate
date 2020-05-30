@@ -38,7 +38,7 @@
               </chef-checkbox>
             </div>
             <p>Remove event feed data after
-              <input aria-label="Days" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0" 
+              <input aria-label="Days before removing event feed data" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0" 
                 (keydown)="preventNegatives($event.key)"/>days
             </p>
           </div>
@@ -50,8 +50,8 @@
                 (change)="handleFormActivation(eventFeedServerActions, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove Chef Server actions after
-              <input aria-label="Days" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
+            <p>Remove Chef Infra Server actions after
+              <input aria-label="Days before removing Chef Infra Server actions" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
                 (keydown)="preventNegatives($event.key)"/>days
             </p>
           </div>
@@ -74,10 +74,10 @@
             </div>
 
             <p>When no health check reports have been received for a service in
-              <input aria-label="Time type" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
+              <input aria-label="Amount of time before labeling a service disconnected" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
                 (keydown)="preventNegatives($event.key)" />
               <mat-form-field appearance="none">
-                <mat-select panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
+                <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
                   <mat-option value="m">minutes</mat-option>
                   <mat-option value="h">hours</mat-option>
                   <mat-option value="d">days</mat-option>
@@ -101,10 +101,10 @@
               </span>
             </div>
             <p>Remove services labeled as disconnected after
-              <input aria-label="Time type" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
+              <input aria-label="Amount of time before removing disconnected services" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
                 (keydown)="preventNegatives($event.key)" />
               <mat-form-field appearance="none">
-                <mat-select panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
+                <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
                   <mat-option value="m">minutes</mat-option>
                   <mat-option value="h">hours</mat-option>
                   <mat-option value="d">days</mat-option>
@@ -124,7 +124,7 @@
               </chef-checkbox>
             </div>
             <p>Remove data for Chef Infra Client runs after
-              <input aria-label="Days" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
+              <input aria-label="Days before removing Chef Infra Client runs" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
                 (keydown)="preventNegatives($event.key)" />days
             </p>
           </div>
@@ -139,10 +139,10 @@
             </div>
           
             <p>When no Chef Infra Client run data has been received from a node in
-              <input aria-label="Time type" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues"
+              <input aria-label="Amount of time before labeling a nodes as missing" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues"
                 type="number" min="0" (keydown)="preventNegatives($event.key)" />
               <mat-form-field appearance="none">
-                <mat-select panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
+                <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
                   <mat-option value="m">minutes</mat-option>
                   <mat-option value="h">hours</mat-option>
                   <mat-option value="d">days</mat-option>
@@ -161,7 +161,7 @@
               </chef-checkbox>
             </div>
             <p>Remove nodes labeled as missing after
-              <input aria-label="Days" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
+              <input aria-label="Days before removing missing nodes" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
                 (keydown)="preventNegatives($event.key)" />days
             </p>
           </div>
@@ -177,7 +177,7 @@
               </chef-checkbox>
             </div>
             <p>Remove compliance reports after
-              <input aria-label="Days" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
+              <input aria-label="Days before removing compliance reports" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
                 (keydown)="preventNegatives($event.key)" />days
             </p>
           </div>
@@ -190,7 +190,7 @@
               </chef-checkbox>
             </div>
             <p>Remove compliance scans after
-              <input aria-label="Days" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
+              <input aria-label="Days before removing compliance scans" chefInput formControlName="threshold" [resetOrigin]="shouldResetValues" type="number" min="0"
                 (keydown)="preventNegatives($event.key)" />days
             </p>
           </div>
