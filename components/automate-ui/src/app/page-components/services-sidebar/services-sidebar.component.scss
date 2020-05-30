@@ -283,19 +283,19 @@ chef-alert {
     margin-right: 8px;
 
     &.OK {
-      color: $chef-success;
+      color: var(--chef-badge-success-color);
     }
 
     &.WARNING {
-      color: $chef-primary;
+      color: var(--chef-badge-warning-color);
     }
 
     &.UNKNOWN {
-      color: $chef-dark-grey;
+      color: var(--chef-primary-dark);
     }
 
     &.CRITICAL {
-      color: $chef-critical;
+      color: var(--chef-badge-critical-color);
     }
   }
 }
