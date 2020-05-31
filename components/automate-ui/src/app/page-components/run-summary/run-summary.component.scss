@@ -32,6 +32,12 @@
     chef-button {
       margin: -5px 1em;
       border: 1px solid $chef-white;
+      background-color: $chef-critical;
+
+      &:hover,
+      &:focus {
+        background-color: $pink;
+      }
     }
   }
 
