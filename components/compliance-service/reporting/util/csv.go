@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 	"unicode/utf8"
 
@@ -28,11 +29,14 @@ type csvFields struct {
 	ControlID             string    `csv:"Control ID"`
 	ControlTitle          string    `csv:"Control Title"`
 	ControlImpact         string    `csv:"Control Impact"`
+	ControlWaived         bool      `csv:"Waived (true/false)"`
 	ResultStatus          string    `csv:"Result Status"`
 	ResultRunTime         string    `csv:"Result Run Time"`
 	ResultCodeDescription string    `csv:"Result Code Description"`
 	ResultMessage         string    `csv:"Result Message"`
 	ResultSkipMessage     string    `csv:"Result Skip Message"`
+	WaiverJustification   string    `csv:"Waiver Justification"`
+	WaiverExpiration      string    `csv:"Waiver Expiration"`
 }
 
 // ReportToCSV converts a report to its CSV representation as a string
@@ -51,6 +55,14 @@ func ReportToCSV(report *reportingapi.Report) (string, error) {
 					logrus.Errorf(err.Error())
 					timestamp = time.Time{}
 				}
+				waived := false
+				if strings.HasPrefix(control.WaivedStr, "yes") {
+					waived = true
+				}
+				if control.WaiverData == nil {
+					// prevent nil pointer failure
+					control.WaiverData = &reportingapi.OrigWaiverData{}
+				}
 				cache = append(cache, csvFields{
 					NodeName:              report.NodeName,
 					EndTime:               timestamp,
@@ -66,11 +78,14 @@ func ReportToCSV(report *reportingapi.Report) (string, error) {
 					ControlID:             control.Id,
 					ControlTitle:          control.Title,
 					ControlImpact:         strconv.FormatFloat(float64(control.Impact), 'f', 2, 32),
+					ControlWaived:         waived,
 					ResultStatus:          result.Status,
 					ResultRunTime:         strconv.FormatFloat(float64(result.RunTime), 'f', 3, 32),
 					ResultCodeDescription: maxCharLimit(result.CodeDesc),
 					ResultMessage:         maxCharLimit(result.Message),
 					ResultSkipMessage:     result.SkipMessage,
+					WaiverJustification:   control.WaiverData.Justification,
+					WaiverExpiration:      control.WaiverData.ExpirationDate,
 				})
 			}
 		}
