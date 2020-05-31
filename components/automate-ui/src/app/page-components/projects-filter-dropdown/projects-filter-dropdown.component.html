@@ -12,7 +12,7 @@
   <chef-icon *ngIf="dropdownCaretVisible" aria-hidden>keyboard_arrow_down</chef-icon>
 </button>
 <chef-click-outside omit="dropdown-label" (clickOutside)="handleEscape()" *ngIf="dropdownActive">
-  <chef-dropdown class="dropdown" id="projects-filter-dropdown" [attr.visible]="dropdownActive" (keydown.esc)="handleEscape()">
+  <chef-dropdown class="dropdown" id="projects-filter-dropdown" [attr.visible]="dropdownActive" (keydown.esc)="handleEscape()" role="">
 
       <div class="dropdown-body">
 
@@ -44,6 +44,7 @@
         <div id="drop-list" class="dropdown-content">
           <chef-checkbox
             *ngFor="let option of filteredOptions"
+            role="menuitem"
             [attr.title]="option.label"
             [checked]="option.checked"
             (change)="handleOptionChange($event, option.label)"
