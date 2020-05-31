@@ -15,14 +15,14 @@
   flex-basis: 100px;
 
   & > .event-time {
-    padding-bottom: 5pt;
-    padding-top: 5pt;
+    padding-bottom: 4pt;
+    padding-top: 4pt;
   }
 
   & > .event-day,
   & > .event-date {
-    font-size: .625em;
-    line-height: 10pt;
+    font-size: 11px;
+    line-height: 16px;
   }
 }
 
