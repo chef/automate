@@ -133,14 +133,20 @@ chef-side-panel {
   }
 }
 
-.event-group-text {
-  margin: 0;
-  font-size: 10px;
-
-
+.event-group-text,
+.event-group-list h2.display4 {
   & > strong {
     display: block;
     margin-bottom: 4px;
+  }
+}
+
+.event-group-text {
+  margin: 0;
+  font-size: 11px;
+
+
+  & > strong {
     font-size: 12px;
   }
 

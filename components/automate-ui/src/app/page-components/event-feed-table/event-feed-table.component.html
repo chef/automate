@@ -47,10 +47,10 @@
           </app-event-icon>
         </div>
 
-        <p class="event-group-text">
+        <h2 class="display4">
           <strong>{{groupedEvent.eventCount}} {{getEventTypeLabel(groupedEvent)}}</strong>
           {{getFormattedEventType(groupedEvent)}} {{displayRequestorPreposition(groupedEvent.requestorName)}} <em>{{displayRequestorName(groupedEvent.requestorName)}}</em>
-        </p>
+        </h2>
       </li>
       <li *ngFor="let event of groupedEvents" class="event-group-item">
         <div class="event-icon">
