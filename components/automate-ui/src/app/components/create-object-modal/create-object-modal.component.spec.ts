@@ -101,8 +101,11 @@ describe('CreateObjectModalComponent', () => {
     component.ngOnChanges(
       { visible: new SimpleChange(false, true, true) });
 
-    component.policies.forEach(p =>
-      p.itemList.forEach(i => expect(i.checked).toBe(false)));
+    const checkedStatusOfEveryPolicy =
+      component.policies.flatMap(p => p.itemList.map(i => i.checked));
+    expect(checkedStatusOfEveryPolicy)
+      .withContext('some polices were not reset to false')
+      .toEqual(Array(checkedStatusOfEveryPolicy.length).fill(false));
   });
 
   it('upon opening, dispatches a call to refresh policies', () => {
@@ -208,7 +211,7 @@ describe('CreateObjectModalComponent', () => {
     });
   });
 
-  function genPolicy(id: string, type?: IAMType): Policy {
+  function genPolicy(id: string, type: IAMType): Policy {
     return {
       id,
       name: id,

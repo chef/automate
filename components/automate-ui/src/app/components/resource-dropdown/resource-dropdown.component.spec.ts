@@ -58,7 +58,7 @@ describe('ResourceDropdownComponent', () => {
       genResource('aa', false),
       genResource('bb', true)
     )];
-      component.objectNounPlural = 'policies';
+    component.objectNounPlural = 'policies';
 
     toggleDropdown(); // open
     changeResources([], resources, true);
@@ -376,6 +376,8 @@ describe('ResourceDropdownComponent', () => {
   }
 
   function genResourceList(...resources: ResourceChecked[]): ResourceCheckedSection {
+    // Though title is technically optional, we need to supply it here so we can compare
+    // filteredResources to resources in one step in specifyLemursAndOpenDropdown().
     return {
       title: 'any',
       itemList: resources

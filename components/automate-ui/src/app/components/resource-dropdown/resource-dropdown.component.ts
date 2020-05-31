@@ -110,9 +110,8 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   closeDropdown(): void {
     this.dropdownState = 'closed';
-    const flattenedIDs = [].concat(
-      ...this.snapshotResources.map(
-        resource => resource.itemList.filter(r => r.checked).map(r => r.id)));
+    const flattenedIDs = this.snapshotResources.flatMap(
+      resource => resource.itemList.filter(r => r.checked).map(r => r.id));
     this.onDropdownClosing.emit(flattenedIDs);
   }
 
@@ -130,12 +129,11 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     // Not deep and not shallow!
     // Need the individual resources to point to the same objects
     // so that when one is checked, it is checked in BOTH structures.
-    this.filteredResources = [].concat(
-      ...this.snapshotResources.map(section =>
+    this.filteredResources = this.snapshotResources.flatMap(section =>
         ({
           title: section.title,
           itemList: section.itemList
-        })));
+        }));
     this.allFilteredResourcesCount = this.calculateAllFilteredResourcesCount();
   }
 
@@ -170,19 +168,21 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   }
 
   private calculateAllFilteredResourcesCount(): number {
-    return this.filteredResources.reduce(
-      (sum, group) => sum + group.itemList.length, 0);
+    return this.resourceCount(this.filteredResources);
   }
 
   private get allResourcesCount(): number {
-    return this.resources.reduce(
+    return this.resourceCount(this.resources);
+  }
+
+  private resourceCount(resources: ResourceCheckedSection[]): number {
+    return resources.reduce(
       (sum, group) => sum + group.itemList.length, 0);
   }
 
   private get allCheckedResourceNames(): string[] {
-    return [].concat(
-      ...this.snapshotResources.map(
-        resource => resource.itemList.filter(r => r.checked).map(r => r.name)));
+    return this.snapshotResources.flatMap(
+        resource => resource.itemList.filter(r => r.checked).map(r => r.name));
   }
 
 }
