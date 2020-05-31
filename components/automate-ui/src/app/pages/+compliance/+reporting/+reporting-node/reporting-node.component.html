@@ -30,7 +30,7 @@
             </div>
             <chef-expander opened class="metadata-body" #metadatabody>
               <div class="metadata-group">
-                <h4 class="metadata-group-heading">Report Information</h4>
+                <h2 class="metadata-group-heading">Report Information</h2>
                 <table>
                   <tr>
                     <th>Last Scan</th>
@@ -39,7 +39,7 @@
                 </table>
               </div>
               <div class="metadata-group">
-                <h4 class="metadata-group-heading">Node Information</h4>
+                <h2 class="metadata-group-heading">Node Information</h2>
                 <table>
                   <tr *ngIf="activeReport.fqdn?.length">
                     <th>FQDN</th>
@@ -64,7 +64,7 @@
                 </table>
               </div>
               <div class="metadata-group">
-                <h4 class="metadata-group-heading">Metadata</h4>
+                <h2 class="metadata-group-heading">Metadata</h2>
                 <table>
                   <tr *ngIf="activeReport.chef_organization?.length">
                     <th>Chef Organization</th>
@@ -242,7 +242,7 @@
         <div class="side-panel-header">
           <chef-icon class="header-icon">restore</chef-icon>
           <div class="header-text">
-            <h4><strong>Scan history for node:</strong></h4>
+            <h2 class="display4"><strong>Scan history for node:</strong></h2>
             <p>{{ activeReport?.node_name }}</p>
           </div>
           <chef-button secondary (click)="onHistoryCloseClick($event)">
