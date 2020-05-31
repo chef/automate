@@ -44,7 +44,6 @@
         <div id="drop-list" class="dropdown-content">
           <chef-checkbox
             *ngFor="let option of filteredOptions"
-            role="menuitem"
             [attr.title]="option.label"
             [checked]="option.checked"
             (change)="handleOptionChange($event, option.label)"
