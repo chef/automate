@@ -52,7 +52,7 @@ func isTimeoutSane(timeout time.Duration, max time.Duration) error {
 }
 
 // Scan a target node with all specified profiles
-func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[string]string) ([]byte, []byte, *Error) {
+func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[string]string, inputs map[string]string) ([]byte, []byte, *Error) {
 	if err := isTimeoutSane(timeout, 12*time.Hour); err != nil {
 		return nil, nil, NewInspecError(INVALID_PARAM, err.Error())
 	}
@@ -67,6 +67,11 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 	env["HOME"] = os.Getenv("HOME")
 
 	args := append([]string{binName, "exec"}, paths...)
+
+	for k, v := range inputs {
+		args = append(args, fmt.Sprintf("--input %s=%s", k, v))
+	}
+
 	stdOut, stdErr, err := run(args, target, timeout, env)
 
 	stdOutErr := ""

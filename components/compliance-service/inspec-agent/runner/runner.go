@@ -19,6 +19,7 @@ import (
 
 	"sort"
 
+	"github.com/chef/automate/api/external/secrets"
 	ingest_events_compliance_api "github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	ingest_inspec "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	"github.com/chef/automate/api/interservice/compliance/ingest/ingest"
@@ -672,15 +673,16 @@ func secretInfoExists(tc *inspec.TargetConfig) bool {
 	return true
 }
 
-func cloudEnvVars(tc *inspec.TargetConfig) (map[string]string, error) {
+func cloudEnvVars(tc *inspec.TargetConfig) (map[string]string, map[string]string, error) {
 	envsMap := map[string]string{
 		"CHEF_LICENSE": "accept-no-persist",
 	}
+	inputs := make(map[string]string)
 	switch tc.Backend {
 	case "aws":
 		if tc.AwsUser == "" || tc.AwsPassword == "" {
 			logrus.Debugf("no aws creds found in env vars, no aws creds found for node; attempting to use aws credential chain via inspec/train")
-			return envsMap, nil
+			return envsMap, inputs, nil
 		}
 		envsMap["AWS_ACCESS_KEY_ID"] = tc.AwsUser
 		envsMap["AWS_SECRET_ACCESS_KEY"] = tc.AwsPassword
@@ -690,45 +692,55 @@ func cloudEnvVars(tc *inspec.TargetConfig) (map[string]string, error) {
 		if tc.AwsSessionToken != "" {
 			envsMap["AWS_SESSION_TOKEN"] = tc.AwsSessionToken
 		}
-		return envsMap, nil
+		return envsMap, inputs, nil
 	case "azure":
 		if tc.AzureClientID == "" || tc.AzureClientSecret == "" || tc.AzureTenantID == "" {
 			logrus.Debugf("no azure creds found in environment, no azure creds found for node; attempting to use azure credential chain via inspec/train")
-			return envsMap, nil
+			return envsMap, inputs, nil
 		}
 		envsMap["AZURE_CLIENT_ID"] = tc.AzureClientID
 		envsMap["AZURE_CLIENT_SECRET"] = tc.AzureClientSecret
 		envsMap["AZURE_TENANT_ID"] = tc.AzureTenantID
-		return envsMap, nil
+		return envsMap, inputs, nil
 	case "gcp":
 		if tc.GcpCredsJson != "" {
+			// GCP scans require an input of the gcp_project_id
+			gcpCredStruct := secrets.GcpCredential{}
+			err := json.Unmarshal([]byte(tc.GcpCredsJson), &gcpCredStruct)
+			if err != nil {
+				return envsMap, inputs, errors.Wrapf(err, "unable to find gcp_project_id")
+			}
+			inputs["gcp_project_id"] = gcpCredStruct.ProjectID
+
 			// Specify "" for the temp dir as ioutil will pick TMPDIR or OS default
 			tmpFile, err := ioutil.TempFile("", ".gcp-project-cred.json")
 			if err != nil {
-				return envsMap, err
+				return envsMap, inputs, err
 			}
 
 			err = ioutil.WriteFile(tmpFile.Name(), []byte(tc.GcpCredsJson), 0400)
 			if err != nil {
-				return envsMap, err
+				return envsMap, inputs, err
 			}
 
 			// Not consumed by InSpec via the json config stdin but via file on disk
 			tc.GcpCredsJson = ""
 			envsMap["GOOGLE_APPLICATION_CREDENTIALS"] = tmpFile.Name()
-			return envsMap, nil
+
+			return envsMap, inputs, nil
 		} else {
-			return envsMap, fmt.Errorf("cloudEnvVars: GcpCredsJson can't be empty, job will fail execution")
+			return envsMap, inputs, fmt.Errorf("cloudEnvVars: GcpCredsJson can't be empty, job will fail execution")
 		}
 	}
 
-	return envsMap, nil
+	return envsMap, inputs, nil
 }
 
 // doDetect executes a detect job and returns error type for retrying purposes
 func doDetect(job *types.InspecJob) (osInfo *inspec.OSInfo, err *inspec.Error) {
 	timeout := time.Duration(job.Timeout) * time.Second
-	env, genericErr := cloudEnvVars(&job.TargetConfig)
+	// inputs are not required here, as detect has no need for them
+	env, _, genericErr := cloudEnvVars(&job.TargetConfig)
 	defer func() {
 		cleanupCreds(env)
 	}()
@@ -753,7 +765,7 @@ func doDetect(job *types.InspecJob) (osInfo *inspec.OSInfo, err *inspec.Error) {
 
 func doExec(job *types.InspecJob) (jsonBytes []byte, err *inspec.Error) {
 	timeout := time.Duration(job.Timeout) * time.Second
-	env, genericErr := cloudEnvVars(&job.TargetConfig)
+	env, inputs, genericErr := cloudEnvVars(&job.TargetConfig)
 	defer func() {
 		cleanupCreds(env)
 	}()
@@ -762,7 +774,7 @@ func doExec(job *types.InspecJob) (jsonBytes []byte, err *inspec.Error) {
 	}
 
 	for i, tc := range potentialTargetConfigs(job) {
-		jsonBytes, _, err = inspec.Scan(job.InternalProfiles, &tc, timeout, env)
+		jsonBytes, _, err = inspec.Scan(job.InternalProfiles, &tc, timeout, env, inputs)
 		if err == nil {
 			break
 		}
