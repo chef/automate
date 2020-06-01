@@ -198,7 +198,7 @@ func TestCSVExportWithEndTime(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 20, len(records))
 
-	assert.Equal(t, []string{"centos-beta", "2018-03-04T09:18:41Z", "centos", "5.11", "DevSec Prod beta", "10.3.4.5", "web-cent.example.com", "nginx-baseline", "DevSec Nginx Baseline", "2.1.0", "Test-suite for best-practice nginx hardening", "nginx-01", "Running worker process as non-privileged user", "1.00", "passed", "0.000", "Worked like a charm baby!", "", ""}, records[1])
+	assert.Equal(t, []string{"centos-beta", "2018-03-04T09:18:41Z", "centos", "5.11", "DevSec Prod beta", "10.3.4.5", "web-cent.example.com", "nginx-baseline", "DevSec Nginx Baseline", "2.1.0", "Test-suite for best-practice nginx hardening", "nginx-01", "Running worker process as non-privileged user", "1.00", "false", "passed", "0.000", "Worked like a charm baby!", "", "", "", ""}, records[1])
 }
 
 func TestCSVExportWithEndTimeAndMissingFields(t *testing.T) {
@@ -243,7 +243,7 @@ func TestCSVExportWithEndTimeAndMissingFields(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 15, len(records))
 
-	assert.Equal(t, []string{"windows(1)-zeta-apache(s)-skipped", "2018-03-04T10:18:41Z", "windows", "7", "DevSec Prod Zeta", "", "", "apache-baseline", "DevSec Apache Baseline", "2.0.1", "Test-suite for best-practice apache hardening", "apache-01", "Apache should be running", "1.00", "skipped", "0.000", "Operating System Detection", "", "Skipped control due to only_if condition."}, records[1])
+	assert.Equal(t, []string{"windows(1)-zeta-apache(s)-skipped", "2018-03-04T10:18:41Z", "windows", "7", "DevSec Prod Zeta", "", "", "apache-baseline", "DevSec Apache Baseline", "2.0.1", "Test-suite for best-practice apache hardening", "apache-01", "Apache should be running", "1.00", "false", "skipped", "0.000", "Operating System Detection", "", "Skipped control due to only_if condition.", "", ""}, records[1])
 }
 
 func TestJSONExportWithControlFilter(t *testing.T) {
