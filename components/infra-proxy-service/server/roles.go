@@ -203,6 +203,66 @@ func (s *Server) DeleteRole(ctx context.Context, req *request.Role) (*response.R
 
 }
 
+// UpdateRole updates the role
+func (s *Server) UpdateRole(ctx context.Context, req *request.UpdateRole) (*response.Role, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "must supply role name")
+	}
+
+	runList := req.RunList
+	if len(runList) == 0 {
+		runList = []string{}
+	}
+
+	var defAtt interface{}
+	var ovrAtt interface{}
+
+	defIn := req.DefaultAttributes
+	if defIn == "" {
+		defIn = "{}"
+	}
+
+	overIn := req.OverrideAttributes
+	if overIn == "" {
+		overIn = "{}"
+	}
+	defaultAttributes := json.RawMessage(defIn)
+	overrideAttributes := json.RawMessage(overIn)
+
+	err = json.Unmarshal(defaultAttributes, &defAtt)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = json.Unmarshal(overrideAttributes, &ovrAtt)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	_, err = c.client.Roles.Put(
+		&chef.Role{
+			Name:               req.Name,
+			Description:        req.Description,
+			RunList:            runList,
+			DefaultAttributes:  defAtt,
+			OverrideAttributes: ovrAtt,
+			EnvRunList:         chef.EnvRunList{},
+		})
+
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.Role{
+		Name: req.Name,
+	}, nil
+}
+
 // fromAPIToListRoles a response.Roles from a struct of RoleList
 func fromAPIToListRoles(result RoleListResult) []*response.RoleListItem {
 	cl := make([]*response.RoleListItem, result.Total)
