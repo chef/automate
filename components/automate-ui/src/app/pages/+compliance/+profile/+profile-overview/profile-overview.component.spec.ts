@@ -122,7 +122,7 @@ describe('ProfilesOverviewComponent', () => {
       return input.attributes['placeholder'] === 'Search profiles...';
     })).toEqual(true);
 
-    // tabs are visble.
+    // tabs are visible.
     const selectors: DebugElement[] = fixture.debugElement.queryAll(By.css('.profiles-tabs'));
     expect(selectors.length > 0).toEqual(true);
 
