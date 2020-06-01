@@ -142,21 +142,16 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 			cfgErr.AddMissingKey("global.v1.backups.gcs.bucket.name")
 		}
 
-		// The user might be relying on IAM for GCP credentials. Here we'll
-		// make sure that if credentials are provided
-		json := bu.GetGcs().GetCredentials().GetJson().GetValue()
-		path := bu.GetGcs().GetCredentials().GetPath().GetValue()
-		if path == "" && json == "" {
-			cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.json")
+		// Make sure the user has the path to the gcs creds set and it is accessible
+		gcscredpath := bu.GetGcs().GetCredentials().GetPath().GetValue()
+		if gcscredpath == "" {
 			cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.path")
-		} else if path != "" && json != "" {
-			cfgErr.AddInvalidValue("global.v1.backups.gcs.credentials", "Must use either json or path not both")
-		} else if path != "" {
-			ok, err := fileutils.Readable("hab", path)
+		} else {
+			ok, err := fileutils.Readable("hab", gcscredpath)
 			if err == nil && !ok {
 				cfgErr.AddInvalidValue(
 					"global.v1.backups.gcs.credentials.path",
-					fmt.Sprintf("the 'hab' user must have read permissions to path: %s", path),
+					fmt.Sprintf("the 'hab' user must have read permissions to path: %s", gcscredpath),
 				)
 			}
 		}

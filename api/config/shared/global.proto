@@ -205,10 +205,8 @@ message Backups {
 		Bucket bucket = 3;
 
 		message GCPCredentials {
-			// Actual JSON
-			google.protobuf.StringValue json = 1;
 			// Path to json file
-			google.protobuf.StringValue path = 2;
+			google.protobuf.StringValue path = 1;
 		}
 
 		message Elasticsearch {
