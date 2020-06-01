@@ -201,17 +201,6 @@
                   </chef-toggle>
                   <ng-container [ngSwitch]="openControlPane(control)">
                     <div *ngSwitchCase="'results'">
-                      <ng-container *ngIf="control.status !== 'waived'">
-                        <div class="result-item" *ngFor="let result of control.results">
-                          <div class="result-item-header">
-                            <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
-                            <p>{{ result.code_desc }}</p>
-                          </div>
-                          <div class="result-item-body" *ngIf="result.message.length || result.skip_message.length">
-                            <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
-                          </div>
-                        </div>
-                      </ng-container>
                       <div *ngIf="control.status === 'waived'">
                         <p>This control was waived.</p>
                         <dl class="waiver-details">
@@ -220,6 +209,16 @@
                           <dt>Reason:</dt>
                           <dd>{{ control.waiver_data.justification }}</dd>
                         </dl>
+                      </div>
+                      <!-- show results of control even if waived -->
+                      <div class="result-item" *ngFor="let result of control.results">
+                        <div class="result-item-header">
+                          <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
+                          <p>{{ result.code_desc }}</p>
+                        </div>
+                        <div class="result-item-body" *ngIf="result.message.length || result.skip_message.length">
+                          <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
+                        </div>
                       </div>
                     </div>
                     <chef-snippet
