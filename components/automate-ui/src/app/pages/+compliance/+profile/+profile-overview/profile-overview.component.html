@@ -21,6 +21,7 @@
           <input
             chefInput
             type="text"
+            aria-label="Search profiles"
             placeholder="Search profiles..."
             (input)="onSearchInput($event)"/>
         </div>
@@ -81,7 +82,8 @@
             </chef-table>
             <div class="actions">
               <label class="custom-file-input">
-                <input (change)="onFilesSelected($event)" type="file" accept=".gz,.zip,.tar" multiple>
+                Select Files
+                <input class="custom-file-input" (change)="onFilesSelected($event)" type="file" accept=".gz,.zip,.tar" multiple>
               </label>
               <chef-button tertiary (click)="hideUploadModal()">Cancel</chef-button>
             </div>

@@ -34,7 +34,7 @@
               <chef-click-outside (clickOutside)="hideShareDropdown()" omit="dropdown-toggle">
                 <p>Copy this private URL to share:</p>
                 <div class="copy-input">
-                  <input type="text" [value]="shareUrl" readonly />
+                  <input type="text" aria-label="URL" [value]="shareUrl" readonly />
                   <chef-clipboard [value]="shareUrl"></chef-clipboard>
                 </div>
               </chef-click-outside>

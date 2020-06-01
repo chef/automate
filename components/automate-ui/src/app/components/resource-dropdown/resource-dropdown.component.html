@@ -1,4 +1,4 @@
-<label>{{ objectNounPlural | capitalize }}</label>
+<label for="{{ objectNounPlural }}">{{ objectNounPlural | capitalize }}</label>
 <div class="dropdown-wrap">
   <button class="dropdown-button" attr.aria-label="Select {{ objectNounPlural }}"
     (click)="toggleDropdown()"
@@ -14,7 +14,7 @@
     <chef-dropdown [attr.visible]="dropdownState === 'open'">
 
       <div id="filter-container">
-        <input chefInput type="text" [(ngModel)]="filterValue" placeholder="Filter {{ objectNounPlural }}..."
+        <input id="{{ objectNounPlural }}" type="text" [(ngModel)]="filterValue" placeholder="Filter {{ objectNounPlural }}..."
           (keyup)="handleFilterKeyUp()" />
       </div>
 

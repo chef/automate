@@ -62,8 +62,8 @@
       <section class="page-body" *ngIf="tabValue === 'details'">
         <form [formGroup]="updateForm">
           <chef-form-field>
-            <label>Name <span aria-hidden="true">*</span></label>
-            <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
+            <label for="name">Name <span aria-hidden="true">*</span></label>
+            <input id="name" chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
               data-cy="team-details-name-input">
             <chef-error
               *ngIf="(updateForm.get('name').hasError('required') || updateForm.get('name').hasError('pattern')) && updateForm.get('name').dirty">
