@@ -52,19 +52,39 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
           this.environmentsTab = false;
           this.dataBagsTab = false;
           this.rolesTab = true;
+          this.policyFilesTab = false;
         }
 
         if ( params.path.includes('environments') ) {
           this.cookbooksTab = false;
           this.rolesTab = false;
+          this.dataBagsTab = false;
           this.environmentsTab = true;
+          this.policyFilesTab = false;
         }
 
         if ( params.path.includes('policyFiles') ) {
           this.cookbooksTab = false;
           this.rolesTab = false;
+          this.dataBagsTab = false;
           this.environmentsTab = false;
           this.policyFilesTab = true;
+        }
+
+        if ( params.path.includes('data_bags') ) {
+          this.cookbooksTab = false;
+          this.rolesTab = false;
+          this.dataBagsTab = true;
+          this.environmentsTab = false;
+          this.policyFilesTab = false;
+        }
+
+        if ( params.path.includes('cookbooks') ) {
+          this.cookbooksTab = true;
+          this.rolesTab = false;
+          this.dataBagsTab = false;
+          this.environmentsTab = false;
+          this.policyFilesTab = false;
         }
       });
     }

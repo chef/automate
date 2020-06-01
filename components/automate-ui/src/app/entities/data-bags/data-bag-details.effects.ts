@@ -33,7 +33,7 @@ export class DataBagDetailsEffects {
           observableOf(new GetDataBagDetailsFailure(error))))));
 
   @Effect()
-  getDataBagsFailure$ = this.actions$.pipe(
+  getDataBagDetailsFailure$ = this.actions$.pipe(
       ofType(DataBagDetailsActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetDataBagDetailsFailure) => {
         const msg = payload.error.error;

@@ -14,13 +14,13 @@ export const dataBagDetailsEntityAdapter: EntityAdapter<DataBags> = createEntity
   selectId: (dataBags: DataBags) => dataBags.name
 });
 
-export const DataBagsEntityInitialState: DataBagDetailsEntityState =
+export const DataBagDetailsEntityInitialState: DataBagDetailsEntityState =
 dataBagDetailsEntityAdapter.getInitialState(<DataBagDetailsEntityState>{
     getAllStatus: EntityStatus.notLoaded
   });
 
 export function dataBagDetailsEntityReducer(
-  state: DataBagDetailsEntityState = DataBagsEntityInitialState,
+  state: DataBagDetailsEntityState = DataBagDetailsEntityInitialState,
   action: DataBagDetailsActions): DataBagDetailsEntityState {
 
   switch (action.type) {

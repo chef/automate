@@ -9,7 +9,54 @@
         {{ dataBagsName }}
       </chef-breadcrumbs>
       <chef-page-header>
+        <table>
+          <thead>
+            <tr class="detail-row">
+              <th class="id-column">Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="detail-row">
+              <td class="id-column">{{ dataBagsName }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <chef-tab-selector [value]="tabValue">
+          <chef-option value='details' data-cy="details-tab">Details</chef-option>
+        </chef-tab-selector>
       </chef-page-header>
+      <section class="page-body" *ngIf="tabValue === 'details'">
+        <div class="details-row">
+          <div class="item-column">
+            <ul>
+              <li *ngFor="let item of dataBagDetails" 
+              [class.selected]="item.name === selectedItem"
+              (click)="handleItemSelected(item.name)">
+                {{item.name}}
+                <chef-icon class="arrow">play_arrow</chef-icon>
+              </li>
+            </ul>
+          </div>
+          <div class="item-details-column" *ngIf="selectedItemDetails.id">
+            <div class="expand-collapse">
+              <span class="action" (click)="tree.expand()">
+                <chef-icon>add_circle</chef-icon>
+                <span>Expand All</span>
+              </span>
+              <span class="separator">|</span>
+              <span class="action" (click)="tree.collapse()">
+                <chef-icon>remove_circle</chef-icon>
+                <span>Collapse All</span>
+              </span>
+            </div>
+            <app-json-tree-table class="json-tree-container" #tree [json]="selectedItemDetails"></app-json-tree-table>
+          </div>
+
+          <div class="item-details-column" *ngIf="!selectedItemDetails.id">
+            <div class="empty-column-msg">Please Select The Item From The List to See It's Details</div>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 </div>

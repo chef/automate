@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, takeUntil, pluck } from 'rxjs/operators';
@@ -9,10 +9,13 @@ import { routeParams } from 'app/route.selectors';
 import { identity, isNil } from 'lodash/fp';
 
 import { GetDataBagDetails } from 'app/entities/data-bags/data-bag-details.action';
-import { DataBags } from 'app/entities/data-bags/data-bags.model';
+import { DataBags, DataBagsItemDetails, ItemAttributes } from 'app/entities/data-bags/data-bags.model';
 import { allDataBagDetails, getAllStatus } from 'app/entities/data-bags/data-bag-details.selector';
+import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.action';
+import { allDataBagItemDetails, getStatus } from 'app/entities/data-bags/data-bag-item-details.selector';
+import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
 
-export type DataBagsDetailsTab = 'content';
+export type DataBagsDetailsTab = 'details';
 
 @Component({
   selector: 'app-data-bags-details',
@@ -22,18 +25,30 @@ export type DataBagsDetailsTab = 'content';
 export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public dataBagDetails: DataBags[];
+  public dataBagItemDetails: DataBagsItemDetails[];
   public serverId: string;
   public orgId: string;
   public dataBagsName: string;
-  public tabValue: DataBagsDetailsTab = 'content';
+  public tabValue: DataBagsDetailsTab = 'details';
   public dataBagsDetailsLoading = true;
+  public selectedItem: string;
+
+  public selectedItemDetails = new ItemAttributes({
+    id: '',
+    data: '',
+    name: ''
+  });
+
+  @ViewChild(JsonTreeTable, { static: true })
+  tree: JsonTreeTable;
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit() {
-
+    console.log(this.selectedItemDetails);
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
     combineLatest([
@@ -58,7 +73,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       this.store.select(allDataBagDetails)
     ]).pipe(
       filter(([getDataBagDetailsSt, _dataBagDetailsState]) =>
-      getDataBagDetailsSt === EntityStatus.loadingSuccess),
+        getDataBagDetailsSt === EntityStatus.loadingSuccess),
       filter(([_getDataBagDetailsSt, dataBagDetailsState]) =>
         !isNil(dataBagDetailsState)),
       takeUntil(this.isDestroyed))
@@ -66,6 +81,31 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         this.dataBagDetails = dataBagDetailsState;
         this.dataBagsDetailsLoading = false;
       });
+
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(allDataBagItemDetails)
+    ]).pipe(
+      filter(([getDataBagItemDetailsSt, _dataBagItemDetailsState]) =>
+        getDataBagItemDetailsSt === EntityStatus.loadingSuccess),
+      filter(([_getDataBagItemDetailsSt, dataBagItemDetailsState]) =>
+        !isNil(dataBagItemDetailsState)),
+      takeUntil(this.isDestroyed))
+      .subscribe(([_getDataBagItemDetailsSt, dataBagItemDetailsState]) => {
+        if (dataBagItemDetailsState.length) {
+          this.selectedItemDetails = new ItemAttributes(dataBagItemDetailsState[0]);
+        }
+      });
+  }
+
+  public handleItemSelected(item: string): void {
+    this.selectedItem = item;
+    this.store.dispatch(new GetDataBagItemDetails({
+      server_id: this.serverId,
+      org_id: this.orgId,
+      name: this.dataBagsName,
+      item_name: item
+    }));
   }
 
   ngOnDestroy(): void {
