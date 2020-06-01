@@ -60,6 +60,7 @@ service InfraProxy {
 
     rpc GetEnvironments (chef.automate.domain.infra_proxy.request.Environments) returns (chef.automate.domain.infra_proxy.response.Environments) {};
     rpc GetEnvironment (chef.automate.domain.infra_proxy.request.Environment) returns (chef.automate.domain.infra_proxy.response.Environment) {};
+    rpc CreateEnvironment (chef.automate.domain.infra_proxy.request.CreateEnvironment) returns (chef.automate.domain.infra_proxy.response.Environment) {};
     rpc DeleteEnvironment (chef.automate.domain.infra_proxy.request.Environment) returns (chef.automate.domain.infra_proxy.response.Environment) {};
 
     rpc GetAffectedNodes  (chef.automate.domain.infra_proxy.request.AffectedNodes) returns (chef.automate.domain.infra_proxy.response.AffectedNodes) {};

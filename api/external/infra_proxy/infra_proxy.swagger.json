@@ -819,6 +819,44 @@
         "tags": [
           "InfraProxy"
         ]
+      },
+      "post": {
+        "operationId": "CreateEnvironment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environment"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.CreateEnvironment"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
@@ -1170,6 +1208,46 @@
         "name": {
           "type": "string",
           "description": "Data bag name."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.CreateEnvironment": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Environment name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Environment description."
+        },
+        "json_class": {
+          "type": "string",
+          "description": "Class name."
+        },
+        "cookbook_versions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Environment versined cookbooks constraints."
+        },
+        "default_attributes": {
+          "type": "string",
+          "description": "Stringified json of the default attributes."
+        },
+        "override_attributes": {
+          "type": "string",
+          "description": "Stringified json of the override attributes."
         }
       }
     },
@@ -1748,22 +1826,22 @@
         },
         "chef_type": {
           "type": "string",
-          "description": "Object type."
+          "description": "Chef object type."
         },
         "description": {
           "type": "string",
-          "description": "Node description."
+          "description": "Environment description."
         },
         "json_class": {
           "type": "string",
-          "description": "Class name."
+          "description": "Environment JSON class."
         },
         "cookbook_versions": {
-          "type": "array",
-          "items": {
+          "type": "object",
+          "additionalProperties": {
             "type": "string"
           },
-          "description": "Versioned cookbooks list."
+          "description": "Environment versined cookbooks constraints."
         },
         "default_attributes": {
           "type": "string",

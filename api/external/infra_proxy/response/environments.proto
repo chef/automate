@@ -16,16 +16,16 @@ message EnvironmentListItem {
 message Environment {
     // Environment name.
     string name = 1;
-    // Object type.
+    // Chef object type.
     string chef_type = 2;
-    // Node description.
+    // Environment description.
     string description = 3;
-    // Class name.
-    string json_class = 5;
-    // Versioned cookbooks list.
-    repeated string cookbook_versions = 6;
+    // Environment JSON class.
+    string json_class = 4;
+    // Environment versined cookbooks constraints.
+    map<string, string> cookbook_versions = 5;
     // Stringified json of the default attributes.
-    string default_attributes = 7;
+    string default_attributes = 6;
     // Stringified json of the override attributes.
-    string override_attributes = 8;
+    string override_attributes = 7;
 }
