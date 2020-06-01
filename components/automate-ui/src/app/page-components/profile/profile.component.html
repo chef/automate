@@ -22,6 +22,7 @@
           (keydown.arrowup)="handleArrowUp($event)"
           (keydown.arrowdown)="handleArrowDown($event)"
           class="profile"
+          role="menuitem"
           #focusElement>Profile</a>
       </li>
       <li class="dropdown-list-item">
@@ -40,6 +41,7 @@
               (keydown.arrowdown)="handleArrowDown($event)"
               data-cy="welcome-modal-button"
               class="welcome-modal-button"
+              role="menuitem"
               #focusElement>About</button>
           </li>
           <li>
@@ -47,6 +49,7 @@
               (click)="closeDropdown()"
               (keydown.arrowup)="handleArrowUp($event)"
               (keydown.arrowdown)="handleArrowDown($event)"
+              role="menuitem"
               #focusElement>
               License <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
             </a>
@@ -56,6 +59,7 @@
               (click)="closeDropdown()"
               (keydown.arrowup)="handleArrowUp($event)"
               (keydown.arrowdown)="handleArrowDown($event)"
+              role="menuitem"
               #focusElement>
               Release Notes <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
             </a>
@@ -68,6 +72,7 @@
           (keydown.tab)="closeDropdown()"
           (keydown.arrowup)="handleArrowUp($event)"
           (keydown.arrowdown)="handleArrowDown($event)"
+          role="menuitem"
           #focusElement>
           Sign Out
         </button>
