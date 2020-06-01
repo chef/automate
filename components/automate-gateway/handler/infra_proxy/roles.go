@@ -87,6 +87,27 @@ func (a *InfraProxyServer) DeleteRole(ctx context.Context, r *gwreq.Role) (*gwre
 	}, nil
 }
 
+// UpdateRole updates an infra role
+func (a *InfraProxyServer) UpdateRole(ctx context.Context, r *gwreq.UpdateRole) (*gwres.Role, error) {
+	req := &infra_req.UpdateRole{
+		OrgId:              r.OrgId,
+		ServerId:           r.ServerId,
+		Name:               r.Name,
+		Description:        r.Description,
+		DefaultAttributes:  r.DefaultAttributes,
+		OverrideAttributes: r.OverrideAttributes,
+		RunList:            r.RunList,
+	}
+	res, err := a.client.UpdateRole(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Role{
+		Name: res.GetName(),
+	}, nil
+}
+
 func fromUpstreamRoles(roles []*infra_res.RoleListItem) []*gwres.RoleListItem {
 	ts := make([]*gwres.RoleListItem, len(roles))
 
