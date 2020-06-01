@@ -38,7 +38,7 @@ chef-checkbox {
   }
 
   &[aria-checked='false'] .check-wrap {
-    border-color: var(--chef-primary-dark);
+    border-color: var(--chef-dark-grey);
     background-color: var(--chef-white);
   }
 

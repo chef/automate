@@ -45,7 +45,7 @@
     }
 
     &.missing {
-      background: $chef-primary-dark;
+      background: $chef-dark-grey;
     }
   }
 }
@@ -61,6 +61,7 @@ chef-icon {
   width: 100%;
   font-size: .875em;
   font-weight: normal;
+  color: inherit;
 }
 
 .count {
