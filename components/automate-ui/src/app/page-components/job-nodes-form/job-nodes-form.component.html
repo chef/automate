@@ -29,12 +29,12 @@
             class="filter-regions"
             id="manager-{{mIndex}}-regions"
             formGroupName="regionsGroup">
-            <label>
+            <label for="regionsSelect">
               <chef-icon>room</chef-icon>
               Specify regions (optional)
             </label>
             <div class="field" *ngIf="managerControl.get('regionsGroup.values').length">
-              <select formControlName="include">
+              <select id="regionsSelect" formControlName="include">
                 <option [ngValue]="true">Include</option>
                 <option [ngValue]="false">Exclude</option>
               </select>
@@ -72,12 +72,12 @@
             class="filter-names"
             id="manager-{{mIndex}}-names"
             formGroupName="namesGroup">
-            <label>
+            <label for="namesSelect">
               <chef-icon>room</chef-icon>
               Specify names (optional)
             </label>
             <div class="field" *ngIf="managerControl.get('namesGroup.values').length">
-              <select formControlName="include">
+              <select id="namesSelect" formControlName="include">
                 <option [ngValue]="true">Include</option>
                 <option [ngValue]="false">Exclude</option>
               </select>
@@ -115,7 +115,7 @@
             class="filter-tags"
             id="manager-{{mIndex}}-tags"
             formArrayName="tagsArray">
-            <label>
+            <label for="tagsSelect">
               <chef-icon>label</chef-icon>
               Specify tags (optional)
             </label>
@@ -124,7 +124,7 @@
               [formGroup]="tag"
               id="manager-{{mIndex}}-tag-{{tIndex}}"
               class="field">
-              <select formControlName="include">
+              <select id="tagsSelect" formControlName="include">
                 <option [ngValue]="true">Include</option>
                 <option [ngValue]="false">Exclude</option>
               </select>
