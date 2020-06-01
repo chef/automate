@@ -4,16 +4,17 @@ import {
 import { FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
-import {
-  Project, ProjectConstants, ProjectCheckedMap
-} from 'app/entities/projects/project.model';
-import { PolicyChecked } from 'app/entities/policies/policy.model';
+import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { GetPolicies } from 'app/entities/policies/policy.actions';
 import { allPolicies } from 'app/entities/policies/policy.selectors';
+import { ResourceCheckedSection } from 'app/components/resource-dropdown/resource-dropdown.component';
+
+const INGEST_POLICY_ID = 'ingest-access';
 
 @Component({
   selector: 'app-create-object-modal',
@@ -31,9 +32,8 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter<Project[]>();
 
-  public projects: ProjectCheckedMap = {};
-  public checkedProjectIDs: string[] = []; // resets project dropdown btwn modal openings
-  public policies: PolicyChecked[] = [];
+  public checkedProjectIDs: string[] = []; // resets project dropdown between modal openings
+  public policies: ResourceCheckedSection[] = [];
   public modifyID = false; // Whether the edit ID form is open or not.
   public conflictError = false;
   public addPolicies = true;
@@ -55,9 +55,23 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     });
 
     this.store.select(allPolicies)
-      .pipe(takeUntil(this.isDestroyed))
-      // OK to leave `checked` undefined--will be initialized upon `visible`
-      .subscribe(policies => this.policies = policies as PolicyChecked[]);
+      .pipe(filter(list => list.length > 0),
+        takeUntil(this.isDestroyed))
+      .subscribe(policies => {
+        // separate into two sections, with ingest on top of chef-managed section
+        const pols = ChefSorters.naturalSort(
+          policies.filter(p => p.id !== INGEST_POLICY_ID), 'name');
+        const customPolicies = pols.filter(p => p.type !== 'CHEF_MANAGED');
+        const chefManagedPolicies = pols.filter(p => p.type === 'CHEF_MANAGED');
+        const ingestPolicy = policies.find(p => p.id === INGEST_POLICY_ID);
+        if (ingestPolicy) {
+          chefManagedPolicies.unshift(ingestPolicy);
+        }
+        this.policies = [
+          { title: 'Chef-managed', itemList: chefManagedPolicies},
+          { title: 'Custom', itemList: customPolicies}
+        ];
+      });
   }
 
   ngOnDestroy() {
@@ -68,12 +82,15 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.visible && (changes.visible.currentValue as boolean)) {
 
-      this.store.dispatch(new GetPolicies()); // refresh in case of updates
+      if (this.objectNoun === 'token') {
+        this.store.dispatch(new GetPolicies()); // refresh in case of updates
+      }
 
-      Object.values(this.projects).forEach(p => p.checked = false); // reset projects
+      this.checkedProjectIDs = []; // reset projects
       this.projectsUpdatedEvent.emit();
 
-      Object.values(this.policies).forEach(p => p.checked = false); // reset policies
+      this.policies.forEach(policy =>
+        policy.itemList.forEach(p => p.checked = false)); // reset policies
       this.policiesUpdatedEvent.emit();
 
       if (this.createProjectModal) {
@@ -119,13 +136,11 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
 
   closeEvent(): void {
     this.modifyID = false;
-    this.checkedProjectIDs = [];
     this.close.emit();
   }
 
   createObject(): void {
     this.createClicked.emit();
-    this.checkedProjectIDs = [];
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {

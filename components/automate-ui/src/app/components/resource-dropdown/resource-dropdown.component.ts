@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { cloneDeep } from 'lodash/fp';
 
-import { ChefSorters } from 'app/helpers/auth/sorter';
 
 export interface ResourceChecked {
   id: string;
@@ -8,8 +8,9 @@ export interface ResourceChecked {
   checked: boolean;
 }
 
-export interface ResourceCheckedMap {
-  [id: string]: ResourceChecked;
+export interface ResourceCheckedSection {
+  title?: string;
+  itemList: ResourceChecked[];
 }
 
 @Component({
@@ -21,7 +22,7 @@ export interface ResourceCheckedMap {
 export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   // The map of resources to operate on.
-  @Input() resources: ResourceChecked[] = [];
+  @Input() resources: ResourceCheckedSection[] = [];
 
   // (Optional) Used to re-synchronize summary label if the set of checked items has changed.
   // This input is needed only when re-displaying the resource dropdown
@@ -38,16 +39,26 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   // Emits checked set of resource IDs upon completion.
   @Output() onDropdownClosing = new EventEmitter<string[]>();
 
-  // filteredResources is merely a container to hold the resources
-  // that can be altered
-  public filteredResources: ResourceChecked[] = [];
+  // Provides a level of indirection so that we do not lose *unsaved* checked items:
+  // (a) while dropdown is open
+  // (b) when dropdown is closed then re-opened
+  private snapshotResources: ResourceCheckedSection[] = [];
+
+  // Transitory subset of snapshotResources for display based on user's entered filter.
+  public filteredResources: ResourceCheckedSection[] = [];
+  public allFilteredResourcesCount = 0;
+
   public dropdownState: 'closed' | 'opening' | 'open' = 'closed';
   public label = this.noneSelectedLabel;
   public filterValue = '';
+  public disabled = false;
 
   ngOnInit(): void {
-    if (this.resourcesUpdated) { // an optional setting
+    // an optional setting allowing caller to force reset to initial state
+    if (this.resourcesUpdated) {
       this.resourcesUpdated.subscribe(() => {
+        this.snapshotResources = cloneDeep(this.resources);
+        this.resetFilteredResources();
         this.updateLabel();
       });
     }
@@ -55,15 +66,14 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.resources) {
-      this.updateLabel();
-      if (changes.resources.firstChange) { // only update on initialization/first change
-        this.filteredResources = this.resourcesInOrder;
+      if (!changes.resources.previousValue || changes.resources.previousValue.length === 0) {
+        // only update if not previously initialized
+        this.snapshotResources = cloneDeep(this.resources);
+        this.resetFilteredResources();
+        this.updateLabel();
       }
+      this.disabled = this.isDisabled();
     }
-  }
-
-  get resourcesInOrder(): ResourceChecked[] {
-    return ChefSorters.naturalSort(this.resources, 'name');
   }
 
   toggleDropdown(): void {
@@ -72,7 +82,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     }
     if (this.dropdownState === 'closed') { // opening
       this.filterValue = '';
-      this.filteredResources = this.resourcesInOrder;
+      this.resetFilteredResources();
       // we cannot go directly to 'open' because handleClickOutside,
       // firing next on the same event that arrived here, would then immediately close it.
       this.dropdownState = 'opening';
@@ -100,14 +110,31 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   closeDropdown(): void {
     this.dropdownState = 'closed';
-    this.onDropdownClosing.emit(
-      this.resources.filter(r => r.checked).map(r => r.id));
+    const flattenedIDs = this.snapshotResources.flatMap(
+      resource => resource.itemList.filter(r => r.checked).map(r => r.id));
+    this.onDropdownClosing.emit(flattenedIDs);
   }
 
   handleFilterKeyUp(): void {
-    this.filteredResources = this.resourcesInOrder.filter(resource =>
-      resource.id.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1
-    );
+    for (let i = 0; i < this.filteredResources.length; i++) {
+      this.filteredResources[i].itemList =
+        this.snapshotResources[i].itemList.filter(r =>
+          r.name.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1);
+    }
+    this.allFilteredResourcesCount = this.calculateAllFilteredResourcesCount();
+  }
+
+  private resetFilteredResources(): void {
+
+    // Not deep and not shallow!
+    // Need the individual resources to point to the same objects
+    // so that when one is checked, it is checked in BOTH structures.
+    this.filteredResources = this.snapshotResources.flatMap(section =>
+        ({
+          title: section.title,
+          itemList: section.itemList
+        }));
+    this.allFilteredResourcesCount = this.calculateAllFilteredResourcesCount();
   }
 
   moveFocus(event: KeyboardEvent): void {
@@ -129,13 +156,33 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
   }
 
   private updateLabel(): void {
-    const checkedResources = this.resources.filter(p => p.checked);
+    const checkedResources = this.allCheckedResourceNames;
     this.label = checkedResources.length === 0 ? this.noneSelectedLabel
-      : checkedResources.length === 1 ? checkedResources[0].name
+      : checkedResources.length === 1 ? checkedResources[0]
         : `${checkedResources.length} ${this.objectNounPlural}`;
   }
 
-  get disabled(): boolean {
-    return this.resources.length === 0;
+  // Context is a *closed* dropdown, so use the raw resources, not the last snapshot
+  private isDisabled(): boolean {
+    return this.resources.length === 0 || this.allResourcesCount === 0;
   }
+
+  private calculateAllFilteredResourcesCount(): number {
+    return this.resourceCount(this.filteredResources);
+  }
+
+  private get allResourcesCount(): number {
+    return this.resourceCount(this.resources);
+  }
+
+  private resourceCount(resources: ResourceCheckedSection[]): number {
+    return resources.reduce(
+      (sum, group) => sum + group.itemList.length, 0);
+  }
+
+  private get allCheckedResourceNames(): string[] {
+    return this.snapshotResources.flatMap(
+        resource => resource.itemList.filter(r => r.checked).map(r => r.name));
+  }
+
 }

@@ -6,7 +6,8 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { ngrxReducers, runtimeChecks, NgrxStateAtom } from 'app/ngrx.reducers';
 import { using } from 'app/testing/spec-helpers';
-import { GetPolicies } from 'app/entities/policies/policy.actions';
+import { GetPolicies, GetPoliciesSuccessPayload, GetPoliciesSuccess } from 'app/entities/policies/policy.actions';
+import { Policy, IAMType } from 'app/entities/policies/policy.model';
 import { CreateObjectModalComponent } from './create-object-modal.component';
 
 describe('CreateObjectModalComponent', () => {
@@ -69,43 +70,48 @@ describe('CreateObjectModalComponent', () => {
     });
   });
 
-  it('upon opening, checked status of all projects is set to false', () => {
-    component.projects = {
-      'proj1':
-        { id: 'proj1', name: 'proj1', type: 'CHEF_MANAGED', status: 'NO_RULES', checked: true },
-      'proj3':
-        { id: 'proj3', name: 'proj3', type: 'CUSTOM', status: 'EDITS_PENDING', checked: false },
-      'proj2':
-        { id: 'proj2', name: 'proj2', type: 'CUSTOM', status: 'RULES_APPLIED', checked: true }
-    };
+  it('upon opening, checked status of all PROJECTS is set to false', () => {
+    component.checkedProjectIDs = ['proj1', 'proj2', 'proj3'];
 
     component.ngOnChanges(
       { visible: new SimpleChange(false, true, true) });
 
-    Object.values(component.projects).forEach(p => {
-      expect(p.checked).toBe(false);
-    });
+    // By resetting this list, that triggers ProjectsDropdownComponent to set all projects false
+    expect(component.checkedProjectIDs.length).toEqual(0);
   });
 
-  it('upon opening, checked status of all policies is set to false', () => {
+  it('upon opening, checked status of all POLICIES is set to false', () => {
     component.policies = [
-        { id: 'proj1', name: 'proj1', type: 'CHEF_MANAGED', members: [], projects: [],
-          checked: true },
-        { id: 'proj3', name: 'proj3', type: 'CUSTOM', members: [], projects: [], checked: false },
-        { id: 'proj2', name: 'proj2', type: 'CUSTOM', members: [], projects: [], checked: true }
+      {
+        title: 'section1',
+        itemList: [
+          { id: 'proj1', name: 'proj1', checked: true }
+        ]
+      },
+      {
+        title: 'section2',
+        itemList: [
+          { id: 'proj1', name: 'proj1', checked: true },
+          { id: 'proj3', name: 'proj3', checked: false },
+          { id: 'proj2', name: 'proj2', checked: true }
+        ]
+      }
     ];
 
     component.ngOnChanges(
       { visible: new SimpleChange(false, true, true) });
 
-    Object.values(component.policies).forEach(p => {
-      expect(p.checked).toBe(false);
-    });
+    const checkedStatusOfEveryPolicy =
+      component.policies.flatMap(p => p.itemList.map(i => i.checked));
+    expect(checkedStatusOfEveryPolicy)
+      .withContext('some polices were not reset to false')
+      .toEqual(Array(checkedStatusOfEveryPolicy.length).fill(false));
   });
 
   it('upon opening, dispatches a call to refresh policies', () => {
     spyOn(store, 'dispatch');
 
+    component.objectNoun = 'token';
     component.ngOnChanges(
       { visible: new SimpleChange(false, true, true) });
 
@@ -131,5 +137,88 @@ describe('CreateObjectModalComponent', () => {
     expect(component.createForm.controls.addPolicies.value).toEqual(true);
     expect(component.createForm.controls.addTeams.value).toEqual(true);
   });
+
+  describe('ordering', () => {
+
+    it('segregates chef-managed and custom policies into separate sections', () => {
+      const policies: GetPoliciesSuccessPayload = {
+        policies: [
+          genPolicy('zz', 'CHEF_MANAGED'),
+          genPolicy('cc', 'CUSTOM'),
+          genPolicy('aa', 'CHEF_MANAGED'),
+          genPolicy('dd', 'CUSTOM'),
+          genPolicy('bb', 'CUSTOM')
+        ]
+      };
+      store.dispatch(new GetPoliciesSuccess(policies));
+      fixture.detectChanges();
+
+      const chefPolicies = component.policies[0];
+      const customPolicies = component.policies[1];
+      expect(chefPolicies.itemList.map(p => p.name)).toEqual(['aa', 'zz']);
+      expect(customPolicies.itemList.map(p => p.name)).toEqual(['bb', 'cc', 'dd']);
+    });
+
+    it('uses standard sort for custom policies', () => {
+      const policies: GetPoliciesSuccessPayload = {
+        policies: [
+          genPolicy('zz', 'CUSTOM'),
+          genPolicy('cc', 'CUSTOM'),
+          genPolicy('aa', 'CUSTOM'),
+          genPolicy('bb', 'CUSTOM')
+        ]
+      };
+      store.dispatch(new GetPoliciesSuccess(policies));
+      fixture.detectChanges();
+
+      const customPolicies = component.policies[1];
+      expect(customPolicies.itemList.map(p => p.name))
+        .toEqual(['aa', 'bb', 'cc', 'zz']);
+    });
+
+    it('uses standard sort for chef-managed policies OTHER THAN ingest', () => {
+      const policies: GetPoliciesSuccessPayload = {
+        policies: [
+          genPolicy('zz', 'CHEF_MANAGED'),
+          genPolicy('cc', 'CHEF_MANAGED'),
+          genPolicy('aa', 'CHEF_MANAGED'),
+          genPolicy('bb', 'CHEF_MANAGED')
+        ]
+      };
+      store.dispatch(new GetPoliciesSuccess(policies));
+      fixture.detectChanges();
+
+      const chefPolicies = component.policies[0];
+      expect(chefPolicies.itemList.map(p => p.name))
+        .toEqual(['aa', 'bb', 'cc', 'zz']);
+    });
+
+    it('puts ingest at the top of chef-managed', () => {
+      const policies: GetPoliciesSuccessPayload = {
+        policies: [
+          genPolicy('zz', 'CHEF_MANAGED'),
+          genPolicy('ingest-access', 'CHEF_MANAGED'),
+          genPolicy('aa', 'CHEF_MANAGED'),
+          genPolicy('bb', 'CHEF_MANAGED')
+        ]
+      };
+      store.dispatch(new GetPoliciesSuccess(policies));
+      fixture.detectChanges();
+
+      const chefPolicies = component.policies[0];
+      expect(chefPolicies.itemList.map(p => p.name))
+        .toEqual(['ingest-access', 'aa', 'bb', 'zz']);
+    });
+  });
+
+  function genPolicy(id: string, type: IAMType): Policy {
+    return {
+      id,
+      name: id,
+      type: type,
+      members: [],
+      projects: []
+    };
+  }
 
 });

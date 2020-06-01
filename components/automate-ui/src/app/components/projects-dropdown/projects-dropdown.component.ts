@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
-
-import { ProjectConstants } from 'app/entities/projects/project.model';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
-import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { ProjectConstants } from 'app/entities/projects/project.model';
+import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { ResourceChecked } from '../resource-dropdown/resource-dropdown.component';
+import { ResourceCheckedSection } from 'app/components/resource-dropdown/resource-dropdown.component';
 
 @Component({
   selector: 'app-projects-dropdown',
@@ -30,7 +30,7 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
   // Label to use when none are selected
   public noneSelectedLabel = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
-  public projects: ResourceChecked[];
+  public projects: ResourceCheckedSection[];
 
   private isDestroyed = new Subject<boolean>();
 
@@ -40,16 +40,17 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
     this.store.select(assignableProjects)
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((assignable: ProjectsFilterOption[]) => {
-        this.projects =
-          assignable.map(p => {
-            return <ResourceChecked>{
+        this.projects = [{
+          itemList: assignable.map(p => {
+            return {
               id: p.value,
               name: p.label,
               type: p.type,
               checked: this.checkedProjectIDs
                 && this.checkedProjectIDs.includes(p.value)
             };
-          });
+          })
+        }];
       });
   }
 
@@ -59,14 +60,19 @@ export class ProjectsDropdownComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.checkedProjectIDs && changes.checkedProjectIDs.currentValue && this.projects) {
-      // Need to trigger OnChanges in ResourceDropdownComponent
-      // so we cannot just update the checked property of the existing array elements.
-      this.projects = this.projects
-        .map(p => ({
-          ...p,
-          checked: (changes.checkedProjectIDs.currentValue as string[]).includes(p.id)
-        }));
+    if (changes.checkedProjectIDs) {
+      // cannot proceed unless we have received the available projects list from the back end
+      if (this.projects) {
+        // Need to trigger OnChanges in ResourceDropdownComponent
+        // so we cannot just update the checked property of the existing array elements.
+        this.projects = [{
+          itemList: this.projects[0].itemList
+            .map(p => ({
+              ...p,
+              checked: (changes.checkedProjectIDs.currentValue as string[]).includes(p.id)
+            }))
+        }];
+      }
     }
   }
 

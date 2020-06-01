@@ -19,17 +19,20 @@
       </div>
 
       <div id="resource-container">
-        <chef-checkbox *ngFor="let resource of filteredResources"
-          [checked]="resource.checked"
-          [attr.title]="resource.name"
-          (change)="resourceChecked($event.detail, resource)"
-          (keydown.enter)="closeDropdown()"
-          (keydown.esc)="closeDropdown()"
-          (keydown.arrowup)="moveFocus($event)"
-          (keydown.arrowdown)="moveFocus($event)">{{ resource.name }}</chef-checkbox>
+        <ng-container *ngFor="let section of filteredResources">
+          <h3 class="resource-section" *ngIf="section.title && section.itemList.length">{{ section.title }}</h3>
+          <chef-checkbox *ngFor="let resource of section.itemList"
+            [checked]="resource.checked"
+            [attr.title]="resource.name"
+            (change)="resourceChecked($event.detail, resource)"
+            (keydown.enter)="closeDropdown()"
+            (keydown.esc)="closeDropdown()"
+            (keydown.arrowup)="moveFocus($event)"
+            (keydown.arrowdown)="moveFocus($event)">{{ resource.name }}</chef-checkbox>
+        </ng-container>
       </div>
 
-      <div class="no-resources" *ngIf="filteredResources.length === 0">
+      <div class="no-resources" *ngIf="allFilteredResourcesCount === 0">
         <p>No {{ objectNounPlural }} found.</p>
         <p>You don't have access to any {{ objectNounPlural }} that match your search.</p>
       </div>
