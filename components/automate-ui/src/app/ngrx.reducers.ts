@@ -34,6 +34,7 @@ import * as manager from './entities/managers/manager.reducer';
 import * as NotificationRuleEntity from './entities/notification_rules/notification_rule.reducer';
 import * as permEntity from './entities/userperms/userperms.reducer';
 import * as policyEntity from './entities/policies/policy.reducer';
+import * as policyFileEntity from './entities/policy-files/policy-file.reducer';
 import * as profileEntity from './entities/profiles/profile.reducer';
 import * as projectEntity from './entities/projects/project.reducer';
 import * as roleEntity from './entities/roles/role.reducer';
@@ -85,6 +86,7 @@ export interface NgrxStateAtom {
   notifications: notificationEntity.NotificationEntityState;
   notificationRules: NotificationRuleEntity.NotificationRuleEntityState;
   policies: policyEntity.PolicyEntityState;
+  policyFiles: policyFileEntity.PolicyFileEntityState;
   profiles: profileEntity.ProfileEntityState;
   projects: projectEntity.ProjectEntityState;
   roles: roleEntity.RoleEntityState;
@@ -204,6 +206,7 @@ export const defaultInitialState = {
   notifications: notificationEntity.InitialState,
   notificationRules: NotificationRuleEntity.NotificationRuleEntityInitialState,
   policies: policyEntity.PolicyEntityInitialState,
+  policyFiles: policyFileEntity.PolicyFileEntityInitialState,
   profiles: profileEntity.ProfileEntityInitialState,
   projects: projectEntity.ProjectEntityInitialState,
   roles: roleEntity.RoleEntityInitialState,
@@ -257,6 +260,7 @@ export const ngrxReducers = {
   notifications: notificationEntity.notificationEntityReducer,
   notificationRules: NotificationRuleEntity.notificationRuleEntityReducer,
   policies: policyEntity.policyEntityReducer,
+  policyFiles: policyFileEntity.policyFileEntityReducer,
   profiles: profileEntity.profileEntityReducer,
   projects: projectEntity.projectEntityReducer,
   roles: roleEntity.roleEntityReducer,

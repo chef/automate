@@ -31,6 +31,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public rolesTab = false;
   public dataBagsTab = false;
   public clientsTab = false;
+  public policyFilesTab = false;
   private isDestroyed = new Subject<boolean>();
 
   previousRoute$: Observable<RouterState>;
@@ -55,6 +56,13 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
           this.cookbooksTab = false;
           this.rolesTab = false;
           this.environmentsTab = true;
+        }
+
+        if ( params.path.includes('policyFiles') ) {
+          this.cookbooksTab = false;
+          this.rolesTab = false;
+          this.environmentsTab = false;
+          this.policyFilesTab = true;
         }
       });
     }
@@ -103,7 +111,10 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         this.telemetryService.track('orgDetailsTab', 'clients');
         break;
       case 5:
-        this.telemetryService.track('orgDetailsTab', 'org-edit');
+        this.telemetryService.track('orgDetailsTab', 'policyFiles');
+        break;
+      case 6:
+        this.telemetryService.track('orgDetailsTab', 'orgEdit');
         break;
     }
   }

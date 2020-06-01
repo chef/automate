@@ -90,6 +90,7 @@ import { RoleRequests } from './entities/roles/role.requests';
 import { RuleRequests } from './entities/rules/rule.requests';
 import { ServerRequests } from './entities/servers/server.requests';
 import { OrgRequests } from './entities/orgs/org.requests';
+import { PolicyFileRequests } from './entities/policy-files/policy-file.requests';
 import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
 import { TeamRequests } from './entities/teams/team.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
@@ -335,6 +336,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     RunHistoryStore,
     ServerRequests,
     OrgRequests,
+    PolicyFileRequests,
     ServiceGroupsRequests,
     SessionStorageService,
     TeamRequests,
