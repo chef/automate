@@ -85,5 +85,15 @@ EOF
     echo "$AWS_SESSION_TOKEN" | /usr/share/elasticsearch/bin/elasticsearch-keystore add s3.client.default.session_token
   fi
 
+  if [[ -n "${gcs_endpoint}" ]]; then
+    echo "y" | /usr/share/elasticsearch/bin/elasticsearch-plugin install "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-gcs/repository-gcs-${version}.zip"
+
+    cat >> /etc/elasticsearch/elasticsearch.yml <<EOF
+gcs.client.default.read_timeout: "50s"
+EOF
+
+    /usr/share/elasticsearch/bin/elasticsearch-keystore add-file gcs.client.default.credentials_file $GOOGLE_APPLICATION_CREDENTIALS
+  fi
+
   systemctl start elasticsearch.service
 }

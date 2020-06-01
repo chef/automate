@@ -55,6 +55,8 @@ var backupCmdFlags = struct {
 	s3SecretKey    string
 	s3SessionToken string
 
+	gcsCredentialsPath string
+
 	sha256 string
 
 	patchConfigPath string
@@ -81,6 +83,7 @@ func init() {
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3AccessKey, "s3-access-key", "", "The S3 access key ID")
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3SecretKey, "s3-secret-key", "", "The S3 secret access key")
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3SessionToken, "s3-session-token", "", "The S3 session token when assuming an IAM role")
+	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.gcsCredentialsPath, "gcs-credentials-path", "", "The path to the GCP service account json file")
 
 	createBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.createWaitTimeout, "wait-timeout", "t", 7200, "How long to wait for a operation to complete before raising an error")
 
@@ -282,6 +285,27 @@ func parseLocationSpecFromCLIArgs(location string) (backup.LocationSpecification
 			AccessKey:    backupCmdFlags.s3AccessKey,
 			SecretKey:    backupCmdFlags.s3SecretKey,
 			SessionToken: backupCmdFlags.s3SessionToken,
+		}, nil
+	} else if strings.HasPrefix(location, "gcs://") {
+		bucketAndBasePath := strings.TrimPrefix(location, "gcs://")
+		parts := strings.SplitN(bucketAndBasePath, "/", 2)
+		bucketName := ""
+		basePath := ""
+		if len(parts) == 1 {
+			bucketName = parts[0]
+		} else if len(parts) == 2 {
+			bucketName = parts[0]
+			basePath = parts[1]
+		} else {
+			return nil, status.Errorf(status.InvalidCommandArgsError,
+				"%q could not be parsed. The expected input is gcs://bucket/base/path",
+				location,
+			)
+		}
+
+		return backup.S3LocationSpecification{
+			BucketName: bucketName,
+			BasePath:   basePath,
 		}, nil
 	}
 
