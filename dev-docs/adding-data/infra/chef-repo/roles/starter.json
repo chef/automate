@@ -4,13 +4,14 @@
   "json_class": "Chef::Role",
   "chef_type": "role",
   "default_attributes": {
-
+    "apache2": {
+      "max_children": "50"
+    }
   },
   "override_attributes": {
 
   },
   "run_list": [
-    "role[role]",
     "recipe[starter]"
   ],
   "env_run_lists": {

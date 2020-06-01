@@ -24,18 +24,6 @@ document "infra_service_load_sample_data" <<DOC
   infra_service_load_sample_data -N 100 -S chef-server -O chef-org
 DOC
 
-function start_local_dev_chef_server() {
-  if ! chef-server-ctl version  | grep "Chef Automate Chef server" &> /dev/null; then
-    cat << EOH > /tmp/.enable_chef_server.toml
-[deployment.v1.svc]
-  enable_chef_server = true
-EOH
-    chef-automate config patch /tmp/.enable_chef_server.toml
-    rm /tmp/.enable_chef_server.toml
-
-  fi
-}
-
 function infra_service_load_sample_data() {
   install_if_missing core/jq-static jq
   install_if_missing core/grpcurl grpcurl
@@ -100,7 +88,10 @@ EOF
 
 function infra_service_load_chef_repo() {
   log_line "Started loading chef repo..."
-  start_local_dev_chef_server
+
+  if ! chef-server-ctl version 2> /dev/null | grep "Chef Automate Chef server" &> /dev/null; then
+    start_chef_server
+  fi
 
   chef_server_hostname=${CONTAINER_HOSTNAME:-a2-dev.test}
   chef_server_ip_address="127.0.0.1"
