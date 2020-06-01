@@ -31,6 +31,7 @@ func (a *InfraProxyServer) GetDataBags(ctx context.Context, r *gwreq.DataBags) (
 	req := &infra_req.DataBags{
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
+		Name:     r.Name,
 	}
 	res, err := a.client.GetDataBags(ctx, req)
 	if err != nil {
@@ -79,6 +80,24 @@ func (a *InfraProxyServer) DeleteDataBag(ctx context.Context, r *gwreq.DataBag) 
 		Id:   res.GetId(),
 		Name: res.GetName(),
 		Data: res.GetData(),
+	}, nil
+}
+
+// CreateDataBagItem creates a data bag item
+func (a *InfraProxyServer) CreateDataBagItem(ctx context.Context, r *gwreq.CreateDataBagItem) (*gwres.CreateDataBagItem, error) {
+	req := &infra_req.CreateDataBagItem{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+		Data:     r.Data,
+	}
+	res, err := a.client.CreateDataBagItem(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.CreateDataBagItem{
+		Name: res.GetName(),
 	}, nil
 }
 
