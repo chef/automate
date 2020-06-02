@@ -37,29 +37,3 @@ steps:
             privileged: true
             environment:
               - HAB_NONINTERACTIVE=true
-
-  - label: ":cypress:"
-    command: .expeditor/buildkite/cypress.sh
-    soft_fail: true
-    retry:
-      automatic:
-        limit: 1
-    concurrency: 1
-    concurrency_group: chef-automate-master/deploy/$CHANNEL
-    timeout_in_minutes: 35
-    expeditor:
-      secrets:
-        CYPRESS_RECORD_KEY:
-          path: secret/a2/cypress
-          field: record_key
-        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST:
-          path: secret/a2/testing/target_host
-          field: data
-        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER:
-          path: secret/a2/testing/target_user
-          field: data
-        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY:
-          path: secret/a2/testing/target_key
-          field: data
-      executor:
-          docker:
