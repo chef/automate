@@ -23,7 +23,7 @@ Bootstrapping Chef Habitat Builder requires:
 * An existing Chef Habitat [public Builder](https://bldr.habitat.sh) account.
 
 ##
-### Unsupported Topologies
+## Unsupported Topologies
 
 * High Availability/DR/Multinode Builder
 
