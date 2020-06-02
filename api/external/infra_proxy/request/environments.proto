@@ -37,3 +37,22 @@ message CreateEnvironment {
     // Stringified json of the override attributes.
     string override_attributes = 8;
 }
+
+message UpdateEnvironment {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Environment name.
+    string name = 3;
+    // Environment description.
+    string description = 4;
+    // Class name.
+    string json_class = 5;
+    // Environment versined cookbooks constraints.
+    map<string, string> cookbook_versions = 6;
+    // Stringified json of the default attributes.
+    string default_attributes = 7;
+    // Stringified json of the override attributes.
+    string override_attributes = 8;
+}
