@@ -65,7 +65,7 @@ These variables greatly influence the polling rate that the Chef Builder API wil
 
 The following table can be used as a planning guide for appropriately sizing hardware at differing client workloads.
 
-* `Clients` refers to the total number of Chef Habitat Supervisors and total number of Service Instances being managed with an update strategy.
+* `Clients` refers to the total number of Chef Habitat Supervisors running with the `--auto-update` flag plus the total number of Service Instances being managed with an update strategy.
 * `Interval` refers to the value of `HAB_SUP_UPDATE_MS` and `HAB_UPDATE_STRATEGY_FREQUENCY_MS` and assumes they are both set to the same value.
 
 | Clients | Interval | Server Spec |
@@ -89,8 +89,7 @@ Chef Automate and Chef Habitat Builder require:
 * The shell that starts Automate should have a max open files setting of at least 65535
 * Run the installation and bootstrapping procedures as the superuser or use `sudo` at the start of each command.
 
-To operate optimally at larger scales, several OS optimizations can be made to improve performance. The following is an example
-of how to make some recommended tuning changes for a RHEL based system:
+To operate optimally at larger scales, several OS optimizations can be made to improve performance. The following is an example of how to make some recommended tuning changes for a RHEL based system:
 
 ```
 cat > /etc/sysctl.d/00-chef.conf <<EOF
