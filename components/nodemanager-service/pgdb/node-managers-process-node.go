@@ -109,6 +109,11 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 		return fmt.Errorf("no uuid included in message. aborting.")
 	}
 
+	// warn if manager is empty; it should not be
+	if len(node.GetManagerType()) == 0 {
+		logrus.Warnf("manager value is empty for node %s", node.GetName())
+	}
+
 	// the incoming node may hit any of these cases:
 	// 1) it is already registered in our db with same uuid as incoming report: update the node entry
 	// 2) it is already registered in our db with diff uuid, same source_id, region, acct id: update the node by source_id
