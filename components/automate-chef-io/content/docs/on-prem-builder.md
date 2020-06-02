@@ -64,7 +64,8 @@ The frequency at which Habitat Supervisors poll the on-premises Chef Builder API
 
 These variables greatly influence the polling rate that the Chef Builder API will have to handle.
 
-The following table can be used as a planning guide for appropriately sizing hardware at differing client workloads.
+#### Planning Guide
+The planning guide can be used for appropriately sizing hardware at differing client workloads.
 
 * `Clients` refers to the total number of Chef Habitat Supervisors running with the `--auto-update` flag plus the total number of Service Instances being managed with an update strategy.
 * `Interval` refers to the value of `HAB_SUP_UPDATE_MS` and `HAB_UPDATE_STRATEGY_FREQUENCY_MS` and assumes they are both set to the same value.
