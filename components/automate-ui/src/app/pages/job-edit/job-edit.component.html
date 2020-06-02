@@ -1,6 +1,6 @@
 <div class="content-container">
   <div class="container">
-    
+
     <main class="job-add">
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/compliance/scan-jobs/jobs']">Scan jobs</chef-breadcrumb>
@@ -18,7 +18,7 @@
             [disabled]="!isStepValid(Step['add-nodes'])">
             <a routerLink="./" fragment="add-profiles">Add Profiles</a>
           </chef-step>
-          <chef-step 
+          <chef-step
             [selected]="isCurrentStep(Step['add-schedule'], (step$ | async))"
             [disabled]="!isStepValid(Step['add-nodes']) || !isStepValid(Step['add-profiles'])">
             <a routerLink="./" fragment="add-schedule">Add Schedule</a>
@@ -47,15 +47,15 @@
         <ng-container [ngSwitch]="step$ | async">
           <chef-job-nodes-form
             *ngSwitchCase="Step['add-nodes']"
-            [form]="form.get('nodesGroup')">
+            [form]="formControl('nodesGroup')">
           </chef-job-nodes-form>
           <chef-job-profiles-form
             *ngSwitchCase="Step['add-profiles']"
-            [form]="form.get('profilesGroup')">
+            [form]="formControl('profilesGroup')">
           </chef-job-profiles-form>
           <chef-job-schedule-form
             *ngSwitchCase="Step['add-schedule']"
-            [form]="form.get('scheduleGroup')">
+            [form]="formControl('scheduleGroup')">
           </chef-job-schedule-form>
         </ng-container>
       </form>

@@ -1,6 +1,6 @@
 <div class="content-container">
   <div class="container">
-    
+
     <main class="job-add">
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/compliance/scan-jobs/jobs']">Scan jobs</chef-breadcrumb>
@@ -47,15 +47,15 @@
         <ng-container [ngSwitch]="step$ | async">
           <chef-job-nodes-form
             *ngSwitchCase="Step['add-nodes']"
-            [form]="form.controls['nodesGroup']">
+            [form]="formControl('nodesGroup')">
           </chef-job-nodes-form>
           <chef-job-profiles-form
             *ngSwitchCase="Step['add-profiles']"
-            [form]="form.controls['profilesGroup']">
+            [form]="formControl('profilesGroup')">
           </chef-job-profiles-form>
           <chef-job-schedule-form
             *ngSwitchCase="Step['add-schedule']"
-            [form]="form.controls['scheduleGroup']">
+            [form]="formControl('scheduleGroup')">
           </chef-job-schedule-form>
         </ng-container>
       </form>
