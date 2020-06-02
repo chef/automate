@@ -5,7 +5,7 @@
 }
 
 .profiles-search {
-  padding: 32px 0 14px;
+  padding: 18px 0 14px;
 
   chef-input {
     width: 100%;
@@ -13,11 +13,31 @@
   }
 }
 
-.profiles-content {
-  margin: 35px;
+chef-subheading {
+  padding-bottom: 14px;
+}
 
-  .empty-help {
+.profiles-content {
+  padding: 35px;
+}
+
+a {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.empty-state {
+  text-align: center;
+
+  chef-button {
     margin: 0;
+    left: 50%;
+  }
+
+  p {
+    font-size: 18px;
+    font-weight: 400;
+    margin-top: 42px;
   }
 }
 
