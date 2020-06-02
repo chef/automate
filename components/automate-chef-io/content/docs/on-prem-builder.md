@@ -53,20 +53,20 @@ Chef Habitat artifact storage; we do not support using Artifactory for artifact 
 
 ### Hardware Sizing Considerations
 
-The frequency at which Habitat Supervisors poll the on-premises Chef Builder API for changes can be controlled by two Environment variables in the Chef Habitat Supervisor's runtime.
+The frequency at which Habitat Supervisors poll the on-premises Chef Builder API for changes can be controlled by three Environment variables in the Chef Habitat Supervisor's runtime.
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `HAB_SUP_UPDATE_MS` | 60000 | Frequency in milliseconds governing how often to check for Supervisor updates when running with an [update strategy](https://www.habitat.sh/docs/using-habitat/#using-updates) |
-| `HAB_UPDATE_STRATEGY_FREQUENCY_MS` | 60000 | Frequency in milliseconds governing how often to check for Service updates when running with an [update strategy](https://www.habitat.sh/docs/using-habitat/#using-updates) |
+| `HAB_SUP_UPDATE_MS` | 60000 | Frequency in milliseconds governing how often to check for Supervisor updates when running with the [--auto-update](https://www.habitat.sh/docs/habitat-cli/#hab-sup-run) flag. |
+| `HAB_UPDATE_STRATEGY_FREQUENCY_MS` | 60000 | Frequency in milliseconds governing how often to check for service updates when running with an [update strategy](https://www.habitat.sh/docs/using-habitat/#using-updates) |
+| `HAB_UPDATE_STRATEGY_FREQUENCY_BYPASS_CHECK` | no default | If set to `1`, will enable the Supervisor to utilize the `HAB_UPDATE_STRATEGY_FREQUENCY_MS` variable value from the line above for service updates. |
 
 These variables greatly influence the polling rate that the Chef Builder API will have to handle.
 
 The following table can be used as a planning guide for appropriately sizing hardware at differing client workloads.
 
-`Clients` refers to the total number of Chef Habitat Supervisors and total number of Service Instances being managed with an update strategy.
-
-`Interval` refers to the value of `HAB_SUP_UPDATE_MS` and `HAB_UPDATE_STRATEGY_FREQUENCY_MS` and assumes they are both set to the same value.
+* `Clients` refers to the total number of Chef Habitat Supervisors and total number of Service Instances being managed with an update strategy.
+* `Interval` refers to the value of `HAB_SUP_UPDATE_MS` and `HAB_UPDATE_STRATEGY_FREQUENCY_MS` and assumes they are both set to the same value.
 
 | Clients | Interval | Server Spec |
 | --- | --- | --- |
@@ -90,7 +90,7 @@ Chef Automate and Chef Habitat Builder require:
 * Run the installation and bootstrapping procedures as the superuser or use `sudo` at the start of each command.
 
 To operate optimally at larger scales, several OS optimizations can be made to improve performance. The following is an example
-of how to make this tuning changes for a RHEL based system:
+of how to make some recommended tuning changes for a RHEL based system:
 
 ```
 cat > /etc/sysctl.d/00-chef.conf <<EOF
