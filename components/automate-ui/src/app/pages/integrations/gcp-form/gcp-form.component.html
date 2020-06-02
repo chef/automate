@@ -1,6 +1,6 @@
 <ng-container [formGroup]="formGroup">
 
-  <ng-container [formGroup]="formGroup.controls.credentials">
+  <ng-container [formGroup]="credentialsFormGroup()">
     <label class="form-field">
       <span class="label">Enter your service account JSON credentials</span>
       <textarea formControlName="google_credentials_json"></textarea>

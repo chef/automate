@@ -46,4 +46,8 @@ export class IntegrationsFormComponent {
   handleRemoveCred(i) {
     this.instance_credentials.removeAt(i);
   }
+
+  providerFormGroup(name: string): FormGroup {
+    return this.integrationsForm.controls[name] as FormGroup;
+  }
 }

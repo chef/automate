@@ -1,6 +1,5 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { get } from 'lodash/fp';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { BaseIntegrationFormComponent } from '../base-integration-form.component';
 
 @Component({
   selector: 'app-azure-integration-form',
@@ -8,12 +7,5 @@ import { get } from 'lodash/fp';
   styleUrls: ['./azure-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IntegrationsAzureFormComponent {
-  @Input() formGroup: FormGroup;
-
-  showInstanceCreds() {
-    const formData = this.formGroup.value;
-    const no_creds = get('no_creds', formData);
-    return !no_creds;
-  }
+export class IntegrationsAzureFormComponent extends BaseIntegrationFormComponent {
 }
