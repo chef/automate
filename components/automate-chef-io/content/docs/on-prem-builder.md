@@ -22,7 +22,6 @@ Bootstrapping Chef Habitat Builder requires:
 * An outward bound HTTPS connection
 * An existing Chef Habitat [public Builder](https://bldr.habitat.sh) account.
 
-##
 ## Unsupported Topologies
 
 * High Availability/DR/Multinode Builder
