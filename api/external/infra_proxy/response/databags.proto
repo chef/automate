@@ -26,3 +26,10 @@ message CreateDataBag {
     // Data bag name.
     string name = 1;
 }
+
+message CreateDataBagItem {
+    // Data bag name.
+    string name = 1;
+    // Data bag item ID.
+    string id = 2;
+}

@@ -744,6 +744,51 @@ func init() {
         "tags": [
           "InfraProxy"
         ]
+      },
+      "post": {
+        "operationId": "CreateDataBagItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateDataBagItem"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Data bag name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.CreateDataBagItem"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
@@ -1256,6 +1301,27 @@ func init() {
         "name": {
           "type": "string",
           "description": "Data bag name."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.CreateDataBagItem": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Data bag name."
+        },
+        "data": {
+          "type": "string",
+          "description": "Data bag item stringify data."
         }
       }
     },
@@ -1831,6 +1897,19 @@ func init() {
         "name": {
           "type": "string",
           "description": "Data bag name."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.CreateDataBagItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Data bag name."
+        },
+        "id": {
+          "type": "string",
+          "description": "Data bag item ID."
         }
       }
     },

@@ -31,3 +31,14 @@ message CreateDataBag {
     // Data bag name.
     string name = 3;
 }
+
+message CreateDataBagItem {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Data bag name.
+    string name = 3;
+    // Data bag item stringify data.
+    string data = 4;
+}

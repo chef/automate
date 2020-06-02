@@ -39,6 +39,38 @@ func (s *Server) CreateDataBag(ctx context.Context, req *request.CreateDataBag) 
 	}, nil
 }
 
+// CreateDataBagItem creates a data bag item
+func (s *Server) CreateDataBagItem(ctx context.Context, req *request.CreateDataBagItem) (*response.CreateDataBagItem, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "must supply data bag name")
+	}
+
+	data := req.Data
+	if data == "" {
+		data = "{}"
+	}
+
+	var dataBagItem chef.DataBagItem
+	err = json.Unmarshal(json.RawMessage(data), &dataBagItem)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = c.client.DataBags.CreateItem(req.Name, dataBagItem)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.CreateDataBagItem{
+		Name: req.Name,
+	}, nil
+}
+
 // GetDataBags get data bags list
 func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*response.DataBags, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
