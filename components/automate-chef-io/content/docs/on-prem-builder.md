@@ -53,6 +53,7 @@ Chef Habitat artifact storage; we do not support using Artifactory for artifact 
 
 ### Hardware Sizing Considerations
 
+#### Environment Variables
 The frequency at which Habitat Supervisors poll the on-premises Chef Builder API for changes can be controlled by three Environment variables in the Chef Habitat Supervisor's runtime.
 
 | Variable | Default | Description |
