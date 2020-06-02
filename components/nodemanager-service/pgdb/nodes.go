@@ -690,7 +690,7 @@ func validateNodeFilters(filters []*common.Filter) error {
 func isValidNodeManagerType(item string) bool {
 	switch item {
 	// empty string covers legacy nodes (nodes created before we started associating all manual nodes with "automate" as a manager and nodes brought over from a1)
-	case "aws-ec2", "aws-api", "azure-api", "azure-vm", "automate", "":
+	case "aws-ec2", "aws-api", "azure-api", "azure-vm", "automate", "gcp-api", "chef", "":
 		return true
 	default:
 		return false

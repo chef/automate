@@ -90,6 +90,10 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 		tags = append(tags, &common.Kv{Key: "environment", Value: in.Report.GetEnvironment()})
 	}
 
+	mgrType := in.Report.GetAutomateManagerType()
+	if in.Report.GetSourceFqdn() != "" {
+		mgrType = "chef"
+	}
 	return &manager.NodeMetadata{
 		Uuid:            in.Report.GetNodeUuid(),
 		Name:            in.Report.GetNodeName(),
@@ -108,7 +112,8 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 			EndTime: endTimeTimestamp,
 			Status:  status,
 		},
-		ManagerId: in.Report.GetAutomateManagerId(),
+		ManagerId:   in.Report.GetAutomateManagerId(),
+		ManagerType: mgrType,
 	}, nil
 }
 

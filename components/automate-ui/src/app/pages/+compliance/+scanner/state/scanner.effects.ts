@@ -45,7 +45,7 @@ export class ScannerEffects {
       const nodesStatusFilter = { key: 'status', values: ['reachable', 'unreachable', 'unknown'] };
       // ensures that we only collect nodes that belong to a manager
       // (Automate (manually managed) nodes + nodes from cloud integrations)
-      const nodesManagersFilter = { key: 'manager_type', values: [''], exclude: true };
+      const nodesManagersFilter = { key: 'manager_type', values: ['automate', 'aws-ec2', 'aws-api', 'azure-vm', 'azure-api', 'gcp-api'], exclude: false };
       const defaultNodesParams = {
         filters: [
           nodesStatusFilter,

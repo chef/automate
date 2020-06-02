@@ -109,6 +109,11 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 		return fmt.Errorf("no uuid included in message. aborting.")
 	}
 
+	// warn if manager is empty; it should not be
+	if len(node.GetManagerType()) == 0 {
+		logrus.Warnf("manager value is empty for node %s", node.GetName())
+	}
+
 	// the incoming node may hit any of these cases:
 	// 1) it is already registered in our db with same uuid as incoming report: update the node entry
 	// 2) it is already registered in our db with diff uuid, same source_id, region, acct id: update the node by source_id
@@ -127,20 +132,12 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 		return errors.Wrap(err, "ProcessIncomingNode unable to marshal projects data")
 	}
 
-	var mgrType string
-	if node.ManagerId != "" {
-		mgrType, err = db.SelectStr(sqlGetManagerTypeFromId, node.ManagerId)
-		if err != nil {
-			logrus.Warnf("unable to find manager for node")
-		}
-	}
-
 	err = Transact(db, func(tx *DBTrans) error {
 		logrus.Debugf("processing node %s with cloud info %s %s %s", node.GetName(), node.GetSourceId(), node.GetSourceAccountId(), node.GetSourceRegion())
 		nodeDetails := nodeDetails{
 			nodeState:           nodeState,
 			lastContact:         lastContact,
-			mgrType:             mgrType,
+			mgrType:             node.GetManagerType(),
 			lastContactDataByte: lastContactDataByte,
 			projectsDataByte:    projectsDataByte,
 		}
