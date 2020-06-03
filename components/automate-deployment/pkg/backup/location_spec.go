@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"path"
 	"strings"
@@ -191,6 +192,13 @@ func NewRemoteLocationSpecificationFromRestoreTask(restoreTask *api.BackupRestor
 			SecretKey:    restoreTask.GetS3BackupLocation().GetSecretKey(),
 			SessionToken: restoreTask.GetS3BackupLocation().GetSessionToken(),
 		}
+	} else if restoreTask.GetGcsBackupLocation().GetBucketName() != "" {
+		return GCSLocationSpecification{
+			BucketName:                   restoreTask.GetGcsBackupLocation().GetBucketName(),
+			BasePath:                     restoreTask.GetGcsBackupLocation().GetBasePath(),
+			GoogleApplicationCredentials: restoreTask.GetGcsBackupLocation().GetGoogleApplicationCredentials(),
+			ProjectID:                    restoreTask.GetGcsBackupLocation().GetProjectId(),
+		}
 	}
 
 	return FilesystemLocationSpecification{Path: restoreTask.GetBackupDir()}
@@ -208,6 +216,20 @@ func NewRemoteLocationSpecificationFromGlobalConfig(globalConfig *config.GlobalC
 			AccessKey:    globalConfig.GetV1().GetBackups().GetS3().GetCredentials().GetAccessKey().GetValue(),
 			SecretKey:    globalConfig.GetV1().GetBackups().GetS3().GetCredentials().GetSecretKey().GetValue(),
 			SessionToken: globalConfig.GetV1().GetBackups().GetS3().GetCredentials().GetSessionToken().GetValue(),
+		}
+	case "gcs":
+		// TODO(jaym): We need to fix this before merge.
+		// The config needs to full credentials json and not a path
+		data, _ := ioutil.ReadFile(globalConfig.GetV1().GetBackups().GetGcs().GetCredentials().GetPath().GetValue())
+		creds := ""
+		if data != nil {
+			creds = string(data)
+		}
+		return GCSLocationSpecification{
+			BucketName:                   globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetName().GetValue(),
+			BasePath:                     globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetBasePath().GetValue(),
+			ProjectID:                    globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetProjectid().GetValue(),
+			GoogleApplicationCredentials: creds,
 		}
 	default:
 		return FilesystemLocationSpecification{
