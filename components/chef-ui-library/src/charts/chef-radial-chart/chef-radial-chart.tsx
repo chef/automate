@@ -31,7 +31,7 @@ let UID = 0;
  *     color: var(--chef-warning);
  *   }
  *   chef-radial-chart .success, chef-radial-chart .major {
- *     color: var(--chef-success);
+ *     color: var(--chef-ok);
  *   }
  *   chef-radial-chart .skipped, chef-radial-chart .minor {
  *     color: var(--chef-unknown);

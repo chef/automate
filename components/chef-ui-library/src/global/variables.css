@@ -47,17 +47,17 @@
 
   /* ** THESE SEMANTIC COLOR VARIABLES ARE FREE TO BE USED WITHIN AUTOMATE ** */
   /* primary */
-  --chef-primary: var(--mahogany);
+  --chef-primary: var(--chef-orange);
   --chef-primary-dark: var(--ebony-clay);
   --chef-primary-bright: var(--royal-blue);
   --chef-primary-light: var(--malibu);
   --chef-primary-hover: var(--blue);
   /* secondary */
-  --chef-critical: var(--maroon);
-  --chef-warning: var(--mahogany);
+  --chef-critical: var(--pink);
+  --chef-warning: var(--matomic-tangerine);
   --chef-major: var(--violet);
   --chef-minor: var(--indigo);
-  --chef-success: var(--medium-teal-blue);
+  --chef-success: var(--science-blue);
   /* tertiary */
   --chef-info-alert: var(--fuchsia);
   --chef-info-alert-light: var(--fuchsia-light);
