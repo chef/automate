@@ -41,6 +41,7 @@ func main() {
 	cmd.PersistentFlags().String("bldr-client-secret", "", "bldr oauth2 client secret")
 	cmd.PersistentFlags().String("signin-url", "/signin", "signin URL")
 	cmd.PersistentFlags().String("postgres-url", "", "postgresql URL")
+	cmd.PersistentFlags().Bool("persistent", false, "Use persistent sessions")
 
 	// bind all flags to viper config
 	if err := viper.BindPFlags(cmd.PersistentFlags()); err != nil {
@@ -69,6 +70,7 @@ type config struct {
 	PostgresURL      string `mapstructure:"postgres-url"`
 	Database         string `mapstructure:"database"`
 	MigrationsPath   string `mapstructure:"migrations-path"`
+	Persistent       bool   `mapstructure:"persistent"`
 	certs.TLSConfig  `mapstructure:"tls"`
 }
 
@@ -150,7 +152,8 @@ func serve(_ *cobra.Command, args []string) {
 		oidcConfig,
 		bldrClient,
 		signInURL,
-		serviceCerts)
+		serviceCerts,
+		cfg.Persistent)
 	if err != nil {
 		fail(errors.Wrap(err, "init server"))
 	}

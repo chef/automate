@@ -6,6 +6,7 @@ host = "localhost"
 port = 7777
 signin_url = "/signin"
 external_fqdn = "localhost"
+persistent = true
 
 [oidc]
 # issuer is constructed from external-fqdn config + "/dex"
