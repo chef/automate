@@ -54,7 +54,7 @@
   --chef-primary-hover: var(--blue);
   /* secondary */
   --chef-critical: var(--pink);
-  --chef-warning: var(--matomic-tangerine);
+  --chef-warning: var(--atomic-tangerine);
   --chef-major: var(--violet);
   --chef-minor: var(--indigo);
   --chef-success: var(--science-blue);
