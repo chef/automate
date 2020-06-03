@@ -37,7 +37,7 @@ UI code coverage can be viewed at:
 
 Past UI code coverage results can be found at the parent page, https://a2-code-coverage.cd.chef.co/automate-ui/, along with a chart showing changes in the last 90 days.
 
-This is automatically populated each day.
+This is automatically regenerated with each merged PR.
 
 ### Viewing Go Code Coverage
 
