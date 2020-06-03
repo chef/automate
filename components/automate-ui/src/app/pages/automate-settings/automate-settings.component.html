@@ -44,7 +44,7 @@
                 formControlName="threshold"
                 [resetOrigin]="shouldResetValues"
                 type="number"
-                min="0" 
+                min="0"
                 (keydown)="preventNegatives($event.key)"
               />days
             </p>
@@ -89,7 +89,8 @@
 
             <p>When no health check reports have been received for a service in
               <input
-                aria-label="Amount of time before labeling a service disconnected" chefInput
+                aria-label="Amount of time before labeling a service disconnected"
+                chefInput
                 formControlName="threshold"
                 [resetOrigin]="shouldResetValues"
                 type="number"
@@ -105,7 +106,7 @@
               </mat-form-field>
               , label the service as disconnected</p>
           </div>
-          
+
           <div class="checkbox-row secondary-row" [formGroup]="serviceGroupRemoveServices">
             <div class="checkbox-container">
               <chef-tooltip follow position="top" for='service-group-remove-services'>
@@ -122,7 +123,8 @@
             </div>
             <p>Remove services labeled as disconnected after
               <input
-                aria-label="Amount of time before removing disconnected services" chefInput
+                aria-label="Amount of time before removing disconnected services"
+                chefInput
                 formControlName="threshold"
                 [resetOrigin]="shouldResetValues"
                 type="number"
@@ -170,7 +172,7 @@
               [disabled]="isDesktopView">
               </chef-checkbox>
             </div>
-          
+
             <p>When no Chef Infra Client run data has been received from a node in
               <input
                 aria-label="Amount of time before labeling a node as missing"
