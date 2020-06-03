@@ -9,7 +9,7 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 )
 
-// NewError creates new validation error.
+// NewError creates new validation error for field violoations.
 func NewError(violations []*FieldViolation) error {
 	errViolations := make([]*errdetails.BadRequest_FieldViolation, len(violations))
 	newStatus := status.New(codes.InvalidArgument, "invalid argument") // TODO: need better message
@@ -33,4 +33,9 @@ func NewError(violations []*FieldViolation) error {
 		panic(fmt.Sprintf("Unexpected error attaching metadata: %v", err))
 	}
 	return newStatus.Err()
+}
+
+// NewPlainError creates new validation error.
+func NewPlainError(fv *FieldViolation) error {
+	return status.Error(codes.InvalidArgument, fv.Description)
 }

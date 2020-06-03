@@ -38,13 +38,12 @@ func New(opts Options) *Validator {
 func (v *Validator) Validate() error {
 	reqVal := reflect.ValueOf(v.Opts.Request)
 	typeOfS := reqVal.Type()
-	violations := []*FieldViolation{}
 
 	if v.Opts.RequiredDefault {
 		for i := 0; i < reqVal.NumField(); i++ {
 			fv := RequiredField(getFieldValue(reqVal, i), getFieldTag(typeOfS, i), v.Opts.Target)
 			if fv != nil {
-				violations = append(violations, fv)
+				return NewPlainError(fv)
 			}
 		}
 	}
@@ -55,18 +54,14 @@ func (v *Validator) Validate() error {
 			case "required":
 				fv := RequiredField(getFieldValue(reqVal, field), getFieldTag(typeOfS, field), v.Opts.Target)
 				if fv != nil {
-					violations = append(violations, fv)
+					return NewPlainError(fv)
 				}
 			case "ipv4":
-				return nil
+				return nil //TODO: Dev debt
 			case "regex":
-				return nil
+				return nil //TODO: Dev debt
 			}
 		}
-	}
-
-	if len(violations) > 0 {
-		return NewError(violations)
 	}
 
 	return nil
