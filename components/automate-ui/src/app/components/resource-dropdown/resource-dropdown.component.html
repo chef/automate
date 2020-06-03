@@ -14,7 +14,11 @@
     <chef-dropdown [attr.visible]="dropdownState === 'open'">
 
       <div id="filter-container">
-        <input id="{{ objectNounPlural }}" type="text" [(ngModel)]="filterValue" placeholder="Filter {{ objectNounPlural }}..."
+        <input chefInput
+          id="{{ objectNounPlural }}"
+          type="text"
+          [(ngModel)]="filterValue"
+          placeholder="Filter {{ objectNounPlural }}..."
           (keyup)="handleFilterKeyUp()" />
       </div>
 
