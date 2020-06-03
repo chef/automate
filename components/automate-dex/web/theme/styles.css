@@ -20,16 +20,12 @@ html, body {
   font-weight: 400;
 }
 
-button {
-  display: block;
-  background-color: #3864f2;
-  color: #fff;
-  width: 279px;
-  height: 53px;
-  margin: 0 auto;
-  border-radius: 4px;
-  border: 0;
-  line-height: 33px;
+button, div.dex-btn {
+    background-color: #3864f2;
+    color: #fff;
+    width: 279px;
+    height: 53px;
+    margin: 0 auto;
 }
 
 button.sign-in {
@@ -78,6 +74,8 @@ main.password {
   font-family: 'Muli';
   font-size: 14px;
   font-weight: 400;
+  float:left;
+  margin-top: 8px;
   padding: 0px 6px;
   text-align: left;
 }
@@ -85,6 +83,7 @@ main.password {
 .dex-btn-icon--local,
 .dex-btn-icon--saml,
 .dex-btn-icon--ldap {
+  margin-top: 8px;
   background-color: #3864f2;
 }
 
