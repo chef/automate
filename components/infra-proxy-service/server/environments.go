@@ -76,7 +76,7 @@ func (s *Server) CreateEnvironment(ctx context.Context, req *request.CreateEnvir
 	}
 
 	cookbooks := req.CookbookVersions
-	if len(cookbooks) == 0 {
+	if cookbooks == nil {
 		cookbooks = map[string]string{}
 	}
 
@@ -156,7 +156,7 @@ func (s *Server) UpdateEnvironment(ctx context.Context, req *request.UpdateEnvir
 	}
 
 	cookbooks := req.CookbookVersions
-	if len(cookbooks) == 0 {
+	if cookbooks == nil {
 		cookbooks = map[string]string{}
 	}
 
