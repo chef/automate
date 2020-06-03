@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/user"
 	"path"
@@ -303,9 +304,20 @@ func parseLocationSpecFromCLIArgs(location string) (backup.LocationSpecification
 			)
 		}
 
-		return backup.S3LocationSpecification{
-			BucketName: bucketName,
-			BasePath:   basePath,
+		creds := ""
+		if backupCmdFlags.gcsCredentialsPath != "" {
+			var err error
+			data, err := ioutil.ReadFile(backupCmdFlags.gcsCredentialsPath)
+			if err != nil {
+				return nil, status.Wrap(err, status.InvalidCommandArgsError, "Could not read credentials")
+			}
+			creds = string(data)
+		}
+
+		return backup.GCSLocationSpecification{
+			BucketName:                   bucketName,
+			BasePath:                     basePath,
+			GoogleApplicationCredentials: creds,
 		}, nil
 	}
 

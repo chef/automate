@@ -7,11 +7,15 @@ __bucket_base_path() {
     return 0
 }
 
-gcs_bucket_name="a2-backup-restore-test"
+#gcs_bucket_name="a2-backup-restore-test"
+gcs_bucket_name="policyfile-archive"
 
 gcs_bucket_base_path="$(__bucket_base_path)"
 
 do_create_config_gcs_default() {
+  export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gcpcred"
+  cat <<< "$GOOGLE_APPLICATION_JSON" > "$GOOGLE_APPLICATION_CREDENTIALS"
+  chmod 755 "$GOOGLE_APPLICATION_CREDENTIALS"
   #shellcheck disable=SC2154
   cat <<EOF >> "$test_config_path"
 [global.v1.backups]
@@ -19,6 +23,7 @@ do_create_config_gcs_default() {
 [global.v1.backups.gcs.bucket]
   name = "${gcs_bucket_name}"
   base_path = "${gcs_bucket_base_path}"
+  projectid = "dbright-project"
 [global.v1.backups.gcs.credentials]
   path = "$GOOGLE_APPLICATION_CREDENTIALS"
 EOF
@@ -34,9 +39,6 @@ do_deploy_gcs_default() {
         --manifest-dir "$test_manifest_path" \
         --admin-password chefautomate \
         --accept-terms-and-mlsa
-
-    log_info "applying dev license"
-    chef-automate license apply "$A2_LICENSE"
 }
 
 do_test_deploy_gcs_default() {

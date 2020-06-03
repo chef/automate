@@ -526,6 +526,13 @@ message S3BackupLocation {
 	string session_token = 6;
 }
 
+message GCSBackupLocation {
+	string bucket_name = 1;
+	string base_path = 2;
+	string project_id = 3;
+	string google_application_credentials = 4;
+}
+
 message BackupRestoreTask {
 	google.protobuf.Timestamp id = 1;
 	BackupTask backup = 2;
@@ -552,6 +559,8 @@ message BackupRestoreTask {
 	ReleaseManifest manifest = 11;
 	AutomateConfig patch_config = 12;
 	AutomateConfig set_config = 13;
+
+	GCSBackupLocation gcs_backup_location = 14;
 }
 
 message BackupDeleteTask {

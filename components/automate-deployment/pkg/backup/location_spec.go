@@ -249,3 +249,42 @@ func NewMinioLocationSpec(endpoint,
 		secretStore:     secretStore,
 	}, nil
 }
+
+type GCSLocationSpecification struct {
+	// Required
+	BucketName string
+
+	// Optional
+	BasePath                     string
+	GoogleApplicationCredentials string
+	ProjectID                    string
+}
+
+func (gcsSpec GCSLocationSpecification) ToBucket(baseKey string) Bucket {
+	bucket, err := NewGCSBucket(gcsSpec.BucketName, path.Join(gcsSpec.BasePath, baseKey), &GCSConfig{
+		GoogleApplicationCredentials: gcsSpec.GoogleApplicationCredentials,
+		ProjectID:                    gcsSpec.ProjectID,
+	})
+
+	if err != nil {
+		// I should have just let the creation the Context return an error :(
+		logrus.WithError(err).Warn("could not initialize bucket")
+		return errBucket{err: err}
+	}
+
+	return bucket
+}
+
+func (gcsSpec GCSLocationSpecification) ConfigureBackupRestoreTask(req *api.BackupRestoreTask) error {
+	req.GcsBackupLocation = &api.GCSBackupLocation{
+		BucketName:                   gcsSpec.BucketName,
+		BasePath:                     gcsSpec.BasePath,
+		ProjectId:                    gcsSpec.ProjectID,
+		GoogleApplicationCredentials: gcsSpec.GoogleApplicationCredentials,
+	}
+	return nil
+}
+
+func (gcsSpec GCSLocationSpecification) String() string {
+	return fmt.Sprintf("gcs repository <gcs://%s/%s>", gcsSpec.BucketName, gcsSpec.BasePath)
+}

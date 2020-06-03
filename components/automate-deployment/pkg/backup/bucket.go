@@ -14,13 +14,16 @@ import (
 	"strings"
 
 	"go.uber.org/multierr"
+	"golang.org/x/oauth2/google"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"gocloud.dev/blob"
+	"gocloud.dev/blob/gcsblob"
 	"gocloud.dev/blob/s3blob"
 	"gocloud.dev/gcerrors"
+	"gocloud.dev/gcp"
 
 	"github.com/chef/automate/lib/io/fileutils"
 
@@ -507,4 +510,117 @@ func ToObjectPaths(deleteObjs []BucketObject) []string {
 		objPaths[i] = o.Name
 	}
 	return objPaths
+}
+
+type gcsBucket struct {
+	bucket   *blob.Bucket
+	name     string
+	basePath string
+}
+
+type GCSConfig struct {
+	GoogleApplicationCredentials string
+	ProjectID                    string
+}
+
+func NewGCSBucket(name string, basePath string, c *GCSConfig) (Bucket, error) {
+	ctx := context.Background()
+
+	var creds *google.Credentials
+	var err error
+
+	if c.GoogleApplicationCredentials != "" {
+		creds, err = google.CredentialsFromJSON(ctx, []byte(c.GoogleApplicationCredentials),
+			"https://www.googleapis.com/auth/cloud-platform")
+	} else {
+		creds, err = gcp.DefaultCredentials(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get GCS credentials")
+	}
+
+	client, err := gcp.NewHTTPClient(
+		gcp.DefaultTransport(),
+		gcp.CredentialsTokenSource(creds))
+	if err != nil {
+		return nil, err
+	}
+
+	bucket, err := gcsblob.OpenBucket(ctx, client, name, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gcsBucket{
+		bucket:   bucket,
+		name:     name,
+		basePath: basePath,
+	}, nil
+}
+
+func (bkt *gcsBucket) NewReader(ctx context.Context, name string, verifier ObjectVerifier) (io.ReadCloser, error) {
+	relPath := path.Join(bkt.basePath, name)
+	validatePath(relPath)
+	r, err := bkt.bucket.NewReader(ctx, relPath, nil)
+	if err != nil {
+		return nil, err
+	}
+	cksumReader := newChecksummingReader(r)
+	defer cksumReader.Close()
+	return newVerifiedReader(name, cksumReader, verifier)
+}
+
+func (bkt *gcsBucket) NewWriter(ctx context.Context, name string) (BlobWriter, error) {
+	return nil, errors.New("Unimplemented")
+
+}
+
+func (bkt *gcsBucket) Delete(ctx context.Context, objectPaths []string) error {
+	return errors.New("Unimplemented")
+}
+
+func (bkt *gcsBucket) List(ctx context.Context, pathPrefix string, delimited bool) ([]BucketObject, []SharedPrefix, error) {
+	pathPrefix = path.Join(bkt.basePath, pathPrefix)
+	validatePath(pathPrefix)
+
+	prefix := pathPrefix
+	if prefix != "" && prefix[len(prefix)-1] != '/' {
+		prefix = prefix + "/"
+	}
+
+	objs := []BucketObject{}
+	prefixes := []SharedPrefix{}
+
+	delimiter := ""
+	if delimited {
+		delimiter = "/"
+	}
+	iter := bkt.bucket.List(&blob.ListOptions{
+		Prefix:    prefix,
+		Delimiter: delimiter,
+	})
+
+	for {
+		obj, err := iter.Next(ctx)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, nil, err
+		}
+
+		relKey := strings.TrimPrefix(strings.TrimPrefix(obj.Key, bkt.basePath), "/")
+		if obj.IsDir {
+			prefixes = append(prefixes, SharedPrefix(relKey))
+		} else {
+			objs = append(objs, BucketObject{
+				Name: relKey,
+			})
+		}
+	}
+
+	return objs, prefixes, nil
 }
