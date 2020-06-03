@@ -161,10 +161,12 @@ describe('project management', () => {
     cy.get('[data-cy=save-button]').click();
     cy.get('app-project-list chef-modal').should('not.be.visible');
 
-    // verify success notification and then dismiss it
+    // verify success notification
     cy.get('app-notification.info')
       .contains(`Created project ${customWithPolsProjectID} and associated policies`);
-    cy.get('app-notification.info chef-icon').click();
+
+    // dismiss all three success notifications
+    cy.get('app-notification.info chef-icon').click({ multiple: true });
 
     cy.contains(customWithPolsProjectID).should('exist');
 
