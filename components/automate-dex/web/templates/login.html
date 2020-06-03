@@ -18,15 +18,20 @@
       <h1>User Sign In</h1>
       <div>
         {{ range $c := .Connectors }}
-        <form class="theme-form-row" method="post" action="{{ $c.URL }}">
-          {{ if eq $c.ID "local" }}
-          <button type="submit" class="dex-btn-text"><span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>Sign in as a local user</button>
-          {{ else }}
-          <button type="submit" class="dex-btn-text"><span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>Sign in with {{ $c.Name }}</button>
-          {{ end }}
-        </form>
+        <div class="theme-form-row">
+          <a href="{{ $c.URL }}" target="_self">
+            <div class="dex-btn theme-btn-provider">
+                <span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>
+                {{ if eq $c.ID "local" }}
+                <span class="dex-btn-text">Sign in as a local user</span>
+                {{ else }}
+                <span class="dex-btn-text">Sign in with {{ $c.Name }}</span>
+                {{ end }}
+            </div>
+          </a>
         {{ end }}
       </div>
+    </div>
     </main>
   </body>
 </html>
