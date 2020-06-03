@@ -791,6 +791,60 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item_id}": {
+      "put": {
+        "operationId": "UpdateDataBagItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateDataBagItem"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Data bag name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "item_id",
+            "description": "Data bag item ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateDataBagItem"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
       "get": {
         "operationId": "GetDataBagItem",
@@ -1536,6 +1590,31 @@ func init() {
         "admin_key": {
           "type": "string",
           "description": "Chef organization admin key."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.UpdateDataBagItem": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Data bag name."
+        },
+        "item_id": {
+          "type": "string",
+          "description": "Data bag item ID."
+        },
+        "data": {
+          "type": "string",
+          "description": "Data bag item stringify data."
         }
       }
     },
@@ -2553,6 +2632,19 @@ func init() {
         "path": {
           "type": "string",
           "description": "Source options path."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.UpdateDataBagItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Data bag name."
+        },
+        "item_id": {
+          "type": "string",
+          "description": "Data bag item ID."
         }
       }
     },

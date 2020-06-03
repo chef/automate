@@ -33,3 +33,10 @@ message CreateDataBagItem {
     // Data bag item ID.
     string id = 2;
 }
+
+message UpdateDataBagItem {
+    // Data bag name.
+    string name = 1;
+    // Data bag item ID.
+    string item_id = 2;
+}

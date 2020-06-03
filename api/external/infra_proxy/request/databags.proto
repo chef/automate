@@ -42,3 +42,16 @@ message CreateDataBagItem {
     // Data bag item stringify data.
     string data = 4;
 }
+
+message UpdateDataBagItem {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Data bag name.
+    string name = 3;
+    // Data bag item ID.
+    string item_id = 4;
+    // Data bag item stringify data.
+    string data = 5;
+}

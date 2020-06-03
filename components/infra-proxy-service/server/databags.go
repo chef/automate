@@ -12,17 +12,28 @@ import (
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
 // CreateDataBag creates a data bag
 func (s *Server) CreateDataBag(ctx context.Context, req *request.CreateDataBag) (*response.CreateDataBag, error) {
-	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	err := validation.New(validation.Options{
+		Target:  "databag",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply data bag name")
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
 	_, err = c.client.DataBags.Create(
@@ -41,13 +52,23 @@ func (s *Server) CreateDataBag(ctx context.Context, req *request.CreateDataBag) 
 
 // CreateDataBagItem creates a data bag item
 func (s *Server) CreateDataBagItem(ctx context.Context, req *request.CreateDataBagItem) (*response.CreateDataBagItem, error) {
-	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	err := validation.New(validation.Options{
+		Target:  "databag",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply data bag name")
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
 	data := DefaultIfEmpty(req.Data)
@@ -99,6 +120,21 @@ func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*respo
 
 // GetDataBagItem get data bag
 func (s *Server) GetDataBagItem(ctx context.Context, req *request.DataBag) (*response.DataBag, error) {
+	err := validation.New(validation.Options{
+		Target:  "databag",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+			"Item":     []string{"required"},
+		},
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
@@ -124,13 +160,23 @@ func (s *Server) GetDataBagItem(ctx context.Context, req *request.DataBag) (*res
 
 // DeleteDataBag delete the data bag and data bag item
 func (s *Server) DeleteDataBag(ctx context.Context, req *request.DataBag) (*response.DataBag, error) {
-	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	err := validation.New(validation.Options{
+		Target:  "databag",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply data bag name")
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
 	if req.Item != "" {
@@ -154,6 +200,47 @@ func (s *Server) DeleteDataBag(ctx context.Context, req *request.DataBag) (*resp
 		Name: data.Name,
 	}, nil
 
+}
+
+// UpdateDataBagItem updates a data bag item
+func (s *Server) UpdateDataBagItem(ctx context.Context, req *request.UpdateDataBagItem) (*response.UpdateDataBagItem, error) {
+	err := validation.New(validation.Options{
+		Target:  "databag",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+			"ItemId":   []string{"required"},
+		},
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	data := DefaultIfEmpty(req.Data)
+
+	var dataBagItem chef.DataBagItem
+	err = json.Unmarshal(json.RawMessage(data), &dataBagItem)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = c.client.DataBags.UpdateItem(req.Name, req.ItemId, dataBagItem)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.UpdateDataBagItem{
+		Name:   req.Name,
+		ItemId: req.ItemId,
+	}, nil
 }
 
 // fromAPIToListDatabags a response.DataBags from a struct of DataBags
