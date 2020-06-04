@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -208,7 +207,6 @@ func (s *server) RestoreBackup(ctx context.Context, req *api.RestoreBackupReques
 		return res, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	spew.Dump(req.Restore)
 	remoteRestoreSpec = backup.NewRemoteLocationSpecificationFromRestoreTask(req.Restore)
 	sender := s.newEventSender()
 
