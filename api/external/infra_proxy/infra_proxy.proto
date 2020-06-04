@@ -4,6 +4,7 @@ package chef.automate.api.infra_proxy;
 option go_package = "github.com/chef/automate/api/external/infra_proxy";
 
 import "google/api/annotations.proto";
+import "google/rpc/error_details.proto";
 
 import "api/external/infra_proxy/request/orgs.proto";
 import "api/external/infra_proxy/request/servers.proto";
