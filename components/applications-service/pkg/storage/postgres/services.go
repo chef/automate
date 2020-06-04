@@ -295,7 +295,7 @@ func (db *Postgres) GetServices(
 
 func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string, filters map[string][]string) ([]string, error) {
 	// We do not want to filter on the fieldname we are looking up, because a user may want to use multiple values for searching
-	delete(filters, fieldName)
+	delete(filters, filterNameForField(fieldName))
 	// Pass "AND" for firstKeyword because we build the WHERE with the query fragment
 	whereConstraints, err := buildWhereConstraintsFromFilters(filters, "AND", false)
 	if err != nil {
@@ -329,6 +329,17 @@ func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string, f
 		return nil, err
 	}
 	return matches, nil
+}
+
+func filterNameForField(fieldName string) string {
+	switch fieldName {
+	case "service_name":
+		return "service"
+	case "group_name":
+		return "group"
+	default:
+		return fieldName
+	}
 }
 
 func columnNameForField(fieldName string) string {
