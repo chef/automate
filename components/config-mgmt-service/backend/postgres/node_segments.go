@@ -27,15 +27,15 @@ ORDER BY policy_node_group ASC, policy_name ASC, policy_domain_url ASC;
 
 func (p *Postgres) ListNodeSegmentsForRolloutProgress() ([]*NodeSegmentWithRollouts, error) {
 	// for each distinct node segment, need the last 5 rollouts
-	var rollouts []*Rollout
-	_, err := p.mapper.Select(&rollouts, mostRecentRolloutsForSegments)
+	var indexedRollouts []*RolloutWithOrderIndex
+	_, err := p.mapper.Select(&indexedRollouts, mostRecentRolloutsForSegments)
 	if err != nil {
 		return nil, err
 	}
 
 	var segmentsWithRollouts []*NodeSegmentWithRollouts
 	n := &NodeSegmentWithRollouts{}
-	for _, r := range rollouts {
+	for _, r := range indexedRollouts {
 		if r.PolicyName != n.PolicyName ||
 			r.PolicyNodeGroup != n.PolicyNodeGroup ||
 			r.PolicyDomainURL != n.PolicyDomainURL {
@@ -48,7 +48,7 @@ func (p *Postgres) ListNodeSegmentsForRolloutProgress() ([]*NodeSegmentWithRollo
 			}
 			segmentsWithRollouts = append(segmentsWithRollouts, n)
 		}
-		n.Rollouts = append(n.Rollouts, r)
+		n.Rollouts = append(n.Rollouts, &r.Rollout)
 	}
 	return segmentsWithRollouts, nil
 }

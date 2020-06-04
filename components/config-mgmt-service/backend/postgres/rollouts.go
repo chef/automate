@@ -19,13 +19,17 @@ type NewRollout struct {
 	Description      string `db:"description"`
 	CiJobId          string `db:"ci_job_id"`
 	CiJobUrl         string `db:"ci_job_url"`
-	OrderIndex       int    `db:"order_index"` // present in query for last N rollouts per segment
 }
 
 type Rollout struct {
 	NewRollout
 	StartTime *time.Time `db:"start_time"`
 	EndTime   *time.Time `db:"end_time"`
+}
+
+type RolloutWithOrderIndex struct {
+	Rollout
+	OrderIndex int `db:"order_index"` // present in query for last N rollouts per segment
 }
 
 const getAllRollouts = `
