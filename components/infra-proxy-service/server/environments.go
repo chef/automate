@@ -11,6 +11,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
 // GetEnvironments get environments list
@@ -32,6 +33,20 @@ func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments)
 
 // GetEnvironment gets the environment details
 func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
+	err := validation.New(validation.Options{
+		Target:  "environment",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
@@ -66,13 +81,23 @@ func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (
 
 // CreateEnvironment creates the environment
 func (s *Server) CreateEnvironment(ctx context.Context, req *request.CreateEnvironment) (*response.Environment, error) {
-	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	err := validation.New(validation.Options{
+		Target:  "environment",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply environment name")
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
 	cookbooks := req.CookbookVersions
@@ -119,13 +144,23 @@ func (s *Server) CreateEnvironment(ctx context.Context, req *request.CreateEnvir
 
 // DeleteEnvironment deletes the environment
 func (s *Server) DeleteEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
-	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	err := validation.New(validation.Options{
+		Target:  "environment",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply environment name")
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
 	environment, err := c.client.Environments.Delete(req.Name)
@@ -140,13 +175,23 @@ func (s *Server) DeleteEnvironment(ctx context.Context, req *request.Environment
 
 // UpdateEnvironment updates the environment attributes
 func (s *Server) UpdateEnvironment(ctx context.Context, req *request.UpdateEnvironment) (*response.Environment, error) {
-	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	err := validation.New(validation.Options{
+		Target:  "environment",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply environment name")
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
 	cookbooks := req.CookbookVersions
