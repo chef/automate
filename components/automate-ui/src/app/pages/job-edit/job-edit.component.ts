@@ -433,8 +433,4 @@ export class JobEditComponent implements OnDestroy {
     }
     return false;
   }
-
-  public formControl(name: string): FormGroup {
-    return this.form.get(name) as FormGroup;
-  }
 }

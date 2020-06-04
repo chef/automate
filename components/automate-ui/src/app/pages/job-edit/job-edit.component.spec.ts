@@ -2,18 +2,20 @@ import { CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
-import { of as observableOf } from 'rxjs';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { ROUTER_NAVIGATION } from '@ngrx/router-store';
+import { of as observableOf } from 'rxjs';
+
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
-import { ChefSessionService } from '../../services/chef-session/chef-session.service';
-import { JobEditComponent, Step } from './job-edit.component';
-import { Job } from '../../entities/jobs/job.model';
-import { JobGetSuccess } from '../../entities/jobs/job.actions';
-import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
+import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
+import { Job } from 'app/entities/jobs/job.model';
+import { JobGetSuccess } from 'app/entities/jobs/job.actions';
+import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
+import { JobEditComponent, Step } from './job-edit.component';
 
 const changeStep = fragment => {
   return {
@@ -46,6 +48,7 @@ describe('JobEditComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
+        ChefPipesModule,
         ReactiveFormsModule,
         RouterTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })

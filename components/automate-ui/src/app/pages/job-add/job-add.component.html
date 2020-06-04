@@ -47,15 +47,15 @@
         <ng-container [ngSwitch]="step$ | async">
           <chef-job-nodes-form
             *ngSwitchCase="Step['add-nodes']"
-            [form]="formControl('nodesGroup')">
+            [form]="form.controls['nodesGroup'] | castFormGroup">
           </chef-job-nodes-form>
           <chef-job-profiles-form
             *ngSwitchCase="Step['add-profiles']"
-            [form]="formControl('profilesGroup')">
+            [form]="form.controls['profilesGroup | castFormGroup']">
           </chef-job-profiles-form>
           <chef-job-schedule-form
             *ngSwitchCase="Step['add-schedule']"
-            [form]="formControl('scheduleGroup')">
+            [form]="form.controls['scheduleGroup | castFormGroup']">
           </chef-job-schedule-form>
         </ng-container>
       </form>

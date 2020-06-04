@@ -352,8 +352,4 @@ export class JobAddComponent implements OnDestroy {
     }
     return false;
   }
-
-  public formControl(name: string): FormGroup {
-    return this.form.controls[name] as FormGroup;
-  }
 }
