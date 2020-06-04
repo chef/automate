@@ -510,7 +510,7 @@ func buildWhereConstraintsFromFilters(filters map[string][]string, firstKeyword 
 			whereConstraints = whereConstraints + buildORStatementFromValues("environment", values)
 
 		case "group":
-			whereConstraints = whereConstraints + buildORStatementFromValues("s.service_group_name_suffix", values)
+			whereConstraints = whereConstraints + buildORStatementFromValues("service_group_name_suffix", values)
 
 		case "service":
 			whereConstraints = whereConstraints + buildORStatementFromValues("name", values)
