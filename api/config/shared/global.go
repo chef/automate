@@ -134,26 +134,14 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 			}
 		}
 	case "gcs":
-		if bu.GetGcs().GetBucket().GetProjectid().GetValue() == "" {
-			cfgErr.AddMissingKey("global.v1.backups.gcs.bucket.projectid")
-		}
-
 		if bu.GetGcs().GetBucket().GetName().GetValue() == "" {
 			cfgErr.AddMissingKey("global.v1.backups.gcs.bucket.name")
 		}
 
 		// Make sure the user has the path to the gcs creds set and it is accessible
-		gcscredpath := bu.GetGcs().GetCredentials().GetPath().GetValue()
-		if gcscredpath == "" {
-			cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.path")
-		} else {
-			ok, err := fileutils.Readable("hab", gcscredpath)
-			if err == nil && !ok {
-				cfgErr.AddInvalidValue(
-					"global.v1.backups.gcs.credentials.path",
-					fmt.Sprintf("the 'hab' user must have read permissions to path: %s", gcscredpath),
-				)
-			}
+		gcsJSON := bu.GetGcs().GetCredentials().GetJson().GetValue()
+		if gcsJSON == "" {
+			cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.json")
 		}
 
 	default:

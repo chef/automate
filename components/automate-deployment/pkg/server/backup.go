@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -190,6 +191,9 @@ func (s *server) RestoreBackup(ctx context.Context, req *api.RestoreBackupReques
 	if req.Restore.GetS3BackupLocation().GetBucketName() != "" {
 		bucket = req.Restore.GetS3BackupLocation().GetBucketName()
 		basePath = req.Restore.GetS3BackupLocation().GetBasePath()
+	} else if req.Restore.GetGcsBackupLocation().GetBucketName() != "" {
+		bucket = req.Restore.GetGcsBackupLocation().GetBucketName()
+		basePath = req.Restore.GetGcsBackupLocation().GetBasePath()
 	}
 
 	bgwLocationSpec, err = backup.NewBackupGatewayLocationSpec(
@@ -204,6 +208,7 @@ func (s *server) RestoreBackup(ctx context.Context, req *api.RestoreBackupReques
 		return res, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	spew.Dump(req.Restore)
 	remoteRestoreSpec = backup.NewRemoteLocationSpecificationFromRestoreTask(req.Restore)
 	sender := s.newEventSender()
 

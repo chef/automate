@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"path"
 	"strings"
@@ -218,18 +217,11 @@ func NewRemoteLocationSpecificationFromGlobalConfig(globalConfig *config.GlobalC
 			SessionToken: globalConfig.GetV1().GetBackups().GetS3().GetCredentials().GetSessionToken().GetValue(),
 		}
 	case "gcs":
-		// TODO(jaym): We need to fix this before merge.
-		// The config needs to full credentials json and not a path
-		data, _ := ioutil.ReadFile(globalConfig.GetV1().GetBackups().GetGcs().GetCredentials().GetPath().GetValue())
-		creds := ""
-		if data != nil {
-			creds = string(data)
-		}
 		return GCSLocationSpecification{
 			BucketName:                   globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetName().GetValue(),
 			BasePath:                     globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetBasePath().GetValue(),
-			ProjectID:                    globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetProjectid().GetValue(),
-			GoogleApplicationCredentials: creds,
+			ProjectID:                    globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetProjectId().GetValue(),
+			GoogleApplicationCredentials: globalConfig.GetV1().GetBackups().GetGcs().GetCredentials().GetJson().GetValue(),
 		}
 	default:
 		return FilesystemLocationSpecification{

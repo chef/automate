@@ -275,7 +275,7 @@ func (c *ConfigRequest) applyGlobalBackupConfig(
 // old fs backend to the s3 compatible backup-gateway
 func (c *ConfigRequest) migrateToBackupGateway(cfg *ConfigRequest_V1_System_Backups) {
 	// If the backend is configured to use S3 then we need not worry about fallback
-	if cfg.GetBackend().GetValue() == "s3" || cfg.GetBackend().GetValue() == "Gcs" {
+	if cfg.GetBackend().GetValue() == "s3" || cfg.GetBackend().GetValue() == "gcs" {
 		return
 	}
 

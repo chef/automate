@@ -72,8 +72,7 @@ func MergeAndValidateNewUserOverrideConfig(existing *api.AutomateConfig, req *Ba
 	}
 
 	// Merge the restore task options into the config
-	reqS3 := req.GetS3BackupLocation()
-	if reqS3.GetBucketName() != "" {
+	if reqS3 := req.GetS3BackupLocation(); reqS3.GetBucketName() != "" {
 		// We're in S3 mode so we need to populate the config with any options
 		// that are in the req.
 		if cfg.GetGlobal().GetV1() == nil {
@@ -122,6 +121,33 @@ func MergeAndValidateNewUserOverrideConfig(existing *api.AutomateConfig, req *Ba
 
 		if sessionToken := reqS3.GetSessionToken(); sessionToken != "" {
 			creds.SessionToken = w.String(sessionToken)
+		}
+	} else if reqGCS := req.GetGcsBackupLocation(); reqGCS.BucketName != "" {
+		if cfg.GetGlobal().GetV1() == nil {
+			cfg.Global = config.NewGlobalConfig()
+		}
+
+		if cfg.Global.V1.Backups == nil {
+			cfg.Global.V1.Backups = &config.Backups{}
+		}
+
+		cfg.Global.V1.Backups.Gcs = &config.Backups_GCS{
+			Credentials: &config.Backups_GCS_GCPCredentials{},
+			Bucket: &config.Backups_GCS_Bucket{
+				Name: w.String(reqGCS.BucketName),
+			},
+		}
+
+		if reqGCS.BasePath != "" {
+			cfg.Global.V1.Backups.Gcs.Bucket.BasePath = w.String(reqGCS.BasePath)
+		}
+
+		if reqGCS.ProjectId != "" {
+			cfg.Global.V1.Backups.Gcs.Bucket.ProjectId = w.String(reqGCS.ProjectId)
+		}
+
+		if reqGCS.GoogleApplicationCredentials != "" {
+			cfg.Global.V1.Backups.Gcs.Credentials.Json = w.String(reqGCS.GoogleApplicationCredentials)
 		}
 	}
 
