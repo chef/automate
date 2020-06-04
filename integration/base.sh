@@ -140,7 +140,7 @@ do_build_default() {
     else
         log_info "No pre-built sentinel file found"
         log_info "Building Changes"
-        #build_changed
+        build_changed
         log_info "Downloading channel manifests"
         download_manifest "dev" "$test_manifest_dir/dev.json"
         download_manifest "acceptance" "$test_manifest_dir/acceptance.json"
