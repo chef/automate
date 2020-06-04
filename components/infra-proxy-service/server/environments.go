@@ -83,15 +83,9 @@ func (s *Server) CreateEnvironment(ctx context.Context, req *request.CreateEnvir
 	var defAtt interface{}
 	var ovrAtt interface{}
 
-	defIn := req.DefaultAttributes
-	if defIn == "" {
-		defIn = "{}"
-	}
+	defIn := DefaultIfEmpty(req.DefaultAttributes)
+	overIn := DefaultIfEmpty(req.OverrideAttributes)
 
-	overIn := req.OverrideAttributes
-	if overIn == "" {
-		overIn = "{}"
-	}
 	defaultAttributes := json.RawMessage(defIn)
 	overrideAttributes := json.RawMessage(overIn)
 
@@ -163,15 +157,9 @@ func (s *Server) UpdateEnvironment(ctx context.Context, req *request.UpdateEnvir
 	var defAtt interface{}
 	var ovrAtt interface{}
 
-	defIn := req.DefaultAttributes
-	if defIn == "" {
-		defIn = "{}"
-	}
+	defIn := DefaultIfEmpty(req.DefaultAttributes)
+	overIn := DefaultIfEmpty(req.OverrideAttributes)
 
-	overIn := req.OverrideAttributes
-	if overIn == "" {
-		overIn = "{}"
-	}
 	defaultAttributes := json.RawMessage(defIn)
 	overrideAttributes := json.RawMessage(overIn)
 

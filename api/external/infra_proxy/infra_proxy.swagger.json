@@ -1395,7 +1395,7 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Environment versined cookbooks constraints."
+          "description": "Environment versioned cookbooks constraints."
         },
         "default_attributes": {
           "type": "string",
@@ -1564,7 +1564,7 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Environment versined cookbooks constraints."
+          "description": "Environment versioned cookbooks constraints."
         },
         "default_attributes": {
           "type": "string",

@@ -138,7 +138,7 @@ type CreateEnvironment struct {
 	Description string `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty" toml:"description,omitempty" mapstructure:"description,omitempty"`
 	// Class name.
 	JsonClass string `protobuf:"bytes,5,opt,name=json_class,json=jsonClass,proto3" json:"json_class,omitempty" toml:"json_class,omitempty" mapstructure:"json_class,omitempty"`
-	// Environment versined cookbooks constraints.
+	// Environment versioned cookbooks constraints.
 	CookbookVersions map[string]string `protobuf:"bytes,6,rep,name=cookbook_versions,json=cookbookVersions,proto3" json:"cookbook_versions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" toml:"cookbook_versions,omitempty" mapstructure:"cookbook_versions,omitempty"`
 	// Stringified json of the default attributes.
 	DefaultAttributes string `protobuf:"bytes,7,opt,name=default_attributes,json=defaultAttributes,proto3" json:"default_attributes,omitempty" toml:"default_attributes,omitempty" mapstructure:"default_attributes,omitempty"`
@@ -241,7 +241,7 @@ type UpdateEnvironment struct {
 	Description string `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty" toml:"description,omitempty" mapstructure:"description,omitempty"`
 	// Class name.
 	JsonClass string `protobuf:"bytes,5,opt,name=json_class,json=jsonClass,proto3" json:"json_class,omitempty" toml:"json_class,omitempty" mapstructure:"json_class,omitempty"`
-	// Environment versined cookbooks constraints.
+	// Environment versioned cookbooks constraints.
 	CookbookVersions map[string]string `protobuf:"bytes,6,rep,name=cookbook_versions,json=cookbookVersions,proto3" json:"cookbook_versions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" toml:"cookbook_versions,omitempty" mapstructure:"cookbook_versions,omitempty"`
 	// Stringified json of the default attributes.
 	DefaultAttributes string `protobuf:"bytes,7,opt,name=default_attributes,json=defaultAttributes,proto3" json:"default_attributes,omitempty" toml:"default_attributes,omitempty" mapstructure:"default_attributes,omitempty"`

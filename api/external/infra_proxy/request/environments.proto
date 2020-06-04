@@ -30,7 +30,7 @@ message CreateEnvironment {
     string description = 4;
     // Class name.
     string json_class = 5;
-    // Environment versined cookbooks constraints.
+    // Environment versioned cookbooks constraints.
     map<string, string> cookbook_versions = 6;
     // Stringified json of the default attributes.
     string default_attributes = 7;
@@ -49,7 +49,7 @@ message UpdateEnvironment {
     string description = 4;
     // Class name.
     string json_class = 5;
-    // Environment versined cookbooks constraints.
+    // Environment versioned cookbooks constraints.
     map<string, string> cookbook_versions = 6;
     // Stringified json of the default attributes.
     string default_attributes = 7;

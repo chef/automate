@@ -1398,7 +1398,7 @@ func init() {
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Environment versined cookbooks constraints."
+          "description": "Environment versioned cookbooks constraints."
         },
         "default_attributes": {
           "type": "string",
@@ -1567,7 +1567,7 @@ func init() {
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Environment versined cookbooks constraints."
+          "description": "Environment versioned cookbooks constraints."
         },
         "default_attributes": {
           "type": "string",
