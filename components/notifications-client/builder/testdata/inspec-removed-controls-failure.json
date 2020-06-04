@@ -1,0 +1,188 @@
+{
+  "type": "inspec_report",
+  "node_uuid": "34cbbb4c-c502-4971-b193-00e987b4678c",
+  "report_uuid": "44024b50-2e0d-42fa-a57c-dddddddddddd",
+  "job_uuid": "12345678-1234-123e-b12e-222222222222",
+  "node_name": "debian(2)-zeta-linux(f)-apache(p)-failed",
+  "environment": "DevSec Prod Zeta",
+  "roles": ["base_deb", "apache_deb", "debian-hardening-prod", "dot.role"],
+  "recipes": [],
+  "end_time": "2018-02-09T09:18:41Z",
+  "version": "2.1.10",
+  "platform": {
+    "name": "debian",
+    "release": "8.7"
+  },
+  "statistics": {
+    "duration": 0.636833
+  },
+  "other_checks": [],
+  "policy_name": "",
+  "policy_group": "",
+  "organization_name": "",
+  "source_fqdn": "localhost",
+  "chef_tags": [],
+  "ipaddress": "192.168.56.33",
+  "fqdn": "lb-deb.example.com",
+  "profiles": [
+    {
+      "name": "linux-baseline",
+      "title": "DevSec Linux Security Baseline",
+      "version": "2.0.1",
+      "sha256": "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015",
+      "summary": "Test-suite for best-preactice os hardening",
+      "maintainer": "",
+      "license": "",
+      "copyright": "Hardening Framework Team",
+      "copyright_email": "hello@hardening.io",
+      "status": "loaded",
+      "attributes": [
+        {
+          "name": "role_name",
+          "options": {
+            "default": "base",
+            "description": "Chef Role"
+          }
+        },
+        {
+          "name": "profile_id",
+          "options": {
+            "default": 1,
+            "description": "An int id"
+          }
+        },
+        {
+          "name": "do.this?",
+          "options": {
+            "default": true,
+            "description": "A bool flag"
+          }
+        },
+        {
+          "name": "take_this",
+          "options": {
+            "default": [
+              "oh",
+              "hear"
+            ],
+            "description": "A bloody array"
+          }
+        },
+        {
+          "name": "bloody_hash",
+          "options": {
+            "default": {
+              "oh": "god"
+            }
+          }
+        },
+        {
+          "name": "no_default",
+          "options": {
+            "description": "Default is for lazies!"
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "os-02",
+          "code": "control 'os-02' do\n  impact 1.0\n  title 'Check owner and permissions for /etc/shadow'\n  desc 'Check periodically the owner and permissions for /etc/shadow'\n  describe file('/etc/shadow') do\n    it { should exist }\n    it { should be_file }\n    it { should be_owned_by 'root' }\n    its('group') { should eq 'root' }\n    it { should_not be_executable }\n    it { should be_writable.by('owner') }\n    it { should be_readable.by('owner') }\n    it { should_not be_readable.by('group') }\n    it { should_not be_readable.by('other') }\n  end\n  tag 'tag1': 'value1'\nend\n",
+          "desc": "Check periodically the owner and permissions for /etc/shadow",
+          "impact": 1,
+          "title": "Check owner and permissions for /etc/shadow",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/os_spec.rb",
+            "line": 33
+          },
+          "refs": [],
+          "tags": { "tag1": "value1" },
+          "waiver_data": {
+            "justification": "Sound reasoning",
+            "run": true,
+            "skipped_due_to_waiver": false,
+            "message": ""
+          },
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should exist",
+              "run_time": 0.004684,
+              "start_time": "2018-02-09T10:17:23+01:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should be file",
+              "run_time": 0.004503,
+              "start_time": "2018-02-09T10:17:23+01:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should be owned by \"root\"",
+              "run_time": 0.000176,
+              "start_time": "2018-02-09T10:17:23+01:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should not be executable",
+              "run_time": 0.000138,
+              "start_time": "2018-02-09T10:17:23+01:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should be writable by owner",
+              "run_time": 7.6e-05,
+              "start_time": "2018-02-09T10:17:23+01:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should be readable by owner",
+              "run_time": 7.2e-05,
+              "start_time": "2018-02-09T10:17:23+01:00"
+            },
+            {
+              "status": "failed",
+              "code_desc": "File /etc/shadow should not be readable by group",
+              "run_time": 0.000171,
+              "start_time": "2018-02-09T10:17:23+01:00",
+              "message": "expected File /etc/shadow not to be readable by group"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should not be readable by other",
+              "run_time": 9.4e-05,
+              "start_time": "2018-02-09T10:17:23+01:00"
+            },
+            {
+              "status": "failed",
+              "code_desc": "File /etc/shadow group should eq \"root\"",
+              "run_time": 0.000138,
+              "start_time": "2018-02-09T10:17:23+01:00",
+              "message": "\nexpected: \"root\"\n     got: \"shadow\"\n\n(compared using ==)\n"
+            },
+            {
+              "status": "failed",
+              "code_desc": "File /etc/shadow group should eq \"root\"",
+              "run_time": 0.000138,
+              "start_time": "2018-02-09T10:17:23+01:00",
+              "message": "\nexpected: \"root\"\n     got: \"shadow\"\n\n(compared using ==)\n"
+            },
+            {
+              "status": "failed",
+              "code_desc": "File /etc/shadow group should eq \"root\"",
+              "run_time": 0.000138,
+              "start_time": "2018-02-09T10:17:23+01:00",
+              "message": "\nexpected: \"root\"\n     got: \"shadow\"\n\n(compared using ==)\n"
+            }
+          ],
+          "removed_results_counts": {
+            "failed": 150,
+            "skipped": 100,
+            "passed": 50
+          }
+        }
+      ],
+      "supports": null,
+      "groups": null
+    }
+  ]
+}

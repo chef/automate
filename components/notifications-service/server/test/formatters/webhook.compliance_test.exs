@@ -29,6 +29,7 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
               status: "failed",
               number_of_tests: 3,
               title: "/etc/ssh should have limited access to 0755",
+              removed_results_counts: nil,
               refs: []}
           ],
           license: "Proprietary, All rights reserved",
@@ -79,7 +80,8 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
               ],
               source_location: %{line: 37, ref: "base/ssh/controls/ssh_folder_spec.rb"},
               status: "failed", title: "/etc/ssh should have limited access to 0755",
-              refs: []
+              refs: [],
+              removed_results_counts: nil,
             }
           ],
           copyright: "Chef Software, Inc.",
@@ -131,7 +133,8 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
               ],
               source_location: %{line: 37, ref: "base/ssh/controls/ssh_folder_spec.rb"},
               status: "failed", title: "/etc/ssh should have limited access to 0755",
-              refs: []
+              refs: [],
+              removed_results_counts: nil,
             },
             %{code: "control 'basic-2' do\n  impact 1.0\n  title '/etc/ssh should be owned by root'\n  desc '\n    The OpenSSH configuration folder should be owned\n    by the root user. It is an important step towards making\n    sure, that configuration files are only changed by\n    priviledged users.\n  '\n  describe file('/etc/ssh') do\n    it { should be_owned_by 'root' }\n  end\nend\n",
               desc: "The OpenSSH configuration folder should be owned\nby the root user. It is an important step towards making\nsure, that configuration files are only changed by\npriviledged users.",
@@ -150,7 +153,8 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
               source_location: %{line: 23, ref: "base/ssh/controls/ssh_folder_spec.rb"},
               status: "failed",
               title: "/etc/ssh should be owned by root",
-              refs: []
+              refs: [],
+              removed_results_counts: nil,
             }
           ],
           copyright: "Chef Software, Inc.", copyright_email: "support@chef.io",
