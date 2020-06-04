@@ -195,6 +195,11 @@ func TestRemovedControlsFailure(t *testing.T) {
 	assert.Equal(t, int32(150), failedControl.RemovedResultsCounts.Failed)
 	assert.Equal(t, int32(50), failedControl.RemovedResultsCounts.Passed)
 	assert.Equal(t, int32(100), failedControl.RemovedResultsCounts.Skipped)
+
+	assert.Equal(t, int32(311), failedControl.Stats.NumTests)
+	assert.Equal(t, int32(154), failedControl.Stats.NumFailedTests)
+	assert.Equal(t, int32(100), failedControl.Stats.NumSkippedTests)
+	assert.Equal(t, int32(57), failedControl.Stats.NumPassedTests)
 }
 
 func fromJSON(name string, out proto.Message) error {
