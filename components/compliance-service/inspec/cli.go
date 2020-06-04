@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // BackendCache used for configuring inspec exec command, passed in via config flag
@@ -51,8 +53,20 @@ func isTimeoutSane(timeout time.Duration, max time.Duration) error {
 	return nil
 }
 
+func writeInputsToYmlFile(inputs map[string]string, filename string) error {
+	content, err := yaml.Marshal(inputs)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(filename, content, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Scan a target node with all specified profiles
-func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[string]string) ([]byte, []byte, *Error) {
+func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[string]string, inputs map[string]string) ([]byte, []byte, *Error) {
 	if err := isTimeoutSane(timeout, 12*time.Hour); err != nil {
 		return nil, nil, NewInspecError(INVALID_PARAM, err.Error())
 	}
@@ -67,6 +81,18 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 	env["HOME"] = os.Getenv("HOME")
 
 	args := append([]string{binName, "exec"}, paths...)
+
+	// write the inputs to a file to be passed to inspec during command execution
+	if len(inputs) > 0 {
+		filename := "/tmp/inputs.yml"
+		err := writeInputsToYmlFile(inputs, filename)
+		if err != nil {
+			errString := fmt.Sprintf("unable to write inputs to file for scan job %s : %s", target.Hostname, err.Error())
+			return nil, nil, NewInspecError(INVALID_PARAM, errString)
+		}
+		args = append(args, fmt.Sprintf("--input-file %s", filename))
+	}
+
 	stdOut, stdErr, err := run(args, target, timeout, env)
 
 	stdOutErr := ""

@@ -1,11 +1,14 @@
 package inspec
 
 import (
+	"io/ioutil"
 	"testing"
 	"time"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	yaml "gopkg.in/yaml.v2"
 )
 
 func TestInspecErrReturnsCorrectErr(t *testing.T) {
@@ -34,4 +37,24 @@ func TestInspecErrReturnsCorrectErr(t *testing.T) {
 	err = getInspecError("", stdErr, blankErr, target, time.Duration(90))
 	assert.Equal(t, &Error{Type: "authentication failed", Message: "Authentication failed for test\n\nNet::SSH::AuthenticationFailed"}, err)
 
+}
+
+func TestWriteInputsToYmlFile(t *testing.T) {
+	inputs := make(map[string]string)
+	inputs["key1"] = "val1"
+	inputs["key2"] = "val2"
+	err := writeInputsToYmlFile(inputs, "/tmp/test-file.yml")
+	require.NoError(t, err)
+
+	yamlFile, err := ioutil.ReadFile("/tmp/test-file.yml")
+	require.NoError(t, err)
+
+	var res map[string]string
+	err = yaml.Unmarshal(yamlFile, &res)
+	require.NoError(t, err)
+
+	expected := make(map[string]string)
+	expected["key1"] = "val1"
+	expected["key2"] = "val2"
+	assert.Equal(t, expected, res)
 }
