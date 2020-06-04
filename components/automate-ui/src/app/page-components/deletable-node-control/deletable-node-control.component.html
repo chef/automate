@@ -2,7 +2,7 @@
   label="Delete checked nodes"
   (click)="showConfModal()"
   [disabled]="selectedNodesIsEmpty()">
-    Delete {{nodesSelectedForDelete.size }} node{{ nodesSelectedForDelete.size | i18nPlural: pluralMapping }}
+    Delete {{nodesSelectedForDelete.size }} Node{{ nodesSelectedForDelete.size | i18nPlural: pluralMapping }}
 </chef-button>
 <span *ngIf="selectedNodesNonEmpty()">
   <!-- {{nodesSelectedForDelete.size }} item{{ nodesSelectedForDelete.size | i18nPlural: pluralMapping }} selected -->
