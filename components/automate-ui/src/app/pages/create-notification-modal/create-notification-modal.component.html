@@ -21,6 +21,44 @@
         <div class="margin">
           <chef-form-field>
             <label>
+              <span class="label">Webhook type<span aria-hidden="true">*</span></span>
+              <chef-select
+                (change)="changeSelectionForWebhookType($event)"
+                class="notification-select-menu">
+                <chef-option *ngFor="let key of getTagetTypeKeys()" [value]="key">
+                  <img src="assets/img/logo-{{key}}.png" alt="{{key}} logo"/>
+                  {{ notificationRule.TargetTypeLabels[key] }} - {{key}}
+                </chef-option>
+              </chef-select>
+            </label>
+          </chef-form-field>
+        </div>
+        <div class="margin">
+          <chef-form-field>
+            <label>
+              <span class="label">Failure type  <span aria-hidden="true">*</span></span>
+              <chef-select
+                (change)="setFailureType($event)"
+                class="notification-select-menu">
+                <chef-option *ngFor="let key of getAlertTypeKeys()" [value]="key">
+                  {{ notificationRule.AlertTypeLabels[key] }}
+                </chef-option>
+              </chef-select>
+              <div *ngIf="displayCriticalControlsCheckbox()">
+                <p class="small">
+                  <chef-checkbox
+                    (change)="updateCriticalControlsOnly($event.detail)"
+                    [checked]="notificationRule.criticalControlsOnly">
+                  </chef-checkbox>
+                  Only send notifications for critical control failures
+                </p>
+              </div>
+            </label>
+          </chef-form-field>
+        </div>
+        <div class="margin">
+          <chef-form-field>
+            <label>
               <span class="label">Webhook URL <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="targetUrl" type="text" id="targetUrl-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
@@ -30,35 +68,36 @@
             </chef-error>
           </chef-form-field>
         </div>
-        <div class="margin">
-          <chef-form-field>
-            <label>
-              <span class="label">Username <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="username" type="text" id="username-input" (keyup)="handleInput($event)" autocomplete="off"/>
-            </label>
-            <span class="i-desc">Encrypted, and only used to access the notification.</span>
-            <chef-error *ngIf="createForm.get('username').hasError('required') && createForm.get('username').dirty">
-              Username is required.
-            </chef-error>
-          </chef-form-field>
+        <div *ngIf="notificationRule.targetType === 'ServiceNowAlert'">
+          <div class="margin">
+            <chef-form-field>
+              <label>
+                <span class="label">ServiceNow Username <span aria-hidden="true">*</span></span>
+                <input chefInput formControlName="username" type="text" id="username-input" (keyup)="handleInput($event)" autocomplete="off"/>
+              </label>
+              <span class="i-desc">Encrypted, and only used to access the notification.</span>
+              <chef-error *ngIf="createForm.get('username').hasError('required') && createForm.get('username').dirty">
+                Username is required.
+              </chef-error>
+            </chef-form-field>
+          </div>
+          <div class="margin">
+            <chef-form-field>
+              <label>
+                <span class="label">ServiceNow Password <span aria-hidden="true">*</span></span>
+                <input chefInput formControlName="password" type="password" id="password-input" (keyup)="handleInput($event)" autocomplete="off"/>
+              </label>
+              <span class="i-desc">Encrypted, and only used to access the notification feed.</span>
+              <chef-error *ngIf="createForm.get('password').hasError('password') && createForm.get('password').dirty">
+                Password is required.
+              </chef-error>
+              <chef-error
+                *ngIf="createForm.get('password').hasError('password') && createForm.get('password').dirty">
+                Password is required.
+              </chef-error>
+            </chef-form-field>
+          </div>
         </div>
-        <div class="margin">
-          <chef-form-field>
-            <label>
-              <span class="label">Password <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="password" type="password" id="password-input" (keyup)="handleInput($event)" autocomplete="off"/>
-            </label>
-            <span class="i-desc">Encrypted, and only used to access the notification feed.</span>
-            <chef-error
-              *ngIf="createForm.get('password').hasError('password') && createForm.get('password').dirty">
-              Password is required.
-            </chef-error>
-          </chef-form-field>
-        </div>
-        <chef-error
-          *ngIf="createForm.get('password').hasError('password') && createForm.get('password').dirty">
-          Password is required.
-        </chef-error>
 
         <div id="button-bar">
           <div class="url-failed" *ngIf="hookStatus === urlState.Failure">
@@ -70,7 +109,6 @@
             <chef-icon class="url-success-icon">done</chef-icon>
             <span class="status-heading">Notification test connected successfully!</span>
           </div>
-
           <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-button-object-modal" (click)="createNotification()">
             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
             <span *ngIf="!creating">Create Notification</span>

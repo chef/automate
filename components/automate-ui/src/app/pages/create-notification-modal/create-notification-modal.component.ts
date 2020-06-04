@@ -1,5 +1,9 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import {
+  NotificationRule,
+  ServiceActionType
+} from 'app/entities/notification_rules/notification_rule.model';
 
 enum UrlTestState {
   Inactive,
@@ -23,7 +27,7 @@ export class CreateNotificationModalComponent implements OnInit {
   @Output() sendTestClicked = new EventEmitter();
   @Input() createForm: FormGroup;
   @Input() hookStatus = UrlTestState.Inactive;
-
+  @Input() notificationRule = new NotificationRule('', '', null, '', null, '', false);
   public conflictError = false;
   public urlState = UrlTestState;
 
@@ -31,6 +35,9 @@ export class CreateNotificationModalComponent implements OnInit {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
       this.conflictError = isConflict;
     });
+
+    this.notificationRule.ruleType = 'CCRFailure';
+    this.notificationRule.targetType = ServiceActionType.SLACK;
   }
 
   public handleInput(event: KeyboardEvent): void {
@@ -56,27 +63,34 @@ export class CreateNotificationModalComponent implements OnInit {
     return this.createForm.controls.targetUrl.value !== '' ? true : false;
   }
 
-  // getAlertTypeKeys() {
-  //   return this.rule.getAlertTypeKeys();
-  // }
+  getAlertTypeKeys() {
+    return this.notificationRule.getAlertTypeKeys();
+  }
 
-  // updateCriticalControlsOnly(event) {
-  //   this.model.rule.criticalControlsOnly = event;
-  // }
+  getTagetTypeKeys() {
+    return this.notificationRule.getTargetTypeKeys();
+  }
 
-  // displayCriticalControlsCheckbox() {
-  //   return this.model.rule.targetType === ServiceActionType.SERVICENOW &&
-  //   this.model.rule.ruleType === 'ComplianceFailure';
-  // }
+  setFailureType(event) {
+    this.notificationRule.ruleType = event.target.value;
+    if (this.notificationRule.ruleType !== 'ComplianceFailure' &&
+    this.notificationRule.targetType === ServiceActionType.SERVICENOW) {
+      this.notificationRule.criticalControlsOnly = false;
+    }
+  }
 
-  // onSelectionChange(name) {
-  //   this.targetType = name;
-  //   this.model.rule.targetType = name;
-  // }
+  changeSelectionForWebhookType(event) {
+    this.notificationRule.targetType = event.target.value;
+  }
 
-  // targetTypeChosen() {
-  //   return typeof this.targetType !== 'undefined';
-  // }
+  updateCriticalControlsOnly(event) {
+    this.notificationRule.criticalControlsOnly = event;
+  }
+
+  displayCriticalControlsCheckbox() {
+    return this.notificationRule.targetType === ServiceActionType.SERVICENOW &&
+    this.notificationRule.ruleType === 'ComplianceFailure';
+  }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
     return event.key === 'Shift' || event.key === 'Tab';

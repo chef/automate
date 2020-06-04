@@ -6,7 +6,6 @@ import { identity } from 'lodash/fp';
 import { of as observableOf, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { NotificationRule } from './notification_rule.model';
-// import { CreateNotificationRulePayload } from './notification_rule.action';
 
 const NOTIFIER_URL = environment.notifier_url;
 const SECRETS_URL = environment.secrets_url;
@@ -114,6 +113,17 @@ export class NotificationRuleRequests {
     } else {
       return observableOf('');
     }
+  }
+
+  public testHookWithUsernamePassword(url: string,
+    username: string, password: string): Observable<Object> {
+    return this.http.post(encodeURI(
+      this.joinToNotifierUrl(['webhook'])), { url, 'username_password': {username, password} });
+  }
+
+  public testHookWithNoCreds(url: string): Observable<Object> {
+    return this.http.post(encodeURI(
+      this.joinToNotifierUrl(['webhook'])), { url, 'none': {}});
   }
 
   private newSecret(id: string, name: string, targetUsername: string,

@@ -29,14 +29,13 @@ import * as integrationsDetail from './pages/integrations/detail/integrations-de
 import * as integrationsEdit from './pages/integrations/edit/integrations-edit.reducer';
 import * as license from './entities/license/license.reducer';
 import * as layout from './entities/layout/layout.reducer';
-import * as notificationEntity from './entities/notifications/notification.reducer';
-import * as NotificationRuleEntity from './entities/notification_rules/notification_rule.reducer';
 import * as credential from './entities/credentials/credential.reducer';
 import * as jobAdd from './pages/job-add/job-add.reducer';
 import * as jobEdit from './pages/job-edit/job-edit.reducer';
 import * as jobEntity from './entities/jobs/job.reducer';
 import * as jobList from './pages/job-list/job-list.reducer';
 import * as manager from './entities/managers/manager.reducer';
+import * as notificationEntity from './entities/notifications/notification.reducer';
 import * as NotificationRuleEntity from './entities/notification_rules/notification_rule.reducer';
 import * as permEntity from './entities/userperms/userperms.reducer';
 import * as policyEntity from './entities/policies/policy.reducer';

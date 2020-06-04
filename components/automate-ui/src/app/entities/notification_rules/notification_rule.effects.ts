@@ -63,7 +63,7 @@ export class NotificationRuleEffects {
       ofType(NotificationRuleActionTypes.CREATE),
       mergeMap(({ payload, username, password }: CreateNotificationRule) =>
       this.requests.createNotificationRule( payload, username, password ).pipe(
-        map((resp) => new CreateNotificationRuleSuccess(resp)),
+        map(() => new CreateNotificationRuleSuccess(payload)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new CreateNotificationRuleFailure(error))))));
 

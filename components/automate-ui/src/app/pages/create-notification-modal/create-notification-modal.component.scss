@@ -75,3 +75,38 @@ chef-modal {
   font-size: 12px;
   font-weight: 300;
 }
+
+chef-select {
+  width: 100%;
+  font-weight: 100;
+}
+
+img {
+  width: 15px;
+  margin-right: 5px;
+  margin-bottom: -3px;
+}
+
+chef-modal ::ng-deep .modal {
+  height: 95%;
+  overflow-x: hidden;
+}
+
+chef-modal ::ng-deep .modal::-webkit-scrollbar {
+  width: 12px;
+  background-color: #F5F5F5;
+}
+
+chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #CCC;
+}
+
+chef-checkbox ::ng-deep .check-wrap {
+  color: $chef-dark-grey;
+  border: 1px solid;
+}
+
+.small:first-of-type {
+  margin-top: 10px;
+}

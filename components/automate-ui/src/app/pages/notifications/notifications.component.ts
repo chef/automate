@@ -14,8 +14,9 @@ import { HttpStatus } from 'app/types/types';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { NotificationRule, ServiceActionType } from 'app/entities/notification_rules/notification_rule.model';
 import { SortDirection } from '../../types/types';
-import { RulesService } from '../../services/rules/rules.service';
+// import { RulesService } from '../../services/rules/rules.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { NotificationRuleRequests } from 'app/entities/notification_rules/notification_rule.requests';
 import {
   allRules,
   saveStatus,
@@ -66,20 +67,20 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   public notificationToDelete: NotificationRule;
   public deleteModalVisible = false;
   public hookStatus = UrlTestState.Inactive;
+  public notificationObj = new NotificationRule('', '', null, '', null, '', false);
   private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
     private layoutFacade: LayoutFacadeService,
-    private service: RulesService,
+    private notificationRuleRequests: NotificationRuleRequests,
     private telemetryService: TelemetryService
   ) {
     this.rules$ = store.pipe(select(allRules));
     this.createNotificationForm = this.fb.group({
       // Must stay in sync with error checks in create-notification-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      ruleType: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       // Note that URL here may be FQDN -or- IP!
       targetUrl: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -152,25 +153,11 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   public createNotification(): void {
     this.creatingNotification = true;
-    const notificationRuleObj = {
-      id: null,
-      name: this.createNotificationForm.controls['name'].value.trim(),
-      ruleType: this.createNotificationForm.controls['ruleType'].value.trim(),
-      targetType: this.createNotificationForm.controls['targetType'].value.trim(),
-      targetUrl: this.createNotificationForm.controls['tagetUrl'].value.trim(),
-      criticalControlsOnly: this.createNotificationForm.controls['criticalControlsOnly'].value.trim(),
-      AlertTypeLabels: null,
-      toRequest: null,
-      targetSecretId: null,
-      getAlertTypeKeys: null
-    };
-    const username: string = this.createNotificationForm.controls['username'].value.trim();
-    const password: string = this.createNotificationForm.controls['password'].value.trim();
-    this.store.dispatch(new CreateNotificationRule(notificationRuleObj, username, password));
-  }
-
-  public sendTestForNotification(): void {
-    this.sendingNotification = false;
+    this.notificationObj.name = this.createNotificationForm.value.name.trim();
+    this.notificationObj.targetUrl = this.createNotificationForm.value.targetUrl.trim();
+    const username: string = this.createNotificationForm.value.username || '';
+    const password: string = this.createNotificationForm.value.password || '';
+    this.store.dispatch(new CreateNotificationRule(this.notificationObj, username, password));
   }
 
   toggleSort(field: string) {
@@ -297,12 +284,38 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     this.telemetryService.track('notificationRuleCount', ruleCount);
   }
 
+  public sendTestForNotification(): void {
+    this.sendingNotification = true;
+    this.hookStatus = UrlTestState.Loading;
+    const targetUrl: string =  this.createNotificationForm.controls['targetUrl'].value;
+    const targetUsername: string = this.createNotificationForm.controls['username'].value;
+    const targetPassword: string = this.createNotificationForm.controls['password'].value;
+    if (targetUrl && targetUsername && targetPassword) {
+      this.notificationRuleRequests.testHookWithUsernamePassword(targetUrl,
+        targetUsername, targetPassword).subscribe(
+          () => this.revealUrlStatus(UrlTestState.Success),
+          () => this.revealUrlStatus(UrlTestState.Failure)
+        );
+    } else {
+      this.notificationRuleRequests.testHookWithNoCreds(targetUrl)
+        .subscribe(
+          () => this.revealUrlStatus(UrlTestState.Success),
+          () => this.revealUrlStatus(UrlTestState.Failure)
+        );
+    }
+    this.sendingNotification = false;
+  }
+
+  private revealUrlStatus(status: UrlTestState) {
+    this.hookStatus = status;
+  }
+
   // TODO - this was common in all three uses, but I'm not sure this is the best
   // way to do it - do we really need to refresh after the server confirms the action
   // successful? Seem it should be possible to update the local model with the
   // changes and have that trigger view updates?
   refreshRules() {
-    this.rules$ = this.service.fetchRules();
+    // this.rules$ = this.service.fetchRules();
     this.rules$.subscribe(rules => {
       this.sendCountToTelemetry(rules);
       this.updateSort(this.sortField, this.sortDir[this.sortField]);
