@@ -8,10 +8,6 @@ import { get } from 'lodash/fp';
 export class BaseIntegrationFormComponent {
   @Input() formGroup: FormGroup;
 
-  credentialsFormGroup(): FormGroup {
-    return this.formGroup.controls.credentials as FormGroup;
-  }
-
   showInstanceCreds() {
     const formData = this.formGroup.value;
     const no_creds = get('no_creds', formData);
