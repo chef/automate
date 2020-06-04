@@ -548,7 +548,7 @@ func buildORStatementFromValues(field string, values []string) string {
 
 	for _, value := range values {
 		if secondStatement {
-			ORConstraint = ORConstraint + " OR"
+			ORConstraint = ORConstraint + " OR "
 		}
 
 		if strings.ContainsAny(value, "?*") { // Wild cards detected, lookout!
@@ -556,12 +556,12 @@ func buildORStatementFromValues(field string, values []string) string {
 			pgWild = strings.Replace(pgWild, "?", "_", -1)
 			ORConstraint = ORConstraint + fmt.Sprintf(" %s LIKE '%s'", field, pgutils.EscapeLiteralForPG(pgWild))
 		} else {
-			ORConstraint = ORConstraint + fmt.Sprintf(" %s = '%s'", field, pgutils.EscapeLiteralForPG(value))
+			ORConstraint = ORConstraint + fmt.Sprintf("%s = '%s'", field, pgutils.EscapeLiteralForPG(value))
 		}
 		secondStatement = true
 	}
 
-	return ORConstraint
+	return fmt.Sprintf(" (%s)", ORConstraint)
 }
 
 func buildHealthStatementFromValues(values []string) string {
@@ -572,19 +572,19 @@ func buildHealthStatementFromValues(values []string) string {
 
 	for _, value := range values {
 		if secondStatement {
-			ORConstraint = ORConstraint + " OR"
+			ORConstraint = ORConstraint + " OR "
 		}
 		if value == "disconnected" {
 			ORConstraint = " disconnected"
 		} else {
-			ORConstraint = ORConstraint + fmt.Sprintf(" %s = '%s'", "health",
+			ORConstraint = ORConstraint + fmt.Sprintf("%s = '%s'", "health",
 				pgutils.EscapeLiteralForPG(strings.ToUpper(value)))
 		}
 
 		secondStatement = true
 	}
 
-	return ORConstraint
+	return fmt.Sprintf(" (%s)", ORConstraint)
 }
 
 // orderByStatementFromSortField returns the ORDER BY statement from the provided sort field,
