@@ -64,7 +64,7 @@ defmodule Notifications.Formatters.Slack.Compliance.Test do
     expected = %{
         attachments: [%{
             color: "warning",
-            fallback: "InSpec critical control failure on node sad-node.\n2 of 3 tests failed. View in Chef Automate for full details.",
+            fallback: "InSpec critical control failure on node sad-node.\n2 of 4 tests failed. View in Chef Automate for full details.",
             fields: [%{
                 short: false,
                 title: "Control ID::Title",
@@ -79,7 +79,7 @@ defmodule Notifications.Formatters.Slack.Compliance.Test do
                 value: "sad-node"
             }],
             mrkdwn_in: ["text", "pretext"],
-            text: "```2 of 3 tests failed. View in Chef Automate for full details.```\n"
+            text: "```2 of 4 tests failed. View in Chef Automate for full details.```\n"
         }],
         icon_url: "https://docs.chef.io/images/chef-icon.png",
         text: "<https://localhost/compliance/reporting/nodes/deadbeef03|InSpec found a critical control failure on node sad-node>",
@@ -93,7 +93,7 @@ defmodule Notifications.Formatters.Slack.Compliance.Test do
     expected = %{
         attachments: [%{
             color: "warning",
-            fallback: "InSpec critical control failure on node failing-node.\n97 of 174 tests failed. View in Chef Automate for full details.",
+            fallback: "InSpec critical control failure on node failing-node.\n97 of 122 tests failed. View in Chef Automate for full details.",
             fields: [%{
                 short: false,
                 title: "Control ID::Title",
@@ -108,7 +108,7 @@ defmodule Notifications.Formatters.Slack.Compliance.Test do
                 value: "failing-node"
             }],
             mrkdwn_in: ["text", "pretext"],
-            text: "```97 of 174 tests failed. View in Chef Automate for full details.```\n"
+            text: "```97 of 122 tests failed. View in Chef Automate for full details.```\n"
         }],
         icon_url: "https://docs.chef.io/images/chef-icon.png",
         text: "<https://localhost/compliance/reporting/nodes/deadbeef06|InSpec found a critical control failure on node failing-node>",
