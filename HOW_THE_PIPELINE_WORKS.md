@@ -66,7 +66,7 @@ past before merging a pull request.
 Each pipeline is defined in a configuration file:
 
 - `verify`: `.expeditor/verify.pipeline.yml`
-- `verify-private`: `.expeditor/verify_pipeline.yml`
+- `verify-private`: `.expeditor/verify_private.pipeline.yml`
 
 The core of these configuration files are the "steps" (we sometimes
 call these "jobs"). Each step runs on a different buildkite-agent and
