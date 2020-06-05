@@ -4,7 +4,6 @@ package chef.automate.api.infra_proxy;
 option go_package = "github.com/chef/automate/api/external/infra_proxy";
 
 import "google/api/annotations.proto";
-import "google/rpc/error_details.proto";
 
 import "api/external/infra_proxy/request/orgs.proto";
 import "api/external/infra_proxy/request/servers.proto";
@@ -204,6 +203,12 @@ service InfraProxy {
   };
   rpc DeleteEnvironment (infra_proxy.request.Environment) returns (infra_proxy.response.Environment) {
     option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+  };
+  rpc UpdateEnvironment (infra_proxy.request.UpdateEnvironment) returns (infra_proxy.response.Environment) {
+    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
+    option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
   };

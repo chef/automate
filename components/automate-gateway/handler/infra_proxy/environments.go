@@ -87,6 +87,28 @@ func (a *InfraProxyServer) DeleteEnvironment(ctx context.Context, r *gwreq.Envir
 	}, nil
 }
 
+// UpdateEnvironment updates the environment attributes
+func (a *InfraProxyServer) UpdateEnvironment(ctx context.Context, r *gwreq.UpdateEnvironment) (*gwres.Environment, error) {
+	req := &infra_req.UpdateEnvironment{
+		OrgId:              r.OrgId,
+		ServerId:           r.ServerId,
+		Name:               r.Name,
+		Description:        r.Description,
+		CookbookVersions:   r.CookbookVersions,
+		DefaultAttributes:  r.DefaultAttributes,
+		OverrideAttributes: r.OverrideAttributes,
+		JsonClass:          r.JsonClass,
+	}
+	res, err := a.client.UpdateEnvironment(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Environment{
+		Name: res.GetName(),
+	}, nil
+}
+
 func fromUpstreamEnvironments(environments []*infra_res.EnvironmentListItem) []*gwres.EnvironmentListItem {
 	ts := make([]*gwres.EnvironmentListItem, len(environments))
 

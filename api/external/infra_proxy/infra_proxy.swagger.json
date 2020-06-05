@@ -978,6 +978,51 @@
         "tags": [
           "InfraProxy"
         ]
+      },
+      "put": {
+        "operationId": "UpdateEnvironment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environment"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Environment name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateEnvironment"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
@@ -1350,7 +1395,7 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Environment versined cookbooks constraints."
+          "description": "Environment versioned cookbooks constraints."
         },
         "default_attributes": {
           "type": "string",
@@ -1488,6 +1533,46 @@
         "admin_key": {
           "type": "string",
           "description": "Chef organization admin key."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.UpdateEnvironment": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Environment name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Environment description."
+        },
+        "json_class": {
+          "type": "string",
+          "description": "Class name."
+        },
+        "cookbook_versions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Environment versioned cookbooks constraints."
+        },
+        "default_attributes": {
+          "type": "string",
+          "description": "Stringified json of the default attributes."
+        },
+        "override_attributes": {
+          "type": "string",
+          "description": "Stringified json of the override attributes."
         }
       }
     },

@@ -132,3 +132,12 @@ func ParseAPIError(err error) error {
 	}
 	return err
 }
+
+// DefaultIfEmpty returns the raw empty JSON string.
+func DefaultIfEmpty(value string) string {
+	if value == "" {
+		value = "{}"
+	}
+
+	return value
+}

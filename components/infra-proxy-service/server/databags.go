@@ -50,10 +50,7 @@ func (s *Server) CreateDataBagItem(ctx context.Context, req *request.CreateDataB
 		return nil, status.Error(codes.InvalidArgument, "must supply data bag name")
 	}
 
-	data := req.Data
-	if data == "" {
-		data = "{}"
-	}
+	data := DefaultIfEmpty(req.Data)
 
 	var dataBagItem chef.DataBagItem
 	err = json.Unmarshal(json.RawMessage(data), &dataBagItem)

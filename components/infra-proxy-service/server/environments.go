@@ -11,6 +11,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
 // GetEnvironments get environments list
@@ -32,6 +33,20 @@ func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments)
 
 // GetEnvironment gets the environment details
 func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
+	err := validation.New(validation.Options{
+		Target:  "environment",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
@@ -66,32 +81,36 @@ func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (
 
 // CreateEnvironment creates the environment
 func (s *Server) CreateEnvironment(ctx context.Context, req *request.CreateEnvironment) (*response.Environment, error) {
+	err := validation.New(validation.Options{
+		Target:  "environment",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply environment name")
-	}
-
 	cookbooks := req.CookbookVersions
-	if len(cookbooks) == 0 {
+	if cookbooks == nil {
 		cookbooks = map[string]string{}
 	}
 
 	var defAtt interface{}
 	var ovrAtt interface{}
 
-	defIn := req.DefaultAttributes
-	if defIn == "" {
-		defIn = "{}"
-	}
+	defIn := DefaultIfEmpty(req.DefaultAttributes)
+	overIn := DefaultIfEmpty(req.OverrideAttributes)
 
-	overIn := req.OverrideAttributes
-	if overIn == "" {
-		overIn = "{}"
-	}
 	defaultAttributes := json.RawMessage(defIn)
 	overrideAttributes := json.RawMessage(overIn)
 
@@ -121,18 +140,27 @@ func (s *Server) CreateEnvironment(ctx context.Context, req *request.CreateEnvir
 	return &response.Environment{
 		Name: req.Name,
 	}, nil
-
 }
 
 // DeleteEnvironment deletes the environment
 func (s *Server) DeleteEnvironment(ctx context.Context, req *request.Environment) (*response.Environment, error) {
-	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	err := validation.New(validation.Options{
+		Target:  "environment",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply environment name")
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
 	environment, err := c.client.Environments.Delete(req.Name)
@@ -143,7 +171,69 @@ func (s *Server) DeleteEnvironment(ctx context.Context, req *request.Environment
 	return &response.Environment{
 		Name: environment.Name,
 	}, nil
+}
 
+// UpdateEnvironment updates the environment attributes
+func (s *Server) UpdateEnvironment(ctx context.Context, req *request.UpdateEnvironment) (*response.Environment, error) {
+	err := validation.New(validation.Options{
+		Target:  "environment",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	cookbooks := req.CookbookVersions
+	if cookbooks == nil {
+		cookbooks = map[string]string{}
+	}
+
+	var defAtt interface{}
+	var ovrAtt interface{}
+
+	defIn := DefaultIfEmpty(req.DefaultAttributes)
+	overIn := DefaultIfEmpty(req.OverrideAttributes)
+
+	defaultAttributes := json.RawMessage(defIn)
+	overrideAttributes := json.RawMessage(overIn)
+
+	err = json.Unmarshal(defaultAttributes, &defAtt)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = json.Unmarshal(overrideAttributes, &ovrAtt)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	_, err = c.client.Environments.Put(&chef.Environment{
+		Name:               req.Name,
+		Description:        req.Description,
+		DefaultAttributes:  defAtt,
+		OverrideAttributes: ovrAtt,
+		CookbookVersions:   cookbooks,
+		JsonClass:          req.JsonClass,
+	})
+
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.Environment{
+		Name: req.Name,
+	}, nil
 }
 
 // fromAPIToListEnvironments a response.Environments from a struct of Environments
