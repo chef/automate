@@ -1417,7 +1417,7 @@
         },
         "data": {
           "type": "object",
-          "description": "Data bag item stringify data."
+          "description": "Data bag item JSON data."
         }
       }
     },
@@ -1611,7 +1611,7 @@
         },
         "data": {
           "type": "object",
-          "description": "Data bag item stringify data."
+          "description": "Data bag item JSON data."
         }
       }
     },

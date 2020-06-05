@@ -1420,7 +1420,7 @@ func init() {
         },
         "data": {
           "type": "object",
-          "description": "Data bag item stringify data."
+          "description": "Data bag item JSON data."
         }
       }
     },
@@ -1614,7 +1614,7 @@ func init() {
         },
         "data": {
           "type": "object",
-          "description": "Data bag item stringify data."
+          "description": "Data bag item JSON data."
         }
       }
     },

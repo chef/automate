@@ -41,7 +41,7 @@ message CreateDataBagItem {
     string server_id = 2;
     // Data bag name.
     string name = 3;
-    // Data bag item stringify data.
+    // Data bag item JSON data.
     google.protobuf.Struct data = 4;
 }
 
@@ -54,6 +54,6 @@ message UpdateDataBagItem {
     string name = 3;
     // Data bag item ID.
     string item_id = 4;
-    // Data bag item stringify data.
+    // Data bag item JSON data.
     google.protobuf.Struct data = 5;
 }
