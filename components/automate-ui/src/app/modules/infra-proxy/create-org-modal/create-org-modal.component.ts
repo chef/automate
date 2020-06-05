@@ -1,9 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
-import {
-  ProjectConstants, ProjectCheckedMap
-} from 'app/entities/projects/project.model';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 
 @Component({
   selector: 'app-create-org-modal',
@@ -20,7 +18,6 @@ export class CreateOrgModalComponent implements OnInit, OnChanges {
 
   public conflictError = false;
   public modifyID = false; // Whether the edit ID form is open or not.
-  public projects: ProjectCheckedMap = {};
   public projectsUpdatedEvent = new EventEmitter();
   public checkedProjectIDs: string[] = []; // resets project dropdown btwn modal openings
   public UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
@@ -35,7 +32,7 @@ export class CreateOrgModalComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.visible && (changes.visible.currentValue as boolean)) {
-      Object.values(this.projects).forEach(p => p.checked = false); // reset projects
+      this.checkedProjectIDs = []; // reset projects
       this.projectsUpdatedEvent.emit();
     }
   }
