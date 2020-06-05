@@ -295,7 +295,7 @@ func (db *Postgres) GetServices(
 
 func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string, filters map[string][]string) ([]string, error) {
 	// We do not want to filter on the fieldname we are looking up, because a user may want to use multiple values for searching
-	delete(filters, fieldName)
+	delete(filters, filterNameForField(fieldName))
 	// Pass "AND" for firstKeyword because we build the WHERE with the query fragment
 	whereConstraints, err := buildWhereConstraintsFromFilters(filters, "AND", false)
 	if err != nil {
@@ -329,6 +329,17 @@ func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string, f
 		return nil, err
 	}
 	return matches, nil
+}
+
+func filterNameForField(fieldName string) string {
+	switch fieldName {
+	case "service_name":
+		return "service"
+	case "group_name":
+		return "group"
+	default:
+		return fieldName
+	}
 }
 
 func columnNameForField(fieldName string) string {
@@ -510,7 +521,7 @@ func buildWhereConstraintsFromFilters(filters map[string][]string, firstKeyword 
 			whereConstraints = whereConstraints + buildORStatementFromValues("environment", values)
 
 		case "group":
-			whereConstraints = whereConstraints + buildORStatementFromValues("s.service_group_name_suffix", values)
+			whereConstraints = whereConstraints + buildORStatementFromValues("service_group_name_suffix", values)
 
 		case "service":
 			whereConstraints = whereConstraints + buildORStatementFromValues("name", values)
@@ -548,7 +559,7 @@ func buildORStatementFromValues(field string, values []string) string {
 
 	for _, value := range values {
 		if secondStatement {
-			ORConstraint = ORConstraint + " OR"
+			ORConstraint = ORConstraint + " OR "
 		}
 
 		if strings.ContainsAny(value, "?*") { // Wild cards detected, lookout!
@@ -556,12 +567,12 @@ func buildORStatementFromValues(field string, values []string) string {
 			pgWild = strings.Replace(pgWild, "?", "_", -1)
 			ORConstraint = ORConstraint + fmt.Sprintf(" %s LIKE '%s'", field, pgutils.EscapeLiteralForPG(pgWild))
 		} else {
-			ORConstraint = ORConstraint + fmt.Sprintf(" %s = '%s'", field, pgutils.EscapeLiteralForPG(value))
+			ORConstraint = ORConstraint + fmt.Sprintf("%s = '%s'", field, pgutils.EscapeLiteralForPG(value))
 		}
 		secondStatement = true
 	}
 
-	return ORConstraint
+	return fmt.Sprintf(" (%s)", ORConstraint)
 }
 
 func buildHealthStatementFromValues(values []string) string {
@@ -572,19 +583,19 @@ func buildHealthStatementFromValues(values []string) string {
 
 	for _, value := range values {
 		if secondStatement {
-			ORConstraint = ORConstraint + " OR"
+			ORConstraint = ORConstraint + " OR "
 		}
 		if value == "disconnected" {
 			ORConstraint = " disconnected"
 		} else {
-			ORConstraint = ORConstraint + fmt.Sprintf(" %s = '%s'", "health",
+			ORConstraint = ORConstraint + fmt.Sprintf("%s = '%s'", "health",
 				pgutils.EscapeLiteralForPG(strings.ToUpper(value)))
 		}
 
 		secondStatement = true
 	}
 
-	return ORConstraint
+	return fmt.Sprintf(" (%s)", ORConstraint)
 }
 
 // orderByStatementFromSortField returns the ORDER BY statement from the provided sort field,
