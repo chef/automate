@@ -1419,7 +1419,7 @@ func init() {
           "description": "Data bag name."
         },
         "data": {
-          "type": "string",
+          "type": "object",
           "description": "Data bag item stringify data."
         }
       }
@@ -1613,7 +1613,7 @@ func init() {
           "description": "Data bag item ID."
         },
         "data": {
-          "type": "string",
+          "type": "object",
           "description": "Data bag item stringify data."
         }
       }
@@ -2665,6 +2665,14 @@ func init() {
           "description": "Chef Infra Server."
         }
       }
+    },
+    "google.protobuf.NullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "` + "`" + `NullValue` + "`" + ` is a singleton enumeration to represent the null value for the\n` + "`" + `Value` + "`" + ` type union.\n\n The JSON representation for ` + "`" + `NullValue` + "`" + ` is JSON ` + "`" + `null` + "`" + `.\n\n - NULL_VALUE: Null value."
     }
   }
 }

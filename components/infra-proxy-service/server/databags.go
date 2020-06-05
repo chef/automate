@@ -71,15 +71,12 @@ func (s *Server) CreateDataBagItem(ctx context.Context, req *request.CreateDataB
 		return nil, err
 	}
 
-	data := DefaultIfEmpty(req.Data)
-
-	var dataBagItem chef.DataBagItem
-	err = json.Unmarshal(json.RawMessage(data), &dataBagItem)
+	dataBagItem, err := StructToJSON(req.Data)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	err = c.client.DataBags.CreateItem(req.Name, dataBagItem)
+	err = c.client.DataBags.CreateItem(req.Name, &dataBagItem)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
@@ -224,15 +221,12 @@ func (s *Server) UpdateDataBagItem(ctx context.Context, req *request.UpdateDataB
 		return nil, err
 	}
 
-	data := DefaultIfEmpty(req.Data)
-
-	var dataBagItem chef.DataBagItem
-	err = json.Unmarshal(json.RawMessage(data), &dataBagItem)
+	dataBagItem, err := StructToJSON(req.Data)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	err = c.client.DataBags.UpdateItem(req.Name, req.ItemId, dataBagItem)
+	err = c.client.DataBags.UpdateItem(req.Name, req.ItemId, &dataBagItem)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}

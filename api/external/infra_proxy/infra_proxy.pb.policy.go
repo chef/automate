@@ -441,8 +441,6 @@ func init() {
 					return m.ServerId
 				case "name":
 					return m.Name
-				case "data":
-					return m.Data
 				default:
 					return ""
 				}
@@ -481,8 +479,6 @@ func init() {
 					return m.Name
 				case "item_id":
 					return m.ItemId
-				case "data":
-					return m.Data
 				default:
 					return ""
 				}
