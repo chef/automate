@@ -14,6 +14,7 @@ import {
   getStatus, orgFromRoute
 } from 'app/entities/orgs/org.selectors';
 import { GetOrg } from 'app/entities/orgs/org.actions';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 
 @Component({
   selector: 'app-org-details',
@@ -33,6 +34,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public clientsTab = false;
   public policyFilesTab = false;
   private isDestroyed = new Subject<boolean>();
+  public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   previousRoute$: Observable<RouterState>;
 

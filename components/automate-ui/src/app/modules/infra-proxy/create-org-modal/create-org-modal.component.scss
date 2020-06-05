@@ -14,11 +14,10 @@ chef-modal {
     justify-content: center;
 
     .input-margin {
-      margin-bottom: 5px;
+      margin-bottom: 30px;
     }
 
     form {
-      flex-basis: 60%;
 
       input {
         font-size: 1em;
@@ -40,10 +39,18 @@ chef-modal {
           font-weight: bold;
         }
       }
+
+      .scrollable-form-div {
+        height: calc(100vh - 220px);
+        overflow-y: scroll;
+        padding-right: 90px;
+        margin-left: 100px;
+      }
     }
 
     #button-org {
       text-align: center;
+      padding-top: 30px;
 
       chef-loading-spinner {
         position: relative;
@@ -53,7 +60,7 @@ chef-modal {
     }
 
     #admin_key {
-      height: 140px;
+      height: 45px;
     }
   }
 }

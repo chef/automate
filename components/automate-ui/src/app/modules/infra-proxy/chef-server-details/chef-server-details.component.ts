@@ -27,6 +27,7 @@ import {
   getAllStatus as getAllOrgsForServerStatus,
   deleteStatus as deleteOrgStatus
 } from 'app/entities/orgs/org.selectors';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 
 export type ChefServerTabName = 'orgs' | 'details';
 
@@ -56,6 +57,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
   private isDestroyed = new Subject<boolean>();
+  public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   constructor(
     private fb: FormBuilder,
@@ -70,7 +72,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
       name: ['', [Validators.required]],
       admin_user: ['', [Validators.required]],
-      admin_key: ['', [Validators.required]]
+      admin_key: ['', [Validators.required]],
+      projects: [[]]
     });
   }
 
@@ -196,7 +199,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       server_id: this.id,
       name: this.orgForm.controls['name'].value.trim(),
       admin_user: this.orgForm.controls['admin_user'].value.trim(),
-      admin_key: this.orgForm.controls['admin_key'].value.trim()
+      admin_key: this.orgForm.controls['admin_key'].value.trim(),
+      projects: this.orgForm.controls.projects.value
     };
     this.store.dispatch(new CreateOrg( serverOrg ));
   }

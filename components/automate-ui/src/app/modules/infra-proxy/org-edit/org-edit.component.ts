@@ -5,7 +5,7 @@ import { Subject, combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { filter, takeUntil } from 'rxjs/operators';
-import { isNil } from 'lodash/fp';
+import { isNil, xor } from 'lodash/fp';
 import { EntityStatus, allLoaded, pending } from 'app/entities/entities';
 import { Org } from 'app/entities/orgs/org.model';
 import {
@@ -39,7 +39,8 @@ export class OrgEditComponent implements OnInit, OnDestroy {
       this.updateOrgForm = this.fb.group({
         name: new FormControl({value: ''}, [Validators.required]),
         admin_user: new FormControl({value: ''}, [Validators.required]),
-        admin_key: new FormControl({value: ''})
+        admin_key: new FormControl({value: ''}),
+        projects: [[]]
       });
    }
 
@@ -70,6 +71,7 @@ export class OrgEditComponent implements OnInit, OnDestroy {
       this.updateOrgForm.controls['name'].setValue(this.org.name);
       this.updateOrgForm.controls['admin_user'].setValue(this.org.admin_user);
       this.updateOrgForm.controls['admin_key'].setValue(this.org.admin_key);
+      this.updateOrgForm.controls.projects.setValue(this.org.projects);
     });
 
     this.store.select(updateStatus).pipe(
@@ -93,6 +95,20 @@ export class OrgEditComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateOrg({
       org: {...this.org, name, admin_user, admin_key}
     }));
+  }
+
+  onProjectDropdownClosing(selectedProjects: string[]): void {
+
+    this.updateOrgForm.controls.projects.setValue(selectedProjects);
+
+    // since the app-projects-dropdown is not a true form input (select)
+    // we have to manage the form reactions
+    if (xor(this.org.projects, this.updateOrgForm.controls.projects.value).length === 0) {
+      this.updateOrgForm.controls.projects.markAsPristine();
+    } else {
+      this.updateOrgForm.controls.projects.markAsDirty();
+    }
+
   }
 
   ngOnDestroy(): void {

@@ -33,6 +33,10 @@ describe('OrgEditComponent', () => {
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
+        MockComponent({ selector: 'app-resource-dropdown',
+        inputs: ['resources', 'resourcesUpdated', 'objectNounPlural'] }),
+        MockComponent({ selector: 'app-projects-dropdown',
+        inputs: ['projects', 'projectsUpdated', 'checkedProjectIDs'] }),
         OrgEditComponent
       ],
       providers: [
