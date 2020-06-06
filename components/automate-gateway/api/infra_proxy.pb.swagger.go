@@ -1455,12 +1455,12 @@ func init() {
           "description": "Environment versioned cookbooks constraints."
         },
         "default_attributes": {
-          "type": "string",
-          "description": "Stringified json of the default attributes."
+          "type": "object",
+          "description": "Environment default attributes JSON."
         },
         "override_attributes": {
-          "type": "string",
-          "description": "Stringified json of the override attributes."
+          "type": "object",
+          "description": "Environment override attributes JSON."
         }
       }
     },
@@ -1516,12 +1516,12 @@ func init() {
           "description": "Role description."
         },
         "default_attributes": {
-          "type": "string",
-          "description": "Role default attributes."
+          "type": "object",
+          "description": "Role default attributes JSON."
         },
         "override_attributes": {
-          "type": "string",
-          "description": "Role override attributes."
+          "type": "object",
+          "description": "Role override attributes JSON."
         },
         "run_list": {
           "type": "array",
@@ -1649,12 +1649,12 @@ func init() {
           "description": "Environment versioned cookbooks constraints."
         },
         "default_attributes": {
-          "type": "string",
-          "description": "Stringified json of the default attributes."
+          "type": "object",
+          "description": "Environment default attributes JSON."
         },
         "override_attributes": {
-          "type": "string",
-          "description": "Stringified json of the override attributes."
+          "type": "object",
+          "description": "Environment override attributes JSON."
         }
       }
     },
@@ -1706,12 +1706,12 @@ func init() {
           "description": "Role description."
         },
         "default_attributes": {
-          "type": "string",
-          "description": "Role default attributes."
+          "type": "object",
+          "description": "Role default attributes JSON."
         },
         "override_attributes": {
-          "type": "string",
-          "description": "Role override attributes."
+          "type": "object",
+          "description": "Role override attributes JSON."
         },
         "run_list": {
           "type": "array",

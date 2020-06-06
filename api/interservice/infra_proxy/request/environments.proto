@@ -3,6 +3,8 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
 
+import "google/protobuf/struct.proto";
+
 message Environments {
     // Chef organization ID.
     string org_id = 1;
@@ -32,10 +34,10 @@ message CreateEnvironment {
     string json_class = 5;
     // Environment versioned cookbooks constraints.
     map<string, string> cookbook_versions = 6;
-    // Stringified json of the default attributes.
-    string default_attributes = 7;
-    // Stringified json of the override attributes.
-    string override_attributes = 8;
+    // Environment default attributes JSON.
+    google.protobuf.Struct default_attributes = 7;
+    // Environment override attributes JSON.
+    google.protobuf.Struct override_attributes = 8;
 }
 
 message UpdateEnvironment {
@@ -51,8 +53,8 @@ message UpdateEnvironment {
     string json_class = 5;
     // Environment versioned cookbooks constraints.
     map<string, string> cookbook_versions = 6;
-    // Stringified json of the default attributes.
-    string default_attributes = 7;
-    // Stringified json of the override attributes.
-    string override_attributes = 8;
+    // Environment default attributes JSON.
+    google.protobuf.Struct default_attributes = 7;
+    // Environment override attributes JSON.
+    google.protobuf.Struct override_attributes = 8;
 }

@@ -55,27 +55,12 @@ func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*resp
 		runList = []string{}
 	}
 
-	var defAtt interface{}
-	var ovrAtt interface{}
-
-	defIn := req.DefaultAttributes
-	if defIn == "" {
-		defIn = "{}"
-	}
-
-	overIn := req.OverrideAttributes
-	if overIn == "" {
-		overIn = "{}"
-	}
-	defaultAttributes := json.RawMessage(defIn)
-	overrideAttributes := json.RawMessage(overIn)
-
-	err = json.Unmarshal(defaultAttributes, &defAtt)
+	defaultAttributes, err := StructToJSON(req.DefaultAttributes)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	err = json.Unmarshal(overrideAttributes, &ovrAtt)
+	overrideAttributes, err := StructToJSON(req.OverrideAttributes)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -85,8 +70,8 @@ func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*resp
 			Name:               req.Name,
 			Description:        req.Description,
 			RunList:            runList,
-			DefaultAttributes:  defAtt,
-			OverrideAttributes: ovrAtt,
+			DefaultAttributes:  defaultAttributes,
+			OverrideAttributes: overrideAttributes,
 			EnvRunList:         chef.EnvRunList{},
 		})
 
@@ -219,27 +204,12 @@ func (s *Server) UpdateRole(ctx context.Context, req *request.UpdateRole) (*resp
 		runList = []string{}
 	}
 
-	var defAtt interface{}
-	var ovrAtt interface{}
-
-	defIn := req.DefaultAttributes
-	if defIn == "" {
-		defIn = "{}"
-	}
-
-	overIn := req.OverrideAttributes
-	if overIn == "" {
-		overIn = "{}"
-	}
-	defaultAttributes := json.RawMessage(defIn)
-	overrideAttributes := json.RawMessage(overIn)
-
-	err = json.Unmarshal(defaultAttributes, &defAtt)
+	defaultAttributes, err := StructToJSON(req.DefaultAttributes)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	err = json.Unmarshal(overrideAttributes, &ovrAtt)
+	overrideAttributes, err := StructToJSON(req.OverrideAttributes)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -249,8 +219,8 @@ func (s *Server) UpdateRole(ctx context.Context, req *request.UpdateRole) (*resp
 			Name:               req.Name,
 			Description:        req.Description,
 			RunList:            runList,
-			DefaultAttributes:  defAtt,
-			OverrideAttributes: ovrAtt,
+			DefaultAttributes:  defaultAttributes,
+			OverrideAttributes: overrideAttributes,
 			EnvRunList:         chef.EnvRunList{},
 		})
 
