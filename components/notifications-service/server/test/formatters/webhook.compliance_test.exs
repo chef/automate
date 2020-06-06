@@ -1,9 +1,6 @@
 defmodule Notifications.Formatters.Webhook.Compliance.Test do
   use ExUnit.Case
   alias Notifications.Formatters.Webhook.Compliance
-  alias Notifications.ComplianceFailure
-  alias Notifications.Profile
-  alias Notifications.ComplianceFailure.ControlTotals
   doctest Compliance
 
   test "One compliance test failure, create correct map" do
@@ -32,7 +29,6 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
               status: "failed",
               number_of_tests: 3,
               title: "/etc/ssh should have limited access to 0755",
-              removed_results_counts: nil,
               refs: []}
           ],
           license: "Proprietary, All rights reserved",
@@ -83,8 +79,7 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
               ],
               source_location: %{line: 37, ref: "base/ssh/controls/ssh_folder_spec.rb"},
               status: "failed", title: "/etc/ssh should have limited access to 0755",
-              refs: [],
-              removed_results_counts: nil,
+              refs: []
             }
           ],
           copyright: "Chef Software, Inc.",
@@ -136,8 +131,7 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
               ],
               source_location: %{line: 37, ref: "base/ssh/controls/ssh_folder_spec.rb"},
               status: "failed", title: "/etc/ssh should have limited access to 0755",
-              refs: [],
-              removed_results_counts: nil,
+              refs: []
             },
             %{code: "control 'basic-2' do\n  impact 1.0\n  title '/etc/ssh should be owned by root'\n  desc '\n    The OpenSSH configuration folder should be owned\n    by the root user. It is an important step towards making\n    sure, that configuration files are only changed by\n    priviledged users.\n  '\n  describe file('/etc/ssh') do\n    it { should be_owned_by 'root' }\n  end\nend\n",
               desc: "The OpenSSH configuration folder should be owned\nby the root user. It is an important step towards making\nsure, that configuration files are only changed by\npriviledged users.",
@@ -156,8 +150,7 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
               source_location: %{line: 23, ref: "base/ssh/controls/ssh_folder_spec.rb"},
               status: "failed",
               title: "/etc/ssh should be owned by root",
-              refs: [],
-              removed_results_counts: nil,
+              refs: []
             }
           ],
           copyright: "Chef Software, Inc.", copyright_email: "support@chef.io",
@@ -180,84 +173,6 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
           type: "compliance_failure"
       }
     assert expected == Compliance.format(failure)
-  end
-
-  test "removed results counts in control" do
-    failure = %ComplianceFailure{id: "id",
-      compliance_url: "https://localhost/compliance/reporting/nodes/ubuntu1604",
-      node_name: "",
-      node_id: "",
-      inspec_version: "",
-      end_time: "",
-      timestamp: "",
-      test_totals: %ControlTotals{failed: 1,
-        skipped: 0,
-        passed: 2,
-        critical: 3,
-        critical_failed: 1
-      },
-      failed_profiles: [
-        %Profile{
-          name: "",
-          title: "",
-          version: "",
-          summary: "",
-          maintainer: "",
-          license: "",
-          copyright: "",
-          copyright_email: "",
-          sha256: "",
-          # supports: ,
-          attributes: [],
-          failed_controls: [
-            %Notifications.Profile.Control{
-              id: "id",
-              impact: 1,
-              title: "title",
-              code: "code",
-              desc: "desc",
-              # source_location: "",
-              refs: [],
-              failed_results: [
-                %Notifications.Profile.Control.Result{
-                  status: "",
-                  code_desc: "",
-                  run_time: 1.9,
-                  start_time: "",
-                  message: "",
-                  skip_message: ""
-                }
-              ],
-              stats: %Notifications.Profile.Control.ResultTotals{
-                num_tests: 225,
-                num_failed_tests: 100,
-                num_skipped_tests: 50,
-                num_passed_tests: 75
-              },
-              removed_results_counts: %Notifications.Profile.Control.RemovedResultsCounts{
-                failed: 100,
-                skipped: 50,
-                passed: 75
-              }
-            }
-          ],
-          stats: %Notifications.Profile.ControlTotals{
-            num_tests: 3,
-            num_failed_tests: 1,
-            num_skipped_tests: 0,
-            num_passed_tests: 2
-          } 
-        }
-      ]
-    }
-
-    message = Compliance.format(failure)
-    failedProfile = Enum.at(message.failed_critical_profiles, 0)
-    failedControl = Enum.at(failedProfile.controls, 0)
-
-    assert 100 == failedControl.removed_results_counts.failed
-    assert 50 == failedControl.removed_results_counts.skipped
-    assert 75 == failedControl.removed_results_counts.passed
   end
 
 end

@@ -70,22 +70,6 @@ defmodule Notifications.Profile.Control.ResultTotals do
   field :num_passed_tests, 4, type: :int32
 end
 
-defmodule Notifications.Profile.Control.RemovedResultsCounts do
-  @moduledoc false
-  use Protobuf, syntax: :proto3
-
-  @type t :: %__MODULE__{
-          failed: integer,
-          skipped: integer,
-          passed: integer
-        }
-  defstruct [:failed, :skipped, :passed]
-
-  field :failed, 1, type: :int32
-  field :skipped, 2, type: :int32
-  field :passed, 3, type: :int32
-end
-
 defmodule Notifications.Profile.Control do
   @moduledoc false
   use Protobuf, syntax: :proto3
@@ -99,21 +83,9 @@ defmodule Notifications.Profile.Control do
           source_location: Notifications.SourceLocation.t() | nil,
           refs: [Notifications.Refs.t()],
           failed_results: [Notifications.Profile.Control.Result.t()],
-          stats: Notifications.Profile.Control.ResultTotals.t() | nil,
-          removed_results_counts: Notifications.Profile.Control.RemovedResultsCounts.t() | nil
+          stats: Notifications.Profile.Control.ResultTotals.t() | nil
         }
-  defstruct [
-    :id,
-    :impact,
-    :title,
-    :code,
-    :desc,
-    :source_location,
-    :refs,
-    :failed_results,
-    :stats,
-    :removed_results_counts
-  ]
+  defstruct [:id, :impact, :title, :code, :desc, :source_location, :refs, :failed_results, :stats]
 
   field :id, 1, type: :string
   field :impact, 2, type: :float
@@ -124,7 +96,6 @@ defmodule Notifications.Profile.Control do
   field :refs, 7, repeated: true, type: Notifications.Refs
   field :failed_results, 9, repeated: true, type: Notifications.Profile.Control.Result
   field :stats, 10, type: Notifications.Profile.Control.ResultTotals
-  field :removed_results_counts, 11, type: Notifications.Profile.Control.RemovedResultsCounts
 end
 
 defmodule Notifications.Profile.Attribute.Options do

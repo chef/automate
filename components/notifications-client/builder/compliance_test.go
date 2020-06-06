@@ -192,10 +192,6 @@ func TestRemovedControlsFailure(t *testing.T) {
 	require.Equal(t, 1, len(failedProfile.FailedControls))
 	failedControl := failedProfile.FailedControls[0]
 
-	assert.Equal(t, int32(150), failedControl.RemovedResultsCounts.Failed)
-	assert.Equal(t, int32(50), failedControl.RemovedResultsCounts.Passed)
-	assert.Equal(t, int32(100), failedControl.RemovedResultsCounts.Skipped)
-
 	assert.Equal(t, int32(311), failedControl.Stats.NumTests)
 	assert.Equal(t, int32(154), failedControl.Stats.NumFailedTests)
 	assert.Equal(t, int32(100), failedControl.Stats.NumSkippedTests)

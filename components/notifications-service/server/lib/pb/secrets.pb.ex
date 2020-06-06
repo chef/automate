@@ -41,7 +41,7 @@ defmodule Chef.Automate.Api.Secrets.Query do
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          filters: [Chef.Automate.Api.Common.Query.Filter.t()],
+          filters: [Chef.Automate.Api.Secrets.Filter.t()],
           order: Chef.Automate.Api.Secrets.Query.OrderType.t(),
           sort: String.t(),
           page: integer,
@@ -49,7 +49,7 @@ defmodule Chef.Automate.Api.Secrets.Query do
         }
   defstruct [:filters, :order, :sort, :page, :per_page]
 
-  field :filters, 20, repeated: true, type: Chef.Automate.Api.Common.Query.Filter
+  field :filters, 20, repeated: true, type: Chef.Automate.Api.Secrets.Filter
   field :order, 21, type: Chef.Automate.Api.Secrets.Query.OrderType, enum: true
   field :sort, 22, type: :string
   field :page, 23, type: :int32
@@ -65,8 +65,8 @@ defmodule Chef.Automate.Api.Secrets.Secret do
           name: String.t(),
           type: String.t(),
           last_modified: Google.Protobuf.Timestamp.t() | nil,
-          tags: [Chef.Automate.Api.Common.Query.Kv.t()],
-          data: [Chef.Automate.Api.Common.Query.Kv.t()]
+          tags: [Chef.Automate.Api.Secrets.Kv.t()],
+          data: [Chef.Automate.Api.Secrets.Kv.t()]
         }
   defstruct [:id, :name, :type, :last_modified, :tags, :data]
 
@@ -74,8 +74,8 @@ defmodule Chef.Automate.Api.Secrets.Secret do
   field :name, 2, type: :string
   field :type, 3, type: :string
   field :last_modified, 20, type: Google.Protobuf.Timestamp
-  field :tags, 21, repeated: true, type: Chef.Automate.Api.Common.Query.Kv
-  field :data, 22, repeated: true, type: Chef.Automate.Api.Common.Query.Kv
+  field :tags, 21, repeated: true, type: Chef.Automate.Api.Secrets.Kv
+  field :data, 22, repeated: true, type: Chef.Automate.Api.Secrets.Kv
 end
 
 defmodule Chef.Automate.Api.Secrets.Secrets do
@@ -90,6 +90,36 @@ defmodule Chef.Automate.Api.Secrets.Secrets do
 
   field :secrets, 1, repeated: true, type: Chef.Automate.Api.Secrets.Secret
   field :total, 20, type: :int32
+end
+
+defmodule Chef.Automate.Api.Secrets.Filter do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          key: String.t(),
+          exclude: boolean,
+          values: [String.t()]
+        }
+  defstruct [:key, :exclude, :values]
+
+  field :key, 20, type: :string
+  field :exclude, 22, type: :bool
+  field :values, 23, repeated: true, type: :string
+end
+
+defmodule Chef.Automate.Api.Secrets.Kv do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          key: String.t(),
+          value: String.t()
+        }
+  defstruct [:key, :value]
+
+  field :key, 1, type: :string
+  field :value, 2, type: :string
 end
 
 defmodule Chef.Automate.Api.Secrets.SecretsService.Service do

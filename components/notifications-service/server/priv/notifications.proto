@@ -40,12 +40,6 @@ message Profile {
       int32 num_passed_tests = 4;
     }
 
-    message RemovedResultsCounts {
-      int32 failed = 1;
-      int32 skipped = 2;
-      int32 passed = 3;
-    }
-
     string id = 1;
     float impact = 2;
     string title = 3;
@@ -56,7 +50,6 @@ message Profile {
     reserved 8;// google.protobuf.Struct tags = 8;
     repeated Result failed_results = 9;
     ResultTotals stats = 10;
-    RemovedResultsCounts removed_results_counts = 11;
   }
 
   message Attribute {

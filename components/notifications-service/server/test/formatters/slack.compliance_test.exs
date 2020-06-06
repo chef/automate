@@ -117,7 +117,7 @@ defmodule Notifications.Formatters.Slack.Compliance.Test do
     assert expected == Notifications.Formatters.Slack.Compliance.format(failure)
   end
 
-  test "removed results counts in control" do
+  test "count tests from the control stats struct" do
     failure = %Notifications.ComplianceFailure{id: "id",
       compliance_url: "https://localhost/compliance/reporting/nodes/ubuntu1604",
       node_name: "side_walk",
@@ -177,11 +177,6 @@ defmodule Notifications.Formatters.Slack.Compliance.Test do
                 num_skipped_tests: 50,
                 num_passed_tests: 75
               },
-              removed_results_counts: %Notifications.Profile.Control.RemovedResultsCounts{
-                failed: 100,
-                skipped: 50,
-                passed: 75
-              }
             }
           ],
           stats: %Notifications.Profile.ControlTotals{
@@ -195,9 +190,10 @@ defmodule Notifications.Formatters.Slack.Compliance.Test do
     }
 
     message = Notifications.Formatters.Slack.Compliance.format(failure)
+
+    assert 1 == Enum.count(message.attachments)
+
     attachment = Enum.at(message.attachments, 0)
-    fallback = attachment.fallback
-    text = attachment.text
 
     assert "InSpec critical control failure on node side_walk.\n100 of 225 tests failed. View in Chef Automate for full details." == attachment.fallback
     assert "```100 of 225 tests failed. View in Chef Automate for full details.```\n" == attachment.text
