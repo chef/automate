@@ -5,7 +5,8 @@
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Data Bags</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Data Bags
+        </chef-breadcrumb>
         {{ dataBagsName }}
       </chef-breadcrumbs>
       <chef-page-header>
@@ -29,31 +30,29 @@
         <div class="details-row">
           <div class="item-column">
             <ul>
-              <li *ngFor="let item of dataBagDetails" 
-              [class.selected]="item.name === selectedItem"
-              (click)="handleItemSelected(item.name)">
+              <li *ngFor="let item of dataBagDetails" [class.selected]="item.name === selectedItem"
+                (click)="handleItemSelected(item.name)">
                 {{item.name}}
                 <chef-icon class="arrow">play_arrow</chef-icon>
               </li>
             </ul>
           </div>
-          <div class="item-details-column" *ngIf="selectedItemDetails.id">
-            <div class="expand-collapse">
-              <span class="action" (click)="tree.expand()">
-                <chef-icon>add_circle</chef-icon>
-                <span>Expand All</span>
-              </span>
-              <span class="separator">|</span>
-              <span class="action" (click)="tree.collapse()">
-                <chef-icon>remove_circle</chef-icon>
-                <span>Collapse All</span>
-              </span>
+          <div class="item-details-column">
+            <chef-loading-spinner *ngIf="dataBagsItemDetailsLoading" size="50" fixed></chef-loading-spinner>
+            <div *ngIf="!dataBagsItemDetailsLoading && selectedItemDetails">
+              <div class="expand-collapse">
+                <span class="action" (click)="tree.expand()">
+                  <chef-icon>add_circle</chef-icon>
+                  <span>Expand All</span>
+                </span>
+                <span class="separator">|</span>
+                <span class="action" (click)="tree.collapse()">
+                  <chef-icon>remove_circle</chef-icon>
+                  <span>Collapse All</span>
+                </span>
+              </div>
+              <app-json-tree-table class="json-tree-container" #tree [json]="selectedItemDetails"></app-json-tree-table>
             </div>
-            <app-json-tree-table class="json-tree-container" #tree [json]="selectedItemDetails"></app-json-tree-table>
-          </div>
-
-          <div class="item-details-column" *ngIf="!selectedItemDetails.id">
-            <div class="empty-column-msg">Please Select The Item From The List to See It's Details</div>
           </div>
         </div>
       </section>

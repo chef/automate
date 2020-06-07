@@ -10,11 +10,6 @@ chef-loading-spinner {
 }
 
 .page-body {
-  chef-loading-spinner {
-    display: block;
-    margin: 100px auto;
-    width: 100px;
-  }
 
   .details-row {
     display: flex;
@@ -30,17 +25,18 @@ chef-loading-spinner {
     }
 
     .item-details-column {
+      chef-loading-spinner {
+        display: flex;
+        margin: auto auto;
+        width: 100%;
+        position: relative;
+      }
+
       flex-basis: 70%;
       padding: 1em;
       border: 1px solid $chef-light-grey;
       background-color: $chef-white;
       border-radius: $global-radius;
-
-      .empty-column-msg {
-        text-align: center;
-        font-size: 14px;
-        margin-top: 12px;
-      }
     }
   }
 

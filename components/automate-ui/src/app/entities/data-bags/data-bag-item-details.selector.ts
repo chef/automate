@@ -3,8 +3,7 @@ import { DataBagItemDetailsEntityState, dataBagItemDetailsEntityAdapter } from '
 import { routeParams } from 'app/route.selectors';
 import { find } from 'lodash/fp';
 
-export const dataBagItemDetailsState = createFeatureSelector<DataBagItemDetailsEntityState>
-('dataBagItemDetails');
+export const dataBagItemDetailsState = createFeatureSelector<DataBagItemDetailsEntityState>('dataBagItemDetails');
 export const {
   selectAll: allDataBagItemDetails,
   selectEntities: dataBagItemDetailsEntities
@@ -16,7 +15,7 @@ export const getStatus = createSelector(
 );
 
 export const dataBagItemDetailsFromRoute = createSelector(
-  dataBagItemDetailsState,
+  dataBagItemDetailsEntities,
   routeParams,
   (state, { name }) => find({ name }, state)
 );
