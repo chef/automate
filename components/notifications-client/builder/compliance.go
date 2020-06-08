@@ -119,6 +119,13 @@ func collectNotificationsControl(control *inspec.Control, agg *complianceReportS
 	failed := 0
 	total := 0
 
+	if control.RemovedResultsCounts != nil {
+		failed = int(control.RemovedResultsCounts.Failed)
+		passed = int(control.RemovedResultsCounts.Passed)
+		skipped = int(control.RemovedResultsCounts.Skipped)
+		total = failed + passed + skipped
+	}
+
 	// Each control can have more than 1 test
 	notifications_control.FailedResults = make([]*Profile_Control_Result, 0, len(control.GetResults()))
 	for _, result := range control.GetResults() {
