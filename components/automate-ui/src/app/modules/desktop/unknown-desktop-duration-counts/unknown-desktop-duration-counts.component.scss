@@ -1,6 +1,23 @@
 @import "~styles/variables";
 @import "@carbon/layout/scss/layout";
 
+.heading-container {
+  display: flex;
+
+  chef-icon {
+    margin-left: 4px;
+    cursor: help;
+  }
+
+  chef-tooltip {
+    width: 288px;
+
+    p {
+      margin-bottom: 0;
+    }
+  }
+}
+
 .heading-title {
   color: var(--chef-primary-dark);
   margin-top: 0;

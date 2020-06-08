@@ -1,5 +1,11 @@
 <div class="content-container">
-  <h2 class="heading-title">Time since Last Check-in</h2>
+  <div class="heading-container">
+    <h2 class="heading-title">Time since Last Check-in</h2>
+    <chef-icon id="since-last-checkin-info" style='font-size: 24px'>info_outline</chef-icon>
+    <chef-tooltip for='since-last-checkin-info'>
+      <p>Count of desktops that haven't checked-in over different periods of time.</p>
+    </chef-tooltip>
+  </div>
   <h6 class="heading-time">Updated {{ lastUpdatedMessage }}</h6>
   <chef-table class="chart-list">
     <chef-tbody>
