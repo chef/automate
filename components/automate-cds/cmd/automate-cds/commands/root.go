@@ -7,7 +7,7 @@ import (
 // RootCmd is our application root command.
 var RootCmd = &cobra.Command{
 	Use:   "automate-cds",
-	Short: "Chef context delivery service proxy",
+	Short: "Chef Automate content delivery service proxy",
 }
 
 func init() {

@@ -17,7 +17,7 @@ import (
 
 var serveCmd = &cobra.Command{
 	Use:   "serve",
-	Short: "Launches the automate infra proxy service.",
+	Short: "Launches the automate content delivery service proxy.",
 	Run:   serve,
 	Args:  cobra.ExactArgs(1),
 }
@@ -33,7 +33,6 @@ func serve(cmd *cobra.Command, args []string) {
 	cmd.PersistentFlags().StringP("log-level", "l", "info", "log level")
 	cmd.PersistentFlags().StringP("log-format", "f", "text", "log format")
 	cmd.PersistentFlags().String("grpc", "127.0.0.1:10154", "grpc host and port")
-	cmd.PersistentFlags().StringP("pg_url", "p", "", "postgres uri")
 
 	viper.SetConfigFile(args[0])
 	if err := viper.ReadInConfig(); err != nil {
