@@ -19,7 +19,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # If no errors, next check for any warnings.
-echo "$out" | grep "$WARNING_LABEL" >/dev/null
+grep -q "$WARNING_LABEL" <<< "$out"
 
 # Return a non-zero exit code if any warnings present.
 # $? will be 0 if warnings were found, so `test` inverts that result.
