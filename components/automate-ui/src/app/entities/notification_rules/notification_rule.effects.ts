@@ -8,9 +8,19 @@ import { Type } from 'app/entities/notifications/notification.model';
 import {
   GetNotificationRulesSuccess,
   GetNotificationRulesFailure,
-  NotificationRuleActionTypes
+  NotificationRuleActionTypes,
+  GetNotification,
+  GetNotificationSuccess,
+  GetNotificationFailure,
+  UpdateNotification,
+  UpdateNotificationSuccess,
+  UpdateNotificationFailure,
+  TestNotification,
+  TestNotificationSuccess,
+  TestNotificationFailure
 } from './notification_rule.action';
 import { NotificationRuleRequests } from './notification_rule.requests';
+import { NotificationRule } from './notification_rule.model';
 
 @Injectable()
 export class NotificationRuleEffects {
@@ -20,7 +30,7 @@ export class NotificationRuleEffects {
   ) { }
 
   @Effect()
-  getDestinations$ = this.actions$.pipe(
+  getNotificatoins$ = this.actions$.pipe(
     ofType(NotificationRuleActionTypes.GET_ALL),
     mergeMap(() =>
       this.requests.getNotificationRules().pipe(
@@ -29,13 +39,88 @@ export class NotificationRuleEffects {
           observableOf(new GetNotificationRulesFailure(error))))));
 
   @Effect()
-  getDestinationsFailure$ = this.actions$.pipe(
+  getNotificatoinsFailure$ = this.actions$.pipe(
     ofType(NotificationRuleActionTypes.GET_ALL_FAILURE),
     map(({ payload }: GetNotificationRulesFailure) => {
       const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
         message: `Could not get notifications: ${msg}`
+      });
+    }));
+
+  @Effect()
+  getNotificatoin$ = this.actions$.pipe(
+      ofType(NotificationRuleActionTypes.GET),
+      mergeMap(({ payload: { id }}: GetNotification) =>
+        this.requests.getNotificationRule(id).pipe(
+          map((resp: NotificationRule) => new GetNotificationSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+          observableOf(new GetNotificationFailure(error, id))))));
+
+  @Effect()
+  getNotificatoinFailure$ = this.actions$.pipe(
+      ofType(NotificationRuleActionTypes.GET_FAILURE),
+      map(({ payload, id }: GetNotificationFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not get notification ${id}: ${msg || payload.error}`
+        });
+      }));
+  
+  @Effect()
+  updateNotificatoin$ = this.actions$.pipe(
+    ofType(NotificationRuleActionTypes.UPDATE),
+    mergeMap(({ payload: { notification, username, password } }: UpdateNotification) =>
+      this.requests.updateNotificationRule(notification, username, password).pipe(
+        map((resp) => new UpdateNotificationSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new UpdateNotificationFailure(error))))));
+
+  @Effect()
+  updateNotificatoinSuccess$ = this.actions$.pipe(
+      ofType(NotificationRuleActionTypes.UPDATE_SUCCESS),
+      map(({ payload  }: UpdateNotificationSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Updated data feed ${payload.name}.`
+    })));
+
+  @Effect()
+  updateNotificatoinFailure$ = this.actions$.pipe(
+    ofType(NotificationRuleActionTypes.UPDATE_FAILURE),
+    map(({ payload }: UpdateNotificationFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not update data feed: ${msg || payload.error}.`
+      });
+    }));
+
+  @Effect()
+  testNotificatoin$ = this.actions$.pipe(
+    ofType(NotificationRuleActionTypes.SEND_TEST),
+    mergeMap(({ payload: { notification } }: TestNotification) =>
+      this.requests.testNotification(notification.targetUrl, notification.targetSecretId).pipe(
+        map(() => new TestNotificationSuccess(notification)),
+        catchError(() =>
+          observableOf(new TestNotificationFailure(notification))))));
+
+  @Effect()
+  testNotificatoinSuccess$ = this.actions$.pipe(
+      ofType(NotificationRuleActionTypes.SEND_TEST_SUCCESS),
+      map(({ payload  }: TestNotificationSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Notification test connected successfully for ${payload.name}.`
+    })));
+
+  @Effect()
+  testNotificatoinFailure$ = this.actions$.pipe(
+    ofType(NotificationRuleActionTypes.SEND_TEST_FAILURE),
+    map(({ payload }: TestNotificationFailure) => {
+      return new CreateNotification({
+        type: Type.error,
+        message: `Unable to connect to notification ${payload.name}.`
       });
     }));
 
