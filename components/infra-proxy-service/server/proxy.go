@@ -2,10 +2,13 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/url"
 
 	chef "github.com/go-chef/chef"
+	jsonpb "github.com/golang/protobuf/jsonpb"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -140,4 +143,15 @@ func DefaultIfEmpty(value string) string {
 	}
 
 	return value
+}
+
+// StructToJSON convert the structpb to JSON interface object.
+func StructToJSON(data *structpb.Struct) (interface{}, error) {
+	var v interface{}
+	m := jsonpb.Marshaler{}
+
+	jsonStr, _ := m.MarshalToString(data)
+	err := json.Unmarshal(json.RawMessage(jsonStr), &v)
+
+	return v, err
 }
