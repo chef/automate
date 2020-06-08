@@ -138,8 +138,7 @@
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/event-gateway",
-        "chef/automate-cds"
+        "chef/event-gateway"
       ]
     },
     {
@@ -147,7 +146,9 @@
       "type": "product",
       "hidden": true,
       "dependencies": ["automate"],
-      "services": []
+      "services": [
+        "chef/automate-cds"
+      ]
     },
     {
       "name": "chef-server",
