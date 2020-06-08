@@ -391,7 +391,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   onFiltersClear(_event) {
-    const queryParams = {...this.route.snapshot.queryParams};
+    const queryParams = {...this.route.snapshot.queryParams} // a lint error
 
     const filteredParams = pickBy((_value, key: ReportingFilterTypes) =>
       // We 'control_tag...' filter because this is a second level filter and will not

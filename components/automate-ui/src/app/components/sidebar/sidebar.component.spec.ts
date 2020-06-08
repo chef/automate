@@ -34,7 +34,7 @@ describe('SidebarComponent', () => {
       ]
     }).compileComponents();
     store = TestBed.inject(Store);
-    layoutFacade = TestBed.inject(LayoutFacadeService);
+    layoutFacade = TestBed.get(LayoutFacadeService); // a lint warning
     featureFlags = TestBed.inject(FeatureFlagsService);
     spyOn(store, 'dispatch').and.callThrough();
   }));
