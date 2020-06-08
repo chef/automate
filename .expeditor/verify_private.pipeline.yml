@@ -631,6 +631,24 @@ steps:
         AWS_SESSION_TOKEN:
           account: aws/chef-cd
           field: session_token
+
+  - label: "backup to gcs"
+    command:
+      - integration/run_test integration/tests/backup_gcs.sh
+    timeout_in_minutes: 35
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+        GOOGLE_APPLICATION_JSON:
+          path: secret/a2/gcp
+          field: backup-creds
+
   - label: "ontop backup "
     command:
       - integration/run_test integration/tests/backup_ontop.sh
