@@ -76,8 +76,7 @@ if [[ "$CI" = "true" ]]; then
     uptime
     echo "======================================="
 
-    # Fix up the creds coming from vault
-    export GOOGLE_APPLICATION_JSON=$(echo $GOOGLE_APPLICATION_JSON)
+    echo $GOOGLE_APPLICATION_JSON|head -n 3
 else
     # In CI we expect the images to have already pulled the latest docker
     # layers, but we can't rely on that for local machines. Here we'll make sure
