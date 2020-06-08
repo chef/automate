@@ -13,7 +13,6 @@ import (
 	builderapi "github.com/chef/automate/api/config/builder_api"
 	builderapiproxy "github.com/chef/automate/api/config/builder_api_proxy"
 	buildermemcached "github.com/chef/automate/api/config/builder_memcached"
-	cds "github.com/chef/automate/api/config/cds"
 	cereal "github.com/chef/automate/api/config/cereal"
 	cfgmgmt "github.com/chef/automate/api/config/cfgmgmt"
 	compliance "github.com/chef/automate/api/config/compliance"
@@ -61,7 +60,6 @@ func NewAutomateConfig() *AutomateConfig {
 		BuilderApi:       builderapi.NewConfigRequest(),
 		BuilderApiProxy:  builderapiproxy.NewConfigRequest(),
 		BuilderMemcached: buildermemcached.NewConfigRequest(),
-		Cds:              cds.NewConfigRequest(),
 		Cereal:           cereal.NewConfigRequest(),
 		Compliance:       compliance.NewConfigRequest(),
 		ConfigMgmt:       cfgmgmt.NewConfigRequest(),
@@ -111,7 +109,6 @@ func DefaultAutomateConfig() *AutomateConfig {
 		BuilderApi:       builderapi.DefaultConfigRequest(),
 		BuilderApiProxy:  builderapiproxy.DefaultConfigRequest(),
 		BuilderMemcached: buildermemcached.DefaultConfigRequest(),
-		Cds:              cds.DefaultConfigRequest(),
 		Cereal:           cereal.DefaultConfigRequest(),
 		Compliance:       compliance.DefaultConfigRequest(),
 		ConfigMgmt:       cfgmgmt.DefaultConfigRequest(),
@@ -156,7 +153,7 @@ and enforces other invariants on configuration option values.
 If the configuration is valid, the returned error is nil.
 */
 func (c *AutomateConfig) Validate() error {
-	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate(), c.Cds.Validate())
+	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate())
 	if err == nil {
 		return nil
 	}
@@ -213,7 +210,6 @@ func (c *AutomateConfig) SetGlobalConfig() {
 	c.Minio.SetGlobalConfig(c.Global)
 	c.BuilderMemcached.SetGlobalConfig(c.Global)
 	c.InfraProxy.SetGlobalConfig(c.Global)
-	c.Cds.SetGlobalConfig(c.Global)
 }
 
 // PlatformServiceConfigForService gets the config for the service by name
@@ -303,8 +299,6 @@ func (c *AutomateConfig) PlatformServiceConfigForService(serviceName string) (sh
 		return c.BuilderMemcached, true
 	case "infra-proxy-service":
 		return c.InfraProxy, true
-	case "automate-cds":
-		return c.Cds, true
 	default:
 		return nil, false
 	}

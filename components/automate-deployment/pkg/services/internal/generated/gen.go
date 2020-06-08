@@ -235,16 +235,6 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/automate-cds",
-      "metadata": {
-        "name": "chef/automate-cds",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
-    },
-    {
       "name": "chef/config-mgmt-service",
       "metadata": {
         "name": "chef/config-mgmt-service",
@@ -523,8 +513,7 @@ var ProductMetadataJSON = `
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/event-gateway",
-        "chef/automate-cds"
+        "chef/event-gateway"
       ],
       "packages": null,
       "dependencies": [
