@@ -7,8 +7,8 @@ __bucket_base_path() {
     return 0
 }
 
-#gcs_bucket_name="a2-backup-restore-test"
-gcs_bucket_name="policyfile-archive"
+gcs_bucket_name="automate-backup-testing"
+#gcs_bucket_name="policyfile-archive"
 
 gcs_bucket_base_path="$(__bucket_base_path)"
 
