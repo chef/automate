@@ -122,7 +122,7 @@ func MergeAndValidateNewUserOverrideConfig(existing *api.AutomateConfig, req *Ba
 		if sessionToken := reqS3.GetSessionToken(); sessionToken != "" {
 			creds.SessionToken = w.String(sessionToken)
 		}
-	} else if reqGCS := req.GetGcsBackupLocation(); reqGCS.BucketName != "" {
+	} else if reqGCS := req.GetGcsBackupLocation(); reqGCS.GetBucketName() != "" {
 		if cfg.GetGlobal().GetV1() == nil {
 			cfg.Global = config.NewGlobalConfig()
 		}
@@ -138,16 +138,16 @@ func MergeAndValidateNewUserOverrideConfig(existing *api.AutomateConfig, req *Ba
 			},
 		}
 
-		if reqGCS.BasePath != "" {
-			cfg.Global.V1.Backups.Gcs.Bucket.BasePath = w.String(reqGCS.BasePath)
+		if reqGCS.GetBasePath() != "" {
+			cfg.Global.V1.Backups.Gcs.Bucket.BasePath = w.String(reqGCS.GetBasePath())
 		}
 
-		if reqGCS.ProjectId != "" {
-			cfg.Global.V1.Backups.Gcs.Bucket.ProjectId = w.String(reqGCS.ProjectId)
+		if reqGCS.GetProjectId() != "" {
+			cfg.Global.V1.Backups.Gcs.Bucket.ProjectId = w.String(reqGCS.GetProjectId())
 		}
 
-		if reqGCS.GoogleApplicationCredentials != "" {
-			cfg.Global.V1.Backups.Gcs.Credentials.Json = w.String(reqGCS.GoogleApplicationCredentials)
+		if reqGCS.GetGoogleApplicationCredentials() != "" {
+			cfg.Global.V1.Backups.Gcs.Credentials.Json = w.String(reqGCS.GetGoogleApplicationCredentials())
 		}
 	}
 
