@@ -26,6 +26,7 @@
     "chef/session-service",
     "chef/ingest-service",
     "chef/infra-proxy-service",
+    "chef/automate-cds",
     "chef/config-mgmt-service",
     "chef/deployment-service",
     "chef/data-feed-service",
@@ -137,7 +138,8 @@
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/event-gateway"
+        "chef/event-gateway",
+        "chef/automate-cds"
       ]
     },
     {

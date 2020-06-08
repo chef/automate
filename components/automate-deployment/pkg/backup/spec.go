@@ -383,6 +383,7 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{Name: "local-user-service", WriteMetadata: false},
 		{Name: "pg-sidecar-service", WriteMetadata: false},
 		{Name: "data-feed-service", WriteMetadata: false},
+		{Name: "automate-cds", WriteMetadata: false},
 
 		// Chef Server Stuff
 		{
