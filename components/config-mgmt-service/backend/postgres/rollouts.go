@@ -2,7 +2,10 @@ package postgres
 
 import (
 	"context"
+	"net/url"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type NewRollout struct {
@@ -44,6 +47,10 @@ ORDER BY policy_domain_url ASC,
 // CreateRollout takes the given rollout attributes and attempts to store the
 // rollout in the database.
 func (p *Postgres) CreateRollout(ctx context.Context, r *NewRollout) (*Rollout, error) {
+	if _, err := url.Parse(r.PolicyDomainURL); err != nil {
+		return nil, errors.Wrapf(err, "Invalid policy domain URL %q", r.PolicyDomainURL)
+	}
+
 	err := p.mapper.WithContext(ctx).Insert(r)
 	if err != nil {
 		return nil, err

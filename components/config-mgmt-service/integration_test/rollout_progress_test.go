@@ -519,13 +519,35 @@ func TestListNodeSegmentsWithRolloutProgress(t *testing.T) {
 	// 	cleanup(t)
 	// })
 
-	// TODO
-	// t.Run("with variations in the Chef Server URL", func(t *testing.T) {
-	// 	// We should do the right thing for:
-	// 	// * trailing slash
-	// 	// * http URL given to the rollout
-	// 	cleanup(t)
-	// })
+	t.Run("with variations in the Chef Server URL", func(t *testing.T) {
+		cleanup(t)
+
+		req := rolloutWithAllRequiredFields
+		// domain is HTTP, no `S`, has a trailing slash and user:password and ?queryParams
+		// We expect all that stuff to get removed
+		req.PolicyDomainUrl = fmt.Sprintf("http://user:password@%s/organizations/%s/?why=noIdea", chefServer1, chefOrg)
+		_, err := cfgmgmt.CreateRollout(ctx, &req)
+		require.NoError(t, err)
+
+		ccrDataIn := newCCR()
+
+		ccrDataIn2 := newCCR()
+		ccrDataIn2.NodePayload.Automatic["policy_revision"] = excludedPolicyRevision
+
+		ingestCCRs(t, []*iBackend.ChefClientRun{ccrDataIn, ccrDataIn2})
+
+		res, err := cfgmgmt.ListNodeSegmentsWithRolloutProgress(ctx, &request.ListNodeSegmentsWithRolloutProgress{})
+		require.NoError(t, err)
+
+		require.Len(t, res.NodeSegmentRolloutProgress, 1)
+		rolloutProgress := res.NodeSegmentRolloutProgress[0]
+		assert.Equal(t, rolloutProgress.PolicyName, policyName1)
+		assert.Equal(t, rolloutProgress.PolicyNodeGroup, policyGroup1)
+		assert.Equal(t, rolloutProgress.PolicyDomainUrl, fmt.Sprintf("https://%s/organizations/%s", chefServer1, chefOrg))
+		assert.Equal(t, rolloutProgress.TotalNodes, int32(1))
+		assert.Equal(t, rolloutProgress.CurrentRolloutProgress.Rollout.PolicyRevisionId, rollout1revID)
+		require.Len(t, rolloutProgress.PreviousRollouts, 0)
+	})
 
 }
 
