@@ -18,7 +18,7 @@
     "test": "scripts/unit-tests.sh",
     "test:watch": "ng test --watch=true --browsers='Chrome' --source-map=true --configuration=no_auth",
     "e2e": "ng e2e --no-webdriver-update",
-    "lint": "ng lint",
+    "lint": "scripts/build.sh 'ng lint' 'WARNING:'",
     "lint:html": "node_modules/htmlhint/bin/htmlhint --config .htmlhintrc src/app/**/*.html",
     "lint:sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q"
   },
