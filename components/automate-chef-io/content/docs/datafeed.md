@@ -22,9 +22,9 @@ The following types of information are sent:
 
 A Data Feed is not a Data Tap, it operates by doing the following:
 
-- Every 30 minutes (configurable) the data-feed-service will aggregate the client runs and compliance reports from the previous 30 minutes and send this to the registered destinations.
+- Every 4 hours (configurable) the data-feed-service will aggregate the client runs and compliance reports from the previous 30 minutes and send this to the registered destinations.
 - If there are no destinations, aggregation will not occur.
-- The data is aggregated and sent in batches of 100 nodes at a time (also configurable)
+- The data is aggregated and sent in batches of 50 nodes at a time (also configurable)
 
 
 By default only Admins of Chef Automate may create and manage Data Feeds.
@@ -74,10 +74,10 @@ On the Chef Automate CLI
 
     host = "localhost"\
     port = 14001\
-    feed_interval = "30m"\
+    feed_interval = "4h"\
     asset_page_size = 100\
     reports_page_size = 1000\
-    node_batch_size = 100\
+    node_batch_size = 50\
     updated_nodes_only = true\
     disable_cidr_filter = true\
     cidr_filter = "0.0.0.0/0"
