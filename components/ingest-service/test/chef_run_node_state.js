@@ -120,6 +120,7 @@ describe("creating node state", function () {
             let source = response.body.hits.hits[0]._source;
             expect(source.entity_uuid).to.equal(entityUuid);
             expect(source.status).to.equal('failure');
+            expect(source.chef_run_status).to.equal('failure');
             expect(source.latest_run_id).to.equal(runID1);
             // Wait for the chefRun2 post.
             return chakram.all([chakram.post(endpoint(), chefRun2.json())]).then(function(responses) {
@@ -133,6 +134,7 @@ describe("creating node state", function () {
                   let source = response.body.hits.hits[0]._source;
                   expect(source.entity_uuid).to.equal(entityUuid);
                   expect(source.status).to.equal('success');
+                  expect(source.chef_run_status).to.equal('success');
                   expect(source.latest_run_id).to.equal(runID2);
                 });
               });

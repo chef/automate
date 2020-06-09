@@ -64,13 +64,20 @@ type NodeAttribute struct {
 
 // NodeInfo defines common fields between Run and Node types
 type NodeInfo struct {
-	EntityUuid            string              `json:"entity_uuid"`
-	EventAction           string              `json:"event_action"`
-	NodeName              string              `json:"node_name"`
-	OrganizationName      string              `json:"organization_name"`
-	RunList               []string            `json:"run_list"`
-	Source                string              `json:"source"`
-	Status                string              `json:"status"`
+	EntityUuid       string   `json:"entity_uuid"`
+	EventAction      string   `json:"event_action"`
+	NodeName         string   `json:"node_name"`
+	OrganizationName string   `json:"organization_name"`
+	RunList          []string `json:"run_list"`
+	Source           string   `json:"source"`
+	// In the backend, status may be modified by other systems/processes and have
+	// new values, for example to mark a node missing
+	Status string `json:"status"`
+	// ChefRunStatus should not be modified and should always contain the Chef
+	// Run's success/failure outcome. This is used to with elasticsearch
+	// aggregations to compute success/failure statistics across different node
+	// cohorts
+	ChefRunStatus         string              `json:"chef_run_status"`
 	TotalResourceCount    int                 `json:"total_resource_count"`
 	Deprecations          []Deprecation       `json:"deprecations,omitempty"`
 	Error                 ChefError           `json:"error,omitempty"`

@@ -78,6 +78,7 @@ func TestFailedCCRToNode(t *testing.T) {
 
 	assert.Equal(t, expectedMessage, translatedNode.ErrorMessage)
 	assert.Equal(t, "failure", translatedNode.Status)
+	assert.Equal(t, "failure", translatedNode.ChefRunStatus)
 	assert.Equal(t, subject.ChefError{}, translatedNode.Error)
 }
 
