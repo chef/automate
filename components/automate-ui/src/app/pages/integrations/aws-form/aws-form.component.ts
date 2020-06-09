@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { BaseIntegrationFormComponent } from 'app/pages/integrations/base-integration-form.component';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { get } from 'lodash/fp';
 
 @Component({
   selector: 'app-aws-integration-form',
@@ -7,5 +8,12 @@ import { BaseIntegrationFormComponent } from 'app/pages/integrations/base-integr
   styleUrls: ['./aws-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IntegrationsAWSFormComponent extends BaseIntegrationFormComponent {
+export class IntegrationsAWSFormComponent {
+  @Input() formGroup: FormGroup;
+
+  showInstanceCreds() {
+    const formData = this.formGroup.value;
+    const no_creds = get('no_creds', formData);
+    return !no_creds;
+  }
 }

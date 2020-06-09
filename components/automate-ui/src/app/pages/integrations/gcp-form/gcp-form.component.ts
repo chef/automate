@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { BaseIntegrationFormComponent } from '../base-integration-form.component';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-gcp-integration-form',
@@ -7,5 +7,6 @@ import { BaseIntegrationFormComponent } from '../base-integration-form.component
   styleUrls: ['./gcp-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IntegrationsGCPFormComponent extends BaseIntegrationFormComponent {
+export class IntegrationsGCPFormComponent {
+  @Input() formGroup: FormGroup;
 }
