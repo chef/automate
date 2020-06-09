@@ -7,9 +7,6 @@ import { FormGroup } from '@angular/forms';
 })
 export class CastFormGroupPipe implements PipeTransform {
 
-  constructor() {
-  }
-
   transform(value: any, _args?: any): FormGroup {
     return value;
   }
