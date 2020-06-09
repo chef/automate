@@ -1,7 +1,13 @@
 <div class="content-container">
   <div class="header">
     <div class="heading">
-      <h2 class="heading-title">Check-in History</h2>
+      <div class="heading-title-container">
+        <h2 class="heading-title">Check-in History</h2>
+        <chef-icon id="checkin-history-info" style='font-size: 24px'>info_outline</chef-icon>
+        <chef-tooltip for='checkin-history-info'>
+          <p class="tooltip-text">Percentage of checked-in to total desktops at 24 hour intervals.</p>
+        </chef-tooltip>
+      </div>
       <h6 class="heading-time">Updated {{ lastUpdatedMessage }}</h6>
     </div>
     <select (change)="dateChanged($event.target.value)">
