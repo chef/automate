@@ -15,10 +15,10 @@
     "copy-ui-lib:fonts": "cp -r ../chef-ui-library/dist/collection/assets/fonts/ src/assets/fonts",
     "build": "ng build",
     "build:prod": "npm run build -- --prod",
-    "test": "scripts/unit-tests.sh",
+    "test": "scripts/build.sh 'ng test --watch=false --code-coverage --source-map=false --configuration=no_auth' 'WARN:'",
     "test:watch": "ng test --watch=true --browsers='Chrome' --source-map=true --configuration=no_auth",
     "e2e": "ng e2e --no-webdriver-update",
-    "lint": "ng lint",
+    "lint": "scripts/build.sh 'ng lint' 'WARNING:'",
     "lint:html": "node_modules/htmlhint/bin/htmlhint --config .htmlhintrc src/app/**/*.html",
     "lint:sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q"
   },
