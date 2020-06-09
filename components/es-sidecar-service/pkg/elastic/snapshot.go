@@ -39,10 +39,10 @@ const (
 // BackupsConfig contains settings for Es snapshot repo type and options, as
 // expressed in the service's toml config file
 type BackupsConfig struct {
-	Backend         string            `mapstructure:"backend"`
-	VerifyRepo      bool              `mapstructure:"verify_repo"`
-	FsBackupsConfig FsBackupsConfig   `mapstructure:"fs"`
-	S3BackupsConfig S3BackupsConfig   `mapstructure:"s3"`
+	Backend          string           `mapstructure:"backend"`
+	VerifyRepo       bool             `mapstructure:"verify_repo"`
+	FsBackupsConfig  FsBackupsConfig  `mapstructure:"fs"`
+	S3BackupsConfig  S3BackupsConfig  `mapstructure:"s3"`
 	GCSBackupsConfig GCSBackupsConfig `mapstructure:"gcs"`
 }
 

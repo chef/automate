@@ -12,10 +12,8 @@ type GCSBackupsConfig struct {
 	Compress               bool   `mapstructure:"compress"`
 	MaxRestoreBytesPerSec  string `mapstructure:"max_restore_bytes_per_sec"`
 	MaxSnapshotBytesPerSec string `mapstructure:"max_snapshot_bytes_per_sec"`
-	ReadOnly               bool   `mapstructure:"readonly`
+	ReadOnly               bool   `mapstructure:"readonly"`
 	ApplicationName        string `mapstructure:"application_name"`
-
-	
 }
 
 // ConfigureSnapshotCreateRepositoryService takes a pointer to an existing snapshot
