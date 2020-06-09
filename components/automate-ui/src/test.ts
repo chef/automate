@@ -16,8 +16,14 @@ import {
 declare const __karma__: any;
 declare const require: any;
 
-// Prevent Karma from running prematurely.
-__karma__.loaded = function () {};
+// Guard needed for wallaby.js
+// (reference: https://github.com/wallabyjs/public/issues/2433#issuecomment-637972491)
+if ((<any>window).__karma__) {
+  // Prevent Karma from running prematurely.
+  __karma__.loaded = function () { };
+}
+
+
 
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
@@ -28,5 +34,9 @@ getTestBed().initTestEnvironment(
 const context = require.context('./', true, /\.spec\.ts$/);
 // And load the modules.
 context.keys().map(context);
-// Finally, start Karma to run the tests.
-__karma__.start();
+
+// Guard needed for wallaby.js
+if ((<any>window).__karma__) {
+  // Finally, start Karma to run the tests.
+  __karma__.start();
+}
