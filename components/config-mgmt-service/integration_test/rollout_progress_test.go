@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/api/external/cfgmgmt/request"
+	internalReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 )
 
@@ -504,11 +505,51 @@ func TestListNodeSegmentsWithRolloutProgress(t *testing.T) {
 		assert.Equal(t, rolloutProgress1.PreviousRollouts[3].LatestRunNodeCount, int32(1))
 	})
 
-	// TODO: fixup ingestion so we retain the CCR outcome regardless of missing status
-	// t.Run("1 rollout with some failed CCRs, the nodes are now marked missing", func(t *testing.T) {
-	// 	// failed vs. success stats are correct, missing is ignored
-	// 	cleanup(t)
-	// })
+	t.Run("1 rollout with nodes marked missing", func(t *testing.T) {
+		// failed vs. success stats are correct, missing is ignored
+		cleanup(t)
+
+		req := rolloutWithAllRequiredFields
+		_, err := cfgmgmt.CreateRollout(ctx, &req)
+		require.NoError(t, err)
+
+		ccrDataIn := newCCR()
+		ccrDataIn.NodePayload.Automatic["policy_revision"] = req.PolicyRevisionId
+		ccrDataIn.StartTime = time.Now().AddDate(0, 0, -25)
+		ccrDataIn.EndTime = time.Now().AddDate(0, 0, -25).Add(time.Minute * 5)
+
+		// Need to manually handle ingestion to make the node missing
+		node, err := ccrDataIn.ToNode()
+		require.NoError(t, err)
+		node.Status = "missing"
+
+		run, err := ccrDataIn.ToNodeRun()
+		require.NoError(t, err)
+
+		suite.IngestRuns([]iBackend.Run{run})
+		suite.IngestNodes([]iBackend.Node{node})
+
+		// Verify the node is missing
+		nodesReq := &internalReq.Nodes{Filter: []string{"status:missing"}}
+		nodesRes, err := cfgmgmt.GetNodes(ctx, nodesReq)
+		require.NoError(t, err)
+		assert.Len(t, nodesRes.Values, 1)
+
+		res, err := cfgmgmt.ListNodeSegmentsWithRolloutProgress(ctx, &request.ListNodeSegmentsWithRolloutProgress{})
+		require.NoError(t, err)
+
+		require.Len(t, res.NodeSegmentRolloutProgress, 1)
+		rolloutProgress := res.NodeSegmentRolloutProgress[0]
+		assert.Equal(t, rolloutProgress.PolicyName, policyName1)
+		assert.Equal(t, rolloutProgress.PolicyNodeGroup, policyGroup1)
+		assert.Equal(t, rolloutProgress.PolicyDomainUrl, fmt.Sprintf("https://%s/organizations/%s", chefServer1, chefOrg))
+		assert.Equal(t, rolloutProgress.TotalNodes, int32(1))
+		assert.Equal(t, rolloutProgress.CurrentRolloutProgress.Rollout.PolicyRevisionId, rollout1revID)
+		// This is the important part, the missing node should still be counted in success/errored
+		assert.Equal(t, rolloutProgress.CurrentRolloutProgress.LatestRunSuccessfulCount, int32(1))
+		assert.Equal(t, rolloutProgress.CurrentRolloutProgress.LatestRunErroredCount, int32(0))
+		require.Len(t, rolloutProgress.PreviousRollouts, 0)
+	})
 
 	t.Run("with variations in the Chef Server URL", func(t *testing.T) {
 		cleanup(t)
