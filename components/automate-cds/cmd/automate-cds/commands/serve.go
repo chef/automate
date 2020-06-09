@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -36,29 +35,29 @@ func serve(cmd *cobra.Command, args []string) {
 
 	viper.SetConfigFile(args[0])
 	if err := viper.ReadInConfig(); err != nil {
-		fail(errors.Wrap(err, `Could not read config file. Please pass a config file as the only argument to this command.`))
+		fail(fmt.Errorf("Could not read config file. Please pass a config file as the only argument to this command. %w", err))
 	}
 
 	cfg := config{}
 	if err := viper.Unmarshal(&cfg); err != nil {
-		fail(errors.Wrap(err, "couldn't parse configuration file"))
+		fail(fmt.Errorf("couldn't parse configuration file  %w", err))
 	}
 
 	l, err := logger.NewLogger(cfg.LogFormat, cfg.LogLevel)
 	if err != nil {
-		fail(errors.Wrap(err, "couldn't initialize logger"))
+		fail(fmt.Errorf("couldn't initialize logger %w", err))
 	}
 
 	cfg.FixupRelativeTLSPaths(args[0])
 	serviceCerts, err := cfg.ReadCerts()
 	if err != nil {
-		fail(errors.Wrap(err, "Could not read certs"))
+		fail(fmt.Errorf("Could not read certs %w", err))
 	}
 	connFactory := secureconn.NewFactory(*serviceCerts)
 
 	service, err := service.Start(l, connFactory)
 	if err != nil {
-		fail(errors.Wrap(err, "could not initialize service"))
+		fail(fmt.Errorf("could not initialize service %w", err))
 	}
 
 	fail(server.GRPC(cfg.GRPC, service))
