@@ -7,6 +7,7 @@ import (
 	"github.com/chef/automate/api/external/common/query"
 	gwnodes "github.com/chef/automate/api/external/nodes"
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 )
@@ -172,6 +173,7 @@ func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 		Id:              nodeID.Id,
 		Name:            "test node",
 		Manager:         "automate",
+		Tags:            []*common.Kv{&common.Kv{}},
 		Platform:        "redhat",
 		PlatformVersion: "7.7",
 		ManagerIds:      []string{"e69dc612-7e67-43f2-9b19-256afd385820"},
