@@ -975,7 +975,7 @@
           "format": "int32",
           "description": "I'm assuming it's easy to get the status when we get the counts."
         },
-        "latest_run_failed_count": {
+        "latest_run_errored_count": {
           "type": "integer",
           "format": "int32"
         },
@@ -1244,11 +1244,10 @@
         "latest_run_node_count": {
           "type": "integer",
           "format": "int32",
-          "title": "The number of nodes in the node segment for which the last recorded CCR\nwas part of this rollout"
+          "description": "The number of nodes in the node segment for which the last recorded CCR\nwas part of this rollout. Note that no breakdown of success/errored is\nprovided, since some nodes may have moved on to the current rollout and\nare not included in the count."
         },
         "source_link": {
-          "type": "string",
-          "title": "don't include the success/failure, it would be misleading since we\naren't including nodes that have since run the code from a newer rollout"
+          "type": "string"
         },
         "build_link": {
           "type": "string"

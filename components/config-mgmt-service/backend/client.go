@@ -219,11 +219,9 @@ type NodeSegmentRevisionsStatus struct {
 	ByPolicyRevision map[string]*PolicyRevisionNodeStatus
 }
 
-// FIXME: get rid of "missing" here, we don't care (seems like it will need a kinda deep change to ingest/storage)
 type PolicyRevisionNodeStatus struct {
 	PolicyRevisionID string
 	Total            int
 	Success          int
-	Failure          int
-	Missing          int
+	Errored          int
 }

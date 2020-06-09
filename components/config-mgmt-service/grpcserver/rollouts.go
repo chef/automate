@@ -134,7 +134,7 @@ func mergeCCRDataIntoRollouts(ns *postgres.NodeSegmentWithRollouts, ccrs *backen
 		Rollout:                  rolloutToAPI(currentRollout),
 		NodeCount:                int32(currentRolloutCCR.Total),
 		LatestRunSuccessfulCount: int32(currentRolloutCCR.Success),
-		LatestRunFailedCount:     int32(currentRolloutCCR.Failure),
+		LatestRunErroredCount:    int32(currentRolloutCCR.Errored),
 	}
 
 	var pastRollouts []*response.PastRolloutProgress

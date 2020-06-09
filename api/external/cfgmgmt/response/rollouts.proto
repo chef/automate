@@ -121,7 +121,7 @@ message CurrentRolloutProgress {
   int32 node_count = 2;
   // I'm assuming it's easy to get the status when we get the counts.
   int32 latest_run_successful_count = 3;
-  int32 latest_run_failed_count = 4;
+  int32 latest_run_errored_count = 4;
   string source_link = 5;
   string build_link = 6;
 }
@@ -130,10 +130,10 @@ message PastRolloutProgress {
   // Rollout is the full rollout object, but we can change this to be a subset only.
   Rollout rollout = 1;
   // The number of nodes in the node segment for which the last recorded CCR
-  // was part of this rollout
+  // was part of this rollout. Note that no breakdown of success/errored is
+  // provided, since some nodes may have moved on to the current rollout and
+  // are not included in the count.
   int32 latest_run_node_count = 2;
-  // don't include the success/failure, it would be misleading since we
-  // aren't including nodes that have since run the code from a newer rollout
   string source_link = 5;
   string build_link = 6;
 }

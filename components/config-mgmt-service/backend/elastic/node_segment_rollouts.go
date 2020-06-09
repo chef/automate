@@ -13,12 +13,17 @@ import (
 )
 
 const (
-	pnameField        = "policy_name"
-	pgroupField       = "policy_group"
-	pRevField         = "policy_revision"
-	chefServerField   = "source_fqdn"
-	chefOrgField      = "organization_name"
-	statusField       = "status"
+	pnameField      = "policy_name"
+	pgroupField     = "policy_group"
+	pRevField       = "policy_revision"
+	chefServerField = "source_fqdn"
+	chefOrgField    = "organization_name"
+	// This field was added to the node-state index in
+	// https://github.com/chef/automate/pull/3887
+	// merge commit: 87185bab5a8994cc4fc230c2c3f5733afa04590a
+	// It should contain the last run status even if the node has been marked
+	// missing, so the only values we expect to see are "success" or "failed"
+	statusField       = "chef_run_status"
 	nodeSegmentsField = "node_segments"
 )
 
@@ -81,11 +86,14 @@ func (es Backend) GetLatestRunRolloutBreakdownCounts() (*b.NodeSegmentRolloutPro
 				case "success":
 					statusStats.Success = countWithStatus
 				case "failure":
-					statusStats.Failure = countWithStatus
-				case "missing":
-					statusStats.Missing = countWithStatus
+					statusStats.Errored = countWithStatus
 				default:
-					return nil, errors.Errorf("unexpected node status %+v", status)
+					log.WithFields(log.Fields{
+						"policy_name":                segment.PolicyName,
+						"policy_group":               segment.PolicyNodeGroup,
+						"policy_domain_url":          segment.PolicyDomainURL,
+						"unexpected_chef_run_status": status,
+					}).Error("Encountered unexpected value of chef_run_status in rollouts status stats aggregation")
 				}
 			}
 		}
