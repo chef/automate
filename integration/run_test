@@ -75,11 +75,6 @@ if [[ "$CI" = "true" ]]; then
     echo "uptime"
     uptime
     echo "======================================="
-
-    # buildkite/expeditor is escaping a bunch of stuff that we dont
-    # want escaped
-    export GOOGLE_APPLICATION_JSON=$(echo -e $GOOGLE_APPLICATION_JSON)
-    echo -E $GOOGLE_APPLICATION_JSON 
 else
     # In CI we expect the images to have already pulled the latest docker
     # layers, but we can't rely on that for local machines. Here we'll make sure
