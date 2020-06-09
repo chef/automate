@@ -1,22 +1,22 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DailyCheckInComponent } from './daily-check-in.component';
+import { CheckInTimeSeriesComponent } from './check-in-time-series.component';
 
-describe('DailyCheckInComponent', () => {
-  let fixture: ComponentFixture<DailyCheckInComponent>;
-  let component: DailyCheckInComponent;
+describe('CheckInTimeSeriesComponent', () => {
+  let fixture: ComponentFixture<CheckInTimeSeriesComponent>;
+  let component: CheckInTimeSeriesComponent;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       declarations: [
-        DailyCheckInComponent
+        CheckInTimeSeriesComponent
       ],
       providers: [],
-      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     });
 
-    fixture = TestBed.createComponent(DailyCheckInComponent);
+    fixture = TestBed.createComponent(CheckInTimeSeriesComponent);
     component = fixture.componentInstance;
   });
 

@@ -1,22 +1,22 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DailyCheckInComponent } from './daily-check-in.component';
+import { TopErrorsComponent } from './top-errors.component';
 
-describe('DailyCheckInComponent', () => {
-  let fixture: ComponentFixture<DailyCheckInComponent>;
-  let component: DailyCheckInComponent;
+describe('TopErrorsComponent', () => {
+  let fixture: ComponentFixture<TopErrorsComponent>;
+  let component: TopErrorsComponent;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       declarations: [
-        DailyCheckInComponent
+        TopErrorsComponent
       ],
       providers: [],
-      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     });
 
-    fixture = TestBed.createComponent(DailyCheckInComponent);
+    fixture = TestBed.createComponent(TopErrorsComponent);
     component = fixture.componentInstance;
   });
 
