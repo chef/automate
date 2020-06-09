@@ -1,0 +1,5 @@
+{
+  "name": "chef/automate-cds",
+  "data_service": false,
+  "uses_platform_scaffolding": true
+}

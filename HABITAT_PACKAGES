@@ -72,6 +72,7 @@ data-feed-service components/data-feed-service
 event-feed-service components/event-feed-service
 cereal-service components/cereal-service
 infra-proxy-service components/infra-proxy-service
+automate-cds components/automate-cds
 automate-minio components/automate-minio
 automate-builder-memcached components/automate-builder-memcached
 automate-builder-api components/automate-builder-api

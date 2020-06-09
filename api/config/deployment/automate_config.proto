@@ -24,6 +24,7 @@ import "api/config/es_sidecar/config_request.proto";
 import "api/config/gateway/config_request.proto";
 import "api/config/ingest/config_request.proto";
 import "api/config/infra_proxy/config_request.proto";
+import "api/config/cds/config_request.proto";
 import "api/config/license_control/config_request.proto";
 import "api/config/load_balancer/config_request.proto";
 import "api/config/local_user/config_request.proto";
@@ -98,4 +99,5 @@ message AutomateConfig {
 	chef.automate.infra.minio.ConfigRequest minio = 43;
 	chef.automate.infra.builder_memcached.ConfigRequest builder_memcached = 44;
 	chef.automate.domain.infra_proxy.ConfigRequest infra_proxy = 45;
+	chef.automate.domain.cds.ConfigRequest cds = 46;
 }

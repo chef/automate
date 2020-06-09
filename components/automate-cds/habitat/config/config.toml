@@ -1,0 +1,8 @@
+grpc = "{{cfg.service.host}}:{{cfg.service.port}}"
+log-format = "{{cfg.log.format}}"
+log-level = "{{cfg.log.level}}"
+
+[tls]
+cert_path = "{{pkg.svc_config_path}}/service.crt"
+key_path = "{{pkg.svc_config_path}}/service.key"
+root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
