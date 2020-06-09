@@ -1,14 +1,5 @@
 package integration_test
 
-/*
-
-TODO LIST:
-* fix the mark missing so we retain the prior status in the database
-* make sure crap like trailing `/` on URLs, http vs. https doesn't affect matching of rollouts
-* Use "errored" instead of failed to describe CCRs that had an error
-
-*/
-
 import (
 	"context"
 	"fmt"
