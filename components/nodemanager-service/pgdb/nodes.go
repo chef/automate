@@ -57,7 +57,7 @@ SELECT
   COALESCE(n.source_id, '') AS source_id,
   COALESCE(n.source_region, '') AS source_region,
   COALESCE(n.source_account_id, '') AS source_account_id,
-  COALESCE(('[' || string_agg(DISTINCT '{"key":"' || t.key || '"' || ',"value": "' || t.value || '"}', ',') || ']'), '[]') :: JSON AS tags,
+  COALESCE(json_agg(json_build_object('key', t.key, 'value', t.value)), '[]') AS tags,
   COALESCE(array_to_json(array_remove(array_agg(DISTINCT m.manager_id), NULL)), '[]') AS manager_ids,
   COALESCE(array_to_json(array_remove(array_agg(DISTINCT p.project_id), NULL)), '[]') AS projects,
   COUNT(*) OVER () AS total_count
@@ -928,7 +928,9 @@ func (db *DB) QueryManualNodesFields(ctx context.Context, filters []*common.Filt
 			results = append(results, node.Name)
 		case "tags":
 			for _, kv := range node.Tags {
-				results = append(results, kv.Key)
+				if len(kv.Key) > 0 {
+					results = append(results, kv.Key)
+				}
 			}
 		}
 	}
