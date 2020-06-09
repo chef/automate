@@ -101,6 +101,26 @@ func (a *InfraProxyServer) CreateDataBagItem(ctx context.Context, r *gwreq.Creat
 	}, nil
 }
 
+// UpdateDataBagItem updates a data bag item
+func (a *InfraProxyServer) UpdateDataBagItem(ctx context.Context, r *gwreq.UpdateDataBagItem) (*gwres.UpdateDataBagItem, error) {
+	req := &infra_req.UpdateDataBagItem{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+		ItemId:   r.ItemId,
+		Data:     r.Data,
+	}
+	res, err := a.client.UpdateDataBagItem(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.UpdateDataBagItem{
+		Name:   res.GetName(),
+		ItemId: res.GetItemId(),
+	}, nil
+}
+
 func fromUpstreamDataBags(dbags []*infra_res.DataBagListItem) []*gwres.DataBagListItem {
 	ts := make([]*gwres.DataBagListItem, len(dbags))
 

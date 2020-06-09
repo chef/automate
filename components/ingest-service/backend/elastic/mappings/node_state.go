@@ -81,6 +81,9 @@ var nodeProps = `
 	"status": {
 		"type": "keyword"
 	},
+	"chef_run_status": {
+		"type": "keyword"
+	},
 	"deprecations": {
 		"type": "object",
 		"dynamic": true,

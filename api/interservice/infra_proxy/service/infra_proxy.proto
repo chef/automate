@@ -59,6 +59,7 @@ service InfraProxy {
     rpc CreateDataBag (chef.automate.domain.infra_proxy.request.CreateDataBag) returns (chef.automate.domain.infra_proxy.response.CreateDataBag) {};
     rpc CreateDataBagItem (chef.automate.domain.infra_proxy.request.CreateDataBagItem) returns (chef.automate.domain.infra_proxy.response.CreateDataBagItem) {};
     rpc DeleteDataBag (chef.automate.domain.infra_proxy.request.DataBag) returns (chef.automate.domain.infra_proxy.response.DataBag) {};
+    rpc UpdateDataBagItem (chef.automate.domain.infra_proxy.request.UpdateDataBagItem) returns (chef.automate.domain.infra_proxy.response.UpdateDataBagItem) {};
 
     rpc GetEnvironments (chef.automate.domain.infra_proxy.request.Environments) returns (chef.automate.domain.infra_proxy.response.Environments) {};
     rpc GetEnvironment (chef.automate.domain.infra_proxy.request.Environment) returns (chef.automate.domain.infra_proxy.response.Environment) {};

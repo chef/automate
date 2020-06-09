@@ -255,6 +255,7 @@ func (ccr *ChefClientRun) initializeNodeInfo() (sharedNodeInfo NodeInfo, err err
 		PlatformVersion:       EmptyStringIfNil(ccr.NodePayload.Automatic["platform_version"]),
 		Source:                ccr.Source,
 		Status:                ccr.Status,
+		ChefRunStatus:         ccr.Status,
 		TotalResourceCount:    ccr.TotalResourceCount,
 		SourceFqdn:            ccr.ChefServerFqdn,
 		ExpandedRunList:       ccr.ExpandedRunList,

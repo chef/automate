@@ -1,10 +1,10 @@
 [service]
 host = "localhost"
 port = 14001
-feed_interval = "30m"
+feed_interval = "4h"
 asset_page_size = 100
 reports_page_size = 1000
-node_batch_size = 100
+node_batch_size = 50
 updated_nodes_only = true
 disable_cidr_filter = true
 cidr_filter = "0.0.0.0/0"
