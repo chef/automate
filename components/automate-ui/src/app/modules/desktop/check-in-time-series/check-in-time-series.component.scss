@@ -16,7 +16,7 @@
     display: flex;
     align-items: center;
     margin-bottom: .25em;
-    
+
     .heading-title {
       color: var(--chef-primary-dark);
       margin-top: 0;
@@ -25,9 +25,10 @@
       font-style: inherit;
       font-size: 18px;
     }
-    
+
     chef-icon {
       margin-left: 4px;
+      font-size: 24px;
       cursor: help;
     }
 

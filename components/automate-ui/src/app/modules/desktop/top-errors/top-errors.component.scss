@@ -2,7 +2,7 @@
 @import "@carbon/layout/scss/layout";
 
 .heading {
-  
+
   .heading-title-container {
     display: flex;
     align-items: center;
@@ -10,6 +10,7 @@
 
     chef-icon {
       margin-left: 4px;
+      font-size: 24px;
       cursor: help;
     }
 
@@ -31,7 +32,7 @@
     font-size: 18px;
   }
 }
-  
+
 .heading-time {
   color: var(--chef-primary-dark);
   margin-top: 0;
