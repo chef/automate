@@ -2177,7 +2177,6 @@ paths = [
   "vendor/github.com/codahale/hdrhistogram/*",
   "vendor/github.com/fsnotify/fsnotify/*",
   "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/go-grpc-middleware/*",
   "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
   "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
   "vendor/github.com/hashicorp/hcl/*",
