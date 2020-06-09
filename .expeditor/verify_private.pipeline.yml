@@ -693,6 +693,27 @@ steps:
         AWS_SESSION_TOKEN:
           account: aws/chef-cd
           field: session_token
+
+  - label: "backup w external es to gcs"
+    command:
+      - integration/run_test integration/tests/backup_external_es_gcs.sh
+    timeout_in_minutes: 35
+    expeditor:
+      accounts:
+        - aws/chef-cd
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+        GOOGLE_APPLICATION_JSON:
+          path: secret/a2/gcp
+          field: backup-creds
+
+
   - label: "upgrade dev -> master"
     command:
       - integration/run_test integration/tests/upgrade.sh
