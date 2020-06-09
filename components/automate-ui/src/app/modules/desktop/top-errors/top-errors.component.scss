@@ -1,14 +1,37 @@
 @import "~styles/variables";
 @import "@carbon/layout/scss/layout";
 
-.heading-title {
-  color: var(--chef-primary-dark);
-  margin-top: 0;
-  font-weight: inherit;
-  font-style: inherit;
-  font-size: 18px;
-}
+.heading {
+  
+  .heading-title-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: .25em;
 
+    chef-icon {
+      margin-left: 4px;
+      cursor: help;
+    }
+
+    chef-tooltip {
+      width: 288px;
+
+      .tooltip-text {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .heading-title {
+    color: var(--chef-primary-dark);
+    margin-top: 0;
+    margin-bottom: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 18px;
+  }
+}
+  
 .heading-time {
   color: var(--chef-primary-dark);
   margin-top: 0;
