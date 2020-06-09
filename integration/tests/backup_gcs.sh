@@ -9,6 +9,11 @@ source "${source_dir}/helpers/gcs.sh"
 test_name="backup-gcs"
 test_backup_restore=true
 
+do_setup() {
+  do_setup_default
+  do_setup_gcs_default
+}
+
 do_create_config() {
   do_create_config_default
   do_create_config_gcs_default

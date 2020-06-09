@@ -11,12 +11,13 @@ test_backup_restore=true
 
 do_setup() {
   do_setup_default
+  do_setup_gcs_default
 
   local previous_umask
   previous_umask=$(umask)
   umask 022
 
-  start_external_elasticsearch "${gcs_endpoint}"
+  start_external_elasticsearch "gcs" "${gcs_creds_path}"
 
   umask "$previous_umask"
 }

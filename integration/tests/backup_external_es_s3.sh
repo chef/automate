@@ -16,7 +16,7 @@ do_setup() {
   previous_umask=$(umask)
   umask 022
 
-  start_external_elasticsearch "${s3_endpoint}"
+  start_external_elasticsearch "s3" "${s3_endpoint}"
 
   umask "$previous_umask"
 }

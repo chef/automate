@@ -8,12 +8,15 @@ __bucket_base_path() {
 }
 
 gcs_bucket_name="a2-backup-restore-test"
-
 gcs_bucket_base_path="$(__bucket_base_path)"
+gcs_creds_path="/tmp/gcpcred"
+
+do_setup_gcs_default() {
+  cat <<< "$GOOGLE_APPLICATION_JSON" > "${gcs_creds_path}"
+}
 
 do_create_config_gcs_default() {
   #shellcheck disable=SC2154
-  cat <<< "$GOOGLE_APPLICATION_JSON" > "/tmp/gcpcred"
   cat <<EOF >> "$test_config_path"
 [global.v1.backups]
   location = "gcs"
