@@ -1,7 +1,13 @@
 <div class="content-container">
   <div class="header">
     <div class="heading">
-      <h2 class="heading-title">Daily Check-in</h2>
+      <div class="heading-title-container">
+        <h2 class="heading-title">Daily Check-in</h2>
+        <chef-icon id="daily-checkin-info" style='font-size: 24px'>info_outline</chef-icon>
+        <chef-tooltip for='daily-checkin-info'>
+          <p class="tooltip-text">Check-in status in the last 24 hours.</p>
+        </chef-tooltip>
+      </div>
       <h6 class="heading-time">Updated {{ lastUpdatedMessage }}</h6>
     </div>
     <app-chart-progress-bar size="large" [value]="unknownCount" [max]="totalCount"></app-chart-progress-bar>

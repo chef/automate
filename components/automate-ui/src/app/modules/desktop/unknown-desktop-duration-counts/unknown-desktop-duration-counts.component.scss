@@ -1,38 +1,44 @@
 @import "~styles/variables";
 @import "@carbon/layout/scss/layout";
 
-.heading-container {
-  display: flex;
+.heading {
 
-  chef-icon {
-    margin-left: 4px;
-    cursor: help;
-  }
+  .heading-title-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: .25em;
 
-  chef-tooltip {
-    width: 288px;
-
-    p {
+    .heading-title {
+      color: var(--chef-primary-dark);
+      margin-top: 0;
       margin-bottom: 0;
+      font-weight: inherit;
+      font-style: inherit;
+      font-size: 18px;
+    }
+
+    chef-icon {
+      margin-left: 4px;
+      cursor: help;
+    }
+
+    chef-tooltip {
+      width: 288px;
+
+      .tooltip-text {
+        margin-bottom: 0;
+      }
     }
   }
-}
 
-.heading-title {
-  color: var(--chef-primary-dark);
-  margin-top: 0;
-  font-weight: inherit;
-  font-style: inherit;
-  font-size: 18px;
-}
-
-.heading-time {
-  color: var(--chef-primary-dark);
-  margin-top: 0;
-  margin-bottom: 12px;
-  font-weight: inherit;
-  font-style: inherit;
-  font-size: 10px;
+  .heading-time {
+    color: var(--chef-primary-dark);
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 10px;
+  }
 }
 
 .chart-list-item {
