@@ -12,7 +12,7 @@ import {
   GetDataBagDetailsFailure,
   DataBagDetailsSuccessPayload,
   DataBagDetailsActionTypes
-} from './data-bag-details.action';
+} from './data-bag-details.actions';
 
 import { DataBagsRequests } from './data-bags.requests';
 

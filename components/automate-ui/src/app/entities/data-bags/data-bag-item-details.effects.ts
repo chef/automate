@@ -11,7 +11,7 @@ import {
   GetDataBagItemDetailsSuccess,
   GetDataBagItemDetailsFailure,
   DataBagItemDetailsActionTypes
-} from './data-bag-item-details.action';
+} from './data-bag-item-details.actions';
 
 import { DataBagsRequests } from './data-bags.requests';
 

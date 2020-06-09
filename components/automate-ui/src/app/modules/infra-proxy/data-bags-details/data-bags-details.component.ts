@@ -6,12 +6,12 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams } from 'app/route.selectors';
-import { identity, isEmpty, isNil } from 'lodash/fp';
+import { identity, isNil } from 'lodash/fp';
 
-import { GetDataBagDetails } from 'app/entities/data-bags/data-bag-details.action';
+import { GetDataBagDetails } from 'app/entities/data-bags/data-bag-details.actions';
 import { DataBags, DataBagsItemDetails } from 'app/entities/data-bags/data-bags.model';
 import { allDataBagDetails, getAllStatus } from 'app/entities/data-bags/data-bag-details.selector';
-import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.action';
+import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.actions';
 import { dataBagItemDetailsFromRoute, getStatus } from 'app/entities/data-bags/data-bag-item-details.selector';
 
 export type DataBagsDetailsTab = 'details';
@@ -67,11 +67,12 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       filter(([getDataBagDetailsSt, _dataBagDetailsState]) =>
         getDataBagDetailsSt === EntityStatus.loadingSuccess),
       filter(([_getDataBagDetailsSt, dataBagDetailsState]) =>
-        !isEmpty(dataBagDetailsState)))
+        !isNil(dataBagDetailsState)))
       .subscribe(([_getDataBagDetailsSt, dataBagDetailsState]) => {
         this.dataBagDetails = dataBagDetailsState;
-        // To fetch fetch first Item details by deafult
-        this.handleItemSelected(this.dataBagDetails[0].name);
+        if (this.dataBagDetails.length) {
+          this.handleItemSelected(this.dataBagDetails[0].name);
+        }
         this.dataBagsDetailsLoading = false;
       });
 

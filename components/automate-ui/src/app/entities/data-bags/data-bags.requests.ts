@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
-import { DataBagsSuccessPayload } from './data-bags.action';
-import { DataBagDetailsSuccessPayload } from './data-bag-details.action';
+import { DataBagsSuccessPayload } from './data-bags.actions';
+import { DataBagDetailsSuccessPayload } from './data-bag-details.actions';
 import { DataBagsItemDetails } from './data-bags.model';
 
 @Injectable()

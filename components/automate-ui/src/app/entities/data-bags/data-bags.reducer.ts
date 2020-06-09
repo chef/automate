@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
-import { DataBagsActionTypes, DataBagsActions } from './data-bags.action';
+import { DataBagsActionTypes, DataBagsActions } from './data-bags.actions';
 import { DataBags } from './data-bags.model';
 
 export interface DataBagsEntityState extends EntityState<DataBags> {
