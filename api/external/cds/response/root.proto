@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package chef.automate.api.cds.response;
-option go_package = "github.com/chef/automate/api/external/cds/request";
+option go_package = "github.com/chef/automate/api/external/cds/response";
 
 message ContentItems {
 

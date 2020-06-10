@@ -7,6 +7,7 @@ import (
 	context "context"
 	fmt "fmt"
 	request "github.com/chef/automate/api/external/cds/request"
+	response "github.com/chef/automate/api/external/cds/response"
 	_ "github.com/chef/automate/components/automate-grpc/protoc-gen-policy/iam"
 	proto "github.com/golang/protobuf/proto"
 	_ "github.com/golang/protobuf/ptypes/struct"
@@ -78,7 +79,7 @@ type CdsClient interface {
 	//```
 	//cds:contentItems:list
 	//```
-	GetContentItems(ctx context.Context, in *request.ContentItems, opts ...grpc.CallOption) (*request.ContentItems, error)
+	GetContentItems(ctx context.Context, in *request.ContentItems, opts ...grpc.CallOption) (*response.ContentItems, error)
 }
 
 type cdsClient struct {
@@ -89,8 +90,8 @@ func NewCdsClient(cc grpc.ClientConnInterface) CdsClient {
 	return &cdsClient{cc}
 }
 
-func (c *cdsClient) GetContentItems(ctx context.Context, in *request.ContentItems, opts ...grpc.CallOption) (*request.ContentItems, error) {
-	out := new(request.ContentItems)
+func (c *cdsClient) GetContentItems(ctx context.Context, in *request.ContentItems, opts ...grpc.CallOption) (*response.ContentItems, error) {
+	out := new(response.ContentItems)
 	err := c.cc.Invoke(ctx, "/chef.automate.api.cds.Cds/GetContentItems", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -109,14 +110,14 @@ type CdsServer interface {
 	//```
 	//cds:contentItems:list
 	//```
-	GetContentItems(context.Context, *request.ContentItems) (*request.ContentItems, error)
+	GetContentItems(context.Context, *request.ContentItems) (*response.ContentItems, error)
 }
 
 // UnimplementedCdsServer can be embedded to have forward compatible implementations.
 type UnimplementedCdsServer struct {
 }
 
-func (*UnimplementedCdsServer) GetContentItems(ctx context.Context, req *request.ContentItems) (*request.ContentItems, error) {
+func (*UnimplementedCdsServer) GetContentItems(ctx context.Context, req *request.ContentItems) (*response.ContentItems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContentItems not implemented")
 }
 

@@ -22,6 +22,7 @@ import (
 
 	// PB-generated imports
 	pb_apps "github.com/chef/automate/api/external/applications"
+	pb_cds "github.com/chef/automate/api/external/cds"
 	pb_cfgmgmt "github.com/chef/automate/api/external/cfgmgmt"
 	pb_profiles "github.com/chef/automate/api/external/compliance/profiles"
 	pb_cc_reporting "github.com/chef/automate/api/external/compliance/reporting"
@@ -122,6 +123,8 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_cfgmgmt.RegisterConfigMgmtServer(grpcServer,
 		handler.NewCfgMgmtServer(cfgMgmtClient))
+
+	pb_cds.RegisterCdsServer(grpcServer, handler.NewCdsServer())
 
 	eventFeedClient, err := clients.FeedClient()
 	if err != nil {
@@ -331,28 +334,29 @@ type registerFunc func(context.Context, *runtime.ServeMux, string, []grpc.DialOp
 // unversionedRESTMux returns all endpoints for the GRPC rest gateway
 func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, func(), error) {
 	return muxFromRegisterMap(grpcURI, dopts, map[string]registerFunc{
-		"event feed":           pb_eventfeed.RegisterEventFeedHandlerFromEndpoint,
-		"config management":    pb_cfgmgmt.RegisterConfigMgmtHandlerFromEndpoint,
-		"chef ingestion":       pb_ingest.RegisterChefIngesterHandlerFromEndpoint,
-		"deployment":           pb_deployment.RegisterDeploymentHandlerFromEndpoint,
-		"ingest job scheduler": pb_ingest.RegisterJobSchedulerHandlerFromEndpoint,
-		"notifications":        pb_notifications.RegisterNotificationsHandlerFromEndpoint,
-		"gateway":              pb_gateway.RegisterGatewayHandlerFromEndpoint,
-		"legacy":               pb_legacy.RegisterLegacyDataCollectorHandlerFromEndpoint,
-		"license":              pb_license.RegisterLicenseHandlerFromEndpoint,
-		"secrets":              pb_secrets.RegisterSecretsServiceHandlerFromEndpoint,
-		"cc_reporting":         pb_cc_reporting.RegisterReportingServiceHandlerFromEndpoint,
-		"cc_stats":             pb_cc_stats.RegisterStatsServiceHandlerFromEndpoint,
-		"cc_jobs":              pb_cc_jobs.RegisterJobsServiceHandlerFromEndpoint,
-		"nodes":                pb_nodes.RegisterNodesServiceHandlerFromEndpoint,
-		"profiles":             pb_profiles.RegisterProfilesServiceHandlerFromEndpoint,
-		"teams-service":        pb_iam.RegisterTeamsHandlerFromEndpoint,
-		"node manager":         pb_nodes_manager.RegisterNodeManagerServiceHandlerFromEndpoint,
-		"telemetry":            pb_telemetry.RegisterTelemetryHandlerFromEndpoint,
-		"data-feed":            pb_data_feed.RegisterDatafeedServiceHandlerFromEndpoint,
-		"data-lifecycle":       pb_data_lifecycle.RegisterDataLifecycleHandlerFromEndpoint,
-		"applications":         pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
-		"infra-proxy":          pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
+		"event feed":               pb_eventfeed.RegisterEventFeedHandlerFromEndpoint,
+		"content delivery service": pb_cds.RegisterCdsHandlerFromEndpoint,
+		"config management":        pb_cfgmgmt.RegisterConfigMgmtHandlerFromEndpoint,
+		"chef ingestion":           pb_ingest.RegisterChefIngesterHandlerFromEndpoint,
+		"deployment":               pb_deployment.RegisterDeploymentHandlerFromEndpoint,
+		"ingest job scheduler":     pb_ingest.RegisterJobSchedulerHandlerFromEndpoint,
+		"notifications":            pb_notifications.RegisterNotificationsHandlerFromEndpoint,
+		"gateway":                  pb_gateway.RegisterGatewayHandlerFromEndpoint,
+		"legacy":                   pb_legacy.RegisterLegacyDataCollectorHandlerFromEndpoint,
+		"license":                  pb_license.RegisterLicenseHandlerFromEndpoint,
+		"secrets":                  pb_secrets.RegisterSecretsServiceHandlerFromEndpoint,
+		"cc_reporting":             pb_cc_reporting.RegisterReportingServiceHandlerFromEndpoint,
+		"cc_stats":                 pb_cc_stats.RegisterStatsServiceHandlerFromEndpoint,
+		"cc_jobs":                  pb_cc_jobs.RegisterJobsServiceHandlerFromEndpoint,
+		"nodes":                    pb_nodes.RegisterNodesServiceHandlerFromEndpoint,
+		"profiles":                 pb_profiles.RegisterProfilesServiceHandlerFromEndpoint,
+		"teams-service":            pb_iam.RegisterTeamsHandlerFromEndpoint,
+		"node manager":             pb_nodes_manager.RegisterNodeManagerServiceHandlerFromEndpoint,
+		"telemetry":                pb_telemetry.RegisterTelemetryHandlerFromEndpoint,
+		"data-feed":                pb_data_feed.RegisterDatafeedServiceHandlerFromEndpoint,
+		"data-lifecycle":           pb_data_lifecycle.RegisterDataLifecycleHandlerFromEndpoint,
+		"applications":             pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
+		"infra-proxy":              pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
 	})
 }
 
