@@ -6,6 +6,7 @@ import { ChefStatusIconPipe } from './chef-status-icon.pipe';
 import { DatetimePipe } from './datetime.pipe';
 import { DefinedOrDefaultPipe } from './defined-or-default.pipe';
 import { IamTypePipe } from './iam-type.pipe';
+import { PaginationTrueEndPipe } from './pagination-true-end.pipe';
 import { PluralizePipe } from './pluralize.pipe';
 import { SelectListInputPipe } from './select-list-input.pipe';
 import { SelectedStatusPipe } from './selected-status.pipe';
@@ -22,6 +23,7 @@ import { TimeFromNowPipe } from './time-from-now.pipe';
     DatetimePipe,
     DefinedOrDefaultPipe,
     IamTypePipe,
+    PaginationTrueEndPipe,
     PluralizePipe,
     SelectListInputPipe,
     ServiceStatusIconPipe,
@@ -37,6 +39,7 @@ import { TimeFromNowPipe } from './time-from-now.pipe';
     DatetimePipe,
     DefinedOrDefaultPipe,
     IamTypePipe,
+    PaginationTrueEndPipe,
     PluralizePipe,
     SelectListInputPipe,
     SelectedStatusPipe,

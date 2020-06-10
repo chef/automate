@@ -49,7 +49,7 @@
               </mat-select>
             </mat-form-field>
         </div>
-        <span>{{ itemStartCount }} - {{ itemEndCount }} of {{ total }} items</span>
+        <span>{{ itemStartCount }} - {{ itemEndCount | paginationTrueEnd: total }} of {{ total }} items</span>
       </div>
 
       <div class="column column2">
