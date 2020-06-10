@@ -91,7 +91,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	c.applyGlobalBackupConfig(backupsCfg, g.GetV1().GetBackups())
 
 	if externalCfg.GetEnable().GetValue() {
-		c.applyExternalConfig(backupsCfg, externalCfg.GetBackup())
+		c.applyExternalConfig(backupsCfg, g.GetV1().GetBackups(), externalCfg.GetBackup())
 		// Early return as we don't need to migrate to the backup-gateway with
 		// external es
 		return
@@ -106,6 +106,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 // into the backup config
 func (c *ConfigRequest) applyExternalConfig(
 	cfg *ConfigRequest_V1_System_Backups,
+	global *ac.Backups,
 	override *ac.External_Elasticsearch_Backup) {
 
 	// If backups are disabled we don't need to worry about applying any other
@@ -153,13 +154,20 @@ func (c *ConfigRequest) applyExternalConfig(
 			cfg.Gcs = &ConfigRequest_V1_System_Backups_GCSSettings{}
 		}
 
+		globalGcs := global.GetGcs()
 		extGcscfg := override.GetGcs()
 		if b := extGcscfg.GetBucket(); b != nil {
 			cfg.Gcs.Bucket = b
+		} else if gb := globalGcs.GetBucket().GetName(); gb != nil {
+			// Unlike the s3 case, we need to grab these values manually.
+			// S3 gets treated special by applyGlobalBackupConfig
+			cfg.Gcs.Bucket = gb
 		}
 
 		if bp := extGcscfg.GetBasePath(); bp != nil {
 			cfg.Gcs.BasePath = bp
+		} else if gbp := globalGcs.GetBucket().GetBasePath(); gbp != nil {
+			cfg.Gcs.BasePath = gbp
 		}
 
 		if c := extGcscfg.GetClient(); c != nil {
