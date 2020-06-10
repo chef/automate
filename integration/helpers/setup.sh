@@ -71,8 +71,10 @@ path.repo: "/var/opt/chef-automate/backups"
 discovery.zen.minimum_master_nodes: 1
 EOF
 
-  local backup_type=$1
-  shift
+  local backup_type="$1"
+  if [[ "$#" -gt 0 ]]; then
+      shift
+  fi
 
   case "${backup_type}" in
     "")
