@@ -62,7 +62,7 @@ do_prepare_restore_gcs_default() {
   #shellcheck disable=SC2154
   chef-automate backup list \
       --debug \
-      --gcs-credentials-path "/tmp/gcpcred" \
+      --gcs-credentials-path "${gcs_creds_path}" \
       "gcs://${gcs_bucket_name}/${gcs_bucket_base_path}" | awk -v s="${test_backup_id}" 'BEGIN{r=1}; $0~s{r=0} 1; END{exit(r)}'
 }
 
@@ -71,7 +71,7 @@ do_restore_gcs_default() {
   chef-automate backup restore \
       --debug \
       --override-origin "$HAB_ORIGIN" \
-      --gcs-credentials-path "/tmp/gcpcred" \
+      --gcs-credentials-path "${gcs_creds_path}" \
       "gcs://${gcs_bucket_name}/${gcs_bucket_base_path}/${test_backup_id}"
 }
 

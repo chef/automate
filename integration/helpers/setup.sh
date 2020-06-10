@@ -76,9 +76,11 @@ EOF
 
   case "${backup_type}" in
     "")
+        log_info "no external backup configuration"
         ;;
     "s3")
-        local s3_endpoint=$1
+        log_info "s3 backup configuration"
+        local s3_endpoint="$1"
 
         echo "y" | /usr/share/elasticsearch/bin/elasticsearch-plugin install \
             "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-s3/repository-s3-${version}.zip"
@@ -96,7 +98,9 @@ EOF
         echo "$AWS_SESSION_TOKEN" | /usr/share/elasticsearch/bin/elasticsearch-keystore add s3.client.default.session_token
         ;;
     "gcs")
-        local gcs_creds=$1
+        log_info "gcs backup configuration"
+
+        local gcs_creds="$1"
 
         echo "y" | /usr/share/elasticsearch/bin/elasticsearch-plugin install "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-gcs/repository-gcs-${version}.zip"
 
@@ -110,5 +114,6 @@ EOF
         return 1
   esac
 
+  log_info "starting external elasticsearch"
   systemctl start elasticsearch.service
 }
