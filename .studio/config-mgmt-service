@@ -257,6 +257,18 @@ function config_mgmt_list_rollouts_raw() {
        "https://localhost/api/beta/cfgmgmt/rollouts/list"
 }
 
+function config_mgmt_list_rollouts_progress() {
+  config_mgmt_list_rollouts_progress_raw | jq .
+}
+
+function config_mgmt_list_rollouts_progress_raw() {
+  local api_token; api_token="$(get_admin_token)"
+  curl -fsS \
+       --insecure \
+       -H "api-token: ${api_token}" \
+       "https://localhost/api/beta/cfgmgmt/rollouts/progress_by_node_segment"
+}
+
 document "config_mgmt_create_rollout" << DOC
   Create a rollout object on the automate server via the JSON REST API.
 
