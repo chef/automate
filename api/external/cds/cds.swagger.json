@@ -1,0 +1,38 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/external/cds/cds.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/beta/cds/content": {
+      "get": {
+        "summary": "GetContentItems",
+        "description": "Returns a list of CDS content metadata\n\nAuthorization Action:\n```\ncds:contentItems:list\n```",
+        "operationId": "GetContentItems",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cds.response.ContentItems"
+            }
+          }
+        },
+        "tags": [
+          "Cds"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "chef.automate.api.cds.response.ContentItems": {
+      "type": "object"
+    }
+  }
+}
