@@ -8,10 +8,6 @@ export enum DataBagItemDetailsActionTypes {
   GET_FAILURE = 'DATA_BAG_ITEM_DETAILS::GET::FAILURE'
 }
 
-// export interface DataBagItemDetailsSuccessPayload {
-//   data_bags_item_details: DataBagsItemDetails;
-// }
-
 export class GetDataBagItemDetails implements Action {
   readonly type = DataBagItemDetailsActionTypes.GET;
   constructor(public payload: {
