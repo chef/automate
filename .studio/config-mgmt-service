@@ -79,6 +79,167 @@ function config_mgmt_grpcurl_get_suggestions() {
 	  chef.automate.domain.cfgmgmt.service.CfgMgmt.GetSuggestions
 }
 
+document "config_mgmt_populate_rollouts" <<DOC
+  Creates rollout records with a variety of policy_node_group, policy_name, and
+  policy_domain_url values.
+DOC
+function config_mgmt_populate_rollouts() {
+  local cheforg="chef_eng_demonstration"
+
+  ### Full Node Segment/Rollout Matrix with All Successful CCRs ###
+  # generate a full matrix of policy_name, policy_node_group, policy_domain_url.
+  # each of those has a set of 3 nodes and 10 rollouts. All CCRs successful
+  ###
+  local pgroup_suffix; pgroup_suffix="1-success"
+  for pname_idx in {1..3} ; do
+    for pdomain_idx in {1..2} ; do
+
+      local pgroup="pgroup-${pgroup_suffix}"
+      local pname="application${pname_idx}"
+      local chefserver="chef${pdomain_idx}.example"
+
+      local node_uuid_list=""
+      # shellcheck disable=SC2034
+      for _node_count in {1..3}; do
+        node_uuid_list="$node_uuid_list $(uuidgen)"
+      done
+
+      # shellcheck disable=SC2034
+      for _revision_idx in {1..10}; do
+        # config_mgmt_rollout_json changes up the policyfile revision id field,
+        # but we need it for the chef client run data so we make a new one
+        local rev_id; rev_id="$(head -c 200 /dev/urandom | tr -cd '0-9a-f')"
+
+        config_mgmt_create_custom_rollout -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id"
+
+        for node_uuid in $node_uuid_list; do
+          config_mgmt_create_rollout_ccr -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id" -U "$node_uuid"
+        done
+      done
+    done
+  done
+
+  ### Mixed Success and Failure ###
+  # A single node segment (policy name/group/chef server) with some success and some failed runs
+  ###
+  local pgroup_suffix; pgroup_suffix="2-mixed-success"
+
+  local pgroup="pgroup-${pgroup_suffix}"
+  local pname="application${pname_idx}"
+  local chefserver="chefserver.example.com"
+
+  local node_uuid_list=""
+  # shellcheck disable=SC2034
+  for _node_count in {1..3}; do
+    node_uuid_list="$node_uuid_list $(uuidgen)"
+  done
+
+  local error_node_uuid_list; error_node_uuid_list=""
+  # shellcheck disable=SC2034
+  for _node_count in {1..3}; do
+    error_node_uuid_list="$error_node_uuid_list $(uuidgen)"
+  done
+
+  # shellcheck disable=SC2034
+  for _revision_idx in {1..10}; do
+    # config_mgmt_rollout_json changes up the policyfile revision id field,
+    # but we need it for the chef client run data so we make a new one
+    local rev_id; rev_id="$(head -c 200 /dev/urandom | tr -cd '0-9a-f')"
+
+    config_mgmt_create_custom_rollout -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id"
+
+    for node_uuid in $node_uuid_list; do
+      config_mgmt_create_rollout_ccr -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id" -U "$node_uuid"
+    done
+    for node_uuid in $error_node_uuid_list; do
+      echo "generating failed CCR pn: $pname pg: $pgroup rev_id: $rev_id node; $node_uuid"
+      generate_chef_run_failure_example | \
+        policyfile_ify "$pname" "$pgroup" "$rev_id" | \
+        config_mgmt_rollout_ccr_setvals -U "$node_uuid" -S "$chefserver" -O "$cheforg" | \
+        send_chef_data_raw
+    done
+  done
+
+  ### Partially Completed Rollout(s)
+  # A single node segment with 5 rollouts, each only partially completed.
+  # There are 5 sets of nodes, all the nodes complete the oldest rollout, 4/5
+  # of the sets complete the 2nd, 3/5 complete the 3rd one, etc.
+  ###
+
+  local pgroup_suffix; pgroup_suffix="3-partial-completion"
+
+  local pgroup="pgroup-${pgroup_suffix}"
+  local pname="application${pname_idx}"
+  local chefserver="chefserver.example.com"
+
+  local node_uuid_list_latest_rollout=""
+  local node_uuid_list_n_minus_1=""
+  local node_uuid_list_n_minus_2=""
+  local node_uuid_list_n_minus_3=""
+  local node_uuid_list_n_minus_4=""
+  # shellcheck disable=SC2034
+  for _node_count in {1..4}; do
+    node_uuid_list_latest_rollout="$node_uuid_list_latest_rollout $(uuidgen)"
+    node_uuid_list_n_minus_1="$node_uuid_list_n_minus_1 $(uuidgen)"
+    node_uuid_list_n_minus_2="$node_uuid_list_n_minus_2 $(uuidgen)"
+    node_uuid_list_n_minus_3="$node_uuid_list_n_minus_3 $(uuidgen)"
+    node_uuid_list_n_minus_4="$node_uuid_list_n_minus_4 $(uuidgen)"
+  done
+
+  # all nodes complete run 1
+  local run_1_nodes="$node_uuid_list_latest_rollout $node_uuid_list_n_minus_1 $node_uuid_list_n_minus_2 $node_uuid_list_n_minus_3 $node_uuid_list_n_minus_4"
+  # all nodes except n-minus-4 complete run 2
+  local run_2_nodes="$node_uuid_list_latest_rollout $node_uuid_list_n_minus_1 $node_uuid_list_n_minus_2 $node_uuid_list_n_minus_3"
+  # all nodes except n-minus-4, n-minus-3 complete run 3
+  local run_3_nodes="$node_uuid_list_latest_rollout $node_uuid_list_n_minus_1 $node_uuid_list_n_minus_2"
+  # all nodes except n-minus-4, n-minus-3, n-minus-2 complete run 4
+  local run_4_nodes="$node_uuid_list_latest_rollout $node_uuid_list_n_minus_1"
+  # all nodes except n-minus-4, n-minus-3, n-minus-2 complete run 4
+  local run_5_nodes="$node_uuid_list_latest_rollout"
+
+  # config_mgmt_rollout_json changes up the policyfile revision id field,
+  # but we need it for the chef client run data so we make a new one
+  local rev_id; rev_id="$(head -c 200 /dev/urandom | tr -cd '0-9a-f')"
+
+  config_mgmt_create_custom_rollout -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id"
+
+  for node_uuid in $run_1_nodes; do
+    config_mgmt_create_rollout_ccr -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id" -U "$node_uuid"
+  done
+
+  local rev_id; rev_id="$(head -c 200 /dev/urandom | tr -cd '0-9a-f')"
+
+  config_mgmt_create_custom_rollout -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id"
+
+  for node_uuid in $run_2_nodes; do
+    config_mgmt_create_rollout_ccr -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id" -U "$node_uuid"
+  done
+
+  local rev_id; rev_id="$(head -c 200 /dev/urandom | tr -cd '0-9a-f')"
+
+  config_mgmt_create_custom_rollout -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id"
+
+  for node_uuid in $run_3_nodes; do
+    config_mgmt_create_rollout_ccr -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id" -U "$node_uuid"
+  done
+
+  local rev_id; rev_id="$(head -c 200 /dev/urandom | tr -cd '0-9a-f')"
+
+  config_mgmt_create_custom_rollout -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id"
+
+  for node_uuid in $run_4_nodes; do
+    config_mgmt_create_rollout_ccr -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id" -U "$node_uuid"
+  done
+
+  local rev_id; rev_id="$(head -c 200 /dev/urandom | tr -cd '0-9a-f')"
+
+  config_mgmt_create_custom_rollout -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id"
+
+  for node_uuid in $run_5_nodes; do
+    config_mgmt_create_rollout_ccr -N "$pname" -G "$pgroup" -S "$chefserver" -O "$cheforg" -R "$rev_id" -U "$node_uuid"
+  done
+}
+
 document "config_mgmt_list_rollouts" <<DOC
   List the rollout objects on the Automate server via the JSON/REST API.
 
@@ -129,7 +290,114 @@ function config_mgmt_send_to_create_rollout_raw() {
        -X POST \
        --data "@-" \
        "https://localhost/api/beta/cfgmgmt/rollouts/create"
-  
+}
+
+function config_mgmt_create_custom_rollout() {
+  config_mgmt_rollout_json | \
+  config_mgmt_rollout_setvals "$@"| \
+  config_mgmt_send_to_create_rollout_pretty
+}
+
+function config_mgmt_create_rollout_ccr() {
+  local pname
+  local pgroup
+  local chefserver
+  local cheforg
+  local rev_id
+  local node_uuid
+
+  local OPTIND opt # reset getopts' "internal" global variables
+  while getopts 'N:G:S:O:R:U:' opt; do
+     case $opt in
+       N) pname="$OPTARG"
+       ;;
+       G) pgroup="$OPTARG"
+       ;;
+       S) chefserver="$OPTARG"
+       ;;
+       O) cheforg="$OPTARG"
+       ;;
+       R) rev_id="$OPTARG"
+       ;;
+       U) node_uuid="$OPTARG"
+       ;;
+       \?) echo "Invalid option -$OPTARG" >&2; exit 1
+       ;;
+       : )
+       echo "Invalid option: $OPTARG requires an argument" 1>&2; exit 1
+       ;;
+     esac
+  done
+
+  echo "Creating Rollout CCR record pn: $pname pg: $pgroup rev_id: $rev_id node: $node_uuid @ $chefserver/$cheforg"
+  generate_chef_run_example | \
+    policyfile_ify "$pname" "$pgroup" "$rev_id" | \
+    config_mgmt_rollout_ccr_setvals -U "$node_uuid" -S "$chefserver" -O "$cheforg" | \
+    send_chef_data_raw
+}
+
+function config_mgmt_rollout_setvals() {
+  local pname
+  local pgroup
+  local chefserver
+  local cheforg
+  local rev_id
+
+  local OPTIND opt # reset getopts' "internal" global variables
+  while getopts 'N:G:S:O:R:' opt; do
+     case $opt in
+       N) pname="$OPTARG"
+       ;;
+       G) pgroup="$OPTARG"
+       ;;
+       S) chefserver="$OPTARG"
+       ;;
+       O) cheforg="$OPTARG"
+       ;;
+       R) rev_id="$OPTARG"
+       ;;
+       \?) echo "Invalid option -$OPTARG" >&2; exit 1
+       ;;
+       : )
+       echo "Invalid option: $OPTARG requires an argument" 1>&2; exit 1
+       ;;
+     esac
+   done
+
+   jq --arg pgroup "$pgroup" \
+      --arg pname "$pname" \
+      --arg pdomain "https://${chefserver}/organizations/${cheforg}" \
+      --arg rev_id "$rev_id" \
+      '.policy_node_group = $pgroup | .policy_name = $pname | .policy_domain_url = $pdomain | .policy_revision_id = $rev_id'
+}
+
+function config_mgmt_rollout_ccr_setvals() {
+  local node_uuid
+  local chefserver
+  local cheforg
+
+  local OPTIND opt # reset getopts' "internal" global variables
+  while getopts 'U:S:O:' opt; do
+     case $opt in
+       U) node_uuid="$OPTARG"
+       ;;
+       S) chefserver="$OPTARG"
+       ;;
+       O) cheforg="$OPTARG"
+       ;;
+       \?) echo "Invalid option -$OPTARG" >&2; exit 1
+       ;;
+       : )
+       echo "Invalid option: $OPTARG requires an argument" 1>&2; exit 1
+       ;;
+     esac
+
+   done
+   jq \
+     --arg node_uuid "$node_uuid" \
+     --arg chefserver "$chefserver" \
+     --arg cheforg "$cheforg" \
+     '.entity_uuid = $node_uuid | .chef_server_fqdn = $chefserver | .organization_name = $cheforg'
 }
 
 document "config_mgmt_rollout_json" <<DOC
@@ -162,4 +430,44 @@ function config_mgmt_rollout_json_static() {
         "ci_job_id": "https://buildkite.com/chef-oss/chef-automate-master-verify/builds/42"
       }
 '
+}
+
+document "policyfile_ify" <<DOC
+  Does the \`jq\` magic to make a chef run (success or failure) a policyfile run
+
+  Example: Success
+  ----------------
+  generate_chef_run_example | policyfile_ify pname pgroup abc123 | send_chef_data_raw
+
+
+  Example: Fail
+  -------------
+  generate_chef_run_failure_example | policyfile_ify pname pgroup abc123 | send_chef_data_raw
+DOC
+function policyfile_ify() {
+  if [[ "$1x" == "x" || "$2x" == "x" || "$3x" == "x" ]]; then
+    echo "usage: policyfile_ify POLICY_NAME POLICY_GROUP REVISION_ID"
+    return 1
+  fi
+  local pname=$1
+  local pgroup=$2
+  local rev_id=$3
+
+  jq --arg pname "${pname}" \
+     --arg pgroup "${pgroup}" \
+     --arg rev_id "${rev_id}" \
+    '.policy_name = $pname | .policy_group = $pgroup | .node.chef_environment = $pgroup | .node.automatic.policy_revision = $rev_id'
+}
+
+document "config_mgmt_clear_rollouts" <<DOC
+  Deletes everything in the node-state index and the chef_config_mgmt_service
+  postgres database.
+DOC
+function config_mgmt_clear_rollouts() {
+  curl -Ss -k -X POST http://localhost:10144/node-state/_delete_by_query -H 'Content-Type: application/json' -d '{        
+      "query": {
+          "match_all": {}
+      }
+  }'
+  chef-automate dev psql chef_config_mgmt_service -- -c "DELETE FROM ROLLOUTS"
 }
