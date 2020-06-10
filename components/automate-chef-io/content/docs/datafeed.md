@@ -22,7 +22,7 @@ The following types of information are sent:
 
 A Data Feed is not a Data Tap, it operates by doing the following:
 
-- Every 4 hours (configurable) the data-feed-service will aggregate the client runs and compliance reports from the previous 30 minutes and send this to the registered destinations.
+- Every 4 hours (configurable) the data-feed-service will aggregate the client runs and compliance reports from the previous 4 hours and send this to the registered destinations.
 - If there are no destinations, aggregation will not occur.
 - The data is aggregated and sent in batches of 50 nodes at a time (also configurable)
 
@@ -63,8 +63,8 @@ To delete an Endpoint for a Data Feed in Chef Automate:
 On the Chef Automate CLI
 
 1. Navigate to /hab/svc/data-feed-service/config/config.toml
-1. To change the interval for the Data Feed collection update the config parameter for *feed_interval* which defaults to 30 minutes
-1. To change the number of sets of node data sent in each individual batch to your end point update the config parameter for *node_batch_size* which defaults to 100 nodes
+1. To change the interval for the Data Feed collection update the config parameter for *feed_interval* which defaults to 4 hours
+1. To change the number of sets of node data sent in each individual batch to your end point update the config parameter for *node_batch_size* which defaults to 50 nodes
 1. To determine what data to include in each export use the update_nodes_only setting. By default, only data that has recently changed will be aggregated. With update_nodes_only set to false additional data is aggregated with each node that has recently changed, all the latest data is sent.
 1. To reduce the IP address range for the node data being collected and processed, if for example you only wish to send production or test node traffic, update the config parameter for *disable_cidr_filter* to false **and** update the setting for *cidr_filter* to cover the IP address range required
 
