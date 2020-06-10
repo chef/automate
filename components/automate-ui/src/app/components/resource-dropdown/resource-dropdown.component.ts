@@ -66,8 +66,12 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.resources) {
-      if (!changes.resources.previousValue || changes.resources.previousValue.length === 0) {
-        // only update if not previously initialized
+      const priorResources: ResourceCheckedSection[] = changes.resources.previousValue;
+      // only update if not previously initialized
+      if (!priorResources
+        || priorResources.length === 0
+        || priorResources[0].itemList.length === 0
+        || priorResources[0].itemList.some(p => p.checked === null)) {
         this.snapshotResources = cloneDeep(this.resources);
         this.resetFilteredResources();
         this.updateLabel();
