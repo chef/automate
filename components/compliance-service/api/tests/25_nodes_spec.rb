@@ -130,7 +130,7 @@ describe File.basename(__FILE__) do
       tags: [
         Common::Kv.new(key: "department", value: "marketing"),
         Common::Kv.new(key: "boss", value: "John"),
-        Common::Kv.new(key: "test", value: "Dot.Comma,Big;\"Trouble")
+        Common::Kv.new(key: "test&6^\"BAD", value: "Dot.Comma,Big;\"Trouble")
       ]
     )
     node_id2 = node2['id']
@@ -191,7 +191,7 @@ describe File.basename(__FILE__) do
               "value": "John"
             },
             {
-              "key": "test",
+              "key": "test&6^\"BAD",
               "value": "Dot.Comma,Big;\"Trouble"
             },
           ],
@@ -206,7 +206,6 @@ describe File.basename(__FILE__) do
           "id": node_id1,
           "name": "M$",
           "manager": "automate",
-          "tags": [{}],
           "status": "unknown",
           "managerIds": [
             "e69dc612-7e67-43f2-9b19-256afd385820"
@@ -253,7 +252,6 @@ describe File.basename(__FILE__) do
       "id": node_id1,
       "name": "M$",
       "manager": "automate",
-      "tags": [{}],
       "status": "unknown",
       "managerIds": [
         "e69dc612-7e67-43f2-9b19-256afd385820"
@@ -289,7 +287,7 @@ describe File.basename(__FILE__) do
           "value": "John"
         },
         {
-          "key": "test",
+          "key": "test&6^\"BAD",
           "value": "Dot.Comma,Big;\"Trouble"
         }
       ],
@@ -583,7 +581,7 @@ describe File.basename(__FILE__) do
       ),
       field: "tags"
     )
-    assert_same_elements(["department", "boss", "test"], tag_keys["fields"])
+    assert_same_elements(["department", "boss", "test&6^\"BAD"], tag_keys["fields"])
 
     names = MANAGER_GRPC manager, :search_node_fields, Manager::FieldQuery.new(
       node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",
