@@ -23,11 +23,25 @@ type JobScheduler struct {
 	CerealSvc *cereal.Manager
 }
 
+type DisconnectedServicesConfigAndInfo struct {
+	*DisconnectedServicesConfigV0
+	*DisconnectedServicesInfo
+}
+
 // + enabled/disabled for both jobs, not just the deleter
 // + recurrence for both
 type DisconnectedServicesConfigV0 struct {
 	Enabled bool
 	Params  *DisconnectedServicesParamsV0
+	// Recurrence string // string representation of rrule
+}
+
+type DisconnectedServicesInfo struct {
+	LastEnqueuedAt *time.Time
+	LastStartedAt  *time.Time
+	LastEndedAt    *time.Time
+	LastElapsed    *time.Duration
+	NextDueAt      *time.Time
 }
 
 type DisconnectedServicesParamsV0 struct {
@@ -161,7 +175,7 @@ func (j *JobScheduler) createWorkflowIfMissing(
 	return nil
 }
 
-func (j *JobScheduler) GetDisconnectedServicesJobConfig(ctx context.Context) (*DisconnectedServicesConfigV0, error) {
+func (j *JobScheduler) GetDisconnectedServicesJobConfig(ctx context.Context) (*DisconnectedServicesConfigAndInfo, error) {
 	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesWorkflowName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to retrieve schedule and config for disconnected_services job")
@@ -172,10 +186,25 @@ func (j *JobScheduler) GetDisconnectedServicesJobConfig(ctx context.Context) (*D
 		return nil, errors.Wrap(err, "unable to load disconnected_services job parameters")
 	}
 
-	return &DisconnectedServicesConfigV0{
-		Enabled: sched.Enabled,
-		Params:  &returnedParams,
-	}, nil
+	ret := &DisconnectedServicesConfigAndInfo{
+		DisconnectedServicesConfigV0: &DisconnectedServicesConfigV0{
+			Enabled: sched.Enabled,
+			Params:  &returnedParams,
+		},
+		DisconnectedServicesInfo: &DisconnectedServicesInfo{
+			LastEnqueuedAt: &sched.LastEnqueuedAt,
+			LastStartedAt:  sched.LastStart,
+			LastEndedAt:    sched.LastEnd,
+			NextDueAt:      &sched.NextDueAt,
+		},
+	}
+
+	if (sched.LastStart != nil) && (sched.LastEnd != nil) {
+		e := (*sched.LastEnd).Sub(*sched.LastStart)
+		ret.DisconnectedServicesInfo.LastElapsed = &e
+	}
+
+	return ret, nil
 }
 
 func (j *JobScheduler) UpdateDisconnectedServicesJobParams(ctx context.Context, params *DisconnectedServicesParamsV0) error {
@@ -196,7 +225,7 @@ func (j *JobScheduler) UpdateDisconnectedServicesJobParams(ctx context.Context, 
 	return nil
 }
 
-func (j *JobScheduler) GetDeleteDisconnectedServicesJobConfig(ctx context.Context) (*DisconnectedServicesConfigV0, error) {
+func (j *JobScheduler) GetDeleteDisconnectedServicesJobConfig(ctx context.Context) (*DisconnectedServicesConfigAndInfo, error) {
 	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesWorkflowName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to retrieve schedule and config for delete_disconnected_services job")
@@ -207,10 +236,25 @@ func (j *JobScheduler) GetDeleteDisconnectedServicesJobConfig(ctx context.Contex
 		return nil, errors.Wrap(err, "unable to load delete_disconnected_services job parameters")
 	}
 
-	return &DisconnectedServicesConfigV0{
-		Enabled: sched.Enabled,
-		Params:  &returnedParams,
-	}, nil
+	ret := &DisconnectedServicesConfigAndInfo{
+		DisconnectedServicesConfigV0: &DisconnectedServicesConfigV0{
+			Enabled: sched.Enabled,
+			Params:  &returnedParams,
+		},
+		DisconnectedServicesInfo: &DisconnectedServicesInfo{
+			LastEnqueuedAt: &sched.LastEnqueuedAt,
+			LastStartedAt:  sched.LastStart,
+			LastEndedAt:    sched.LastEnd,
+			NextDueAt:      &sched.NextDueAt,
+		},
+	}
+
+	if (sched.LastStart != nil) && (sched.LastEnd != nil) {
+		e := (*sched.LastEnd).Sub(*sched.LastStart)
+		ret.DisconnectedServicesInfo.LastElapsed = &e
+	}
+
+	return ret, nil
 }
 
 func (j *JobScheduler) UpdateDeleteDisconnectedServicesJobParams(ctx context.Context, params *DisconnectedServicesParamsV0) error {

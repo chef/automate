@@ -404,7 +404,9 @@ func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	res := &applications.PeriodicMandatoryJobConfig{
+		Running:   config.Enabled,
 		Threshold: config.Params.ThresholdDuration,
+		JobInfo:   jobInfoForResponse(config.DisconnectedServicesInfo),
 	}
 	return res, nil
 }
@@ -445,6 +447,7 @@ func (app *ApplicationsServer) GetDeleteDisconnectedServicesConfig(ctx context.C
 	res := &applications.PeriodicJobConfig{
 		Running:   config.Enabled,
 		Threshold: config.Params.ThresholdDuration,
+		JobInfo:   jobInfoForResponse(config.DisconnectedServicesInfo),
 	}
 	return res, nil
 }
@@ -540,4 +543,28 @@ func convertHealthCheckResult(svc *storage.Service) *applications.HealthCheckRes
 		Stderr:     svc.HCStderr,
 		ExitStatus: svc.HCExitStatus,
 	}
+}
+
+func jobInfoForResponse(info *DisconnectedServicesInfo) *applications.PeriodicJobInfo {
+	ret := &applications.PeriodicJobInfo{
+		LastEnqueuedAt: toProtoTimestamp(info.LastEnqueuedAt),
+		LastStartedAt:  toProtoTimestamp(info.LastStartedAt),
+		LastEndedAt:    toProtoTimestamp(info.LastEndedAt),
+		NextDueAt:      toProtoTimestamp(info.NextDueAt),
+	}
+	if info.LastElapsed != nil {
+		ret.LastElapsed = ptypes.DurationProto(*info.LastElapsed)
+	}
+	return ret
+}
+
+func toProtoTimestamp(t *time.Time) *timestamp.Timestamp {
+	if t == nil {
+		return nil
+	}
+	ts, err := ptypes.TimestampProto(*t)
+	if err != nil {
+		return nil
+	}
+	return ts
 }
