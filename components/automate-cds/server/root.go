@@ -3,7 +3,10 @@ package server
 import (
 	"context"
 
+	"github.com/chef/automate/api/external/cds/request"
+	"github.com/chef/automate/api/external/cds/response"
 	ver_api "github.com/chef/automate/api/external/common/version"
+
 	"github.com/chef/automate/components/automate-cds/service"
 	"github.com/chef/automate/lib/version"
 )
@@ -28,4 +31,10 @@ func (s *Server) GetVersion(
 		Sha:     version.GitSHA,
 		Built:   version.BuildTime,
 	}, nil
+}
+
+// GetContentItems - Returns a list of CDS content metadata
+func (s *Server) GetContentItems(ctx context.Context, request *request.ContentItems) (*response.ContentItems, error) {
+
+	return &response.ContentItems{}, nil
 }

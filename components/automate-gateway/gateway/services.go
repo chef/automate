@@ -114,6 +114,16 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		trialLicenseURL,
 	))
 
+	cdsClient, err := clients.CdsClient()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"service": "automate-cds",
+			"error":   err,
+		}).Fatal("Could not create client")
+	}
+
+	pb_cds.RegisterCdsServer(grpcServer, handler.NewCdsServer(cdsClient))
+
 	cfgMgmtClient, err := clients.CfgMgmtClient()
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -123,8 +133,6 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_cfgmgmt.RegisterConfigMgmtServer(grpcServer,
 		handler.NewCfgMgmtServer(cfgMgmtClient))
-
-	pb_cds.RegisterCdsServer(grpcServer, handler.NewCdsServer())
 
 	eventFeedClient, err := clients.FeedClient()
 	if err != nil {

@@ -7,20 +7,26 @@ import (
 
 	"github.com/chef/automate/api/external/cds/request"
 	"github.com/chef/automate/api/external/cds/response"
+	inter_service "github.com/chef/automate/api/interservice/cds/service"
 )
 
-type CdsServer struct{}
+// CdsServer stores inter-service automate-cds client
+type CdsServer struct {
+	client inter_service.AutomateCdsClient
+}
 
-func NewCdsServer() *CdsServer {
-	return &CdsServer{}
+// NewCdsServer initializes CdsServer with client
+func NewCdsServer(client inter_service.AutomateCdsClient) *CdsServer {
+	return &CdsServer{client}
 }
 
 // GetContentItems - Returns a list of CDS content metadata
-func (s *CdsServer) GetContentItems(ctx context.Context, request *request.ContentItems) (*response.ContentItems, error) {
+func (s *CdsServer) GetContentItems(ctx context.Context,
+	request *request.ContentItems) (*response.ContentItems, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	return &response.ContentItems{}, nil
+	return s.client.GetContentItems(ctx, request)
 }
