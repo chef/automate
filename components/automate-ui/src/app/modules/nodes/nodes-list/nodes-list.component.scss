@@ -25,13 +25,17 @@ chef-icon.SKIPPED {
   color: $chef-dark-grey;
 }
 
+.status-icon {
+
+  &--pointer {
+    cursor: pointer;
+  }
+}
+
 .run-info-tooltip {
   border-left: $spacing-03 solid;
   border-right: $spacing-03 solid transparent;
   padding-right: $spacing-03;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -60px; 
 
   &.FAILED {
     border-left-color: $status-error;
@@ -43,10 +47,6 @@ chef-icon.SKIPPED {
 
   &.UKNOWN, &.SKIPPED {
     border-left-color: $status-unknown;
-  }
-  &.hydrated { 
-    visibility: visible;
-    opacity: 1;
   }
 }
 
