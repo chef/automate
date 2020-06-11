@@ -21,6 +21,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>
   ) { }
 
+  public DateTime = DateTime;
   nodesList;
   nodesListSort = 'last_contact';
   nodesListSortOrder = 'DESC';

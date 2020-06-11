@@ -1,4 +1,5 @@
 @import "~styles/variables";
+@import "@carbon/layout/scss/layout";
 
 chef-td {
   font-size: 80%;
@@ -24,6 +25,51 @@ chef-icon.SKIPPED {
   color: $chef-dark-grey;
 }
 
-chef-tooltip {
-  width: 400px;
+.run-info-tooltip {
+  border-left: $spacing-03 solid;
+  border-right: $spacing-03 solid transparent;
+  padding-right: $spacing-03;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px; 
+
+  &.FAILED {
+    border-left-color: $status-error;
+  }
+
+  &.PASSED {
+    border-left-color: $status-success;
+  }
+
+  &.UKNOWN, &.SKIPPED {
+    border-left-color: $status-unknown;
+  }
+  &.hydrated { 
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.run-info-tooltip-link {
+  display: block;
+  margin-top: $spacing-05;
+}
+
+.run-info-tooltip-info,
+.run-info-tooltip-link {
+  margin: 0;
+  font-size: 14px;
+  white-space: nowrap;
+
+  chef-icon {
+    margin-left: $spacing-03;
+    color: inherit;
+  }
+}
+
+.run-info-tooltip.missing {
+  .run-info-tooltip-date,
+  .run-info-tooltip-link {
+    display: none;
+  }
 }
