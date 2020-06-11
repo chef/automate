@@ -56,7 +56,7 @@
               <chef-td (click)="filterFor('manager_type', node.manager)">{{ node.manager }}</chef-td>
               <chef-td (click)="filterFor('last_contact', node.last_contact)">{{ node.last_contact }}</chef-td>
               <chef-td>
-                <chef-icon class="status-icon" [ngClass]="node.scan_data.status"
+                <chef-icon [attr.id]="node.name" class="status-icon--pointer" [ngClass]="node.scan_data.status"
                 (click)="filterFor('last_scan_status', node.scan_data.status)">
                   {{ statusIcon(node.scan_data.status) }}
                 </chef-icon>
@@ -64,9 +64,10 @@
                 (click)="filterFor('last_scan_penultimate_status', node.scan_data.penultimate_status)">
                   {{ statusIcon(node.scan_data.penultimate_status) }}
                 </chef-icon> 
-                <chef-tooltip
-                [ngClass]="['run-info-tooltip', node.scan_data.status]"
-                interactable>
+                <chef-tooltip 
+                  [attr.for]="node.name"
+                  [ngClass]="['run-info-tooltip', node.scan_data.status]"
+                  interactable>
                   <p class="run-info-tooltip-info">
                     <span class="run-info-tooltip-text">{{ node.scan_data.status | titlecase }}</span>
                     <span class="run-info-tooltip-date">{{ node.scan_data.end_time | datetime: DateTime.RFC2822 }}</span>
