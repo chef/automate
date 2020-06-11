@@ -22,8 +22,8 @@ export class NodesListComponent implements OnInit, OnDestroy {
   ) { }
 
   nodesList;
-  nodesListSort;
-  nodesListSortOrder;
+  nodesListSort = 'last_contact';
+  nodesListSortOrder = 'DESC';
   nodesListFilters = [];
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
