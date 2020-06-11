@@ -428,6 +428,12 @@ func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Cont
 	return &applications.UpdateDisconnectedServicesConfigRes{}, nil
 }
 
+func (app *ApplicationsServer) RunDisconnectedServicesJob(ctx context.Context,
+	request *applications.RunDisconnectedServicesJobReq) (*applications.RunDisconnectedServicesJobResponse, error) {
+
+	return nil, nil
+}
+
 func (app *ApplicationsServer) GetDeleteDisconnectedServicesConfig(ctx context.Context,
 	req *applications.GetDeleteDisconnectedServicesConfigReq) (*applications.PeriodicJobConfig, error) {
 	config, err := app.jobScheduler.GetDeleteDisconnectedServicesJobConfig(ctx)
@@ -476,6 +482,12 @@ func (app *ApplicationsServer) UpdateDeleteDisconnectedServicesConfig(ctx contex
 	}
 
 	return &applications.UpdateDeleteDisconnectedServicesConfigRes{}, nil
+}
+
+func (app *ApplicationsServer) RunDeleteDisconnectedServicesJob(ctx context.Context,
+	request *applications.RunDeleteDisconnectedServicesJobReq) (*applications.RunDeleteDisconnectedServicesJobResponse, error) {
+
+	return nil, nil
 }
 
 // Convert storage.Service array to applications.Service array

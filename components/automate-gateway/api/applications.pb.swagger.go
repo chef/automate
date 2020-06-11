@@ -459,6 +459,32 @@ func init() {
         ]
       }
     },
+    "/api/v0/retention/service_groups/delete_disconnected_services/run": {
+      "post": {
+        "operationId": "RunDeleteDisconnectedServicesJob",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.applications.RunDeleteDisconnectedServicesJobResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.applications.RunDeleteDisconnectedServicesJobReq"
+            }
+          }
+        ],
+        "tags": [
+          "retention"
+        ]
+      }
+    },
     "/api/v0/retention/service_groups/disconnected_services/config": {
       "get": {
         "summary": "Show 'Disconnected Services' configuration",
@@ -478,7 +504,7 @@ func init() {
       },
       "post": {
         "summary": "Change 'Disconnected Services' Configuration",
-        "description": "Changes the configuration for the task that marks services as disconnected after\n'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.\nThis job cannot be disabled, and therefore no information about running is accepted.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n/retention/service_groups/disconnected_services/config\n'{\n\"threshold\": \"15m\"\n}'\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nretention:serviceGroups:update\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Changes the configuration for the task that marks services as disconnected after\n'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n/retention/service_groups/disconnected_services/config\n'{\n\"threshold\": \"15m\"\n}'\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nretention:serviceGroups:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateDisconnectedServicesConfig",
         "responses": {
           "200": {
@@ -495,6 +521,34 @@ func init() {
             "required": true,
             "schema": {
               "$ref": "#/definitions/chef.automate.api.applications.PeriodicMandatoryJobConfig"
+            }
+          }
+        ],
+        "tags": [
+          "retention"
+        ]
+      }
+    },
+    "/api/v0/retention/service_groups/disconnected_services/run": {
+      "post": {
+        "summary": "Runs the job to mark services as disconnected immediately.",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nretention:serviceGroups:update\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "RunDisconnectedServicesJob",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.applications.RunDisconnectedServicesJobResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.applications.RunDisconnectedServicesJobReq"
             }
           }
         ],
@@ -592,14 +646,46 @@ func init() {
         "running": {
           "type": "boolean",
           "format": "boolean",
-          "description": "The job status? ` + "`" + `false` + "`" + ` is disabled, ` + "`" + `true` + "`" + ` is enabled."
+          "description": "Enable/disable the job. ` + "`" + `false` + "`" + ` is disabled, ` + "`" + `true` + "`" + ` is enabled."
         },
         "threshold": {
           "type": "string",
           "description": "The ` + "`" + `threshold` + "`" + ` setting used by periodic jobs for evaluating services.\nThreshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under ` + "`" + `lib/` + "`" + `."
+        },
+        "recurrence": {
+          "type": "string",
+          "description": "A recurrence rule that determines how often, at what interval, and when to\ninitially start a scheduled job.\n\nIf the field is omitted from the request or is set to an emtpy string, no\nchange will be made to the current value. Otherwise, the value should match\nthe  [recurrence rule format defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).\n\nIt is not recommended to change this value from the default setting of a\n60 second interval. This configuration option is provided only for\nconsistency with other data lifecyle APIs."
+        },
+        "job_info": {
+          "$ref": "#/definitions/chef.automate.api.applications.PeriodicJobInfo"
         }
       },
       "description": "Periodic job configuration."
+    },
+    "chef.automate.api.applications.PeriodicJobInfo": {
+      "type": "object",
+      "properties": {
+        "last_enqueued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_ended_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_elapsed": {
+          "type": "string"
+        },
+        "next_due_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "PeriodicJobInfo gives information about the last and next scheduled\nexecutions of a periodic job."
     },
     "chef.automate.api.applications.PeriodicMandatoryJobConfig": {
       "type": "object",
@@ -607,9 +693,34 @@ func init() {
         "threshold": {
           "type": "string",
           "description": "The ` + "`" + `threshold` + "`" + ` setting used by periodic jobs for evaluating services.\nThreshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under ` + "`" + `lib/` + "`" + `."
+        },
+        "running": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Enable/disable the job. ` + "`" + `false` + "`" + ` is disabled, ` + "`" + `true` + "`" + ` is enabled. It is not\nrecommended to disable this job."
+        },
+        "recurrence": {
+          "type": "string",
+          "description": "A recurrence rule that determines how often, at what interval, and when to\ninitially start a scheduled job.\n\nIf the field is omitted from the request or is set to an emtpy string, no\nchange will be made to the current value. Otherwise, the value should match\nthe  [recurrence rule format defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).\n\nIt is not recommended to change this value from the default setting of a\n60 second interval. This configuration option is provided only for\nconsistency with other data lifecyle APIs."
+        },
+        "job_info": {
+          "$ref": "#/definitions/chef.automate.api.applications.PeriodicJobInfo",
+          "description": "Information about the last and next scheduled executions of the job. This\nis only used in a response context."
         }
       },
-      "description": "Configuration for the mandatory periodic job.\nRequired and cannot be disabled."
+      "description": "Configuration for a periodic job. Initially Jobs using this message type\nwere designed such that they could not be disabled, but that has been\nchanged to make the various data lifecycle APIs consistent with each other.\nThus, there is a ` + "`" + `running` + "`" + ` field which will disable the job if set to false.\nThat is not recommended."
+    },
+    "chef.automate.api.applications.RunDeleteDisconnectedServicesJobReq": {
+      "type": "object"
+    },
+    "chef.automate.api.applications.RunDeleteDisconnectedServicesJobResponse": {
+      "type": "object"
+    },
+    "chef.automate.api.applications.RunDisconnectedServicesJobReq": {
+      "type": "object"
+    },
+    "chef.automate.api.applications.RunDisconnectedServicesJobResponse": {
+      "type": "object"
     },
     "chef.automate.api.applications.Service": {
       "type": "object",

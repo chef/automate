@@ -4,6 +4,8 @@ package chef.automate.api.applications;
 option go_package = "github.com/chef/automate/api/external/applications";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 // TODO @afiune Move or re-create the common messages inside the api/ folder
@@ -274,7 +276,6 @@ service ApplicationsService {
 
   Changes the configuration for the task that marks services as disconnected after
   'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
-  This job cannot be disabled, and therefore no information about running is accepted.
 
   Example:
   ```
@@ -301,6 +302,27 @@ service ApplicationsService {
 			tags: "retention";
 		};
   };
+
+  /*
+  Runs the job to mark services as disconnected immediately.
+
+  Authorization Action:
+  ```
+  retention:serviceGroups:update
+  ```
+  */
+  rpc RunDisconnectedServicesJob(RunDisconnectedServicesJobReq) returns (RunDisconnectedServicesJobResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/retention/service_groups/disconnected_services/run"
+      body: "*"
+    };
+
+    option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "retention:serviceGroups:update";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "retention";
+		};
+  }
 
   /*
   Show 'Remove Disconnected Services' Configuration
@@ -356,6 +378,19 @@ service ApplicationsService {
 			tags: "retention";
 		};
   };
+
+  rpc RunDeleteDisconnectedServicesJob(RunDeleteDisconnectedServicesJobReq) returns (RunDeleteDisconnectedServicesJobResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/retention/service_groups/delete_disconnected_services/run"
+      body: "*"
+    };
+
+    option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "retention:serviceGroups:update";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "retention";
+		};
+  }
 }
 
 
@@ -469,26 +504,76 @@ message ServicesStatsRes {
 
 // Periodic job configuration.
 message PeriodicJobConfig {
-  // The job status? `false` is disabled, `true` is enabled.
+  // Enable/disable the job. `false` is disabled, `true` is enabled.
   bool running = 1;
   // The `threshold` setting used by periodic jobs for evaluating services.
   // Threshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under `lib/`.
   string threshold = 2;
+  // A recurrence rule that determines how often, at what interval, and when to
+  // initially start a scheduled job.
+  //
+  // If the field is omitted from the request or is set to an emtpy string, no
+  // change will be made to the current value. Otherwise, the value should match
+  // the  [recurrence rule format defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
+  //
+  // It is not recommended to change this value from the default setting of a
+  // 60 second interval. This configuration option is provided only for
+  // consistency with other data lifecyle APIs.
+	string recurrence = 3;
+  PeriodicJobInfo job_info = 4;
 }
 
-// Configuration for the mandatory periodic job.
-// Required and cannot be disabled.
+// Configuration for a periodic job. Initially Jobs using this message type
+// were designed such that they could not be disabled, but that has been
+// changed to make the various data lifecycle APIs consistent with each other.
+// Thus, there is a `running` field which will disable the job if set to false.
+// That is not recommended.
 message PeriodicMandatoryJobConfig {
   // The `threshold` setting used by periodic jobs for evaluating services.
   // Threshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under `lib/`.
   string threshold = 1;
+  // Enable/disable the job. `false` is disabled, `true` is enabled. It is not
+  // recommended to disable this job.
+  bool running = 2;
+  // A recurrence rule that determines how often, at what interval, and when to
+  // initially start a scheduled job.
+  //
+  // If the field is omitted from the request or is set to an emtpy string, no
+  // change will be made to the current value. Otherwise, the value should match
+  // the  [recurrence rule format defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
+  //
+  // It is not recommended to change this value from the default setting of a
+  // 60 second interval. This configuration option is provided only for
+  // consistency with other data lifecyle APIs.
+	string recurrence = 3;
+  // Information about the last and next scheduled executions of the job. This
+  // is only used in a response context.
+  PeriodicJobInfo job_info = 4;
 }
+
+// PeriodicJobInfo gives information about the last and next scheduled
+// executions of a periodic job. 
+message PeriodicJobInfo {
+	google.protobuf.Timestamp last_enqueued_at = 1;
+	google.protobuf.Timestamp last_started_at = 2;
+	google.protobuf.Timestamp last_ended_at = 3;
+	google.protobuf.Duration last_elapsed = 4;
+	google.protobuf.Timestamp next_due_at = 5;
+}
+
 
 message GetDisconnectedServicesConfigReq{}
 message UpdateDisconnectedServicesConfigRes {}
 
+message RunDisconnectedServicesJobReq {}
+message RunDisconnectedServicesJobResponse {}
+
 message GetDeleteDisconnectedServicesConfigReq{}
 message UpdateDeleteDisconnectedServicesConfigRes {}
+
+message RunDeleteDisconnectedServicesJobReq {}
+message RunDeleteDisconnectedServicesJobResponse {}
+
 
 message Service {
   // The Chef Habitat Supervisor ID.

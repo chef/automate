@@ -23,6 +23,8 @@ type JobScheduler struct {
 	CerealSvc *cereal.Manager
 }
 
+// + enabled/disabled for both jobs, not just the deleter
+// + recurrence for both
 type DisconnectedServicesConfigV0 struct {
 	Enabled bool
 	Params  *DisconnectedServicesParamsV0
@@ -177,10 +179,17 @@ func (j *JobScheduler) GetDisconnectedServicesJobConfig(ctx context.Context) (*D
 }
 
 func (j *JobScheduler) UpdateDisconnectedServicesJobParams(ctx context.Context, params *DisconnectedServicesParamsV0) error {
+	var thingsToUpdate []cereal.WorkflowScheduleUpdateOpt
+
+	if params.ThresholdDuration != "" {
+		thingsToUpdate = append(thingsToUpdate, cereal.UpdateParameters(params))
+	}
+
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
 		DisconnectedServicesScheduleName, DisconnectedServicesWorkflowName,
-		cereal.UpdateParameters(params))
+		thingsToUpdate...,
+	)
 	if err != nil {
 		return errors.Wrap(err, "failed to set disconnected_services job to enabled")
 	}
