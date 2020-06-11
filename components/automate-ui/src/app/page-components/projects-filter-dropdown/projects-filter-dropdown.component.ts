@@ -101,6 +101,7 @@ export class ProjectsFilterDropdownComponent {
 
   handleArrowUp(genericEvent: Event) {
     const event = genericEvent as KeyboardEvent;
+    event.preventDefault();
 
     const element = (event.target as Element).previousElementSibling;
     if (element) {
@@ -110,6 +111,7 @@ export class ProjectsFilterDropdownComponent {
 
   handleArrowDown(genericEvent: Event) {
     const event = genericEvent as KeyboardEvent;
+    event.preventDefault();
 
     const element = (event.target as Element).nextElementSibling;
     if (element) {
