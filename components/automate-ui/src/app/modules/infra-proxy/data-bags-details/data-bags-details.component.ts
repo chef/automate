@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, takeUntil, pluck } from 'rxjs/operators';
+import { identity, isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams } from 'app/route.selectors';
-import { identity, isNil } from 'lodash/fp';
 
 import { GetDataBagDetails } from 'app/entities/data-bags/data-bag-details.actions';
 import { DataBags, DataBagsItemDetails } from 'app/entities/data-bags/data-bags.model';
@@ -63,13 +63,14 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       this.store.select(getAllStatus),
       this.store.select(allDataBagDetails)
     ]).pipe(
-      takeUntil(this.isDestroyed),
       filter(([getDataBagDetailsSt, _dataBagDetailsState]) =>
         getDataBagDetailsSt === EntityStatus.loadingSuccess),
       filter(([_getDataBagDetailsSt, dataBagDetailsState]) =>
-        !isNil(dataBagDetailsState)))
+        !isNil(dataBagDetailsState)),
+      takeUntil(this.isDestroyed))
       .subscribe(([_getDataBagDetailsSt, dataBagDetailsState]) => {
         this.dataBagDetails = dataBagDetailsState;
+        // This code block is for selecting first item from the list by default.
         if (this.dataBagDetails.length) {
           this.handleItemSelected(this.dataBagDetails[0].name);
         }
@@ -80,11 +81,11 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       this.store.select(getStatus),
       this.store.select(dataBagItemDetailsFromRoute)
     ]).pipe(
-      takeUntil(this.isDestroyed),
       filter(([getDataBagItemDetailsSt, _dataBagItemDetailsState]) =>
         getDataBagItemDetailsSt === EntityStatus.loadingSuccess),
       filter(([_getDataBagItemDetailsSt, dataBagItemDetailsState]) =>
-        !isNil(dataBagItemDetailsState)))
+        !isNil(dataBagItemDetailsState)),
+      takeUntil(this.isDestroyed))
       .subscribe(([_getDataBagItemDetailsSt, dataBagItemDetailsState]) => {
         this.selectedItemDetails = JSON.parse(dataBagItemDetailsState.data);
         this.dataBagsItemDetailsLoading = false;

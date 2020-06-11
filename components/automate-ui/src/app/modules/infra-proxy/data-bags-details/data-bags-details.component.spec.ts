@@ -3,8 +3,8 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MockComponent } from 'ng2-mock-component';
 import { Router } from '@angular/router';
-import { StoreModule, Store, Action } from '@ngrx/store';
-import * as routerStore from '@ngrx/router-store';
+import { StoreModule, Store } from '@ngrx/store';
+
 import {
   NgrxStateAtom,
   ngrxReducers,
@@ -94,8 +94,3 @@ describe('DataBagsDetailsComponent', () => {
 
 });
 
-export class GetRoute implements Action {
-  readonly type = routerStore.ROUTER_NAVIGATION;
-
-  constructor(public payload: any) { }
-}

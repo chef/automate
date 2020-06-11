@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { Params } from '@angular/router';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { NgrxStateAtom, RouterState } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
@@ -46,47 +47,27 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
       this.previousRoute$ = this.store.select(previousRoute);
 
       // condition for breadcrumb to select specific tab
-      this.previousRoute$.subscribe((params: any) => {
-        if ( params.path.includes('roles') ) {
-          this.cookbooksTab = false;
-          this.environmentsTab = false;
-          this.dataBagsTab = false;
+      this.previousRoute$.subscribe((params: Params) => {
+        const path: string[] = params.path;
+
+        if (path.includes('roles')) {
+          this.resetTabs();
           this.rolesTab = true;
-          this.policyFilesTab = false;
-        }
-
-        if ( params.path.includes('environments') ) {
-          this.cookbooksTab = false;
-          this.rolesTab = false;
-          this.dataBagsTab = false;
+        } else if (path.includes('environments')) {
+          this.resetTabs();
           this.environmentsTab = true;
-          this.policyFilesTab = false;
-        }
-
-        if ( params.path.includes('policyFiles') ) {
-          this.cookbooksTab = false;
-          this.rolesTab = false;
-          this.dataBagsTab = false;
-          this.environmentsTab = false;
+        } else if (path.includes('policyFiles')) {
+          this.resetTabs();
           this.policyFilesTab = true;
-        }
-
-        if ( params.path.includes('data_bags') ) {
-          this.cookbooksTab = false;
-          this.rolesTab = false;
+        } else if (path.includes('data_bags')) {
+          this.resetTabs();
           this.dataBagsTab = true;
-          this.environmentsTab = false;
-          this.policyFilesTab = false;
-        }
-
-        if ( params.path.includes('cookbooks') ) {
+        } else if (path.includes('cookbooks')) {
+          this.resetTabs();
           this.cookbooksTab = true;
-          this.rolesTab = false;
-          this.dataBagsTab = false;
-          this.environmentsTab = false;
-          this.policyFilesTab = false;
         }
       });
+
     }
 
   ngOnInit() {
@@ -139,6 +120,14 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         this.telemetryService.track('orgDetailsTab', 'orgEdit');
         break;
     }
+  }
+
+  private resetTabs() {
+    this.cookbooksTab = false;
+    this.environmentsTab = false;
+    this.dataBagsTab = false;
+    this.rolesTab = false;
+    this.policyFilesTab = false;
   }
 
   ngOnDestroy(): void {

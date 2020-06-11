@@ -1,9 +1,14 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { DataBagItemDetailsEntityState, dataBagItemDetailsEntityAdapter } from './data-bag-item-details.reducer';
+
 import { routeParams } from 'app/route.selectors';
 import { find } from 'lodash/fp';
 
-export const dataBagItemDetailsState = createFeatureSelector<DataBagItemDetailsEntityState>('dataBagItemDetails');
+import { DataBagItemDetailsEntityState, dataBagItemDetailsEntityAdapter } from './data-bag-item-details.reducer';
+
+export const dataBagItemDetailsState =
+  createFeatureSelector<DataBagItemDetailsEntityState>
+('dataBagItemDetails');
+
 export const {
   selectAll: allDataBagItemDetails,
   selectEntities: dataBagItemDetailsEntities

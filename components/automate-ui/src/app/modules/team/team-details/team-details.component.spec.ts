@@ -2,8 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { StoreModule, Store, Action } from '@ngrx/store';
-import * as routerStore from '@ngrx/router-store';
+import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
 import {
@@ -184,8 +183,3 @@ describe('TeamDetailsComponent', () => {
   });
 });
 
-export class GetRoute implements Action {
-  readonly type = routerStore.ROUTER_NAVIGATION;
-
-  constructor(public payload: any) { }
-}

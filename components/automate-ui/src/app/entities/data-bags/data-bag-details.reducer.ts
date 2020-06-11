@@ -15,7 +15,7 @@ export const dataBagDetailsEntityAdapter: EntityAdapter<DataBags> = createEntity
 });
 
 export const DataBagDetailsEntityInitialState: DataBagDetailsEntityState =
-dataBagDetailsEntityAdapter.getInitialState(<DataBagDetailsEntityState>{
+  dataBagDetailsEntityAdapter.getInitialState(<DataBagDetailsEntityState>{
     getAllStatus: EntityStatus.notLoaded
   });
 
