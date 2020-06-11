@@ -437,7 +437,7 @@ Configuration to sign out users from Chef Automate when they close the browser.
 ```toml
 [session.v1.sys.service]
   # Setting persistent to false will disable persistent sessions.
-  # Users will be logged out when their browser closes.
+  # Users will be signed out when their browser closes.
   persistent = false
 ```
 
