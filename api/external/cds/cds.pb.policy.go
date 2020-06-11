@@ -6,7 +6,7 @@ package cds
 import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.cds.Cds/GetContentItems", "cds:contentItems", "cds:contentItems:list", "GET", "/api/beta/cds/content", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.cds.Cds/GetContentItems", "content:items", "content:items:list", "GET", "/api/beta/cds/content", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
 }

@@ -25,8 +25,8 @@ service Cds {
   */
   rpc GetContentItems(cds.request.ContentItems) returns (cds.response.ContentItems) {
     option (google.api.http).get = "/api/beta/cds/content";
-    option (chef.automate.api.iam.policy).resource = "cds:contentItems";
-    option (chef.automate.api.iam.policy).action = "cds:contentItems:list";
+    option (chef.automate.api.iam.policy).resource = "content:items";
+    option (chef.automate.api.iam.policy).action = "content:items:list";
   };
 
 }

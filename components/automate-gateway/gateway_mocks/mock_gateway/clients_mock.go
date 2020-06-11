@@ -10,7 +10,8 @@ import (
 	secrets "github.com/chef/automate/api/external/secrets"
 	authn "github.com/chef/automate/api/interservice/authn"
 	authz "github.com/chef/automate/api/interservice/authz"
-	service "github.com/chef/automate/api/interservice/cfgmgmt/service"
+	service "github.com/chef/automate/api/interservice/cds/service"
+	service0 "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	jobs "github.com/chef/automate/api/interservice/compliance/jobs"
 	profiles "github.com/chef/automate/api/interservice/compliance/profiles"
@@ -20,7 +21,7 @@ import (
 	data_lifecycle "github.com/chef/automate/api/interservice/data_lifecycle"
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	event_feed "github.com/chef/automate/api/interservice/event_feed"
-	service0 "github.com/chef/automate/api/interservice/infra_proxy/service"
+	service1 "github.com/chef/automate/api/interservice/infra_proxy/service"
 	ingest0 "github.com/chef/automate/api/interservice/ingest"
 	license_control "github.com/chef/automate/api/interservice/license_control"
 	local_user "github.com/chef/automate/api/interservice/local_user"
@@ -57,10 +58,10 @@ func (m *MockClientsFactory) EXPECT() *MockClientsFactoryMockRecorder {
 }
 
 // CfgMgmtClient mocks base method
-func (m *MockClientsFactory) CfgMgmtClient() (service.CfgMgmtClient, error) {
+func (m *MockClientsFactory) CfgMgmtClient() (service0.CfgMgmtClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CfgMgmtClient")
-	ret0, _ := ret[0].(service.CfgMgmtClient)
+	ret0, _ := ret[0].(service0.CfgMgmtClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -477,10 +478,10 @@ func (mr *MockClientsFactoryMockRecorder) PurgeClient(service interface{}) *gomo
 }
 
 // InfraProxyClient mocks base method
-func (m *MockClientsFactory) InfraProxyClient() (service0.InfraProxyClient, error) {
+func (m *MockClientsFactory) InfraProxyClient() (service1.InfraProxyClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InfraProxyClient")
-	ret0, _ := ret[0].(service0.InfraProxyClient)
+	ret0, _ := ret[0].(service1.InfraProxyClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -489,6 +490,21 @@ func (m *MockClientsFactory) InfraProxyClient() (service0.InfraProxyClient, erro
 func (mr *MockClientsFactoryMockRecorder) InfraProxyClient() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InfraProxyClient", reflect.TypeOf((*MockClientsFactory)(nil).InfraProxyClient))
+}
+
+// CdsClient mocks base method
+func (m *MockClientsFactory) CdsClient() (service.AutomateCdsClient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CdsClient")
+	ret0, _ := ret[0].(service.AutomateCdsClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CdsClient indicates an expected call of CdsClient
+func (mr *MockClientsFactoryMockRecorder) CdsClient() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CdsClient", reflect.TypeOf((*MockClientsFactory)(nil).CdsClient))
 }
 
 // Close mocks base method
