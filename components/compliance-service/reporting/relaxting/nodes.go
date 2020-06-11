@@ -168,7 +168,14 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 
 					latestReport.Controls = convertToRSControlSummary(nodeControlSummary)
 					latestReport.Status = status
-					nodes = append(nodes, &node)
+
+					// status is assigned after we've retrieved the nodes from es in the case where
+					// we are filtering by a profile or profile + control (deep filtering).
+					// so here we ensure we only add the node to the list object if the status matches the
+					// requested status.
+					if len(filters["status"]) == 0 || contains(filters["status"], latestReport.Status) {
+						nodes = append(nodes, &node)
+					}
 				} else {
 					return nil, emptyTotals, errors.Wrapf(err, "%s unmarshal error: ", myName)
 				}
