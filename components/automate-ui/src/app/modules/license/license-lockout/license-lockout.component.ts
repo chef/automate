@@ -172,8 +172,13 @@ export class LicenseLockoutComponent implements AfterViewInit {
     } else if (licenseCurrentlyExpired) {
       // don't open, trigger event to apply license
       this.backToLicenseApply(LicenseApplyReason.LICENSE_EXPIRED);
-    } else if (!this.firstTriggerCompleted) {
-      this.licenseFacade.triggerWelcome();
+    } else { // license active and current!
+      if (this.modalVisible) {
+        this.closeModal();
+      }
+      if (!this.firstTriggerCompleted) {
+        this.licenseFacade.triggerWelcome();
+      }
     }
     // After this function has been run once, never want to trigger
     // the welcome modal again, so keep track of that here.
