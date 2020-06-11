@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -114,15 +115,17 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		trialLicenseURL,
 	))
 
-	cdsClient, err := clients.CdsClient()
-	if err != nil {
-		log.WithFields(log.Fields{
-			"service": "automate-cds",
-			"error":   err,
-		}).Fatal("Could not create client")
-	}
+	if os.Getenv("CHEF_DEV_ENVIRONMENT") == "true" {
+		cdsClient, err := clients.CdsClient()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"service": "automate-cds",
+				"error":   err,
+			}).Fatal("Could not create client")
+		}
 
-	pb_cds.RegisterCdsServer(grpcServer, handler.NewCdsServer(cdsClient))
+		pb_cds.RegisterCdsServer(grpcServer, handler.NewCdsServer(cdsClient))
+	}
 
 	cfgMgmtClient, err := clients.CfgMgmtClient()
 	if err != nil {

@@ -452,7 +452,6 @@ func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error)
 		err := fmt.Errorf("Expected connection for %s, but none was found. Check to make sure it is correctly configured", name)
 		return nil, err
 	}
-	log.Infof("connectionByName %v", conn)
 	return conn, nil
 }
 
@@ -477,7 +476,6 @@ func (c *ClientConfig) DialEndpoints(connFactory *secureconn.Factory) (ClientCon
 	c.expandEndpoints()
 
 	for service, endpoint := range c.Endpoints {
-		log.Infof("service %q endpoint %q", service, endpoint)
 		metricsEnabled := clientMetrics[service]
 		logctx := log.WithFields(log.Fields{
 			"service": service,
