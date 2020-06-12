@@ -59,7 +59,7 @@
               <chef-tr *ngFor="let rule of rules$ | async |
                 slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
                 <chef-td>
-                  <a [routerLink]="['/settings/notifications/form', rule.id]">{{ rule.name }}</a>
+                  <a [routerLink]="['/settings/notifications', rule.id]">{{ rule.name }}</a>
                 </chef-td>
                 <chef-td class="{{rule.targetType}}">
                   <img src="assets/img/logo-{{rule.targetType}}.png" alt="{{rule.targetType}} logo" />
