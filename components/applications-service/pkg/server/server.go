@@ -425,6 +425,25 @@ func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Cont
 		return nil, status.Error(codes.InvalidArgument, msg)
 	}
 
+	if req.Running != nil {
+
+		if req.Running.GetValue() {
+			err := app.jobScheduler.EnableDisconnectedServicesJob(ctx)
+			if err != nil {
+				err = errors.Wrap(err, "failed to enable disconnected_services job")
+				log.WithError(err).Error()
+				return nil, status.Error(codes.Internal, err.Error())
+			}
+		} else {
+			err := app.jobScheduler.DisableDisconnectedServicesJob(ctx)
+			if err != nil {
+				err = errors.Wrap(err, "failed to disable disconnected_services job")
+				log.WithError(err).Error()
+				return nil, status.Error(codes.Internal, err.Error())
+			}
+		}
+	}
+
 	err := app.jobScheduler.UpdateDisconnectedServicesJobConfig(ctx, newConfig)
 	if err != nil {
 		err = errors.Wrapf(err, "unable to update disconnected services parameters to %q", req.GetThreshold())
