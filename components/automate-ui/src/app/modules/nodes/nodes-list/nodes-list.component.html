@@ -54,55 +54,58 @@
               <chef-td (click)="filterFor('name', node.name)"> {{ node.name }}</chef-td>
               <chef-td (click)="filterFor('platform_name', node.platform)">{{ node.platform }} {{ node.platform_version }}</chef-td>
               <chef-td (click)="filterFor('manager_type', node.manager)">{{ node.manager }}</chef-td>
-              <chef-td (click)="filterFor('last_contact', node.last_contact)">{{ node.last_contact }}</chef-td>
+              <chef-td (click)="filterFor('last_contact', node.last_contact)">{{ node.last_contact | datetime: DateTime.RFC2822 }}</chef-td>
               <chef-td>
-                <chef-icon [attr.id]="node.name" class="status-icon--pointer" [ngClass]="node.scan_data.status"
+                <chef-icon [attr.id]="'node-'+i+'-scan'" class="status-icon--pointer" [ngClass]="node.scan_data.status"
                 (click)="filterFor('last_scan_status', node.scan_data.status)">
                   {{ statusIcon(node.scan_data.status) }}
                 </chef-icon>
+                <chef-tooltip 
+                [attr.for]="'node-'+i+'-scan'"
+                [ngClass]="['run-info-tooltip', node.scan_data.status]"
+                interactable>
+                <p class="run-info-tooltip-info">
+                  <span class="run-info-tooltip-text">{{ node.scan_data.status | lowercase }}</span>
+                  <span class="run-info-tooltip-date">{{ node.scan_data.end_time | datetime: DateTime.RFC2822 }}</span>
+                </p>
+                <a *ngIf="node.scan_data.id"
+                  class="run-info-tooltip-link"
+                  target="_blank"
+                  [routerLink]="['/compliance/reports/nodes', node.id]"
+                  >View InSpec Scan Details <chef-icon>open_in_new</chef-icon>
+                </a>
+                <small>previous status: {{node.scan_data.penultimate_status | lowercase }}</small>
+                </chef-tooltip>
                 <chef-icon class="status-icon" [ngClass]="node.scan_data.penultimate_status"
                 (click)="filterFor('last_scan_penultimate_status', node.scan_data.penultimate_status)">
                   {{ statusIcon(node.scan_data.penultimate_status) }}
                 </chef-icon> 
-                <chef-tooltip 
-                  [attr.for]="node.name"
-                  [ngClass]="['run-info-tooltip', node.scan_data.status]"
-                  interactable>
-                  <p class="run-info-tooltip-info">
-                    <span class="run-info-tooltip-text">{{ node.scan_data.status | titlecase }}</span>
-                    <span class="run-info-tooltip-date">{{ node.scan_data.end_time | datetime: DateTime.RFC2822 }}</span>
-                  </p>
-                  <a *ngIf="node.scan_data.id"
-                    class="run-info-tooltip-link"
-                    target="_blank"
-                    [routerLink]="['/compliance/reports/nodes', node.id]"
-                    >View InSpec Scan Details <chef-icon>open_in_new</chef-icon>
-                  </a>
-                </chef-tooltip>
               </chef-td>
               <chef-td>
-                <chef-icon class="status-icon" [ngClass]="node.run_data.status"
+                <chef-icon [attr.id]="'node-'+i+'-run'" class="status-icon--pointer" [ngClass]="node.run_data.status"
                 (click)="filterFor('last_run_status', node.run_data.status)">
                   {{ statusIcon(node.run_data.status) }}
                 </chef-icon>
+                <chef-tooltip 
+                [attr.for]="'node-'+i+'-run'"
+                [ngClass]="['run-info-tooltip', node.run_data.status]"
+                interactable>
+                <p class="run-info-tooltip-info">
+                  <span class="run-info-tooltip-text">{{ node.run_data.status | lowercase }}</span>
+                  <span class="run-info-tooltip-date">{{ node.run_data.end_time | datetime: DateTime.RFC2822 }}</span>
+                </p>
+                <a *ngIf="node.run_data.id"
+                  class="run-info-tooltip-link"
+                  target="_blank"
+                  [routerLink]="['/infrastructure/client-runs', node.id, 'runs', node.run_data.id]"
+                  >View Infra Run Details <chef-icon>open_in_new</chef-icon>
+                </a>
+                <small>previous status: {{node.run_data.penultimate_status | lowercase }}</small>
+                </chef-tooltip>
                 <chef-icon class="status-icon" [ngClass]="node.run_data.penultimate_status"
                 (click)="filterFor('last_run_penultimate_status', node.run_data.penultimate_status)">
                   {{ statusIcon(node.run_data.penultimate_status) }}
                 </chef-icon> 
-                <chef-tooltip
-                [ngClass]="['run-info-tooltip', node.run_data.status]"
-                interactable>
-                  <p class="run-info-tooltip-info">
-                    <span class="run-info-tooltip-text">{{ node.run_data.status | titlecase }}</span>
-                    <span class="run-info-tooltip-date">{{ node.run_data.end_time | datetime: DateTime.RFC2822 }}</span>
-                  </p>
-                  <a *ngIf="node.run_data.id"
-                    class="run-info-tooltip-link"
-                    target="_blank"
-                    [routerLink]="['/infrastructure/client-runs', node.id, 'runs', node.run_data.id]"
-                    >View Infra Run Details <chef-icon>open_in_new</chef-icon>
-                  </a>
-                </chef-tooltip>
               </chef-td>    
               <chef-td (click)="filterFor('state', node.state)">{{ node.state }}</chef-td>
               <chef-td>{{ displayNodeTags(node.tags) }}</chef-td>

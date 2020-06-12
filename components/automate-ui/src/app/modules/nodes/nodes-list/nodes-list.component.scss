@@ -66,8 +66,13 @@ chef-icon.SKIPPED {
     color: inherit;
   }
 }
+.run-info-tooltip-text {
+  display: block;
+  font-weight: 700;
+  padding-bottom: 3px;
+}
 
-.run-info-tooltip.missing {
+.run-info-tooltip.UNKNOWN {
   .run-info-tooltip-date,
   .run-info-tooltip-link {
     display: none;
