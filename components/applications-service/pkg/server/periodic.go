@@ -31,9 +31,9 @@ type DisconnectedServicesConfigAndInfo struct {
 // + enabled/disabled for both jobs, not just the deleter
 // + recurrence for both
 type DisconnectedServicesConfigV0 struct {
-	Enabled bool
-	Params  *DisconnectedServicesParamsV0
-	// Recurrence string // string representation of rrule
+	Enabled    bool
+	Params     *DisconnectedServicesParamsV0
+	Recurrence string // string representation of rrule
 }
 
 type DisconnectedServicesInfo struct {
@@ -188,8 +188,9 @@ func (j *JobScheduler) GetDisconnectedServicesJobConfig(ctx context.Context) (*D
 
 	ret := &DisconnectedServicesConfigAndInfo{
 		DisconnectedServicesConfigV0: &DisconnectedServicesConfigV0{
-			Enabled: sched.Enabled,
-			Params:  &returnedParams,
+			Enabled:    sched.Enabled,
+			Recurrence: sched.Recurrence,
+			Params:     &returnedParams,
 		},
 		DisconnectedServicesInfo: &DisconnectedServicesInfo{
 			LastEnqueuedAt: &sched.LastEnqueuedAt,
@@ -238,8 +239,9 @@ func (j *JobScheduler) GetDeleteDisconnectedServicesJobConfig(ctx context.Contex
 
 	ret := &DisconnectedServicesConfigAndInfo{
 		DisconnectedServicesConfigV0: &DisconnectedServicesConfigV0{
-			Enabled: sched.Enabled,
-			Params:  &returnedParams,
+			Enabled:    sched.Enabled,
+			Recurrence: sched.Recurrence,
+			Params:     &returnedParams,
 		},
 		DisconnectedServicesInfo: &DisconnectedServicesInfo{
 			LastEnqueuedAt: &sched.LastEnqueuedAt,

@@ -404,9 +404,10 @@ func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	res := &applications.PeriodicMandatoryJobConfig{
-		Running:   config.Enabled,
-		Threshold: config.Params.ThresholdDuration,
-		JobInfo:   jobInfoForResponse(config.DisconnectedServicesInfo),
+		Running:    config.Enabled,
+		Recurrence: config.Recurrence,
+		Threshold:  config.Params.ThresholdDuration,
+		JobInfo:    jobInfoForResponse(config.DisconnectedServicesInfo),
 	}
 	return res, nil
 }
@@ -445,9 +446,10 @@ func (app *ApplicationsServer) GetDeleteDisconnectedServicesConfig(ctx context.C
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	res := &applications.PeriodicJobConfig{
-		Running:   config.Enabled,
-		Threshold: config.Params.ThresholdDuration,
-		JobInfo:   jobInfoForResponse(config.DisconnectedServicesInfo),
+		Running:    config.Enabled,
+		Threshold:  config.Params.ThresholdDuration,
+		Recurrence: config.Recurrence,
+		JobInfo:    jobInfoForResponse(config.DisconnectedServicesInfo),
 	}
 	return res, nil
 }
