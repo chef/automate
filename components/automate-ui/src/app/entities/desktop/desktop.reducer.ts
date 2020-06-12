@@ -53,7 +53,7 @@ export const desktopEntityInitialState: DesktopEntityState = {
   },
   getDesktopsFilter: {
     currentPage: 1,
-    pageSize: 20,
+    pageSize: 10,
     sortingField: Terms.DesktopName,
     sortingOrder: SortOrder.Ascending,
     terms: []
