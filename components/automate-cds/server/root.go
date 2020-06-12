@@ -36,9 +36,30 @@ func (s *Server) GetVersion(
 // ListContentItems - Returns a list of CDS content metadata
 func (s *Server) ListContentItems(ctx context.Context, request *request.ContentItems) (*response.ContentItems, error) {
 
+	// Canned data
 	return &response.ContentItems{
 		Items: []*response.ContentItem{
-			{},
+			{
+				Name:        "DevSec Linux Security Baseline Benchmark Level 1",
+				Description: "Test suite for best practice Linux OS hardening",
+				Type:        "profile",
+				Version:     "1.9.0",
+				Platform:    "",
+			},
+			{
+				Name:        "Audit Benchmark level 1",
+				Description: "Test suite for best practice Linux OS hardening",
+				Type:        "cookbook",
+				Version:     "9.2.1",
+				Platform:    "",
+			},
+			{
+				Name:        "Compliance Effortless Package",
+				Description: "This is a hart file that enables effortless compliance on your fleet.",
+				Type:        "package",
+				Version:     "2.3.2",
+				Platform:    "",
+			},
 		},
 	}, nil
 }
