@@ -43,7 +43,7 @@
         <div class="per-page-container">
           <span class="items-per">Items per page: </span>
             <mat-form-field appearance="none">
-              <mat-select panelClass="chef-dropdown" [(ngModel)]="maxPageItems">
+              <mat-select panelClass="chef-dropdown" [(ngModel)]="perPage">
                 <mat-option *ngFor="let amount of maxPageOptions" [value]="amount" 
                 (onSelectionChange)="handleSelectMaxPageItems($event, amount)">{{ amount }}</mat-option>
               </mat-select>

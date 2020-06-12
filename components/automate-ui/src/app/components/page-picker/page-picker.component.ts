@@ -24,16 +24,16 @@ export class PagePickerComponent implements OnChanges {
   last = 1;
 
   get itemStartCount() {
-    return this.page === 1 ? '1' : ((this.page - 1) * this.maxPageItems + 1).toString();
+    return this.page === 1 ? '1' : ((this.page - 1) * this.perPage + 1).toString();
   }
 
   get itemEndCount() {
-    const lastItemCount = this.page === this.last ? this.total : this.page * this.maxPageItems;
+    const lastItemCount = this.page === this.last ? this.total : this.page * this.perPage;
     return lastItemCount.toString();
   }
 
   get totalPages() {
-    const pageCount = Math.ceil(this.total / this.maxPageItems);
+    const pageCount = Math.ceil(this.total / this.perPage);
     return Array(pageCount).fill(0).map((_x, i) => i + 1);
   }
 
