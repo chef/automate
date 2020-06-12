@@ -51,6 +51,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
   public hookStatus = UrlTestState.Inactive;
   private isDestroyed = new Subject<boolean>();
   notificationDetailsLoading = true;
+
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
