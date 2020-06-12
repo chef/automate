@@ -85,3 +85,56 @@ message Rollouts {
   repeated Rollout rollouts = 1;
 }
 
+/*
+NodeSegmentsWithRolloutProgress
+
+A Node Segment is the set of Chef Infra nodes with a shared policy_name,
+policy_node_group, and policy_domain_url.
+
+NodeSegmentsWithRolloutProgress lists all of the node segments matching the
+request with information about the progress and status of the code rollouts for each segment.
+*/
+message NodeSegmentsWithRolloutProgress {
+  // The NodeSegmentRolloutProgress are sorted by policy group, policy
+  // name, then domain URL.
+  repeated NodeSegmentRolloutProgress node_segment_rollout_progress = 1;
+}
+
+message NodeSegmentRolloutProgress {
+  // policy_name, policy_node_group, policy_domain_url make up a "compound
+  // id" for the node segment
+  string policy_name = 1;
+  string policy_node_group = 2;
+  string policy_domain_url = 3;
+  // total nodes in elasticsearch in the node segment
+  int32 total_nodes = 4;
+  CurrentRolloutProgress current_rollout_progress = 5;
+  // This is the last, say 2 or 4 rollouts before the current one (to give a
+  // total of 3 or 5)
+  repeated PastRolloutProgress previous_rollouts = 6;
+}
+
+message CurrentRolloutProgress {
+  // Rollout is the full rollout object, but we can change this to be a subset only.
+  Rollout rollout = 1;
+  // Nodes that have run the code being rolled out thus far
+  int32 node_count = 2;
+  // I'm assuming it's easy to get the status when we get the counts.
+  int32 latest_run_successful_count = 3;
+  int32 latest_run_errored_count = 4;
+  string source_link = 5;
+  string build_link = 6;
+}
+
+message PastRolloutProgress {
+  // Rollout is the full rollout object, but we can change this to be a subset only.
+  Rollout rollout = 1;
+  // The number of nodes in the node segment for which the last recorded CCR
+  // was part of this rollout. Note that no breakdown of success/errored is
+  // provided, since some nodes may have moved on to the current rollout and
+  // are not included in the count.
+  int32 latest_run_node_count = 2;
+  string source_link = 5;
+  string build_link = 6;
+}
+

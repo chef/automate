@@ -470,4 +470,10 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
 
+  rpc ListNodeSegmentsWithRolloutProgress(cfgmgmt.request.ListNodeSegmentsWithRolloutProgress) returns (cfgmgmt.response.NodeSegmentsWithRolloutProgress) {
+    option (google.api.http).get = "/api/beta/cfgmgmt/rollouts/progress_by_node_segment";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  }
+
 }

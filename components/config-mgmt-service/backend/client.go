@@ -70,6 +70,7 @@ type Client interface {
 	GetNodeMetadataCounts(filters map[string][]string, types []string, startDate,
 		endDate string) ([]TypeCount, error)
 	GetNodeRunsDailyStatusTimeSeries(string, time.Time, time.Time) ([]RunDurationStatus, error)
+	GetLatestRunRolloutBreakdownCounts() (*NodeSegmentRolloutProgress, error)
 }
 
 // Types that we consume from the ingest-service
@@ -200,4 +201,27 @@ type ChefErrorCount struct {
 	Type    string
 	Message string
 	Count   int32
+}
+
+type NodeSegment struct {
+	PolicyName      string
+	PolicyNodeGroup string
+	PolicyDomainURL string
+}
+
+type NodeSegmentRolloutProgress struct {
+	BySegment map[NodeSegment]*NodeSegmentRevisionsStatus
+}
+
+type NodeSegmentRevisionsStatus struct {
+	NodeSegment
+	NodesInSegment   int32
+	ByPolicyRevision map[string]*PolicyRevisionNodeStatus
+}
+
+type PolicyRevisionNodeStatus struct {
+	PolicyRevisionID string
+	Total            int
+	Success          int
+	Errored          int
 }

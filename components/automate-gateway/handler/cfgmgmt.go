@@ -444,6 +444,15 @@ func (a *CfgMgmtServer) GetRolloutForChefRun(context.Context, *cfgReq.RolloutFor
 	return nil, nil
 }
 
+func (a *CfgMgmtServer) ListNodeSegmentsWithRolloutProgress(ctx context.Context, req *cfgReq.ListNodeSegmentsWithRolloutProgress) (*cfgRes.NodeSegmentsWithRolloutProgress, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.ListNodeSegmentsWithRolloutProgress(ctx, req)
+}
+
 func (a *CfgMgmtServer) NodeExport(*cfgReq.NodeExport, cfgService.ConfigMgmt_NodeExportServer) error {
 	// Please see components/automate-gateway/services.go configMgmtNodeExportHandler for implementation
 	return nil

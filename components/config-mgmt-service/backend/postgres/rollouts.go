@@ -2,14 +2,11 @@ package postgres
 
 import (
 	"context"
+	"net/url"
 	"time"
-)
 
-type NodeSegment struct {
-	PolicyName      string
-	PolicyNodeGroup string
-	PolicyDomainURL string
-}
+	"github.com/pkg/errors"
+)
 
 type NewRollout struct {
 	Id               int32  `db:"id, primarykey, autoincrement"`
@@ -33,6 +30,11 @@ type Rollout struct {
 	EndTime   *time.Time `db:"end_time"`
 }
 
+type RolloutWithOrderIndex struct {
+	Rollout
+	OrderIndex int `db:"order_index"` // present in query for last N rollouts per segment
+}
+
 const getAllRollouts = `
   SELECT *
     FROM rollouts AS r
@@ -45,6 +47,10 @@ ORDER BY policy_domain_url ASC,
 // CreateRollout takes the given rollout attributes and attempts to store the
 // rollout in the database.
 func (p *Postgres) CreateRollout(ctx context.Context, r *NewRollout) (*Rollout, error) {
+	if _, err := url.Parse(r.PolicyDomainURL); err != nil {
+		return nil, errors.Wrapf(err, "Invalid policy domain URL %q", r.PolicyDomainURL)
+	}
+
 	err := p.mapper.WithContext(ctx).Insert(r)
 	if err != nil {
 		return nil, err

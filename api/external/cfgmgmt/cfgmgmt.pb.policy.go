@@ -240,4 +240,7 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/ListNodeSegmentsWithRolloutProgress", "infra:nodes", "infra:nodes:list", "GET", "/api/beta/cfgmgmt/rollouts/progress_by_node_segment", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }
