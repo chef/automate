@@ -29,7 +29,8 @@ export enum DesktopActionTypes {
   ADD_DESKTOPS_FILTER_TERM                        = 'DESKTOP::ADD::DESKTOPS_FILTER_TERM',
   UPDATE_DESKTOPS_FILTER_TERMS                    = 'DESKTOP::UPDATE::DESKTOPS_FILTER_TERMS',
   REMOVE_DESKTOPS_FILTER_TERM                     = 'DESKTOP::REMOVE::DESKTOPS_FILTER_TERM',
-  UPDATE_DESKTOPS_SORT_TERM                       = 'DESKTOP::UPDATE::DESKTOPS_SORT_TERM'
+  UPDATE_DESKTOPS_SORT_TERM                       = 'DESKTOP::UPDATE::DESKTOPS_SORT_TERM',
+  UPDATE_DESKTOPS_FILTER_PAGE_SIZE                = 'DESKTOP::UPDATE::DESKTOPS_FILTER_PAGE_SIZE'
 }
 
 export class SetSelectedDesktop implements Action {
@@ -152,6 +153,11 @@ export class UpdateDesktopSortTerm implements Action {
   constructor(public payload: { term: string }) { }
 }
 
+export class UpdateDesktopsFilterPageSize implements Action {
+  readonly type = DesktopActionTypes.UPDATE_DESKTOPS_FILTER_PAGE_SIZE;
+  constructor(public payload: {pageSize: number}) { }
+}
+
 export type DesktopActions =
   | SetSelectedDaysAgo
   | SetSelectedDesktop
@@ -177,4 +183,5 @@ export type DesktopActions =
   | AddDesktopFilterTerm
   | UpdateDesktopFilterTerm
   | RemoveDesktopFilterTerm
-  | UpdateDesktopSortTerm;
+  | UpdateDesktopSortTerm
+  | UpdateDesktopsFilterPageSize;

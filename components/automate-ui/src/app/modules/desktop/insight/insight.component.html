@@ -144,6 +144,7 @@
     [total]="totalDesktops"
     [perPage]="pageSize"
     [page]="currentPage"
-    (pageChanged)="onPageChange($event)">
+    (pageChanged)="onPageChange($event)"
+    (pageSizeChanged)="onPageSizeChanged($event)">
   </app-page-picker>
 </div>

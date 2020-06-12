@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, HostBinding } from '@angular/core';
 
+
 @Component({
   selector: 'app-page-picker',
   templateUrl: './page-picker.component.html',
@@ -15,6 +16,7 @@ export class PagePickerComponent implements OnChanges {
   @Input() @HostBinding('class.fullScreened') fullScreened = false;
 
   @Output() pageChanged = new EventEmitter<number>();
+  @Output() pageSizeChanged = new EventEmitter<number>();
 
   maxPageOptions = [10, 20, 50];
   selectablePages = [];
@@ -83,6 +85,7 @@ export class PagePickerComponent implements OnChanges {
     if (event.isUserInput) {
       console.log(value);
       console.log('fire event to update store value of pageSize');
+      this.pageSizeChanged.emit(value);
     }
   }
 

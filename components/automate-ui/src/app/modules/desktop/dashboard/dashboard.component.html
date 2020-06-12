@@ -69,6 +69,7 @@
           [termFilters]="termFilters$ | async"
           [fullscreened]="desktopListFullscreened"
           (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
           (termFilterSelected)="onTermFilterSelected($event)"
           (desktopSelected)="onDesktopSelected($event)"
           (closed)="onDesktopListClose()"

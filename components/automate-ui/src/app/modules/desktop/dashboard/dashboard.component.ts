@@ -17,7 +17,8 @@ import {
   UpdateDesktopFilterCurrentPage,
   UpdateDesktopFilterTerm,
   RemoveDesktopFilterTerm,
-  UpdateDesktopSortTerm
+  UpdateDesktopSortTerm,
+  UpdateDesktopsFilterPageSize
 } from 'app/entities/desktop/desktop.actions';
 import {
   dailyCheckInCountCollection,
@@ -191,6 +192,11 @@ export class DashboardComponent implements OnInit {
 
   public onPageChange(pageNumber: number) {
     this.store.dispatch(new UpdateDesktopFilterCurrentPage({page: pageNumber}));
+  }
+
+  public onPageSizeChange(pageSize: number) {
+    console.log(pageSize);
+    this.store.dispatch(new UpdateDesktopsFilterPageSize({pageSize: pageSize}));
   }
 
   public onErrorSelected(errorItem: TopErrorsItem): void {

@@ -29,6 +29,7 @@ export class InsightComponent implements OnInit {
   @Output() closed: EventEmitter<any> = new EventEmitter();
   @Output() fullscreenToggled: EventEmitter<any> = new EventEmitter();
   @Output() pageChange: EventEmitter<number> = new EventEmitter();
+  @Output() pageSizeChange: EventEmitter<number> = new EventEmitter();
   @Output() termFilterSelected: EventEmitter<TermFilter> = new EventEmitter();
   // Returns 'name', 'check-in', or 'platform'
   @Output() sortChange: EventEmitter<string> = new EventEmitter();
@@ -59,6 +60,10 @@ export class InsightComponent implements OnInit {
 
   public onPageChange(pageNumber) {
     this.pageChange.emit(pageNumber);
+  }
+
+  public onPageSizeChanged(pageSize: number) {
+    this.pageSizeChange.emit(pageSize);
   }
 
   public termFilterClicked(term: TermFilter): void {
