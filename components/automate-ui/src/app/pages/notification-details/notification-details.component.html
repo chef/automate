@@ -1,0 +1,103 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-loading-spinner *ngIf="notificationDetailsLoading" size="50" fixed></chef-loading-spinner>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/settings/notifications']">Notifications</chef-breadcrumb>
+        {{ notification.name }}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <chef-heading>{{ notification.name }}</chef-heading>
+        <table>
+          <thead>
+            <tr class="detail-row">
+              <th class="header-column">Webhook Type</th>
+              <th class="header-column">Failure Type</th>
+              <th class="header-column">Webhook URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="detail-row">
+              <td *ngIf="notification.targetType" class="header-column-value" data-cy="notification-target-type">
+                <img src="assets/img/logo-{{notification.targetType}}.png" alt="{{notification.targetType}} logo" />
+                {{ notification.TargetTypeLabels[notification.targetType] }}
+              </td>
+              <td class="header-column-value" data-cy="notification-rule-type">{{ notification.AlertTypeLabels[notification.ruleType] }}</td>
+              <td class="header-column-value" data-cy="notification-target-url">{{ notification.targetUrl }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <chef-tab-selector [value]="tabValue">
+          <chef-option value='details'>Details</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      <section class="page-body">
+        <form [formGroup]="updateForm">
+          <chef-form-field>
+            <label for="name">Name <span aria-hidden="true">*</span></label>
+            <input chefInput id="name" formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="name-input"/>
+            <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
+              Name is required.
+            </chef-error>
+          </chef-form-field>
+          <chef-form-field>
+            <label>
+              <span class="label">Webhook type<span aria-hidden="true">*</span></span>
+              <chef-select
+                (change)="changeSelectionForWebhookType($event)"
+                class="notification-select-menu"
+                [value]="notification.targetType">
+                <chef-option *ngFor="let key of getTagetTypeKeys()" [value]="key">
+                  <img src="assets/img/logo-{{key}}.png" alt="{{key}} logo" />
+                  {{ notification.TargetTypeLabels[key] }}
+                </chef-option>
+              </chef-select>
+            </label>
+          </chef-form-field>
+          
+          <chef-form-field>
+            <label>
+              <span class="label">Failure type  <span aria-hidden="true">*</span></span>
+              <chef-select
+                (change)="setFailureType($event)"
+                class="notification-select-menu"
+                [value]="notification.ruleType">
+                <chef-option *ngFor="let key of getAlertTypeKeys()" [value]="key">
+                  {{ notification.AlertTypeLabels[key] }}
+                </chef-option>
+              </chef-select>
+              <div *ngIf="displayCriticalControlsCheckbox()">
+                <div class="small">
+                  <chef-checkbox
+                    (change)="updateCriticalControlsOnly($event.detail)"
+                    [checked]="notification.criticalControlsOnly">
+                  </chef-checkbox>
+                  Only send notifications for critical control failures
+                </div>
+              </div>
+            </label>
+          </chef-form-field>
+          <chef-form-field>
+            <label for="targetUrl">Webhook URL <span aria-hidden="true">*</span></label>
+            <input chefInput id="targetUrl" formControlName="targetUrl" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="targetUrl-input"/>
+            <chef-error *ngIf="(urlCtrl.hasError('required') || urlCtrl.hasError('pattern')) && urlCtrl.dirty">
+              Webhook URL is required.
+            </chef-error>
+          </chef-form-field>
+        </form>
+        <div>
+          <chef-button secondary [disabled]="testInProgress || !urlPresent()" (click)="sendTestForTargetUrl()">
+            <chef-loading-spinner *ngIf="testInProgress"></chef-loading-spinner>
+            <span *ngIf="testInProgress">Testing...</span>
+            <span *ngIf="!testInProgress">Test Data Feed</span>
+          </chef-button>
+          <chef-button primary [disabled]="saveInProgress || !updateForm.valid" (click)="saveNotification()">
+            <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
+            <span *ngIf="saveInProgress">Saving...</span>
+            <span *ngIf="!saveInProgress">Save</span>
+          </chef-button>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

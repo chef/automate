@@ -12,15 +12,21 @@ export interface RuleInterface {
   name: string; // name of the rule
   ruleType: RuleType; // Compliance or CCR
   targetUrl: string; // URL of the webhook or slack notification
-  targetType: ServiceActionType; // Slack or Custom
+  targetType: ServiceActionType;
 }
 
 
 export class Rule implements RuleInterface {
 
   AlertTypeLabels = {
-    CCRFailure: 'Chef Infra Client run failures',
-    ComplianceFailure: 'InSpec scan failures'
+    CCRFailure: 'Infra Client run failures',
+    ComplianceFailure: 'InSpec compliance scan failure'
+  };
+
+  TargetTypeLabels = {
+    SlackAlert: 'Slack',
+    WebhookAlert: 'Webhook',
+    ServiceNowAlert: 'ServiceNow'
   };
 
   constructor(
@@ -65,6 +71,10 @@ export class Rule implements RuleInterface {
 
   public getAlertTypeKeys(): string[] {
     return Object.keys(this.AlertTypeLabels);
+  }
+
+  public getTargetTypeKeys(): string[] {
+    return Object.keys(this.TargetTypeLabels);
   }
 
   public toRequest(): Object {

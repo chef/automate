@@ -20,6 +20,7 @@ import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import { DataFeedComponent } from './pages/data-feed/data-feed.component';
 import { DataFeedDetailsComponent } from './pages/data-feed-details/data-feed-details.component';
+import { NotificationDetailsComponent } from './pages/notification-details/notification-details.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { SigninComponent } from './pages/signin/signin.component';
@@ -178,6 +179,10 @@ const routes: Routes = [
             {
               path: 'form/:id',
               component: NotificationFormComponent
+            },
+            {
+              path: ':id',
+              component: NotificationDetailsComponent
             }
           ]
         },

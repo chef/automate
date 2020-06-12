@@ -157,6 +157,7 @@ import {
   NodeNoRunsDetailsComponent
 } from './pages/node-noruns-details/node-noruns-details.component';
 import { NodeRollupComponent } from './page-components/node-rollup/node-rollup.component';
+import { NotificationDetailsComponent } from './pages/notification-details/notification-details.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import {
@@ -233,6 +234,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     NodeDetailsComponent,
     NodeNoRunsDetailsComponent,
     NodeRollupComponent,
+    NotificationDetailsComponent,
     NotificationFormComponent,
     NotificationsComponent,
     ProjectsFilterComponent,
