@@ -1,5 +1,5 @@
 +++
-title = "Backup & Restore"
+title = "Backup"
 description = "Procedures for Backing Up Chef Automate Data"
 date = 2018-03-26T15:27:52-07:00
 draft = false
@@ -11,21 +11,22 @@ toc = true
     weight = 70
 +++
 
-Backups are crucial for protecting your data from catastrophic loss and preparing a recovery procedure.
-Back up Chef Automate either to a filesystem or an S3 bucket
+Backups are crucial for protecting your data from catastrophic loss and preparing a recovery procedure. The command `chef-automate backup create` creates a single backup that contains data for all products deployed with Chef Automate, including [Chef Infra Server]({{< ref "infra-server.md" >}}) and [Chef Habitat Builder on-prem]({{< ref "on-prem-builder.md" >}}). By default, Chef Automate stores backups to the filesystem in the directory `/var/opt/chef-automate/backups`. You can also configure Chef Automate to store backups in S3.
 
-## Backup Space Requirements
+## Setting Up Backups
+
+### Backup Space Requirements
 
 This amount of space needed for a backup varies depending on your Chef Automate use. You need enough free space for:
 
 * Complete copies of each Chef Automate service PostgreSQL database.
 * Complete copies of your configuration files
-* Elasticsearch snapshots your Chef Automate configuration and data, such as converge, scan, and report data. You will need enough disk space for the each Elasticsearch snapshot and the delta--or the list of changes--for each successive snapshot.
+* Elasticsearch snapshots of your Chef Automate configuration and data, such as converge, scan, and report data. You will need enough disk space for the each Elasticsearch snapshot and the delta--or the list of changes--for each successive snapshot.
 * Chef Habitat Builder artifacts
 
-## Backup to a Filesystem
+### Backup to a Filesystem
 
-Backups can be stored in a configurable backup directory. The backup directory should be on network attached storage or synced periodically to a disk on another machine, to ensure that you can restore from your backup data during a hardware failure.
+Backups can be stored in a configurable backup directory. The backup directory should be on network-attached storage or synced periodically to a disk on another machine, to ensure that you can restore from your backup data during a hardware failure.
 
 The default backup directory is `/var/opt/chef-automate/backups`. If it does not exist, the deployment process creates it.
 
@@ -46,7 +47,7 @@ To configure your Chef Automate installation's backup directory to another locat
 
     Once this command is applied, the `backup_config.toml` file is no longer necessary, and can be removed.
 
-### Store a Filesystem Backup in a Single-file Archive
+#### Store a Filesystem Backup in a Single-file Archive
 
 Some users prefer to store backups offline in single-file archives. Such archives must
 include both the configuration data and the reporting data contained in the standard
@@ -57,7 +58,9 @@ You must archive both of these directory types in any single-file backups you cr
 
 A timestamp-based directory can be distinguished from the `automate-elasticsearch-data` directory by its file name format, such as `20180518010336`.
 
-## Backup to S3
+Because externally-deployed Elasticsearch nodes will not have access to Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
+
+### Backup to S3
 
 Backups can be stored in an existing S3 bucket.
 
@@ -95,9 +98,9 @@ The following settings are supported:
   -----END CERTIFICATE-----
 ```
 
-### S3 Permissions
+#### S3 Permissions
 
-The following IAM policy describes the lowest permissions Automate requires to run backup and restore operations.
+The following IAM policy describes the lowest permissions Chef Automate requires to run backup and restore operations.
 
 ```JSON
 {
@@ -132,9 +135,11 @@ The following IAM policy describes the lowest permissions Automate requires to r
 }
 ```
 
-## Create a Backup
+## Backup Commands
 
-Make a backup with the following command:
+### Create a Backup
+
+Make a backup with the [`backup create`]({{< ref "cli-chef-automate/#chef-automate-backup-create" >}}) command:
 
 ```shell
 chef-automate backup create
@@ -146,9 +151,16 @@ The command shows the backup progress for each service. A successful backup disp
 Success: Created backup 20180518010336
 ```
 
-## List Backups
+Incorrect directory permissions may cause filesystem backups to fail. Run the
+[`fix-repo-permissions` command]({{< ref "cli-chef-automate/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
 
-You can list existing backups with the `backup list` command:
+```shell
+sudo chef-automate backup fix-repo-permissions <path>
+```
+
+### List Backups
+
+You can list existing backups with the [`backup list`]({{< ref "cli-chef-automate/#chef-automate-backup-list" >}}) command:
 
 ```shell
 chef-automate backup list
@@ -182,97 +194,11 @@ For backups stored in an S3 bucket, use:
 chef-automate backup list s3://bucket_name/base_path
 ```
 
-where `bucket_name` is the name of the S3 bucket `base_path` an optional path within the bucket where the backups live.
+where `bucket_name` is the name of the S3 bucket and `base_path` is an optional path within the bucket where the backups live.
 
-## Restore Chef Automate
+### Delete Backups
 
-Restore Chef Automate to an instance on which Automate is not already installed.
-
-### Prerequisites
-
-1. On the restore host, download and unzip the Chef Automate command-line tool:
-
-   ```shell
-        curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
-    ```
-
-1. **Filesystem backups** require access for Chef Automate to a backup directory in the [configured location]({{< ref
-"backup.md#backup-to-a-filesystem" >}}):
-
-     1. To restore a network-attached filesystem backup, mount the shared backup directory to the same mount point configured at the time of the backup.
-     1. To restore a backup directory that is not a network-attached filesystem, copy the backup directory to the location that was [configured]({{< ref
-"backup.md#backup-to-a-filesystem" >}}) at the time of the backup.
-     1. For restoring a single-file backup archive, copy your archive to the restore host and extract it to the [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}).
-
-1. *(different FQDN only)* To restore to a host whose FQDN differs from that of the host on which the backup was
-   taken, create a `patch.toml` file to provide at restore time that specifies the new FQDN:
-
-    ```toml
-         [global.v1]
-         fqdn = "<new-fqdn>"
-
-         # To provide a cert and key for the restore host, uncomment and fill
-         # these sections.
-         # [[global.v1.frontend_tls]]
-         # The TLS certificate for the load balancer frontend.
-         # cert = """-----BEGIN CERTIFICATE-----
-         # <certificate-for-new-fqdn>
-         # -----END CERTIFICATE-----
-         # """
-
-         # The TLS RSA key for the load balancer frontend.
-         # key = """-----BEGIN RSA PRIVATE KEY-----
-         # <key-for-new-fqdn>
-         # -----END RSA PRIVATE KEY-----
-         # """
-    ```
-
-### Restore From a Filesystem Backup
-
-#### Restore in an Internet-Connected Environment
-
-If you have [configured the backup directory]({{< relref "backup.md#backup-to-a-filesystem" >}}) to a directory other than the default directory (`/var/opt/chef-automate/backups`) you must supply the backup directory. Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
-
-```shell
-chef-automate backup restore </path/to/backups/>BACKUP_ID [--patch-config </path/to/patch.toml>] [--skip-preflight]
-```
-
-Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host whose
-FQDN is different than that of the one on which the backup was taken. Use the `--skip-preflight` option to restore to a host on which a Chef Automate installation exists.
-
-#### Restore in an Airgapped Environment
-
-To restore a backup of an [airgapped installation]({{< relref "airgapped-installation.md" >}}), you must specify the [Airgap Installation Bundle]({{< relref "airgapped-installation.md#create-an-airgap-installation-bundle" >}}) used by the installation.
-If you have [configured the backup directory]({{< relref "backup.md#backup-to-a-filesystem" >}}) to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate uses the most recent backup in the backup directory.
-
-```shell
-chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID [--patch-config </path/to/patch.toml>] [--skip-preflight]
-```
-
-Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host whose
-FQDN is different than that of the one on which the backup was taken. Use the `--skip-preflight` option to restore to a host on which a Chef Automate installation exists.
-
-### Restore From an S3 Backup
-
-To restore from an S3 backup, run
-
-```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID [--patch-config </path/to/patch.toml>] [--skip-preflight]
-```
-
-Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host whose
-FQDN is different than that of the one on which the backup was taken. Use the
-`--skip-preflight` option to restore to a host on which a Chef Automate installation exists.
-
-A successful restore shows the timestamp of the backup used at the end of the status output:
-
-```shell
-Success: Restored backup 20180517223558
-```
-
-## Delete Backups
-
-To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete it using `chef automate backup delete ID`.
+To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete it using [`chef automate backup delete ID`]({{< ref "cli-chef-automate/#chef-automate-backup-delete" >}}).
 
 ```shell
 chef-automate backup list
@@ -303,6 +229,20 @@ The following backups will be permanently deleted:
 Are you sure you want to continue? (y/n)
 y
 Success: Backups deleted
+```
+
+Chef Automate does not provide a mechanism to prune all but a certain number of the most recent backups. You can manage this manually by parsing the output of `chef-automate backup list` and applying the command `chef-automate backup delete`. For example:
+
+```bash
+export KEEP=10; chef-automate backup list --result-json backup.json > /dev/null && jq "[.result.backups[].id] | sort | reverse | .[]" -rM backup.json | tail -n +$(($KEEP+1)) | xargs -L1 -i chef-automate backup delete --yes {}
+```
+
+## Troubleshooting
+Set the log level to `debug` before re-running a failed backup to output debug info to
+the Chef Automate log:
+
+```shell
+chef-automate debug set-log-level deployment-service debug
 ```
 
 ## References

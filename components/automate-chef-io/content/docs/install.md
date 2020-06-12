@@ -149,6 +149,8 @@ Add the following to your config.toml:
 # [global.v1.external.elasticsearch.auth]
 #   scheme = "basic_auth"
 # [global.v1.external.elasticsearch.auth.basic_auth]
+## Create this elasticsearch user before starting the Automate deployment;
+## Automate assumes it exists.
 #   username = "<admin username>"
 #   password = "<admin password>"
 # [global.v1.external.elasticsearch.ssl]
@@ -166,9 +168,10 @@ Add the following to your config.toml:
 
 Because externally-deployed Elasticsearch nodes will not have access to Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
 
-##### Backup to Local Filesystem
+##### Backup Externally-Deployed Elasticsearch to Local Filesystem
 
-To configure backups to use a local filesystem,
+To configure local filesystem backups of Chef Automate data stored in an
+externally-deployed Elasticsearch cluster:
 
 1. Ensure that the filesystems you intend to use for backups are mounted to the same path on all Elasticsearch master and data nodes.
 2. Configure the Elasticsearch `path.repo` setting on each node as described in the Elasticsearch documentation.
@@ -185,9 +188,10 @@ location = "fs"
 path = "/var/opt/chef-automate/backups"
 ```
 
-##### Backup to S3
+##### Backup Externally-Deployed Elasticsearch to S3
 
-To configure backups to use S3,
+To configure S3 backups of Chef Automate data stored in an externally-deployed
+Elasticsearch cluster:
 
 1. Install the [`repository-s3` plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3.html) on all nodes in your Elasticsearch cluster.
 2. If you wish to use IAM authentication to provide your Elasticsearch nodes access to the S3 bucket, you must apply the appropriate IAM policy to each host system in the cluster.
@@ -253,6 +257,8 @@ nodes = ["<pghostname1>:<port1>", "<pghostname2>:<port2>", "..."]
 [global.v1.external.postgresql.auth]
 scheme = "password"
 
+# Create these postgres users before starting the Automate deployment;
+# Automate assumes they already exist.
 [global.v1.external.postgresql.auth.password.superuser]
 username = "<admin username>"
 password = "<admin password>"
