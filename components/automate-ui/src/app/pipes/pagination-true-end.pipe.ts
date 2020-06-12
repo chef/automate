@@ -5,12 +5,12 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class PaginationTrueEndPipe implements PipeTransform {
 
-  transform(value: string, totalCount: number): string {
+  transform(value: number, totalCount: number): number {
     let pageEnd = Number(value);
 
     if (pageEnd > totalCount) {
       pageEnd = totalCount;
     }
-    return pageEnd.toString();
+    return pageEnd;
   }
 }

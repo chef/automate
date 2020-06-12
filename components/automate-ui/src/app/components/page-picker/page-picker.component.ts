@@ -18,6 +18,10 @@ export class PagePickerComponent implements OnChanges {
   @Output() pageChanged = new EventEmitter<number>();
   @Output() pageSizeChanged = new EventEmitter<number>();
 
+  itemStartCount: number;
+  itemEndCount: number;
+  totalPages: number[];
+
   maxPageOptions = [10, 20, 50];
   selectablePages = [];
   first = 1;
@@ -25,21 +29,28 @@ export class PagePickerComponent implements OnChanges {
   next = 1;
   last = 1;
 
-  get itemStartCount() {
-    return this.page === 1 ? '1' : ((this.page - 1) * this.perPage + 1).toString();
+  public getItemStartCount() {
+    this.itemStartCount = this.page === 1 ? 1 : ((this.page - 1) * this.perPage + 1);
   }
 
-  get itemEndCount() {
-    const lastItemCount = this.page === this.last ? this.total : this.page * this.perPage;
-    return lastItemCount.toString();
+  public getItemEndCount() {
+    this.itemEndCount = this.page === this.last ? this.total : this.page * this.perPage;
   }
 
-  get totalPages() {
+  public getTotalPages() {
     const pageCount = Math.ceil(this.total / this.perPage);
-    return Array(pageCount).fill(0).map((_x, i) => i + 1);
+    this.totalPages = Array(pageCount).fill(0).map((_x, i) => i + 1);
+  }
+
+  private setCounts() {
+    this.getItemStartCount();
+    this.getItemEndCount();
+    this.getTotalPages();
   }
 
   ngOnChanges() {
+    this.setCounts();
+
     this.last = Math.ceil(this.total / this.perPage) || 1;
     this.prev = (this.page === this.first) ? null : this.page - 1;
     this.next = (this.page === this.last) ? null : this.page + 1;
@@ -85,9 +96,22 @@ export class PagePickerComponent implements OnChanges {
   handleSelectMaxPageItems(event, value): void {
     if (event.isUserInput) {
       console.log('figure out what page we were on and update the page number as well... might be able to let angular do this on its own.');
-      console.log(`current page: ${this.page}`);
-      console.log(`current pageSize: ${this.perPage}`);
-      console.log(`total items: ${this.total}`);
+      // console.log(`current itemStart: ${this.itemStartCount}`);
+      // console.log(`new pageSize: ${value}`);
+      // console.log(`total items: ${this.total}`);
+
+      let updatedPageNumber;
+      if ( this.itemStartCount === 1 ) {
+        updatedPageNumber = 1;
+      } else if ( this.itemStartCount < this.total ) {
+        console.log(this.itemStartCount);
+      } else if ( this.itemStartCount > this.total) {
+        const newTotalPages = Math.ceil(this.total / value);
+        updatedPageNumber = newTotalPages;
+      }
+
+      console.log(updatedPageNumber);
+
       this.pageSizeChanged.emit(value);
     }
   }
