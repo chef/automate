@@ -6,6 +6,8 @@ option go_package = "github.com/chef/automate/api/external/applications";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
+import "google/protobuf/wrappers.proto";
+
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 // TODO @afiune Move or re-create the common messages inside the api/ folder
@@ -534,7 +536,7 @@ message PeriodicMandatoryJobConfig {
   string threshold = 1;
   // Enable/disable the job. `false` is disabled, `true` is enabled. It is not
   // recommended to disable this job.
-  bool running = 2;
+  google.protobuf.BoolValue running = 2;
   // A recurrence rule that determines how often, at what interval, and when to
   // initially start a scheduled job.
   //

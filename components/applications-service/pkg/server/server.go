@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -404,7 +405,7 @@ func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	res := &applications.PeriodicMandatoryJobConfig{
-		Running:    config.Enabled,
+		Running:    &wrappers.BoolValue{Value: config.Enabled},
 		Recurrence: config.Recurrence,
 		Threshold:  config.Params.ThresholdDuration,
 		JobInfo:    jobInfoForResponse(config.DisconnectedServicesInfo),
