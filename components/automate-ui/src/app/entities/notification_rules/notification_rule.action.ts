@@ -37,56 +37,49 @@ export class GetNotificationRulesFailure implements Action {
 
 export class GetNotification implements Action {
   readonly type = NotificationRuleActionTypes.GET;
-
   constructor(public payload: { id: string }) { }
 }
 
 export class GetNotificationSuccess implements Action {
   readonly type = NotificationRuleActionTypes.GET_SUCCESS;
-
   constructor(public payload: NotificationRule) { }
 }
 
 export class GetNotificationFailure implements Action {
   readonly type = NotificationRuleActionTypes.GET_FAILURE;
-
   constructor(public payload: HttpErrorResponse, public id: string) { }
 }
 
 export class UpdateNotification implements Action {
   readonly type = NotificationRuleActionTypes.UPDATE;
-
-  constructor(public payload: { notification: NotificationRule, username: string, password: string }) { }
+  constructor(public payload: {
+    notification: NotificationRule, username: string, password: string
+  }) { }
 }
 
 export class UpdateNotificationSuccess implements Action {
   readonly type = NotificationRuleActionTypes.UPDATE_SUCCESS;
-
   constructor(public payload) { }
 }
 
 export class UpdateNotificationFailure implements Action {
   readonly type = NotificationRuleActionTypes.UPDATE_FAILURE;
-
   constructor(public payload: HttpErrorResponse) { }
 }
 
 export class TestNotification implements Action {
   readonly type = NotificationRuleActionTypes.SEND_TEST;
-
-  constructor(public payload: { notification: NotificationRule }) { }
+  constructor(public payload: { name: string, targetUrl: string, targetSecretID: string }) { }
 }
 
 export class TestNotificationSuccess implements Action {
   readonly type = NotificationRuleActionTypes.SEND_TEST_SUCCESS;
-
-  constructor(public payload: NotificationRule) { }
+  constructor(public payload: { name: string }) { }
 }
 
 export class TestNotificationFailure implements Action {
   readonly type = NotificationRuleActionTypes.SEND_TEST_FAILURE;
-
-  constructor(public payload: NotificationRule) { }
+  constructor(public payload: { name: string }) { }
 }
 
 

@@ -24,7 +24,7 @@ export const NotificationRuleEntityInitialState: NotificationRuleEntityState =
   notificationRuleEntityAdapter.getInitialState(<NotificationRuleEntityState>{
     getAllStatus: EntityStatus.notLoaded,
     getStatus: EntityStatus.notLoaded,
-    updateStatus: EntityStatus.notLoaded,
+    updateStatus: EntityStatus.notLoaded
   });
 
 export function notificationRuleEntityReducer(

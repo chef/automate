@@ -23,6 +23,12 @@ export class NotificationRule implements RuleInterface {
     ComplianceFailure: 'InSpec compliance scan failure'
   };
 
+  TargetTypeLabels = {
+    SlackAlert: 'Slack',
+    WebhookAlert: 'Webhook',
+    ServiceNowAlert: 'ServiceNow'
+  };
+
   constructor(
     public id: string,
     public name: string,
@@ -65,6 +71,10 @@ export class NotificationRule implements RuleInterface {
 
   public getAlertTypeKeys(): string[] {
     return Object.keys(this.AlertTypeLabels);
+  }
+
+  public getTargetTypeKeys(): string[] {
+    return Object.keys(this.TargetTypeLabels);
   }
 
   public toRequest(): Object {
