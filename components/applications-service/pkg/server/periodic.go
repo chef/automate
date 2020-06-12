@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -34,6 +35,8 @@ type DisconnectedServicesConfigV0 struct {
 	Enabled    bool
 	Params     *DisconnectedServicesParamsV0
 	Recurrence string // string representation of rrule
+	rr         *rrule.RRule
+	validated  bool
 }
 
 type DisconnectedServicesInfo struct {
@@ -46,6 +49,43 @@ type DisconnectedServicesInfo struct {
 
 type DisconnectedServicesParamsV0 struct {
 	ThresholdDuration string `mapstructure:"threshold_duration"`
+}
+
+func (c *DisconnectedServicesConfigV0) Validate() (bool, string) {
+	if c.validated {
+		return true, ""
+	}
+
+	var messages []string
+
+	d := c.Params.ThresholdDuration
+	if d != "" {
+		err := simpledatemath.Validate(d)
+		if err != nil {
+			err := errors.Wrapf(err, "unable to parse threshold value %q", d)
+			messages = append(messages, err.Error())
+		}
+	}
+	if c.Recurrence != "" {
+		rr, err := rrule.StrToRRule(c.Recurrence)
+		if err != nil {
+			err := errors.Wrapf(err, "unable to parse recurrence value %q", c.Recurrence)
+			messages = append(messages, err.Error())
+		}
+		c.rr = rr
+	}
+	if len(messages) != 0 {
+		return false, strings.Join(messages, "; ")
+	}
+	c.validated = true
+	return true, ""
+}
+
+func (c *DisconnectedServicesConfigV0) Verror() error {
+	if valid, msg := c.Validate(); !valid {
+		return errors.New(msg)
+	}
+	return nil
 }
 
 const (

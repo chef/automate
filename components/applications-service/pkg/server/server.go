@@ -20,7 +20,6 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/params"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/lib/grpc/health"
-	"github.com/chef/automate/lib/simpledatemath"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/timef"
 	"github.com/chef/automate/lib/version"
@@ -416,19 +415,17 @@ func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context
 func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Context,
 	req *applications.PeriodicMandatoryJobConfig) (*applications.UpdateDisconnectedServicesConfigRes, error) {
 
-	err := simpledatemath.Validate(req.GetThreshold())
-	if err != nil {
-		err = errors.Wrapf(err, "unable to parse disconnected_services threshold %q", req.GetThreshold())
-		log.WithError(err).Error()
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
 	newConfig := &DisconnectedServicesConfigV0{
 		Recurrence: req.GetRecurrence(),
 		Params:     &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()},
 	}
 
-	err = app.jobScheduler.UpdateDisconnectedServicesJobConfig(ctx, newConfig)
+	if valid, msg := newConfig.Validate(); !valid {
+		log.WithFields(log.Fields{"validation_message": msg}).Error("Invalid Request")
+		return nil, status.Error(codes.InvalidArgument, msg)
+	}
+
+	err := app.jobScheduler.UpdateDisconnectedServicesJobConfig(ctx, newConfig)
 	if err != nil {
 		err = errors.Wrapf(err, "unable to update disconnected services parameters to %q", req.GetThreshold())
 		log.WithError(err).Error()
@@ -480,19 +477,17 @@ func (app *ApplicationsServer) UpdateDeleteDisconnectedServicesConfig(ctx contex
 		}
 	}
 
-	err := simpledatemath.Validate(req.GetThreshold())
-	if err != nil {
-		err = errors.Wrapf(err, "unable to parse delete_disconnected_services threshold %q", req.GetThreshold())
-		log.WithError(err).Error()
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
 	newConfig := &DisconnectedServicesConfigV0{
 		Recurrence: req.GetRecurrence(),
 		Params:     &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()},
 	}
 
-	err = app.jobScheduler.UpdateDeleteDisconnectedServicesJobConfig(ctx, newConfig)
+	if valid, msg := newConfig.Validate(); !valid {
+		log.WithFields(log.Fields{"validation_message": msg}).Error("Invalid Request")
+		return nil, status.Error(codes.InvalidArgument, msg)
+	}
+
+	err := app.jobScheduler.UpdateDeleteDisconnectedServicesJobConfig(ctx, newConfig)
 	if err != nil {
 		err = errors.Wrapf(err, "unable to update delete_disconnected_services parameters to %q", req.GetThreshold())
 		log.WithError(err).Error()
