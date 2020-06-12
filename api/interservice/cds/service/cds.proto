@@ -10,5 +10,5 @@ import "api/external/common/version/version.proto";
 
 service AutomateCds {
     rpc GetVersion (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo);
-    rpc GetContentItems(chef.automate.api.cds.request.ContentItems) returns (chef.automate.api.cds.response.ContentItems);
+    rpc ListContentItems(chef.automate.api.cds.request.ContentItems) returns (chef.automate.api.cds.response.ContentItems);
 }

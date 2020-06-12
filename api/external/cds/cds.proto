@@ -14,17 +14,18 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Cds {
   /*
-  GetContentItems
+  ListContentItems
 
-  Returns a list of CDS content metadata
+  Returns a list of metadata for each CDS content. Provides a description and current 
+  state of each content item.
 
   Authorization Action:
   ```
-  cds:contentItems:list
+  content:items:list
   ```
   */
-  rpc GetContentItems(cds.request.ContentItems) returns (cds.response.ContentItems) {
-    option (google.api.http).get = "/api/beta/cds/content";
+  rpc ListContentItems(cds.request.ContentItems) returns (cds.response.ContentItems) {
+    option (google.api.http).get = "/api/beta/content/items";
     option (chef.automate.api.iam.policy).resource = "content:items";
     option (chef.automate.api.iam.policy).action = "content:items:list";
   };

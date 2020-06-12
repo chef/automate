@@ -33,8 +33,12 @@ func (s *Server) GetVersion(
 	}, nil
 }
 
-// GetContentItems - Returns a list of CDS content metadata
-func (s *Server) GetContentItems(ctx context.Context, request *request.ContentItems) (*response.ContentItems, error) {
+// ListContentItems - Returns a list of CDS content metadata
+func (s *Server) ListContentItems(ctx context.Context, request *request.ContentItems) (*response.ContentItems, error) {
 
-	return &response.ContentItems{}, nil
+	return &response.ContentItems{
+		Items: []*response.ContentItem{
+			{},
+		},
+	}, nil
 }

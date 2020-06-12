@@ -20,13 +20,13 @@ func NewCdsServer(client inter_service.AutomateCdsClient) *CdsServer {
 	return &CdsServer{client}
 }
 
-// GetContentItems - Returns a list of CDS content metadata
-func (s *CdsServer) GetContentItems(ctx context.Context,
+// ListContentItems - Returns a list of CDS content metadata
+func (s *CdsServer) ListContentItems(ctx context.Context,
 	request *request.ContentItems) (*response.ContentItems, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	return s.client.GetContentItems(ctx, request)
+	return s.client.ListContentItems(ctx, request)
 }

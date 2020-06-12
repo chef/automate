@@ -32,20 +32,20 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 
-func request_Cds_GetContentItems_0(ctx context.Context, marshaler runtime.Marshaler, client CdsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_Cds_ListContentItems_0(ctx context.Context, marshaler runtime.Marshaler, client CdsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.ContentItems
 	var metadata runtime.ServerMetadata
 
-	msg, err := client.GetContentItems(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListContentItems(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_Cds_GetContentItems_0(ctx context.Context, marshaler runtime.Marshaler, server CdsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_Cds_ListContentItems_0(ctx context.Context, marshaler runtime.Marshaler, server CdsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.ContentItems
 	var metadata runtime.ServerMetadata
 
-	msg, err := server.GetContentItems(ctx, &protoReq)
+	msg, err := server.ListContentItems(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -55,7 +55,7 @@ func local_request_Cds_GetContentItems_0(ctx context.Context, marshaler runtime.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 func RegisterCdsHandlerServer(ctx context.Context, mux *runtime.ServeMux, server CdsServer) error {
 
-	mux.Handle("GET", pattern_Cds_GetContentItems_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_Cds_ListContentItems_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -64,14 +64,14 @@ func RegisterCdsHandlerServer(ctx context.Context, mux *runtime.ServeMux, server
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Cds_GetContentItems_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Cds_ListContentItems_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Cds_GetContentItems_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Cds_ListContentItems_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -116,7 +116,7 @@ func RegisterCdsHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.C
 // "CdsClient" to call the correct interceptors.
 func RegisterCdsHandlerClient(ctx context.Context, mux *runtime.ServeMux, client CdsClient) error {
 
-	mux.Handle("GET", pattern_Cds_GetContentItems_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_Cds_ListContentItems_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -125,14 +125,14 @@ func RegisterCdsHandlerClient(ctx context.Context, mux *runtime.ServeMux, client
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Cds_GetContentItems_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Cds_ListContentItems_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Cds_GetContentItems_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Cds_ListContentItems_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -140,9 +140,9 @@ func RegisterCdsHandlerClient(ctx context.Context, mux *runtime.ServeMux, client
 }
 
 var (
-	pattern_Cds_GetContentItems_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "beta", "cds", "content"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Cds_ListContentItems_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "beta", "content", "items"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
-	forward_Cds_GetContentItems_0 = runtime.ForwardResponseMessage
+	forward_Cds_ListContentItems_0 = runtime.ForwardResponseMessage
 )

@@ -14,11 +14,11 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/api/beta/cds/content": {
+    "/api/beta/content/items": {
       "get": {
-        "summary": "GetContentItems",
-        "description": "Returns a list of CDS content metadata\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncds:contentItems:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetContentItems",
+        "summary": "ListContentItems",
+        "description": "Returns a list of metadata for each CDS content. Provides a description and current \nstate of each content item.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:items:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "ListContentItems",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -34,8 +34,36 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.cds.response.ContentItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.cds.response.ContentItems": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cds.response.ContentItem"
+          }
+        }
+      }
     }
   }
 }
