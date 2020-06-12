@@ -62,6 +62,6 @@ export class RoleDetailsComponent implements OnInit, OnDestroy {
   }
 
   public roleToString(role: Role): string {
-    return JSON.stringify(role);
+    return JSON.stringify(role, null, '  ');
   }
 }
