@@ -83,8 +83,7 @@ export class PagePickerComponent implements OnChanges {
 
   handleSelectMaxPageItems(event, value): void {
     if (event.isUserInput) {
-      console.log(value);
-      console.log('fire event to update store value of pageSize');
+      console.log('page size changed');
       this.pageSizeChanged.emit(value);
     }
   }

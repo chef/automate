@@ -24,7 +24,8 @@ import {
   GetDesktopsFailure,
   GetDesktopsTotal,
   GetDesktopsTotalSuccess,
-  GetDesktopsTotalFailure
+  GetDesktopsTotalFailure,
+  UpdateDesktopsFilterPageSize
 } from './desktop.actions';
 import { DesktopRequests } from './desktop.requests';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -180,6 +181,11 @@ export class DesktopEffects {
   updateDesktopFilterCurrentPage$ = this.actions$.pipe(
       ofType(DesktopActionTypes.UPDATE_DESKTOPS_FILTER_CURRENT_PAGE),
       mergeMap(() => [ new GetDesktops() ]));
+
+  @Effect()
+  updateDesktopFilterPageSize$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.UPDATE_DESKTOPS_FILTER_PAGE_SIZE),
+    mergeMap(() => [ new GetDesktops() ]));
 
   @Effect()
   addDesktopFilterTerm$ = this.actions$.pipe(
