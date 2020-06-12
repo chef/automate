@@ -25,8 +25,8 @@ steps:
             - HAB_NONINTERACTIVE=true
 
   #
-  # A2 products generation - Detect if the products.meta or package.meta files has been up without generating 
-  # meta files.
+  # A2 products generation - Detect if the products.meta or package.meta files has been update 
+  # without generating meta files.
   #
   - label: "[codegen] A2 products generation"
     command:
