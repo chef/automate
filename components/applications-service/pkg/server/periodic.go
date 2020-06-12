@@ -50,8 +50,8 @@ type DisconnectedServicesParamsV0 struct {
 
 const (
 	cerealServiceMutualTLSName = "cereal-service"
-
-	DefaultJobIntervalSeconds = 60
+	DefaultRecurrence          = "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=60"
+	DefaultJobIntervalSeconds  = 60
 )
 
 var (
@@ -83,11 +83,8 @@ func NewJobScheduler(cerealSvc *cereal.Manager) *JobScheduler {
 
 // SetupScheduler ensures all our jobs exist in the cereal service backend.
 func (j *JobScheduler) Setup() error {
-	r, err := rrule.NewRRule(rrule.ROption{
-		Freq:     rrule.SECONDLY,
-		Interval: DefaultJobIntervalSeconds,
-		Dtstart:  time.Now().UTC(),
-	})
+	defaultConfig := defaultDisconnectedServicesJobConfig()
+	r, err := rrule.StrToRRule(defaultConfig.Recurrence)
 	if err != nil {
 		return errors.Wrap(err, "failed to create job scheduler configuration")
 	}
@@ -96,7 +93,7 @@ func (j *JobScheduler) Setup() error {
 		context.Background(),
 		DisconnectedServicesScheduleName,
 		DisconnectedServicesWorkflowName,
-		defaultDisconnectedServicesJobParams(),
+		defaultConfig.Params,
 		r,
 	)
 
@@ -104,11 +101,8 @@ func (j *JobScheduler) Setup() error {
 		return err
 	}
 
-	r, err = rrule.NewRRule(rrule.ROption{
-		Freq:     rrule.SECONDLY,
-		Interval: DefaultJobIntervalSeconds,
-		Dtstart:  time.Now().UTC(),
-	})
+	deleteConf := defaultDeleteDisconnectedServicesJobConfig()
+	r2, err := rrule.StrToRRule(deleteConf.Recurrence)
 	if err != nil {
 		return errors.Wrap(err, "failed to create job scheduler configuration")
 	}
@@ -117,8 +111,8 @@ func (j *JobScheduler) Setup() error {
 		context.Background(),
 		DeleteDisconnectedServicesScheduleName,
 		DeleteDisconnectedServicesWorkflowName,
-		defaultDeleteDisconnectedServicesJobParams(),
-		r,
+		deleteConf.Params,
+		r2,
 	)
 
 	if err != nil {
@@ -128,13 +122,18 @@ func (j *JobScheduler) Setup() error {
 	return nil
 }
 
+// FIXME: should this be changed to do a full reset?
 func (j *JobScheduler) ResetParams() error {
 	ctx := context.Background()
 
-	if err := j.UpdateDisconnectedServicesJobParams(ctx, defaultDisconnectedServicesJobParams()); err != nil {
+	conf := defaultDisconnectedServicesJobConfig()
+
+	if err := j.UpdateDisconnectedServicesJobConfig(ctx, conf); err != nil {
 		return err
 	}
-	if err := j.UpdateDeleteDisconnectedServicesJobParams(ctx, defaultDeleteDisconnectedServicesJobParams()); err != nil {
+
+	deleteConf := defaultDeleteDisconnectedServicesJobConfig()
+	if err := j.UpdateDeleteDisconnectedServicesJobConfig(ctx, deleteConf); err != nil {
 		return err
 	}
 
@@ -208,11 +207,19 @@ func (j *JobScheduler) GetDisconnectedServicesJobConfig(ctx context.Context) (*D
 	return ret, nil
 }
 
-func (j *JobScheduler) UpdateDisconnectedServicesJobParams(ctx context.Context, params *DisconnectedServicesParamsV0) error {
+func (j *JobScheduler) UpdateDisconnectedServicesJobConfig(ctx context.Context, conf *DisconnectedServicesConfigV0) error {
 	var thingsToUpdate []cereal.WorkflowScheduleUpdateOpt
 
-	if params.ThresholdDuration != "" {
-		thingsToUpdate = append(thingsToUpdate, cereal.UpdateParameters(params))
+	if conf.Params.ThresholdDuration != "" {
+		thingsToUpdate = append(thingsToUpdate, cereal.UpdateParameters(conf.Params))
+	}
+
+	if conf.Recurrence != "" {
+		newRecurrence, err := rrule.StrToRRule(conf.Recurrence)
+		if err != nil {
+			return errors.Wrapf(err, "invalid rrule syntax for 'recurrence' in %q", conf.Recurrence)
+		}
+		thingsToUpdate = append(thingsToUpdate, cereal.UpdateRecurrence(newRecurrence))
 	}
 
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
@@ -259,15 +266,29 @@ func (j *JobScheduler) GetDeleteDisconnectedServicesJobConfig(ctx context.Contex
 	return ret, nil
 }
 
-func (j *JobScheduler) UpdateDeleteDisconnectedServicesJobParams(ctx context.Context, params *DisconnectedServicesParamsV0) error {
+func (j *JobScheduler) UpdateDeleteDisconnectedServicesJobConfig(ctx context.Context, conf *DisconnectedServicesConfigV0) error {
+	var thingsToUpdate []cereal.WorkflowScheduleUpdateOpt
+
+	if conf.Params.ThresholdDuration != "" {
+		thingsToUpdate = append(thingsToUpdate, cereal.UpdateParameters(conf.Params))
+	}
+
+	if conf.Recurrence != "" {
+		newRecurrence, err := rrule.StrToRRule(conf.Recurrence)
+		if err != nil {
+			return errors.Wrapf(err, "invalid rrule syntax for 'recurrence' in %q", conf.Recurrence)
+		}
+		thingsToUpdate = append(thingsToUpdate, cereal.UpdateRecurrence(newRecurrence))
+	}
+
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
 		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesWorkflowName,
-		cereal.UpdateParameters(params))
+		thingsToUpdate...)
 	if err != nil {
 		return errors.Wrap(err, "failed to set delete_disconnected_services job to enabled")
 	}
-	log.WithFields(log.Fields{"new_params": params}).Info("Updated delete_disconnected_services params")
+	log.WithFields(log.Fields{"new_params": conf.Params}).Info("Updated delete_disconnected_services params")
 	return nil
 }
 
@@ -347,12 +368,20 @@ func (j *JobScheduler) RunAllJobsConstantly(ctx context.Context) error {
 	return nil
 }
 
-func defaultDisconnectedServicesJobParams() *DisconnectedServicesParamsV0 {
-	return &DisconnectedServicesParamsV0{ThresholdDuration: "5m"}
+func defaultDisconnectedServicesJobConfig() *DisconnectedServicesConfigV0 {
+	return &DisconnectedServicesConfigV0{
+		Enabled:    true,
+		Recurrence: DefaultRecurrence,
+		Params:     &DisconnectedServicesParamsV0{ThresholdDuration: "5m"},
+	}
 }
 
-func defaultDeleteDisconnectedServicesJobParams() *DisconnectedServicesParamsV0 {
-	return &DisconnectedServicesParamsV0{ThresholdDuration: "7d"}
+func defaultDeleteDisconnectedServicesJobConfig() *DisconnectedServicesConfigV0 {
+	return &DisconnectedServicesConfigV0{
+		Enabled:    true,
+		Recurrence: DefaultRecurrence,
+		Params:     &DisconnectedServicesParamsV0{ThresholdDuration: "7d"},
+	}
 }
 
 type JobRunnerSet struct {

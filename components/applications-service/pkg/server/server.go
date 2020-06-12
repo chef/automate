@@ -422,7 +422,13 @@ func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Cont
 		log.WithError(err).Error()
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	err = app.jobScheduler.UpdateDisconnectedServicesJobParams(ctx, &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()})
+
+	newConfig := &DisconnectedServicesConfigV0{
+		Recurrence: req.GetRecurrence(),
+		Params:     &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()},
+	}
+
+	err = app.jobScheduler.UpdateDisconnectedServicesJobConfig(ctx, newConfig)
 	if err != nil {
 		err = errors.Wrapf(err, "unable to update disconnected services parameters to %q", req.GetThreshold())
 		log.WithError(err).Error()
@@ -480,7 +486,13 @@ func (app *ApplicationsServer) UpdateDeleteDisconnectedServicesConfig(ctx contex
 		log.WithError(err).Error()
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	err = app.jobScheduler.UpdateDeleteDisconnectedServicesJobParams(ctx, &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()})
+
+	newConfig := &DisconnectedServicesConfigV0{
+		Recurrence: req.GetRecurrence(),
+		Params:     &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()},
+	}
+
+	err = app.jobScheduler.UpdateDeleteDisconnectedServicesJobConfig(ctx, newConfig)
 	if err != nil {
 		err = errors.Wrapf(err, "unable to update delete_disconnected_services parameters to %q", req.GetThreshold())
 		log.WithError(err).Error()
