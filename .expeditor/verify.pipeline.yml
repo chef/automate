@@ -25,6 +25,25 @@ steps:
             - HAB_NONINTERACTIVE=true
 
   #
+  # A2 products generation - Detect if the products.meta or package.meta files has been update 
+  # without generating meta files.
+  #
+  - label: "[codegen] A2 products generation"
+    command:
+      - hab studio run "source .studiorc && verify_products_generation"
+    timeout_in_minutes: 10
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  #
   # Repo Health - These are tests that apply to the repository as a
   # whole.
   #

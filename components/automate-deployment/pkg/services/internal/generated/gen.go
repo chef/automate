@@ -523,8 +523,7 @@ var ProductMetadataJSON = `
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/event-gateway",
-        "chef/automate-cds"
+        "chef/event-gateway"
       ],
       "packages": null,
       "dependencies": [
@@ -541,7 +540,9 @@ var ProductMetadataJSON = `
       "name": "automate-dev",
       "aliases": null,
       "type": "product",
-      "services": [],
+      "services": [
+        "chef/automate-cds"
+      ],
       "packages": null,
       "dependencies": [
         "automate"

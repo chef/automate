@@ -179,6 +179,24 @@ function verify_all_protobuf_components() {
   go_component_make api lint unit
 }
 
+document "verify_products_generation" <<DOC
+  Verify that all products.meta and package.meta files have been compiled
+DOC
+function verify_products_generation() {
+  install_if_missing core/git git
+
+  deployment_generate || return $?
+
+  git add .
+  git diff --staged --exit-code --ignore-submodules=all
+  result=$?
+
+  if [ $result != 0 ]; then
+    echo "Run 'deployment_generate' to fix this problem"
+    return $result
+  fi
+}
+
 document "link_component_bin" <<DOC
   Link binaries from COMPONENT/cmd/* to /hab/bin
 DOC
