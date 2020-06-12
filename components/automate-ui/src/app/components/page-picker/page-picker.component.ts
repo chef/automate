@@ -61,6 +61,7 @@ export class PagePickerComponent implements OnChanges {
       }
     }
     this.selectablePages = pages;
+    console.log('page:' + this.page);
   }
 
   onItemTap(value) {
@@ -83,7 +84,10 @@ export class PagePickerComponent implements OnChanges {
 
   handleSelectMaxPageItems(event, value): void {
     if (event.isUserInput) {
-      console.log('page size changed');
+      console.log('figure out what page we were on and update the page number as well... might be able to let angular do this on its own.');
+      console.log(`current page: ${this.page}`);
+      console.log(`current pageSize: ${this.perPage}`);
+      console.log(`total items: ${this.total}`);
       this.pageSizeChanged.emit(value);
     }
   }
