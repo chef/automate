@@ -430,6 +430,17 @@ You can specify the maximum number of inflight data collector requests. The defa
     max_inflight_requests = 100
 ```
 
+#### Sign-out on Browser Close
+
+Configuration to sign out users from Chef Automate when they close the browser.
+
+```toml
+[session.v1.sys.service]
+  # Setting persistent to false will disable persistent sessions.
+  # Users will be signed out when their browser closes.
+  persistent = false
+```
+
 ### Troubleshooting
 
 Common syntax errors may cause issues in configuration files:
