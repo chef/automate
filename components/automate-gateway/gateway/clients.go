@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
 	"github.com/chef/automate/api/interservice/authz"
+	cds "github.com/chef/automate/api/interservice/cds/service"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	cc_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
@@ -116,6 +117,7 @@ type ClientsFactory interface {
 	DatafeedClient() (data_feed.DatafeedServiceClient, error)
 	PurgeClient(service string) (data_lifecycle.PurgeClient, error)
 	InfraProxyClient() (infra_proxy.InfraProxyClient, error)
+	CdsClient() (cds.AutomateCdsClient, error)
 	Close() error
 }
 
@@ -181,6 +183,16 @@ func (c *clientsFactory) CfgMgmtClient() (cfgmgmt.CfgMgmtClient, error) {
 		return nil, err
 	}
 	return cfgmgmt.NewCfgMgmtClient(conn), nil
+}
+
+// CdsClient returns a client for the automate-cds service.
+// It requires the `automate-cds` endpoint to be configured
+func (c *clientsFactory) CdsClient() (cds.AutomateCdsClient, error) {
+	conn, err := c.connectionByName("automate-cds")
+	if err != nil {
+		return nil, err
+	}
+	return cds.NewAutomateCdsClient(conn), nil
 }
 
 // IngestStatusClient returns a client for the IngestStatus service.

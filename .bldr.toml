@@ -354,6 +354,7 @@ paths = [
   "api/config/workflow_nginx/*",
   "api/config/workflow_server/*",
   "api/external/applications/*",
+  "api/external/cds/*",
   "api/external/cfgmgmt/*",
   "api/external/common/*",
   "api/external/compliance/*",
@@ -365,6 +366,7 @@ paths = [
   "api/external/secrets/*",
   "api/interservice/authn/*",
   "api/interservice/authz/*",
+  "api/interservice/cds/*",
   "api/interservice/cereal/*",
   "api/interservice/cfgmgmt/*",
   "api/interservice/compliance/*",
@@ -2163,6 +2165,7 @@ paths = [
 plan_path = "components/automate-cds"
 paths = [
   "components/automate-cds/*",
+  "api/external/cds/*",
   "api/external/common/*",
   "api/interservice/cds/*",
   "components/automate-gateway/api/iam/*",

@@ -91,6 +91,12 @@ addNoProxy {{manager.sys.ip}}
 addNoProxy {{infra.sys.ip}}
 {{~/if}}
 {{~/eachAlive}}
+{{~#eachAlive bind.automate-cds.members as |cds|}}
+{{~#if @last}}
+# Add automate-cds to no_proxy
+addNoProxy {{cds.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
 
 
 

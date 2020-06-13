@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package chef.automate.api.cds;
+option go_package = "github.com/chef/automate/api/external/cds";
+
+import "api/external/cds/request/root.proto";
+import "api/external/cds/response/root.proto";
+
+import "google/protobuf/struct.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+
+service Cds {
+  /*
+  ListContentItems
+
+  Returns a list of metadata for each CDS content. Provides a description and current 
+  state of each content item.
+
+  Authorization Action:
+  ```
+  content:items:list
+  ```
+  */
+  rpc ListContentItems(cds.request.ContentItems) returns (cds.response.ContentItems) {
+    option (google.api.http).get = "/api/beta/content/items";
+    option (chef.automate.api.iam.policy).resource = "content:items";
+    option (chef.automate.api.iam.policy).action = "content:items:list";
+  };
+
+}
