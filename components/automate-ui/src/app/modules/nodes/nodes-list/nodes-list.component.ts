@@ -84,10 +84,10 @@ export class NodesListComponent implements OnInit, OnDestroy {
       const baseTime = item.split('T');
       // for a last contact filter, we send in two dates - beg of day and end of day
       // so we split on T to get the date and then just add the times ourselves
-      this.nodesListFilters.push({key: type, 
+      this.nodesListFilters.push({key: type,
         values: [
-          baseTime[0]+'T00:00:00Z', 
-          baseTime[0]+'T23:59:59Z'
+          baseTime[0] + 'T00:00:00Z',
+          baseTime[0] + 'T23:59:59Z'
         ]
       });
     } else {
