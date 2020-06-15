@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/golang/protobuf/ptypes"
+	w "github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -44,27 +45,40 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 	t.Run("update disconnected_services job params", func(t *testing.T) {
 		defer suite.JobScheduler.ResetParams()
 
-		req := &applications.PeriodicMandatoryJobConfig{Threshold: "23s"}
+		req := &applications.PeriodicMandatoryJobConfig{
+			Threshold:  "23s",
+			Running:    &w.BoolValue{Value: true},
+			Recurrence: "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
+		}
 		_, err := suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
 
 		conf, err := suite.ApplicationsServer.GetDisconnectedServicesConfig(ctx, &applications.GetDisconnectedServicesConfigReq{})
 		require.NoError(t, err)
 		assert.Equal(t, "23s", conf.Threshold)
+		assert.Equal(t, "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61", conf.Recurrence)
+		assert.True(t, conf.Running.Value)
 
 		// Update the params again to ensure we didn't accidentally pass the test due to leftover state somewhere:
-		req = &applications.PeriodicMandatoryJobConfig{Threshold: "42s"}
+		req = &applications.PeriodicMandatoryJobConfig{
+			Threshold:  "42s",
+			Running:    &w.BoolValue{Value: false},
+			Recurrence: "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=62",
+		}
 		_, err = suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
 
 		conf, err = suite.ApplicationsServer.GetDisconnectedServicesConfig(ctx, &applications.GetDisconnectedServicesConfigReq{})
 		require.NoError(t, err)
 		assert.Equal(t, "42s", conf.Threshold)
+		assert.Equal(t, "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=62", conf.Recurrence)
+		assert.False(t, conf.Running.Value)
 	})
 
 	t.Run("running the job runner makes the disconnected_services job run", func(t *testing.T) {
 		err := suite.JobScheduler.RunAllJobsConstantly(ctx)
 		require.NoError(t, err)
+		defer suite.JobScheduler.ResetParams()
 
 		// * have a way to track number of job runs (prometheus (?))
 		defer suite.DeleteDataFromStorage()
@@ -153,6 +167,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 	t.Run("running the job runner makes the delete_disconnected_services job run", func(t *testing.T) {
 		err := suite.JobScheduler.RunAllJobsConstantly(ctx)
 		require.NoError(t, err)
+		defer suite.JobScheduler.ResetParams()
 
 		// * have a way to track number of job runs (prometheus (?))
 		defer suite.DeleteDataFromStorage()
