@@ -38,6 +38,8 @@ import (
 	"github.com/chef/automate/lib/tracing"
 )
 
+var ErrNoConnectionConfigured = errors.New("Client not configured")
+
 // grpcServices are gRPC backend services that we'll connect to to build clients
 var grpcServices = []string{
 	"applications-service",
@@ -449,7 +451,8 @@ func (c *clientsFactory) InfraProxyClient() (infra_proxy.InfraProxyClient, error
 func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error) {
 	conn, exists := c.connections[name]
 	if !exists {
-		err := fmt.Errorf("Expected connection for %s, but none was found. Check to make sure it is correctly configured", name)
+		err := fmt.Errorf("%w: Expected connection for %s, but none was found. Check to make sure it is correctly configured",
+			ErrNoConnectionConfigured, name)
 		return nil, err
 	}
 	return conn, nil
