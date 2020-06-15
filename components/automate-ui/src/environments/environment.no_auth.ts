@@ -7,6 +7,7 @@ export const environment = {
     nodes_url: '/api/v0/nodes',
     nodemgrs_url: '/api/v0/nodemanagers',
     profiles_url: '/api/v0/profiles',
+    cds_url: '/api/beta/content',
     compliance_url: '/api/v0/compliance',
     config_mgmt_url: '/api/v0/cfgmgmt',
     retention_url: '/api/v0/data-lifecycle',
