@@ -210,6 +210,15 @@
                           <dd>{{ control.waiver_data.justification }}</dd>
                         </dl>
                       </div>
+                      <!-- show truncated results counts -->
+                      <div *ngIf="control.removed_results_counts != null">
+                        <p class="trunc-res-msg">Note: This control was truncated for size.</p>
+                        <p class="trunc-res-msg"> {{control.removed_results_counts.failed}} failed result details,
+                          {{control.removed_results_counts.passed}} passed result details,
+                          and {{control.removed_results_counts.skipped}} skipped result details
+                          were removed.</p>
+                          <p class="trunc-res-msg">  Run the control on the node to see full results.</p>
+                      </div>
                       <!-- show results of control even if waived -->
                       <div class="result-item" *ngFor="let result of control.results">
                         <div class="result-item-header">
