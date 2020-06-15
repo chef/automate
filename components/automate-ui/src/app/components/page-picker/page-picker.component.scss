@@ -39,7 +39,7 @@
         }
       }
     }
-    
+
     .arrow-field-container {
       display: flex;
       flex-flow: row nowrap;
@@ -47,7 +47,6 @@
       justify-content: flex-end;
       height: 49px;
       border-radius: $chef-border-radius;
-      // box-shadow: 2px 2px 4px 0 #C5C7D1, -2px -2px 12px 0 #ECF0F9;
 
       .arrow-field-item {
         display: flex;
@@ -70,7 +69,6 @@
       height: 49px;
       min-width: 193px;
       border-radius: $chef-border-radius;
-      // box-shadow: 2px 2px 4px 0 #C5C7D1, -2px -2px 12px 0 #ECF0F9;
 
       span.items-per {
         padding: 16px 4px 15px 16px;
@@ -84,47 +82,40 @@
       }
     }
 
-  // full screen styles
-  &.fullScreened {
-    .per-page-container {
-      display: flex;
+    // full screen styles
+    &.fullScreened {
+      .per-page-container {
+        display: flex;
 
-      @include carbon--breakpoint-down(lg) {
-        display: none;
-      }
-    }
-  }
-
-
-  ::ng-deep {
-    
-    mat-form-field {
-
-      .mat-form-field-infix {
-        border-top: 0;
-        padding: 0;
-        width: unset;
-      }
-
-      .mat-form-field-wrapper {
-        padding: 0;
+        @include carbon--breakpoint-down(lg) {
+          display: none;
+        }
       }
     }
 
-    .mat-select-panel {
-      min-width: 100%;
+    ::ng-deep {
+
+      mat-form-field {
+
+        .mat-form-field-infix {
+          border-top: 0;
+          padding: 0;
+          width: unset;
+        }
+
+        .mat-form-field-wrapper {
+          padding: 0;
+        }
+      }
+
+      .mat-select-panel {
+        min-width: 100%;
+      }
     }
-  }
 
     chef-button {
-      // overwrites
-      // margin: 0;
-      // border-radius: 0;
-      // border: none;
-      // styles
       width: 49px;
       height: 49px;
-      // border-left: 1px solid #DEE6F7;
 
       &:last-child {
         border-bottom-right-radius: $chef-border-radius;
@@ -139,8 +130,7 @@
 
     [panelClass="chef-dropdown"] {
       height: 49px;
-      width: 60px; // old style
-      // border-color: transparent;
+      width: 60px;
 
       &:focus {
         border-color: #3864F2;
@@ -149,17 +139,11 @@
     }
 
     .arrow-field-item [panelClass="chef-dropdown"] {
-      // width: 60px;
       padding: 16px 4px 17px 16px;
-      // border-top-right-radius: 0;
-      // border-bottom-right-radius: 0;
     }
 
     .information-container [panelClass="chef-dropdown"] {
-      // width: 69px;
       padding: 16px 12px 15px 4px;
-      // border-top-left-radius: 0;
-      // border-bottom-left-radius: 0;
     }
 
   } // end desktop

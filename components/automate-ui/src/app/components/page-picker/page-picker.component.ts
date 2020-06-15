@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, HostBinding } from '@angular/core';
+import { PageSizeChangeEvent } from 'app/entities/desktop/desktop.model';
 
 
 @Component({
@@ -16,7 +17,7 @@ export class PagePickerComponent implements OnChanges {
   @Input() @HostBinding('class.fullScreened') fullScreened = false;
 
   @Output() pageChanged = new EventEmitter<number>();
-  @Output() pageSizeChanged = new EventEmitter<any>();
+  @Output() pageSizeChanged = new EventEmitter<PageSizeChangeEvent>();
 
   itemStartCount: number;
   itemEndCount: number;
@@ -109,13 +110,12 @@ export class PagePickerComponent implements OnChanges {
     let newPageNumber;
     const newTotalPages = Math.ceil(this.total / value);
 
+    // handle first page
     if (this.itemStartCount === 1) {
       newPageNumber = 1;
-
     // handle last page
     } else if (this.itemStartCount < this.total && (this.itemStartCount > (this.total - value))) {
       newPageNumber = newTotalPages;
-
     // handle middle pages
     } else {
       newPageNumber = Math.ceil(this.itemStartCount / value);

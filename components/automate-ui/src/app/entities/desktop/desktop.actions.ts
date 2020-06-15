@@ -2,7 +2,8 @@ import { Action } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { DailyCheckInCountCollection, NodeRunsDailyStatusCollection,
-  TopErrorsCollection, CountedDurationCollection, Desktop, TermFilter } from './desktop.model';
+  TopErrorsCollection, CountedDurationCollection, Desktop, TermFilter,
+  PageSizeChangeEvent } from './desktop.model';
 
 export enum DesktopActionTypes {
   GET_DAILY_CHECK_IN_TIME_SERIES                     = 'DESKTOP::GET::DAILY_CHECK_IN_TIME_SERIES',
@@ -155,7 +156,7 @@ export class UpdateDesktopSortTerm implements Action {
 
 export class UpdateDesktopsFilterPageSizeAndCurrentPage implements Action {
   readonly type = DesktopActionTypes.UPDATE_DESKTOPS_FILTER_PAGE_SIZE_AND_CURRENT_PAGE;
-  constructor(public payload: { pageSize: number, updatedPageNumber: number}) { }
+  constructor(public payload: PageSizeChangeEvent) { }
 }
 
 export type DesktopActions =

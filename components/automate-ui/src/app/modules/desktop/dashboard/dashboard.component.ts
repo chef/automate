@@ -33,13 +33,9 @@ import {
 } from 'app/entities/desktop/desktop.selectors';
 import {
   DailyCheckInCount, DailyCheckInCountCollection, DayPercentage,
-  TopErrorsItem, CountedDurationItem, Desktop, TermFilter, Terms
+  TopErrorsItem, CountedDurationItem, Desktop, TermFilter, Terms,
+  PageSizeChangeEvent
 } from 'app/entities/desktop/desktop.model';
-
-export interface PageSizeChangeEvent {
-  pageSize: number;
-  updatedPageNumber: number;
-}
 
 @Component({
   selector: 'app-desktop-dashboard',
