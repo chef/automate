@@ -273,6 +273,28 @@ func (j *JobScheduler) UpdateDisconnectedServicesJobConfig(ctx context.Context, 
 	return nil
 }
 
+func (j *JobScheduler) RunDisconnectedServicesJob(ctx context.Context) error {
+	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesWorkflowName)
+	if err != nil {
+		return err
+	}
+
+	var threshold string
+	if err := sched.GetParameters(&threshold); err != nil {
+		return err
+	}
+
+	err = j.CerealSvc.EnqueueWorkflow(ctx, DisconnectedServicesWorkflowName, DisconnectedServicesScheduleName, threshold)
+	if err == cereal.ErrWorkflowInstanceExists {
+		log.WithFields(log.Fields{
+			"workflow_name": DisconnectedServicesWorkflowName,
+			"schedule_name": DisconnectedServicesScheduleName,
+		}).Warn("Periodic job already running, cannot enqueue it again")
+		return nil
+	}
+	return err
+}
+
 func (j *JobScheduler) GetDeleteDisconnectedServicesJobConfig(ctx context.Context) (*DisconnectedServicesConfigAndInfo, error) {
 	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesWorkflowName)
 	if err != nil {
@@ -330,6 +352,28 @@ func (j *JobScheduler) UpdateDeleteDisconnectedServicesJobConfig(ctx context.Con
 	}
 	log.WithFields(log.Fields{"new_params": conf.Params}).Info("Updated delete_disconnected_services params")
 	return nil
+}
+
+func (j *JobScheduler) RunDeleteDisconnectedServicesJob(ctx context.Context) error {
+	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesWorkflowName)
+	if err != nil {
+		return err
+	}
+
+	var threshold string
+	if err := sched.GetParameters(&threshold); err != nil {
+		return err
+	}
+
+	err = j.CerealSvc.EnqueueWorkflow(ctx, DeleteDisconnectedServicesWorkflowName, DeleteDisconnectedServicesScheduleName, threshold)
+	if err == cereal.ErrWorkflowInstanceExists {
+		log.WithFields(log.Fields{
+			"workflow_name": DeleteDisconnectedServicesWorkflowName,
+			"schedule_name": DeleteDisconnectedServicesScheduleName,
+		}).Warn("Periodic job already running, cannot enqueue it again")
+		return nil
+	}
+	return err
 }
 
 func (j *JobScheduler) EnableDeleteDisconnectedServicesJob(ctx context.Context) error {
