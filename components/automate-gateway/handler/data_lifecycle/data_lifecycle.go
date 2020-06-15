@@ -62,6 +62,11 @@ func (s *Server) GetStatus(ctx context.Context, req *api.GetStatusRequest) (*api
 		return res, err
 	}
 
+	res.Services, err = s.GetServicesStatus(ctx, &api.GetServicesStatusRequest{})
+	if err != nil {
+		return res, err
+	}
+
 	return res, nil
 }
 
@@ -91,6 +96,13 @@ func (s *Server) SetConfig(ctx context.Context, req *api.SetConfigRequest) (*api
 		}
 	}
 
+	if svcs := req.GetServices(); svcs != nil {
+		_, err = s.SetServicesConfig(ctx, svcs)
+		if err != nil {
+			return res, err
+		}
+	}
+
 	return res, nil
 }
 
@@ -110,6 +122,11 @@ func (s *Server) Run(ctx context.Context, req *api.RunRequest) (*api.RunResponse
 	}
 
 	_, err = s.RunEventFeed(ctx, &api.RunEventFeedRequest{})
+	if err != nil {
+		return res, err
+	}
+
+	_, err = s.RunServices(ctx, &api.RunServicesRequest{})
 	if err != nil {
 		return res, err
 	}

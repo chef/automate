@@ -279,9 +279,9 @@ func (j *JobScheduler) RunDisconnectedServicesJob(ctx context.Context) error {
 		return err
 	}
 
-	var threshold string
+	var threshold DisconnectedServicesParamsV0
 	if err := sched.GetParameters(&threshold); err != nil {
-		return err
+		return errors.Wrap(err, "failed to load saved parameters for delete_disconnected_services from cereal")
 	}
 
 	err = j.CerealSvc.EnqueueWorkflow(ctx, DisconnectedServicesWorkflowName, DisconnectedServicesScheduleName, threshold)
@@ -360,9 +360,9 @@ func (j *JobScheduler) RunDeleteDisconnectedServicesJob(ctx context.Context) err
 		return err
 	}
 
-	var threshold string
+	var threshold DisconnectedServicesParamsV0
 	if err := sched.GetParameters(&threshold); err != nil {
-		return err
+		return errors.Wrap(err, "failed to load saved parameters for delete_disconnected_services from cereal")
 	}
 
 	err = j.CerealSvc.EnqueueWorkflow(ctx, DeleteDisconnectedServicesWorkflowName, DeleteDisconnectedServicesScheduleName, threshold)
