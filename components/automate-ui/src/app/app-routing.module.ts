@@ -290,6 +290,10 @@ const routes: Routes = [
       loadChildren: () => import('./modules/desktop/desktop.module').then(m => m.DesktopModule)
     },
     {
+      path: 'cds',
+      loadChildren: () => import('./modules/cds/cds.module').then(m => m.CdsModule)
+    },
+    {
       path: 'nodes',
       loadChildren: () => import('./modules/nodes/nodes.module').then(m => m.NodesModule)
     },
