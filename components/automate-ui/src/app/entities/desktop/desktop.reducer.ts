@@ -177,9 +177,10 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
         set('getDesktopsFilter.sortingOrder', order)
       )(state) as DesktopEntityState;
 
-    case DesktopActionTypes.UPDATE_DESKTOPS_FILTER_PAGE_SIZE:
+    case DesktopActionTypes.UPDATE_DESKTOPS_FILTER_PAGE_SIZE_AND_CURRENT_PAGE:
       return pipe(
-        set('getDesktopsFilter.pageSize', action.payload.pageSize)
+        set('getDesktopsFilter.pageSize', action.payload.pageSize),
+        set('getDesktopsFilter.currentPage', action.payload.updatedPageNumber)
       )(state);
 
     default:

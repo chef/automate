@@ -16,7 +16,7 @@ export class PagePickerComponent implements OnChanges {
   @Input() @HostBinding('class.fullScreened') fullScreened = false;
 
   @Output() pageChanged = new EventEmitter<number>();
-  @Output() pageSizeChanged = new EventEmitter<number>();
+  @Output() pageSizeChanged = new EventEmitter<any>();
 
   itemStartCount: number;
   itemEndCount: number;
@@ -71,8 +71,9 @@ export class PagePickerComponent implements OnChanges {
     }
     this.selectablePages = pages;
 
-    // console.log('page:' + this.page);
-    this.setCounts();
+    if ( this.forDesktop ) {
+      this.setCounts();
+    }
   }
 
   onItemTap(value) {
@@ -97,9 +98,10 @@ export class PagePickerComponent implements OnChanges {
     if (event.isUserInput) {
       const updatedPageNumber = this.getUpdatedPageNumber(value);
 
-      // update this assignment to cirlce around via state
-      this.page = updatedPageNumber;
-      this.pageSizeChanged.emit(value);
+      this.pageSizeChanged.emit({
+        pageSize: value,
+        updatedPageNumber
+      });
     }
   }
 

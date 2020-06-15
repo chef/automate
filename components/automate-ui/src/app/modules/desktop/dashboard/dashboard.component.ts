@@ -18,7 +18,7 @@ import {
   UpdateDesktopFilterTerm,
   RemoveDesktopFilterTerm,
   UpdateDesktopSortTerm,
-  UpdateDesktopsFilterPageSize
+  UpdateDesktopsFilterPageSizeAndCurrentPage
 } from 'app/entities/desktop/desktop.actions';
 import {
   dailyCheckInCountCollection,
@@ -35,6 +35,11 @@ import {
   DailyCheckInCount, DailyCheckInCountCollection, DayPercentage,
   TopErrorsItem, CountedDurationItem, Desktop, TermFilter, Terms
 } from 'app/entities/desktop/desktop.model';
+
+export interface PageSizeChangeEvent {
+  pageSize: number;
+  updatedPageNumber: number;
+}
 
 @Component({
   selector: 'app-desktop-dashboard',
@@ -194,8 +199,11 @@ export class DashboardComponent implements OnInit {
     this.store.dispatch(new UpdateDesktopFilterCurrentPage({page: pageNumber}));
   }
 
-  public onPageSizeChange(pageSize: number) {
-    this.store.dispatch(new UpdateDesktopsFilterPageSize({pageSize: pageSize}));
+  public onPageSizeChange(event: PageSizeChangeEvent) {
+    this.store.dispatch(new UpdateDesktopsFilterPageSizeAndCurrentPage({
+      pageSize: event.pageSize,
+      updatedPageNumber: event.updatedPageNumber
+    }));
   }
 
   public onErrorSelected(errorItem: TopErrorsItem): void {

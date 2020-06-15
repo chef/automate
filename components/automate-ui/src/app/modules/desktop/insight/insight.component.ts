@@ -11,6 +11,11 @@ import { ClientRunsRequests } from 'app/entities/client-runs/client-runs.request
 import { clientRunsState } from 'app/entities/client-runs/client-runs.selectors';
 import { NodeFilter } from 'app/entities/client-runs/client-runs.model';
 
+export interface PageSizeChangeEvent {
+  pageSize: number;
+  updatedPageNumber: number;
+}
+
 @Component({
   selector: 'app-insight',
   templateUrl: './insight.component.html',
@@ -29,7 +34,7 @@ export class InsightComponent implements OnInit {
   @Output() closed: EventEmitter<any> = new EventEmitter();
   @Output() fullscreenToggled: EventEmitter<any> = new EventEmitter();
   @Output() pageChange: EventEmitter<number> = new EventEmitter();
-  @Output() pageSizeChange: EventEmitter<number> = new EventEmitter();
+  @Output() pageSizeChange: EventEmitter<any> = new EventEmitter();
   @Output() termFilterSelected: EventEmitter<TermFilter> = new EventEmitter();
   // Returns 'name', 'check-in', or 'platform'
   @Output() sortChange: EventEmitter<string> = new EventEmitter();
@@ -62,8 +67,11 @@ export class InsightComponent implements OnInit {
     this.pageChange.emit(pageNumber);
   }
 
-  public onPageSizeChanged(pageSize: number) {
-    this.pageSizeChange.emit(pageSize);
+  public onPageSizeChanged(event: PageSizeChangeEvent) {
+    this.pageSizeChange.emit({
+      pageSize: event.pageSize,
+      updatedPageNumber: event.updatedPageNumber
+    });
   }
 
   public termFilterClicked(term: TermFilter): void {

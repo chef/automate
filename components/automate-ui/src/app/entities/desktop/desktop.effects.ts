@@ -183,8 +183,8 @@ export class DesktopEffects {
 
   @Effect()
   updateDesktopFilterPageSize$ = this.actions$.pipe(
-    ofType(DesktopActionTypes.UPDATE_DESKTOPS_FILTER_PAGE_SIZE),
-    mergeMap(() => [ new GetDesktops(), new GetDesktopsTotal() ]));
+    ofType(DesktopActionTypes.UPDATE_DESKTOPS_FILTER_PAGE_SIZE_AND_CURRENT_PAGE),
+    mergeMap(() => [ new GetDesktops() ]));
 
   @Effect()
   addDesktopFilterTerm$ = this.actions$.pipe(
