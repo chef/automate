@@ -49,8 +49,6 @@ export class PagePickerComponent implements OnChanges {
   }
 
   ngOnChanges() {
-    this.setCounts();
-
     this.last = Math.ceil(this.total / this.perPage) || 1;
     this.prev = (this.page === this.first) ? null : this.page - 1;
     this.next = (this.page === this.last) ? null : this.page + 1;
@@ -72,7 +70,9 @@ export class PagePickerComponent implements OnChanges {
       }
     }
     this.selectablePages = pages;
-    console.log('page:' + this.page);
+
+    // console.log('page:' + this.page);
+    this.setCounts();
   }
 
   onItemTap(value) {
@@ -95,25 +95,31 @@ export class PagePickerComponent implements OnChanges {
 
   handleSelectMaxPageItems(event, value): void {
     if (event.isUserInput) {
-      console.log('figure out what page we were on and update the page number as well... might be able to let angular do this on its own.');
-      // console.log(`current itemStart: ${this.itemStartCount}`);
-      // console.log(`new pageSize: ${value}`);
-      // console.log(`total items: ${this.total}`);
+      const updatedPageNumber = this.getUpdatedPageNumber(value);
 
-      let updatedPageNumber;
-      if ( this.itemStartCount === 1 ) {
-        updatedPageNumber = 1;
-      } else if ( this.itemStartCount < this.total ) {
-        console.log(this.itemStartCount);
-      } else if ( this.itemStartCount > this.total) {
-        const newTotalPages = Math.ceil(this.total / value);
-        updatedPageNumber = newTotalPages;
-      }
-
-      console.log(updatedPageNumber);
-
+      // update this assignment to cirlce around via state
+      this.page = updatedPageNumber;
       this.pageSizeChanged.emit(value);
     }
+  }
+
+  private getUpdatedPageNumber(value): number {
+    let newPageNumber;
+    const newTotalPages = Math.ceil(this.total / value);
+
+    if (this.itemStartCount === 1) {
+      newPageNumber = 1;
+
+    // handle last page
+    } else if (this.itemStartCount < this.total && (this.itemStartCount > (this.total - value))) {
+      newPageNumber = newTotalPages;
+
+    // handle middle pages
+    } else {
+      newPageNumber = Math.ceil(this.itemStartCount / value);
+    }
+
+    return newPageNumber;
   }
 
 }

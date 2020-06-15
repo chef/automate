@@ -195,7 +195,6 @@ export class DashboardComponent implements OnInit {
   }
 
   public onPageSizeChange(pageSize: number) {
-    console.log(pageSize);
     this.store.dispatch(new UpdateDesktopsFilterPageSize({pageSize: pageSize}));
   }
 
