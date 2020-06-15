@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	apps "github.com/chef/automate/api/external/applications"
 	api "github.com/chef/automate/api/external/data_lifecycle"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/ingest"
@@ -16,13 +17,16 @@ import (
 func NewServer(ingestJobClient ingest.JobSchedulerClient,
 	ingestPurgeClient data_lifecycle.PurgeClient,
 	compliancePurgeClient data_lifecycle.PurgeClient,
-	eventFeedPurgeClient data_lifecycle.PurgeClient) *Server {
+	eventFeedPurgeClient data_lifecycle.PurgeClient,
+	appsClient apps.ApplicationsServiceClient,
+) *Server {
 
 	return &Server{
 		ingestJobClient:       ingestJobClient,
 		ingestPurgeClient:     ingestPurgeClient,
 		compliancePurgeClient: compliancePurgeClient,
 		eventFeedPurgeClient:  eventFeedPurgeClient,
+		appsClient:            appsClient,
 	}
 }
 
@@ -32,6 +36,7 @@ type Server struct {
 	ingestPurgeClient     data_lifecycle.PurgeClient
 	compliancePurgeClient data_lifecycle.PurgeClient
 	eventFeedPurgeClient  data_lifecycle.PurgeClient
+	appsClient            apps.ApplicationsServiceClient
 }
 
 // NOTE: services is currently unimplemented as the API's are not stable
