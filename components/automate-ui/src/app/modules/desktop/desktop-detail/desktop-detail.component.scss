@@ -34,6 +34,31 @@
   }
 }
 
+.heading-actions {
+  position: relative;
+
+  .download {
+    position: absolute;
+    right: 0;
+    width: 114px;
+
+    div {
+      font-size: 14px;
+      text-align: center;
+      padding: 5px 0;
+      border-bottom: 1px solid $chef-grey;
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+}
+
 h3 {
   margin-bottom: $spacing-05;
 }
