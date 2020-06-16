@@ -30,13 +30,6 @@
       </chef-error>
     </chef-form-field>
     <chef-form-field>
-      <label>
-        <span class="label">Admin Key</span>
-        <textarea rows="27" cols="10" chefInput placeholder="-----BEGIN RSA PRIVATE KEY -----"
-          formControlName="admin_key" data-cy="update-org-admin-key"></textarea>
-      </label>
-    </chef-form-field>
-    <chef-form-field>
       <div id="button-bar">
         <chef-button [disabled]="isLoading || !updateOrgForm.valid || !updateOrgForm.dirty" primary
         inline (click)="saveOrg()">

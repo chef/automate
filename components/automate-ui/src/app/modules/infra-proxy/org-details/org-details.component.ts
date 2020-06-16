@@ -29,6 +29,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public orgId: string;
   public cookbooksTab = true;
   public environmentsTab = false;
+  public resetKeyTab = false;
   public rolesTab = false;
   public dataBagsTab = false;
   public clientsTab = false;
@@ -65,6 +66,12 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
           this.rolesTab = false;
           this.environmentsTab = false;
           this.policyFilesTab = true;
+        }
+        if ( params.path.includes('resetkey') ) {
+          this.cookbooksTab = false;
+          this.rolesTab = false;
+          this.environmentsTab = false;
+          this.resetKeyTab = true;
         }
       });
     }
@@ -117,6 +124,9 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         break;
       case 6:
         this.telemetryService.track('orgDetailsTab', 'orgEdit');
+        break;
+      case 7:
+        this.telemetryService.track('orgDetailsTab', 'resetkey');
         break;
     }
   }

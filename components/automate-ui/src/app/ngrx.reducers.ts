@@ -6,6 +6,7 @@ import * as destinationEntity from './entities/destinations/destination.reducer'
 import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
 import * as projectsFilter from './services/projects-filter/projects-filter.reducer';
+import * as adminKeyEntity from './entities/reset-admin-key/reset-admin-key.reducer';
 import * as apiToken from './entities/api-tokens/api-token.reducer';
 import * as automateSettings from './entities/automate-settings/automate-settings.reducer';
 import * as clientEntity from './entities/clients/client.reducer';
@@ -66,6 +67,7 @@ export interface NgrxStateAtom {
   job_list: jobList.JobListState;
 
   // Entities
+  adminKey: adminKeyEntity.AdminKeyEntityState;
   apiTokens: apiToken.ApiTokenEntityState;
   automateSettings: automateSettings.AutomateSettingsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
@@ -186,6 +188,7 @@ export const defaultInitialState = {
   job_list: jobList.JobListInitialState,
 
   // Entities
+  adminKey: adminKeyEntity.AdminKeyEntityInitialState,
   apiTokens: apiToken.ApiTokenEntityInitialState,
   automateSettings: automateSettings.AutomateSettingsEntityInitialState,
   clients: clientEntity.ClientEntityInitialState,
@@ -239,6 +242,7 @@ export const ngrxReducers = {
   integrations_edit: integrationsEdit.integrationsEditReducer,
 
   // Entities
+  adminKey: adminKeyEntity.adminKeyEntityReducer,
   apiTokens: apiToken.apiTokenEntityReducer,
   automateSettings: automateSettings.automateSettingsEntityReducer,
   clients: clientEntity.clientEntityReducer,
