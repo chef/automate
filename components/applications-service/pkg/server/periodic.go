@@ -525,12 +525,20 @@ type MarkDisconnectedServicesExecutor struct {
 }
 
 func (m *MarkDisconnectedServicesExecutor) Run(ctx context.Context, t cereal.Task) (interface{}, error) {
+	logCtx := log.WithFields(log.Fields{
+		"workflow_name": DisconnectedServicesWorkflowName,
+		"schedule_name": DisconnectedServicesScheduleName,
+		"executor":      "MarkDisconnectedServicesExecutor",
+	})
+	logCtx.Debug("Starting periodic task")
 	err := m.runWithoutStats(t)
 	atomic.AddInt64(&m.totalRuns, 1)
 	if err != nil {
 		atomic.AddInt64(&m.totalRunsFailed, 1)
+		logCtx.WithFields(m.statsLogFields()).Error("periodic task failed")
 	} else {
 		atomic.AddInt64(&m.totalRunsSuccessful, 1)
+		logCtx.WithFields(m.statsLogFields()).Info("periodic task succeeded")
 	}
 	return nil, err
 }
@@ -555,6 +563,14 @@ func (m *MarkDisconnectedServicesExecutor) TotalRuns() int64 {
 	return atomic.LoadInt64(&m.totalRuns)
 }
 
+func (m *MarkDisconnectedServicesExecutor) statsLogFields() log.Fields {
+	return log.Fields{
+		"lifetime_runs":            m.totalRuns,
+		"lifetime_successful_runs": m.totalRunsSuccessful,
+		"lifetime_failed_runs":     m.totalRunsFailed,
+	}
+}
+
 type DeleteDisconnectedServicesExecutor struct {
 	ApplicationsServer  *ApplicationsServer
 	totalRuns           int64
@@ -563,12 +579,20 @@ type DeleteDisconnectedServicesExecutor struct {
 }
 
 func (d *DeleteDisconnectedServicesExecutor) Run(ctx context.Context, t cereal.Task) (interface{}, error) {
+	logCtx := log.WithFields(log.Fields{
+		"workflow_name": DeleteDisconnectedServicesWorkflowName,
+		"schedule_name": DeleteDisconnectedServicesScheduleName,
+		"executor":      "DeleteDisconnectedServicesExecutor",
+	})
+	logCtx.Debug("Starting periodic task")
 	err := d.runWithoutStats(ctx, t)
 	atomic.AddInt64(&d.totalRuns, 1)
 	if err != nil {
 		atomic.AddInt64(&d.totalRunsFailed, 1)
+		logCtx.WithFields(d.statsLogFields()).Error("periodic task failed")
 	} else {
 		atomic.AddInt64(&d.totalRunsSuccessful, 1)
+		logCtx.WithFields(d.statsLogFields()).Info("periodic task succeeded")
 	}
 	return nil, err
 }
@@ -595,10 +619,24 @@ func (d *DeleteDisconnectedServicesExecutor) runWithoutStats(ctx context.Context
 		return err
 	}
 
-	logCtx.WithFields(log.Fields{"svcs_removed": len(svcRemovedRes.Services)}).Debug("periodic task succeeded")
+	svcsRemoved := len(svcRemovedRes.Services)
+	logCtx = logCtx.WithFields(log.Fields{"svcs_removed": svcsRemoved})
+	if svcsRemoved == 0 {
+		logCtx.Debug("task succeeded")
+	} else {
+		logCtx.Info("task succeeded")
+	}
 	return nil
 }
 
 func (d *DeleteDisconnectedServicesExecutor) TotalRuns() int64 {
 	return atomic.LoadInt64(&d.totalRuns)
+}
+
+func (d *DeleteDisconnectedServicesExecutor) statsLogFields() log.Fields {
+	return log.Fields{
+		"lifetime_runs":            d.totalRuns,
+		"lifetime_successful_runs": d.totalRunsSuccessful,
+		"lifetime_failed_runs":     d.totalRunsFailed,
+	}
 }

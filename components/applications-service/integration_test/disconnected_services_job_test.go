@@ -76,6 +76,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 	})
 
 	t.Run("running the job runner makes the disconnected_services job run", func(t *testing.T) {
+		suite.JobScheduler.ResetParams()
 		err := suite.JobScheduler.RunAllJobsConstantly(ctx)
 		require.NoError(t, err)
 		defer suite.JobScheduler.ResetParams()
