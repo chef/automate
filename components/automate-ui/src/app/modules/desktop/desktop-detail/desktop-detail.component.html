@@ -28,8 +28,8 @@
         </chef-button>
           <chef-dropdown class='download' [visible]="downloadDropdownVisible">
             <chef-click-outside omit="download-dropdown-toggle" (clickOutside)="closeDownloadDropdown()">
-              <div (click)="onDownloadCheckInHistory('json')">JSON</div>
-              <div (click)="onDownloadCheckInHistory('csv')">CSV</div>
+              <chef-button tertiary (click)="onDownloadCheckInHistory('json')">JSON</chef-button>
+              <chef-button tertiary (click)="onDownloadCheckInHistory('csv')">CSV</chef-button>
             </chef-click-outside>
           </chef-dropdown>
       </div>

@@ -9,8 +9,8 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Subject } from 'rxjs';
 import { GetDailyNodeRunsStatusTimeSeries } from 'app/entities/desktop/desktop.actions';
 import { getDailyNodeRuns } from 'app/entities/desktop/desktop.selectors';
-import { NodeRunsService } from '../../../services/node-details/node-runs.service';
-import { RunHistoryStore } from '../../../services/run-history-store/run-history.store';
+import { NodeRunsService } from 'app/services/node-details/node-runs.service';
+import { RunHistoryStore } from 'app/services/run-history-store/run-history.store';
 
 @Component({
   selector: 'app-desktop-detail',
@@ -32,6 +32,8 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
   public checkinGridFlexType = 'wrap';
   public checkinNumDays = 15;
   public downloadDropdownVisible = false;
+  public downloadInProgress = false;
+  public downloadFailed = false;
   // These are Material Icon names from https://material.io/resources/icons/
   public historyIcons = {
     converged: 'check_box',
@@ -77,16 +79,18 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
     this.closeDownloadDropdown();
     const filename = `${moment.utc().format(DateTime.REPORT_DATE_TIME)}.${format}`;
 
-    const onComplete = () => console.warn('completed downloading report');
-    const onError = _e => console.error('error downloading report');
+    const onComplete = () => this.downloadInProgress = false;
+    const onError = _e => this.downloadFailed = true;
     const types = {'json': 'application/json', 'csv': 'text/csv'};
     const onNext = data => {
       const type = types[format];
       const blob = new Blob([data], {type});
       saveAs(blob, filename);
     };
+    const filters = this.nodeHistoryStore.filter.getValue();
+    filters.nodeId = this.desktop.id;
 
-    this.nodeRunsService.downloadRuns(format, this.nodeHistoryStore.filter.getValue()).pipe(
+    this.nodeRunsService.downloadRuns(format, filters).pipe(
       finalize(onComplete))
       .subscribe(onNext, onError);
   }
