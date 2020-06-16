@@ -12,7 +12,7 @@ toc = true
 
 Before beginning your installation, check the [System Requirements]({{< relref "system-requirements.md" >}}) for Automate.
 
-See [Airgapped Installation]({{< relref "airgapped-installation.md" >}}) for installing Chef Automate to a host with no inbound or outbound internet traffic.
+See [Airgapped Installation]({{< relref "airgapped-installation.md" >}}) for installing Chef Automate to a host with no inbound or outbound internet traffic. We also recommend using [airgap bundles]({{< ref "airgapped-installation.md#prepare-airgap-installation-bundle" >}}) to install a specific version of Chef Automate.
 
 ## Download the Chef Automate Command-Line Tool
 
@@ -103,6 +103,15 @@ chef-automate upgrade run
 ```
 
 This command upgrades Chef Automate to the latest version available from your release channel.
+
+To upgrade to a specific version of Chef Automate, run
+
+```shell
+chef-automate upgrade run --version <version>
+```
+
+This command does not perform downgrades; it also does not perform upgrades of [airgap installs]({{< ref "airgapped-installation.md" >}}). For
+a list of available versions, see the [Chef Automate release notes](https://automate.chef.io/release-notes).
 
 ### Common Problems
 
