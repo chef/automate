@@ -89,11 +89,13 @@ To delete a webhook notification for Chef Automate:
 
 ### Webhook Notification Payload
 
-The body of the notification payload contains complex JSON data. While most of the attributes are self-explanatory, one to note is `type`.
-Chef Infra Client run failures have a type of `converge_failure` where the Chef InSpec scan failures have a type of `compliance_failure`.
-Another item of note is the `controls` section of the Chef InSpec scan failures. It will contain information about each failed control so the payload can be rather large if the node has a lot of failed controls.
+The body of the notification payload contains complex JSON data.
+One attribute to note is `type`.
+Chef Infra Client run failures have a `type` of `converge_failure` where the Chef InSpec scan failures have a `type` of `compliance_failure`.
 
-Chef Client run failure example payload
+The `controls` section of the Chef InSpec scan failures notification payload contains information about each failed control, so the payload can be rather large if the node has a lot of failed controls.
+
+#### Chef Infra Client Run Failure Example Payload
 
 ``` json
 {
@@ -118,7 +120,7 @@ Chef Client run failure example payload
 }
 ```
 
-Compliance Failure example payload
+#### Chef InSpec Scan Failure Example Payload
 
 ``` json
 {
