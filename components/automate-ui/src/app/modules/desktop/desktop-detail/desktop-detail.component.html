@@ -22,10 +22,16 @@
           <span>Last {{ (checkinNumDays === 15 ? 2 : 4) }} Weeks</span>
           <chef-icon>expand_more</chef-icon>
         </chef-button>
-        <chef-button secondary>
+        <chef-button secondary (click)="toggleDownloadDropdown()" class='download-dropdown-toggle'>
           <span>Download</span>
           <chef-icon>expand_more</chef-icon>
         </chef-button>
+          <chef-dropdown class='download' [visible]="downloadDropdownVisible">
+            <chef-click-outside omit="download-dropdown-toggle" (clickOutside)="closeDownloadDropdown()">
+              <chef-button tertiary (click)="onDownloadCheckInHistory('json')">JSON</chef-button>
+              <chef-button tertiary (click)="onDownloadCheckInHistory('csv')">CSV</chef-button>
+            </chef-click-outside>
+          </chef-dropdown>
       </div>
     </div>
     <chef-table class="checkin-history-table grid">

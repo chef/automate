@@ -34,6 +34,39 @@
   }
 }
 
+.heading-actions {
+  position: relative;
+
+  .download {
+    position: absolute;
+    right: 0;
+    width: 114px;
+
+    chef-button {
+      margin: 0;
+      font-size: 14px;
+      text-align: center;
+      padding: 5px 0;
+      border-bottom: 1px solid $chef-grey;
+      width: 100%;
+      color: inherit;
+
+      button {
+        margin: 0;
+        padding: 0;
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+}
+
 h3 {
   margin-bottom: $spacing-05;
 }

@@ -1,12 +1,16 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { Desktop, DailyNodeRunsStatus } from 'app/entities/desktop/desktop.model';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, finalize } from 'rxjs/operators';
+import * as moment from 'moment/moment';
+import { saveAs } from 'file-saver';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Subject } from 'rxjs';
 import { GetDailyNodeRunsStatusTimeSeries } from 'app/entities/desktop/desktop.actions';
 import { getDailyNodeRuns } from 'app/entities/desktop/desktop.selectors';
+import { NodeRunsService } from 'app/services/node-details/node-runs.service';
+import { RunHistoryStore } from 'app/services/run-history-store/run-history.store';
 
 @Component({
   selector: 'app-desktop-detail',
@@ -27,6 +31,9 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
   public checkinTableType = 'grid';
   public checkinGridFlexType = 'wrap';
   public checkinNumDays = 15;
+  public downloadDropdownVisible = false;
+  public downloadInProgress = false;
+  public downloadFailed = false;
   // These are Material Icon names from https://material.io/resources/icons/
   public historyIcons = {
     converged: 'check_box',
@@ -39,7 +46,9 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
 
   constructor(
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private nodeHistoryStore: RunHistoryStore,
+    private nodeRunsService: NodeRunsService
   ) {
     this.store.select(getDailyNodeRuns).pipe(
       takeUntil(this.isDestroyed)
@@ -64,6 +73,34 @@ export class DesktopDetailComponent implements OnInit, OnDestroy {
   updateCheckInDays() {
     this.checkinNumDays = (this.checkinNumDays === 15 ? 29 : 15);
     this.getCheckInHistory();
+  }
+
+  onDownloadCheckInHistory(format) {
+    this.closeDownloadDropdown();
+    const filename = `${moment.utc().format(DateTime.REPORT_DATE_TIME)}.${format}`;
+
+    const onComplete = () => this.downloadInProgress = false;
+    const onError = _e => this.downloadFailed = true;
+    const types = {'json': 'application/json', 'csv': 'text/csv'};
+    const onNext = data => {
+      const type = types[format];
+      const blob = new Blob([data], {type});
+      saveAs(blob, filename);
+    };
+    const filters = this.nodeHistoryStore.filter.getValue();
+    filters.nodeId = this.desktop.id;
+
+    this.nodeRunsService.downloadRuns(format, filters).pipe(
+      finalize(onComplete))
+      .subscribe(onNext, onError);
+  }
+
+  toggleDownloadDropdown() {
+    this.downloadDropdownVisible = !this.downloadDropdownVisible;
+  }
+
+  closeDownloadDropdown() {
+    this.downloadDropdownVisible = false;
   }
 
   addCheckInLabels(checkInHistory: DailyNodeRunsStatus[]): DailyNodeRunsStatus[] {
