@@ -63,7 +63,7 @@ The `data-lifecycle` API allows configuring and running lifecycle jobs by data t
 * `infra` - Chef Infra Server actions and Chef Infra Client converge data
 * `compliance` - Chef InSpec reports and Chef Compliance scans
 * `event-feed` - Event metadata that powers the operational visibility and query language
-
+* `services` - Chef Habitat Services data
 
 To see the data lifecycle job statuses, configure jobs, or run jobs requires an [api token]({{< relref "api-tokens.md" >}}) with `dataLifecycle:*` IAM access.
 
@@ -81,7 +81,7 @@ To see individual statuses by data type, you can access the data type sub-status
 curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/event-feed/status
 ```
 
-Swap `event-feed` for `infra` or `compliance` to see their corresponding jobs.
+Swap `event-feed` for `infra` or `compliance` or `services` to see their corresponding jobs.
 
 The status is the total of the job configuration, details about its next scheduled run, and details about any previous runs.
 
@@ -167,6 +167,22 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
         }
       }
     ]
+  },
+  "services": {
+    "job_settings": [
+      {
+        "name": "disconnected_services",
+        "disabled": false,
+        "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=60",
+        "threshold": "5m"
+      },
+      {
+        "name": "delete_disconnected_services",
+        "disabled": false,
+        "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=60",
+        "threshold": "7d"
+      }
+    ]
   }
 }
 ```
@@ -236,6 +252,10 @@ Purge jobs have the following options:
     * `disabled` (bool) - True or false if this job is enabled.
     * `policy_name` (string) - The name of the purge policy you wish to update.
     * `older_than_days` (int) - The threshold for what qualifies for deletion.
+
+Services jobs have the following options:
+
+* `threshold` (string) - Setting that allows the user to use `1m` style notation to select the services the task operates on.
 
 ##### Infra Job Settings
 
@@ -345,6 +365,31 @@ The `event_feed` data type has one event feed purge job with one Elasticsearch p
 
 * `periodic_purge` - How often to run the purge job
   * `feed` - Queryable event feed
+
+##### Services Job Settings
+
+The `services` data type has two jobs, one to mark services as disconnected
+when the elapsed time since Automate last received a health check message
+exceeds the threshold, and one to delete services when the time since the last
+health check exceeds the threshold.
+
+```json
+{  "job_settings": [
+    {
+      "name": "disconnected_services",
+      "disabled": false,
+      "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
+      "threshold": "5m"
+    },
+    {
+      "name": "delete_disconnected_services",
+      "disabled": false,
+      "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
+      "threshold": "7d"
+    }
+  ]
+}
+```
 
 ### Run
 
