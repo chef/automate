@@ -26,11 +26,9 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private store: Store<NgrxStateAtom>
-    // private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit() {
-
     this.store.dispatch(new GetContentItems());
     this.contentItems$ = this.store.select(contentItems);
   }
