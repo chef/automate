@@ -30,4 +30,32 @@ describe('PagePickerComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  describe('desktop page picker', () => {
+    // let desktopStateMock = {
+    //   getDesktopsFilter: {
+    //     currentPage: 1,
+    //     pageSize: 10
+    //   }
+    // }
+
+    beforeEach(() => {
+      component.forDesktop = true;
+    });
+
+    describe('initial load', () => {
+
+      xit('should be on the first page', () => {
+        expect(component.page).toEqual(1);
+      });
+
+      xit('should have an item start count of 1', () => {
+        expect(component.itemStartCount).toEqual(1);
+      });
+
+      xit('should display 10 items per page', () => {
+        expect(component.perPage).toEqual(10);
+      });
+    });
+  });
+
 });
