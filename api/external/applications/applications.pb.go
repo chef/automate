@@ -2138,14 +2138,32 @@ type ApplicationsServiceClient interface {
 	//
 	//Change 'Disconnected Services' Configuration
 	//
-	//Changes the configuration for the task that marks services as disconnected after
-	//'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
+	//Changes the configuration for the task that marks services as disconnected.
+	//
+	//The periodic task to check for disconnected services can be enabled or
+	//disabled by setting the 'running' setting to `true` or `false`, respectively.
+	//When disabled, no services will be marked disconnected, regardless of the
+	//time that has elapsed since the last health check. It is not recommened to
+	//disable the job.
+	//
+	//The frequency of the job's execution can be modified by changing the
+	//'recurrence'. This setting is a string
+	//[as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
+	//By default, the task runs every 60 seconds. It is not recommended to change
+	//the recurrence.
+	//
+	//When enabled, services are marked disconnected when the time elapsed since
+	//Automate last received a health check exceeds 'threshold'. Threshold is a
+	//string that follows Elasticsearch's date math expressions.
+	//
 	//
 	//Example:
 	//```
 	///retention/service_groups/disconnected_services/config
 	//'{
-	//"threshold": "15m"
+	//"threshold": "15m",
+	//"running": true,
+	//"recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
 	//}'
 	//```
 	//
@@ -2181,12 +2199,19 @@ type ApplicationsServiceClient interface {
 	//after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
 	//This job can be disabled by setting `"running": false`.
 	//
+	//The frequency of the job's execution can be modified by changing the
+	//'recurrence'. This setting is a string
+	//[as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
+	//By default, the task runs every 60 seconds. It is not recommended to change
+	//the recurrence.
+	//
 	//Example:
 	//```
 	//service_groups/delete_disconnected_services/config" -d
 	//'{
 	//"threshold": "1d",
-	//"running":true
+	//"running":true,
+	//"recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
 	//}'
 	//```
 	//
@@ -2530,14 +2555,32 @@ type ApplicationsServiceServer interface {
 	//
 	//Change 'Disconnected Services' Configuration
 	//
-	//Changes the configuration for the task that marks services as disconnected after
-	//'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
+	//Changes the configuration for the task that marks services as disconnected.
+	//
+	//The periodic task to check for disconnected services can be enabled or
+	//disabled by setting the 'running' setting to `true` or `false`, respectively.
+	//When disabled, no services will be marked disconnected, regardless of the
+	//time that has elapsed since the last health check. It is not recommened to
+	//disable the job.
+	//
+	//The frequency of the job's execution can be modified by changing the
+	//'recurrence'. This setting is a string
+	//[as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
+	//By default, the task runs every 60 seconds. It is not recommended to change
+	//the recurrence.
+	//
+	//When enabled, services are marked disconnected when the time elapsed since
+	//Automate last received a health check exceeds 'threshold'. Threshold is a
+	//string that follows Elasticsearch's date math expressions.
+	//
 	//
 	//Example:
 	//```
 	///retention/service_groups/disconnected_services/config
 	//'{
-	//"threshold": "15m"
+	//"threshold": "15m",
+	//"running": true,
+	//"recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
 	//}'
 	//```
 	//
@@ -2573,12 +2616,19 @@ type ApplicationsServiceServer interface {
 	//after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
 	//This job can be disabled by setting `"running": false`.
 	//
+	//The frequency of the job's execution can be modified by changing the
+	//'recurrence'. This setting is a string
+	//[as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
+	//By default, the task runs every 60 seconds. It is not recommended to change
+	//the recurrence.
+	//
 	//Example:
 	//```
 	//service_groups/delete_disconnected_services/config" -d
 	//'{
 	//"threshold": "1d",
-	//"running":true
+	//"running":true,
+	//"recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
 	//}'
 	//```
 	//

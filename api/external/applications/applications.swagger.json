@@ -431,7 +431,7 @@
       },
       "post": {
         "summary": "Change 'Remove Disconnected Services' Configuration",
-        "description": "Updates configuration information for the task that deletes services marked as disconnected\nafter 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.\nThis job can be disabled by setting `\"running\": false`.\n\nExample:\n```\nservice_groups/delete_disconnected_services/config\" -d\n'{\n\"threshold\": \"1d\",\n\"running\":true\n}'\n```\n\nAuthorization Action:\n```\nretention:serviceGroups:update\n```",
+        "description": "Updates configuration information for the task that deletes services marked as disconnected\nafter 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.\nThis job can be disabled by setting `\"running\": false`.\n\nThe frequency of the job's execution can be modified by changing the\n'recurrence'. This setting is a string\n[as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).\nBy default, the task runs every 60 seconds. It is not recommended to change\nthe recurrence.\n\nExample:\n```\nservice_groups/delete_disconnected_services/config\" -d\n'{\n\"threshold\": \"1d\",\n\"running\":true,\n\"recurrence\": \"FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60\"\n}'\n```\n\nAuthorization Action:\n```\nretention:serviceGroups:update\n```",
         "operationId": "UpdateDeleteDisconnectedServicesConfig",
         "responses": {
           "200": {
@@ -501,7 +501,7 @@
       },
       "post": {
         "summary": "Change 'Disconnected Services' Configuration",
-        "description": "Changes the configuration for the task that marks services as disconnected after\n'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.\n\nExample:\n```\n/retention/service_groups/disconnected_services/config\n'{\n\"threshold\": \"15m\"\n}'\n```\n\nAuthorization Action:\n```\nretention:serviceGroups:update\n```",
+        "description": "Changes the configuration for the task that marks services as disconnected.\n\nThe periodic task to check for disconnected services can be enabled or\ndisabled by setting the 'running' setting to `true` or `false`, respectively.\nWhen disabled, no services will be marked disconnected, regardless of the\ntime that has elapsed since the last health check. It is not recommened to\ndisable the job.\n\nThe frequency of the job's execution can be modified by changing the\n'recurrence'. This setting is a string\n[as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).\nBy default, the task runs every 60 seconds. It is not recommended to change\nthe recurrence.\n\nWhen enabled, services are marked disconnected when the time elapsed since\nAutomate last received a health check exceeds 'threshold'. Threshold is a\nstring that follows Elasticsearch's date math expressions.\n\n\nExample:\n```\n/retention/service_groups/disconnected_services/config\n'{\n\"threshold\": \"15m\",\n\"running\": true,\n\"recurrence\": \"FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60\"\n}'\n```\n\nAuthorization Action:\n```\nretention:serviceGroups:update\n```",
         "operationId": "UpdateDisconnectedServicesConfig",
         "responses": {
           "200": {
