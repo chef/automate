@@ -40,7 +40,7 @@ func (s *Server) GetServicesStatus(ctx context.Context, req *api.GetServicesStat
 	}
 	res := api.GetServicesStatusResponse{
 		Jobs: []*api.JobStatus{
-			&api.JobStatus{
+			{
 				Name:           DisconnectedServicesJobName,
 				Disabled:       !dsc.Running.GetValue(),
 				Recurrence:     dsc.Recurrence,
@@ -51,7 +51,7 @@ func (s *Server) GetServicesStatus(ctx context.Context, req *api.GetServicesStat
 				LastEndedAt:    dsc.JobInfo.LastEndedAt,
 				LastElapsed:    dsc.JobInfo.LastElapsed,
 			},
-			&api.JobStatus{
+			{
 				Name:           DeleteDisconnectedServicesJobName,
 				Disabled:       !ddsc.Running,
 				Recurrence:     ddsc.Recurrence,
