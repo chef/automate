@@ -15,7 +15,7 @@ export const getAllStatus = createSelector(
 );
 
 export const dataBagsFromRoute = createSelector(
-  dataBagsState,
+  dataBagsEntities,
   routeParams,
   (state, { name }) => find({ name }, state)
 );

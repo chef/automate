@@ -15,6 +15,8 @@ import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
 import * as cookbookDetailsEntity from './entities/cookbooks/cookbook-details.reducer';
 import * as cookbookVersionsEntity from './entities/cookbooks/cookbook-versions.reducer';
 import * as dataBagsEntity from './entities/data-bags/data-bags.reducer';
+import * as dataBagDetailsEntity from './entities/data-bags/data-bag-details.reducer';
+import * as dataBagItemDetailsEntity from './entities/data-bags/data-bag-item-details.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
 import * as environmentEntity from './entities/environments/environment.reducer';
 import * as environmentDetailsEntity from './entities/environments/environment-details.reducer';
@@ -76,6 +78,8 @@ export interface NgrxStateAtom {
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityState;
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityState;
   dataBags: dataBagsEntity.DataBagsEntityState;
+  dataBagDetails: dataBagDetailsEntity.DataBagDetailsEntityState;
+  dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityState;
   destinations: destinationEntity.DestinationEntityState;
   environments: environmentEntity.EnvironmentEntityState;
   environmentDetails: environmentDetailsEntity.EnvironmentDetailsEntityState;
@@ -197,6 +201,8 @@ export const defaultInitialState = {
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityInitialState,
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityInitialState,
   dataBags: dataBagsEntity.DataBagsEntityInitialState,
+  dataBagDetails: dataBagDetailsEntity.DataBagDetailsEntityInitialState,
+  dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
   environments: environmentEntity.EnvironmentEntityInitialState,
   environmentDetails: environmentDetailsEntity.EnvironmentEntityInitialState,
@@ -252,6 +258,8 @@ export const ngrxReducers = {
   cookbookVersions: cookbookVersionsEntity.cookbookVersionsEntityReducer,
   credentialEntity: credential.credentialReducer,
   dataBags: dataBagsEntity.dataBagsEntityReducer,
+  dataBagDetails: dataBagDetailsEntity.dataBagDetailsEntityReducer,
+  dataBagItemDetails: dataBagItemDetailsEntity.dataBagItemDetailsEntityReducer,
   destinations: destinationEntity.destinationEntityReducer,
   environments: environmentEntity.environmentEntityReducer,
   environmentDetails: environmentDetailsEntity.environmentDetailsEntityReducer,

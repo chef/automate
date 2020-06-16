@@ -5,8 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { MockComponent } from 'ng2-mock-component';
 import { environment as env } from 'environments/environment';
-import { StoreModule, Store, Action } from '@ngrx/store';
-import * as routerStore from '@ngrx/router-store';
+import { StoreModule, Store } from '@ngrx/store';
 import {
   NgrxStateAtom,
   ngrxReducers,
@@ -159,8 +158,3 @@ describe('CookbookDetailsComponent', () => {
 
 });
 
-export class GetRoute implements Action {
-  readonly type = routerStore.ROUTER_NAVIGATION;
-
-  constructor(public payload: any) { }
-}
