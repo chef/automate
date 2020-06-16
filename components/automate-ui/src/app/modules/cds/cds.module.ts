@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CardTableComponent } from './card-table/card-table.component';
+import { CardComponent } from './card/card.component';
 import { CdsRoutingModule } from './cds-routing.module';
 
 @NgModule({
@@ -16,11 +17,13 @@ import { CdsRoutingModule } from './cds-routing.module';
   ],
   exports: [
     DashboardComponent,
-    CardTableComponent
+    CardTableComponent,
+    CardComponent
   ],
   declarations: [
     DashboardComponent,
-    CardTableComponent
+    CardTableComponent,
+    CardComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

@@ -1,0 +1,55 @@
+@import "~styles/variables";
+
+.description {
+  padding: 30px;
+}
+
+.type {
+  color: var(--chef-primary-dark);
+  margin-top: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 18px;
+}
+
+.name {
+  color: var(--chef-primary-dark);
+  margin-top: 10px;
+  font-weight: bold;
+  font-style: inherit;
+  font-size: 14px;
+}
+
+.version {
+  color: var(--chef-primary-dark);
+  margin-top: 30px;
+  font-weight: bold;
+  font-style: inherit;
+  font-size: 14px;
+}
+
+figcaption {
+  margin-top: 1em;
+  padding-top: 1em;
+  border-top: 1px solid $chef-light-grey;
+  color: $chef-dark-grey;
+}
+
+.platform-label {
+  color: var(--chef-primary-dark);
+  margin-top: 40px;
+  font-weight: bold;
+  font-style: inherit;
+  font-size: 14px;
+}
+
+.button-group {
+  background-color: $gray-highlight;
+  margin: 0;
+  padding: 0;
+}
+
+.action-button {
+  margin: 15px;
+}
+
