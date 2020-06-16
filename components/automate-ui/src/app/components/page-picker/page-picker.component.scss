@@ -1,4 +1,5 @@
 @import "~styles/variables";
+@import "@carbon/layout/scss/layout";
 @import "@carbon/grid/scss/grid";
 
 :host {
@@ -6,7 +7,7 @@
   align-items: center;
 
   chef-button {
-    margin: 0 0.5em 0 0;
+    margin: 0 $spacing-03 0 0;
   }
 
   // desktop styles
@@ -65,19 +66,19 @@
       flex-flow: row nowrap;
       align-items: center;
       justify-content: space-between;
-      margin-right: 16px;
+      margin-right: $spacing-05;
       height: 49px;
       min-width: 193px;
       border-radius: $chef-border-radius;
 
       span.items-per {
-        padding: 16px 4px 15px 16px;
+        padding: $spacing-05 $spacing-02 15px $spacing-05;
       }
     }
 
     .of-pages-container {
       span {
-        padding: 16px 16px 15px 4px;
+        padding: $spacing-05 $spacing-05 15px $spacing-02;
         font-size: 14px;
       }
     }
@@ -133,18 +134,17 @@
       width: 60px;
 
       &:focus {
-        border-color: #3864F2;
+        border-color: $chef-primary-bright;
         outline: none;
       }
     }
 
     .arrow-field-item [panelClass="chef-dropdown"] {
-      padding: 16px 4px 17px 16px;
+      padding: $spacing-05 $spacing-02 17px $spacing-05;
     }
 
     .information-container [panelClass="chef-dropdown"] {
-      padding: 16px 12px 15px 4px;
+      padding: $spacing-05 $spacing-04 15px $spacing-02;
     }
-
   } // end desktop
 }
