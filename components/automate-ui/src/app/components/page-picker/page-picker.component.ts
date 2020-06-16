@@ -23,7 +23,7 @@ export class PagePickerComponent implements OnChanges {
   itemEndCount: number;
   totalPages: number[];
 
-  maxPageOptions = [10, 20, 50];
+  perPageOptions = [10, 20, 50];
   selectablePages = [];
   first = 1;
   prev = 1;
@@ -95,9 +95,9 @@ export class PagePickerComponent implements OnChanges {
     }
   }
 
-  handleSelectMaxPageItems(event, value): void {
+  handleSelectPerPageItems(event, value): void {
     if (event.isUserInput) {
-      const updatedPageNumber = this.getUpdatedPageNumber(value);
+      const updatedPageNumber = Math.ceil(this.itemStartCount / value);
 
       this.pageSizeChanged.emit({
         pageSize: value,
@@ -105,23 +105,4 @@ export class PagePickerComponent implements OnChanges {
       });
     }
   }
-
-  private getUpdatedPageNumber(value): number {
-    let newPageNumber;
-    const newTotalPages = Math.ceil(this.total / value);
-
-    // handle first page
-    if (this.itemStartCount === 1) {
-      newPageNumber = 1;
-    // handle last page
-    } else if (this.itemStartCount < this.total && (this.itemStartCount > (this.total - value))) {
-      newPageNumber = newTotalPages;
-    // handle middle pages
-    } else {
-      newPageNumber = Math.ceil(this.itemStartCount / value);
-    }
-
-    return newPageNumber;
-  }
-
 }
