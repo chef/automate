@@ -3,6 +3,11 @@ export interface FilterOption {
   id: string;
 }
 
+export interface FilterUpdate {
+  filters: string[];
+  saveAsDefault: boolean;
+}
+
 export enum FilterName {
   PlatformVersion = 'Platform Version',
   Domain = 'Domain',

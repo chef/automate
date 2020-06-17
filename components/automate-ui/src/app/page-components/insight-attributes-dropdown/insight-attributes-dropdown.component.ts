@@ -1,11 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FilterOption, FilterableOptions } from './insight-attributes-dropdown.model';
+import { FilterOption, FilterableOptions, FilterUpdate } from './insight-attributes-dropdown.model';
 import { isEqual } from 'lodash/fp';
-
-export interface FilterUpdate {
-  filters: string[];
-  saveAsDefault: boolean;
-}
 
 @Component({
   selector: 'app-insight-attributes-dropdown',
