@@ -18,7 +18,7 @@
         (click)="errorSelected.emit(item)"
         (keyup.enter)="errorSelected.emit(item)">
         <chef-td class="chart-list-item-label-cell">
-          {{ item.type }}: {{ item.message }}
+          <div>{{ item.type }}: {{ item.message }}</div>
         </chef-td>
         <chef-td class="chart-list-item-count-cell">
           <span>
