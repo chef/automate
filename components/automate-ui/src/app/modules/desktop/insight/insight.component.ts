@@ -1,5 +1,6 @@
 import { Component, HostBinding, Input, Output, EventEmitter } from '@angular/core';
 import { Desktop, TermFilter } from 'app/entities/desktop/desktop.model';
+import { FilterUpdate } from 'app/page-components/insight-attributes-dropdown/insight-attributes-dropdown.model';
 
 @Component({
   selector: 'app-insight',
@@ -46,7 +47,7 @@ export class InsightComponent {
     this.attributesMenuOpen = !this.attributesMenuOpen;
   }
 
-  public updateFilters(event) {
+  public updateFilters(event: FilterUpdate) {
     console.log(event);
   }
 }
