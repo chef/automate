@@ -3,6 +3,10 @@
 
 chef-td {
   font-size: 80%;
+
+  &.pointer {
+    cursor: help;
+  }
 }
 
 chef-tr {
@@ -23,13 +27,6 @@ chef-icon.UNKNOWN {
 
 chef-icon.SKIPPED {
   color: $chef-dark-grey;
-}
-
-.status-icon {
-
-  &--pointer {
-    cursor: pointer;
-  }
 }
 
 .run-info-tooltip {
