@@ -1,19 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient, HttpBackend, HttpErrorResponse } from '@angular/common/http';
-import { isNull, isNil } from 'lodash';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, ReplaySubject, timer } from 'rxjs';
 import { map, mergeMap, filter } from 'rxjs/operators';
+import { isNull, isNil } from 'lodash';
 
-
-import { environment } from '../../../environments/environment';
-import { Jwt } from 'app/helpers/jwt/jwt';
-
-import {
-  SetUserSelfID
-} from 'app/entities/users/userself.actions';
+import { environment } from 'environments/environment';
+import { Jwt, IDToken } from 'app/helpers/jwt/jwt';
+import { SetUserSelfID } from 'app/entities/users/userself.actions';
 
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
@@ -126,7 +122,7 @@ export class ChefSessionService implements CanActivate {
       id.email,
       idToken,
       id.groups,
-      id.federated_claims.connector_id === 'local');
+      this.isLocalUserFromId(id));
   }
 
   // canActivate determines if any of the routes (except signin) can be activated
@@ -272,5 +268,10 @@ export class ChefSessionService implements CanActivate {
   setDefaultSession(): void {
     this.setSession('test_subject', 'Test User', 'testchefuser',
       'test_id_token', ['group1', 'group2', 'group3'], true);
+  }
+
+  isLocalUserFromId(id: IDToken): boolean {
+    return id.federated_claims &&
+      id.federated_claims.connector_id === 'local';
   }
 }
