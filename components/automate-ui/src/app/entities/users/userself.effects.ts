@@ -60,11 +60,6 @@ export class UserSelfEffects {
     }));
 
   @Effect()
-  setUserSelfId$ = this.actions$.pipe(
-    ofType(UserSelfActionTypes.SET_ID),
-    map(() => new GetUserSelf()));
-
-  @Effect()
   updatePasswordSelf$ = this.actions$.pipe(
     ofType<UpdatePasswordSelf>(UserSelfActionTypes.UPDATE_PASSWORD_SELF),
     mergeMap((action: UpdatePasswordSelf) =>

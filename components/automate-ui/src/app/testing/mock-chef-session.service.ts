@@ -1,3 +1,5 @@
+import { IDToken } from 'app/helpers/jwt/jwt';
+
 export class MockChefSessionService {
   fullname = 'Test Mock';
   username = 'testmock';
@@ -14,6 +16,10 @@ export class MockChefSessionService {
     return 'test_subject-welcome-modal-seen';
   }
   public fetchTelemetryPreference(): boolean {
+    return true;
+  }
+
+  public isLocalUserFromId(_id: IDToken): boolean {
     return true;
   }
 }

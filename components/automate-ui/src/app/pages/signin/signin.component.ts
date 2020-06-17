@@ -48,8 +48,6 @@ export class SigninComponent implements OnInit {
   }
 
   setSession(): void {
-    const isLocalUser = this.id.federated_claims &&
-      this.id.federated_claims.connector_id === 'local';
     this.session.setSession(
       this.id.sub,
       this.id.name,
@@ -59,7 +57,7 @@ export class SigninComponent implements OnInit {
       this.id.email,
       this.idToken,
       this.id.groups,
-      isLocalUser);
+      this.session.isLocalUserFromId(this.id));
   }
 
   // pathFromState parses the URL path from state, and logs eventually occurring

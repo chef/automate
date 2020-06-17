@@ -156,7 +156,7 @@ describe('SigninComponent', () => {
         'kilgore@kilgore.trout',
         valid_id_token,
         ['authors'],
-        false);
+        true);
     });
   });
 
