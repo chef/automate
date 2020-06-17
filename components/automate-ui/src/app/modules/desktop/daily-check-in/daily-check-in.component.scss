@@ -1,22 +1,48 @@
 @import "~styles/variables";
 @import "@carbon/layout/scss/layout";
 
-.heading-title {
-  color: var(--chef-primary-dark);
-  margin-top: 0;
-  font-weight: inherit;
-  font-style: inherit;
-  font-size: 18px;
+.heading {
+
+  .heading-title-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: .25em;
+
+    .heading-title {
+      color: var(--chef-primary-dark);
+      margin-top: 0;
+      margin-bottom: 0;
+      font-weight: inherit;
+      font-style: inherit;
+      font-size: 18px;
+    }
+
+    chef-icon {
+      margin-left: 4px;
+      font-size: 24px;
+      cursor: help;
+    }
+
+    chef-tooltip {
+      width: 288px;
+
+      .tooltip-text {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .heading-time {
+    color: var(--chef-primary-dark);
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 10px;
+  }
 }
 
-.heading-time {
-  color: var(--chef-primary-dark);
-  margin-top: 0;
-  margin-bottom: 12px;
-  font-weight: inherit;
-  font-style: inherit;
-  font-size: 10px;
-}
+
 
 app-chart-progress-bar {
   margin: $spacing-07 0 $spacing-09 0;
