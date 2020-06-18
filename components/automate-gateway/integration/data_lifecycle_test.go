@@ -11,26 +11,30 @@ import (
 )
 
 const (
-	compliancePurgeJobName           = "periodic_purge"
-	complianceScansPolicyName        = "compliance-scans"
-	complianceReportsPolicyName      = "compliance-reports"
-	complianceReportsOlderThanDays   = 123
-	complianceScansOlderThanDays     = 456
-	eventFeedPurgeJobName            = "periodic_purge"
-	eventFeedPurgePolicyName         = "feed"
-	eventFeedOlderThanDays           = 789
-	infraPurgeJobName                = "periodic_purge_timeseries"
-	infraActionsPurgePolicyName      = "actions"
-	infraActionsOlderThanDays        = 234
-	infraConvergePurgePolicyName     = "converge-history"
-	infraConvergeOlderThanDays       = 567
-	infraDeleteNodesJobName          = "delete_nodes"
-	infraDeleteNodesThreshold        = "14d"
-	infraMissingNodesJobName         = "missing_nodes"
-	infraMissingNodesThreshold       = "21d"
-	infraDeleteMissingNodesJobName   = "missing_nodes_for_deletion"
-	infraDeleteMissingNodesThreshold = "1m"
-	testRecurrence                   = "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=2"
+	compliancePurgeJobName                     = "periodic_purge"
+	complianceScansPolicyName                  = "compliance-scans"
+	complianceReportsPolicyName                = "compliance-reports"
+	complianceReportsOlderThanDays             = 123
+	complianceScansOlderThanDays               = 456
+	eventFeedPurgeJobName                      = "periodic_purge"
+	eventFeedPurgePolicyName                   = "feed"
+	eventFeedOlderThanDays                     = 789
+	infraPurgeJobName                          = "periodic_purge_timeseries"
+	infraActionsPurgePolicyName                = "actions"
+	infraActionsOlderThanDays                  = 234
+	infraConvergePurgePolicyName               = "converge-history"
+	infraConvergeOlderThanDays                 = 567
+	infraDeleteNodesJobName                    = "delete_nodes"
+	infraDeleteNodesThreshold                  = "14d"
+	infraMissingNodesJobName                   = "missing_nodes"
+	infraMissingNodesThreshold                 = "21d"
+	infraDeleteMissingNodesJobName             = "missing_nodes_for_deletion"
+	infraDeleteMissingNodesThreshold           = "1m"
+	svcsDisconnectedServicesJobName            = "disconnected_services"
+	svcsDisconnectedServicesJobThreshold       = "9m"
+	svcsDeleteDisconnectedServicesJobName      = "delete_disconnected_services"
+	svcsDeleteDisconnectedServicesJobThreshold = "23d"
+	testRecurrence                             = "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=2"
 )
 
 // TestDataLifecycleConfigure tests configuring data lifecycle jobs in all
@@ -130,6 +134,23 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 		},
 	}
 
+	newServicesConfig := &data_lifecycle.SetServicesConfigRequest{
+		JobSettings: []*data_lifecycle.JobSettings{
+			&data_lifecycle.JobSettings{
+				Name:       svcsDisconnectedServicesJobName,
+				Disabled:   true,
+				Recurrence: testRecurrence,
+				Threshold:  svcsDisconnectedServicesJobThreshold,
+			},
+			&data_lifecycle.JobSettings{
+				Name:       svcsDeleteDisconnectedServicesJobName,
+				Disabled:   true,
+				Recurrence: testRecurrence,
+				Threshold:  svcsDeleteDisconnectedServicesJobThreshold,
+			},
+		},
+	}
+
 	_, err = dlClient.SetComplianceConfig(suite.ctx, newComplianceConfig)
 	suite.Require().NoError(err)
 
@@ -137,6 +158,9 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 	suite.Require().NoError(err)
 
 	_, err = dlClient.SetEventFeedConfig(suite.ctx, newEventFeedConfig)
+	suite.Require().NoError(err)
+
+	_, err = dlClient.SetServicesConfig(suite.ctx, newServicesConfig)
 	suite.Require().NoError(err)
 
 	// Check each config individually
@@ -152,6 +176,10 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 	suite.Require().NoError(err)
 	suite.assertJobSettingsMatchJobStatus(newInfraConfig.JobSettings, infraStatus.Jobs)
 
+	svcsStatus, err := dlClient.GetServicesStatus(suite.ctx, &data_lifecycle.GetServicesStatusRequest{})
+	suite.Require().NoError(err)
+	suite.assertJobSettingsMatchJobStatus(newServicesConfig.JobSettings, svcsStatus.Jobs)
+
 	// Reset each individually to the original config
 	oldComplianceSettings := jobStatusesToJobSettings(oldStatus.GetCompliance().GetJobs())
 	oldComplianceConfigRequest := &data_lifecycle.SetComplianceConfigRequest{
@@ -165,6 +193,10 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 	oldInfraConfigRequest := &data_lifecycle.SetInfraConfigRequest{
 		JobSettings: oldInfraSettings,
 	}
+	oldSvcsSettings := jobStatusesToJobSettings(oldStatus.GetServices().GetJobs())
+	oldSvcsConfigRequest := &data_lifecycle.SetServicesConfigRequest{
+		JobSettings: oldSvcsSettings,
+	}
 
 	_, err = dlClient.SetComplianceConfig(suite.ctx, oldComplianceConfigRequest)
 	suite.Require().NoError(err)
@@ -172,12 +204,15 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 	suite.Require().NoError(err)
 	_, err = dlClient.SetEventFeedConfig(suite.ctx, oldEventFeedConfigRequest)
 	suite.Require().NoError(err)
+	_, err = dlClient.SetServicesConfig(suite.ctx, oldSvcsConfigRequest)
+	suite.Require().NoError(err)
 
 	// Set the config globally
 	_, err = dlClient.SetConfig(suite.ctx, &data_lifecycle.SetConfigRequest{
 		Compliance: newComplianceConfig,
 		EventFeed:  newEventFeedConfig,
 		Infra:      newInfraConfig,
+		Services:   newServicesConfig,
 	})
 
 	// Get the status globally and ensure the config is set properly
@@ -186,12 +221,14 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 	suite.assertJobSettingsMatchJobStatus(newComplianceConfig.JobSettings, status.Compliance.Jobs)
 	suite.assertJobSettingsMatchJobStatus(newEventFeedConfig.JobSettings, status.EventFeed.Jobs)
 	suite.assertJobSettingsMatchJobStatus(newInfraConfig.JobSettings, status.Infra.Jobs)
+	suite.assertJobSettingsMatchJobStatus(newServicesConfig.JobSettings, status.Services.Jobs)
 
 	// Set it back to the original config
 	_, err = dlClient.SetConfig(suite.ctx, &data_lifecycle.SetConfigRequest{
 		Compliance: oldComplianceConfigRequest,
 		EventFeed:  oldEventFeedConfigRequest,
 		Infra:      oldInfraConfigRequest,
+		Services:   oldSvcsConfigRequest,
 	})
 	suite.Require().NoError(err)
 }
@@ -294,6 +331,22 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 				},
 			},
 		},
+		Services: &data_lifecycle.SetServicesConfigRequest{
+			JobSettings: []*data_lifecycle.JobSettings{
+				&data_lifecycle.JobSettings{
+					Name:       svcsDisconnectedServicesJobName,
+					Disabled:   true,
+					Recurrence: r,
+					Threshold:  svcsDisconnectedServicesJobThreshold,
+				},
+				&data_lifecycle.JobSettings{
+					Name:       svcsDeleteDisconnectedServicesJobName,
+					Disabled:   true,
+					Recurrence: r,
+					Threshold:  svcsDeleteDisconnectedServicesJobThreshold,
+				},
+			},
+		},
 	})
 
 	// Config changes will kick off enabled jobs. Let's wait for them to quickly
@@ -311,6 +364,9 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 	_, err = dlClient.RunInfra(suite.ctx, &data_lifecycle.RunInfraRequest{})
 	suite.Require().NoError(err)
 
+	_, err = dlClient.RunServices(suite.ctx, &data_lifecycle.RunServicesRequest{})
+	suite.Require().NoError(err)
+
 	// Give the jobs some time to run and then get their updated status
 	time.Sleep(1 * time.Second)
 	complianceStatus, err := dlClient.GetComplianceStatus(suite.ctx, &data_lifecycle.GetComplianceStatusRequest{})
@@ -322,6 +378,9 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 	infraStatus, err := dlClient.GetInfraStatus(suite.ctx, &data_lifecycle.GetInfraStatusRequest{})
 	suite.Require().NoError(err)
 
+	svcsStatus, err := dlClient.GetServicesStatus(suite.ctx, &data_lifecycle.GetServicesStatusRequest{})
+	suite.Require().NoError(err)
+
 	// Assert that they ran successfully
 	suite.assertStartedAfter(complianceStatus.Jobs, startTime)
 	suite.assertStartedAfter(eventFeedStatus.Jobs, startTime)
@@ -330,6 +389,7 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 			suite.assertStartedAfter([]*data_lifecycle.JobStatus{j}, startTime)
 		}
 	}
+	suite.assertStartedAfter(svcsStatus.Jobs, startTime)
 
 	// Reset the startTime and run them from the global endpoint
 	startTime = time.Now()
@@ -344,6 +404,7 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 
 	// Get all purge jobs and assert they ran after the start time
 	purgeJobs := append(status.Compliance.Jobs, status.EventFeed.Jobs...)
+	purgeJobs = append(purgeJobs, status.Services.Jobs...)
 	for _, j := range status.Infra.Jobs {
 		if j.Name == infraPurgeJobName {
 			purgeJobs = append(purgeJobs, j)
@@ -364,10 +425,15 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 	oldInfraConfigRequest := &data_lifecycle.SetInfraConfigRequest{
 		JobSettings: oldInfraSettings,
 	}
+	oldSvcsSettings := jobStatusesToJobSettings(oldStatus.GetServices().GetJobs())
+	oldSvcsConfigRequest := &data_lifecycle.SetServicesConfigRequest{
+		JobSettings: oldSvcsSettings,
+	}
 	_, err = dlClient.SetConfig(suite.ctx, &data_lifecycle.SetConfigRequest{
 		Compliance: oldComplianceConfigRequest,
 		EventFeed:  oldEventFeedConfigRequest,
 		Infra:      oldInfraConfigRequest,
+		Services:   oldSvcsConfigRequest,
 	})
 	suite.Require().NoError(err)
 }

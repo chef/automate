@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	apps "github.com/chef/automate/api/external/applications"
 	api "github.com/chef/automate/api/external/data_lifecycle"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/ingest"
@@ -16,13 +17,16 @@ import (
 func NewServer(ingestJobClient ingest.JobSchedulerClient,
 	ingestPurgeClient data_lifecycle.PurgeClient,
 	compliancePurgeClient data_lifecycle.PurgeClient,
-	eventFeedPurgeClient data_lifecycle.PurgeClient) *Server {
+	eventFeedPurgeClient data_lifecycle.PurgeClient,
+	appsClient apps.ApplicationsServiceClient,
+) *Server {
 
 	return &Server{
 		ingestJobClient:       ingestJobClient,
 		ingestPurgeClient:     ingestPurgeClient,
 		compliancePurgeClient: compliancePurgeClient,
 		eventFeedPurgeClient:  eventFeedPurgeClient,
+		appsClient:            appsClient,
 	}
 }
 
@@ -32,6 +36,7 @@ type Server struct {
 	ingestPurgeClient     data_lifecycle.PurgeClient
 	compliancePurgeClient data_lifecycle.PurgeClient
 	eventFeedPurgeClient  data_lifecycle.PurgeClient
+	appsClient            apps.ApplicationsServiceClient
 }
 
 // NOTE: services is currently unimplemented as the API's are not stable
@@ -53,6 +58,11 @@ func (s *Server) GetStatus(ctx context.Context, req *api.GetStatusRequest) (*api
 	}
 
 	res.EventFeed, err = s.GetEventFeedStatus(ctx, &api.GetEventFeedStatusRequest{})
+	if err != nil {
+		return res, err
+	}
+
+	res.Services, err = s.GetServicesStatus(ctx, &api.GetServicesStatusRequest{})
 	if err != nil {
 		return res, err
 	}
@@ -86,6 +96,13 @@ func (s *Server) SetConfig(ctx context.Context, req *api.SetConfigRequest) (*api
 		}
 	}
 
+	if svcs := req.GetServices(); svcs != nil {
+		_, err = s.SetServicesConfig(ctx, svcs)
+		if err != nil {
+			return res, err
+		}
+	}
+
 	return res, nil
 }
 
@@ -105,6 +122,11 @@ func (s *Server) Run(ctx context.Context, req *api.RunRequest) (*api.RunResponse
 	}
 
 	_, err = s.RunEventFeed(ctx, &api.RunEventFeedRequest{})
+	if err != nil {
+		return res, err
+	}
+
+	_, err = s.RunServices(ctx, &api.RunServicesRequest{})
 	if err != nil {
 		return res, err
 	}

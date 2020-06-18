@@ -70,12 +70,17 @@ func init() {
 				switch want {
 				case "threshold":
 					return m.Threshold
+				case "recurrence":
+					return m.Recurrence
 				default:
 					return ""
 				}
 			})
 		}
 		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/RunDisconnectedServicesJob", "retention:serviceGroups", "retention:serviceGroups:update", "POST", "/api/v0/retention/service_groups/disconnected_services/run", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
 	})
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDeleteDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:get", "GET", "/api/v0/retention/service_groups/delete_disconnected_services/config", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
@@ -86,11 +91,16 @@ func init() {
 				switch want {
 				case "threshold":
 					return m.Threshold
+				case "recurrence":
+					return m.Recurrence
 				default:
 					return ""
 				}
 			})
 		}
 		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/RunDeleteDisconnectedServicesJob", "retention:serviceGroups", "retention:serviceGroups:update", "POST", "/api/v0/retention/service_groups/delete_disconnected_services/run", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
 	})
 }

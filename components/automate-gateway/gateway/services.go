@@ -312,6 +312,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		ingestPurgeClient,
 		compliancePurgeClient,
 		eventFeedPurgeClient,
+		applicationsClient,
 	)
 	pb_data_lifecycle.RegisterDataLifecycleServer(grpcServer, dataLifecycleServer)
 
