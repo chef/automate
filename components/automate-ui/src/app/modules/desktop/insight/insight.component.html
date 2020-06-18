@@ -93,7 +93,21 @@
     </div>
   </div>
 
-  <h4>Total: {{totalDesktops}}</h4>
+  <div class="node-list-options">
+    <h4>Total: {{totalDesktops}}</h4>
+    <div class="download-nodes">
+      <chef-button secondary (click)="toggleDownloadDropdown()" class='download-nodes-toggle'>
+        <span>Download</span>
+        <chef-icon>expand_more</chef-icon>
+      </chef-button>
+        <chef-dropdown class='download' [visible]="downloadOptsVisible">
+          <chef-click-outside omit="download-nodes-toggle" (clickOutside)="hideDownloadDropdown()">
+            <chef-button tertiary (click)="onDownloadOptPressed('json')">JSON</chef-button>
+            <chef-button tertiary (click)="onDownloadOptPressed('csv')">CSV</chef-button>
+          </chef-click-outside>
+        </chef-dropdown>
+    </div>
+  </div>
   <chef-table>
     <chef-thead>
       <chef-tr>
