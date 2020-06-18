@@ -86,6 +86,122 @@ EOF
   )" chef.automate.api.infra_proxy.InfraProxy.CreateOrg >/dev/null
 }
 
+function infra_service_load_chef_repo() {
+  log_line "Started loading chef repo..."
+
+  if ! chef-server-ctl version 2> /dev/null | grep "Chef Automate Chef server" &> /dev/null; then
+    start_chef_server
+  fi
+
+  chef_server_hostname=${CONTAINER_HOSTNAME:-a2-dev.test}
+  chef_server_ip_address="127.0.0.1"
+  chef_server_pivotal_key_path="/hab/svc/automate-cs-oc-erchef/data/pivotal.pem"
+  chef_server_pivotal_rb_path="/tmp/.pivotal.rb"
+  chef_server_client_rb_path="/tmp/.client.rb"
+  chef_server_test_admin_key_path_path="/tmp/.admin_key.pem"
+  chef_server_berksfile_path="/tmp/.Berksfile"
+  chef_server_berksfile_config_path="/tmp/.berks.config.json"
+  chef_server_test_validator_path="/tmp/.tests_validator.pem"
+  chef_server_test_node_name="test-admin"
+  chef_server_test_admin_user_name="test-admin"
+  chef_server_test_admin_user_email="admin@test.com"
+  chef_server_test_admin_user_password="S3cur3!"
+  chef_server_test_org_name="test"
+  chef_repo_path="/src/dev-docs/adding-data/infra/chef-repo"
+  infra_service_server_id="local-dev"
+  infra_service_org_id="test-org"
+
+  set_up_chef_server_test_environment
+
+  # make sure we've deployed and can find a pivotal key to create our client
+  check_if_deployinate_started || return 1
+  if [ ! -f ${chef_server_pivotal_key_path} ]; then
+    error "Unable to locate chef server pivotal key"
+    return 1
+  fi
+
+  if ! hab pkg exec chef/chef-dk knife -v | grep "Chef Infra Client" &> /dev/null; then
+    hab pkg install chef/chef-dk
+  fi
+
+  # create our configuration files
+  cat << EOH > ${chef_server_pivotal_rb_path}
+log_location     STDOUT
+node_name        'pivotal'
+chef_server_url  'https://${chef_server_hostname}'
+chef_server_root 'https://${chef_server_hostname}'
+ssl_verify_mode  :verify_none
+client_key       '${chef_server_pivotal_key_path}'
+EOH
+
+  cat << EOH > ${chef_server_client_rb_path}
+log_location           STDOUT
+chef_server_url        'https://${chef_server_hostname}/organizations/${chef_server_test_org_name}'
+node_name              '${chef_server_test_node_name}'
+ssl_verify_mode        :verify_none
+client_key             '${chef_server_test_admin_key_path_path}'
+validation_client_name 'test-validator'
+validation_key         '${chef_server_test_validator_path}'
+EOH
+
+  cat << EOH > ${chef_server_berksfile_config_path}
+{
+  "chef": {
+    "chef_server_url": "https://${chef_server_hostname}/organizations/${chef_server_test_org_name}",
+    "node_name":       "${chef_server_test_node_name}",
+    "client_key":      "${chef_server_test_admin_key_path_path}"
+  },
+  "ssl": {
+    "verify": false
+  }
+}
+EOH
+
+  cat << EOH > ${chef_server_berksfile_path}
+source "https://supermarket.chef.io"
+
+cookbook "audit"
+EOH
+
+  if ! hab pkg exec chef/chef-dk knife opc user list -c ${chef_server_pivotal_rb_path} | grep ${chef_server_test_node_name} &> /dev/null; then
+    knife opc user create ${chef_server_test_admin_user_name} \
+      ${chef_server_test_admin_user_name} \
+      ${chef_server_test_admin_user_name} \
+      ${chef_server_test_admin_user_email} \
+      ${chef_server_test_admin_user_password} \
+        -c ${chef_server_pivotal_rb_path} \
+        -d \
+        -f ${chef_server_test_admin_key_path_path}
+  fi
+
+  if ! hab pkg exec chef/chef-dk knife opc org list -c ${chef_server_pivotal_rb_path} | grep ${chef_server_test_org_name} &> /dev/null; then
+    hab pkg exec chef/chef-dk knife opc org create ${chef_server_test_org_name} ${chef_server_test_org_name} \
+      -a ${chef_server_test_node_name} \
+      -c ${chef_server_pivotal_rb_path} \
+      -d \
+      -f ${chef_server_test_validator_path}
+  fi
+
+  hab pkg exec chef/chef-dk knife opc org user add ${chef_server_test_org_name} ${chef_server_test_admin_user_name} \
+    -a \
+    -c ${chef_server_pivotal_rb_path} &> /dev/null
+
+  chef_server_admin_key="$(<${chef_server_test_admin_key_path_path} tr '\n' ':' | sed 's/:/\\n/g')"
+  infra_service_create_servers_orgs "${infra_service_server_id}" \
+    "${infra_service_server_id}" \
+    "${chef_server_ip_address}" \
+    "${chef_server_hostname}" \
+    "${infra_service_org_id}" \
+    "${chef_server_test_org_name}" \
+    "${chef_server_test_node_name}" \
+    "${chef_server_admin_key}" &> /dev/null
+
+  hab pkg exec chef/chef-dk knife upload / --chef-repo-path ${chef_repo_path} -c ${chef_server_client_rb_path}
+  hab pkg exec chef/chef-dk berks install -b ${chef_server_berksfile_path} -c ${chef_server_berksfile_config_path}
+  hab pkg exec chef/chef-dk berks upload -b ${chef_server_berksfile_path} -c ${chef_server_berksfile_config_path}
+  log_line "Finished uploading..."
+}
+
 document "infra_service_psql" <<DOC
    Enter psql with the infra proxy service database
 DOC

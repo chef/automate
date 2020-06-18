@@ -1,0 +1,25 @@
+{
+  "name": "dev",
+  "description": "Chef environment dev example",
+  "cookbook_versions": {
+    "audit": "= 9.4.0"
+  },
+  "default_attributes": {
+    "apache2": {
+      "listen_ports": [
+        "80",
+        "443"
+      ]
+    }
+  },
+  "override_attributes": {
+    "apache2": {
+      "prefork": { "min_spareservers": "5" }
+    },
+    "tomcat": {
+      "worker_threads": "100"
+    }
+  },
+  "json_class": "Chef::Environment",
+  "chef_type": "environment"
+}

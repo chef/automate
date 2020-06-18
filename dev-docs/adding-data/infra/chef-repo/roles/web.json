@@ -1,0 +1,22 @@
+{
+  "name": "web",
+  "description": "Web server role.",
+  "json_class": "Chef::Role",
+  "chef_type": "role",
+  "default_attributes": {
+    "chef_client": {
+      "interval": 300,
+      "splay": 60
+    }
+  },
+  "override_attributes": {
+
+  },
+  "run_list": [
+    "role[starter]",
+    "recipe[chef-client::default]"
+  ],
+  "env_run_lists": {
+
+  }
+}
