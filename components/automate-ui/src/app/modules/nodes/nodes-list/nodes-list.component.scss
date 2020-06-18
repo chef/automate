@@ -31,8 +31,6 @@ chef-icon.SKIPPED {
 
 .run-info-tooltip {
   border-left: $spacing-03 solid;
-  border-right: $spacing-03 solid transparent;
-  padding-right: $spacing-03;
 
   &.FAILED {
     border-left-color: $status-error;
