@@ -15,6 +15,7 @@ func NewConfigRequest() *ConfigRequest {
 				Service: &ConfigRequest_V1_System_Service{},
 				Log:     &ConfigRequest_V1_System_Log{},
 			},
+			Svc: &ConfigRequest_V1_Service{},
 		},
 	}
 }

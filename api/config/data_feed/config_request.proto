@@ -11,10 +11,13 @@ import "google/protobuf/wrappers.proto";
 message ConfigRequest {
 	option (chef.automate.api.service_config) = {name: "data-feed-service"};
 
-	V1 v1 = 1;
+    reserved 1 to 2;
+
+	V1 v1 = 3;
 
 	message V1 {
 		System sys = 1;
+        Service svc = 2;
 
 		message System {
 			chef.automate.infra.config.Mlsa mlsa = 1;
