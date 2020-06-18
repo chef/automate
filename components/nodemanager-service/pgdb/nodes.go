@@ -38,6 +38,21 @@ from nodes n
 %s;
 `
 
+const sqlGetNodeTagKeys = `
+SELECT DISTINCT tags.key from tags 
+WHERE tags.id IN (select nodes_tags.tag_id from nodes_tags 
+WHERE nodes_tags.node_id IN (select id from nodes n %s %s));
+`
+
+const sqlGetNodeTagValues = `
+SELECT DISTINCT tags.value from tags 
+WHERE tags.id IN (select nodes_tags.tag_id from nodes_tags 
+WHERE nodes_tags.node_id IN (select id from nodes n %s %s))
+AND tags.key='%s';
+`
+
+// WHERE tags.id IN (select nodes_tags.tag_id from nodes_tags
+// WHERE nodes_tags.node_id IN (select id from nodes n %s %s));
 const selectSecretIdsFromNodes = `
 SELECT secret_id
 FROM nodes_secrets
@@ -1115,6 +1130,13 @@ func (db *DB) GetNodeSuggestions(ctx context.Context, field string, filters []*c
 	if err != nil {
 		return sugg, err
 	}
+	if field == "tags" {
+		return db.getNodeTagKeySuggestions(ctx, field, whereFilter, havingFilter)
+	}
+
+	if strings.HasPrefix(field, "tags:") {
+		return db.getTagValueSuggestions(ctx, field, whereFilter, havingFilter)
+	}
 
 	var noEmptyStringFilter string
 	if whereFilter != "" || havingFilter != "" {
@@ -1126,6 +1148,33 @@ func (db *DB) GetNodeSuggestions(ctx context.Context, field string, filters []*c
 
 	logrus.Debugf("SQL: %s", query)
 	_, err = db.Select(&sugg, query)
+	if err != nil {
+		return sugg, err
+	}
+	return sugg, nil
+}
+
+func (db *DB) getNodeTagKeySuggestions(ctx context.Context, field string, whereFilter string, havingFilter string) ([]string, error) {
+	sugg := []string{}
+
+	query := fmt.Sprintf(sqlGetNodeTagKeys, whereFilter, havingFilter)
+
+	logrus.Debugf("SQL: %s", query)
+	_, err := db.Select(&sugg, query)
+	if err != nil {
+		return sugg, err
+	}
+	return sugg, nil
+}
+
+func (db *DB) getTagValueSuggestions(ctx context.Context, field string, whereFilter string, havingFilter string) ([]string, error) {
+	sugg := []string{}
+	tagKeyReq := strings.SplitAfterN(field, ":", 2)
+
+	query := fmt.Sprintf(sqlGetNodeTagValues, whereFilter, havingFilter, tagKeyReq[1])
+
+	logrus.Debugf("SQL: %s", query)
+	_, err := db.Select(&sugg, query)
 	if err != nil {
 		return sugg, err
 	}

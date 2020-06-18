@@ -789,3 +789,63 @@ func (suite *NodesIntegrationSuite) TestGetNodeSuggestionsWithFilters() {
 	suite.Require().NoError(err)
 	suite.Equal([]string{"STOPPED"}, sugg)
 }
+
+func (suite *NodesIntegrationSuite) TestGetTagKeySuggestionsForNodes() {
+	ctx := context.Background()
+	// add nodes
+	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Platform: "debian", Tags: []*common.Kv{{Key: "test", Value: "one"}, {Key: "test2", Value: "two"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Tostada Node", Manager: "aws-ec2", Platform: "ubuntu", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "aws-ec2", Platform: "ubuntu", Tags: []*common.Kv{{Key: "test", Value: "one"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Toasted Node", Manager: "automate", Platform: "debian", Tags: []*common.Kv{{Key: "env", Value: "dev"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	// get suggestions
+	sugg, err := suite.Database.GetNodeSuggestions(ctx, "tags", []*common.Filter{})
+	suite.Require().NoError(err)
+	sort.Strings(sugg)
+	suite.Equal([]string{"env", "test", "test2"}, sugg)
+
+	// get suggestions with filters
+	sugg, err = suite.Database.GetNodeSuggestions(ctx, "tags", []*common.Filter{
+		{Key: "manager_type", Values: []string{"aws-ec2"}},
+	})
+	suite.Require().NoError(err)
+	sort.Strings(sugg)
+	suite.Equal([]string{"test"}, sugg)
+}
+
+func (suite *NodesIntegrationSuite) TestGetTagValueSuggestionsForNodes() {
+	ctx := context.Background()
+	// add nodes
+	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Platform: "debian", Tags: []*common.Kv{{Key: "test", Value: "one"}, {Key: "test2", Value: "two"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Tostada Node", Manager: "aws-ec2", Platform: "ubuntu", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "aws-ec2", Platform: "ubuntu", Tags: []*common.Kv{{Key: "test", Value: "five"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Toasted Node", Manager: "automate", Platform: "debian", Tags: []*common.Kv{{Key: "env", Value: "dev"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	// get suggestions
+	sugg, err := suite.Database.GetNodeSuggestions(ctx, "tags:test", []*common.Filter{})
+	suite.Require().NoError(err)
+	sort.Strings(sugg)
+	suite.Equal([]string{"five", "one"}, sugg)
+
+	// get suggestions with filters
+	sugg, err = suite.Database.GetNodeSuggestions(ctx, "tags:test", []*common.Filter{
+		{Key: "manager_type", Values: []string{"aws-ec2"}},
+	})
+	suite.Require().NoError(err)
+	sort.Strings(sugg)
+	suite.Equal([]string{"five"}, sugg)
+}
