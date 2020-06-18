@@ -58,6 +58,12 @@
 
   .chart-list-item-label-cell {
     flex-basis: 55%;
+
+    div {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
   }
 
   .chart-list-item-count-cell {
