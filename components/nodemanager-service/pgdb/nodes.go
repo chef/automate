@@ -665,7 +665,7 @@ func validateNodeFilters(filters []*common.Filter) error {
 		case "state":
 			for _, item := range filter.Values {
 				if !isValidState(item) {
-					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid state filter: %s. state must be one of the following: 'RUNNING', 'STOPPED', 'TERMINATED'", item)}
+					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid state filter: %s. state must be one of the following: 'RUNNING', 'STOPPED', 'TERMINATED', 'MISSING'", item)}
 				}
 			}
 		case "statechange_timerange":
@@ -711,7 +711,7 @@ func isValidState(item string) bool {
 		return true // this covers the empty string case
 	}
 	switch item {
-	case "STOPPED", "RUNNING", "TERMINATED":
+	case "STOPPED", "RUNNING", "TERMINATED", "MISSING":
 		return true
 	default:
 		return false

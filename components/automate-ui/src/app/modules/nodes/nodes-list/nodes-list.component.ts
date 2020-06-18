@@ -21,9 +21,10 @@ export class NodesListComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>
   ) { }
 
+  public DateTime = DateTime;
   nodesList;
-  nodesListSort;
-  nodesListSortOrder;
+  nodesListSort = 'last_contact';
+  nodesListSortOrder = 'DESC';
   nodesListFilters = [];
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -79,7 +80,17 @@ export class NodesListComponent implements OnInit, OnDestroy {
   }
 
   filterFor(type: string, item: string): void {
-    this.nodesListFilters.push({key: type, values: [item]});
+    if (type === 'last_contact') {
+      // for a last contact filter, we send in two dates - beg of day and end of day
+      this.nodesListFilters.push({key: type,
+        values: [
+          moment(item).startOf('day').toISOString(),
+          moment(item).endOf('day').toISOString()
+        ]
+      });
+    } else {
+      this.nodesListFilters.push({key: type, values: [item]});
+    }
     const params = {
       page: 1, per_page: 100,
       sort: this.nodesListSort, order: this.nodesListSortOrder,
@@ -92,9 +103,9 @@ export class NodesListComponent implements OnInit, OnDestroy {
     this.nodesListFilters.forEach((filter) => {
       filter.values.forEach((val) => {
         if (filter.exclude) {
-        filters.push(filter.key + ':' + val + ':negated=true');
+        filters.push(filter.key + '::' + val + '::negated=true');
         } else {
-          filters.push(filter.key + ':' + val + ':negated=false');
+          filters.push(filter.key + '::' + val + '::negated=false');
         }
       });
     });
@@ -105,7 +116,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
   }
 
   isMatchingFilter(stringFilter: string): {filter: {key, values}} {
-    const arr = stringFilter.split(':');
+    const arr = stringFilter.split('::');
     for (let i = 0 ; i < this.nodesListFilters.length; i++) {
       if (this.nodesListFilters[i].key === arr[0]) {
         for (let j = 0 ; j < this.nodesListFilters[i].values.length; j++) {
