@@ -12,6 +12,7 @@ node_batch_size = {{cfg.service.node_batch_size}}
 updated_nodes_only = {{cfg.service.updated_nodes_only}}
 disable_cidr_filter = {{cfg.service.disable_cidr_filter}}
 cidr_filter = "{{cfg.service.cidr_filter}}"
+external_fqdn = "https://{{cfg.service.external_fqdn}}"
 
 [postgres]
 database = "{{cfg.storage.database}}"

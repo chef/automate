@@ -11,10 +11,13 @@ import "google/protobuf/wrappers.proto";
 message ConfigRequest {
 	option (chef.automate.api.service_config) = {name: "data-feed-service"};
 
-	V1 v1 = 1;
+    reserved 1 to 2;
+
+	V1 v1 = 3;
 
 	message V1 {
 		System sys = 1;
+        Service svc = 2;
 
 		message System {
 			chef.automate.infra.config.Mlsa mlsa = 1;
@@ -25,6 +28,14 @@ message ConfigRequest {
 			message Service {
 				google.protobuf.StringValue host = 1;
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 14001, protocol: "grpc" } ];
+				google.protobuf.StringValue feed_interval = 3;
+                google.protobuf.Int32Value asset_page_size = 4;
+                google.protobuf.Int32Value reports_page_size = 5;
+                google.protobuf.Int32Value node_batch_size = 6;
+                google.protobuf.BoolValue update_nodes_only = 7;
+				google.protobuf.BoolValue disable_cidr_filter = 8;
+				google.protobuf.StringValue cidr_filter = 9;
+				google.protobuf.StringValue external_fqdn = 10;
 			}
 
 			message Log {
@@ -34,5 +45,8 @@ message ConfigRequest {
 
 		}
 
+	    message Service {
+
+		}
 	}
 }

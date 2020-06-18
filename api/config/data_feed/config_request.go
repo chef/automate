@@ -15,6 +15,7 @@ func NewConfigRequest() *ConfigRequest {
 				Service: &ConfigRequest_V1_System_Service{},
 				Log:     &ConfigRequest_V1_System_Log{},
 			},
+			Svc: &ConfigRequest_V1_Service{},
 		},
 	}
 }
@@ -24,6 +25,13 @@ func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 	c.V1.Sys.Service.Host = w.String("0.0.0.0")
 	c.V1.Sys.Service.Port = w.Int32(14001)
+	c.V1.Sys.Service.FeedInterval = w.String("4h")
+	c.V1.Sys.Service.AssetPageSize = w.Int32(100)
+	c.V1.Sys.Service.ReportsPageSize = w.Int32(1000)
+	c.V1.Sys.Service.NodeBatchSize = w.Int32(50)
+	c.V1.Sys.Service.UpdateNodesOnly = w.Bool(true)
+	c.V1.Sys.Service.DisableCidrFilter = w.Bool(true)
+	c.V1.Sys.Service.CidrFilter = w.String("0.0.0.0/0")
 	c.V1.Sys.Log.Level = w.String("info")
 	c.V1.Sys.Log.Format = w.String("text")
 	return c
@@ -48,6 +56,10 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *config.TLSCredentials) (confi
 // SetGlobalConfig imports settings from the global configuration
 func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	c.V1.Sys.Mlsa = g.V1.Mlsa
+
+	if g.GetV1().Fqdn != nil {
+		c.V1.Sys.Service.ExternalFqdn = g.GetV1().Fqdn
+	}
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
 		c.V1.Sys.Log.Level.Value = logLevel
