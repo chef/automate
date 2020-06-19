@@ -15,6 +15,11 @@ export interface RuleInterface {
   targetType: ServiceActionType;
 }
 
+export interface TargetInterface {
+  url: string;
+  secret_id?: string;
+  critical_controls_only?: boolean;
+}
 
 export class NotificationRule implements RuleInterface {
 
@@ -78,12 +83,12 @@ export class NotificationRule implements RuleInterface {
   }
 
   public toRequest(): Object {
-    let target: any = {'url': this.targetUrl};
+    let target: TargetInterface = { url: this.targetUrl };
     if (this.targetSecretId !== undefined && this.targetSecretId !== '' ) {
       target = {
-        'url': this.targetUrl,
-        'secret_id': this.targetSecretId,
-        'critical_controls_only': this.criticalControlsOnly
+        url: this.targetUrl,
+        secret_id: this.targetSecretId,
+        critical_controls_only: this.criticalControlsOnly
       };
     }
 

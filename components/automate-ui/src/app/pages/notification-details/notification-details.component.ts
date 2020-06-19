@@ -155,10 +155,6 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  public urlPresent() {
-    return this.updateForm.controls.targetUrl.value !== '' ? true : false;
-  }
-
   public get nameCtrl(): FormControl {
     return <FormControl>this.updateForm.controls.name;
   }

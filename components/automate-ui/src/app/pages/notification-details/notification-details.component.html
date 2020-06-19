@@ -86,7 +86,7 @@
           </chef-form-field>
         </form>
         <div>
-          <chef-button secondary [disabled]="testInProgress || !urlPresent()" (click)="sendTestForTargetUrl()">
+          <chef-button secondary [disabled]="testInProgress || urlCtrl.hasError('required')" (click)="sendTestForTargetUrl()">
             <chef-loading-spinner *ngIf="testInProgress"></chef-loading-spinner>
             <span *ngIf="testInProgress">Testing...</span>
             <span *ngIf="!testInProgress">Test Data Feed</span>
