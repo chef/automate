@@ -28,7 +28,7 @@ interface Secret {
 }
 
 export interface RuleResponse {
-  rule: object;
+  rule: NotificationRule;
 }
 
 export interface NotificationRulesResponse {
