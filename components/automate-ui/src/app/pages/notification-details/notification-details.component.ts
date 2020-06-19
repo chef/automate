@@ -50,6 +50,8 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
   public saveSuccessful = false;
   public hookStatus = UrlTestState.Inactive;
   public notificationDetailsLoading = true;
+  public targetKeys: string[];
+  public alertTypeKeys: string[];
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -105,6 +107,8 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.layoutFacade.showSidebar(Sidebar.Settings);
+    this.targetKeys = this.notification.getTargetTypeKeys();
+    this.alertTypeKeys = this.notification.getAlertTypeKeys(); 
   }
 
   public saveNotification(): void {
@@ -124,14 +128,6 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
     const targetSecretID: string = this.notification.targetSecretId;
     this.store.dispatch(new TestNotification({ name, targetUrl, targetSecretID}));
     this.testInProgress = false;
-  }
-
-  public getAlertTypeKeys() {
-    return this.notification.getAlertTypeKeys();
-  }
-
-  public getTargetTypeKeys() {
-    return this.notification.getTargetTypeKeys();
   }
 
   public changeSelectionForWebhookType(event: { target: { value: ServiceActionType } }) {
