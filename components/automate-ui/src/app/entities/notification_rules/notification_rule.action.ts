@@ -52,9 +52,7 @@ export class GetNotificationFailure implements Action {
 
 export class UpdateNotification implements Action {
   readonly type = NotificationRuleActionTypes.UPDATE;
-  constructor(public payload: {
-    notification: NotificationRule, username: string, password: string
-  }) { }
+  constructor(public payload: { notification: NotificationRule }) { }
 }
 
 export class UpdateNotificationSuccess implements Action {

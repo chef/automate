@@ -54,11 +54,10 @@ export class NotificationRuleRequests {
       map((rulesJson: RuleResponse) => NotificationRule.fromResponse(rulesJson.rule)));
   }
 
-  public updateNotificationRule(rule: NotificationRule, targetUsername: string,
-    targetPassword: string): Observable<RuleResponse> {
-    return this.updateSecret(rule, targetUsername, targetPassword)
-      .pipe(mergeMap((secreteId: string) => {
-        rule.targetSecretId = secreteId;
+  public updateNotificationRule(rule: NotificationRule): Observable<RuleResponse> {
+    return this.updateSecret(rule, '', '')
+      .pipe(mergeMap((secretId: string) => {
+        rule.targetSecretId = secretId;
         const response: any = rule.toRequest();
         // special case for authz handling - id needs to be in top level of request params
         response.id = rule.id;
@@ -74,8 +73,8 @@ export class NotificationRuleRequests {
       const secret = this.newSecret(rule.targetSecretId, rule.name, targetUsername, targetPassword);
 
       if (rule.targetSecretId.length > 0) {
-        return this.http.patch<any>(`${SECRETS_URL}/id/${rule.targetSecretId}`, secret).pipe(
-          map(_d => rule.targetSecretId));
+        return this.http.patch<{}>(`${SECRETS_URL}/id/${rule.targetSecretId}`, secret).pipe(
+          map(() => rule.targetSecretId));
       } else {
         return this.http.post<SecretId>(`${SECRETS_URL}`, secret).pipe(
           map(secretId => secretId.id));

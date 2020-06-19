@@ -72,8 +72,8 @@ export class NotificationRuleEffects {
   @Effect()
   updateNotification$ = this.actions$.pipe(
     ofType(NotificationRuleActionTypes.UPDATE),
-    mergeMap(({ payload: { notification, username, password } }: UpdateNotification) =>
-      this.requests.updateNotificationRule(notification, username, password).pipe(
+    mergeMap(({ payload: { notification } }: UpdateNotification) =>
+      this.requests.updateNotificationRule(notification).pipe(
         map(() => new UpdateNotificationSuccess(notification)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new UpdateNotificationFailure(error)))

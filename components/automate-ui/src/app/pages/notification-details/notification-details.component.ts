@@ -49,8 +49,8 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
   public testInProgress = false;
   public saveSuccessful = false;
   public hookStatus = UrlTestState.Inactive;
+  public notificationDetailsLoading = true;
   private isDestroyed = new Subject<boolean>();
-  notificationDetailsLoading = true;
 
   constructor(
     private fb: FormBuilder,
@@ -59,7 +59,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
   ) {
 
     this.updateForm = this.fb.group({
-      // Must stay in sync with error checks in data-feed-details.component.html
+      // Must stay in sync with error checks in notification-details.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       // Note that URL here may be FQDN -or- IP!
       targetUrl: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
@@ -92,8 +92,8 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
 
     this.store.pipe(
       select(updateStatus),
-      takeUntil(this.isDestroyed),
-      filter(state => this.saveInProgress && !pending(state)))
+      filter(state => this.saveInProgress && !pending(state),
+      takeUntil(this.isDestroyed)))
       .subscribe((state) => {
         this.saveInProgress = false;
         this.saveSuccessful = (state === EntityStatus.loadingSuccess);
@@ -113,7 +113,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
     this.notification.name = this.updateForm.controls['name'].value.trim();
     this.notification.targetUrl = this.updateForm.controls['targetUrl'].value.trim();
     this.store.dispatch(new UpdateNotification({
-      notification: this.notification, username: '', password: ''
+      notification: this.notification
     }));
   }
 
@@ -130,7 +130,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
     return this.notification.getAlertTypeKeys();
   }
 
-  public getTagetTypeKeys() {
+  public getTargetTypeKeys() {
     return this.notification.getTargetTypeKeys();
   }
 
@@ -144,14 +144,14 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
 
   public displayCriticalControlsCheckbox() {
     return this.notification.targetType === ServiceActionType.SERVICENOW &&
-    this.notification.ruleType === 'ComplianceFailure';
+      this.notification.ruleType === 'ComplianceFailure';
   }
 
   public setFailureType(event: { target: { value: RuleType } }) {
     this.notification.ruleType = event.target.value;
     if (this.notification.ruleType !== 'ComplianceFailure' &&
-    this.notification.targetType === ServiceActionType.SERVICENOW) {
-      this.notification.criticalControlsOnly = false;
+      this.notification.targetType === ServiceActionType.SERVICENOW) {
+        this.notification.criticalControlsOnly = false;
     }
   }
 

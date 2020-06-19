@@ -42,12 +42,12 @@
           </chef-form-field>
           <chef-form-field>
             <label>
-              <span class="label">Webhook type<span aria-hidden="true">*</span></span>
+              <span class="label">Webhook type <span aria-hidden="true">*</span></span>
               <chef-select
                 (change)="changeSelectionForWebhookType($event)"
                 class="notification-select-menu"
                 [value]="notification.targetType">
-                <chef-option *ngFor="let key of getTagetTypeKeys()" [value]="key">
+                <chef-option *ngFor="let key of getTargetTypeKeys()" [value]="key">
                   <img src="assets/img/logo-{{key}}.png" alt="{{key}} logo" />
                   {{ notification.TargetTypeLabels[key] }}
                 </chef-option>
