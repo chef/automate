@@ -76,6 +76,7 @@ func InitDB(connectionString string) (*DB, error) {
 		return nil, errors.Wrapf(err, "Failed to open database with uri: %s", connectionString)
 	}
 
+	sql.SetMaxIdleConns(5)
 	// Check if the database exists
 	err = sql.Ping()
 	if err != nil {
