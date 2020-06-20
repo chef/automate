@@ -101,7 +101,7 @@ func (s *ChefIngestServer) ProcessChefAction(ctx context.Context, action *chef.A
 		defer close(errc)
 
 		var err error
-		if errQ := s.chefActionPipeline.Run(ctx, action, errc); err != nil {
+		if errQ := s.chefActionPipeline.Run(ctx, action, errc); errQ != nil {
 			err = errQ
 		} else {
 			err = <-errc
