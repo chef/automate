@@ -5,25 +5,44 @@
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Cookbooks</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Cookbooks
+        </chef-breadcrumb>
         {{ cookbookName }}
       </chef-breadcrumbs>
       <chef-page-header>
         <chef-heading>{{ cookbookName }}</chef-heading>
         <div class="version-dropdown">
           <label for="version">Version</label>
-          <chef-select id="version" *ngIf="cookbook"
-            (change)="handleCookbookVersionChange($event)">
+          <chef-select id="version" *ngIf="cookbook" (change)="handleCookbookVersionChange($event)">
             <chef-option *ngFor="let version of cookbook.versions" [value]="version">{{ version }}</chef-option>
           </chef-select>
         </div>
-        <chef-tab-selector [value]="tabValue">
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='details' data-cy="details-tab">Details</chef-option>
+          <chef-option value='content' data-cy="content-tab">Content</chef-option>
         </chef-tab-selector>
       </chef-page-header>
-      <section class="page-body">
+      <section class="page-body" *ngIf="tabValue === 'details'">
         <chef-loading-spinner *ngIf="cookbookDetailsLoading" size="50"></chef-loading-spinner>
         <chef-markdown *ngIf="readFileContent" [text]="readFileContent.content"></chef-markdown>
+      </section>
+      <section class="page-body" *ngIf="tabValue === 'content'">
+        <div class="details-row">
+          <div class="item-column">
+            <ul class="list">
+              <li *ngFor="let item of accordian; let i = index;">
+                <span (click)="clickEvent($event)" [ngClass]="{'extend-list': i === 0}">
+                  {{ item.menu | titlecase  }}
+                </span>
+                <ul class="sub-list" [ngClass]="{'show': i === 0}">
+                  <li *ngFor="let content of item.submenu; let j = index;" [ngClass]="{'active-sub-list': j === 0}">{{ content.name }}</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="item-details-column">
+          </div>
+        </div>
       </section>
     </main>
   </div>

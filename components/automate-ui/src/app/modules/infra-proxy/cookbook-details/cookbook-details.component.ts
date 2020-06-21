@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { Store } from '@ngrx/store';
 import { environment as env } from 'environments/environment';
 import { Subject, combineLatest } from 'rxjs';
 import { first, filter, takeUntil, pluck } from 'rxjs/operators';
@@ -40,9 +41,17 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
   public readFileContent;
   public cookbookDetailsLoading = false;
   public cookbookVersionsLoading = true;
+  public status = false;
+
+  // tslint:disable-next-line: max-line-length
+  public accordian = [ { menu: 'attribute', submenu: [{name: 'aix'}, {name: 'aix1'}, {name: 'aix2'}, {name: 'aix3'}, {name: 'aix4'}, {name: 'aix5'}, {name: 'aix6'}] },
+  // tslint:disable-next-line: max-line-length
+  { menu: 'Definations', submenu: [{name: 'aix'}, {name: 'aix1'}, {name: 'aix2'}, {name: 'aix3'}, {name: 'aix4'}, {name: 'aix5'}, {name: 'aix6'}] }];
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
+    private router: Router,
     private http: HttpClient
   ) { }
 
@@ -131,6 +140,21 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
       cookbook_name: this.cookbook.name,
       cookbook_version: event.target.value
     }));
+  }
+
+  clickEvent(event) {
+    if (event.target.classList.contains('extend-list')) {
+      event.target.classList.remove('extend-list');
+      event.target.parentNode.querySelector('ul').classList.remove('show');
+    } else {
+      event.target.classList.add('extend-list');
+      event.target.parentNode.querySelector('ul').classList.add('show');
+    }
+  }
+
+  onSelectedTab(event: { target: { value: CookbookDetailsTab } }) {
+    this.tabValue = event.target.value;
+    this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
   ngOnDestroy(): void {
