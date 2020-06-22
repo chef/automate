@@ -16,7 +16,7 @@ toc = true
 The Data Feed service is used to send node data to a 3rd party service. This can be useful when updating Configuration Management Databases, external Security Dashboards and ITSM platforms.
 The following types of information are sent:
  
- - Ohai data gathered from each node being managed, this includes HW, OS and installed program information, there is some variation depending on the OS being managed
+ - Ohai data gathered from each node being managed, this includes hardware, operating system and installed program information, there is some variation depending on the operating system being managed
  - Configuration information about each node being managed, this includes Chef Client Run status, Runlists, Cookbooks, Recipes being run against each node
  - Compliance information about each node that shows the compliance state, this includes passed and failed controls for each profile executed against that node
 
@@ -26,12 +26,13 @@ A Data Feed is not a Data Tap, it operates by doing the following:
 - If there are no destinations, aggregation will not occur.
 - The data is aggregated and sent in batches of 50 nodes at a time (also configurable)
 
-
 By default only Admins of Chef Automate may create and manage Data Feeds.
 
 ### Adding a Data Feed Endpoint
 
-To add an endpoint for a Data Feed in Chef Automate:
+A single instance of a Data Feed connects to one endpoint.
+
+To setup an individual endpoint for Data Feed in Chef Automate (currently feature flagged):
 
 ![Setup Data Feed Page](/images/docs/filled_form_create_data_feed.png)
 
@@ -60,12 +61,14 @@ To delete an Endpoint for a Data Feed in Chef Automate:
 
 ## Configuring Global Data Feed Behaviour
 
+**Currently these settings apply to all endpoints configured with Data Feed settings in Automate**
+
 On the Chef Automate CLI
 
 1. Navigate to /hab/svc/data-feed-service/config/config.toml
 1. To change the interval for the Data Feed collection update the config parameter for *feed_interval* which defaults to 4 hours
 1. To change the number of sets of node data sent in each individual batch to your end point update the config parameter for *node_batch_size* which defaults to 50 nodes
-1. To determine what data to include in each export use the update_nodes_only setting. By default, only data that has recently changed will be aggregated. With update_nodes_only set to false additional data is aggregated with each node that has recently changed, all the latest data is sent.
+1. To determine what data to include in each export use the updated_nodes_only setting. By default this is set to true, meaning only node data that has recently changed will be aggregated. With updated_nodes_only set to false all the latest data is sent for any nodes that have udpated since the last export.
 1. To reduce the IP address range for the node data being collected and processed, if for example you only wish to send production or test node traffic, update the config parameter for *disable_cidr_filter* to false **and** update the setting for *cidr_filter* to cover the IP address range required
 
 /hab/svc/data-feed-service/config/config.toml
@@ -86,11 +89,11 @@ To debug any issues with the Data Feed Service in Automate, update the following
 
     [log]
     log_format = "text"
-    log_level = "debug"
+    log_level = "info"
 
 ## Data Feed Output Syntax and Details
 
-The import consists of line separated JSON strings. Each line represents the data for one node. Each line is of the format:
+The exported data consists of line separated JSON strings. Each line represents the data for one node. Each line is of the format:
 
     {
     "attributes": {
@@ -111,6 +114,7 @@ The import consists of line separated JSON strings. Each line represents the dat
     "report": {...},
     "client_run": {...},
     "node: {
+     "automate_fqdn": "",
      "ip_address" : "",
      "mac_address": "",
      "description":"",
