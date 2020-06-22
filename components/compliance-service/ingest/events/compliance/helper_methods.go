@@ -82,9 +82,9 @@ func AddControlSummary(total *reportingTypes.NodeControlSummary, sum reportingTy
 func ReportComplianceStatus(summary *reportingTypes.NodeControlSummary) (status string) {
 	if summary.Failed.Total > 0 {
 		status = inspec.ResultStatusFailed
-	} else if summary.Total == summary.Skipped.Total {
+	} else if summary.Total == summary.Skipped.Total && summary.Total > 0 {
 		status = inspec.ResultStatusSkipped
-	} else if summary.Total == summary.Waived.Total {
+	} else if summary.Total == summary.Waived.Total && summary.Total > 0 {
 		status = inspec.ResultStatusWaived
 	} else {
 		status = inspec.ResultStatusPassed
