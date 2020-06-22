@@ -11,9 +11,21 @@
     top: 68px;
   }
 
+  &[hasUserNotifications] {
+    chef-side-panel {
+      max-height: calc(100% - 120px);
+    }
+  }
+
   &[hasNotifications] {
     chef-side-panel {
       top: 107px;
+    }
+  }
+
+  &[hasNotifications][hasUserNotifications] {
+    chef-side-panel {
+      max-height: calc(100% - 162px);
     }
   }
 }
