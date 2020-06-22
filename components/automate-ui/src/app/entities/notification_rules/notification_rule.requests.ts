@@ -6,7 +6,7 @@ import { identity } from 'lodash/fp';
 import { of as observableOf, Observable } from 'rxjs';
 
 import { environment } from 'environments/environment';
-import { NotificationRule } from './notification_rule.model';
+import { NotificationRule, NotificationTarget } from './notification_rule.model';
 
 const NOTIFIER_URL = environment.notifier_url;
 const SECRETS_URL = environment.secrets_url;
@@ -58,7 +58,7 @@ export class NotificationRuleRequests {
     return this.updateSecret(rule, '', '')
       .pipe(mergeMap((secretId: string) => {
         rule.targetSecretId = secretId;
-        const response: any = rule.toRequest();
+        const response: (NotificationTarget | NotificationRule) = rule.toRequest();
         // special case for authz handling - id needs to be in top level of request params
         response.id = rule.id;
 

@@ -16,7 +16,8 @@ export interface RuleInterface {
 }
 
 export interface NotificationTarget {
-  url: string;
+  id?: string;
+  url?: string;
   secret_id?: string;
   critical_controls_only?: boolean;
 }
