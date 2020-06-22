@@ -321,5 +321,18 @@ func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filter
 }
 
 func getHostAttributes(attributesJson map[string]interface{}) (string, string, string) {
-	return attributesJson["ipaddress"].(string), attributesJson["macaddress"].(string), attributesJson["hostname"].(string)
+	var ipAddress string
+	var macAddress string
+	var hostname string
+
+	if attributesJson["ipaddress"] != nil {
+		ipAddress = attributesJson["ipaddress"].(string)
+	}
+	if attributesJson["macaddress"] != nil {
+		macAddress = attributesJson["macaddress"].(string)
+	}
+	if attributesJson["hostname"] != nil {
+		hostname = attributesJson["hostname"].(string)
+	}
+	return ipAddress, macAddress, hostname
 }
