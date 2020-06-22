@@ -16,7 +16,6 @@ describe('SidebarComponent', () => {
   let fixture: ComponentFixture<SidebarComponent>;
   // let element: HTMLElement;
   let layoutFacade: LayoutFacadeService;
-  let featureFlags: FeatureFlagsService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -35,7 +34,6 @@ describe('SidebarComponent', () => {
     }).compileComponents();
     store = TestBed.inject(Store);
     layoutFacade = TestBed.inject(LayoutFacadeService);
-    featureFlags = TestBed.inject(FeatureFlagsService);
     spyOn(store, 'dispatch').and.callThrough();
   }));
 
@@ -45,7 +43,6 @@ describe('SidebarComponent', () => {
     // element = fixture.debugElement.nativeElement;
 
     // enable all feature flags, if any, for testing
-    featureFlags.setFeature('servicenow_cmdb', true);
 
     fixture.detectChanges();
   });
