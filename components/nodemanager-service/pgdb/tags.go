@@ -26,7 +26,7 @@ INSERT INTO nodes_tags(node_id, tag_id)
 			nodes_tags.tag_id=tid AND 
 			node_id=$1 
 		WHERE nodes_tags.node_id IS NULL
-	)
+	);
 `
 
 func (trans *DBTrans) addTags(tags []*common.Kv) ([]string, error) {
