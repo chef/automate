@@ -101,7 +101,11 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		runsThusFar := runners.MarkDisconnectedServicesExecutor.TotalRuns()
 		detectedJobRun := false
 		for i := 0; i <= 100; i++ {
-			if runners.MarkDisconnectedServicesExecutor.TotalRuns() > runsThusFar {
+			// Wait for the job to run twice. There is race condition potential with
+			// this test reconfiguring the job constantly and cereal concurrently
+			// starting tasks.
+			// We can be pretty sure things are good if the job runs twice.
+			if runners.MarkDisconnectedServicesExecutor.TotalRuns() > (runsThusFar + 1) {
 				detectedJobRun = true
 				break
 			}

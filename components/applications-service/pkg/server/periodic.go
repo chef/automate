@@ -172,8 +172,15 @@ func (j *JobScheduler) ResetParams() error {
 		return err
 	}
 
+	if err := j.EnableDisconnectedServicesJob(ctx); err != nil {
+		return err
+	}
+
 	deleteConf := defaultDeleteDisconnectedServicesJobConfig()
 	if err := j.UpdateDeleteDisconnectedServicesJobConfig(ctx, deleteConf); err != nil {
+		return err
+	}
+	if err := j.EnableDeleteDisconnectedServicesJob(ctx); err != nil {
 		return err
 	}
 
