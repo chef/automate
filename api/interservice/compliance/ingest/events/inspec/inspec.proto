@@ -40,6 +40,7 @@ message Profile {
 	string parent_profile = 34;
 	string status = 35;
 	string skip_message= 36;
+	string status_message = 37;
 }
 
 message Control {

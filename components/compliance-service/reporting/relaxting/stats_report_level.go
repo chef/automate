@@ -146,8 +146,8 @@ func (depth *ReportDepth) getStatsTopFailuresAggs(
 					Field("profiles.profile").
 					Size(size).
 					Order("failures", false).
-					SubAggregation("failures", elastic.NewFilterAggregation().
-						Filter(elastic.NewRangeQuery("profiles.controls_sums.failed.total").Gt(0))))
+					SubAggregation("failures",
+						elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.status", "failed"))))
 		default:
 			return aggs, &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid type '%s'", reportType)}
 		}

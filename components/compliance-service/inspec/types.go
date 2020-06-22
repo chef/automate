@@ -141,6 +141,7 @@ type Profile struct {
 	Groups         []*reportingapi.Group      `json:"groups"`
 	Status         string                     `json:"status,omitempty"`
 	SkipMessage    string                     `json:"skip_message,omitempty"`
+	StatusMessage  string                     `json:"status_message,omitempty"`
 }
 
 // ToJSON is a simple helper convert Metadata into a json string

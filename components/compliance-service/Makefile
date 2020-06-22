@@ -62,21 +62,22 @@ yellow=`tput setaf 3`
 blue=`tput setaf 6`
 reset=`tput sgr0`
 
-clean-deps:
-	rm -rf ../../vendor
-
 ## BUILD ##
 build: build-linux build-windows build-mac
+	@printf "\n===> ${blue}Building all packages...${reset}\n"
 
 build-linux:
 	# to ensure this build works in alpine
 	# https://stackoverflow.com/questions/36279253/go-compiled-binary-wont-run-in-an-alpine-docker-container-on-ubuntu-host
+	@printf "\n===> ${blue}Building linux package...${reset}\n"
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags netgo -ldflags $(LDFLAGS) -o dist/linux/compliance cmd/compliance-service/main.go
 
 build-windows:
+	@printf "\n===> ${blue}Building windows package...${reset}\n"
 	GOOS=windows GOARCH=amd64 go build -ldflags $(LDFLAGS) -o dist/win/compliance.exe cmd/compliance-service/main.go
 
 build-mac:
+	@printf "\n===> ${blue}Building mac package...${reset}\n"
 	GOOS=darwin GOARCH=amd64 go build -ldflags $(LDFLAGS) -o dist/mac/compliance cmd/compliance-service/main.go
 
 ## TOOLS ##
@@ -122,9 +123,9 @@ gateway-proto:
 	@printf "\n===> ${blue}Generating automate-gateway protos${reset}\n"
 	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component automate-gateway'
 
-
 wait-for-compliance-service:
-	@i=1; \
+	@printf "\n===> ${blue}Waiting for the compliance service to be ready...${reset}\n"; \
+	i=1; \
 	max_loops=30; \
 	printf "\n===> ${blue}Checking Compliance Service version to ensure it's ready to receive connections...${reset}\n"; \
 	$(RUN_GRPCURL_COMPLIANCE_VERSION); \
@@ -184,14 +185,16 @@ run-nodemanager:
 
 clean:
 	@printf "\n===> ${yellow}Clearing compliance and dependent services...${reset}\n"
-	@-pkill -f " run --port $(PORT)" || true
+	@# If we don't match he process with /(tmp|var) at the beginning, in pkill will fail itself and fail the make.
+	@pkill -x -f "/(tmp|var).+ run --port $(PORT) .*" || true
 	@cd ../nodemanager-service && make clean
 
 
 ## ELASTICSEARCH, POSTGRES, SSH NODE ##
 start-es-pg: start-pg create-es-data-dir
-	@data_dir="$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)"; \
-	if [ "$(A1_DATA)" == "true" ]; then \
+	@printf "\n===> ${blue}Running start-es-pg...${reset}\n"; \
+	data_dir="$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)"; \
+	if [ "$(A1_DATA)" = "true" ]; then \
 	  printf "\n===> ${yellow}Loading test a1 data into ElasticSearch${reset} ($$data_dir)...\n"; \
 	  tar -xzvf test_data/es-pg/es5-a1-data.tar.gz -C "$$data_dir"; \
 	  printf "===> ${yellow}Loading test a1 data into Postgres${reset}...\n"; \
@@ -200,27 +203,27 @@ start-es-pg: start-pg create-es-data-dir
 	  docker exec cc_pg gunzip /tmp/a1-pg-dump.sql.gz; \
 	  docker exec cc_pg psql -Upostgres chef_automate -f /tmp/a1-pg-dump.sql; \
 	fi; \
-	if [ "$(A2V1_DATA)" == "true" ]; then \
+	if [ "$(A2V1_DATA)" = "true" ]; then \
 		printf "\n===> ${yellow}Loading test A2v1 data into ElasticSearch${reset} ($$data_dir)...\n"; \
 		tar -xzvf test_data/es-pg/es6-a2v1-data.tar.gz -C "$$data_dir"; \
 	fi; \
-	if [ "$(A2V2_DATA)" == "true" ]; then \
+	if [ "$(A2V2_DATA)" = "true" ]; then \
 	  printf "\n===> ${yellow}Loading test A2v2 data into ElasticSearch${reset} ($$data_dir)...\n"; \
 	  tar -xzvf test_data/es-pg/es6-a2v2-data.tar.gz -C "$$data_dir"; \
 	fi; \
-	if [ "$(A2V3_DATA)" == "true" ]; then \
+	if [ "$(A2V3_DATA)" = "true" ]; then \
 	  printf "\n===> ${yellow}Loading test A2v3 data into ElasticSearch${reset} ($$data_dir)...\n"; \
 	  tar -xzvf test_data/es-pg/es6-a2v3-data.tar.gz -C "$$data_dir"; \
 	fi; \
-	if [ "$(A2V4_DATA)" == "true" ]; then \
+	if [ "$(A2V4_DATA)" = "true" ]; then \
 	  printf "\n===> ${yellow}Loading test A2v4 data into ElasticSearch${reset} ($$data_dir)...\n"; \
 	  tar -xzvf test_data/es-pg/es6-a2v4-data.tar.gz -C "$$data_dir"; \
 	fi; \
-	if [ "$(A2V5_DATA)" == "true" ]; then \
+	if [ "$(A2V5_DATA)" = "true" ]; then \
 	  printf "\n===> ${yellow}Loading test A2v5 data into ElasticSearch${reset} ($$data_dir)...\n"; \
 	  tar -xzvf test_data/es-pg/es6-a2v5-data.tar.gz -C "$$data_dir"; \
 	fi; \
-	if [ "$(A2V6_DATA)" == "true" ]; then \
+	if [ "$(A2V6_DATA)" = "true" ]; then \
 	  printf "\n===> ${yellow}Loading test A2v6 data into ElasticSearch${reset} ($$data_dir)...\n"; \
 	  tar -xzvf test_data/es-pg/es6-a2v6-data.tar.gz -C "$$data_dir"; \
 	fi; \
@@ -235,24 +238,26 @@ start-es: start-es$(ES_VER)
 
 start-es5: create-es-data-dir
 	@printf "\n===> ${yellow}Recreating the ElasticSearch 5 container...${reset}\n"
-	docker rm -f cc_es5 &> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es5 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 elasticsearch:5.4.0
+	docker rm -f cc_es5 2> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es5 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 elasticsearch:5.4.0
 	@$(MAKE) wait-for-es
 
 start-es6: create-es-data-dir
 	@printf "\n===> ${yellow}Recreating the ElasticSearch 6 container...${reset}\n"
-	docker rm -f cc_es6 &> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es6 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
+	docker rm -f cc_es6 2> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es6 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 	@$(MAKE) wait-for-es
 
 create-es-data-dir:
+	@printf "\n===> ${blue}Creating the ES data directory...${reset}\n"
 	@mkdir -p "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)" && chmod 777 "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)"
 
 purge-es-data:
-	rm -rf "$(PWD)/elasticsearch/.tmp"
+	@printf "\n===> ${yellow}Purging ES data...${reset}\n"
+	@rm -rf "$(PWD)/elasticsearch/.tmp"
 
 # for automate 2.0, we'll be on pg6
 start-pg:
 	@printf "\n===> ${yellow}Recreating the PostgreSQL container...${reset}\n"
-	docker rm -f cc_pg &> /dev/null; sleep 1; docker run --name cc_pg -e POSTGRES_DB=chef_automate -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=admin -p $(POSTGRES_PORT):5432 -d postgres:9.6.11 || docker start cc_pg
+	docker rm -f cc_pg 2> /dev/null; sleep 1; docker run --name cc_pg -e POSTGRES_DB=chef_automate -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=admin -p $(POSTGRES_PORT):5432 -d postgres:9.6.11 || docker start cc_pg
 	@$(MAKE) wait-for-pg
 	@printf "\n * ${blue}Creating the PostgreSQL databases...${reset}\n"
 	docker exec -it cc_pg psql -Upostgres -c 'CREATE DATABASE secrets_service;'
@@ -260,6 +265,7 @@ start-pg:
 
 # Login to postgres and type away: \d, select * from nodes;, etc
 login-pg:
+	@printf "\n===> ${blue}Logging in to postgres...${reset}\n"
 	docker exec -e COLUMNS="`tput cols`" -e LINES="`tput lines`" -it cc_pg psql -Upostgres chef_automate
 
 clear-es-pg: clear-es clear-pg
@@ -279,22 +285,24 @@ clear-es-templates:
 	curl -X DELETE "$(ELASTICSEARCH_URL)/_template/comp-*"
 
 clean-all: clean
-	@printf "\n===> ${yellow}Clearing containers and directories ${reset}\n"
-	docker rm -f cc_pg cc_es5 cc_es6 cc_ssh_node || true &> /dev/null
+	@printf "\n===> ${yellow}Clearing containers...${reset}\n"
+	@docker rm -f cc_pg cc_es5 cc_es6 cc_ssh_node 2> /dev/null || true
 	@$(MAKE) purge-es-data
-	rm -rf $(PROFILES_PATH)
-	rm -rf $(MARKET_PATH)
+	@printf "\n===> ${yellow}Clearing profiles directories...${reset}\n"
+	@rm -rf $(PROFILES_PATH)
+	@rm -rf $(MARKET_PATH)
 
 start-ssh-node:
 	@printf "\n===> ${blue}Ensuring we have a cc_ssh_node container${reset} to be used as ssh node target\n"
-	docker rm -f cc_ssh_node &> /dev/null || true
+	docker rm -f cc_ssh_node 2> /dev/null || true
 	docker pull $(SSH_TARGET_IMAGE)
 	docker run -p 11030:22 --name cc_ssh_node -d $(SSH_TARGET_IMAGE)
 
 # need to use this here: pg_isready
 # and change database to chef_compliance_service
 wait-for-pg:
-	@i=1; \
+	@printf "\n===> ${blue}Waiting for postgres to be ready...${reset}\n"; \
+	i=1; \
 	max_loops=20; \
 	printf "\n===> ${blue}Checking PostgreSQL to ensure it's ready to receive connections${reset}\n"; \
 	docker exec -it cc_pg psql -Upostgres chef_automate -c "\d" > /dev/null; \
@@ -312,9 +320,9 @@ wait-for-pg:
 	printf " * ${green}PostgreSQL is healthy, moving on...${reset}\n"
 
 wait-for-es:
-	@i=1; \
+	@printf "\n===> ${blue}Checking ElasticSearch to ensure it's ready to receive connections${reset}\n"; \
+	i=1; \
 	max_loops=100; \
-	printf "\n===> ${blue}Checking ElasticSearch to ensure it's ready to receive connections${reset}\n"; \
 	curl -s -X GET "$(ELASTICSEARCH_URL)/_cluster/health" | grep -E '"status":"yellow"|"green"'; \
 	while [ $$? -ne 0 -a $$i -lt $$max_loops ]; do \
 	  printf " * ${yellow}$$i ElasticSearch is not healthy yet, retrying...${reset}\n"; \
@@ -335,10 +343,11 @@ wait-for-es:
 
 # Waiting to avoid starting the tests before the test reports have been ingested 100%
 wait-for-ingestion:
-	@i=1; \
+	@printf "\n===> ${blue}Waiting for ingestion to complete...${reset}\n"; \
+	i=1; \
 	curl_output="-=init=-"; \
 	max_loops=50; \
-	es_docs=25; \
+	es_docs=30; \
 	healthy_match="\"total\":$$es_docs,\"successful\":$$es_docs"; \
 	printf "\n===> ${blue}Checking ElasticSearch to ensure it has ingested our reports${reset}\n"; \
 	curl -s -X GET "$(ELASTICSEARCH_URL)/comp-*-r-20*/_doc/_count" | grep $$healthy_match > /dev/null; \
@@ -355,7 +364,7 @@ wait-for-ingestion:
 	  exit 1; \
 	fi; \
 	ls -la "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)";
-	printf " * ${green}ElasticSearch finished successfully ingesting our reports!${reset}\n";
+	@printf " * ${green}ElasticSearch finished successfully ingesting our reports!${reset}\n";
 
 ## Use this if you don't want to worry about the order in which to start things when testing.. it does it all!
 run-test: clean-all test-prep run ingest-reports-into-es test
@@ -364,11 +373,12 @@ run-test: clean-all test-prep run ingest-reports-into-es test
 test-db: run-with-es-pg run-db-tests
 
 run-db-tests:
+	@printf "\n===> ${blue}Running db tests...${reset}\n"
 	@POSTGRES_URI="$(POSTGRES_URI)" CGO_ENABLED=0 \
 		go test -v ./dao/... ./profiles/db ./scanner/... ./inspec-agent/scheduler -cover -database -parallel=1 -p 1 -failfast
 
 test-integration: start-es start-pg
-	printf "\n===> ${blue}Running integration tests with ES_VER=$(ES_VER)${reset}\n"
+	@printf "\n===> ${blue}Running integration tests with ES_VER=$(ES_VER)${reset}\n"
 	@$(MAKE) start-ssh-node
 	@$(MAKE) download-sample-market-profiles
 	@$(MAKE) clear-es
@@ -429,6 +439,7 @@ test-automate-upgrade: clean-all
 	fi;
 
 test-ingest-to-manager-conn:
+	@printf "\n===> ${blue}Testing ingestion to manager...${reset}\n"
 	go run examples/ingest/ingest_client.go --file ingest/examples/compliance-success-tiny-report.json
 	go run examples/ingest/ingest_client.go --file ingest/examples/compliance-failure-big-report.json
 	# now send the first report in again, to ensure we get two, not three nodes
@@ -450,7 +461,8 @@ test-scanner:
 # Run individual tests with: TEST="02_nodes_spec.rb" make test
 # or multiple ones with: TEST="02_*" make test
 test: generate-ruby-grpc wait-for-compliance-service
-	@if [ -z "$$TEST" ] ; then TEST='*_spec.rb'; fi; \
+	@printf "\n===> ${blue}Running tests...${reset}\n"; \
+	if [ -z "$$TEST" ] ; then TEST='*_spec.rb'; fi; \
 	bundler_version=`grep -A 1 "BUNDLED WITH" api/tests/Gemfile.lock | tail -1 | tr -d '[:space:]'`; \
 	gem install bundler -f --version "= $$bundler_version"; \
 	cd api/tests && \
@@ -475,6 +487,7 @@ test: generate-ruby-grpc wait-for-compliance-service
 test-prep: $(MARKET_PATH) $(PROFILES_PATH) start-ssh-node download-sample-market-profiles install-inspec start-es-pg
 
 install-inspec:
+	@printf "\n===> ${blue}Installing inspec if needed...${reset}\n"
 	@inspec --version 2> /dev/null | grep -q $(shell cat ../../INSPEC_VERSION) || gem install inspec-bin --no-document --version $(shell cat ../../INSPEC_VERSION)
 
 test-examples:
@@ -491,13 +504,16 @@ test-unit:
 	@go test $(shell GOFLAGS='$(GOFLAGS)' go list ./... |  grep -v '^github.com/chef/automate/components/compliance-service/\(examples\|feed/\|api/automate-feed\|api/automate-event\|api/tests\|scanner\|integration_test\)') -cover
 
 send-ingest-report:
+	@printf "\n===> ${blue}Sending report to ingestion endpoint...${reset}\n"
 	go run examples/ingest/ingest_client.go --file ingest/examples/compliance-success-tiny-report.json --threads 1 --reports-per-thread 1
 
 ## DATA ##
 $(MARKET_PATH):
+	@printf "\n===> ${blue}Creating profiles market directory...${reset}\n"
 	@mkdir -p $(MARKET_PATH)
 
 $(PROFILES_PATH):
+	@printf "\n===> ${blue}Creating profiles directory...${reset}\n"
 	@mkdir -p $(PROFILES_PATH)
 
 download-sample-market-profiles: $(MARKET_PATH)
@@ -527,8 +543,9 @@ download-sample-market-profiles: $(MARKET_PATH)
 # when running against es that is inside vm (virtualbox)  be sure to edit /opt/delivery/sv/elasticsearch/run and change -Des.network.host=127.0.0.1 to -Des.network.host=0.0.0.0
 # in order to tunnel to a remote ES, we must trust the certificate that the remote instance is offering.  get this from your browser and add it to the keychain on the respective OS.
 ingest-reports-into-es:
+	@printf "\n===> ${blue}Ingesting reports into ES...${reset}\n"
 	@if  [ "$(A1_DATA)" != "true" ] && [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ] && [ "$(A2V3_DATA)" != "true" ] && [ "$(A2V4_DATA)" != "true" ] && [ "$(A2V5_DATA)" != "true" ] && [ "$(A2V6_DATA)" != "true" ]; then \
-	  @printf "\n===> PROCESSING REPORTS FROM ${blue}test_data/audit_reports${reset}\n"; \
+	  printf "\n===> PROCESSING REPORTS FROM ${blue}test_data/audit_reports${reset}\n"; \
 	  FILES=$$(ls -1 test_data/audit_reports | grep '\.json'); \
 	  for file in $$FILES; do \
 	    file="test_data/audit_reports/$$file"; \
@@ -548,3 +565,6 @@ $(INSPEC_RUNNER_PATH): $(shell find cmd/inspec_runner)
 	sudo touch $(INSPEC_RUNNER_PATH)
 	sudo chown root: $(INSPEC_RUNNER_PATH)
 	sudo chmod u+s $(INSPEC_RUNNER_PATH)
+
+logs:
+	@tail -f /tmp/compliance.log | grep -v -E "(Worker s|dead tasks|Recurring workflow|Cleaning workflow results table)"

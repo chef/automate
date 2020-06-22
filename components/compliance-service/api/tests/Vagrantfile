@@ -139,7 +139,7 @@ SCRIPT
 install_automate = <<SCRIPT
 cd automate
 sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/.local/bin:$HOME/bin' >> ~/.bashrc
+echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/.local/bin:$HOME/bin:$HOME/go/bin' >> ~/.bashrc
 sudo ./scripts/install_inspec.sh
 sudo ./scripts/install_golang.sh
 sudo ./scripts/install_grpcurl.sh

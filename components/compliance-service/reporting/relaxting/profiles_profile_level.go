@@ -35,10 +35,10 @@ func (depth *ProfileDepth) getProfileMinsFromNodesAggs(filters map[string][]stri
 func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 	filters map[string][]string,
 	searchResult *elastic.SearchResult,
-	statusFilters []string) (map[string]reporting.ProfileMin, *reportingapi.ProfileCounts, error) {
+	statusFilters []string) ([]reporting.ProfileMin, *reportingapi.ProfileCounts, error) {
 	myName := "ProfileDepth::getProfileMinsFromNodesResults"
 
-	profileMins := make(map[string]reporting.ProfileMin)
+	profileMins := make([]reporting.ProfileMin, 0)
 	statusMap := make(map[string]int, 4)
 
 	if aggRoot, found := depth.unwrap(&searchResult.Aggregations); found {
@@ -66,7 +66,10 @@ func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 				var profileStatus string
 				if profileStatusHash["skipped"] > 0 && profileStatusHash["loaded"] == 0 && profileStatusHash[""] == 0 {
 					profileStatus = "skipped"
-					logrus.Debugf("%s profile_name=%q, status=%q", myName, profileName, profileStatus)
+					logrus.Debugf("%s profile_name=%q, root status=skipped", myName, profileName)
+				} else if profileStatusHash["failed"] > 0 && profileStatusHash["loaded"] == 0 && profileStatusHash[""] == 0 {
+					profileStatus = "failed"
+					logrus.Debugf("%s profile_name=%q, root status=failed", myName, profileName)
 				} else {
 					sumFailures, _ := bucket.Aggregations.Sum("failures")
 					sumPassed, _ := bucket.Aggregations.Sum("passed")
@@ -92,12 +95,11 @@ func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 					ID:     profileId,
 					Status: profileStatus,
 				}
-				profileMins[profileId] = summary
+				profileMins = append(profileMins, summary)
 			}
 		}
 	}
 	logrus.Debugf("%s Done with statusMap=%+v", myName, statusMap)
-	logrus.Debugf("%s Done with statusMap['something']=%+v", myName, statusMap["passed"])
 	counts := &reportingapi.ProfileCounts{
 		Total:   int32(statusMap["failed"] + statusMap["passed"] + statusMap["skipped"] + statusMap["waived"]),
 		Failed:  int32(statusMap["failed"]),

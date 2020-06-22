@@ -420,7 +420,12 @@ func (backend *ES2Backend) GetReport(reportId string,
 					logrus.Debugf("Determine profile: %s", esInSpecReportProfileMin.Name)
 					esInSpecProfile, err := backend.GetProfile(esInSpecReportProfileMin.SHA256)
 					if err != nil {
-						logrus.Errorf("%s - Could not get profile: %s", myName, err.Error())
+						logrus.Errorf("%s - Could not get profile '%s' error: %s", myName, esInSpecReportProfileMin.SHA256, err.Error())
+						logrus.Debugf("%s - Making the most from the profile information in esInSpecReportProfileMin", myName)
+						esInSpecProfile.Name = esInSpecReportProfileMin.Name
+						esInSpecProfile.Title = esInSpecReportProfileMin.Title
+						esInSpecProfile.Version = esInSpecReportProfileMin.Version
+						esInSpecProfile.Sha256 = esInSpecReportProfileMin.SHA256
 					}
 
 					reportProfile := inspec.Profile{}
@@ -432,10 +437,15 @@ func (backend *ES2Backend) GetReport(reportId string,
 					reportProfile.Version = esInSpecProfile.Version
 					reportProfile.Sha256 = esInSpecProfile.Sha256
 					reportProfile.Status = esInSpecProfile.Status
-					reportProfile.SkipMessage = esInSpecProfile.SkipMessage
 					reportProfile.Status = esInSpecReportProfileMin.Status
-					reportProfile.SkipMessage = esInSpecReportProfileMin.SkipMessage
 					reportProfile.Full = esInSpecReportProfileMin.Full
+
+					if esInSpecReportProfileMin.StatusMessage != "" {
+						reportProfile.StatusMessage = esInSpecReportProfileMin.StatusMessage
+					} else {
+						// Legacy message only available for the skipped status
+						reportProfile.StatusMessage = esInSpecReportProfileMin.SkipMessage
+					}
 
 					dependsHash := make(map[string]*ESInSpecReportDepends, len(esInSpecReportProfileMin.Depends))
 					for _, esInSpecProfileDependency := range esInSpecReportProfileMin.Depends {
@@ -498,7 +508,7 @@ func (backend *ES2Backend) GetReport(reportId string,
 						Controls:       convertedControls,
 						Attributes:     convertedAttributes,
 						Status:         reportProfile.Status,
-						SkipMessage:    reportProfile.SkipMessage,
+						StatusMessage:  reportProfile.StatusMessage,
 					}
 					profiles = append(profiles, &convertedProfile)
 				}

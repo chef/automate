@@ -408,6 +408,9 @@ var ComplianceRepDate = Mapping{
             "skip_message": {
               "type": "keyword"
             },
+            "status_message": {
+              "type": "keyword"
+            },
             "status": {
               "type": "keyword"
             },

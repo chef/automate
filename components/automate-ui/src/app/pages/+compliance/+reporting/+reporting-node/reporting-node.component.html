@@ -99,10 +99,21 @@
                       <ng-container *ngIf="profilesByStatus(activeReport.profiles, 'skipped'); let skipped">
                         <span id="skipped-count" *ngIf="skipped.length > 0">
                           ({{ skipped.length | number }} Skipped <chef-icon>info</chef-icon>)
-                          <chef-tooltip for="skipped-count">
+                          <chef-tooltip id="skip-tooltip" for="skipped-count">
                             <p>Skipped profile<span *ngIf="skipped.length > 1">s</span>:</p>
                             <ul>
-                              <li *ngFor="let profile of skipped"><strong>{{ profile.name }}</strong> <span *ngIf="profile.skip_message != ''">({{ profile.skip_message }})</span></li>
+                              <li *ngFor="let profile of skipped"><strong>{{ profile.name }}</strong> <span *ngIf="profile.status_message != ''">({{ profile.status_message }})</span></li>
+                            </ul>
+                          </chef-tooltip>
+                        </span>
+                      </ng-container>
+                      <ng-container *ngIf="profilesByStatus(activeReport.profiles, 'failed'); let failed">
+                        <span id="failed-count" *ngIf="failed.length > 0">
+                          ({{ failed.length | number }} Failed <chef-icon>info</chef-icon>)
+                          <chef-tooltip id="fail-tooltip" for="failed-count">
+                            <p>Failed profile<span *ngIf="failed.length > 1">s</span>:</p>
+                            <ul>
+                              <li *ngFor="let profile of failed"><strong>{{ profile.name }}</strong> <span *ngIf="profile.status_message != ''">({{ profile.status_message }})</span></li>
                             </ul>
                           </chef-tooltip>
                         </span>
@@ -157,7 +168,7 @@
             </span>
           </chef-option>
         </chef-phat-radio>
-  
+
         <chef-table class="controls-table">
           <chef-thead>
             <chef-tr>
@@ -233,7 +244,7 @@
             </ng-container>
           </chef-tbody>
         </chef-table>
-  
+
         <chef-scroll-top></chef-scroll-top>
       </ng-container>
 
@@ -273,7 +284,7 @@
           </ul>
         </div>
       </chef-side-panel>
-  
+
       <chef-loading-spinner *ngIf="reportLoading" size="100"></chef-loading-spinner>
     </main>
   </div>

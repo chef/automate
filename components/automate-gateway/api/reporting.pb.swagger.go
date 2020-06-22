@@ -845,6 +845,10 @@ func init() {
         "skip_message": {
           "type": "string",
           "description": "The reason this profile was skipped in the generated report, if any."
+        },
+        "status_message": {
+          "type": "string",
+          "description": "A message to detail the reason why a profile is skipped or failed in the generated report."
         }
       }
     },

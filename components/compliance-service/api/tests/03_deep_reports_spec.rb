@@ -242,9 +242,12 @@ describe File.basename(__FILE__) do
 
     #test that we are dedup-ing in case the same profile_id is passed in twice.. we still want dedup so that deep works
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
-        Reporting::ListFilter.new(type: 'profile_id',
-                                  values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9',
-                                           '41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'])
+        Reporting::ListFilter.new(
+          type: 'profile_id',
+          values: [
+            '41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9',
+            '41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'
+          ])
     ], sort: 'node_name', order: 0, page: 3, per_page: 2)
     expected_json = {
         "reports" => [
@@ -285,6 +288,44 @@ describe File.basename(__FILE__) do
         ],
         "total" => 7
     }.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+
+    # Deep filter by a profile it that failed at root
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(
+          type: 'profile_id',
+          values: [
+            '5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888'
+          ])
+    ], sort: 'node_name', order: 0, page: 1, per_page: 3)
+    expected_json = {"reports" =>
+      [{"controls" => {"failed" => {}, "passed" => {}, "skipped" => {}, "waived" => {}},
+        "endTime" => "2018-04-02T03:02:02Z",
+        "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20",
+        "ipaddress" => "188.38.98.100",
+        "nodeId" => "999f4e51-b049-4b10-9555-555789999967",
+        "nodeName" => "ubuntu(4)-alpha-myskippy(s)-myfaily(f)-apache(f)-linux(p)-failed",
+        "status" => "failed"}],
+     "total" => 1}.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+
+    # Deep filter by a profile it that skipped at root
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(
+          type: 'profile_id',
+          values: [
+            '5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777'
+          ])
+    ], sort: 'node_name', order: 0, page: 1, per_page: 3)
+    expected_json = {"reports" =>
+      [{"controls" => {"failed" => {}, "passed" => {}, "skipped" => {}, "waived" => {}},
+        "endTime" => "2018-04-02T03:02:02Z",
+        "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20",
+        "ipaddress" => "188.38.98.100",
+        "nodeId" => "999f4e51-b049-4b10-9555-555789999967",
+        "nodeName" => "ubuntu(4)-alpha-myskippy(s)-myfaily(f)-apache(f)-linux(p)-failed",
+        "status" => "skipped"}],
+     "total" => 1}.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     # Get all reports for these two nodes, one missing
@@ -629,7 +670,6 @@ describe File.basename(__FILE__) do
     res = GRPC reporting, :read_report, Reporting::Query.new(id: 'bb93e1b2-36d6-439e-ac70-cccccccccc04')
     assert_equal(Reporting::Report, res.class)
 
-    puts res['version']
     assert_equal('3.1.0', res['version'])
     assert_equal('bb93e1b2-36d6-439e-ac70-cccccccccc04', res['id'])
     assert_equal('9b9f4e51-b049-4b10-9555-10578916e149', res['node_id'])
@@ -666,7 +706,7 @@ describe File.basename(__FILE__) do
       assert_equal("Skipping profile: 'myprofile1' on unsupported platform: 'mac_os_x/17.7.0'.", res['profiles'][0]['depends'][0]['skip_message'])
 
       assert_equal('skipped', res['profiles'][2]['status'])
-      assert_equal("Skipping profile: 'fake-baseline' on unsupported platform: 'amazon/2'.", res['profiles'][2]['skip_message'])
+      assert_equal("Skipping profile: 'fake-baseline' on unsupported platform: 'amazon/2'.", res['profiles'][2]['status_message'])
     end
 
     # Get a specific report filter by profile_id
@@ -678,7 +718,6 @@ describe File.basename(__FILE__) do
     )
     assert_equal(Reporting::Report, res.class)
 
-    puts res['version']
     assert_equal('3.1.0', res['version'])
     assert_equal('bb93e1b2-36d6-439e-ac70-cccccccccc04', res['id'])
     assert_equal('9b9f4e51-b049-4b10-9555-10578916e149', res['node_id'])
@@ -726,7 +765,6 @@ describe File.basename(__FILE__) do
     )
     assert_equal(Reporting::Report, res.class)
 
-    puts res['version']
     assert_equal('3.1.0', res['version'])
     assert_equal('bb93e1b2-36d6-439e-ac70-cccccccccc04', res['id'])
     assert_equal('9b9f4e51-b049-4b10-9555-10578916e149', res['node_id'])
