@@ -31,6 +31,13 @@ const (
 	NodeManagersTableAbbrev = "nm"
 )
 
+const sqlGetNodeFields = `
+SELECT DISTINCT %s 
+from nodes n
+%s %s
+%s;
+`
+
 const selectSecretIdsFromNodes = `
 SELECT secret_id
 FROM nodes_secrets
@@ -1092,4 +1099,35 @@ func (tx *DBTrans) bulkUpdateNodeProjects(nodeUpdates []nodeUpdate) error {
 	}
 
 	return err
+}
+
+// GetNodeSuggestions returns "suggestions" for filtering the nodes list, given a field and filters
+// this is not used by any API/other function yet, but will be.
+// it only supports suggestions for columns that are in the nodes table.
+// it respects filters, it does not apply sorting to the returned list.
+func (db *DB) GetNodeSuggestions(ctx context.Context, field string, filters []*common.Filter) ([]string, error) {
+	sugg := []string{}
+	err := validateNodeFilters(filters)
+	if err != nil {
+		return sugg, err
+	}
+	whereFilter, havingFilter, err := buildWhereHavingFilter(filters, NodesTableAbbrev, nodesFilterField)
+	if err != nil {
+		return sugg, err
+	}
+
+	var noEmptyStringFilter string
+	if whereFilter != "" || havingFilter != "" {
+		noEmptyStringFilter = fmt.Sprintf("AND %s <> '' IS TRUE", field)
+	} else {
+		noEmptyStringFilter = fmt.Sprintf("WHERE %s <> '' IS TRUE", field)
+	}
+	query := fmt.Sprintf(sqlGetNodeFields, field, whereFilter, havingFilter, noEmptyStringFilter)
+
+	logrus.Debugf("SQL: %s", query)
+	_, err = db.Select(&sugg, query)
+	if err != nil {
+		return sugg, err
+	}
+	return sugg, nil
 }
