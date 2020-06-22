@@ -29,7 +29,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.AssetPageSize = w.Int32(100)
 	c.V1.Sys.Service.ReportsPageSize = w.Int32(1000)
 	c.V1.Sys.Service.NodeBatchSize = w.Int32(50)
-	c.V1.Sys.Service.UpdateNodesOnly = w.Bool(true)
+	c.V1.Sys.Service.UpdatedNodesOnly = w.Bool(true)
 	c.V1.Sys.Service.DisableCidrFilter = w.Bool(true)
 	c.V1.Sys.Service.CidrFilter = w.String("0.0.0.0/0")
 	c.V1.Sys.Log.Level = w.String("info")
