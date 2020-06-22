@@ -10,9 +10,10 @@ import (
 )
 
 type ChefIngestRunPipelineConfig struct {
-	MaxNumberOfBundledMsgs   int
-	NumberOfMsgsTransformers int
-	NumberOfPublishers       int
+	MaxNumberOfBundledMsgs        int
+	NumberOfMsgsTransformers      int
+	NumberOfPublishers            int
+	NumberOfNodemanagerPublishers int
 }
 
 type ChefIngestServerConfig struct {

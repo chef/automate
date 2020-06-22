@@ -91,7 +91,7 @@ func TestBundlerSingleMessage(t *testing.T) {
 
 	inbox <- message.NewChefRun(context.Background(), &chef.Run{}, errc)
 	close(inbox)
-	out := nodeManagerPublisher(inbox, nodeMgrClient)
+	out := nodeManagerPublisher(inbox, nodeMgrClient, 1)
 
 	<-out
 

@@ -43,6 +43,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value message_buffer_size = 10;
 				google.protobuf.BoolValue nodes_missing_running_default = 11;
 				google.protobuf.BoolValue missing_nodes_for_deletion_running_default = 12;
+				google.protobuf.Int32Value number_of_nodemanager_publishers = 13;
 			}
 
 			message Log {

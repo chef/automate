@@ -346,9 +346,10 @@ func createServices(s *Suite) error {
 	chefIngestServerConfig := serveropts.ChefIngestServerConfig{
 		MaxNumberOfBundledActionMsgs: 100,
 		ChefIngestRunPipelineConfig: serveropts.ChefIngestRunPipelineConfig{
-			MaxNumberOfBundledMsgs:   100,
-			NumberOfMsgsTransformers: 1,
-			NumberOfPublishers:       1,
+			MaxNumberOfBundledMsgs:        100,
+			NumberOfNodemanagerPublishers: 1,
+			NumberOfMsgsTransformers:      1,
+			NumberOfPublishers:            1,
 		},
 	}
 	// A global ChefIngestServer instance to call any rpc function
