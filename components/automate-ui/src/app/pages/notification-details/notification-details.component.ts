@@ -63,6 +63,8 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
     this.updateForm = this.fb.group({
       // Must stay in sync with error checks in notification-details.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      targetType: [[]],
+      ruleType: [[]],
       // Note that URL here may be FQDN -or- IP!
       targetUrl: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
@@ -108,7 +110,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.targetKeys = this.notification.getTargetTypeKeys();
-    this.alertTypeKeys = this.notification.getAlertTypeKeys(); 
+    this.alertTypeKeys = this.notification.getAlertTypeKeys();
   }
 
   public saveNotification(): void {
@@ -131,7 +133,10 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
   }
 
   public changeSelectionForWebhookType(event: { target: { value: ServiceActionType } }) {
-    this.notification.targetType = event.target.value;
+    if ( this.notification.targetType !==  event.target.value ) {
+      this.updateForm.controls.targetType.markAsDirty();
+      this.notification.targetType = event.target.value;
+    }
   }
 
   public updateCriticalControlsOnly(event: boolean) {
@@ -144,6 +149,10 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
   }
 
   public setFailureType(event: { target: { value: RuleType } }) {
+    if ( this.notification.ruleType !==  event.target.value ) {
+      this.updateForm.controls.ruleType.markAsDirty();
+    }
+
     this.notification.ruleType = event.target.value;
     if (this.notification.ruleType !== 'ComplianceFailure' &&
       this.notification.targetType === ServiceActionType.SERVICENOW) {

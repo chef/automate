@@ -91,7 +91,7 @@
             <span *ngIf="testInProgress">Testing...</span>
             <span *ngIf="!testInProgress">Test Data Feed</span>
           </chef-button>
-          <chef-button primary [disabled]="saveInProgress || !updateForm.valid" (click)="saveNotification()">
+          <chef-button primary [disabled]="saveInProgress || !updateForm.valid || !this.updateForm.dirty" (click)="saveNotification()">
             <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
             <span *ngIf="saveInProgress">Saving...</span>
             <span *ngIf="!saveInProgress">Save</span>
