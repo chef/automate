@@ -42,15 +42,19 @@ export class ChefPhatRadio {
 
   selected: HTMLChefOptionElement;
 
-  @Listen('click') handleClick(event) {
-    const option = event.target.closest('chef-option');
-    // If new click option is the same as current, we are deselecting
-    const isSameOption = this.value === option.value;
-
+  @Listen('click') handleClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const option = target.closest('chef-option');
     if (option) {
-    this.value = this.deselectable && isSameOption ? '' : option.value;
-    this.change.emit();
-    this.input.emit();
+      this.selectOption(option);
+    }
+  }
+
+  @Listen('keypress') handleKeypress(event: KeyboardEvent) {
+    const target = event.target as HTMLElement;
+    const option = target.closest('chef-option');
+    if (option && event.key === 'Enter') {
+      this.selectOption(option);
     }
   }
 
@@ -67,11 +71,10 @@ export class ChefPhatRadio {
     }
     this.selected.selected = true;
 
-    // add keypress listeners to all the child options
+    // Set tabindex on options to make them keyboard focusable
     options.forEach(option => {
-        option.addEventListener('keypress', (event) => this.handleKeypress(event));
-        option.setAttribute('tabindex', '0');
-      });
+      option.setAttribute('tabindex', '0');
+    });
   }
 
   componentDidUpdate() {
@@ -95,10 +98,11 @@ export class ChefPhatRadio {
     return options;
   }
 
-  handleKeypress(event) {
-    if (event.key === 'Enter') {
-      this.handleClick(event);
-    }
+  selectOption(option: HTMLChefOptionElement) {
+    const isSameOption = this.value === option.value;
+    this.value = this.deselectable && isSameOption ? '' : option.value;
+    this.change.emit();
+    this.input.emit();
   }
 
 }
