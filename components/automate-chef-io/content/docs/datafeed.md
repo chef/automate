@@ -1,6 +1,6 @@
 +++
 title = "Data Feeds"
-description = "Exporting Node Data from Chef Client Runs to External Data Collectors"
+description = "Export Node Data from Chef Client Runs to External Data Collectors"
 date = 2020-05-05T13:19:02-07:00
 draft = false
 bref = ""
@@ -8,71 +8,75 @@ toc = true
 [menu]
   [menu.docs]
     parent = "settings"
-    weight = 10
+    weight = 15
 +++
 
-## About Automate Data Feeds
-
-The Data Feed service is used to send node data to a 3rd party service. This can be useful when updating Configuration Management Databases, external Security Dashboards and ITSM platforms.
+The Data Feed service sends node data to a 3rd party service.
+This can be useful when updating Configuration Management Databases, external Security Dashboards and IT service management platforms.
 The following types of information are sent:
- 
- - Ohai data gathered from each node being managed, this includes hardware, operating system and installed program information, there is some variation depending on the operating system being managed
- - Configuration information about each node being managed, this includes Chef Client Run status, Runlists, Cookbooks, Recipes being run against each node
- - Compliance information about each node that shows the compliance state, this includes passed and failed controls for each profile executed against that node
 
-A Data Feed is not a Data Tap, it operates by doing the following:
+- Ohai data gathered from each managed node - This data includes HW, operating system, and installed program information. Some variation depends on the managed operating system
+- Configuration information about each managed node - This information includes Chef Client Run status, Runlists, Cookbooks, and Recipes being ran against each node
+- Compliance information about each node that shows the compliance state - This information includes passed and failed controls for each profile executed against that node
 
-- Every 4 hours (configurable) the data-feed-service will aggregate the client runs and compliance reports from the previous 4 hours and send this to the registered destinations.
-- If there are no destinations, aggregation will not occur.
-- The data is aggregated and sent in batches of 50 nodes at a time (also configurable)
+A Data Feed is not a data tap.
+A Data Feed operates by doing the following:
 
-By default only Admins of Chef Automate may create and manage Data Feeds.
+- Every 4 hours, the data-feed-service will aggregate the client runs and compliance reports from the previous 4 hours and send this information to the registered destinations. This time interval is 4 hours by default, but is configurable
+- If there are no destinations, aggregation will not occur
+- The data aggregates and sends in batches of 50 nodes at a time. The batch amount is 50 by default, but is configurable
+
+By default, only Admin users of Chef Automate may create and manage Data Feeds.
 
 ### Adding a Data Feed Endpoint
 
-A single instance of a Data Feed connects to one endpoint.
+A single Data Feed instance connects to one endpoint.
+Create as many Data Feed instances as needed.
 
-To setup an individual endpoint for Data Feed in Chef Automate (currently feature flagged):
+To add a Data Feed endpoint in Chef Automate:
 
 ![Setup Data Feed Page](/images/docs/filled_form_create_data_feed.png)
 
-1. In the **Settings** tab, navigate to the _Data Feeds_ page in the sidebar.
-1. Select **Create Data Feed**.
-1. Enter a unique Data Feed name.
-1. Enter the URL for your Data Feed End Point, including any specific port details
-1. Enter the Username and Password that your 3rd party endpoint requires for Authentication
-1. Use the **Test Data Feed** button to validate the connection details
-1. Once the Test is successful, use the **Create Data Feed** button to save your Data Feed Configuration
+1. In the **Settings** tab, navigate to _Data Feeds_ in the sidebar
+2. Select **Create Data Feed**
+3. Enter a unique Data Feed name
+4. Enter the URL for your Data Feed End Point, including any specific port details
+5. Enter the Username and Password that your 3rd party endpoint requires for authentication
+6. Select **Test Data Feed** to begin validating the connection details
+7. Once the test is successful, select **Create Data Feed** to save your Data Feed configuration
 
 ### Edit a Data Feed Endpoint
 
-To edit an Endpoint for a Data Feed in Chef Automate:
+To edit a Data Feed endpoint in Chef Automate:
 
-1. From the _Data Feeds_ page, select the Data Feed name to open its detail page.
-1. Edit the Data Feed name or URL.
-1. Use the **Save** button to save the Data Feed.
+1. In _Data Feeds_, select the Data Feed name to open its detail page
+1. Edit the Data Feed name or URL
+1. Use the **Save** button to save your changes
 
 ### Delete a Data Feed Endpoint
 
-To delete an Endpoint for a Data Feed in Chef Automate:
+To delete a Data Feed endpoint in Chef Automate:
 
-1. From the _Data Feeds_ page, select **Delete Data Feed** from the menu at the end of the table row.
-1. Confirm that you wish to permanently delete this Data Feed by using the **Delete Data Feed** button.
+1. In _Data Feeds_, select **Delete Data Feed** from the menu at the end of the table row
+1. Select **Delete Data Feed** to confirm permanent deletion of this Data Feed
 
-## Configuring Global Data Feed Behaviour
+## Configuring Global Data Feed Behavior
 
-**Currently these settings apply to all endpoints configured with Data Feed settings in Automate**
+{{< info >}}
+The settings in `config.toml` apply across all configured Data Feed endpoints.
+{{< /info >}}
 
-On the Chef Automate CLI
+Using the Chef Automate command-line tool, navigate to `/hab/svc/data-feed-service/config/config.toml`.
+Change one or more configuration parameters to reflect the desired global Data Feed behavior:
 
-1. Navigate to /hab/svc/data-feed-service/config/config.toml
-1. To change the interval for the Data Feed collection update the config parameter for *feed_interval* which defaults to 4 hours
-1. To change the number of sets of node data sent in each individual batch to your end point update the config parameter for *node_batch_size* which defaults to 50 nodes
-1. To determine what data to include in each export use the updated_nodes_only setting. By default this is set to true, meaning only node data that has recently changed will be aggregated. With updated_nodes_only set to false all the latest data is sent for any nodes that have udpated since the last export.
-1. To reduce the IP address range for the node data being collected and processed, if for example you only wish to send production or test node traffic, update the config parameter for *disable_cidr_filter* to false **and** update the setting for *cidr_filter* to cover the IP address range required
+- Update the `feed_interval` parameter to change the interval for the Data Feed collection. The default value is four hours
+- Update the `node_batch_size` parameter to change the number of sets of node data sent in each individual batch to your endpoint. The default value is 50 nodes
+- Use the `updated_nodes_only` setting to determine what data to include in each export. The default setting is `true`, which causes only recently changed data to aggregate. Set `updated_nodes_only` to `false` and all the latest data is sent for any nodes that have updated since the last export
+- To reduce the IP address range for the node data being collected and processed, update the `disable_cidr_filter` parameter to `false` **and** update the `cidr_filter` setting to cover the required IP address range. For example, you may wish to send only production or test node traffic
 
-/hab/svc/data-feed-service/config/config.toml
+### Config.toml Example
 
+```toml
     [service]
 
     host = "localhost"\
@@ -84,17 +88,23 @@ On the Chef Automate CLI
     updated_nodes_only = true\
     disable_cidr_filter = true\
     cidr_filter = "0.0.0.0/0"
+```
 
-To debug any issues with the Data Feed Service in Automate, update the following section by changing the *log_level* to debug:
+To debug any issues with the Data Feed Service in Chef Automate, update the following section in `config.toml` by changing the `log_level` value to "debug":
 
+```toml
     [log]
     log_format = "text"
     log_level = "info"
+```
 
 ## Data Feed Output Syntax and Details
 
-The exported data consists of line separated JSON strings. Each line represents the data for one node. Each line is of the format:
+The exported data consists of line-separated JSON strings.
+Each line represents the data for one node.
+Each line is of the format:
 
+```json
     {
     "attributes": {
      "node_id": "",
@@ -122,5 +132,4 @@ The exported data consists of line separated JSON strings. Each line represents 
      "os_service_pack":""
      }
     }
-
-
+```
