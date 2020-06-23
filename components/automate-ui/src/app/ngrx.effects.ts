@@ -4,6 +4,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { AdminKeyEffects } from './entities/reset-admin-key/reset-admin-key.effects';
 import { ApiTokenEffects } from './entities/api-tokens/api-token.effects';
 import { AutomateSettingsEffects } from './entities/automate-settings/automate-settings.effects';
+import { CdsEffects } from './entities/cds/cds.effects';
 import { ClientRunsEffects } from './entities/client-runs/client-runs.effects';
 import { CookbookEffects } from './entities/cookbooks/cookbook.effects';
 import { CookbookDetailsEffects } from './entities/cookbooks/cookbook-details.effects';
@@ -48,6 +49,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       AdminKeyEffects,
       ApiTokenEffects,
       AutomateSettingsEffects,
+      CdsEffects,
       ClientRunsEffects,
       CookbookEffects,
       CookbookDetailsEffects,

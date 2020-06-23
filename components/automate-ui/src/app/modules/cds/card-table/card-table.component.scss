@@ -1,0 +1,63 @@
+@import "~styles/variables";
+@import "@carbon/layout/scss/layout";
+@import "@carbon/grid/scss/grid";
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+h1 {
+  display: flex;
+  margin: $spacing-09 0 0 0;
+  align-items: center;
+  font-size: 18px;
+
+  chef-icon {
+    margin-right: $spacing-03;
+  }
+}
+
+.dashboard-grid {
+  @extend .bx--grid;
+  height: 100%;
+}
+
+.dashboard-grid-row {
+  @extend .bx--row;
+  height: 100%;
+}
+
+.dashboard-overview-column {
+  @extend .bx--col-lg-16;
+}
+
+.dashboard-overview-grid {
+  @extend .bx--grid;
+  @extend .bx--no-gutter;
+}
+
+.dashboard-overview-row {
+  @extend .bx--row;
+}
+
+.dashboard-overview-col {
+  @extend .bx--col-lg-8;
+}
+
+.dashboard-overview-header {
+  @extend .bx--col-lg-16;
+}
+
+app-card {
+  display: block;
+  margin: $spacing-05 0;
+  padding: 0;
+  background: $chef-white;
+  border: 1px solid $chef-grey;
+  border-radius: $global-radius;
+
+  @include carbon--breakpoint-up(lg) {
+    height: calc(100% - #{$spacing-07});
+  }
+}

@@ -9,6 +9,7 @@ import * as projectsFilter from './services/projects-filter/projects-filter.redu
 import * as adminKeyEntity from './entities/reset-admin-key/reset-admin-key.reducer';
 import * as apiToken from './entities/api-tokens/api-token.reducer';
 import * as automateSettings from './entities/automate-settings/automate-settings.reducer';
+import * as cdsEntity from './entities/cds/cds.reducer';
 import * as clientEntity from './entities/clients/client.reducer';
 import * as clientRuns from './entities/client-runs/client-runs.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
@@ -72,6 +73,7 @@ export interface NgrxStateAtom {
   adminKey: adminKeyEntity.AdminKeyEntityState;
   apiTokens: apiToken.ApiTokenEntityState;
   automateSettings: automateSettings.AutomateSettingsEntityState;
+  cds: cdsEntity.CdsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
   clients: clientEntity.ClientEntityState;
@@ -195,6 +197,7 @@ export const defaultInitialState = {
   adminKey: adminKeyEntity.AdminKeyEntityInitialState,
   apiTokens: apiToken.ApiTokenEntityInitialState,
   automateSettings: automateSettings.AutomateSettingsEntityInitialState,
+  cds: cdsEntity.cdsEntityInitialState,
   clients: clientEntity.ClientEntityInitialState,
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
@@ -251,6 +254,7 @@ export const ngrxReducers = {
   adminKey: adminKeyEntity.adminKeyEntityReducer,
   apiTokens: apiToken.apiTokenEntityReducer,
   automateSettings: automateSettings.automateSettingsEntityReducer,
+  cds: cdsEntity.desktopEntityReducer,
   clients: clientEntity.clientEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
