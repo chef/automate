@@ -35,7 +35,7 @@ export const ManagerEntityInitialState: ManagerEntityState = managerEntityAdapte
 });
 
 export function managerEntityReducer(state: ManagerEntityState = ManagerEntityInitialState,
-                                     action: ManagerActions) {
+                                     action: ManagerActions): ManagerEntityState {
 
   switch (action.type) {
 
