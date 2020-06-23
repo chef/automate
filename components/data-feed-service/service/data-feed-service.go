@@ -221,7 +221,7 @@ func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []st
 		log.Errorf("Error getting node run %v", err)
 		return nodeData, err
 	}
-	automaticAttrs := attributesJson["automatic"].(map[string]interface{})
+	automaticAttrs, _ := attributesJson["automatic"].(map[string]interface{})
 	ipaddress, macAddress, hostname := getHostAttributes(automaticAttrs)
 	nodeDataContent := make(map[string]interface{})
 	nodeData["client_run"] = lastRun
@@ -234,19 +234,44 @@ func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []st
 }
 
 func addDataContent(nodeDataContent map[string]interface{}, attributes map[string]interface{}) {
-	if strings.ToLower(attributes["os"].(string)) == "windows" {
-		kernel := attributes["kernel"].(map[string]interface{})
-		osInfo := kernel["os_info"].(map[string]interface{})
+	os, _ := attributes["os"].(string)
+	if strings.ToLower(os) == "windows" {
+		kernel, ok := attributes["kernel"].(map[string]interface{})
+		if !ok {
+			nodeDataContent["serial_number"] = ""
+			nodeDataContent["os_service_pack"] = ""
+			return
+		}
+
+		osInfo, ok := kernel["os_info"].(map[string]interface{})
+		if !ok {
+			nodeDataContent["serial_number"] = ""
+			nodeDataContent["os_service_pack"] = ""
+			return
+		}
 		nodeDataContent["serial_number"] = osInfo["serial_number"]
-		servicePackMajorVersion := fmt.Sprintf("%g", osInfo["service_pack_major_version"].(float64))
-		servicePackMinorVersion := fmt.Sprintf("%g", osInfo["service_pack_minor_version"].(float64))
+		nodeDataContent["os_service_pack"] = ""
+		majorVersion, ok := osInfo["service_pack_major_version"].(float64)
+		if !ok {
+			return
+		}
+		minorVersion, ok := osInfo["service_pack_minor_version"].(float64)
+		if !ok {
+			return
+		}
+		servicePackMajorVersion := fmt.Sprintf("%g", majorVersion)
+		servicePackMinorVersion := fmt.Sprintf("%g", minorVersion)
 		servicePack := strings.Join([]string{servicePackMajorVersion, servicePackMinorVersion}, ".")
 		nodeDataContent["os_service_pack"] = servicePack
 	} else {
 		// assume linux
-		dmi := attributes["dmi"].(map[string]interface{})
-		system := dmi["system"].(map[string]interface{})
-		nodeDataContent["serial_number"] = system["serial_number"]
+		dmi, _ := attributes["dmi"].(map[string]interface{})
+		system, _ := dmi["system"].(map[string]interface{})
+		serialNumber := system["serial_number"]
+		if serialNumber == nil {
+			serialNumber = ""
+		}
+		nodeDataContent["serial_number"] = serialNumber
 	}
 }
 
@@ -321,18 +346,10 @@ func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filter
 }
 
 func getHostAttributes(attributesJson map[string]interface{}) (string, string, string) {
-	var ipAddress string
-	var macAddress string
-	var hostname string
 
-	if attributesJson["ipaddress"] != nil {
-		ipAddress = attributesJson["ipaddress"].(string)
-	}
-	if attributesJson["macaddress"] != nil {
-		macAddress = attributesJson["macaddress"].(string)
-	}
-	if attributesJson["hostname"] != nil {
-		hostname = attributesJson["hostname"].(string)
-	}
+	ipAddress, _ := attributesJson["ipaddress"].(string)
+	macAddress, _ := attributesJson["macaddress"].(string)
+	hostname, _ := attributesJson["hostname"].(string)
+
 	return ipAddress, macAddress, hostname
 }
