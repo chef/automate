@@ -231,6 +231,17 @@ Select your Gravatar icon on the top right corner of the Chef Habitat Builder we
 
 Once you are signed in to the Chef Habitat Builder UI, select the **New Origin** button and enter `core` as the name for the origin.
 
+## Access Chef Habitat Builder On-prem With Habitat Command-Line Tools
+
+Use the URL `https://{{< example_fqdn "automate" >}}/bldr/v1` (note the `v1`) when
+accessing your Chef Habitat Builder installation with the Habitat command-line tools. The Habitat
+command-line tools recognize the [`HAB_BLDR_URL` environment variable](https://www.habitat.sh/docs/reference/), which you can set on
+the command line with:
+
+```bash
+export HAB_BLDR_URL=https://{{< example_fqdn "automate" >}}/bldr/v1/
+```
+
 ## Bootstrap Chef Habitat Builder with Core Packages (Optional)
 
 Prerequisites:
@@ -288,7 +299,7 @@ HAB_AUTH_TOKEN=<your_public_builder_personal_access_token> hab pkg download --ta
 
 ### Bulk-Upload Seed List Packages to Chef Habitat Builder on-prem
 
-Run the `bulkupload` command to upload artifacts from `<artifact-dir>` to the `<channel>` channel in on-premises Chef Habitat Builder:
+Run the `bulkupload` command to upload artifacts from `<artifact-dir>` to the `<channel>` channel in on-premises Chef Habitat Builder using the [Builder API endpoint]({{< ref "on-prem-builder.md#access-chef-habitat-builder-on-prem-with-habitat-command-line-tools" >}}):
 
 ```shell
 HAB_AUTH_TOKEN=<your_on-prem_Builder_personal_access_token> hab pkg bulkupload --url https://{{< example_fqdn "automate" >}}/bldr/v1 --channel <channel> <artifact-dir> --auto-create-origins
@@ -326,17 +337,14 @@ use the Chef Habitat Builder UI to create the necessary origins before running t
 
 To finish up, return to your Chef Habitat Builder on-prem installation and view the packages that you've added to your `core` origin at `https://{{< example_fqdn "automate" >}}/bldr/#/origins/core/packages`.
 
+## Using Chef Habitat Builder
+
+Because you are using an on-prem installation of Chef Habitat Builder, you must specify
+the [Builder API endpoint of your installation]({{< ref "on-prem-builder.md#access-chef-habitat-builder-on-prem-with-habitat-command-line-tools" >}}) when following the [Habitat Builder documentation](https://www.habitat.sh/docs/using-builder/). This documentation covers [using origin keys](https://www.habitat.sh/docs/using-builder/#using-origin-secrets), [using origin secrets](https://www.habitat.sh/docs/using-builder/#using-origin-secrets), and [uploading and promoting packages](https://www.habitat.sh/docs/using-builder/#upload-and-promote-packages).
+
 ## Operating Chef Habitat Builder
 
 Chef Habitat Builder uses the same mechanisms that Chef Automate does for [backups]({{< relref "backup.md" >}}), [log management]({{< relref "log-management.md" >}}), and [uninstalling]({{< relref "troubleshooting.md#uninstalling-chef-automate" >}}).
-
-### Chef Habitat Environment Variables
-
-Set the Chef Habitat Builder on-prem `HAB_BLDR_URL` environment variable on the command line with:
-
-```bash
-export HAB_BLDR_URL=https://{{< example_fqdn "automate" >}}/bldr/v1/
-```
 
 ### Logging errors
 
@@ -386,3 +394,4 @@ If you are using a certificate signed by a trusted certificate authority instead
 you can provide Builder with the root certificate authority for the signed certificate.
 
 For more information, check out this further explanation on how to [configure Builder to authenticate via Chef Automate](https://github.com/habitat-sh/on-prem-builder).
+
