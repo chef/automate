@@ -10,7 +10,7 @@ function start_workflow_server {
   log_line "Patching the deployment-service to enable workflow"
   cat << EOF > "/tmp/.enable_workflow_server.toml"
 [deployment.v1.svc]
-enable_workflow = true
+  products = ["automate-dev", "workflow"]
 EOF
   chef-automate config patch /tmp/.enable_workflow_server.toml
   rm /tmp/.enable_workflow_server.toml
