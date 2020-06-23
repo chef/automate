@@ -8,11 +8,13 @@ import {
 export interface CdsEntityState {
   contentItems: ContentItem[];
   getContentItemsStatus: EntityStatus;
+  installContentItemStatus: EntityStatus;
 }
 
 export const cdsEntityInitialState: CdsEntityState = {
   contentItems: [],
-  getContentItemsStatus: EntityStatus.notLoaded
+  getContentItemsStatus: EntityStatus.notLoaded,
+  installContentItemStatus: EntityStatus.notLoaded
 };
 
 export function desktopEntityReducer(state: CdsEntityState = cdsEntityInitialState,
@@ -29,6 +31,15 @@ export function desktopEntityReducer(state: CdsEntityState = cdsEntityInitialSta
 
     case CdsActionTypes.GET_CONTENT_ITEMS_FAILURE:
       return set('getContentItemsStatus', EntityStatus.loadingFailure, state);
+
+    case CdsActionTypes.INSTALL_CONTENT_ITEM:
+      return set('installContentItemStatus', EntityStatus.loading, state);
+
+    case CdsActionTypes.INSTALL_CONTENT_ITEM_SUCCESS:
+      return set('installContentItemStatus', EntityStatus.loadingSuccess, state);
+
+    case CdsActionTypes.INSTALL_CONTENT_ITEM_FAILURE:
+      return set('installContentItemStatus', EntityStatus.loadingFailure, state);
 
     default:
       return state;

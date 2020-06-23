@@ -1,7 +1,11 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ContentItem } from 'app/entities/cds/cds.model';
 
-import { CdsRequests } from 'app/entities/cds/cds.requests';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import {
+  InstallContentItem
+} from 'app/entities/cds/cds.actions';
 
 @Component({
   selector: 'app-card',
@@ -19,14 +23,14 @@ export class CardComponent implements OnChanges {
   platforms: string[];
   canBeInstall: boolean;
 
-  constructor(private cdsRequests: CdsRequests) { }
+  constructor(private store: Store<NgrxStateAtom>) { }
 
   clickedInstall(id: string) {
-    this.cdsRequests.installContentItem(id);
+    this.store.dispatch(new InstallContentItem({id}));
   }
 
-  clickedDownload(id: string) {
-    console.info('clickedDownload with ID: ' + id);
+  clickedDownload(_id: string) {
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {

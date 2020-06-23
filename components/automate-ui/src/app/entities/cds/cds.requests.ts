@@ -35,10 +35,10 @@ export class CdsRequests {
       mapRxjs(resp => this.convertToContentItems(resp)));
   }
 
-  public installContentItem(id: string) {
+  public installContentItem(id: string): Observable<any> {
     const url = `${CDS_URL}/install`;
 
-    this.http.post<any>(url, {id}).subscribe();
+    return this.http.post<any>(url, {id});
   }
 
   private convertToContentItems(resp: RespContentItems): ContentItem[] {
