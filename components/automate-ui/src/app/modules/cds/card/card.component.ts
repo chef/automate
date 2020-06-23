@@ -1,11 +1,5 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, OnChanges, SimpleChanges, EventEmitter } from '@angular/core';
 import { ContentItem } from 'app/entities/cds/cds.model';
-
-import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import {
-  InstallContentItem
-} from 'app/entities/cds/cds.actions';
 
 @Component({
   selector: 'app-card',
@@ -15,6 +9,7 @@ import {
 export class CardComponent implements OnChanges {
 
   @Input() contentItem: ContentItem;
+  @Output() onInstallItem: EventEmitter<string> = new EventEmitter();
 
   type: string;
   name: string;
@@ -23,10 +18,10 @@ export class CardComponent implements OnChanges {
   platforms: string[];
   canBeInstall: boolean;
 
-  constructor(private store: Store<NgrxStateAtom>) { }
+  constructor() { }
 
   clickedInstall(id: string) {
-    this.store.dispatch(new InstallContentItem({id}));
+    this.onInstallItem.emit(id);
   }
 
   clickedDownload(_id: string) {
