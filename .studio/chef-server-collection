@@ -6,7 +6,7 @@ DOC
 function start_chef_server() {
   cat << EOH > /tmp/.enable_chef_server.toml
 [deployment.v1.svc]
-  enable_chef_server = true
+  products = ["automate-dev", "chef-server"]
 EOH
   chef-automate config patch /tmp/.enable_chef_server.toml
   rm /tmp/.enable_chef_server.toml
