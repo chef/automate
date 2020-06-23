@@ -6,3 +6,7 @@ option go_package = "github.com/chef/automate/api/external/cds/request";
 message ContentItems {
 
 }
+
+message InstallContentItem {
+  string id = 1;
+}

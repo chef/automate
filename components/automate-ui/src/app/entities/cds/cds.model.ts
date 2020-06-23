@@ -3,6 +3,7 @@ export interface ContentItem {
   name: string;
   type: string;
   description: string;
-  status: string;
-  platform: string;
+  version: string;
+  platforms: string[];
+  canBeInstall: boolean;
 }

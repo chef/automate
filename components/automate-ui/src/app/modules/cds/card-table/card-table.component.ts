@@ -27,7 +27,7 @@ export class CardTableComponent implements OnChanges {
         } else {
           return concat(tail(acc), [concat(head, item)]);
         }
-      }, [], this.contentItems);
+      }, [], changes.contentItems.currentValue);
 
       this.collectionOfPairs = reverse(paired);
     }

@@ -30,4 +30,23 @@ service Cds {
     option (chef.automate.api.iam.policy).action = "content:items:list";
   };
 
+  /*
+  InstallContentItem
+
+  Installs a content item from its ID
+
+  Authorization Action:
+  ```
+  content:items:install
+  ```
+  */
+  rpc InstallContentItem(cds.request.InstallContentItem) returns (cds.response.InstallContentItem) {
+    option (google.api.http) = {
+      post: "/api/beta/content/install"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "content:items";
+    option (chef.automate.api.iam.policy).action = "content:items:install";
+  };
+
 }
