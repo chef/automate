@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import * as moment from 'moment/moment';
 
 import { LicenseFacadeService, LicenseApplyReason } from 'app/entities/license/license.facade';
@@ -51,12 +52,21 @@ export class LicenseApplyComponent implements AfterViewInit {
     public licenseFacade: LicenseFacadeService,
     private chefSessionService: ChefSessionService,
     fb: FormBuilder) {
+      // keep these subscriptions always present
+
       this.licenseFacade.licenseApplyReason$.subscribe((reason) => {
         this.licenseApplyReason = reason;
         if (this.licenseApplyReason === LicenseApplyReason.LICENSE_ABOUT_TO_EXPIRE) {
           this.modalLocked = false;
         }
       });
+      this.licenseFacade.fetchLicense$.pipe(
+        filter(state =>
+          this.modalVisible
+          && state.status === EntityStatus.loadingSuccess
+          && !moment().isAfter(state.license.licensed_period.end)))
+        .subscribe(() => this.closeModal());
+
       this.applyForm = fb.group({
         licenseKey: ['', [Validators.required]]
       });
