@@ -16,7 +16,7 @@ export const cdsEntityInitialState: CdsEntityState = {
 };
 
 export function desktopEntityReducer(state: CdsEntityState = cdsEntityInitialState,
-  action: CdsActions) {
+  action: CdsActions): CdsEntityState {
 
   switch (action.type) {
     case CdsActionTypes.GET_CONTENT_ITEMS:
@@ -25,7 +25,7 @@ export function desktopEntityReducer(state: CdsEntityState = cdsEntityInitialSta
     case CdsActionTypes.GET_CONTENT_ITEMS_SUCCESS:
       return pipe(
         set('getContentItemsStatus', EntityStatus.loadingSuccess),
-        set('contentItems', action.payload))(state);
+        set('contentItems', action.payload))(state) as CdsEntityState;
 
     case CdsActionTypes.GET_CONTENT_ITEMS_FAILURE:
       return set('getContentItemsStatus', EntityStatus.loadingFailure, state);
