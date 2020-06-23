@@ -50,7 +50,7 @@ export const ClientRunsEntityInitialState: ClientRunsEntityState = {
 
 export function clientRunsEntityReducer(
       state: ClientRunsEntityState = ClientRunsEntityInitialState,
-      action: ClientRunsActions) {
+      action: ClientRunsActions): ClientRunsEntityState {
 
   switch (action.type) {
 

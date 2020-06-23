@@ -20,7 +20,7 @@ export const RoleEntityInitialState: RoleEntityState = roleEntityAdapter.getInit
 });
 
 export function roleEntityReducer(state: RoleEntityState = RoleEntityInitialState,
-  action: RoleActions) {
+  action: RoleActions): RoleEntityState {
 
   switch (action.type) {
     case RoleActionTypes.GET_ALL:

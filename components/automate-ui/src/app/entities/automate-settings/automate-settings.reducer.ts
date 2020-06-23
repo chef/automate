@@ -28,7 +28,7 @@ export const AutomateSettingsEntityInitialState: AutomateSettingsEntityState = {
 
 export function automateSettingsEntityReducer(
       state: AutomateSettingsEntityState = AutomateSettingsEntityInitialState,
-      action: AutomateSettingsActions) {
+      action: AutomateSettingsActions): AutomateSettingsEntityState {
 
   switch (action.type) {
 

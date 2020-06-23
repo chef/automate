@@ -16,7 +16,7 @@ export const JobEntityInitialState: JobEntityState = jobEntityAdapter.getInitial
 });
 
 export function jobEntityReducer(state: JobEntityState = JobEntityInitialState,
-                                 action: JobActions) {
+                                 action: JobActions): JobEntityState {
 
   switch (action.type) {
 

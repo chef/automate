@@ -19,7 +19,7 @@ export const UserSelfEntityInitialState: UserSelfEntityState = {
 };
 
 export function userSelfEntityReducer(state: UserSelfEntityState = UserSelfEntityInitialState,
-  action: UserSelfActions) {
+  action: UserSelfActions): UserSelfEntityState {
 
   switch (action.type) {
     case UserSelfActionTypes.SET_ID:

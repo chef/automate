@@ -18,7 +18,7 @@ export const IntegrationsEditInitialState: IntegrationsEditState = {
 };
 
 export function integrationsEditReducer(state: IntegrationsEditState = IntegrationsEditInitialState,
-                                        action: ManagerActions) {
+                                        action: ManagerActions): IntegrationsEditState {
   switch (action.type) {
     case ManagerActionTypes.UPDATE:
       return set('status', Status.updating, state);

@@ -32,7 +32,7 @@ export const IntegrationsDetailInitialState: IntegrationsDetailState = {
 
 export function integrationsDetailReducer(
   state: IntegrationsDetailState = IntegrationsDetailInitialState,
-  action: ManagerActions) {
+  action: ManagerActions): IntegrationsDetailState {
 
   switch (action.type) {
     case ManagerActionTypes.GET:
