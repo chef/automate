@@ -138,7 +138,6 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 			cfgErr.AddMissingKey("global.v1.backups.gcs.bucket.name")
 		}
 
-		// Make sure the user has the path to the gcs creds set and it is accessible
 		gcsJSON := bu.GetGcs().GetCredentials().GetJson().GetValue()
 		if gcsJSON == "" {
 			cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.json")

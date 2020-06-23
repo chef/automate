@@ -211,7 +211,7 @@ message Backups {
 		message Elasticsearch {
 			// Backup repo settings
 			google.protobuf.BoolValue compress = 2;
-			 google.protobuf.BoolValue application_name = 3;
+			google.protobuf.BoolValue application_name = 3;
 			// Snapshot settings
 			google.protobuf.StringValue max_snapshot_bytes_per_sec = 4;
 			google.protobuf.StringValue max_restore_bytes_per_sec = 5;
