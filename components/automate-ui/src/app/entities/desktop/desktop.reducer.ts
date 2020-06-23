@@ -76,7 +76,7 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
     case DesktopActionTypes.GET_DAILY_CHECK_IN_TIME_SERIES_SUCCESS:
       return pipe(
         set('getDailyCheckInTimeSeriesStatus', EntityStatus.loadingSuccess),
-        set('dailyCheckInCountCollection', action.payload))(state);
+        set('dailyCheckInCountCollection', action.payload))(state) as DesktopEntityState;
 
     case DesktopActionTypes.GET_DAILY_CHECK_IN_TIME_SERIES_FAILURE:
       return set('getDailyCheckInTimeSeriesStatus', EntityStatus.loadingFailure, state);
@@ -85,12 +85,12 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
       return pipe(
         set('dailyNodeRuns.status', EntityStatus.loading),
         set('dailyNodeRuns.nodeId', action.nodeId),
-        set('dailyNodeRuns.daysAgo', action.daysAgo))(state);
+        set('dailyNodeRuns.daysAgo', action.daysAgo))(state) as DesktopEntityState;
 
     case DesktopActionTypes.GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES_SUCCESS:
       return pipe(
         set('dailyNodeRuns.status', EntityStatus.loadingSuccess),
-        set('dailyNodeRuns.durations', action.payload))(state);
+        set('dailyNodeRuns.durations', action.payload))(state) as DesktopEntityState;
 
     case DesktopActionTypes.GET_DAILY_NODE_RUNS_STATUS_TIME_SERIES_FAILURE:
       return set('dailyNodeRuns.status', EntityStatus.loadingFailure, state);
@@ -101,7 +101,7 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
     case DesktopActionTypes.GET_TOP_ERRORS_COLLECTION_SUCCESS:
       return pipe(
         set('getTopErrorCollectionStatus', EntityStatus.loadingSuccess),
-        set('topErrorCollection', action.payload))(state);
+        set('topErrorCollection', action.payload))(state) as DesktopEntityState;
 
     case DesktopActionTypes.GET_TOP_ERRORS_COLLECTION_FAILURE:
       return set('getTopErrorCollectionStatus', EntityStatus.loadingFailure, state);
@@ -112,7 +112,7 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
     case DesktopActionTypes.GET_UNKNOWN_DESKTOP_DURATION_COUNTS_SUCCESS:
       return pipe(
         set('getUnknownDesktopDurationCountsStatus', EntityStatus.loadingSuccess),
-        set('unknownDesktopDurationCounts', action.payload))(state);
+        set('unknownDesktopDurationCounts', action.payload))(state) as DesktopEntityState;
 
     case DesktopActionTypes.GET_UNKNOWN_DESKTOP_DURATION_COUNTS_FAILURE:
       return set('getUnknownDesktopDurationCountsStatus', EntityStatus.loadingFailure, state);
@@ -123,7 +123,7 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
     case DesktopActionTypes.GET_DESKTOPS_SUCCESS:
       return pipe(
         set('getDesktopsStatus', EntityStatus.loadingSuccess),
-        set('desktops', action.payload))(state);
+        set('desktops', action.payload))(state) as DesktopEntityState;
 
     case DesktopActionTypes.GET_DESKTOPS_FAILURE:
       return set('getDesktopsStatus', EntityStatus.loadingFailure, state);
@@ -134,7 +134,7 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
     case DesktopActionTypes.GET_DESKTOPS_TOTAL_SUCCESS:
       return pipe(
         set('getDesktopsTotalStatus', EntityStatus.loadingSuccess),
-        set('desktopsTotal', action.payload))(state);
+        set('desktopsTotal', action.payload))(state) as DesktopEntityState;
 
     case DesktopActionTypes.GET_DESKTOPS_TOTAL_FAILURE:
       return set('getDesktopsTotalStatus', EntityStatus.loadingFailure, state);
@@ -147,13 +147,13 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
         set('getDesktopsFilter.terms',
           concat(state.getDesktopsFilter.terms, [action.payload.term])),
         set('getDesktopsFilter.currentPage', 1)
-      )(state);
+      )(state) as DesktopEntityState;
 
     case DesktopActionTypes.UPDATE_DESKTOPS_FILTER_TERMS:
       return pipe(
         set('getDesktopsFilter.terms', action.payload.terms ),
         set('getDesktopsFilter.currentPage', 1)
-      )(state);
+      )(state) as DesktopEntityState;
 
     case DesktopActionTypes.REMOVE_DESKTOPS_FILTER_TERM:
       return pipe(
@@ -162,7 +162,7 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
             term.type === action.payload.term.type,
             state.getDesktopsFilter.terms)),
         set('getDesktopsFilter.currentPage', 1)
-      )(state);
+      )(state) as DesktopEntityState;
 
     case DesktopActionTypes.UPDATE_DESKTOPS_SORT_TERM:
       let order = SortOrder.Ascending;
@@ -175,7 +175,7 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
       return pipe(
         set('getDesktopsFilter.sortingField', action.payload.term),
         set('getDesktopsFilter.sortingOrder', order)
-      )(state);
+      )(state) as DesktopEntityState;
 
     default:
       return state;

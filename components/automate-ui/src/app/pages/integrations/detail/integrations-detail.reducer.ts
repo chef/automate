@@ -43,7 +43,7 @@ export function integrationsDetailReducer(
       return pipe(
         set('manager', manager),
         set('managerLoadingStatus', Status.success)
-      )(state);
+      )(state) as IntegrationsDetailState;
 
     case ManagerActionTypes.GET_NODES:
       return set('managerNodesLoadingStatus', Status.loading, state);
@@ -54,7 +54,7 @@ export function integrationsDetailReducer(
         set('managerNodes', nodes),
         set('managerNodesTotal', total),
         set('managerNodesLoadingStatus', Status.success)
-      )(state);
+      )(state) as IntegrationsDetailState;
 
     case ManagerActionTypes.NAV_DETAIL:
       const { page, per_page } = action.payload;
@@ -63,7 +63,7 @@ export function integrationsDetailReducer(
         set('managerNodesPage', page),
         set('managerNodesPerPage', per_page),
         set('managerNodesLoadingStatus', Status.notLoaded)
-      )(state);
+      )(state) as IntegrationsDetailState;
 
     default:
       return state;

@@ -38,12 +38,13 @@ export function automateSettingsEntityReducer(
     case AutomateSettingsActionTypes.GET_SETTINGS_SUCCESS:
       return pipe(
         set('status', EntityStatus.loadingSuccess),
-        set('jobSchedulerStatus', action.payload.jobSchedulerStatus))(state);
+        set('jobSchedulerStatus', action.payload.jobSchedulerStatus))
+        (state) as AutomateSettingsEntityState;
 
     case AutomateSettingsActionTypes.GET_SETTINGS_FAILURE:
       return pipe(
         set('status', EntityStatus.loadingFailure),
-        set('errorResp', action.payload))(state);
+        set('errorResp', action.payload))(state) as AutomateSettingsEntityState;
 
     case AutomateSettingsActionTypes.CONFIGURE_SETTINGS:
       return set('changeConfiguration.status', EntityStatus.loading, state);
@@ -51,12 +52,13 @@ export function automateSettingsEntityReducer(
     case AutomateSettingsActionTypes.CONFIGURE_SETTINGS_SUCCESS:
       return pipe(
         set('changeConfiguration.status', EntityStatus.loadingSuccess),
-        set('changeConfiguration.errorResp', null))(state);
+        set('changeConfiguration.errorResp', null))(state) as AutomateSettingsEntityState;
 
     case AutomateSettingsActionTypes.CONFIGURE_SETTINGS_FAILURE:
       return pipe(
         set('changeConfiguration.status', EntityStatus.loadingFailure),
-        set('changeConfiguration.errorResp', action.payload))(state);
+        set('changeConfiguration.errorResp', action.payload))
+        (state) as AutomateSettingsEntityState;
 
     default:
       return state;
