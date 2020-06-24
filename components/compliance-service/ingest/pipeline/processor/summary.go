@@ -80,9 +80,12 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 				// If at least one of the profiles in the report comes in with "failed" status, we ignore the totalSum aggregation which might have all
 				// controls passed from another profile. This way we flag the failure of a profile without running any controls, e.g. profile parse error.
 				msg.Shared.Status = inspec.ResultStatusFailed
-			} else if skippedProfiles == len(msg.Report.Profiles) {
+			} else if skippedProfiles > 0 && skippedProfiles == len(msg.Report.Profiles) {
 				// If the ingested report has the status of "skipped" for all profiles, we mark the report as "skipped"
 				msg.Shared.Status = inspec.ResultStatusSkipped
+			} else if len(msg.Report.Profiles) == 0 {
+				// If the report has no profiles at all, InSpec most likely threw a runtime exception
+				msg.Shared.Status = inspec.ResultStatusFailed
 			} else {
 				// Otherwise, we leave the summary of all profiles in the report to decide the overall status
 				msg.Shared.Status = compliance.ReportComplianceStatus(totalSum)
