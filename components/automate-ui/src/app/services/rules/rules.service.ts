@@ -70,7 +70,7 @@ export class RulesService {
     return this.updateSecret(rule, targetUsername, targetPassword)
       .pipe(mergeMap((secreteId: string) => {
         rule.targetSecretId = secreteId;
-        const response: any = rule.toRequest();
+        const response = rule.toRequest();
         // special case for authz handling - id needs to be in top level of request params
         response.id = ruleId;
 

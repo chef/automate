@@ -15,6 +15,17 @@ export interface RuleInterface {
   targetType: ServiceActionType;
 }
 
+export interface NotificationTarget {
+  id?: string;
+  url?: string;
+  secret_id?: string;
+  critical_controls_only?: boolean;
+}
+
+export interface NotificationRuleTarget {
+  id?: string;
+  rule: {};
+}
 
 export class Rule implements RuleInterface {
 
@@ -77,8 +88,8 @@ export class Rule implements RuleInterface {
     return Object.keys(this.TargetTypeLabels);
   }
 
-  public toRequest(): Object {
-    let target: any = {'url': this.targetUrl};
+  public toRequest(): NotificationRuleTarget {
+    let target: NotificationTarget = {'url': this.targetUrl};
     if (this.targetSecretId !== undefined && this.targetSecretId !== '' ) {
       target = {
         'url': this.targetUrl,

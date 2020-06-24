@@ -22,6 +22,11 @@ export interface NotificationTarget {
   critical_controls_only?: boolean;
 }
 
+export interface NotificationRuleTarget {
+  id?: string;
+  rule: {};
+}
+
 export class NotificationRule implements RuleInterface {
 
   AlertTypeLabels = {
@@ -83,7 +88,7 @@ export class NotificationRule implements RuleInterface {
     return Object.keys(this.TargetTypeLabels);
   }
 
-  public toRequest(): Object {
+  public toRequest(): NotificationRuleTarget {
     let target: NotificationTarget = { url: this.targetUrl };
     if (this.targetSecretId !== undefined && this.targetSecretId !== '' ) {
       target = {
@@ -94,7 +99,8 @@ export class NotificationRule implements RuleInterface {
     }
 
     return {
-      'rule': {
+      id: this.id,
+      rule: {
         'name': this.name,
         'event': this.ruleType,
         [this.targetType]: target
