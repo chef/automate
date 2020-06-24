@@ -80,7 +80,9 @@ export class NodesListComponent implements OnInit, OnDestroy {
   }
 
   filterFor(type: string, item: string): void {
-    if (type === 'last_contact') {
+    if (type === 'last_contact' ||
+          type === 'last_scan_timerange' ||
+            type === 'last_run_timerange') {
       // for a last contact filter, we send in two dates - beg of day and end of day
       this.nodesListFilters.push({key: type,
         values: [
@@ -127,6 +129,10 @@ export class NodesListComponent implements OnInit, OnDestroy {
       }
     }
     return undefined;
+  }
+
+  formatTime(datestamp) {
+    return datestamp ? moment(datestamp).fromNow() : '-';
   }
 
   negateFilter(filter: string): void {
