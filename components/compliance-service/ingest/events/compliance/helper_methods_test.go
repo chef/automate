@@ -170,7 +170,7 @@ func TestSummary(t *testing.T) {
 	assert.Equal(t, inspec.ResultStatusFailed, ReportComplianceStatus(summary1), "Report status is failed")
 	assert.Equal(t, inspec.ResultStatusPassed, ReportComplianceStatus(summary2), "Report status is passed")
 	summary3 := reporting.NodeControlSummary{}
-	assert.Equal(t, inspec.ResultStatusSkipped, ReportComplianceStatus(&summary3), "Report status is skipped")
+	assert.Equal(t, inspec.ResultStatusPassed, ReportComplianceStatus(&summary3), "Report status is passed")
 	summary3.Total = 3
 	summary3.Skipped.Total = 3
 	assert.Equal(t, inspec.ResultStatusSkipped, ReportComplianceStatus(&summary3), "Report status is skipped")
