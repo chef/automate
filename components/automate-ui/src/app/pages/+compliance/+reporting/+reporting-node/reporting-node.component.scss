@@ -126,7 +126,37 @@ chef-loading-spinner {
   }
 }
 
+#failed-count {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5em;
+  cursor: pointer;
+
+  chef-icon {
+    margin: 0 0 0 0.25em;
+    color: $chef-primary-bright;
+  }
+}
+
 chef-tooltip[for='skipped-count'] {
+  margin-right: 50px;
+
+  ul {
+    margin: 0;
+    padding-left: 1em;
+
+    li {
+      font-size: 14px;
+      margin-bottom: 1em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+chef-tooltip[for='failed-count'] {
   margin-right: 50px;
 
   ul {

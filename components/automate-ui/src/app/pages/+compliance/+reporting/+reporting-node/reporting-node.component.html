@@ -110,7 +110,7 @@
                       <ng-container *ngIf="profilesByStatus(activeReport.profiles, 'failed'); let failed">
                         <span id="skipped-count" *ngIf="failed.length > 0">
                           ({{ failed.length | number }} Failed <chef-icon>info</chef-icon>)
-                          <chef-tooltip for="skipped-count">
+                          <chef-tooltip for="failed-count">
                             <p>Failed profile<span *ngIf="failed.length > 1">s</span>:</p>
                             <ul>
                               <li *ngFor="let profile of failed"><strong>{{ profile.name }}</strong> <span *ngIf="profile.skip_message != ''">({{ profile.skip_message }})</span></li>
