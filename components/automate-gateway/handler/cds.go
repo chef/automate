@@ -30,3 +30,14 @@ func (s *CdsServer) ListContentItems(ctx context.Context,
 
 	return s.client.ListContentItems(ctx, request)
 }
+
+// InstallContentItem - Returns a list of CDS content metadata
+func (s *CdsServer) InstallContentItem(ctx context.Context,
+	request *request.InstallContentItem) (*response.InstallContentItem, error) {
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return s.client.InstallContentItem(ctx, request)
+}

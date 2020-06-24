@@ -335,17 +335,21 @@ wait-for-es:
 # Waiting to avoid starting the tests before the test reports have been ingested 100%
 wait-for-ingestion:
 	@i=1; \
+	curl_output="-=init=-"; \
 	max_loops=50; \
+	es_docs=30; \
+	healthy_match="\"total\":$$es_docs,\"successful\":$$es_docs"; \
 	printf "\n===> ${blue}Checking ElasticSearch to ensure it has ingested our reports${reset}\n"; \
-	curl -s -X GET "$(ELASTICSEARCH_URL)/comp-*-r-20*/_doc/_count" | grep '"total":25,"successful":25' > /dev/null; \
+	curl -s -X GET "$(ELASTICSEARCH_URL)/comp-*-r-20*/_doc/_count" | grep $$healthy_match > /dev/null; \
 	while [ $$? -ne 0 -a $$i -lt $$max_loops ]; do \
 	  printf " * ${yellow}$$i ElasticSearch is still ingesting, retrying...${reset}\n"; \
 	  sleep 5; \
 	  i=$$(( $$i + 1 )); \
-	  curl -s -X GET "$(ELASTICSEARCH_URL)/comp-*-r-20*/_doc/_count" | grep '"total":20,"successful":20' > /dev/null; \
+	  curl_output=`curl -s -X GET "$(ELASTICSEARCH_URL)/comp-*-r-20*/_doc/_count"`; \
+		echo $$curl_output | grep $$healthy_match > /dev/null; \
 	done; \
 	if [ $$i -eq $$max_loops ]; then \
-	  printf "${red}Timeout waiting for ingestion to complete${reset}, cc_es$(ES_VER) logs:\n"; \
+	  printf "\n${red}Timeout waiting for ingestion to complete, _doc/_count output:${yellow}\n$$curl_output\n${reset}doesn't include:\n${green}$$healthy_match${reset}\n\ncc_es$(ES_VER) logs:\n"; \
 	  docker logs cc_es$(ES_VER) --since 2000; \
 	  exit 1; \
 	fi; \

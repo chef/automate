@@ -560,6 +560,12 @@ var ComplianceRepDate = Mapping{
 				},
 				"run_time_limit": {
 				  "type": "double"
+				},
+				"status": {
+					"type": "keyword"
+				},
+				"status_message": {
+					"type": "keyword"
 				}
       }
     }

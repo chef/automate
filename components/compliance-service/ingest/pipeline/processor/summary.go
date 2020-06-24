@@ -76,21 +76,27 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 			msg.Shared.PerProfileSums = perProfileSums
 			msg.Shared.AllProfileSums = totalSum
 
-			if failedProfiles > 0 {
-				// If at least one of the profiles in the report comes in with "failed" status, we ignore the totalSum aggregation which might have all
-				// controls passed from another profile. This way we flag the failure of a profile without running any controls, e.g. profile parse error.
-				msg.Shared.Status = inspec.ResultStatusFailed
-			} else if skippedProfiles > 0 && skippedProfiles == len(msg.Report.Profiles) {
-				// If the ingested report has the status of "skipped" for all profiles, we mark the report as "skipped"
-				msg.Shared.Status = inspec.ResultStatusSkipped
-			} else if len(msg.Report.Profiles) == 0 {
-				// If the report has no profiles at all, InSpec most likely threw a runtime exception
-				msg.Shared.Status = inspec.ResultStatusFailed
+			if msg.Report.Status == "failed" && len(msg.Report.Profiles) == 0 {
+				msg.Shared.Status = msg.Report.Status
+				msg.Shared.StatusMessage = msg.Report.StatusMessage
+				logrus.Warn("Report status is failed and there are not profiles")
 			} else {
-				// Otherwise, we leave the summary of all profiles in the report to decide the overall status
-				msg.Shared.Status = compliance.ReportComplianceStatus(totalSum)
-			}
+				if failedProfiles > 0 {
+					// If at least one of the profiles in the report comes in with "failed" status, we ignore the totalSum aggregation which might have all
+					// controls passed from another profile. This way we flag the failure of a profile without running any controls, e.g. profile parse error.
+					msg.Shared.Status = inspec.ResultStatusFailed
+				} else if skippedProfiles > 0 && skippedProfiles == len(msg.Report.Profiles) {
+					// If the ingested report has the status of "skipped" for all profiles, we mark the report as "skipped"
+					msg.Shared.Status = inspec.ResultStatusSkipped
+				} else if len(msg.Report.Profiles) == 0 {
+					// If the report has no profiles at all, InSpec most likely threw a runtime exception
+					msg.Shared.Status = inspec.ResultStatusFailed
+				} else {
+					// Otherwise, we leave the summary of all profiles in the report to decide the overall status
+					msg.Shared.Status = compliance.ReportComplianceStatus(totalSum)
+				}
 
+			}
 			msg.Shared.EndTime, err = time.Parse(time.RFC3339, msg.Report.EndTime)
 			if err != nil {
 				grpcErr := status.Errorf(codes.Internal, "Unable to Parse end_time: %s", err)
@@ -126,6 +132,7 @@ func ComplianceSummary(in <-chan message.Compliance) <-chan message.Compliance {
 				ControlsSums:     *msg.Shared.AllProfileSums,
 				Profiles:         msg.Shared.PerProfileSums,
 				Status:           msg.Shared.Status,
+				StatusMessage:    msg.Shared.StatusMessage,
 				DocVersion:       compliance.DocVersion,
 				ESTimestamp:      compliance.CurrentTime(),
 				PolicyName:       msg.Report.PolicyName,

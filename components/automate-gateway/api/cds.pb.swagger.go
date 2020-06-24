@@ -14,6 +14,34 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/beta/content/install": {
+      "post": {
+        "summary": "InstallContentItem",
+        "description": "Installs a content item from its ID\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:items:install\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "InstallContentItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cds.response.InstallContentItem"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cds.request.InstallContentItem"
+            }
+          }
+        ],
+        "tags": [
+          "Cds"
+        ]
+      }
+    },
     "/api/beta/content/items": {
       "get": {
         "summary": "ListContentItems",
@@ -34,9 +62,20 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.cds.request.InstallContentItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.cds.response.ContentItem": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         },
@@ -49,8 +88,15 @@ func init() {
         "version": {
           "type": "string"
         },
-        "platform": {
-          "type": "string"
+        "platforms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "can_be_installed": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -64,6 +110,9 @@ func init() {
           }
         }
       }
+    },
+    "chef.automate.api.cds.response.InstallContentItem": {
+      "type": "object"
     }
   }
 }

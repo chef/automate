@@ -3,10 +3,26 @@
 
 package cds
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import (
+	request "github.com/chef/automate/api/external/cds/request"
+	policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+)
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.cds.Cds/ListContentItems", "content:items", "content:items:list", "GET", "/api/beta/content/items", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
+	})
+	policy.MapMethodTo("/chef.automate.api.cds.Cds/InstallContentItem", "content:items", "content:items:install", "POST", "/api/beta/content/install", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.InstallContentItem); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "id":
+					return m.Id
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
 	})
 }

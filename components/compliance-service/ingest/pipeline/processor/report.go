@@ -41,6 +41,7 @@ func ComplianceReport(in <-chan message.Compliance) <-chan message.Compliance {
 				ControlsSums:     *msg.Shared.AllProfileSums,
 				Profiles:         compliance.ReportProfilesFromInSpecProfiles(msg.Report.Profiles, msg.Shared.PerProfileSums),
 				Status:           msg.Shared.Status,
+				StatusMessage:    msg.Shared.StatusMessage,
 				InSpecVersion:    msg.Report.Version,
 				DocVersion:       compliance.DocVersion,
 				ESTimestamp:      compliance.CurrentTime(),

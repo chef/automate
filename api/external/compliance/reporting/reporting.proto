@@ -478,6 +478,8 @@ message Report {
 	repeated string chef_tags = 18;
 	// The projects the node is assigned to.
 	repeated string projects = 20;
+	// The status message of the report.
+    string status_message = 21;
 }
 
 message Profile {

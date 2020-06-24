@@ -136,22 +136,19 @@ func ParseAPIError(err error) error {
 	return err
 }
 
-// DefaultIfEmpty returns the raw empty JSON string.
-func DefaultIfEmpty(value string) string {
-	if value == "" {
-		value = "{}"
-	}
-
-	return value
-}
-
 // StructToJSON convert the structpb to JSON interface object.
 func StructToJSON(data *structpb.Struct) (interface{}, error) {
-	var v interface{}
-	m := jsonpb.Marshaler{}
+	if data == nil {
+		data = &structpb.Struct{}
+	}
 
-	jsonStr, _ := m.MarshalToString(data)
-	err := json.Unmarshal(json.RawMessage(jsonStr), &v)
+	jsonStr, err := (&jsonpb.Marshaler{}).MarshalToString(data)
+	if err != nil {
+		return nil, err
+	}
+
+	var v interface{}
+	err = json.Unmarshal(json.RawMessage(jsonStr), &v)
 
 	return v, err
 }
