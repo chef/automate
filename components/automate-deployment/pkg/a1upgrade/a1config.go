@@ -216,6 +216,7 @@ type PrivateChef struct {
 	Bookshelf     Bookshelf     `json:"bookshelf"`
 	OcID          OcID          `json:"oc_id"`
 	DataCollector DataCollector `json:"data_collector"`
+	CSNginx       CSNginx       `json:"nginx"`
 }
 
 type OpscodeErchef struct {
@@ -256,6 +257,22 @@ type OpscodeErchef struct {
 	KeygenStartSize        json.Number `json:"keygen_start_size"`
 	KeygenTimeout          json.Number `json:"keygen_timeout"`
 	StrictSearchResultACLs bool        `json:"strict_search_result_acls"`
+}
+
+type CSNginx struct {
+	ProxyConnectTimeout       json.Number `json:"proxy_connect_timeout"`
+	WorkerProcesses           json.Number `json:"worker_processes"`
+	WorkerConnections         json.Number `json:"worker_connections"`
+	Sendfile                  string      `json:"sendfile"`
+	TCPNodelay                string      `json:"tcp_nodelay"`
+	TCPNopush                 string      `json:"tcp_nopush"`
+	Gzip                      string      `json:"gzip"`
+	GzipHTTPVersion           string      `json:"gzip_http_version"`
+	GzipCompLevel             string      `json:"gzip_comp_level"`
+	GzipProxied               string      `json:"gzip_proxied"`
+	KeepaliveTimeout          json.Number `json:"keepalive_timeout"`
+	ClientMaxBodySize         string      `json:"client_max_body_size"`
+	ServerNamesHashBucketSize json.Number `json:"server_names_hash_bucket_size"`
 }
 
 type DataCollector struct {

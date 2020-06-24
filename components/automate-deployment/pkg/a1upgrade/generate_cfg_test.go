@@ -307,6 +307,17 @@ func TestErchefSettings(t *testing.T) {
 	})
 }
 
+func TestInfraSettings(t *testing.T) {
+	t.Run("parses worker connections", func(t *testing.T) {
+		r := newMockChefServerRunnig(t)
+
+		ngx, err := getInfraServerNginxSettings(r)
+		require.NoError(t, err)
+
+		require.Equal(t, int32(10240), ngx.Ngx.Events.WorkerConnections.GetValue())
+	})
+}
+
 func newMockDeliveryRunning(t *testing.T) *DeliveryRunning {
 	config := NewA1Config()
 	config.DeliveryRunningPath = fixturePath("delivery-running.json")

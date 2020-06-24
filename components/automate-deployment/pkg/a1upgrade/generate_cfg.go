@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/config/authn"
+	"github.com/chef/automate/api/config/cs_nginx"
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/dex"
 	es "github.com/chef/automate/api/config/elasticsearch"
@@ -549,6 +550,50 @@ func getErchefSettings(r *ChefServerRunning) (*erchef.ConfigRequest_V1_System, e
 	return sys, nil
 }
 
+func getInfraServerNginxSettings(cs *ChefServerRunning) (*cs_nginx.ConfigRequest_V1_System, error) {
+	var err error
+
+	ngx := cs.PrivateChef.CSNginx
+	sys := cs_nginx.NewConfigRequest().GetV1().GetSys()
+
+	sys.Ngx.Http.ProxyConnectTimeout, err = to32w(ngx.ProxyConnectTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Main.WorkerProcesses, err = to32w(ngx.WorkerProcesses)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Events.WorkerConnections, err = to32w(ngx.WorkerConnections)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Http.Sendfile = w.String(ngx.Sendfile)
+	sys.Ngx.Http.TcpNodelay = w.String(ngx.TCPNodelay)
+	sys.Ngx.Http.TcpNopush = w.String(ngx.TCPNopush)
+	sys.Ngx.Http.Gzip = w.String(ngx.Gzip)
+	sys.Ngx.Http.GzipHttpVersion = w.String(ngx.GzipHTTPVersion)
+	sys.Ngx.Http.GzipCompLevel = w.String(ngx.GzipCompLevel)
+	sys.Ngx.Http.GzipProxied = w.String(ngx.GzipProxied)
+
+	sys.Ngx.Http.KeepaliveTimeout, err = to32w(ngx.KeepaliveTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Http.ClientMaxBodySize = w.String(ngx.ClientMaxBodySize)
+
+	sys.Ngx.Http.ServerNamesHashBucketSize, err = to32w(ngx.ServerNamesHashBucketSize)
+	if err != nil {
+		return sys, err
+	}
+
+	return sys, nil
+}
+
 func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets, cs *ChefServerRunning) (*dc.AutomateConfig, error) {
 	frontendTLSCreds, err := getFrontendTLSCreds(r)
 	if err != nil {
@@ -677,18 +722,30 @@ func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets, cs 
 		},
 	}
 
-	// Add Chef Server config if it exists
-	if cs != nil {
-		erchefSys, err := getErchefSettings(cs)
-		if err != nil {
-			return cfg, err
-		}
+	// Return early if we're not migrating Chef Infra Serverc config
+	if cs == nil {
+		return cfg, nil
+	}
 
-		cfg.Erchef = &erchef.ConfigRequest{
-			V1: &erchef.ConfigRequest_V1{
-				Sys: erchefSys,
-			},
-		}
+	erchefSys, err := getErchefSettings(cs)
+	if err != nil {
+		return cfg, err
+	}
+
+	infraNginxSys, err := getInfraServerNginxSettings(cs)
+	if err != nil {
+		return cfg, err
+	}
+
+	cfg.Erchef = &erchef.ConfigRequest{
+		V1: &erchef.ConfigRequest_V1{
+			Sys: erchefSys,
+		},
+	}
+	cfg.CsNginx = &cs_nginx.ConfigRequest{
+		V1: &cs_nginx.ConfigRequest_V1{
+			Sys: infraNginxSys,
+		},
 	}
 
 	return cfg, nil
