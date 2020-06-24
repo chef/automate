@@ -70,7 +70,6 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	password := ""
 	var err error
 	url := request.Url
-	log.Infof("TestDestination %s", url)
 	switch request.Credentials.(type) {
 	case *datafeed.URLValidationRequest_UsernamePassword:
 		username = request.GetUsernamePassword().GetUsername()
