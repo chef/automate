@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, OnChanges, SimpleChanges, EventEmitter } from '@angular/core';
 import { ContentItem } from 'app/entities/cds/cds.model';
 
 @Component({
@@ -6,9 +6,36 @@ import { ContentItem } from 'app/entities/cds/cds.model';
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss']
 })
-export class CardComponent {
+export class CardComponent implements OnChanges {
 
   @Input() contentItem: ContentItem;
+  @Output() onInstallItem: EventEmitter<string> = new EventEmitter();
+
+  type: string;
+  name: string;
+  version: string;
+  description: string;
+  platforms: string[];
+  canBeInstall: boolean;
 
   constructor() { }
+
+  clickedInstall(id: string) {
+    this.onInstallItem.emit(id);
+  }
+
+  clickedDownload(_id: string) {
+
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['contentItem']) {
+      this.type = changes.contentItem.currentValue.type;
+      this.name = changes.contentItem.currentValue.name;
+      this.version = changes.contentItem.currentValue.version;
+      this.description = changes.contentItem.currentValue.description;
+      this.platforms = changes.contentItem.currentValue.platforms;
+      this.canBeInstall = changes.contentItem.currentValue.canBeInstall;
+    }
+  }
 }

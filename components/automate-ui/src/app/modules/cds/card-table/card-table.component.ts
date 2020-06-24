@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { ContentItem } from 'app/entities/cds/cds.model';
 import { reduce, first, tail, concat, isEmpty, reverse } from 'lodash/fp';
 
@@ -10,6 +10,7 @@ import { reduce, first, tail, concat, isEmpty, reverse } from 'lodash/fp';
 export class CardTableComponent implements OnChanges {
 
   @Input() contentItems: ContentItem[];
+  @Output() onInstallItem: EventEmitter<string> = new EventEmitter();
 
   collectionOfPairs: ContentItem[][];
 
@@ -27,9 +28,13 @@ export class CardTableComponent implements OnChanges {
         } else {
           return concat(tail(acc), [concat(head, item)]);
         }
-      }, [], this.contentItems);
+      }, [], changes.contentItems.currentValue);
 
       this.collectionOfPairs = reverse(paired);
     }
+  }
+
+  installContentItem(item: ContentItem) {
+    this.onInstallItem.emit(item.id);
   }
 }

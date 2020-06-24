@@ -13,7 +13,8 @@
           <div *ngFor="let pairOfItems of collectionOfPairs" class="dashboard-overview-row">
             <div *ngFor="let item of pairOfItems" class="dashboard-overview-col">
               <app-card
-                [contentItem] = "item">
+                [contentItem] = "item"
+                (onInstallItem)="installContentItem(item)">
               </app-card>
             </div>
           </div>

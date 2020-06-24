@@ -1,5 +1,6 @@
 <div class="content-container">
   <app-card-table
-    [contentItems] = "contentItems$ | async">
+    [contentItems] = "contentItems$ | async"
+    (onInstallItem)="installContentItem($event)">
   </app-card-table>
 </div>

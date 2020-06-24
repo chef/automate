@@ -5,7 +5,8 @@ import { Store } from '@ngrx/store';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import {
-  GetContentItems
+  GetContentItems,
+  InstallContentItem
 } from 'app/entities/cds/cds.actions';
 
 import {
@@ -35,5 +36,9 @@ export class DashboardComponent implements OnInit {
     this.contentItems$ = this.store.select(contentItems);
 
     setTimeout(() => this.layoutFacade.hideSidebar());
+  }
+
+  installContentItem(itemId: string) {
+    this.store.dispatch(new InstallContentItem({id: itemId}));
   }
 }
