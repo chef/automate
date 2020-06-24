@@ -23,6 +23,7 @@ import (
 	// PB-generated imports
 	pb_apps "github.com/chef/automate/api/external/applications"
 	pb_cds "github.com/chef/automate/api/external/cds"
+	cds_request "github.com/chef/automate/api/external/cds/request"
 	pb_cfgmgmt "github.com/chef/automate/api/external/cfgmgmt"
 	pb_profiles "github.com/chef/automate/api/external/compliance/profiles"
 	pb_cc_reporting "github.com/chef/automate/api/external/compliance/reporting"
@@ -528,6 +529,56 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(data) // nolint: errcheck
+}
+
+func (s *Server) CdsDownloadHandler(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var request cds_request.DownloadContentItem
+	err := decoder.Decode(&request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	log.Infof("processing content item download %s", request.Id)
+
+	var resource, action string
+
+	action = "content:items:download"
+	resource = "content:items"
+
+	ctx, err := s.authRequest(r, resource, action)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	client, err := s.clientsFactory.CdsClient()
+	if err != nil {
+		http.Error(w, "grpc service for automate-cds unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
+	stream, err := client.DownloadContentItem(ctx, &request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		contentLength := strconv.Itoa(len(data.GetContent()))
+		w.Header().Set("Content-Length", contentLength)
+		w.Header().Set("Content-Type", "application/x-gzip")
+		w.Header().Set("Accept-Ranges", "bytes")
+		w.Write(data.GetContent()) // nolint: errcheck
+	}
 }
 
 func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {

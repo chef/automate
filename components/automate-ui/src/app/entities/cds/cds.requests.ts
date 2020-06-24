@@ -41,6 +41,12 @@ export class CdsRequests {
     return this.http.post<any>(url, {id});
   }
 
+  public downloadContentItem(id: string): Observable<Blob> {
+    const url = `${CDS_URL}/download`;
+    const body = {id};
+    return this.http.post(url, body, {responseType: 'blob'});
+  }
+
   private convertToContentItems(resp: RespContentItems): ContentItem[] {
     return map((respItem: RespContentItem) => this.convertToContentItem(respItem), resp.items);
   }

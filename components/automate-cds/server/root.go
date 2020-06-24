@@ -2,14 +2,19 @@ package server
 
 import (
 	"context"
+	"io/ioutil"
 
 	"github.com/chef/automate/api/external/cds/request"
 	"github.com/chef/automate/api/external/cds/response"
+	"github.com/chef/automate/api/external/common"
 	ver_api "github.com/chef/automate/api/external/common/version"
+	interservice "github.com/chef/automate/api/interservice/cds/service"
 
 	"github.com/chef/automate/components/automate-cds/service"
 	"github.com/chef/automate/lib/version"
 	log "github.com/sirupsen/logrus"
+
+	"net/http"
 )
 
 // Server is an Automate CDS proxy server
@@ -79,4 +84,32 @@ func (s *Server) InstallContentItem(ctx context.Context, request *request.Instal
 	log.Infof("Installing content item with ID %s ...", request.Id)
 
 	return &response.InstallContentItem{}, nil
+}
+
+// DownloadContentItem - download content item
+func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
+	stream interservice.AutomateCds_DownloadContentItemServer) error {
+
+	log.Infof("DownloadContentItem: Downloading content item with ID %s ...", request.Id)
+
+	// Get the data
+	resp, err := http.Get("https://github.com/dev-sec/apache-baseline/archive/master.tar.gz")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// TODO Do not read all stream the file down and up
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	stream.Send(&common.ExportData{
+		Content: body,
+	})
+
+	log.Infof("Streamed file")
+
+	return nil
 }

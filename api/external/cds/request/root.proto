@@ -10,3 +10,7 @@ message ContentItems {
 message InstallContentItem {
   string id = 1;
 }
+
+message DownloadContentItem {
+  string id = 1;
+}

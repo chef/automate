@@ -10,6 +10,7 @@ export class CardComponent implements OnChanges {
 
   @Input() contentItem: ContentItem;
   @Output() onInstallItem: EventEmitter<string> = new EventEmitter();
+  @Output() onDownloadItem: EventEmitter<string> = new EventEmitter();
 
   type: string;
   name: string;
@@ -24,8 +25,8 @@ export class CardComponent implements OnChanges {
     this.onInstallItem.emit(id);
   }
 
-  clickedDownload(_id: string) {
-
+  clickedDownload(id: string) {
+    this.onDownloadItem.emit(id);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

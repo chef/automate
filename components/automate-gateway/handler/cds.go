@@ -5,6 +5,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	external_service "github.com/chef/automate/api/external/cds"
 	"github.com/chef/automate/api/external/cds/request"
 	"github.com/chef/automate/api/external/cds/response"
 	inter_service "github.com/chef/automate/api/interservice/cds/service"
@@ -40,4 +41,10 @@ func (s *CdsServer) InstallContentItem(ctx context.Context,
 	}).Debug("rpc call")
 
 	return s.client.InstallContentItem(ctx, request)
+}
+
+func (a *CdsServer) DownloadContentItem(*request.DownloadContentItem, external_service.Cds_DownloadContentItemServer) error {
+	// grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
+	// so we do not auto-generate the route for download; we instead custom handle with mux in gateway/services.go
+	return nil
 }
