@@ -136,27 +136,7 @@ func TestGetNodeAttributesMissing(t *testing.T) {
 		t.Log("expected empty attributesJson map got: nil")
 		t.Fail()
 	}
-	verifyStringValue(attributesJson, "name", "", t)
-	verifyStringValue(attributesJson, "node_id", "", t)
-	verifyStringValue(attributesJson, "chef_environment", "", t)
-	verifyInt32Value(attributesJson, "normal_value_count", 0, t)
-	verifyInt32Value(attributesJson, "default_value_count", 0, t)
-	verifyInt32Value(attributesJson, "override_value_count", 0, t)
-	verifyInt32Value(attributesJson, "automatic_value_count", 0, t)
-	verifyInt32Value(attributesJson, "all_value_count", 0, t)
-	verifyEmptyMap(attributesJson, "automatic", t)
-	verifyEmptyMap(attributesJson, "default", t)
-	verifyEmptyMap(attributesJson, "normal", t)
-	verifyEmptyMap(attributesJson, "override", t)
-	runList, ok := attributesJson["run_list"].([]string)
-	if !ok {
-		t.Log("expected run_list to be an array")
-		t.Fail()
-	}
-	if len(runList) != 0 {
-		t.Logf("expected run_list to be an empty array, got %v", runList)
-		t.Fail()
-	}
+	verifyAttributesEmpty(attributesJson, t)
 	if err != nil {
 		t.Logf("expected nil error got: %v", err)
 		t.Fail()
