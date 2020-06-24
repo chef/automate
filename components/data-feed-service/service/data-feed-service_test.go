@@ -15,6 +15,7 @@ import (
 	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 
+const hostname = "test.chef.com"
 const ipAttr = "172.18.2.110"
 const macAttr = "0A:B1:4A:DB:01:C5"
 const hostAttr = "datafeed.test.com"
@@ -29,6 +30,11 @@ const servicePackMinorVersion float64 = 1
 const servicePack = "2.1"
 
 var attrRunList = []string{"recipe1", "recipe2"}
+var mockErr = errors.New(mockErrMsg)
+var mockAttrString = "{\"foo\":\"bar\"}"
+var mockAttrs = map[string]string{"foo": "bar"}
+var automaticAttrs = "{\"dmi\":{\"system\":{\"serial_number\":\"serial-number\"}},\"hostname\":\"test.chef.com\",\"hostnamectl\":{\"operating_system\":\"ubuntu\"},\"ipaddress\":\"172.18.2.120\",\"macaddress\":\"00:1C:42:C1:2D:87\",\"os\":\"linux\",\"os_version\":\"4.13.0-45-generic\"}"
+var automaticAttrsWin = "{\"os\":\"windows\",\"kernel\":{\"os_info\":{\"serial_number\":\"serial-number\",\"service_pack_major_version\":2,\"service_pack_minor_version\":1}},\"dmi\":{\"system\":{\"serial_number\":\"\"}},\"hostname\":\"test.chef.com\",\"ipaddress\":\"172.18.2.120\",\"macaddress\":\"00:1C:42:C1:2D:87\"}"
 
 func TestAssetCreated(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -126,7 +132,6 @@ func TestGetNodeAttributesMissing(t *testing.T) {
 		gomock.Any(),
 	).Return(&cfgmgmtResponse.NodeAttribute{}, nil)
 	attributesJson, err := getNodeAttributes(context.Background(), mockCfgMgmtClient, "")
-	// map[all_value_count:0 automatic:map[] automatic_value_count:0 chef_environment: default:map[] default_value_count:0 name: node_id: normal:map[] normal_value_count:0 override:map[] override_value_count:0 run_list:[]]
 	if attributesJson == nil {
 		t.Log("expected empty attributesJson map got: nil")
 		t.Fail()
@@ -159,26 +164,7 @@ func TestGetNodeAttributesMissing(t *testing.T) {
 }
 
 func TestGetNodeAttributes(t *testing.T) {
-	mockAttrString := "{\"foo\":\"bar\"}"
-	mockAttrs := map[string]string{"foo": "bar"}
-	nodeAttributes := &cfgmgmtResponse.NodeAttribute{
-		NodeId:               attrNodeId,
-		Name:                 attrNodeName,
-		RunList:              attrRunList,
-		ChefEnvironment:      attrChefEnv,
-		Normal:               mockAttrString,
-		Default:              mockAttrString,
-		Override:             mockAttrString,
-		NormalValueCount:     1,
-		DefaultValueCount:    2,
-		OverrideValueCount:   3,
-		AllValueCount:        10,
-		Automatic:            mockAttrString,
-		AutomaticValueCount:  4,
-		XXX_NoUnkeyedLiteral: struct{}{},
-		XXX_unrecognized:     nil,
-		XXX_sizecache:        0,
-	}
+	nodeAttributes := getAttributeResponse(automaticAttrs)
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
@@ -187,40 +173,11 @@ func TestGetNodeAttributes(t *testing.T) {
 		gomock.Any(),
 	).Return(nodeAttributes, nil)
 	attributesJson, err := getNodeAttributes(context.Background(), mockCfgMgmtClient, "")
-	// map[all_value_count:0 automatic:map[] automatic_value_count:0 chef_environment: default:map[] default_value_count:0 name: node_id: normal:map[] normal_value_count:0 override:map[] override_value_count:0 run_list:[]]
 	if attributesJson == nil {
 		t.Log("expected empty attributesJson map got: nil")
 		t.Fail()
 	}
-	verifyStringValue(attributesJson, "name", attrNodeName, t)
-	verifyStringValue(attributesJson, "node_id", attrNodeId, t)
-	verifyStringValue(attributesJson, "chef_environment", attrChefEnv, t)
-	verifyMapValue(attributesJson, "automatic", mockAttrs, t)
-	verifyMapValue(attributesJson, "normal", mockAttrs, t)
-	verifyMapValue(attributesJson, "default", mockAttrs, t)
-	verifyMapValue(attributesJson, "override", mockAttrs, t)
-	verifyInt32Value(attributesJson, "normal_value_count", 1, t)
-	verifyInt32Value(attributesJson, "default_value_count", 2, t)
-	verifyInt32Value(attributesJson, "override_value_count", 3, t)
-	verifyInt32Value(attributesJson, "automatic_value_count", 4, t)
-	verifyInt32Value(attributesJson, "all_value_count", 10, t)
-	runList, ok := attributesJson["run_list"].([]string)
-	if !ok {
-		t.Log("expected run_list to be an array")
-		t.Fail()
-	}
-	if len(runList) != 2 {
-		t.Logf("expected len(run_list) to be 2, got %v", len(runList))
-		t.Fail()
-	}
-	if runList[0] != "recipe1" {
-		t.Logf("expected run_list[0] to be recipe1, got %v", runList[0])
-		t.Fail()
-	}
-	if runList[1] != "recipe2" {
-		t.Logf("expected run_list[1] to be recipe2, got %v", runList[1])
-		t.Fail()
-	}
+	verifyAttributes(attributesJson, t)
 	if err != nil {
 		t.Logf("expected nil error got: %v", err)
 		t.Fail()
@@ -230,14 +187,12 @@ func TestGetNodeAttributes(t *testing.T) {
 func TestGetNodeAttributesError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockErr := errors.New(mockErrMsg)
 	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetAttributes(
 		context.Background(),
 		gomock.Any(),
 	).Return(&cfgmgmtResponse.NodeAttribute{}, mockErr)
 	attributesJson, err := getNodeAttributes(context.Background(), mockCfgMgmtClient, "")
-	// map[all_value_count:0 automatic:map[] automatic_value_count:0 chef_environment: default:map[] default_value_count:0 name: node_id: normal:map[] normal_value_count:0 override:map[] override_value_count:0 run_list:[]]
 	if attributesJson == nil {
 		t.Log("expected empty attributesJson map got: nil")
 		t.Fail()
@@ -288,15 +243,12 @@ func TestGetNodeFields(t *testing.T) {
 	node := &structpb.Struct{Fields: fields}
 	values := []*structpb.Value{&structpb.Value{Kind: &structpb.Value_StructValue{StructValue: node}}}
 	nodeResponse := &structpb.ListValue{Values: values}
-	//nodeResponse := &structpb.Value{Kind: &structpb.Value_ListValue{ListValue: listValue}}
-
 	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
 	).Return(nodeResponse, nil)
 	id, lastRunId, err := getNodeFields(context.Background(), mockCfgMgmtClient, []string{})
-	// map[all_value_count:0 automatic:map[] automatic_value_count:0 chef_environment: default:map[] default_value_count:0 name: node_id: normal:map[] normal_value_count:0 override:map[] override_value_count:0 run_list:[]]
 	if id != attrNodeId {
 		t.Logf("expected id %v, got: %v", attrNodeId, id)
 		t.Fail()
@@ -315,14 +267,12 @@ func TestGetNodeFields(t *testing.T) {
 func TestGetNodeFieldsError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockErr := errors.New(mockErrMsg)
 	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
 	).Return(&structpb.ListValue{}, mockErr)
 	id, lastRunId, err := getNodeFields(context.Background(), mockCfgMgmtClient, []string{})
-	// map[all_value_count:0 automatic:map[] automatic_value_count:0 chef_environment: default:map[] default_value_count:0 name: node_id: normal:map[] normal_value_count:0 override:map[] override_value_count:0 run_list:[]]
 	if id != "" {
 		t.Log("expected empty id, got: ''")
 		t.Fail()
@@ -351,7 +301,6 @@ func TestGetNodeHostFieldsEmpty(t *testing.T) {
 		gomock.Any(),
 	).Return(&cfgmgmtResponse.NodeAttribute{}, nil)
 	ipAddress, macAddress, hostname, err := getNodeHostFields(context.Background(), mockCfgMgmtClient, []string{})
-	// map[all_value_count:0 automatic:map[] automatic_value_count:0 chef_environment: default:map[] default_value_count:0 name: node_id: normal:map[] normal_value_count:0 override:map[] override_value_count:0 run_list:[]]
 	if ipAddress != "" {
 		t.Logf("expected empty ipAddress, got: %v", ipAddress)
 		t.Fail()
@@ -374,14 +323,12 @@ func TestGetNodeHostFieldsEmpty(t *testing.T) {
 func TestGetNodeHostFieldsNodeError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockErr := errors.New(mockErrMsg)
 	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
 	).Return(&structpb.ListValue{}, mockErr)
 	ipAddress, macAddress, hostname, err := getNodeHostFields(context.Background(), mockCfgMgmtClient, []string{})
-	// map[all_value_count:0 automatic:map[] automatic_value_count:0 chef_environment: default:map[] default_value_count:0 name: node_id: normal:map[] normal_value_count:0 override:map[] override_value_count:0 run_list:[]]
 	if ipAddress != "" {
 		t.Logf("expected empty ipAddress, got: %v", ipAddress)
 		t.Fail()
@@ -404,7 +351,6 @@ func TestGetNodeHostFieldsNodeError(t *testing.T) {
 func TestGetNodeHostFieldsAttrError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockErr := errors.New(mockErrMsg)
 	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
@@ -415,7 +361,6 @@ func TestGetNodeHostFieldsAttrError(t *testing.T) {
 		gomock.Any(),
 	).Return(&cfgmgmtResponse.NodeAttribute{}, mockErr)
 	ipAddress, macAddress, hostname, err := getNodeHostFields(context.Background(), mockCfgMgmtClient, []string{})
-	// map[all_value_count:0 automatic:map[] automatic_value_count:0 chef_environment: default:map[] default_value_count:0 name: node_id: normal:map[] normal_value_count:0 override:map[] override_value_count:0 run_list:[]]
 	if ipAddress != "" {
 		t.Logf("expected empty ipAddress, got: %v", ipAddress)
 		t.Fail()
@@ -576,7 +521,6 @@ func TestAddDataContentWindowsEmpty(t *testing.T) {
 }
 
 func TestAddDataContentNotWindows(t *testing.T) {
-	//addDataContent(nodeDataContent map[string]interface{}, attributes map[string]interface{}) {
 	attributes := make(map[string]interface{})
 	attributes["os"] = "not windows"
 	dmi := make(map[string]interface{})
@@ -599,7 +543,6 @@ func TestAddDataContentNotWindows(t *testing.T) {
 }
 
 func TestAddDataContentNotWindowsEmpty(t *testing.T) {
-	//addDataContent(nodeDataContent map[string]interface{}, attributes map[string]interface{}) {
 	attributes := make(map[string]interface{})
 	attributes["os"] = "not windows"
 
@@ -638,6 +581,248 @@ func TestGetNodeDataEmpty(t *testing.T) {
 		t.Fail()
 	}
 	attributesJson := nodeData["attributes"].(map[string]interface{})
+	verifyAttributesEmpty(attributesJson, t)
+	if err != nil {
+		t.Logf("expected nil error, got %v", err)
+		t.Fail()
+	}
+
+	node := nodeData["node"].(map[string]interface{})
+	if len(node) != 4 {
+		t.Logf("excpected 4 entries in node got %v", node)
+	}
+	if node["ipaddress"].(string) != "" {
+		t.Logf("expected empty ipaddress, got %v", node["ipaddress"])
+		t.Fail()
+	}
+	if node["macaddress"].(string) != "" {
+		t.Logf("expected empty macaddress, got %v", node["macaddress"])
+		t.Fail()
+	}
+	if node["hostname"].(string) != "" {
+		t.Logf("expected empty hostanme, got %v", node["hostname"])
+		t.Fail()
+	}
+	if node["serial_number"].(string) != "" {
+		t.Logf("expected empty serial_number, got %v", node["serial_number"])
+		t.Fail()
+	}
+}
+
+func TestGetNodeDataFieldsError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient.EXPECT().GetNodes(
+		context.Background(),
+		gomock.Any(),
+	).Return(&structpb.ListValue{}, mockErr)
+
+	nodeData, err := getNodeData(context.Background(), mockCfgMgmtClient, []string{})
+	if len(nodeData) != 0 {
+		t.Logf("expected empty node data map, got %v", nodeData)
+		t.Fail()
+	}
+	if err != mockErr {
+		t.Logf("expected error %v, got %v", mockErr, err)
+		t.Fail()
+	}
+}
+
+func TestGetNodeDataAttrsError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient.EXPECT().GetNodes(
+		context.Background(),
+		gomock.Any(),
+	).Return(&structpb.ListValue{}, nil)
+	mockCfgMgmtClient.EXPECT().GetAttributes(
+		context.Background(),
+		gomock.Any(),
+	).Return(&cfgmgmtResponse.NodeAttribute{}, mockErr)
+	nodeData, err := getNodeData(context.Background(), mockCfgMgmtClient, []string{})
+	if len(nodeData) != 0 {
+		t.Logf("expected empty node data map, got %v", nodeData)
+		t.Fail()
+	}
+	if err != mockErr {
+		t.Logf("expected error %v, got %v", mockErr, err)
+		t.Fail()
+	}
+}
+
+func TestGetNodeDataRunError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient.EXPECT().GetNodes(
+		context.Background(),
+		gomock.Any(),
+	).Return(&structpb.ListValue{}, nil)
+	mockCfgMgmtClient.EXPECT().GetAttributes(
+		context.Background(),
+		gomock.Any(),
+	).Return(&cfgmgmtResponse.NodeAttribute{}, nil)
+	mockCfgMgmtClient.EXPECT().GetNodeRun(
+		context.Background(),
+		gomock.Any(),
+	).Return(&cfgmgmtResponse.Run{}, mockErr)
+	nodeData, err := getNodeData(context.Background(), mockCfgMgmtClient, []string{})
+	attributesJson := nodeData["attributes"].(map[string]interface{})
+	verifyAttributesEmpty(attributesJson, t)
+	if err != mockErr {
+		t.Logf("expected error %v, got %v", mockErr, err)
+		t.Fail()
+	}
+
+}
+
+func TestGetNodeDataNotWindows(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	nodeAttributes := getAttributeResponse(automaticAttrs)
+	run := getNodeRun()
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient.EXPECT().GetNodes(
+		context.Background(),
+		gomock.Any(),
+	).Return(&structpb.ListValue{}, nil)
+	mockCfgMgmtClient.EXPECT().GetAttributes(
+		context.Background(),
+		gomock.Any(),
+	).Return(nodeAttributes, nil)
+	mockCfgMgmtClient.EXPECT().GetNodeRun(
+		context.Background(),
+		gomock.Any(),
+	).Return(run, nil)
+	nodeData, err := getNodeData(context.Background(), mockCfgMgmtClient, []string{})
+	if nodeData["attributes"] == nil {
+		t.Log("expected attributes, got nil")
+		t.Fail()
+	}
+	attributesJson := nodeData["attributes"].(map[string]interface{})
+	verifyAttributes(attributesJson, t)
+	if err != nil {
+		t.Logf("expected nil error, got %v", err)
+		t.Fail()
+	}
+
+	node := nodeData["node"].(map[string]interface{})
+	if len(node) != 4 {
+		t.Logf("excpected 4 entries in node got %v", node)
+	}
+	if node["ipaddress"].(string) != "172.18.2.120" {
+		t.Logf("expected 172.18.2.120 ipaddress, got %v", node["ipaddress"])
+		t.Fail()
+	}
+	if node["macaddress"].(string) != "00:1C:42:C1:2D:87" {
+		t.Logf("expected 00:1C:42:C1:2D:87 macaddress, got %v", node["macaddress"])
+		t.Fail()
+	}
+	if node["hostname"].(string) != "test.chef.com" {
+		t.Logf("expected test.chef.com hostname, got %v", node["hostname"])
+		t.Fail()
+	}
+	if node["serial_number"].(string) != serialNumber {
+		t.Logf("expected empty serial_number, got %v", node["serial_number"])
+		t.Fail()
+	}
+
+}
+
+func TestGetNodeDataWindows(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	nodeAttributes := getAttributeResponse(automaticAttrsWin)
+	run := getNodeRun()
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient.EXPECT().GetNodes(
+		context.Background(),
+		gomock.Any(),
+	).Return(&structpb.ListValue{}, nil)
+	mockCfgMgmtClient.EXPECT().GetAttributes(
+		context.Background(),
+		gomock.Any(),
+	).Return(nodeAttributes, nil)
+	mockCfgMgmtClient.EXPECT().GetNodeRun(
+		context.Background(),
+		gomock.Any(),
+	).Return(run, nil)
+	nodeData, err := getNodeData(context.Background(), mockCfgMgmtClient, []string{})
+	if nodeData["attributes"] == nil {
+		t.Log("expected attributes, got nil")
+		t.Fail()
+	}
+	attributesJson := nodeData["attributes"].(map[string]interface{})
+	verifyAttributes(attributesJson, t)
+	if err != nil {
+		t.Logf("expected nil error, got %v", err)
+		t.Fail()
+	}
+
+	node := nodeData["node"].(map[string]interface{})
+	if len(node) != 5 {
+		t.Logf("excpected 5 entries in node got %v", node)
+	}
+	if node["ipaddress"].(string) != "172.18.2.120" {
+		t.Logf("expected 172.18.2.120 ipaddress, got %v", node["ipaddress"])
+		t.Fail()
+	}
+	if node["macaddress"].(string) != "00:1C:42:C1:2D:87" {
+		t.Logf("expected 00:1C:42:C1:2D:87 macaddress, got %v", node["macaddress"])
+		t.Fail()
+	}
+	if node["hostname"].(string) != "test.chef.com" {
+		t.Logf("expected test.chef.com hostname, got %v", node["hostname"])
+		t.Fail()
+	}
+	if node["serial_number"].(string) != serialNumber {
+		t.Logf("expected empty serial_number, got %v", node["serial_number"])
+		t.Fail()
+	}
+	if node["os_service_pack"].(string) != servicePack {
+		t.Logf("expected service pack %v, got %v", servicePack, node["os_service_pack"])
+		t.Fail()
+	}
+}
+
+func verifyAttributes(attributesJson map[string]interface{}, t *testing.T) {
+	verifyStringValue(attributesJson, "name", attrNodeName, t)
+	verifyStringValue(attributesJson, "node_id", attrNodeId, t)
+	verifyStringValue(attributesJson, "chef_environment", attrChefEnv, t)
+	automatic := attributesJson["automatic"].(map[string]interface{})
+	verifyStringValue(automatic, "ipaddress", "172.18.2.120", t)
+	verifyStringValue(automatic, "macaddress", "00:1C:42:C1:2D:87", t)
+	verifyStringValue(automatic, "hostname", hostname, t)
+	verifyMapValue(attributesJson, "normal", mockAttrs, t)
+	verifyMapValue(attributesJson, "default", mockAttrs, t)
+	verifyMapValue(attributesJson, "override", mockAttrs, t)
+	verifyInt32Value(attributesJson, "normal_value_count", 1, t)
+	verifyInt32Value(attributesJson, "default_value_count", 2, t)
+	verifyInt32Value(attributesJson, "override_value_count", 3, t)
+	verifyInt32Value(attributesJson, "automatic_value_count", 4, t)
+	verifyInt32Value(attributesJson, "all_value_count", 10, t)
+	runList, ok := attributesJson["run_list"].([]string)
+	if !ok {
+		t.Log("expected run_list to be an array")
+		t.Fail()
+	}
+	if len(runList) != 2 {
+		t.Logf("expected len(run_list) to be 2, got %v", len(runList))
+		t.Fail()
+	}
+	if runList[0] != "recipe1" {
+		t.Logf("expected run_list[0] to be recipe1, got %v", runList[0])
+		t.Fail()
+	}
+	if runList[1] != "recipe2" {
+		t.Logf("expected run_list[1] to be recipe2, got %v", runList[1])
+		t.Fail()
+	}
+}
+
+func verifyAttributesEmpty(attributesJson map[string]interface{}, t *testing.T) {
 	verifyStringValue(attributesJson, "name", "", t)
 	verifyStringValue(attributesJson, "node_id", "", t)
 	verifyStringValue(attributesJson, "chef_environment", "", t)
@@ -659,29 +844,6 @@ func TestGetNodeDataEmpty(t *testing.T) {
 		t.Logf("expected run_list to be an empty array, got %v", runList)
 		t.Fail()
 	}
-	if err != nil {
-		t.Logf("expected nil error, got %v", err)
-		t.Fail()
-	}
-	// client run, node objects
-	t.Log("incomplete - needs tests for client_run and node")
-	t.Fail()
-}
-
-func TestGetNodeDataFieldsError(t *testing.T) {
-	t.Fail()
-}
-
-func TestGetNodeDataAttrsError(t *testing.T) {
-	t.Fail()
-}
-
-func TestGetNodeDataRunError(t *testing.T) {
-	t.Fail()
-}
-
-func TestGetNodeData(t *testing.T) {
-	t.Fail()
 }
 
 func verifyMapValue(attrs map[string]interface{}, key string, expected map[string]string, t *testing.T) {
@@ -724,4 +886,83 @@ func verifyEmptyMap(m map[string]interface{}, k string, t *testing.T) {
 		t.Logf("expected %s to be empty map, got: %v", k, m[k])
 		t.Fail()
 	}
+}
+
+func getAttributeResponse(automaticAttributes string) *cfgmgmtResponse.NodeAttribute {
+	nodeAttributes := &cfgmgmtResponse.NodeAttribute{
+		NodeId:               attrNodeId,
+		Name:                 attrNodeName,
+		RunList:              attrRunList,
+		ChefEnvironment:      attrChefEnv,
+		Normal:               mockAttrString,
+		Default:              mockAttrString,
+		Override:             mockAttrString,
+		NormalValueCount:     1,
+		DefaultValueCount:    2,
+		OverrideValueCount:   3,
+		AllValueCount:        10,
+		Automatic:            automaticAttributes,
+		AutomaticValueCount:  4,
+		XXX_NoUnkeyedLiteral: struct{}{},
+		XXX_unrecognized:     nil,
+		XXX_sizecache:        0,
+	}
+	return nodeAttributes
+}
+
+func getNodeRun() *cfgmgmtResponse.Run {
+	run := &cfgmgmtResponse.Run{
+		Id:                    nodeRunId,
+		NodeId:                attrNodeId,
+		NodeName:              attrNodeName,
+		Organization:          "Organization",
+		StartTime:             nil,
+		EndTime:               nil,
+		Source:                "Source",
+		Status:                "Status",
+		TotalResourceCount:    0,
+		UpdatedResourceCount:  0,
+		ChefVersion:           "15",
+		UptimeSeconds:         0,
+		Environment:           "Environment",
+		Fqdn:                  "Fqdn",
+		SourceFqdn:            "SourceFqdn",
+		Ipaddress:             "Ipaddress",
+		Resources:             nil,
+		RunList:               nil,
+		Deprecations:          nil,
+		Error:                 nil,
+		Tags:                  nil,
+		ResourceNames:         nil,
+		Recipes:               nil,
+		ChefTags:              nil,
+		Cookbooks:             nil,
+		Platform:              "",
+		PlatformFamily:        "",
+		PlatformVersion:       "",
+		Roles:                 nil,
+		PolicyName:            "",
+		PolicyGroup:           "",
+		PolicyRevision:        "",
+		ExpandedRunList:       nil,
+		Projects:              nil,
+		VersionedCookbooks:    nil,
+		Ip6Address:            "",
+		Timezone:              "",
+		Domain:                "",
+		Hostname:              hostname,
+		MemoryTotal:           "",
+		Macaddress:            "",
+		DmiSystemSerialNumber: serialNumber,
+		DmiSystemManufacturer: "",
+		VirtualizationRole:    "",
+		VirtualizationSystem:  "",
+		KernelVersion:         "",
+		KernelRelease:         "",
+		CloudProvider:         "",
+		XXX_NoUnkeyedLiteral:  struct{}{},
+		XXX_unrecognized:      nil,
+		XXX_sizecache:         0,
+	}
+	return run
 }
