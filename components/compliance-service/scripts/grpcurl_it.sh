@@ -83,3 +83,14 @@ fi
 
 # List all jobs
 # grpcurl $CURL_OPTS_COMP.jobs.JobsService/List
+
+# List all reporting profiles for a specific date
+# grpcurl -d @ $CURL_OPTS_COMP.reporting.ReportingService/ListProfiles <<EOM
+# {
+#   "filters": [
+#     { "type": "end_time", "values":["2020-06-20T23:59:59Z"] }
+#   ],
+#   "page": 1,
+#   "per_page": 100
+# }
+# EOM
