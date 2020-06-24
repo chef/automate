@@ -7,7 +7,7 @@ import (
 )
 
 // DeliveryRunning represents the data we're extracting from the A1
-// /etc/delivery/delivery-running.json configuration file
+// /etc/delivery/delivery-running.json configuration file.
 type DeliveryRunning struct {
 	Delivery struct {
 		FQDN      string `json:"fqdn"`
@@ -215,11 +215,53 @@ type PrivateChef struct {
 	Postgresql    CSRPostgreSQL `json:"postgresql"`
 	Bookshelf     Bookshelf     `json:"bookshelf"`
 	OcID          OcID          `json:"oc_id"`
+	DataCollector DataCollector `json:"data_collector"`
 }
 
 type OpscodeErchef struct {
-	SearchProvider  string `json:"search_provider"`
-	SearchQueueMode string `json:"search_queue_mode"`
+	MemoryMaxbytes json.Number `json:"max_bytes"`
+	LogRotation    struct {
+		FileMaxbytes         json.Number `json:"file_maxbytes"`
+		NumToKeep            json.Number `json:"num_to_keep"`
+		MaxMessagesPerSecond json.Number `json:"max_messages_per_second"`
+	} `json:"log_rotation"`
+	AuthSkew               json.Number `json:"auth_skew"`
+	AuthzPoolerTimeout     json.Number `json:"authz_pooler_timeout"`
+	BulkFetchBatchSize     json.Number `json:"bulk_fetch_batch_size"`
+	ReindexBatchSize       json.Number `json:"reindex_batch_size"`
+	ReindexSleepMinMs      json.Number `json:"reindex_sleep_min_ms"`
+	ReindexSleepMaxMs      json.Number `json:"reindex_sleep_max_ms"`
+	ReindexItemRetries     json.Number `json:"reindex_item_retries"`
+	DBPoolMax              json.Number `json:"db_pool_max"`
+	DBPoolInit             json.Number `json:"db_pool_init"`
+	DBPoolQueueMax         json.Number `json:"db_pool_queue_max"`
+	DBPoolerTimeout        json.Number `json:"db_pooler_timeout"`
+	SQLDBTimeout           json.Number `json:"sql_db_timeout"`
+	DepsolverPoolerTimeout json.Number `json:"depsolver_pooler_timeout"`
+	DepsolverPoolQueueMax  json.Number `json:"depsolver_pool_queue_max"`
+	DepsolverWorkerCount   json.Number `json:"depsolver_worker_count"`
+	DepsolverTimeout       json.Number `json:"depsolver_timeout"`
+	SearchProvider         string      `json:"search_provider"`
+	SearchQueueMode        string      `json:"search_queue_mode"`
+	SearchBatchSizeMaxSize json.Number `json:"search_batch_max_size"`
+	SearchBatchSizeMaxWait json.Number `json:"search_batch_max_wait"`
+	SolrTimeout            json.Number `json:"solr_timeout"`
+	SolrHTTPInitCount      json.Number `json:"solr_http_init_count"`
+	SolrHTTPMaxCount       json.Number `json:"solr_http_max_count"`
+	BaseResourceURL        string      `json:"base_resource_url"`
+	AuthzTimeout           json.Number `json:"authz_timeout"`
+	AuthzFanout            json.Number `json:"authz_fanout"`
+	MaxRequestSize         json.Number `json:"max_request_size"`
+	KeygenCacheSize        json.Number `json:"keygen_cache_size"`
+	KeygenStartSize        json.Number `json:"keygen_start_size"`
+	KeygenTimeout          json.Number `json:"keygen_timeout"`
+	StrictSearchResultACLs bool        `json:"strict_search_result_acls"`
+}
+
+type DataCollector struct {
+	Timeout       json.Number `json:"timeout"`
+	HTTPInitCount json.Number `json:"http_init_count"`
+	HTTPMaxCount  json.Number `json:"http_max_count"`
 }
 
 type OpscodeSolr4 struct {

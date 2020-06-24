@@ -1,18 +1,21 @@
 package a1upgrade
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"reflect"
 	"strings"
 
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/config/authn"
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/dex"
 	es "github.com/chef/automate/api/config/elasticsearch"
+	"github.com/chef/automate/api/config/erchef"
 	lb "github.com/chef/automate/api/config/load_balancer"
 	ns "github.com/chef/automate/api/config/notifications"
 	pg "github.com/chef/automate/api/config/postgresql"
@@ -352,7 +355,201 @@ func getProxySettings(r *DeliveryRunning) (*ac.Proxy, error) {
 	}, nil
 }
 
-func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets) (*dc.AutomateConfig, error) {
+// nolint: gocyclo
+func getErchefSettings(r *ChefServerRunning) (*erchef.ConfigRequest_V1_System, error) {
+	sys := erchef.NewConfigRequest().GetV1().GetSys()
+	c := r.PrivateChef.OpscodeErchef
+	d := r.PrivateChef.DataCollector
+
+	memMax, err := to64w(c.MemoryMaxbytes)
+	if err != nil {
+		return sys, err
+	}
+
+	if memMax.GetValue() > 0 {
+		sys.Memory.MaxBytes = memMax
+	}
+
+	sys.Log.RotationMaxBytes, err = to64w(c.LogRotation.FileMaxbytes)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Log.RotationMaxFiles, err = to32w(c.LogRotation.NumToKeep)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Log.MaxErrorLogsPerSecond, err = to32w(c.LogRotation.MaxMessagesPerSecond)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Api.AuthSkew, err = to32w(c.AuthSkew)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Authz.PoolQueueTimeout, err = to32w(c.AuthzPoolerTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Api.BulkFetchBatchSize, err = to32w(c.BulkFetchBatchSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.ReindexBatchSize, err = to32w(c.ReindexBatchSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.ReindexSleepMinMs, err = to32w(c.ReindexSleepMinMs)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.ReindexSleepMaxMs, err = to32w(c.ReindexSleepMaxMs)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.ReindexItemRetries, err = to32w(c.ReindexItemRetries)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolMaxSize, err = to32w(c.DBPoolMax)
+	if err != nil {
+		return sys, err
+	}
+
+	poolInitSize, err := to32w(c.DBPoolInit)
+	if err != nil {
+		return sys, err
+	}
+	if poolInitSize.GetValue() > 0 {
+		sys.Sql.PoolInitSize = poolInitSize
+	}
+
+	poolQueueMax, err := to32w(c.DBPoolQueueMax)
+	if err != nil {
+		return sys, err
+	}
+	if poolQueueMax.GetValue() > 0 {
+		sys.Sql.PoolQueueMax = poolQueueMax
+	}
+
+	sys.Sql.PoolQueueTimeout, err = to32w(c.DBPoolerTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.Timeout, err = to32w(c.SQLDBTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Depsolver.PoolQueueTimeout, err = to32w(c.DepsolverPoolerTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Depsolver.PoolQueueMax, err = to32w(c.DepsolverPoolQueueMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Depsolver.PoolInitSize, err = to32w(c.DepsolverWorkerCount)
+	if err != nil {
+		return sys, err
+	}
+	sys.Depsolver.PoolMaxSize = sys.Depsolver.PoolInitSize
+
+	sys.Depsolver.Timeout, err = to32w(c.DepsolverTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.BatchSize, err = to32w(c.SearchBatchSizeMaxSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.BatchMaxWait, err = to32w(c.SearchBatchSizeMaxWait)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.Timeout, err = to32w(c.SolrTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.PoolInitSize, err = to32w(c.SolrHTTPInitCount)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.PoolMaxSize, err = to32w(c.SolrHTTPMaxCount)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Api.BaseResourceUrl = w.String(c.BaseResourceURL)
+
+	sys.Authz.Timeout, err = to32w(c.AuthzTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Authz.Fanout, err = to32w(c.AuthzFanout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Api.MaxRequestSize, err = to32w(c.MaxRequestSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Keygen.CacheSize, err = to32w(c.KeygenCacheSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Keygen.StartSize, err = to32w(c.KeygenStartSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Keygen.Timeout, err = to32w(c.KeygenTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Api.StrictSearchResultAcls = w.Bool(c.StrictSearchResultACLs)
+
+	sys.DataCollector.Timeout, err = to32w(d.Timeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.DataCollector.PoolInitSize, err = to32w(d.HTTPInitCount)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.DataCollector.PoolMaxSize, err = to32w(d.HTTPMaxCount)
+	if err != nil {
+		return sys, err
+	}
+
+	return sys, nil
+}
+
+func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets, cs *ChefServerRunning) (*dc.AutomateConfig, error) {
 	frontendTLSCreds, err := getFrontendTLSCreds(r)
 	if err != nil {
 		return nil, err
@@ -480,5 +677,47 @@ func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets) (*d
 		},
 	}
 
+	// Add Chef Server config if it exists
+	if cs != nil {
+		erchefSys, err := getErchefSettings(cs)
+		if err != nil {
+			return cfg, err
+		}
+
+		cfg.Erchef = &erchef.ConfigRequest{
+			V1: &erchef.ConfigRequest_V1{
+				Sys: erchefSys,
+			},
+		}
+	}
+
 	return cfg, nil
+}
+
+func to32w(in json.Number) (*wrappers.Int32Value, error) {
+	i, err := in.Int64()
+	if err != nil {
+		// If the value is not set we'll return an empty wrapper
+		if in.String() == "" {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return w.Int32(int32(i)), nil
+}
+
+func to64w(in json.Number) (*wrappers.Int64Value, error) {
+	i, err := in.Int64()
+	if err != nil {
+		// If the value is not set we'll return an empty wrapper
+		if in.String() == "" {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return w.Int64(i), nil
 }
