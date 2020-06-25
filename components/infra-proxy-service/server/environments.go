@@ -105,21 +105,12 @@ func (s *Server) CreateEnvironment(ctx context.Context, req *request.CreateEnvir
 		cookbooks = map[string]string{}
 	}
 
-	var defAtt interface{}
-	var ovrAtt interface{}
-
-	defIn := DefaultIfEmpty(req.DefaultAttributes)
-	overIn := DefaultIfEmpty(req.OverrideAttributes)
-
-	defaultAttributes := json.RawMessage(defIn)
-	overrideAttributes := json.RawMessage(overIn)
-
-	err = json.Unmarshal(defaultAttributes, &defAtt)
+	defaultAttributes, err := StructToJSON(req.DefaultAttributes)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	err = json.Unmarshal(overrideAttributes, &ovrAtt)
+	overrideAttributes, err := StructToJSON(req.OverrideAttributes)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -127,8 +118,8 @@ func (s *Server) CreateEnvironment(ctx context.Context, req *request.CreateEnvir
 	_, err = c.client.Environments.Create(&chef.Environment{
 		Name:               req.Name,
 		Description:        req.Description,
-		DefaultAttributes:  defAtt,
-		OverrideAttributes: ovrAtt,
+		DefaultAttributes:  defaultAttributes,
+		OverrideAttributes: overrideAttributes,
 		CookbookVersions:   cookbooks,
 		JsonClass:          req.JsonClass,
 	})
@@ -199,21 +190,12 @@ func (s *Server) UpdateEnvironment(ctx context.Context, req *request.UpdateEnvir
 		cookbooks = map[string]string{}
 	}
 
-	var defAtt interface{}
-	var ovrAtt interface{}
-
-	defIn := DefaultIfEmpty(req.DefaultAttributes)
-	overIn := DefaultIfEmpty(req.OverrideAttributes)
-
-	defaultAttributes := json.RawMessage(defIn)
-	overrideAttributes := json.RawMessage(overIn)
-
-	err = json.Unmarshal(defaultAttributes, &defAtt)
+	defaultAttributes, err := StructToJSON(req.DefaultAttributes)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	err = json.Unmarshal(overrideAttributes, &ovrAtt)
+	overrideAttributes, err := StructToJSON(req.OverrideAttributes)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -221,8 +203,8 @@ func (s *Server) UpdateEnvironment(ctx context.Context, req *request.UpdateEnvir
 	_, err = c.client.Environments.Put(&chef.Environment{
 		Name:               req.Name,
 		Description:        req.Description,
-		DefaultAttributes:  defAtt,
-		OverrideAttributes: ovrAtt,
+		DefaultAttributes:  defaultAttributes,
+		OverrideAttributes: overrideAttributes,
 		CookbookVersions:   cookbooks,
 		JsonClass:          req.JsonClass,
 	})

@@ -295,10 +295,6 @@ func init() {
 					return m.Name
 				case "description":
 					return m.Description
-				case "default_attributes":
-					return m.DefaultAttributes
-				case "override_attributes":
-					return m.OverrideAttributes
 				default:
 					return ""
 				}
@@ -335,10 +331,6 @@ func init() {
 					return m.Name
 				case "description":
 					return m.Description
-				case "default_attributes":
-					return m.DefaultAttributes
-				case "override_attributes":
-					return m.OverrideAttributes
 				default:
 					return ""
 				}
@@ -532,10 +524,6 @@ func init() {
 					return m.Description
 				case "json_class":
 					return m.JsonClass
-				case "default_attributes":
-					return m.DefaultAttributes
-				case "override_attributes":
-					return m.OverrideAttributes
 				default:
 					return ""
 				}
@@ -574,10 +562,6 @@ func init() {
 					return m.Description
 				case "json_class":
 					return m.JsonClass
-				case "default_attributes":
-					return m.DefaultAttributes
-				case "override_attributes":
-					return m.OverrideAttributes
 				default:
 					return ""
 				}
