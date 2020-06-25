@@ -200,6 +200,12 @@ func init() {
 					return m.CiJobUrl
 				case "ci_job_id":
 					return m.CiJobId
+				case "scm_author_name":
+					return m.ScmAuthorName
+				case "scm_author_email":
+					return m.ScmAuthorEmail
+				case "policy_domain_username":
+					return m.PolicyDomainUsername
 				default:
 					return ""
 				}

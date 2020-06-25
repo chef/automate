@@ -14,7 +14,7 @@ enum SCMWebType {
 }
 
 /*
-A "Rollout" represents the process of distributing Chef Infra code (with
+A Rollout represents the process of distributing Chef Infra code (with
 Policyfiles) to a set of nodes. It's used to track which nodes have run the
 latest version of the Chef Infra code assigned to them and also provide the
 user insights about the code by aggregating Chef Client run results
@@ -93,6 +93,17 @@ message Rollout {
   string start_time = 14;
   // The time that the rollout was replaced with another rollout.
   string end_time = 15;
+
+  // The username of the author of the most recent commit to the source code
+  // repository. In git, this is the setting `user.name`.
+  string scm_author_name = 16;
+  // The email address of the author of the most recent commit to the source
+  // code repository. In git, this is the setting `user.email`.
+  string scm_author_email = 17;
+  // The username of the entity who uploaded/promoted the policy code to the
+  // code host. In a Chef Server architecture, this is the name of the Chef
+  // Server user who ran the `chef push` command to upload the policy.
+  string policy_domain_username = 18;
 }
 
 message Rollouts {

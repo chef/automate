@@ -29,6 +29,9 @@ message CreateRollout {
   string description = 10;
   string ci_job_url = 11;
   string ci_job_id = 12;
+  string scm_author_name = 13;
+  string scm_author_email = 14;
+  string policy_domain_username = 15;
 }
 
 message Rollouts {

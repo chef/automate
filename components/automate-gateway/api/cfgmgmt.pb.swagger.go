@@ -859,6 +859,15 @@ func init() {
         },
         "ci_job_id": {
           "type": "string"
+        },
+        "scm_author_name": {
+          "type": "string"
+        },
+        "scm_author_email": {
+          "type": "string"
+        },
+        "policy_domain_username": {
+          "type": "string"
         }
       },
       "description": "CreateRollout is a request to create a new Rollout. All\nfields have the same meaning as with the response Rollout\ntype."
@@ -1368,7 +1377,7 @@ func init() {
         },
         "description": {
           "type": "string",
-          "description": "A free-form description of the rollout, as given by the user."
+          "description": "A free-form description of the rollout, as given by the user. Long\nmessages may be displayed in a truncated form in the UI. The content may\nbe entered manually by the user or extracted from another system, for\nexample a git commit message."
         },
         "ci_job_url": {
           "type": "string",
@@ -1379,16 +1388,31 @@ func init() {
           "description": "If the rollout was initiated by Ci/CD or similar system, the id of the job\nthat initiated the rollout. Should include the Ci system's nickname or\nother identifying information users would need to associate the job ID to\nthe Ci/CD system."
         },
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "The system-generated ID for this rollout. The system currently provides\nautoincrementing integers for the Ids."
         },
         "start_time": {
-          "type": "string"
+          "type": "string",
+          "description": "The time that the rollout began. Whenever a new rollout is created, it\nbecomes the \"current\" rollout for its node segment; that is, any nodes\nthat start a Chef Infra Client run will run the policy revision described\nby this \"current\" rollout. The system will populate the previously current\nrollout's ` + "`" + `end_time` + "`" + ` attribute with the current time."
         },
         "end_time": {
-          "type": "string"
+          "type": "string",
+          "description": "The time that the rollout was replaced with another rollout."
+        },
+        "scm_author_name": {
+          "type": "string",
+          "description": "The username of the author of the most recent commit to the source code\nrepository. In git, this is the setting ` + "`" + `user.name` + "`" + `."
+        },
+        "scm_author_email": {
+          "type": "string",
+          "description": "The email address of the author of the most recent commit to the source\ncode repository. In git, this is the setting ` + "`" + `user.email` + "`" + `."
+        },
+        "policy_domain_username": {
+          "type": "string",
+          "description": "The username of the entity who uploaded/promoted the policy code to the\ncode host. In a Chef Server architecture, this is the name of the Chef\nServer user who ran the ` + "`" + `chef push` + "`" + ` command to upload the policy."
         }
       },
-      "description": "A \"Rollout\" represents the process of distributing Chef Infra code (with\nPolicyfiles) to a set of nodes. It's used to track which nodes have run the\nlatest version of the Chef Infra code assigned to them and also provide the\nuser insights about the code by aggregating Chef Client run results\naccording to the version of Chef Infra code applied. Metadata about the code\nis stored in order to provide the user with convenient references back to\nsystems they already use (such as SCM and Ci/CD systems) to manage their code.\n\nNodes are segmented by a triple of policy name, policy group, and policy domain URL:\npolicy name generally describes what kind of system it is, e.g., a database server\npolicy group generally describes where the system fits in the user's code\nlifecycle, e.g., \"QA\" or \"production\"\npolicy domain URL identifies the system that distributes the Chef Infra code\nand is the owner of the namespaces for policy name and group. E.g., a Chef\nServer URL with the ` + "`" + `/organizations/:orgname` + "`" + ` part.\n\nThere is one (or zero) revision(s) of the Chef Infra code applied to any\nsegment at a time. Rollouts track the changes to which revision of the code is\napplied to the node segments over time."
+      "description": "A Rollout represents the process of distributing Chef Infra code (with\nPolicyfiles) to a set of nodes. It's used to track which nodes have run the\nlatest version of the Chef Infra code assigned to them and also provide the\nuser insights about the code by aggregating Chef Client run results\naccording to the version of Chef Infra code applied. Metadata about the code\nis stored in order to provide the user with convenient references back to\nsystems they already use (such as SCM and Ci/CD systems) to manage their code.\n\nNodes are segmented by a triple of policy name, policy group, and policy domain URL:\npolicy name generally describes what kind of system it is, e.g., a database server\npolicy group generally describes where the system fits in the user's code\nlifecycle, e.g., \"QA\" or \"production.\" Policy groups may also represent a\nsubset of nodes within a code lifecycle stage, such as a \"production-canary\"\ngroup.\npolicy domain URL identifies the system that distributes the Chef Infra code\nand is the owner of the namespaces for policy name and group. E.g., a Chef\nServer URL with the ` + "`" + `/organizations/:orgname` + "`" + ` part.\n\nThere is one (or zero) revision(s) of the Chef Infra code applied to any\nsegment at a time. Rollouts track the changes to which revision of the code is\napplied to the node segments over time."
     },
     "chef.automate.api.cfgmgmt.response.Rollouts": {
       "type": "object",
