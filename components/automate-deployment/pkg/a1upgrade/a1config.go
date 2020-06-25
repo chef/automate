@@ -275,6 +275,26 @@ type CSNginx struct {
 	ServerNamesHashBucketSize json.Number `json:"server_names_hash_bucket_size"`
 }
 
+type Bookshelf struct {
+	Enable      bool   `json:"enable"`
+	StorageType string `json:"storage_type"`
+	LogRotation struct {
+		FileMaxbytes json.Number `json:"file_maxbytes"`
+		NumToKeep    json.Number `json:"num_to_keep"`
+	} `json:"log_rotation"`
+	StreamDownload                 bool        `json:"stream_download"`
+	SqlRetryCount                  json.Number `json:"sql_retry_count"`
+	SqlRetryDelay                  json.Number `json:"sql_retry_delay"`
+	AbandonedUploadCleanupInterval json.Number `json:"abandoned_upload_cleanup_interval"`
+	DeleteDataCleanupInterval      json.Number `json:"delete_data_cleanup_interval"`
+	DbPoolSize                     json.Number `json:"db_pool_size"`
+	DbPoolMax                      json.Number `json:"db_pool_max"`
+	DbPoolInit                     json.Number `json:"db_pool_init"`
+	DbPoolQueueMax                 json.Number `json:"db_pool_queue_max"`
+	DbPoolerTimeout                json.Number `json:"db_pooler_timeout"`
+	SqlDbTimeout                   json.Number `json:"sql_db_timeout"`
+}
+
 type DataCollector struct {
 	Timeout       json.Number `json:"timeout"`
 	HTTPInitCount json.Number `json:"http_init_count"`
@@ -292,11 +312,6 @@ type CSRPostgreSQL struct {
 	External bool        `json:"external"`
 	Vip      string      `json:"vip"`
 	Port     json.Number `json:"port"`
-}
-
-type Bookshelf struct {
-	Enable      bool   `json:"enable"`
-	StorageType string `json:"storage_type"`
 }
 
 type OcID struct {

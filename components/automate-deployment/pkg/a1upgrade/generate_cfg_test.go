@@ -318,6 +318,17 @@ func TestInfraSettings(t *testing.T) {
 	})
 }
 
+func TestBookshelfSettings(t *testing.T) {
+	t.Run("parses abandoned cleanup interval", func(t *testing.T) {
+		r := newMockChefServerRunnig(t)
+
+		bk, err := getBookeshelfSettings(r)
+		require.NoError(t, err)
+
+		require.Equal(t, int32(1140000), bk.Bookshelf.AbandonedUploadCleanupInterval.GetValue())
+	})
+}
+
 func newMockDeliveryRunning(t *testing.T) *DeliveryRunning {
 	config := NewA1Config()
 	config.DeliveryRunningPath = fixturePath("delivery-running.json")

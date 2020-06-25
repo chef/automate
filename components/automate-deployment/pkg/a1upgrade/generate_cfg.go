@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/config/authn"
+	"github.com/chef/automate/api/config/bookshelf"
 	"github.com/chef/automate/api/config/cs_nginx"
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/dex"
@@ -594,6 +595,72 @@ func getInfraServerNginxSettings(cs *ChefServerRunning) (*cs_nginx.ConfigRequest
 	return sys, nil
 }
 
+func getBookeshelfSettings(cs *ChefServerRunning) (*bookshelf.ConfigRequest_V1_System, error) {
+	var err error
+
+	sys := bookshelf.NewConfigRequest().GetV1().GetSys()
+	bk := cs.PrivateChef.Bookshelf
+
+	sys.Log.RotationMaxBytes, err = to64w(bk.LogRotation.FileMaxbytes)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Log.RotationMaxFiles, err = to32w(bk.LogRotation.NumToKeep)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Bookshelf.StreamDownload = w.Bool(bk.StreamDownload)
+
+	sys.Bookshelf.SqlRetryCount, err = to32w(bk.SqlRetryCount)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Bookshelf.SqlRetryDelay, err = to32w(bk.SqlRetryDelay)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Bookshelf.AbandonedUploadCleanupInterval, err = to32w(bk.AbandonedUploadCleanupInterval)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Bookshelf.DeletedDataCleanupInterval, err = to32w(bk.DeleteDataCleanupInterval)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolInitSize, err = to32w(bk.DbPoolSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolMaxSize, err = to32w(bk.DbPoolMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueMax, err = to32w(bk.DbPoolQueueMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueTimeout, err = to32w(bk.DbPoolerTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.Timeout, err = to32w(bk.SqlDbTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	return sys, nil
+}
+
 func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets, cs *ChefServerRunning) (*dc.AutomateConfig, error) {
 	frontendTLSCreds, err := getFrontendTLSCreds(r)
 	if err != nil {
@@ -722,19 +789,24 @@ func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets, cs 
 		},
 	}
 
-	// Return early if we're not migrating Chef Infra Serverc config
+	// Return early if we're not migrating Chef Infra Server config
 	if cs == nil {
 		return cfg, nil
 	}
 
 	erchefSys, err := getErchefSettings(cs)
 	if err != nil {
-		return cfg, err
+		return cfg, errors.Wrap(err, "paring Chef Infra Server oc-erchef settings")
 	}
 
 	infraNginxSys, err := getInfraServerNginxSettings(cs)
 	if err != nil {
-		return cfg, err
+		return cfg, errors.Wrap(err, "paring Chef Infra Server nginx settings")
+	}
+
+	bookshelfSys, err := getBookeshelfSettings(cs)
+	if err != nil {
+		return cfg, errors.Wrap(err, "paring Chef Infra Server bookshelf settings")
 	}
 
 	cfg.Erchef = &erchef.ConfigRequest{
@@ -745,6 +817,11 @@ func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets, cs 
 	cfg.CsNginx = &cs_nginx.ConfigRequest{
 		V1: &cs_nginx.ConfigRequest_V1{
 			Sys: infraNginxSys,
+		},
+	}
+	cfg.Bookshelf = &bookshelf.ConfigRequest{
+		V1: &bookshelf.ConfigRequest_V1{
+			Sys: bookshelfSys,
 		},
 	}
 
