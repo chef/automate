@@ -107,6 +107,7 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
   getEventTypeLabel(event: ChefEvent): string {
     const labelMap = {
       version: 'cookbook',
+      cookbook_artifact_version: 'cookbook',
       item: 'data bag item',
       bag: 'data bag',
       scanjobs: 'scan job'

@@ -20,6 +20,7 @@ export class EventIconComponent {
       case 'node': return 'storage';
       case 'cookbook': return 'chrome_reader_mode';
       case 'version': return 'chrome_reader_mode';
+      case 'cookbook_artifact_version': return 'chrome_reader_mode';
       case 'item': return 'business_center';
       case 'bag': return 'business_center';
       case 'environment': return 'public';

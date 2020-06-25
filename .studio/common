@@ -430,7 +430,7 @@ _component_auto_complete()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     opts="api config license"
-    opts="$opts $(ls /src/components/*/scripts/grpc.sh | cut -d/ -f4 | tr "\\n" " ")"
+    opts="$opts $(ls /src/components/ | cut -d/ -f4 | tr "\\n" " ")"
 
     if [[ ${cur} == * ]]; then
         COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
