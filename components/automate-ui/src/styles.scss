@@ -13,6 +13,7 @@
 
   &[hasUserNotifications] {
     chef-side-panel {
+      // Adjust height when global notifications are visible.
       max-height: calc(100% - 120px);
     }
   }
@@ -25,6 +26,8 @@
 
   &[hasNotifications][hasUserNotifications] {
     chef-side-panel {
+      // Adjust height when global notifications
+      // and user notifications are visible.
       max-height: calc(100% - 162px);
     }
   }
