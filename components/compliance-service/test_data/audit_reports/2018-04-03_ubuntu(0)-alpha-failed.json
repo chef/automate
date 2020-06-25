@@ -1,0 +1,30 @@
+{
+  "type": "inspec_report",
+  "node_uuid": "9b9f4e51-b049-4b10-9555-10578916e666",
+  "report_uuid": "bb93e1b2-36d6-439e-ac70-cccccccccc08",
+  "job_uuid": "74a54a28-c628-4f82-86df-555555555557",
+  "node_name": "ubuntu(0)-alpha-failed",
+  "environment": "DevSec Prod Alpha",
+  "roles": [],
+  "recipes": [],
+  "end_time": "2018-04-03T03:02:02Z",
+  "version": "4.20.0",
+  "platform": {
+    "name": "unknown",
+    "release": "unknown"
+  },
+  "statistics": {
+    "duration": 0.01
+  },
+  "other_checks": [],
+  "policy_name": "test_policy_name",
+  "policy_group": "test_policy_group",
+  "organization_name": "test_org",
+  "source_fqdn": "api.chef.io",
+  "chef_tags": ["mylinux", "my.tag", "some=tag"],
+  "ipaddress": "188.38.98.100",
+  "fqdn": "web-ubu.example.com",
+  "profiles": [],
+  "status": "failed",
+  "status_message": "Skipping profile: 'myprofile' on unsupported platform: 'ubuntu/18.04'."
+}

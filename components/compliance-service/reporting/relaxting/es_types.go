@@ -50,6 +50,7 @@ type ESInSpecReport struct {
 	Environment   string    `json:"environment"`
 	EndTime       time.Time `json:"end_time"`
 	Status        string    `json:"status"`
+	StatusMessage string    `json:"status_message"`
 	JobID         string    `json:"job_uuid"`
 	Roles         []string  `json:"roles"`
 	Recipes       []string  `json:"recipes"`
