@@ -21,15 +21,14 @@ Restore Chef Automate from a [filesystem backup]({{< ref "restore.md#restore-fro
         curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     ```
 
-1. **Filesystem backups** require access for Chef Automate to a backup directory in the [configured location]({{< ref
-"backup.md#backup-to-a-filesystem" >}}).
+1. **Filesystem backups** require access for Chef Automate to a backup directory in the [configured location]({{< ref "backup.md#backup-to-a-filesystem" >}}).
 Ensure access for the backup type used:
 
-     1. To restore a network-attached filesystem backup, mount the shared backup directory to the same mount point configured at the time of the backup.
-     1. To restore a backup directory that is not a network-attached filesystem, copy the backup directory to the [configured location]({{< ref "backup.md#backup-to-a-filesystem" >}}) at the time of the backup.
-     1. For restoring a single-file backup archive, copy your archive to the restore host and extract it to the [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}).
+     1. To restore [a network-attached filesystem backup]({{< ref "backup.md#backup-to-a-filesystem" >}}), mount the shared backup directory to the same mount point configured at the time of the backup.
+     1. To restore [a backup directory that is not a network-attached filesystem]({{< ref "backup.md#backup-to-a-filesystem" >}}), copy the backup directory to the configured location at the time of the backup.
+     1. For restoring a [single-file backup archive]({{< ref "backup.md#store-a-filesystem-backup-in-a-single-file-archive" >}}), copy your archive to the restore host and extract it to the configured backup directory.
 
-1. **(OPTIONAL)** To restore to a host with a different fully qualified domain name (FQDN) than that of the backup host, create a `patch.toml` file that specifies the new FQDN and provides it at restore time:
+1. If restoring to a host with a different fully qualified domain name (FQDN) than that of the backup host, then create a `patch.toml` file that specifies the new FQDN and provides it at restore time:
 
     ```toml
          [global.v1]
@@ -53,7 +52,7 @@ Ensure access for the backup type used:
 
 ## Restore From a Filesystem Backup
 
-Ensure to meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
+Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
 
 ### Restore in an Internet-Connected Environment
 
@@ -96,7 +95,7 @@ sudo chef-automate backup fix-repo-permissions <path>
 
 ## Restore From an S3 Backup
 
-Ensure to meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
+Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
 
 To restore from an S3 bucket backup, run:
 
