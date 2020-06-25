@@ -217,6 +217,7 @@ type PrivateChef struct {
 	OcID          OcID          `json:"oc_id"`
 	DataCollector DataCollector `json:"data_collector"`
 	CSNginx       CSNginx       `json:"nginx"`
+	OcBifrost     OcBifrost     `json:"oc_bifrost"`
 }
 
 type OpscodeErchef struct {
@@ -257,6 +258,19 @@ type OpscodeErchef struct {
 	KeygenStartSize        json.Number `json:"keygen_start_size"`
 	KeygenTimeout          json.Number `json:"keygen_timeout"`
 	StrictSearchResultACLs bool        `json:"strict_search_result_acls"`
+}
+
+type OcBifrost struct {
+	LogRotation struct {
+		FileMaxbytes         json.Number `json:"file_maxbytes"`
+		NumToKeep            json.Number `json:"num_to_keep"`
+		MaxMessagesPerSecond json.Number `json:"max_messages_per_second"`
+	} `json:"log_rotation"`
+	DbPoolSize      json.Number `json:"db_pool_size"`
+	DbPoolMax       json.Number `json:"db_pool_max"`
+	DbPoolInit      json.Number `json:"db_pool_init"`
+	DbPoolerTimeout json.Number `json:"db_pooler_timeout"`
+	DbPoolQueueMax  json.Number `json:"db_pool_queue_max"`
 }
 
 type CSNginx struct {

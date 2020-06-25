@@ -322,10 +322,21 @@ func TestBookshelfSettings(t *testing.T) {
 	t.Run("parses abandoned cleanup interval", func(t *testing.T) {
 		r := newMockChefServerRunnig(t)
 
-		bk, err := getBookeshelfSettings(r)
+		bk, err := getBookshelfSettings(r)
 		require.NoError(t, err)
 
 		require.Equal(t, int32(1140000), bk.Bookshelf.AbandonedUploadCleanupInterval.GetValue())
+	})
+}
+
+func TestBifrostSettings(t *testing.T) {
+	t.Run("parses db pooler timeout", func(t *testing.T) {
+		r := newMockChefServerRunnig(t)
+
+		bf, err := getBifrostSettings(r)
+		require.NoError(t, err)
+
+		require.Equal(t, int32(2000), bf.Sql.PoolQueueTimeout.GetValue())
 	})
 }
 

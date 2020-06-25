@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/config/authn"
+	"github.com/chef/automate/api/config/bifrost"
 	"github.com/chef/automate/api/config/bookshelf"
 	"github.com/chef/automate/api/config/cs_nginx"
 	dc "github.com/chef/automate/api/config/deployment"
@@ -595,7 +596,7 @@ func getInfraServerNginxSettings(cs *ChefServerRunning) (*cs_nginx.ConfigRequest
 	return sys, nil
 }
 
-func getBookeshelfSettings(cs *ChefServerRunning) (*bookshelf.ConfigRequest_V1_System, error) {
+func getBookshelfSettings(cs *ChefServerRunning) (*bookshelf.ConfigRequest_V1_System, error) {
 	var err error
 
 	sys := bookshelf.NewConfigRequest().GetV1().GetSys()
@@ -654,6 +655,50 @@ func getBookeshelfSettings(cs *ChefServerRunning) (*bookshelf.ConfigRequest_V1_S
 	}
 
 	sys.Sql.Timeout, err = to32w(bk.SqlDbTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	return sys, nil
+}
+
+func getBifrostSettings(cs *ChefServerRunning) (*bifrost.ConfigRequest_V1_System, error) {
+	var err error
+
+	sys := bifrost.NewConfigRequest().GetV1().GetSys()
+	bf := cs.PrivateChef.OcBifrost
+
+	sys.Log.RotationMaxBytes, err = to64w(bf.LogRotation.FileMaxbytes)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Log.RotationMaxFiles, err = to32w(bf.LogRotation.NumToKeep)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Log.MaxErrorLogsPerSecond, err = to32w(bf.LogRotation.MaxMessagesPerSecond)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolInitSize, err = to32w(bf.DbPoolSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolMaxSize, err = to32w(bf.DbPoolMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueMax, err = to32w(bf.DbPoolQueueMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueTimeout, err = to32w(bf.DbPoolerTimeout)
 	if err != nil {
 		return sys, err
 	}
@@ -804,9 +849,14 @@ func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets, cs 
 		return cfg, errors.Wrap(err, "paring Chef Infra Server nginx settings")
 	}
 
-	bookshelfSys, err := getBookeshelfSettings(cs)
+	bookshelfSys, err := getBookshelfSettings(cs)
 	if err != nil {
 		return cfg, errors.Wrap(err, "paring Chef Infra Server bookshelf settings")
+	}
+
+	bifrostSys, err := getBifrostSettings(cs)
+	if err != nil {
+		return cfg, errors.Wrap(err, "paring Chef Infra Server oc-bifrost settings")
 	}
 
 	cfg.Erchef = &erchef.ConfigRequest{
@@ -822,6 +872,11 @@ func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets, cs 
 	cfg.Bookshelf = &bookshelf.ConfigRequest{
 		V1: &bookshelf.ConfigRequest_V1{
 			Sys: bookshelfSys,
+		},
+	}
+	cfg.Bifrost = &bifrost.ConfigRequest{
+		V1: &bifrost.ConfigRequest_V1{
+			Sys: bifrostSys,
 		},
 	}
 
