@@ -299,6 +299,17 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
+      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "types", values: ["profile", "platform", "environment", "control"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+      ])
+      expected_data = {
+        "platforms" => [{"name" => "unknown", "failures" => 1}],
+        "environments" => [{"name" => "DevSec Prod Alpha", "failures" => 1}]
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
       ##read profiles
       actual_data = GRPC stats, :read_profiles, Stats::Query.new()
       expected_data = {}
@@ -453,6 +464,14 @@ if !ENV['NO_STATS_TESTS']
             "id" => "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777"}]}
       assert_equal_json_content(expected_data, actual_data)
 
+      # Get the profiles used on the day when we got the failed report with no profiles
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+        Stats::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+      ])
+      expected_data = {}
+      assert_equal_json_content(expected_data, actual_data)
+
+
       #description: Profile stats list for nodes
       #filter: in one of the two profiles and end_time
       #calls: stats::ReadProfiles::GetProfileSummaryByProfileId
@@ -483,6 +502,17 @@ if !ENV['NO_STATS_TESTS']
         type: "nodes",
         filters: [
           Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+        ])
+      expected_data = {
+        "nodeSummary" => { "noncompliant" => 1 }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        type: "nodes",
+        filters: [
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
         ])
       expected_data = {
         "nodeSummary" => { "noncompliant" => 1 }

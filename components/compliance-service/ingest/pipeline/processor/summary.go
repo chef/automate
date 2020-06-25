@@ -76,7 +76,11 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 			msg.Shared.PerProfileSums = perProfileSums
 			msg.Shared.AllProfileSums = totalSum
 
-			if failedProfiles > 0 {
+			if msg.Report.Status == "failed" && len(msg.Report.Profiles) == 0 {
+				msg.Shared.Status = msg.Report.Status
+				msg.Shared.StatusMessage = msg.Report.StatusMessage
+				logrus.Warn("Report status is failed and there are not profiles")
+			} else if failedProfiles > 0 {
 				// If at least one of the profiles in the report comes in with "failed" status, we ignore the totalSum aggregation which might have all
 				// controls passed from another profile. This way we flag the failure of a profile without running any controls, e.g. profile parse error.
 				msg.Shared.Status = inspec.ResultStatusFailed
@@ -126,6 +130,7 @@ func ComplianceSummary(in <-chan message.Compliance) <-chan message.Compliance {
 				ControlsSums:     *msg.Shared.AllProfileSums,
 				Profiles:         msg.Shared.PerProfileSums,
 				Status:           msg.Shared.Status,
+				StatusMessage:    msg.Shared.StatusMessage,
 				DocVersion:       compliance.DocVersion,
 				ESTimestamp:      compliance.CurrentTime(),
 				PolicyName:       msg.Report.PolicyName,

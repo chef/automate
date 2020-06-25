@@ -680,7 +680,6 @@ describe File.basename(__FILE__) do
     assert_equal(Reporting::Platform.new(name: "centos", release: "5.11", full: "centos 5.11"), res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 3.309065103530884), res['statistics'])
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
-    puts res['profiles'].class
 
     if res['profiles'].is_a?(Google::Protobuf::RepeatedField)
       assert_equal(3, res['profiles'].length)
@@ -717,7 +716,6 @@ describe File.basename(__FILE__) do
                                       values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'])]
     )
     assert_equal(Reporting::Report, res.class)
-
     assert_equal('3.1.0', res['version'])
     assert_equal('bb93e1b2-36d6-439e-ac70-cccccccccc04', res['id'])
     assert_equal('9b9f4e51-b049-4b10-9555-10578916e149', res['node_id'])
@@ -728,7 +726,6 @@ describe File.basename(__FILE__) do
     assert_equal(Reporting::Platform.new(name: "centos", release: "5.11", full: "centos 5.11"), res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 3.309065103530884), res['statistics'])
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
-    puts res['profiles'].class
 
     if res['profiles'].is_a?(Google::Protobuf::RepeatedField)
       assert_equal(1, res['profiles'].length)
@@ -775,7 +772,6 @@ describe File.basename(__FILE__) do
     assert_equal(Reporting::Platform.new(name: "centos", release: "5.11", full: "centos 5.11"), res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 3.309065103530884), res['statistics'])
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
-    puts res['profiles'].class
 
     if res['profiles'].is_a?(Google::Protobuf::RepeatedField)
       assert_equal(1, res['profiles'].length)

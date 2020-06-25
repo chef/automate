@@ -159,6 +159,12 @@
         },
         "automate_manager_type": {
           "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "status_message": {
+          "type": "string"
         }
       }
     },

@@ -10,6 +10,8 @@ message Report {
 	Platform platform = 2;
 	Statistics statistics = 3;
 	repeated string other_checks = 4;
+	string status = 5;
+	string status_message = 6;
 	repeated Profile profiles = 20;
 }
 

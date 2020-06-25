@@ -723,6 +723,13 @@ describe File.basename(__FILE__) do
     }.to_json
     assert_equal(expected_data, actual_data.to_json)
 
+    # Get profiles used by nodes on the day without profiles. Sorted by name desc
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: "end_time", values: ["2018-04-03T#{END_OF_DAY}"])
+    ], sort: 'name', order: 1)
+    expected_data = { "counts": {} }.to_json
+    assert_equal(expected_data, actual_data.to_json)
+
     # Cover the other sort fields:
     resp = actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(sort: 'name', order: 1)
     assert_equal(Reporting::ProfileMins, resp.class)

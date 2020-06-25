@@ -186,7 +186,8 @@ if !ENV['NO_STATS_TREND_TESTS']
             "failed": 1
           },
           {
-            "reportTime": "2018-04-03T23:59:59Z"
+            "reportTime": "2018-04-03T23:59:59Z",
+            "failed": 1
           },
           {
             "reportTime": "2018-04-04T23:59:59Z"

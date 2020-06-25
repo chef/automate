@@ -1512,6 +1512,42 @@ describe File.basename(__FILE__) do
       "totalFailed" => 1}.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
+
+    # Get nodes from 2018-04-03 with non matching profile
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'profile_id', values: [
+        '5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777'
+      ]),
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+    ])
+    expected_nodes = {}.to_json
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+
+
+    # Get nodes from 2018-04-03
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+    ])
+    expected_nodes = {
+      "nodes" => [
+        {
+          "environment" => "DevSec Prod Alpha",
+          "id" => "888f4e51-b049-4b10-9555-111222333333",
+          "latestReport" => {
+            "controls" => { "failed" => {}, "passed" => {}, "skipped" => {}, "waived" => {}},
+            "endTime" => "2018-04-03T11:02:02Z",
+            "id" => "zz93e1b2-36d6-439e-ac70-cccccccccckk",
+            "status" => "failed"
+          },
+          "name" => "ubuntu(0)-alpha-failed",
+          "platform" => { "full" => "unknown unknown", "name" => "unknown", "release" => "unknown"}
+        }
+      ],
+      "total" => 1,
+      "totalFailed" => 1
+    }.to_json
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+
     # Cover the other sort fields:
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(
       filters: [Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])], sort: 'platform', order: 1)
@@ -1613,6 +1649,22 @@ describe File.basename(__FILE__) do
           "version"=>"1.0.5"
         }
       ]
+    }
+    assert_equal_json_sorted( expected_node.to_json, actual_node.to_json)
+
+    # Node details API
+    actual_node = GRPC reporting, :read_node, Reporting::Id.new(id: '888f4e51-b049-4b10-9555-111222333333')
+    expected_node = {
+      "environment" => "DevSec Prod Alpha",
+      "id" => "888f4e51-b049-4b10-9555-111222333333",
+      "latestReport" => {
+        "controls" => { "failed" => {}, "passed" => {}, "skipped" => {}, "waived" => {} },
+        "endTime" => "2018-04-03T11:02:02Z",
+        "id" => "zz93e1b2-36d6-439e-ac70-cccccccccckk",
+        "status" => "failed"
+      },
+      "name" => "ubuntu(0)-alpha-failed",
+      "platform" => { "full" => "unknown unknown", "name" => "unknown", "release" => "unknown" }
     }
     assert_equal_json_sorted( expected_node.to_json, actual_node.to_json)
 
