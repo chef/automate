@@ -137,7 +137,7 @@ func ConvertParamToActionBackend(parameter string) string {
 	switch parameter {
 	case "organization":
 		return backend.ActionOrganization
-	case "source_fqdn":
+	case "source_fqdn", "chef_server":
 		return backend.ActionSourceFQDN
 	case "event-type":
 		return backend.EntityTypeName
