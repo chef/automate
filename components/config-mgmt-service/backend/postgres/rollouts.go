@@ -9,19 +9,22 @@ import (
 )
 
 type NewRollout struct {
-	Id               int32  `db:"id, primarykey, autoincrement"`
-	PolicyName       string `db:"policy_name"`
-	PolicyNodeGroup  string `db:"policy_node_group"`
-	PolicyRevisionId string `db:"policy_revision_id"`
-	PolicyDomainURL  string `db:"policy_domain_url"`
-	SCMType          string `db:"scm_type"`
-	SCMWebType       string `db:"scm_web_type"`
-	PolicySCMURL     string `db:"policy_scm_url"`
-	PolicySCMWebURL  string `db:"policy_scm_web_url"`
-	PolicySCMCommit  string `db:"policy_scm_commit"`
-	Description      string `db:"description"`
-	CiJobId          string `db:"ci_job_id"`
-	CiJobUrl         string `db:"ci_job_url"`
+	Id                   int32  `db:"id, primarykey, autoincrement"`
+	PolicyName           string `db:"policy_name"`
+	PolicyNodeGroup      string `db:"policy_node_group"`
+	PolicyRevisionId     string `db:"policy_revision_id"`
+	PolicyDomainURL      string `db:"policy_domain_url"`
+	PolicyDomainUsername string `db:"policy_domain_username"`
+	SCMType              string `db:"scm_type"`
+	SCMWebType           string `db:"scm_web_type"`
+	PolicySCMURL         string `db:"policy_scm_url"`
+	PolicySCMWebURL      string `db:"policy_scm_web_url"`
+	PolicySCMCommit      string `db:"policy_scm_commit"`
+	SCMAuthorName        string `db:"scm_author_name"`
+	SCMAuthorEmail       string `db:"scm_author_email"`
+	Description          string `db:"description"`
+	CiJobId              string `db:"ci_job_id"`
+	CiJobUrl             string `db:"ci_job_url"`
 }
 
 type Rollout struct {
