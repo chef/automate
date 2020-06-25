@@ -22,7 +22,9 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Events struct {
-	Events               []*Event `protobuf:"bytes,1,rep,name=events,proto3" json:"events,omitempty"`
+	// List of events.
+	Events []*Event `protobuf:"bytes,1,rep,name=events,proto3" json:"events,omitempty"`
+	// Total count of events.
 	TotalEvents          int64    `protobuf:"varint,2,opt,name=total_events,json=totalEvents,proto3" json:"total_events,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -69,22 +71,34 @@ func (m *Events) GetTotalEvents() int64 {
 }
 
 type Event struct {
-	EventType            string               `protobuf:"bytes,1,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`
-	Task                 string               `protobuf:"bytes,2,opt,name=task,proto3" json:"task,omitempty"`
-	StartTime            *timestamp.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EntityName           string               `protobuf:"bytes,4,opt,name=entity_name,json=entityName,proto3" json:"entity_name,omitempty"`
-	RequestorType        string               `protobuf:"bytes,5,opt,name=requestor_type,json=requestorType,proto3" json:"requestor_type,omitempty"`
-	RequestorName        string               `protobuf:"bytes,6,opt,name=requestor_name,json=requestorName,proto3" json:"requestor_name,omitempty"`
-	ServiceHostname      string               `protobuf:"bytes,7,opt,name=service_hostname,json=serviceHostname,proto3" json:"service_hostname,omitempty"`
-	StartId              string               `protobuf:"bytes,8,opt,name=start_id,json=startId,proto3" json:"start_id,omitempty"`
-	EventCount           int32                `protobuf:"varint,9,opt,name=event_count,json=eventCount,proto3" json:"event_count,omitempty"`
-	ParentName           string               `protobuf:"bytes,16,opt,name=parent_name,json=parentName,proto3" json:"parent_name,omitempty"`
-	ParentType           string               `protobuf:"bytes,17,opt,name=parent_type,json=parentType,proto3" json:"parent_type,omitempty"`
-	EndTime              *timestamp.Timestamp `protobuf:"bytes,18,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	EndId                string               `protobuf:"bytes,19,opt,name=end_id,json=endId,proto3" json:"end_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	// Type of event (cookbook, role, etc).
+	EventType string `protobuf:"bytes,1,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`
+	// Type of task for the event (create, update, delete).
+	Task string `protobuf:"bytes,2,opt,name=task,proto3" json:"task,omitempty"`
+	// Start time of the event.
+	StartTime  *timestamp.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EntityName string               `protobuf:"bytes,4,opt,name=entity_name,json=entityName,proto3" json:"entity_name,omitempty"`
+	// Requestor type on the event record.
+	RequestorType string `protobuf:"bytes,5,opt,name=requestor_type,json=requestorType,proto3" json:"requestor_type,omitempty"`
+	// Requestor name on the event record.
+	RequestorName string `protobuf:"bytes,6,opt,name=requestor_name,json=requestorName,proto3" json:"requestor_name,omitempty"`
+	// Hostname from which the record was gathered.
+	ServiceHostname string `protobuf:"bytes,7,opt,name=service_hostname,json=serviceHostname,proto3" json:"service_hostname,omitempty"`
+	// Used for grouping events together.
+	StartId string `protobuf:"bytes,8,opt,name=start_id,json=startId,proto3" json:"start_id,omitempty"`
+	// Used for grouping events together.
+	EventCount int32 `protobuf:"varint,9,opt,name=event_count,json=eventCount,proto3" json:"event_count,omitempty"`
+	// Used for grouping events together.
+	ParentName string `protobuf:"bytes,16,opt,name=parent_name,json=parentName,proto3" json:"parent_name,omitempty"`
+	// Used for grouping events together.
+	ParentType string `protobuf:"bytes,17,opt,name=parent_type,json=parentType,proto3" json:"parent_type,omitempty"`
+	// Used for grouping events together; equal to start_time if not grouped
+	EndTime *timestamp.Timestamp `protobuf:"bytes,18,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	// Used for grouping events together; equal to start_id if not grouped
+	EndId                string   `protobuf:"bytes,19,opt,name=end_id,json=endId,proto3" json:"end_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Event) Reset()         { *m = Event{} }
@@ -204,7 +218,9 @@ func (m *Event) GetEndId() string {
 }
 
 type EventCounts struct {
-	Total                int64         `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	// Total count of events.
+	Total int64 `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	// Total count of events per type.
 	Counts               []*EventCount `protobuf:"bytes,2,rep,name=counts,proto3" json:"counts,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
@@ -251,7 +267,9 @@ func (m *EventCounts) GetCounts() []*EventCount {
 }
 
 type EventCount struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Name of the event.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Count of events.
 	Count                int64    `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
