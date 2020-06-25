@@ -42,11 +42,10 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
   ) {
-    const initialStatus: TokenStatus = 'active';
     this.updateForm = fb.group({
       // Must stay in sync with error checks in api-token-details.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      status: [initialStatus],
+      status: [],
       projects: [[]]
     });
   }
