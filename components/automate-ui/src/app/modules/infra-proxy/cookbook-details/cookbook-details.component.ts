@@ -1,19 +1,24 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { environment as env } from 'environments/environment';
 import { Subject, combineLatest } from 'rxjs';
 import { first, filter, takeUntil, pluck } from 'rxjs/operators';
+import { identity, isNil } from 'lodash/fp';
+import { CollapsibleListMapper } from 'app/helpers/infra-proxy/collapsible-list-mapper';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeURL, routeParams } from 'app/route.selectors';
-import { identity, isNil } from 'lodash/fp';
 import { CookbookVersions } from 'app/entities/cookbooks/cookbook-versions.model';
 import { cookbookVersionsFromRoute, getStatus } from 'app/entities/cookbooks/cookbook-versions.selectors';
 import { GetCookbookVersions } from 'app/entities/cookbooks/cookbook-versions.actions';
-import { CookbookDetails, RootFiles } from 'app/entities/cookbooks/cookbook-details.model';
+import {
+  CookbookDetails,
+  RootFiles,
+  Menu,
+  SubMenu
+} from 'app/entities/cookbooks/cookbook-details.model';
 import {
   cookbookDetailsFromRoute,
   getStatus as getAllCookbooksDetailsStatus
@@ -41,17 +46,29 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
   public readFileContent;
   public cookbookDetailsLoading = false;
   public cookbookVersionsLoading = true;
+  public contentTabLoading = false;
+  public contentLoading = false;
   public status = false;
-
-  // tslint:disable-next-line: max-line-length
-  public accordian = [ { menu: 'attribute', submenu: [{name: 'aix'}, {name: 'aix1'}, {name: 'aix2'}, {name: 'aix3'}, {name: 'aix4'}, {name: 'aix5'}, {name: 'aix6'}] },
-  // tslint:disable-next-line: max-line-length
-  { menu: 'Definations', submenu: [{name: 'aix'}, {name: 'aix1'}, {name: 'aix2'}, {name: 'aix3'}, {name: 'aix4'}, {name: 'aix5'}, {name: 'aix6'}] }];
+  public menuList: Menu[] = [];
+  public defaultContent: SubMenu;
+  public contentUrl: string;
+  public urlContent;
+  public activeContentName: string;
+  public listItem = [
+    'attributes',
+    'definitions',
+    'files',
+    'libraries',
+    'providers',
+    'recipes',
+    'resources',
+    'root_files',
+    'templates'
+  ];
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
-    private router: Router,
     private http: HttpClient
   ) { }
 
@@ -95,6 +112,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         this.cookbook = cookbookVersionState;
         this.cookbookVersionsLoading = false;
         this.cookbookDetailsLoading = true;
+        this.contentTabLoading = true;
         this.currentVersion = this.cookbook.versions[0];
         this.store.dispatch(new GetCookbookDetails({
           server_id: this.serverId,
@@ -115,6 +133,11 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(([_getCookbooksSt, cookbookDetailsState]) => {
         this.cookbookDetails = cookbookDetailsState;
+        this.menuList = CollapsibleListMapper.transform(cookbookDetailsState, this.listItem);
+        this.defaultContent = this.menuList[0].subMenu[0];
+        if (this.defaultContent) {
+          this.getContent(this.defaultContent);
+        }
         this.readFile = cookbookDetailsState?.root_files.find(data => data.name === 'README.md');
         if (this.readFile) {
           this.readFileUrl = encodeURIComponent(this.readFile?.url);
@@ -134,6 +157,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
   public handleCookbookVersionChange(event): void {
     this.readFileContent = '';
     this.cookbookDetailsLoading = true;
+    this.contentTabLoading = true;
     this.store.dispatch(new GetCookbookDetails({
       server_id: this.serverId,
       org_id: this.orgId,
@@ -142,7 +166,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  clickEvent(event) {
+  listClickEvent(event) {
     if (event.target.classList.contains('extend-list')) {
       event.target.classList.remove('extend-list');
       event.target.parentNode.querySelector('ul').classList.remove('show');
@@ -152,9 +176,29 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  subListClickEvent(event, currentContent: SubMenu) {
+    this.contentLoading = true;
+    this.getContent(currentContent);
+    document.querySelector('li.active-sub-list').classList.remove('active-sub-list');
+    event.target.classList.add('active-sub-list');
+  }
+
+  getContent(activeContent: SubMenu) {
+    this.activeContentName = activeContent.name;
+    this.contentUrl = encodeURIComponent(activeContent.url);
+    this.http.get(
+      `${env.infra_proxy_url}/servers/${this.serverId}/orgs/${this.orgId}/cookbooks/${this.cookbookName}/${this.currentVersion}/file-content?url=${this.contentUrl}`)
+      .pipe(first())
+      .subscribe
+      (fileContent => {
+        this.urlContent = fileContent;
+        this.contentTabLoading = false;
+        this.contentLoading = false;
+      });
+  }
+
   onSelectedTab(event: { target: { value: CookbookDetailsTab } }) {
     this.tabValue = event.target.value;
-    this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
   ngOnDestroy(): void {

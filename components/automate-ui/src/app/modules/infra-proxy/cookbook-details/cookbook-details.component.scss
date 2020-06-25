@@ -33,6 +33,7 @@ chef-loading-spinner {
   }
 
   ul {
+    margin: 0;
     list-style: none;
     padding-inline-start: 20px;
   }
@@ -88,18 +89,25 @@ chef-loading-spinner {
     }
 
     .item-details-column {
-      chef-loading-spinner {
-        display: flex;
-        margin: auto auto;
-        width: 100%;
-        position: relative;
-      }
-
       flex-basis: 75%;
-      padding: 1em;
+      height: fit-content;
+      overflow: auto;
+      padding: 1em 1em;
       border: 1px solid $chef-light-grey;
       background-color: $chef-white;
       border-radius: $global-radius;
+
+      .item-heading {
+        margin-bottom: 1em;
+        font-weight: 900;
+      }
+
+      chef-snippet {
+        ::ng-deep pre {
+          background-color: $chef-lightest-grey;
+        }
+      }
+
     }
   }
 }
