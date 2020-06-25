@@ -156,7 +156,9 @@ h3 {
     }
 
     chef-icon {
-      &.converged, &.unchanged {
+      &.converged,
+      &.unchanged,
+      &.success {
         color: $status-success;
       }
 
@@ -273,11 +275,9 @@ h3 {
     border-left-color: $status-error;
   }
 
-  &.converged {
-    border-left-color: $status-success;
-  }
-
-  &.unchanged {
+  &.converged,
+  &.unchanged,
+  &.success {
     border-left-color: $status-success;
   }
 

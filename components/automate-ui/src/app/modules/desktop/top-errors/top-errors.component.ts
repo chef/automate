@@ -18,6 +18,7 @@ export class TopErrorsComponent  implements OnInit, OnDestroy, OnChanges  {
 
   @Input() topErrorsItems: TopErrorsItem[];
   @Input() lastUpdated: Date;
+  @Input() selectedError: TopErrorsItem;
   @Output() errorSelected: EventEmitter<TopErrorsItem> = new EventEmitter();
 
   private isDestroyed = new Subject<boolean>();
@@ -44,6 +45,10 @@ export class TopErrorsComponent  implements OnInit, OnDestroy, OnChanges  {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  onErrorSelect(error: TopErrorsItem) {
+    this.errorSelected.emit(error !== this.selectedError ? error : undefined);
   }
 
   get topErrorsItemsMax() {

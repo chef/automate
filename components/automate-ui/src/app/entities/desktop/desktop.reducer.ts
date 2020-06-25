@@ -1,10 +1,13 @@
-import { set, pipe, concat, remove } from 'lodash/fp';
+import { set, pipe, find, concat, remove } from 'lodash/fp';
 import { EntityStatus } from '../entities';
 import { DesktopActionTypes, DesktopActions } from './desktop.actions';
 import {
   DailyCheckInCountCollection,
   TopErrorsCollection,
   CountedDurationCollection,
+  NodeMetadataCount,
+  NodeMetadataCountValue,
+  NodeMetadataCountType,
   DailyNodeRuns,
   Desktop,
   Filter,
@@ -22,7 +25,10 @@ export interface DesktopEntityState {
   getTopErrorCollectionStatus: EntityStatus;
   unknownDesktopDurationCounts: CountedDurationCollection;
   getUnknownDesktopDurationCountsStatus: EntityStatus;
+  nodeMetadataCounts: NodeMetadataCount[];
+  getNodeMetadataCountsStatus: EntityStatus;
   dailyNodeRuns: DailyNodeRuns;
+  desktopListTitle: string;
   desktops: Desktop[];
   getDesktopsStatus: EntityStatus;
   desktopsTotal: number;
@@ -41,6 +47,9 @@ export const desktopEntityInitialState: DesktopEntityState = {
   getTopErrorCollectionStatus: EntityStatus.notLoaded,
   unknownDesktopDurationCounts: {items: [], updated: new Date(0)},
   getUnknownDesktopDurationCountsStatus: EntityStatus.notLoaded,
+  nodeMetadataCounts: [],
+  getNodeMetadataCountsStatus: EntityStatus.notLoaded,
+  desktopListTitle: 'Desktops',
   desktops: [],
   getDesktopsStatus: EntityStatus.notLoaded,
   desktopsTotal: 0,
@@ -117,6 +126,21 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
     case DesktopActionTypes.GET_UNKNOWN_DESKTOP_DURATION_COUNTS_FAILURE:
       return set('getUnknownDesktopDurationCountsStatus', EntityStatus.loadingFailure, state);
 
+    case DesktopActionTypes.GET_NODE_METADATA_COUNTS:
+      return set('getNodeMetadataCountsStatus', EntityStatus.loading, state);
+
+    case DesktopActionTypes.GET_NODE_METADATA_COUNTS_SUCCESS:
+      return pipe(
+        set('getNodeMetadataCountsStatus', EntityStatus.loadingSuccess),
+        set('nodeMetadataCounts', nodeMetadataCounts(action.payload, state.getDesktopsFilter.terms))
+      )(state) as DesktopEntityState;
+
+    case DesktopActionTypes.GET_NODE_METADATA_COUNTS_FAILURE:
+      return set('getNodeMetadataCountsStatus', EntityStatus.loadingFailure, state);
+
+    case DesktopActionTypes.UPDATE_DESKTOP_LIST_TITLE:
+      return set('desktopListTitle', action.payload)(state);
+
     case DesktopActionTypes.GET_DESKTOPS:
       return set('getDesktopsStatus', EntityStatus.loading, state);
 
@@ -142,27 +166,33 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
     case DesktopActionTypes.UPDATE_DESKTOPS_FILTER_CURRENT_PAGE:
       return set('getDesktopsFilter.currentPage', action.payload.page)(state);
 
-    case DesktopActionTypes.ADD_DESKTOPS_FILTER_TERM:
+    case DesktopActionTypes.ADD_DESKTOPS_FILTER_TERM: {
+      const terms = concat(state.getDesktopsFilter.terms, [action.payload.term]);
       return pipe(
-        set('getDesktopsFilter.terms',
-          concat(state.getDesktopsFilter.terms, [action.payload.term])),
-        set('getDesktopsFilter.currentPage', 1)
+        set('getDesktopsFilter.terms', terms),
+        set('getDesktopsFilter.currentPage', 1),
+        set('nodeMetadataCounts', nodeMetadataCounts(state.nodeMetadataCounts, terms))
       )(state) as DesktopEntityState;
+    }
 
     case DesktopActionTypes.UPDATE_DESKTOPS_FILTER_TERMS:
       return pipe(
         set('getDesktopsFilter.terms', action.payload.terms ),
-        set('getDesktopsFilter.currentPage', 1)
+        set('getDesktopsFilter.currentPage', 1),
+        set('nodeMetadataCounts',
+          nodeMetadataCounts(state.nodeMetadataCounts, action.payload.terms))
       )(state) as DesktopEntityState;
 
-    case DesktopActionTypes.REMOVE_DESKTOPS_FILTER_TERM:
+    case DesktopActionTypes.REMOVE_DESKTOPS_FILTER_TERM: {
+      const terms = remove<TermFilter>(
+        term => term.type === action.payload.term.type,
+        state.getDesktopsFilter.terms);
       return pipe(
-        set('getDesktopsFilter.terms',
-          remove<TermFilter>((term) =>
-            term.type === action.payload.term.type,
-            state.getDesktopsFilter.terms)),
-        set('getDesktopsFilter.currentPage', 1)
+        set('getDesktopsFilter.terms', terms),
+        set('getDesktopsFilter.currentPage', 1),
+        set('nodeMetadataCounts', nodeMetadataCounts(state.nodeMetadataCounts, terms))
       )(state) as DesktopEntityState;
+    }
 
     case DesktopActionTypes.UPDATE_DESKTOPS_SORT_TERM:
       let order = SortOrder.Ascending;
@@ -177,6 +207,12 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
         set('getDesktopsFilter.sortingOrder', order)
       )(state) as DesktopEntityState;
 
+    case DesktopActionTypes.UPDATE_DESKTOPS_DATE_TERM:
+      return pipe(
+        set('getDesktopsFilter.start', action.payload.start),
+        set('getDesktopsFilter.end', action.payload.end)
+      )(state) as DesktopEntityState;
+
     case DesktopActionTypes.UPDATE_DESKTOPS_FILTER_PAGE_SIZE_AND_CURRENT_PAGE:
       return pipe(
         set('getDesktopsFilter.pageSize', action.payload.pageSize),
@@ -186,5 +222,36 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
     default:
       return state;
 
+  }
+}
+
+function nodeMetadataCounts(counts: NodeMetadataCount[], terms: TermFilter[]): NodeMetadataCount[] {
+  // Only "top 3" for each nodeMetadata category is displayed
+  const maxCount = 3;
+
+  return counts.map((count: NodeMetadataCount) => {
+    const label = nodeMetadataCountLabel(count, maxCount);
+    const values = count.values.map((value: NodeMetadataCountValue) => {
+      const typeIsSelected = !!find({ type: count.type }, terms);
+      const valueIsSelected = !!find({ value: value.value }, terms);
+      const disabled = typeIsSelected ? !valueIsSelected : false;
+      const checked = typeIsSelected && valueIsSelected;
+      return { ...value, disabled, checked };
+    }).slice(0, maxCount);
+
+    return { ...count, label, values };
+  });
+}
+
+function nodeMetadataCountLabel(count: NodeMetadataCount, maxCount: number): string {
+  switch (count.type) {
+    case NodeMetadataCountType.Domain:
+      return `Top ${maxCount} Domains`;
+    case NodeMetadataCountType.Platform:
+      return `Top ${maxCount} Platforms`;
+    case NodeMetadataCountType.Environment:
+      return `Top ${maxCount} Environments`;
+    case NodeMetadataCountType.Status:
+      return 'Last Run';
   }
 }

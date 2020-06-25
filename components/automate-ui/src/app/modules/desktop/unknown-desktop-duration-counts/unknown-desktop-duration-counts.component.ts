@@ -17,8 +17,9 @@ export class UnknownDesktopDurationCountsComponent  implements OnInit, OnDestroy
 
   @Input() countedDurationItems: CountedDurationItem[];
   @Input() lastUpdated: Date;
+  @Input() selectedDuration: string;
 
-  @Output() durationSelected: EventEmitter<any> = new EventEmitter();
+  @Output() durationSelected: EventEmitter<string> = new EventEmitter();
 
   private isDestroyed = new Subject<boolean>();
   public lastUpdatedMessage = '-';
@@ -48,6 +49,10 @@ export class UnknownDesktopDurationCountsComponent  implements OnInit, OnDestroy
 
   get countedDurationItemsMax() {
     return maxBy('count', this.countedDurationItems);
+  }
+
+  onDurationSelect(duration: string) {
+    this.durationSelected.emit(duration !== this.selectedDuration ? duration : undefined);
   }
 
   // Make this more general once we don't have hard coded durations.

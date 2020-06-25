@@ -19,7 +19,7 @@
       <h3>Check-in History</h3>
       <div class="heading-actions">
         <chef-button secondary (click)="updateCheckInDays()">
-          <span>Last {{ (checkinNumDays === 15 ? 2 : 4) }} Weeks</span>
+          <span>Last {{ (checkInNumDays === twoWeekNumDays ? 2 : 4) }} Weeks</span>
           <chef-icon>expand_more</chef-icon>
         </chef-button>
         <chef-button secondary (click)="toggleDownloadDropdown()" class='download-dropdown-toggle'>
@@ -43,7 +43,7 @@
         </chef-tr>
       </chef-thead>
       <chef-tbody>
-        <chef-tr *ngFor="let history of checkInHistory; index as i">
+        <chef-tr *ngFor="let history of labeledCheckInHistory; index as i">
           <chef-td class="status-cell">
             <chef-icon [id]="'checkin-item-'+i+'text'" [ngClass]="history.status">
               {{ historyIcons[history.status] }}

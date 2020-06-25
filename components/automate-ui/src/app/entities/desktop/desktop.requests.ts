@@ -6,9 +6,10 @@ import { reduce } from 'lodash/fp';
 import { DailyCheckInCountCollection, DailyCheckInCount,
   NodeRunsDailyStatusCollection,
   TopErrorsCollection, TopErrorsItem,
-  CountedDurationCollection, CountedDurationItem, Desktop, Filter } from './desktop.model';
+  CountedDurationCollection, CountedDurationItem, Desktop, Filter,
+  NodeMetadataCount, NodeMetadataCountType, TermFilter } from './desktop.model';
 
-import { environment } from '../../../environments/environment';
+import { environment } from 'environments/environment';
 const CONFIG_MGMT_URL = environment.config_mgmt_url;
 
 interface RespDailyCheckInCountCollection {
@@ -52,6 +53,10 @@ interface RespCountedDurationItem {
   count: number;
 }
 
+interface RespNodeMetadataCounts {
+  types: NodeMetadataCount[];
+}
+
 export interface RespDesktop {
   id: string;
   name: string;
@@ -59,6 +64,8 @@ export interface RespDesktop {
   checkin: Date;
   uptime_seconds: number;
   platform: string;
+  platform_family: string;
+  platform_version: string;
   environment: string;
   policy_group: string;
   latest_run_id: string;
@@ -69,6 +76,7 @@ export interface RespDesktop {
   last_ccr_received: Date;
   deprecations_count: number;
   chef_version: string;
+  domain: string;
 }
 
 export interface RespDesktopCount {
@@ -112,6 +120,14 @@ export class DesktopRequests {
       this.createCountedDurationCollection(respCountedDurationCollection)));
   }
 
+  public getNodeMetadataCounts(filter: Filter): Observable<NodeMetadataCount[]> {
+    const url = `${CONFIG_MGMT_URL}/node_metadata_counts`;
+    const options = { params: this.buildNodeMetadataCountsParams(filter) };
+
+    return this.http.get<RespNodeMetadataCounts>(url, options).pipe(
+      map(respNodeMetadataCounts => respNodeMetadataCounts.types));
+  }
+
   public getDesktops(filter: Filter): Observable<Desktop[]> {
     const url = `${CONFIG_MGMT_URL}/nodes`;
 
@@ -140,12 +156,15 @@ export class DesktopRequests {
       checkin: respDesktop.checkin,
       uptimeSeconds: respDesktop.uptime_seconds,
       platform: respDesktop.platform,
-      chefVersion: respDesktop.chef_version
+      platformFamily: respDesktop.platform_family,
+      platformVersion: respDesktop.platform_version,
+      chefVersion: respDesktop.chef_version,
+      domain: respDesktop.domain
     };
   }
 
   private buildUnknownDesktopDurationCountsParams(): HttpParams {
-    let searchParam: HttpParams = new HttpParams();
+    let searchParam = new HttpParams();
 
     searchParam = searchParam.append('durations', '1M');
     searchParam = searchParam.append('durations', '2w');
@@ -155,14 +174,49 @@ export class DesktopRequests {
     return searchParam;
   }
 
+  private buildNodeMetadataCountsParams(filter: Filter): HttpParams {
+    let searchParam = new HttpParams();
+
+    if (filter.terms.length > 0) {
+      searchParam = this.formatFilterParams(searchParam, filter.terms);
+    }
+
+    if (filter.start) {
+      searchParam = searchParam.append('start', this.formatDateParam(filter.start));
+    }
+
+    if (filter.end) {
+      searchParam = searchParam.append('end', this.formatDateParam(filter.end));
+    }
+
+    searchParam = searchParam.append('type', NodeMetadataCountType.Platform);
+    searchParam = searchParam.append('type', NodeMetadataCountType.Environment);
+    searchParam = searchParam.append('type', NodeMetadataCountType.Domain);
+    searchParam = searchParam.append('type', NodeMetadataCountType.Status);
+
+    return searchParam;
+  }
+
+  private formatFilterParams(params: HttpParams, terms: TermFilter[]): HttpParams {
+    return reduce((param, term) => {
+      const filterParam = `${encodeURIComponent(term.type)}:${encodeURIComponent(term.value)}`;
+      return param.append('filter', filterParam);
+    }, params, terms);
+  }
+
   private buildURLSearchParams(filter: Filter): HttpParams {
     let searchParam = new HttpParams();
 
     if (filter.terms.length > 0) {
-      searchParam = reduce((param, term) => {
-        const filterParam = `${encodeURIComponent(term.type)}:${encodeURIComponent(term.value)}`;
-        return param.append('filter', filterParam);
-      }, searchParam, filter.terms);
+      searchParam = this.formatFilterParams(searchParam, filter.terms);
+    }
+
+    if (filter.start) {
+      searchParam = searchParam.append('start', this.formatDateParam(filter.start));
+    }
+
+    if (filter.end) {
+      searchParam = searchParam.append('end', this.formatDateParam(filter.end));
     }
 
     searchParam = searchParam.append('pagination.page', filter.currentPage.toString());
@@ -233,5 +287,10 @@ export class DesktopRequests {
         buckets: respNodeRunsDailyStatusCollection.durations,
         updated: new Date()
       };
+  }
+
+  // Returns ISO 8601 formatted date string with milliseconds removed
+  private formatDateParam(date: Date): string {
+    return date.toISOString().split('.')[0] + 'Z';
   }
 }

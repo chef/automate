@@ -37,17 +37,19 @@
 .sub-header {
   display: flex;
   position: relative;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
 
   chef-button {
-    margin: 0;
+    margin: 0 0 $spacing-03 0;
   }
 }
 
 .selected-filters {
+  flex-basis: 70%;
+
   chef-button {
-    margin: 0 $spacing-03 0 0;
+    margin: 0 $spacing-03 $spacing-03 0;
   }
 }
 

@@ -22,12 +22,15 @@
           <div class="dashboard-overview-row">
             <div class="dashboard-overview-col">
               <app-daily-check-in
+                *ngIf="last24HourCheckInCount$ | async as last24HourCheckInCount"
                 [unknownPercentage]="unknownPercentage$ | async"
                 [checkedInPercentage]="checkedInPercentage$ | async"
                 [totalCount]="totalCount$ | async"
                 [unknownCount]="unknownCount$ | async"
                 [lastUpdated]="checkInCountCollectedUpdated$ | async"
-                [checkedInCount]="checkedInCount$ | async">
+                [checkedInCount]="checkedInCount$ | async"
+                [selectedStatus]="selectedCheckInStatus"
+                (statusSelected)="onDailyStatusSelected($event, last24HourCheckInCount)">
               </app-daily-check-in>
             </div>
             <div class="dashboard-overview-col">
@@ -44,6 +47,7 @@
               <app-unknown-desktop-duration-counts
                 [countedDurationItems]="unknownDesktopCountedDurationItems$ | async"
                 [lastUpdated]="unknownDesktopCountedDurationUpdated$ | async"
+                [selectedDuration]="selectedDuration"
                 (durationSelected)="onDurationSelected($event)">
               </app-unknown-desktop-duration-counts>
             </div>
@@ -51,6 +55,7 @@
               <app-top-errors
                 [topErrorsItems]="topErrorsItems$ | async"
                 [lastUpdated]="topErrorsUpdated$ | async"
+                [selectedError]="selectedError"
                 (errorSelected)="onErrorSelected($event)">
               </app-top-errors>
             </div>
@@ -61,16 +66,19 @@
         *ngIf="desktopListVisible && !desktopDetailFullscreened"
         class="dashboard-list-column">
         <app-insight
+          [titleText]="desktopListTitle$ | async"
           [desktops]="desktops$ | async"
           [selectedDesktop]="selectedDesktop"
           [totalDesktops]="totalDesktopCount$ | async"
           [pageSize]="pageSize$ | async"
           [currentPage]="currentPage$ | async"
           [termFilters]="termFilters$ | async"
+          [nodeMetadataCounts]="nodeMetadataCounts$ | async"
           [fullscreened]="desktopListFullscreened"
           (pageChange)="onPageChange($event)"
           (pageSizeChange)="onPageSizeChange($event)"
-          (termFilterSelected)="onTermFilterSelected($event)"
+          (termFilterAdded)="onTermFilterAdded($event)"
+          (termFilterRemoved)="onTermFilterRemoved($event)"
           (desktopSelected)="onDesktopSelected($event)"
           (closed)="onDesktopListClose()"
           (fullscreenToggled)="onDesktopListFullscreen()"
@@ -83,6 +91,9 @@
         <app-desktop-detail
           [desktop]="selectedDesktop"
           [fullscreened]="desktopDetailFullscreened"
+          [checkInHistory]="checkInHistory$ | async"
+          [checkInNumDays]="checkInNumDays"
+          (checkInNumDaysChanged)="onCheckInNumDaysChanged($event)"
           (closed)="onDesktopDetailClose()"
           (fullscreenToggled)="onDesktopDetailFullscreen()">
         </app-desktop-detail>
