@@ -360,35 +360,32 @@ func getProxySettings(r *DeliveryRunning) (*ac.Proxy, error) {
 
 // nolint: gocyclo
 func getErchefSettings(r *ChefServerRunning) (*erchef.ConfigRequest_V1_System, error) {
+	var err error
+
 	sys := erchef.NewConfigRequest().GetV1().GetSys()
 	c := r.PrivateChef.OpscodeErchef
 	d := r.PrivateChef.DataCollector
 
-	memMax, err := to64w(c.MemoryMaxbytes)
-	if err != nil {
-		return sys, err
-	}
-
-	if memMax.GetValue() > 0 {
-		sys.Memory.MaxBytes = memMax
-	}
-
-	sys.Log.RotationMaxBytes, err = to64w(c.LogRotation.FileMaxbytes)
-	if err != nil {
-		return sys, err
-	}
-
-	sys.Log.RotationMaxFiles, err = to32w(c.LogRotation.NumToKeep)
-	if err != nil {
-		return sys, err
-	}
-
-	sys.Log.MaxErrorLogsPerSecond, err = to32w(c.LogRotation.MaxMessagesPerSecond)
-	if err != nil {
-		return sys, err
-	}
-
 	sys.Api.AuthSkew, err = to32w(c.AuthSkew)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Api.BaseResourceUrl = w.String(c.BaseResourceURL)
+
+	sys.Api.BulkFetchBatchSize, err = to32w(c.BulkFetchBatchSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Api.MaxRequestSize, err = to32w(c.MaxRequestSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Api.StrictSearchResultAcls = w.Bool(c.StrictSearchResultACLs)
+
+	sys.Authz.Fanout, err = to32w(c.AuthzFanout)
 	if err != nil {
 		return sys, err
 	}
@@ -398,63 +395,22 @@ func getErchefSettings(r *ChefServerRunning) (*erchef.ConfigRequest_V1_System, e
 		return sys, err
 	}
 
-	sys.Api.BulkFetchBatchSize, err = to32w(c.BulkFetchBatchSize)
+	sys.Authz.Timeout, err = to32w(c.AuthzTimeout)
 	if err != nil {
 		return sys, err
 	}
 
-	sys.Index.ReindexBatchSize, err = to32w(c.ReindexBatchSize)
+	sys.DataCollector.PoolInitSize, err = to32w(d.HTTPInitCount)
 	if err != nil {
 		return sys, err
 	}
 
-	sys.Index.ReindexSleepMinMs, err = to32w(c.ReindexSleepMinMs)
+	sys.DataCollector.PoolMaxSize, err = to32w(d.HTTPMaxCount)
 	if err != nil {
 		return sys, err
 	}
 
-	sys.Index.ReindexSleepMaxMs, err = to32w(c.ReindexSleepMaxMs)
-	if err != nil {
-		return sys, err
-	}
-
-	sys.Index.ReindexItemRetries, err = to32w(c.ReindexItemRetries)
-	if err != nil {
-		return sys, err
-	}
-
-	sys.Sql.PoolMaxSize, err = to32w(c.DBPoolMax)
-	if err != nil {
-		return sys, err
-	}
-
-	poolInitSize, err := to32w(c.DBPoolInit)
-	if err != nil {
-		return sys, err
-	}
-	if poolInitSize.GetValue() > 0 {
-		sys.Sql.PoolInitSize = poolInitSize
-	}
-
-	poolQueueMax, err := to32w(c.DBPoolQueueMax)
-	if err != nil {
-		return sys, err
-	}
-	if poolQueueMax.GetValue() > 0 {
-		sys.Sql.PoolQueueMax = poolQueueMax
-	}
-
-	sys.Sql.PoolQueueTimeout, err = to32w(c.DBPoolerTimeout)
-	if err != nil {
-		return sys, err
-	}
-
-	sys.Sql.Timeout, err = to32w(c.SQLDBTimeout)
-	if err != nil {
-		return sys, err
-	}
-
-	sys.Depsolver.PoolQueueTimeout, err = to32w(c.DepsolverPoolerTimeout)
+	sys.DataCollector.Timeout, err = to32w(d.Timeout)
 	if err != nil {
 		return sys, err
 	}
@@ -468,14 +424,15 @@ func getErchefSettings(r *ChefServerRunning) (*erchef.ConfigRequest_V1_System, e
 	if err != nil {
 		return sys, err
 	}
-	sys.Depsolver.PoolMaxSize = sys.Depsolver.PoolInitSize
 
-	sys.Depsolver.Timeout, err = to32w(c.DepsolverTimeout)
+	sys.Depsolver.PoolQueueTimeout, err = to32w(c.DepsolverPoolerTimeout)
 	if err != nil {
 		return sys, err
 	}
 
-	sys.Index.BatchSize, err = to32w(c.SearchBatchSizeMaxSize)
+	sys.Depsolver.PoolMaxSize = sys.Depsolver.PoolInitSize // same as DepsolverWorkerCount
+
+	sys.Depsolver.Timeout, err = to32w(c.DepsolverTimeout)
 	if err != nil {
 		return sys, err
 	}
@@ -485,7 +442,7 @@ func getErchefSettings(r *ChefServerRunning) (*erchef.ConfigRequest_V1_System, e
 		return sys, err
 	}
 
-	sys.Index.Timeout, err = to32w(c.SolrTimeout)
+	sys.Index.BatchSize, err = to32w(c.SearchBatchSizeMaxSize)
 	if err != nil {
 		return sys, err
 	}
@@ -499,20 +456,27 @@ func getErchefSettings(r *ChefServerRunning) (*erchef.ConfigRequest_V1_System, e
 	if err != nil {
 		return sys, err
 	}
-
-	sys.Api.BaseResourceUrl = w.String(c.BaseResourceURL)
-
-	sys.Authz.Timeout, err = to32w(c.AuthzTimeout)
+	sys.Index.ReindexBatchSize, err = to32w(c.ReindexBatchSize)
 	if err != nil {
 		return sys, err
 	}
 
-	sys.Authz.Fanout, err = to32w(c.AuthzFanout)
+	sys.Index.ReindexItemRetries, err = to32w(c.ReindexItemRetries)
 	if err != nil {
 		return sys, err
 	}
 
-	sys.Api.MaxRequestSize, err = to32w(c.MaxRequestSize)
+	sys.Index.ReindexSleepMaxMs, err = to32w(c.ReindexSleepMaxMs)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.ReindexSleepMinMs, err = to32w(c.ReindexSleepMinMs)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.Timeout, err = to32w(c.SolrTimeout)
 	if err != nil {
 		return sys, err
 	}
@@ -532,19 +496,47 @@ func getErchefSettings(r *ChefServerRunning) (*erchef.ConfigRequest_V1_System, e
 		return sys, err
 	}
 
-	sys.Api.StrictSearchResultAcls = w.Bool(c.StrictSearchResultACLs)
-
-	sys.DataCollector.Timeout, err = to32w(d.Timeout)
+	sys.Log.MaxErrorLogsPerSecond, err = to32w(c.LogRotation.MaxMessagesPerSecond)
 	if err != nil {
 		return sys, err
 	}
 
-	sys.DataCollector.PoolInitSize, err = to32w(d.HTTPInitCount)
+	sys.Log.RotationMaxBytes, err = to64w(c.LogRotation.FileMaxbytes)
 	if err != nil {
 		return sys, err
 	}
 
-	sys.DataCollector.PoolMaxSize, err = to32w(d.HTTPMaxCount)
+	sys.Log.RotationMaxFiles, err = to32w(c.LogRotation.NumToKeep)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Memory.MaxBytes, err = to64w(c.MemoryMaxbytes)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolInitSize, err = to32w(c.DBPoolInit)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolMaxSize, err = to32w(c.DBPoolMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueMax, err = to32w(c.DBPoolQueueMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueTimeout, err = to32w(c.DBPoolerTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.Timeout, err = to32w(c.SQLDBTimeout)
 	if err != nil {
 		return sys, err
 	}
@@ -558,24 +550,12 @@ func getInfraServerNginxSettings(cs *ChefServerRunning) (*cs_nginx.ConfigRequest
 	ngx := cs.PrivateChef.CSNginx
 	sys := cs_nginx.NewConfigRequest().GetV1().GetSys()
 
-	sys.Ngx.Http.ProxyConnectTimeout, err = to32w(ngx.ProxyConnectTimeout)
-	if err != nil {
-		return sys, err
-	}
-
-	sys.Ngx.Main.WorkerProcesses, err = to32w(ngx.WorkerProcesses)
-	if err != nil {
-		return sys, err
-	}
-
 	sys.Ngx.Events.WorkerConnections, err = to32w(ngx.WorkerConnections)
 	if err != nil {
 		return sys, err
 	}
 
-	sys.Ngx.Http.Sendfile = w.String(ngx.Sendfile)
-	sys.Ngx.Http.TcpNodelay = w.String(ngx.TCPNodelay)
-	sys.Ngx.Http.TcpNopush = w.String(ngx.TCPNopush)
+	sys.Ngx.Http.ClientMaxBodySize = w.String(ngx.ClientMaxBodySize)
 	sys.Ngx.Http.Gzip = w.String(ngx.Gzip)
 	sys.Ngx.Http.GzipHttpVersion = w.String(ngx.GzipHTTPVersion)
 	sys.Ngx.Http.GzipCompLevel = w.String(ngx.GzipCompLevel)
@@ -586,9 +566,26 @@ func getInfraServerNginxSettings(cs *ChefServerRunning) (*cs_nginx.ConfigRequest
 		return sys, err
 	}
 
-	sys.Ngx.Http.ClientMaxBodySize = w.String(ngx.ClientMaxBodySize)
+	sys.Ngx.Http.ProxyConnectTimeout, err = to32w(ngx.ProxyConnectTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Http.Sendfile = w.String(ngx.Sendfile)
 
 	sys.Ngx.Http.ServerNamesHashBucketSize, err = to32w(ngx.ServerNamesHashBucketSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Http.TcpNodelay = w.String(ngx.TCPNodelay)
+
+	sys.Ngx.Http.TcpNopush = w.String(ngx.TCPNopush)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Main.WorkerProcesses, err = to32w(ngx.WorkerProcesses)
 	if err != nil {
 		return sys, err
 	}
@@ -602,17 +599,15 @@ func getBookshelfSettings(cs *ChefServerRunning) (*bookshelf.ConfigRequest_V1_Sy
 	sys := bookshelf.NewConfigRequest().GetV1().GetSys()
 	bk := cs.PrivateChef.Bookshelf
 
-	sys.Log.RotationMaxBytes, err = to64w(bk.LogRotation.FileMaxbytes)
+	sys.Bookshelf.AbandonedUploadCleanupInterval, err = to32w(bk.AbandonedUploadCleanupInterval)
 	if err != nil {
 		return sys, err
 	}
 
-	sys.Log.RotationMaxFiles, err = to32w(bk.LogRotation.NumToKeep)
+	sys.Bookshelf.DeletedDataCleanupInterval, err = to32w(bk.DeleteDataCleanupInterval)
 	if err != nil {
 		return sys, err
 	}
-
-	sys.Bookshelf.StreamDownload = w.Bool(bk.StreamDownload)
 
 	sys.Bookshelf.SqlRetryCount, err = to32w(bk.SqlRetryCount)
 	if err != nil {
@@ -624,12 +619,14 @@ func getBookshelfSettings(cs *ChefServerRunning) (*bookshelf.ConfigRequest_V1_Sy
 		return sys, err
 	}
 
-	sys.Bookshelf.AbandonedUploadCleanupInterval, err = to32w(bk.AbandonedUploadCleanupInterval)
+	sys.Bookshelf.StreamDownload = w.Bool(bk.StreamDownload)
+
+	sys.Log.RotationMaxBytes, err = to64w(bk.LogRotation.FileMaxbytes)
 	if err != nil {
 		return sys, err
 	}
 
-	sys.Bookshelf.DeletedDataCleanupInterval, err = to32w(bk.DeleteDataCleanupInterval)
+	sys.Log.RotationMaxFiles, err = to32w(bk.LogRotation.NumToKeep)
 	if err != nil {
 		return sys, err
 	}
@@ -668,17 +665,17 @@ func getBifrostSettings(cs *ChefServerRunning) (*bifrost.ConfigRequest_V1_System
 	sys := bifrost.NewConfigRequest().GetV1().GetSys()
 	bf := cs.PrivateChef.OcBifrost
 
+	sys.Log.MaxErrorLogsPerSecond, err = to32w(bf.LogRotation.MaxMessagesPerSecond)
+	if err != nil {
+		return sys, err
+	}
+
 	sys.Log.RotationMaxBytes, err = to64w(bf.LogRotation.FileMaxbytes)
 	if err != nil {
 		return sys, err
 	}
 
 	sys.Log.RotationMaxFiles, err = to32w(bf.LogRotation.NumToKeep)
-	if err != nil {
-		return sys, err
-	}
-
-	sys.Log.MaxErrorLogsPerSecond, err = to32w(bf.LogRotation.MaxMessagesPerSecond)
 	if err != nil {
 		return sys, err
 	}

@@ -210,109 +210,109 @@ type ChefServerRunning struct {
 }
 
 type PrivateChef struct {
+	Bookshelf     Bookshelf     `json:"bookshelf"`
+	CSNginx       CSNginx       `json:"nginx"`
+	DataCollector DataCollector `json:"data_collector"`
+	OcBifrost     OcBifrost     `json:"oc_bifrost"`
+	OcID          OcID          `json:"oc_id"`
 	OpscodeErchef OpscodeErchef `json:"opscode-erchef"`
 	OpscodeSolr4  OpscodeSolr4  `json:"opscode-solr4"`
 	Postgresql    CSRPostgreSQL `json:"postgresql"`
-	Bookshelf     Bookshelf     `json:"bookshelf"`
-	OcID          OcID          `json:"oc_id"`
-	DataCollector DataCollector `json:"data_collector"`
-	CSNginx       CSNginx       `json:"nginx"`
-	OcBifrost     OcBifrost     `json:"oc_bifrost"`
 }
 
 type OpscodeErchef struct {
-	MemoryMaxbytes json.Number `json:"max_bytes"`
-	LogRotation    struct {
-		FileMaxbytes         json.Number `json:"file_maxbytes"`
-		NumToKeep            json.Number `json:"num_to_keep"`
-		MaxMessagesPerSecond json.Number `json:"max_messages_per_second"`
-	} `json:"log_rotation"`
+	AuthzFanout            json.Number `json:"authz_fanout"`
 	AuthSkew               json.Number `json:"auth_skew"`
+	AuthzTimeout           json.Number `json:"authz_timeout"`
 	AuthzPoolerTimeout     json.Number `json:"authz_pooler_timeout"`
+	BaseResourceURL        string      `json:"base_resource_url"`
 	BulkFetchBatchSize     json.Number `json:"bulk_fetch_batch_size"`
-	ReindexBatchSize       json.Number `json:"reindex_batch_size"`
-	ReindexSleepMinMs      json.Number `json:"reindex_sleep_min_ms"`
-	ReindexSleepMaxMs      json.Number `json:"reindex_sleep_max_ms"`
-	ReindexItemRetries     json.Number `json:"reindex_item_retries"`
-	DBPoolMax              json.Number `json:"db_pool_max"`
-	DBPoolInit             json.Number `json:"db_pool_init"`
-	DBPoolQueueMax         json.Number `json:"db_pool_queue_max"`
 	DBPoolerTimeout        json.Number `json:"db_pooler_timeout"`
-	SQLDBTimeout           json.Number `json:"sql_db_timeout"`
+	DBPoolInit             json.Number `json:"db_pool_init"`
+	DBPoolMax              json.Number `json:"db_pool_max"`
+	DBPoolQueueMax         json.Number `json:"db_pool_queue_max"`
 	DepsolverPoolerTimeout json.Number `json:"depsolver_pooler_timeout"`
 	DepsolverPoolQueueMax  json.Number `json:"depsolver_pool_queue_max"`
-	DepsolverWorkerCount   json.Number `json:"depsolver_worker_count"`
 	DepsolverTimeout       json.Number `json:"depsolver_timeout"`
-	SearchProvider         string      `json:"search_provider"`
-	SearchQueueMode        string      `json:"search_queue_mode"`
-	SearchBatchSizeMaxSize json.Number `json:"search_batch_max_size"`
-	SearchBatchSizeMaxWait json.Number `json:"search_batch_max_wait"`
-	SolrTimeout            json.Number `json:"solr_timeout"`
-	SolrHTTPInitCount      json.Number `json:"solr_http_init_count"`
-	SolrHTTPMaxCount       json.Number `json:"solr_http_max_count"`
-	BaseResourceURL        string      `json:"base_resource_url"`
-	AuthzTimeout           json.Number `json:"authz_timeout"`
-	AuthzFanout            json.Number `json:"authz_fanout"`
-	MaxRequestSize         json.Number `json:"max_request_size"`
+	DepsolverWorkerCount   json.Number `json:"depsolver_worker_count"`
 	KeygenCacheSize        json.Number `json:"keygen_cache_size"`
 	KeygenStartSize        json.Number `json:"keygen_start_size"`
 	KeygenTimeout          json.Number `json:"keygen_timeout"`
+	LogRotation            struct {
+		FileMaxbytes         json.Number `json:"file_maxbytes"`
+		MaxMessagesPerSecond json.Number `json:"max_messages_per_second"`
+		NumToKeep            json.Number `json:"num_to_keep"`
+	} `json:"log_rotation"`
+	MaxRequestSize         json.Number `json:"max_request_size"`
+	MemoryMaxbytes         json.Number `json:"max_bytes"`
+	ReindexBatchSize       json.Number `json:"reindex_batch_size"`
+	ReindexItemRetries     json.Number `json:"reindex_item_retries"`
+	ReindexSleepMaxMs      json.Number `json:"reindex_sleep_max_ms"`
+	ReindexSleepMinMs      json.Number `json:"reindex_sleep_min_ms"`
+	SearchBatchSizeMaxSize json.Number `json:"search_batch_max_size"`
+	SearchBatchSizeMaxWait json.Number `json:"search_batch_max_wait"`
+	SearchProvider         string      `json:"search_provider"`
+	SearchQueueMode        string      `json:"search_queue_mode"`
+	SolrHTTPInitCount      json.Number `json:"solr_http_init_count"`
+	SolrHTTPMaxCount       json.Number `json:"solr_http_max_count"`
+	SolrTimeout            json.Number `json:"solr_timeout"`
 	StrictSearchResultACLs bool        `json:"strict_search_result_acls"`
+	SQLDBTimeout           json.Number `json:"sql_db_timeout"`
 }
 
 type OcBifrost struct {
-	LogRotation struct {
-		FileMaxbytes         json.Number `json:"file_maxbytes"`
-		NumToKeep            json.Number `json:"num_to_keep"`
-		MaxMessagesPerSecond json.Number `json:"max_messages_per_second"`
-	} `json:"log_rotation"`
-	DbPoolSize      json.Number `json:"db_pool_size"`
-	DbPoolMax       json.Number `json:"db_pool_max"`
-	DbPoolInit      json.Number `json:"db_pool_init"`
 	DbPoolerTimeout json.Number `json:"db_pooler_timeout"`
+	DbPoolInit      json.Number `json:"db_pool_init"`
+	DbPoolMax       json.Number `json:"db_pool_max"`
 	DbPoolQueueMax  json.Number `json:"db_pool_queue_max"`
+	DbPoolSize      json.Number `json:"db_pool_size"`
+	LogRotation     struct {
+		FileMaxbytes         json.Number `json:"file_maxbytes"`
+		MaxMessagesPerSecond json.Number `json:"max_messages_per_second"`
+		NumToKeep            json.Number `json:"num_to_keep"`
+	} `json:"log_rotation"`
 }
 
 type CSNginx struct {
-	ProxyConnectTimeout       json.Number `json:"proxy_connect_timeout"`
-	WorkerProcesses           json.Number `json:"worker_processes"`
-	WorkerConnections         json.Number `json:"worker_connections"`
-	Sendfile                  string      `json:"sendfile"`
-	TCPNodelay                string      `json:"tcp_nodelay"`
-	TCPNopush                 string      `json:"tcp_nopush"`
+	ClientMaxBodySize         string      `json:"client_max_body_size"`
 	Gzip                      string      `json:"gzip"`
-	GzipHTTPVersion           string      `json:"gzip_http_version"`
 	GzipCompLevel             string      `json:"gzip_comp_level"`
+	GzipHTTPVersion           string      `json:"gzip_http_version"`
 	GzipProxied               string      `json:"gzip_proxied"`
 	KeepaliveTimeout          json.Number `json:"keepalive_timeout"`
-	ClientMaxBodySize         string      `json:"client_max_body_size"`
+	ProxyConnectTimeout       json.Number `json:"proxy_connect_timeout"`
+	Sendfile                  string      `json:"sendfile"`
 	ServerNamesHashBucketSize json.Number `json:"server_names_hash_bucket_size"`
+	TCPNodelay                string      `json:"tcp_nodelay"`
+	TCPNopush                 string      `json:"tcp_nopush"`
+	WorkerConnections         json.Number `json:"worker_connections"`
+	WorkerProcesses           json.Number `json:"worker_processes"`
 }
 
 type Bookshelf struct {
-	Enable      bool   `json:"enable"`
-	StorageType string `json:"storage_type"`
-	LogRotation struct {
+	AbandonedUploadCleanupInterval json.Number `json:"abandoned_upload_cleanup_interval"`
+	DbPoolerTimeout                json.Number `json:"db_pooler_timeout"`
+	DbPoolInit                     json.Number `json:"db_pool_init"`
+	DbPoolMax                      json.Number `json:"db_pool_max"`
+	DbPoolQueueMax                 json.Number `json:"db_pool_queue_max"`
+	DbPoolSize                     json.Number `json:"db_pool_size"`
+	DeleteDataCleanupInterval      json.Number `json:"delete_data_cleanup_interval"`
+	Enable                         bool        `json:"enable"`
+	LogRotation                    struct {
 		FileMaxbytes json.Number `json:"file_maxbytes"`
 		NumToKeep    json.Number `json:"num_to_keep"`
 	} `json:"log_rotation"`
-	StreamDownload                 bool        `json:"stream_download"`
-	SqlRetryCount                  json.Number `json:"sql_retry_count"`
-	SqlRetryDelay                  json.Number `json:"sql_retry_delay"`
-	AbandonedUploadCleanupInterval json.Number `json:"abandoned_upload_cleanup_interval"`
-	DeleteDataCleanupInterval      json.Number `json:"delete_data_cleanup_interval"`
-	DbPoolSize                     json.Number `json:"db_pool_size"`
-	DbPoolMax                      json.Number `json:"db_pool_max"`
-	DbPoolInit                     json.Number `json:"db_pool_init"`
-	DbPoolQueueMax                 json.Number `json:"db_pool_queue_max"`
-	DbPoolerTimeout                json.Number `json:"db_pooler_timeout"`
-	SqlDbTimeout                   json.Number `json:"sql_db_timeout"`
+	SqlRetryCount  json.Number `json:"sql_retry_count"`
+	SqlRetryDelay  json.Number `json:"sql_retry_delay"`
+	StorageType    string      `json:"storage_type"`
+	StreamDownload bool        `json:"stream_download"`
+	SqlDbTimeout   json.Number `json:"sql_db_timeout"`
 }
 
 type DataCollector struct {
-	Timeout       json.Number `json:"timeout"`
 	HTTPInitCount json.Number `json:"http_init_count"`
 	HTTPMaxCount  json.Number `json:"http_max_count"`
+	Timeout       json.Number `json:"timeout"`
 }
 
 type OpscodeSolr4 struct {
