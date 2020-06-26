@@ -35,6 +35,7 @@ export class NotificationsComponent implements OnInit {
   pageSize = 10;
   sortField: string;
   sortDir: FieldDirection;
+  direction = 'none';
   permissionDenied = false; // not currently used
   // This is exposed here to allow the component HTML access to ServiceActionType
   serviceActionType = ServiceActionType;
@@ -72,13 +73,28 @@ export class NotificationsComponent implements OnInit {
   toggleSort(field: string) {
     if (field === this.sortField) {
       // when sorting is inverted for the currently sorted column
-      this.sortDir[field] = this.sortDir[field] === 'asc' ? 'desc' : 'asc';
+      switch (this.direction) {
+        case 'none':
+          this.direction = this.sortDir[field] = 'asc';
+          break;
+        case 'asc':
+          this.direction = this.sortDir[field] = 'desc';
+          break;
+        case 'desc':
+        default:
+          this.direction = this.sortDir[field] = 'none';
+      }
     } else {
       // when sorting a different column than the currently sorted one
       this.resetSortDir();
     }
+    if (this.sortDir[field] === 'none') {
+      this.resetSortDir();
+      this.toggleSort('name');
+    } else {
     this.sortField = field;
     this.updateSort(field, this.sortDir[field]);
+    }
   }
 
   sortIcon(field: string): string {
@@ -108,6 +124,7 @@ export class NotificationsComponent implements OnInit {
   }
 
   private updateSort(field: string, direction: string) {
+    this.direction = direction;
     this.rules$ = this.rules$.pipe(map(rules => {
       let sortedRules: NotificationRule[] = [];
       if (field === 'name') {

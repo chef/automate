@@ -7,7 +7,7 @@ export type HealthStatus = 'ok' | 'critical' | 'warning' | 'unknown';
 export type RollupServiceStatus = HealthStatus | 'total';
 export type RollupState = Status | 'total';
 export type RollupCompliance = Compliance | 'total';
-export type SortDirection = 'asc' | 'desc' | 'ASC' | 'DESC';
+export type SortDirection = 'asc' | 'desc' | 'ASC' | 'DESC' | 'none';
 
 
 export enum LoadingStatus {
