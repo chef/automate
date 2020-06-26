@@ -48,10 +48,10 @@ export class DashboardComponent implements OnInit {
     this.store.dispatch(new InstallContentItem({id: itemId}));
   }
 
-  downloadContentItem(id: string) {
-    this.requests.downloadContentItem(id)
+  downloadContentItem(item: ContentItem) {
+    this.requests.downloadContentItem(item.id)
     .subscribe(tarball => {
-      saveAs(tarball, 'profile.tar.gz');
+      saveAs(tarball, item.filename);
     });
   }
 }

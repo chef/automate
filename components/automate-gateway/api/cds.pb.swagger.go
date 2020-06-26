@@ -97,6 +97,9 @@ func init() {
         "can_be_installed": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "filename": {
+          "type": "string"
         }
       }
     },

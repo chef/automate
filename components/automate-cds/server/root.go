@@ -53,6 +53,7 @@ func (s *Server) ListContentItems(ctx context.Context, request *request.ContentI
 				Version:        "1.9.0",
 				Platforms:      []string{"Ubuntu", "Debian"},
 				CanBeInstalled: true,
+				Filename:       "linux-baseline-2.2.2.tar.gz",
 			},
 			{
 				Id:             "1f9e6a1e-3381-487f-98ef-9966c65ff92a",
@@ -62,6 +63,7 @@ func (s *Server) ListContentItems(ctx context.Context, request *request.ContentI
 				Version:        "9.2.1",
 				Platforms:      []string{"Redhat", "Centos"},
 				CanBeInstalled: false,
+				Filename:       "audit-benchmark-level-1.tar.gz",
 			},
 			{
 				Id:             "736f5724-b384-4d74-b8cb-dedd9f1ecd54",
@@ -71,6 +73,7 @@ func (s *Server) ListContentItems(ctx context.Context, request *request.ContentI
 				Version:        "2.3.2",
 				Platforms:      []string{"Solaris"},
 				CanBeInstalled: true,
+				Filename:       "chef-compliance-effortless-1.1.1-20200626161151-x86_64-linux.hart",
 			},
 		},
 	}, nil

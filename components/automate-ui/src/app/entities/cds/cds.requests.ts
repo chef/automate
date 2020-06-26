@@ -21,6 +21,7 @@ interface RespContentItem {
   version: string;
   platforms: string[];
   can_be_installed: boolean;
+  filename: string;
 }
 
 @Injectable()
@@ -59,7 +60,8 @@ export class CdsRequests {
       description: respItem.description,
       version: respItem.version,
       platforms: respItem.platforms,
-      canBeInstall: respItem.can_be_installed
+      canBeInstall: respItem.can_be_installed,
+      filename: respItem.filename
     };
   }
 }
