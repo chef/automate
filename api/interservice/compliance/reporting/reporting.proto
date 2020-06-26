@@ -120,6 +120,7 @@ message Report {
 	repeated string roles = 17;
 	repeated string chef_tags = 18;
 	repeated string projects = 20;
+	string end_time_string = 21;
 }
 message Profile {
 	string name = 1;

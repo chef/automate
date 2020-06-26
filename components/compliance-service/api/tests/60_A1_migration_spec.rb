@@ -149,6 +149,7 @@ describe File.basename(__FILE__) do
       "nodeId": "6dd7c19c-c1bc-4cf5-b431-524e3e42f551",
       "nodeName": "centos6-node1",
       "endTime": "2017-07-29T10:39:25Z",
+      "endTimeString": "2017-07-29 10:39:25Z",
       "status": "passed",
       "environment": "_default",
       "version": "1.39.1",

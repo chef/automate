@@ -1116,6 +1116,10 @@ func init() {
             "type": "string"
           },
           "description": "The projects the node is assigned to."
+        },
+        "end_time_string": {
+          "type": "string",
+          "description": "End time on the report, as a string."
         }
       }
     },
