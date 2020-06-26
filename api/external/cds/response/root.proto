@@ -20,7 +20,3 @@ message ContentItem {
 message InstallContentItem {
 
 }
-
-message DownloadContentItem {
-
-}
