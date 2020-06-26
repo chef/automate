@@ -151,7 +151,7 @@ GEM
     plist (3.5.0)
     proxifier (1.0.3)
     public_suffix (4.0.3)
-    rack (2.1.2)
+    rack (2.2.3)
     retryable (3.0.5)
     rubyntlm (0.6.2)
     rubyzip (2.2.0)
