@@ -25,11 +25,12 @@ import { environment } from '../../../environments/environment';
 import * as moment from 'moment/moment';
 const GATEWAY_URL = environment.gateway_url;
 const CONFIG_MGMT_URL = environment.config_mgmt_url;
-const ENTITY_TYPE_TAG = 'entity_type';
+const ENTITY_TYPE_TAG = 'event-type';
 const ENTITY_TYPE_DATA_BAG_ITEM_TAG = 'item';
 const ENTITY_TYPE_DATA_BAG_TAG = 'bag';
 const ENTITY_TYPE_COOKBOOK_TAG = 'cookbook';
 const ENTITY_TYPE_COOKBOOK_VERSION_TAG = 'version';
+const ENTITY_TYPE_ARTIFACT_COOKBOOK_VERSION_TAG = 'cookbook_artifact_version';
 
 @Injectable()
 export class EventFeedService {
@@ -161,7 +162,8 @@ export class EventFeedService {
     let searchParam: HttpParams = new HttpParams();
 
     if (filters.searchBar) {
-      searchParam = this.flattenSearchBar(filters.searchBar, searchParam);
+      const searchBarWithChildren = this.addChildEventTypes(filters.searchBar);
+      searchParam = this.flattenSearchBar(searchBarWithChildren, searchParam);
     }
 
     if (filters.startDate) {
@@ -182,7 +184,8 @@ export class EventFeedService {
     let searchParam: HttpParams = new HttpParams();
 
     if (filters.searchBar) {
-      searchParam = this.flattenSearchBar(filters.searchBar, searchParam);
+      const searchBarWithChildren = this.addChildEventTypes(filters.searchBar);
+      searchParam = this.flattenSearchBar(searchBarWithChildren, searchParam);
     }
 
     searchParam = searchParam.append('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -228,6 +231,12 @@ export class EventFeedService {
     if (includes(ENTITY_TYPE_COOKBOOK_TAG, entityTypes) &&
       !includes(ENTITY_TYPE_COOKBOOK_VERSION_TAG, entityTypes)) {
       filters = concat(filters, {type: ENTITY_TYPE_TAG, text: ENTITY_TYPE_COOKBOOK_VERSION_TAG});
+    }
+
+    if (includes(ENTITY_TYPE_COOKBOOK_TAG, entityTypes) &&
+      !includes(ENTITY_TYPE_ARTIFACT_COOKBOOK_VERSION_TAG, entityTypes)) {
+      filters = concat(filters,
+        {type: ENTITY_TYPE_TAG, text: ENTITY_TYPE_ARTIFACT_COOKBOOK_VERSION_TAG});
     }
 
     return filters;
