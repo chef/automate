@@ -104,18 +104,21 @@ func TestRolloutCreate(t *testing.T) {
 	t.Run("create succeeds with all available fields filled", func(t *testing.T) {
 		cleanup(t)
 		req := request.CreateRollout{
-			PolicyName:       "example-policy-name-full",
-			PolicyNodeGroup:  "example-policy-node-group",
-			PolicyRevisionId: "abc123",
-			PolicyDomainUrl:  "https://chef-server.example/organizations/example_org",
-			ScmType:          request.SCMType_GIT,
-			ScmWebType:       request.SCMWebType_GITHUB,
-			PolicyScmUrl:     "git@github.com:chef/automate.git",
-			PolicyScmWebUrl:  "https://github.com/chef/automate",
-			PolicyScmCommit:  "a2a344e6804629de85ffa50e84caad18ac42cf50",
-			Description:      "install winamp",
-			CiJobId:          "buildkite/chef-automate-master-verify#11875",
-			CiJobUrl:         "https://buildkite.com/chef-oss/chef-automate-master-verify/builds/11875",
+			PolicyName:           "example-policy-name-full",
+			PolicyNodeGroup:      "example-policy-node-group",
+			PolicyRevisionId:     "abc123",
+			PolicyDomainUrl:      "https://chef-server.example/organizations/example_org",
+			PolicyDomainUsername: "bobo",
+			ScmType:              request.SCMType_GIT,
+			ScmWebType:           request.SCMWebType_GITHUB,
+			ScmAuthorName:        "Bobo Tiberius Clown",
+			ScmAuthorEmail:       "bobo@example.com",
+			PolicyScmUrl:         "git@github.com:chef/automate.git",
+			PolicyScmWebUrl:      "https://github.com/chef/automate",
+			PolicyScmCommit:      "a2a344e6804629de85ffa50e84caad18ac42cf50",
+			Description:          "install winamp",
+			CiJobId:              "buildkite/chef-automate-master-verify#11875",
+			CiJobUrl:             "https://buildkite.com/chef-oss/chef-automate-master-verify/builds/11875",
 		}
 		createResponse, err := cfgmgmt.CreateRollout(ctx, &req)
 		require.NoError(t, err)
@@ -127,11 +130,14 @@ func TestRolloutCreate(t *testing.T) {
 			assert.Equal(t, "example-policy-node-group", res.PolicyNodeGroup)
 			assert.Equal(t, "abc123", res.PolicyRevisionId)
 			assert.Equal(t, "https://chef-server.example/organizations/example_org", res.PolicyDomainUrl)
+			assert.Equal(t, "bobo", res.PolicyDomainUsername)
 			assert.Equal(t, response.SCMType_GIT, res.ScmType)
 			assert.Equal(t, response.SCMWebType_GITHUB, res.ScmWebType)
 			assert.Equal(t, "git@github.com:chef/automate.git", res.PolicyScmUrl)
 			assert.Equal(t, "https://github.com/chef/automate", res.PolicyScmWebUrl)
 			assert.Equal(t, "a2a344e6804629de85ffa50e84caad18ac42cf50", res.PolicyScmCommit)
+			assert.Equal(t, "Bobo Tiberius Clown", res.ScmAuthorName)
+			assert.Equal(t, "bobo@example.com", res.ScmAuthorEmail)
 			assert.Equal(t, "install winamp", res.Description)
 			assert.Equal(t, "buildkite/chef-automate-master-verify#11875", res.CiJobId)
 			assert.Equal(t, "https://buildkite.com/chef-oss/chef-automate-master-verify/builds/11875", res.CiJobUrl)

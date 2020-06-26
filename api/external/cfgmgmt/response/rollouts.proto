@@ -14,7 +14,7 @@ enum SCMWebType {
 }
 
 /*
-A "Rollout" represents the process of distributing Chef Infra code (with
+A Rollout represents the process of distributing Chef Infra code (with
 Policyfiles) to a set of nodes. It's used to track which nodes have run the
 latest version of the Chef Infra code assigned to them and also provide the
 user insights about the code by aggregating Chef Client run results
@@ -25,7 +25,9 @@ systems they already use (such as SCM and Ci/CD systems) to manage their code.
 Nodes are segmented by a triple of policy name, policy group, and policy domain URL:
 * policy name generally describes what kind of system it is, e.g., a database server
 * policy group generally describes where the system fits in the user's code
-  lifecycle, e.g., "QA" or "production"
+  lifecycle, e.g., "QA" or "production." Policy groups may also represent a
+  subset of nodes within a code lifecycle stage, such as a "production-canary"
+  group.
 * policy domain URL identifies the system that distributes the Chef Infra code
   and is the owner of the namespaces for policy name and group. E.g., a Chef
   Server URL with the `/organizations/:orgname` part.
@@ -65,7 +67,10 @@ message Rollout {
   // The source control system's identifier for the repository version. This
   // should be the version where the policy's lockfile was committed.
   string policy_scm_commit = 9;
-  // A free-form description of the rollout, as given by the user.
+  // A free-form description of the rollout, as given by the user. Long
+  // messages may be displayed in a truncated form in the UI. The content may
+  // be entered manually by the user or extracted from another system, for
+  // example a git commit message.
   string description = 10;
   // If the rollout was initiated via Ci/CD or similar system, the web URL
   // for the job that initiated the rollout.
@@ -76,9 +81,29 @@ message Rollout {
   // the Ci/CD system.
   string ci_job_id = 12;
 
+  // The system-generated ID for this rollout. The system currently provides
+  // autoincrementing integers for the Ids.
   string id = 13;
+
+  // The time that the rollout began. Whenever a new rollout is created, it
+  // becomes the "current" rollout for its node segment; that is, any nodes
+  // that start a Chef Infra Client run will run the policy revision described
+  // by this "current" rollout. The system will populate the previously current
+  // rollout's `end_time` attribute with the current time.
   string start_time = 14;
+  // The time that the rollout was replaced with another rollout.
   string end_time = 15;
+
+  // The username of the author of the most recent commit to the source code
+  // repository. In git, this is the setting `user.name`.
+  string scm_author_name = 16;
+  // The email address of the author of the most recent commit to the source
+  // code repository. In git, this is the setting `user.email`.
+  string scm_author_email = 17;
+  // The username of the entity who uploaded/promoted the policy code to the
+  // code host. In a Chef Server architecture, this is the name of the Chef
+  // Server user who ran the `chef push` command to upload the policy.
+  string policy_domain_username = 18;
 }
 
 message Rollouts {
