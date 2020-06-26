@@ -21,7 +21,7 @@ There are two steps to getting data collection running in Chef Automate:
 
 1. You must first have an API token. You have two options:
 
-  * [Create a new API Token]({{< relref "api-tokens.md#creating-api-tokens" >}}).
+  * [Create a new API token]({{< relref "api-tokens.md#creating-api-tokens" >}}) and add the API token to the Ingest policy, preferably at time of creation.
   * Or you can [use your existing data collector token]({{< relref "#existing-data-collector-token-setup" >}}) if you are migrating from Chef Automate 1.
 
 1. Once you have an API token, you can either:
