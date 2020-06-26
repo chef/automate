@@ -102,6 +102,11 @@ export class LayoutFacadeService {
     return this.layout.license.display;
   }
 
+  hasUserNotifications(): boolean {
+    return this.layout.userNotifications.pendingEdits
+      || this.layout.userNotifications.updatesProcessing;
+  }
+
   ShowPageLoading(showLoading: boolean): void {
     setTimeout(() => this.store.dispatch(new ShowPageLoading(showLoading)));
   }
