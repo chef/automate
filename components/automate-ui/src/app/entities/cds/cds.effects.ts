@@ -9,11 +9,15 @@ import {
   CdsActionTypes,
   InstallContentItem,
   InstallContentItemSuccess,
-  InstallContentItemFailure
+  InstallContentItemFailure,
+  DownloadContentItem,
+  DownloadContentItemSuccess,
+  DownloadContentItemFailure
 } from './cds.actions';
 import { CdsRequests } from './cds.requests';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
+import { saveAs } from 'file-saver';
 
 @Injectable()
 export class CdsEffects {
@@ -71,4 +75,39 @@ export class CdsEffects {
         message: 'Content Item was installed'
       });
     }));
+
+    @Effect()
+    downloadContentItem$ = this.actions$.pipe(
+      ofType(CdsActionTypes.DOWNLOAD_CONTENT_ITEM),
+      mergeMap( (action: DownloadContentItem) =>
+        this.requests.downloadContentItem(action.payload.id).pipe(
+          map( (file: Blob) => {
+            saveAs(file, action.payload.filename);
+            return new DownloadContentItemSuccess( { name: action.payload.name } );
+          }),
+          catchError((error) => of(new DownloadContentItemFailure(
+            { name: action.payload.name, httpErrorResponse: error})))
+      )));
+
+    @Effect()
+    downloadContentItemFailure$ = this.actions$.pipe(
+      ofType(CdsActionTypes.DOWNLOAD_CONTENT_ITEM_FAILURE),
+      map(( action: DownloadContentItemFailure) => {
+        const error = action.payload.httpErrorResponse.error;
+        const msg = error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Error downloading content item "${action.payload.name}" errors: ${msg || error}`
+        });
+      }));
+
+    @Effect()
+    downloadContentItemSuccess$ = this.actions$.pipe(
+      ofType(CdsActionTypes.DOWNLOAD_CONTENT_ITEM_SUCCESS),
+      map((action: DownloadContentItemSuccess) => {
+        return new CreateNotification({
+          type: Type.info,
+          message: `Content Item "${action.payload.name}" was download`
+        });
+      }));
 }

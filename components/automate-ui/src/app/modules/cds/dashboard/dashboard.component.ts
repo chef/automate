@@ -3,11 +3,11 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { saveAs } from 'file-saver';
 
 import {
   GetContentItems,
-  InstallContentItem
+  InstallContentItem,
+  DownloadContentItem
 } from 'app/entities/cds/cds.actions';
 
 import {
@@ -17,10 +17,6 @@ import {
 import {
   ContentItem
 } from 'app/entities/cds/cds.model';
-
-import {
-  CdsRequests
-} from 'app/entities/cds/cds.requests';
 
 @Component({
   selector: 'app-desktop-dashboard',
@@ -33,8 +29,7 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private requests: CdsRequests
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit() {
@@ -49,9 +44,6 @@ export class DashboardComponent implements OnInit {
   }
 
   downloadContentItem(item: ContentItem) {
-    this.requests.downloadContentItem(item.id)
-    .subscribe(tarball => {
-      saveAs(tarball, item.filename);
-    });
+    this.store.dispatch(new DownloadContentItem( item ));
   }
 }
