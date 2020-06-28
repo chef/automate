@@ -62,7 +62,6 @@ func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destin
 }
 
 func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, request *datafeed.URLValidationRequest) (*datafeed.TestDestinationResponse, error) {
-	log.Infof("TestDestination %s", request)
 	response := &datafeed.TestDestinationResponse{Success: false}
 	// http client to endpoint {text: "TEST: Successful validation completed by Automate"}
 	// if it's secret - get the credentials
