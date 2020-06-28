@@ -575,7 +575,6 @@ func (bkt *gcsBucket) NewReader(ctx context.Context, name string, verifier Objec
 
 func (bkt *gcsBucket) NewWriter(ctx context.Context, name string) (BlobWriter, error) {
 	return nil, errors.New("Unimplemented")
-
 }
 
 func (bkt *gcsBucket) Delete(ctx context.Context, objectPaths []string) error {

@@ -138,7 +138,6 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 			cfgErr.AddMissingKey("global.v1.backups.gcs.bucket.name")
 		}
 
-		// Make sure the user has the path to the gcs creds set and it is accessible
 		gcsJSON := bu.GetGcs().GetCredentials().GetJson().GetValue()
 		if gcsJSON == "" {
 			cfgErr.AddMissingKey("global.v1.backups.gcs.credentials.json")
@@ -149,7 +148,7 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 		// none is given the default configuration "filesystem" location will
 		// be used.
 		if location != "" {
-			cfgErr.AddInvalidValue("global.v1.backups.location", "Must be either 'filesystem', 's3', or 'gcs'")
+			cfgErr.AddInvalidValue("global.v1.backups.location", "Must be 'filesystem', 's3', or 'gcs'")
 		}
 	}
 

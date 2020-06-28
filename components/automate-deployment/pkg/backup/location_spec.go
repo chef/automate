@@ -300,5 +300,5 @@ func (gcsSpec GCSLocationSpecification) ConfigureBackupRestoreTask(req *api.Back
 }
 
 func (gcsSpec GCSLocationSpecification) String() string {
-	return fmt.Sprintf("gcs repository <gcs://%s/%s>", gcsSpec.BucketName, gcsSpec.BasePath)
+	return fmt.Sprintf("gcs repository <gs://%s/%s>", gcsSpec.BucketName, gcsSpec.BasePath)
 }

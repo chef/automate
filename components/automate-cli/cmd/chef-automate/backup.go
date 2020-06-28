@@ -287,8 +287,8 @@ func parseLocationSpecFromCLIArgs(location string) (backup.LocationSpecification
 			SecretKey:    backupCmdFlags.s3SecretKey,
 			SessionToken: backupCmdFlags.s3SessionToken,
 		}, nil
-	} else if strings.HasPrefix(location, "gcs://") {
-		bucketAndBasePath := strings.TrimPrefix(location, "gcs://")
+	} else if strings.HasPrefix(location, "gs://") {
+		bucketAndBasePath := strings.TrimPrefix(location, "gs://")
 		parts := strings.SplitN(bucketAndBasePath, "/", 2)
 		bucketName := ""
 		basePath := ""
@@ -299,7 +299,7 @@ func parseLocationSpecFromCLIArgs(location string) (backup.LocationSpecification
 			basePath = parts[1]
 		} else {
 			return nil, status.Errorf(status.InvalidCommandArgsError,
-				"%q could not be parsed. The expected input is gcs://bucket/base/path",
+				"%q could not be parsed. The expected input is gs://bucket/base/path",
 				location,
 			)
 		}
