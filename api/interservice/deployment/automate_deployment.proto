@@ -529,8 +529,7 @@ message S3BackupLocation {
 message GCSBackupLocation {
 	string bucket_name = 1;
 	string base_path = 2;
-	string project_id = 3;
-	string google_application_credentials = 4;
+	string google_application_credentials = 3;
 }
 
 message BackupRestoreTask {

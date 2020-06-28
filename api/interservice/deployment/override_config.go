@@ -142,10 +142,6 @@ func MergeAndValidateNewUserOverrideConfig(existing *api.AutomateConfig, req *Ba
 			cfg.Global.V1.Backups.Gcs.Bucket.BasePath = w.String(reqGCS.GetBasePath())
 		}
 
-		if reqGCS.GetProjectId() != "" {
-			cfg.Global.V1.Backups.Gcs.Bucket.ProjectId = w.String(reqGCS.GetProjectId())
-		}
-
 		if reqGCS.GetGoogleApplicationCredentials() != "" {
 			cfg.Global.V1.Backups.Gcs.Credentials.Json = w.String(reqGCS.GetGoogleApplicationCredentials())
 		}
