@@ -520,7 +520,6 @@ type gcsBucket struct {
 
 type GCSConfig struct {
 	GoogleApplicationCredentials string
-	ProjectID                    string
 }
 
 func NewGCSBucket(name string, basePath string, c *GCSConfig) (Bucket, error) {

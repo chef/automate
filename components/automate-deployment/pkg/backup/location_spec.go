@@ -196,7 +196,6 @@ func NewRemoteLocationSpecificationFromRestoreTask(restoreTask *api.BackupRestor
 			BucketName:                   restoreTask.GetGcsBackupLocation().GetBucketName(),
 			BasePath:                     restoreTask.GetGcsBackupLocation().GetBasePath(),
 			GoogleApplicationCredentials: restoreTask.GetGcsBackupLocation().GetGoogleApplicationCredentials(),
-			ProjectID:                    restoreTask.GetGcsBackupLocation().GetProjectId(),
 		}
 	}
 
@@ -220,7 +219,6 @@ func NewRemoteLocationSpecificationFromGlobalConfig(globalConfig *config.GlobalC
 		return GCSLocationSpecification{
 			BucketName:                   globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetName().GetValue(),
 			BasePath:                     globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetBasePath().GetValue(),
-			ProjectID:                    globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetProjectId().GetValue(),
 			GoogleApplicationCredentials: globalConfig.GetV1().GetBackups().GetGcs().GetCredentials().GetJson().GetValue(),
 		}
 	default:
@@ -271,13 +269,11 @@ type GCSLocationSpecification struct {
 	// Optional
 	BasePath                     string
 	GoogleApplicationCredentials string
-	ProjectID                    string
 }
 
 func (gcsSpec GCSLocationSpecification) ToBucket(baseKey string) Bucket {
 	bucket, err := NewGCSBucket(gcsSpec.BucketName, path.Join(gcsSpec.BasePath, baseKey), &GCSConfig{
 		GoogleApplicationCredentials: gcsSpec.GoogleApplicationCredentials,
-		ProjectID:                    gcsSpec.ProjectID,
 	})
 
 	if err != nil {
@@ -293,7 +289,6 @@ func (gcsSpec GCSLocationSpecification) ConfigureBackupRestoreTask(req *api.Back
 	req.GcsBackupLocation = &api.GCSBackupLocation{
 		BucketName:                   gcsSpec.BucketName,
 		BasePath:                     gcsSpec.BasePath,
-		ProjectId:                    gcsSpec.ProjectID,
 		GoogleApplicationCredentials: gcsSpec.GoogleApplicationCredentials,
 	}
 	return nil
