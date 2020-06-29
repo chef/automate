@@ -57,7 +57,7 @@ describe('PagePickerComponent', () => {
         expect(component.itemEndCount).toEqual(10);
       });
 
-      it('should display provide 16 pages to select', () => {
+      it('should display 16 pages to select', () => {
         expect(component.totalPages.length).toEqual(16);
       });
     });
@@ -83,10 +83,13 @@ describe('PagePickerComponent', () => {
         [41, 85, 3, 20, 5, 10],
         [157, 186, 7, 20, 4, 50],
         [61, 85, 3, 20, 2, 50]
-      ], function (itemStartCount: number, total: number,
-        currentPageNumber: number, currentPageSize: number,
-        newPageNumber: number, newPageSize: number) {
-          it(`when current page is ${currentPageNumber}, emits the calculated page as ${newPageNumber} and page Selection of ${newPageSize}`, () => {
+      ], function (itemStartCount: number,
+                   total: number,
+                   currentPageNumber: number,
+                   currentPageSize: number,
+                   newPageNumber: number,
+                   newPageSize: number) {
+          it(`when current page is ${currentPageNumber}, and page size is changed emits the calculated page as ${newPageNumber} and page Selection of ${newPageSize}`, () => {
           const mockEvent = { isUserInput: true };
           spyOn(component.pageSizeChanged, 'emit');
 

@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, HostBinding } from '@angular/core';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { PageSizeChangeEvent } from 'app/entities/desktop/desktop.model';
 
 
@@ -30,15 +31,15 @@ export class PagePickerComponent implements OnChanges {
   next = 1;
   last = 1;
 
-  public getItemStartCount() {
+  private getItemStartCount() {
     this.itemStartCount = this.page === 1 ? 1 : ((this.page - 1) * this.perPage + 1);
   }
 
-  public getItemEndCount() {
+  private getItemEndCount() {
     this.itemEndCount = this.page === this.last ? this.total : this.page * this.perPage;
   }
 
-  public getTotalPages() {
+  private getTotalPages() {
     const pageCount = Math.ceil(this.total / this.perPage);
     this.totalPages = Array(pageCount).fill(0).map((_x, i) => i + 1);
   }
@@ -89,13 +90,13 @@ export class PagePickerComponent implements OnChanges {
     return item;
   }
 
-  handleSelectItem(event, value): void {
+  handleSelectItem(event: MatOptionSelectionChange, value: number): void {
     if (event.isUserInput) {
       this.pageChanged.emit(value);
     }
   }
 
-  handleSelectPerPageItems(event, value): void {
+  handleSelectPerPageItems(event: MatOptionSelectionChange, value: number): void {
     if (event.isUserInput) {
       const updatedPageNumber = Math.ceil(this.itemStartCount / value);
 
