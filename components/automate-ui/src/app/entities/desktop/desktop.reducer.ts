@@ -181,7 +181,7 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
       return pipe(
         set('getDesktopsFilter.pageSize', action.payload.pageSize),
         set('getDesktopsFilter.currentPage', action.payload.updatedPageNumber)
-      )(state);
+      )(state) as DesktopEntityState;
 
     default:
       return state;
