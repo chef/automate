@@ -24,7 +24,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type ConfigRequest struct {
-	V1                   *ConfigRequest_V1 `protobuf:"bytes,3,opt,name=v1,proto3" json:"v1,omitempty" toml:"v1,omitempty" mapstructure:"v1,omitempty"`
+	V1                   *ConfigRequest_V1 `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty" toml:"v1,omitempty" mapstructure:"v1,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte            `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_sizecache        int32             `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -63,11 +63,10 @@ func (m *ConfigRequest) GetV1() *ConfigRequest_V1 {
 }
 
 type ConfigRequest_V1 struct {
-	Sys                  *ConfigRequest_V1_System  `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty" toml:"sys,omitempty" mapstructure:"sys,omitempty"`
-	Svc                  *ConfigRequest_V1_Service `protobuf:"bytes,2,opt,name=svc,proto3" json:"svc,omitempty" toml:"svc,omitempty" mapstructure:"svc,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                  `json:"-" toml:"-" mapstructure:"-,omitempty"`
-	XXX_unrecognized     []byte                    `json:"-" toml:"-" mapstructure:"-,omitempty"`
-	XXX_sizecache        int32                     `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	Sys                  *ConfigRequest_V1_System `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty" toml:"sys,omitempty" mapstructure:"sys,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                 `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte                   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32                    `json:"-" toml:"-" mapstructure:"-,omitempty"`
 }
 
 func (m *ConfigRequest_V1) Reset()         { *m = ConfigRequest_V1{} }
@@ -98,13 +97,6 @@ var xxx_messageInfo_ConfigRequest_V1 proto.InternalMessageInfo
 func (m *ConfigRequest_V1) GetSys() *ConfigRequest_V1_System {
 	if m != nil {
 		return m.Sys
-	}
-	return nil
-}
-
-func (m *ConfigRequest_V1) GetSvc() *ConfigRequest_V1_Service {
-	if m != nil {
-		return m.Svc
 	}
 	return nil
 }
@@ -350,44 +342,12 @@ func (m *ConfigRequest_V1_System_Log) GetLevel() *wrappers.StringValue {
 	return nil
 }
 
-type ConfigRequest_V1_Service struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
-	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
-	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
-}
-
-func (m *ConfigRequest_V1_Service) Reset()         { *m = ConfigRequest_V1_Service{} }
-func (m *ConfigRequest_V1_Service) String() string { return proto.CompactTextString(m) }
-func (*ConfigRequest_V1_Service) ProtoMessage()    {}
-func (*ConfigRequest_V1_Service) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3881e0f358fbc19d, []int{0, 0, 1}
-}
-
-func (m *ConfigRequest_V1_Service) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ConfigRequest_V1_Service.Unmarshal(m, b)
-}
-func (m *ConfigRequest_V1_Service) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ConfigRequest_V1_Service.Marshal(b, m, deterministic)
-}
-func (m *ConfigRequest_V1_Service) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ConfigRequest_V1_Service.Merge(m, src)
-}
-func (m *ConfigRequest_V1_Service) XXX_Size() int {
-	return xxx_messageInfo_ConfigRequest_V1_Service.Size(m)
-}
-func (m *ConfigRequest_V1_Service) XXX_DiscardUnknown() {
-	xxx_messageInfo_ConfigRequest_V1_Service.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ConfigRequest_V1_Service proto.InternalMessageInfo
-
 func init() {
 	proto.RegisterType((*ConfigRequest)(nil), "chef.automate.domain.data_feed.ConfigRequest")
 	proto.RegisterType((*ConfigRequest_V1)(nil), "chef.automate.domain.data_feed.ConfigRequest.V1")
 	proto.RegisterType((*ConfigRequest_V1_System)(nil), "chef.automate.domain.data_feed.ConfigRequest.V1.System")
 	proto.RegisterType((*ConfigRequest_V1_System_Service)(nil), "chef.automate.domain.data_feed.ConfigRequest.V1.System.Service")
 	proto.RegisterType((*ConfigRequest_V1_System_Log)(nil), "chef.automate.domain.data_feed.ConfigRequest.V1.System.Log")
-	proto.RegisterType((*ConfigRequest_V1_Service)(nil), "chef.automate.domain.data_feed.ConfigRequest.V1.Service")
 }
 
 func init() {
@@ -397,6 +357,9 @@ func init() {
 var fileDescriptor_3881e0f358fbc19d = []byte{
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> proto update and rebase
 	// 682 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x95, 0xef, 0x4e, 0xdb, 0x3a,
 	0x14, 0xc0, 0x45, 0x5b, 0x0a, 0x98, 0x5b, 0x01, 0x46, 0xba, 0x37, 0x0a, 0x57, 0x08, 0xdd, 0x4f,
@@ -441,6 +404,7 @@ var fileDescriptor_3881e0f358fbc19d = []byte{
 	0xb4, 0x63, 0xdc, 0xf1, 0xdf, 0x37, 0x53, 0xaa, 0x07, 0xc3, 0xbe, 0x17, 0x89, 0xcc, 0x37, 0x8f,
 	0x71, 0xfa, 0x07, 0xec, 0xff, 0xee, 0xe3, 0xd0, 0xaf, 0x17, 0xdb, 0xec, 0x7d, 0x0f, 0x00, 0x00,
 	0xff, 0xff, 0xba, 0x22, 0x3e, 0xc7, 0x3b, 0x06, 0x00, 0x00,
+<<<<<<< HEAD
 =======
 	// 704 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x95, 0xdf, 0x4e, 0xdb, 0x48,
@@ -536,4 +500,6 @@ var fileDescriptor_3881e0f358fbc19d = []byte{
 	0x2f, 0xf6, 0x3d, 0xf8, 0x12, 0x00, 0x00, 0xff, 0xff, 0xa2, 0x2e, 0x30, 0x03, 0x98, 0x06, 0x00,
 	0x00,
 >>>>>>> update the datafeed config
+=======
+>>>>>>> proto update and rebase
 }
