@@ -1,8 +1,9 @@
 package server
 
 import (
+	"bufio"
 	"context"
-	"io/ioutil"
+	"fmt"
 
 	"github.com/chef/automate/api/external/cds/request"
 	"github.com/chef/automate/api/external/cds/response"
@@ -11,11 +12,16 @@ import (
 	interservice "github.com/chef/automate/api/interservice/cds/service"
 
 	"github.com/chef/automate/components/automate-cds/service"
+	"github.com/chef/automate/lib/io/chunks"
 	"github.com/chef/automate/lib/version"
 	log "github.com/sirupsen/logrus"
 
 	"net/http"
 )
+
+// Chosen somewhat arbitrarily to be a "good enough" value.
+// See: https://github.com/chef/automate/pull/1143#discussion_r170428374
+const streamBufferSize = 262144
 
 // Server is an Automate CDS proxy server
 type Server struct {
@@ -102,17 +108,16 @@ func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 	}
 	defer resp.Body.Close()
 
-	// TODO Do not read all stream the file down and up
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	stream.Send(&common.ExportData{
-		Content: body,
+	writer := chunks.NewWriter(streamBufferSize, func(p []byte) error {
+		return stream.Send(&common.ExportData{Content: p})
 	})
 
-	log.Infof("Streamed file")
+	reader := bufio.NewReaderSize(resp.Body, streamBufferSize)
+
+	_, err = reader.WriteTo(writer)
+	if err != nil {
+		return fmt.Errorf("Failed to stream: %+v", err)
+	}
 
 	return nil
 }

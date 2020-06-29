@@ -421,18 +421,10 @@ func (s *Server) startHTTPServer() error {
 	// `rpc ReadTar(ProfileDetails) returns (stream ProfileData) {};`
 	mux.HandleFunc("/api/v0/compliance/profiles/tar", profileTarHandlerUnlessDELETE)
 
-	cdsDownloadHandlerUnlessDELETE := func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodDelete {
-			s.CdsDownloadHandler(w, r)
-			return
-		}
-		v0Mux.ServeHTTP(w, r)
-	}
-
 	// custom mux route for content item download; corresponds to:
-	// https://github.com/chef/automate/blob/master/api/interservice/cds/profiles.proto
-	// `rpc ReadTar(ProfileDetails) returns (stream ProfileData) {};`
-	mux.HandleFunc("/api/beta/content/download", cdsDownloadHandlerUnlessDELETE)
+	// https://github.com/chef/automate/blob/master/api/interservice/cds/cds.proto
+	// `rpc DownloadContentItem(chef.automate.api.cds.request.DownloadContentItem) returns (stream chef.automate.api.common.ExportData) { };`
+	mux.HandleFunc("/api/beta/content/download", s.cdsDownloadHandler)
 
 	// for legacy endpoints:
 	// compliance/profiles/{owner}/{name}/tar,

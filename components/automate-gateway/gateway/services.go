@@ -531,25 +531,23 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(data) // nolint: errcheck
 }
 
-func (s *Server) CdsDownloadHandler(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var request cds_request.DownloadContentItem
-	err := decoder.Decode(&request)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	log.Infof("processing content item download %s", request.Id)
-
-	var resource, action string
-
-	action = "content:items:download"
-	resource = "content:items"
+func (s *Server) cdsDownloadHandler(w http.ResponseWriter, r *http.Request) {
+	const (
+		action   = "content:items:download"
+		resource = "content:items"
+	)
 
 	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var request cds_request.DownloadContentItem
+	err = decoder.Decode(&request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -573,10 +571,6 @@ func (s *Server) CdsDownloadHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
-		contentLength := strconv.Itoa(len(data.GetContent()))
-		w.Header().Set("Content-Length", contentLength)
-		w.Header().Set("Content-Type", "application/x-gzip")
-		w.Header().Set("Accept-Ranges", "bytes")
 		w.Write(data.GetContent()) // nolint: errcheck
 	}
 }
