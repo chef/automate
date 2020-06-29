@@ -78,6 +78,11 @@ export enum InfraJobName {
   PeriodicPurgeTimeseries = 'periodic_purge_timeseries'
 }
 
+export enum ServicesJobName {
+  DisconnectedServices = 'disconnected_services',
+  DeleteDisconnectedServices = 'delete_disconnected_services'
+}
+
 // Actions and ConvergeHistory are nested, but contained inside
 // the InfraJobName of PeriodicPurgeTimeseries
 export enum NestedJobName {

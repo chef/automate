@@ -12,6 +12,7 @@ import {
   UnfurledJob,
   JobRequestBody,
   InfraJobName,
+  ServicesJobName,
   JobCategories
 } from './automate-settings.model';
 
@@ -70,6 +71,9 @@ export class AutomateSettingsRequests {
             }
           }
         ]
+      },
+      services: {
+        job_settings: []
       }
     };
 
@@ -77,9 +81,11 @@ export class AutomateSettingsRequests {
       let thisJob = new UnfurledJob;
 
       switch (job.name) {
-        case InfraJobName.DeleteNodes:              // fallthrough
-        case InfraJobName.MissingNodes:             // fallthrough
-        case InfraJobName.MissingNodesForDeletion:
+        case InfraJobName.DeleteNodes:                    // fallthrough
+        case InfraJobName.MissingNodes:                   // fallthrough
+        case InfraJobName.MissingNodesForDeletion:        // fallthrough
+        case ServicesJobName.DisconnectedServices:        // fallthrough
+        case ServicesJobName.DeleteDisconnectedServices:
           thisJob = this.unfurlIngestJob(job);
           // Protect against an undefined value
           if (body[job.category].job_settings) {
