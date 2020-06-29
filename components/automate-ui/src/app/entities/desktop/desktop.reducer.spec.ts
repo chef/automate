@@ -14,7 +14,7 @@ describe('desktopEntityReducer', () => {
         const action = new UpdateDesktopsFilterPageSizeAndCurrentPage({
           pageSize: 20, updatedPageNumber: 3
         });
-        const newState: any = desktopEntityReducer(initialState, action);
+        const newState = desktopEntityReducer(initialState, action);
 
         expect(newState.getDesktopsFilter.pageSize).toBe(20);
         expect(newState.getDesktopsFilter.currentPage).toBe(3);

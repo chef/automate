@@ -4,11 +4,13 @@ import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { PagePickerComponent } from './page-picker.component';
 import { using } from 'app/testing/spec-helpers';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 
 describe('PagePickerComponent', () => {
   let component: PagePickerComponent;
   let fixture: ComponentFixture<PagePickerComponent>;
   let store: Store<NgrxStateAtom>;
+  const MockSelectionEvent: MatOptionSelectionChange = { isUserInput: true, source: null };
 
   beforeEach(async() => {
     TestBed.configureTestingModule({
@@ -36,7 +38,7 @@ describe('PagePickerComponent', () => {
     beforeEach(() => {
       component.forDesktop = true;
       component.page = 1;
-      component.total = 153;
+      component.totalItems = 153;
       component.perPage = 10;
     });
 
@@ -58,17 +60,15 @@ describe('PagePickerComponent', () => {
       });
 
       it('should display 16 pages to select', () => {
-        expect(component.totalPages.length).toEqual(16);
+        expect(component.allPages.length).toEqual(16);
       });
     });
 
     describe('selecting a new page', () => {
 
       it('emits the newly selected page value', () => {
-        const mockEvent = { isUserInput: true };
         spyOn(component.pageChanged, 'emit');
-
-        component.handleSelectItem(mockEvent, 3);
+        component.handleSelectItem(MockSelectionEvent, 3);
 
         expect(component.pageChanged.emit).toHaveBeenCalledWith(3);
       });
@@ -84,21 +84,21 @@ describe('PagePickerComponent', () => {
         [157, 186, 7, 20, 4, 50],
         [61, 85, 3, 20, 2, 50]
       ], function (itemStartCount: number,
-                   total: number,
+                   totalItems: number,
                    currentPageNumber: number,
                    currentPageSize: number,
                    newPageNumber: number,
                    newPageSize: number) {
           it(`when current page is ${currentPageNumber}, and page size is changed emits the calculated page as ${newPageNumber} and page Selection of ${newPageSize}`, () => {
-          const mockEvent = { isUserInput: true };
+
           spyOn(component.pageSizeChanged, 'emit');
 
           component.itemStartCount = itemStartCount;
-          component.total = total;
+          component.totalItems = totalItems;
           component.page = currentPageNumber;
           component.perPage = currentPageSize;
 
-          component.handleSelectPerPageItems(mockEvent, newPageSize);
+          component.handleSelectPerPageItems(MockSelectionEvent, newPageSize);
 
           expect(component.pageSizeChanged.emit).toHaveBeenCalledWith({
             pageSize: newPageSize,

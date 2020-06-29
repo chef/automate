@@ -48,7 +48,7 @@
               </mat-select>
             </mat-form-field>
         </div>
-        <span>{{ itemStartCount }} - {{ itemEndCount | paginationTrueEnd: total }} of {{ total }} items</span>
+        <span>{{ itemStartCount }} - {{ itemEndCount | paginationTrueEnd: totalItems }} of {{ totalItems }} items</span>
       </div>
 
       <div class="column column--2">
@@ -56,15 +56,15 @@
           <div class="arrow-field-item dropdown">
             <mat-form-field appearance="none">
               <mat-select panelClass="chef-dropdown" [(ngModel)]="page">
-                <mat-option *ngFor="let item of totalPages; trackBy: trackBy"
+                <mat-option *ngFor="let item of allPages; trackBy: trackBy"
                 (onSelectionChange)="handleSelectItem($event, item)"
-                [attr.disabled]="totalPages.length <= 1"
+                [attr.disabled]="allPages.length <= 1"
                 [value]="item">{{ item }}</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
           <div class="arrow-field-item of-pages-container">
-            <span>of {{ totalPages.length }} pages</span>
+            <span>of {{ allPages.length }} pages</span>
           </div>
           <div class="arrow-field-item">
             <chef-button secondary class="page-picker-item page-picker-prev" (click)="onItemTap(prev)" [disabled]="isNull(prev)">
