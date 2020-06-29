@@ -6,6 +6,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class PaginationTrueEndPipe implements PipeTransform {
 
   transform(pageEnd: number, totalCount: number): number {
-    return (pageEnd > totalCount) ? totalCount : pageEnd;
+    return (pageEnd > totalCount || pageEnd === 0) ? totalCount : pageEnd;
   }
 }
