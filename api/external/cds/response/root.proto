@@ -15,6 +15,7 @@ message ContentItem {
   string version = 5;
   repeated string platforms = 6;
   bool can_be_installed = 7;
+  string filename = 8;
 }
 
 message InstallContentItem {

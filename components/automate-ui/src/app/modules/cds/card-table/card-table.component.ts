@@ -11,6 +11,7 @@ export class CardTableComponent implements OnChanges {
 
   @Input() contentItems: ContentItem[];
   @Output() onInstallItem: EventEmitter<string> = new EventEmitter();
+  @Output() onDownloadItem: EventEmitter<ContentItem> = new EventEmitter();
 
   collectionOfPairs: ContentItem[][];
 
@@ -36,5 +37,9 @@ export class CardTableComponent implements OnChanges {
 
   installContentItem(item: ContentItem) {
     this.onInstallItem.emit(item.id);
+  }
+
+  downloadContentItem(item: ContentItem) {
+    this.onDownloadItem.emit(item);
   }
 }

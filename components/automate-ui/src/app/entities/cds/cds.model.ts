@@ -6,4 +6,5 @@ export interface ContentItem {
   version: string;
   platforms: string[];
   canBeInstall: boolean;
+  filename: string;
 }

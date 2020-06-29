@@ -417,9 +417,14 @@ func (s *Server) startHTTPServer() error {
 	}
 
 	// custom mux route for profile tar download; corresponds to:
-	// https://github.com/chef/automate/blob/master/components/automate-gateway/api/compliance/profiles/profiles.proto
+	// https://github.com/chef/automate/blob/master/api/interservice/compliance/profiles/profiles.proto
 	// `rpc ReadTar(ProfileDetails) returns (stream ProfileData) {};`
 	mux.HandleFunc("/api/v0/compliance/profiles/tar", profileTarHandlerUnlessDELETE)
+
+	// custom mux route for content item download; corresponds to:
+	// https://github.com/chef/automate/blob/master/api/interservice/cds/cds.proto
+	// `rpc DownloadContentItem(chef.automate.api.cds.request.DownloadContentItem) returns (stream chef.automate.api.common.ExportData) { };`
+	mux.HandleFunc("/api/beta/content/download", s.cdsDownloadHandler)
 
 	// for legacy endpoints:
 	// compliance/profiles/{owner}/{name}/tar,

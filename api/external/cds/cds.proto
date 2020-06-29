@@ -5,6 +5,7 @@ option go_package = "github.com/chef/automate/api/external/cds";
 
 import "api/external/cds/request/root.proto";
 import "api/external/cds/response/root.proto";
+import "api/external/common/response.proto";
 
 import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
@@ -49,4 +50,25 @@ service Cds {
     option (chef.automate.api.iam.policy).action = "content:items:install";
   };
 
+  /*
+  DownloadContentItem
+
+  Download a content item from its ID
+
+  grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
+	so we do not auto-generate the route for download; we instead custom handle with mux
+
+  Authorization Action:
+  ```
+  content:items:download
+  ```
+  */
+  rpc DownloadContentItem(cds.request.DownloadContentItem) returns (stream chef.automate.api.common.ExportData) { }
+  //   option (google.api.http) = {
+  //     post: "/api/beta/content/download"
+  //     body: "*"
+  //   };
+  //   option (chef.automate.api.iam.policy).resource = "content:items";
+  //   option (chef.automate.api.iam.policy).action = "content:items:download";
+  // };
 }

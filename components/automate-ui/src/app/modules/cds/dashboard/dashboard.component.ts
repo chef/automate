@@ -6,7 +6,8 @@ import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import {
   GetContentItems,
-  InstallContentItem
+  InstallContentItem,
+  DownloadContentItem
 } from 'app/entities/cds/cds.actions';
 
 import {
@@ -40,5 +41,9 @@ export class DashboardComponent implements OnInit {
 
   installContentItem(itemId: string) {
     this.store.dispatch(new InstallContentItem({id: itemId}));
+  }
+
+  downloadContentItem(item: ContentItem) {
+    this.store.dispatch(new DownloadContentItem( item ));
   }
 }
