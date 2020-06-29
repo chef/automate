@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"net"
 	"time"
 
 	cfgmgmtRequest "github.com/chef/automate/api/interservice/cfgmgmt/request"
@@ -112,19 +113,20 @@ func (d *DataFeedAggregateTask) buildDatafeed(ctx context.Context, nodeIDs map[s
 
 	nodeMessages := make(map[string]map[string]interface{})
 	log.Debugf("buildDatafeed nodeIDs %v", nodeIDs)
-	for ip, nodeID := range nodeIDs {
+	// might not be ip, might be the inspec node_id if there are no infra nodes e.g. a cloud resource
+	for resourceId, nodeID := range nodeIDs {
 		if nodeID.ClientID == "" && nodeID.ComplianceID == "" {
 			continue
 		}
 
-		log.Debugf("buildDataFeed ipaddress %s, value %v", ip, nodeID)
-
-		nodeData, err := d.getNodeClientData(ctx, ip, nodeID, updatedNodesOnly)
+		log.Debugf("buildDataFeed resourceId %s, value %v", resourceId, nodeID)
+		// if resourceId is an IP address we get client data returned
+		nodeData, err := d.getNodeClientData(ctx, resourceId, nodeID, updatedNodesOnly)
 		if err != nil {
 			log.Warnf("Error getting node data %v", err)
 		}
 
-		report, err := d.getNodeComplianceData(ctx, ip, nodeID, updatedNodesOnly)
+		report, err := d.getNodeComplianceData(ctx, resourceId, nodeID, updatedNodesOnly)
 		if err != nil {
 			log.Warnf("Error getting compliance data %v", err)
 		}
@@ -132,15 +134,20 @@ func (d *DataFeedAggregateTask) buildDatafeed(ctx context.Context, nodeIDs map[s
 		if report != nil {
 			nodeData["report"] = report
 		}
-		nodeMessages[ip] = nodeData
+		nodeMessages[resourceId] = nodeData
 	}
 	log.Debugf("%v node attribute messages retrieved in interval", len(nodeMessages))
 	return nodeMessages, nil
 }
 
-func (d *DataFeedAggregateTask) getNodeClientData(ctx context.Context, ipaddress string, nodeID NodeIDs, updatedNodesOnly bool) (map[string]interface{}, error) {
+func (d *DataFeedAggregateTask) getNodeClientData(ctx context.Context, resourceId string, nodeID NodeIDs, updatedNodesOnly bool) (map[string]interface{}, error) {
 
 	nodeData := make(map[string]interface{})
+	var ipaddress string
+	if isIPAddress(resourceId) {
+		ipaddress = resourceId
+	}
+
 	var err error
 	if nodeID.ClientID != "" || updatedNodesOnly == false {
 		// get full node data
@@ -148,13 +155,13 @@ func (d *DataFeedAggregateTask) getNodeClientData(ctx context.Context, ipaddress
 		var filters []string
 		if nodeID.ClientID != "" {
 			filters = []string{"id:" + nodeID.ClientID}
-		} else {
+		} else if isIPAddress(resourceId) {
 			filters = []string{"ipaddress:" + ipaddress}
 		}
 		// get the attributes and last client run data of each node
-		nodeData, err = d.getNodeData(ctx, filters)
+		nodeData, err = d.safeGetNodeData(ctx, filters)
 
-	} else if nodeID.ClientID == "" && updatedNodesOnly {
+	} else if nodeID.ClientID == "" && updatedNodesOnly && isIPAddress(resourceId) {
 		// get hosts data
 		filters := []string{"ipaddress:" + ipaddress}
 		_, macAddress, hostname, err := getNodeHostFields(ctx, d.cfgMgmt, filters)
@@ -172,6 +179,20 @@ func (d *DataFeedAggregateTask) getNodeClientData(ctx context.Context, ipaddress
 		return nodeData, err
 	}
 	return nodeData, nil
+}
+
+func isIPAddress(resourceId string) bool {
+	if net.ParseIP(resourceId) != nil {
+		return true
+	}
+	return false
+}
+
+func (d *DataFeedAggregateTask) safeGetNodeData(ctx context.Context, filters []string) (map[string]interface{}, error) {
+	if len(filters) == 0 {
+		return make(map[string]interface{}), nil
+	}
+	return d.getNodeData(ctx, filters)
 }
 
 func (d *DataFeedAggregateTask) getNodeData(ctx context.Context, filters []string) (map[string]interface{}, error) {

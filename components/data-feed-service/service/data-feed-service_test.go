@@ -689,7 +689,8 @@ func TestGetNodeDataNotWindows(t *testing.T) {
 		gomock.Any(),
 	).Return(run, nil)
 	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient, externalFqdn: externalFqdn}
-	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
+	filters := []string{"ipaddress:" + ipAttr}
+	nodeData, err := aggTask.safeGetNodeData(context.Background(), filters)
 	if nodeData["attributes"] == nil {
 		t.Log("expected attributes, got nil")
 		t.Fail()
