@@ -42,7 +42,7 @@
         <div class="per-page-container">
           <span class="items-per">Items per page: </span>
             <mat-form-field appearance="none">
-              <mat-select panelClass="chef-dropdown" [(ngModel)]="perPage">
+              <mat-select panelClass="chef-dropdown" [value]="perPage">
                 <mat-option *ngFor="let amount of perPageOptions" [value]="amount" 
                 (onSelectionChange)="handleSelectPerPageItems($event, amount)">{{ amount }}</mat-option>
               </mat-select>
@@ -55,7 +55,7 @@
         <div class="arrow-field-container">
           <div class="arrow-field-item dropdown">
             <mat-form-field appearance="none">
-              <mat-select panelClass="chef-dropdown" [(ngModel)]="page">
+              <mat-select panelClass="chef-dropdown" [value]="page">
                 <mat-option *ngFor="let item of allPages; trackBy: trackBy"
                 (onSelectionChange)="handleSelectItem($event, item)"
                 [attr.disabled]="allPages.length <= 1"
