@@ -28,6 +28,16 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 )
 
+const restoreRecovery = `Check the logs (journalctl -u chef-automate) for errors related
+to the failed restore.
+
+Before retrying the restore process, remove the file %s.
+
+Under normal circumstances, restoring over an existing Chef Automate installation where
+some services are down will work correctly. If such a restore does not work correctly, ensure that
+either all services are up (chef-automate restart-services)
+or all services are down (chef-automate stop) before retrying the restore.`
+
 var backupCmdFlags = struct {
 	noProgress     bool
 	requestTimeout int64
@@ -876,18 +886,20 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 		client.WithDeploymentRestoreAirgapInstallBundle(backupCmdFlags.airgap),
 	)
 
+	restoreRecoveryMsg := fmt.Sprintf(restoreRecovery, api.ConvergeDisableFilePath)
+
 	if err := dsRestore.Restore(ctx); err != nil {
-		return status.Annotate(err, status.BackupError)
+		return status.WithRecovery(status.Annotate(err, status.BackupError), restoreRecoveryMsg)
 	}
 
 	manifest, err := dsRestore.ResolvedManifest()
 	if err != nil {
-		return status.Annotate(err, status.BackupError)
+		return status.WithRecovery(status.Annotate(err, status.BackupError), restoreRecoveryMsg)
 	}
 
 	jsManifest, err := json.Marshal(manifest)
 	if err != nil {
-		return status.Wrap(err, status.BackupError, "Failed to marshal package manifest to JSON")
+		return status.WithRecovery(status.Wrap(err, status.BackupError, "Failed to marshal package manifest to JSON"), restoreRecoveryMsg)
 	}
 
 	rt.Manifest = &api.ReleaseManifest{
@@ -902,7 +914,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 			rt,
 		)
 		if err != nil {
-			return err
+			return status.WithRecovery(err, restoreRecoveryMsg)
 		}
 
 		status.GlobalResult = restoreBackupResponse{
@@ -920,7 +932,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 		rt,
 	)
 	if err != nil {
-		return err
+		return status.WithRecovery(err, restoreRecoveryMsg)
 	}
 
 	status.GlobalResult = restoreBackupResponse{
