@@ -38,6 +38,7 @@ message ConfigRequest {
 				google.protobuf.BoolValue verify_repo = 6;
 				FsSettings fs = 2;
 				S3Settings s3 = 5;
+				GCSSettings gcs = 7;
 
 				message FsSettings {
 					google.protobuf.StringValue root_location = 1;
@@ -50,6 +51,12 @@ message ConfigRequest {
 					google.protobuf.StringValue client = 2;
 					google.protobuf.StringValue base_path = 3;
 					chef.automate.infra.config.Backups.S3.Elasticsearch es = 4;
+				}
+				message GCSSettings {
+					google.protobuf.StringValue bucket = 1;
+					google.protobuf.StringValue client = 2;
+					google.protobuf.StringValue base_path = 3;
+					chef.automate.infra.config.Backups.GCS.Elasticsearch es = 4;
 				}
 			}
 

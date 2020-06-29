@@ -10,7 +10,7 @@ delete_backup_and_assert_idempotent() {
     # Delete the backup
     #shellcheck disable=SC2154
     log_info "deleting backup ${test_backup_id}"
-    chef-automate backup delete --yes "${test_backup_id}" || return 1
+    chef-automate backup delete -t 300 --yes "${test_backup_id}" || return 1
     # Make sure that our backup is not in the list
     log_info "checking to make sure backup doesn't exist"
     assert_backup_missing "${test_backup_id}"

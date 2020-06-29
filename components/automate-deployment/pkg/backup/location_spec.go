@@ -191,6 +191,12 @@ func NewRemoteLocationSpecificationFromRestoreTask(restoreTask *api.BackupRestor
 			SecretKey:    restoreTask.GetS3BackupLocation().GetSecretKey(),
 			SessionToken: restoreTask.GetS3BackupLocation().GetSessionToken(),
 		}
+	} else if restoreTask.GetGcsBackupLocation().GetBucketName() != "" {
+		return GCSLocationSpecification{
+			BucketName:                   restoreTask.GetGcsBackupLocation().GetBucketName(),
+			BasePath:                     restoreTask.GetGcsBackupLocation().GetBasePath(),
+			GoogleApplicationCredentials: restoreTask.GetGcsBackupLocation().GetGoogleApplicationCredentials(),
+		}
 	}
 
 	return FilesystemLocationSpecification{Path: restoreTask.GetBackupDir()}
@@ -208,6 +214,12 @@ func NewRemoteLocationSpecificationFromGlobalConfig(globalConfig *config.GlobalC
 			AccessKey:    globalConfig.GetV1().GetBackups().GetS3().GetCredentials().GetAccessKey().GetValue(),
 			SecretKey:    globalConfig.GetV1().GetBackups().GetS3().GetCredentials().GetSecretKey().GetValue(),
 			SessionToken: globalConfig.GetV1().GetBackups().GetS3().GetCredentials().GetSessionToken().GetValue(),
+		}
+	case "gcs":
+		return GCSLocationSpecification{
+			BucketName:                   globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetName().GetValue(),
+			BasePath:                     globalConfig.GetV1().GetBackups().GetGcs().GetBucket().GetBasePath().GetValue(),
+			GoogleApplicationCredentials: globalConfig.GetV1().GetBackups().GetGcs().GetCredentials().GetJson().GetValue(),
 		}
 	default:
 		return FilesystemLocationSpecification{
@@ -248,4 +260,40 @@ func NewMinioLocationSpec(endpoint,
 		secretGroupName: groupName,
 		secretStore:     secretStore,
 	}, nil
+}
+
+type GCSLocationSpecification struct {
+	// Required
+	BucketName string
+
+	// Optional
+	BasePath                     string
+	GoogleApplicationCredentials string
+}
+
+func (gcsSpec GCSLocationSpecification) ToBucket(baseKey string) Bucket {
+	bucket, err := NewGCSBucket(gcsSpec.BucketName, path.Join(gcsSpec.BasePath, baseKey), &GCSConfig{
+		GoogleApplicationCredentials: gcsSpec.GoogleApplicationCredentials,
+	})
+
+	if err != nil {
+		// I should have just let the creation the Context return an error :(
+		logrus.WithError(err).Warn("could not initialize bucket")
+		return errBucket{err: err}
+	}
+
+	return bucket
+}
+
+func (gcsSpec GCSLocationSpecification) ConfigureBackupRestoreTask(req *api.BackupRestoreTask) error {
+	req.GcsBackupLocation = &api.GCSBackupLocation{
+		BucketName:                   gcsSpec.BucketName,
+		BasePath:                     gcsSpec.BasePath,
+		GoogleApplicationCredentials: gcsSpec.GoogleApplicationCredentials,
+	}
+	return nil
+}
+
+func (gcsSpec GCSLocationSpecification) String() string {
+	return fmt.Sprintf("gcs repository <gs://%s/%s>", gcsSpec.BucketName, gcsSpec.BasePath)
 }

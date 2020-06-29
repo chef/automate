@@ -35,6 +35,7 @@ message ConfigRequest {
 				message Backup {
 					Filesystem filesystem = 1;
 					chef.automate.infra.config.Backups.S3 s3 = 2;
+					chef.automate.infra.config.Backups.GCS gcs = 3;
 
 					message Filesystem {
 						reserved 1; // enable

@@ -103,6 +103,7 @@ docker_run_args=(
         "--env" "AWS_ACCESS_KEY_ID"
         "--env" "AWS_SECRET_ACCESS_KEY"
         "--env" "AWS_SESSION_TOKEN"
+        "--env" "GOOGLE_APPLICATION_JSON"
         "--env" "test_container_name=${test_container_name}"
         "--env" "test_build_slug=${test_build_slug}"
         "--env" "test_proxy_container_name=${test_proxy_container_name}"
