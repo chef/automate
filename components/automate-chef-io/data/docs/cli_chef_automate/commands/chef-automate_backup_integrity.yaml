@@ -16,6 +16,8 @@ inherited_options:
   shorthand: d
   default_value: "false"
   usage: Enable debug output
+- name: gcs-credentials-path
+  usage: The path to the GCP service account json file
 - name: no-check-version
   default_value: "false"
   usage: Disable version check
