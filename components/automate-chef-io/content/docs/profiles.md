@@ -43,6 +43,10 @@ Uploads use either the `.tar.gz` or zip archive file formats.
 
 All profiles are stored in PostgreSQL, and are covered by backup and restore functionality.
 
+{{% info %}}
+All profiles should have a valid version in their inspec.yml. Older versions of Automate require at least three elements of the form x.y.z, for example "1.2.0", and optionally can have one more element, like "1.2.0-20". Newer versions allow both two element and three element profile versions.
+{{% /info %}}
+
 ### Updating profiles
 
 New releases of profiles are shipped with the product when available.
