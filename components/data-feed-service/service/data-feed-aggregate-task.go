@@ -150,7 +150,7 @@ func (d *DataFeedAggregateTask) getNodeClientData(ctx context.Context, ipaddress
 			filters = []string{"ipaddress:" + ipaddress}
 		}
 		// get the attributes and last client run data of each node
-		nodeData, err = d.getNodeData(ctx, d.cfgMgmt, filters)
+		nodeData, err = d.getNodeData(ctx, filters)
 
 	} else if nodeID.ClientID == "" && updatedNodesOnly {
 		// get hosts data
@@ -172,9 +172,10 @@ func (d *DataFeedAggregateTask) getNodeClientData(ctx context.Context, ipaddress
 	return nodeData, nil
 }
 
-func (d *DataFeedAggregateTask) getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (map[string]interface{}, error) {
+func (d *DataFeedAggregateTask) getNodeData(ctx context.Context, filters []string) (map[string]interface{}, error) {
 
 	nodeData := make(map[string]interface{})
+	client := d.cfgMgmt
 	nodeId, lastRunId, err := getNodeFields(ctx, client, filters)
 	if err != nil {
 		return nodeData, err
