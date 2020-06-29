@@ -19,7 +19,6 @@ import (
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline"
-	"github.com/chef/automate/components/notifications-client/builder"
 	"github.com/chef/automate/components/notifications-client/notifier"
 )
 
@@ -38,7 +37,7 @@ func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.No
 	messageBufferSize int) *ComplianceIngestServer {
 
 	compliancePipeline := pipeline.NewCompliancePipeline(esClient,
-		authzProjectsClient, mgrClient, messageBufferSize)
+		authzProjectsClient, mgrClient, messageBufferSize, notifierClient, automateURL)
 
 	return &ComplianceIngestServer{
 		compliancePipeline: compliancePipeline,
@@ -87,29 +86,7 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 			}
 		}
 	}
-
-	logrus.Debugf("Calling handleNotifications for report id %s", in.ReportUuid)
-	err = s.handleNotifications(ctx, in)
-	if err != nil {
-		logrus.Errorf("ProcessComplianceReport unable to send notification: %s", err.Error())
-	}
 	logrus.Debugf("Calling compliancePipeline.Run for report id %s", in.ReportUuid)
 	err = s.compliancePipeline.Run(in)
 	return &gp.Empty{}, err
-}
-
-func (s *ComplianceIngestServer) handleNotifications(ctx context.Context, report *compliance.Report) error {
-	if s.notifierClient == nil {
-		return fmt.Errorf("no notifier client found")
-	}
-
-	ev, err := builder.Compliance(s.automateURL, report)
-	if err != nil {
-		// We treat notification errors as non fatal
-		logrus.WithFields(logrus.Fields{"id": report.ReportUuid}).Warnf("Could not build notifications InSpec event: %v", err)
-	} else {
-		// This happens asynchronously
-		s.notifierClient.Send(ctx, ev)
-	}
-	return nil
 }

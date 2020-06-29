@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/publisher"
+	"github.com/chef/automate/components/notifications-client/notifier"
 )
 
 var ErrQueueFull = errors.New("Report processing queue is full")
@@ -24,13 +25,13 @@ type Compliance struct {
 }
 
 func NewCompliancePipeline(client *ingestic.ESClient, authzClient authz.ProjectsClient,
-	nodeMgrClient manager.NodeManagerServiceClient, messageBufferSize int) Compliance {
+	nodeMgrClient manager.NodeManagerServiceClient, messageBufferSize int, notifierClient notifier.Notifier, automateURL string) Compliance {
 	in := make(chan message.Compliance, messageBufferSize)
 	compliancePipeline(in,
 		processor.ComplianceProfile(client),
 		processor.ComplianceShared,
 		processor.ComplianceSummary,
-		processor.ComplianceReport,
+		processor.ComplianceReport(notifierClient, automateURL),
 		processor.BundleReportProjectTagger(authzClient),
 		publisher.BuildNodeManagerPublisher(nodeMgrClient),
 		publisher.StoreCompliance(client, 100))

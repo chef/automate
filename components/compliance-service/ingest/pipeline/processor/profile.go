@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
+
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -140,6 +141,7 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processed Compliance Profile")
 			message.Propagate(out, &msg)
+
 		}
 		close(out)
 	}()
