@@ -115,22 +115,11 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		trialLicenseURL,
 	))
 
-	if cdsClient, err := clients.CdsClient(); err != nil {
-		logCtx := log.WithFields(log.Fields{
-			"service": "automate-cds",
-			"error":   err,
-		})
-		if errors.Is(err, ErrNoConnectionConfigured) {
-			// If we dont have cds configuration, return an unimplemented server
-			logCtx.Debug("Could not create client")
-			pb_cds.RegisterCdsServer(grpcServer, &pb_cds.UnimplementedCdsServer{})
-		} else {
-			// Something else went wrong
-			logCtx.Fatal("Could not create client")
-		}
-	} else {
-		pb_cds.RegisterCdsServer(grpcServer, handler.NewCdsServer(cdsClient))
+	cdsClient, err := clients.CdsClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for content-delivery-service")
 	}
+	pb_cds.RegisterCdsServer(grpcServer, handler.NewCdsServer(cdsClient))
 
 	cfgMgmtClient, err := clients.CfgMgmtClient()
 	if err != nil {

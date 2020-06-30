@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/cds"
 	"github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
@@ -36,6 +37,7 @@ func NewServer() *grpc.Server {
 	s := grpc.NewServer()
 
 	applications.RegisterApplicationsServiceServer(s, &applications.UnimplementedApplicationsServiceServer{})
+	cds.RegisterCdsServer(s, &cds.UnimplementedCdsServer{})
 	authn.RegisterAuthenticationServer(s, &authn.UnimplementedAuthenticationServer{})
 	authz.RegisterPoliciesServer(s, &authz.UnimplementedPoliciesServer{})
 	cc_ingest.RegisterComplianceIngesterServer(s, &cc_ingest.UnimplementedComplianceIngesterServer{})
