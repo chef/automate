@@ -9,7 +9,6 @@ test_skip_diagnostics=true
 do_deploy() {
     #shellcheck disable=SC2154
     chef-automate deploy config.toml \
-        --product automate \
         --product automate-dev \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \

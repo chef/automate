@@ -54,7 +54,7 @@ Chef Automate and Chef Habitat Builder require:
 * `systemd` as the init system
 * `useradd`
 * `curl` or `wget`
-* The shell that starts Automate should have a max open files setting of at least 65535
+* The shell that starts Chef Automate should have a max open files setting of at least 65535
 * Run the installation and bootstrapping procedures as the superuser or use `sudo` at the start of each command.
 
 ### Unsupported Topologies
@@ -73,21 +73,18 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 
 ### Deploy Chef Automate and Chef Habitat Builder On-prem
 
-Deploying Chef Habitat Builder with Chef Automate requires a Chef Automate license. If you
-already have a Chef Automate license, you may use it for the deployment. Otherwise, you
-can accept the 30-day trial license when you first sign in to Chef Automate.
+Deploying Chef Habitat Builder with Chef Automate requires a Chef Automate license.
+If you already have a Chef Automate license, you may use it for the deployment.
+Otherwise, you can accept the 30-day trial license when you first sign in to Chef Automate.
 
-If you are deploying Chef Habitat Builder with Chef Automate in an airgapped environment,
-follow [the documentation on building an airgap bundle]({{< relref "airgapped-installation.md" >}}).
+If you are deploying Chef Habitat Builder with Chef Automate in an airgapped environment, follow [the documentation on building an airgap bundle]({{< relref "airgapped-installation.md" >}}).
 
-You can deploy Chef Habitat Builder either with a full Chef Automate installation
-or with the Chef Automate auth stack only.
-
+You can deploy Chef Habitat Builder either with a full Chef Automate installation or with the Chef Automate auth stack only.
 
 #### Deploy Chef Automate and Chef Habitat Builder
 
-To deploy Chef Automate and Chef Habitat Builder, specify both the `builder` and `automate`
-products on the command line. For example:
+To deploy Chef Automate and Chef Habitat Builder, specify both the `builder` and `automate` products on the command line.
+For example:
 
 ```shell
  ./chef-automate deploy --product builder --product automate
@@ -97,8 +94,8 @@ Accept the license with `y`.
 
 #### Deploy Chef Habitat Builder with Chef Automate Auth
 
-To deploy Chef Habitat Builder with the Chef Automate UI and Auth services only, specify the `builder`
-product on the command line. For example:
+To deploy Chef Habitat Builder with the Chef Automate UI and Auth services only, specify the `builder` product on the command line.
+For example:
 
 ```shell
  ./chef-automate deploy --product builder
@@ -106,10 +103,8 @@ product on the command line. For example:
 
 Accept the license with `y`.
 
-Please note that the Chef Automate UI will only support managing Users, Groups,
-and Authorization policies when deployed without the full Chef Automate stack.
-If you wish to enable all of Chef Automate at a later time you can update the
-product configuration to include the complete Chef Automate stack. For example:
+Please note that the Chef Automate UI will only support managing Users, Groups, and Authorization policies when deployed without the full Chef Automate stack.
+If you wish to enable all of Chef Automate at a later time you can update the product configuration to include the complete Chef Automate stack. For example:
 
 1. Create a new patch configuration toml as `config.toml` and update the products
   to include both `builder` and `automate`:
@@ -162,6 +157,7 @@ product configuration to include the complete Chef Automate stack. For example:
       Started automate-load-balancer
     Success: Configuration patched
     ```
+
 #### Add Chef Habitat Builder to a Chef Automate Installation
 
 Patch an existing Chef Automate installation to add Chef Habitat Builder:
@@ -173,12 +169,13 @@ Patch an existing Chef Automate installation to add Chef Habitat Builder:
        products=["automate", "builder"]
     ```
 
-2. Apply the patch to the Chef Automate installation:
+1. Apply the patch to the Chef Automate installation:
 
     ```shell
        sudo chef-automate config ./patch.toml
     ```
-   The command output shows the Chef Habitat Builder services being added:
+
+    The command output shows the Chef Habitat Builder services being added:
 
     ```shell
        Updating deployment configuration
@@ -195,6 +192,7 @@ Patch an existing Chef Automate installation to add Chef Habitat Builder:
          Started automate-load-balancer
        Success: Configuration patched
     ```
+
 ### Sign in to Chef Automate and the Chef Habitat Builder
 
 1. View your login credentials in the terminal with:
@@ -219,7 +217,7 @@ Patch an existing Chef Automate installation to add Chef Habitat Builder:
 1. Select **Sign in with Chef Automate**
 1. Sign into Chef Habitat Builder using the same credentials used with Chef Automate
 
-The Automate-deployed Chef Habitat Builder supports authentication with local users only. We plan on adding more authentication methods in future releases.
+The Chef Automate-deployed Chef Habitat Builder supports authentication with local users only. We plan on adding more authentication methods in future releases.
 
 ### Generate a Chef Habitat on-prem Builder Personal Access Token
 
@@ -227,9 +225,18 @@ You need a Personal Access Token for Chef Habitat on-prem in order to bootstrap 
 
 Select your Gravatar icon on the top right corner of the Chef Habitat Builder web page, and then select Profile. This will take you to a page where you can generate your access token. Make sure to save it securely.
 
-### Create the core origin
+### Create the Core Origin
 
 Once you are signed in to the Chef Habitat Builder UI, select the **New Origin** button and enter `core` as the name for the origin.
+
+## Access Chef Habitat Builder On-prem With Chef Habitat Command-Line Tools
+
+Use the `https://{{< example_fqdn "automate" >}}/bldr/v1` URL when accessing your Chef Habitat Builder installation with the Chef Habitat command-line tools.
+The Chef Habitat command-line tools recognize the [`HAB_BLDR_URL` environment variable](https://www.habitat.sh/docs/reference/), which you can set on the command line with:
+
+```bash
+export HAB_BLDR_URL=https://{{< example_fqdn "automate" >}}/bldr/v1/
+```
 
 ## Bootstrap Chef Habitat Builder with Core Packages (Optional)
 
@@ -288,7 +295,7 @@ HAB_AUTH_TOKEN=<your_public_builder_personal_access_token> hab pkg download --ta
 
 ### Bulk-Upload Seed List Packages to Chef Habitat Builder on-prem
 
-Run the `bulkupload` command to upload artifacts from `<artifact-dir>` to the `<channel>` channel in on-premises Chef Habitat Builder:
+Run the `bulkupload` command to upload artifacts from `<artifact-dir>` to the `<channel>` channel in the on-premises Chef Habitat Builder using the [Builder API endpoint]({{< ref "on-prem-builder.md#access-chef-habitat-builder-on-prem-with-chef-habitat-command-line-tools" >}}):
 
 ```shell
 HAB_AUTH_TOKEN=<your_on-prem_Builder_personal_access_token> hab pkg bulkupload --url https://{{< example_fqdn "automate" >}}/bldr/v1 --channel <channel> <artifact-dir> --auto-create-origins
@@ -326,17 +333,14 @@ use the Chef Habitat Builder UI to create the necessary origins before running t
 
 To finish up, return to your Chef Habitat Builder on-prem installation and view the packages that you've added to your `core` origin at `https://{{< example_fqdn "automate" >}}/bldr/#/origins/core/packages`.
 
+## Using Chef Habitat Builder
+
+Because you are using an on-prem installation of Chef Habitat Builder, you must specify the [Builder API endpoint of your installation]({{< ref "on-prem-builder.md#access-chef-habitat-builder-on-prem-with-habitat-command-line-tools" >}}) when following the [Habitat Builder documentation](https://www.habitat.sh/docs/using-builder/).
+This documentation covers [using origin keys](https://www.habitat.sh/docs/using-builder/#using-origin-secrets), [using origin secrets](https://www.habitat.sh/docs/using-builder/#using-origin-secrets), and [uploading and promoting packages](https://www.habitat.sh/docs/using-builder/#upload-and-promote-packages).
+
 ## Operating Chef Habitat Builder
 
 Chef Habitat Builder uses the same mechanisms that Chef Automate does for [backups]({{< relref "backup.md" >}}), [log management]({{< relref "log-management.md" >}}), and [uninstalling]({{< relref "troubleshooting.md#uninstalling-chef-automate" >}}).
-
-### Chef Habitat Environment Variables
-
-Set the Chef Habitat Builder on-prem `HAB_BLDR_URL` environment variable on the command line with:
-
-```bash
-export HAB_BLDR_URL=https://{{< example_fqdn "automate" >}}/bldr/v1/
-```
 
 ### Logging errors
 
@@ -354,7 +358,7 @@ scoped_levels = ["tokio_core=error", "tokio_reactor=error", "zmq=error", "hyper=
 These instructions have been deprecated in favor of using the Chef Automate installer to deploy Chef Habitat on-prem.
 {{< /warning >}}
 
-To configure Chef Automate as an OAuth Provider for Habitat Builder, create a TOML file with the partial configuration below.
+To configure Chef Automate as an OAuth Provider for Chef Habitat Builder, create a TOML file with the partial configuration below.
 Run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 `bldr_client_id` and `bldr_client_secret` simply need to match what you configured for the corresponding
@@ -373,8 +377,8 @@ bldr_client_id = "<your Habitat Builder Oauth2 Client ID>"
 bldr_client_secret = "<your Habitat Builder Oauth2 Client Secret>"
 ```
 
-In addition, add Automate's TLS certificate to Builder's list of accepted certificates.
-Locate Automate's default self-signed certificate by running `cat /hab/svc/automate-load-balancer/data/{{< example_fqdn "automate" >}}.cert`, copy this default certificate, and then add it to your Builder instance's list of accepted certificates.
+In addition, add Chef Automate's TLS certificate to Builder's list of accepted certificates.
+Locate Chef Automate's default self-signed certificate by running `cat /hab/svc/automate-load-balancer/data/{{< example_fqdn "automate" >}}.cert`, copy this default certificate, and then add it to your Builder instance's list of accepted certificates.
 
 ```text
 -----BEGIN CERTIFICATE-----
