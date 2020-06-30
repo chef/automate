@@ -249,7 +249,6 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
       return job;
     });
-    console.log(jobs);
 
     this.store.dispatch(new ConfigureSettings({jobs: jobs}));
   }

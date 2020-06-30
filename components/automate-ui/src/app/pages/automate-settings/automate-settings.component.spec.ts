@@ -318,7 +318,7 @@ describe('AutomateSettingsComponent', () => {
         ]);
       });
 
-      function genInjestJob(category: string, name: string, threshold: string, disabled: boolean) {
+      function genIngestJob(category: string, name: string, threshold: string, disabled: boolean) {
         return { category, name, threshold, disabled };
       }
 
@@ -372,14 +372,14 @@ describe('AutomateSettingsComponent', () => {
 
       using([
         // Client Runs
-        ['clientRunsRemoveNodes', genInjestJob('infra', 'missing_nodes_for_deletion', '5m', false)],
-        ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes', '6h', false)],
+        ['clientRunsRemoveNodes', genIngestJob('infra', 'missing_nodes_for_deletion', '5m', false)],
+        ['clientRunsLabelMissing', genIngestJob('infra', 'missing_nodes', '6h', false)],
 
         // Services
         ['serviceGroupNoHealthChecks',
-          genInjestJob('services', 'disconnected_services', '32m', false)],
+          genIngestJob('services', 'disconnected_services', '32m', false)],
         ['serviceGroupRemoveServices',
-          genInjestJob('services', 'delete_disconnected_services', '18d', false)]
+          genIngestJob('services', 'delete_disconnected_services', '18d', false)]
       ], function (formName: string, job: IngestJob) {
         it(`when updating ${formName} form,
               the form data is extracted from the non-nested form`, () => {
@@ -430,14 +430,14 @@ describe('AutomateSettingsComponent', () => {
 
       using([
         // Client Runs
-        ['clientRunsRemoveNodes', genInjestJob('infra', 'missing_nodes_for_deletion', '5m', true)],
-        ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes', '6h', true)],
+        ['clientRunsRemoveNodes', genIngestJob('infra', 'missing_nodes_for_deletion', '5m', true)],
+        ['clientRunsLabelMissing', genIngestJob('infra', 'missing_nodes', '6h', true)],
 
         // Services
         ['serviceGroupNoHealthChecks',
-          genInjestJob('services', 'disconnected_services', '32m', true)],
+          genIngestJob('services', 'disconnected_services', '32m', true)],
         ['serviceGroupRemoveServices',
-          genInjestJob('services', 'delete_disconnected_services', '18d', true)]
+          genIngestJob('services', 'delete_disconnected_services', '18d', true)]
       ], function (formName: string, job: IngestJob) {
         it(`when ${formName} form is saved as disabled, unit and threshold are undefined
               because they are not present in the non-nested form anymore`, () => {
