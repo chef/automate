@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 
 import { CapitalizePipe } from './capitalize.pipe';
+import { CastFormGroupPipe } from './cast-formgroup.pipe';
 import { ContinuousPipe } from './continuous.pipe';
 import { ChefStatusIconPipe } from './chef-status-icon.pipe';
 import { DatetimePipe } from './datetime.pipe';
@@ -17,6 +18,7 @@ import { TimeFromNowPipe } from './time-from-now.pipe';
 @NgModule({
   declarations: [
     CapitalizePipe,
+    CastFormGroupPipe,
     ContinuousPipe,
     ChefStatusIconPipe,
     DatetimePipe,
@@ -32,6 +34,7 @@ import { TimeFromNowPipe } from './time-from-now.pipe';
   ],
   exports: [
     CapitalizePipe,
+    CastFormGroupPipe,
     ContinuousPipe,
     ChefStatusIconPipe,
     DatetimePipe,

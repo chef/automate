@@ -5,11 +5,13 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { ROUTER_NAVIGATION } from '@ngrx/router-store';
+
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
-import { ChefSessionService } from '../../services/chef-session/chef-session.service';
-import { JobAddComponent, Step } from './job-add.component';
+import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
+import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
+import { JobAddComponent, Step } from './job-add.component';
 
 const changeStep = fragment => {
   return {
@@ -35,6 +37,7 @@ describe('JobAddComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
+        ChefPipesModule,
         ReactiveFormsModule,
         RouterTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })

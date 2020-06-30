@@ -19,11 +19,11 @@
     </label>
 
     <ng-container [ngSwitch]="integrationsForm.controls.type.value">
-      <app-aws-integration-form *ngSwitchCase="'aws'" [formGroup]="integrationsForm.controls.aws">
+      <app-aws-integration-form *ngSwitchCase="'aws'" [formGroup]="integrationsForm.controls.aws | castFormGroup">
       </app-aws-integration-form>
-      <app-azure-integration-form *ngSwitchCase="'azure'" [formGroup]="integrationsForm.controls.azure">
+      <app-azure-integration-form *ngSwitchCase="'azure'" [formGroup]="integrationsForm.controls.azure | castFormGroup">
       </app-azure-integration-form>
-      <app-gcp-integration-form *ngSwitchCase="'gcp'" [formGroup]="integrationsForm.controls.gcp">
+      <app-gcp-integration-form *ngSwitchCase="'gcp'" [formGroup]="integrationsForm.controls.gcp | castFormGroup">
       </app-gcp-integration-form>
     </ng-container>
 
