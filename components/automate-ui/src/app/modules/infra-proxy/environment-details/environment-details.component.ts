@@ -91,8 +91,8 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
     ).subscribe(environment => {
       this.show = true;
       this.environment = environment;
-      this.cookbookVersions = environment.cookbook_versions.filter(Boolean);
-      if (this.cookbookVersions.length > 0) {
+      this.cookbookVersions = environment.cookbook_versions;
+      if (Object.keys(environment.cookbook_versions).length > 0) {
         this.hasCookbookConstraints = true;
       }
       this.attributes = new EnvironmentAttributes(this.environment);
