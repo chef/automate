@@ -139,9 +139,12 @@
     </chef-tbody>
   </chef-table>
   <app-page-picker
-    [total]="totalDesktops"
+    [forDesktop]="true"
+    [fullScreened]="fullscreened"
+    [totalItems]="totalDesktops"
     [perPage]="pageSize"
     [page]="currentPage"
-    (pageChanged)="onPageChange($event)">
+    (pageChanged)="onPageChange($event)"
+    (pageSizeChanged)="onPageSizeChanged($event)">
   </app-page-picker>
 </div>

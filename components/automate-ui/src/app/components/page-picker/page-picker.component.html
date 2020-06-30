@@ -1,35 +1,83 @@
 <ng-container *ngIf="selectablePages.length > 1">
-  <chef-button secondary
-    class="page-picker-item page-picker-first"
-    (click)="onItemTap(first)"
-    [disabled]="isNull(prev)">
-    <chef-icon>first_page</chef-icon>
-  </chef-button>
-  <chef-button secondary
-    class="page-picker-item page-picker-prev"
-    (click)="onItemTap(prev)"
-    [disabled]="isNull(prev)">
-    <chef-icon>chevron_left</chef-icon>
-  </chef-button>
-  <chef-button
-    *ngFor="let item of selectablePages; trackBy: trackBy"
-    class="page-picker-item"
-    [attr.primary]="item === page"
-    [attr.secondary]="item !== page"
-    [attr.disabled]="selectablePages.length <= 1"
-    (click)="onItemTap(item)">
-    {{ item }}
-  </chef-button>
-  <chef-button secondary
-    class="page-picker-item page-picker-next"
-    (click)="onItemTap(next)"
-    [disabled]="isNull(next)">
-    <chef-icon>chevron_right</chef-icon>
-  </chef-button>
-  <chef-button secondary
-    class="page-picker-item page-picker-last"
-    (click)="onItemTap(last)"
-    [disabled]="isNull(next)">
-    <chef-icon>last_page</chef-icon>
-  </chef-button>
+  <ng-container *ngIf="!forDesktop">
+    <chef-button secondary
+      class="page-picker-item page-picker-first"
+      (click)="onItemTap(first)"
+      [disabled]="isNull(prev)">
+      <chef-icon>first_page</chef-icon>
+    </chef-button>
+    <chef-button secondary
+      class="page-picker-item page-picker-prev"
+      (click)="onItemTap(prev)"
+      [disabled]="isNull(prev)">
+      <chef-icon>chevron_left</chef-icon>
+    </chef-button>
+    <chef-button
+      *ngFor="let item of selectablePages; trackBy: trackBy"
+      class="page-picker-item"
+      [attr.primary]="item === page"
+      [attr.secondary]="item !== page"
+      [attr.disabled]="selectablePages.length <= 1"
+      (click)="onItemTap(item)">
+      {{ item }}
+    </chef-button>
+    <chef-button secondary
+      class="page-picker-item page-picker-next"
+      (click)="onItemTap(next)"
+      [disabled]="isNull(next)">
+      <chef-icon>chevron_right</chef-icon>
+    </chef-button>
+    <chef-button secondary
+      class="page-picker-item page-picker-last"
+      (click)="onItemTap(last)"
+      [disabled]="isNull(next)">
+      <chef-icon>last_page</chef-icon>
+    </chef-button>
+  </ng-container>
+
+  <!-- new styles being used only for desktop at the moment -->
+  <ng-container *ngIf="forDesktop">
+    <div class="bx--row">
+      <div class="column information-container ">
+        <div class="per-page-container">
+          <span class="items-per">Items per page: </span>
+            <mat-form-field appearance="none">
+              <mat-select panelClass="chef-dropdown" [value]="perPage">
+                <mat-option *ngFor="let amount of perPageOptions" [value]="amount" 
+                (onSelectionChange)="handleSelectPerPageItems($event, amount)">{{ amount }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+        </div>
+        <span>{{ itemStartCount }} - {{ itemEndCount | paginationTrueEnd: totalItems }} of {{ totalItems }} items</span>
+      </div>
+
+      <div class="column column--2">
+        <div class="arrow-field-container">
+          <div class="arrow-field-item dropdown">
+            <mat-form-field appearance="none">
+              <mat-select panelClass="chef-dropdown" [value]="page">
+                <mat-option *ngFor="let item of allPages; trackBy: trackBy"
+                (onSelectionChange)="handleSelectItem($event, item)"
+                [attr.disabled]="allPages.length <= 1"
+                [value]="item">{{ item }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="arrow-field-item of-pages-container">
+            <span>of {{ allPages.length }} pages</span>
+          </div>
+          <div class="arrow-field-item">
+            <chef-button secondary class="page-picker-item page-picker-prev" (click)="onItemTap(prev)" [disabled]="isNull(prev)">
+              <chef-icon>chevron_left</chef-icon>
+            </chef-button>
+            <chef-button secondary class="page-picker-item page-picker-next" (click)="onItemTap(next)" [disabled]="isNull(next)">
+              <chef-icon>chevron_right</chef-icon>
+            </chef-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <!-- end forDesktop -->
+
 </ng-container>

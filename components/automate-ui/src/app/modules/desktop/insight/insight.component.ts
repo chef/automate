@@ -1,15 +1,15 @@
 import { Component, HostBinding, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Desktop, TermFilter } from 'app/entities/desktop/desktop.model';
-import { FilterUpdate } from 'app/page-components/insight-attributes-dropdown/insight-attributes-dropdown.model';
 import { finalize } from 'rxjs/operators';
 import * as moment from 'moment/moment';
 import { saveAs } from 'file-saver';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { ClientRunsRequests } from 'app/entities/client-runs/client-runs.requests';
 import { clientRunsState } from 'app/entities/client-runs/client-runs.selectors';
+import { Desktop, TermFilter, PageSizeChangeEvent } from 'app/entities/desktop/desktop.model';
 import { NodeFilter } from 'app/entities/client-runs/client-runs.model';
+import { FilterUpdate } from 'app/page-components/insight-attributes-dropdown/insight-attributes-dropdown.model';
 
 @Component({
   selector: 'app-insight',
@@ -29,6 +29,7 @@ export class InsightComponent implements OnInit {
   @Output() closed: EventEmitter<any> = new EventEmitter();
   @Output() fullscreenToggled: EventEmitter<any> = new EventEmitter();
   @Output() pageChange: EventEmitter<number> = new EventEmitter();
+  @Output() pageSizeChange: EventEmitter<PageSizeChangeEvent> = new EventEmitter();
   @Output() termFilterSelected: EventEmitter<TermFilter> = new EventEmitter();
   // Returns 'name', 'check-in', or 'platform'
   @Output() sortChange: EventEmitter<string> = new EventEmitter();
@@ -59,6 +60,13 @@ export class InsightComponent implements OnInit {
 
   public onPageChange(pageNumber) {
     this.pageChange.emit(pageNumber);
+  }
+
+  public onPageSizeChanged(event: PageSizeChangeEvent) {
+    this.pageSizeChange.emit({
+      pageSize: event.pageSize,
+      updatedPageNumber: event.updatedPageNumber
+    });
   }
 
   public termFilterClicked(term: TermFilter): void {

@@ -96,3 +96,8 @@ export interface TermFilter {
   type: string;
   value: string;
 }
+
+export interface PageSizeChangeEvent {
+  pageSize: number;
+  updatedPageNumber: number;
+}
