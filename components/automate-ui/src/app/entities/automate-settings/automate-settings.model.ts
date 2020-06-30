@@ -157,15 +157,14 @@ export interface JobRequestBody {
   event_feed: {
     job_settings: JobRequestComponent[];
   };
-  // services has not yet been implemented so we will leave as optional for now
-  services?: {
+  services: {
     job_settings: JobRequestComponent[];
   };
 }
 
 export interface SingleDefaultForm {
   category: JobCategories;
-  name?: string;                  // TODO; make stricter after services implemented
+  name: InfraJobName | ServicesJobName;
   nested_name?: NestedJobName;
   unit: {
     value: string;

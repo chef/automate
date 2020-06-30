@@ -89,6 +89,7 @@ export class AutomateSettingsRequests {
           thisJob = this.unfurlIngestJob(job);
           // Protect against an undefined value
           if (body[job.category].job_settings) {
+            console.log(job.name);
             body[job.category].job_settings.push(thisJob);
           } else {
             console.error(`Error: unable to save ${job.name}.`);

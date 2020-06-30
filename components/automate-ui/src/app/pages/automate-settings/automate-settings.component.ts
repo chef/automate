@@ -22,7 +22,8 @@ import {
   InfraJobName,
   NestedJobName,
   DefaultFormData,
-  JobCategories
+  JobCategories,
+  ServicesJobName
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
@@ -226,7 +227,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       // Extract the raw values from the formGroup so that
       // we can make sure to keep disabled inputs populated in the UI
       const jobForm = this[jobName].getRawValue();
-
+      console.log(jobForm);
       const isNested = jobForm.nested_name ? true : false;
       const job = new IngestJob(null, null);
       job.category = jobForm.category;
@@ -248,6 +249,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
       return job;
     });
+    console.log(jobs);
 
     this.store.dispatch(new ConfigureSettings({jobs: jobs}));
   }
@@ -301,8 +303,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
 
       switch (job.category) {
+        case 'services':
         case 'infra': {
-          this.populateInfra(job);
+          this.populateNonNested(job);
         }
         break;
 
@@ -331,7 +334,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     ];
   }
 
-  private populateInfra(job: IngestJob): void {
+  private populateNonNested(job: IngestJob): void {
     let formThreshold, formUnit;
 
     switch (job.name) {
@@ -371,6 +374,26 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         this.populateNested(job);
       }
       break;
+
+      case ServicesJobName.DisconnectedServices:
+        this.handleDisable(this.serviceGroupNoHealthChecks, job.disabled);
+        [formThreshold, formUnit] = this.splitThreshold(job.threshold);
+        this.serviceGroupNoHealthChecks.patchValue({
+          unit: formUnit,
+          threshold: formThreshold,
+          disabled: job.disabled
+        });
+        break;
+
+      case ServicesJobName.DeleteDisconnectedServices:
+        this.handleDisable(this.serviceGroupRemoveServices, job.disabled);
+        [formThreshold, formUnit] = this.splitThreshold(job.threshold);
+        this.serviceGroupRemoveServices.patchValue({
+          unit: formUnit,
+          threshold: formThreshold,
+          disabled: job.disabled
+        });
+        break;
 
       default:
         break;
@@ -450,17 +473,17 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       },
       serviceGroupNoHealthChecks: {
         category: JobCategories.Services,
-        name: '',
-        unit: { value: 'm', disabled: true},
-        threshold: [{ value: '5', disabled: true }, Validators.required],
-        disabled: false // special case: only alterable by the API so we want to show as enabled
+        name: 'disconnected_services',
+        unit: { value: 'm', disabled: false},
+        threshold: [{ value: '5', disabled: false }, Validators.required],
+        disabled: false
       },
       serviceGroupRemoveServices: {
         category: JobCategories.Services,
-        name: '',
-        unit: { value: 'd', disabled: true },
-        threshold: [{ value: '5', disabled: true }, Validators.required],
-        disabled: false // special case: API not ready to alter
+        name: 'delete_disconnected_services',
+        unit: { value: 'd', disabled: false },
+        threshold: [{ value: '5', disabled: false }, Validators.required],
+        disabled: false
       },
       clientRunsRemoveData: {
         category: JobCategories.Infra,
