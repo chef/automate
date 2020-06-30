@@ -320,6 +320,9 @@ var ComplianceSumDate = Mapping{
         "status": {
           "type": "keyword"
         },
+		"status_message": {
+			"type": "keyword"
+		},
         "projects": {
           "type": "keyword"
         },

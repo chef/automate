@@ -63,7 +63,14 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 			}
 			msg.Shared.PerProfileSums = perProfileSums
 			msg.Shared.AllProfileSums = totalSum
-			msg.Shared.Status = compliance.ReportComplianceStatus(totalSum)
+
+			if msg.Report.Status == "failed" && len(msg.Report.Profiles) == 0 {
+				msg.Shared.Status = msg.Report.Status
+				msg.Shared.StatusMessage = msg.Report.StatusMessage
+				logrus.Warn("Report status is failed and there are not profiles")
+			} else {
+				msg.Shared.Status = compliance.ReportComplianceStatus(totalSum)
+			}
 			msg.Shared.EndTime, err = time.Parse(time.RFC3339, msg.Report.EndTime)
 			if err != nil {
 				grpcErr := status.Errorf(codes.Internal, "Unable to Parse end_time: %s", err)
@@ -99,6 +106,7 @@ func ComplianceSummary(in <-chan message.Compliance) <-chan message.Compliance {
 				ControlsSums:     *msg.Shared.AllProfileSums,
 				Profiles:         msg.Shared.PerProfileSums,
 				Status:           msg.Shared.Status,
+				StatusMessage:    msg.Shared.StatusMessage,
 				DocVersion:       compliance.DocVersion,
 				ESTimestamp:      compliance.CurrentTime(),
 				PolicyName:       msg.Report.PolicyName,
