@@ -119,7 +119,7 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 You can apply your Chef Automate license with the `chef-automate license apply` command in one of two ways:
 
-* `chef-automate license apply </path/to/license-file`
+* `chef-automate license apply </path/to/license-file.jwt>`
 * `chef-automate license apply <content-of-license>`
 
 You cannot apply a license after your initial deployment by patching the configuration file.
