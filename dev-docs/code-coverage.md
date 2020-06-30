@@ -8,12 +8,16 @@
   - [Viewing UI Code Coverage](#viewing-ui-code-coverage)
   - [Viewing Go Code Coverage](#viewing-go-code-coverage)
   - [Updating Code Coverage Dashboard](#updating-code-coverage-dashboard)
+    - [Updating UI code coverage files](#updating-ui-code-coverage-files)
+    - [Updating Go code coverage files](#updating-go-code-coverage-files)
 - [Running Code Coverage Locally](#running-code-coverage-locally)
   - [UI Code Coverage](#ui-code-coverage)
   - [Go Code Coverage](#go-code-coverage)
 - [More Information/Discussion](#more-informationdiscussion)
 
 <!-- /TOC -->
+
+_NB: As of 2020-06-03, UI code coverage [here](https://a2-code-coverage.cd.chef.co/automate-ui) is active but Go coverage [here](https://a2-code-coverage.cd.chef.co/) is not.
 
 ## Code Coverage Dashboard
 
@@ -31,11 +35,9 @@ UI code coverage can be viewed at:
 
 <https://a2-code-coverage.cd.chef.co/automate-ui/current/>
 
-Past UI code coverage results can be found at `/YYYY-MM-DD` instead of `/current`
+Past UI code coverage results can be found at the parent page, https://a2-code-coverage.cd.chef.co/automate-ui/, along with a chart showing changes in the last 90 days.
 
-To view what previous dates are available, see [Updating Code Coverage Dashboard](#Updating-Code-Coverage-Dashboard).
-
-Currently this is manually updated periodically.
+This is automatically regenerated with each merged PR.
 
 ### Viewing Go Code Coverage
 
@@ -75,10 +77,13 @@ Currently a work in progress.
 
 ### UI Code Coverage
 
-In A2, go to the automate-ui directory. From this directory, run `make test`. This will run the unit and e2e tests and output code coverage results to a code-coverage directory. To view code-coverage, open the index.html file from this directory in a browser.
+In A2, go to the automate-ui directory. From this directory, run `make test`. This will run the unit and e2e tests and output code coverage results to a `coverage` directory. Open the index.html file in this directory to view the report.
 
 How does 'make test' work:
-The makefile triggers `npm` and uses the run command; this is just a general runner that is looking for a script to run. The scripts it uses are defined in the `package.json` file. There you will fine a test script that is just calling `ng test` with a code coverage option. `ng` is the angular-cli, which uses karma to do testing and provide code coverage. Karma config can be found in `karma.conf.js`.
+The makefile triggers `npm` and uses the run command; this is just a general runner that is looking for a script to run.
+The scripts it uses are defined in the `package.json` file.
+There you will find a test script that is just calling `ng test` with a code coverage option.
+`ng` is the angular-cli, which uses karma to do testing and provide code coverage. Karma config can be found in `karma.conf.js`.
 
 For further details:
 
