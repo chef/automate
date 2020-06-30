@@ -19,7 +19,7 @@ export class CreateOrgModalComponent implements OnInit, OnChanges {
   public conflictError = false;
   public modifyID = false; // Whether the edit ID form is open or not.
   public projectsUpdatedEvent = new EventEmitter();
-  public checkedProjectIDs: string[] = []; // resets project dropdown btwn modal openings
+  public checkedProjectIDs: string[] = []; // resets project dropdown between modal openings
   public UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   ngOnInit() {

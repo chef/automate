@@ -93,7 +93,7 @@ describe('ProfilesOverviewComponent', () => {
         return input.attributes['placeholder'] === 'Search profiles...';
       })).toEqual(true);
 
-      // Profiles and Available tabs are visble.
+      // Profiles and Available tabs are visible.
       const selectors: DebugElement[] = fixture.debugElement.queryAll(By.css('.profiles-tabs'));
       expect(selectors.length > 0).toEqual(true);
 
@@ -449,7 +449,7 @@ describe('ProfilesOverviewComponent', () => {
         return input.attributes['placeholder'] === 'Search profiles...';
       })).toEqual(true);
 
-      // Profiles and Available tabs are visble.
+      // Profiles and Available tabs are visible.
       const selectors: DebugElement[] = fixture.debugElement.queryAll(By.css('.profiles-tabs'));
       expect(selectors.length > 0).toEqual(true);
 
@@ -535,7 +535,7 @@ describe('ProfilesOverviewComponent', () => {
         return input.attributes['placeholder'] === 'Search profiles...';
       })).toEqual(false);
 
-      // Profiles and Available tabs are not visble.
+      // Profiles and Available tabs are not visible.
       const selectors: DebugElement[] = fixture.debugElement.queryAll(By.css('.profiles-tabs'));
       expect(selectors.length > 0).toEqual(false);
 
@@ -621,7 +621,7 @@ describe('ProfilesOverviewComponent', () => {
         return input.attributes['placeholder'] === 'Search profiles...';
       })).toEqual(false);
 
-      // Profiles and Available tabs are not visble.
+      // Profiles and Available tabs are not visible.
       const selectors: DebugElement[] = fixture.debugElement.queryAll(By.css('.profiles-tabs'));
       expect(selectors.length > 0).toEqual(false);
 
