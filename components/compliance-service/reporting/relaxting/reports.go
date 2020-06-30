@@ -601,11 +601,12 @@ func convertControl(profileControlsMap map[string]*reportingapi.Control, reportC
 	for _, tag := range reportControlMin.StringTags {
 		if len(tag.Values) == 0 {
 			jsonTags[tag.Key] = &reportingapi.TagValues{Values: []string{"null"}}
-		}
-		vals := make([]string, 0)
-		for _, val := range tag.Values {
-			vals = append(vals, val)
-			jsonTags[tag.Key] = &reportingapi.TagValues{Values: vals}
+		} else {
+			vals := make([]string, 0)
+			for _, val := range tag.Values {
+				vals = append(vals, val)
+				jsonTags[tag.Key] = &reportingapi.TagValues{Values: vals}
+			}
 		}
 	}
 
@@ -634,7 +635,7 @@ func doesControlTagMatchFilter(filters map[string][]string,
 			trimmed := strings.TrimPrefix(filterKey, "control_tag:")
 			if tagVal, ok := jsonTags[trimmed]; ok {
 				for _, val := range filterVals {
-					if contains(tagVal.Values, val) || val == "null" {
+					if contains(tagVal.Values, val) || nullArrMatchEmptyString(tagVal.Values, val) {
 						return true
 					}
 				}
@@ -646,6 +647,15 @@ func doesControlTagMatchFilter(filters map[string][]string,
 		return false
 	}
 	return true
+}
+
+func nullArrMatchEmptyString(vals []string, val string) bool {
+	if len(vals) == 1 && vals[0] == "null" {
+		if val == "" {
+			return true
+		}
+	}
+	return false
 }
 
 func contains(a []string, x string) bool {
