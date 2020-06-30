@@ -227,7 +227,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       // Extract the raw values from the formGroup so that
       // we can make sure to keep disabled inputs populated in the UI
       const jobForm = this[jobName].getRawValue();
-      console.log(jobForm);
+
       const isNested = jobForm.nested_name ? true : false;
       const job = new IngestJob(null, null);
       job.category = jobForm.category;
