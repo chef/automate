@@ -82,7 +82,7 @@ export enum NonNestedJobName {
 }
 
 // Actions and ConvergeHistory are nested, but contained inside
-// the InfraJobName of PeriodicPurgeTimeseries
+// the NonNestedJobName of PeriodicPurgeTimeseries
 export enum NestedJobName {
   ComplianceReports = 'compliance-reports',
   ComplianceScans = 'compliance-scans',

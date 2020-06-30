@@ -105,9 +105,6 @@
 
           <div class="checkbox-row secondary-row" [formGroup]="serviceGroupRemoveServices">
             <div class="checkbox-container">
-              <chef-tooltip follow position="top" for='service-group-remove-services'>
-                Changing this setting in the UI is not supported.
-              </chef-tooltip>
               <span id="service-group-remove-services">
                 <chef-checkbox
                 [checked]="!serviceGroupRemoveServices.value.disabled"
