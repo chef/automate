@@ -53,4 +53,3 @@ export type ClientActions =
   | GetClient
   | GetClientSuccess
   | GetClientFailure;
-  
