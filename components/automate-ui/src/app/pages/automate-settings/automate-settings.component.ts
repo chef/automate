@@ -19,12 +19,10 @@ import {
   JobSchedulerStatus,
   IngestJob,
   IngestJobs,
-  InfraJobName,
+  NonNestedJobName,
   NestedJobName,
   DefaultFormData,
-  JobCategories,
-  ServicesJobName,
-  NonNestedJobName
+  JobCategories
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
@@ -338,7 +336,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     let formThreshold, formUnit;
 
     switch (job.name) {
-      case InfraJobName.MissingNodesForDeletion: {
+      case NonNestedJobName.MissingNodesForDeletion: {
         if (!this.isDesktopView) {
           this.handleDisable(this.clientRunsRemoveNodes, job.disabled);
         }
@@ -352,7 +350,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       }
       break;
 
-      case InfraJobName.MissingNodes: {
+      case NonNestedJobName.MissingNodes: {
         if (!this.isDesktopView) {
           this.handleDisable(this.clientRunsLabelMissing, job.disabled);
         }
@@ -365,17 +363,17 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       }
       break;
 
-      case InfraJobName.DeleteNodes: {
+      case NonNestedJobName.DeleteNodes: {
         // delete_nodes not yet implemented
       }
       break;
 
-      case InfraJobName.PeriodicPurgeTimeseries: {
+      case NonNestedJobName.PeriodicPurgeTimeseries: {
         this.populateNested(job);
       }
       break;
 
-      case ServicesJobName.DisconnectedServices:
+      case NonNestedJobName.DisconnectedServices:
         this.handleDisable(this.serviceGroupNoHealthChecks, job.disabled);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.serviceGroupNoHealthChecks.patchValue({
@@ -385,7 +383,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         });
         break;
 
-      case ServicesJobName.DeleteDisconnectedServices:
+      case NonNestedJobName.DeleteDisconnectedServices:
         this.handleDisable(this.serviceGroupRemoveServices, job.disabled);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.serviceGroupRemoveServices.patchValue({

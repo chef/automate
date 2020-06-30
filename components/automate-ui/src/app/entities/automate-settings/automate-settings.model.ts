@@ -71,18 +71,6 @@ export enum JobCategories {
   Services = 'services'
 }
 
-export enum InfraJobName {
-  MissingNodes = 'missing_nodes',
-  MissingNodesForDeletion = 'missing_nodes_for_deletion',
-  DeleteNodes = 'delete_nodes',
-  PeriodicPurgeTimeseries = 'periodic_purge_timeseries'
-}
-
-export enum ServicesJobName {
-  DisconnectedServices = 'disconnected_services',
-  DeleteDisconnectedServices = 'delete_disconnected_services'
-}
-
 export enum NonNestedJobName {
   MissingNodes = 'missing_nodes',
   MissingNodesForDeletion = 'missing_nodes_for_deletion',

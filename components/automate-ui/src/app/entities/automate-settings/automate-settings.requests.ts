@@ -11,8 +11,7 @@ import {
   RespJobSchedulerStatus,
   UnfurledJob,
   JobRequestBody,
-  InfraJobName,
-  ServicesJobName,
+  NonNestedJobName,
   JobCategories
 } from './automate-settings.model';
 
@@ -81,11 +80,11 @@ export class AutomateSettingsRequests {
       let thisJob = new UnfurledJob;
 
       switch (job.name) {
-        case InfraJobName.DeleteNodes:                    // fallthrough
-        case InfraJobName.MissingNodes:                   // fallthrough
-        case InfraJobName.MissingNodesForDeletion:        // fallthrough
-        case ServicesJobName.DisconnectedServices:        // fallthrough
-        case ServicesJobName.DeleteDisconnectedServices:
+        case NonNestedJobName.DeleteNodes:                    // fallthrough
+        case NonNestedJobName.MissingNodes:                   // fallthrough
+        case NonNestedJobName.MissingNodesForDeletion:        // fallthrough
+        case NonNestedJobName.DisconnectedServices:        // fallthrough
+        case NonNestedJobName.DeleteDisconnectedServices:
           thisJob = this.unfurlIngestJob(job);
           // Protect against an undefined value
           if (body[job.category].job_settings) {
@@ -95,7 +94,7 @@ export class AutomateSettingsRequests {
           }
           break;
 
-        case InfraJobName.PeriodicPurgeTimeseries:  // fallthrough
+        case NonNestedJobName.PeriodicPurgeTimeseries:  // fallthrough
 
         case 'periodic_purge':                      // all other nested jobs are
                                                     // contained in 'periodic_purge'
