@@ -44,7 +44,7 @@ Uploads use either the `.tar.gz` or zip archive file formats.
 All profiles are stored in PostgreSQL, and are covered by backup and restore functionality.
 
 {{% info %}}
-All profiles should have a valid version in their inspec.yml. Older builds of Automate require at least three elements of the form x.y.z, for example, "1.2.0", and optionally can have one more element, like "1.2.0-20". Newer Automate builds allow both two-element and three-element profile versions.
+All profiles should have a valid version in their `inspec.yml`. Older builds of Chef Automate require at least three elements of the x.y.z form -- for example, "1.2.0" -- and optionally can have one additional element, such as "1.2.0-20". Newer Chef Automate builds allow both two-element and three-element profile versions.
 {{% /info %}}
 
 ### Updating profiles
