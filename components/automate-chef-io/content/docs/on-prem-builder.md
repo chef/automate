@@ -271,7 +271,7 @@ cd on-prem-builder
 The Chef Automate installer uses a self-signed certificate. Copy the SSL public key certificate chain from Chef Automate into `/hab/cache/ssl` with this command:
 
 ```shell
-cp /hab/svc/automate-load-balancer/data/{{< example_fqdn "automate" >}}.cert /hab/cache/ssl/{{< example_fqdn "automate" >}}.crt
+cp /hab/svc/automate-load-balancer/data/{{< example_fqdn "automate" >}}.cert /hab/cache/ssl/{{< example_fqdn "automate" >}}.cert
 ```
 
 ### Download Seed List Packages from the Public Chef Habitat Builder
