@@ -23,7 +23,8 @@ import {
   NestedJobName,
   DefaultFormData,
   JobCategories,
-  ServicesJobName
+  ServicesJobName,
+  NonNestedJobName
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
@@ -456,7 +457,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     return {
       eventFeedRemoveData: {
         category: JobCategories.EventFeed,
-        name: 'periodic_purge',
+        name: NonNestedJobName.PeriodicPurge,
         nested_name: NestedJobName.Feed,
         unit: { value: 'd', disabled: false },
         threshold: [{ value: '30', disabled: false}, Validators.required],
@@ -464,7 +465,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       },
       eventFeedServerActions: {
         category: JobCategories.Infra,
-        name: 'periodic_purge_timeseries',
+        name: NonNestedJobName.PeriodicPurgeTimeseries,
         nested_name: NestedJobName.Actions,
         unit: { value: 'd', disabled: false },
         threshold: [{ value: '30', disabled: false }, Validators.required],
@@ -472,21 +473,21 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       },
       serviceGroupNoHealthChecks: {
         category: JobCategories.Services,
-        name: 'disconnected_services',
+        name: NonNestedJobName.DisconnectedServices,
         unit: { value: 'm', disabled: false},
         threshold: [{ value: '5', disabled: false }, Validators.required],
         disabled: false
       },
       serviceGroupRemoveServices: {
         category: JobCategories.Services,
-        name: 'delete_disconnected_services',
+        name: NonNestedJobName.DeleteDisconnectedServices,
         unit: { value: 'd', disabled: false },
         threshold: [{ value: '5', disabled: false }, Validators.required],
         disabled: false
       },
       clientRunsRemoveData: {
         category: JobCategories.Infra,
-        name: 'periodic_purge_timeseries',
+        name: NonNestedJobName.PeriodicPurgeTimeseries,
         nested_name: NestedJobName.ConvergeHistory,
         unit: { value: 'd', disabled: false },
         threshold: [{ value: '30', disabled: false }, Validators.required],
@@ -494,21 +495,21 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       },
       clientRunsLabelMissing: {
         category: JobCategories.Infra,
-        name: 'missing_nodes',
+        name: NonNestedJobName.MissingNodes,
         unit: { value: 'd', disabled: isDesktopView },
         threshold: [{ value: '30', disabled: isDesktopView }, Validators.required],
         disabled: isDesktopView
       },
       clientRunsRemoveNodes: {
         category: JobCategories.Infra,
-        name: 'missing_nodes_for_deletion',
+        name: NonNestedJobName.MissingNodesForDeletion,
         unit: { value: 'd', disabled: isDesktopView },
         threshold: [{ value: '30', disabled: isDesktopView }, Validators.required],
         disabled: isDesktopView
       },
       complianceRemoveReports: {
         category: JobCategories.Compliance,
-        name: 'periodic_purge',
+        name: NonNestedJobName.PeriodicPurge,
         nested_name: NestedJobName.ComplianceReports,
         unit: { value: 'd', disabled: false },
         threshold: [{ value: '30', disabled: false }, Validators.required],
@@ -516,7 +517,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       },
       complianceRemoveScans: {
         category: JobCategories.Compliance,
-        name: 'periodic_purge',
+        name: NonNestedJobName.PeriodicPurge,
         nested_name: NestedJobName.ComplianceScans,
         unit: { value: 'd', disabled: false },
         threshold: [{ value: '30', disabled: false }, Validators.required],

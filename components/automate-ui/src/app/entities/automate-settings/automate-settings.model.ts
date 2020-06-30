@@ -83,6 +83,16 @@ export enum ServicesJobName {
   DeleteDisconnectedServices = 'delete_disconnected_services'
 }
 
+export enum NonNestedJobName {
+  MissingNodes = 'missing_nodes',
+  MissingNodesForDeletion = 'missing_nodes_for_deletion',
+  DeleteNodes = 'delete_nodes',
+  PeriodicPurge = 'periodic_purge',
+  PeriodicPurgeTimeseries = 'periodic_purge_timeseries',
+  DisconnectedServices = 'disconnected_services',
+  DeleteDisconnectedServices = 'delete_disconnected_services'
+}
+
 // Actions and ConvergeHistory are nested, but contained inside
 // the InfraJobName of PeriodicPurgeTimeseries
 export enum NestedJobName {
@@ -164,7 +174,7 @@ export interface JobRequestBody {
 
 export interface SingleDefaultForm {
   category: JobCategories;
-  name: InfraJobName | ServicesJobName;
+  name: NonNestedJobName;
   nested_name?: NestedJobName;
   unit: {
     value: string;

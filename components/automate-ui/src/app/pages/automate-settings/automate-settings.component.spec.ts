@@ -180,10 +180,7 @@ describe('AutomateSettingsComponent', () => {
 
     describe('handleFormActivation()', () => {
 
-      using(ALL_FORMS
-          // Service Groups are not currently uncheckable through the UI
-          .filter( form => !['serviceGroupNoHealthChecks', 'serviceGroupRemoveServices']
-          .includes(form)),
+      using(ALL_FORMS.map( form => form ),
           function( form: string) {
         it(`deactivates the associated ${form} form`, () => {
           expect(component[form].value.disabled).toEqual(false);
@@ -194,10 +191,7 @@ describe('AutomateSettingsComponent', () => {
         });
       });
 
-      using(ALL_FORMS
-          // Service Groups are not currently uncheckable through the UI
-          .filter( form => !['serviceGroupsNoHealthChecks', 'serviceGroupRemoveServices']
-          .includes(form)),
+      using(ALL_FORMS.map( form => form ),
           function (form: string) {
             it(`activates the associated ${form} form`, () => {
           component[form].patchValue({disabled: true}); // Deactivate form to start
