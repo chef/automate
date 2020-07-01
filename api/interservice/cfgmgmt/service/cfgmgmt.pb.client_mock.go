@@ -60,6 +60,26 @@ func (mr *MockCfgMgmtClientMockRecorder) CreateRollout(arg0, arg1 interface{}, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRollout", reflect.TypeOf((*MockCfgMgmtClient)(nil).CreateRollout), varargs...)
 }
 
+// CreateRolloutTest mocks base method
+func (m *MockCfgMgmtClient) CreateRolloutTest(arg0 context.Context, arg1 *request.CreateRolloutTest, arg2 ...grpc.CallOption) (*response.CreateRolloutTest, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateRolloutTest", varargs...)
+	ret0, _ := ret[0].(*response.CreateRolloutTest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRolloutTest indicates an expected call of CreateRolloutTest
+func (mr *MockCfgMgmtClientMockRecorder) CreateRolloutTest(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRolloutTest", reflect.TypeOf((*MockCfgMgmtClient)(nil).CreateRolloutTest), varargs...)
+}
+
 // GetAttributes mocks base method
 func (m *MockCfgMgmtClient) GetAttributes(arg0 context.Context, arg1 *request0.Node, arg2 ...grpc.CallOption) (*response0.NodeAttribute, error) {
 	m.ctrl.T.Helper()
@@ -882,6 +902,21 @@ func (m *MockCfgMgmtServer) CreateRollout(arg0 context.Context, arg1 *request.Cr
 func (mr *MockCfgMgmtServerMockRecorder) CreateRollout(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRollout", reflect.TypeOf((*MockCfgMgmtServer)(nil).CreateRollout), arg0, arg1)
+}
+
+// CreateRolloutTest mocks base method
+func (m *MockCfgMgmtServer) CreateRolloutTest(arg0 context.Context, arg1 *request.CreateRolloutTest) (*response.CreateRolloutTest, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateRolloutTest", arg0, arg1)
+	ret0, _ := ret[0].(*response.CreateRolloutTest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRolloutTest indicates an expected call of CreateRolloutTest
+func (mr *MockCfgMgmtServerMockRecorder) CreateRolloutTest(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRolloutTest", reflect.TypeOf((*MockCfgMgmtServer)(nil).CreateRolloutTest), arg0, arg1)
 }
 
 // GetAttributes mocks base method

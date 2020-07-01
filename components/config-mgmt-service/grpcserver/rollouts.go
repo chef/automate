@@ -16,6 +16,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+func (s *CfgMgmtServer) CreateRolloutTest(ctx context.Context, req *request.CreateRolloutTest) (*response.CreateRolloutTest, error) {
+	return &response.CreateRolloutTest{}, nil
+}
+
 func (s *CfgMgmtServer) CreateRollout(ctx context.Context, req *request.CreateRollout) (*response.Rollout, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")

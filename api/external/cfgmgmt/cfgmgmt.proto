@@ -423,6 +423,27 @@ service ConfigMgmt {
   };
 
   /*
+  CreateRolloutTest
+
+  CreateRolloutTest is a no-op endpoint that has the same auth requirements as
+  CreateRollout. It can be used to verify end-to-end config/connectivity for
+  clients
+
+  Authorization Action:
+  ```
+  ingest:unifiedEvents:create
+  ```
+  */
+  rpc CreateRolloutTest(cfgmgmt.request.CreateRolloutTest) returns (cfgmgmt.response.CreateRolloutTest) {
+    option (google.api.http) = {
+      post: "/api/beta/cfgmgmt/rollouts/test_create"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "ingest:unifiedEvents";
+    option (chef.automate.api.iam.policy).action = "ingest:unifiedEvents:create";
+  };
+
+  /*
   GetRollouts
 
   Gives a list of rollouts

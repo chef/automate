@@ -213,6 +213,9 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/CreateRolloutTest", "ingest:unifiedEvents", "ingest:unifiedEvents:create", "POST", "/api/beta/cfgmgmt/rollouts/test_create", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetRollouts", "infra:nodes", "infra:nodes:list", "GET", "/api/beta/cfgmgmt/rollouts/list", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
