@@ -450,6 +450,8 @@ test-scanner:
 # or multiple ones with: TEST="02_*" make test
 test: generate-ruby-grpc wait-for-compliance-service
 	@if [ -z "$$TEST" ] ; then TEST='*_spec.rb'; fi; \
+	bundler_version=`grep -A 1 "BUNDLED WITH" api/tests/Gemfile.lock | tail -1 | tr -d '[:space:]'`; \
+	gem install bundler --version "= $$bundler_version"; \
 	cd api/tests && \
 	printf "\n===> ${blue}Running 'bundle install' in api/tests...${reset}\n" && \
 	bundle install && \
