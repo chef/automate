@@ -38,7 +38,7 @@ describe('PagePickerComponent', () => {
     beforeEach(() => {
       component.forDesktop = true;
       component.page = 1;
-      component.totalItems = 153;
+      component.total = 153;
       component.perPage = 10;
     });
 
@@ -94,7 +94,7 @@ describe('PagePickerComponent', () => {
           spyOn(component.pageSizeChanged, 'emit');
 
           component.itemStartCount = itemStartCount;
-          component.totalItems = totalItems;
+          component.total = totalItems;
           component.page = currentPageNumber;
           component.perPage = currentPageSize;
 
