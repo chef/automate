@@ -18,14 +18,10 @@
           </chef-select>
         </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
-          <chef-option value='details' data-cy="details-tab">Details</chef-option>
           <chef-option value='content' data-cy="content-tab">Content</chef-option>
+          <chef-option value='details' data-cy="details-tab">Details</chef-option>
         </chef-tab-selector>
       </chef-page-header>
-      <section class="page-body" *ngIf="tabValue === 'details'">
-        <chef-loading-spinner *ngIf="cookbookDetailsLoading" size="50"></chef-loading-spinner>
-        <chef-markdown *ngIf="readFileContent" [text]="readFileContent.content"></chef-markdown>
-      </section>
       <section class="page-body" *ngIf="tabValue === 'content'">
         <chef-loading-spinner *ngIf="contentTabLoading" size="50"></chef-loading-spinner>
         <div class="details-row" *ngIf="!contentTabLoading">
@@ -34,13 +30,13 @@
               <li *ngFor="let item of menuList; let i = index;">
                 <span (click)="listClickEvent($event)" 
                 [ngClass]="{'extend-list': i === 0}">
-                  {{ item.menu | titlecase  }}
+                  {{ item.menu | titlecase  }} ({{ item.subMenu.length }})
                 </span>
                 <ul class="sub-list" [ngClass]="{'show': i === 0}">
                   <li *ngFor="let content of item.subMenu; let j = index;" 
                   [ngClass]="{'active-sub-list': j === 0 && i === 0}" 
                   (click)="subListClickEvent($event, content)">
-                    {{ content.name }}</li>
+                    {{ content.name }}<chef-icon>fiber_manual_record</chef-icon></li>
                 </ul>
               </li>
             </ul>
@@ -48,13 +44,17 @@
           <div class="item-details-column">
             <chef-loading-spinner *ngIf="contentLoading" size="50"></chef-loading-spinner>
             <div *ngIf="!contentLoading">
-              <div class="item-heading">{{ activeContentName }}</div>
+              <h2 class="item-heading">{{ activeContentName }}</h2>
               <div class="item-content">
                 <chef-snippet [code]="urlContent?.content"></chef-snippet>
               </div>
             </div>
           </div>
         </div>
+      </section>
+      <section class="page-body" *ngIf="tabValue === 'details'">
+        <chef-loading-spinner *ngIf="cookbookDetailsLoading" size="50"></chef-loading-spinner>
+        <chef-markdown *ngIf="readFileContent" [text]="readFileContent.content"></chef-markdown>
       </section>
     </main>
   </div>

@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
-import { environment as env } from 'environments/environment';
 import { Subject, combineLatest } from 'rxjs';
 import { first, filter, takeUntil, pluck } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
+
+import { environment as env } from 'environments/environment';
 import { CollapsibleListMapper } from 'app/helpers/infra-proxy/collapsible-list-mapper';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
@@ -24,7 +25,7 @@ import {
   getStatus as getAllCookbooksDetailsStatus
 } from 'app/entities/cookbooks/cookbook-details.selectors';
 import { GetCookbookDetails } from 'app/entities/cookbooks/cookbook-details.actions';
-export type CookbookDetailsTab = 'details' | 'content';
+export type CookbookDetailsTab = 'content' | 'details';
 
 @Component({
   selector: 'app-cookbook-details',
@@ -40,7 +41,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
   public currentVersion: string;
   public cookbookName: string;
   public cookbookDetails: CookbookDetails;
-  public tabValue: CookbookDetailsTab = 'details';
+  public tabValue: CookbookDetailsTab = 'content';
   public readFile: RootFiles;
   public readFileUrl: string;
   public readFileContent;
@@ -79,7 +80,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
       .subscribe((url: string) => {
         this.url = url;
         const [, fragment] = url.split('#');
-        this.tabValue = (fragment === 'content') ? 'content' : 'details';
+        this.tabValue = (fragment === 'details') ? 'details' : 'content';
       });
 
     combineLatest([
@@ -134,9 +135,12 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
       .subscribe(([_getCookbooksSt, cookbookDetailsState]) => {
         this.cookbookDetails = cookbookDetailsState;
         this.menuList = CollapsibleListMapper.transform(cookbookDetailsState, this.listItem);
-        this.defaultContent = this.menuList[0].subMenu[0];
-        if (this.defaultContent) {
-          this.getContent(this.defaultContent);
+        if (this.menuList.length) {
+          // to check submenu exist and show defualt item detials
+          if ( this.menuList[0].subMenu.length ) {
+            this.defaultContent = this.menuList[0].subMenu[0];
+            this.getContent(this.defaultContent);
+          }
         }
         this.readFile = cookbookDetailsState?.root_files.find(data => data.name === 'README.md');
         if (this.readFile) {

@@ -38,21 +38,24 @@ chef-loading-spinner {
     padding-inline-start: 20px;
   }
 
-  .list>li {
+  .list > li {
     margin-bottom: 5px;
+    color: $chef-primary-bright;
   }
 
-  .list>li>span {
+  .list > li > span {
     cursor: pointer;
   }
 
-  .list>li>span:before {
-    content: "+";
+  .list > li > span:before {
+    font-family: 'Material Icons';
+    content: "folder";
     padding-right: 5px;
   }
 
-  .list>li>span.extend-list:before {
-    content: "-";
+  .list > li > span.extend-list:before {
+    font-family: 'Material Icons';
+    content: "folder_open";
     padding-right: 6px;
   }
 
@@ -64,15 +67,24 @@ chef-loading-spinner {
     display: block;
   }
 
-  .sub-list>li {
+  .sub-list > li {
     margin: 5px;
-    color: $chef-primary-light;
+    color: $chef-primary-dark;
     cursor: pointer;
+
+    chef-icon {
+      display: none;
+      float: right;
+      margin-top: 4px;
+    }
   }
 
-  .sub-list>li.active-sub-list {
-    color: $chef-primary-dark;
+  .sub-list > li.active-sub-list {
     font-weight: 900;
+
+    chef-icon {
+      display: block;
+    }
   }
 
   .details-row {
@@ -99,7 +111,8 @@ chef-loading-spinner {
 
       .item-heading {
         margin-bottom: 1em;
-        font-weight: 900;
+        font-size: 18px;
+        font-weight: 600;
       }
 
       chef-snippet {
@@ -107,7 +120,6 @@ chef-loading-spinner {
           background-color: $chef-lightest-grey;
         }
       }
-
     }
   }
 }
