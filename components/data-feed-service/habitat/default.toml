@@ -9,6 +9,7 @@ updated_nodes_only = true
 disable_cidr_filter = true
 cidr_filter = "0.0.0.0/0"
 external_fqdn = ""
+accepted_status_codes = [ 201, 201, 202, 203, 204 ]
 
 [tls]
 key_contents =""

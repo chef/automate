@@ -31,16 +31,17 @@ type LogConfig struct {
 }
 
 type ServiceConfig struct {
-	Host              string        `mapstructure:"host"`
-	Port              uint16        `mapstructure:"port"`
-	FeedInterval      time.Duration `mapstructure:"feed_interval"`
-	AssetPageSize     int32         `mapstructure:"asset_page_size"`
-	ReportsPageSize   int32         `mapstructure:"reports_page_size"`
-	NodeBatchSize     int           `mapstructure:"node_batch_size"`
-	UpdatedNodesOnly  bool          `mapstructure:"updated_nodes_only"`
-	DisableCIDRFilter bool          `mapstructure:"disable_cidr_filter"`
-	CIDRFilter        string        `mapstructure:"cidr_filter"`
-	ExternalFqdn      string        `mapstructure:"external_fqdn"`
+	Host                string        `mapstructure:"host"`
+	Port                uint16        `mapstructure:"port"`
+	FeedInterval        time.Duration `mapstructure:"feed_interval"`
+	AssetPageSize       int32         `mapstructure:"asset_page_size"`
+	ReportsPageSize     int32         `mapstructure:"reports_page_size"`
+	NodeBatchSize       int           `mapstructure:"node_batch_size"`
+	UpdatedNodesOnly    bool          `mapstructure:"updated_nodes_only"`
+	DisableCIDRFilter   bool          `mapstructure:"disable_cidr_filter"`
+	CIDRFilter          string        `mapstructure:"cidr_filter"`
+	ExternalFqdn        string        `mapstructure:"external_fqdn"`
+	AcceptedStatusCodes []int32       `mapstructure:"accepted_status_codes"`
 }
 
 type PostgresConfig struct {
@@ -145,4 +146,13 @@ func Configure() (*DataFeedConfig, error) {
 	log.Debugf("DATA FEED SERVICE CONFIG: %+v", config)
 	log.Debug("end config.go Configure() ->")
 	return config, nil
+}
+
+func IsAcceptedStatusCode(statusCode int32, acceptedCodes []int32) bool {
+	for _, code := range acceptedCodes {
+		if code == statusCode {
+			return true
+		}
+	}
+	return false
 }

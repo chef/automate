@@ -32,20 +32,22 @@ type DataFeedAggregateTaskParams struct {
 }
 
 type DataFeedAggregateTask struct {
-	cfgMgmt      cfgmgmt.CfgMgmtClient
-	reporting    reporting.ReportingServiceClient
-	secrets      secrets.SecretsServiceClient
-	db           *dao.DB
-	externalFqdn string
+	cfgMgmt             cfgmgmt.CfgMgmtClient
+	reporting           reporting.ReportingServiceClient
+	secrets             secrets.SecretsServiceClient
+	db                  *dao.DB
+	externalFqdn        string
+	acceptedStatusCodes []int32
 }
 
 func NewDataFeedAggregateTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grpc.ClientConn, complianceConn *grpc.ClientConn, secretsConn *grpc.ClientConn, db *dao.DB) *DataFeedAggregateTask {
 	return &DataFeedAggregateTask{
-		reporting:    reporting.NewReportingServiceClient(complianceConn),
-		cfgMgmt:      cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
-		secrets:      secrets.NewSecretsServiceClient(secretsConn),
-		db:           db,
-		externalFqdn: dataFeedConfig.ServiceConfig.ExternalFqdn,
+		reporting:           reporting.NewReportingServiceClient(complianceConn),
+		cfgMgmt:             cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
+		secrets:             secrets.NewSecretsServiceClient(secretsConn),
+		db:                  db,
+		externalFqdn:        dataFeedConfig.ServiceConfig.ExternalFqdn,
+		acceptedStatusCodes: dataFeedConfig.ServiceConfig.AcceptedStatusCodes,
 	}
 }
 
@@ -93,7 +95,7 @@ func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (inte
 			// build and send notification for this rule
 			notification := datafeedNotification{username: username, password: password, url: destinations[destination].URL, data: buffer}
 
-			client := NewDataClient()
+			client := NewDataClient(d.acceptedStatusCodes)
 			err = send(client, notification)
 			if err != nil {
 				handleSendErr(notification, params.FeedStart, params.FeedEnd, err)

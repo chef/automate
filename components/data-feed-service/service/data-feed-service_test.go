@@ -30,6 +30,7 @@ const serialNumber = "serial-number"
 const servicePackMajorVersion float64 = 2
 const servicePackMinorVersion float64 = 1
 const servicePack = "2.1"
+const externalFqdn = "https://datafeed.automate.com"
 
 var attrRunList = []string{"recipe1", "recipe2"}
 var mockErr = errors.New(mockErrMsg)
@@ -38,6 +39,7 @@ var mockAttrs = map[string]string{"foo": "bar"}
 var automaticAttrs = "{\"dmi\":{\"system\":{\"serial_number\":\"serial-number\"}},\"hostname\":\"test.chef.com\",\"hostnamectl\":{\"operating_system\":\"ubuntu\"},\"ipaddress\":\"172.18.2.120\",\"macaddress\":\"00:1C:42:C1:2D:87\",\"os\":\"linux\",\"os_version\":\"4.13.0-45-generic\"}"
 var automaticAttrsWin = "{\"os\":\"windows\",\"kernel\":{\"os_info\":{\"serial_number\":\"serial-number\",\"service_pack_major_version\":2,\"service_pack_minor_version\":1}},\"dmi\":{\"system\":{\"serial_number\":\"\"}},\"hostname\":\"test.chef.com\",\"ipaddress\":\"172.18.2.120\",\"macaddress\":\"00:1C:42:C1:2D:87\"}"
 var mockConfig = &config.DataFeedConfig{}
+var acceptedStatusCodes []int32 = []int32{200, 201, 202, 203, 204}
 
 func TestAssetCreated(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +48,7 @@ func TestAssetCreated(t *testing.T) {
 	defer ts.Close()
 
 	client := ts.Client()
-	dataClient := DataClient{client: *client}
+	dataClient := DataClient{client: *client, acceptedStatusCodes: acceptedStatusCodes}
 	notification := datafeedNotification{url: ts.URL}
 	err := send(dataClient, notification)
 	if err != nil {
@@ -558,7 +560,7 @@ func TestGetNodeDataEmpty(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(&cfgmgmtResponse.Run{}, nil)
-	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient, externalFqdn: externalFqdn}
 	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	if nodeData["attributes"] == nil {
 		t.Log("expected attributes, got nil")
@@ -572,7 +574,7 @@ func TestGetNodeDataEmpty(t *testing.T) {
 	}
 
 	node := nodeData["node"].(map[string]interface{})
-	if len(node) != 4 {
+	if len(node) != 5 {
 		t.Logf("excpected 4 entries in node got %v", node)
 	}
 	if node["ipaddress"].(string) != "" {
@@ -584,11 +586,15 @@ func TestGetNodeDataEmpty(t *testing.T) {
 		t.Fail()
 	}
 	if node["hostname"].(string) != "" {
-		t.Logf("expected empty hostanme, got %v", node["hostname"])
+		t.Logf("expected empty hostname, got %v", node["hostname"])
 		t.Fail()
 	}
 	if node["serial_number"].(string) != "" {
 		t.Logf("expected empty serial_number, got %v", node["serial_number"])
+		t.Fail()
+	}
+	if node["automate_fqdn"].(string) != externalFqdn {
+		t.Logf("expected fqdn %v, got %v", externalFqdn, node["automate_fqdn"])
 		t.Fail()
 	}
 }
@@ -601,7 +607,7 @@ func TestGetNodeDataFieldsError(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(&structpb.ListValue{}, mockErr)
-	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient, externalFqdn: externalFqdn}
 	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	if len(nodeData) != 0 {
 		t.Logf("expected empty node data map, got %v", nodeData)
@@ -625,7 +631,7 @@ func TestGetNodeDataAttrsError(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(&cfgmgmtResponse.NodeAttribute{}, mockErr)
-	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient, externalFqdn: externalFqdn}
 	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	if len(nodeData) != 0 {
 		t.Logf("expected empty node data map, got %v", nodeData)
@@ -653,7 +659,7 @@ func TestGetNodeDataRunError(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(&cfgmgmtResponse.Run{}, mockErr)
-	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient, externalFqdn: externalFqdn}
 	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	attributesJson := nodeData["attributes"].(map[string]interface{})
 	verifyAttributesEmpty(attributesJson, t)
@@ -682,7 +688,7 @@ func TestGetNodeDataNotWindows(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(run, nil)
-	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient, externalFqdn: externalFqdn}
 	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	if nodeData["attributes"] == nil {
 		t.Log("expected attributes, got nil")
@@ -696,7 +702,7 @@ func TestGetNodeDataNotWindows(t *testing.T) {
 	}
 
 	node := nodeData["node"].(map[string]interface{})
-	if len(node) != 4 {
+	if len(node) != 5 {
 		t.Logf("excpected 4 entries in node got %v", node)
 	}
 	if node["ipaddress"].(string) != "172.18.2.120" {
@@ -713,6 +719,10 @@ func TestGetNodeDataNotWindows(t *testing.T) {
 	}
 	if node["serial_number"].(string) != serialNumber {
 		t.Logf("expected empty serial_number, got %v", node["serial_number"])
+		t.Fail()
+	}
+	if node["automate_fqdn"].(string) != externalFqdn {
+		t.Logf("expected fqdn %v, got %v", externalFqdn, node["automate_fqdn"])
 		t.Fail()
 	}
 
@@ -736,7 +746,7 @@ func TestGetNodeDataWindows(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(run, nil)
-	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient, externalFqdn: externalFqdn}
 	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	if nodeData["attributes"] == nil {
 		t.Log("expected attributes, got nil")
@@ -750,8 +760,8 @@ func TestGetNodeDataWindows(t *testing.T) {
 	}
 
 	node := nodeData["node"].(map[string]interface{})
-	if len(node) != 5 {
-		t.Logf("excpected 5 entries in node got %v", node)
+	if len(node) != 6 {
+		t.Logf("expected 6 entries in node got %v", node)
 	}
 	if node["ipaddress"].(string) != "172.18.2.120" {
 		t.Logf("expected 172.18.2.120 ipaddress, got %v", node["ipaddress"])
@@ -771,6 +781,10 @@ func TestGetNodeDataWindows(t *testing.T) {
 	}
 	if node["os_service_pack"].(string) != servicePack {
 		t.Logf("expected service pack %v, got %v", servicePack, node["os_service_pack"])
+		t.Fail()
+	}
+	if node["automate_fqdn"].(string) != externalFqdn {
+		t.Logf("expected fqdn %v, got %v", externalFqdn, node["automate_fqdn"])
 		t.Fail()
 	}
 }
