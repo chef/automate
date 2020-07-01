@@ -45,6 +45,8 @@ export class CalendarComponent {
 
   @Input()
   set selected(input) {
+    console.log("select");
+    console.log(input);
     const date = moment.isMoment(input) ? input : moment.utc(input);
     this._selected = date;
   }
@@ -85,6 +87,10 @@ export class CalendarComponent {
     const tagActive = (d: moment.Moment) => {
       switch (d.date()) {
       case selected:
+        console.log("Selected");
+        console.log(selected);
+        console.log(d);
+        console.log(d.date());
         return tag('a s')(d);
       case today:
         return tag('a t')(d);

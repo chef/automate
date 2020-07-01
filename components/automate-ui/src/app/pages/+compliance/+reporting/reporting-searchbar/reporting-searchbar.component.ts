@@ -27,7 +27,7 @@ import { DateTime } from 'app/helpers/datetime/datetime';
   styleUrls: ['./reporting-searchbar.component.scss']
 })
 export class ReportingSearchbarComponent implements OnInit {
-  @Input() date = moment().utc();
+  private _date = moment().utc();
   @Input() filters: FilterC[] = [];
   @Input() filterTypes = [];
   @Input() filterValues = [];
@@ -89,6 +89,24 @@ export class ReportingSearchbarComponent implements OnInit {
       }, 800);
     });
   }
+
+  @Input()
+  set date(input) {
+    console.log(this._date);
+    const date = moment.isMoment(input) ? input : moment.utc([
+      input.getYear(),
+      input.getMonth(),
+      input.getDate()
+    ]);
+    console.log(input);
+    console.log(date);
+    this._date = input;
+  }
+
+  get date() {
+    return this._date;
+  }
+
 
   ngOnInit() {
     this.isLoadingSuggestions = false;
@@ -422,7 +440,9 @@ export class ReportingSearchbarComponent implements OnInit {
   }
 
   onDaySelect(date: string) {
+    console.log("onDaySelect " + date);
     const m = moment.utc(date);
+    console.log(m);
     this.visibleDate.date(m.date());
     this.visibleDate.month(m.month());
     this.visibleDate.year(m.year());
