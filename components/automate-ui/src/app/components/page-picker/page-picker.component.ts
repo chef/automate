@@ -10,7 +10,7 @@ import { PageSizeChangeEvent } from 'app/entities/desktop/desktop.model';
 })
 export class PagePickerComponent implements OnChanges {
 
-  @Input() totalItems: number;
+  @Input() total: number;
   @Input() perPage: number;
   @Input() page: number;
   @Input() maxPageItems = 10;
@@ -38,11 +38,11 @@ export class PagePickerComponent implements OnChanges {
   }
 
   private getItemEndCount() {
-    this.itemEndCount = this.page === this.last ? this.totalItems : this.page * this.perPage;
+    this.itemEndCount = this.page === this.last ? this.total : this.page * this.perPage;
   }
 
   private getAllPages() {
-    const pageCount = Math.ceil(this.totalItems / this.perPage);
+    const pageCount = Math.ceil(this.total / this.perPage);
     this.allPages = Array(pageCount).fill(0).map((_x, i) => i + 1);
   }
 
@@ -53,7 +53,7 @@ export class PagePickerComponent implements OnChanges {
   }
 
   ngOnChanges() {
-    this.last = Math.ceil(this.totalItems / this.perPage) || 1;
+    this.last = Math.ceil(this.total / this.perPage) || 1;
     this.prev = (this.page === this.first) ? null : this.page - 1;
     this.next = (this.page === this.last) ? null : this.page + 1;
 
