@@ -19,7 +19,7 @@ import {
   JobSchedulerStatus,
   IngestJob,
   IngestJobs,
-  InfraJobName,
+  NonNestedJobName,
   NestedJobName,
   DefaultFormData,
   JobCategories
@@ -301,8 +301,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
 
       switch (job.category) {
+        case 'services':
         case 'infra': {
-          this.populateInfra(job);
+          this.populateNonNested(job);
         }
         break;
 
@@ -331,11 +332,11 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     ];
   }
 
-  private populateInfra(job: IngestJob): void {
+  private populateNonNested(job: IngestJob): void {
     let formThreshold, formUnit;
 
     switch (job.name) {
-      case InfraJobName.MissingNodesForDeletion: {
+      case NonNestedJobName.MissingNodesForDeletion: {
         if (!this.isDesktopView) {
           this.handleDisable(this.clientRunsRemoveNodes, job.disabled);
         }
@@ -349,7 +350,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       }
       break;
 
-      case InfraJobName.MissingNodes: {
+      case NonNestedJobName.MissingNodes: {
         if (!this.isDesktopView) {
           this.handleDisable(this.clientRunsLabelMissing, job.disabled);
         }
@@ -362,15 +363,35 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       }
       break;
 
-      case InfraJobName.DeleteNodes: {
+      case NonNestedJobName.DeleteNodes: {
         // delete_nodes not yet implemented
       }
       break;
 
-      case InfraJobName.PeriodicPurgeTimeseries: {
+      case NonNestedJobName.PeriodicPurgeTimeseries: {
         this.populateNested(job);
       }
       break;
+
+      case NonNestedJobName.DisconnectedServices:
+        this.handleDisable(this.serviceGroupNoHealthChecks, job.disabled);
+        [formThreshold, formUnit] = this.splitThreshold(job.threshold);
+        this.serviceGroupNoHealthChecks.patchValue({
+          unit: formUnit,
+          threshold: formThreshold,
+          disabled: job.disabled
+        });
+        break;
+
+      case NonNestedJobName.DeleteDisconnectedServices:
+        this.handleDisable(this.serviceGroupRemoveServices, job.disabled);
+        [formThreshold, formUnit] = this.splitThreshold(job.threshold);
+        this.serviceGroupRemoveServices.patchValue({
+          unit: formUnit,
+          threshold: formThreshold,
+          disabled: job.disabled
+        });
+        break;
 
       default:
         break;
@@ -434,7 +455,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     return {
       eventFeedRemoveData: {
         category: JobCategories.EventFeed,
-        name: 'periodic_purge',
+        name: NonNestedJobName.PeriodicPurge,
         nested_name: NestedJobName.Feed,
         unit: { value: 'd', disabled: false },
         threshold: [{ value: '30', disabled: false}, Validators.required],
@@ -442,7 +463,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       },
       eventFeedServerActions: {
         category: JobCategories.Infra,
-        name: 'periodic_purge_timeseries',
+        name: NonNestedJobName.PeriodicPurgeTimeseries,
         nested_name: NestedJobName.Actions,
         unit: { value: 'd', disabled: false },
         threshold: [{ value: '30', disabled: false }, Validators.required],
@@ -450,21 +471,21 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       },
       serviceGroupNoHealthChecks: {
         category: JobCategories.Services,
-        name: '',
-        unit: { value: 'm', disabled: true},
-        threshold: [{ value: '5', disabled: true }, Validators.required],
-        disabled: false // special case: only alterable by the API so we want to show as enabled
+        name: NonNestedJobName.DisconnectedServices,
+        unit: { value: 'm', disabled: false},
+        threshold: [{ value: '5', disabled: false }, Validators.required],
+        disabled: false
       },
       serviceGroupRemoveServices: {
         category: JobCategories.Services,
-        name: '',
-        unit: { value: 'd', disabled: true },
-        threshold: [{ value: '5', disabled: true }, Validators.required],
-        disabled: false // special case: API not ready to alter
+        name: NonNestedJobName.DeleteDisconnectedServices,
+        unit: { value: 'd', disabled: false },
+        threshold: [{ value: '5', disabled: false }, Validators.required],
+        disabled: false
       },
       clientRunsRemoveData: {
         category: JobCategories.Infra,
-        name: 'periodic_purge_timeseries',
+        name: NonNestedJobName.PeriodicPurgeTimeseries,
         nested_name: NestedJobName.ConvergeHistory,
         unit: { value: 'd', disabled: false },
         threshold: [{ value: '30', disabled: false }, Validators.required],
@@ -472,21 +493,21 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       },
       clientRunsLabelMissing: {
         category: JobCategories.Infra,
-        name: 'missing_nodes',
+        name: NonNestedJobName.MissingNodes,
         unit: { value: 'd', disabled: isDesktopView },
         threshold: [{ value: '30', disabled: isDesktopView }, Validators.required],
         disabled: isDesktopView
       },
       clientRunsRemoveNodes: {
         category: JobCategories.Infra,
-        name: 'missing_nodes_for_deletion',
+        name: NonNestedJobName.MissingNodesForDeletion,
         unit: { value: 'd', disabled: isDesktopView },
         threshold: [{ value: '30', disabled: isDesktopView }, Validators.required],
         disabled: isDesktopView
       },
       complianceRemoveReports: {
         category: JobCategories.Compliance,
-        name: 'periodic_purge',
+        name: NonNestedJobName.PeriodicPurge,
         nested_name: NestedJobName.ComplianceReports,
         unit: { value: 'd', disabled: false },
         threshold: [{ value: '30', disabled: false }, Validators.required],
@@ -494,7 +515,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       },
       complianceRemoveScans: {
         category: JobCategories.Compliance,
-        name: 'periodic_purge',
+        name: NonNestedJobName.PeriodicPurge,
         nested_name: NestedJobName.ComplianceScans,
         unit: { value: 'd', disabled: false },
         threshold: [{ value: '30', disabled: false }, Validators.required],

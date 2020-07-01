@@ -71,15 +71,18 @@ export enum JobCategories {
   Services = 'services'
 }
 
-export enum InfraJobName {
+export enum NonNestedJobName {
   MissingNodes = 'missing_nodes',
   MissingNodesForDeletion = 'missing_nodes_for_deletion',
   DeleteNodes = 'delete_nodes',
-  PeriodicPurgeTimeseries = 'periodic_purge_timeseries'
+  PeriodicPurge = 'periodic_purge',
+  PeriodicPurgeTimeseries = 'periodic_purge_timeseries',
+  DisconnectedServices = 'disconnected_services',
+  DeleteDisconnectedServices = 'delete_disconnected_services'
 }
 
 // Actions and ConvergeHistory are nested, but contained inside
-// the InfraJobName of PeriodicPurgeTimeseries
+// the NonNestedJobName of PeriodicPurgeTimeseries
 export enum NestedJobName {
   ComplianceReports = 'compliance-reports',
   ComplianceScans = 'compliance-scans',
@@ -152,15 +155,14 @@ export interface JobRequestBody {
   event_feed: {
     job_settings: JobRequestComponent[];
   };
-  // services has not yet been implemented so we will leave as optional for now
-  services?: {
+  services: {
     job_settings: JobRequestComponent[];
   };
 }
 
 export interface SingleDefaultForm {
   category: JobCategories;
-  name?: string;                  // TODO; make stricter after services implemented
+  name: NonNestedJobName;
   nested_name?: NestedJobName;
   unit: {
     value: string;

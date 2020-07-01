@@ -180,10 +180,7 @@ describe('AutomateSettingsComponent', () => {
 
     describe('handleFormActivation()', () => {
 
-      using(ALL_FORMS
-          // Service Groups are not currently uncheckable through the UI
-          .filter( form => !['serviceGroupNoHealthChecks', 'serviceGroupRemoveServices']
-          .includes(form)),
+      using(ALL_FORMS.map( form => form ),
           function( form: string) {
         it(`deactivates the associated ${form} form`, () => {
           expect(component[form].value.disabled).toEqual(false);
@@ -194,10 +191,7 @@ describe('AutomateSettingsComponent', () => {
         });
       });
 
-      using(ALL_FORMS
-          // Service Groups are not currently uncheckable through the UI
-          .filter( form => !['serviceGroupsNoHealthChecks', 'serviceGroupRemoveServices']
-          .includes(form)),
+      using(ALL_FORMS.map( form => form ),
           function (form: string) {
             it(`activates the associated ${form} form`, () => {
           component[form].patchValue({disabled: true}); // Deactivate form to start
@@ -279,6 +273,20 @@ describe('AutomateSettingsComponent', () => {
           }
         };
 
+        const serviceGroupNoHealthChecks: IngestJob = {
+          category: JobCategories.Services,
+          name: 'disconnected_services',
+          disabled: false,
+          threshold: '5h'
+        };
+
+        const serviceGroupRemoveServices: IngestJob = {
+          category: JobCategories.Services,
+          name: 'delete_disconnected_services',
+          disabled: false,
+          threshold: '13m'
+        };
+
         const clientRunsRemoveData: IngestJob = {
           category: JobCategories.Infra,
           name: 'missing_nodes',
@@ -298,11 +306,13 @@ describe('AutomateSettingsComponent', () => {
           infraNestedForms,
           clientRunsRemoveData,
           clientRunsLabelMissing,
-          complianceForms
+          complianceForms,
+          serviceGroupNoHealthChecks,
+          serviceGroupRemoveServices
         ]);
       });
 
-      function genInjestJob(category: string, name: string, threshold: string, disabled: boolean) {
+      function genIngestJob(category: string, name: string, threshold: string, disabled: boolean) {
         return { category, name, threshold, disabled };
       }
 
@@ -331,10 +341,6 @@ describe('AutomateSettingsComponent', () => {
         ['eventFeedServerActions', 'actions',
             genNestedIngestJob('infra', 'periodic_purge_timeseries', 'actions', 2, false)],
 
-        // Services --> not yet enabled
-        // ['serviceGroupNoHealthChecks'],
-        // ['serviceGroupRemoveServices'],
-
         // Client Runs
         ['clientRunsRemoveData', 'converge-history',
             genNestedIngestJob('infra', 'periodic_purge_timeseries', 'converge-history', 7, false)],
@@ -360,8 +366,14 @@ describe('AutomateSettingsComponent', () => {
 
       using([
         // Client Runs
-        ['clientRunsRemoveNodes', genInjestJob('infra', 'missing_nodes_for_deletion', '5m', false)],
-        ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes', '6h', false)]
+        ['clientRunsRemoveNodes', genIngestJob('infra', 'missing_nodes_for_deletion', '5m', false)],
+        ['clientRunsLabelMissing', genIngestJob('infra', 'missing_nodes', '6h', false)],
+
+        // Services
+        ['serviceGroupNoHealthChecks',
+          genIngestJob('services', 'disconnected_services', '32m', false)],
+        ['serviceGroupRemoveServices',
+          genIngestJob('services', 'delete_disconnected_services', '18d', false)]
       ], function (formName: string, job: IngestJob) {
         it(`when updating ${formName} form,
               the form data is extracted from the non-nested form`, () => {
@@ -386,10 +398,6 @@ describe('AutomateSettingsComponent', () => {
           genNestedIngestJob('event_feed', 'periodic_purge', 'feed', 1, true)],
         ['eventFeedServerActions', 'actions',
           genNestedIngestJob('infra', 'periodic_purge_timeseries', 'actions', 2, true)],
-
-        // Services --> not yet enabled
-        // ['serviceGroupNoHealthChecks'],
-        // ['serviceGroupRemoveServices'],
 
         // Client Runs
         ['clientRunsRemoveData', 'converge-history',
@@ -416,8 +424,14 @@ describe('AutomateSettingsComponent', () => {
 
       using([
         // Client Runs
-        ['clientRunsRemoveNodes', genInjestJob('infra', 'missing_nodes_for_deletion', '5m', true)],
-        ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes', '6h', true)]
+        ['clientRunsRemoveNodes', genIngestJob('infra', 'missing_nodes_for_deletion', '5m', true)],
+        ['clientRunsLabelMissing', genIngestJob('infra', 'missing_nodes', '6h', true)],
+
+        // Services
+        ['serviceGroupNoHealthChecks',
+          genIngestJob('services', 'disconnected_services', '32m', true)],
+        ['serviceGroupRemoveServices',
+          genIngestJob('services', 'delete_disconnected_services', '18d', true)]
       ], function (formName: string, job: IngestJob) {
         it(`when ${formName} form is saved as disabled, unit and threshold are undefined
               because they are not present in the non-nested form anymore`, () => {
