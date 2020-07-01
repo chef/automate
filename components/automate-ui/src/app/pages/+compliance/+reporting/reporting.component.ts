@@ -513,6 +513,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   convertMomentToDateWithoutTimezone(m: moment.Moment): Date {
-    return new Date(m.year(), m.month(), m.date());
+    // const newDate = new Date(m.year(), m.month(), m.date());
+    // console.log(newDate);
+    // const modate = moment(newDate);
+    // console.log(moment.isMoment(modate));
+    // console.log(modate);
+    // console.log(m.toDate());
+    // return new Date(m.year(), m.month(), m.date());
+    return m.toDate();
   }
 }
