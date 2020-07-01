@@ -122,8 +122,8 @@ describe('CookbookDetailsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('defaults to showing details section', () => {
-    expect(component.tabValue).toBe('details');
+  it('defaults to showing content section', () => {
+    expect(component.tabValue).toBe('content');
   });
 
   it('Check cookbook version success', () => {
