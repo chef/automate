@@ -43,6 +43,20 @@ func TestLoadDeliverySecrets(t *testing.T) {
 	)
 }
 
+func TestLoadChefServerRunning(t *testing.T) {
+	config := NewA1Config()
+	config.ChefServerRunningPath = fixturePath("chef-server-running.json")
+	err := config.LoadChefServerRunning()
+	require.NoError(t, err)
+	timeout, err := config.ChefServerRunning.PrivateChef.OpscodeErchef.SQLDBTimeout.Int64()
+	require.NoError(t, err)
+	assert.Equal(
+		t,
+		5000,
+		int(timeout),
+	)
+}
+
 func TestNoUseOfOutlawedTypes(t *testing.T) {
 	config := NewA1Config()
 	noOutlawedTypes(t, "", reflect.ValueOf(config))

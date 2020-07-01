@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"fmt"
-	"time"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
@@ -45,6 +44,7 @@ var grpcServices = []string{
 	"applications-service",
 	"authn-service",
 	"authz-service",
+	"automate-cds",
 	"compliance-service",
 	"config-mgmt-service",
 	"data-feed-service",
@@ -496,10 +496,6 @@ func (c *ClientConfig) DialEndpoints(connFactory *secureconn.Factory) (ClientCon
 			opts = append(opts,
 				grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
 				grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor))
-		}
-
-		if endpoint.Target == c.socketPath() {
-			opts = append(opts, grpc.WithBlock(), grpc.WithTimeout(1*time.Second))
 		}
 
 		if endpoint.Secure {

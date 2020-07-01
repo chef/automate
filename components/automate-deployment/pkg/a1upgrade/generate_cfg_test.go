@@ -33,6 +33,7 @@ func TestGenerateMigrationOverrideConfig(t *testing.T) {
 	t.Run("Sets the LDAP host configuration for Dex if user defined A1 LDAP configuration exists", func(t *testing.T) {
 		r := newMockDeliveryRunning(t)
 		s := newMockDeliverySecrets(t)
+		cs := newMockChefServerRunnig(t)
 		mockSSLCerts(r)
 
 		r.Delivery.Delivery.LDAPHosts = []string{"128.16.82.23"}
@@ -43,16 +44,17 @@ func TestGenerateMigrationOverrideConfig(t *testing.T) {
 		r.Delivery.Delivery.LDAPMail = "mail"
 		r.Delivery.Delivery.LDAPLogin = "sAMAccountName"
 
-		config, err := generateMigrationOverrideConfig(r, s)
+		config, err := generateMigrationOverrideConfig(r, s, cs)
 		require.NoError(t, err)
 		assert.Equal(t, "128.16.82.23:6789", config.Dex.V1.Sys.Connectors.Ldap.Host.Value)
 	})
 	t.Run("Doesn't set the LDAP host configuration for Dex if default A1 LDAP configuration exists", func(t *testing.T) {
 		r := newMockDeliveryRunning(t)
 		s := newMockDeliverySecrets(t)
+		cs := newMockChefServerRunnig(t)
 		mockSSLCerts(r)
 
-		config, err := generateMigrationOverrideConfig(r, s)
+		config, err := generateMigrationOverrideConfig(r, s, cs)
 		require.NoError(t, err)
 		assert.Nil(t, config.Dex.V1.Sys.Connectors.Ldap)
 	})
@@ -294,6 +296,50 @@ func TestProxySettings(t *testing.T) {
 	})
 }
 
+func TestErchefSettings(t *testing.T) {
+	t.Run("parses max request size ", func(t *testing.T) {
+		r := newMockChefServerRunnig(t)
+
+		erchef, err := getErchefSettings(r)
+		require.NoError(t, err)
+
+		require.Equal(t, int32(2000000), erchef.Api.MaxRequestSize.GetValue())
+	})
+}
+
+func TestInfraSettings(t *testing.T) {
+	t.Run("parses worker connections", func(t *testing.T) {
+		r := newMockChefServerRunnig(t)
+
+		ngx, err := getInfraServerNginxSettings(r)
+		require.NoError(t, err)
+
+		require.Equal(t, int32(10240), ngx.Ngx.Events.WorkerConnections.GetValue())
+	})
+}
+
+func TestBookshelfSettings(t *testing.T) {
+	t.Run("parses abandoned cleanup interval", func(t *testing.T) {
+		r := newMockChefServerRunnig(t)
+
+		bk, err := getBookshelfSettings(r)
+		require.NoError(t, err)
+
+		require.Equal(t, int32(1140000), bk.Bookshelf.AbandonedUploadCleanupInterval.GetValue())
+	})
+}
+
+func TestBifrostSettings(t *testing.T) {
+	t.Run("parses db pooler timeout", func(t *testing.T) {
+		r := newMockChefServerRunnig(t)
+
+		bf, err := getBifrostSettings(r)
+		require.NoError(t, err)
+
+		require.Equal(t, int32(2000), bf.Sql.PoolQueueTimeout.GetValue())
+	})
+}
+
 func newMockDeliveryRunning(t *testing.T) *DeliveryRunning {
 	config := NewA1Config()
 	config.DeliveryRunningPath = fixturePath("delivery-running.json")
@@ -310,6 +356,15 @@ func newMockDeliverySecrets(t *testing.T) *DeliverySecrets {
 	require.NoError(t, err, "failed to load delivery-secrets.json")
 
 	return config.DeliverySecrets
+}
+
+func newMockChefServerRunnig(t *testing.T) *ChefServerRunning {
+	config := NewA1Config()
+	config.ChefServerRunningPath = fixturePath("chef-server-running.json")
+	err := config.LoadChefServerRunning()
+	require.NoError(t, err, "failed to load chef-server-running.json")
+
+	return config.ChefServerRunning
 }
 
 func newTestTempDir(t *testing.T, msg string) (string, func()) {

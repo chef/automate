@@ -1,0 +1,698 @@
+{
+  "private_chef": {
+    "removed_services": [
+      "opscode-webui",
+      "opscode-solr",
+      "couchdb",
+      "opscode-account",
+      "opscode-org-creator",
+      "opscode-certificate"
+    ],
+    "hidden_services": [
+      "opscode-chef-mover"
+    ],
+    "api_version": "12.0.0",
+    "flavor": "cs",
+    "install_path": "/opt/opscode",
+    "notification_email": "pc-default@chef.io",
+    "from_email": "\"Opscode\" <donotreply@chef.io>",
+    "role": "standalone",
+    "license": {
+      "nodes": 25,
+      "upgrade_url": "http://www.chef.io/contact/on-premises-simple"
+    },
+    "default_orgname": null,
+    "fips_enabled": false,
+    "required_recipe": {
+      "enable": false,
+      "path": null
+    },
+    "sysvinit_id": "SV",
+    "addons": {
+      "install": false,
+      "path": null,
+      "packages": [
+        "opscode-reporting",
+        "opscode-manage",
+        "opscode-analytics",
+        "opscode-push-jobs-server",
+        "chef-ha"
+      ],
+      "ubuntu_supported_codenames": [
+        "lucid",
+        "precise",
+        "trusty"
+      ],
+      "ubuntu_distribution": "lucid"
+    },
+    "user": {
+      "username": "opscode",
+      "shell": "/bin/sh",
+      "home": "/opt/opscode/embedded"
+    },
+    "service_dir_perms": "0750",
+    "couchdb": {
+      "data_dir": "/var/opt/opscode/couchdb/db",
+      "vip": "127.0.0.1",
+      "port": 5984
+    },
+    "opscode-solr": {
+      "data_dir": "/var/opt/opscode/opscode-solr/data",
+      "vip": "127.0.0.1",
+      "port": 8983
+    },
+    "server-api-version": 0,
+    "haproxy": {
+      "enable": true,
+      "ha": false,
+      "dir": "/var/opt/opscode/haproxy",
+      "log_directory": "/var/log/opscode/haproxy",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "listen": "0.0.0.0",
+      "local_postgresql_port": 5432,
+      "remote_postgresql_port": 5432,
+      "local_elasticsearch_port": 9200,
+      "remote_elasticsearch_port": 9200,
+      "leaderl_healthcheck_port": 7331,
+      "etcd_port": 2379
+    },
+    "rabbitmq": {
+      "enable": false,
+      "ha": false,
+      "dir": "/var/opt/opscode/rabbitmq",
+      "data_dir": "/var/opt/opscode/rabbitmq/db",
+      "log_directory": "/var/log/opscode/rabbitmq",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "vhost": "/chef",
+      "user": "chef",
+      "actions_user": "actions",
+      "actions_vhost": "/analytics",
+      "actions_exchange": "actions",
+      "node_ip_address": "127.0.0.1",
+      "node_port": "5672",
+      "nodename": "rabbit@localhost",
+      "vip": "127.0.0.1",
+      "consumer_id": "hotsauce",
+      "env_path": "/opt/opscode/bin:/opt/opscode/embedded/bin:/usr/bin:/bin",
+      "startup_timeout": 100,
+      "ssl_versions": [
+        "tlsv1.2",
+        "tlsv1.1"
+      ],
+      "management_user": "rabbitmgmt",
+      "management_port": 15672,
+      "management_enabled": false,
+      "analytics_max_length": 10000,
+      "queue_length_monitor_vhost": "/analytics",
+      "queue_length_monitor_queue": "alaska",
+      "queue_length_monitor_enabled": false,
+      "queue_at_capacity_affects_overall_status": false,
+      "queue_length_monitor_millis": 30000,
+      "queue_length_monitor_timeout_millis": 5000,
+      "drop_on_full_capacity": true,
+      "prevent_erchef_startup_on_full_capacity": false,
+      "rabbit_mgmt_timeout": 30000,
+      "rabbit_mgmt_http_init_count": 25,
+      "rabbit_mgmt_http_max_count": 100,
+      "rabbit_mgmt_http_cull_interval": 60,
+      "rabbit_mgmt_http_max_age": 70,
+      "rabbit_mgmt_http_max_connection_duration": 70,
+      "rabbit_mgmt_ibrowse_options": "{connect_timeout, 10000}",
+      "password": "32dd74560593ad08b4fb3b065a82cadf4d5df9bfb9dbce33ab963c328edfeac10df042273026ca4e17d19f773056b35c5a29",
+      "management_password": "302e93fb05f5d76cb1e9980df83d5b904b162edc4604df5ee5fcc1d32df49dbc57366543ed7cda835992f7953aedc164cfe6",
+      "actions_password": "e4752fbdacef5053ceb6d61befc62acced2139df3bf2c5054c17425f1d63cb843df9780c99b990cf5d75dde668c75d64a74e"
+    },
+    "external-rabbitmq": {
+      "enable": false,
+      "actions_user": "actions",
+      "actions_vhost": "/analytics",
+      "actions_exchange": "actions",
+      "node_port": "5672",
+      "vip": "127.0.0.1"
+    },
+    "jetty": {
+      "enable": false,
+      "ha": false,
+      "log_directory": "/var/opt/opscode/opscode-solr4/jetty/logs"
+    },
+    "opscode-solr4": {
+      "enable": true,
+      "external": true,
+      "external_url": "http://localhost:8080/elasticsearch",
+      "ha": false,
+      "dir": "/var/opt/opscode/opscode-solr4",
+      "data_dir": "/var/opt/opscode/opscode-solr4/data",
+      "temp_directory": "/var/opt/opscode/opscode-solr4/",
+      "log_directory": "/var/log/opscode/opscode-solr4",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "log_gc": true,
+      "heap_size": null,
+      "new_size": null,
+      "java_opts": "",
+      "url": "http://localhost:8983/solr",
+      "ip_address": "127.0.0.1",
+      "vip": "127.0.0.1",
+      "port": 8983,
+      "ram_buffer_size": 100,
+      "merge_factor": 15,
+      "max_merge_docs": 2147483647,
+      "max_field_length": 100000,
+      "max_commit_docs": 1000,
+      "auto_soft_commit": 1000,
+      "commit_interval": 60000,
+      "poll_seconds": 20,
+      "enable_full_admin_api": false,
+      "elasticsearch_shard_count": 5,
+      "elasticsearch_replica_count": 1
+    },
+    "opscode-expander": {
+      "enable": false,
+      "ha": false,
+      "dir": "/var/opt/opscode/opscode-expander",
+      "log_directory": "/var/log/opscode/opscode-expander",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "consumer_id": "default",
+      "nodes": 2,
+      "max_retries": 1,
+      "retry_wait": 1
+    },
+    "opscode-erchef": {
+      "enable": true,
+      "ha": false,
+      "dir": "/var/opt/opscode/opscode-erchef",
+      "memory_maxbytes": null,
+      "log_directory": "/var/log/opscode/opscode-erchef",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10,
+        "max_messages_per_second": 1000
+      },
+      "vip": "127.0.0.1",
+      "listen": "127.0.0.1",
+      "port": 8000,
+      "auth_skew": "900",
+      "authz_pooler_timeout": "0",
+      "bulk_fetch_batch_size": "5",
+      "udp_socket_pool_size": null,
+      "sql_user": "opscode_chef",
+      "sql_ro_user": "opscode_chef_ro",
+      "enable_request_logging": true,
+      "reindex_batch_size": 10,
+      "reindex_sleep_min_ms": 500,
+      "reindex_sleep_max_ms": 2000,
+      "reindex_item_retries": 3,
+      "db_pool_size": 20,
+      "db_pool_max": null,
+      "db_pool_init": null,
+      "db_pool_queue_max": 20,
+      "db_pooler_timeout": 2000,
+      "sql_db_timeout": 5000,
+      "depsolver_pooler_timeout": "0",
+      "depsolver_pool_queue_max": "50",
+      "depsolver_worker_count": 5,
+      "depsolver_timeout": 5000,
+      "ibrowse_max_sessions": 256,
+      "ibrowse_max_pipeline_size": 1,
+      "search_provider": "elasticsearch",
+      "search_queue_mode": "batch",
+      "search_batch_max_size": "5000000",
+      "search_batch_max_wait": "10",
+      "solr_timeout": 30000,
+      "solr_http_init_count": 25,
+      "solr_http_max_count": 100,
+      "solr_http_cull_interval": "{1, min}",
+      "solr_http_max_age": "{70, sec}",
+      "solr_http_max_connection_duration": "{70,sec}",
+      "solr_ibrowse_options": "[{connect_timeout, 10000}]",
+      "base_resource_url": "host_header",
+      "s3_bucket": "bookshelf",
+      "s3_url_ttl": 28800,
+      "nginx_bookshelf_caching": "on",
+      "s3_url_expiry_window_size": "50%",
+      "s3_parallel_ops_timeout": 5000,
+      "s3_parallel_ops_fanout": 20,
+      "authz_timeout": 2000,
+      "authz_fanout": 20,
+      "root_metric_key": "chefAPI",
+      "max_request_size": 2000000,
+      "cleanup_batch_size": 0,
+      "keygen_cache_size": 10,
+      "keygen_start_size": 0,
+      "keygen_cache_workers": "auto",
+      "keygen_timeout": 1000,
+      "keygen_key_size": 2048,
+      "strict_search_result_acls": false,
+      "ssl_session_caching": {
+        "enabled": false
+      },
+      "health_ping_timeout": 400,
+      "stats_auth_enable": true,
+      "stats_user": "statsuser",
+      "stats_password_file": "/var/opt/opscode/nginx/stats_htpasswd",
+      "sql_password": "abdd858f146a99c19df71ff4d4ac4786528eee6c53c731912e27d407097c",
+      "sql_ro_password": "4ea0d11c854726104ac8dc6c185ea1e31257fd8675c8c7dbb5fdd084d820",
+      "stats_password": "d4b3437c1c864b76d3409305cc2cd736299ec241f60c69a420657c7bb12085241f316e7ebf889d103f51c472cd007ed7d6d117d42943efcb9ef11a9bd1f3fb15"
+    },
+    "opscode-chef": {
+      "checksum_path": "/var/opt/opscode/opscode-chef/checksum"
+    },
+    "opscode-webui": {
+      "enable": false
+    },
+    "oc-chef-pedant": {
+      "dir": "/var/opt/opscode/oc-chef-pedant",
+      "log_directory": "/var/log/opscode/oc-chef-pedant",
+      "log_http_requests": true,
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "debug_org_creation": false,
+      "chef_server": "https://a1-migration.test"
+    },
+    "redis_lb": {
+      "enable": true,
+      "ha": false,
+      "dir": "/var/opt/opscode/redis_lb",
+      "data_dir": "/var/opt/opscode/redis_lb/data",
+      "log_directory": "/var/log/opscode/redis_lb",
+      "log_rotation": {
+        "file_maxbytes": 1000000,
+        "num_to_keep": 10
+      },
+      "port": "16379",
+      "bind": "127.0.0.1",
+      "vip": "127.0.0.1",
+      "keepalive": "60",
+      "timeout": "300",
+      "loglevel": "notice",
+      "databases": "16",
+      "appendonly": "no",
+      "appendfsync": "always",
+      "activerehashing": "no",
+      "aof_rewrite_percent": "50",
+      "aof_rewrite_min_size": "16mb",
+      "maxmemory": "8m",
+      "maxmemory_policy": "noeviction",
+      "save_frequency": {
+        "900": "1",
+        "300": "10",
+        "60": "1000"
+      },
+      "password": "88952c5e2db72ab8cd9b12ba2947b87dab541dfec244b13cfc0a4fba2b72b15d364a9c8822a6a5578287cdc3c2af84c7bf73"
+    },
+    "lb": {
+      "enable": true,
+      "vip": "127.0.0.1",
+      "api_fqdn": "a1-migration.test",
+      "web_ui_fqdn": "a1-migration.test",
+      "debug": false,
+      "upstream": {
+        "opscode-erchef": [
+          "127.0.0.1"
+        ],
+        "oc_bifrost": [
+          "127.0.0.1"
+        ],
+        "opscode-solr4": [
+          "127.0.0.1"
+        ],
+        "bookshelf": [
+          "127.0.0.1"
+        ]
+      },
+      "redis_connection_timeout": 1000,
+      "redis_keepalive_timeout": 2000,
+      "redis_connection_pool_size": 250,
+      "maint_refresh_interval": 600,
+      "ban_refresh_interval": 600,
+      "chef_min_version": 10,
+      "access_by_lua_file": false,
+      "xdl_defaults": {
+        "503_mode": false,
+        "couchdb_containers": false,
+        "couchdb_groups": false,
+        "couchdb_acls": false,
+        "couchdb_association_requests": false,
+        "couchdb_organizations": false,
+        "couchdb_associations": false
+      }
+    },
+    "lb_internal": {
+      "enable": true,
+      "vip": "127.0.0.1",
+      "chef_port": 9680,
+      "account_port": 9685,
+      "oc_bifrost_port": 9683
+    },
+    "nginx": {
+      "enable": true,
+      "ha": false,
+      "dir": "/var/opt/opscode/nginx",
+      "log_directory": "/var/log/opscode/nginx",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "log_x_forwarded_for": false,
+      "ssl_port": 8443,
+      "enable_non_ssl": false,
+      "non_ssl_port": false,
+      "x_forwarded_proto": "https",
+      "server_name": "a1-migration.test",
+      "url": "https://a1-migration.test",
+      "proxy_connect_timeout": 1,
+      "enable_stub_status": true,
+      "stub_status": {
+        "listen_host": "127.0.0.1",
+        "listen_port": "9999",
+        "location": "/nginx_status",
+        "allow_list": [
+          "127.0.0.1"
+        ]
+      },
+      "ssl_protocols": "TLSv1.2",
+      "ssl_ciphers": "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:AES256-GCM-SHA384:AES:!aNULL:!eNULL:!EXPORT",
+      "ssl_certificate": "/var/opt/opscode/nginx/ca/a1-migration.test.crt",
+      "ssl_certificate_key": "/var/opt/opscode/nginx/ca/a1-migration.test.key",
+      "ssl_dhparam": "/var/opt/opscode/nginx/ca/dhparams.pem",
+      "ssl_country_name": "US",
+      "ssl_company_name": "YouCorp",
+      "ssl_organizational_unit_name": "Operations",
+      "ssl_key_length": 2048,
+      "ssl_duration": 3650,
+      "dhparam_key_length": 1024,
+      "dhparam_generator_id": 2,
+      "worker_processes": 12,
+      "worker_connections": 10240,
+      "sendfile": "on",
+      "tcp_nopush": "on",
+      "tcp_nodelay": "on",
+      "gzip": "on",
+      "gzip_http_version": "1.0",
+      "gzip_comp_level": "2",
+      "gzip_proxied": "any",
+      "gzip_types": [
+        "text/plain",
+        "text/css",
+        "application/x-javascript",
+        "text/xml",
+        "application/xml",
+        "application/xml+rss",
+        "text/javascript",
+        "application/json"
+      ],
+      "keepalive_timeout": 65,
+      "client_max_body_size": "250m",
+      "cache_max_size": "5000m",
+      "server_names_hash_bucket_size": 128,
+      "enable_ipv6": false,
+      "strict_host_header": false,
+      "use_implicit_hosts": false,
+      "show_welcome_page": true
+    },
+    "postgresql": {
+      "version": "9.6",
+      "enable": true,
+      "external": true,
+      "ha": false,
+      "dir": "/var/opt/opscode/postgresql/9.6",
+      "data_dir": "/var/opt/opscode/postgresql/9.6/data",
+      "log_directory": "/var/log/opscode/postgresql/9.6",
+      "log_min_duration_statement": -1,
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "username": "opscode-pgsql",
+      "db_superuser": "chef-pgsql",
+      "shell": "/bin/sh",
+      "home": "/var/opt/opscode/postgresql",
+      "user_path": "/opt/opscode/embedded/bin:/opt/opscode/bin:$PATH",
+      "vip": "127.0.0.1",
+      "port": 5432,
+      "listen_address": "127.0.0.1",
+      "max_connections": 350,
+      "keepalives_idle": 60,
+      "keepalives_interval": 15,
+      "keepalives_count": 2,
+      "md5_auth_cidr_addresses": [
+        "127.0.0.1/32",
+        "::1/128"
+      ],
+      "wal_level": "minimal",
+      "archive_mode": "off",
+      "archive_command": "",
+      "archive_timeout": 0,
+      "shared_buffers": "7901MB",
+      "work_mem": "8MB",
+      "effective_cache_size": "15802MB",
+      "max_wal_size": "1GB",
+      "min_wal_size": "80MB",
+      "checkpoint_timeout": "5min",
+      "checkpoint_completion_target": 0.5,
+      "checkpoint_flush_after": "256kB",
+      "checkpoint_warning": "30s",
+      "pg_upgrade_timeout": 7200,
+      "db_superuser_password": "6591266f724f79da0ef8a984dee897b51eba969df9345ce0ddffdd9af627d39a83b3deb804ac4f2c000473c703a970d5f692"
+    },
+    "oc_bifrost": {
+      "enable": true,
+      "ha": false,
+      "dir": "/var/opt/opscode/oc_bifrost",
+      "log_directory": "/var/log/opscode/oc_bifrost",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10,
+        "max_messages_per_second": 1000
+      },
+      "vip": "127.0.0.1",
+      "listen": "127.0.0.1",
+      "port": 9463,
+      "db_pool_size": "20",
+      "db_pool_max": null,
+      "db_pool_init": null,
+      "db_pooler_timeout": 2000,
+      "db_pool_queue_max": 20,
+      "udp_socket_pool_size": null,
+      "sql_user": "bifrost",
+      "sql_ro_user": "bifrost_ro",
+      "sql_db_timeout": 5000,
+      "extended_perf_log": true,
+      "enable_request_logging": true,
+      "superuser_id": "ed2c4bdcfdc1d09ce638be3e77dd353e",
+      "sql_password": "e25186fefb73504a594b5572305fbaa910935a05f814c728c3b1f91dd05997eb65d9a886da2b46e28d341567e3f44149e6a4",
+      "sql_ro_password": "f78d8dea633c704a56a5c9127177b624d61445d87991cd5bccd5b0a347f39d29fc5d675a9e3e836ef3c15b46f0d74938ebc4"
+    },
+    "oc_chef_authz": {
+      "http_init_count": 25,
+      "http_max_count": 100,
+      "http_queue_max": 50,
+      "http_cull_interval": "{1, min}",
+      "http_max_age": "{70, sec}",
+      "http_max_connection_duration": "{70, sec}",
+      "ibrowse_options": "[{connect_timeout, 5000}]"
+    },
+    "bookshelf": {
+      "enable": true,
+      "ha": false,
+      "dir": "/var/opt/opscode/bookshelf",
+      "data_dir": "/var/opt/opscode/bookshelf/data",
+      "log_directory": "/var/log/opscode/bookshelf",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "vip": "a1-migration",
+      "vip_port": 443,
+      "listen": "127.0.0.1",
+      "port": 4321,
+      "stream_download": true,
+      "external_url": "host_header",
+      "storage_type": "sql",
+      "sql_retry_count": 0,
+      "sql_retry_delay": 10,
+      "abandoned_upload_cleanup_interval": 1140000,
+      "deleted_data_cleanup_interval": 420000,
+      "db_pool_size": 20,
+      "db_pool_max": null,
+      "db_pool_init": null,
+      "db_pool_queue_max": 200,
+      "db_pooler_timeout": 2000,
+      "sql_db_timeout": 5000,
+      "sql_ro_user": "bookshelf_ro",
+      "sql_user": "bookshelf",
+      "enable_request_logging": false,
+      "access_key_id": "8197aef76e8aa08d0ec55e4123b93c27929790d9",
+      "secret_access_key": "0fddcd2d4c2f1f1420e6159f8121a5bcd047ea40c55e7e23485ab861879a138551ebb4b657c4cb71",
+      "sql_password": "8a153d5e8ff427c570e84bb1587549f6a1db1397e91b0faa0fdfd770763516dd94a65af71cf21e48",
+      "sql_ro_password": "81a5370bf132d4dedd0e395f967de3d49e0619b91cdaf23ee9a7484f21b609fd1f01f2b6238cda44"
+    },
+    "oc_id": {
+      "enable": false,
+      "ha": false,
+      "dir": "/var/opt/opscode/oc_id",
+      "log_directory": "/var/log/opscode/oc_id",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "vip": "127.0.0.1",
+      "port": 9090,
+      "sql_database": "oc_id",
+      "sql_user": "oc_id",
+      "sql_ro_user": "oc_id_ro",
+      "db_pool_size": "20",
+      "sentry_dsn": null,
+      "sign_up_url": null,
+      "email_from_address": "\"Opscode\" <donotreply@chef.io>",
+      "origin": null,
+      "administrators": [
+
+      ],
+      "applications": {
+
+      },
+      "secret_key_base": "9ee6f4446cc66e1398d4fe265f8714fcc46f7516aec5684fa2c3940e62c0329b597680e19a466ca5820eca9f0df99190331a",
+      "sql_password": "fa0c1a72e8db0a6baf7444fda2dcafb4fde41f8c955e38be164b0d7e824042b5540daeb2cd963b6fbb9c3a2084e42ef6abe7",
+      "sql_ro_password": "c016c3aab399676f7dd3ba831de03167144d7361b40253bbfea1bb5147a7415e5d6dd8b4812b93784ddee02c11c3a97b9b17"
+    },
+    "dark_launch": {
+      "quick_start": false,
+      "new_theme": true,
+      "private-chef": true,
+      "sql_users": true,
+      "add_type_and_bag_to_items": true,
+      "reporting": true,
+      "actions": false
+    },
+    "opscode-chef-mover": {
+      "enable": true,
+      "ha": false,
+      "dir": "/var/opt/opscode/opscode-chef-mover",
+      "data_dir": "/var/opt/opscode/opscode-chef-mover/data",
+      "log_directory": "/var/log/opscode/opscode-chef-mover",
+      "log_rotation": {
+        "file_maxbytes": 1073741824,
+        "num_to_keep": 10
+      },
+      "bulk_fetch_batch_size": 5,
+      "max_cache_size": "10000",
+      "cache_ttl": "3600",
+      "db_pool_size": "5",
+      "udp_socket_pool_size": null,
+      "sql_db_timeout": 5000,
+      "ibrowse_max_sessions": 256,
+      "ibrowse_max_pipeline_size": 1,
+      "solr_timeout": 30000,
+      "solr_http_init_count": 25,
+      "solr_http_max_count": 100,
+      "solr_http_cull_interval": "{1, min}",
+      "solr_http_max_age": "{70, sec}",
+      "solr_http_max_connection_duration": "{70,sec}",
+      "solr_ibrowse_options": "[{connect_timeout, 10000}]"
+    },
+    "bootstrap": {
+      "enable": true
+    },
+    "estatsd": {
+      "enable": true,
+      "dir": "/var/opt/opscode/estatsd",
+      "log_directory": "/var/log/opscode/estatsd",
+      "vip": "127.0.0.1",
+      "port": 9466,
+      "protocol": "estatsd"
+    },
+    "ldap": {
+
+    },
+    "upgrades": {
+      "dir": "/var/opt/opscode/upgrades"
+    },
+    "folsom_graphite": {
+      "enabled": false,
+      "host": "localhost",
+      "port": 8080,
+      "prefix": "stats_prefix",
+      "send_interval": 10000,
+      "retry_interval": 2000
+    },
+    "data_collector": {
+      "timeout": 30000,
+      "http_init_count": 25,
+      "http_max_count": 100,
+      "http_max_age": "{70, sec}",
+      "http_cull_interval": "{1, min}",
+      "http_max_connection_duration": "{70,sec}",
+      "ibrowse_options": "[{connect_timeout, 10000}]",
+      "root_url": "https://localhost/data-collector/v0",
+      "token": "SI3JNdW4XIN3iNaNL2gWkSOjxowNQHW7r8NG9yV7fsI"
+    },
+    "profiles": {
+      "root_url": "https://localhost"
+    },
+    "folsom-graphite": {
+
+    },
+    "lb-internal": {
+
+    },
+    "drbd": {
+      "shared_secret": "e7af30e9dea66cccd145ceacd02795dc20f2ead7c0f509a118ce9c047c5c"
+    },
+    "ha": {
+
+    },
+    "use_chef_backend": false,
+    "chef_backend_members": [
+
+    ],
+    "disabled-plugins": [
+
+    ],
+    "enabled-plugins": [
+
+    ],
+    "backup": {
+      "strategy": "tar"
+    },
+    "topology": "standalone",
+    "servers": {
+
+    },
+    "backend_vips": {
+
+    },
+    "logs": {
+      "log_retention": {
+
+      }
+    },
+    "insecure_addon_compat": true
+  },
+  "run_list": [
+  "recipe[private-chef::default]"
+]
+,
+  "runit": {
+    "prefer_local_yum": false,
+    "sv_bin": "/opt/opscode/embedded/bin/sv",
+    "svlogd_bin": "/opt/opscode/embedded/bin/svlogd",
+    "chpst_bin": "/opt/opscode/embedded/bin/chpst",
+    "service_dir": "/opt/opscode/service",
+    "sv_dir": "/opt/opscode/sv",
+    "lsb_init_dir": "/opt/opscode/init"
+  }
+}

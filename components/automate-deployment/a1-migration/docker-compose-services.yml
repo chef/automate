@@ -5,7 +5,7 @@ services:
     hostname: a1-migration
     image: chef/a1-migration
     privileged: true  # so we can run hab
-    mem_limit: 4G
+    mem_limit: 8G
     expose:
       - "443"
     ports:

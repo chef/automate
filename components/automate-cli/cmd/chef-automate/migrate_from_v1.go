@@ -206,24 +206,8 @@ func init() {
 		panic(":(")
 	}
 
-	// a1 migration with Chef Server is only supported for the all-in-one topology
-	// used in OWCA and marketplace images; we do not support that configuration
-	// for other customers, so it's hidden.
-	err = migrateFrom1Cmd.PersistentFlags().MarkHidden("enable-chef-server")
-	if err != nil {
-		fmt.Printf("failed configuring cobra: %s\n", err.Error())
-		panic(":(")
-	}
-
 	// a1 migration with Workflow Server will be hidden until it is fully completed
 	err = migrateFrom1Cmd.PersistentFlags().MarkHidden("enable-workflow")
-	if err != nil {
-		fmt.Printf("failed configuring cobra: %s\n", err.Error())
-		panic(":(")
-	}
-
-	// Also hide this because it's related to the chef-server feature
-	err = migrateFrom1Cmd.PersistentFlags().MarkHidden("chef-server-running")
 	if err != nil {
 		fmt.Printf("failed configuring cobra: %s\n", err.Error())
 		panic(":(")
