@@ -13,6 +13,7 @@ automate-builder-api BINDING_MODE strict
 automate-builder-api-proxy REQUIRED automate-builder-api
 automate-builder-api-proxy BINDING_MODE strict
 automate-builder-memcached BINDING_MODE strict
+automate-cds REQUIRED compliance-service
 automate-cds BINDING_MODE strict
 automate-cs-bookshelf REQUIRED automate-pg-gateway pg-sidecar-service
 automate-cs-bookshelf BINDING_MODE strict

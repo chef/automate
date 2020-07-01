@@ -14,6 +14,9 @@ pkg_exports=(
   [port]=service.port # default service is grpc
   [host]=service.host
 )
+pkg_binds=(
+  [compliance-service]="port"
+)
 pkg_exposes=(port)
 
 pkg_bin_dirs=(bin)

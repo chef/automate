@@ -15,8 +15,12 @@ import (
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/chef/automate/lib/version"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"net/http"
+
+	profiles "github.com/chef/automate/api/interservice/compliance/profiles"
 )
 
 // Chosen somewhat arbitrarily to be a "good enough" value.
@@ -25,12 +29,16 @@ const streamBufferSize = 262144
 
 // Server is an Automate CDS proxy server
 type Server struct {
-	service *service.Service
+	service               *service.Service
+	profilesServiceClient profiles.ProfilesServiceClient
 }
 
 // NewServer returns an Automate CDS proxy server
-func NewServer(service *service.Service) *Server {
-	return &Server{service: service}
+func NewServer(service *service.Service, profilesServiceClient profiles.ProfilesServiceClient) *Server {
+	return &Server{
+		service:               service,
+		profilesServiceClient: profilesServiceClient,
+	}
 }
 
 // GetVersion returns the version of Automate CDS GRPC API
@@ -78,7 +86,7 @@ func (s *Server) ListContentItems(ctx context.Context, request *request.ContentI
 				Type:           "package",
 				Version:        "2.3.2",
 				Platforms:      []string{"Solaris"},
-				CanBeInstalled: true,
+				CanBeInstalled: false,
 				Filename:       "chef-compliance-effortless-1.1.1-20200626161151-x86_64-linux.hart",
 			},
 		},
@@ -88,9 +96,23 @@ func (s *Server) ListContentItems(ctx context.Context, request *request.ContentI
 // InstallContentItem - installing a content item
 func (s *Server) InstallContentItem(ctx context.Context, request *request.InstallContentItem) (*response.InstallContentItem, error) {
 
-	log.Infof("Downloading content item with ID %s ...", request.Id)
+	url := getSaaSURL(request.Id)
+	log.Infof("Downloading content item with ID %s and URL: %s", request.Id, url)
 
-	log.Infof("Installing content item with ID %s ...", request.Id)
+	// Cookbook and Package types can not be installed
+	if request.Id == "736f5724-b384-4d74-b8cb-dedd9f1ecd54" ||
+		request.Id == "1f9e6a1e-3381-487f-98ef-9966c65ff92a" {
+		// return an error
+
+		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument, "Can not be installed")
+	}
+
+	if request.Id == "f354577e-2ea5-4c96-86ed-78a8ba68e0f3" {
+		log.Infof("Installing content item with ID %s ...", request.Id)
+
+		s.profilesServiceClient.Create()
+		// stream the file from the SaaS to the compliance-service
+	}
 
 	return &response.InstallContentItem{}, nil
 }
@@ -101,8 +123,10 @@ func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 
 	log.Infof("DownloadContentItem: Downloading content item with ID %s ...", request.Id)
 
+	url := getSaaSURL(request.Id)
+
 	// Get the data
-	resp, err := http.Get("https://github.com/dev-sec/apache-baseline/archive/master.tar.gz")
+	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
@@ -120,4 +144,20 @@ func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 	}
 
 	return nil
+}
+
+func getSaaSURL(id string) string {
+	if id == "f354577e-2ea5-4c96-86ed-78a8ba68e0f3" {
+		return "https://github.com/dev-sec/apache-baseline/archive/master.tar.gz"
+	}
+
+	if id == "736f5724-b384-4d74-b8cb-dedd9f1ecd54" {
+		return "https://bldr.habitat.sh/v1/depot/pkgs/effortless/audit-baseline/0.1.0/20191217125442/download"
+	}
+
+	if id == "1f9e6a1e-3381-487f-98ef-9966c65ff92a" {
+		return "https://github.com/dev-sec/apache-baseline/archive/master.tar.gz"
+	}
+
+	return "https://media.giphy.com/media/NkW4LM727h1U4/giphy.gif"
 }
