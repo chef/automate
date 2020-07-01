@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/chef/automate/api/external/cds/request"
 	"github.com/chef/automate/api/external/cds/response"
@@ -97,7 +98,6 @@ func (s *Server) ListContentItems(ctx context.Context, request *request.ContentI
 func (s *Server) InstallContentItem(ctx context.Context, request *request.InstallContentItem) (*response.InstallContentItem, error) {
 
 	url := getSaaSURL(request.Id)
-	log.Infof("Downloading content item with ID %s and URL: %s", request.Id, url)
 
 	// Cookbook and Package types can not be installed
 	if request.Id == "736f5724-b384-4d74-b8cb-dedd9f1ecd54" ||
@@ -110,8 +110,41 @@ func (s *Server) InstallContentItem(ctx context.Context, request *request.Instal
 	if request.Id == "f354577e-2ea5-4c96-86ed-78a8ba68e0f3" {
 		log.Infof("Installing content item with ID %s ...", request.Id)
 
-		s.profilesServiceClient.Create()
-		// stream the file from the SaaS to the compliance-service
+		// Get the data
+		resp, err := http.Get(url)
+		if err != nil {
+			return &response.InstallContentItem{}, status.Errorf(codes.Internal, "Could not connect to Content Delivery Service")
+		}
+		defer resp.Body.Close()
+
+		stream, err := s.profilesServiceClient.Create(ctx)
+		if err != nil {
+			return &response.InstallContentItem{}, status.Errorf(codes.Internal, "Failed connecting to the compliance-service")
+		}
+
+		// How do we get the owner?
+		owner := "admin"
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return &response.InstallContentItem{}, status.Errorf(codes.Internal, "Failed streaming from SaaS")
+		}
+
+		err = stream.Send(&profiles.ProfilePostRequest{
+			Owner: owner,
+			Chunk: &profiles.Chunk{Data: body},
+			Meta: &profiles.Metadata{
+				ContentType: "application/gzip",
+			},
+		})
+		if err != nil {
+			return &response.InstallContentItem{}, status.Errorf(codes.Internal, "Failed sending to the compliance service")
+		}
+
+		_, err = stream.CloseAndRecv()
+		if err != nil {
+			return &response.InstallContentItem{}, status.Errorf(codes.Internal, "Failed closing stream to the compliance service error: %q", err.Error())
+		}
 	}
 
 	return &response.InstallContentItem{}, nil
