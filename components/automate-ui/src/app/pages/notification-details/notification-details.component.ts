@@ -52,6 +52,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
   public notificationDetailsLoading = true;
   public targetKeys: string[];
   public alertTypeKeys: string[];
+  public displayCriticalControlsBox = false;
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -136,6 +137,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
     if ( this.notification.targetType !==  event.target.value ) {
       this.updateForm.controls.targetType.markAsDirty();
       this.notification.targetType = event.target.value;
+      this.displayCriticalControlsBox = this.displayCriticalControlsCheckbox();
     }
   }
 
@@ -154,6 +156,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
     }
 
     this.notification.ruleType = event.target.value;
+    this.displayCriticalControlsBox = this.displayCriticalControlsCheckbox();
     if (this.notification.ruleType !== 'ComplianceFailure' &&
       this.notification.targetType === ServiceActionType.SERVICENOW) {
         this.notification.criticalControlsOnly = false;

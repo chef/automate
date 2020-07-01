@@ -24,7 +24,13 @@ export interface NotificationTarget {
 
 export interface NotificationRuleTarget {
   id?: string;
-  rule: {};
+  rule: RuleTarget;
+}
+
+export interface RuleTarget {
+  name?: string;
+  event?: string;
+  targetType?: string;
 }
 
 export class NotificationRule implements RuleInterface {

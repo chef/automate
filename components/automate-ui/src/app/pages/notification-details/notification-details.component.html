@@ -66,7 +66,7 @@
                   {{ notification.AlertTypeLabels[key] }}
                 </chef-option>
               </chef-select>
-              <div *ngIf="displayCriticalControlsCheckbox()">
+              <div *ngIf="displayCriticalControlsBox">
                 <div class="small">
                   <chef-checkbox
                     (change)="updateCriticalControlsOnly($event.detail)"
