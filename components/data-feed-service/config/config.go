@@ -40,6 +40,7 @@ type ServiceConfig struct {
 	UpdatedNodesOnly  bool          `mapstructure:"updated_nodes_only"`
 	DisableCIDRFilter bool          `mapstructure:"disable_cidr_filter"`
 	CIDRFilter        string        `mapstructure:"cidr_filter"`
+	ExternalFqdn      string        `mapstructure:"external_fqdn"`
 }
 
 type PostgresConfig struct {

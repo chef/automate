@@ -200,39 +200,6 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 	return nil
 }
 
-func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (map[string]interface{}, error) {
-
-	nodeData := make(map[string]interface{})
-	nodeId, lastRunId, err := getNodeFields(ctx, client, filters)
-	if err != nil {
-		return nodeData, err
-	}
-
-	attributesJson, err := getNodeAttributes(ctx, client, nodeId)
-	if err != nil {
-		return nodeData, err
-	}
-
-	nodeData["attributes"] = attributesJson
-
-	lastRun, err := client.GetNodeRun(ctx, &cfgmgmtRequest.NodeRun{NodeId: nodeId, RunId: lastRunId})
-
-	if err != nil {
-		log.Errorf("Error getting node run %v", err)
-		return nodeData, err
-	}
-	automaticAttrs, _ := attributesJson["automatic"].(map[string]interface{})
-	ipaddress, macAddress, hostname := getHostAttributes(automaticAttrs)
-	nodeDataContent := make(map[string]interface{})
-	nodeData["client_run"] = lastRun
-	nodeDataContent["macaddress"] = macAddress
-	nodeDataContent["hostname"] = hostname
-	nodeDataContent["ipaddress"] = ipaddress
-	addDataContent(nodeDataContent, automaticAttrs)
-	nodeData["node"] = nodeDataContent
-	return nodeData, nil
-}
-
 func addDataContent(nodeDataContent map[string]interface{}, attributes map[string]interface{}) {
 	os, _ := attributes["os"].(string)
 	if strings.ToLower(os) == "windows" {

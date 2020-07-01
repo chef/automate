@@ -8,6 +8,7 @@ node_batch_size = 50
 updated_nodes_only = true
 disable_cidr_filter = true
 cidr_filter = "0.0.0.0/0"
+external_fqdn = ""
 
 [tls]
 key_contents =""

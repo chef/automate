@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/chef/automate/components/data-feed-service/config"
+
 	cfgmgmtResponse "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/golang/mock/gomock"
@@ -35,6 +37,7 @@ var mockAttrString = "{\"foo\":\"bar\"}"
 var mockAttrs = map[string]string{"foo": "bar"}
 var automaticAttrs = "{\"dmi\":{\"system\":{\"serial_number\":\"serial-number\"}},\"hostname\":\"test.chef.com\",\"hostnamectl\":{\"operating_system\":\"ubuntu\"},\"ipaddress\":\"172.18.2.120\",\"macaddress\":\"00:1C:42:C1:2D:87\",\"os\":\"linux\",\"os_version\":\"4.13.0-45-generic\"}"
 var automaticAttrsWin = "{\"os\":\"windows\",\"kernel\":{\"os_info\":{\"serial_number\":\"serial-number\",\"service_pack_major_version\":2,\"service_pack_minor_version\":1}},\"dmi\":{\"system\":{\"serial_number\":\"\"}},\"hostname\":\"test.chef.com\",\"ipaddress\":\"172.18.2.120\",\"macaddress\":\"00:1C:42:C1:2D:87\"}"
+var mockConfig = &config.DataFeedConfig{}
 
 func TestAssetCreated(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -555,7 +558,8 @@ func TestGetNodeDataEmpty(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(&cfgmgmtResponse.Run{}, nil)
-	nodeData, err := getNodeData(context.Background(), mockCfgMgmtClient, []string{})
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	if nodeData["attributes"] == nil {
 		t.Log("expected attributes, got nil")
 		t.Fail()
@@ -597,8 +601,8 @@ func TestGetNodeDataFieldsError(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(&structpb.ListValue{}, mockErr)
-
-	nodeData, err := getNodeData(context.Background(), mockCfgMgmtClient, []string{})
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	if len(nodeData) != 0 {
 		t.Logf("expected empty node data map, got %v", nodeData)
 		t.Fail()
@@ -621,7 +625,8 @@ func TestGetNodeDataAttrsError(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(&cfgmgmtResponse.NodeAttribute{}, mockErr)
-	nodeData, err := getNodeData(context.Background(), mockCfgMgmtClient, []string{})
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	if len(nodeData) != 0 {
 		t.Logf("expected empty node data map, got %v", nodeData)
 		t.Fail()
@@ -648,7 +653,8 @@ func TestGetNodeDataRunError(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(&cfgmgmtResponse.Run{}, mockErr)
-	nodeData, err := getNodeData(context.Background(), mockCfgMgmtClient, []string{})
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	attributesJson := nodeData["attributes"].(map[string]interface{})
 	verifyAttributesEmpty(attributesJson, t)
 	if err != mockErr {
@@ -676,7 +682,8 @@ func TestGetNodeDataNotWindows(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(run, nil)
-	nodeData, err := getNodeData(context.Background(), mockCfgMgmtClient, []string{})
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	if nodeData["attributes"] == nil {
 		t.Log("expected attributes, got nil")
 		t.Fail()
@@ -729,7 +736,8 @@ func TestGetNodeDataWindows(t *testing.T) {
 		context.Background(),
 		gomock.Any(),
 	).Return(run, nil)
-	nodeData, err := getNodeData(context.Background(), mockCfgMgmtClient, []string{})
+	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient}
+	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
 	if nodeData["attributes"] == nil {
 		t.Log("expected attributes, got nil")
 		t.Fail()

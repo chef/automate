@@ -25,6 +25,14 @@ message ConfigRequest {
 			message Service {
 				google.protobuf.StringValue host = 1;
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 14001, protocol: "grpc" } ];
+				google.protobuf.StringValue feed_interval = 3;
+				google.protobuf.Int32Value asset_page_size = 4;
+				google.protobuf.Int32Value reports_page_size = 5;
+				google.protobuf.Int32Value node_batch_size = 6;
+				google.protobuf.BoolValue updated_nodes_only = 7;
+				google.protobuf.BoolValue disable_cidr_filter = 8;
+				google.protobuf.StringValue cidr_filter = 9;
+				google.protobuf.StringValue external_fqdn = 10;
 			}
 
 			message Log {
@@ -33,6 +41,5 @@ message ConfigRequest {
 			}
 
 		}
-
 	}
 }
