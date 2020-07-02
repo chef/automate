@@ -68,7 +68,7 @@
     </chef-button>
     <chef-button class="calendar-btn" secondary (click)="toggleCalendar()">
       <chef-icon>date_range</chef-icon>
-      <span>{{ date | datetime: CHEF_SHORT_DATE }}</span>
+      <span>{{ date }}</span>
     </chef-button>
     <chef-dropdown [attr.visible]="calendarVisible">
       <chef-click-outside omit="calendar-btn" (clickOutside)="hideCalendar()">
