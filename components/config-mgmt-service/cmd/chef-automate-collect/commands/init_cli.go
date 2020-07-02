@@ -13,6 +13,7 @@ func newRootCmd() *cobra.Command {
 		Short: "Collect data for Chef Automate",
 	}
 	r.AddCommand(newDescribeCmd())
+	r.AddCommand(newGenConfigCommand())
 	return r
 }
 
