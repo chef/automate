@@ -50,7 +50,7 @@ export class CdsEffects {
   installContentItem$ = this.actions$.pipe(
     ofType(CdsActionTypes.INSTALL_CONTENT_ITEM),
     mergeMap( (action: InstallContentItem) =>
-      this.requests.installContentItem(action.payload.id).pipe(
+      this.requests.installContentItem(action.payload.id, action.payload.user).pipe(
         map( _ => new InstallContentItemSuccess( )),
         catchError((error) => of(new InstallContentItemFailure(error))))
     ));

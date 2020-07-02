@@ -37,7 +37,8 @@ type Server struct {
 }
 
 // NewServer returns an Automate CDS proxy server
-func NewServer(service *service.Service, profilesServiceClient profiles.ProfilesServiceClient) *Server {
+func NewServer(service *service.Service,
+	profilesServiceClient profiles.ProfilesServiceClient) *Server {
 	return &Server{
 		service:               service,
 		profilesServiceClient: profilesServiceClient,
@@ -58,11 +59,13 @@ func (s *Server) GetVersion(
 }
 
 // ListContentItems - Returns a list of CDS content metadata
-func (s *Server) ListContentItems(ctx context.Context, request *request.ContentItems) (*response.ContentItems, error) {
+func (s *Server) ListContentItems(ctx context.Context,
+	request *request.ContentItems) (*response.ContentItems, error) {
 
 	backendItems, err := s.client.GetContentItems()
 	if err != nil {
-		return &response.ContentItems{}, status.Errorf(codes.Internal, "Failed connecting to Chef Cloud")
+		return &response.ContentItems{}, status.Errorf(codes.Internal,
+			"Failed connecting to Chef Cloud")
 	}
 
 	responseItems := make([]*response.ContentItem, len(backendItems))
@@ -85,28 +88,37 @@ func (s *Server) ListContentItems(ctx context.Context, request *request.ContentI
 }
 
 // InstallContentItem - installing a content item
-func (s *Server) InstallContentItem(ctx context.Context, request *request.InstallContentItem) (*response.InstallContentItem, error) {
+func (s *Server) InstallContentItem(ctx context.Context,
+	request *request.InstallContentItem) (*response.InstallContentItem, error) {
 	contentItem, found, err := s.client.GetContentItem(request.Id)
 	if err != nil {
-		return &response.InstallContentItem{}, status.Errorf(codes.Internal, "Could not connect to Content Delivery Service error: %s", err.Error)
+		return &response.InstallContentItem{}, status.Errorf(codes.Internal,
+			"Could not connect to Content Delivery Service error: %s", err.Error)
 	}
 	if !found {
-		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument, "Content item not found with ID %q", request.Id)
+		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument,
+			"Content item not found with ID %q", request.Id)
 	}
 
 	if !contentItem.CanBeInstalled {
-		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument, "Can not be installed")
+		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument,
+			"Content item with ID %q Can not be installed", request.Id)
 	}
 
 	if contentItem.Type == "profile" {
-		// How do we get the owner?
-		owner := "admin"
-		err = s.installProfile(ctx, contentItem, owner)
+		if request.RequestUser == "" {
+			return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument,
+				"A request_user must be non empty")
+		}
+
+		err = s.installProfile(ctx, contentItem, request.RequestUser)
 		if err != nil {
-			return &response.InstallContentItem{}, status.Errorf(codes.Internal, "Error Installing Profile: %s", err.Error)
+			return &response.InstallContentItem{}, status.Errorf(codes.Internal,
+				"Error Installing Profile: %s", err.Error)
 		}
 	} else {
-		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument, "Can install content item type %q", contentItem.Type)
+		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument,
+			"Can install content item type %q", contentItem.Type)
 	}
 
 	return &response.InstallContentItem{}, nil
@@ -147,7 +159,8 @@ func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 	return nil
 }
 
-func (s *Server) installProfile(ctx context.Context, contentItem backend.ContentItem, owner string) error {
+func (s *Server) installProfile(ctx context.Context,
+	contentItem backend.ContentItem, owner string) error {
 	log.Infof("Installing profile content item with ID %s ...", contentItem.ID)
 
 	// Get the data
@@ -180,7 +193,8 @@ func (s *Server) installProfile(ctx context.Context, contentItem backend.Content
 
 	_, err = stream.CloseAndRecv()
 	if err != nil {
-		return status.Errorf(codes.Internal, "Failed closing stream to the compliance service error: %q", err.Error())
+		return status.Errorf(codes.Internal,
+			"Failed closing stream to the compliance service error: %q", err.Error())
 	}
 
 	return nil

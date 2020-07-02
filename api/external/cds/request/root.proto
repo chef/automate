@@ -9,6 +9,7 @@ message ContentItems {
 
 message InstallContentItem {
   string id = 1;
+  string request_user = 2;
 }
 
 message DownloadContentItem {

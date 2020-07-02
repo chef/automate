@@ -16,7 +16,8 @@ import (
 )
 
 // NewGRPCServer creates a grpc server that serves all Teams GRPC APIs
-func NewGRPCServer(s *service.Service, profilesServiceClient profiles.ProfilesServiceClient) *grpc.Server {
+func NewGRPCServer(s *service.Service,
+	profilesServiceClient profiles.ProfilesServiceClient) *grpc.Server {
 	grpcServer := s.ConnFactory.NewServer(tracing.GlobalServerInterceptor())
 
 	health.RegisterHealthServer(grpcServer, health.NewService())
