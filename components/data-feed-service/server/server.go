@@ -29,9 +29,10 @@ import (
 
 // DatafeedServer is the interface to this component.
 type DatafeedServer struct {
-	db      *dao.DB
-	health  *health.Service
-	secrets secrets.SecretsServiceClient
+	db                  *dao.DB
+	health              *health.Service
+	secrets             secrets.SecretsServiceClient
+	acceptedStatusCodes []int32
 }
 
 // New creates a new DatafeedServer instance.
@@ -42,9 +43,10 @@ func NewDatafeedServer(db *dao.DB, config *config.DataFeedConfig, connFactory *s
 		return nil, errors.Wrap(err, "could not connect to secrets-service")
 	}
 	return &DatafeedServer{
-		db:      db,
-		health:  health.NewService(),
-		secrets: secrets.NewSecretsServiceClient(secretsConn),
+		db:                  db,
+		health:              health.NewService(),
+		secrets:             secrets.NewSecretsServiceClient(secretsConn),
+		acceptedStatusCodes: config.ServiceConfig.AcceptedStatusCodes,
 	}, nil
 }
 
@@ -122,7 +124,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		log.Infof("Test data posted to %v, Status %v", url, httpResponse.Status)
 	}
 
-	if httpResponse.StatusCode == http.StatusOK {
+	if config.IsAcceptedStatusCode(int32(httpResponse.StatusCode), datafeedServer.acceptedStatusCodes) {
 		response.Success = true
 	} else {
 		return response, status.Newf(codes.Internal, "%s posting test message to: %s", httpResponse.Status, url).Err()

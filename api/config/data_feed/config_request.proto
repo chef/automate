@@ -33,6 +33,7 @@ message ConfigRequest {
 				google.protobuf.BoolValue disable_cidr_filter = 8;
 				google.protobuf.StringValue cidr_filter = 9;
 				google.protobuf.StringValue external_fqdn = 10;
+				repeated google.protobuf.Int32Value accepted_status_codes = 11;
 			}
 
 			message Log {

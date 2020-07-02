@@ -36,12 +36,14 @@ type datafeedNotification struct {
 }
 
 type DataClient struct {
-	client http.Client
+	client              http.Client
+	acceptedStatusCodes []int32
 }
 
-func NewDataClient() DataClient {
+func NewDataClient(statusCodes []int32) DataClient {
 	return DataClient{
-		client: http.Client{},
+		client:              http.Client{},
+		acceptedStatusCodes: statusCodes,
 	}
 }
 
@@ -190,7 +192,7 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 	} else {
 		log.Infof("Asset data posted to %v, Status %v", notification.url, response.Status)
 	}
-	if response.StatusCode != http.StatusAccepted {
+	if !config.IsAcceptedStatusCode(int32(response.StatusCode), client.acceptedStatusCodes) {
 		return errors.New(response.Status)
 	}
 	err = response.Body.Close()

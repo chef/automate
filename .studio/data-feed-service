@@ -36,6 +36,6 @@ function datafeed_quick_build() {
       log_line "${RED}ERROR:${NC} Unable to compile component '$component'"
       return 1
     fi
-
   done
+  (cd components/data-feed-service && make hab_test)
 }
