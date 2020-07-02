@@ -37,7 +37,5 @@ function datafeed_quick_build() {
       return 1
     fi
   done
-  cd components/data-feed-service
-  make hab_test
-  cd -
+  (cd components/data-feed-service && make hab_test)
 }
