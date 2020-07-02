@@ -7,11 +7,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/chef/automate/components/automate-cds/config"
 	"github.com/chef/automate/components/automate-cds/server"
 	"github.com/chef/automate/components/automate-cds/service"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
-	"github.com/chef/automate/lib/tls/certs"
 )
 
 var serveCmd = &cobra.Command{
@@ -19,13 +19,6 @@ var serveCmd = &cobra.Command{
 	Short: "Launches the automate content delivery service proxy.",
 	Run:   serve,
 	Args:  cobra.ExactArgs(1),
-}
-
-type config struct {
-	GRPC            string `mapstructure:"grpc"`
-	LogFormat       string `mapstructure:"log-format"`
-	LogLevel        string `mapstructure:"log-level"`
-	certs.TLSConfig `mapstructure:"tls"`
 }
 
 func serve(cmd *cobra.Command, args []string) {
@@ -38,7 +31,7 @@ func serve(cmd *cobra.Command, args []string) {
 		fail(fmt.Errorf("Could not read config file. Please pass a config file as the only argument to this command. %w", err))
 	}
 
-	cfg := config{}
+	cfg := config.AutomateCdsConfig{}
 	if err := viper.Unmarshal(&cfg); err != nil {
 		fail(fmt.Errorf("couldn't parse configuration file  %w", err))
 	}
@@ -60,7 +53,7 @@ func serve(cmd *cobra.Command, args []string) {
 		fail(fmt.Errorf("could not initialize service %w", err))
 	}
 
-	fail(server.GRPC(cfg.GRPC, service))
+	fail(server.GRPC(cfg, service))
 }
 
 // fail outputs the error and exits with a non-zero code

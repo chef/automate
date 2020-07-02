@@ -6,3 +6,9 @@ log-level = "{{cfg.log.level}}"
 cert_path = "{{pkg.svc_config_path}}/service.crt"
 key_path = "{{pkg.svc_config_path}}/service.key"
 root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
+
+
+[compliance-service]
+{{~#eachAlive bind.compliance-service.members as |member|}}
+address = "{{member.sys.ip}}:{{member.cfg.port}}"
+{{~/eachAlive}}

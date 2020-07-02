@@ -31,7 +31,7 @@ export class GetContentItemsFailure implements Action {
 
 export class InstallContentItem implements Action {
   readonly type = CdsActionTypes.INSTALL_CONTENT_ITEM;
-  constructor( public payload: { id: string }) { }
+  constructor( public payload: { id: string, user: string }) { }
 }
 
 export class InstallContentItemSuccess implements Action {

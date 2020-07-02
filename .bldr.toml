@@ -2188,6 +2188,7 @@ paths = [
   "api/external/cds/*",
   "api/external/common/*",
   "api/interservice/cds/*",
+  "api/interservice/compliance/*",
   "components/automate-gateway/api/iam/*",
   "components/automate-grpc/*",
   "lib/grpc/*",

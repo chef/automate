@@ -18,6 +18,8 @@ func init() {
 				switch want {
 				case "id":
 					return m.Id
+				case "request_user":
+					return m.RequestUser
 				default:
 					return ""
 				}

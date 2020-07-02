@@ -3,6 +3,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 
 import {
   GetContentItems,
@@ -29,7 +30,8 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private chefSessionService: ChefSessionService
   ) { }
 
   ngOnInit() {
@@ -40,7 +42,10 @@ export class DashboardComponent implements OnInit {
   }
 
   installContentItem(itemId: string) {
-    this.store.dispatch(new InstallContentItem({id: itemId}));
+    this.store.dispatch(new InstallContentItem({
+      id: itemId,
+      user: this.chefSessionService.username
+    }));
   }
 
   downloadContentItem(item: ContentItem) {

@@ -67,6 +67,9 @@ func init() {
       "properties": {
         "id": {
           "type": "string"
+        },
+        "request_user": {
+          "type": "string"
         }
       }
     },
