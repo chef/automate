@@ -81,6 +81,7 @@ build-mac:
 
 ## TOOLS ##
 ruby-grpc-tools:
+	@printf "\n===> ${blue}Installing grpc gems...${reset}\n"
 	@if ! gem list grpc -i; then gem install grpc -v 1.28.0 ; fi > /dev/null
 	@if ! gem list grpc-tools -i; then gem install grpc-tools -v 1.28.0; fi > /dev/null
 
@@ -234,12 +235,12 @@ start-es: start-es$(ES_VER)
 
 start-es5: create-es-data-dir
 	@printf "\n===> ${yellow}Recreating the ElasticSearch 5 container...${reset}\n"
-	docker rm -f cc_es5 &> /dev/null; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es5 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 elasticsearch:5.4.0
+	docker rm -f cc_es5 &> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es5 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 elasticsearch:5.4.0
 	@$(MAKE) wait-for-es
 
 start-es6: create-es-data-dir
 	@printf "\n===> ${yellow}Recreating the ElasticSearch 6 container...${reset}\n"
-	docker rm -f cc_es6 &> /dev/null; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es6 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
+	docker rm -f cc_es6 &> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es6 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 	@$(MAKE) wait-for-es
 
 create-es-data-dir:
@@ -251,7 +252,7 @@ purge-es-data:
 # for automate 2.0, we'll be on pg6
 start-pg:
 	@printf "\n===> ${yellow}Recreating the PostgreSQL container...${reset}\n"
-	docker rm -f cc_pg &> /dev/null; docker run --name cc_pg -e POSTGRES_DB=chef_automate -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=admin -p $(POSTGRES_PORT):5432 -d postgres:9.6.11 || docker start cc_pg
+	docker rm -f cc_pg &> /dev/null; sleep 1; docker run --name cc_pg -e POSTGRES_DB=chef_automate -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=admin -p $(POSTGRES_PORT):5432 -d postgres:9.6.11 || docker start cc_pg
 	@$(MAKE) wait-for-pg
 	@printf "\n * ${blue}Creating the PostgreSQL databases...${reset}\n"
 	docker exec -it cc_pg psql -Upostgres -c 'CREATE DATABASE secrets_service;'
@@ -504,21 +505,22 @@ download-sample-market-profiles: $(MARKET_PATH)
 	@if [ -f $(MARKET_PATH)/linux-patch-baseline-0.3.0.tar.gz ]; then printf " * ${blue}linux-patch-baseline${reset} already downloaded\n"; else curl -LSs -o $(MARKET_PATH)/linux-patch-baseline-0.3.0.tar.gz https://github.com/dev-sec/linux-patch-baseline/archive/0.3.0.tar.gz; fi;
 	@if [ -f $(MARKET_PATH)/windows-baseline-1.1.0.tar.gz ]; then printf " * ${blue}windows-baseline${reset} already downloaded\n"; else curl -LSs -o $(MARKET_PATH)/windows-baseline-1.1.0.tar.gz https://github.com/dev-sec/windows-baseline/archive/1.1.0.tar.gz; fi;
 
-	@printf " * ${blue}Generating inspec jsons for $(MARKET_PATH)${reset}\n"
+	@printf "\n===> ${blue}Generating inspec jsons for $(MARKET_PATH)${reset} profiles...\n"
 	@FILES=$$(ls -1 $(MARKET_PATH) | grep '\.tar.gz$$'); \
 	for file in $$FILES; do \
 	  file="$(MARKET_PATH)/$$file"; \
-	  if [ -f $$file ]; then \
-	    printf " * ${blue}$$file${reset} already generated\n"; \
+	  if [ -f "$$file.json" ]; then \
+	    printf " * ${blue}$$file.json${reset} already generated, skipping...\n"; \
 	  else \
-	    printf "\n >> Create inspec json for: ${blue}$$file${reset}\n"; \
-	    inspec json "$$file" > "$$file.json"; \
+	    printf " * Creating ${blue}$$file.json${reset}\n"; \
+	    inspec json "$$file" > "$$file.json" --chef-license="accept-no-persist"; \
 	  fi; \
-	done;
+	done; \
+	echo;
 
 	@# we use this to test zip upload
-	@if [ -f $(TMP_PATH)/ssl-baseline-1.3.0.zip ]; then printf " * ${blue}ssl-baseline-1.3.0${reset} already downloaded\n"; else curl -LSs -o $(TMP_PATH)/ssl-baseline-1.3.0.zip https://github.com/dev-sec/ssl-baseline/archive/1.3.0.zip; fi;
-	@if [ -f $(TMP_PATH)/ssl-baseline-1.4.0.zip ]; then printf " * ${blue}ssl-baseline-1.4.0${reset} already downloaded\n"; else curl -LSs -o $(TMP_PATH)/ssl-baseline-1.4.0.zip https://github.com/dev-sec/ssl-baseline/archive/1.4.0.zip; fi;
+	@if [ -f $(TMP_PATH)/ssl-baseline-1.3.0.zip ]; then printf " * ${blue}$(TMP_PATH)/ssl-baseline-1.3.0.zip${reset} already downloaded\n"; else curl -LSs -o $(TMP_PATH)/ssl-baseline-1.3.0.zip https://github.com/dev-sec/ssl-baseline/archive/1.3.0.zip; fi;
+	@if [ -f $(TMP_PATH)/ssl-baseline-1.4.0.zip ]; then printf " * ${blue}$(TMP_PATH)ssl-baseline-1.4.0.zip${reset} already downloaded\n"; else curl -LSs -o $(TMP_PATH)/ssl-baseline-1.4.0.zip https://github.com/dev-sec/ssl-baseline/archive/1.4.0.zip; fi;
 	cp -f $(TEST_PATH)/mario-0.1.0.tar.gz $(TMP_PATH)
 
 # when running against local es this requires start-es

@@ -118,6 +118,9 @@ echo "* hard nofile 256000" >> /etc/security/limits.conf
 echo "root soft nofile 100000" >> /etc/security/limits.conf
 echo "root hard nofile 256000" >> /etc/security/limits.conf
 sysctl fs.inotify.max_user_watches=524288
+if ! grep -i -q "^vm.max_map_count=" /etc/sysctl.conf; then
+  echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf > /dev/null
+fi
 sysctl -p
 echo 'Defaults    env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/root_ssh_agent
 SSHD_CONFIG="/etc/ssh/sshd_config"

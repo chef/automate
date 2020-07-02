@@ -17,7 +17,7 @@ vagrant plugin install vagrant-managed-servers
 ```
 export SSH_HOST='192.168.56.90'
 export SSH_USER='vagrant'
-export SSH_KEY_PATH='/Users/apop/.ssh/id_rsa'
+export SSH_KEY_PATH='~/.ssh/id_rsa'
 vagrant up
 vagrant provision
 # Follow the instructions provided at the end of the provision step. For example:
