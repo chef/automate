@@ -29,7 +29,7 @@
     "strictNullInputTypes": true,
     "strictAttributeTypes": true,
     "strictSafeNavigationTypes": true,
-    "strictDomLocalRefTypes": false,
+    "strictDomLocalRefTypes": true,
     "strictOutputEventTypes": true,
     "strictDomEventTypes": false,
     "strictContextGenerics": true,
