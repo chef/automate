@@ -84,9 +84,9 @@ describe('ReportingComponent', () => {
     ['00', 'exactly end of day'],
     ['01', 'an hour after end of day']
   ], function (hour: string, description: string) {
-    it(`maps hour correctly without timezone for ${description}`, () => {
+    it(`maps hour correctly to UTC timestandard for ${description}`, () => {
       const dateBefore = moment(`20191023-${hour}00`, 'YYYYMMDD-HHMM');
-      const dateAfter = component.convertMomentToDateWithoutTimezone(dateBefore);
+      const dateAfter = component.convertMomentToDate(dateBefore);
       expect(dateBefore.hour()).toEqual(dateAfter.getHours());
     });
   });
