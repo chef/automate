@@ -58,12 +58,10 @@ export class NotificationRuleRequests {
     return this.updateSecret(rule, '', '')
       .pipe(mergeMap((secretId: string) => {
         rule.targetSecretId = secretId;
-        const response = rule.toRequest();
-        // special case for authz handling - id needs to be in top level of request params
-        response.id = rule.id;
+        const request = rule.toRequest();
 
         return this.http.put<RuleResponse>(encodeURI(
-          this.joinToNotifierUrl(['rules', rule.id])), response);
+          this.joinToNotifierUrl(['rules', rule.id])), request);
       }));
   }
 
