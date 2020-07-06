@@ -12,7 +12,7 @@ var genConfigCommands = struct {
 	insecureConnection bool
 	privateConfig      bool
 	writeRepoConfig    bool
-	writeGlobalConfig  bool
+	writeUserConfig    bool
 }{}
 
 func newGenConfigCommand() *cobra.Command {
@@ -49,7 +49,7 @@ func newGenConfigCommand() *cobra.Command {
 		false,
 		"write config suitable for use in a shared SCM repo",
 	)
-	c.Flags().BoolVar(&genConfigCommands.writeGlobalConfig,
+	c.Flags().BoolVar(&genConfigCommands.writeUserConfig,
 		"user",
 		false,
 		"write config for your user account",
@@ -79,7 +79,6 @@ func runGenConfigCommand(c *cobra.Command, args []string) error {
 
 	cliIO.msg("# Config verified by successful request to %q\n", ac.TestURL)
 
-	// if --repo was passed, write repo config files
 	if genConfigCommands.writeRepoConfig {
 		err := conf.WriteRepoConfigFiles()
 		if err != nil {
@@ -87,7 +86,7 @@ func runGenConfigCommand(c *cobra.Command, args []string) error {
 		}
 	}
 
-	if genConfigCommands.writeGlobalConfig {
+	if genConfigCommands.writeUserConfig {
 		err := conf.WriteUserConfigFiles()
 		if err != nil {
 			return nil

@@ -13,6 +13,7 @@ import (
 	fpath "path/filepath"
 
 	"github.com/BurntSushi/toml"
+	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/httputils"
@@ -23,6 +24,7 @@ const (
 	TestCreateEndpoint        = "/api/beta/cfgmgmt/rollouts/test_create"
 	ConfigFileBasename        = ".automate_collector.toml"
 	PrivateConfigFileBasename = ".automate_collector_private.toml"
+	UserConfigFileBasename    = "automate_collector.toml"
 	GitIgnoreContent          = `
 # .automate_collector_private.toml contains Chef Automate credentials:
 .automate_collector_private.toml
@@ -66,7 +68,10 @@ func (c *Config) WriteRepoConfigFiles() error {
 
 	defer publicFile.Close()
 	enc := toml.NewEncoder(publicFile)
-	enc.Encode(c)
+	err = enc.Encode(c)
+	if err != nil {
+		return err
+	}
 
 	fmt.Printf("in a git repo %+v\n", inAGitRepo())
 	fmt.Printf("file is gitignored? %+v\n", fileIsGitignored(PrivateConfigFileBasename))
@@ -86,7 +91,10 @@ func (c *Config) WriteRepoConfigFiles() error {
 	}
 	defer privateFile.Close()
 	enc = toml.NewEncoder(privateFile)
-	enc.Encode(c.WithPrivate())
+	err = enc.Encode(c.WithPrivate())
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -144,12 +152,36 @@ func isRepoRoot(path string) bool {
 
 func (c *Config) WriteUserConfigFiles() error {
 	// TODO/FIXME windows places?
+	configDir, err := homedir.Expand("~/.chef")
+	if err != nil {
+		return err
+	}
+
+	_, err = os.Stat(configDir)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if err != nil && os.IsNotExist(err) {
+		err := os.Mkdir(configDir, 0700)
+		if err != nil {
+			return err
+		}
+	}
+
+	userConfigFilename := fpath.Join(configDir, UserConfigFileBasename)
+
+	configFile, err := os.OpenFile(userConfigFilename, os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return err
+	}
+	defer configFile.Close()
+	enc := toml.NewEncoder(configFile)
+	err = enc.Encode(c.WithPrivate())
+	if err != nil {
+		return err
+	}
+
 	return nil
-}
-
-func globalConfigDir() (string, error) {
-
-	return "", nil
 }
 
 type PrivateConfig struct {
