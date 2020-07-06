@@ -750,7 +750,7 @@ func runGRPCurl(cmd *cobra.Command, args []string) error {
 	svcName := args[0]
 
 	grpcPkg := habpkg.New("core", "grpcurl")
-	habcmd := target.NewHabCmd(command.DefaultExecutor, false)
+	habcmd := target.NewHabCmd(command.DefaultExecutor, target.DefaultHabCmdOptions())
 	installed, err := habcmd.IsInstalled(ctx, &grpcPkg)
 	if err != nil {
 		return status.Wrap(
