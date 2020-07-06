@@ -153,6 +153,8 @@ export function eventFeedReducer(
     }
 
     case GET_GUITAR_STRINGS_SUCCESS: {
+      console.log('reduced');
+      console.log(action.payload);
       return pipe(
         set('guitarStringCollection', action.payload),
         set('guitarStringsStatus', Status.loadingSuccess)
