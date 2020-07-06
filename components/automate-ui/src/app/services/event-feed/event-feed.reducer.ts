@@ -64,14 +64,14 @@ export const initialState: EventFeedState = {
   suggestions: [],
   guitarStringCollection:
     new GuitarStringCollection([],
-    moment().subtract(6, 'days').startOf('day'),
-    moment().endOf('day')),
+    moment().utc().subtract(6, 'days').startOf('day'),
+    moment().utc().endOf('day')),
   typeCounts: EventTypeCount.Null,
   taskCounts: EventTaskCount.Null,
   filters: {
     searchBar: [],
-    endDate: moment().endOf('day'),
-    startDate: moment().subtract(6, 'days').startOf('day'),
+    endDate: moment().utc().endOf('day'),
+    startDate: moment().utc().subtract(6, 'days').startOf('day'),
     hoursBetween: 1,
     pageSize: 100,
     collapse: true
