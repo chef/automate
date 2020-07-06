@@ -102,7 +102,7 @@ there are three options...
 ----------------------------------------------------------------------------------
 # DELETING DATA
 
-to delete the postgres data:
+to delete the postgres scanjobs data:
 
 `A2_URL='https://a2-dev.test' A2_TOKEN='token_val' components/compliance-service/scripts/delete-pg-data.sh`
 
@@ -116,8 +116,25 @@ to delete the elasticsearch data:
 # ADDING DATA TO NON-DEV-ENV AUTOMATE 
 we don't have hab studio when we're trying to load data into a built instance of automate, so we have to do things a bit differently.
 
+### Modifying the hab studio functions to talk to another automate url
+modify `components/ingest-service/chef-load-data/chef-load.toml` to point to the desired automate instance and include an ingest token:
+```
+data_collector_url = "https://a2-url/data-collector/v0"
+data_collector_token = "token"
+```
+modify `.studio/chef-load`'s prepare_chef_load function to be only:
+```
+function prepare_chef_load() {
+  cp components/ingest-service/chef-load-data/chef-load.toml /tmp/chef-load.toml
+  install_if_missing core/busybox-static netstat;
+  install_if_missing chef/chef-load chef-load;
+}
+```
+`source .studio/chef-load`
+
 ## Adding data to event feed
-TBD
+follow the instructions for "Modifying the hab studio functions to talk to another automate url"
+`chef_load_actions`
 
 ## Adding services to apps page
 TBD
@@ -129,8 +146,16 @@ for _ in {1..500} ; do   m=$((RANDOM % 4));   n=$((RANDOM % 25));   generate_che
 ```
 _note: play with the args to generate more varied data_
 
+or 
+follow the instructions for "Modifying the hab studio functions to talk to another automate url"
+`chef_load_nodes`
+
 ## Adding nodes to populate compliance reporting
 `components/compliance-service/test_data/audit_reports/send_to_data_collector.sh https://a2-url token_value`
+
+or 
+follow the instructions for "Modifying the hab studio functions to talk to another automate url"
+`load_compliance_reports`
 
 ## Profiles, cloud integrations
 same instructions as dev env

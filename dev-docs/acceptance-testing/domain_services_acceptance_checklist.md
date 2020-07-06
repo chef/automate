@@ -4,6 +4,7 @@ _note: create, edit, and delete of credential, manual node, profile, and scan jo
 
 ## where to go and what to expect
 go to: https://a2-local-inplace-upgrade-acceptance.cd.chef.co/dashboards/event-feed 
+or https://a2-perf-test-single-local-inplace-upgrade-acceptance.cd.chef.co/dashboards/event-feed 
 
 dashboards: (event feed) empty\
 applications page: some services data loaded\
@@ -72,6 +73,17 @@ _note: if you find yourself missing tools, please see [the readme](https://githu
 3) click into the details for the node, ensure there's data
 4) go back to the list view, apply a filter and expect data (if any) to match filter
 5) download json report
+
+
+### check on desktops
+1) navigate to acceptance, /desktop
+2) see a desktop with data (from the kitchen/audit run)
+3) click on a filter to open the list view
+4) play with the filters
+5) download report from list view
+6) view the details for a desktop
+7) download report from detail view
+
 
 ### check on chef servers
 1) navigate to acceptance, infrastructure, chef servers
