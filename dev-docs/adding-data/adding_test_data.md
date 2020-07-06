@@ -133,8 +133,15 @@ function prepare_chef_load() {
 `source .studio/chef-load`
 
 ## Adding data to event feed
-follow the instructions for "Modifying the hab studio functions to talk to another automate url"
-`chef_load_actions`
+follow the instructions for "Modifying the hab studio functions to talk to another automate url" then: 
+```
+chef_load_actions
+```
+
+Troubleshooting If your event feed guitar string graph does not show up locally in the UI run:
+```
+go_update_component config-mgmt-service
+```
 
 ## Adding services to apps page
 TBD
