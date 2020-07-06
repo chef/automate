@@ -11,7 +11,7 @@
     "@angular/platform-browser": "=2.1.2",
     "@angular/platform-browser-dynamic": "=2.1.2",
     "@angular/upgrade": "=2.1.2",
-    "angular": "=1.7.9",
+    "angular": "=1.8.0",
     "angular-animate": "=1.7.9",
     "angular-clipboard": "=1.7.0",
     "angular-cookies": "=1.7.9",
