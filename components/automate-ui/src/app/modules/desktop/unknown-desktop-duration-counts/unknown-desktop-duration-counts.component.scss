@@ -47,7 +47,8 @@
     margin-bottom: 0;
   }
 
-  &:hover {
+  &:hover,
+  &.selected {
     cursor: pointer;
 
     .chart-list-item-label-cell,

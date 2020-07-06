@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChange } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnDestroy, OnChanges, Output, SimpleChange } from '@angular/core';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
@@ -16,6 +16,9 @@ export class DailyCheckInComponent implements OnInit, OnDestroy, OnChanges {
   @Input() unknownCount: number;
   @Input() checkedInCount: number;
   @Input() lastUpdated: Date;
+  @Input() selectedStatus: string;
+
+  @Output() statusSelected: EventEmitter<string> = new EventEmitter<string>();
 
   private isDestroyed = new Subject<boolean>();
   public lastUpdatedMessage = '-';

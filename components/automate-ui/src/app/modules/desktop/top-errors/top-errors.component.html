@@ -14,9 +14,10 @@
       <chef-tr
         *ngFor="let item of topErrorsItems"
         class="chart-list-item"
+        [ngClass]="{'selected': item === selectedError}"
         tabindex="0"
-        (click)="errorSelected.emit(item)"
-        (keyup.enter)="errorSelected.emit(item)">
+        (click)="onErrorSelect(item)"
+        (keyup.enter)="onErrorSelect(item)">
         <chef-td class="chart-list-item-label-cell">
           <div>{{ item.type }}: {{ item.message }}</div>
         </chef-td>

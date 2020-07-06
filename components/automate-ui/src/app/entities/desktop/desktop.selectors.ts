@@ -44,6 +44,16 @@ export const unknownDesktopDurationCounts = createSelector(
   (state) => state.unknownDesktopDurationCounts
 );
 
+export const nodeMetadataCounts = createSelector(
+  desktopState,
+  (state) => state.nodeMetadataCounts
+);
+
+export const desktopListTitle = createSelector(
+  desktopState,
+  (state) => state.desktopListTitle
+);
+
 export const desktops = createSelector(
   desktopState,
   (state) => state.desktops

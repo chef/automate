@@ -14,9 +14,10 @@
       <chef-tr
         *ngFor="let item of countedDurationItems"
         class="chart-list-item"
+        [ngClass]="{'selected': item.duration === selectedDuration}"
         tabindex="0"
-        (click)="durationSelected.emit(item)"
-        (keyup.enter)="durationSelected.emit(item)">
+        (click)="onDurationSelect(item.duration)"
+        (keyup.enter)="onDurationSelect(item.duration)">
         <chef-td class="chart-list-item-label-cell">
           {{ formatDuration(item.duration) }}
         </chef-td>

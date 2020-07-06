@@ -1,15 +1,16 @@
 import { Component, HostBinding, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { Store, createSelector } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { finalize } from 'rxjs/operators';
-import * as moment from 'moment/moment';
 import { saveAs } from 'file-saver';
+import { find } from 'lodash/fp';
+import * as moment from 'moment/moment';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { Desktop, TermFilter, NodeMetadataCount, NodeMetadataCountValue, PageSizeChangeEvent } from 'app/entities/desktop/desktop.model';
+import { FilterUpdate } from 'app/page-components/insight-attributes-dropdown/insight-attributes-dropdown.model';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { ClientRunsRequests } from 'app/entities/client-runs/client-runs.requests';
 import { clientRunsState } from 'app/entities/client-runs/client-runs.selectors';
-import { Desktop, TermFilter, PageSizeChangeEvent } from 'app/entities/desktop/desktop.model';
 import { NodeFilter } from 'app/entities/client-runs/client-runs.model';
-import { FilterUpdate } from 'app/page-components/insight-attributes-dropdown/insight-attributes-dropdown.model';
 
 @Component({
   selector: 'app-insight',
@@ -24,13 +25,16 @@ export class InsightComponent implements OnInit {
   @Input() pageSize: number;
   @Input() totalDesktops: number;
   @Input() termFilters: TermFilter[];
+  @Input() titleText: string;
+  @Input() nodeMetadataCounts: NodeMetadataCount[];
   @Input() @HostBinding('class.fullscreened') fullscreened = false;
 
   @Output() closed: EventEmitter<any> = new EventEmitter();
   @Output() fullscreenToggled: EventEmitter<any> = new EventEmitter();
   @Output() pageChange: EventEmitter<number> = new EventEmitter();
   @Output() pageSizeChange: EventEmitter<PageSizeChangeEvent> = new EventEmitter();
-  @Output() termFilterSelected: EventEmitter<TermFilter> = new EventEmitter();
+  @Output() termFilterAdded: EventEmitter<TermFilter> = new EventEmitter();
+  @Output() termFilterRemoved: EventEmitter<TermFilter> = new EventEmitter();
   // Returns 'name', 'check-in', or 'platform'
   @Output() sortChange: EventEmitter<string> = new EventEmitter();
   @Output() desktopSelected: EventEmitter<Desktop> = new EventEmitter();
@@ -69,8 +73,12 @@ export class InsightComponent implements OnInit {
     });
   }
 
-  public termFilterClicked(term: TermFilter): void {
-    this.termFilterSelected.emit(term);
+  public termFilterOptionToggled(term: TermFilter): void {
+    if (find(term, this.termFilters)) {
+      this.termFilterRemoved.emit(term);
+    } else {
+      this.termFilterAdded.emit(term);
+    }
   }
 
   public sortOn(fieldName: string): void {
@@ -110,5 +118,13 @@ export class InsightComponent implements OnInit {
     this.requests.downloadNodes(format, this.nodeFilter).pipe(
       finalize(onComplete))
       .subscribe(onNext, onError);
+  }
+
+  filterGroupTrackBy(_index: number, item: NodeMetadataCount): string {
+    return item.type;
+  }
+
+  filterGroupValueTrackBy(_index: number, item: NodeMetadataCountValue): string {
+    return item.value;
   }
 }

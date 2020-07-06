@@ -19,6 +19,9 @@ import {
   GetUnknownDesktopDurationCounts,
   GetUnknownDesktopDurationCountsSuccess,
   GetUnknownDesktopDurationCountsFailure,
+  GetNodeMetadataCounts,
+  GetNodeMetadataCountsSuccess,
+  GetNodeMetadataCountsFailure,
   GetDesktops,
   GetDesktopsSuccess,
   GetDesktopsFailure,
@@ -122,6 +125,16 @@ export class DesktopEffects {
         new GetUnknownDesktopDurationCountsSuccess(countedDurationCollection)),
         catchError((error) => of(new GetUnknownDesktopDurationCountsFailure(error)))))
     );
+
+  @Effect()
+  getNodeMetadataCounts$ = this.actions$.pipe(
+    ofType<GetNodeMetadataCounts>(DesktopActionTypes.GET_NODE_METADATA_COUNTS),
+    withLatestFrom(this.store$),
+    switchMap(([_action, storeState]) =>
+      this.requests.getNodeMetadataCounts(storeState.desktops.getDesktopsFilter).pipe(
+        map(nodeMetadataCounts => new GetNodeMetadataCountsSuccess(nodeMetadataCounts)),
+        catchError((error) => of(new GetNodeMetadataCountsFailure(error))))
+    ));
 
   @Effect()
   getUnknownDesktopDurationCountsFailure$ = this.actions$.pipe(
