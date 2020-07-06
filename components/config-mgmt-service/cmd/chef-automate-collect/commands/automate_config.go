@@ -10,16 +10,23 @@ import (
 	"os"
 	"strings"
 
+	fpath "path/filepath"
+
 	"github.com/BurntSushi/toml"
+	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/httputils"
 	cmd "github.com/chef/automate/lib/platform/command"
 )
 
 const (
-	TestCreateEndpoint    = "/api/beta/cfgmgmt/rollouts/test_create"
-	ConfigFilename        = ".automate_collector.toml"
-	PrivateConfigFilename = ".automate_collector_private.toml"
+	TestCreateEndpoint        = "/api/beta/cfgmgmt/rollouts/test_create"
+	ConfigFileBasename        = ".automate_collector.toml"
+	PrivateConfigFileBasename = ".automate_collector_private.toml"
+	GitIgnoreContent          = `
+# .automate_collector_private.toml contains Chef Automate credentials:
+.automate_collector_private.toml
+`
 )
 
 type AutomateCollectorConfig interface {
@@ -44,7 +51,15 @@ func (c *Config) WithPrivate() *PrivateConfig {
 
 func (c *Config) WriteRepoConfigFiles() error {
 
-	publicFile, err := os.Create(ConfigFilename)
+	configDir, err := repoRoot()
+	if err != nil {
+		return err
+	}
+
+	configFilename := fpath.Join(configDir, ConfigFileBasename)
+	privateConfigFilename := fpath.Join(configDir, PrivateConfigFileBasename)
+
+	publicFile, err := os.Create(configFilename)
 	if err != nil {
 		return err
 	}
@@ -53,19 +68,19 @@ func (c *Config) WriteRepoConfigFiles() error {
 	enc := toml.NewEncoder(publicFile)
 	enc.Encode(c)
 
-	// Check if we are in a git directory
-	_, err = cmd.Output("git", cmd.Args("rev-parse", "--git-dir"))
-	if err == nil {
-		// if we are in a git directory, check if the private config filename is in
-		// gitignore (with -q, check-ignore will exit 1 if the file is NOT ignored):
-		_, err = cmd.Output("git", cmd.Args("check-ignore", "-q", PrivateConfigFilename))
+	fmt.Printf("in a git repo %+v\n", inAGitRepo())
+	fmt.Printf("file is gitignored? %+v\n", fileIsGitignored(PrivateConfigFileBasename))
+
+	if inAGitRepo() && !fileIsGitignored(PrivateConfigFileBasename) {
+		gitignorePath := fpath.Join(configDir, ".gitignore")
+		err := appendFile(gitignorePath, []byte(GitIgnoreContent), 0644)
 		if err != nil {
-			// TODO/FIXME: acceptable to just add it? it's less dangerous.
-			(&CLIIO{}).msg("WARNING: add the following line to your .gitignore to avoid leaking credentials!\n%s\n", PrivateConfigFilename)
+			return errors.Wrapf(err, "unable to create/modify gitignore file %q", gitignorePath)
 		}
+		(&CLIIO{}).msg("Your .gitignore has been updated to protect your Chef Automate credentials\n")
 	}
 
-	privateFile, err := os.OpenFile(PrivateConfigFilename, os.O_RDWR|os.O_CREATE, 0600)
+	privateFile, err := os.OpenFile(privateConfigFilename, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}
@@ -74,6 +89,67 @@ func (c *Config) WriteRepoConfigFiles() error {
 	enc.Encode(c.WithPrivate())
 
 	return nil
+}
+
+func inAGitRepo() bool {
+	_, err := cmd.Output("git", cmd.Args("rev-parse", "--git-dir"))
+	return err == nil
+}
+
+func fileIsGitignored(filename string) bool {
+	// if we are in a git directory, check if the private config filename is in
+	// gitignore (with -q, check-ignore will exit 1 if the file is NOT ignored):
+	o, err := cmd.Output("git", cmd.Args("check-ignore", "-q", filename))
+	fmt.Printf("check ignore %q %+v\n", o, err)
+	return err == nil
+}
+
+func appendFile(filename string, data []byte, perm os.FileMode) error {
+	fd, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, perm)
+	if err != nil {
+		return err
+	}
+	defer fd.Close()
+	_, err = fd.Write(data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func repoRoot() (string, error) {
+	// go's implementation of Getwd honors the PWD env var if set, which handles
+	// most cases where the user is navigating into dirs via symlinks. So we
+	// should not need any additional heuristics to get the expected dirname
+	// https://golang.org/src/os/getwd.go?s=620:656#L16
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	for dirToCheck := cwd; dirToCheck != "/"; dirToCheck = fpath.Dir(dirToCheck) {
+		(&CLIIO{}).msg("checking for git dir in %q\n", dirToCheck)
+		if isRepoRoot(dirToCheck) {
+			return dirToCheck, nil
+		}
+	}
+	// if nothing we tried is the repo root
+	(&CLIIO{}).verbose("no .git dir found in %q and above, falling back to working directory for repo root", cwd)
+	return cwd, nil
+}
+
+func isRepoRoot(path string) bool {
+	_, err := os.Stat(fpath.Join(path, ".git"))
+	return err == nil
+}
+
+func (c *Config) WriteUserConfigFiles() error {
+	// TODO/FIXME windows places?
+	return nil
+}
+
+func globalConfigDir() (string, error) {
+
+	return "", nil
 }
 
 type PrivateConfig struct {

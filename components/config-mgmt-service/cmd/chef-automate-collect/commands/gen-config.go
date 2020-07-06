@@ -12,6 +12,7 @@ var genConfigCommands = struct {
 	insecureConnection bool
 	privateConfig      bool
 	writeRepoConfig    bool
+	writeGlobalConfig  bool
 }{}
 
 func newGenConfigCommand() *cobra.Command {
@@ -48,6 +49,11 @@ func newGenConfigCommand() *cobra.Command {
 		false,
 		"write config suitable for use in a shared SCM repo",
 	)
+	c.Flags().BoolVar(&genConfigCommands.writeGlobalConfig,
+		"user",
+		false,
+		"write config for your user account",
+	)
 	return c
 }
 
@@ -81,7 +87,14 @@ func runGenConfigCommand(c *cobra.Command, args []string) error {
 		}
 	}
 
-	if !genConfigCommands.writeRepoConfig {
+	if genConfigCommands.writeGlobalConfig {
+		err := conf.WriteUserConfigFiles()
+		if err != nil {
+			return nil
+		}
+	}
+
+	if !(genConfigCommands.writeRepoConfig || genConfigCommands.writeRepoConfig) {
 		var confToEmit AutomateCollectorConfig
 		confToEmit = conf
 
