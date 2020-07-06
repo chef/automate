@@ -59,7 +59,9 @@ export class GuitarStringDataContainer {
 
   private rebucketGuitarStrings(): GuitarString[] {
     return this.hourlyBucketedGuitarStrings.map(guitarString => {
-      const initialItem = new GuitarStringItem([], moment().add(2000, 'year'), moment(0));
+      const initialItem = new GuitarStringItem([], moment().utc().add(2000, 'year'), moment.utc(0));
+
+      console.log(initialItem);
 
       const guitarStringItemAccum: GuitarStringItemAccum =
         reduce((acc: GuitarStringItemAccum, item: GuitarStringItem) => {
