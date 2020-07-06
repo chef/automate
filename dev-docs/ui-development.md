@@ -44,10 +44,7 @@ followed by the [Chef UI Library setup instructions](../components/chef-ui-libra
    chef-ui-library. Open your browser and navigate to the URL `http://localhost:3334`. Run `ui_logs`
    to see how the chef-ui-library rebuilds.
 
-1. Optional step: Run the necessary commands to bring up data in your environment,
-   for example `chef_load_actions` or `chef_load_nodes` to load events in the event feed. 
-   **Troubleshooting** If your event feed guitar string graph does not show up locally in the UI
-   run `go_update_component config-mgmt-service`
+1. Optional step: Run the necessary commands to bring up data in your environment [Adding Test Data Docs](./adding-data/adding_test_data.md)
 
 **IMPORTANT:** _If you don't want to run the UI inside the studio, you can follow these steps
 instead of using the `start_automate_ui_background` helper method._
