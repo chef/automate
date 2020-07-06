@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { CardTableComponent } from './card-table/card-table.component';
 import { CardComponent } from './card/card.component';
 import { CdsRoutingModule } from './cds-routing.module';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { RegisterModalComponent } from './register-modal/register-modal.component';
 
 @NgModule({
   imports: [
@@ -16,14 +17,16 @@ import { CdsRoutingModule } from './cds-routing.module';
     CdsRoutingModule
   ],
   exports: [
-    DashboardComponent,
     CardTableComponent,
-    CardComponent
+    CardComponent,
+    DashboardComponent,
+    RegisterModalComponent
   ],
   declarations: [
-    DashboardComponent,
     CardTableComponent,
-    CardComponent
+    CardComponent,
+    DashboardComponent,
+    RegisterModalComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

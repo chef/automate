@@ -1,0 +1,22 @@
+<chef-modal label="license-lockout-label" [locked]="modalLocked" [visible]="modalVisible" (closeModal)="closeModal()">
+  <div class="register-wrapper">
+
+    <h2 class="title">Welcome to Chef Automate CDS!</h2>
+    <form class="token" [formGroup]="tokenform" (ngSubmit)="onFormSubmit()" novalidate>
+      <div class="token-container">
+        <chef-form-field>
+          <label for="token">Chef Cloud token<span aria-hidden="true"></span></label>
+          <div class="suggester-input-wrapper">
+            <input chefInput name="token-id" id="token" formControlName="token" type="text" autofocus>
+          </div>
+          <chef-error *ngIf="tokenform.get('token').hasError('required') && tokenform.get('token').dirty">
+            Token required.
+          </chef-error>
+        </chef-form-field>
+      </div>
+      <div class="button">
+        <chef-button primary type="submit">Apply Token</chef-button>
+      </div>
+    </form>
+  </div>
+</chef-modal>

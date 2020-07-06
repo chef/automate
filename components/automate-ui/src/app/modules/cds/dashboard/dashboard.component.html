@@ -1,4 +1,7 @@
 <div class="content-container">
+
+  <app-register-modal></app-register-modal>
+
   <app-card-table
     [contentItems] = "contentItems$ | async"
     (onInstallItem)="installContentItem($event)"
