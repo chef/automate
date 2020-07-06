@@ -36,6 +36,8 @@ export class GuitarStringDataContainer {
     if ( guitarStringCollection.start.isBefore(guitarStringCollection.end) ) {
       this.startDateWindow = guitarStringCollection.start;
       this.endDateWindow = guitarStringCollection.end;
+      console.log(this.startDateWindow);
+      console.log(this.endDateWindow);
 
       this.hourlyBucketedGuitarStrings = guitarStringCollection.strings;
       this.dynamicallyBucketedGuitarStrings = this.rebucketGuitarStrings();
@@ -61,10 +63,10 @@ export class GuitarStringDataContainer {
     return this.hourlyBucketedGuitarStrings.map(guitarString => {
       const initialItem = new GuitarStringItem([], moment().utc().add(2000, 'year'), moment.utc(0));
 
-      console.log(initialItem);
-
       const guitarStringItemAccum: GuitarStringItemAccum =
         reduce((acc: GuitarStringItemAccum, item: GuitarStringItem) => {
+          // console.log(acc);
+          // console.log(item);
           const mergedItem = this.mergeItems(item, acc.currentItem);
           if (acc.count === this.hourlyBucketSize) {
             acc.items.push(mergedItem);
@@ -108,6 +110,7 @@ export class GuitarStringDataContainer {
   private createSections(): Date[] {
     const sections: Date[] = [];
     let current = this.startDateWindow.clone();
+    console.log(current);
 
     while ( current < this.endDateWindow ) {
       sections.push(current.toDate());
@@ -294,6 +297,8 @@ export class EventFeedGuitarStringsComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['guitarStringCollection']) {
       this.updateGuitarStringCollection(changes['guitarStringCollection'].currentValue);
+      console.log('--------');
+      console.log(changes['guitarStringCollection'].currentValue);
     }
   }
 
@@ -305,7 +310,8 @@ export class EventFeedGuitarStringsComponent implements OnInit, OnChanges {
     this.endSliderPosition = (index + 1) * this.sliderGrid;
 
     if (this.guitarStringDataContainer.getNumberOfDaysInView() !== 1) {
-      const date = moment(dateSelected);
+      const date = moment.utc(dateSelected);
+
       start = date.clone().startOf('day');
       end = date.clone().endOf('day');
 
