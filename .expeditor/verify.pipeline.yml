@@ -550,6 +550,21 @@ steps:
           # a1-buildkite has erlang 18 pre-installed
           image: chefes/a1-buildkite
 
+  - label: "[unit] automate-cds"
+    command:
+      - hab studio run "source .studiorc && go_component_unit automate-cds && go_component_static_tests automate-cds"
+    timeout_in_minutes: 10
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
   - wait
 
   - label: "automate-ui"

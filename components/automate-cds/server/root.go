@@ -93,7 +93,7 @@ func (s *Server) InstallContentItem(ctx context.Context,
 	contentItem, found, err := s.client.GetContentItem(request.Id)
 	if err != nil {
 		return &response.InstallContentItem{}, status.Errorf(codes.Internal,
-			"Could not connect to Content Delivery Service error: %s", err.Error)
+			"Could not connect to Content Delivery Service error: %s", err.Error())
 	}
 	if !found {
 		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument,
@@ -114,7 +114,7 @@ func (s *Server) InstallContentItem(ctx context.Context,
 		err = s.installProfile(ctx, contentItem, request.RequestUser)
 		if err != nil {
 			return &response.InstallContentItem{}, status.Errorf(codes.Internal,
-				"Error Installing Profile: %s", err.Error)
+				"Error Installing Profile: %s", err.Error())
 		}
 	} else {
 		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument,
