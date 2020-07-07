@@ -14,6 +14,8 @@ func newRootCmd() *cobra.Command {
 	}
 	r.AddCommand(newDescribeCmd())
 	r.AddCommand(newGenConfigCommand())
+	r.AddCommand(newShowConfigCommand())
+	r.AddCommand(newDocumentChefPushCommand())
 	return r
 }
 

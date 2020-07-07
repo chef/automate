@@ -8,6 +8,7 @@ import (
 	"net/http/httptrace"
 	"net/url"
 	"os"
+	"runtime"
 	"strings"
 
 	fpath "path/filepath"
@@ -21,15 +22,33 @@ import (
 )
 
 const (
-	TestCreateEndpoint        = "/api/beta/cfgmgmt/rollouts/test_create"
+	TestCreateEndpoint = "/api/beta/cfgmgmt/rollouts/test_create"
+
 	ConfigFileBasename        = ".automate_collector.toml"
 	PrivateConfigFileBasename = ".automate_collector_private.toml"
-	UserConfigFileBasename    = "automate_collector.toml"
-	GitIgnoreContent          = `
+	NonHiddenConfigBasename   = "automate_collector.toml"
+
+	RepoConfigDirPathEnvVar   = "CHEF_AC_REPO_CONFIG_DIR"
+	UserConfigDirPathEnvVar   = "CHEF_AC_USER_CONFIG_DIR"
+	SystemConfigDirPathEnvVar = "CHEF_AC_SYSTEM_CONFIG_DIR"
+
+	NoRepoConfigEnvVar   = "CHEF_AC_NO_REPO_CONFIG"
+	NoUserConfigEnvVar   = "CHEF_AC_NO_USER_CONFIG"
+	NoSystemConfigEnvVar = "CHEF_AC_NO_SYSTEM_CONFIG"
+
+	GitIgnoreContent = `
 # .automate_collector_private.toml contains Chef Automate credentials:
 .automate_collector_private.toml
 `
 )
+
+type ConfigLoader struct {
+	RepoConfigPath        string
+	RepoPrivateConfigPath string
+	UserConfigPath        string
+	SystemConfigPath      string
+	LoadedConfig          *Config
+}
 
 type AutomateCollectorConfig interface {
 	IsAutomateCollectorConfig() bool
@@ -39,8 +58,247 @@ type Config struct {
 	Automate []*AutomateConfig `toml:"automate"`
 }
 
+type PrivateConfig struct {
+	Automate []*PrivateAutomateConfig `toml:"automate"`
+}
+
+func (p *PrivateConfig) IsAutomateCollectorConfig() bool {
+	return true
+}
+
+type AutomateConfig struct {
+	URL         string `toml:"url"`
+	authToken   string
+	InsecureTLS bool   `toml:"-"`
+	TestURL     string `toml:"-"`
+}
+
+type PrivateAutomateConfig struct {
+	*AutomateConfig
+	AuthToken   string `toml:"auth_token"`
+	InsecureTLS bool   `toml:"insecure_tls"`
+}
+
+func NewConfigLoader() *ConfigLoader {
+	c := &ConfigLoader{}
+	c.findRepoConfig()
+	c.findUserConfig()
+	c.findSystemConfig()
+
+	return c
+}
+
+func (l *ConfigLoader) ViableConfigPaths() []string {
+	paths := []string{}
+	// These are in a precedence order from low to high. Later ones should
+	// override previous when loading.
+	possiblePaths := []string{
+		l.SystemConfigPath,
+		l.UserConfigPath,
+		l.RepoConfigPath,
+		l.RepoPrivateConfigPath,
+	}
+
+	for _, p := range possiblePaths {
+		if p != "" {
+			paths = append(paths, p)
+		}
+	}
+	return paths
+}
+
+func (l *ConfigLoader) Load() error {
+	rawConfigsByURL := make(map[string]*AutomateConfig)
+
+	for _, p := range l.ViableConfigPaths() {
+		var configFromFile PrivateConfig
+		fileContent, err := ioutil.ReadFile(p)
+		if err != nil {
+			return errors.Wrapf(err, "failed to read config file %q", p)
+		}
+		err = toml.Unmarshal(fileContent, &configFromFile)
+		if err != nil {
+			return errors.Wrapf(err, "cannot decode TOML content in %q", p)
+		}
+		configFromFile.FixupUnmarshal()
+
+		for _, serverConfigFromFile := range configFromFile.Automate {
+			cliIO.verbose("applying configuration for %q from %s\n", serverConfigFromFile.URL, p)
+			cliIO.verbose("applying configuration %+v from %s\n", serverConfigFromFile, p)
+			previousConfig, havePreviousConfig := rawConfigsByURL[serverConfigFromFile.URL]
+			if havePreviousConfig {
+				previousConfig.ApplyValuesFrom(serverConfigFromFile.AutomateConfig)
+			} else {
+				rawConfigsByURL[serverConfigFromFile.URL] = serverConfigFromFile.AutomateConfig
+			}
+		}
+	}
+
+	l.LoadedConfig = &Config{Automate: make([]*AutomateConfig, 0, len(rawConfigsByURL))}
+	for _, c := range rawConfigsByURL {
+		l.LoadedConfig.Automate = append(l.LoadedConfig.Automate, c)
+	}
+
+	return nil
+}
+
+func (l *ConfigLoader) findRepoConfig() {
+	if value, envSet := os.LookupEnv(NoRepoConfigEnvVar); envSet && value != "false" {
+		cliIO.verbose("found environment %s=%q repo config is disabled\n", NoRepoConfigEnvVar, value)
+		return
+	}
+
+	if dirFromEnv, envSet := os.LookupEnv(RepoConfigDirPathEnvVar); envSet {
+		cliIO.verbose("found environment %s=%q, looking for repo configuration there", RepoConfigDirPathEnvVar, dirFromEnv)
+		candidateFilename := fpath.Join(dirFromEnv, ConfigFileBasename)
+		_, err := os.Stat(candidateFilename)
+		if err != nil {
+			cliIO.verbose("candidate config file %q could not be found/accessed, no repo config will be set: %s\n", candidateFilename, err.Error())
+			return
+		}
+		cliIO.verbose("found repo config file %q\n", candidateFilename)
+		l.RepoConfigPath = candidateFilename
+
+		candidatePrivateConfigFilename := fpath.Join(dirFromEnv, PrivateConfigFileBasename)
+		_, err = os.Stat(candidatePrivateConfigFilename)
+		if err != nil {
+			cliIO.verbose("candidate private config file %q could not be found/accessed: %s\n", candidatePrivateConfigFilename, err.Error())
+			return
+		}
+
+		cliIO.verbose("found repo private config file %q\n", candidatePrivateConfigFilename)
+		l.RepoPrivateConfigPath = candidatePrivateConfigFilename
+		return
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		cliIO.verbose("failed to get cwd, cannot find repo config: %s\n", err.Error())
+		return
+	}
+	var configDir string
+	for configDir = cwd; configDir != "/"; configDir = fpath.Dir(configDir) {
+		candidateFilename := fpath.Join(configDir, ConfigFileBasename)
+		_, err := os.Stat(candidateFilename)
+		if err != nil {
+			cliIO.verbose("candidate repo config file %q not found: %s\n", candidateFilename, err.Error())
+			continue
+		}
+		{
+			cliIO.verbose("found repo config file %q\n", candidateFilename)
+			l.RepoConfigPath = candidateFilename
+			break
+		}
+	}
+
+	if l.RepoConfigPath == "" {
+		return
+	}
+	candidatePrivateConfigFilename := fpath.Join(configDir, PrivateConfigFileBasename)
+	_, err = os.Stat(candidatePrivateConfigFilename)
+	if err != nil {
+		cliIO.verbose("candidate private config file %q not found: %s\n", candidatePrivateConfigFilename, err.Error())
+		return
+	}
+	cliIO.verbose("found private config file %q\n", candidatePrivateConfigFilename)
+	l.RepoPrivateConfigPath = candidatePrivateConfigFilename
+	return
+}
+
+func (l *ConfigLoader) findUserConfig() {
+	if value, envSet := os.LookupEnv(NoUserConfigEnvVar); envSet && value != "false" {
+		cliIO.verbose("found environment %s=%q repo config is disabled\n", NoUserConfigEnvVar, value)
+		return
+	}
+
+	if dirFromEnv, envSet := os.LookupEnv(UserConfigDirPathEnvVar); envSet {
+		cliIO.verbose("found environment %s=%q, looking for user configuration there", UserConfigDirPathEnvVar, dirFromEnv)
+		candidateFilename := fpath.Join(dirFromEnv, NonHiddenConfigBasename)
+		_, err := os.Stat(candidateFilename)
+		if err != nil {
+			cliIO.verbose("candidate config file %q could not be found/accessed, no user config will be set: %s\n", candidateFilename, err.Error())
+			return
+		}
+		cliIO.verbose("found user config file %q\n", candidateFilename)
+		l.UserConfigPath = candidateFilename
+		return
+	}
+
+	configDir, err := homedir.Expand("~/.chef")
+	if err != nil {
+		cliIO.verbose("cannot locate home directory, cannot find user config: %s\n", err.Error())
+	}
+	userConfigFilename := fpath.Join(configDir, NonHiddenConfigBasename)
+	_, err = os.Stat(userConfigFilename)
+	if err != nil {
+		cliIO.verbose("candidate user config filename %q not found: %s\n", userConfigFilename, err.Error())
+		return
+	}
+	cliIO.verbose("found user config file %q\n", userConfigFilename)
+	l.UserConfigPath = userConfigFilename
+	return
+}
+
+func (l *ConfigLoader) findSystemConfig() {
+	if value, envSet := os.LookupEnv(NoSystemConfigEnvVar); envSet && value != "false" {
+		cliIO.verbose("found environment %s=%q repo config is disabled\n", NoSystemConfigEnvVar, value)
+		return
+	}
+
+	if dirFromEnv, envSet := os.LookupEnv(SystemConfigDirPathEnvVar); envSet {
+		cliIO.verbose("found environment %s=%q, looking for user configuration there", SystemConfigDirPathEnvVar, dirFromEnv)
+		candidateFilename := fpath.Join(dirFromEnv, NonHiddenConfigBasename)
+		_, err := os.Stat(candidateFilename)
+		if err != nil {
+			cliIO.verbose("candidate config file %q could not be found/accessed, no system config will be set: %s\n", candidateFilename, err.Error())
+			return
+		}
+		cliIO.verbose("found system config file %q\n", candidateFilename)
+		l.SystemConfigPath = candidateFilename
+		return
+
+	}
+	// assume *nix and change it if we detect windows (next)
+	systemConfigDir := "/etc/chef"
+
+	// In Chef::Config, the location of the system config is /etc/chef for *nix
+	// (including Mac), and on windows uses the following logic:
+	// * drive letter is determined from where the Chef package is installed,
+	//   defaulting to `C:`
+	// * directory name is `chef`
+	// Here we skip the drive letter shenanigans for now and assume C:/chef. It
+	// can be overridden with environment if needed.
+	if runtime.GOOS == "windows" {
+		systemConfigDir = "C:/chef"
+	}
+
+	candidateFilename := fpath.Join(systemConfigDir, NonHiddenConfigBasename)
+	_, err := os.Stat(candidateFilename)
+	if err != nil {
+		cliIO.verbose("candidate config file %q could not be found/accessed, no system config will be set: %s\n", candidateFilename, err.Error())
+		return
+	}
+	cliIO.verbose("found system config file %q\n", candidateFilename)
+	l.SystemConfigPath = candidateFilename
+	return
+}
+
+func (p *PrivateConfig) FixupUnmarshal() {
+	for _, c := range p.Automate {
+		c.authToken = c.AuthToken
+	}
+}
+
 func (c *Config) IsAutomateCollectorConfig() bool {
 	return true
+}
+
+func (c *Config) Redacted() *PrivateConfig {
+	p := &PrivateConfig{}
+	for _, a := range c.Automate {
+		p.Automate = append(p.Automate, a.Redacted())
+	}
+	return p
 }
 
 func (c *Config) WithPrivate() *PrivateConfig {
@@ -73,16 +331,13 @@ func (c *Config) WriteRepoConfigFiles() error {
 		return err
 	}
 
-	fmt.Printf("in a git repo %+v\n", inAGitRepo())
-	fmt.Printf("file is gitignored? %+v\n", fileIsGitignored(PrivateConfigFileBasename))
-
 	if inAGitRepo() && !fileIsGitignored(PrivateConfigFileBasename) {
 		gitignorePath := fpath.Join(configDir, ".gitignore")
 		err := appendFile(gitignorePath, []byte(GitIgnoreContent), 0644)
 		if err != nil {
 			return errors.Wrapf(err, "unable to create/modify gitignore file %q", gitignorePath)
 		}
-		(&CLIIO{}).msg("Your .gitignore has been updated to protect your Chef Automate credentials\n")
+		cliIO.msg("Your .gitignore has been updated to protect your Chef Automate credentials\n")
 	}
 
 	privateFile, err := os.OpenFile(privateConfigFilename, os.O_RDWR|os.O_CREATE, 0600)
@@ -135,13 +390,13 @@ func repoRoot() (string, error) {
 		return "", err
 	}
 	for dirToCheck := cwd; dirToCheck != "/"; dirToCheck = fpath.Dir(dirToCheck) {
-		(&CLIIO{}).msg("checking for git dir in %q\n", dirToCheck)
+		cliIO.msg("checking for git dir in %q\n", dirToCheck)
 		if isRepoRoot(dirToCheck) {
 			return dirToCheck, nil
 		}
 	}
 	// if nothing we tried is the repo root
-	(&CLIIO{}).verbose("no .git dir found in %q and above, falling back to working directory for repo root", cwd)
+	cliIO.verbose("no .git dir found in %q and above, falling back to working directory for repo root", cwd)
 	return cwd, nil
 }
 
@@ -168,7 +423,7 @@ func (c *Config) WriteUserConfigFiles() error {
 		}
 	}
 
-	userConfigFilename := fpath.Join(configDir, UserConfigFileBasename)
+	userConfigFilename := fpath.Join(configDir, NonHiddenConfigBasename)
 
 	configFile, err := os.OpenFile(userConfigFilename, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
@@ -182,27 +437,6 @@ func (c *Config) WriteUserConfigFiles() error {
 	}
 
 	return nil
-}
-
-type PrivateConfig struct {
-	Automate []*PrivateAutomateConfig `toml:"automate"`
-}
-
-func (p *PrivateConfig) IsAutomateCollectorConfig() bool {
-	return true
-}
-
-type AutomateConfig struct {
-	URL         string `toml:"url"`
-	authToken   string
-	InsecureTLS bool   `toml:"-"`
-	TestURL     string `toml:"-"`
-}
-
-type PrivateAutomateConfig struct {
-	AutomateConfig
-	AuthToken   string `toml:"auth_token"`
-	InsecureTLS bool   `toml:"insecure_tls"`
 }
 
 func newAutomateConfig(givenURL, token string) (*AutomateConfig, error) {
@@ -228,15 +462,39 @@ func newAutomateConfig(givenURL, token string) (*AutomateConfig, error) {
 
 func (a *AutomateConfig) WithPrivate() *PrivateAutomateConfig {
 	return &PrivateAutomateConfig{
-		AutomateConfig: *a,
+		AutomateConfig: a,
 		AuthToken:      a.authToken,
 		InsecureTLS:    a.InsecureTLS,
 	}
 }
 
-func (a *AutomateConfig) Test() error {
-	cliIO := CLIIO{EnableVerbose: genConfigCommands.verbose}
+func (a *AutomateConfig) Redacted() *PrivateAutomateConfig {
+	var authTokenReplacement string
+	if a.authToken != "" {
+		authTokenReplacement = "[REDACTED]"
+	}
 
+	return &PrivateAutomateConfig{
+		AutomateConfig: a,
+		AuthToken:      authTokenReplacement,
+		InsecureTLS:    a.InsecureTLS,
+	}
+}
+
+func (a *AutomateConfig) ApplyValuesFrom(other *AutomateConfig) {
+	if other.URL != "" {
+		a.URL = other.URL
+		a.TestURL = other.TestURL
+	}
+	if other.authToken != "" {
+		a.authToken = other.authToken
+	}
+	if other.InsecureTLS {
+		a.InsecureTLS = true
+	}
+}
+
+func (a *AutomateConfig) Test() error {
 	tr := httputils.NewDefaultTransport()
 	tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: genConfigCommands.insecureConnection}
 	httpClient := &http.Client{Transport: tr}

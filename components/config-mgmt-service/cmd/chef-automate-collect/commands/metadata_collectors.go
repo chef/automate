@@ -21,7 +21,9 @@ var SCMWebType_GITHUB = req.SCMWebType_name[int32(req.SCMWebType_GITHUB)]
 type RolloutMetadata struct {
 	policyLockPath   string
 	PolicyName       string `json:"policy_name"`
+	PolicyNodeGroup  string `json:"policy_node_group"`
 	PolicyRevisionID string `json:"policy_revision_id"`
+	PolicyDomainURL  string `json:"policy_domain_url"`
 	Description      string `json:"description"`
 	SCMMetadata
 	CiMetadata

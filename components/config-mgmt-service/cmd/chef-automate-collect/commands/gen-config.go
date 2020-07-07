@@ -61,7 +61,7 @@ func runGenConfigCommand(c *cobra.Command, args []string) error {
 	automateURLIn := args[0]
 	token := args[1]
 
-	cliIO := CLIIO{}
+	cliIO.EnableVerbose = genConfigCommands.verbose
 
 	ac, err := newAutomateConfig(automateURLIn, token)
 	if err != nil {
