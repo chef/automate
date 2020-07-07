@@ -23,7 +23,7 @@ func ChefClientConverge(url string, run *chef.Run) (*Event, error) {
 	if run.Status == "failure" {
 		failed_resource := getFailedResources(run.GetResources())
 		if failed_resource == nil {
-			log.Warn("Could not find failed resource in chef run")
+			log.Info("Could not find failed resource in chef run")
 			failed_resource = &chef.Resource{}
 		}
 
