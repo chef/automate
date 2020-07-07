@@ -10,6 +10,7 @@ import (
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	. "github.com/chef/automate/components/notifications-client/api"
+	log "github.com/sirupsen/logrus"
 )
 
 // ChefClientConverge builds a chef converge event that can be sent to the notifier
@@ -22,7 +23,8 @@ func ChefClientConverge(url string, run *chef.Run) (*Event, error) {
 	if run.Status == "failure" {
 		failed_resource := getFailedResources(run.GetResources())
 		if failed_resource == nil {
-			return nil, errors.New("Could not find failed resource in chef run")
+			log.Info("Could not find failed resource in chef run")
+			failed_resource = &chef.Resource{}
 		}
 
 		err := run.GetError()
