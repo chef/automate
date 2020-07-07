@@ -13,7 +13,12 @@ export interface Environment {
 
 export interface CookbookVersion {
   name: string;
-  version: string;
+}
+
+export interface CookbookVersionDisplay {
+  name?: string;
+  operator?: string;
+  versionNumber?: string;
 }
 
 export class EnvironmentAttributes {

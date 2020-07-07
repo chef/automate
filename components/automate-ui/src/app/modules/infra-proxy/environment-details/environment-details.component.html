@@ -43,10 +43,10 @@
                 </chef-tr>
               </chef-thead>
               <chef-tbody>
-                <chef-tr *ngFor= "let version of cookbookVersions | keyvalue">
-                  <chef-td  >{{ version.key }}</chef-td>
-                  <chef-td  >{{ version.value.split(" ")[0] }}</chef-td>
-                  <chef-td  >{{ version.value.split(" ")[1] }}</chef-td>
+                <chef-tr *ngFor= "let version of cookbookVersions">
+                  <chef-td  >{{ version.name }}</chef-td>
+                  <chef-td  >{{ version.operator }}</chef-td>
+                  <chef-td  >{{ version.versionNumber }}</chef-td>
                 </chef-tr>
               </chef-tbody>
             </chef-table>
