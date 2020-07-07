@@ -1,5 +1,6 @@
 import { Component, Input, Output, SimpleChanges, OnChanges, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-enable-content-modal',
@@ -11,11 +12,12 @@ export class EnableContentModalComponent implements OnChanges {
   @Output() onTokenSubmit: EventEmitter<string> = new EventEmitter();
 
   public modalVisible = true;
-  public modalLocked = true;
+  public modalLocked = false;
   public tokenForm: FormGroup;
 
   constructor(
-    public fb: FormBuilder
+    public fb: FormBuilder,
+    private router: Router
   ) {
     this.tokenForm = fb.group({
       token: ['', [Validators.required]]
@@ -29,7 +31,7 @@ export class EnableContentModalComponent implements OnChanges {
   }
 
   public closeModal(): void {
-    this.modalVisible = false;
+    this.router.navigate(['/']);
   }
 
   public onFormSubmit(): void {
