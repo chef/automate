@@ -16,9 +16,9 @@ export interface CookbookVersion {
 }
 
 export interface CookbookVersionDisplay {
-  name?: string;
-  operator?: string;
-  versionNumber?: string;
+  name: string;
+  operator: string;
+  versionNumber: string;
 }
 
 export class EnvironmentAttributes {
