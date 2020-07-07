@@ -12,7 +12,9 @@ import {
   InstallContentItemFailure,
   DownloadContentItem,
   DownloadContentItemSuccess,
-  DownloadContentItemFailure
+  DownloadContentItemFailure,
+  IsContentEnabledFailure,
+  IsContentEnabledSuccess
 } from './cds.actions';
 import { CdsRequests } from './cds.requests';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -76,38 +78,58 @@ export class CdsEffects {
       });
     }));
 
-    @Effect()
-    downloadContentItem$ = this.actions$.pipe(
-      ofType(CdsActionTypes.DOWNLOAD_CONTENT_ITEM),
-      mergeMap( (action: DownloadContentItem) =>
-        this.requests.downloadContentItem(action.payload.id).pipe(
-          map( (file: Blob) => {
-            saveAs(file, action.payload.filename);
-            return new DownloadContentItemSuccess( { name: action.payload.name } );
-          }),
-          catchError((error) => of(new DownloadContentItemFailure(
-            { name: action.payload.name, httpErrorResponse: error})))
-      )));
+  @Effect()
+  downloadContentItem$ = this.actions$.pipe(
+    ofType(CdsActionTypes.DOWNLOAD_CONTENT_ITEM),
+    mergeMap( (action: DownloadContentItem) =>
+      this.requests.downloadContentItem(action.payload.id).pipe(
+        map( (file: Blob) => {
+          saveAs(file, action.payload.filename);
+          return new DownloadContentItemSuccess( { name: action.payload.name } );
+        }),
+        catchError((error) => of(new DownloadContentItemFailure(
+          { name: action.payload.name, httpErrorResponse: error})))
+    )));
 
-    @Effect()
-    downloadContentItemFailure$ = this.actions$.pipe(
-      ofType(CdsActionTypes.DOWNLOAD_CONTENT_ITEM_FAILURE),
-      map(( action: DownloadContentItemFailure) => {
-        const error = action.payload.httpErrorResponse.error;
-        const msg = error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Error downloading content item "${action.payload.name}" errors: ${msg || error}`
-        });
-      }));
+  @Effect()
+  downloadContentItemFailure$ = this.actions$.pipe(
+    ofType(CdsActionTypes.DOWNLOAD_CONTENT_ITEM_FAILURE),
+    map(( action: DownloadContentItemFailure) => {
+      const error = action.payload.httpErrorResponse.error;
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Error downloading content item "${action.payload.name}" errors: ${msg || error}`
+      });
+    }));
 
-    @Effect()
-    downloadContentItemSuccess$ = this.actions$.pipe(
-      ofType(CdsActionTypes.DOWNLOAD_CONTENT_ITEM_SUCCESS),
-      map((action: DownloadContentItemSuccess) => {
-        return new CreateNotification({
-          type: Type.info,
-          message: `Content Item "${action.payload.name}" was download`
-        });
-      }));
+  @Effect()
+  downloadContentItemSuccess$ = this.actions$.pipe(
+    ofType(CdsActionTypes.DOWNLOAD_CONTENT_ITEM_SUCCESS),
+    map((action: DownloadContentItemSuccess) => {
+      return new CreateNotification({
+        type: Type.info,
+        message: `Content Item "${action.payload.name}" was download`
+      });
+    }));
+
+  @Effect()
+  isContentEnabled$ = this.actions$.pipe(
+    ofType(CdsActionTypes.IS_CONTENT_ENABLED),
+    mergeMap( (_action) =>
+      this.requests.isContentEnabled().pipe(
+        map(isContentEnabled => new IsContentEnabledSuccess( isContentEnabled )),
+        catchError((error) => of(new IsContentEnabledFailure(error))))
+    ));
+
+  @Effect()
+  isContentEnabledFailure$ = this.actions$.pipe(
+    ofType(CdsActionTypes.IS_CONTENT_ENABLED_FAILURE),
+    map(({ payload: { error } }: IsContentEnabledFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not check is content is enabled: ${msg || error}`
+      });
+    }));
 }

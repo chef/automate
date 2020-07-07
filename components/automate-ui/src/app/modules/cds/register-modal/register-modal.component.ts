@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
@@ -6,7 +6,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   templateUrl: './register-modal.component.html',
   styleUrls: ['./register-modal.component.scss']
 })
-export class RegisterModalComponent {
+export class RegisterModalComponent implements OnChanges {
+  @Input() show: boolean;
+
   public modalVisible = true;
   public modalLocked = true;
   public tokenform: FormGroup;
@@ -17,6 +19,12 @@ export class RegisterModalComponent {
     this.tokenform = fb.group({
       token: ['', [Validators.required]]
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['show']) {
+      this.modalVisible = changes.show.currentValue;
+    }
   }
 
   public closeModal(): void {

@@ -8,3 +8,8 @@ export const contentItems = createSelector(
   cdsState,
   (state) => state.contentItems
 );
+
+export const contentEnabled = createSelector(
+  cdsState,
+  (state) => state.isContentEnabled
+);

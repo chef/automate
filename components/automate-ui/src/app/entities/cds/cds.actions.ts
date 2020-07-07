@@ -12,7 +12,10 @@ export enum CdsActionTypes {
   INSTALL_CONTENT_ITEM_FAILURE   = 'CDS::INSTALL::CONTENT_ITEM::FAILURE',
   DOWNLOAD_CONTENT_ITEM          = 'CDS::DOWNLOAD::CONTENT_ITEM',
   DOWNLOAD_CONTENT_ITEM_SUCCESS  = 'CDS::DOWNLOAD::CONTENT_ITEM::SUCCESS',
-  DOWNLOAD_CONTENT_ITEM_FAILURE  = 'CDS::DOWNLOAD::CONTENT_ITEM::FAILURE'
+  DOWNLOAD_CONTENT_ITEM_FAILURE  = 'CDS::DOWNLOAD::CONTENT_ITEM::FAILURE',
+  IS_CONTENT_ENABLED             = 'CDS::IS_CONTENT_ENABLED',
+  IS_CONTENT_ENABLED_SUCCESS     = 'CDS::IS_CONTENT_ENABLED::SUCCESS',
+  IS_CONTENT_ENABLED_FAILURE     = 'CDS::IS_CONTENT_ENABLED::FAILURE'
 }
 
 export class GetContentItems implements Action {
@@ -58,6 +61,20 @@ export class DownloadContentItemFailure implements Action {
   constructor(public payload: {httpErrorResponse: HttpErrorResponse, name: string} ) { }
 }
 
+export class IsContentEnabled implements Action {
+  readonly type = CdsActionTypes.IS_CONTENT_ENABLED;
+}
+
+export class IsContentEnabledSuccess implements Action {
+  readonly type = CdsActionTypes.IS_CONTENT_ENABLED_SUCCESS;
+  constructor( public payload: boolean ) { }
+}
+
+export class IsContentEnabledFailure implements Action {
+  readonly type = CdsActionTypes.IS_CONTENT_ENABLED_FAILURE;
+  constructor(public payload: HttpErrorResponse ) { }
+}
+
 export type CdsActions =
   | GetContentItems
   | GetContentItemsSuccess
@@ -67,4 +84,7 @@ export type CdsActions =
   | InstallContentItemFailure
   | DownloadContentItem
   | DownloadContentItemSuccess
-  | DownloadContentItemFailure;
+  | DownloadContentItemFailure
+  | IsContentEnabled
+  | IsContentEnabledSuccess
+  | IsContentEnabledFailure;

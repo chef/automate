@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ContentItem } from './cds.model';
 import { map as mapRxjs } from 'rxjs/operators';
@@ -46,6 +46,11 @@ export class CdsRequests {
     const url = `${CDS_URL}/download`;
     const body = {id};
     return this.http.post(url, body, {responseType: 'blob'});
+  }
+
+  public isContentEnabled(): Observable<boolean> {
+    console.info('isContentEnabled request');
+    return of(false);
   }
 
   private convertToContentItems(resp: RespContentItems): ContentItem[] {
