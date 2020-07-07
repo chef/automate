@@ -15,3 +15,11 @@ message InstallContentItem {
 message DownloadContentItem {
   string id = 1;
 }
+
+message Token {
+  string token = 1;
+}
+
+message ContentEnabled {
+
+}

@@ -14,6 +14,24 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/beta/content/enabled": {
+      "get": {
+        "summary": "IsContentEnabled",
+        "description": "Check if the content is enable for this Automate instance. \n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:enabled\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "IsContentEnabled",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cds.response.ContentEnabled"
+            }
+          }
+        },
+        "tags": [
+          "Cds"
+        ]
+      }
+    },
     "/api/beta/content/install": {
       "post": {
         "summary": "InstallContentItem",
@@ -59,6 +77,34 @@ func init() {
           "Cds"
         ]
       }
+    },
+    "/api/beta/content/token/submit": {
+      "post": {
+        "summary": "SubmitToken",
+        "description": "Submit a Chef Cloud token\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:token:submit\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "SubmitToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cds.response.Token"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cds.request.Token"
+            }
+          }
+        ],
+        "tags": [
+          "Cds"
+        ]
+      }
     }
   },
   "definitions": {
@@ -70,6 +116,23 @@ func init() {
         },
         "request_user": {
           "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.cds.request.Token": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.cds.response.ContentEnabled": {
+      "type": "object",
+      "properties": {
+        "is_content_enabled": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -118,6 +181,9 @@ func init() {
       }
     },
     "chef.automate.api.cds.response.InstallContentItem": {
+      "type": "object"
+    },
+    "chef.automate.api.cds.response.Token": {
       "type": "object"
     },
     "chef.automate.api.common.ExportData": {

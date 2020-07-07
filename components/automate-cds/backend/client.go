@@ -2,6 +2,7 @@ package backend
 
 type Client struct {
 	items []ContentItem
+	token string
 }
 
 // NewClient - create a new backend client
@@ -25,6 +26,22 @@ func (client *Client) GetContentItem(id string) (ContentItem, bool, error) {
 	}
 
 	return ContentItem{}, false, nil
+}
+
+// VerifyToken - return true if the token is valid and false otherwise.
+func (client *Client) VerifyToken(token string) (bool, error) {
+	return true, nil
+}
+
+// AddToken - storing the token (This will be but in the secrets-service later)
+func (client *Client) AddToken(token string) error {
+	client.token = token
+	return nil
+}
+
+// GetToken - getting token (later this will be pulled from the secrets-service)
+func (client *Client) GetToken() (string, error) {
+	return client.token, nil
 }
 
 func getItem() []ContentItem {

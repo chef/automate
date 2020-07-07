@@ -12,6 +12,22 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.cds.Cds/ListContentItems", "content:items", "content:items:list", "GET", "/api/beta/content/items", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.cds.Cds/SubmitToken", "content:token", "content:token:submit", "POST", "/api/beta/content/token/submit", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.Token); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "token":
+					return m.Token
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.cds.Cds/IsContentEnabled", "content:token", "content:token:enabled", "GET", "/api/beta/content/enabled", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 	policy.MapMethodTo("/chef.automate.api.cds.Cds/InstallContentItem", "content:items", "content:items:install", "POST", "/api/beta/content/install", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.InstallContentItem); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {

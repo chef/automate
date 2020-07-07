@@ -87,6 +87,57 @@ func (s *Server) ListContentItems(ctx context.Context,
 	}, nil
 }
 
+// IsContentEnabled - Check if the content is enable for this Automate instance.
+func (s *Server) IsContentEnabled(ctx context.Context,
+	request *request.ContentEnabled) (*response.ContentEnabled, error) {
+
+	token, err := s.client.GetToken()
+	if err != nil {
+		return &response.ContentEnabled{}, status.Errorf(codes.Internal,
+			"Could not retrieve token from secrets-service error: %s", err.Error())
+	}
+
+	if len(token) == 0 {
+		return &response.ContentEnabled{
+			IsContentEnabled: false,
+		}, nil
+	}
+
+	ok, err := s.client.VerifyToken(token)
+	if err != nil {
+		return &response.ContentEnabled{}, status.Errorf(codes.Internal, "Could not verify the token with Chef Cloud. error: %s", err.Error())
+	}
+	if !ok {
+		return &response.ContentEnabled{}, status.Errorf(codes.InvalidArgument, "Chef Cloud does not recognize the provided token")
+	}
+
+	return &response.ContentEnabled{
+		IsContentEnabled: true,
+	}, nil
+}
+
+// SubmitToken - Submit a Chef Cloud token to enable content
+func (s *Server) SubmitToken(ctx context.Context,
+	request *request.Token) (*response.Token, error) {
+
+	if len(request.Token) == 0 {
+		return &response.Token{}, status.Errorf(codes.InvalidArgument,
+			"token must not be empty")
+	}
+
+	ok, err := s.client.VerifyToken(request.Token)
+	if err != nil {
+		return &response.Token{}, status.Errorf(codes.Internal, "Could not verify the token with Chef Cloud. error: %s", err.Error())
+	}
+	if !ok {
+		return &response.Token{}, status.Errorf(codes.InvalidArgument, "Chef Cloud does not recognize the provided token")
+	}
+
+	s.client.AddToken(request.Token)
+
+	return &response.Token{}, nil
+}
+
 // InstallContentItem - installing a content item
 func (s *Server) InstallContentItem(ctx context.Context,
 	request *request.InstallContentItem) (*response.InstallContentItem, error) {

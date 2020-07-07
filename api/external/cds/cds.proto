@@ -32,6 +32,41 @@ service Cds {
   };
 
   /*
+  SubmitToken
+
+  Submit a Chef Cloud token to enable content
+
+  Authorization Action:
+  ```
+  content:token:submit
+  ```
+  */
+  rpc SubmitToken(cds.request.Token) returns (cds.response.Token) {
+    option (google.api.http) = {
+      post: "/api/beta/content/token/submit"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "content:token";
+    option (chef.automate.api.iam.policy).action = "content:token:submit";
+  };
+
+  /*
+  IsContentEnabled
+
+  Check if the content is enable for this Automate instance. 
+
+  Authorization Action:
+  ```
+  content:enabled
+  ```
+  */
+  rpc IsContentEnabled(cds.request.ContentEnabled) returns (cds.response.ContentEnabled) {
+    option (google.api.http).get = "/api/beta/content/enabled";
+    option (chef.automate.api.iam.policy).resource = "content:token";
+    option (chef.automate.api.iam.policy).action = "content:token:enabled";
+  };
+
+  /*
   InstallContentItem
 
   Installs a content item from its ID

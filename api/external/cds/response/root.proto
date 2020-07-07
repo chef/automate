@@ -21,3 +21,11 @@ message ContentItem {
 message InstallContentItem {
 
 }
+
+message Token {
+
+}
+
+message ContentEnabled {
+  bool is_content_enabled = 1;
+}
