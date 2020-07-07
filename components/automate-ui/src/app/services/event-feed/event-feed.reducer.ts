@@ -64,14 +64,14 @@ export const initialState: EventFeedState = {
   suggestions: [],
   guitarStringCollection:
     new GuitarStringCollection([],
-    moment().utc().subtract(6, 'days').startOf('day'),
-    moment().utc().endOf('day')),
+    moment.utc().subtract(6, 'days').startOf('day'),
+    moment.utc().endOf('day')),
   typeCounts: EventTypeCount.Null,
   taskCounts: EventTaskCount.Null,
   filters: {
     searchBar: [],
-    endDate: moment().utc().endOf('day'),
-    startDate: moment().utc().subtract(6, 'days').startOf('day'),
+    endDate: moment.utc().endOf('day'),
+    startDate: moment.utc().subtract(6, 'days').startOf('day'),
     hoursBetween: 1,
     pageSize: 100,
     collapse: true
@@ -153,8 +153,6 @@ export function eventFeedReducer(
     }
 
     case GET_GUITAR_STRINGS_SUCCESS: {
-      console.log('reduced');
-      console.log(action.payload);
       return pipe(
         set('guitarStringCollection', action.payload),
         set('guitarStringsStatus', Status.loadingSuccess)

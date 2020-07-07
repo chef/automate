@@ -120,6 +120,7 @@ export class EventFeedService {
       !responseGuitarStringCollection.hours_between) {
       throw new Error('Guitar strings response is missing the start, end, or hours_between value');
     }
+
     const start = moment.utc(responseGuitarStringCollection.start).startOf('day');
     const end = moment.utc(responseGuitarStringCollection.end).endOf('day');
 
@@ -305,6 +306,7 @@ export class EventFeedService {
         hoursBetweenItems * index, 'hours').startOf('hour');
       const end = initialStart.clone().add(
         hoursBetweenItems * index, 'hours').endOf('hour');
+
       return new GuitarStringItem(eventCollection.events_count, start, end);
     });
 

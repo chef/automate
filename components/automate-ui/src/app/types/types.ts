@@ -632,6 +632,10 @@ export class GuitarStringItem {
   end: moment.Moment;
 
   constructor(eventTypeCount: RespEventCount[], start: moment.Moment, end: moment.Moment) {
+    console.log('blah');
+    console.log(start);
+    console.log(end);
+
     this.eventTypeCount = eventTypeCount;
     this.start = start;
     this.end = end;
@@ -697,6 +701,7 @@ export class GuitarStringCollection {
   end: moment.Moment;
 
   constructor(strings: GuitarString[], start: moment.Moment, end: moment.Moment) {
+
     this.strings = strings;
     this.start = start;
     this.end = end;
