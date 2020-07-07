@@ -13,8 +13,12 @@ import {
   DownloadContentItem,
   DownloadContentItemSuccess,
   DownloadContentItemFailure,
+  IsContentEnabled,
   IsContentEnabledFailure,
-  IsContentEnabledSuccess
+  IsContentEnabledSuccess,
+  SubmitToken,
+  SubmitTokenFailure,
+  SubmitTokenSuccess
 } from './cds.actions';
 import { CdsRequests } from './cds.requests';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -130,6 +134,31 @@ export class CdsEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not check is content is enabled: ${msg || error}`
+      });
+    }));
+
+  @Effect()
+  submitToken$ = this.actions$.pipe(
+    ofType(CdsActionTypes.SUBMIT_TOKEN),
+    mergeMap( (action: SubmitToken) =>
+      this.requests.submitToken(action.payload.token).pipe(
+        map(_ => new SubmitTokenSuccess( )),
+        catchError((error) => of(new SubmitTokenFailure(error))))
+    ));
+
+  @Effect()
+  submitTokenSuccess$ = this.actions$.pipe(
+    ofType(CdsActionTypes.SUBMIT_TOKEN_SUCCESS),
+    map( (_action) => new IsContentEnabled()));
+
+  @Effect()
+  submitTokenFailure$ = this.actions$.pipe(
+    ofType(CdsActionTypes.SUBMIT_TOKEN_FAILURE),
+    map(({ payload: { error } }: SubmitTokenFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Failed to submit token: ${msg || error}`
       });
     }));
 }

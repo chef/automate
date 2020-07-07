@@ -14,8 +14,8 @@
             <div *ngFor="let item of pairOfItems" class="dashboard-overview-col">
               <app-card
                 [contentItem] = "item"
-                (onInstallItem)="installContentItem(item)"
-                (onDownloadItem)="downloadContentItem(item)">
+                (onInstallItem) = "installContentItem(item)"
+                (onDownloadItem) = "downloadContentItem(item)">
               </app-card>
             </div>
           </div>

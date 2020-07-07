@@ -7,7 +7,7 @@ import { CardTableComponent } from './card-table/card-table.component';
 import { CardComponent } from './card/card.component';
 import { CdsRoutingModule } from './cds-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { RegisterModalComponent } from './register-modal/register-modal.component';
+import { EnableContentModalComponent } from './enable-content-modal/enable-content-modal.component';
 
 @NgModule({
   imports: [
@@ -20,13 +20,13 @@ import { RegisterModalComponent } from './register-modal/register-modal.componen
     CardTableComponent,
     CardComponent,
     DashboardComponent,
-    RegisterModalComponent
+    EnableContentModalComponent
   ],
   declarations: [
     CardTableComponent,
     CardComponent,
     DashboardComponent,
-    RegisterModalComponent
+    EnableContentModalComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

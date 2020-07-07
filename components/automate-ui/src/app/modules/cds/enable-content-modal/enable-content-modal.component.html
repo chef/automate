@@ -2,14 +2,14 @@
   <div class="register-wrapper">
 
     <h2 class="title">Welcome to Chef Automate CDS!</h2>
-    <form class="token" [formGroup]="tokenform" (ngSubmit)="onFormSubmit()" novalidate>
+    <form class="token" [formGroup]="tokenForm" (ngSubmit)="onFormSubmit()" novalidate>
       <div class="token-container">
         <chef-form-field>
           <label for="token">Enter Chef Cloud Token<span aria-hidden="true"></span></label>
           <div class="suggester-input-wrapper">
             <input chefInput name="token-id" id="token" formControlName="token" type="text" autofocus>
           </div>
-          <chef-error *ngIf="tokenform.get('token').hasError('required') && tokenform.get('token').dirty">
+          <chef-error *ngIf="tokenForm.get('token').hasError('required') && tokenForm.get('token').dirty">
             Token required.
           </chef-error>
         </chef-form-field>

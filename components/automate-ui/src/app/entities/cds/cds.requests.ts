@@ -29,6 +29,8 @@ export class CdsRequests {
 
   constructor(private http: HttpClient) { }
 
+  private enabled = false;
+
   public getContentItems(): Observable<ContentItem[]> {
     const url = `${CDS_URL}/items`;
 
@@ -50,7 +52,13 @@ export class CdsRequests {
 
   public isContentEnabled(): Observable<boolean> {
     console.info('isContentEnabled request');
-    return of(false);
+    return of(this.enabled);
+  }
+
+  public submitToken(_token: string): Observable<any> {
+    console.info('submitToken request');
+    this.enabled = true;
+    return of('');
   }
 
   private convertToContentItems(resp: RespContentItems): ContentItem[] {

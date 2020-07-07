@@ -15,7 +15,10 @@ export enum CdsActionTypes {
   DOWNLOAD_CONTENT_ITEM_FAILURE  = 'CDS::DOWNLOAD::CONTENT_ITEM::FAILURE',
   IS_CONTENT_ENABLED             = 'CDS::IS_CONTENT_ENABLED',
   IS_CONTENT_ENABLED_SUCCESS     = 'CDS::IS_CONTENT_ENABLED::SUCCESS',
-  IS_CONTENT_ENABLED_FAILURE     = 'CDS::IS_CONTENT_ENABLED::FAILURE'
+  IS_CONTENT_ENABLED_FAILURE     = 'CDS::IS_CONTENT_ENABLED::FAILURE',
+  SUBMIT_TOKEN                   = 'CDS::SUBMIT_TOKEN',
+  SUBMIT_TOKEN_SUCCESS           = 'CDS::SUBMIT_TOKEN::SUCCESS',
+  SUBMIT_TOKEN_FAILURE           = 'CDS::SUBMIT_TOKEN::FAILURE'
 }
 
 export class GetContentItems implements Action {
@@ -75,6 +78,20 @@ export class IsContentEnabledFailure implements Action {
   constructor(public payload: HttpErrorResponse ) { }
 }
 
+export class SubmitToken implements Action {
+  readonly type = CdsActionTypes.SUBMIT_TOKEN;
+  constructor( public payload: { token: string } ) { }
+}
+
+export class SubmitTokenSuccess implements Action {
+  readonly type = CdsActionTypes.SUBMIT_TOKEN_SUCCESS;
+}
+
+export class SubmitTokenFailure implements Action {
+  readonly type = CdsActionTypes.SUBMIT_TOKEN_FAILURE;
+  constructor(public payload: HttpErrorResponse ) { }
+}
+
 export type CdsActions =
   | GetContentItems
   | GetContentItemsSuccess
@@ -87,4 +104,7 @@ export type CdsActions =
   | DownloadContentItemFailure
   | IsContentEnabled
   | IsContentEnabledSuccess
-  | IsContentEnabledFailure;
+  | IsContentEnabledFailure
+  | SubmitToken
+  | SubmitTokenSuccess
+  | SubmitTokenFailure;

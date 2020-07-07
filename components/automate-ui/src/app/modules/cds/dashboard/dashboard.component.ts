@@ -10,7 +10,8 @@ import {
   IsContentEnabled,
   GetContentItems,
   InstallContentItem,
-  DownloadContentItem
+  DownloadContentItem,
+  SubmitToken
 } from 'app/entities/cds/cds.actions';
 
 import {
@@ -69,5 +70,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   downloadContentItem(item: ContentItem) {
     this.store.dispatch(new DownloadContentItem( item ));
+  }
+
+  tokenSubmit(token: string) {
+    this.store.dispatch(new SubmitToken( {token} ));
   }
 }
