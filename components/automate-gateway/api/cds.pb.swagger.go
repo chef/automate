@@ -81,7 +81,7 @@ func init() {
     "/api/beta/content/token/submit": {
       "post": {
         "summary": "SubmitToken",
-        "description": "Submit a Chef Cloud token\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:token:submit\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Submit a Chef Cloud token to enable content\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:token:submit\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "SubmitToken",
         "responses": {
           "200": {

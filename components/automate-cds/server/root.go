@@ -62,7 +62,18 @@ func (s *Server) GetVersion(
 func (s *Server) ListContentItems(ctx context.Context,
 	request *request.ContentItems) (*response.ContentItems, error) {
 
-	backendItems, err := s.client.GetContentItems()
+	token, found, err := s.client.GetToken()
+	if err != nil {
+		return &response.ContentItems{}, status.Errorf(codes.Internal,
+			"Could not retrieve token from secrets-service error: %s", err.Error())
+	}
+
+	if !found {
+		return &response.ContentItems{}, status.Errorf(codes.InvalidArgument,
+			"Can not request content items without a token submitted")
+	}
+
+	backendItems, err := s.client.GetContentItems(token)
 	if err != nil {
 		return &response.ContentItems{}, status.Errorf(codes.Internal,
 			"Failed connecting to Chef Cloud")
@@ -91,13 +102,13 @@ func (s *Server) ListContentItems(ctx context.Context,
 func (s *Server) IsContentEnabled(ctx context.Context,
 	request *request.ContentEnabled) (*response.ContentEnabled, error) {
 
-	token, err := s.client.GetToken()
+	token, found, err := s.client.GetToken()
 	if err != nil {
 		return &response.ContentEnabled{}, status.Errorf(codes.Internal,
 			"Could not retrieve token from secrets-service error: %s", err.Error())
 	}
 
-	if len(token) == 0 {
+	if !found {
 		return &response.ContentEnabled{
 			IsContentEnabled: false,
 		}, nil
@@ -141,7 +152,17 @@ func (s *Server) SubmitToken(ctx context.Context,
 // InstallContentItem - installing a content item
 func (s *Server) InstallContentItem(ctx context.Context,
 	request *request.InstallContentItem) (*response.InstallContentItem, error) {
-	contentItem, found, err := s.client.GetContentItem(request.Id)
+	token, found, err := s.client.GetToken()
+	if err != nil {
+		return &response.InstallContentItem{}, status.Errorf(codes.Internal,
+			"Could not retrieve token from secrets-service error: %s", err.Error())
+	}
+
+	if !found {
+		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument,
+			"Can not install a content item without a token submitted")
+	}
+	contentItem, found, err := s.client.GetContentItem(request.Id, token)
 	if err != nil {
 		return &response.InstallContentItem{}, status.Errorf(codes.Internal,
 			"Could not connect to Content Delivery Service error: %s", err.Error)
@@ -162,7 +183,7 @@ func (s *Server) InstallContentItem(ctx context.Context,
 				"A request_user must be non empty")
 		}
 
-		err = s.installProfile(ctx, contentItem, request.RequestUser)
+		err = s.installProfile(ctx, contentItem, request.RequestUser, token)
 		if err != nil {
 			return &response.InstallContentItem{}, status.Errorf(codes.Internal,
 				"Error Installing Profile: %s", err.Error)
@@ -178,7 +199,19 @@ func (s *Server) InstallContentItem(ctx context.Context,
 // DownloadContentItem - download content item
 func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 	stream interservice.AutomateCds_DownloadContentItemServer) error {
-	contentItem, found, err := s.client.GetContentItem(request.Id)
+
+	token, found, err := s.client.GetToken()
+	if err != nil {
+		return status.Errorf(codes.Internal,
+			"Could not retrieve token from secrets-service error: %s", err.Error())
+	}
+
+	if !found {
+		return status.Errorf(codes.InvalidArgument,
+			"Can not download a content item without a token submitted")
+	}
+
+	contentItem, found, err := s.client.GetContentItem(request.Id, token)
 	if err != nil {
 		return err
 	}
@@ -211,7 +244,7 @@ func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 }
 
 func (s *Server) installProfile(ctx context.Context,
-	contentItem backend.ContentItem, owner string) error {
+	contentItem backend.ContentItem, owner string, token string) error {
 	log.Infof("Installing profile content item with ID %s ...", contentItem.ID)
 
 	// Get the data

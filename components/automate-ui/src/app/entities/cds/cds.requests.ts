@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ContentItem } from './cds.model';
 import { map as mapRxjs } from 'rxjs/operators';
@@ -24,12 +24,14 @@ interface RespContentItem {
   filename: string;
 }
 
+interface RespContentEnabled {
+  is_content_enabled: boolean;
+}
+
 @Injectable()
 export class CdsRequests {
 
   constructor(private http: HttpClient) { }
-
-  private enabled = false;
 
   public getContentItems(): Observable<ContentItem[]> {
     const url = `${CDS_URL}/items`;
@@ -51,14 +53,16 @@ export class CdsRequests {
   }
 
   public isContentEnabled(): Observable<boolean> {
-    console.info('isContentEnabled request');
-    return of(this.enabled);
+    const url = `${CDS_URL}/enabled`;
+
+    return this.http.get<RespContentEnabled>(url).pipe(
+      mapRxjs(resp => resp.is_content_enabled));
   }
 
-  public submitToken(_token: string): Observable<any> {
-    console.info('submitToken request');
-    this.enabled = true;
-    return of('');
+  public submitToken( token: string): Observable<any> {
+    const url = `${CDS_URL}/token/submit`;
+
+    return this.http.post(url, { token });
   }
 
   private convertToContentItems(resp: RespContentItems): ContentItem[] {

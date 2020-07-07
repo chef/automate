@@ -97,7 +97,7 @@ type CdsClient interface {
 	//
 	//SubmitToken
 	//
-	//Submit a Chef Cloud token
+	//Submit a Chef Cloud token to enable content
 	//
 	//Authorization Action:
 	//```
@@ -231,7 +231,7 @@ type CdsServer interface {
 	//
 	//SubmitToken
 	//
-	//Submit a Chef Cloud token
+	//Submit a Chef Cloud token to enable content
 	//
 	//Authorization Action:
 	//```
