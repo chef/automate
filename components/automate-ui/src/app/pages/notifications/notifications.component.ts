@@ -81,10 +81,12 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     this.createNotificationForm = this.fb.group({
       // Must stay in sync with error checks in create-notification-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      ruleType: [[]],
+      targetType: [[]],
       // Note that URL here may be FQDN -or- IP!
       targetUrl: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      username: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      password: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      username: [[]],
+      password: [[]]
     });
    }
 
@@ -282,6 +284,20 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       });
 
     this.telemetryService.track('notificationRuleCount', ruleCount);
+  }
+
+  public updateTargetType(): void {
+    if (this.createNotificationForm.value.targetType === 'ServiceNowAlert') {
+      this.createNotificationForm.get('username').setValidators([
+        Validators.required
+      ]);
+      this.createNotificationForm.get('password').setValidators([
+        Validators.required
+      ]);
+    } else {
+      this.createNotificationForm.get('username').clearValidators();
+      this.createNotificationForm.get('password').clearValidators();
+    }
   }
 
   public sendTestForNotification(): void {

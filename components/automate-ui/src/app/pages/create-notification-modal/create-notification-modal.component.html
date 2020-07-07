@@ -8,7 +8,6 @@
               <span class="label">Name <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="name" type="text" id="name-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
-            <span class="i-desc">Don't worry, notification names can be changed later.</span>
             <chef-error
             *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
             Display Name is required.
@@ -16,6 +15,7 @@
           <chef-error *ngIf="conflictError">
             Name "{{createForm.get('name').value}}" already exists.
           </chef-error>
+          <span class="i-desc">Don't worry, notification names can be changed later.</span>
           </chef-form-field>
         </div>
         <div class="margin">
@@ -75,10 +75,10 @@
                 <span class="label">ServiceNow Username <span aria-hidden="true">*</span></span>
                 <input chefInput formControlName="username" type="text" id="username-input" (keyup)="handleInput($event)" autocomplete="off"/>
               </label>
-              <span class="i-desc">Encrypted, and only used to access the notification.</span>
               <chef-error *ngIf="createForm.get('username').hasError('required') && createForm.get('username').dirty">
                 Username is required.
               </chef-error>
+              <span class="i-desc">Encrypted, and only used to access the notification.</span>
             </chef-form-field>
           </div>
           <div class="margin">
@@ -87,14 +87,10 @@
                 <span class="label">ServiceNow Password <span aria-hidden="true">*</span></span>
                 <input chefInput formControlName="password" type="password" id="password-input" (keyup)="handleInput($event)" autocomplete="off"/>
               </label>
+              <chef-error *ngIf="createForm.get('password').hasError('required') && createForm.get('password').dirty">
+                Password is required.
+              </chef-error>
               <span class="i-desc">Encrypted, and only used to access the notification feed.</span>
-              <chef-error *ngIf="createForm.get('password').hasError('password') && createForm.get('password').dirty">
-                Password is required.
-              </chef-error>
-              <chef-error
-                *ngIf="createForm.get('password').hasError('password') && createForm.get('password').dirty">
-                Password is required.
-              </chef-error>
             </chef-form-field>
           </div>
         </div>

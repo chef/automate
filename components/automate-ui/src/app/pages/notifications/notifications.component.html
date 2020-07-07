@@ -15,7 +15,8 @@
         (close)="closeCreateModal()"
         [conflictErrorEvent]="conflictErrorEvent"
         (createClicked)="createNotification()"
-        (sendTestClicked)="sendTestForNotification()">
+        (sendTestClicked)="sendTestForNotification()"
+        (targetTypeChanged)="updateTargetType()">
       </app-create-notification-modal>
 
       <div class="page-body">

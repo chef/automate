@@ -25,6 +25,7 @@ export class CreateNotificationModalComponent implements OnInit {
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter();
   @Output() sendTestClicked = new EventEmitter();
+  @Output() targetTypeChanged = new EventEmitter();
   @Input() createForm: FormGroup;
   @Input() hookStatus = UrlTestState.Inactive;
   @Input() notificationRule = new NotificationRule('', '', null, '', null, '', false);
@@ -73,6 +74,7 @@ export class CreateNotificationModalComponent implements OnInit {
 
   setFailureType(event) {
     this.notificationRule.ruleType = event.target.value;
+    this.createForm.value.ruleType = event.target.value;
     if (this.notificationRule.ruleType !== 'ComplianceFailure' &&
     this.notificationRule.targetType === ServiceActionType.SERVICENOW) {
       this.notificationRule.criticalControlsOnly = false;
@@ -81,6 +83,8 @@ export class CreateNotificationModalComponent implements OnInit {
 
   changeSelectionForWebhookType(event) {
     this.notificationRule.targetType = event.target.value;
+    this.createForm.value.targetType = event.target.value;
+    this.targetTypeChanged.emit();
   }
 
   updateCriticalControlsOnly(event) {
