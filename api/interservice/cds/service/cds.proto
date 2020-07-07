@@ -15,5 +15,5 @@ service AutomateCds {
     rpc InstallContentItem(chef.automate.api.cds.request.InstallContentItem) returns (chef.automate.api.cds.response.InstallContentItem);
     rpc DownloadContentItem(chef.automate.api.cds.request.DownloadContentItem) returns (stream chef.automate.api.common.ExportData) { }
     rpc IsContentEnabled(chef.automate.api.cds.request.ContentEnabled) returns (chef.automate.api.cds.response.ContentEnabled);
-    rpc SubmitToken(chef.automate.api.cds.request.Token) returns (chef.automate.api.cds.response.Token);
+    rpc SubmitCredentials(chef.automate.api.cds.request.Credentials) returns (chef.automate.api.cds.response.Credentials);
 }

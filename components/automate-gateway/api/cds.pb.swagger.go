@@ -14,6 +14,34 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/beta/content/credentials": {
+      "post": {
+        "summary": "SubmitToken",
+        "description": "Submit a Chef Cloud token to enable content\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:token:submit\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "SubmitCredentials",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cds.response.Credentials"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cds.request.Credentials"
+            }
+          }
+        ],
+        "tags": [
+          "Cds"
+        ]
+      }
+    },
     "/api/beta/content/enabled": {
       "get": {
         "summary": "IsContentEnabled",
@@ -77,37 +105,23 @@ func init() {
           "Cds"
         ]
       }
-    },
-    "/api/beta/content/token/submit": {
-      "post": {
-        "summary": "SubmitToken",
-        "description": "Submit a Chef Cloud token to enable content\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:token:submit\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "SubmitToken",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.cds.response.Token"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.cds.request.Token"
-            }
-          }
-        ],
-        "tags": [
-          "Cds"
-        ]
-      }
     }
   },
   "definitions": {
+    "chef.automate.api.cds.request.Credentials": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        },
+        "tenant_specific_url": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.cds.request.InstallContentItem": {
       "type": "object",
       "properties": {
@@ -115,14 +129,6 @@ func init() {
           "type": "string"
         },
         "request_user": {
-          "type": "string"
-        }
-      }
-    },
-    "chef.automate.api.cds.request.Token": {
-      "type": "object",
-      "properties": {
-        "token": {
           "type": "string"
         }
       }
@@ -180,10 +186,10 @@ func init() {
         }
       }
     },
-    "chef.automate.api.cds.response.InstallContentItem": {
+    "chef.automate.api.cds.response.Credentials": {
       "type": "object"
     },
-    "chef.automate.api.cds.response.Token": {
+    "chef.automate.api.cds.response.InstallContentItem": {
       "type": "object"
     },
     "chef.automate.api.common.ExportData": {

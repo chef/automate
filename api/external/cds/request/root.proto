@@ -16,8 +16,10 @@ message DownloadContentItem {
   string id = 1;
 }
 
-message Token {
-  string token = 1;
+message Credentials {
+  string client_id = 1;
+  string client_secret = 2;
+  string tenant_specific_url = 3;
 }
 
 message ContentEnabled {

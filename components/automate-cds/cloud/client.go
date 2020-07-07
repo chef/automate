@@ -1,8 +1,9 @@
-package backend
+package cloud
+
+import "github.com/chef/automate/components/automate-cds/creds"
 
 type Client struct {
 	items []ContentItem
-	token string
 }
 
 // NewClient - create a new backend client
@@ -13,12 +14,12 @@ func NewClient() Client {
 }
 
 // GetContentItems - Returns a list of CDS content items
-func (client *Client) GetContentItems(token string) ([]ContentItem, error) {
+func (client *Client) GetContentItems(credentials creds.Credentials) ([]ContentItem, error) {
 	return client.items, nil
 }
 
 // GetContentItem - Get a content item
-func (client *Client) GetContentItem(id string, token string) (ContentItem, bool, error) {
+func (client *Client) GetContentItem(id string, credentials creds.Credentials) (ContentItem, bool, error) {
 	for _, item := range client.items {
 		if item.ID == id {
 			return item, true, nil
@@ -28,20 +29,14 @@ func (client *Client) GetContentItem(id string, token string) (ContentItem, bool
 	return ContentItem{}, false, nil
 }
 
-// VerifyToken - return true if the token is valid and false otherwise.
-func (client *Client) VerifyToken(token string) (bool, error) {
-	return "55c4f0d3-b982-4f39-93a7-01500966d291" == token, nil
-}
+// VerifyCredentials - return true if the token is valid and false otherwise.
+func (client *Client) VerifyCredentials(credentials creds.Credentials) (bool, error) {
+	isValid :=
+		"55c4f0d3-b982-4f39-93a7-01500966d291" == credentials.ClientID &&
+			"55c4f0d3-b982-4f39-93a7-01500966d291" == credentials.ClientSecret &&
+			"https://chef-cloud.io" == credentials.TenantSpecificURL
 
-// AddToken - storing the token (This will be but in the secrets-service later)
-func (client *Client) AddToken(token string) error {
-	client.token = token
-	return nil
-}
-
-// GetToken - getting token (later this will be pulled from the secrets-service)
-func (client *Client) GetToken() (string, bool, error) {
-	return client.token, client.token != "", nil
+	return isValid, nil
 }
 
 func getItem() []ContentItem {

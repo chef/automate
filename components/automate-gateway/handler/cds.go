@@ -50,14 +50,14 @@ func (a *CdsServer) DownloadContentItem(*request.DownloadContentItem, external_s
 }
 
 // SubmitToken - submit a token to enable content
-func (s *CdsServer) SubmitToken(ctx context.Context,
-	request *request.Token) (*response.Token, error) {
+func (s *CdsServer) SubmitCredentials(ctx context.Context,
+	request *request.Credentials) (*response.Credentials, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	return s.client.SubmitToken(ctx, request)
+	return s.client.SubmitCredentials(ctx, request)
 }
 
 // IsContentEnabled - check if content is enabled

@@ -41,13 +41,13 @@ service Cds {
   content:token:submit
   ```
   */
-  rpc SubmitToken(cds.request.Token) returns (cds.response.Token) {
+  rpc SubmitCredentials(cds.request.Credentials) returns (cds.response.Credentials) {
     option (google.api.http) = {
-      post: "/api/beta/content/token/submit"
+      post: "/api/beta/content/credentials"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "content:token";
-    option (chef.automate.api.iam.policy).action = "content:token:submit";
+    option (chef.automate.api.iam.policy).action = "content:token:add";
   };
 
   /*

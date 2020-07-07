@@ -12,7 +12,8 @@ import (
 	ver_api "github.com/chef/automate/api/external/common/version"
 	interservice "github.com/chef/automate/api/interservice/cds/service"
 
-	"github.com/chef/automate/components/automate-cds/backend"
+	"github.com/chef/automate/components/automate-cds/cloud"
+	"github.com/chef/automate/components/automate-cds/creds"
 	"github.com/chef/automate/components/automate-cds/service"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/chef/automate/lib/version"
@@ -33,7 +34,8 @@ const streamBufferSize = 262144
 type Server struct {
 	service               *service.Service
 	profilesServiceClient profiles.ProfilesServiceClient
-	client                backend.Client
+	cloud                 cloud.Client
+	secrets               creds.Secrets
 }
 
 // NewServer returns an Automate CDS proxy server
@@ -42,7 +44,7 @@ func NewServer(service *service.Service,
 	return &Server{
 		service:               service,
 		profilesServiceClient: profilesServiceClient,
-		client:                backend.NewClient(),
+		cloud:                 cloud.NewClient(),
 	}
 }
 
@@ -62,7 +64,7 @@ func (s *Server) GetVersion(
 func (s *Server) ListContentItems(ctx context.Context,
 	request *request.ContentItems) (*response.ContentItems, error) {
 
-	token, found, err := s.client.GetToken()
+	credentials, found, err := s.secrets.GetCredentials()
 	if err != nil {
 		return &response.ContentItems{}, status.Errorf(codes.Internal,
 			"Could not retrieve token from secrets-service error: %s", err.Error())
@@ -73,23 +75,23 @@ func (s *Server) ListContentItems(ctx context.Context,
 			"Can not request content items without a token submitted")
 	}
 
-	backendItems, err := s.client.GetContentItems(token)
+	cloudItems, err := s.cloud.GetContentItems(credentials)
 	if err != nil {
 		return &response.ContentItems{}, status.Errorf(codes.Internal,
 			"Failed connecting to Chef Cloud")
 	}
 
-	responseItems := make([]*response.ContentItem, len(backendItems))
-	for index, backendItem := range backendItems {
+	responseItems := make([]*response.ContentItem, len(cloudItems))
+	for index, cloudItem := range cloudItems {
 		responseItems[index] = &response.ContentItem{
-			Id:             backendItem.ID,
-			Name:           backendItem.Name,
-			Description:    backendItem.Description,
-			Type:           backendItem.Type,
-			Version:        backendItem.Version,
-			Platforms:      backendItem.Platforms,
-			CanBeInstalled: backendItem.CanBeInstalled,
-			Filename:       backendItem.Filename,
+			Id:             cloudItem.ID,
+			Name:           cloudItem.Name,
+			Description:    cloudItem.Description,
+			Type:           cloudItem.Type,
+			Version:        cloudItem.Version,
+			Platforms:      cloudItem.Platforms,
+			CanBeInstalled: cloudItem.CanBeInstalled,
+			Filename:       cloudItem.Filename,
 		}
 	}
 
@@ -102,7 +104,7 @@ func (s *Server) ListContentItems(ctx context.Context,
 func (s *Server) IsContentEnabled(ctx context.Context,
 	request *request.ContentEnabled) (*response.ContentEnabled, error) {
 
-	token, found, err := s.client.GetToken()
+	credentials, found, err := s.secrets.GetCredentials()
 	if err != nil {
 		return &response.ContentEnabled{}, status.Errorf(codes.Internal,
 			"Could not retrieve token from secrets-service error: %s", err.Error())
@@ -114,7 +116,7 @@ func (s *Server) IsContentEnabled(ctx context.Context,
 		}, nil
 	}
 
-	ok, err := s.client.VerifyToken(token)
+	ok, err := s.cloud.VerifyCredentials(credentials)
 	if err != nil {
 		return &response.ContentEnabled{}, status.Errorf(codes.Internal, "Could not verify the token with Chef Cloud. error: %s", err.Error())
 	}
@@ -127,32 +129,36 @@ func (s *Server) IsContentEnabled(ctx context.Context,
 	}, nil
 }
 
-// SubmitToken - Submit a Chef Cloud token to enable content
-func (s *Server) SubmitToken(ctx context.Context,
-	request *request.Token) (*response.Token, error) {
+// SubmitCredentials - Submit a Chef Cloud credentials to enable content
+func (s *Server) SubmitCredentials(ctx context.Context,
+	request *request.Credentials) (*response.Credentials, error) {
 
-	if len(request.Token) == 0 {
-		return &response.Token{}, status.Errorf(codes.InvalidArgument,
-			"token must not be empty")
+	if len(request.ClientId) == 0 ||
+		len(request.ClientSecret) == 0 ||
+		len(request.TenantSpecificUrl) == 0 {
+		return &response.Credentials{}, status.Errorf(codes.InvalidArgument,
+			"the client ID, client secret, and tenant specific URL must not be empty")
 	}
 
-	ok, err := s.client.VerifyToken(request.Token)
+	credentials := creds.CreateCredentials(request.ClientId, request.ClientSecret, request.TenantSpecificUrl)
+
+	ok, err := s.cloud.VerifyCredentials(credentials)
 	if err != nil {
-		return &response.Token{}, status.Errorf(codes.Internal, "Could not verify the token with Chef Cloud. error: %s", err.Error())
+		return &response.Credentials{}, status.Errorf(codes.Internal, "Could not verify the token with Chef Cloud. error: %s", err.Error())
 	}
 	if !ok {
-		return &response.Token{}, status.Errorf(codes.InvalidArgument, "Chef Cloud does not recognize the provided token")
+		return &response.Credentials{}, status.Errorf(codes.InvalidArgument, "Chef Cloud does not recognize the provided token")
 	}
 
-	s.client.AddToken(request.Token)
+	s.secrets.AddCredentials(credentials)
 
-	return &response.Token{}, nil
+	return &response.Credentials{}, nil
 }
 
 // InstallContentItem - installing a content item
 func (s *Server) InstallContentItem(ctx context.Context,
 	request *request.InstallContentItem) (*response.InstallContentItem, error) {
-	token, found, err := s.client.GetToken()
+	credentials, found, err := s.secrets.GetCredentials()
 	if err != nil {
 		return &response.InstallContentItem{}, status.Errorf(codes.Internal,
 			"Could not retrieve token from secrets-service error: %s", err.Error())
@@ -162,7 +168,7 @@ func (s *Server) InstallContentItem(ctx context.Context,
 		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument,
 			"Can not install a content item without a token submitted")
 	}
-	contentItem, found, err := s.client.GetContentItem(request.Id, token)
+	contentItem, found, err := s.cloud.GetContentItem(request.Id, credentials)
 	if err != nil {
 		return &response.InstallContentItem{}, status.Errorf(codes.Internal,
 			"Could not connect to Content Delivery Service error: %s", err.Error)
@@ -183,7 +189,7 @@ func (s *Server) InstallContentItem(ctx context.Context,
 				"A request_user must be non empty")
 		}
 
-		err = s.installProfile(ctx, contentItem, request.RequestUser, token)
+		err = s.installProfile(ctx, contentItem, request.RequestUser, credentials)
 		if err != nil {
 			return &response.InstallContentItem{}, status.Errorf(codes.Internal,
 				"Error Installing Profile: %s", err.Error)
@@ -200,7 +206,7 @@ func (s *Server) InstallContentItem(ctx context.Context,
 func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 	stream interservice.AutomateCds_DownloadContentItemServer) error {
 
-	token, found, err := s.client.GetToken()
+	credentials, found, err := s.secrets.GetCredentials()
 	if err != nil {
 		return status.Errorf(codes.Internal,
 			"Could not retrieve token from secrets-service error: %s", err.Error())
@@ -211,7 +217,7 @@ func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 			"Can not download a content item without a token submitted")
 	}
 
-	contentItem, found, err := s.client.GetContentItem(request.Id, token)
+	contentItem, found, err := s.cloud.GetContentItem(request.Id, credentials)
 	if err != nil {
 		return err
 	}
@@ -244,7 +250,7 @@ func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 }
 
 func (s *Server) installProfile(ctx context.Context,
-	contentItem backend.ContentItem, owner string, token string) error {
+	contentItem cloud.ContentItem, owner string, credentials creds.Credentials) error {
 	log.Infof("Installing profile content item with ID %s ...", contentItem.ID)
 
 	// Get the data

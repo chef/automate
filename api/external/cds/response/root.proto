@@ -22,7 +22,7 @@ message InstallContentItem {
 
 }
 
-message Token {
+message Credentials {
 
 }
 
