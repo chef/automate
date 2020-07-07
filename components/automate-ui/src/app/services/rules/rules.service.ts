@@ -70,12 +70,10 @@ export class RulesService {
     return this.updateSecret(rule, targetUsername, targetPassword)
       .pipe(mergeMap((secreteId: string) => {
         rule.targetSecretId = secreteId;
-        const response = rule.toRequest();
-        // special case for authz handling - id needs to be in top level of request params
-        response.id = ruleId;
+        const request = rule.toRequest();
 
         return this.httpClient.put<RuleResponse>(encodeURI(
-          this.joinToNotifierUrl(['rules', ruleId])), response);
+          this.joinToNotifierUrl(['rules', ruleId])), request);
       }));
   }
 
