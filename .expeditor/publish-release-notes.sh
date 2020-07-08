@@ -33,8 +33,8 @@ pushd ./automate.wiki
 ## Chef Product Versions
 
 This release depends on:
-  Chef Habitat version
-  Chef InSpec version
+- Chef Habitat version
+- Chef InSpec version
 
 EOH
 
