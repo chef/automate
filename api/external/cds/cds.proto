@@ -32,6 +32,41 @@ service Cds {
   };
 
   /*
+  SubmitCredentials
+
+  Submit a Chef Cloud Credentials to enable content
+
+  Authorization Action:
+  ```
+  content:credentials:add
+  ```
+  */
+  rpc SubmitCredentials(cds.request.Credentials) returns (cds.response.Credentials) {
+    option (google.api.http) = {
+      post: "/api/beta/content/credentials"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "content:credentials";
+    option (chef.automate.api.iam.policy).action = "content:credentials:add";
+  };
+
+  /*
+  IsContentEnabled
+
+  Check if the content is enable for this Automate instance. 
+
+  Authorization Action:
+  ```
+  content:credentials:enabled
+  ```
+  */
+  rpc IsContentEnabled(cds.request.ContentEnabled) returns (cds.response.ContentEnabled) {
+    option (google.api.http).get = "/api/beta/content/enabled";
+    option (chef.automate.api.iam.policy).resource = "content:credentials";
+    option (chef.automate.api.iam.policy).action = "content:credentials:enabled";
+  };
+
+  /*
   InstallContentItem
 
   Installs a content item from its ID

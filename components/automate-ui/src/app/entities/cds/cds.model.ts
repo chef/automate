@@ -8,3 +8,9 @@ export interface ContentItem {
   canBeInstall: boolean;
   filename: string;
 }
+
+export interface Credentials {
+  clientId: string;
+  clientSecret: string;
+  tenantSpecificUrl: string;
+}

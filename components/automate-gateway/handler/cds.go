@@ -48,3 +48,25 @@ func (a *CdsServer) DownloadContentItem(*request.DownloadContentItem, external_s
 	// so we do not auto-generate the route for download; we instead custom handle with mux in gateway/services.go
 	return nil
 }
+
+// SubmitToken - submit a token to enable content
+func (s *CdsServer) SubmitCredentials(ctx context.Context,
+	request *request.Credentials) (*response.Credentials, error) {
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return s.client.SubmitCredentials(ctx, request)
+}
+
+// IsContentEnabled - check if content is enabled
+func (s *CdsServer) IsContentEnabled(ctx context.Context,
+	request *request.ContentEnabled) (*response.ContentEnabled, error) {
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return s.client.IsContentEnabled(ctx, request)
+}

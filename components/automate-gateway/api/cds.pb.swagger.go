@@ -14,6 +14,52 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/beta/content/credentials": {
+      "post": {
+        "summary": "SubmitCredentials",
+        "description": "Submit a Chef Cloud Credentials to enable content\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:credentials:add\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "SubmitCredentials",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cds.response.Credentials"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cds.request.Credentials"
+            }
+          }
+        ],
+        "tags": [
+          "Cds"
+        ]
+      }
+    },
+    "/api/beta/content/enabled": {
+      "get": {
+        "summary": "IsContentEnabled",
+        "description": "Check if the content is enable for this Automate instance. \n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:credentials:enabled\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "IsContentEnabled",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cds.response.ContentEnabled"
+            }
+          }
+        },
+        "tags": [
+          "Cds"
+        ]
+      }
+    },
     "/api/beta/content/install": {
       "post": {
         "summary": "InstallContentItem",
@@ -62,6 +108,20 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.cds.request.Credentials": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        },
+        "tenant_specific_url": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.cds.request.InstallContentItem": {
       "type": "object",
       "properties": {
@@ -70,6 +130,15 @@ func init() {
         },
         "request_user": {
           "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.cds.response.ContentEnabled": {
+      "type": "object",
+      "properties": {
+        "is_content_enabled": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -116,6 +185,9 @@ func init() {
           }
         }
       }
+    },
+    "chef.automate.api.cds.response.Credentials": {
+      "type": "object"
     },
     "chef.automate.api.cds.response.InstallContentItem": {
       "type": "object"

@@ -1,4 +1,6 @@
-package backend
+package cloud
+
+import "github.com/chef/automate/components/automate-cds/creds"
 
 type Client struct {
 	items []ContentItem
@@ -12,12 +14,12 @@ func NewClient() Client {
 }
 
 // GetContentItems - Returns a list of CDS content items
-func (client *Client) GetContentItems() ([]ContentItem, error) {
+func (client *Client) GetContentItems(credentials creds.Credentials) ([]ContentItem, error) {
 	return client.items, nil
 }
 
 // GetContentItem - Get a content item
-func (client *Client) GetContentItem(id string) (ContentItem, bool, error) {
+func (client *Client) GetContentItem(id string, credentials creds.Credentials) (ContentItem, bool, error) {
 	for _, item := range client.items {
 		if item.ID == id {
 			return item, true, nil
@@ -25,6 +27,16 @@ func (client *Client) GetContentItem(id string) (ContentItem, bool, error) {
 	}
 
 	return ContentItem{}, false, nil
+}
+
+// VerifyCredentials - return true if the token is valid and false otherwise.
+func (client *Client) VerifyCredentials(credentials creds.Credentials) (bool, error) {
+	isNotValid :=
+		"wrong" == credentials.ClientID ||
+			"wrong" == credentials.ClientSecret ||
+			"wrong" == credentials.TenantSpecificURL
+
+	return !isNotValid, nil
 }
 
 func getItem() []ContentItem {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { ContentItem } from './cds.model';
+import { ContentItem, Credentials } from './cds.model';
 import { map as mapRxjs } from 'rxjs/operators';
 import { map } from 'lodash/fp';
 
@@ -22,6 +22,10 @@ interface RespContentItem {
   platforms: string[];
   can_be_installed: boolean;
   filename: string;
+}
+
+interface RespContentEnabled {
+  is_content_enabled: boolean;
 }
 
 @Injectable()
@@ -46,6 +50,24 @@ export class CdsRequests {
     const url = `${CDS_URL}/download`;
     const body = {id};
     return this.http.post(url, body, {responseType: 'blob'});
+  }
+
+  public isContentEnabled(): Observable<boolean> {
+    const url = `${CDS_URL}/enabled`;
+
+    return this.http.get<RespContentEnabled>(url).pipe(
+      mapRxjs(resp => resp.is_content_enabled));
+  }
+
+  public submitCredentials(
+    credentials: Credentials ): Observable<any> {
+    const url = `${CDS_URL}/credentials`;
+
+    return this.http.post(url, {
+      client_id: credentials.clientId,
+      client_secret: credentials.clientSecret,
+      tenant_specific_url: credentials.tenantSpecificUrl
+    });
   }
 
   private convertToContentItems(resp: RespContentItems): ContentItem[] {

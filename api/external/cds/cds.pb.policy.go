@@ -12,6 +12,26 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.cds.Cds/ListContentItems", "content:items", "content:items:list", "GET", "/api/beta/content/items", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.cds.Cds/SubmitCredentials", "content:credentials", "content:credentials:add", "POST", "/api/beta/content/credentials", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.Credentials); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "client_id":
+					return m.ClientId
+				case "client_secret":
+					return m.ClientSecret
+				case "tenant_specific_url":
+					return m.TenantSpecificUrl
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.cds.Cds/IsContentEnabled", "content:credentials", "content:credentials:enabled", "GET", "/api/beta/content/enabled", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 	policy.MapMethodTo("/chef.automate.api.cds.Cds/InstallContentItem", "content:items", "content:items:install", "POST", "/api/beta/content/install", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.InstallContentItem); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {

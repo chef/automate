@@ -1,22 +1,27 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 
 import {
+  IsContentEnabled,
   GetContentItems,
   InstallContentItem,
-  DownloadContentItem
+  DownloadContentItem,
+  SubmitCredentials
 } from 'app/entities/cds/cds.actions';
 
 import {
-  contentItems
+  contentItems,
+  contentEnabled
 } from 'app/entities/cds/cds.selectors';
 
 import {
-  ContentItem
+  ContentItem,
+  Credentials
 } from 'app/entities/cds/cds.model';
 
 @Component({
@@ -24,9 +29,11 @@ import {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
 
   public contentItems$: Observable<ContentItem[]>;
+  public isContentEnabled$: Observable<boolean>;
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -35,10 +42,24 @@ export class DashboardComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.store.dispatch(new GetContentItems());
+    this.store.dispatch(new IsContentEnabled());
+
     this.contentItems$ = this.store.select(contentItems);
+    this.isContentEnabled$ = this.store.select(contentEnabled);
+
+    this.isContentEnabled$.pipe(
+      takeUntil(this.isDestroyed),
+      filter(isEnabled => isEnabled))
+      .subscribe(_ => {
+        this.store.dispatch(new GetContentItems());
+      });
 
     setTimeout(() => this.layoutFacade.hideSidebar());
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   installContentItem(itemId: string) {
@@ -50,5 +71,9 @@ export class DashboardComponent implements OnInit {
 
   downloadContentItem(item: ContentItem) {
     this.store.dispatch(new DownloadContentItem( item ));
+  }
+
+  credentialsSubmit(credentials: Credentials) {
+    this.store.dispatch(new SubmitCredentials( {credentials} ));
   }
 }

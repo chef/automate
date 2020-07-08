@@ -1,0 +1,64 @@
+@import "~styles/variables";
+
+.register-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .suggester-input-wrapper {
+    display: flex;
+    border-radius: 4px;
+    border: 1px solid #E6EBEE;
+    flex-flow: row;
+    flex: 1 1 auto;
+    order: 1;
+    height: 48px;
+    align-items: center;
+
+    input {
+      border: 0px;
+      background: transparent;
+      font-family: 'Muli', Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      flex: 1 1 auto;
+      padding-left: 15px;
+      height: 100%;
+    }
+  }
+
+  .title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 1em;
+    margin-top: 20px;
+
+    chef-icon {
+      vertical-align: -4px;
+    }
+  }
+
+  h2 {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .button {
+    margin-top: 1em;
+    text-align: center;
+  }
+
+  .credentials {
+    width: 500px;
+
+    .credentials-container {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 20px;
+
+      chef-form-field {
+        margin-right: 20px;
+        flex-grow: 1;
+      }
+    }
+  }
+}
