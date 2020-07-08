@@ -85,7 +85,7 @@ describe('ReportingComponent', () => {
     ['06', '30', '01', 'an hour after end of day']
   ], function (month: string, day: string, hour: string, description: string) {
     it(`displays the date correctly in UTC timestandard for ${description}`, () => {
-      const originalDate = moment.utc(`2019${month}${day}-${hour}01`, 'YYYYMMDD-HHMM'); // valid
+      const originalDate = moment.utc(`2019${month}${day}-${hour}01`, 'YYYYMMDD-HHMM');
       component.reportQuery.setState({
         endDate: originalDate
       } as ReportQuery);
