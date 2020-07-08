@@ -19,8 +19,6 @@ describe('ClientDetailsComponent', () => {
         MockComponent({ selector: 'chef-button',
           inputs: ['disabled', 'routerLink'] }),
         MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),

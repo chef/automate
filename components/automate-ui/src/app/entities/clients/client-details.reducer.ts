@@ -34,10 +34,18 @@ export function clientDetailsEntityReducer(
       ) as ClientDetailsEntityState;
 
     case ClientActionTypes.GET_SUCCESS:
-      return set(GET_STATUS, EntityStatus.loadingSuccess,
-        clientDetailsEntityAdapter.addOne(action.payload, state));
+      return set(
+        GET_STATUS,
+        EntityStatus.loadingSuccess,
+        clientDetailsEntityAdapter.addOne(action.payload, state)
+      ) as ClientDetailsEntityState;
+
     case ClientActionTypes.GET_FAILURE:
-      return set(GET_STATUS, EntityStatus.loadingFailure, state);
+      return set(
+        GET_STATUS,
+        EntityStatus.loadingFailure,
+        state
+      ) as ClientDetailsEntityState;
 
     default:
       return state;
