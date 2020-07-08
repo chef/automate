@@ -30,16 +30,16 @@ Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like
 
 Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs.
 
-![](/images/docs/data-lifecycle.png)
+![Data Lifecycle](/images/docs/data-lifecycle.png)
 
 ### Event Feed
 
-The event feed data lifecycle settings allow you to remove all event feed data and Chef Infra Server actions after a set amount of days.
+The Event Feed Data Lifecycle settings allow you to remove all event feed data and Chef Infra Server actions after a set amount of days.
 The default is to remove event feed data after 7 days, and Chef Infra Server actions after 30 days.
 
 ### Service Groups
 
-The service group data lifecycle settings allow you to label health check reports as disconnected and automatically remove them after a set amount of time.
+The Service Group Data Lifecycle settings allow you to label health check reports as disconnected and automatically remove them after a set amount of time.
 The default is to label health check reports as disconnected after 5 minutes, and remove disconnected services after 5 days.
 
 ### Client Runs
@@ -199,7 +199,7 @@ Save the JSON file as `config.json` in the current working directory:
 curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/config
 ```
 
-If you wish to configure a specific endpoint, you can specify the `job_settings` for that data type and configure it using data types sub-resource. 
+If you wish to configure a specific endpoint, you can specify the `job_settings` for that data type and configure it using data types sub-resource.
 For example, if you want to configure compliance settings, create a smaller JSON payload:
 
 ```json
@@ -368,7 +368,7 @@ The `event_feed` data type has one event feed purge job with one Elasticsearch p
 ##### Services Job Settings
 
 The `services` data type has two jobs, one to mark services as disconnected
-when the elapsed time since Automate last received a health check message
+when the elapsed time since Chef Automate last received a health check message
 exceeds the threshold, and one to delete services when the time since the last
 health check exceeds the threshold.
 
