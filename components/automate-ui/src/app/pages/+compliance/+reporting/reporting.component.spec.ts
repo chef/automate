@@ -88,6 +88,7 @@ describe('ReportingComponent', () => {
       const originalDate = moment.utc(`2019${month}${day}-${hour}00`, 'YYYYMMDD-HHMM');
       const resultDate = component.convertMomentToDate(originalDate);
 
+      expect(originalDate.month()).toEqual(resultDate.getMonth());
       expect(originalDate.day()).toEqual(resultDate.getDay());
     });
   });
