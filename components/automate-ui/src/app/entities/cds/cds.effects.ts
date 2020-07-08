@@ -16,9 +16,9 @@ import {
   IsContentEnabled,
   IsContentEnabledFailure,
   IsContentEnabledSuccess,
-  SubmitToken,
-  SubmitTokenFailure,
-  SubmitTokenSuccess
+  SubmitCredentials,
+  SubmitCredentialsFailure,
+  SubmitCredentialsSuccess
 } from './cds.actions';
 import { CdsRequests } from './cds.requests';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -138,27 +138,27 @@ export class CdsEffects {
     }));
 
   @Effect()
-  submitToken$ = this.actions$.pipe(
-    ofType(CdsActionTypes.SUBMIT_TOKEN),
-    mergeMap( (action: SubmitToken) =>
-      this.requests.submitToken(action.payload.token).pipe(
-        map(_ => new SubmitTokenSuccess( )),
-        catchError((error) => of(new SubmitTokenFailure(error))))
+  submitCredentials$ = this.actions$.pipe(
+    ofType(CdsActionTypes.SUBMIT_CREDENTIALS),
+    mergeMap( (action: SubmitCredentials) =>
+      this.requests.submitCredentials(action.payload.credentials).pipe(
+        map(_ => new SubmitCredentialsSuccess( )),
+        catchError((error) => of(new SubmitCredentialsFailure(error))))
     ));
 
   @Effect()
-  submitTokenSuccess$ = this.actions$.pipe(
-    ofType(CdsActionTypes.SUBMIT_TOKEN_SUCCESS),
+  submitCredentialsSuccess$ = this.actions$.pipe(
+    ofType(CdsActionTypes.SUBMIT_CREDENTIALS_SUCCESS),
     map( (_action) => new IsContentEnabled()));
 
   @Effect()
-  submitTokenFailure$ = this.actions$.pipe(
-    ofType(CdsActionTypes.SUBMIT_TOKEN_FAILURE),
-    map(({ payload: { error } }: SubmitTokenFailure) => {
+  submitCredentialsFailure$ = this.actions$.pipe(
+    ofType(CdsActionTypes.SUBMIT_CREDENTIALS_FAILURE),
+    map(({ payload: { error } }: SubmitCredentialsFailure) => {
       const msg = error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Failed to submit token: ${msg || error}`
+        message: `Failed to submit credentials: ${msg || error}`
       });
     }));
 }

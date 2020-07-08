@@ -31,12 +31,12 @@ func (client *Client) GetContentItem(id string, credentials creds.Credentials) (
 
 // VerifyCredentials - return true if the token is valid and false otherwise.
 func (client *Client) VerifyCredentials(credentials creds.Credentials) (bool, error) {
-	isValid :=
-		"55c4f0d3-b982-4f39-93a7-01500966d291" == credentials.ClientID &&
-			"55c4f0d3-b982-4f39-93a7-01500966d291" == credentials.ClientSecret &&
-			"https://chef-cloud.io" == credentials.TenantSpecificURL
+	isNotValid :=
+		"wrong" == credentials.ClientID ||
+			"wrong" == credentials.ClientSecret ||
+			"wrong" == credentials.TenantSpecificURL
 
-	return isValid, nil
+	return !isNotValid, nil
 }
 
 func getItem() []ContentItem {

@@ -16,8 +16,8 @@ func init() {
   "paths": {
     "/api/beta/content/credentials": {
       "post": {
-        "summary": "SubmitToken",
-        "description": "Submit a Chef Cloud token to enable content\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:token:submit\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "SubmitCredentials",
+        "description": "Submit a Chef Cloud Credentials to enable content\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:credentials:add\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "SubmitCredentials",
         "responses": {
           "200": {
@@ -45,7 +45,7 @@ func init() {
     "/api/beta/content/enabled": {
       "get": {
         "summary": "IsContentEnabled",
-        "description": "Check if the content is enable for this Automate instance. \n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:enabled\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Check if the content is enable for this Automate instance. \n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncontent:credentials:enabled\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "IsContentEnabled",
         "responses": {
           "200": {

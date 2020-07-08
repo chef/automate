@@ -11,7 +11,7 @@ import {
   GetContentItems,
   InstallContentItem,
   DownloadContentItem,
-  SubmitToken
+  SubmitCredentials
 } from 'app/entities/cds/cds.actions';
 
 import {
@@ -20,7 +20,8 @@ import {
 } from 'app/entities/cds/cds.selectors';
 
 import {
-  ContentItem
+  ContentItem,
+  Credentials
 } from 'app/entities/cds/cds.model';
 
 @Component({
@@ -72,7 +73,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DownloadContentItem( item ));
   }
 
-  tokenSubmit(token: string) {
-    this.store.dispatch(new SubmitToken( {token} ));
+  credentialsSubmit(credentials: Credentials) {
+    this.store.dispatch(new SubmitCredentials( {credentials} ));
   }
 }

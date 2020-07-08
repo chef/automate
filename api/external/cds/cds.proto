@@ -32,13 +32,13 @@ service Cds {
   };
 
   /*
-  SubmitToken
+  SubmitCredentials
 
-  Submit a Chef Cloud token to enable content
+  Submit a Chef Cloud Credentials to enable content
 
   Authorization Action:
   ```
-  content:token:submit
+  content:credentials:add
   ```
   */
   rpc SubmitCredentials(cds.request.Credentials) returns (cds.response.Credentials) {
@@ -46,8 +46,8 @@ service Cds {
       post: "/api/beta/content/credentials"
       body: "*"
     };
-    option (chef.automate.api.iam.policy).resource = "content:token";
-    option (chef.automate.api.iam.policy).action = "content:token:add";
+    option (chef.automate.api.iam.policy).resource = "content:credentials";
+    option (chef.automate.api.iam.policy).action = "content:credentials:add";
   };
 
   /*
@@ -57,13 +57,13 @@ service Cds {
 
   Authorization Action:
   ```
-  content:enabled
+  content:credentials:enabled
   ```
   */
   rpc IsContentEnabled(cds.request.ContentEnabled) returns (cds.response.ContentEnabled) {
     option (google.api.http).get = "/api/beta/content/enabled";
-    option (chef.automate.api.iam.policy).resource = "content:token";
-    option (chef.automate.api.iam.policy).action = "content:token:enabled";
+    option (chef.automate.api.iam.policy).resource = "content:credentials";
+    option (chef.automate.api.iam.policy).action = "content:credentials:enabled";
   };
 
   /*

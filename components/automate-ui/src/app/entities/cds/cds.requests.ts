@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { ContentItem } from './cds.model';
+import { ContentItem, Credentials } from './cds.model';
 import { map as mapRxjs } from 'rxjs/operators';
 import { map } from 'lodash/fp';
 
@@ -59,10 +59,15 @@ export class CdsRequests {
       mapRxjs(resp => resp.is_content_enabled));
   }
 
-  public submitToken( token: string): Observable<any> {
-    const url = `${CDS_URL}/token/submit`;
+  public submitCredentials(
+    credentials: Credentials ): Observable<any> {
+    const url = `${CDS_URL}/credentials`;
 
-    return this.http.post(url, { token });
+    return this.http.post(url, {
+      client_id: credentials.clientId,
+      client_secret: credentials.clientSecret,
+      tenant_specific_url: credentials.tenantSpecificUrl
+    });
   }
 
   private convertToContentItems(resp: RespContentItems): ContentItem[] {

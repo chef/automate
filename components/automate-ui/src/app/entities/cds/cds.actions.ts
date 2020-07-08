@@ -1,7 +1,7 @@
 import { Action } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { ContentItem } from './cds.model';
+import { ContentItem, Credentials } from './cds.model';
 
 export enum CdsActionTypes {
   GET_CONTENT_ITEMS              = 'CDS::GET::CONTENT_ITEMS',
@@ -16,9 +16,9 @@ export enum CdsActionTypes {
   IS_CONTENT_ENABLED             = 'CDS::IS_CONTENT_ENABLED',
   IS_CONTENT_ENABLED_SUCCESS     = 'CDS::IS_CONTENT_ENABLED::SUCCESS',
   IS_CONTENT_ENABLED_FAILURE     = 'CDS::IS_CONTENT_ENABLED::FAILURE',
-  SUBMIT_TOKEN                   = 'CDS::SUBMIT_TOKEN',
-  SUBMIT_TOKEN_SUCCESS           = 'CDS::SUBMIT_TOKEN::SUCCESS',
-  SUBMIT_TOKEN_FAILURE           = 'CDS::SUBMIT_TOKEN::FAILURE'
+  SUBMIT_CREDENTIALS             = 'CDS::SUBMIT_CREDENTIALS',
+  SUBMIT_CREDENTIALS_SUCCESS     = 'CDS::SUBMIT_CREDENTIALS::SUCCESS',
+  SUBMIT_CREDENTIALS_FAILURE     = 'CDS::SUBMIT_CREDENTIALS::FAILURE'
 }
 
 export class GetContentItems implements Action {
@@ -78,17 +78,17 @@ export class IsContentEnabledFailure implements Action {
   constructor(public payload: HttpErrorResponse ) { }
 }
 
-export class SubmitToken implements Action {
-  readonly type = CdsActionTypes.SUBMIT_TOKEN;
-  constructor( public payload: { token: string } ) { }
+export class SubmitCredentials implements Action {
+  readonly type = CdsActionTypes.SUBMIT_CREDENTIALS;
+  constructor( public payload: { credentials: Credentials} ) { }
 }
 
-export class SubmitTokenSuccess implements Action {
-  readonly type = CdsActionTypes.SUBMIT_TOKEN_SUCCESS;
+export class SubmitCredentialsSuccess implements Action {
+  readonly type = CdsActionTypes.SUBMIT_CREDENTIALS_SUCCESS;
 }
 
-export class SubmitTokenFailure implements Action {
-  readonly type = CdsActionTypes.SUBMIT_TOKEN_FAILURE;
+export class SubmitCredentialsFailure implements Action {
+  readonly type = CdsActionTypes.SUBMIT_CREDENTIALS_FAILURE;
   constructor(public payload: HttpErrorResponse ) { }
 }
 
@@ -105,6 +105,6 @@ export type CdsActions =
   | IsContentEnabled
   | IsContentEnabledSuccess
   | IsContentEnabledFailure
-  | SubmitToken
-  | SubmitTokenSuccess
-  | SubmitTokenFailure;
+  | SubmitCredentials
+  | SubmitCredentialsSuccess
+  | SubmitCredentialsFailure;

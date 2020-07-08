@@ -12,7 +12,7 @@ export interface CdsEntityState {
   installContentItemStatus: EntityStatus;
   downloadContentItemStatus: EntityStatus;
   isContentEnabledStatus: EntityStatus;
-  submitTokenStatus: EntityStatus;
+  submitCredentialsStatus: EntityStatus;
 }
 
 export const cdsEntityInitialState: CdsEntityState = {
@@ -22,7 +22,7 @@ export const cdsEntityInitialState: CdsEntityState = {
   installContentItemStatus: EntityStatus.notLoaded,
   downloadContentItemStatus: EntityStatus.notLoaded,
   isContentEnabledStatus: EntityStatus.notLoaded,
-  submitTokenStatus: EntityStatus.notLoaded
+  submitCredentialsStatus: EntityStatus.notLoaded
 };
 
 export function desktopEntityReducer(state: CdsEntityState = cdsEntityInitialState,
@@ -69,14 +69,14 @@ export function desktopEntityReducer(state: CdsEntityState = cdsEntityInitialSta
     case CdsActionTypes.IS_CONTENT_ENABLED_FAILURE:
       return set('isContentEnabledStatus', EntityStatus.loadingFailure, state);
 
-    case CdsActionTypes.IS_CONTENT_ENABLED:
-      return set('submitTokenStatus', EntityStatus.loading, state);
+    case CdsActionTypes.SUBMIT_CREDENTIALS:
+      return set('submitCredentialsStatus', EntityStatus.loading, state);
 
-    case CdsActionTypes.IS_CONTENT_ENABLED_SUCCESS:
-      return set('submitTokenStatus', EntityStatus.loadingSuccess, state);
+    case CdsActionTypes.SUBMIT_CREDENTIALS_SUCCESS:
+      return set('submitCredentialsStatus', EntityStatus.loadingSuccess, state);
 
-    case CdsActionTypes.IS_CONTENT_ENABLED_FAILURE:
-      return set('submitTokenStatus', EntityStatus.loadingFailure, state);
+    case CdsActionTypes.SUBMIT_CREDENTIALS_FAILURE:
+      return set('submitCredentialsStatus', EntityStatus.loadingFailure, state);
 
     default:
       return state;

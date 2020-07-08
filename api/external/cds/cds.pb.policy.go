@@ -12,7 +12,7 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.cds.Cds/ListContentItems", "content:items", "content:items:list", "GET", "/api/beta/content/items", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.cds.Cds/SubmitCredentials", "content:token", "content:token:add", "POST", "/api/beta/content/credentials", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.cds.Cds/SubmitCredentials", "content:credentials", "content:credentials:add", "POST", "/api/beta/content/credentials", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Credentials); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -29,7 +29,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.cds.Cds/IsContentEnabled", "content:token", "content:token:enabled", "GET", "/api/beta/content/enabled", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.cds.Cds/IsContentEnabled", "content:credentials", "content:credentials:enabled", "GET", "/api/beta/content/enabled", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
 	policy.MapMethodTo("/chef.automate.api.cds.Cds/InstallContentItem", "content:items", "content:items:install", "POST", "/api/beta/content/install", func(unexpandedResource string, input interface{}) string {

@@ -2,7 +2,7 @@
 
   <app-enable-content-modal
     [show] = "!(isContentEnabled$ | async)"
-    (onTokenSubmit) = "tokenSubmit($event)">
+    (onCredentialsSubmit) = "credentialsSubmit($event)">
   </app-enable-content-modal>
 
   <app-card-table

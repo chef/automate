@@ -67,12 +67,12 @@ func (s *Server) ListContentItems(ctx context.Context,
 	credentials, found, err := s.secrets.GetCredentials()
 	if err != nil {
 		return &response.ContentItems{}, status.Errorf(codes.Internal,
-			"Could not retrieve token from secrets-service error: %s", err.Error())
+			"Could not retrieve credentials from secrets-service error: %s", err.Error())
 	}
 
 	if !found {
 		return &response.ContentItems{}, status.Errorf(codes.InvalidArgument,
-			"Can not request content items without a token submitted")
+			"Can not request content items without a credentials submitted")
 	}
 
 	cloudItems, err := s.cloud.GetContentItems(credentials)
@@ -107,7 +107,7 @@ func (s *Server) IsContentEnabled(ctx context.Context,
 	credentials, found, err := s.secrets.GetCredentials()
 	if err != nil {
 		return &response.ContentEnabled{}, status.Errorf(codes.Internal,
-			"Could not retrieve token from secrets-service error: %s", err.Error())
+			"Could not retrieve credentials from secrets-service error: %s", err.Error())
 	}
 
 	if !found {
@@ -118,10 +118,10 @@ func (s *Server) IsContentEnabled(ctx context.Context,
 
 	ok, err := s.cloud.VerifyCredentials(credentials)
 	if err != nil {
-		return &response.ContentEnabled{}, status.Errorf(codes.Internal, "Could not verify the token with Chef Cloud. error: %s", err.Error())
+		return &response.ContentEnabled{}, status.Errorf(codes.Internal, "Could not verify the credentials with Chef Cloud. error: %s", err.Error())
 	}
 	if !ok {
-		return &response.ContentEnabled{}, status.Errorf(codes.InvalidArgument, "Chef Cloud does not recognize the provided token")
+		return &response.ContentEnabled{}, status.Errorf(codes.InvalidArgument, "Chef Cloud does not recognize the provided credentials")
 	}
 
 	return &response.ContentEnabled{
@@ -144,10 +144,10 @@ func (s *Server) SubmitCredentials(ctx context.Context,
 
 	ok, err := s.cloud.VerifyCredentials(credentials)
 	if err != nil {
-		return &response.Credentials{}, status.Errorf(codes.Internal, "Could not verify the token with Chef Cloud. error: %s", err.Error())
+		return &response.Credentials{}, status.Errorf(codes.Internal, "Could not verify the credentials with Chef Cloud. error: %s", err.Error())
 	}
 	if !ok {
-		return &response.Credentials{}, status.Errorf(codes.InvalidArgument, "Chef Cloud does not recognize the provided token")
+		return &response.Credentials{}, status.Errorf(codes.InvalidArgument, "Chef Cloud does not recognize the provided credentials")
 	}
 
 	s.secrets.AddCredentials(credentials)
@@ -161,12 +161,12 @@ func (s *Server) InstallContentItem(ctx context.Context,
 	credentials, found, err := s.secrets.GetCredentials()
 	if err != nil {
 		return &response.InstallContentItem{}, status.Errorf(codes.Internal,
-			"Could not retrieve token from secrets-service error: %s", err.Error())
+			"Could not retrieve credentials from secrets-service error: %s", err.Error())
 	}
 
 	if !found {
 		return &response.InstallContentItem{}, status.Errorf(codes.InvalidArgument,
-			"Can not install a content item without a token submitted")
+			"Can not install a content item without a credentials submitted")
 	}
 	contentItem, found, err := s.cloud.GetContentItem(request.Id, credentials)
 	if err != nil {
@@ -209,12 +209,12 @@ func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 	credentials, found, err := s.secrets.GetCredentials()
 	if err != nil {
 		return status.Errorf(codes.Internal,
-			"Could not retrieve token from secrets-service error: %s", err.Error())
+			"Could not retrieve credentials from secrets-service error: %s", err.Error())
 	}
 
 	if !found {
 		return status.Errorf(codes.InvalidArgument,
-			"Can not download a content item without a token submitted")
+			"Can not download a content item without a credentials submitted")
 	}
 
 	contentItem, found, err := s.cloud.GetContentItem(request.Id, credentials)

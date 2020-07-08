@@ -2,6 +2,10 @@ import { Component, Input, Output, SimpleChanges, OnChanges, EventEmitter } from
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
+import {
+  Credentials
+} from 'app/entities/cds/cds.model';
+
 @Component({
   selector: 'app-enable-content-modal',
   templateUrl: './enable-content-modal.component.html',
@@ -9,18 +13,20 @@ import { Router } from '@angular/router';
 })
 export class EnableContentModalComponent implements OnChanges {
   @Input() show: boolean;
-  @Output() onTokenSubmit: EventEmitter<string> = new EventEmitter();
+  @Output() onCredentialsSubmit: EventEmitter<Credentials> = new EventEmitter();
 
   public modalVisible = true;
   public modalLocked = false;
-  public tokenForm: FormGroup;
+  public credentialsForm: FormGroup;
 
   constructor(
     public fb: FormBuilder,
     private router: Router
   ) {
-    this.tokenForm = fb.group({
-      token: ['', [Validators.required]]
+    this.credentialsForm = fb.group({
+      clientId: ['', [Validators.required]],
+      clientSecret: ['', [Validators.required]],
+      tenantSpecificUrl: ['', [Validators.required]]
     });
   }
 
@@ -35,9 +41,14 @@ export class EnableContentModalComponent implements OnChanges {
   }
 
   public onFormSubmit(): void {
-    const formValues = this.tokenForm.value;
-    const token = formValues.token.trim();
+    const formValues = this.credentialsForm.value;
 
-    this.onTokenSubmit.emit(token);
+    const credentials: Credentials = {
+      clientId: formValues.clientId.trim(),
+      clientSecret: formValues.clientSecret.trim(),
+      tenantSpecificUrl: formValues.tenantSpecificUrl.trim()
+    };
+
+    this.onCredentialsSubmit.emit(credentials);
   }
 }
