@@ -80,16 +80,21 @@ describe('ReportingComponent', () => {
   });
 
   using([
-    ['01', '1', '23', 'an hour before end of day'],
+    ['01', '01', '23', 'an hour before end of day'],
     ['04', '22', '00', 'exactly end of day'],
-    ['6', '30', '01', 'an hour after end of day']
+    ['06', '30', '01', 'an hour after end of day']
   ], function (month: string, day: string, hour: string, description: string) {
     it(`displays the date correctly in UTC timestandard for ${description}`, () => {
-      const originalDate = moment.utc(`2019${month}${day}-${hour}00`, 'YYYYMMDD-HHMM');
-      const resultDate = component.convertMomentToDate(originalDate);
+      const originalDate = moment.utc(`2019${month}${day}-${hour}01`, 'YYYYMMDD-HHMM'); // valid
+      component.reportQuery.setState({
+        endDate: originalDate
+      } as ReportQuery);
+      fixture.detectChanges();
 
-      expect(originalDate.month()).toEqual(resultDate.getMonth());
-      expect(originalDate.day()).toEqual(resultDate.getDay());
+      component.endDate$.subscribe(d => {
+        expect(originalDate.month()).toEqual(d.getUTCMonth());
+        expect(originalDate.date()).toEqual(d.getUTCDate());
+      });
     });
   });
 
