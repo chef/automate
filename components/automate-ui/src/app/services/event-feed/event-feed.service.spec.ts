@@ -30,8 +30,8 @@ describe('EventFeedService', () => {
 
     service = TestBed.inject(EventFeedService);
 
-    today = moment().endOf('day');
-    oneWeekAgo = moment().subtract(6, 'days').startOf('day');
+    today = moment.utc().endOf('day');
+    oneWeekAgo = moment.utc().subtract(6, 'days').startOf('day');
   });
 
   describe('buildEventFeedURLSearchParams', () => {
