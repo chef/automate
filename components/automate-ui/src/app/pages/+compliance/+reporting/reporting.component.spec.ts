@@ -80,14 +80,15 @@ describe('ReportingComponent', () => {
   });
 
   using([
-    ['23', 'an hour before end of day'],
-    ['00', 'exactly end of day'],
-    ['01', 'an hour after end of day']
-  ], function (hour: string, description: string) {
-    it(`maps hour correctly to UTC timestandard for ${description}`, () => {
-      const dateBefore = moment(`20191023-${hour}00`, 'YYYYMMDD-HHMM');
-      const dateAfter = component.convertMomentToDate(dateBefore);
-      expect(dateBefore.hour()).toEqual(dateAfter.getHours());
+    ['01', '1', '23', 'an hour before end of day'],
+    ['04', '22', '00', 'exactly end of day'],
+    ['6', '30', '01', 'an hour after end of day']
+  ], function (month: string, day: string, hour: string, description: string) {
+    it(`displays the date correctly in UTC timestandard for ${description}`, () => {
+      const originalDate = moment.utc(`2019${month}${day}-${hour}00`, 'YYYYMMDD-HHMM');
+      const resultDate = component.convertMomentToDate(originalDate);
+
+      expect(originalDate.day()).toEqual(resultDate.getDay());
     });
   });
 
