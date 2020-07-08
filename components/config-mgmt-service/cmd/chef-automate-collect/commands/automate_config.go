@@ -55,11 +55,11 @@ type AutomateCollectorConfig interface {
 }
 
 type Config struct {
-	Automate []*AutomateConfig `toml:"automate"`
+	Automate *AutomateConfig `toml:"automate"`
 }
 
 type PrivateConfig struct {
-	Automate []*PrivateAutomateConfig `toml:"automate"`
+	Automate *PrivateAutomateConfig `toml:"automate"`
 }
 
 func (p *PrivateConfig) IsAutomateCollectorConfig() bool {
@@ -108,35 +108,20 @@ func (l *ConfigLoader) ViableConfigPaths() []string {
 }
 
 func (l *ConfigLoader) Load() error {
-	rawConfigsByURL := make(map[string]*AutomateConfig)
+	l.LoadedConfig = &Config{Automate: &AutomateConfig{}}
 
 	for _, p := range l.ViableConfigPaths() {
-		var configFromFile PrivateConfig
+		configFromFile := &PrivateConfig{}
 		fileContent, err := ioutil.ReadFile(p)
 		if err != nil {
 			return errors.Wrapf(err, "failed to read config file %q", p)
 		}
-		err = toml.Unmarshal(fileContent, &configFromFile)
+		err = toml.Unmarshal(fileContent, configFromFile)
 		if err != nil {
 			return errors.Wrapf(err, "cannot decode TOML content in %q", p)
 		}
-		configFromFile.FixupUnmarshal()
-
-		for _, serverConfigFromFile := range configFromFile.Automate {
-			cliIO.verbose("applying configuration for %q from %s\n", serverConfigFromFile.URL, p)
-			cliIO.verbose("applying configuration %+v from %s\n", serverConfigFromFile, p)
-			previousConfig, havePreviousConfig := rawConfigsByURL[serverConfigFromFile.URL]
-			if havePreviousConfig {
-				previousConfig.ApplyValuesFrom(serverConfigFromFile.AutomateConfig)
-			} else {
-				rawConfigsByURL[serverConfigFromFile.URL] = serverConfigFromFile.AutomateConfig
-			}
-		}
-	}
-
-	l.LoadedConfig = &Config{Automate: make([]*AutomateConfig, 0, len(rawConfigsByURL))}
-	for _, c := range rawConfigsByURL {
-		l.LoadedConfig.Automate = append(l.LoadedConfig.Automate, c)
+		cliIO.verbose("applying configuration from %q", p)
+		l.LoadedConfig.ApplyValuesFrom(configFromFile.ToConfig())
 	}
 
 	return nil
@@ -144,7 +129,7 @@ func (l *ConfigLoader) Load() error {
 
 func (l *ConfigLoader) findRepoConfig() {
 	if value, envSet := os.LookupEnv(NoRepoConfigEnvVar); envSet && value != "false" {
-		cliIO.verbose("found environment %s=%q repo config is disabled\n", NoRepoConfigEnvVar, value)
+		cliIO.verbose("found environment %s=%q repo config is disabled", NoRepoConfigEnvVar, value)
 		return
 	}
 
@@ -153,27 +138,27 @@ func (l *ConfigLoader) findRepoConfig() {
 		candidateFilename := fpath.Join(dirFromEnv, ConfigFileBasename)
 		_, err := os.Stat(candidateFilename)
 		if err != nil {
-			cliIO.verbose("candidate config file %q could not be found/accessed, no repo config will be set: %s\n", candidateFilename, err.Error())
+			cliIO.verbose("candidate config file %q could not be found/accessed, no repo config will be set: %s", candidateFilename, err.Error())
 			return
 		}
-		cliIO.verbose("found repo config file %q\n", candidateFilename)
+		cliIO.verbose("found repo config file %q", candidateFilename)
 		l.RepoConfigPath = candidateFilename
 
 		candidatePrivateConfigFilename := fpath.Join(dirFromEnv, PrivateConfigFileBasename)
 		_, err = os.Stat(candidatePrivateConfigFilename)
 		if err != nil {
-			cliIO.verbose("candidate private config file %q could not be found/accessed: %s\n", candidatePrivateConfigFilename, err.Error())
+			cliIO.verbose("candidate private config file %q could not be found/accessed: %s", candidatePrivateConfigFilename, err.Error())
 			return
 		}
 
-		cliIO.verbose("found repo private config file %q\n", candidatePrivateConfigFilename)
+		cliIO.verbose("found repo private config file %q", candidatePrivateConfigFilename)
 		l.RepoPrivateConfigPath = candidatePrivateConfigFilename
 		return
 	}
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		cliIO.verbose("failed to get cwd, cannot find repo config: %s\n", err.Error())
+		cliIO.verbose("failed to get cwd, cannot find repo config: %s", err.Error())
 		return
 	}
 	var configDir string
@@ -181,11 +166,11 @@ func (l *ConfigLoader) findRepoConfig() {
 		candidateFilename := fpath.Join(configDir, ConfigFileBasename)
 		_, err := os.Stat(candidateFilename)
 		if err != nil {
-			cliIO.verbose("candidate repo config file %q not found: %s\n", candidateFilename, err.Error())
+			cliIO.verbose("candidate repo config file %q not found: %s", candidateFilename, err.Error())
 			continue
 		}
 		{
-			cliIO.verbose("found repo config file %q\n", candidateFilename)
+			cliIO.verbose("found repo config file %q", candidateFilename)
 			l.RepoConfigPath = candidateFilename
 			break
 		}
@@ -197,17 +182,17 @@ func (l *ConfigLoader) findRepoConfig() {
 	candidatePrivateConfigFilename := fpath.Join(configDir, PrivateConfigFileBasename)
 	_, err = os.Stat(candidatePrivateConfigFilename)
 	if err != nil {
-		cliIO.verbose("candidate private config file %q not found: %s\n", candidatePrivateConfigFilename, err.Error())
+		cliIO.verbose("candidate private config file %q not found: %s", candidatePrivateConfigFilename, err.Error())
 		return
 	}
-	cliIO.verbose("found private config file %q\n", candidatePrivateConfigFilename)
+	cliIO.verbose("found private config file %q", candidatePrivateConfigFilename)
 	l.RepoPrivateConfigPath = candidatePrivateConfigFilename
 	return
 }
 
 func (l *ConfigLoader) findUserConfig() {
 	if value, envSet := os.LookupEnv(NoUserConfigEnvVar); envSet && value != "false" {
-		cliIO.verbose("found environment %s=%q repo config is disabled\n", NoUserConfigEnvVar, value)
+		cliIO.verbose("found environment %s=%q repo config is disabled", NoUserConfigEnvVar, value)
 		return
 	}
 
@@ -216,32 +201,32 @@ func (l *ConfigLoader) findUserConfig() {
 		candidateFilename := fpath.Join(dirFromEnv, NonHiddenConfigBasename)
 		_, err := os.Stat(candidateFilename)
 		if err != nil {
-			cliIO.verbose("candidate config file %q could not be found/accessed, no user config will be set: %s\n", candidateFilename, err.Error())
+			cliIO.verbose("candidate config file %q could not be found/accessed, no user config will be set: %s", candidateFilename, err.Error())
 			return
 		}
-		cliIO.verbose("found user config file %q\n", candidateFilename)
+		cliIO.verbose("found user config file %q", candidateFilename)
 		l.UserConfigPath = candidateFilename
 		return
 	}
 
 	configDir, err := homedir.Expand("~/.chef")
 	if err != nil {
-		cliIO.verbose("cannot locate home directory, cannot find user config: %s\n", err.Error())
+		cliIO.verbose("cannot locate home directory, cannot find user config: %s", err.Error())
 	}
 	userConfigFilename := fpath.Join(configDir, NonHiddenConfigBasename)
 	_, err = os.Stat(userConfigFilename)
 	if err != nil {
-		cliIO.verbose("candidate user config filename %q not found: %s\n", userConfigFilename, err.Error())
+		cliIO.verbose("candidate user config filename %q not found: %s", userConfigFilename, err.Error())
 		return
 	}
-	cliIO.verbose("found user config file %q\n", userConfigFilename)
+	cliIO.verbose("found user config file %q", userConfigFilename)
 	l.UserConfigPath = userConfigFilename
 	return
 }
 
 func (l *ConfigLoader) findSystemConfig() {
 	if value, envSet := os.LookupEnv(NoSystemConfigEnvVar); envSet && value != "false" {
-		cliIO.verbose("found environment %s=%q repo config is disabled\n", NoSystemConfigEnvVar, value)
+		cliIO.verbose("found environment %s=%q repo config is disabled", NoSystemConfigEnvVar, value)
 		return
 	}
 
@@ -250,10 +235,10 @@ func (l *ConfigLoader) findSystemConfig() {
 		candidateFilename := fpath.Join(dirFromEnv, NonHiddenConfigBasename)
 		_, err := os.Stat(candidateFilename)
 		if err != nil {
-			cliIO.verbose("candidate config file %q could not be found/accessed, no system config will be set: %s\n", candidateFilename, err.Error())
+			cliIO.verbose("candidate config file %q could not be found/accessed, no system config will be set: %s", candidateFilename, err.Error())
 			return
 		}
-		cliIO.verbose("found system config file %q\n", candidateFilename)
+		cliIO.verbose("found system config file %q", candidateFilename)
 		l.SystemConfigPath = candidateFilename
 		return
 
@@ -275,18 +260,21 @@ func (l *ConfigLoader) findSystemConfig() {
 	candidateFilename := fpath.Join(systemConfigDir, NonHiddenConfigBasename)
 	_, err := os.Stat(candidateFilename)
 	if err != nil {
-		cliIO.verbose("candidate config file %q could not be found/accessed, no system config will be set: %s\n", candidateFilename, err.Error())
+		cliIO.verbose("candidate config file %q could not be found/accessed, no system config will be set: %s", candidateFilename, err.Error())
 		return
 	}
-	cliIO.verbose("found system config file %q\n", candidateFilename)
+	cliIO.verbose("found system config file %q", candidateFilename)
 	l.SystemConfigPath = candidateFilename
 	return
 }
 
 func (p *PrivateConfig) FixupUnmarshal() {
-	for _, c := range p.Automate {
-		c.authToken = c.AuthToken
-	}
+	p.Automate.authToken = p.Automate.AuthToken
+}
+
+func (p *PrivateConfig) ToConfig() *Config {
+	p.FixupUnmarshal()
+	return &Config{Automate: p.Automate.AutomateConfig}
 }
 
 func (c *Config) IsAutomateCollectorConfig() bool {
@@ -294,19 +282,15 @@ func (c *Config) IsAutomateCollectorConfig() bool {
 }
 
 func (c *Config) Redacted() *PrivateConfig {
-	p := &PrivateConfig{}
-	for _, a := range c.Automate {
-		p.Automate = append(p.Automate, a.Redacted())
-	}
-	return p
+	return &PrivateConfig{Automate: c.Automate.Redacted()}
 }
 
 func (c *Config) WithPrivate() *PrivateConfig {
-	p := &PrivateConfig{}
-	for _, a := range c.Automate {
-		p.Automate = append(p.Automate, a.WithPrivate())
-	}
-	return p
+	return &PrivateConfig{Automate: c.Automate.WithPrivate()}
+}
+
+func (c *Config) ApplyValuesFrom(other *Config) {
+	c.Automate.ApplyValuesFrom(other.Automate)
 }
 
 func (c *Config) WriteRepoConfigFiles() error {
@@ -337,7 +321,7 @@ func (c *Config) WriteRepoConfigFiles() error {
 		if err != nil {
 			return errors.Wrapf(err, "unable to create/modify gitignore file %q", gitignorePath)
 		}
-		cliIO.msg("Your .gitignore has been updated to protect your Chef Automate credentials\n")
+		cliIO.msg("Your .gitignore has been updated to protect your Chef Automate credentials")
 	}
 
 	privateFile, err := os.OpenFile(privateConfigFilename, os.O_RDWR|os.O_CREATE, 0600)
@@ -363,7 +347,7 @@ func fileIsGitignored(filename string) bool {
 	// if we are in a git directory, check if the private config filename is in
 	// gitignore (with -q, check-ignore will exit 1 if the file is NOT ignored):
 	o, err := cmd.Output("git", cmd.Args("check-ignore", "-q", filename))
-	fmt.Printf("check ignore %q %+v\n", o, err)
+	cliIO.verbose("check gitignore for file %q returned %q %+v", filename, o, err)
 	return err == nil
 }
 
@@ -390,7 +374,7 @@ func repoRoot() (string, error) {
 		return "", err
 	}
 	for dirToCheck := cwd; dirToCheck != "/"; dirToCheck = fpath.Dir(dirToCheck) {
-		cliIO.msg("checking for git dir in %q\n", dirToCheck)
+		cliIO.msg("checking for git dir in %q", dirToCheck)
 		if isRepoRoot(dirToCheck) {
 			return dirToCheck, nil
 		}
@@ -518,14 +502,14 @@ func (a *AutomateConfig) Test() error {
 				// whether d.Err != nil is always
 				// fatal, so we still log the
 				// addresses here.
-				cliIO.verbose("HTTP TRACE: %q resolved to %v (with error: %s)\n",
+				cliIO.verbose("HTTP TRACE: %q resolved to %v (with error: %s)",
 					req.URL.Host, addrStrs, d.Err.Error())
 				return
 			}
-			cliIO.verbose("HTTP TRACE: %q resolved to %v\n", req.URL.Host, addrStrs)
+			cliIO.verbose("HTTP TRACE: %q resolved to %v", req.URL.Host, addrStrs)
 		},
 		GotConn: func(c httptrace.GotConnInfo) {
-			cliIO.verbose("HTTP TRACE: connected to %q (reused: %t) (was idle: %t)\n",
+			cliIO.verbose("HTTP TRACE: connected to %q (reused: %t) (was idle: %t)",
 				c.Conn.RemoteAddr(), c.Reused, c.WasIdle)
 		},
 	}
@@ -546,14 +530,14 @@ func (a *AutomateConfig) Test() error {
 	}
 
 	for k, v := range response.Header {
-		cliIO.verbose("HTTP RESPONSE HEADER %s: %s\n", k, strings.Join(v, ", "))
+		cliIO.verbose("HTTP RESPONSE HEADER %s: %s", k, strings.Join(v, ", "))
 	}
-	cliIO.verbose("HTTP RESPONSE BODY------------\n")
+	cliIO.verbose("HTTP RESPONSE BODY------------")
 	cliIO.verbose(string(bodyBytes))
-	cliIO.verbose("\nEND HTTP RESPONSE BODY--------\n")
+	cliIO.verbose("\nEND HTTP RESPONSE BODY--------")
 
 	if response.StatusCode != 200 {
-		fmt.Fprintf(os.Stderr, "ERROR: request to %q failed with status code %d\n", a.URL, response.StatusCode)
+		cliIO.msg("ERROR: request to %q failed with status code %d", a.URL, response.StatusCode)
 		os.Exit(1)
 	}
 

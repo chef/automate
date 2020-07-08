@@ -42,7 +42,7 @@ func runDescribeCmd(c *cobra.Command, args []string) error {
 
 func describeCmdFailErr(err error) {
 	if err != nil {
-		fmt.Printf("Error: %s\n", err.Error())
+		cliIO.msg("Error: %s", err.Error())
 		os.Exit(1)
 	}
 }

@@ -68,16 +68,14 @@ func runGenConfigCommand(c *cobra.Command, args []string) error {
 		return err
 	}
 	ac.InsecureTLS = genConfigCommands.insecureConnection
-	conf := &Config{
-		Automate: []*AutomateConfig{ac},
-	}
+	conf := &Config{Automate: ac}
 
 	err = ac.Test()
 	if err != nil {
 		return err
 	}
 
-	cliIO.msg("# Config verified by successful request to %q\n", ac.TestURL)
+	cliIO.msg("# Config verified by successful request to %q", ac.TestURL)
 
 	if genConfigCommands.writeRepoConfig {
 		err := conf.WriteRepoConfigFiles()

@@ -42,14 +42,14 @@ func runShowConfigCommand(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to load configuration")
 	}
-	cliIO.out("Found config files:\n")
-	cliIO.out("-------------------\n")
+	cliIO.out("Found config files:")
+	cliIO.out("-------------------")
 	for _, name := range loader.ViableConfigPaths() {
-		cliIO.out("  %s\n", name)
+		cliIO.out("  %s", name)
 	}
-	cliIO.out("\n")
+	cliIO.out("")
 
-	cliIO.out("Computed configuration:\n")
+	cliIO.out("Computed configuration:")
 	cliIO.out("-----------------------\n\n")
 
 	enc := toml.NewEncoder(os.Stdout)
