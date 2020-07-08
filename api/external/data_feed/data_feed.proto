@@ -8,6 +8,26 @@ import "google/api/annotations.proto";
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service DatafeedService {
+/*
+Add a datafeed destination
+
+Adds a datafeed destination. Requires values for name, url, and secret.
+The secret is the id returned from creating a secret using the secrets api.
+
+Example:
+```
+{
+  "name": "my datafeed destination",
+  "url": "https://my.server.com/dataingest",
+  "secret":"42b369f1-9d3f-44b3-bcf8-a9a09d6bd4bb"
+}
+```
+
+Authorization Action:
+```
+datafeed:destination:add
+```
+*/
   rpc AddDestination(AddDestinationRequest) returns (AddDestinationResponse){
 	  option (google.api.http) = {
 		  post: "/api/v0/datafeed/destination"
@@ -18,6 +38,16 @@ service DatafeedService {
 		  action: "datafeed:destination:add"
 	  };
 	};
+/*
+Get a datafeed destination
+
+Gets a datafeed destination the ID of the destination.
+
+Authorization Action:
+```
+datafeed:destination:get
+```
+*/
   rpc GetDestination(GetDestinationRequest) returns (GetDestinationResponse) {
 		option (google.api.http) = {
 			get: "/api/v0/datafeed/destination/{id}"
@@ -27,6 +57,16 @@ service DatafeedService {
 			action: "datafeed:destination:get"
 		};
 	};
+	/*
+  Delete a datafeed destination
+
+  Deletes a datafeed destination given the ID of the destination.
+
+  Authorization Action:
+  ```
+  destination:destination:delete
+  ```
+  */
   rpc DeleteDestination(DeleteDestinationRequest) returns (DeleteDestinationResponse){
 		option (google.api.http) = {
 			delete: "/api/v0/datafeed/destination/{id}"
@@ -36,6 +76,19 @@ service DatafeedService {
 			action: "destination:destination:delete"
 		};
 	};
+/*
+  Update a datafeed destination
+
+  Updates a datafeed destination.
+  This is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.
+  This will update the name, url or secret for the destination
+
+
+	Authorization Action:
+	```
+  destination:destination:update
+	```
+  */
   rpc UpdateDestination(UpdateDestinationRequest) returns (UpdateDestinationResponse) {
  		option (google.api.http) = {
 			patch: "/api/v0/datafeed/destination/{id}"
@@ -46,6 +99,16 @@ service DatafeedService {
 			action: "datafeed:destination:update"
 		};
 	};
+	/*
+  List Destinations
+
+  Returns a list of all datafeed destinations.
+
+  Authorization Action:
+  ```
+  datafeed:destinations:list
+  ```
+  */
   rpc ListDestinations(ListDestinationRequest) returns (ListDestinationResponse){
 		option (google.api.http) = {
 			post: "/api/v0/datafeed/destinations"
@@ -56,6 +119,34 @@ service DatafeedService {
 			action: "datafeed:destinations:list"
 		};
 	};
+/*
+Test a datafeed destination
+
+Tests a datafeed destination endpoint with the details provided. Requires values for name, url, and secret.
+The secret is the id returned from creating a secret using the secrets api.
+Accepts either url, secret or url, username_password
+
+Examples:
+```
+{
+  "url": "https://my.server.com/dataingest",
+  "secret":"42b369f1-9d3f-44b3-bcf8-a9a09d6bd4bb"
+}
+
+{
+  "url": "https://my.server.com/dataingest",
+  "username_password": {
+    "username": "muyuser",
+    "password": "mypassword"
+  }
+}
+```
+
+Authorization Action:
+```
+datafeed:destinations:test
+```
+*/
 	rpc TestDestination(URLValidationRequest) returns (TestDestinationResponse) {
 		option (google.api.http) = {
 			post: "/api/v0/datafeed/destinations/test"
