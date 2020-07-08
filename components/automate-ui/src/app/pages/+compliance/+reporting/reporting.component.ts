@@ -513,6 +513,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   convertMomentToDate(m: moment.Moment): Date {
-    return m.toDate();
+    return new Date(Date.UTC(m.year(), m.month(), m.date()));
   }
 }
