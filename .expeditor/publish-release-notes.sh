@@ -30,6 +30,12 @@ pushd ./automate.wiki
 ## Backward Incompatibilities
 -
 
+## Chef Product Versions
+
+This release depends on:
+  Chef Habitat version
+  Chef InSpec version
+
 EOH
 
   # Push changes back up to GitHub
