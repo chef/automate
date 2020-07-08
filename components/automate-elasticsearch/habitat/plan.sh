@@ -51,6 +51,7 @@ do_build() {
 do_install() {
   cp -a "$(pkg_path_for ${vendor_origin}/elasticsearch)/es/"* "${pkg_prefix}/es/"
   "${pkg_prefix}/es/bin/elasticsearch-plugin" install -b "file://${HAB_CACHE_SRC_PATH}/repository-s3.zip"
+  rm -rf "${pkg_prefix}/es/modules/x-pack-"*
 }
 
 do_strip() {
