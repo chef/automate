@@ -16,9 +16,7 @@ The `chef-automate backup create` command creates a single backup that contains 
 By default, Chef Automate stores backups to the filesystem in the directory `/var/opt/chef-automate/backups`.
 You can also configure Chef Automate to store backups in Amazon S3 buckets.
 
-## Setting Up Backups
-
-### Backup Space Requirements
+## Backup Space Requirements
 
 This amount of space needed for a backup varies depending on your Chef Automate use. You need enough free space for:
 
@@ -27,7 +25,7 @@ This amount of space needed for a backup varies depending on your Chef Automate 
 * Elasticsearch snapshots of your Chef Automate configuration and data, such as converge, scan, and report data. You will need enough disk space for the each Elasticsearch snapshot and the delta--or the list of changes--for each successive snapshot.
 * Chef Habitat Builder artifacts
 
-### Backup to a Filesystem
+## Backup to a Filesystem
 
 One backup option is to store backups in a configurable backup directory.
 The backup directory should be on network-attached storage or synced periodically to a disk on another machine.
@@ -50,26 +48,21 @@ To configure your Chef Automate installation's backup directory to another locat
     chef-automate config patch backup_config.toml
     ```
 
-    After applying your configuration, the `backup_config.toml` file is no longer necessary, and its removal can occur.
+    Remove the `backup_config.toml` file after applying your configuration, as it is no longer necessary.
 
-#### Store a Filesystem Backup in a Single-file Archive
+### Store a Filesystem Backup in a Single-file Archive
 
-Some users prefer to store backups offline in single-file archives.
-Such archives must include both the configuration data and the reporting data contained in the standard backup.
+To store backups offline in single-file archives, single-file archives must include both the configuration data and the reporting data contained in the standard backup.
 
-The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}) contains both the timestamp-based directory for the configuration, and the reporting data stored in the `automate-elasticsearch-data` directory.
-You must archive both of these directory types in any single-file backups you create.
+The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}) contains both the timestamp-based directory for the configuration and the reporting data stored in the `automate-elasticsearch-data` directory.
 
-A timestamp-based directory distinguishes itself in the `automate-elasticsearch-data` directory by its file name format, such as `20180518010336`.
+A timestamp-based directory has a date-based name, such as such as `20180518010336`, in the `automate-elasticsearch-data` directory.
 
-Because externally-deployed Elasticsearch nodes lacks access to Chef Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Chef Automate's primary backup settings.
-You can configure backups to use either the local filesystem or an Amazon S3 bucket.
+To provide externally-deployed Elasticsearch nodes access to Chef Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Chef Automate's primary backup settings.
 
-### Backup to S3
+## Backup to S3
 
-Another backup option is to store backups in an existing Amazon S3 bucket.
-
-Supported S3-related settings are below:
+To store backups in an existing Amazon S3 bucket, use the supported S3-related settings below:
 
 ```toml
 [global.v1.backups]
@@ -103,11 +96,11 @@ Supported S3-related settings are below:
   -----END CERTIFICATE-----
 ```
 
-#### S3 Permissions
+### S3 Permissions
 
-The following IAM policy describes the lowest permissions Chef Automate requires to run backup and restore operations.
+The following IAM policy describes the basic permissions Chef Automate requires to run backup and restore operations.
 
-```JSON
+```json
 {
   "Statement": [
     {
@@ -236,8 +229,7 @@ y
 Success: Backups deleted
 ```
 
-Chef Automate does not provide a mechanism to prune all but a certain number of the most recent backups.
-You can manage this manually by parsing the output of `chef-automate backup list` and applying the command `chef-automate backup delete`.
+To prune all but a certain number of the most recent backups manually, parsing the output of `chef-automate backup list` and applying the command `chef-automate backup delete`.
 For example:
 
 ```bash
