@@ -20,9 +20,9 @@ You can also configure Chef Automate to store backups in Amazon S3 buckets.
 
 This amount of space needed for a backup varies depending on your Chef Automate use. You need enough free space for:
 
-* Complete copies of each Chef Automate service PostgreSQL database.
+* Complete copies of each Chef Automate service PostgreSQL database
 * Complete copies of your configuration files
-* Elasticsearch snapshots of your Chef Automate configuration and data, such as converge, scan, and report data. You will need enough disk space for the each Elasticsearch snapshot and the delta--or the list of changes--for each successive snapshot.
+* Elasticsearch snapshots of your Chef Automate configuration and data, such as converge, scan, and report data. You will need enough disk space for the each Elasticsearch snapshot and the delta--or the list of changes--for each successive snapshot
 * Chef Habitat Builder artifacts
 
 ## Backup to a Filesystem
@@ -41,13 +41,13 @@ To configure your Chef Automate installation's backup directory to another locat
       path = "/path/to/backups"
     ```
 
-2. Run the following command to apply your configuration:
+1. Run the following command to apply your configuration:
 
     ```shell
     chef-automate config patch backup_config.toml
     ```
 
-    Remove the `backup_config.toml` file after applying your configuration, as it is no longer necessary.
+1. Remove the now-redundant `backup_config.toml` file.
 
 ### Store a Filesystem Backup in a Single-file Archive
 
@@ -57,7 +57,7 @@ The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}
 
 A timestamp-based directory has a date-based name, such as `20180518010336`, in the `automate-elasticsearch-data` directory.
 
-To provide externally-deployed Elasticsearch nodes access to Chef Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Chef Automate's primary backup settings.
+To provide externally-deployed Elasticsearch nodes access to Chef Automate's built-in backup storage services, you must [configure Elasticsearch backup]({{< relref "install.md#configuring-external-elasticsearch" >}}) settings separately from Chef Automate's primary backup settings.
 
 ## Backup to S3
 
@@ -195,7 +195,7 @@ where `bucket_name` is the name of the S3 bucket and `base_path` is an optional 
 
 ### Delete Backups
 
-To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete it using [`chef automate backup delete ID`]({{< ref "cli-chef-automate/#chef-automate-backup-delete" >}}).
+To delete backups from a running instance of Chef Automate, first find the backup ID with `chef-automate backup list` and then delete the backup using [`chef automate backup delete ID`]({{< ref "cli-chef-automate/#chef-automate-backup-delete" >}}).
 
 ```shell
 chef-automate backup list
@@ -205,7 +205,7 @@ chef-automate backup list
 20181026184012    completed  15 seconds old
 ```
 
-You can delete a single backup with `chef-automate backup delete`:
+Delete a single backup with `chef-automate backup delete`:
 
 ```shell
 chef-automate backup delete 20181026183901
@@ -216,7 +216,7 @@ y
 Success: Backups deleted
 ```
 
-To delete multiple backups:
+To delete two or more backups, use `chef-automate backup delete` followed by the backup IDs:
 
 ```shell
 chef-automate backup delete 20181026183954 20181026184012
@@ -237,7 +237,7 @@ export KEEP=10; chef-automate backup list --result-json backup.json > /dev/null 
 
 ## Troubleshooting
 
-Set the log level to `debug` before re-running a failed backup to output debug info to the Chef Automate log:
+To debug a failed backup, set the log level to `debug` and re-run the backup. This outputs the debug information to the Chef Automate log:
 
 ```shell
 chef-automate debug set-log-level deployment-service debug

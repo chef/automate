@@ -10,7 +10,7 @@ toc = true
     weight = 30
 +++
 
-Before beginning your installation, check the [System Requirements]({{< relref "system-requirements.md" >}}) for Automate.
+Before beginning your installation, check the [System Requirements]({{< relref "system-requirements.md" >}}) for Chef Automate.
 
 See [Airgapped Installation]({{< relref "airgapped-installation.md" >}}) for installing Chef Automate to a host with no inbound or outbound internet traffic.
 
@@ -166,7 +166,7 @@ Add the following to your config.toml:
 #  ssl_verify_depth = "2"
 ```
 
-Because externally-deployed Elasticsearch nodes will not have access to Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
+Because externally-deployed Elasticsearch nodes will not have access to Chef Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Chef Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
 
 ##### Backup Externally-Deployed Elasticsearch to Local Filesystem
 
@@ -238,7 +238,7 @@ location = "s3"
 # protocol = "https"
 ```
 
-#### Configuring An External PostgreSQL Database
+#### Configuring an External PostgreSQL Database
 
 Add the following to your config.toml:
 
