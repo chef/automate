@@ -13,8 +13,8 @@
   "paths": {
     "/api/v0/event_task_counts": {
       "get": {
-        "summary": "Get Counts Per Event Task Occurrence",
-        "description": "Event tasks are about the actions taken on the event, such as update, create, and delete.\n\nExample:\n```\nevent_task_counts?start=1592546400000\u0026end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
+        "summary": "List Counts Per Event Task Occurrence",
+        "description": "Returns totals for update, create, and delete event tasks, which are the actions taken on the event.\n\nExample:\n```\nevent_task_counts?start=1592546400000\u0026end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
         "operationId": "GetEventTaskCounts",
         "responses": {
           "200": {
@@ -60,8 +60,8 @@
     },
     "/api/v0/event_type_counts": {
       "get": {
-        "summary": "Get Count of Event Type Occurrence",
-        "description": "Event types are things like role, cookbook, organization, etc.\n\nExample:\n```\nevent_type_counts?start=1592546400000\u0026end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
+        "summary": "List Count of Event Type Occurrence",
+        "description": "Returns totals for role, cookbook, and organization event types.\n\nExample:\n```\nevent_type_counts?start=1592546400000\u0026end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
         "operationId": "GetEventTypeCounts",
         "responses": {
           "200": {
@@ -108,7 +108,7 @@
     "/api/v0/eventfeed": {
       "get": {
         "summary": "List Events",
-        "description": "Returns a list of events that have been recorded in Chef Automate, such as Infra Server events like cookbook\ncreation, policyfile updates, and node creation and Automate internal events like profile installs and scan\njob creation.\nAdding a filter makes a list of all events that meet the filter criteria.\n\nExample:\n```\neventfeed?collapse=true\u0026filter=organization:The%2520Watchmen\u0026page_size=100\u0026start=1592546400000\u0026end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
+        "description": "Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).\nAdding a filter makes a list of all events that meet the filter criteria.\n\nExample:\n```\neventfeed?collapse=true\u0026filter=organization:The%2520Watchmen\u0026page_size=100\u0026start=1592546400000\u0026end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
         "operationId": "GetEventFeed",
         "responses": {
           "200": {
@@ -172,14 +172,14 @@
           },
           {
             "name": "cursor",
-            "description": "Used for pagination, to bookmark the place from which to grab the next set of results.",
+            "description": "Used for pagination, to bookmark next set of results.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "collapse",
-            "description": "Used to group similar events into one.",
+            "description": "Used to group similar events together.",
             "in": "query",
             "required": false,
             "type": "boolean",
@@ -193,8 +193,8 @@
     },
     "/api/v0/eventstrings": {
       "get": {
-        "summary": "Get Summary Stats About Events",
-        "description": "This data populates the guitar strings visual on the top of the event feed.\n\nExample:\n```\neventstrings?timezone=America/Denver\u0026hours_between=1\u0026start=2020-06-19\u0026end=2020-06-25\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
+        "summary": "List Summary Stats About Events",
+        "description": "Returns data that populates the guitar strings visual on the top of the event feed.\n\nExample:\n```\neventstrings?timezone=America/Denver\u0026hours_between=1\u0026start=2020-06-19\u0026end=2020-06-25\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
         "operationId": "GetEventStringBuckets",
         "responses": {
           "200": {
@@ -228,7 +228,7 @@
           },
           {
             "name": "hours_between",
-            "description": "Interval for returned results (e.g. 1 hour buckets).",
+            "description": "Interval for returned results, for example: 1 hour buckets.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -262,23 +262,23 @@
         },
         "task": {
           "type": "string",
-          "description": "Type of task for the event (create, update, delete)."
+          "description": "Type of event task (create, update, delete)."
         },
         "start_time": {
           "type": "string",
           "format": "date-time",
-          "description": "Start time of the event."
+          "description": "Event start time."
         },
         "entity_name": {
           "type": "string"
         },
         "requestor_type": {
           "type": "string",
-          "description": "Requestor type on the event record."
+          "description": "Event record requestor type."
         },
         "requestor_name": {
           "type": "string",
-          "description": "Requestor name on the event record."
+          "description": "Event record requestor name."
         },
         "service_hostname": {
           "type": "string",
@@ -328,7 +328,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the event."
+          "description": "Event name."
         },
         "count": {
           "type": "string",

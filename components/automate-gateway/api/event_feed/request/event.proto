@@ -16,9 +16,9 @@ message EventFilter {
   int64 after = 5;
   // Used for pagination, to request results in descending order.
   int64 before = 6;
-  // Used for pagination, to bookmark the place from which to grab the next set of results.
+  // Used for pagination, to bookmark next set of results.
   string cursor = 7;
-  // Used to group similar events into one.
+  // Used to group similar events together.
   bool collapse = 8;
 }
 

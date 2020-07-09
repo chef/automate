@@ -15,14 +15,14 @@ message Events {
 message Event {
   // Type of event (cookbook, role, etc).
   string event_type = 1;
-  // Type of task for the event (create, update, delete).
+  // Type of event task (create, update, delete).
   string task = 2;
-  // Start time of the event.
+  // Event start time.
   google.protobuf.Timestamp start_time = 3;
   string entity_name = 4;
-  // Requestor type on the event record.
+  // Event record requestor type.
   string requestor_type = 5;
-  // Requestor name on the event record.
+  // Event record requestor name.
   string requestor_name = 6;
   // Hostname from which the record was gathered.
   string service_hostname = 7;
@@ -48,7 +48,7 @@ message EventCounts {
 }
 
 message EventCount {
-  // Name of the event.
+  // Event name.
   string name = 1;
   // Count of events.
   int64 count = 2;

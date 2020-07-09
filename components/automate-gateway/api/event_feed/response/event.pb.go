@@ -73,14 +73,14 @@ func (m *Events) GetTotalEvents() int64 {
 type Event struct {
 	// Type of event (cookbook, role, etc).
 	EventType string `protobuf:"bytes,1,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`
-	// Type of task for the event (create, update, delete).
+	// Type of event task (create, update, delete).
 	Task string `protobuf:"bytes,2,opt,name=task,proto3" json:"task,omitempty"`
-	// Start time of the event.
+	// Event start time.
 	StartTime  *timestamp.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	EntityName string               `protobuf:"bytes,4,opt,name=entity_name,json=entityName,proto3" json:"entity_name,omitempty"`
-	// Requestor type on the event record.
+	// Event record requestor type.
 	RequestorType string `protobuf:"bytes,5,opt,name=requestor_type,json=requestorType,proto3" json:"requestor_type,omitempty"`
-	// Requestor name on the event record.
+	// Event record requestor name.
 	RequestorName string `protobuf:"bytes,6,opt,name=requestor_name,json=requestorName,proto3" json:"requestor_name,omitempty"`
 	// Hostname from which the record was gathered.
 	ServiceHostname string `protobuf:"bytes,7,opt,name=service_hostname,json=serviceHostname,proto3" json:"service_hostname,omitempty"`
@@ -267,7 +267,7 @@ func (m *EventCounts) GetCounts() []*EventCount {
 }
 
 type EventCount struct {
-	// Name of the event.
+	// Event name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Count of events.
 	Count                int64    `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`

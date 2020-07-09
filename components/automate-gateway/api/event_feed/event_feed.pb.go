@@ -77,9 +77,7 @@ type EventFeedClient interface {
 	//
 	//List Events
 	//
-	//Returns a list of events that have been recorded in Chef Automate, such as Infra Server events like cookbook
-	//creation, policyfile updates, and node creation and Automate internal events like profile installs and scan
-	//job creation.
+	//Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).
 	//Adding a filter makes a list of all events that meet the filter criteria.
 	//
 	//Example:
@@ -93,9 +91,9 @@ type EventFeedClient interface {
 	//```
 	GetEventFeed(ctx context.Context, in *request.EventFilter, opts ...grpc.CallOption) (*response.Events, error)
 	//
-	//Get Count of Event Type Occurrence
+	//List Count of Event Type Occurrence
 	//
-	//Event types are things like role, cookbook, organization, etc.
+	//Returns totals for role, cookbook, and organization event types.
 	//
 	//Example:
 	//```
@@ -108,9 +106,9 @@ type EventFeedClient interface {
 	//```
 	GetEventTypeCounts(ctx context.Context, in *request.EventCountsFilter, opts ...grpc.CallOption) (*response.EventCounts, error)
 	//
-	//Get Counts Per Event Task Occurrence
+	//List Counts Per Event Task Occurrence
 	//
-	//Event tasks are about the actions taken on the event, such as update, create, and delete.
+	//Returns totals for update, create, and delete event tasks, which are the actions taken on the event.
 	//
 	//Example:
 	//```
@@ -123,9 +121,9 @@ type EventFeedClient interface {
 	//```
 	GetEventTaskCounts(ctx context.Context, in *request.EventCountsFilter, opts ...grpc.CallOption) (*response.EventCounts, error)
 	//
-	//Get Summary Stats About Events
+	//List Summary Stats About Events
 	//
-	//This data populates the guitar strings visual on the top of the event feed.
+	//Returns data that populates the guitar strings visual on the top of the event feed.
 	//
 	//Example:
 	//```
@@ -188,9 +186,7 @@ type EventFeedServer interface {
 	//
 	//List Events
 	//
-	//Returns a list of events that have been recorded in Chef Automate, such as Infra Server events like cookbook
-	//creation, policyfile updates, and node creation and Automate internal events like profile installs and scan
-	//job creation.
+	//Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).
 	//Adding a filter makes a list of all events that meet the filter criteria.
 	//
 	//Example:
@@ -204,9 +200,9 @@ type EventFeedServer interface {
 	//```
 	GetEventFeed(context.Context, *request.EventFilter) (*response.Events, error)
 	//
-	//Get Count of Event Type Occurrence
+	//List Count of Event Type Occurrence
 	//
-	//Event types are things like role, cookbook, organization, etc.
+	//Returns totals for role, cookbook, and organization event types.
 	//
 	//Example:
 	//```
@@ -219,9 +215,9 @@ type EventFeedServer interface {
 	//```
 	GetEventTypeCounts(context.Context, *request.EventCountsFilter) (*response.EventCounts, error)
 	//
-	//Get Counts Per Event Task Occurrence
+	//List Counts Per Event Task Occurrence
 	//
-	//Event tasks are about the actions taken on the event, such as update, create, and delete.
+	//Returns totals for update, create, and delete event tasks, which are the actions taken on the event.
 	//
 	//Example:
 	//```
@@ -234,9 +230,9 @@ type EventFeedServer interface {
 	//```
 	GetEventTaskCounts(context.Context, *request.EventCountsFilter) (*response.EventCounts, error)
 	//
-	//Get Summary Stats About Events
+	//List Summary Stats About Events
 	//
-	//This data populates the guitar strings visual on the top of the event feed.
+	//Returns data that populates the guitar strings visual on the top of the event feed.
 	//
 	//Example:
 	//```

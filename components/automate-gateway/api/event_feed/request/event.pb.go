@@ -33,9 +33,9 @@ type EventFilter struct {
 	After int64 `protobuf:"varint,5,opt,name=after,proto3" json:"after,omitempty"`
 	// Used for pagination, to request results in descending order.
 	Before int64 `protobuf:"varint,6,opt,name=before,proto3" json:"before,omitempty"`
-	// Used for pagination, to bookmark the place from which to grab the next set of results.
+	// Used for pagination, to bookmark next set of results.
 	Cursor string `protobuf:"bytes,7,opt,name=cursor,proto3" json:"cursor,omitempty"`
-	// Used to group similar events into one.
+	// Used to group similar events together.
 	Collapse             bool     `protobuf:"varint,8,opt,name=collapse,proto3" json:"collapse,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
