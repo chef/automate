@@ -11,6 +11,10 @@ toc = true
     weight = 15
 +++
 
+{{< info >}}
+Data Feed is currently in beta. Turn on this beta feature by typing 'feat' into your browser for the Feature Flags window to appear. Select the toggle next to "Chef Automate Data Feed" to turn into the "ON" position and enable Data Feed.
+{{< /info >}}
+
 The Data Feed service sends node data to a 3rd party service.
 This can be useful when updating configuration management databases, external security dashboards and IT service management platforms.
 The following types of information are sent:
