@@ -31,4 +31,95 @@ chef-loading-spinner {
     margin: 100px auto;
     width: 100px;
   }
+
+  ul {
+    margin: 0;
+    list-style: none;
+    padding-inline-start: 20px;
+  }
+
+  .list > li {
+    margin-bottom: 5px;
+    color: $chef-primary-bright;
+  }
+
+  .list > li > span {
+    cursor: pointer;
+  }
+
+  .list > li > span:before {
+    font-family: 'Material Icons';
+    content: "folder";
+    padding-right: 5px;
+  }
+
+  .list > li > span.extend-list:before {
+    font-family: 'Material Icons';
+    content: "folder_open";
+    padding-right: 6px;
+  }
+
+  .sub-list {
+    display: none;
+  }
+
+  .show {
+    display: block;
+  }
+
+  .sub-list > li {
+    margin: 5px;
+    color: $chef-primary-dark;
+    cursor: pointer;
+
+    chef-icon {
+      display: none;
+      float: right;
+      margin-top: 4px;
+    }
+  }
+
+  .sub-list > li.active-sub-list {
+    font-weight: 600;
+
+    chef-icon {
+      display: block;
+    }
+  }
+
+  .details-row {
+    display: flex;
+
+    .item-column {
+      flex-basis: 25%;
+      height: fit-content;
+      margin-right: 1em;
+      padding: 1em;
+      border: 1px solid $chef-light-grey;
+      background-color: $chef-white;
+      border-radius: $global-radius;
+    }
+
+    .item-details-column {
+      flex-basis: 75%;
+      height: fit-content;
+      overflow: auto;
+      padding: 1em 1em;
+      border: 1px solid $chef-light-grey;
+      background-color: $chef-white;
+      border-radius: $global-radius;
+
+      .item-heading {
+        margin-bottom: 1em;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      chef-snippet {
+        ::ng-deep pre {
+          background-color: $chef-lightest-grey;
+        }
+      }
+    }
+  }
 }

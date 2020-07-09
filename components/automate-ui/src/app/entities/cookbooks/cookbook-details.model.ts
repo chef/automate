@@ -46,3 +46,12 @@ export interface RootFiles {
     specificity: string;
 }
 
+export interface SubMenu {
+    name: string;
+    url: string;
+}
+
+export interface Menu {
+    menu: string;
+    subMenu: SubMenu[];
+}
