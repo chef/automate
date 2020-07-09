@@ -1342,7 +1342,7 @@ describe File.basename(__FILE__) do
     res = GRPC reporting, :read_report, Reporting::Query.new(id: 'bb93e1b2-36d6-439e-ac70-ccccccczzz20')
     assert_equal(Reporting::Report, res.class)
 
-    assert_equal('4.20.0', res['version'])
+    assert_equal('4.22.0', res['version'])
     assert_equal('bb93e1b2-36d6-439e-ac70-ccccccczzz20', res['id'])
     assert_equal('999f4e51-b049-4b10-9555-555789999967', res['node_id'])
     assert_equal('ubuntu(4)-alpha-myskippy(s)-myfaily(f)-apache(f)-linux(p)-failed', res['node_name'])

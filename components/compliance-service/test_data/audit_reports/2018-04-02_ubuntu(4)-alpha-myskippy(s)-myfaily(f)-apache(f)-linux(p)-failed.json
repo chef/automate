@@ -8,7 +8,7 @@
   "roles": [],
   "recipes": [],
   "end_time": "2018-04-02T03:02:02Z",
-  "version": "4.20.0",
+  "version": "4.22.0",
   "platform": {
     "name": "ubuntu",
     "release": "18.04"
@@ -44,6 +44,7 @@
       "groups": [],
       "controls": [],
       "status": "skipped",
+      "skip_message": "Skipping profile: 'myprofile' on unsupported platform: 'ubuntu/18.04'.",
       "status_message": "Skipping profile: 'myprofile' on unsupported platform: 'ubuntu/18.04'."
     },
     {
