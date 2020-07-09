@@ -8,6 +8,11 @@ slack:
 
 github:
   delete_branch_on_merge: true
+  changelog_file: "CHANGELOG.md"
+
+changelog:
+  categories:
+    - "bug 🐛": "Bug Fixes"
 
 # At the given time, trigger the following scheduled workloads
 # https://expeditor.chef.io/docs/getting-started/subscriptions/#scheduling-workloads
@@ -109,6 +114,7 @@ subscriptions:
   # These actions are taken, in order they are specified, anytime a Pull Request is merged.
   - workload: staged_workload_released:chef/automate:master:post_merge:*
     actions:
+      - built_in:update_changelog
       - bash:.expeditor/generate-automate-cli-docs.sh:
           post_commit: false
           only_if_modified:
