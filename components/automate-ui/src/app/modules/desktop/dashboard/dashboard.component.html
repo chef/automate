@@ -90,6 +90,7 @@
         class="dashboard-detail-column">
         <app-desktop-detail
           [desktop]="selectedDesktop"
+          [nodeRun]="selectedNodeRun$ | async"
           [fullscreened]="desktopDetailFullscreened"
           [checkInHistory]="checkInHistory$ | async"
           [checkInNumDays]="checkInNumDays"

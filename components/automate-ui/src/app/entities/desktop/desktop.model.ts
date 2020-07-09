@@ -1,3 +1,5 @@
+import { NodeRun } from 'app/types/types';
+
 export enum Terms {
   DesktopName = 'name',
   Platform = 'platform',
@@ -16,6 +18,7 @@ export enum SortOrder {
 export interface Selected {
   desktop: Desktop;
   daysAgo: number;
+  nodeRun: NodeRun;
 }
 
 export interface DailyCheckInCountCollection {
@@ -87,6 +90,7 @@ export interface Desktop {
   platformVersion: string;
   chefVersion: string;
   domain: string;
+  latestRunId: string;
 }
 
 export interface Filter {

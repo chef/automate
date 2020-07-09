@@ -6,6 +6,7 @@ import { saveAs } from 'file-saver';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { NodeRunsService } from 'app/services/node-details/node-runs.service';
 import { RunHistoryStore } from 'app/services/run-history-store/run-history.store';
+import { NodeRun } from 'app/types/types';
 
 @Component({
   selector: 'app-desktop-detail',
@@ -15,6 +16,7 @@ import { RunHistoryStore } from 'app/services/run-history-store/run-history.stor
 export class DesktopDetailComponent {
 
   @Input() desktop: Desktop;
+  @Input() nodeRun: NodeRun;
   @Input() fullscreened = false;
   @Input() checkInHistory: DailyNodeRuns;
   @Input() checkInNumDays = 15;

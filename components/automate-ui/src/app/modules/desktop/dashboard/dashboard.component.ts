@@ -6,10 +6,12 @@ import { map, filter } from 'rxjs/operators';
 import { last, reverse } from 'lodash/fp';
 import * as moment from 'moment/moment';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { NodeRun } from 'app/types/types';
 
 import {
   GetDailyCheckInTimeSeries,
   SetSelectedDesktop,
+  GetDesktop,
   SetSelectedDaysAgo,
   GetTopErrorsCollection,
   GetUnknownDesktopDurationCounts,
@@ -38,7 +40,8 @@ import {
   desktopsTotal,
   desktopsCurrentPage,
   desktopsPageSize,
-  desktopsFilterTerms
+  desktopsFilterTerms,
+  getSelectedNodeRun
 } from 'app/entities/desktop/desktop.selectors';
 import {
   DailyCheckInCount, DailyCheckInCountCollection, DayPercentage,
@@ -75,6 +78,7 @@ export class DashboardComponent implements OnInit {
   public currentPage$: Observable<number>;
   public pageSize$: Observable<number>;
   public termFilters$: Observable<TermFilter[]>;
+  public selectedNodeRun$: Observable<NodeRun>;
   public checkInNumDays = 15;
   public desktopListVisible = false;
   public desktopListFullscreened = false;
@@ -109,6 +113,8 @@ export class DashboardComponent implements OnInit {
 
     this.desktopListTitle$ = this.store.select(desktopListTitle);
     this.desktops$ = this.store.select(desktops);
+
+    this.selectedNodeRun$ = this.store.select(getSelectedNodeRun);
 
     this.totalDesktopCount$ = this.store.select(desktopsTotal);
 
@@ -309,6 +315,7 @@ export class DashboardComponent implements OnInit {
   public onDesktopSelected(desktop: Desktop) {
     this.selectedDesktop = desktop;
     this.store.dispatch(new SetSelectedDesktop({desktop}));
+    this.store.dispatch(new GetDesktop({ nodeId: desktop.id, runId: desktop.latestRunId }));
     this.store.dispatch(
       new GetDailyNodeRunsStatusTimeSeries(this.selectedDesktop.id, this.checkInNumDays));
     this.desktopDetailVisible = true;

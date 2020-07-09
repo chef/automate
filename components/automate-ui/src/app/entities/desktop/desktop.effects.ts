@@ -1,9 +1,11 @@
 import { catchError, mergeMap, map, withLatestFrom, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { of, combineLatest } from 'rxjs';
+import { of, combineLatest, from } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Store } from '@ngrx/store';
+import { NodeRunsService } from 'app/services/node-details/node-runs.service';
+import { NodeRun } from 'app/types/types';
 
 import {
   GetDailyCheckInTimeSeries,
@@ -25,6 +27,9 @@ import {
   GetDesktops,
   GetDesktopsSuccess,
   GetDesktopsFailure,
+  GetDesktop,
+  GetDesktopSuccess,
+  GetDesktopFailure,
   GetDesktopsTotal,
   GetDesktopsTotalSuccess,
   GetDesktopsTotalFailure
@@ -39,7 +44,8 @@ export class DesktopEffects {
   constructor(
     private actions$: Actions,
     private requests: DesktopRequests,
-    private store$: Store<NgrxStateAtom>
+    private store$: Store<NgrxStateAtom>,
+    private nodeRunsService: NodeRunsService
   ) { }
 
   @Effect()
@@ -165,6 +171,26 @@ export class DesktopEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not get desktops errors: ${msg || error}`
+      });
+    }));
+
+  @Effect()
+  getDesktop$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_DESKTOP),
+    switchMap((action: GetDesktop) =>
+      from(this.nodeRunsService.getNodeRun(action.payload.nodeId, action.payload.runId)).pipe(
+        map((nodeRun: NodeRun) => new GetDesktopSuccess(nodeRun)),
+        catchError((error) => of(new GetDesktopFailure(error))))
+    ));
+
+  @Effect()
+  getDesktopFailure$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_DESKTOP_FAILURE),
+    map(({ payload: { error } }: GetDesktopFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get desktop errors: ${msg || error}`
       });
     }));
 

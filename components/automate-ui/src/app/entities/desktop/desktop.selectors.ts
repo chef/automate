@@ -29,6 +29,11 @@ export const getSelectedDesktop = createSelector(
   (state) => state.selected.desktop
 );
 
+export const getSelectedNodeRun = createSelector(
+  desktopState,
+  (state) => state.selected.nodeRun
+);
+
 export const getDailyNodeRuns = createSelector(
   desktopState,
   (state) => state.dailyNodeRuns

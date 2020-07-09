@@ -31,6 +31,7 @@ export interface DesktopEntityState {
   desktopListTitle: string;
   desktops: Desktop[];
   getDesktopsStatus: EntityStatus;
+  getDesktopStatus: EntityStatus;
   desktopsTotal: number;
   getDesktopsTotalStatus: EntityStatus;
   getDesktopsFilter: Filter;
@@ -41,7 +42,8 @@ export const desktopEntityInitialState: DesktopEntityState = {
   getDailyCheckInTimeSeriesStatus: EntityStatus.notLoaded,
   selected: {
     desktop: undefined,
-    daysAgo: 3
+    daysAgo: 3,
+    nodeRun: undefined
   },
   topErrorCollection: {items: [], updated: new Date(0)},
   getTopErrorCollectionStatus: EntityStatus.notLoaded,
@@ -52,6 +54,7 @@ export const desktopEntityInitialState: DesktopEntityState = {
   desktopListTitle: 'Desktops',
   desktops: [],
   getDesktopsStatus: EntityStatus.notLoaded,
+  getDesktopStatus: EntityStatus.notLoaded,
   desktopsTotal: 0,
   getDesktopsTotalStatus: EntityStatus.notLoaded,
   dailyNodeRuns: {
@@ -151,6 +154,17 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
 
     case DesktopActionTypes.GET_DESKTOPS_FAILURE:
       return set('getDesktopsStatus', EntityStatus.loadingFailure, state);
+
+    case DesktopActionTypes.GET_DESKTOP:
+      return set('getDesktopStatus', EntityStatus.loading, state);
+
+    case DesktopActionTypes.GET_DESKTOP_SUCCESS:
+      return pipe(
+        set('getDesktopStatus', EntityStatus.loadingSuccess),
+        set('selected.nodeRun', action.payload))(state) as DesktopEntityState;
+
+    case DesktopActionTypes.GET_DESKTOP_FAILURE:
+      return set('getDesktopStatus', EntityStatus.loadingFailure, state);
 
     case DesktopActionTypes.GET_DESKTOPS_TOTAL:
       return set('getDesktopsTotalStatus', EntityStatus.loading, state);
