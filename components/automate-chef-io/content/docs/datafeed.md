@@ -27,7 +27,7 @@ A Data Feed operates by doing the following:
 
 By default, only Admin users of Chef Automate may create and manage Data Feeds.
 
-### Adding a Data Feed Instance
+## Adding a Data Feed Instance
 
 A single Data Feed instance connects to one 3rd party endpoint.
 Create as many Data Feed instances as needed.
@@ -44,7 +44,7 @@ To add a Data Feed instance in Chef Automate:
 1. Select **Test Data Feed** to begin validating the connection details
 1. Once the test is successful, select **Create Data Feed** to save your Data Feed configuration
 
-### Edit a Data Feed Instance
+## Edit a Data Feed Instance
 
 To edit a Data Feed instance in Chef Automate:
 
@@ -52,7 +52,7 @@ To edit a Data Feed instance in Chef Automate:
 1. Edit the Data Feed name or URL
 1. Use the **Save** button to save your changes
 
-### Delete a Data Feed Instance
+## Delete a Data Feed Instance
 
 To delete a Data Feed instance in Chef Automate:
 
