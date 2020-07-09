@@ -22,11 +22,16 @@ import (
 )
 
 const (
-	TestCreateEndpoint = "/api/beta/cfgmgmt/rollouts/test_create"
+	TestCreateURLPath     = "/api/beta/cfgmgmt/rollouts/test_create"
+	CreateRolloutsURLPath = "/api/beta/cfgmgmt/rollouts/create"
 
 	ConfigFileBasename        = ".automate_collector.toml"
 	PrivateConfigFileBasename = ".automate_collector_private.toml"
 	NonHiddenConfigBasename   = "automate_collector.toml"
+
+	AutomateURLEnvVar         = "CHEF_AC_AUTOMATE_URL"
+	AutomateTokenEnvVar       = "CHEF_AC_AUTOMATE_TOKEN"
+	AutomateInsecureTLSEnvVar = "CHEF_AC_AUTOMATE_INSECURE_TLS"
 
 	RepoConfigDirPathEnvVar   = "CHEF_AC_REPO_CONFIG_DIR"
 	UserConfigDirPathEnvVar   = "CHEF_AC_USER_CONFIG_DIR"
@@ -69,8 +74,7 @@ func (p *PrivateConfig) IsAutomateCollectorConfig() bool {
 type AutomateConfig struct {
 	URL         string `toml:"url"`
 	authToken   string
-	InsecureTLS bool   `toml:"-"`
-	TestURL     string `toml:"-"`
+	InsecureTLS bool `toml:"-"`
 }
 
 type PrivateAutomateConfig struct {
@@ -123,6 +127,8 @@ func (l *ConfigLoader) Load() error {
 		cliIO.verbose("applying configuration from %q", p)
 		l.LoadedConfig.ApplyValuesFrom(configFromFile.ToConfig())
 	}
+
+	l.LoadedConfig.ApplyValuesFromEnv()
 
 	return nil
 }
@@ -268,17 +274,16 @@ func (l *ConfigLoader) findSystemConfig() {
 	return
 }
 
-func (p *PrivateConfig) FixupUnmarshal() {
-	p.Automate.authToken = p.Automate.AuthToken
-}
-
 func (p *PrivateConfig) ToConfig() *Config {
-	p.FixupUnmarshal()
-	return &Config{Automate: p.Automate.AutomateConfig}
+	return &Config{Automate: p.Automate.ToConfig()}
 }
 
 func (c *Config) IsAutomateCollectorConfig() bool {
 	return true
+}
+
+func (c *Config) ApplyValuesFromEnv() {
+	c.Automate.ApplyValuesFromEnv()
 }
 
 func (c *Config) Redacted() *PrivateConfig {
@@ -434,14 +439,32 @@ func newAutomateConfig(givenURL, token string) (*AutomateConfig, error) {
 	cleanedURL.Path = ""
 	baseURL := cleanedURL.String()
 
-	testURL := cleanedURL
-	testURL.Path = TestCreateEndpoint
-
 	return &AutomateConfig{
 		URL:       baseURL,
 		authToken: token,
-		TestURL:   testURL.String(),
 	}, nil
+}
+
+func (a *AutomateConfig) TestURL() (*url.URL, error) {
+	u, err := url.Parse(a.URL)
+	if err != nil {
+		return nil, err
+	}
+	u.Path = ""
+
+	u.Path = TestCreateURLPath
+	return u, nil
+}
+
+func (a *AutomateConfig) CreateRolloutURL() (*url.URL, error) {
+	u, err := url.Parse(a.URL)
+	if err != nil {
+		return nil, err
+	}
+	u.Path = ""
+
+	u.Path = CreateRolloutsURLPath
+	return u, nil
 }
 
 func (a *AutomateConfig) WithPrivate() *PrivateAutomateConfig {
@@ -465,10 +488,28 @@ func (a *AutomateConfig) Redacted() *PrivateAutomateConfig {
 	}
 }
 
+func (a *AutomateConfig) ApplyValuesFromEnv() {
+	if url, envVarSet := os.LookupEnv(AutomateURLEnvVar); envVarSet {
+		cliIO.verbose("found environment %s=%q setting Automate URL", AutomateURLEnvVar, url)
+		a.URL = url
+	}
+	if token, envVarSet := os.LookupEnv(AutomateTokenEnvVar); envVarSet {
+		cliIO.verbose("found environment %s=%q setting Automate Token", AutomateURLEnvVar, token)
+		a.authToken = token
+	}
+	if val, envVarSet := os.LookupEnv(AutomateInsecureTLSEnvVar); envVarSet {
+		if val == "false" {
+			a.InsecureTLS = false
+		} else {
+			a.InsecureTLS = true
+		}
+	}
+}
+
 func (a *AutomateConfig) ApplyValuesFrom(other *AutomateConfig) {
+	cliIO.verbose("applying config %+v to existing %+v", *other, *a)
 	if other.URL != "" {
 		a.URL = other.URL
-		a.TestURL = other.TestURL
 	}
 	if other.authToken != "" {
 		a.authToken = other.authToken
@@ -483,7 +524,12 @@ func (a *AutomateConfig) Test() error {
 	tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: genConfigCommands.insecureConnection}
 	httpClient := &http.Client{Transport: tr}
 
-	req, err := http.NewRequest("POST", a.TestURL, nil)
+	testURL, err := a.TestURL()
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", testURL.String(), nil)
 	if err != nil {
 		return err
 	}
@@ -542,4 +588,11 @@ func (a *AutomateConfig) Test() error {
 	}
 
 	return nil
+}
+
+func (p *PrivateAutomateConfig) ToConfig() *AutomateConfig {
+	c := p.AutomateConfig
+	c.InsecureTLS = p.InsecureTLS
+	c.authToken = p.AuthToken
+	return c
 }
