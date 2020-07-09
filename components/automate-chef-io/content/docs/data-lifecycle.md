@@ -40,7 +40,7 @@ The default is to remove event feed data after 7 days, and Chef Infra Server act
 ### Service Groups
 
 The Service Group Data Lifecycle settings allow you to label health check reports as disconnected and automatically remove them after a set amount of time.
-The default is to label health check reports as disconnected after 5 minutes, and remove disconnected services after 5 days.
+The default is to label health check reports as disconnected after 5 minutes, and remove disconnected services after 7 days.
 
 ### Client Runs
 
