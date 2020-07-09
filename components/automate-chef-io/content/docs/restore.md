@@ -21,12 +21,12 @@ Restore Chef Automate from a [filesystem backup]({{< ref "restore.md#restore-fro
         curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     ```
 
-1. **Filesystem backups** require access for Chef Automate to a backup directory in the [configured location]({{< ref "backup.md#backup-to-a-filesystem" >}}).
+1. To restore, **filesystem backups** require access for Chef Automate to a backup directory in the [configured location]({{< ref "backup.md#backup-to-a-filesystem" >}}).
 Ensure access for the backup type used:
 
      1. To restore [a network-attached filesystem backup]({{< ref "backup.md#backup-to-a-filesystem" >}}), mount the shared backup directory to the same mount point configured at the time of the backup.
      1. To restore [a backup directory that is not a network-attached filesystem]({{< ref "backup.md#backup-to-a-filesystem" >}}), copy the backup directory to the configured location at the time of the backup.
-     1. For restoring a [single-file backup archive]({{< ref "backup.md#store-a-filesystem-backup-in-a-single-file-archive" >}}), copy your archive to the restore host and extract it to the configured backup directory.
+     1. To restore a [single-file backup archive]({{< ref "backup.md#store-a-filesystem-backup-in-a-single-file-archive" >}}), copy your archive to the restore host and extract it to the configured backup directory.
 
 1. If restoring to a host with a different fully qualified domain name (FQDN) than that of the backup host, then create a `patch.toml` file that specifies the new FQDN and provides it at restore time:
 
@@ -66,7 +66,7 @@ chef-automate backup restore </path/to/backups/>BACKUP_ID [--patch-config </path
 Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host.
 Use the `--skip-preflight` option to restore to a host with a pre-existing Chef Automate installation.
 
-Incorrect directory permissions cause restore from a filesystem backup to fail.
+Restores from a filesystem backup may fail with incorrect directory permissions.
 Run the [`fix-repo-permissions` command]({{< ref "cli-chef-automate/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
 
 ```shell
@@ -86,7 +86,7 @@ chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups
 Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host.
 Use the `--skip-preflight` option to restore to a host with a pre-existing Chef Automate installation.
 
-Incorrect directory permissions cause restore from a filesystem backups to fail.
+Restores from a filesystem backup may fail with incorrect directory permissions.
 Run the [`fix-repo-permissions` command]({{< ref "cli-chef-automate/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
 
 ```shell

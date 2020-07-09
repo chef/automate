@@ -27,8 +27,7 @@ This amount of space needed for a backup varies depending on your Chef Automate 
 
 ## Backup to a Filesystem
 
-One backup option is to store backups in a configurable backup directory.
-The backup directory should be on network-attached storage or synced periodically to a disk on another machine.
+To store backups in a configurable backup directory, the backup directory should be on network-attached storage or synced periodically to a disk on another machine.
 This best practice ensures that you can restore from your backup data during a hardware failure.
 
 The default backup directory is `/var/opt/chef-automate/backups`. If it does not exist, the deployment process creates it.
@@ -56,7 +55,7 @@ To store backups offline in single-file archives, single-file archives must incl
 
 The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}) contains both the timestamp-based directory for the configuration and the reporting data stored in the `automate-elasticsearch-data` directory.
 
-A timestamp-based directory has a date-based name, such as such as `20180518010336`, in the `automate-elasticsearch-data` directory.
+A timestamp-based directory has a date-based name, such as `20180518010336`, in the `automate-elasticsearch-data` directory.
 
 To provide externally-deployed Elasticsearch nodes access to Chef Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Chef Automate's primary backup settings.
 
@@ -149,7 +148,7 @@ The output shows the backup progress for each service. A successful backup displ
 Success: Created backup 20180518010336
 ```
 
-Incorrect directory permissions may cause filesystem backups to fail.
+Restores from a filesystem backup may fail with incorrect directory permissions.
 Run the [`fix-repo-permissions` command]({{< ref "cli-chef-automate/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
 
 ```shell
