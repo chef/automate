@@ -32,9 +32,12 @@ pushd ./automate.wiki
 
 ## Chef Product Versions
 
-This release depends on:
+This release uses:
 - Chef Habitat version
-- Chef InSpec version
+- Chef Habitat Builder version
+- Chef Infra Client version
+- Chef Infra Server version
+- Chef InSpec version 
 
 EOH
 
