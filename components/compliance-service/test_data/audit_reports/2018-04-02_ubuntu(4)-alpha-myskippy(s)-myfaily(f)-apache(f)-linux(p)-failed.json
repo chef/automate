@@ -1,0 +1,130 @@
+{
+  "type": "inspec_report",
+  "node_uuid": "999f4e51-b049-4b10-9555-555789999967",
+  "report_uuid": "bb93e1b2-36d6-439e-ac70-ccccccczzz20",
+  "job_uuid": "74a54a28-c628-4f82-86df-555555555777",
+  "node_name": "ubuntu(4)-alpha-myskippy(s)-myfaily(f)-apache(f)-linux(p)-failed",
+  "environment": "DevSec Prod Alpha",
+  "roles": [],
+  "recipes": [],
+  "end_time": "2018-04-02T03:02:02Z",
+  "version": "4.22.0",
+  "platform": {
+    "name": "ubuntu",
+    "release": "18.04"
+  },
+  "statistics": {
+    "duration": 0.016909
+  },
+  "other_checks": [],
+  "policy_name": "test_policy_name",
+  "policy_group": "test_policy_group",
+  "organization_name": "test_org",
+  "source_fqdn": "api.chef.io",
+  "chef_tags": ["mylinux", "my.tag", "some=tag"],
+  "ipaddress": "188.38.98.100",
+  "fqdn": "web-ubu.example.com",
+  "profiles": [
+    {
+      "name": "myskippy",
+      "version": "1.0.0",
+      "sha256": "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777",
+      "title": "My Skipped Profile title",
+      "maintainer": "Demo, Inc.",
+      "summary": "My Profile summary",
+      "license": "Apache-2.0",
+      "copyright": "Demo, Inc.",
+      "copyright_email": "support@example.com",
+      "supports": [
+        {
+          "platform-family": "windows"
+        }
+      ],
+      "attributes": [],
+      "groups": [],
+      "controls": [],
+      "status": "skipped",
+      "skip_message": "Skipping profile: 'myprofile' on unsupported platform: 'ubuntu/18.04'.",
+      "status_message": "Skipping profile: 'myprofile' on unsupported platform: 'ubuntu/18.04'."
+    },
+    {
+      "name": "myfaily",
+      "version": "1.0.0",
+      "sha256": "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888",
+      "title": "My Faily Profile title",
+      "maintainer": "Demo, Inc.",
+      "summary": "My Profile summary",
+      "license": "Apache-2.0",
+      "copyright": "Demo, Inc.",
+      "copyright_email": "support@example.com",
+      "supports": [
+        {
+          "platform-family": "linux"
+        }
+      ],
+      "attributes": [],
+      "groups": [],
+      "controls": [],
+      "status": "failed",
+      "status_message": "ERROR: cannot load such file -- inspec/resources/something (LoadError)"
+    },
+    {
+      "name": "apache-baseline",
+      "title": "DevSec Apache Baseline",
+      "version": "2.0.0",
+      "sha256": "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
+      "summary": "Test-suite for best-practice apache hardening",
+      "maintainer": "",
+      "license": "",
+      "copyright": "Hardening Framework Team",
+      "copyright_email": "hello@dev-sec.io",
+      "controls": [],
+      "attributes": [],
+      "groups": [],
+      "status": "failed",
+      "status_message": "ERROR: DEPRECATION: The apache resource is deprecated This resource was removed in InSpec 4.0. (used at apache-baseline-0b5f21e668940d53e85c2ca36b41ba7ae18fac01/controls/apache_spec.rb:25)"
+    },
+    {
+      "name": "linux-baseline",
+      "title": "DevSec Linux Security Baseline",
+      "version": "2.0.1",
+      "sha256": "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015",
+      "summary": "Test-suite for best-preactice os hardening",
+      "maintainer": "",
+      "license": "",
+      "copyright": "Hardening Framework Team",
+      "copyright_email": "hello@hardening.io",
+      "status": "loaded",
+      "attributes": [],
+      "controls": [
+        {
+          "id": "os-01",
+          "code": "control 'os-01' do\n  impact 1.0\n  title 'Trusted hosts login'\n  desc \"Rhosts/hosts.equiv files are a weak implemenation of authentication. Disabling the .rhosts and hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system.\"\n  describe command('find / -name \\'.rhosts\\'') do\n    its('stdout') { should be_empty }\n  end\n  describe command('find / -name \\'hosts.equiv\\' ') do\n    its('stdout') { should be_empty }\n  end\n  tag 'web'\n  tag 'scope': 'OS'\n  tag 'gtitle': 'TitleVal'\n  tag 'satisfies': ['SRG-00006', 'SRG-00007']\n  tag 'stig_id': 'RHEL-07-010050'\n  tag 'cci': ['CCI-000048']\n  tag 'hashhash': { \"bad.one\": [6] }\n  tag 'documentable': false\n  tag 'our_criticality': 8\nend\n  ",
+          "desc": "Rhosts/hosts.equiv files are a weak implemenation of authentication. Disabling the .rhosts and hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system.",
+          "impact": 1,
+          "title": "Trusted hosts login",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/os_spec.rb",
+            "line": 21
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Command find / -name '.rhosts' stdout should be empty",
+              "run_time": 0.062734,
+              "start_time": "2018-02-09T10:17:23+01:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Command find / -name 'hosts.equiv'  stdout should be empty",
+              "run_time": 0.06203,
+              "start_time": "2018-02-09T10:17:23+01:00"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -59,8 +59,6 @@ type ESInspecProfile struct {
 	// ES specific not required by code, harmonized with logstash
 	DocVersion  string `json:"doc_version"`
 	ESTimestamp string `json:"@timestamp"`
-	Status      string `json:"status,omitempty"`
-	SkipMessage string `json:"skip_message,omitempty"`
 }
 
 func (report *ESInspecProfile) toJSON() ([]byte, error) {
@@ -178,8 +176,6 @@ func (esprofile *ESInspecProfile) convertToInspecProfile() (reportingapi.Profile
 	inspecProfile.Supports = convertInspecSupportsToRSSupports(esprofile.Supports)
 	inspecProfile.Depends = convertInspecDependenciesToRSDependencies(esprofile.Dependencies)
 	inspecProfile.Sha256 = esprofile.Sha256
-	inspecProfile.Status = esprofile.Status
-	inspecProfile.SkipMessage = esprofile.SkipMessage
 
 	groups := make([]*reportingapi.Group, 0, len(esprofile.Groups))
 	for _, group := range esprofile.Groups {
@@ -578,13 +574,16 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "%s, cannot get profileIDs from nodes", myName)
 	}
+	logrus.Debugf("Got from nodes profileMins=%+v", profileMins)
 
-	profileIDs := make([]string, 0)
-	for _, profileMin := range profileMins {
-		profileIDs = append(profileIDs, profileMin.ID)
-		logrus.Debugf("profile id: %s", profileMin.ID)
+	profileIDs := make([]string, len(profileMins))
+	profileIDsStatusMap := make(map[string]string, len(profileMins))
+	for i, profileMin := range profileMins {
+		profileIDs[i] = profileMin.ID
+		profileIDsStatusMap[profileMin.ID] = profileMin.Status
 	}
 
+	logrus.Debugf("%s querying the profiles index with ids: %v", myName, profileIDs)
 	query := elastic.NewIdsQuery(mappings.DocType)
 	query.Ids(profileIDs...)
 
@@ -625,19 +624,21 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 
 	profiles := make([]*reportingapi.ProfileMin, 0)
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+		// Loop over the data from the compliance-profiles metadata index
 		for _, hit := range searchResult.Hits.Hits {
 			var profile reportingapi.ProfileMin
 			if hit.Source != nil {
 				err := json.Unmarshal(*hit.Source, &profile)
 				if err == nil {
 					profile.Id = hit.Id
-					profile.Status = profileMins[profile.Id].Status
+					profile.Status = profileIDsStatusMap[profile.Id]
 					profiles = append(profiles, &profile)
 				} else {
 					logrus.Errorf("%s unmarshal error: %s", myName, err.Error())
 				}
 			}
 		}
+		logrus.Debugf("%s returning profiles=%+v with counts %+v", myName, profiles, counts)
 		return profiles, counts, nil
 	}
 
@@ -646,7 +647,7 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 }
 
 func (backend ES2Backend) getProfileMinsFromNodes(
-	filters map[string][]string) (map[string]reporting.ProfileMin, *reportingapi.ProfileCounts, error) {
+	filters map[string][]string) ([]reporting.ProfileMin, *reportingapi.ProfileCounts, error) {
 	myName := "getProfileMinsFromNodes"
 
 	for filterName, filterValue := range filters {

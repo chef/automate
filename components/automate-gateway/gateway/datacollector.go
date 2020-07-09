@@ -527,6 +527,7 @@ func getInspecProfiles(body []byte) []*inspecEvent.Profile {
 				ParentProfile:  getStringIfExists("parent_profile", profile),
 				Status:         getStringIfExists("status", profile),
 				SkipMessage:    getStringIfExists("skip_message", profile),
+				StatusMessage:  getStringIfExists("status_message", profile),
 			}
 			inspecProfiles = append(inspecProfiles, inspecProfile)
 		}

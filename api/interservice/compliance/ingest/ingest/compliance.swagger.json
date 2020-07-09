@@ -357,6 +357,9 @@
         },
         "skip_message": {
           "type": "string"
+        },
+        "status_message": {
+          "type": "string"
         }
       }
     },

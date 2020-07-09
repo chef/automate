@@ -679,6 +679,50 @@ describe File.basename(__FILE__) do
     }.to_json
     assert_equal(expected_data, actual_data.to_json)
 
+    # Get profiles used by nodes. Sorted by name desc
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: "end_time", values: ["2018-04-02T#{END_OF_DAY}"])
+    ], sort: 'name', order: 1)
+    expected_data = {
+      "profiles": [
+        {
+          "name": "myskippy",
+          "title": "My Skipped Profile title",
+          "id": "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777",
+          "version": "1.0.0",
+          "status": "skipped"
+        },
+        {
+          "name": "myfaily",
+          "title": "My Faily Profile title",
+          "id": "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888",
+          "version": "1.0.0",
+          "status": "failed"
+        },
+        {
+          "name": "linux-baseline",
+          "title": "DevSec Linux Security Baseline",
+          "id": "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015",
+          "version": "2.0.1",
+          "status": "passed"
+        },
+        {
+          "name": "apache-baseline",
+          "title": "DevSec Apache Baseline",
+          "id": "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
+          "version": "2.0.0",
+          "status": "failed"
+        }
+      ],
+      "counts": {
+        "total": 4,
+        "failed": 2,
+        "skipped": 1,
+        "passed": 1
+      }
+    }.to_json
+    assert_equal(expected_data, actual_data.to_json)
+
     # Cover the other sort fields:
     resp = actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(sort: 'name', order: 1)
     assert_equal(Reporting::ProfileMins, resp.class)

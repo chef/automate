@@ -61,7 +61,7 @@ type Depth interface {
 	getProfileMinsFromNodesResults(
 		filters map[string][]string,
 		searchResult *elastic.SearchResult,
-		statusFilters []string) (map[string]reporting.ProfileMin, *reportingapi.ProfileCounts, error)
+		statusFilters []string) ([]reporting.ProfileMin, *reportingapi.ProfileCounts, error)
 
 	getTrendAggs(trendType string, filters map[string][]string) map[string]elastic.Aggregation
 	getTrendResults(trendType string,

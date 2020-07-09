@@ -59,7 +59,10 @@ echo "Sending the following compliance reports to Automate ( $AUTOMATE_URL )"
 # Send all report files prefixed with '2018-03-07' with today's date
 send_to_automate '2018-03-07' $(past_date 0)
 send_to_automate '2018-02-09' $(past_date 0)
-send_to_automate '2018-04-01' $(past_date 0)
+
+# Send all report files prefixed with '2018-04' with yesterday's date
+send_to_automate '2018-04-01' $(past_date 1)
+send_to_automate '2018-04-02' $(past_date 1)
 
 # Send all report files prefixed with '2018-03-05' dated two days ago
 send_to_automate '2018-03-05' $(past_date 2)

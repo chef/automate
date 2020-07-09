@@ -88,9 +88,11 @@ describe File.basename(__FILE__) do
       "DevSec Apache Baseline--41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8--2.0.0",
       "DevSec Linux Security Baseline--b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015--2.0.1",
       "DevSec Nginx Baseline--09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988--2.1.0",
+      "My Faily Profile title--5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888--1.0.0",
       "My Profile 1 title--447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4--1.0.1",
       "My Profile 2 title--447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5--1.0.5",
-      "My Profile title--5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b367da--1.0.0"]
+      "My Profile title--5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b367da--1.0.0",
+      "My Skipped Profile title--5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777--1.0.0"]
     assert_suggestions_text_id_version(expected, actual_data)
 
     # suggest profile, text with space and size limit
@@ -100,7 +102,7 @@ describe File.basename(__FILE__) do
     expected = [
       "DevSec Apache Baseline--41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8--2.0.0",
       "DevSec Apache Baseline--41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9--2.0.1",
-      "DevSec Nginx Baseline--09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988--2.1.0" ]
+      "DevSec Linux Security Baseline--b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015--2.0.1" ]
     assert_suggestions_text_id_version(expected, actual_data)
 
     # suggest all controls

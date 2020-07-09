@@ -53,9 +53,9 @@ func (depth *ControlDepth) getProfileMinsFromNodesAggs(filters map[string][]stri
 func (depth *ControlDepth) getProfileMinsFromNodesResults(
 	filters map[string][]string,
 	searchResult *elastic.SearchResult,
-	statusFilters []string) (map[string]reporting.ProfileMin, *reportingapi.ProfileCounts, error) {
+	statusFilters []string) ([]reporting.ProfileMin, *reportingapi.ProfileCounts, error) {
 
-	profileMins := make(map[string]reporting.ProfileMin)
+	profileMins := make([]reporting.ProfileMin, 0)
 	var counts *reportingapi.ProfileCounts
 	statusMap := make(map[string]int, 4)
 
@@ -109,7 +109,7 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 				ID:     summary.Id,
 				Status: profileStatus,
 			}
-			profileMins[summary.Id] = summaryRep
+			profileMins = append(profileMins, summaryRep)
 
 			//let's keep track of the counts even if they're not in the filter so that we may know that they're there for UI chicklets
 			statusMap[profileStatus]++

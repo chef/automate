@@ -141,6 +141,7 @@ message Profile {
 	string latest_version = 22;
 	string status = 23;
 	string skip_message = 24;
+	string status_message = 25;
 }
 message Ref {
 	string url = 1;

@@ -136,18 +136,19 @@ type ESInSpecReportControl struct {
 }
 
 type ESInSpecReportProfile struct {
-	Name         string                       `json:"name"`
-	Title        string                       `json:"title"`
-	Profile      string                       `json:"profile"`
-	Full         string                       `json:"full"`
-	Version      string                       `json:"version"`
-	Namespace    string                       `json:"namespace,omitempty"`
-	SHA256       string                       `json:"sha256"`
-	Controls     []ESInSpecReportControl      `json:"controls"`
-	ControlsSums reporting.NodeControlSummary `json:"controls_sums"`
-	Depends      []ESInSpecReportDepends      `json:"depends"`
-	Status       string                       `json:"status"`
-	SkipMessage  string                       `json:"skip_message"`
+	Name          string                       `json:"name"`
+	Title         string                       `json:"title"`
+	Profile       string                       `json:"profile"`
+	Full          string                       `json:"full"`
+	Version       string                       `json:"version"`
+	Namespace     string                       `json:"namespace,omitempty"`
+	SHA256        string                       `json:"sha256"`
+	Controls      []ESInSpecReportControl      `json:"controls"`
+	ControlsSums  reporting.NodeControlSummary `json:"controls_sums"`
+	Depends       []ESInSpecReportDepends      `json:"depends"`
+	Status        string                       `json:"status"`
+	SkipMessage   string                       `json:"skip_message"`
+	StatusMessage string                       `json:"status_message"`
 }
 
 type ESInSpecReportDepends struct {

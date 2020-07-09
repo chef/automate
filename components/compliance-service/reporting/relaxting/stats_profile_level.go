@@ -452,28 +452,19 @@ func (depth *ProfileDepth) getStatsSummaryResult(searchResult *elastic.SearchRes
 
 func (depth *ProfileDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggregation {
 	aggCompliant := elastic.NewFilterAggregation().
-		Filter(elastic.NewBoolQuery().
-			Must(elastic.NewTermQuery("profiles.controls_sums.failed.total", 0)).
-			Should(
-				elastic.NewBoolQuery().Must(
-					elastic.NewTermQuery("profiles.controls_sums.skipped.total", 0),
-					elastic.NewTermQuery("profiles.controls_sums.waived.total", 0)),
-				elastic.NewRangeQuery("profiles.controls_sums.passed.total").Gt(0)))
+		Filter(elastic.NewTermQuery("profiles.status", "passed"))
 
 	aggSkipped := elastic.NewFilterAggregation().
-		Filter(elastic.NewBoolQuery().
-			Must(elastic.NewTermQuery("profiles.controls_sums.failed.total", 0)).
-			Must(elastic.NewTermQuery("profiles.controls_sums.passed.total", 0)).
-			Must(elastic.NewRangeQuery("profiles.controls_sums.skipped.total").Gt(0)))
-
-	aggNoncompliant := elastic.NewFilterAggregation().
-		Filter(elastic.NewRangeQuery("profiles.controls_sums.failed.total").Gt(0))
-
-	aggHighRisk := elastic.NewFilterAggregation().
-		Filter(elastic.NewRangeQuery("profiles.controls_sums.failed.critical").Gt(0))
+		Filter(elastic.NewTermQuery("profiles.status", "skipped"))
 
 	aggWaived := elastic.NewFilterAggregation().
 		Filter(elastic.NewTermQuery("profiles.status", "waived"))
+
+	aggNoncompliant := elastic.NewFilterAggregation().
+		Filter(elastic.NewTermQuery("profiles.status", "failed"))
+
+	aggHighRisk := elastic.NewFilterAggregation().
+		Filter(elastic.NewRangeQuery("profiles.controls_sums.failed.critical").Gt(0))
 
 	aggMediumRisk := elastic.NewFilterAggregation().
 		Filter(elastic.NewBoolQuery().

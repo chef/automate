@@ -188,12 +188,12 @@ sysctl -p
 echo 'Defaults    env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/root_ssh_agent
 SSHD_CONFIG="/etc/ssh/sshd_config"
 if ! grep -q "^ClientAliveInterval" $SSHD_CONFIG; then
-  echo "ClientAliveInterval 60" >> $SSHD_CONFIG
+  echo "ClientAliveInterval 120" >> $SSHD_CONFIG
 fi
 if ! grep -q "^ClientAliveCountMax" $SSHD_CONFIG; then
   echo "ClientAliveCountMax 10000" >> $SSHD_CONFIG
 fi
-service ssh restart
+systemctl reload sshd.service
 # permit root auth to bypass the hab studio if we wish so
 sed -r -i 's/^.+" ssh-/ssh-/' /root/.ssh/authorized_keys
 CRON_FILE="/etc/cron.hourly/auto-stop"
@@ -279,8 +279,12 @@ EOT
     hab studio run "mount -o discard /dev/\\$device_to_mount /hab/svc/automate-elasticsearch/data"
     hab studio run 'mkdir -p /hab/svc/automate-elasticsearch/data/es_data && chown -R hab:hab /hab/svc/automate-elasticsearch/data/es_data'
   fi
-  echo " * Running: hab studio enter"
-  hab studio enter
+  echo " * Running: 'hab studio enter' in 'screen'!!!"
+  if screen -ls; then
+    screen -r
+  else
+    screen hab studio enter
+  fi
 fi
 EOF
 hab pkg install -b core/git

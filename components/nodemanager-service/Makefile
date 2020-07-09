@@ -202,9 +202,10 @@ clean:
 	@printf "\n===> ${yellow}Clearing nodemanager and dependent services...${reset}\n"
 	@# dirs(create-ss-config, create-event-config) have been created by a bug in the past and confuse Makefile targets with the same name
 	@rm -rf create-ss-config create-event-config
-	@-pkill -f "nodemanager.* run --port" || true
-	@-pkill -f "event-service.* serve --config" || true
-	@-pkill -f "secrets-service.* serve --config" || true
+	@# If we don't match he process with /(tmp|var) at the beginning, in pkill will fail itself and fail the make.
+	@pkill -x -f "/(tmp|var).+nodemanager.* run --port.*" || true
+	@pkill -x -f "/(tmp|var).+event-service.* serve --config" || true
+	@pkill -x -f "/(tmp|var).+secrets-service.* serve --config" || true
 
 wait-for-nodemanager-service:
 	@i=1; \
