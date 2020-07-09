@@ -521,7 +521,7 @@ func (a *AutomateConfig) ApplyValuesFrom(other *AutomateConfig) {
 
 func (a *AutomateConfig) Test() error {
 	tr := httputils.NewDefaultTransport()
-	tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: genConfigCommands.insecureConnection}
+	tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: a.InsecureTLS}
 	httpClient := &http.Client{Transport: tr}
 
 	testURL, err := a.TestURL()
