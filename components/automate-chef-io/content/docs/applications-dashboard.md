@@ -23,7 +23,7 @@ See [Setting up the Applications Dashboard]({{< relref "applications-setup.md" >
 
 ## Service Groups
 
-Service groups are Habitat services, which Chef Automate orders by package identifiers and configurations.
+Service groups are Chef Habitat services, which Chef Automate orders by package identifiers and configurations.
 The *Applications* dashboard _Service Groups_ display gives you a top-level view of your Chef Habitat services groups and lets you drill down into the status of individual instances to understand the health and contentents of any individual instance of a service.
 The default _Service Groups_ view shows only the services that are available.
 The right sidebar provides detailed reporting for each individual service.
@@ -43,22 +43,22 @@ Selecting a container changes the Service Groups table to display only the servi
 Each row of the _Service Groups_ table displays the results for an individual service group.
 The rows sort according to the highest criticality, meaning that the service groups reporting the lowest percentage of healthy services--and the highest percentage of "critical" services--appear at the top.
 
-By default, the table rows sort from the smallest to the largest percentage of "OK" services. 
+By default, the table rows sort from the smallest to the largest percentage of "OK" services.
 Selecting the _Health_ column reverses the order, and displays the percentage of "OK" services from largest to smallest.
 
 ### Health
 
-Under the _Health_ column, the donut chart display shows the proportion of health status via color for the service group. 
+Under the _Health_ column, the donut chart display shows the proportion of health status via color for the service group.
 The percentage inside the circle shows the percentage of services with the _OK_ status.
 
-A corresponding status icon with a matching color appears next the circle display if applicable. 
+A corresponding status icon with a matching color appears next the circle display if applicable.
 For example, if a service group is 20% _OK_ and 80% _Critical_, a magenta triangle exclamation icon appears next to the service group's circle display and draws attention to the critical status.
 
 If there are multiple Service Groups with the same _OK_ health percentage, then the Service Groups will display in the same order of priority: _Critical_, _Unknown_, and _Warning_.
 
 ### Service Group
 
-The _Service Group_ column lists the Service Group name and the number of healthy services, which are services reporting an _OK_ status, out of the total number of services in the group. 
+The _Service Group_ column lists the Service Group name and the number of healthy services, which are services reporting an _OK_ status, out of the total number of services in the group.
 A broken chain icon appears if there are any disconnected services in the group, along with the number of disconnected services.
 
 ### Additional Service Group Information
@@ -73,7 +73,7 @@ The _App_ column, which is short for _Application_, displays the application nam
 
 ## Service Group Details Sidebar
 
-Selecting a Service Group in a row populates the right-hand sidebar with information about each service in the Service Group. 
+Selecting a Service Group in a row populates the right-hand sidebar with information about each service in the Service Group.
 To filter the individual services in the side bar by their health status, select one of the health status buttons at the top of the sidebar.
 
 The individual service rows sort by their level of criticality, from the "most critical" status to the "least critical" status - "critical", "warning", "unknown", and "OK" respectively.
@@ -82,11 +82,11 @@ The most critical issues appear at the top of the list, allowing you to determin
 
 ## Filtering Results
 
-Use the search bar at the top of the page to filter the results in the main table. 
+Use the search bar at the top of the page to filter the results in the main table.
 Select the search bar, select your search field type from the drop-down menu.
 Available search field types include _Origin_, _Service Name_, _Version_, _Channel_, _Application_, _Environment_, _Site_, _Build Timestamp_, and _Group Name_.
 
-After selecting your search field type, enter your specific search term, or select one from the auto-populated list of existing values. 
+After selecting your search field type, enter your specific search term, or select one from the auto-populated list of existing values.
 Applying the filter changes the Service Groups list to display matching results and updates health status display accordingly.
 
 ![EAS Filtered Service Groups List](/images/docs/eas-filtered-service-groups.png)
@@ -95,7 +95,7 @@ Applying the filter changes the Service Groups list to display matching results 
 
 Disconnected services are defined services that have not reported back with a health check message for a user-defined period of time.
 
-Use the Chef Automate Service Groups API endpoint to manage the activity of periodic jobs, and to assess disconnection status and removal of services.
+Use the [Service Group Data Lifecycle settings](https://automate.chef.io/docs/data-lifecycle/#service-groups) to manage the activity of periodic jobs, and to assess disconnection status and removal of services.
 
 ### Periodic Disconnection Checks
 
@@ -105,42 +105,6 @@ Use the `threshold` configuration to set the amount of time between the last nod
 Health checks are mandatory and you cannot disable health checks.
 The default time for a node to report to Chef Automate is 5 minutes.
 
-Chef Habitat sends the health check messages every 30 seconds by default. Configure this setting using the `--health-check-interval` option with the `hab sup run` command.
+Chef Habitat sends the health check messages every 30 seconds by default.
+Configure this setting using the `--health-check-interval` option with the `hab sup run` command.
 See the [Habitat CLI documentation](https://www.habitat.sh/docs/habitat-cli/#hab-sup-run) for more information.
-
-### Marking a Service as Disconnected
-
-Configure the threshold for marking a service as disconnected through the Chef Automate API.
-
-Using the API, change the `threshold` setting for marking a service as disconnected with an API call like:
-
-```bash
-curl -sSX POST "https://automate-url/api/v0/retention/service_groups/disconnected_services/config" -d \
-'{
-  "threshold": "15m"
-}' \
--H "api-token: $TOKEN"
-```
-
-### Periodic Removal
-
-Removing services disconnected after a period of time keeps the dashboard populated with the most relevent information and saves storage space.
-The removal threshold is optional.
-The default is 7 days.
-Disabling the threshold setting provides you with a long-term record of services.
-
-Configure the threshold for removing a disconnected service through either Chef Automate or the Chef Automate API.
-The threshold is the amount of time since marking a service as disconnected.
-
-Through the API, disable service removal by setting `"running": false`.
-
-Configure the `threshold` for removing disconnected services with an API with a call like:
-
-```bash
-curl -sSX POST "https://automate-url/api/v0/retention/service_groups/delete_disconnected_services/config" -d \
-'{
-  "threshold": "1d",
-  "running": true
-}' \
--H "api-token: $TOKEN"
-```
