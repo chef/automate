@@ -21,13 +21,21 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type EventFilter struct {
-	Filter               []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
-	Start                int64    `protobuf:"varint,2,opt,name=start,proto3" json:"start,omitempty"`
-	End                  int64    `protobuf:"varint,3,opt,name=end,proto3" json:"end,omitempty"`
-	PageSize             int32    `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	After                int64    `protobuf:"varint,5,opt,name=after,proto3" json:"after,omitempty"`
-	Before               int64    `protobuf:"varint,6,opt,name=before,proto3" json:"before,omitempty"`
-	Cursor               string   `protobuf:"bytes,7,opt,name=cursor,proto3" json:"cursor,omitempty"`
+	// Filters to be applied to the request.
+	Filter []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
+	// Earliest events to return.
+	Start int64 `protobuf:"varint,2,opt,name=start,proto3" json:"start,omitempty"`
+	// Latest events to return.
+	End int64 `protobuf:"varint,3,opt,name=end,proto3" json:"end,omitempty"`
+	// Count of events to return per page.
+	PageSize int32 `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	// Used for pagination, to request results in ascending order.
+	After int64 `protobuf:"varint,5,opt,name=after,proto3" json:"after,omitempty"`
+	// Used for pagination, to request results in descending order.
+	Before int64 `protobuf:"varint,6,opt,name=before,proto3" json:"before,omitempty"`
+	// Used for pagination, to bookmark next set of results.
+	Cursor string `protobuf:"bytes,7,opt,name=cursor,proto3" json:"cursor,omitempty"`
+	// Used to group similar events together.
 	Collapse             bool     `protobuf:"varint,8,opt,name=collapse,proto3" json:"collapse,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -116,8 +124,11 @@ func (m *EventFilter) GetCollapse() bool {
 }
 
 type EventCountsFilter struct {
-	Filter               []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
-	Start                int64    `protobuf:"varint,2,opt,name=start,proto3" json:"start,omitempty"`
+	// Filters to be applied to the request.
+	Filter []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
+	// Earliest events to return.
+	Start int64 `protobuf:"varint,2,opt,name=start,proto3" json:"start,omitempty"`
+	// Latest events to return.
 	End                  int64    `protobuf:"varint,3,opt,name=end,proto3" json:"end,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

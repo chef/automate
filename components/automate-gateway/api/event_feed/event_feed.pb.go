@@ -74,9 +74,66 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EventFeedClient interface {
+	//
+	//List Events
+	//
+	//Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).
+	//Adding a filter makes a list of all events that meet the filter criteria.
+	//
+	//Example:
+	//```
+	//eventfeed?collapse=true&filter=organization:The%2520Watchmen&page_size=100&start=1592546400000&end=1593151199999
+	//```
+	//
+	//Authorization Action:
+	//```
+	//event:events:list
+	//```
 	GetEventFeed(ctx context.Context, in *request.EventFilter, opts ...grpc.CallOption) (*response.Events, error)
+	//
+	//List Count of Event Type Occurrence
+	//
+	//Returns totals for role, cookbook, and organization event types.
+	//
+	//Example:
+	//```
+	//event_type_counts?start=1592546400000&end=1593151199999
+	//```
+	//
+	//Authorization Action:
+	//```
+	//event:events:list
+	//```
 	GetEventTypeCounts(ctx context.Context, in *request.EventCountsFilter, opts ...grpc.CallOption) (*response.EventCounts, error)
+	//
+	//List Counts Per Event Task Occurrence
+	//
+	//Returns totals for update, create, and delete event tasks, which are the actions taken on the event.
+	//
+	//Example:
+	//```
+	//event_task_counts?start=1592546400000&end=1593151199999
+	//```
+	//
+	//Authorization Action:
+	//```
+	//event:events:list
+	//```
 	GetEventTaskCounts(ctx context.Context, in *request.EventCountsFilter, opts ...grpc.CallOption) (*response.EventCounts, error)
+	//
+	//List Summary Stats About Events
+	//
+	//Returns data that populates the guitar strings visual on the top of the event feed.
+	//
+	//Example:
+	//```
+	//eventstrings?timezone=America/Denver&hours_between=1&start=2020-06-19&end=2020-06-25
+	//```
+	//
+	//Authorization Action:
+	//```
+	//event:events:list
+	//```
 	GetEventStringBuckets(ctx context.Context, in *request.EventStrings, opts ...grpc.CallOption) (*response.EventStrings, error)
 }
 
@@ -126,9 +183,66 @@ func (c *eventFeedClient) GetEventStringBuckets(ctx context.Context, in *request
 
 // EventFeedServer is the server API for EventFeed service.
 type EventFeedServer interface {
+	//
+	//List Events
+	//
+	//Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).
+	//Adding a filter makes a list of all events that meet the filter criteria.
+	//
+	//Example:
+	//```
+	//eventfeed?collapse=true&filter=organization:The%2520Watchmen&page_size=100&start=1592546400000&end=1593151199999
+	//```
+	//
+	//Authorization Action:
+	//```
+	//event:events:list
+	//```
 	GetEventFeed(context.Context, *request.EventFilter) (*response.Events, error)
+	//
+	//List Count of Event Type Occurrence
+	//
+	//Returns totals for role, cookbook, and organization event types.
+	//
+	//Example:
+	//```
+	//event_type_counts?start=1592546400000&end=1593151199999
+	//```
+	//
+	//Authorization Action:
+	//```
+	//event:events:list
+	//```
 	GetEventTypeCounts(context.Context, *request.EventCountsFilter) (*response.EventCounts, error)
+	//
+	//List Counts Per Event Task Occurrence
+	//
+	//Returns totals for update, create, and delete event tasks, which are the actions taken on the event.
+	//
+	//Example:
+	//```
+	//event_task_counts?start=1592546400000&end=1593151199999
+	//```
+	//
+	//Authorization Action:
+	//```
+	//event:events:list
+	//```
 	GetEventTaskCounts(context.Context, *request.EventCountsFilter) (*response.EventCounts, error)
+	//
+	//List Summary Stats About Events
+	//
+	//Returns data that populates the guitar strings visual on the top of the event feed.
+	//
+	//Example:
+	//```
+	//eventstrings?timezone=America/Denver&hours_between=1&start=2020-06-19&end=2020-06-25
+	//```
+	//
+	//Authorization Action:
+	//```
+	//event:events:list
+	//```
 	GetEventStringBuckets(context.Context, *request.EventStrings) (*response.EventStrings, error)
 }
 

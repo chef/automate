@@ -21,10 +21,15 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type EventStrings struct {
-	Start                string   `protobuf:"bytes,1,opt,name=start,proto3" json:"start,omitempty"`
-	End                  string   `protobuf:"bytes,2,opt,name=end,proto3" json:"end,omitempty"`
-	Timezone             string   `protobuf:"bytes,3,opt,name=timezone,proto3" json:"timezone,omitempty"`
-	HoursBetween         int32    `protobuf:"varint,4,opt,name=hours_between,json=hoursBetween,proto3" json:"hours_between,omitempty"`
+	// Earliest events to return.
+	Start string `protobuf:"bytes,1,opt,name=start,proto3" json:"start,omitempty"`
+	// Latest events to return.
+	End string `protobuf:"bytes,2,opt,name=end,proto3" json:"end,omitempty"`
+	// User timezone to apply to request.
+	Timezone string `protobuf:"bytes,3,opt,name=timezone,proto3" json:"timezone,omitempty"`
+	// Interval for returned results, for example: 1 hour buckets.
+	HoursBetween int32 `protobuf:"varint,4,opt,name=hours_between,json=hoursBetween,proto3" json:"hours_between,omitempty"`
+	// Filters to be applied to the request.
 	Filter               []string `protobuf:"bytes,5,rep,name=filter,proto3" json:"filter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
