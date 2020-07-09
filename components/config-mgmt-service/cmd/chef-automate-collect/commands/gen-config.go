@@ -91,7 +91,7 @@ func runGenConfigCommand(c *cobra.Command, args []string) error {
 		}
 	}
 
-	if !(genConfigCommands.writeRepoConfig || genConfigCommands.writeRepoConfig) {
+	if !(genConfigCommands.writeRepoConfig || genConfigCommands.writeUserConfig) {
 		var confToEmit AutomateCollectorConfig
 		confToEmit = conf
 
