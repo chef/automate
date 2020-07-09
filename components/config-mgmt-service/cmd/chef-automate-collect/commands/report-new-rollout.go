@@ -14,10 +14,6 @@ import (
 	"github.com/chef/automate/lib/httputils"
 )
 
-const (
-	DisableDocumentChefPushEnvVar = "CHEF_AC_DISABLE_COLLECTOR"
-)
-
 var reportNewRolloutFlags = struct {
 	verbose              bool
 	lockfilePath         string // required
@@ -94,8 +90,8 @@ func newReportNewRolloutCommand() *cobra.Command {
 func runReportNewRolloutCommand(cmd *cobra.Command, args []string) error {
 	cliIO.EnableVerbose = reportNewRolloutFlags.verbose
 
-	if val, envGiven := os.LookupEnv(DisableDocumentChefPushEnvVar); envGiven && val != "false" {
-		cliIO.verbose("Found environment setting %s=%q disabling metadata collector", DisableDocumentChefPushEnvVar, val)
+	if val, envGiven := os.LookupEnv(DisableReportNewRolloutEnvVar); envGiven && val != "false" {
+		cliIO.verbose("Found environment setting %s=%q disabling metadata collector", DisableReportNewRolloutEnvVar, val)
 		return nil
 	}
 

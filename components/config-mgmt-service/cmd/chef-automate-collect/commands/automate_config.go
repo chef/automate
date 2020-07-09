@@ -29,18 +29,6 @@ const (
 	PrivateConfigFileBasename = ".automate_collector_private.toml"
 	NonHiddenConfigBasename   = "automate_collector.toml"
 
-	AutomateURLEnvVar         = "CHEF_AC_AUTOMATE_URL"
-	AutomateTokenEnvVar       = "CHEF_AC_AUTOMATE_TOKEN"
-	AutomateInsecureTLSEnvVar = "CHEF_AC_AUTOMATE_INSECURE_TLS"
-
-	RepoConfigDirPathEnvVar   = "CHEF_AC_REPO_CONFIG_DIR"
-	UserConfigDirPathEnvVar   = "CHEF_AC_USER_CONFIG_DIR"
-	SystemConfigDirPathEnvVar = "CHEF_AC_SYSTEM_CONFIG_DIR"
-
-	NoRepoConfigEnvVar   = "CHEF_AC_NO_REPO_CONFIG"
-	NoUserConfigEnvVar   = "CHEF_AC_NO_USER_CONFIG"
-	NoSystemConfigEnvVar = "CHEF_AC_NO_SYSTEM_CONFIG"
-
 	GitIgnoreContent = `
 # .automate_collector_private.toml contains Chef Automate credentials:
 .automate_collector_private.toml
@@ -395,7 +383,6 @@ func isRepoRoot(path string) bool {
 }
 
 func (c *Config) WriteUserConfigFiles() error {
-	// TODO/FIXME windows places?
 	configDir, err := homedir.Expand("~/.chef")
 	if err != nil {
 		return err

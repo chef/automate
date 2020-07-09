@@ -97,11 +97,12 @@ func (s *SCMMetadata) ReadGitMetadata() error {
 		return c.Args(args...)
 	}
 
-	// verify we are in a git directory.
-	// TODO: if we are not, we should warn and continue
+	s.SCMType = "UNKNOWN_SCM"
+	s.SCMWebType = SCMWebType_UNKNOWN_SCM_WEB
+
+	// test if we are in a git directory, if we are not, exit and leave scmtype set to unknown
 	_, err := c.Output("git", g("rev-parse", "--git-dir"))
 	if err != nil {
-		s.SCMType = "UNKNOWN_SCM"
 		return nil
 	}
 
@@ -156,11 +157,15 @@ func (s *SCMMetadata) ReadGitMetadata() error {
 	s.SCMAuthorName = strings.Trim(commiterNameOut, "\n")
 	s.SCMAuthorEmail = strings.Trim(commiterEmailOut, "\n")
 
-	// TODO: need to allow for remotes not named origin.
-	// it should be per-user config (not repo)
+	gitRemoteName := "origin"
+
+	if value, envVarSet := os.LookupEnv(GitRemoteNameEnvVar); envVarSet {
+		cliIO.verbose("Found environment %s=%q, using this value to detect git URL", GitRemoteNameEnvVar, value)
+		gitRemoteName = value
+	}
 	// get the URL of the remote
 	//   git ls-remote --get-url $origin
-	originURLOut, err := c.Output("git", g("ls-remote", "--get-url", "origin"))
+	originURLOut, err := c.Output("git", g("ls-remote", "--get-url", gitRemoteName))
 	if err != nil {
 		return err
 	}
