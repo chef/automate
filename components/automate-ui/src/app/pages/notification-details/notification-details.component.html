@@ -19,10 +19,10 @@
           <tbody>
             <tr class="detail-row">
               <td *ngIf="notification.targetType" class="header-column-value" data-cy="notification-target-type">
-                <img src="assets/img/logo-{{notification.targetType}}.png" alt="{{notification.targetType}} logo" />
-                {{ notification.TargetTypeLabels[notification.targetType] }}
+                <img src="assets/img/logo-{{targetTypeValue}}.png" alt="{{targetTypeValue}} logo" />
+                {{ notification.TargetTypeLabels[targetTypeValue] }}
               </td>
-              <td class="header-column-value" data-cy="notification-rule-type">{{ notification.AlertTypeLabels[notification.ruleType] }}</td>
+              <td class="header-column-value" data-cy="notification-rule-type">{{ notification.AlertTypeLabels[ruleTypeValue] }}</td>
               <td class="header-column-value" data-cy="notification-target-url">{{ notification.targetUrl }}</td>
             </tr>
           </tbody>

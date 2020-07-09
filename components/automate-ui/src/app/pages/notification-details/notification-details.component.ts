@@ -53,6 +53,8 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
   public targetKeys: string[];
   public alertTypeKeys: string[];
   public displayCriticalControlsBox = false;
+  public targetTypeValue: string;
+  public ruleTypeValue: string;
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -87,6 +89,8 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(([_, notification]) => {
         this.notification = notification;
+        this.targetTypeValue = notification.targetType;
+        this.ruleTypeValue = notification.ruleType;
         setTimeout(() => (
           this.updateForm.controls.name.setValue(this.notification.name),
           this.updateForm.controls.targetUrl.setValue(this.notification.targetUrl),
@@ -122,6 +126,8 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateNotification({
       notification: this.notification
     }));
+    this.targetTypeValue = this.notification.targetType;
+    this.ruleTypeValue = this.notification.ruleType;
   }
 
   public sendTestForTargetUrl(): void {
