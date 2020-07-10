@@ -71,7 +71,7 @@ var a2Config = config{
 		// // TODO(ssd) 2019-01-22: The following files are files that need to be checked.
 		{regex: `components/automate-deployment/pkg/persistence/boltdb/internal/v1/testdata/boltdb-20180226095149.db`},
 		{regex: `components/automate-chef-io/content/docs/configuration.md`},
-		{regex: `components/automate-chef-io/content/docs/backup.md`},
+		{regex: `components/automate-chef-io/content/docs/restore.md`},
 		{regex: `components/automate-deployment/cmd/chef-server-ctl/secrets.go`},
 		{regex: `components/automate-deployment/pkg/a1stub/test_harness.go`},
 		{regex: `components/automate-deployment/pkg/a1upgrade/testdata/chef-server-running.json`},
