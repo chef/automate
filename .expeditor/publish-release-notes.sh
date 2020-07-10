@@ -35,9 +35,8 @@ pushd ./automate.wiki
 This release uses:
 - Chef Habitat version
 - Chef Habitat Builder version
-- Chef Infra Client version
 - Chef Infra Server version
-- Chef InSpec version 
+- Chef InSpec version
 
 EOH
 
