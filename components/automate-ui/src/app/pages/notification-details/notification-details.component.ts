@@ -69,7 +69,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
       targetType: [[]],
       ruleType: [[]],
       // Note that URL here may be FQDN -or- IP!
-      targetUrl: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      targetUrl: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_FQDN)]]
     });
 
     this.store.select(routeParams).pipe(

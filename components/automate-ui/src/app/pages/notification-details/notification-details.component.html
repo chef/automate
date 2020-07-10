@@ -80,8 +80,12 @@
           <chef-form-field>
             <label for="targetUrl">Webhook URL <span aria-hidden="true">*</span></label>
             <input chefInput id="targetUrl" formControlName="targetUrl" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="targetUrl-input"/>
-            <chef-error *ngIf="(urlCtrl.hasError('required') || urlCtrl.hasError('pattern')) && urlCtrl.dirty">
+            <chef-error *ngIf="urlCtrl.hasError('required') && urlCtrl.dirty">
               Webhook URL is required.
+            </chef-error>
+            <chef-error
+              *ngIf="urlCtrl.hasError('pattern') && urlCtrl.dirty">
+              Valid Webhook URL is required.
             </chef-error>
           </chef-form-field>
         </form>
