@@ -12,7 +12,7 @@ toc = true
 +++
 
 {{< info >}}
-Data Feed is currently in beta. Turn on this beta feature by typing 'feat' into your browser for the Feature Flags window to appear. Select the toggle next to "Chef Automate Data Feed" to turn into the "ON" position and enable Data Feed.
+Data Feed is a beta feature in active development. To enable Data Feed, first select anywhere on the Chef Automate interface and enter 'feat' to open the feature flags window and then toggle "Chef Automate Data Feed" to the "ON" position.
 {{< /info >}}
 
 The Data Feed service sends node data to a 3rd party service.
@@ -91,16 +91,16 @@ Modify Data Feed behavior with configuration settings in `config.toml`.
 ```toml
     [service]
 
-    host = "localhost"\
-    port = 14001\
-    feed_interval = "4h"\
-    asset_page_size = 100\
-    reports_page_size = 1000\
-    node_batch_size = 50\
-    updated_nodes_only = true\
-    disable_cidr_filter = true\
-    cidr_filter = "0.0.0.0/0"\
-    external_fqdn = ""\
+    host = "localhost"
+    port = 14001
+    feed_interval = "4h"
+    asset_page_size = 100
+    reports_page_size = 1000
+    node_batch_size = 50
+    updated_nodes_only = true
+    disable_cidr_filter = true
+    cidr_filter = "0.0.0.0/0"
+    external_fqdn = ""
     accepted_status_codes = [ 200, 201, 202, 203, 204 ]
 ```
 
@@ -134,9 +134,9 @@ Each line represents the data for one node, and contains the following propertie
      "all_value_count": 10,
      "automatic_value_count": 8
     },
-    "report": {...},
-    "client_run": {...},
-    "node: {
+    "report": { ... },
+    "client_run": { ... },
+    "node": {
      "automate_fqdn": "",
      "ip_address" : "",
      "mac_address": "",
