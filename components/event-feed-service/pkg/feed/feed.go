@@ -110,6 +110,7 @@ type FeedEntry struct {
 	TargetName         string    `json:"target_name"`
 	TargetObjectType   string    `json:"target_object_type"`
 	Created            time.Time `json:"created"`
+	Projects           []string  `json:"projects"`
 }
 
 func (f *FeedEntry) ToJSON() ([]byte, error) {

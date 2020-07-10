@@ -2005,6 +2005,7 @@ paths = [
   "api/interservice/es_sidecar/*",
   "api/interservice/event/*",
   "api/interservice/event_feed/*",
+  "components/authz-service/*",
   "components/automate-gateway/api/iam/*",
   "components/automate-grpc/*",
   "lib/authz/*",

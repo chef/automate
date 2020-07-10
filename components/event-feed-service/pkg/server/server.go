@@ -51,7 +51,7 @@ func (eventFeedServer *EventFeedServer) GetFeed(ctx context.Context,
 		"rpc":     "GetFeed",
 	})
 
-	if feedEntries, hits, err = eventFeedServer.feedService.GetFeed(request); err != nil {
+	if feedEntries, hits, err = eventFeedServer.feedService.GetFeed(request, ctx); err != nil {
 		logctx.WithError(err).Warn("getting feed")
 		return nil, err
 	}

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -14,6 +15,7 @@ import (
 	e "github.com/chef/automate/components/event-feed-service/pkg/errors"
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -25,7 +27,7 @@ func NewFeedService(feedStore persistence.FeedStore) *FeedService {
 	return &FeedService{store: feedStore}
 }
 
-func (f *FeedService) GetFeed(req *event_feed.FeedRequest) ([]*feed.FeedEntry, int64, error) {
+func (f *FeedService) GetFeed(req *event_feed.FeedRequest, ctx context.Context) ([]*feed.FeedEntry, int64, error) {
 
 	// Date Range
 	startTime, endTime, err := feed.ValidateMillisecondDateRange(req.Start, req.End)
@@ -47,6 +49,11 @@ func (f *FeedService) GetFeed(req *event_feed.FeedRequest) ([]*feed.FeedEntry, i
 	filters, err := feed.FormatFilters(req.Filters)
 	if err != nil {
 		return nil, 0, err
+	}
+
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return nil, 0, e.GrpcErrorFromErr(codes.Internal, err)
 	}
 
 	fq := feed.FeedQuery{
@@ -147,4 +154,17 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 	}
 
 	return &api.EventResponse{Success: success}, nil
+}
+
+func filterByProjects(ctx context.Context, filters map[string][]string) (map[string][]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		return filters, nil
+	}
+
+	filters["projects"] = projectsFilter
+	return filters, nil
 }
