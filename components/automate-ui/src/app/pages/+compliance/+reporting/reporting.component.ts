@@ -207,7 +207,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const allUrlParameters$ = this.getAllUrlParameters();
 
     this.endDate$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
-      this.convertMomentToDateWithoutTimezone(reportQuery.endDate)));
+      this.convertMomentToDate(reportQuery.endDate)));
 
     allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
       allUrlParameters => this.applyParamFilters(allUrlParameters));
@@ -512,7 +512,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     return 0;
   }
 
-  convertMomentToDateWithoutTimezone(m: moment.Moment): Date {
-    return new Date(m.year(), m.month(), m.date());
+  convertMomentToDate(m: moment.Moment): Date {
+    return new Date(Date.UTC(m.year(), m.month(), m.date()));
   }
 }
