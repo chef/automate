@@ -53,10 +53,21 @@
         </chef-option>
       </chef-status-filter-group>
     </div>
+    <div class="bulk-action-bar">
+      <chef-checkbox
+        [checked]="allChecked"
+        (change)="handleSelectAll($event.detail)">Select All</chef-checkbox>
+      <chef-button tertiary>Delete {{ checkedServicesDisplay }} Services</chef-button>
+    </div>
     <ul>
       <li class="service-item" *ngFor="let service of services$ | async; let i = index">
         <div class="header">
-          <div class ="fqdn-line"><chef-icon>storage</chef-icon> <p class="fqdn-data">{{ service.fqdn || "--"}}</p></div>
+          <div class ="fqdn-line">
+            <chef-checkbox
+              [checked]="checkedServices.includes(service.id)"
+              (change)="handleToggleCheckbox(service.id, $event.detail)"></chef-checkbox>
+            <p class="fqdn-data">{{ service.fqdn || "--"}}</p>
+          </div>
           <div class ="supervisor-line"><strong>Supervisor:</strong><p class="supervisor-data">{{ service.supervisor_id || "--"}}</p></div>
           <div class ="site-line"><strong>Site:</strong> <p class="site-data">{{ service.site  || "--"}}</p></div>
         </div>

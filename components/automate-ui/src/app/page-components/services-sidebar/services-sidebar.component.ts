@@ -49,6 +49,11 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   private currentServicesFilters$: Observable<GroupServicesFilters>;
   private isDestroyed: Subject<boolean> = new Subject();
 
+  // Manual Deletion of Services
+  public checkedServices: number[] = [];
+  public allChecked = false;
+  public checkedServicesDisplay: string | number = '';
+
   constructor(
     private serviceGroupsFacade: ServiceGroupsFacadeService,
     private telemetryService: TelemetryService,
@@ -136,6 +141,24 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     } else {
       this.activeHealthAccordions.push(index); // open accordion
     }
+  }
+
+  public handleToggleCheckbox(id: number, checked: boolean): void {
+    if (checked) {
+      this.checkedServices.push(id);
+    } else {
+      this.checkedServices = this.checkedServices.filter(n => n !== id);
+    }
+    this.updateCheckedServicesDisplay();
+  }
+
+  public handleSelectAll(checked: boolean): void {
+    this.allChecked = checked;
+  }
+
+  public updateCheckedServicesDisplay() {
+    this.checkedServicesDisplay =
+      this.checkedServices.length > 0 ? this.checkedServices.length : '';
   }
 
 }

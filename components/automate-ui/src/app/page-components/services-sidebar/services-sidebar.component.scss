@@ -313,6 +313,7 @@ chef-alert {
 }
 
 .fqdn-data {
+  margin-left: 8px;
   margin-bottom: 0px;
   word-break: break-all;
 }
@@ -329,4 +330,14 @@ chef-alert {
   margin-bottom: 0px;
   font-size: 14px;
   word-break: break-all;
+}
+
+.bulk-action-bar {
+  display: flex;
+  align-items: center;
+  padding: 0 35px;
+
+  chef-button {
+    margin: 0 8px;
+  }
 }
