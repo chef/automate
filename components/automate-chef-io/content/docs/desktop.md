@@ -13,7 +13,7 @@ Desktop information populates this dashboard after a Chef Infra Client run has e
 ## Setting Up the Desktop Dashboard
 
 Enable the Desktop dashboard with: `chef-automate deploy --product automate --product infra-server --product desktop`.
-For more information, see [Install Chef Infra Server with Automate](https://automate.chef.io/docs/infra-server/).
+For more information, see [Install Chef Infra Server with Chef Automate](https://automate.chef.io/docs/infra-server/).
 The Desktop dashboard has no supported compliance profiles, and installation with the `--product desktop` flag includes no compliance profiles.
 
 {{< info >}}
@@ -37,6 +37,9 @@ Below the bar, boxes display counts of all desktops, desktops with an `unknown` 
 `Checked-in` refers to desktops reporting into Chef Automate.
 `Unknown` desktops did not report to Chef Automate during the last twenty-four hours.
 
+Clicking on a box will display a Filtered Desktop List of desktops for the selected status.
+The selected filters will not persist when selecting a different box.
+
 ### Check-in History
 
 _Check-in History_ shows the history of checked-in desktop counts as graphed over a selected period of time.
@@ -55,11 +58,11 @@ Selecting an error opens the Filter Desktop List with the applied error filter t
 
 ### Filtered Desktop Lists
 
-Selecting rows in either _Time since Last Check-in_ or _Top 10 Errors_ activates the Filtered Desktop List.
-The Filtered Desktop List displays a list of desktops filtered according to the selected timeframe or error in the previous display.
+Selecting rows in _Daily Check-in_, _Time since Last Check-in_, or _Top 10 Errors_ activates the Filtered Desktop List.
+The Filtered Desktop List displays a list of desktops filtered according to the selected status,timeframe, or error in the previous display.
 
 Apply more filters to this initial list if desired.
-Specific filter values populate according to available desktop information and include the categories of "platform," "version," "domain," and "last run status."
+Specific filter values populate according to available desktop information and include the categories of "platform," "environment," "domain," and "last run status."
 
 Select an individual desktop row to display the individual desktop's node details.
 
@@ -68,9 +71,8 @@ Select an individual desktop row to display the individual desktop's node detail
 The _Node Details_ display shows the details of a single desktop and includes a visualization of its check-in history.
 
 The individual check-in history displays the desktop's latest status for each day with an associated icon.
-Statuses include "converged" (check box icon), "unchanged" (dash icon), "error" (exclamation point icon), or "unknown" (question mark icon).
-The check-in history's format can appear in grid icon, status list, or selectable JSON form.
-Select the gear icon at the top of the display to make these modifications.
+Hover over a status icon to see the status name.
+Statuses include "converged" (check box icon), "unchanged" (dash icon), "error" (exclamation point icon), or "missing" (question mark icon).
 The timescale of the check-in history can also switch between "Last 2 Weeks" and "Last 4 Weeks."
 
 The individual desktop has an information panel that displays the following data: Overview, Chef Infra Client, System, Virtualization, and Kernel.
