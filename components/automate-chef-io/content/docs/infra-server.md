@@ -61,6 +61,20 @@ Install Chef Automate and Chef Infra Server on the same host with this command:
 sudo chef-automate deploy --product automate --product infra-server
 ```
 
+Add a stanza to a new patch.toml that bumps the maximum report size:
+
+```toml
+[erchef.v1.sys.api]
+max_request_size = 2000000
+# Default: 2000000 (2mb), increase to 4000000 (4mb) as needed.
+```
+
+Apply the configuration:
+
+```shell
+chef-automate config patch patch.toml
+```
+
 Then, [set up `knife`]({{< relref "infra-server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
 
 ### Configuration File Install of Chef Automate and Infra Server
@@ -74,11 +88,15 @@ Installations require elevated privileges, so run the commands as the superuser 
       sudo chef-automate init-config
     ```
 
-1. Add a stanza to the configuration file to deploy Chef Automate and Chef Infra Server:
+1. Add a stanza to the configuration file to deploy Chef Automate and Chef Infra Server and bump the maximum report size:
 
     ```toml
       [deployment.v1.svc]
       products=["automate", "infra-server"]
+
+      [erchef.v1.sys.api]
+      max_request_size = 2000000
+      # Default: 2000000 (2mb), increase to 4000000 (4mb) as needed.
     ```
 
 1. Make any other configuration changes desired.
@@ -109,11 +127,15 @@ Installations require elevated privileges, so run the commands as the superuser 
        sudo chef-automate init-config
     ```
 
-1. Add a stanza to the configuration file to disable Chef Automate data collection:
+1. Add a stanza to the configuration file to disable Chef Automate data collection and bump the maximum report size:
 
     ```toml
        [erchef.v1.sys.data_collector]
        enabled = false
+
+      [erchef.v1.sys.api]
+      max_request_size = 2000000
+      # Default: 2000000 (2mb), increase to 4000000 (4mb) as needed.
     ```
 
 1. Use the configuration file to deploy Chef Infra Server by running the following command:
@@ -137,7 +159,7 @@ Installations require elevated privileges, so run the commands as the superuser 
       sudo chef-automate init-config
     ```
 
-1. Add a stanza to the configuration file to deploy Chef Infra Server:
+1. Add a stanza to the configuration file to deploy Chef Infra Server and bump the maximum report size:
 
     ```toml
        [deployment.v1.svc]
@@ -146,6 +168,10 @@ Installations require elevated privileges, so run the commands as the superuser 
        # Disable Automate data collection as Automate will not be deployed
        [erchef.v1.sys.data_collector]
        enabled = false
+
+      [erchef.v1.sys.api]
+      max_request_size = 2000000
+      # Default: 2000000 (2mb), increase to 4000000 (4mb) as needed.
     ```
 
 1. Run the `chef-automate deploy` command with your configuration file (config.toml):
@@ -160,17 +186,21 @@ Installations require elevated privileges, so run the commands as the superuser 
 
 Patch an existing Chef Automate installation to add Chef Infra Server:
 
-1. Create a `patch.toml` file to add `infra-server` to the list of products to deploy:
+1. Create a `patch.toml` file to add `infra-server` to the list of products to deploy and bump the maximum report size:
 
     ```toml
        [deployment.v1.svc]
        products=["automate", "infra-server"]
+
+      [erchef.v1.sys.api]
+      max_request_size = 2000000
+      # Default: 2000000 (2mb), increase to 4000000 (4mb) as needed.
     ```
 
 2. Apply the patch to the Chef Automate installation:
 
     ```shell
-       sudo chef-automate config ./patch.toml
+       sudo chef-automate config patch ./patch.toml
     ```
 
    The command output shows the added Chef Infra Server services:
