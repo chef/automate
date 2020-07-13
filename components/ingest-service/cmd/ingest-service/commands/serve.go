@@ -96,6 +96,7 @@ func readCliParams() *serveropts.Opts {
 		CerealAddress:                 viper.GetString("cereal-address"),
 		EventAddress:                  viper.GetString("event-address"),
 		NodeManagerAddress:            viper.GetString("nodemanager-address"),
+		ConfigMgmtAddress:             viper.GetString("config-mgmt-address"),
 		LogLevel:                      viper.GetString("log-level"),
 		PurgeConvergeHistoryAfterDays: int32(viper.GetInt("converge-history-days")),
 		PurgeActionsAfterDays:         int32(viper.GetInt("actions-days")),
