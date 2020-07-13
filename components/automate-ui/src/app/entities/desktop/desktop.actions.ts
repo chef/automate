@@ -1,6 +1,7 @@
 import { Action } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 
+import { NodeRun } from 'app/types/types';
 import { DailyCheckInCountCollection, NodeRunsDailyStatusCollection,
   TopErrorsCollection, CountedDurationCollection, Desktop, TermFilter,
   PageSizeChangeEvent, NodeMetadataCount } from './desktop.model';
@@ -50,6 +51,12 @@ export enum DesktopActionTypes {
     'DESKTOP::GET::DESKTOPS_TOTAL::SUCCESS',
   GET_DESKTOPS_TOTAL_FAILURE =
     'DESKTOP::GET::DESKTOPS_TOTAL::FAILURE',
+  GET_DESKTOP =
+    'DESKTOP::GET::DESKTOP',
+  GET_DESKTOP_SUCCESS =
+    'DESKTOP::GET::DESKTOP::SUCCESS',
+  GET_DESKTOP_FAILURE =
+    'DESKTOP::GET::DESKTOP::FAILURE',
   SET_SELECTED_DESKTOP =
     'DESKTOP::SET::DESKTOP',
   SET_SELECTED_DAYS_AGO =
@@ -170,6 +177,21 @@ export class GetDesktopsFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class GetDesktop implements Action {
+  readonly type = DesktopActionTypes.GET_DESKTOP;
+  constructor(public payload: { nodeId: string, runId: string }) { }
+}
+
+export class GetDesktopSuccess implements Action {
+  readonly type = DesktopActionTypes.GET_DESKTOP_SUCCESS;
+  constructor(public payload: NodeRun) { }
+}
+
+export class GetDesktopFailure implements Action {
+  readonly type = DesktopActionTypes.GET_DESKTOP_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export class GetDesktopsTotal implements Action {
   readonly type = DesktopActionTypes.GET_DESKTOPS_TOTAL;
 }
@@ -241,6 +263,9 @@ export type DesktopActions =
   | GetDesktops
   | GetDesktopsSuccess
   | GetDesktopsFailure
+  | GetDesktop
+  | GetDesktopSuccess
+  | GetDesktopFailure
   | GetDesktopsTotal
   | GetDesktopsTotalSuccess
   | GetDesktopsTotalFailure

@@ -159,7 +159,8 @@ export class DesktopRequests {
       platformFamily: respDesktop.platform_family,
       platformVersion: respDesktop.platform_version,
       chefVersion: respDesktop.chef_version,
-      domain: respDesktop.domain
+      domain: respDesktop.domain,
+      latestRunId: respDesktop.latest_run_id
     };
   }
 

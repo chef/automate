@@ -294,6 +294,19 @@ export interface RespNodeRun {
     run_list: ExpandedRunListItem[];
   };
   versioned_cookbooks: VersionedCookbook[];
+  ip6address?: string;
+  timezone?: string;
+  domain?: string;
+  hostname?: string;
+  memory_total?: string;
+  macaddress?: string;
+  dmi_system_serial_number?: string;
+  dmi_system_manufacturer?: string;
+  virtualization_role?: string;
+  virtualization_system?: string;
+  kernel_version?: string;
+  kernel_release?: string;
+  cloud_provider?: string;
 }
 
 export interface Deprecation {
@@ -371,7 +384,20 @@ export class NodeRun {
        name: '',
        version: ''
      }
-   ]
+   ],
+    ip6address: '',
+    timezone: '',
+    domain: '',
+    hostname: '',
+    memory_total: '',
+    macaddress: '',
+    dmi_system_serial_number: '',
+    dmi_system_manufacturer: '',
+    virtualization_role: '',
+    virtualization_system: '',
+    kernel_version: '',
+    kernel_release: '',
+    cloud_provider: ''
   });
 
   nodeId: string;
@@ -420,6 +446,19 @@ export class NodeRun {
     run_list: ExpandedRunListItem[];
   };
   versionedCookbooks: VersionedCookbook[];
+  ip6address?: string;
+  timezone?: string;
+  domain?: string;
+  hostname?: string;
+  memoryTotal?: string;
+  macaddress?: string;
+  dmiSystemSerialNumber?: string;
+  dmiSystemManufacturer?: string;
+  virtualizationRole?: string;
+  virtualizationSystem?: string;
+  kernelVersion?: string;
+  kernelRelease?: string;
+  cloudProvider?: string;
 
   constructor(respNodeRun: RespNodeRun) {
     this.nodeId = respNodeRun.node_id;
@@ -457,6 +496,19 @@ export class NodeRun {
     this.uptimeSeconds = respNodeRun.uptime_seconds;
     this.deprecations = respNodeRun.deprecations;
     this.versionedCookbooks = respNodeRun.versioned_cookbooks;
+    this.ip6address = respNodeRun.ip6address;
+    this.timezone = respNodeRun.timezone;
+    this.domain = respNodeRun.domain;
+    this.hostname = respNodeRun.hostname;
+    this.memoryTotal = respNodeRun.memory_total;
+    this.macaddress = respNodeRun.macaddress;
+    this.dmiSystemSerialNumber = respNodeRun.dmi_system_serial_number;
+    this.dmiSystemManufacturer = respNodeRun.dmi_system_manufacturer;
+    this.virtualizationRole = respNodeRun.virtualization_role;
+    this.virtualizationSystem = respNodeRun.virtualization_system;
+    this.kernelVersion = respNodeRun.kernel_version;
+    this.kernelRelease = respNodeRun.kernel_release;
+    this.cloudProvider = respNodeRun.cloud_provider;
   }
 
   isPolicyFile(): boolean {
