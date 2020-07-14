@@ -46,3 +46,39 @@ func parseNodeAttributeFromRes(nodes []*infra_res.NodeAttribute) []*gwres.NodeAt
 
 	return nl
 }
+
+// DeleteNode deletes the node by name
+func (a *InfraProxyServer) DeleteNode(ctx context.Context, r *gwreq.DeleteNode) (*gwres.DeleteNode, error) {
+
+	req := &infra_req.DeleteNode{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.DeleteNode(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.DeleteNode{
+		Name: res.GetName(),
+	}, nil
+}
+
+func parseNodeAttributeFromRes(nodes []*infra_res.NodeAttribute) []*gwres.NodeAttribute {
+	nl := make([]*gwres.NodeAttribute, len(nodes))
+
+	for i, node := range nodes {
+		nl[i] = &gwres.NodeAttribute{
+			Id:          node.Id,
+			Name:        node.Name,
+			CheckIn:     node.CheckIn,
+			Environment: node.Environment,
+			Platform:    node.Platform,
+			PolicyGroup: node.PolicyGroup,
+			Uptime:      node.Uptime,
+		}
+	}
+
+	return nl
+}
