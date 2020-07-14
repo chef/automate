@@ -336,6 +336,11 @@ chef-alert {
   display: flex;
   align-items: center;
   padding: 0 35px;
+  // temp - check with UX
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: $chef-white;
 
   chef-button {
     margin: 0 8px;
