@@ -130,6 +130,7 @@ func init() {
 	serveCmd.Flags().String("event-address", "localhost:10132", "address of event (domain:<port>)")
 	serveCmd.Flags().String("cereal-address", "localhost:10101", "address of cereal (domain:<port>)")
 	serveCmd.Flags().String("nodemanager-address", "localhost:10120", "address of nodemanager (domain:<port>)")
+	serveCmd.Flags().String("config-mgmt-address", "localhost:10119", "address of config-mgmt-service (domain:<port>)")
 	serveCmd.Flags().String("postgresql-url", "", "PG URI (postgres://host:port)")
 	serveCmd.Flags().String("postgresql-database", "chef_ingest_service", "PG Database name")
 	serveCmd.Flags().Int32("converge-history-days", 30, "Number of days to keep converge history for. A number less than or equal to 0 means data should never be deleted")

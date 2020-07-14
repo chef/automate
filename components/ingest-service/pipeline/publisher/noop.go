@@ -13,3 +13,13 @@ func noop(in <-chan message.ChefRun) <-chan message.ChefRun {
 	}()
 	return out
 }
+
+func actionsNoop(in <-chan message.ChefAction) <-chan message.ChefAction {
+	out := make(chan message.ChefAction, 10)
+	go func() {
+		for msg := range in {
+			message.PropagateChefAction(out, &msg)
+		}
+	}()
+	return out
+}
