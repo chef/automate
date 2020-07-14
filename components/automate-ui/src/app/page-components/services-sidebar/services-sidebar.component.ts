@@ -55,6 +55,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public isAllSelected = false;
   public isIndeterminate = false;
   public checkedServicesDisplay: string | number = '';
+  public deleteModalVisible = false;
 
   constructor(
     private serviceGroupsFacade: ServiceGroupsFacadeService,
@@ -168,7 +169,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.updateCheckedServicesDisplay();
   }
 
-  private updateCheckedServicesDisplay() {
+  private updateCheckedServicesDisplay(): void {
     // Must reset values for indeterminate to function properly
     this.isAllSelected = false;
     this.isIndeterminate = false;
@@ -185,5 +186,12 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     }
   }
 
+  public beginServicesDelete(): void {
+    this.deleteModalVisible = true;
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
+  }
 
 }

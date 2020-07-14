@@ -8,6 +8,7 @@ import {
 } from '../../entities/service-groups/service-groups.model';
 
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { By } from '@angular/platform-browser';
 
 class MockTelemetryService {
   track(_event?: string, _properties?: any): void { }
@@ -132,6 +133,18 @@ describe('ServicesSidebarComponent', () => {
       expect(component.checkedServices.length).toEqual(1);
       expect(component.checkedServices).not.toContain(300 && 500);
     });
+
+    xit('should disable the Delete Services button when none are selected', () => {
+      expect(component.checkedServices.length).toEqual(0);
+
+      const deleteButton = fixture.debugElement.query(By.css('#delete-services-button'));
+      expect(deleteButton).not.toBeNull();
+      expect(deleteButton.nativeElement.disabled).toBeTruthy();
+
+      component.handleToggleCheckbox(300, true);
+      expect(component.checkedServices.length).toEqual(1);
+
+    })
 
     describe('Selecting or deselecting all at once', () => {
       it('when checked, should add all service ids to the checkedServices list', () => {
