@@ -194,4 +194,8 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
+  public deleteServices(): void {
+    console.log('kick off deletion.');
+  }
+
 }
