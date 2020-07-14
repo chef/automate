@@ -50,6 +50,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   private isDestroyed: Subject<boolean> = new Subject();
 
   // Manual Deletion of Services
+  public servicesList: GroupService[];
   public checkedServices: number[] = [];
   public allChecked = false;
   public checkedServicesDisplay: string | number = '';
@@ -89,6 +90,11 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
          totalServices: this.totalServices,
          statusFilter: this.selectedHealth
       });
+    });
+
+    this.services$.pipe(takeUntil(this.isDestroyed))
+      .subscribe((services) => {
+        this.servicesList = services;
     });
   }
 
@@ -153,10 +159,16 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   }
 
   public handleSelectAll(checked: boolean): void {
+    if (checked) {
+      this.checkedServices = this.servicesList.map(service => service.id);
+    } else {
+      this.checkedServices = [];
+    }
     this.allChecked = checked;
+    this.updateCheckedServicesDisplay();
   }
 
-  public updateCheckedServicesDisplay() {
+  private updateCheckedServicesDisplay() {
     this.checkedServicesDisplay =
       this.checkedServices.length > 0 ? this.checkedServices.length : '';
   }

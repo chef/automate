@@ -74,6 +74,7 @@ export interface GroupService {
   current_health_since: string;
   health_updated_at: Date;
   health_check_result: HealthCheckResult;
+  id?: number;
 }
 
 export interface HealthCheckResult {
