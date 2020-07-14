@@ -33,6 +33,19 @@ export MINIO_BROWSER=off
 export SSL_CERT_FILE={{pkgPathFor "core/cacerts"}}/ssl/cert.pem
 export SSL_CERT_DIR={{pkgPathFor "core/cacerts"}}/ssl/certs
 
+# Minio uses the access key and secret key to encrypt its config.
+# We don't have any special config, so we want to make the safe to
+# regenerate.
+checksum_path="{{pkg.svc_var_path}}/creds.sha256"
+last_checksum=$(cat "${checksum_path}" || true)
+current_checksum=$(echo -n "${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}" | sha256sum | cut -f1 -d ' ')
+
+if [[ "${last_checksum}" != "${current_checksum}" ]]; then
+    echo "minio credentials have changed: removing .minio.sys"
+    rm -r "{{pkg.svc_data_path}}/.minio.sys"
+    echo -n "${current_checksum}" > "${checksum_path}"
+fi
+
 #{{#if cfg.gateway.storage.s3.bucket.name~}}
 #exec minio gateway s3 {{cfg.gateway.storage.s3.bucket.endpoint}} \
   #--config-dir "{{pkg.svc_var_path}}/config" \
