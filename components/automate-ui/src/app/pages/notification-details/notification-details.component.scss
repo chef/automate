@@ -1,0 +1,118 @@
+@import "~styles/variables";
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+.detail-row {
+  display: flex;
+  color: $chef-primary-dark;
+}
+
+thead {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: $chef-primary-dark;
+}
+
+th {
+  text-align: left;
+  padding: 0px;
+}
+
+tbody > .detail-row {
+  padding-top: 0px;
+  padding-bottom: 15px;
+}
+
+.header-column {
+  padding-top: 0px;
+  padding-left: 0px;
+  width: 33%;
+}
+
+.header-column-value {
+  font-size: 14px;
+  padding-top: 0px;
+  padding-left: 0px;
+  width: 33%;
+
+  img {
+    width: 18px;
+    margin-right: 2px;
+    position: relative;
+    top: 3px;
+  }
+}
+
+chef-tab-selector {
+  chef-option {
+    margin-right: 16px;
+    color: $chef-primary-dark;
+  }
+}
+
+chef-form-field {
+  width: 310px;
+  padding-bottom: 30px;
+
+  img {
+    width: 18px;
+    margin-right: 5px;
+    margin-bottom: -2px;
+  }
+}
+
+chef-radio chef-option {
+  display: inline-block;
+}
+
+section {
+  chef-button {
+    margin: 0;
+
+    chef-loading-spinner {
+      position: relative;
+      top: 2px;
+      margin-right: 5px;
+    }
+  }
+
+  #saved-note {
+    font-size: 0.75em;
+    padding-left: 12px;
+  }
+
+  chef-button[primary] {
+    margin-left: 15px;
+  }
+}
+
+chef-select {
+  font-weight: 100;
+  font-size: 14px;
+  width: 308px;
+}
+
+.small:first-of-type {
+  font-size: 12px;
+  font-weight: 100;
+  margin-top: 10px;
+}
+
+.form-field>label, .label {
+  padding-bottom: 0px;
+}
+
+chef-checkbox ::ng-deep .check-wrap {
+  color: $chef-dark-grey;
+  border: 1px solid;
+}
+
+chef-select ::ng-deep .selected-value {
+  padding: 0.7em 3.5em 0.7em 0.7em;
+}
+
+chef-select ::ng-deep chef-option {
+  padding: 0.7em 3.5em 0.7em 0.7em;
+}

@@ -15,12 +15,46 @@ export interface RuleInterface {
   targetType: ServiceActionType;
 }
 
+export interface SlackAlert {
+  url: string;
+}
+
+export interface WebhookAlert {
+  url: string;
+}
+
+export interface ServiceNowAlert {
+  url: string;
+  secret_id: string;
+  critical_controls_only: boolean;
+}
+
+export interface NotificationRuleRequest {
+  id: string;
+  rule: RuleRequest;
+}
+
+export interface RuleRequest {
+  id: string;
+  name: string;
+  event: string;
+  // request will have just one of the following:
+  SlackAlert?: SlackAlert;
+  WebhookAlert?: WebhookAlert;
+  ServiceNowAlert?: ServiceNowAlert;
+}
 
 export class NotificationRule implements RuleInterface {
 
   AlertTypeLabels = {
     CCRFailure: 'Infra Client run failures',
     ComplianceFailure: 'InSpec compliance scan failure'
+  };
+
+  TargetTypeLabels = {
+    SlackAlert: 'Slack',
+    WebhookAlert: 'Webhook',
+    ServiceNowAlert: 'ServiceNow'
   };
 
   constructor(
@@ -67,22 +101,35 @@ export class NotificationRule implements RuleInterface {
     return Object.keys(this.AlertTypeLabels);
   }
 
-  public toRequest(): Object {
-    let target: any = {'url': this.targetUrl};
-    if (this.targetSecretId !== undefined && this.targetSecretId !== '' ) {
-      target = {
-        'url': this.targetUrl,
-        'secret_id': this.targetSecretId,
-        'critical_controls_only': this.criticalControlsOnly
-      };
-    }
+  public getTargetTypeKeys(): string[] {
+    return Object.keys(this.TargetTypeLabels);
+  }
 
-    return {
-      'rule': {
-        'name': this.name,
-        'event': this.ruleType,
-        [this.targetType]: target
+  public toRequest(): NotificationRuleRequest {
+    const request: NotificationRuleRequest = {
+      // id needs to be duplicated at top level for authz handling
+      id: this.id,
+      rule: {
+        id: this.id,
+        name: this.name,
+        event: this.ruleType
       }
     };
+    switch (this.targetType) {
+      case ServiceActionType.SLACK:
+        request.rule.SlackAlert = { url: this.targetUrl };
+        break;
+      case ServiceActionType.WEBHOOK:
+        request.rule.WebhookAlert = { url: this.targetUrl };
+        break;
+      case ServiceActionType.SERVICENOW:
+        request.rule.ServiceNowAlert = {
+          url: this.targetUrl,
+          secret_id: this.targetSecretId,
+          critical_controls_only: this.criticalControlsOnly
+        };
+        break;
+    }
+    return request;
   }
 }
