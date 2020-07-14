@@ -138,6 +138,18 @@ export function serviceGroupsEntityReducer(
         set('suggestions.status', EntityStatus.loadingFailure),
         set('error', action.payload))(state) as ServiceGroupsEntityState;
 
+    case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID:
+      return set('status', EntityStatus.loading, state ) as ServiceGroupsEntityState;
+
+    case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS:
+      return set('status', EntityStatus.loadingSuccess, state) as ServiceGroupsEntityState;
+
+    case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_FAILURE:
+      return pipe(
+        set('status', EntityStatus.loadingFailure),
+        set('error', action.payload)
+        )(state) as ServiceGroupsEntityState;
+
     default:
       return state;
   }

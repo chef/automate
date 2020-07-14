@@ -117,12 +117,12 @@ export class GetServiceGroupsSuggestionsFailure implements Action {
 
 export class DeleteServicesById implements Action {
   readonly type = ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID;
-  constructor(public payload: number[]) {}
+  constructor(public payload: { servicesToDelete: number[] }) {}
 }
 
 export class DeleteServicesByIdSuccess implements Action {
   readonly type = ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS;
-  constructor(public payload: GroupService[]) { }
+  constructor() { }
 }
 
 export class DeleteServicesByIdFailure implements Action {

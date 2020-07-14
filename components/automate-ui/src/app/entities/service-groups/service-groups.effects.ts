@@ -13,7 +13,8 @@ import {
   ServiceGroupsHealthSummary,
   ServiceGroupsFilters,
   GroupServicesFilters,
-  GroupServicesPayload
+  GroupServicesPayload,
+  GroupService
 } from './service-groups.model';
 
 import {
@@ -34,7 +35,10 @@ import {
   GetServiceGroupsFailure,
   GetServiceGroupsSuggestionsSuccess,
   GetServiceGroupsSuggestionsFailure,
-  GetServiceGroupsSuggestions
+  GetServiceGroupsSuggestions,
+  DeleteServicesById,
+  DeleteServicesByIdSuccess,
+  DeleteServicesByIdFailure
 } from './service-groups.actions';
 
 @Injectable()
@@ -103,4 +107,13 @@ export class ServiceGroupsEffects {
           new GetServiceGroupsSuggestionsSuccess({ serviceGroupsSuggestions })),
         catchError((error) => of(new GetServiceGroupsSuggestionsFailure(error))));
       }));
+
+  @Effect()
+  deleteServicesById$ = this.actions$.pipe(
+    ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
+    mergeMap((action: DeleteServicesById) =>
+      this.requests.deleteServicesById(action.payload.servicesToDelete)),
+    map((_resp) => new DeleteServicesByIdSuccess() ),
+    catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error))
+  ));
 }

@@ -185,6 +185,6 @@
   <h1>Warning</h1>
   <p>You are about to delete <strong>{{ checkedServicesDisplay }} services</strong></p>
   <p>This will delete all data about them from the Applications view, but they will show up again if a new health check report from the service is received.</p>
-  <chef-button primary caution>Delete {{ checkedServicesDisplay }} Services</chef-button>
+  <chef-button primary caution (click)="deleteServices()">Delete {{ checkedServicesDisplay }} Services</chef-button>
   <chef-button tertiary (click)="closeDeleteModal()">Cancel</chef-button>
 </chef-modal>

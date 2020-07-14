@@ -146,4 +146,8 @@ export class ServiceGroupsRequests {
       return params.append('filter', filterParam);
     }, searchParam, filters);
   }
+
+  public deleteServicesById(payload: any): any {
+    console.log(payload);
+  }
 }

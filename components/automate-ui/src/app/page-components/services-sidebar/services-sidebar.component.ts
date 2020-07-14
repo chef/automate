@@ -13,7 +13,7 @@ import {
   GroupService,
   GroupServicesFilters
 } from '../../entities/service-groups/service-groups.model';
-import { UpdateSelectedSG } from 'app/entities/service-groups/service-groups.actions';
+import { UpdateSelectedSG, DeleteServicesById } from 'app/entities/service-groups/service-groups.actions';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { DateTime } from 'app/helpers/datetime/datetime';
 
@@ -195,7 +195,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   }
 
   public deleteServices(): void {
-    console.log('kick off deletion.');
+    this.store.dispatch( new DeleteServicesById({servicesToDelete: this.checkedServices}) );
   }
 
 }
