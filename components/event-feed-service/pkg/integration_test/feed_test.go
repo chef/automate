@@ -377,9 +377,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One chef_server event with a project. A matching project requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					Projects:   []string{"project9"},
-					ProducerID: "chef_server",
+					ID:                 "1",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
 				},
 			},
 			ctx:         contextWithProjects([]string{"project9"}),
@@ -389,8 +389,8 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One non-chef_server event with no project. A request with projects",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "profile",
+					ID:                 "1",
+					ProducerObjectType: "profile",
 				},
 			},
 			ctx:         contextWithProjects([]string{"project9"}),
@@ -400,8 +400,8 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "No events returned. One chef_server event with a no projects. A non-matching project requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
 				},
 			},
 			ctx:         contextWithProjects([]string{"project9"}),
@@ -411,9 +411,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "No events returned. One chef_server event with a non-matching project with the request",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"non-matching"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"non-matching"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project9"}),
@@ -423,14 +423,14 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "Two events returned. Two chef_server events with the same project. A matching project requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					Projects:   []string{"project9"},
-					ProducerID: "chef_server",
+					ID:                 "1",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
 				},
 				{
-					ID:         "2",
-					Projects:   []string{"project9"},
-					ProducerID: "chef_server",
+					ID:                 "2",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
 				},
 			},
 			ctx:         contextWithProjects([]string{"project9"}),
@@ -440,13 +440,13 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "Two events returned. One non-chef_server and one chef_server event with a matching request project",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "profile",
+					ID:                 "1",
+					ProducerObjectType: "profile",
 				},
 				{
-					ID:         "2",
-					Projects:   []string{"project9"},
-					ProducerID: "chef_server",
+					ID:                 "2",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
 				},
 			},
 			ctx:         contextWithProjects([]string{"project9"}),
@@ -456,13 +456,13 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One non-chef_server and one chef_server event with a non-matching request project",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "profile",
+					ID:                 "1",
+					ProducerObjectType: "profile",
 				},
 				{
-					ID:         "2",
-					Projects:   []string{"not-matching-project"},
-					ProducerID: "chef_server",
+					ID:                 "2",
+					Projects:           []string{"not-matching-project"},
+					ProducerObjectType: "chef_server",
 				},
 			},
 			ctx:         contextWithProjects([]string{"project9"}),
@@ -472,14 +472,14 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. Two chef_server events with only one project matching the request",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					Projects:   []string{"project9"},
-					ProducerID: "chef_server",
+					ID:                 "1",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
 				},
 				{
-					ID:         "2",
-					Projects:   []string{"not-matching"},
-					ProducerID: "chef_server",
+					ID:                 "2",
+					Projects:           []string{"not-matching"},
+					ProducerObjectType: "chef_server",
 				},
 			},
 			ctx:         contextWithProjects([]string{"project9"}),
@@ -489,9 +489,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One chef_server event with a project. All projects requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					Projects:   []string{"any-project-name"},
-					ProducerID: "chef_server",
+					ID:                 "1",
+					Projects:           []string{"any-project-name"},
+					ProducerObjectType: "chef_server",
 				},
 			},
 			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
@@ -501,18 +501,18 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "Three events returned. Two chef_server events with different projects and the other with no projects. All projects requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					Projects:   []string{"any-project-name"},
-					ProducerID: "chef_server",
+					ID:                 "1",
+					Projects:           []string{"any-project-name"},
+					ProducerObjectType: "chef_server",
 				},
 				{
-					ID:         "2",
-					Projects:   []string{"another-any-project-name"},
-					ProducerID: "chef_server",
+					ID:                 "2",
+					Projects:           []string{"another-any-project-name"},
+					ProducerObjectType: "chef_server",
 				},
 				{
-					ID:         "3",
-					ProducerID: "chef_server",
+					ID:                 "3",
+					ProducerObjectType: "chef_server",
 				},
 			},
 			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
@@ -522,8 +522,8 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One chef_server event with a no project. All projects requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
 				},
 			},
 			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
@@ -533,8 +533,8 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One chef_server event with a no project. Unassigned projects requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
 				},
 			},
 			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
@@ -544,9 +544,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "No events returned. One chef_server event with a project. Unassigned projects requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project9"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project9"},
 				},
 			},
 			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
@@ -556,13 +556,13 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. Two chef_server events one with a project and the other without a project. Unassigned projects requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project9"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project9"},
 				},
 				{
-					ID:         "2",
-					ProducerID: "chef_server",
+					ID:                 "2",
+					ProducerObjectType: "chef_server",
 				},
 			},
 			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
@@ -572,9 +572,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One chef_server event with a project. Unassigned and one matching projects requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project9"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project9"},
 				},
 			},
 			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID, "project9"}),
@@ -584,9 +584,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One chef_server event without a project. No projects requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{},
 				},
 			},
 			ctx:         contextWithProjects([]string{}),
@@ -596,14 +596,14 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "Two events returned. Both are chef_server events with and without projects. No projects requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{},
 				},
 				{
-					ID:         "2",
-					ProducerID: "chef_server",
-					Projects:   []string{"project9"},
+					ID:                 "2",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project9"},
 				},
 			},
 			ctx:         contextWithProjects([]string{}),
@@ -613,9 +613,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One chef_server event with a project. One matching of several requested projects",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project9"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project9"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
@@ -625,14 +625,14 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "Two events returned. Two chef_server events with different projects. Two matching projects of several requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project9"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project9"},
 				},
 				{
-					ID:         "2",
-					ProducerID: "chef_server",
-					Projects:   []string{"project3"},
+					ID:                 "2",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project3"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
@@ -642,9 +642,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "No events returned. One chef_server event a projects. No matching projects of several requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project9"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project9"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project3", "project8", "project7", "project6"}),
@@ -654,14 +654,14 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "No events returned. Two chef_server events different projects. No matching projects of several requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project9"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project9"},
 				},
 				{
-					ID:         "2",
-					ProducerID: "chef_server",
-					Projects:   []string{"project10"},
+					ID:                 "2",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project10"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project3", "project8", "project7", "project6"}),
@@ -671,9 +671,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One chef_server event with several different projects. One matching project requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project3", "project4", "project7", "project6"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project3", "project4", "project7", "project6"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project3"}),
@@ -683,14 +683,14 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "Two events returned. Two chef_server events both with several projects. One project matching both events requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project5", "project6", "project3", "project7"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project5", "project6", "project3", "project7"},
 				},
 				{
-					ID:         "2",
-					ProducerID: "chef_server",
-					Projects:   []string{"project1", "project3", "project2", "project4"},
+					ID:                 "2",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project1", "project3", "project2", "project4"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project3"}),
@@ -700,14 +700,14 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. Two chef_server events both with several projects. One project matching one of the events requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project5", "project6", "project3", "project7"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project5", "project6", "project3", "project7"},
 				},
 				{
-					ID:         "2",
-					ProducerID: "chef_server",
-					Projects:   []string{"project1", "project3", "project2", "project4"},
+					ID:                 "2",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project1", "project3", "project2", "project4"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project6"}),
@@ -717,9 +717,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One chef_server event with several different projects. Several projects with one matching requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project3", "project4", "project7", "project6"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project3", "project4", "project7", "project6"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project1", "project3", "project2", "project14"}),
@@ -729,14 +729,14 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "Two events returned. Two chef_server events both with several projects. Several projects with different one matching the events requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project5", "project6", "project3", "project7"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project5", "project6", "project3", "project7"},
 				},
 				{
-					ID:         "2",
-					ProducerID: "chef_server",
-					Projects:   []string{"project1", "project9", "project2", "project4"},
+					ID:                 "2",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project1", "project9", "project2", "project4"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project11", "project9", "project6", "project14"}),
@@ -746,9 +746,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One chef_server event with several different projects. Several projects with non matching requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project3", "project4", "project7", "project6"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project3", "project4", "project7", "project6"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project1", "project13", "project2", "project14"}),
@@ -758,9 +758,9 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			description: "One event returned. One chef_server event with several different projects. Several projects with two matching requested",
 			entries: []feed.FeedEntry{
 				{
-					ID:         "1",
-					ProducerID: "chef_server",
-					Projects:   []string{"project3", "project10", "project7", "project6"},
+					ID:                 "1",
+					ProducerObjectType: "chef_server",
+					Projects:           []string{"project3", "project10", "project7", "project6"},
 				},
 			},
 			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
@@ -773,7 +773,7 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			for index := range test.entries {
 				test.entries[index].Published = time.Now()
 				test.entries[index].ProducerName = "Fred"
-				test.entries[index].ProducerObjectType = "user"
+				test.entries[index].ProducerID = "environment"
 				test.entries[index].ProducerTags = []string{"mycompany", "engineering department", "compliance team"}
 				test.entries[index].FeedType = "event"
 				test.entries[index].EventType = event.ScanJobUpdatedEventName

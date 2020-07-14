@@ -21,8 +21,56 @@ document "event_feed_add_event" <<DOC
   Add an example event
 DOC
 function event_feed_add_event() {
-  chef-automate dev grpcurl event-feed-service -- chef.automate.domain.event_feed.api.EventFeedService.HandleEvent -d \
-    '{"EventID": "f7b3ffa0-3f17-4bf3-8a01-8a15e17f6eeb", "Published": "2019-06-28T15:17:21Z", "Producer": { "ID": "", "ProducerName": "ProducerName", "ProducerType": "ProducerType", "Tags": []}, "Type": { "Name": "event type"}, "Actor": {"ID":"actor ID", "ObjectType": "actor ObjectType", "DisplayName": "actor DisplayName"}, "Object": {"ID":"object ID", "DisplayName": "object display name", "ObjectType": "object ObjectType"}, "Target": {"ID": "target ID", "ObjectType": "target ObjectType", "DisplayName": "target DisplayName"}}'
+  generate_random_chef_server_event | send_event
+}
+
+document "send_event" <<DOC
+  Send a piped in json to the event feed service
+DOC
+function send_event() {
+  read -r message
+  chef-automate dev grpcurl event-feed-service -- chef.automate.domain.event_feed.api.EventFeedService.HandleEvent -d "$message"
+}
+
+document "generate_event_example" <<DOC
+  Generate a exmaple event
+DOC
+function generate_event_example() {
+    echo '{"EventID": "f7b3ffa0-3f17-4bf3-8a01-8a15e17f6eeb", "Published": "2019-06-28T15:17:21Z", "Producer": { "ID": "", "ProducerName": "ProducerName", "ProducerType": "ProducerType", "Tags": []}, "Type": { "Name": "event type"}, "Actor": {"ID":"actor ID", "ObjectType": "actor ObjectType", "DisplayName": "actor DisplayName"}, "Object": {"ID":"object ID", "DisplayName": "object display name", "ObjectType": "object ObjectType"}, "Target": {"ID": "target ID", "ObjectType": "target ObjectType", "DisplayName": "target DisplayName"}}'
+}
+
+document "generate_random_chef_server_event" <<DOC
+  Add an example chef_server event
+DOC
+function generate_random_chef_server_event() {
+  local uuid
+  uuid=$(uuidgen)
+
+  json="$(generate_random_event_example | jq --arg uuid "$uuid" \
+    '.Producer.ID = "environment" |
+     .Producer.ProducerName = "Environment" |
+     .Producer.ProducerType = "chef_server" |
+     .Verb = "create" |
+     .Actor.ObjectType = "User" |
+     .Actor.DisplayName = "krasnow" |
+     .Object.ObjectType = "environment" |
+     .Object.DisplayName = "acceptance-chef-products-automate-master" |
+     .Object.ID = $uuid |
+     .Projects = ["project9"]')"
+
+  echo $json
+}
+
+document "generate_random_event_example" <<DOC
+  Add an example event with random ID and time from the last 144 hours.
+DOC
+function generate_random_event_example() {
+  local uuid
+  uuid=$(uuidgen)
+  local rfc_time
+  rfc_time=$(date +%FT%TZ -d "$((RANDOM % 144)) hour ago")
+
+  generate_event_example | jq --arg uuid "$uuid" --arg rfc_time "$rfc_time" '.EventID = $uuid | .Published = $rfc_time'
 }
 
 document "event_feed_summary" <<DOC

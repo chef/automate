@@ -11,7 +11,7 @@ import (
 
 var (
 	ProjectTag              = "projects"
-	ProducerIDTag           = "producer_id"
+	ProducerTypeTag         = "producer_object_type"
 	ChefServerProducerIDTag = "chef_server"
 )
 

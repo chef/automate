@@ -146,6 +146,7 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 		TargetName:         req.Target.DisplayName,
 		TargetObjectType:   req.Target.ObjectType,
 		Created:            time.Now().UTC(),
+		Projects:           req.Projects,
 	}
 
 	success, err := f.store.CreateFeedEntry(&feedEntry)
