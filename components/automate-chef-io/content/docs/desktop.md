@@ -59,7 +59,7 @@ Selecting an error opens the Filter Desktop List with the applied error filter t
 ### Filtered Desktop Lists
 
 Selecting rows in _Daily Check-in_, _Time since Last Check-in_, or _Top 10 Errors_ activates the Filtered Desktop List.
-The Filtered Desktop List displays a list of desktops filtered according to the selected status,timeframe, or error in the previous display.
+The Filtered Desktop List displays a list of desktops filtered according to the selected status, timeframe, or error in the previous display.
 
 Apply more filters to this initial list if desired.
 Specific filter values populate according to available desktop information and include the categories of "platform," "environment," "domain," and "last run status."
@@ -71,8 +71,10 @@ Select an individual desktop row to display the individual desktop's node detail
 The _Node Details_ display shows the details of a single desktop and includes a visualization of its check-in history.
 
 The individual check-in history displays the desktop's latest status for each day with an associated icon.
-Hover over a status icon to see the status name.
+Hover over a status icon to see the status label.
 Statuses include "converged" (check box icon), "unchanged" (dash icon), "error" (exclamation point icon), or "missing" (question mark icon).
 The timescale of the check-in history can also switch between "Last 2 Weeks" and "Last 4 Weeks."
 
 The individual desktop has an information panel that displays the following data: Overview, Chef Infra Client, System, Virtualization, and Kernel.
+
+Select **Download** and choose the output format -- **JSON** or **CSV** -- to download the individual desktop's historical data.
