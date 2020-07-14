@@ -9,6 +9,12 @@ import (
 	project_update_lib "github.com/chef/automate/lib/authz"
 )
 
+var (
+	ProjectTag              = "projects"
+	ProducerTypeTag         = "producer_object_type"
+	ChefServerProducerIDTag = "chef_server"
+)
+
 type FeedStore interface {
 	// @param (context, indexName)
 	DeleteIndex(ctx context.Context, index string) error

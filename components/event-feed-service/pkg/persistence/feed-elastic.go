@@ -5,15 +5,18 @@ import (
 	"encoding/json"
 	"math"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	olivere "gopkg.in/olivere/elastic.v6"
 
+	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	feedErrors "github.com/chef/automate/components/event-feed-service/pkg/errors"
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	project_update_lib "github.com/chef/automate/lib/authz"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 const (
@@ -150,12 +153,22 @@ func (efs ElasticFeedStore) GetFeed(query *feed.FeedQuery) ([]*feed.FeedEntry, i
 		mainQuery = mainQuery.Must(rangeQuery)
 	}
 
-	searchService := efs.client.Search().
+	searchSource := olivere.NewSearchSource().
 		Query(mainQuery).
-		Index(IndexNameFeeds).
 		Size(query.Size).
 		Sort(PublishedTimestampField, query.Ascending).
 		Sort(FeedEntryID, query.Ascending)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, 0, errors.Wrap(err, "getting source")
+	}
+
+	logQueryPartMin(IndexNameFeeds, source, "GetFeed")
+
+	searchService := efs.client.Search().
+		SearchSource(searchSource).
+		Index(IndexNameFeeds)
 
 	if query.CursorDate.Unix() != 0 && query.CursorID != "" {
 		milliseconds := query.CursorDate.UnixNano() / int64(time.Millisecond)
@@ -228,13 +241,48 @@ func newBoolQueryFromFilters(filters map[string][]string) *olivere.BoolQuery {
 		if len(values) == 0 {
 			continue
 		}
-		filterQuery := olivere.NewBoolQuery().Should(
-			olivere.NewTermsQuery(field, stringArrayToInterfaceArray(values)...))
+		filterQuery := olivere.NewBoolQuery()
+		refinedValues := make([]string, 0, 0)
+		if field == ProjectTag {
+			// do not project filter on non-chef-server events
+			notChefServerEvent := olivere.NewBoolQuery()
+			notChefServerEvent.MustNot(olivere.NewTermQuery(ProducerTypeTag, ChefServerProducerIDTag))
+			filterQuery = filterQuery.Should(notChefServerEvent)
 
+			if stringutils.SliceContains(values, authzConstants.UnassignedProjectID) {
+				emptyProjectQuery := olivere.NewBoolQuery()
+				emptyProjectQuery.MustNot(olivere.NewExistsQuery(field))
+				filterQuery = filterQuery.Should(emptyProjectQuery)
+			}
+
+			refinedValues = stringutils.SliceFilter(values, func(projectId string) bool {
+				return projectId != authzConstants.UnassignedProjectID
+			})
+		} else {
+			for _, value := range values {
+				if containsWildcards(value) {
+					wildQuery := olivere.NewWildcardQuery(field, value)
+					filterQuery = filterQuery.Should(wildQuery)
+				} else {
+					refinedValues = append(refinedValues, value)
+				}
+			}
+		}
+
+		// Even if there is a wildcard value found, we still want to narrow down by any other values.
+		// This would probably negate anything found with wildcards but using should brings back extra results
+		if len(refinedValues) > 0 {
+			termQuery := olivere.NewTermsQuery(field, stringArrayToInterfaceArray(refinedValues)...)
+			filterQuery = filterQuery.Should(termQuery)
+		}
 		boolQuery = boolQuery.Filter(filterQuery)
 	}
 
 	return boolQuery
+}
+
+func containsWildcards(value string) bool {
+	return strings.Contains(value, "*") || strings.Contains(value, "?")
 }
 
 // stringArrayToInterfaceArray Converts an array of strings into an array of interfaces
@@ -639,4 +687,19 @@ func getPercentageComplete(status interface{}) float64 {
 	}
 
 	return updated / total
+}
+
+func logQueryPartMin(indices string, partToPrint interface{}, name string) {
+	part, err := json.Marshal(partToPrint)
+	if err != nil {
+		logrus.Errorf("%s", err)
+	}
+	stringPart := string(part)
+	if stringPart == "null" {
+		stringPart = ""
+	} else {
+		stringPart = "\n" + stringPart
+	}
+	logrus.Debugf("\n------------------ %s-(start)--[%s]---------------%s \n------------------ %s-(end)-----------------------------------\n",
+		name, indices, stringPart, name)
 }
