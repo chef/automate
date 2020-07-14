@@ -13,7 +13,7 @@ Desktop information populates this dashboard after a Chef Infra Client run has e
 ## Setting Up the Desktop Dashboard
 
 Enable the Desktop dashboard with: `chef-automate deploy --product automate --product infra-server --product desktop`.
-For more information, see [Install Chef Infra Server with Chef Automate](https://automate.chef.io/docs/infra-server/).
+For more installation information, see [Install Chef Infra Server with Chef Automate](https://automate.chef.io/docs/infra-server/).
 The Desktop dashboard has no supported compliance profiles, and installation with the `--product desktop` flag includes no compliance profiles.
 
 {{< info >}}
@@ -37,7 +37,7 @@ Below the bar, boxes display counts of all desktops, desktops with an `unknown` 
 `Checked-in` refers to desktops reporting into Chef Automate.
 `Unknown` desktops did not report to Chef Automate during the last twenty-four hours.
 
-Clicking on a box will display a Filtered Desktop List of desktops for the selected status.
+Selecting a box will display a Filtered Desktop List of desktops for the selected status.
 The selected filters will not persist when selecting a different box.
 
 ### Check-in History
