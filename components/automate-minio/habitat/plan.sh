@@ -8,6 +8,7 @@ pkg_deps=(
   core/bash
   core/curl
   core/cacerts
+  core/coreutils
   chef/automate-platform-tools
 )
 
