@@ -52,7 +52,8 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   // Manual Deletion of Services
   public servicesList: GroupService[];
   public checkedServices: number[] = [];
-  public allChecked = false;
+  public isAllSelected = false;
+  public isIndeterminate = false;
   public checkedServicesDisplay: string | number = '';
 
   constructor(
@@ -164,13 +165,25 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     } else {
       this.checkedServices = [];
     }
-    this.allChecked = checked;
     this.updateCheckedServicesDisplay();
   }
 
   private updateCheckedServicesDisplay() {
+    // Must reset values for indeterminate to function properly
+    this.isAllSelected = false;
+    this.isIndeterminate = false;
+
     this.checkedServicesDisplay =
       this.checkedServices.length > 0 ? this.checkedServices.length : '';
+
+    if (this.checkedServices.length === this.servicesList.length) {
+      this.isAllSelected = true;
+    } else if ( this.checkedServices.length < 1 ) {
+      this.isAllSelected = false;
+    } else {
+      this.isIndeterminate = true;
+    }
   }
+
 
 }

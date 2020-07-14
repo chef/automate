@@ -55,7 +55,8 @@
     </div>
     <div class="bulk-action-bar">
       <chef-checkbox
-        [checked]="allChecked"
+        [checked]="isAllSelected"
+        [indeterminate]="isIndeterminate"
         (change)="handleSelectAll($event.detail)">Select All</chef-checkbox>
       <chef-button tertiary>Delete {{ checkedServicesDisplay }} Services</chef-button>
     </div>
