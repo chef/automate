@@ -166,6 +166,34 @@ func init() {
         ]
       }
     },
+    "/api/beta/cfgmgmt/rollouts/test_create": {
+      "post": {
+        "summary": "CreateRolloutTest",
+        "description": "CreateRolloutTest is a no-op endpoint that has the same auth requirements as\nCreateRollout. It can be used to verify end-to-end config/connectivity for\nclients\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ningest:unifiedEvents:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "CreateRolloutTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CreateRolloutTest"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.CreateRolloutTest"
+            }
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/api/v0/cfgmgmt/errors": {
       "get": {
         "summary": "List Errors",
@@ -872,6 +900,9 @@ func init() {
       },
       "description": "CreateRollout is a request to create a new Rollout. All\nfields have the same meaning as with the response Rollout\ntype."
     },
+    "chef.automate.api.cfgmgmt.request.CreateRolloutTest": {
+      "type": "object"
+    },
     "chef.automate.api.cfgmgmt.request.SCMType": {
       "type": "string",
       "enum": [
@@ -969,6 +1000,9 @@ func init() {
           "title": "The number of nodes for this duration"
         }
       }
+    },
+    "chef.automate.api.cfgmgmt.response.CreateRolloutTest": {
+      "type": "object"
     },
     "chef.automate.api.cfgmgmt.response.CurrentRolloutProgress": {
       "type": "object",

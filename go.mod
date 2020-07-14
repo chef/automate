@@ -65,6 +65,7 @@ require (
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
+	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
 	github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9

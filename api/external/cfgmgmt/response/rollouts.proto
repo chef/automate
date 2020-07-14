@@ -163,3 +163,4 @@ message PastRolloutProgress {
   string build_link = 6;
 }
 
+message CreateRolloutTest {}
