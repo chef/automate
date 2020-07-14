@@ -75,7 +75,10 @@ func runGenConfigCommand(c *cobra.Command, args []string) error {
 		return err
 	}
 
-	cliIO.msg("# Config verified by successful request to %q", ac.TestURL)
+	// if this would return an error, we would have gotten an error above and not
+	// reached this code.
+	testURL, _ := ac.TestURL()
+	cliIO.msg("# Config verified by successful request to %q", testURL)
 
 	if genConfigCommands.writeRepoConfig {
 		err := conf.WriteRepoConfigFiles()
