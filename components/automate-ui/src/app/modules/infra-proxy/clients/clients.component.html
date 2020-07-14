@@ -9,7 +9,9 @@
       </chef-thead>
       <chef-tbody>
         <chef-tr *ngFor="let client of clients">
-          <chef-td>{{ client.name }}</chef-td>
+          <chef-td>
+            <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'clients', client.name]">{{ client.name }}</a>
+          </chef-td>
         </chef-tr>
       </chef-tbody>
     </chef-table>

@@ -7,6 +7,7 @@ import {
 } from './modules/token/token-details/api-token-details.component';
 import { ApiTokenListComponent } from './modules/token/token-list/api-token-list.component';
 import { ApplicationsComponent } from './pages/applications/applications.component';
+import { ClientDetailsComponent } from './modules/infra-proxy/client-details/client-details.component';
 import { EventFeedComponent } from './pages/event-feed/event-feed.component';
 import { IntegrationsAddComponent } from './pages/integrations/add/integrations-add.component';
 import {
@@ -267,6 +268,10 @@ const routes: Routes = [
             {
               path: ':id/organizations/:orgid/data_bags/:name',
               component: DataBagsDetailsComponent
+            },
+            {
+              path: ':id/organizations/:orgid/clients/:name',
+              component: ClientDetailsComponent
             }
           ]
         }

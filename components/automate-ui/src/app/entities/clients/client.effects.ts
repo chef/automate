@@ -11,7 +11,10 @@ import {
   GetClientsSuccess,
   ClientsSuccessPayload,
   GetClientsFailure,
-  ClientActionTypes
+  ClientActionTypes,
+  GetClient,
+  GetClientSuccess,
+  GetClientFailure
 } from './client.action';
 
 import { ClientRequests } from './client.requests';
@@ -43,4 +46,23 @@ export class ClientEffects {
       });
     }));
 
+  @Effect()
+  getClient$ = this.actions$.pipe(
+    ofType(ClientActionTypes.GET),
+    mergeMap(({ payload: { server_id, org_id, name } }: GetClient) =>
+      this.requests.getClient(server_id, org_id, name).pipe(
+        map((resp) => new GetClientSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+        observableOf(new GetClientFailure(error))))));
+
+  @Effect()
+  getClientFailure$ = this.actions$.pipe(
+    ofType(ClientActionTypes.GET_FAILURE),
+    map(({ payload }: GetClientFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get client: ${msg || payload.error}`
+      });
+    }));
 }

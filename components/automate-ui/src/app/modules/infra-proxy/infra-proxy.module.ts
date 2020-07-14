@@ -8,6 +8,7 @@ import { ChefComponentsModule } from 'app/components/chef-components.module';
 import { ChefServerDetailsComponent } from './chef-server-details/chef-server-details.component';
 import { ChefServersListComponent } from './chef-servers-list/chef-servers-list.component';
 import { ClientsComponent } from './clients/clients.component';
+import { ClientDetailsComponent } from './client-details/client-details.component';
 import { CookbooksComponent } from './cookbooks/cookbooks.component';
 import { CookbookDetailsComponent } from './cookbook-details/cookbook-details.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
@@ -30,6 +31,7 @@ import { TreeTableModule } from './tree-table/tree-table.module';
     ChefServersListComponent,
     ChefServerDetailsComponent,
     ClientsComponent,
+    ClientDetailsComponent,
     CookbooksComponent,
     CookbookDetailsComponent,
     CreateChefServerModalComponent,
