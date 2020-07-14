@@ -2,9 +2,6 @@
 
 exec 2>&1
 
-chmod 0600 "{{pkg.svc_config_path}}/secrets"
-source "{{pkg.svc_config_path}}/secrets"
-
 mkdir -p "{{pkg.svc_data_path}}/depot"
 
 # Minio requires TLS certs to be in a 'certs' subdirectory of the config-dir.
