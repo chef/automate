@@ -11,8 +11,6 @@ toc = true
     weight = 10
 +++
 
-## Overview
-
 The Reports view under the Compliance tab provides comprehensive insight into the compliance status of all scanned infrastructure.
 
 {{% info %}}
