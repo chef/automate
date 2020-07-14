@@ -12,7 +12,8 @@ import { GetEnvironment } from 'app/entities/environments/environment.action';
 import {
   Environment,
   CookbookVersion,
-  EnvironmentAttributes
+  EnvironmentAttributes,
+  CookbookVersionDisplay
 } from 'app/entities/environments/environment.model';
 import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
 
@@ -26,7 +27,7 @@ export type EnvironmentTabName = 'cookbookConstraints' | 'attributes';
 
 export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   public environment: Environment;
-  public cookbookVersions: CookbookVersion[];
+  public cookbookVersions: CookbookVersionDisplay[];
   public tabValue: EnvironmentTabName = 'cookbookConstraints';
   public url: string;
   public conflictErrorEvent = new EventEmitter<boolean>();
@@ -91,8 +92,8 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
     ).subscribe(environment => {
       this.show = true;
       this.environment = environment;
-      this.cookbookVersions = environment.cookbook_versions.filter(Boolean);
-      if (this.cookbookVersions.length > 0) {
+      this.cookbookVersions = this.toDisplay(environment.cookbook_versions);
+      if (Object.keys(environment.cookbook_versions).length > 0) {
         this.hasCookbookConstraints = true;
       }
       this.attributes = new EnvironmentAttributes(this.environment);
@@ -124,6 +125,13 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
         return {};
       }
     }
+  }
+
+  toDisplay(cookbookVersions: CookbookVersion[]): CookbookVersionDisplay[] {
+    return Object.keys(cookbookVersions).map(function (key) {
+      const value = cookbookVersions[key].split(' ');
+      return {name: key, operator: value[0], versionNumber: value[1]};
+    });
   }
 
   onSelectedTab(event: { target: { value: EnvironmentTabName } }) {
