@@ -84,7 +84,7 @@ describe('CookbookDetailsComponent', () => {
       state: {
         ...defaultRouterRouterState,
         url: `infrastructure/chef-servers/${serverId}/org/${orgId}/cookbooks/${cookbook_name}`,
-        params: { id: serverId, orgid: orgId, cookbook_name: cookbook_name }
+        params: { id: serverId, 'org-id': orgId, 'cookbook-name': cookbook_name }
       }
     }
   };
