@@ -142,7 +142,6 @@ export function serviceGroupsEntityReducer(
       return set('status', EntityStatus.loading, state ) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS:
-      console.log('success');
       return set('status', EntityStatus.loadingSuccess, state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_FAILURE:

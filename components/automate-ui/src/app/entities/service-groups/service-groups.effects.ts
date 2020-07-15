@@ -13,8 +13,7 @@ import {
   ServiceGroupsHealthSummary,
   ServiceGroupsFilters,
   GroupServicesFilters,
-  GroupServicesPayload,
-  GroupService
+  GroupServicesPayload
 } from './service-groups.model';
 
 import {
@@ -113,8 +112,11 @@ export class ServiceGroupsEffects {
     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
     mergeMap((action: DeleteServicesById) =>
       this.requests.deleteServicesById(action.payload.servicesToDelete)),
-    mergeMap(() => [new DeleteServicesByIdSuccess(),
-      new GetServiceGroups(), new GetServiceGroupsCounts()] ),
+    mergeMap(() => [
+      new DeleteServicesByIdSuccess(),
+      new GetServiceGroups(),
+      new GetServiceGroupsCounts()
+    ]),
     catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error))
   ));
 }

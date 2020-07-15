@@ -4,8 +4,7 @@ import {
   ServiceGroupsHealthSummary,
   ServiceGroupsPayload,
   GroupServicesPayload,
-  GroupServicesFilters,
-  GroupService
+  GroupServicesFilters
 } from './service-groups.model';
 
 export enum ServiceGroupsActionTypes {

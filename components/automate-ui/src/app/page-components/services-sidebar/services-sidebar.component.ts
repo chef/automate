@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { getOr } from 'lodash/fp';
 
 import { EntityStatus } from '../../entities/entities';
@@ -98,6 +98,15 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
       .subscribe((services) => {
         this.servicesList = services;
     });
+
+    this.serviceGroupsStatus$.pipe(
+      filter(status => status === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed)
+      )
+      .subscribe(() => {
+        this.resetServiceSelections();
+    });
+
   }
 
   ngOnDestroy() {
@@ -177,7 +186,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.checkedServicesDisplay =
       this.checkedServices.length > 0 ? this.checkedServices.length : '';
 
-    if (this.checkedServices.length === this.servicesList.length) {
+    if (this.checkedServices.length === this.servicesList.length && this.servicesList.length > 0) {
       this.isAllSelected = true;
     } else if ( this.checkedServices.length < 1 ) {
       this.isAllSelected = false;
@@ -196,6 +205,12 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
 
   public deleteServices(): void {
     this.store.dispatch( new DeleteServicesById({servicesToDelete: this.checkedServices}) );
+  }
+
+  private resetServiceSelections(): void {
+    this.checkedServices = [];
+    this.updateCheckedServicesDisplay();
+    this.closeDeleteModal();
   }
 
 }
