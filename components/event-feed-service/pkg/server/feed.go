@@ -101,12 +101,20 @@ func (f *FeedService) GetFeedSummary(countCategory string, filters []string,
 }
 
 // interval = time span for which to collect activity entries in hours
-func (f *FeedService) GetActionLine(filters []string, startDate string, endDate string, timezone string, interval int, action string) (*feed.ActionLine, error) {
+func (f *FeedService) GetActionLine(ctx context.Context, filters []string, startDate string, endDate string, timezone string, interval int, action string) (*feed.ActionLine, error) {
 
 	// remove action (aka "task") from the filters array...
 	// we're already filtering lines by action
 	filters = stringutils.SliceReject(filters, action)
-	line, err := f.store.GetActionLine(filters, startDate, endDate, timezone, interval, action)
+	formattedFilters, err := feed.FormatFilters(filters)
+	if err != nil {
+		return &feed.ActionLine{}, err
+	}
+	formattedFilters, err = filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, err
+	}
+	line, err := f.store.GetActionLine(formattedFilters, startDate, endDate, timezone, interval, action)
 	if err != nil {
 		return &feed.ActionLine{}, errors.Wrap(err, "getting timeline from persistence store")
 	}

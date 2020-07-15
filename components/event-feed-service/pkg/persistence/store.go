@@ -29,7 +29,7 @@ type FeedStore interface {
 	CreateFeedEntry(entry *feed.FeedEntry) (bool, error)
 	GetFeed(query *feed.FeedQuery) ([]*feed.FeedEntry, int64, error)
 	GetFeedSummary(query *feed.FeedSummaryQuery) (map[string]int64, error)
-	GetActionLine(filters []string, startDate string, endDate string, timezone string, interval int, action string) (*feed.ActionLine, error)
+	GetActionLine(filters map[string][]string, startDate string, endDate string, timezone string, interval int, action string) (*feed.ActionLine, error)
 }
 
 func NewFeedStore(esClient *olivere.Client) FeedStore {

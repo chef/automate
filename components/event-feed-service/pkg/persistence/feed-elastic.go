@@ -491,18 +491,13 @@ func (efs *ElasticFeedStore) indexExists(name string) (bool, error) {
 // interval - 24 must be divisible by this number
 // For example 1, 2, 3, 4, 6, 8, 12, and 24 are valid. Where
 // 5, 7, 9, 10, 11, and 13 are not valid values.
-func (efs ElasticFeedStore) GetActionLine(filters []string, startDate string, endDate string, timezone string, interval int, action string) (*feed.ActionLine, error) {
+func (efs ElasticFeedStore) GetActionLine(formattedFilters map[string][]string, startDate string, endDate string, timezone string, interval int, action string) (*feed.ActionLine, error) {
 	exists, err := efs.indexExists(IndexNameFeeds)
 	if err != nil {
 		return &feed.ActionLine{}, err
 	}
 	if !exists {
 		return &feed.ActionLine{}, feedErrors.NewBackendError("timeline index %s does not exist", IndexNameFeeds)
-	}
-
-	formattedFilters, err := feed.FormatFilters(filters)
-	if err != nil {
-		return &feed.ActionLine{}, err
 	}
 
 	var (
