@@ -6,3 +6,13 @@ option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
 message PolicyRevision {
   string revision_id = 1;
 }
+
+message PolicyUpdateAction {
+  string policy_name = 1;
+  string policy_group = 2;
+  string policy_revision_id = 3;
+  string chef_server_fqdn = 4;
+  string chef_server_orgname = 5;
+  string chef_server_username = 6;
+  string policyfile_content = 7;
+}

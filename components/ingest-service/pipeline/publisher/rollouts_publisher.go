@@ -1,8 +1,10 @@
 package publisher
 
 import (
+	"context"
 	"time"
 
+	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	log "github.com/sirupsen/logrus"
@@ -46,7 +48,20 @@ func handleMessage(client cfgmgmt.CfgMgmtClient, msg message.ChefAction, out cha
 
 	start := time.Now()
 
-	err := publishZeData(client, msg)
+	req := &request.PolicyUpdateAction{
+		PolicyName:         msg.InternalChefAction.EntityName,
+		PolicyGroup:        msg.InternalChefAction.ParentName,
+		PolicyRevisionId:   msg.InternalChefAction.RevisionId,
+		ChefServerFqdn:     msg.InternalChefAction.ServiceHostname,
+		ChefServerOrgname:  msg.InternalChefAction.OrganizationName,
+		ChefServerUsername: msg.InternalChefAction.RequestorName,
+		PolicyfileContent:  msg.InternalChefAction.Data,
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := client.HandlePolicyUpdateAction(ctx, req)
 
 	logCtx := log.WithFields(log.Fields{
 		"message_id":  msg.ID,
@@ -68,17 +83,10 @@ func isPolicyUpdateAction(msg message.ChefAction) bool {
 	// When using this endpoint, Chef Server sends the policy group name as the
 	// "parent" entity.
 	// Chef Server offers other policyfile APIs but these are not used in practice.
+	//
+	// Setting of parent entity fields happens here-ish:
+	// https://github.com/chef/chef-server/blob/1dd58e0236cdaa21014b356758f53d6c080fc28e/src/oc_erchef/apps/oc_chef_wm/src/oc_chef_action.erl#L219
 
-	// entity_name=jenkins entity_task=update entity_type=policy parent_name=foo3 parent_type=policy_group type=ingest_time
 	a := msg.InternalChefAction
 	return a.EntityType == "policy" && a.ParentType == "policy_group"
-}
-
-func publishZeData(client cfgmgmt.CfgMgmtClient, message message.ChefAction) error {
-	// TODO: put some code here :) ... or inline it into handleMessage
-	// We can get the policy group from the ParentName field when the
-	// ParentType is "policy_group".
-	// It comes from here-ish: https://github.com/chef/chef-server/blob/1dd58e0236cdaa21014b356758f53d6c080fc28e/src/oc_erchef/apps/oc_chef_wm/src/oc_chef_action.erl#L219
-	// parent_name=foo3 parent_type=policy_group
-	return nil
 }

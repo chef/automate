@@ -560,6 +560,26 @@ func (mr *MockCfgMgmtClientMockRecorder) GetVersion(arg0, arg1 interface{}, arg2
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetVersion), varargs...)
 }
 
+// HandlePolicyUpdateAction mocks base method
+func (m *MockCfgMgmtClient) HandlePolicyUpdateAction(arg0 context.Context, arg1 *request0.PolicyUpdateAction, arg2 ...grpc.CallOption) (*response0.PolicyUpdateAction, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HandlePolicyUpdateAction", varargs...)
+	ret0, _ := ret[0].(*response0.PolicyUpdateAction)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HandlePolicyUpdateAction indicates an expected call of HandlePolicyUpdateAction
+func (mr *MockCfgMgmtClientMockRecorder) HandlePolicyUpdateAction(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandlePolicyUpdateAction", reflect.TypeOf((*MockCfgMgmtClient)(nil).HandlePolicyUpdateAction), varargs...)
+}
+
 // ListNodeSegmentsWithRolloutProgress mocks base method
 func (m *MockCfgMgmtClient) ListNodeSegmentsWithRolloutProgress(arg0 context.Context, arg1 *request.ListNodeSegmentsWithRolloutProgress, arg2 ...grpc.CallOption) (*response.NodeSegmentsWithRolloutProgress, error) {
 	m.ctrl.T.Helper()
@@ -1277,6 +1297,21 @@ func (m *MockCfgMgmtServer) GetVersion(arg0 context.Context, arg1 *request0.Vers
 func (mr *MockCfgMgmtServerMockRecorder) GetVersion(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetVersion), arg0, arg1)
+}
+
+// HandlePolicyUpdateAction mocks base method
+func (m *MockCfgMgmtServer) HandlePolicyUpdateAction(arg0 context.Context, arg1 *request0.PolicyUpdateAction) (*response0.PolicyUpdateAction, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HandlePolicyUpdateAction", arg0, arg1)
+	ret0, _ := ret[0].(*response0.PolicyUpdateAction)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HandlePolicyUpdateAction indicates an expected call of HandlePolicyUpdateAction
+func (mr *MockCfgMgmtServerMockRecorder) HandlePolicyUpdateAction(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandlePolicyUpdateAction", reflect.TypeOf((*MockCfgMgmtServer)(nil).HandlePolicyUpdateAction), arg0, arg1)
 }
 
 // ListNodeSegmentsWithRolloutProgress mocks base method
