@@ -121,7 +121,7 @@ export class DeleteServicesById implements Action {
 
 export class DeleteServicesByIdSuccess implements Action {
   readonly type = ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS;
-  constructor() { }
+  constructor(public payload: GroupServicesPayload) { }
 }
 
 export class DeleteServicesByIdFailure implements Action {

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { Store, select} from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { takeUntil, filter } from 'rxjs/operators';
 import { getOr } from 'lodash/fp';
@@ -16,6 +16,7 @@ import {
 import { UpdateSelectedSG, DeleteServicesById } from 'app/entities/service-groups/service-groups.actions';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { DateTime } from 'app/helpers/datetime/datetime';
+import { serviceDeletionStatus } from 'app/entities/service-groups/service-groups.selector';
 
 @Component({
   selector: 'app-services-sidebar',
@@ -55,7 +56,6 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public isAllSelected = false;
   public isIndeterminate = false;
   public checkedServicesDisplay: string | number = '';
-  public deleteModalVisible = false;
 
   constructor(
     private serviceGroupsFacade: ServiceGroupsFacadeService,
@@ -99,14 +99,14 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
         this.servicesList = services;
     });
 
-    this.serviceGroupsStatus$.pipe(
+    this.store.pipe(
+      select(serviceDeletionStatus),
       filter(status => status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed)
-      )
+    )
       .subscribe(() => {
-        this.resetServiceSelections();
-    });
-
+          this.resetServiceSelections();
+      });
   }
 
   ngOnDestroy() {

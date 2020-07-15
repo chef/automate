@@ -13,7 +13,8 @@ import {
   ServiceGroupsHealthSummary,
   ServiceGroupsFilters,
   GroupServicesFilters,
-  GroupServicesPayload
+  GroupServicesPayload,
+  GroupService
 } from './service-groups.model';
 
 import {
@@ -39,6 +40,9 @@ import {
   DeleteServicesByIdSuccess,
   DeleteServicesByIdFailure
 } from './service-groups.actions';
+
+import { CreateNotification } from '../notifications/notification.actions';
+import { Type } from '../notifications/notification.model';
 
 @Injectable()
 export class ServiceGroupsEffects {
@@ -112,11 +116,36 @@ export class ServiceGroupsEffects {
     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
     mergeMap((action: DeleteServicesById) =>
       this.requests.deleteServicesById(action.payload.servicesToDelete)),
-    mergeMap(() => [
-      new DeleteServicesByIdSuccess(),
+    mergeMap((payload: GroupServicesPayload) => [
+      // console.log(payload.services.length),
+      new DeleteServicesByIdSuccess(payload),
       new GetServiceGroups(),
       new GetServiceGroupsCounts()
     ]),
     catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error))
   ));
+
+  @Effect()
+  deleteServicesByIdFailure$ = this.actions$.pipe(
+    ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_FAILURE),
+    map(() => {
+      return new CreateNotification({
+        type: Type.error,
+        message: 'Unable to delete service. Please try again, or contact Chef Support.'
+      });
+    })
+  );
+
+  @Effect()
+  deleteServicesByIdSuccess$ = this.actions$.pipe(
+    ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS),
+    map((payload: GroupServicesPayload) => {
+      console.log(payload.services.length);
+      const amount = payload.services.length;
+      return new CreateNotification({
+        type: Type.info,
+        message: `${amount} services deleted.`
+      });
+    })
+  );
 }
