@@ -249,13 +249,13 @@ func TestEventStringsProjectFilter(t *testing.T) {
 		expected    map[string]int
 	}{
 		{
-			description: "No Actions with requesting projects",
+			description: "No events with a request filting on a project",
 			entries:     []feed.FeedEntry{},
 			ctx:         contextWithProjects([]string{"project9"}),
 			expected:    map[string]int{},
 		},
 		{
-			description: "One Action with a project matching requested projects",
+			description: "One event with a project matching the request's project filters",
 			entries: []feed.FeedEntry{
 				{
 					ObjectObjectType:   "policyfile",
@@ -270,7 +270,21 @@ func TestEventStringsProjectFilter(t *testing.T) {
 			},
 		},
 		{
-			description: "Two Actions with a project matching requested projects",
+			description: "One non-chef-server event with no projects; request's has a project",
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "profile",
+					Verb:               "update",
+					ProducerObjectType: "profile",
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: map[string]int{
+				"profile": 1,
+			},
+		},
+		{
+			description: "Two events with the same project matching the request's project filter",
 			entries: []feed.FeedEntry{
 				{
 					ObjectObjectType:   "policyfile",
@@ -289,6 +303,47 @@ func TestEventStringsProjectFilter(t *testing.T) {
 			expected: map[string]int{
 				"policyfile": 1,
 				"cookbook":   1,
+			},
+		},
+		{
+			description: "Two events one chef-server and the other not; The chef-server event has a matching project to the request's projects",
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "policyfile",
+					Verb:               "delete",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "profile",
+					Verb:               "update",
+					ProducerObjectType: "profile",
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: map[string]int{
+				"profile":    1,
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Two events one chef-server and the other not; The chef-server event has a non-matching project to the request's projects",
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "policyfile",
+					Verb:               "delete",
+					Projects:           []string{"non-matching-project"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "profile",
+					Verb:               "update",
+					ProducerObjectType: "profile",
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: map[string]int{
+				"profile": 1,
 			},
 		},
 		{
