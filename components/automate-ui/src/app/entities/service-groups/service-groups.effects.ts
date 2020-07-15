@@ -117,8 +117,7 @@ export class ServiceGroupsEffects {
     mergeMap((action: DeleteServicesById) =>
       this.requests.deleteServicesById(action.payload.servicesToDelete)),
     mergeMap((payload: GroupServicesPayload) => [
-      // console.log(payload.services.length),
-      new DeleteServicesByIdSuccess(payload),
+      new DeleteServicesByIdSuccess({ amount: payload.services.length }),
       new GetServiceGroups(),
       new GetServiceGroupsCounts()
     ]),
@@ -139,12 +138,12 @@ export class ServiceGroupsEffects {
   @Effect()
   deleteServicesByIdSuccess$ = this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS),
-    map((payload: GroupServicesPayload) => {
-      console.log(payload.services.length);
-      const amount = payload.services.length;
+    map((payload: any) => {
+      console.log(payload.payload);
+      const amount = payload.payload.amount;
       return new CreateNotification({
         type: Type.info,
-        message: `${amount} services deleted.`
+        message: `${ amount } services deleted.`
       });
     })
   );
