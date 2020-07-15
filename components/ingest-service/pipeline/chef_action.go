@@ -34,7 +34,7 @@ func NewChefActionPipeline(client backend.Client, authzClient authz.ProjectsClie
 		processor.BuildActionProjectTagger(authzClient),
 		processor.BuildActionMsgToBulkRequestTransformer(client),
 		publisher.BuildBulkActionPublisher(client, maxNumberOfBundledActionMsgs),
-		publisher.BuildRolloutsPublisher(configMgmtClient, maxNumberOfBundledActionMsgs),
+		publisher.BuildConfigMgmtPublisher(configMgmtClient, maxNumberOfBundledActionMsgs),
 		processor.CountActions(&counter),
 	)
 
