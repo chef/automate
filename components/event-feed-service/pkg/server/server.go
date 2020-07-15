@@ -51,7 +51,7 @@ func (eventFeedServer *EventFeedServer) GetFeed(ctx context.Context,
 		"rpc":     "GetFeed",
 	})
 
-	if feedEntries, hits, err = eventFeedServer.feedService.GetFeed(request, ctx); err != nil {
+	if feedEntries, hits, err = eventFeedServer.feedService.GetFeed(ctx, request); err != nil {
 		logctx.WithError(err).Warn("getting feed")
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (eventFeedServer *EventFeedServer) GetFeedSummary(ctx context.Context,
 		return &event_feed.FeedSummaryResponse{}, e.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
-	fs, err := eventFeedServer.feedService.GetFeedSummary(request.CountCategory, request.Filters,
+	fs, err := eventFeedServer.feedService.GetFeedSummary(ctx, request.CountCategory, request.Filters,
 		startTime, endTime)
 	if err != nil {
 		logctx.WithError(err).Warn("getting feed summary")

@@ -27,7 +27,7 @@ func NewFeedService(feedStore persistence.FeedStore) *FeedService {
 	return &FeedService{store: feedStore}
 }
 
-func (f *FeedService) GetFeed(req *event_feed.FeedRequest, ctx context.Context) ([]*feed.FeedEntry, int64, error) {
+func (f *FeedService) GetFeed(ctx context.Context, req *event_feed.FeedRequest) ([]*feed.FeedEntry, int64, error) {
 
 	// Date Range
 	startTime, endTime, err := feed.ValidateMillisecondDateRange(req.Start, req.End)
@@ -74,13 +74,18 @@ func (f *FeedService) GetFeed(req *event_feed.FeedRequest, ctx context.Context) 
 	return resp, hits, nil
 }
 
-func (f *FeedService) GetFeedSummary(countCategory string, filters []string,
+func (f *FeedService) GetFeedSummary(ctx context.Context, countCategory string, filters []string,
 	start time.Time, end time.Time) (*feed.FeedSummary, error) {
 
 	// remove count category from the filters array
 	filters = stringutils.SliceReject(filters, countCategory)
 
 	mapFilters, err := feed.FormatFilters(filters)
+	if err != nil {
+		return nil, err
+	}
+
+	mapFilters, err = filterByProjects(ctx, mapFilters)
 	if err != nil {
 		return nil, err
 	}

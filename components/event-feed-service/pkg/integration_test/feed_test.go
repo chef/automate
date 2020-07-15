@@ -801,7 +801,6 @@ func TestEventFeedProjectFilter(t *testing.T) {
 
 			// collect IDs from events response
 			eventIDs := make([]string, res.TotalEntries)
-			t.Logf("number %d", res.TotalEntries)
 			for index, event := range res.FeedEntries {
 				eventIDs[index] = event.ID
 			}

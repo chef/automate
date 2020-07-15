@@ -352,32 +352,38 @@ func (efs ElasticFeedStore) getAggregationBucket(boolQuery *olivere.BoolQuery, i
 	searchSource := olivere.NewSearchSource().
 		Aggregation(searchTerm, agg)
 
-		// Search Elasticsearch body
-		// {
-		// 	"aggregations":{
-		// 		 "organization_name":{
-		// 				"aggregations":{
-		// 					 "counts":{
-		// 							"terms":{
-		// 								 "field":"[searchTerm]",
-		// 								 "size":1000
-		// 							}
-		// 					 }
-		// 				},
-		// 				"filter":{
-		// 					 "bool":{
-		// 							"must":{
-		// 								 "terms":{
-		// 										"exists":[
-		// 											 "true"
-		// 										]
-		// 								 }
-		// 							}
-		// 					 }
-		// 				}
-		// 		 }
-		// 	}
-		// }
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrap(err, "getting source")
+	}
+
+	logQueryPartMin(indexName, source, "getAggregationBucket")
+	// Search Elasticsearch body
+	// {
+	// 	"aggregations":{
+	// 		 "organization_name":{
+	// 				"aggregations":{
+	// 					 "counts":{
+	// 							"terms":{
+	// 								 "field":"[searchTerm]",
+	// 								 "size":1000
+	// 							}
+	// 					 }
+	// 				},
+	// 				"filter":{
+	// 					 "bool":{
+	// 							"must":{
+	// 								 "terms":{
+	// 										"exists":[
+	// 											 "true"
+	// 										]
+	// 								 }
+	// 							}
+	// 					 }
+	// 				}
+	// 		 }
+	// 	}
+	// }
 	searchResult, err := efs.client.Search().
 		SearchSource(searchSource).
 		Index(indexName).
