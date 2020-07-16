@@ -246,7 +246,7 @@ func newBoolQueryFromFilters(filters map[string][]string) *olivere.BoolQuery {
 		if field == ProjectTag {
 			// do not project filter on non-chef-server events
 			notChefServerEvent := olivere.NewBoolQuery()
-			notChefServerEvent.MustNot(olivere.NewTermQuery(ProducerTypeTag, ChefServerProducerIDTag))
+			notChefServerEvent.MustNot(olivere.NewTermQuery(ProducerTypeTag, ChefServerProducerTypeTag))
 			filterQuery = filterQuery.Should(notChefServerEvent)
 
 			if stringutils.SliceContains(values, authzConstants.UnassignedProjectID) {

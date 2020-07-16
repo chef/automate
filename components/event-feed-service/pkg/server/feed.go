@@ -130,7 +130,7 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 	}
 
 	// translate event message into feed entry
-	feedEntry := feed.FeedEntry{
+	feedEntry := &feed.FeedEntry{
 		ID:                 uuid.Must(uuid.NewV4()).String(),
 		ProducerID:         req.Producer.ID,
 		ProducerName:       req.Producer.ProducerName,
@@ -154,12 +154,34 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 		Projects:           req.Projects,
 	}
 
-	success, err := f.store.CreateFeedEntry(&feedEntry)
+	if isEventFromChefServer(req) {
+		feedEntry.ChefInfraServer = getChefInfraServer(req)
+		feedEntry.ChefOrganization = getChefOrganization(req)
+	}
+
+	success, err := f.store.CreateFeedEntry(feedEntry)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating feed entry in persistence store")
 	}
 
 	return &api.EventResponse{Success: success}, nil
+}
+
+func getChefInfraServer(req *api.EventMsg) string {
+	if req.Data != nil && req.Data.Fields != nil {
+		return req.Data.Fields[persistence.ChefServerFieldTag].GetStringValue()
+	}
+	return ""
+}
+
+func getChefOrganization(req *api.EventMsg) string {
+	if req.Data != nil && req.Data.Fields != nil {
+		return req.Data.Fields[persistence.ChefOrganizationFieldTag].GetStringValue()
+	}
+	return ""
+}
+func isEventFromChefServer(req *api.EventMsg) bool {
+	return req.Producer.ProducerType == persistence.ChefServerProducerTypeTag
 }
 
 func filterByProjects(ctx context.Context, filters map[string][]string) (map[string][]string, error) {
@@ -171,6 +193,6 @@ func filterByProjects(ctx context.Context, filters map[string][]string) (map[str
 		return filters, nil
 	}
 
-	filters["projects"] = projectsFilter
+	filters[persistence.ProjectTag] = projectsFilter
 	return filters, nil
 }

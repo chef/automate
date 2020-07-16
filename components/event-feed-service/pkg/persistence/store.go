@@ -10,9 +10,11 @@ import (
 )
 
 var (
-	ProjectTag              = "projects"
-	ProducerTypeTag         = "producer_object_type"
-	ChefServerProducerIDTag = "chef_server"
+	ProjectTag                = "projects"
+	ProducerTypeTag           = "producer_object_type"
+	ChefServerProducerTypeTag = "chef_server"
+	ChefServerFieldTag        = "chef_infra_server"
+	ChefOrganizationFieldTag  = "chef_organization"
 )
 
 type FeedStore interface {
