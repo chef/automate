@@ -51,6 +51,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   private isDestroyed: Subject<boolean> = new Subject();
 
   // Manual Deletion of Services
+  public deleteModalVisible = false;
   public servicesList: GroupService[];
   public checkedServices: number[] = [];
   public isAllSelected = false;

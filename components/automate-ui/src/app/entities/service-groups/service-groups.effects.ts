@@ -13,8 +13,7 @@ import {
   ServiceGroupsHealthSummary,
   ServiceGroupsFilters,
   GroupServicesFilters,
-  GroupServicesPayload,
-  GroupService
+  GroupServicesPayload
 } from './service-groups.model';
 
 import {
