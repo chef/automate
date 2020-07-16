@@ -811,6 +811,130 @@ func TestEventFeedProjectFilter(t *testing.T) {
 	}
 }
 
+func TestEventFeedChefServerChefOrgFilters(t *testing.T) {
+
+	cases := []struct {
+		description string
+		entries     []feed.FeedEntry
+		filters     []string
+		expectedIDs []string
+	}{
+		{
+			description: "One event stored; filter for a chef infra server matching the event. One event is returned",
+			entries: []feed.FeedEntry{
+				{
+					ID:                 "1",
+					ChefInfraServer:    "server1",
+					ProducerObjectType: "chef_server",
+				},
+			},
+			filters:     []string{"chef_server:server1"},
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "One event stored; filter for a chef infra server non-matching the event; no events are returned",
+			entries: []feed.FeedEntry{
+				{
+					ID:                 "1",
+					ChefInfraServer:    "server1",
+					ProducerObjectType: "chef_server",
+				},
+			},
+			filters:     []string{"chef_server:server2"},
+			expectedIDs: []string{},
+		},
+		{
+			description: "Two events stored with different chef servers; filtering for only one of the events; One event is returned",
+			entries: []feed.FeedEntry{
+				{
+					ID:                 "1",
+					ChefInfraServer:    "server1",
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ID:                 "2",
+					ChefInfraServer:    "server2",
+					ProducerObjectType: "chef_server",
+				},
+			},
+			filters:     []string{"chef_server:server1"},
+			expectedIDs: []string{"1"},
+		},
+
+		{
+			description: "One event stored; filter for a chef org matching the event. One event is returned",
+			entries: []feed.FeedEntry{
+				{
+					ID:                 "1",
+					ChefOrganization:   "org1",
+					ProducerObjectType: "chef_server",
+				},
+			},
+			filters:     []string{"organization:org1"},
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "One event stored; filter for a chef org non-matching the event; no events are returned",
+			entries: []feed.FeedEntry{
+				{
+					ID:                 "1",
+					ChefOrganization:   "org1",
+					ProducerObjectType: "chef_server",
+				},
+			},
+			filters:     []string{"organization:org2"},
+			expectedIDs: []string{},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+			for index := range test.entries {
+				test.entries[index].Published = time.Now()
+				test.entries[index].ProducerName = "Fred"
+				test.entries[index].ProducerID = "environment"
+				test.entries[index].ProducerTags = []string{"mycompany", "engineering department", "compliance team"}
+				test.entries[index].FeedType = "event"
+				test.entries[index].EventType = event.ScanJobUpdatedEventName
+				test.entries[index].Tags = []string{"org_1", "compliance", "profile"}
+				test.entries[index].ActorID = "urn:mycompany:user:fred"
+				test.entries[index].ActorObjectType = "User"
+				test.entries[index].ActorName = "Fred"
+				test.entries[index].Verb = "update"
+				test.entries[index].ObjectID = "urn:chef:compliance:scan-job"
+				test.entries[index].ObjectObjectType = "profile"
+				test.entries[index].ObjectName = "Scan Job"
+				test.entries[index].TargetID = "urn:mycompany:environment:production"
+				test.entries[index].TargetObjectType = "Environment"
+				test.entries[index].TargetName = "Production"
+				test.entries[index].Created = time.Now().UTC()
+
+				testSuite.feedBackend.CreateFeedEntry(&test.entries[index])
+			}
+			testSuite.RefreshIndices(persistence.IndexNameFeeds)
+
+			defer testSuite.DeleteAllDocuments()
+
+			request := &event_feed.FeedRequest{
+				Size:    100,
+				Filters: test.filters,
+			}
+
+			res, err := testSuite.feedClient.GetFeed(context.Background(), request)
+			assert.NoError(t, err)
+
+			// collect IDs from events response
+			eventIDs := make([]string, res.TotalEntries)
+			for index, event := range res.FeedEntries {
+				eventIDs[index] = event.ID
+			}
+
+			// test response
+			assert.ElementsMatch(t, test.expectedIDs, eventIDs)
+		})
+	}
+}
+
 func toMilliseconds(timestamp *google_protobuf.Timestamp) int64 {
 	return timestamp.GetSeconds()*millisPerSecond +
 		int64(timestamp.GetNanos()/nanosPerMillisecond)
