@@ -137,6 +137,20 @@ describe('ServicesSidebarComponent', () => {
       expect(component.checkedServices).not.toContain(300 && 500);
     });
 
+    it('should update the count of services selected', () => {
+      component.ngOnInit();
+      expect(component.checkedServicesDisplay).toBe('Services');
+      component.handleToggleCheckbox(300, true);
+      component.handleToggleCheckbox(400, true);
+      expect(component.checkedServices.length).toEqual(2);
+
+      expect(component.checkedServicesDisplay).toBe('2 Services');
+
+      component.handleToggleCheckbox(300, false);
+      expect(component.checkedServices.length).toEqual(1);
+      expect(component.checkedServicesDisplay).toBe('1 Service');
+    });
+
     xit('should disable the Delete Services button when none are selected', () => {
       expect(component.checkedServices.length).toEqual(0);
 
