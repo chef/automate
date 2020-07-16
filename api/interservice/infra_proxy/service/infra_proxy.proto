@@ -67,7 +67,8 @@ service InfraProxy {
     rpc UpdateEnvironment (chef.automate.domain.infra_proxy.request.UpdateEnvironment) returns (chef.automate.domain.infra_proxy.response.Environment) {};
     rpc DeleteEnvironment (chef.automate.domain.infra_proxy.request.Environment) returns (chef.automate.domain.infra_proxy.response.Environment) {};
 
-    rpc GetAffectedNodes  (chef.automate.domain.infra_proxy.request.AffectedNodes) returns (chef.automate.domain.infra_proxy.response.AffectedNodes) {};
+    rpc GetAffectedNodes (chef.automate.domain.infra_proxy.request.AffectedNodes) returns (chef.automate.domain.infra_proxy.response.AffectedNodes) {};
+    rpc DeleteNode (chef.automate.domain.infra_proxy.request.DeleteNode) returns (chef.automate.domain.infra_proxy.response.DeleteNode) {};
 
     rpc GetPolicyfiles (chef.automate.domain.infra_proxy.request.Policyfiles) returns (chef.automate.domain.infra_proxy.response.Policyfiles) {};
     rpc GetPolicyfile (chef.automate.domain.infra_proxy.request.Policyfile) returns (chef.automate.domain.infra_proxy.response.Policyfile) {};

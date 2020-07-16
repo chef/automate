@@ -343,35 +343,35 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "ID of the Server.",
+            "description": "Chef Infra Server ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "ID of the Org.",
+            "description": "Chef organization ID.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "chef_type",
-            "description": "Type of the chef object (e.g. 'cookbooks', 'roles', 'chef_environment').",
+            "description": "Chef object type (e.g. 'cookbooks', 'roles', 'chef_environment').",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "description": "Name of the chef object.",
+            "description": "Chef object name.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "version",
-            "description": "Version of the chef object.",
+            "description": "Chef object version.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1075,6 +1075,45 @@ func init() {
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateEnvironment"
             }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}": {
+      "delete": {
+        "operationId": "DeleteNode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DeleteNode"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Node name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2133,6 +2172,15 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.DeleteNode": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Node name."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.DeleteOrg": {
       "type": "object",
       "properties": {
@@ -2304,31 +2352,31 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "ID of the node."
+          "description": "Node ID."
         },
         "name": {
           "type": "string",
-          "description": "Name of the node."
+          "description": "Node name."
         },
         "check_in": {
           "type": "string",
-          "description": "Last checked in of the node."
+          "description": "Node last checkin."
         },
         "uptime": {
           "type": "string",
-          "description": "Uptime of the node."
+          "description": "Node uptime."
         },
         "platform": {
           "type": "string",
-          "description": "Name of the platform of the node."
+          "description": "Node platform."
         },
         "environment": {
           "type": "string",
-          "description": "Environment name of the node."
+          "description": "Node environment name."
         },
         "policy_group": {
           "type": "string",
-          "description": "Policy group name of the node."
+          "description": "Node policy group."
         }
       }
     },
