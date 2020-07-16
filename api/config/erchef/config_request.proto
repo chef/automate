@@ -61,6 +61,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value max_request_size = 3;
 				google.protobuf.StringValue base_resource_url = 4;
 				google.protobuf.BoolValue strict_search_result_acls = 5;
+				google.protobuf.StringValue actions_fqdn = 6;
 			}
 
 			message Indexing {
