@@ -24,7 +24,6 @@ export enum FilterName {
   KernelVersion = 'Kernel Version',
   Hostname = 'Hostname',
   Timezone = 'Timezone',
-  LastCheckInTime = 'Last Check-in Time',
   DMIsystemManufacturer = 'DMI System Manufacturer',
   DMIsystemSerialNumber = 'DMI System Serial Number',
   CloudProvider = 'Cloud Provider'
@@ -42,7 +41,6 @@ export const FilterableOptions: FilterOption[] = [
   { name: FilterName.IpAddress, id: 'ip_address'},
   { name: FilterName.Timezone, id: 'timezone'},
   { name: FilterName.Ip6Address, id: 'ip_6_address'},
-  { name: FilterName.LastCheckInTime, id: 'last_check_in_time'},
   { name: FilterName.MacAddress, id: 'mac_address'},
   { name: FilterName.DMIsystemManufacturer, id: 'dmi_system_manufacturer'},
   { name: FilterName.Uptime, id: 'uptime'},
