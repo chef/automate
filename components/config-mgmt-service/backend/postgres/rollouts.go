@@ -50,6 +50,10 @@ ORDER BY policy_domain_url ASC,
 // CreateRollout takes the given rollout attributes and attempts to store the
 // rollout in the database.
 func (p *Postgres) CreateRollout(ctx context.Context, r *NewRollout) (*Rollout, error) {
+	// TODO/FIXME:
+	// - along with adding this, we need to make the other create rollout method work as follows:
+	// if it doesn't exist, then create
+	// if it does exist, then update the metadata fields
 	if _, err := url.Parse(r.PolicyDomainURL); err != nil {
 		return nil, errors.Wrapf(err, "Invalid policy domain URL %q", r.PolicyDomainURL)
 	}
@@ -97,5 +101,31 @@ func (p *Postgres) FindRolloutByNodeSegmentAndTime(nodeSegment *NodeSegment, tim
 	   	we can ignore it if we require retention of rollouts to be longer than CCRs)
 
 	*/
+	return nil, nil
+}
+
+func (p *Postgres) CreateRolloutFromChefAction(ctx context.Context, r *NewRollout) (*Rollout, error) {
+	// From an end-user view, there are two ways to create rollouts. One is with
+	// a metadata collector that runs on workstations and/or Ci, the other is via
+	// Chef Server Actions (notifications). The metadata collector method is
+	// preferred because Chef Server Actions only has the bare minimum data (the
+	// metadata collector collects git and Ci information that the Chef Server
+	// can't). The Chef Server Actions method provides a fallback if metadata
+	// collection isn't configured correctly. It should have the following
+	// behaviors under different circumstances:
+	// - When creating a truly new rollout (revision id, policy name, policy group
+	//   name, and policy domain URL DO NOT match an existing "current" rollout),
+	//   then a new rollout row is inserted.
+	// - When the rollout-to-be-created is already in the database (e.g., it was
+	//   created via a different API/mechanism), ignore.
+	if _, err := url.Parse(r.PolicyDomainURL); err != nil {
+		return nil, errors.Wrapf(err, "Invalid policy domain URL %q", r.PolicyDomainURL)
+	}
+
+	err := p.mapper.WithContext(ctx).Insert(r)
+	if err != nil {
+		return nil, err
+	}
+
 	return nil, nil
 }
