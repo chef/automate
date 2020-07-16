@@ -149,12 +149,9 @@ export function serviceGroupsEntityReducer(
         ) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_FAILURE:
-      console.log('failure');
-      console.log(action.payload);
-      return pipe(
-        set('serviceDeletionStatus', EntityStatus.loadingFailure),
-        set('error', action.payload)
-        )(state) as ServiceGroupsEntityState;
+      return set(
+        'serviceDeletionStatus', EntityStatus.loadingFailure, state
+        ) as ServiceGroupsEntityState;
 
     default:
       return state;

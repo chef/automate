@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { Store, select} from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { takeUntil, filter } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { getOr } from 'lodash/fp';
 
 import { EntityStatus } from '../../entities/entities';
@@ -51,12 +51,12 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   private isDestroyed: Subject<boolean> = new Subject();
 
   // Manual Deletion of Services
-  public deleteModalVisible = false;
   public servicesList: GroupService[];
   public checkedServices: number[] = [];
   public isAllSelected = false;
   public isIndeterminate = false;
   public checkedServicesDisplay: string | number = '';
+  public deleteModalVisible = false;
 
   constructor(
     private serviceGroupsFacade: ServiceGroupsFacadeService,
@@ -102,11 +102,14 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
 
     this.store.pipe(
       select(serviceDeletionStatus),
-      filter(status => status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed)
     )
-      .subscribe(() => {
+      .subscribe((status) => {
+        if (status === EntityStatus.loadingSuccess) {
           this.resetServiceSelections();
+        } else if (status === EntityStatus.loadingFailure) {
+          this.deleteModalVisible = false;
+        }
       });
   }
 
