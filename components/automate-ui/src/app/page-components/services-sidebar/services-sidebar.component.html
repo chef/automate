@@ -6,9 +6,6 @@
       [timeout]="10">
       {{ (serviceGroupsError$ | async).status }}: {{ (serviceGroupsError$ | async).error.message }}
     </app-notification>
-
-
-
   </div>
 </div>
 <div id="services-panel" class="services-panel">
@@ -65,7 +62,7 @@
         id="delete-services-button"
         [disabled]="checkedServices.length === 0"
         (click)="beginServicesDelete()"
-        >Delete {{ checkedServicesDisplay }} Services</chef-button>
+        >Delete {{ checkedServicesDisplay }}</chef-button>
     </div>
     <ul>
       <li class="service-item" *ngFor="let service of services$ | async; let i = index">
@@ -186,8 +183,8 @@
   (closeModal)="closeDeleteModal()"
   >
   <h1>Warning</h1>
-  <p>You are about to delete <strong>{{ checkedServicesDisplay }} services</strong></p>
-  <p>This will delete all data about them from the Applications view, but they will show up again if a new health check report from the service is received.</p>
-  <chef-button primary caution (click)="deleteServices()">Delete {{ checkedServicesDisplay }} Services</chef-button>
+  <p class="modal-line">You are about to delete <strong>{{ checkedServicesDisplay }}.</strong></p>
+  <p class="modal-line">This will delete all data about them from the Applications view, but they will show up again if a new health check report from the service is received.</p>
+  <chef-button primary caution (click)="deleteServices()">Delete {{ checkedServicesDisplay }}</chef-button>
   <chef-button tertiary (click)="closeDeleteModal()">Cancel</chef-button>
 </chef-modal>

@@ -111,6 +111,8 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
           this.deleteModalVisible = false;
         }
       });
+
+    this.updateCheckedServicesDisplay();
   }
 
   ngOnDestroy() {
@@ -187,8 +189,14 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.isAllSelected = false;
     this.isIndeterminate = false;
 
-    this.checkedServicesDisplay =
-      this.checkedServices.length > 0 ? this.checkedServices.length : '';
+    const numOfCheckedServices = this.checkedServices.length;
+    if (numOfCheckedServices === 0) {
+    this.checkedServicesDisplay = 'Services';
+    } else if (numOfCheckedServices === 1) {
+      this.checkedServicesDisplay = '1 Service';
+    } else {
+      this.checkedServicesDisplay = `${numOfCheckedServices} Services`;
+    }
 
     if (this.checkedServices.length === this.servicesList.length && this.servicesList.length > 0) {
       this.isAllSelected = true;

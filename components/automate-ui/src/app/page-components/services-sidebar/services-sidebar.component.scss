@@ -346,3 +346,16 @@ chef-alert {
     margin: 0 8px;
   }
 }
+
+chef-modal[label="delete-services-modal"] {
+  text-align: center;
+
+  h1 {
+    margin-bottom: 24px;
+    color: $chef-critical;
+  }
+
+  .modal-line {
+    margin-bottom: 24px;
+  }
+}
