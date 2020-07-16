@@ -1,6 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { TestBed, ComponentFixture, async } from '@angular/core/testing';
 import { ServicesSidebarComponent } from './services-sidebar.component';
+import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import {
@@ -9,6 +10,7 @@ import {
 
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { By } from '@angular/platform-browser';
+import { DeleteServicesById } from 'app/entities/service-groups/service-groups.actions';
 
 class MockTelemetryService {
   track(_event?: string, _properties?: any): void { }
@@ -26,7 +28,8 @@ describe('ServicesSidebarComponent', () => {
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
-        ServicesSidebarComponent
+        ServicesSidebarComponent,
+        MockComponent({ selector: 'chef-button', inputs: ['disabled'] })
       ],
       providers: [
         { provide: TelemetryService, useClass: MockTelemetryService }
@@ -143,6 +146,9 @@ describe('ServicesSidebarComponent', () => {
 
       component.handleToggleCheckbox(300, true);
       expect(component.checkedServices.length).toEqual(1);
+      fixture.detectChanges();
+
+      expect(deleteButton.nativeElement.disabled).not.toBeTruthy();
     });
 
     describe('Selecting or deselecting all at once', () => {
@@ -162,5 +168,52 @@ describe('ServicesSidebarComponent', () => {
         expect(component.checkedServices.length).toEqual(0);
       });
     });
+
+    describe('clicking delete services button', () => {
+
+      it('delete modal should be visible upon clicking delete', async(() => {
+        expect(component.checkedServices.length).toEqual(0);
+        component.handleToggleCheckbox(300, true);
+        expect(component.checkedServices.length).toEqual(1);
+
+        expect(component.deleteModalVisible).toBe(false);
+        component.beginServicesDelete();
+        fixture.detectChanges();
+
+        expect(component.deleteModalVisible).toBe(true);
+      }));
+
+      it('should hide the delete modal when cancelled with no change to selections', () =>{
+        expect(component.checkedServices.length).toEqual(0);
+        component.handleToggleCheckbox(300, true);
+        component.handleToggleCheckbox(400, true);
+        component.handleToggleCheckbox(500, true);
+        expect(component.checkedServices.length).toEqual(3);
+
+        component.beginServicesDelete();
+        expect(component.deleteModalVisible).toBe(true);
+
+        component.closeDeleteModal();
+        expect(component.deleteModalVisible).toBe(false);
+        expect(component.checkedServices.length).toEqual(3);
+        expect(component.checkedServices).toContain(300 && 400 && 500);
+      });
+
+      it('inside delete modal, clicking Delete button should delete services', () => {
+        component.handleToggleCheckbox(500, true);
+        expect(component.checkedServices.length).toEqual(1);
+        expect(component.checkedServices).toEqual([500]);
+
+        spyOn(store, 'dispatch');
+        component.deleteServices();
+
+        expect(store.dispatch).toHaveBeenCalledWith(
+          new DeleteServicesById({servicesToDelete: component.checkedServices})
+          );
+      });
+
+    });
+
+
   });
 });
