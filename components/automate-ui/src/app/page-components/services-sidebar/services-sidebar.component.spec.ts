@@ -29,7 +29,7 @@ describe('ServicesSidebarComponent', () => {
         ServicesSidebarComponent
       ],
       providers: [
-        { provide: TelemetryService, useClass: MockTelemetryService },
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     });
@@ -143,8 +143,7 @@ describe('ServicesSidebarComponent', () => {
 
       component.handleToggleCheckbox(300, true);
       expect(component.checkedServices.length).toEqual(1);
-
-    })
+    });
 
     describe('Selecting or deselecting all at once', () => {
       it('when checked, should add all service ids to the checkedServices list', () => {
@@ -161,7 +160,7 @@ describe('ServicesSidebarComponent', () => {
 
         component.handleSelectAll(false);
         expect(component.checkedServices.length).toEqual(0);
-      })
+      });
     });
   });
 });

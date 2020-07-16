@@ -136,7 +136,7 @@ export class ServiceGroupsEffects {
     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS),
     mergeMap((payload: any) => {
       const amount = payload.payload.amount;
-      const msg = amount > 1 ? `${amount} services deleted.` : '1 service deleted.'
+      const msg = amount > 1 ? `${amount} services deleted.` : '1 service deleted.';
       return [
         new GetServiceGroups(),
         new GetServiceGroupsCounts(),
