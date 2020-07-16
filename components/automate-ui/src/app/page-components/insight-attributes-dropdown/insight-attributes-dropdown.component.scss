@@ -12,6 +12,7 @@
   border-radius: $spacing-03;
   background: $chef-white;
   box-shadow: $spacing-03 $spacing-03 24px 0 rgba(197, 199, 209, 0.6);
+  z-index: 100;
 
   @include carbon--breakpoint-up(md) {
     max-width: 467px;
