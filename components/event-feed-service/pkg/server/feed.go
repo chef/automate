@@ -169,19 +169,19 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 
 func getChefInfraServer(req *api.EventMsg) string {
 	if req.Data != nil && req.Data.Fields != nil {
-		return req.Data.Fields[persistence.ChefServerFieldTag].GetStringValue()
+		return req.Data.Fields[feed.ChefServerFieldTag].GetStringValue()
 	}
 	return ""
 }
 
 func getChefOrganization(req *api.EventMsg) string {
 	if req.Data != nil && req.Data.Fields != nil {
-		return req.Data.Fields[persistence.ChefOrganizationFieldTag].GetStringValue()
+		return req.Data.Fields[feed.ChefOrganizationFieldTag].GetStringValue()
 	}
 	return ""
 }
 func isEventFromChefServer(req *api.EventMsg) bool {
-	return req.Producer.ProducerType == persistence.ChefServerProducerTypeTag
+	return req.Producer.ProducerType == feed.ChefServerProducerTypeTag
 }
 
 func filterByProjects(ctx context.Context, filters map[string][]string) (map[string][]string, error) {
@@ -193,6 +193,6 @@ func filterByProjects(ctx context.Context, filters map[string][]string) (map[str
 		return filters, nil
 	}
 
-	filters[persistence.ProjectTag] = projectsFilter
+	filters[feed.ProjectTag] = projectsFilter
 	return filters, nil
 }

@@ -16,6 +16,14 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 )
 
+var (
+	ProjectTag                = "projects"
+	ProducerTypeTag           = "producer_object_type"
+	ChefServerProducerTypeTag = "chef_server"
+	ChefServerFieldTag        = "chef_infra_server"
+	ChefOrganizationFieldTag  = "chef_organization"
+)
+
 type FeedSummary struct {
 	Counts map[string]int64
 }
@@ -142,6 +150,10 @@ func ConvertAPIKeyToBackendKey(parameter string) string {
 		return "verb"
 	case "requestor_name":
 		return "actor_name"
+	case "chef_server":
+		return ChefServerFieldTag
+	case "organization":
+		return ChefOrganizationFieldTag
 	default:
 		return parameter
 	}
