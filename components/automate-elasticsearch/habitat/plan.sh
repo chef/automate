@@ -73,15 +73,14 @@ do_install() {
   LD_RUN_PATH=$LD_RUN_PATH:${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/lib
   export LD_RUN_PATH
 
-  _es_ml_bins=( "autoconfig" "autodetect" "categorize" "controller" "normalize" )
-  for bin in "${_es_ml_bins[@]}"; do
+  for bin in autoconfig autodetect categorize controller normalize; do
     build_line "patch ${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/bin/${bin}"
     patchelf --interpreter "$(pkg_path_for glibc)/lib/ld-linux-x86-64.so.2" --set-rpath "${LD_RUN_PATH}" \
       "${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/bin/${bin}"
-
-    find "${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/lib" -type f -name "*.so" \
-      -exec patchelf --set-rpath "${LD_RUN_PATH}" {} \;
   done
+
+  find "${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/lib" -type f -name "*.so" \
+      -exec patchelf --set-rpath "${LD_RUN_PATH}" {} \;
 
   "${pkg_prefix}/es/bin/elasticsearch-plugin" install -b "file://${HAB_CACHE_SRC_PATH}/repository-s3.zip"
 }
