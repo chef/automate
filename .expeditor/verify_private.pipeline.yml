@@ -801,6 +801,15 @@ steps:
         linux:
           privileged: true
 
+  - label: "[integration] deprecated backup w external es"
+    command: integration/run_test integration/tests/deprecated_backup_external_es.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
   - label: "iam reset admin access"
     command:
       - integration/run_test integration/tests/iam_reset_admin_access.sh

@@ -69,6 +69,9 @@ http.port: 59200
 transport.tcp.port: "59300-59400"
 path.repo: "/var/opt/chef-automate/backups"
 discovery.zen.minimum_master_nodes: 1
+
+xpack.security.enabled: false
+xpack.ml.enabled: false
 EOF
 
   local backup_type="$1"
