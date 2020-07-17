@@ -12,6 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 	olivere "gopkg.in/olivere/elastic.v6"
 
+	"github.com/chef/automate/api/interservice/authz"
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	feedErrors "github.com/chef/automate/components/event-feed-service/pkg/errors"
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"
@@ -102,6 +103,40 @@ func (efs ElasticFeedStore) JobStatus(ctx context.Context, jobID string) (projec
 		PercentageComplete:    float32(percentageComplete),
 		EstimatedEndTimeInSec: estimatedEndTimeInSec,
 	}, nil
+}
+
+func (efs ElasticFeedStore) JobCancel(context.Context, string) error {
+	logrus.Info("JobCancel")
+	return nil
+}
+
+func (efs ElasticFeedStore) UpdateProjectTags(context.Context, map[string]*authz.ProjectRules) ([]string, error) {
+	logrus.Info("UpdateProjectTags")
+	return []string{}, nil
+}
+
+func (efs ElasticFeedStore) ListProjectUpdateTasks(
+	ctx context.Context) ([]project_update_lib.SerializedProjectUpdateTask, error) {
+	logrus.Info("ListProjectUpdateTasks")
+	return []project_update_lib.SerializedProjectUpdateTask{}, nil
+}
+
+func (efs ElasticFeedStore) RunProjectUpdateTask(ctx context.Context, projectUpdateID string, params map[string]string,
+	projectTaggingRules map[string]*authz.ProjectRules) (project_update_lib.SerializedProjectUpdateTaskID, project_update_lib.SerializedProjectUpdateTaskStatus, error) {
+	logrus.Info("RunProjectUpdateTask")
+	return "", project_update_lib.SerializedProjectUpdateTaskStatus{}, nil
+}
+
+func (efs ElasticFeedStore) MonitorProjectUpdateTask(ctx context.Context, projectUpdateID string,
+	id project_update_lib.SerializedProjectUpdateTaskID) (project_update_lib.SerializedProjectUpdateTaskStatus, error) {
+	logrus.Info("MonitorProjectUpdateTask")
+	return project_update_lib.SerializedProjectUpdateTaskStatus{}, nil
+}
+
+func (efs ElasticFeedStore) CancelProjectUpdateTask(ctx context.Context,
+	projectUpdateID string, id project_update_lib.SerializedProjectUpdateTaskID) error {
+	logrus.Info("CancelProjectUpdateTask")
+	return nil
 }
 
 func (efs ElasticFeedStore) CreateFeedEntry(entry *feed.FeedEntry) (bool, error) {

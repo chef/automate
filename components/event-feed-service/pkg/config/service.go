@@ -14,6 +14,7 @@ type EventFeed struct {
 	ElasticSearchSidecar `mapstructure:"elasticsearch_sidecar"`
 	Cereal               `mapstructure:"cereal"`
 	Jobs                 `mapstructure:"jobs"`
+	Authz                `mapstructure:"authz"`
 }
 
 // Service is a base config options struct for all services
@@ -35,6 +36,11 @@ type ElasticSearchSidecar struct {
 
 // Cereal is the workflow backend for scheduled jobs
 type Cereal struct {
+	Address string `mapstructure:"address"`
+}
+
+// Authz connection info
+type Authz struct {
 	Address string `mapstructure:"address"`
 }
 

@@ -81,13 +81,9 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/es-sidecar-service",
-      "metadata": null
-    },
-    {
-      "name": "chef/event-feed-service",
+      "name": "chef/authz-service",
       "metadata": {
-        "name": "chef/event-feed-service",
+        "name": "chef/authz-service",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
@@ -95,9 +91,13 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/authz-service",
+      "name": "chef/es-sidecar-service",
+      "metadata": null
+    },
+    {
+      "name": "chef/event-feed-service",
       "metadata": {
-        "name": "chef/authz-service",
+        "name": "chef/event-feed-service",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,

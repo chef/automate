@@ -33,3 +33,8 @@ default_purge_after_days = 7
 {{~#eachAlive bind.cereal-service.members as |member|}}
 address = "{{member.sys.ip}}:{{member.cfg.port}}"
 {{~/eachAlive}}
+
+[authz]
+{{~#eachAlive bind.authz-service.members as |member|}}
+address = "{{member.sys.ip}}:{{member.cfg.port}}"
+{{~/eachAlive}}
