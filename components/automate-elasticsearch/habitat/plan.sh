@@ -15,15 +15,13 @@ pkg_build_deps=(
   core/patchelf
 )
 pkg_deps=(
-  core/busybox-static
-  core/zlib
-  core/wget
-  chef/mlsa
-  core/glibc
   core/coreutils-static
+  core/busybox-static
+  core/glibc
+  core/zlib
+
+  chef/mlsa
   core/curl # health_check
-  core/unzip
-  core/grep
   chef/automate-openjdk
   chef/automate-platform-tools
 )
