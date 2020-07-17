@@ -3,6 +3,8 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
 
+import "google/protobuf/struct.proto";
+
 message AffectedNodes {
     // Chef organization ID.
     string org_id = 1;
@@ -23,4 +25,29 @@ message DeleteNode {
     string server_id = 2;
     // Node name.
     string name = 3;
+}
+
+message UpdateNode {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Node name.
+    string name = 3;
+    // Node environment.
+    string environment = 4;
+    // Node policy name.
+    string policy_name = 5;
+    // Node policy group.
+    string policy_group = 6;
+    // Node run-list.
+    repeated string run_list = 7;
+    // Node automatic JSON attributes.
+    google.protobuf.Struct automatic_attributes = 8;
+    // Node default JSON attributes.
+    google.protobuf.Struct default_attributes = 9;
+    // Node normal JSON attributes.
+    google.protobuf.Struct normal_attributes = 10;
+    // Node override JSON attributes.
+    google.protobuf.Struct override_attributes = 11;
 }

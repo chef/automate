@@ -1119,6 +1119,51 @@ func init() {
         "tags": [
           "InfraProxy"
         ]
+      },
+      "put": {
+        "operationId": "UpdateNode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateNode"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Node name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateNode"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
@@ -1694,6 +1739,58 @@ func init() {
         "override_attributes": {
           "type": "object",
           "description": "Environment override attributes JSON."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.UpdateNode": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Node name."
+        },
+        "environment": {
+          "type": "string",
+          "description": "Node environment."
+        },
+        "policy_name": {
+          "type": "string",
+          "description": "Node policy name."
+        },
+        "policy_group": {
+          "type": "string",
+          "description": "Node policy group."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Node run-list."
+        },
+        "automatic_attributes": {
+          "type": "object",
+          "description": "Node automatic JSON attributes."
+        },
+        "default_attributes": {
+          "type": "object",
+          "description": "Node default JSON attributes."
+        },
+        "normal_attributes": {
+          "type": "object",
+          "description": "Node normal JSON attributes."
+        },
+        "override_attributes": {
+          "type": "object",
+          "description": "Node override JSON attributes."
         }
       }
     },
@@ -2693,6 +2790,15 @@ func init() {
         "item_id": {
           "type": "string",
           "description": "Data bag item ID."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.UpdateNode": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Node name."
         }
       }
     },
