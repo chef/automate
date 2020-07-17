@@ -196,7 +196,7 @@ describe('ServicesSidebarComponent', () => {
         expect(component.deleteModalVisible).toBe(true);
       }));
 
-      it('should hide the delete modal when cancelled with no change to selections', () =>{
+      it('should hide the delete modal when cancelled with no change to selections', () => {
         expect(component.checkedServices.length).toEqual(0);
         component.handleToggleCheckbox(300, true);
         component.handleToggleCheckbox(400, true);
