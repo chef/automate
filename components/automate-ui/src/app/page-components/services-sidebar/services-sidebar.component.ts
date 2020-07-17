@@ -51,7 +51,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   private isDestroyed: Subject<boolean> = new Subject();
 
   // Manual Deletion of Services
-  public servicesList: GroupService[];
+  public servicesList: GroupService[] = [];
   public checkedServices: number[] = [];
   public isAllSelected = false;
   public isIndeterminate = false;
@@ -97,8 +97,9 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
 
     this.services$.pipe(takeUntil(this.isDestroyed))
       .subscribe((services) => {
-        this.servicesList = services;
-    });
+          this.resetServiceSelections();
+          this.servicesList = services;
+      });
 
     this.store.pipe(
       select(serviceDeletionStatus),

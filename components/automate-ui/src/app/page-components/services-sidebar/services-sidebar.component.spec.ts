@@ -192,7 +192,6 @@ describe('ServicesSidebarComponent', () => {
 
         expect(component.deleteModalVisible).toBe(false);
         component.beginServicesDelete();
-        fixture.detectChanges();
 
         expect(component.deleteModalVisible).toBe(true);
       }));
