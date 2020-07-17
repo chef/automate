@@ -77,6 +77,8 @@ gateway.recover_after_time: {{cfg.gateway.recover_after_time}}
 
 action.destructive_requires_name: {{cfg.action.destructive_requires_name}}
 
+xpack.ml.enabled: false
+
 {{#if cfg.plugins.cloud_aws_signer ~}}
 cloud.aws.signer: {{cfg.plugins.cloud_aws_signer}}
 {{/if ~}}

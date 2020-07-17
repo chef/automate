@@ -46,6 +46,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Api.MaxRequestSize = w.Int32(4000000)
 	c.V1.Sys.Api.BaseResourceUrl = w.String("host_header")
 	c.V1.Sys.Api.StrictSearchResultAcls = w.Bool(false)
+	c.V1.Sys.Api.ActionsFqdn = w.String("")
 
 	c.V1.Sys.Keygen.WorkerCount = w.Int32(2)
 	c.V1.Sys.Keygen.CacheSize = w.Int32(10)
@@ -106,6 +107,10 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
 		c.V1.Sys.Log.Level.Value = logLevel
+	}
+
+	if actionsFQDN := c.GetV1().GetSys().GetApi().GetActionsFqdn(); actionsFQDN == nil || actionsFQDN.GetValue() == "" {
+		c.V1.Sys.Api.ActionsFqdn = g.GetV1().Fqdn
 	}
 
 	c.V1.Sys.ExternalAutomate = g.GetV1().GetExternal().GetAutomate()

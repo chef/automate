@@ -36,7 +36,35 @@ document "generate_event_example" <<DOC
   Generate a exmaple event
 DOC
 function generate_event_example() {
-    echo '{"EventID": "f7b3ffa0-3f17-4bf3-8a01-8a15e17f6eeb", "Published": "2019-06-28T15:17:21Z", "Producer": { "ID": "", "ProducerName": "ProducerName", "ProducerType": "ProducerType", "Tags": []}, "Type": { "Name": "event type"}, "Actor": {"ID":"actor ID", "ObjectType": "actor ObjectType", "DisplayName": "actor DisplayName"}, "Object": {"ID":"object ID", "DisplayName": "object display name", "ObjectType": "object ObjectType"}, "Target": {"ID": "target ID", "ObjectType": "target ObjectType", "DisplayName": "target DisplayName"}}'
+    echo '{
+      "EventID": "f7b3ffa0-3f17-4bf3-8a01-8a15e17f6eeb", 
+      "Published": "2019-06-28T15:17:21Z", 
+      "Producer": { 
+        "ID": "", 
+        "ProducerName": "ProducerName", 
+        "ProducerType": "ProducerType", 
+        "Tags": []
+      }, 
+      "Type": { 
+        "Name": "event type"
+      }, 
+      "Actor": {
+        "ID":"actor ID", 
+        "ObjectType": "actor ObjectType", 
+        "DisplayName": "actor DisplayName"
+      }, 
+      "Object": {
+        "ID":"object ID", 
+        "DisplayName": 
+        "object display name", 
+        "ObjectType": "object ObjectType"
+      }, 
+      "Target": {
+        "ID": "target ID", 
+        "ObjectType": "target ObjectType", 
+        "DisplayName": "target DisplayName"
+      }
+    }'
 }
 
 document "generate_random_chef_server_event" <<DOC
@@ -56,7 +84,9 @@ function generate_random_chef_server_event() {
      .Object.ObjectType = "environment" |
      .Object.DisplayName = "acceptance-chef-products-automate-master" |
      .Object.ID = $uuid |
-     .Projects = ["project9"]')"
+     .Projects = ["project9"] |
+     .data.chef_organization = "1st Ranger Battalion" |
+     .data.chef_infra_server = "chef.example.com"')"
 
   echo $json
 }

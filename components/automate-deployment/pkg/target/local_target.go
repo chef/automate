@@ -223,8 +223,10 @@ func (t *LocalTarget) SetupSupervisor(ctx context.Context, config *dc.ConfigRequ
 		}
 	}
 
-	if err := t.EnsureHabUser(writer); err != nil {
-		return err
+	if os.Getenv("CHEF_AUTOMATE_SKIP_HAB_USER") != "true" {
+		if err := t.EnsureHabUser(writer); err != nil {
+			return err
+		}
 	}
 
 	if os.Getenv("CHEF_AUTOMATE_SKIP_SYSTEMD") != "true" {
