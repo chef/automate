@@ -348,7 +348,7 @@ func (backend ES2Backend) getProfileWithVersionSuggestions(ctx context.Context,
 		Query(boolQuery).
 		FetchSource(false).
 		Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
-		// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+	// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
 
 	source, err := searchSource.Source()
 	if err != nil {
@@ -446,7 +446,7 @@ func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *ela
 		Query(boolQuery).
 		FetchSource(false).
 		Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
-		// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+	// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
 
 	source, err := searchSource.Source()
 	if err != nil {
@@ -513,6 +513,119 @@ func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *ela
 }
 
 func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
+	myName := "getControlSuggestions"
+	esIndex, err := GetEsIndex(filters, false, true)
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlSuggestions unable to get index dates")
+	}
+
+	boolQuery := backend.getFiltersQuery(filters, true)
+
+	var innerQuery elastic.Query
+	if len(text) >= 2 {
+		innerBoolQuery := elastic.NewBoolQuery()
+		innerBoolQuery.Must(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("or"))
+		innerBoolQuery.Should(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and"))
+		innerBoolQuery.Should(elastic.NewTermQuery(target, text).Boost(100))
+		innerBoolQuery.Should(elastic.NewPrefixQuery(target, text).Boost(100))
+
+		innerQuery = innerBoolQuery
+	} else {
+		innerQuery = elastic.NewExistsQuery(target)
+	}
+
+	searchSource := elastic.NewSearchSource().
+		Query(boolQuery).
+		FetchSource(false).
+		Size(0) //setting size to 0 because we now use aggs to get this stuff and don't need the actual docs
+	//Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
+	// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+
+	controlsTitles := elastic.NewTermsAggregation().
+		Field("profiles.controls.title").
+		Size(10).
+		Order("_count", false)
+
+	controlIds := elastic.NewTermsAggregation().
+		Field("profiles.controls.id").
+		Size(10).
+		Order("_count", false)
+
+	controlsTitles.SubAggregation("ids", controlIds)
+
+	controlsAgg := elastic.NewFilterAggregation().Filter(innerQuery).
+		SubAggregation("titles", controlsTitles)
+
+	controlsFilterAgg := elastic.NewNestedAggregation().
+		Path("profiles.controls").
+		SubAggregation("controls", controlsAgg)
+
+	profilesAgg := elastic.NewNestedAggregation().
+		Path("profiles").
+		SubAggregation("controls_filter", controlsFilterAgg)
+
+	searchSource.Aggregation("profiles", profilesAgg)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlSuggestions unable to get Source")
+	}
+
+	LogQueryPartMin(esIndex, source, "getControlSuggestions query")
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		Do(ctx)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlSuggestions search failed")
+	}
+
+	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
+
+	type ControlSource struct {
+		ID    string `json:"id"`
+		Title string `json:"title"`
+	}
+
+	singular := false
+	addedControls := make(map[string]bool)
+	suggs := make([]*reportingapi.Suggestion, 0)
+	if outerProfilesAggResult, found := searchResult.Aggregations.Nested("profiles"); found {
+		if outerFilteredControls, found := outerProfilesAggResult.Aggregations.Nested("controls_filter"); found {
+			if outerControlsAggResult, found := outerFilteredControls.Aggregations.Filter("controls"); found {
+				if titlesBuckets, found := outerControlsAggResult.Aggregations.Terms("titles"); found && len(titlesBuckets.Buckets) > 0 {
+					for _, titleBucket := range titlesBuckets.Buckets {
+						title, ok := titleBucket.Key.(string)
+						if !ok {
+							logrus.Errorf("could not convert the value of titleBucket: %v, to a string!", titleBucket)
+						}
+						logrus.Debugf("%s titleBucket.Key: %s", myName, title)
+
+						if idsBuckets, found := titleBucket.Aggregations.Terms("ids"); found && len(idsBuckets.Buckets) > 0 {
+							for _, idsBucket := range idsBuckets.Buckets {
+								id, ok := idsBucket.Key.(string)
+								if !ok {
+									logrus.Errorf("could not convert the value of idsBucket: %v, to a string!", idsBucket)
+								}
+								if !singular || !addedControls[id] {
+									oneSugg := reportingapi.Suggestion{Id: id, Text: title}
+									suggs = append(suggs, &oneSugg)
+									addedControls[id] = true
+								}
+								logrus.Debugf("%s idsBucket.Key: %s", myName, id)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return suggs, nil
+}
+
+func (backend ES2Backend) getControlSuggestionsOld(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
 	esIndex, err := GetEsIndex(filters, false, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getControlSuggestions unable to get index dates")
@@ -545,7 +658,7 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 		Query(boolQuery).
 		FetchSource(false).
 		Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
-		// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+	// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
 
 	source, err := searchSource.Source()
 	if err != nil {
@@ -608,7 +721,227 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 	return suggs, nil
 }
 
+func (backend ES2Backend) getControlTagsSuggestionsExperimental(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, controlTagFilterKey string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+	myName := "getControlSuggestions"
+	esIndex, err := GetEsIndex(filters, false, true)
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlSuggestions unable to get index dates")
+	}
+
+	boolQuery := backend.getFiltersQuery(filters, true)
+
+	var innerQuery elastic.Query
+	if len(text) >= 2 {
+		innerBoolQuery := elastic.NewBoolQuery()
+		innerBoolQuery.Must(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("or"))
+		innerBoolQuery.Should(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and"))
+		innerBoolQuery.Should(elastic.NewTermQuery(target, text).Boost(100))
+		innerBoolQuery.Should(elastic.NewPrefixQuery(target, text).Boost(100))
+
+		innerQuery = innerBoolQuery
+	} else {
+		innerQuery = elastic.NewExistsQuery(target)
+	}
+
+	searchSource := elastic.NewSearchSource().
+		Query(boolQuery).
+		FetchSource(false).
+		Size(0) //setting size to 0 because we now use aggs to get this stuff and don't need the actual docs
+	//Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
+	// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+
+	controlsTitles := elastic.NewTermsAggregation().
+		Field("profiles.controls.title").
+		Size(10).
+		Order("_count", false)
+
+	controlIds := elastic.NewTermsAggregation().
+		Field("profiles.controls.id").
+		Size(10).
+		Order("_count", false)
+
+	controlsTitles.SubAggregation("ids", controlIds)
+
+	// controlTags start
+	controlTagAgg := elastic.NewFilterAggregation().Filter(innerQuery).
+		SubAggregation("titles", controlsTitles)
+
+	controlTagsFilterAgg := elastic.NewNestedAggregation().
+		Path("profiles.controls.string_tags").
+		SubAggregation("control_tags", controlTagAgg)
+
+	controlsAgg := elastic.NewFilterAggregation().Filter(innerQuery).
+		SubAggregation("titles", controlsTitles).SubAggregation("control_tags", controlTagsFilterAgg)
+	// controlTags end
+
+	controlsFilterAgg := elastic.NewNestedAggregation().
+		Path("profiles.controls").
+		SubAggregation("controls", controlsAgg)
+
+	profilesAgg := elastic.NewNestedAggregation().
+		Path("profiles").
+		SubAggregation("controls_filter", controlsFilterAgg)
+
+	searchSource.Aggregation("profiles", profilesAgg)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlSuggestions unable to get Source")
+	}
+
+	LogQueryPartMin(esIndex, source, "getControlSuggestions query")
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		Do(ctx)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlSuggestions search failed")
+	}
+
+	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
+
+	type ControlSource struct {
+		ID    string `json:"id"`
+		Title string `json:"title"`
+	}
+
+	singular := false
+	addedControls := make(map[string]bool)
+	suggs := make([]*reportingapi.Suggestion, 0)
+	if outerProfilesAggResult, found := searchResult.Aggregations.Nested("profiles"); found {
+		if outerFilteredControls, found := outerProfilesAggResult.Aggregations.Nested("controls_filter"); found {
+			if outerControlsAggResult, found := outerFilteredControls.Aggregations.Filter("controls"); found {
+				if titlesBuckets, found := outerControlsAggResult.Aggregations.Terms("titles"); found && len(titlesBuckets.Buckets) > 0 {
+					for _, titleBucket := range titlesBuckets.Buckets {
+						title, ok := titleBucket.Key.(string)
+						if !ok {
+							logrus.Errorf("could not convert the value of titleBucket: %v, to a string!", titleBucket)
+						}
+						logrus.Debugf("%s titleBucket.Key: %s", myName, title)
+
+						if idsBuckets, found := titleBucket.Aggregations.Terms("ids"); found && len(idsBuckets.Buckets) > 0 {
+							for _, idsBucket := range idsBuckets.Buckets {
+								id, ok := idsBucket.Key.(string)
+								if !ok {
+									logrus.Errorf("could not convert the value of idsBucket: %v, to a string!", idsBucket)
+								}
+								if !singular || !addedControls[id] {
+									oneSugg := reportingapi.Suggestion{Id: id, Text: title}
+									suggs = append(suggs, &oneSugg)
+									addedControls[id] = true
+								}
+								logrus.Debugf("%s idsBucket.Key: %s", myName, id)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return suggs, nil
+}
+
 func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, controlTagFilterKey string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+	myName := "getControlTagsSuggestions"
+	if typeParam == "control_tag_value" && controlTagFilterKey == "" {
+		return nil, status.Error(codes.InvalidArgument, "'control_tag' filter is required for 'control_tag_value' suggestions")
+	}
+	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlTagsSuggestions unable to get index dates")
+	}
+	boolQuery := backend.getFiltersQuery(filters, true)
+	text = strings.ToLower(text)
+
+	finalInnerBoolQuery := elastic.NewBoolQuery()
+	if len(text) >= 2 {
+		finalInnerBoolQuery.Must(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("or"))
+		finalInnerBoolQuery.Should(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and"))
+		finalInnerBoolQuery.Should(elastic.NewTermQuery(fmt.Sprintf("%s.lower", target), text).Boost(100))
+		finalInnerBoolQuery.Should(elastic.NewPrefixQuery(fmt.Sprintf("%s.lower", target), text).Boost(100))
+	} else {
+		finalInnerBoolQuery.Must(elastic.NewExistsQuery(target))
+	}
+
+	if typeParam == "control_tag_value" {
+		finalInnerBoolQuery.Must(elastic.NewTermQuery("profiles.controls.string_tags.key", controlTagFilterKey))
+	}
+	searchSource := elastic.NewSearchSource().
+		Query(boolQuery).
+		FetchSource(false).
+		Size(0) //set to 0 because we do aggs now
+
+	controlsTitles := elastic.NewTermsAggregation().
+		Field(target).
+		Size(10).
+		Order("_count", false)
+
+	stringTagsAgg := elastic.NewFilterAggregation().Filter(finalInnerBoolQuery).
+		SubAggregation("totals", controlsTitles)
+
+	controlTagsAgg := elastic.NewNestedAggregation().
+		Path("profiles.controls.string_tags").
+		SubAggregation("string_tags", stringTagsAgg)
+
+	controlsFilterAgg := elastic.NewNestedAggregation().
+		Path("profiles.controls").
+		SubAggregation("controls", controlTagsAgg)
+
+	profilesAgg := elastic.NewNestedAggregation().
+		Path("profiles").
+		SubAggregation("controls_filter", controlsFilterAgg)
+
+	searchSource.Aggregation("profiles", profilesAgg)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlTagsSuggestions unable to get Source")
+	}
+
+	LogQueryPartMin(esIndex, source, myName)
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		Do(ctx)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlTagsSuggestions search failed")
+	}
+
+	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
+
+	suggs := make([]*reportingapi.Suggestion, 0)
+	if outerProfilesAggResult, found := searchResult.Aggregations.Nested("profiles"); found {
+		if outerFilteredControls, found := outerProfilesAggResult.Aggregations.Nested("controls_filter"); found {
+			if outerControlsAggResult, found := outerFilteredControls.Aggregations.Nested("controls"); found {
+				if stringTagsAggResult, found := outerControlsAggResult.Aggregations.Filter("string_tags"); found {
+					if stringTagsBuckets, found := stringTagsAggResult.Aggregations.Terms("totals"); found && len(stringTagsBuckets.Buckets) > 0 {
+						logrus.Debugf("%s stringTagsBuckets: %v", myName, stringTagsBuckets)
+						for _, stringTagsBucket := range stringTagsBuckets.Buckets {
+							logrus.Debugf("%s stringTagsBucket: %v", myName, stringTagsBucket)
+							stringTagKey, ok := stringTagsBucket.Key.(string)
+							if !ok {
+								logrus.Errorf("could not convert the value of stringTagsBucket: %v, to a string!", stringTagsBucket)
+							}
+							logrus.Debugf("%s stringTagKey.Key: %s", myName, stringTagKey)
+							suggs = append(suggs, &reportingapi.Suggestion{
+								Text:  stringTagKey,
+								Score: 0,
+							})
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return suggs, nil
+}
+
+func (backend ES2Backend) getControlTagsSuggestionsOld(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, controlTagFilterKey string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	if typeParam == "control_tag_value" && controlTagFilterKey == "" {
 		return nil, status.Error(codes.InvalidArgument, "'control_tag' filter is required for 'control_tag_value' suggestions")
 	}
@@ -641,7 +974,7 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 		Query(boolQuery).
 		FetchSource(false).
 		Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
-		// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+	// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
 
 	source, err := searchSource.Source()
 	if err != nil {
