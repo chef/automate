@@ -13,11 +13,11 @@ aws s3 cp s3://chef-cd-citadel/packages_at_chef.io.pgp packages_at_chef.io.pgp -
 gpg --import packages_at_chef.io.pgp
 
 # Generate the License Scout Dependency Manifest
-.expeditor/license_scout.sh
+#.expeditor/license_scout.sh
 
 # Upload the License Scout Dependency Manifest to the S3 bucket
-aws s3 cp a2-dependency-licenses.json "s3://chef-automate-artifacts/licenses/automate/$VERSION.json" --acl public-read --profile chef-cd
-aws s3 cp a2-dependency-licenses.json s3://chef-automate-artifacts/dev/latest/automate/licenses.json --acl public-read --profile chef-cd
+#aws s3 cp a2-dependency-licenses.json "s3://chef-automate-artifacts/licenses/automate/$VERSION.json" --acl public-read --profile chef-cd
+#aws s3 cp a2-dependency-licenses.json s3://chef-automate-artifacts/dev/latest/automate/licenses.json --acl public-read --profile chef-cd
 
 #
 # Generate the manifest.json
