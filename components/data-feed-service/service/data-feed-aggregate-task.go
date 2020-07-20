@@ -88,13 +88,13 @@ func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (inte
 			"url":  destinations[destination].URL,
 		}).Debug("Destination")
 
-		username, password, err := GetCredentials(ctx, d.secrets, destinations[destination].Secret)
+		credentials, err := GetCredentials(ctx, d.secrets, destinations[destination].Secret)
 
 		if err != nil {
 			log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
 		} else {
 			// build and send notification for this rule
-			notification := datafeedNotification{username: username, password: password, url: destinations[destination].URL, data: buffer}
+			notification := datafeedNotification{credentials: credentials, url: destinations[destination].URL, data: buffer}
 
 			client := NewDataClient(d.acceptedStatusCodes)
 			err = send(client, notification)

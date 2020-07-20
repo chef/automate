@@ -40,6 +40,7 @@ var automaticAttrs = "{\"dmi\":{\"system\":{\"serial_number\":\"serial-number\"}
 var automaticAttrsWin = "{\"os\":\"windows\",\"kernel\":{\"os_info\":{\"serial_number\":\"serial-number\",\"service_pack_major_version\":2,\"service_pack_minor_version\":1}},\"dmi\":{\"system\":{\"serial_number\":\"\"}},\"hostname\":\"test.chef.com\",\"ipaddress\":\"172.18.2.120\",\"macaddress\":\"00:1C:42:C1:2D:87\"}"
 var mockConfig = &config.DataFeedConfig{}
 var acceptedStatusCodes []int32 = []int32{200, 201, 202, 203, 204}
+var mockCredentials = NewBasicAuthCredentials("user", "pass")
 
 func TestAssetCreated(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +50,7 @@ func TestAssetCreated(t *testing.T) {
 
 	client := ts.Client()
 	dataClient := DataClient{client: *client, acceptedStatusCodes: acceptedStatusCodes}
-	notification := datafeedNotification{url: ts.URL}
+	notification := datafeedNotification{credentials: mockCredentials, url: ts.URL}
 	err := send(dataClient, notification)
 	if err != nil {
 		t.Errorf("error got: %s, want nil", err)
@@ -64,7 +65,7 @@ func TestSendError(t *testing.T) {
 
 	client := ts.Client()
 	dataClient := DataClient{client: *client}
-	notification := datafeedNotification{url: ts.URL}
+	notification := datafeedNotification{credentials: mockCredentials, url: ts.URL}
 	err := send(dataClient, notification)
 	if err == nil {
 		t.Error("error got: nil, wanted an error")
