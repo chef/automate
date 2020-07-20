@@ -29,8 +29,9 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "Org: Single rule matching update",
 			entry: feed.FeedEntry{
-				ChefOrganization: "org1",
-				Projects:         []string{"old_tag"},
+				ChefOrganization:   "org1",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -52,8 +53,9 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "Org: no matching actions",
 			entry: feed.FeedEntry{
-				ChefOrganization: "org1",
-				Projects:         []string{"old_tag"},
+				ChefOrganization:   "org1",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -75,8 +77,9 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "Org: project rules match current event project tags",
 			entry: feed.FeedEntry{
-				ChefOrganization: "org1",
-				Projects:         []string{"old_tag"},
+				ChefOrganization:   "org1",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"old_tag": {
@@ -100,8 +103,9 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "chefServers: Single rule matching",
 			entry: feed.FeedEntry{
-				ChefInfraServer: "chef-server.org",
-				Projects:        []string{"old_tag"},
+				ChefInfraServer:    "chef-server.org",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -123,8 +127,9 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "chefServers: Single rule not matching",
 			entry: feed.FeedEntry{
-				ChefInfraServer: "chef-server2.org",
-				Projects:        []string{"old_tag"},
+				ChefInfraServer:    "chef-server2.org",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -146,8 +151,9 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "chefServers: Single rule differing case not matching",
 			entry: feed.FeedEntry{
-				ChefInfraServer: "Chef-server.org",
-				Projects:        []string{"old_tag"},
+				ChefInfraServer:    "Chef-server.org",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -169,8 +175,9 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "chefServers: Single rule with two values on a condition",
 			entry: feed.FeedEntry{
-				ChefInfraServer: "chef-server.org",
-				Projects:        []string{"old_tag"},
+				ChefInfraServer:    "chef-server.org",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -192,9 +199,10 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "chefServers: two rules both matching on different fields",
 			entry: feed.FeedEntry{
-				ChefInfraServer:  "chef-server.org",
-				ChefOrganization: "org1",
-				Projects:         []string{"old_tag"},
+				ChefInfraServer:    "chef-server.org",
+				ChefOrganization:   "org1",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -225,9 +233,10 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "chefServers: two rules with only one matching",
 			entry: feed.FeedEntry{
-				ChefInfraServer:  "chef-server.org",
-				ChefOrganization: "org1",
-				Projects:         []string{"old_tag"},
+				ChefInfraServer:    "chef-server.org",
+				ChefOrganization:   "org1",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -258,9 +267,10 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "chefServers: one rule two conditions with only one matching",
 			entry: feed.FeedEntry{
-				ChefInfraServer:  "chef-server.org",
-				ChefOrganization: "org1",
-				Projects:         []string{"old_tag"},
+				ChefInfraServer:    "chef-server.org",
+				ChefOrganization:   "org1",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -288,9 +298,10 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "project rules does not have any rules",
 			entry: feed.FeedEntry{
-				ChefInfraServer:  "chef-server.org",
-				ChefOrganization: "org1",
-				Projects:         []string{"old_tag"},
+				ChefInfraServer:    "chef-server.org",
+				ChefOrganization:   "org1",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"old_tag": {
@@ -302,9 +313,31 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		{
 			description: "project rule does not have any conditions",
 			entry: feed.FeedEntry{
-				ChefInfraServer:  "chef-server.org",
-				ChefOrganization: "org1",
-				Projects:         []string{"old_tag"},
+				ChefInfraServer:    "chef-server.org",
+				ChefOrganization:   "org1",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "chef_server",
+			},
+			projects: map[string]*authz.ProjectRules{
+				"old_tag": {
+					Rules: []*authz.ProjectRule{
+						{
+							Type:       authz.ProjectRuleTypes_EVENT,
+							Conditions: []*authz.Condition{},
+						},
+					},
+				},
+			},
+			projectIDs: []string{},
+		},
+
+		{
+			description: "clear all projects from non-chef-server events",
+			entry: feed.FeedEntry{
+				ChefInfraServer:    "for-testing-only",
+				ChefOrganization:   "for-testing-only",
+				Projects:           []string{"old_tag"},
+				ProducerObjectType: "profile",
 			},
 			projects: map[string]*authz.ProjectRules{
 				"old_tag": {

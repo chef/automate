@@ -116,6 +116,10 @@ func (efs ElasticFeedStore) updateEventProjectTags(
 	ctx context.Context, projectTaggingRules map[string]*authz.ProjectRules) (string, error) {
 	logrus.Debug("running updateEventProjectTags")
 	script := `
+	  if (ctx._source.producer_object_type != "chef_server") {
+			ctx._source.projects = new ArrayList();
+			return;
+		}
 		ArrayList matchingProjects = new ArrayList();
 		for (def project : params.projects) {
 			for (def rule : project.rules) {
