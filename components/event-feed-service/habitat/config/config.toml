@@ -14,12 +14,16 @@ root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
 
 [elasticsearch]
 {{~#eachAlive bind.automate-es-gateway.members as |member|}}
+{{~#if @last}}
 url = "http://127.0.0.1:{{member.cfg.http-port}}"
+{{~/if}}
 {{~/eachAlive}}
 
 [elasticsearch_sidecar]
 {{~#eachAlive bind.es-sidecar-service.members as |member|}}
+{{~#if @last}}
 address = "{{member.sys.ip}}:{{member.cfg.port}}"
+{{~/if}}
 {{~/eachAlive}}
 
 [jobs]
@@ -31,10 +35,14 @@ default_purge_after_days = 7
 
 [cereal]
 {{~#eachAlive bind.cereal-service.members as |member|}}
+{{~#if @last}}
 address = "{{member.sys.ip}}:{{member.cfg.port}}"
+{{~/if}}
 {{~/eachAlive}}
 
 [authz]
 {{~#eachAlive bind.authz-service.members as |member|}}
+{{~#if @last}}
 address = "{{member.sys.ip}}:{{member.cfg.port}}"
+{{~/if}}
 {{~/eachAlive}}
