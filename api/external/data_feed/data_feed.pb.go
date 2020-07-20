@@ -852,11 +852,96 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type DatafeedServiceClient interface {
+	//
+	//Add a datafeed destination
+	//
+	//Adds a datafeed destination. Requires values for name, url, and secret.
+	//The secret is the id returned from creating a secret using the secrets api.
+	//
+	//Example:
+	//```
+	//{
+	//"name": "my datafeed destination",
+	//"url": "https://my.server.com/dataingest",
+	//"secret":"42b369f1-9d3f-44b3-bcf8-a9a09d6bd4bb"
+	//}
+	//```
+	//
+	//Authorization Action:
+	//```
+	//datafeed:destination:add
+	//```
 	AddDestination(ctx context.Context, in *AddDestinationRequest, opts ...grpc.CallOption) (*AddDestinationResponse, error)
+	//
+	//Get a datafeed destination
+	//
+	//Gets a datafeed destination the ID of the destination.
+	//
+	//Authorization Action:
+	//```
+	//datafeed:destination:get
+	//```
 	GetDestination(ctx context.Context, in *GetDestinationRequest, opts ...grpc.CallOption) (*GetDestinationResponse, error)
+	//
+	//Delete a datafeed destination
+	//
+	//Deletes a datafeed destination given the ID of the destination.
+	//
+	//Authorization Action:
+	//```
+	//destination:destination:delete
+	//```
 	DeleteDestination(ctx context.Context, in *DeleteDestinationRequest, opts ...grpc.CallOption) (*DeleteDestinationResponse, error)
+	//
+	//Update a datafeed destination
+	//
+	//Updates a datafeed destination.
+	//This is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.
+	//This will update the name, url or secret for the destination
+	//
+	//
+	//Authorization Action:
+	//```
+	//destination:destination:update
+	//```
 	UpdateDestination(ctx context.Context, in *UpdateDestinationRequest, opts ...grpc.CallOption) (*UpdateDestinationResponse, error)
+	//
+	//List Destinations
+	//
+	//Returns a list of all datafeed destinations.
+	//
+	//Authorization Action:
+	//```
+	//datafeed:destinations:list
+	//```
 	ListDestinations(ctx context.Context, in *ListDestinationRequest, opts ...grpc.CallOption) (*ListDestinationResponse, error)
+	//
+	//Test a datafeed destination
+	//
+	//Tests a datafeed destination endpoint with the details provided. Requires values for name, url, and secret.
+	//The secret is the id returned from creating a secret using the secrets api.
+	//Accepts either url, secret or url, username_password
+	//
+	//Examples:
+	//```
+	//{
+	//"url": "https://my.server.com/dataingest",
+	//"secret":"42b369f1-9d3f-44b3-bcf8-a9a09d6bd4bb"
+	//}
+	//
+	//{
+	//"url": "https://my.server.com/dataingest",
+	//"username_password": {
+	//"username": "muyuser",
+	//"password": "mypassword"
+	//}
+	//}
+	//```
+	//
+	//Authorization Action:
+	//```
+	//datafeed:destinations:test
+	//```
 	TestDestination(ctx context.Context, in *URLValidationRequest, opts ...grpc.CallOption) (*TestDestinationResponse, error)
 }
 
@@ -924,11 +1009,96 @@ func (c *datafeedServiceClient) TestDestination(ctx context.Context, in *URLVali
 
 // DatafeedServiceServer is the server API for DatafeedService service.
 type DatafeedServiceServer interface {
+	//
+	//Add a datafeed destination
+	//
+	//Adds a datafeed destination. Requires values for name, url, and secret.
+	//The secret is the id returned from creating a secret using the secrets api.
+	//
+	//Example:
+	//```
+	//{
+	//"name": "my datafeed destination",
+	//"url": "https://my.server.com/dataingest",
+	//"secret":"42b369f1-9d3f-44b3-bcf8-a9a09d6bd4bb"
+	//}
+	//```
+	//
+	//Authorization Action:
+	//```
+	//datafeed:destination:add
+	//```
 	AddDestination(context.Context, *AddDestinationRequest) (*AddDestinationResponse, error)
+	//
+	//Get a datafeed destination
+	//
+	//Gets a datafeed destination the ID of the destination.
+	//
+	//Authorization Action:
+	//```
+	//datafeed:destination:get
+	//```
 	GetDestination(context.Context, *GetDestinationRequest) (*GetDestinationResponse, error)
+	//
+	//Delete a datafeed destination
+	//
+	//Deletes a datafeed destination given the ID of the destination.
+	//
+	//Authorization Action:
+	//```
+	//destination:destination:delete
+	//```
 	DeleteDestination(context.Context, *DeleteDestinationRequest) (*DeleteDestinationResponse, error)
+	//
+	//Update a datafeed destination
+	//
+	//Updates a datafeed destination.
+	//This is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.
+	//This will update the name, url or secret for the destination
+	//
+	//
+	//Authorization Action:
+	//```
+	//destination:destination:update
+	//```
 	UpdateDestination(context.Context, *UpdateDestinationRequest) (*UpdateDestinationResponse, error)
+	//
+	//List Destinations
+	//
+	//Returns a list of all datafeed destinations.
+	//
+	//Authorization Action:
+	//```
+	//datafeed:destinations:list
+	//```
 	ListDestinations(context.Context, *ListDestinationRequest) (*ListDestinationResponse, error)
+	//
+	//Test a datafeed destination
+	//
+	//Tests a datafeed destination endpoint with the details provided. Requires values for name, url, and secret.
+	//The secret is the id returned from creating a secret using the secrets api.
+	//Accepts either url, secret or url, username_password
+	//
+	//Examples:
+	//```
+	//{
+	//"url": "https://my.server.com/dataingest",
+	//"secret":"42b369f1-9d3f-44b3-bcf8-a9a09d6bd4bb"
+	//}
+	//
+	//{
+	//"url": "https://my.server.com/dataingest",
+	//"username_password": {
+	//"username": "muyuser",
+	//"password": "mypassword"
+	//}
+	//}
+	//```
+	//
+	//Authorization Action:
+	//```
+	//datafeed:destinations:test
+	//```
 	TestDestination(context.Context, *URLValidationRequest) (*TestDestinationResponse, error)
 }
 
