@@ -2017,6 +2017,7 @@ paths = [
   "lib/authz/*",
   "lib/cereal/*",
   "lib/datalifecycle/*",
+  "lib/elasticutil/*",
   "lib/grpc/*",
   "lib/io/*",
   "lib/stringutils/*",

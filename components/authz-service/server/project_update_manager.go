@@ -48,6 +48,7 @@ var SerializedProjectUpdateDomainServices = []string{
 	"compliance",
 	"ingest",
 	"nodemanager",
+	"feed",
 }
 
 type ProjectUpdateStatus interface {

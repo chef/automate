@@ -28,8 +28,7 @@ document "send_event" <<DOC
   Send a piped in json to the event feed service
 DOC
 function send_event() {
-  read -r message
-  chef-automate dev grpcurl event-feed-service -- chef.automate.domain.event_feed.api.EventFeedService.HandleEvent -d "$message"
+  chef-automate dev grpcurl event-feed-service -- chef.automate.domain.event_feed.api.EventFeedService.HandleEvent -d @
 }
 
 document "generate_event_example" <<DOC
