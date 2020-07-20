@@ -8,6 +8,7 @@ import (
 
 	"github.com/chef/automate/api/external/cfgmgmt/request"
 	"github.com/chef/automate/api/external/cfgmgmt/response"
+	ireq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -227,5 +228,143 @@ func TestRolloutCreate(t *testing.T) {
 		list, err := cfgmgmt.GetRollouts(ctx, &request.Rollouts{})
 		require.NoError(t, err)
 		assert.Len(t, list.Rollouts, 3)
+	})
+}
+
+func TestCreateRolloutFromAction(t *testing.T) {
+	ctx := context.Background()
+
+	cleanup := func(t *testing.T) {
+		err := cfgmgmt.ClearPg()
+		require.NoError(t, err)
+	}
+
+	t.Run("create fails when the request is blank", func(t *testing.T) {
+		cleanup(t)
+		req := ireq.PolicyUpdateAction{}
+		_, err := cfgmgmt.HandlePolicyUpdateAction(ctx, &req)
+		require.Error(t, err)
+	})
+
+	reqWithAllRequiredFields := ireq.PolicyUpdateAction{
+		PolicyName:         "example-policy-name",
+		PolicyGroup:        "example-policy-node-group",
+		PolicyRevisionId:   "abc123",
+		ChefServerFqdn:     "chef-server.example",
+		ChefServerOrgname:  "example_org",
+		ChefServerUsername: "exampleUser",
+	}
+
+	t.Run("create fails when the request has a blank PolicyName", func(t *testing.T) {
+		cleanup(t)
+		req := reqWithAllRequiredFields
+		req.PolicyName = ""
+		_, err := cfgmgmt.HandlePolicyUpdateAction(ctx, &req)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "required field(s) \"policy_name\" were blank")
+	})
+
+	t.Run("create fails when the request has a blank PolicyNodeGroup", func(t *testing.T) {
+		cleanup(t)
+		req := reqWithAllRequiredFields
+		req.PolicyGroup = ""
+		_, err := cfgmgmt.HandlePolicyUpdateAction(ctx, &req)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "required field(s) \"policy_group\" were blank")
+	})
+
+	t.Run("create fails when the request has a blank PolicyRevisionId", func(t *testing.T) {
+		cleanup(t)
+		req := reqWithAllRequiredFields
+		req.PolicyRevisionId = ""
+		_, err := cfgmgmt.HandlePolicyUpdateAction(ctx, &req)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "required field(s) \"policy_revision_id\" were blank")
+	})
+
+	t.Run("create fails when the request has a blank ChefServerFqdn", func(t *testing.T) {
+		cleanup(t)
+		req := reqWithAllRequiredFields
+		req.ChefServerFqdn = ""
+		_, err := cfgmgmt.HandlePolicyUpdateAction(ctx, &req)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "required field(s) \"chef_server_fqdn\" were blank")
+	})
+
+	t.Run("create fails when the request has a blank ChefServerOrgname", func(t *testing.T) {
+		cleanup(t)
+		req := reqWithAllRequiredFields
+		req.ChefServerOrgname = ""
+		_, err := cfgmgmt.HandlePolicyUpdateAction(ctx, &req)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "required field(s) \"chef_server_orgname\" were blank")
+	})
+
+	t.Run("create succeeds with a minimum valid request", func(t *testing.T) {
+		cleanup(t)
+		req := reqWithAllRequiredFields
+		_, err := cfgmgmt.HandlePolicyUpdateAction(ctx, &req)
+		require.NoError(t, err)
+
+		list, err := cfgmgmt.GetRollouts(ctx, &request.Rollouts{})
+		require.NoError(t, err)
+		assert.Len(t, list.Rollouts, 1)
+
+		created := list.Rollouts[0]
+		assert.Equal(t, "example-policy-name", created.PolicyName)
+		assert.Equal(t, "example-policy-node-group", created.PolicyNodeGroup)
+		assert.Equal(t, "abc123", created.PolicyRevisionId)
+		assert.Equal(t, "https://chef-server.example/organizations/example_org", created.PolicyDomainUrl)
+		s, err := time.Parse(time.RFC3339, created.StartTime)
+		require.NoError(t, err)
+		assert.WithinDuration(t, time.Now().UTC(), s, 1*time.Minute)
+		assert.Empty(t, created.EndTime)
+	})
+
+	t.Run("creating a rollout with the same target node segment and policy revision is a successful no-op", func(t *testing.T) {
+		cleanup(t)
+		req1 := reqWithAllRequiredFields
+		req2 := reqWithAllRequiredFields
+		_, err := cfgmgmt.HandlePolicyUpdateAction(ctx, &req1)
+		require.NoError(t, err)
+
+		list, err := cfgmgmt.GetRollouts(ctx, &request.Rollouts{})
+		require.NoError(t, err)
+		assert.Len(t, list.Rollouts, 1)
+		firstFetchedRollout := list.Rollouts[0]
+
+		_, err = cfgmgmt.HandlePolicyUpdateAction(ctx, &req2)
+		// any error here would just spam the Chef Server logs, we should only do
+		// that for a problem that needs attention.
+		require.NoError(t, err)
+
+		list2, err := cfgmgmt.GetRollouts(ctx, &request.Rollouts{})
+		require.NoError(t, err)
+		assert.Len(t, list2.Rollouts, 1)
+		secondFetchedRollout := list2.Rollouts[0]
+
+		assert.Equal(t, firstFetchedRollout, secondFetchedRollout)
+	})
+
+	t.Run("creating a second rollout with the same target node segment sets end_time on the older one", func(t *testing.T) {
+		cleanup(t)
+		req1 := reqWithAllRequiredFields
+		req2 := reqWithAllRequiredFields
+		req2.PolicyRevisionId = "def456"
+		_, err := cfgmgmt.HandlePolicyUpdateAction(ctx, &req1)
+		require.NoError(t, err)
+		_, err = cfgmgmt.HandlePolicyUpdateAction(ctx, &req2)
+		require.NoError(t, err)
+
+		list, err := cfgmgmt.GetRollouts(ctx, &request.Rollouts{})
+		require.NoError(t, err)
+		assert.Len(t, list.Rollouts, 2)
+
+		newestRollout := list.Rollouts[0]
+		olderRollout := list.Rollouts[1]
+
+		assert.NotEmpty(t, olderRollout.EndTime, "EndTime was not set on the rollout when it was replaced with a newer one")
+		assert.Empty(t, newestRollout.EndTime)
+
 	})
 }

@@ -11,6 +11,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
+	"github.com/chef/automate/components/config-mgmt-service/backend/postgres"
 )
 
 func (s *CfgMgmtServer) HandlePolicyUpdateAction(ctx context.Context, req *request.PolicyUpdateAction) (*response.PolicyUpdateAction, error) {
@@ -23,7 +24,7 @@ func (s *CfgMgmtServer) HandlePolicyUpdateAction(ctx context.Context, req *reque
 		{req.PolicyRevisionId, "policy_revision_id"},
 		{req.ChefServerFqdn, "chef_server_fqdn"},
 		{req.ChefServerOrgname, "chef_server_orgname"},
-		{req.ChefServerOrgname, "chef_server_username"},
+		{req.ChefServerUsername, "chef_server_username"},
 	}
 	blankFields := []string{}
 	for _, field := range fieldsToCheck {
@@ -36,7 +37,14 @@ func (s *CfgMgmtServer) HandlePolicyUpdateAction(ctx context.Context, req *reque
 		return nil, status.Error(codes.InvalidArgument, message)
 	}
 
-	created, err := s.pg.CreateRolloutFromChefAction(ctx, dbNewRolloutFromActionReq(req))
+	newRollout := &postgres.NewRollout{
+		PolicyRevisionId: req.PolicyRevisionId,
+		PolicyName:       req.PolicyName,
+		PolicyNodeGroup:  req.PolicyGroup,
+		PolicyDomainURL:  fmt.Sprintf("https://%s/organizations/%s", req.ChefServerFqdn, req.ChefServerOrgname),
+	}
+
+	err := s.pg.CreateRolloutFromChefAction(ctx, newRollout)
 	if err != nil {
 		return nil, err
 	}

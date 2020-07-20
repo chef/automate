@@ -3,8 +3,10 @@ package postgres
 import (
 	"context"
 	"net/url"
+	"strings"
 	"time"
 
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 
@@ -104,7 +106,7 @@ func (p *Postgres) FindRolloutByNodeSegmentAndTime(nodeSegment *NodeSegment, tim
 	return nil, nil
 }
 
-func (p *Postgres) CreateRolloutFromChefAction(ctx context.Context, r *NewRollout) (*Rollout, error) {
+func (p *Postgres) CreateRolloutFromChefAction(ctx context.Context, r *NewRollout) error {
 	// From an end-user view, there are two ways to create rollouts. One is with
 	// a metadata collector that runs on workstations and/or Ci, the other is via
 	// Chef Server Actions (notifications). The metadata collector method is
@@ -119,13 +121,25 @@ func (p *Postgres) CreateRolloutFromChefAction(ctx context.Context, r *NewRollou
 	// - When the rollout-to-be-created is already in the database (e.g., it was
 	//   created via a different API/mechanism), ignore.
 	if _, err := url.Parse(r.PolicyDomainURL); err != nil {
-		return nil, errors.Wrapf(err, "Invalid policy domain URL %q", r.PolicyDomainURL)
+		return errors.Wrapf(err, "Invalid policy domain URL %q", r.PolicyDomainURL)
 	}
 
 	err := p.mapper.WithContext(ctx).Insert(r)
 	if err != nil {
-		return nil, err
+		// if this is a conflict with existing rollout, don't return an error, Chef
+		// Server can't do anything about it and the outcome is what the user
+		// wanted (rollout is created).
+		if err, isPqError := err.(*pq.Error); isPqError {
+			// this error comes from a `RAISE` inside a trigger function, so there's
+			// not a great alternative to string matching. But it should be stable if
+			// we don't muck with the trigger function. See 02_add_rollouts.up.sql in
+			// the schema/sql dir.
+			if strings.HasPrefix(err.Message, "current rollout exists") {
+				return nil
+			}
+		}
+		return err
 	}
 
-	return nil, nil
+	return nil
 }
