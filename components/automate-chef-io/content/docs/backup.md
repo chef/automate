@@ -132,6 +132,49 @@ The following IAM policy describes the lowest permissions Automate requires to r
 }
 ```
 
+## Backup to GCS (Google Cloud Storage Bucket)
+
+
+Backups can be stored in an existing GCS bucket. You will need to [generate a service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) with the `storage.admin` permission for the project the bucket is associated with.
+
+The following settings are supported:
+
+```toml
+[global.v1.backups]
+  location = "gcs"
+[global.v1.backups.gcs.bucket]
+  # name (required): The name of the bucket
+  name = "<bucket name>"
+
+  # base_path (optional):  The path within the bucket where backups should be stored
+  # If base_path is not set, backups will be stored at the root of the bucket.
+  base_path = "<base path>"
+
+[global.v1.backups.gcs.credentials]
+# This is the JSON credentials file you generate during service account 
+# creation, you must copy/paste the entire contents here (this is just an example)
+json = '''
+  {
+  "type": "service_account",
+  "project_id": "my-favorite-project",
+  "private_key_id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n-----END PRIVATE KEY-----\n",
+  "client_email": "chef@my-favorite-project.iam.gserviceaccount.com",
+  "client_id": "XXXXXXXXXXXXXXXXXXXXX",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/chef%40my-favorite-project.iam.gserviceaccount.com"
+}
+'''
+```
+
+### GCS Permissions
+
+Per [Elasticsearch's documentation](https://www.elastic.co/guide/en/cloud-enterprise/current/ece-configure-gcp-snapshotting.html#ece_set_up_your_service_account_credentials_2), the service account that is used to backup should be granted the role of 
+`storage.admin` to quote;
+> so that Elasticsearch clusters can read, write, and list the bucket objects.
+
 ## Create a Backup
 
 Make a backup with the following command:
@@ -180,6 +223,12 @@ For backups stored in an S3 bucket, use:
 
 ```shell
 chef-automate backup list s3://bucket_name/base_path
+```
+
+For backups stored in a GCS bucket, use:
+
+```shell
+chef-automate backup list gs://bucket_name/base_path
 ```
 
 where `bucket_name` is the name of the S3 bucket `base_path` an optional path within the bucket where the backups live.
@@ -234,19 +283,41 @@ To restore on an existing Chef Automate host:
 chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID --skip-preflight
 ```
 
-### Restore From an S3 Backup
+Using S3 or GCS:
+
+```shell
+# S3
+chef-automate backup restore --airgap-bundle </path/to/bundle> s3://bucket_name/</path/to/backups/>BACKUP_ID --skip-preflight
+
+# GCS
+hef-automate backup restore --airgap-bundle </path/to/bundle> gs://bucket_name/</path/to/backups/>BACKUP_ID --skip-preflight
+```
+
+### Restore From an S3 or GCS Backup
 
 To restore on a new host:
 
-```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID
-```
+* S3:
+
+  ```shell
+  chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID
+  ```
+* GCS:
+  ```shell
+  chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID
+  ```
 
 To restore on an existing Chef Automate host:
 
-```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
-```
+* S3:
+
+  ```shell
+  chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
+  ```
+* GCS:
+   ```shell
+  chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
+  ```
 
 A successful restore shows the timestamp of the backup used at the end of the status output:
 
