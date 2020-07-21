@@ -75,29 +75,29 @@ func createEvent(msg message.ChefAction) (*automate_event.EventMsg, error) {
 	}
 
 	return &automate_event.EventMsg{
-		EventID: msg.InternalChefAction.Id,
+		EventID: uuid.Must(uuid.NewV4()).String(),
 		Type:    &automate_event.EventType{Name: event.EventFeedEventName},
 		Producer: &automate_event.Producer{
-			ID:           msg.Action.EntityType,
-			ProducerName: msg.Action.EntityType,
+			ID:           msg.InternalChefAction.EntityType,
+			ProducerName: msg.InternalChefAction.EntityType,
 			ProducerType: "chef_server",
 		},
 		Published: timestamp,
 		Actor: &automate_event.Actor{
 			ID:          msg.InternalChefAction.RemoteRequestId,
-			ObjectType:  "User",
-			DisplayName: msg.Action.RequestorName,
+			ObjectType:  msg.InternalChefAction.RequestorType,
+			DisplayName: msg.InternalChefAction.RequestorName,
 		},
 		Verb: msg.Action.Task,
 		Object: &automate_event.Object{
-			ID:          uuid.Must(uuid.NewV4()).String(),
-			ObjectType:  msg.Action.EntityType,
-			DisplayName: msg.Action.EntityName,
+			ID:          msg.InternalChefAction.Id,
+			ObjectType:  msg.InternalChefAction.EntityType,
+			DisplayName: msg.InternalChefAction.EntityName,
 		},
 		Target: &automate_event.Target{
 			ID:          "",
 			ObjectType:  "Not Applicable",
-			DisplayName: "Not Applicable",
+			DisplayName: msg.InternalChefAction.ServiceHostname,
 		},
 		Projects: msg.InternalChefAction.Projects,
 		Data: &_struct.Struct{
@@ -110,6 +110,16 @@ func createEvent(msg message.ChefAction) (*automate_event.EventMsg, error) {
 				"chef_infra_server": {
 					Kind: &_struct.Value_StringValue{
 						StringValue: msg.InternalChefAction.ServiceHostname,
+					},
+				},
+				"parent_name": {
+					Kind: &_struct.Value_StringValue{
+						StringValue: msg.InternalChefAction.ParentName,
+					},
+				},
+				"parent_id": {
+					Kind: &_struct.Value_StringValue{
+						StringValue: msg.InternalChefAction.ParentType,
 					},
 				},
 			},

@@ -242,20 +242,20 @@ func collectEventFeed(ctx context.Context,
 	}
 
 	agEvents := make([]*agRes.Event, len(eventCollection.FeedEntries))
-	for index, complianceEvent := range eventCollection.FeedEntries {
+	for index, entry := range eventCollection.FeedEntries {
 		agEvents[index] = &agRes.Event{
-			StartId:         complianceEvent.GetID(),
-			EndId:           complianceEvent.GetID(),
-			EventType:       complianceEvent.GetProducer().GetID(),
-			Task:            complianceEvent.GetVerb(),
-			StartTime:       complianceEvent.GetSourceEventPublished(),
-			EndTime:         complianceEvent.GetSourceEventPublished(),
-			EntityName:      complianceEvent.GetObject().GetName(),
-			RequestorType:   complianceEvent.GetActor().GetObjectType(),
-			RequestorName:   complianceEvent.GetActor().GetName(),
-			ServiceHostname: complianceEvent.GetTarget().GetName(),
-			ParentName:      "Not Applicable",
-			ParentType:      "Not Applicable",
+			StartId:         entry.GetID(),
+			EndId:           entry.GetID(),
+			EventType:       entry.GetProducer().GetID(),
+			Task:            entry.GetVerb(),
+			StartTime:       entry.GetSourceEventPublished(),
+			EndTime:         entry.GetSourceEventPublished(),
+			EntityName:      entry.GetObject().GetName(),
+			RequestorType:   entry.GetActor().GetObjectType(),
+			RequestorName:   entry.GetActor().GetName(),
+			ServiceHostname: entry.GetTarget().GetName(),
+			ParentName:      entry.GetParent().GetName(),
+			ParentType:      entry.GetParent().GetID(),
 			EventCount:      1,
 		}
 	}

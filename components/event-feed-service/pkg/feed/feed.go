@@ -22,6 +22,8 @@ var (
 	ChefServerProducerTypeTag = "chef_server"
 	ChefServerFieldTag        = "chef_infra_server"
 	ChefOrganizationFieldTag  = "chef_organization"
+	ParentNameFieldTag        = "parent_name"
+	ParentIDFieldTag          = "parent_id"
 )
 
 type FeedSummary struct {
@@ -121,6 +123,8 @@ type FeedEntry struct {
 	Projects           []string  `json:"projects"`
 	ChefOrganization   string    `json:"chef_organization"`
 	ChefInfraServer    string    `json:"chef_infra_server"`
+	ParentName         string    `json:"parent_name"`
+	ParentID           string    `json:"parent_id"`
 }
 
 func (f *FeedEntry) ToJSON() ([]byte, error) {
