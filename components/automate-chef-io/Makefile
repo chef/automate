@@ -48,7 +48,7 @@ generate_swagger: $(SWAGGER_RESULT_FILE)
 		jq -es 'if . == [] then null else .[] | .paths = (.paths | with_entries( select( all( .value[].tags[]; . != "hidden") ) ) ) end' \
 		> $(SWAGGER_RESULT_FILE)
 
-serve: sync $(REDOC_FILE)
+serve: sync generate_swagger $(REDOC_FILE)
 	hugo server --buildDrafts --noHTTPCache
 
 lint: themes/chef
