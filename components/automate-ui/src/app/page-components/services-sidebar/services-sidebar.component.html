@@ -58,7 +58,7 @@
         [checked]="isAllSelected"
         [indeterminate]="isIndeterminate"
         (change)="handleSelectAll($event.detail)">Select All</chef-checkbox>
-      <chef-button tertiary
+      <chef-button tertiary caution
         id="delete-services-button"
         [disabled]="checkedServices.length === 0"
         (click)="beginServicesDelete()"
