@@ -2,7 +2,8 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import {
   NotificationRule,
-  ServiceActionType
+  ServiceActionType,
+  RuleType
 } from 'app/entities/notification_rules/notification_rule.model';
 
 enum UrlTestState {
@@ -29,6 +30,8 @@ export class CreateNotificationModalComponent implements OnInit {
   @Input() createForm: FormGroup;
   @Input() hookStatus = UrlTestState.Inactive;
   @Input() notificationRule = new NotificationRule('', '', null, '', null, '', false);
+  @Input() targetKeysValue: string[];
+  @Input() alertTypeKeysValue: string[];
   public conflictError = false;
   public urlState = UrlTestState;
 
@@ -72,7 +75,7 @@ export class CreateNotificationModalComponent implements OnInit {
     return this.notificationRule.getTargetTypeKeys();
   }
 
-  setFailureType(event) {
+  setFailureType(event: { target: { value: RuleType } }) {
     this.notificationRule.ruleType = event.target.value;
     this.createForm.value.ruleType = event.target.value;
     if (this.notificationRule.ruleType !== 'ComplianceFailure' &&
@@ -81,13 +84,13 @@ export class CreateNotificationModalComponent implements OnInit {
     }
   }
 
-  changeSelectionForWebhookType(event) {
+  changeSelectionForWebhookType(event: { target: { value: ServiceActionType } }) {
     this.notificationRule.targetType = event.target.value;
     this.createForm.value.targetType = event.target.value;
     this.targetTypeChanged.emit();
   }
 
-  updateCriticalControlsOnly(event) {
+  updateCriticalControlsOnly(event: boolean) {
     this.notificationRule.criticalControlsOnly = event;
   }
 

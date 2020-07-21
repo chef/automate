@@ -23,9 +23,11 @@
             <label>
               <span class="label">Webhook type<span aria-hidden="true">*</span></span>
               <chef-select
+                ngDefaultControl
+                formControlName="targetType"
                 (change)="changeSelectionForWebhookType($event)"
                 class="notification-select-menu">
-                <chef-option *ngFor="let key of getTagetTypeKeys()" [value]="key">
+                <chef-option *ngFor="let key of targetKeysValue" [value]="key">
                   <img src="assets/img/logo-{{key}}.png" alt="{{key}} logo"/>
                   {{ notificationRule.TargetTypeLabels[key] }} - {{key}}
                 </chef-option>
@@ -38,9 +40,11 @@
             <label>
               <span class="label">Failure type  <span aria-hidden="true">*</span></span>
               <chef-select
+                ngDefaultControl
+                formControlName="ruleType"
                 (change)="setFailureType($event)"
                 class="notification-select-menu">
-                <chef-option *ngFor="let key of getAlertTypeKeys()" [value]="key">
+                <chef-option *ngFor="let key of alertTypeKeysValue" [value]="key">
                   {{ notificationRule.AlertTypeLabels[key] }}
                 </chef-option>
               </chef-select>

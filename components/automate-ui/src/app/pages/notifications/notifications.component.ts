@@ -70,6 +70,9 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   public notificationObj = new NotificationRule('', '', null, '', null, '', false);
   private isDestroyed = new Subject<boolean>();
 
+  public targetKeys: string[];
+  public alertTypeKeys: string[];
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
@@ -77,17 +80,21 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     private notificationRuleRequests: NotificationRuleRequests,
     private telemetryService: TelemetryService
   ) {
-    this.rules$ = store.pipe(select(allRules));
+     this.rules$ = store.pipe(select(allRules));
     this.createNotificationForm = this.fb.group({
       // Must stay in sync with error checks in create-notification-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      ruleType: [[]],
-      targetType: [[]],
+      ruleType: ['ComplianceFailure', []],
+      targetType: [ServiceActionType.WEBHOOK, []],
+
       // Note that URL here may be FQDN -or- IP!
       targetUrl: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: [[]],
       password: [[]]
     });
+
+    this.targetKeys = this.notificationObj.getTargetTypeKeys();
+    this.alertTypeKeys = this.notificationObj.getAlertTypeKeys();
    }
 
   ngOnInit() {
