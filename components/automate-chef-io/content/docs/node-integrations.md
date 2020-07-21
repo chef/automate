@@ -22,7 +22,7 @@ Access the _Node Integrations_ page from the **Settings** tab.
 
 Set up Chef Automate to detect and scan the nodes in your AWS EC2 account by providing your AWS Credentials and creating an _AWS EC2 Node Manager_ from the **Node Credentials** page in the **Settings** tab. Chef Automate requires your information to detect the nodes in your AWS EC2 account. Chef Automate creates a node reference for each EC2 instance in your account and collects all of the tags associated with each instance.
 
-Inspec 2+ supports running scan jobs against your AWS account configuration, such as CloudWatch or IAM, [see more here](https://www.inspec.io/docs/reference/resources/#aws-resources). Set up Chef Automate to run these scan jobs by providing your AWS Credentials and creating an _AWS API Node Manager_ in the **Node Integrations** page in the **Settings**  tab.
+Inspec 2+ supports running scan jobs against your AWS account configuration, such as CloudWatch or IAM, [see more here](https://docs.chef.io/inspec/resources/#aws). Set up Chef Automate to run these scan jobs by providing your AWS Credentials and creating an _AWS API Node Manager_ in the **Node Integrations** page in the **Settings**  tab.
 
 To create an AWS EC2 Node Manager, you need the following information:
 
@@ -186,7 +186,7 @@ Filter instances for scanning by specifying either regions or tags by their keys
 
 ## Use Case: Azure Account Scanning with Chef Automate
 
-Inspec 2+ supports running scan jobs against your Azure account configuration, such as network security groups and ad users. See [Azure resources](https://www.inspec.io/docs/reference/resources/#azure-resources) for more information.
+Inspec 2+ supports running scan jobs against your Azure account configuration, such as network security groups and ad users. See [Azure resources](https://docs.chef.io/inspec/resources/#azure) for more information.
 Set up Chef Automate to run these scan jobs by providing your Azure credentials and creating an _Azure API Node Manager_.
 
 ### Adding an Azure API Node Manager
@@ -208,7 +208,7 @@ Filter the regions for the scan job by specifying regions to include or exclude.
 
 ## Google Cloud Platform Account Scanning with Chef Automate
 
-Run scans against your GCP account infrastructure using Chef Automate. Set up Chef Automate to detect and scan the nodes in your Google Cloud Platform (GCP) account by providing your GCP Credentials and creating a _GCP Node Manager_. To create a GCP Node Manager, navigate to _Node Integrations_, select `Create Integration`, and you should see _Google Cloud_ as one of your node management service options. See the Chef InSpec documentation for more infomation about [GCP resources](https://www.inspec.io/docs/reference/resources/#gcp-resources).
+Run scans against your GCP account infrastructure using Chef Automate. Set up Chef Automate to detect and scan the nodes in your Google Cloud Platform (GCP) account by providing your GCP Credentials and creating a _GCP Node Manager_. To create a GCP Node Manager, navigate to _Node Integrations_, select `Create Integration`, and you should see _Google Cloud_ as one of your node management service options. See the Chef InSpec documentation for more infomation about [GCP resources](https://docs.chef.io/inspec/resources/#gcp).
 
 To run a GCP scan in Chef Automate:
 
