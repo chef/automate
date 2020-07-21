@@ -26,7 +26,7 @@ trap upload_dep_manifest EXIT
 
 echo "--- Installing Chef UI Library dependencies"
 pushd components/chef-ui-library
-  npm install --verbose
+  npm install
   npm run build
 popd
 
