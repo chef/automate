@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/user"
 	"path"
 	"strconv"
 	"syscall"
 
 	"github.com/chef/automate/components/compliance-service/cmd/inspec_runner/platform"
+	"github.com/chef/automate/lib/user"
 )
 
 // Set at build time via linker flags.

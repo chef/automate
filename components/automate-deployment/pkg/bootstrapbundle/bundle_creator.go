@@ -4,15 +4,16 @@ import (
 	"archive/tar"
 	"io"
 	"os"
-	"os/user"
 	"path"
 	"strconv"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/product"
 	"github.com/chef/automate/lib/stringutils"
-	"github.com/pkg/errors"
+	"github.com/chef/automate/lib/user"
 )
 
 const magicHeader = "ABB-1\n\n"

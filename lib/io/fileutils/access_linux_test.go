@@ -3,12 +3,12 @@ package fileutils
 import (
 	"io/ioutil"
 	"os"
-	"os/user"
 	"path"
 	"strings"
 	"syscall"
 	"testing"
 
+	"github.com/chef/automate/lib/user"
 	"github.com/stretchr/testify/require"
 )
 

@@ -13,7 +13,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/user"
 	"path"
 	"path/filepath"
 	"strings"
@@ -35,6 +34,7 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/platform/sys"
+	"github.com/chef/automate/lib/user"
 )
 
 // LocalTarget struct
