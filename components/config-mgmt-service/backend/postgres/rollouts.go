@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/lib/pq"
@@ -37,37 +36,141 @@ type Rollout struct {
 
 type RolloutWithOrderIndex struct {
 	Rollout
-	OrderIndex int `db:"order_index"` // present in query for last N rollouts per segment
+	OrderIndex     int   `db:"order_index"`     // present in query for last N rollouts per segment
+	CurrentRollout *bool `db:"current_rollout"` // db uses this to enforce uniqueness of current rollouts
 }
 
 const getAllRollouts = `
-  SELECT *
+  SELECT  id
+         ,policy_name
+         ,policy_node_group
+         ,policy_revision_id
+         ,policy_domain_url
+         ,policy_domain_username
+         ,scm_type
+         ,scm_web_type
+         ,policy_scm_url
+         ,policy_scm_web_url
+         ,policy_scm_commit
+         ,scm_author_name
+         ,scm_author_email
+         ,description
+         ,ci_job_url
+         ,ci_job_id
+         ,start_time
+         ,end_time
+	
     FROM rollouts AS r
 ORDER BY policy_domain_url ASC,
          policy_name ASC,
-				 policy_node_group ASC,
-				 start_time DESC
+         policy_node_group ASC,
+         start_time DESC
+`
+
+const upsertRollout = `
+      INSERT INTO rollouts (
+              policy_name            -- 1
+             ,policy_node_group      -- 2
+             ,policy_revision_id     -- 3
+             ,policy_domain_url      -- 4
+             ,policy_domain_username -- 5
+             ,scm_type               -- 6
+             ,scm_web_type           -- 7
+             ,policy_scm_url         -- 8
+             ,policy_scm_web_url     -- 9
+             ,policy_scm_commit      -- 10
+             ,scm_author_name        -- 11
+             ,scm_author_email       -- 12
+             ,description            -- 13
+             ,ci_job_url             -- 14
+             ,ci_job_id              -- 15
+             )
+      VALUES (
+             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+             )
+ ON CONFLICT ON CONSTRAINT current_rollout_unique
+   DO UPDATE SET (
+              policy_domain_username
+             ,scm_type
+             ,scm_web_type
+             ,policy_scm_url
+             ,policy_scm_web_url
+             ,policy_scm_commit
+             ,scm_author_name
+             ,scm_author_email
+             ,description
+             ,ci_job_url
+             ,ci_job_id
+             ) = (
+	       EXCLUDED.policy_domain_username
+             ,EXCLUDED.scm_type
+             ,EXCLUDED.scm_web_type
+             ,EXCLUDED.policy_scm_url
+             ,EXCLUDED.policy_scm_web_url
+             ,EXCLUDED.policy_scm_commit
+             ,EXCLUDED.scm_author_name
+             ,EXCLUDED.scm_author_email
+             ,EXCLUDED.description
+             ,EXCLUDED.ci_job_url
+             ,EXCLUDED.ci_job_id
+             )
+   RETURNING 
+              id
+             ,policy_name
+             ,policy_node_group
+             ,policy_revision_id
+             ,policy_domain_url
+             ,policy_domain_username
+             ,scm_type
+             ,scm_web_type
+             ,policy_scm_url
+             ,policy_scm_web_url
+             ,policy_scm_commit
+             ,scm_author_name
+             ,scm_author_email
+             ,description
+             ,ci_job_url
+             ,ci_job_id
+             ,start_time
+             ,end_time
+	      
+;
 `
 
 // CreateRollout takes the given rollout attributes and attempts to store the
 // rollout in the database.
 func (p *Postgres) CreateRollout(ctx context.Context, r *NewRollout) (*Rollout, error) {
-	// TODO/FIXME:
-	// - along with adding this, we need to make the other create rollout method work as follows:
-	// if it doesn't exist, then create
-	// if it does exist, then update the metadata fields
 	if _, err := url.Parse(r.PolicyDomainURL); err != nil {
 		return nil, errors.Wrapf(err, "Invalid policy domain URL %q", r.PolicyDomainURL)
 	}
 
-	err := p.mapper.WithContext(ctx).Insert(r)
+	var upsertedRollout Rollout
+
+	err := p.mapper.WithContext(ctx).SelectOne(&upsertedRollout,
+		upsertRollout,
+		r.PolicyName,           //  policy_name            -- 1
+		r.PolicyNodeGroup,      // ,policy_node_group      -- 2
+		r.PolicyRevisionId,     // ,policy_revision_id     -- 3
+		r.PolicyDomainURL,      // ,policy_domain_url      -- 4
+		r.PolicyDomainUsername, // ,policy_domain_username -- 5
+		r.SCMType,              // ,scm_type               -- 6
+		r.SCMWebType,           // ,scm_web_type           -- 7
+		r.PolicySCMURL,         // ,policy_scm_url         -- 8
+		r.PolicySCMWebURL,      // ,policy_scm_web_url     -- 9
+		r.PolicySCMCommit,      // ,policy_scm_commit      -- 10
+		r.SCMAuthorName,        // ,scm_author_name        -- 11
+		r.SCMAuthorEmail,       // ,scm_author_email       -- 12
+		r.Description,          // ,description            -- 13
+		r.CiJobUrl,             // ,ci_job_url             -- 14
+		r.CiJobId,              // ,ci_job_id              -- 15
+	)
 	if err != nil {
 		return nil, err
 	}
 
 	// We have to fetch the row back to get the values of any fields the database
 	// itself set or modified.
-	return p.FindRolloutByID(ctx, r.Id)
+	return &upsertedRollout, nil
 }
 
 func (p *Postgres) FindRolloutByID(ctx context.Context, id int32) (*Rollout, error) {
@@ -130,11 +233,7 @@ func (p *Postgres) CreateRolloutFromChefAction(ctx context.Context, r *NewRollou
 		// Server can't do anything about it and the outcome is what the user
 		// wanted (rollout is created).
 		if err, isPqError := err.(*pq.Error); isPqError {
-			// this error comes from a `RAISE` inside a trigger function, so there's
-			// not a great alternative to string matching. But it should be stable if
-			// we don't muck with the trigger function. See 02_add_rollouts.up.sql in
-			// the schema/sql dir.
-			if strings.HasPrefix(err.Message, "current rollout exists") {
+			if err.Constraint == "current_rollout_unique" {
 				return nil
 			}
 		}
