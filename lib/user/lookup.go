@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+type UnknownGroupIdError = gouser.UnknownGroupIdError
+type UnknownGroupError = gouser.UnknownGroupError
+type UnknownUserError = gouser.UnknownUserError
+type UnknownUserIdError = gouser.UnknownUserIdError
+
+type User = gouser.User
+type Group = gouser.Group
+
 var DefaultLookupProvider LookupProvider = &chainLookupProvider{
 	providers: []LookupProvider{
 		goLookupProvider{},
@@ -17,25 +25,25 @@ var DefaultLookupProvider LookupProvider = &chainLookupProvider{
 }
 
 type LookupProvider interface {
-	Lookup(username string) (*gouser.User, error)
-	LookupId(uid string) (*gouser.User, error)
-	LookupGroup(groupname string) (*gouser.Group, error)
-	LookupGroupId(gid string) (*gouser.Group, error)
+	Lookup(username string) (*User, error)
+	LookupId(uid string) (*User, error)
+	LookupGroup(groupname string) (*Group, error)
+	LookupGroupId(gid string) (*Group, error)
 }
 
-func Lookup(username string) (*gouser.User, error) {
+func Lookup(username string) (*User, error) {
 	return DefaultLookupProvider.Lookup(username)
 }
 
-func LookupId(uid string) (*gouser.User, error) {
+func LookupId(uid string) (*User, error) {
 	return DefaultLookupProvider.LookupId(uid)
 }
 
-func LookupGroup(groupname string) (*gouser.Group, error) {
+func LookupGroup(groupname string) (*Group, error) {
 	return DefaultLookupProvider.LookupGroup(groupname)
 }
 
-func LookupGroupId(gid string) (*gouser.Group, error) {
+func LookupGroupId(gid string) (*Group, error) {
 	return DefaultLookupProvider.LookupGroupId(gid)
 }
 
@@ -43,7 +51,7 @@ type chainLookupProvider struct {
 	providers []LookupProvider
 }
 
-func (c *chainLookupProvider) Lookup(username string) (*gouser.User, error) {
+func (c *chainLookupProvider) Lookup(username string) (*User, error) {
 	var lastErr error
 	for _, provider := range c.providers {
 		u, err := provider.Lookup(username)
@@ -55,7 +63,7 @@ func (c *chainLookupProvider) Lookup(username string) (*gouser.User, error) {
 	return nil, lastErr
 }
 
-func (c *chainLookupProvider) LookupId(uid string) (*gouser.User, error) {
+func (c *chainLookupProvider) LookupId(uid string) (*User, error) {
 	var lastErr error
 	for _, provider := range c.providers {
 		u, err := provider.LookupId(uid)
@@ -67,7 +75,7 @@ func (c *chainLookupProvider) LookupId(uid string) (*gouser.User, error) {
 	return nil, lastErr
 }
 
-func (c *chainLookupProvider) LookupGroup(groupname string) (*gouser.Group, error) {
+func (c *chainLookupProvider) LookupGroup(groupname string) (*Group, error) {
 	var lastErr error
 	for _, provider := range c.providers {
 		g, err := provider.LookupGroup(groupname)
@@ -79,7 +87,7 @@ func (c *chainLookupProvider) LookupGroup(groupname string) (*gouser.Group, erro
 	return nil, lastErr
 }
 
-func (c *chainLookupProvider) LookupGroupId(gid string) (*gouser.Group, error) {
+func (c *chainLookupProvider) LookupGroupId(gid string) (*Group, error) {
 	var lastErr error
 	for _, provider := range c.providers {
 		g, err := provider.LookupGroupId(gid)
@@ -94,15 +102,15 @@ func (c *chainLookupProvider) LookupGroupId(gid string) (*gouser.Group, error) {
 type goLookupProvider struct {
 }
 
-func (goLookupProvider) Lookup(username string) (*gouser.User, error) {
+func (goLookupProvider) Lookup(username string) (*User, error) {
 	return gouser.Lookup(username)
 }
 
-func (goLookupProvider) LookupId(uid string) (*gouser.User, error) {
+func (goLookupProvider) LookupId(uid string) (*User, error) {
 	return gouser.LookupId(uid)
 }
 
-func (goLookupProvider) LookupGroup(groupname string) (*gouser.Group, error) {
+func (goLookupProvider) LookupGroup(groupname string) (*Group, error) {
 	return gouser.LookupGroup(groupname)
 }
 
@@ -112,18 +120,18 @@ func (goLookupProvider) LookupGroupId(gid string) (*gouser.Group, error) {
 
 type getentLookupProvider struct{}
 
-func (getentLookupProvider) Lookup(username string) (*gouser.User, error) {
+func (getentLookupProvider) Lookup(username string) (*User, error) {
 	parts, err := getent("passwd", username, 7)
 	if err != nil {
 		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
 			if exitError.ExitCode() == 2 {
-				return nil, gouser.UnknownUserError(username)
+				return nil, UnknownUserError(username)
 			}
 		}
 		return nil, err
 	}
-	return &gouser.User{
+	return &User{
 		Username: parts[0],
 		Uid:      parts[2],
 		Gid:      parts[3],
@@ -131,19 +139,19 @@ func (getentLookupProvider) Lookup(username string) (*gouser.User, error) {
 	}, nil
 }
 
-func (getentLookupProvider) LookupId(uid string) (*gouser.User, error) {
+func (getentLookupProvider) LookupId(uid string) (*User, error) {
 	parts, err := getent("passwd", uid, 7)
 	if err != nil {
 		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
 			if exitError.ExitCode() == 2 {
 				uidNum, _ := strconv.Atoi(uid) // nolint: errcheck
-				return nil, gouser.UnknownUserIdError(uidNum)
+				return nil, UnknownUserIdError(uidNum)
 			}
 		}
 		return nil, err
 	}
-	return &gouser.User{
+	return &User{
 		Username: parts[0],
 		Uid:      parts[2],
 		Gid:      parts[3],
@@ -151,37 +159,37 @@ func (getentLookupProvider) LookupId(uid string) (*gouser.User, error) {
 	}, nil
 }
 
-func (getentLookupProvider) LookupGroup(groupname string) (*gouser.Group, error) {
+func (getentLookupProvider) LookupGroup(groupname string) (*Group, error) {
 	parts, err := getent("group", groupname, 4)
 	if err != nil {
 		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
 			if exitError.ExitCode() == 2 {
-				return nil, gouser.UnknownGroupError(groupname)
+				return nil, UnknownGroupError(groupname)
 			}
 		}
 		return nil, err
 	}
 
-	return &gouser.Group{
+	return &Group{
 		Gid:  parts[2],
 		Name: parts[0],
 	}, nil
 }
 
-func (getentLookupProvider) LookupGroupId(gid string) (*gouser.Group, error) {
+func (getentLookupProvider) LookupGroupId(gid string) (*Group, error) {
 	parts, err := getent("group", gid, 4)
 	if err != nil {
 		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
 			if exitError.ExitCode() == 2 {
-				return nil, gouser.UnknownGroupIdError(gid)
+				return nil, UnknownGroupIdError(gid)
 			}
 		}
 		return nil, err
 	}
 
-	return &gouser.Group{
+	return &Group{
 		Gid:  parts[2],
 		Name: parts[0],
 	}, nil

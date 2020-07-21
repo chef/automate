@@ -8,11 +8,11 @@ package fileutils
 
 import (
 	"os"
-	"os/user"
 	"path/filepath"
 	"strconv"
 	"syscall"
 
+	"github.com/chef/automate/lib/user"
 	"github.com/pkg/errors"
 )
 
