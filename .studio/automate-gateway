@@ -121,7 +121,7 @@ function send_chef_action_example() {
   install_if_missing core/curl curl
   install_if_missing core/jq-static jq
 
-  local event_types=(cookbook bag client node policyfile role scanjobs profile)
+  local event_types=(cookbook bag client node policy role scanjobs profile)
   local event_type=${event_types[$((RANDOM % 8))]}
   local event_tasks=(update create delete)
   local event_task=${event_tasks[$((RANDOM % 3))]}

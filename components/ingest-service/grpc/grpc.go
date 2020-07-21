@@ -133,7 +133,7 @@ func Spawn(opts *serveropts.Opts) error {
 
 	// ChefRuns
 	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient,
-		opts.ChefIngestServerConfig, nodesServiceClient)
+		opts.ChefIngestServerConfig, nodesServiceClient, eventServiceClient)
 	ingest.RegisterChefIngesterServer(grpcServer, chefIngest)
 
 	// Pass the chef ingest server to give status about the pipelines

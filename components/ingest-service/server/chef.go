@@ -11,6 +11,7 @@ import (
 	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/api/external/ingest/response"
 	"github.com/chef/automate/api/interservice/authz"
+	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
@@ -35,12 +36,13 @@ type ChefIngestServer struct {
 func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsClient,
 	nodeMgrClient manager.NodeManagerServiceClient,
 	chefIngestServerConfig serveropts.ChefIngestServerConfig,
-	nodesClient nodes.NodesServiceClient) *ChefIngestServer {
+	nodesClient nodes.NodesServiceClient,
+	eventServiceClient automate_event.EventServiceClient) *ChefIngestServer {
 	return &ChefIngestServer{
 		chefRunPipeline: pipeline.NewChefRunPipeline(client, authzClient,
 			nodeMgrClient, chefIngestServerConfig.ChefIngestRunPipelineConfig,
 			chefIngestServerConfig.MessageBufferSize),
-		chefActionPipeline: pipeline.NewChefActionPipeline(client, authzClient,
+		chefActionPipeline: pipeline.NewChefActionPipeline(client, authzClient, eventServiceClient,
 			chefIngestServerConfig.MaxNumberOfBundledActionMsgs,
 			chefIngestServerConfig.MessageBufferSize),
 		client:        client,
