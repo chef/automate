@@ -69,7 +69,7 @@ promote:
           - value_one: "{{target_channel}}"
             operator: equals
             value_two: current
-    - bash:.expeditor/purge-cdn.sh:
+    - purge_packages_chef_io_fastly:{{target_channel}}/automate/latest:
         post_commit: true
     - bash:.expeditor/announce-release.sh:
         post_commit: true
@@ -157,7 +157,7 @@ subscriptions:
           post_commit: true
       - trigger_pipeline:deploy/automate-chef-io:
           post_commit: true
-      - bash:.expeditor/purge-cdn.sh:
+      - purge_packages_chef_io_fastly:dev/automate/latest:
           post_commit: true
   # Update our compliance-profile pinnings when new profiles are released
   - workload: hab_package_published:unstable:chef/automate-compliance-profiles/*
