@@ -31,7 +31,7 @@ func eventPublisher(in <-chan message.ChefAction,
 
 			event, err := createEvent(msg)
 			if err != nil {
-				log.Errorf("unable to send event", msg.Action.GetNodeId)
+				log.Errorf("unable to send event nodeID %s", msg.Action.NodeId)
 				message.PropagateChefAction(out, &msg)
 				continue
 			}
@@ -40,7 +40,7 @@ func eventPublisher(in <-chan message.ChefAction,
 			req := &automate_event.PublishRequest{Msg: event}
 			_, err = eventServiceClient.Publish(context.Background(), req)
 			if err != nil {
-				log.Errorf("unable to send event", msg.Action.GetNodeId)
+				log.Errorf("unable to send event nodeID %s", msg.Action.NodeId)
 			}
 			dur := time.Since(start)
 			log.WithFields(log.Fields{

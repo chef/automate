@@ -150,15 +150,6 @@ func (s *Suite) GetNodes(x int) ([]cfgBackend.Node, error) {
 	return s.cfgmgmt.GetNodes(1, x, "node_name", true, filterMap, "", "")
 }
 
-// GetActions retrives X Chef Actions
-func (s *Suite) GetActions(x int) ([]cfgBackend.Action, error) {
-	filterMap := make(map[string][]string, 0)
-	actions, _, err := s.cfgmgmt.GetActions(filterMap,
-		time.Time{}, time.Now().Add(time.Hour*24*365), x, time.Time{}, "", true)
-
-	return actions, err
-}
-
 // GetNonExistingNodes retrives X Chef Nodes that doesn't actually exist :thinking:
 //
 // We need this custom function since we need a way to verify the nodes we update and

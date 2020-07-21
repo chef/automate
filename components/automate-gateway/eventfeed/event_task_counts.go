@@ -8,9 +8,6 @@ import (
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 )
 
-// A eventCountsFunc type returns a subset of event counts and an error
-type eventCountsFunc func() (*agRes.EventCounts, error)
-
 // CollectEventTaskCounts - collect the event task counts from all the components
 func (eventFeedAggregate *EventFeedAggregate) CollectEventTaskCounts(
 	ctx context.Context, request *agReq.EventCountsFilter) (*agRes.EventCounts, error) {

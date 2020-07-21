@@ -14,9 +14,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// A eventsFunc type returns a subset of events and an error
-type eventsFunc func() (*agRes.Events, error)
-
 type EventFeedAggregate struct {
 	feedServiceClient event_feed_api.EventFeedServiceClient
 }

@@ -13,9 +13,6 @@ import (
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 )
 
-// A stringsFunc type returns a subset of event strings and an error
-type stringsFunc func() (*agRes.EventStrings, error)
-
 // CollectEventGuitarStrings - collect the guitar strings from all the componets
 //
 // It is important to mention that we will be able to survive if one of the
@@ -144,53 +141,6 @@ func validateDateRange(start string, end string) error {
 	}
 
 	return nil
-}
-
-func createEmptyEventStrings(request *agReq.EventStrings) (*agRes.EventStrings, error) {
-	loc, err := time.LoadLocation(request.Timezone)
-	if err != nil {
-		return &agRes.EventStrings{}, err
-	}
-
-	startTime, err := createStartTime(request.Start, loc)
-	if err != nil {
-		return &agRes.EventStrings{}, err
-	}
-
-	endTime, err := createEndTime(request.End, loc)
-	if err != nil {
-		return &agRes.EventStrings{}, err
-	}
-
-	itemCollection := make([]*agRes.EventCollection, 0)
-	for startTime.Before(endTime) {
-		startTime = startTime.Add(time.Duration(int64(time.Hour) * int64(request.HoursBetween)))
-		itemCollection = append(itemCollection, new(agRes.EventCollection))
-	}
-
-	guitarStrings := make([]*agRes.EventString, 3)
-
-	guitarStrings[0] = &agRes.EventString{
-		EventAction: "create",
-		Collection:  itemCollection,
-	}
-
-	guitarStrings[1] = &agRes.EventString{
-		EventAction: "update",
-		Collection:  itemCollection,
-	}
-
-	guitarStrings[2] = &agRes.EventString{
-		EventAction: "delete",
-		Collection:  itemCollection,
-	}
-
-	return &agRes.EventStrings{
-		Strings:      guitarStrings,
-		Start:        request.Start,
-		End:          request.End,
-		HoursBetween: request.HoursBetween,
-	}, nil
 }
 
 func eventFeedToGatewayEventCollection(slots []*event_feed_api.Timeslot, totalNumberOfBucketsAllowed int) []*agRes.EventCollection {
