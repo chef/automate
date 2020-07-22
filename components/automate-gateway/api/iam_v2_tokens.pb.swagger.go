@@ -17,7 +17,7 @@ func init() {
     "/apis/iam/v2/tokens": {
       "get": {
         "summary": "Lists all tokens",
-        "description": "Lists all tokens, both admin and non-admin.\n\nAuthorization Action:\n`+"`"+``+"`"+``+"`"+`\niam:tokens:list\n`+"`"+``+"`"+``+"`"+`",
+        "description": "Lists all tokens, both admin and non-admin.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListTokens",
         "responses": {
           "200": {
@@ -33,7 +33,7 @@ func init() {
       },
       "post": {
         "summary": "Creates a token",
-        "description": "Creates a token.\nActive defaults to true when not specified.\nValue is auto-generated when not specified.\n\nNote that this creates *non-admin* tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using `+"`"+`tokens:*`+"`"+``+"`"+`).\n\nYou cannot create admin tokens via the REST API.\nAdmin tokens can only be created by specifying the `+"`"+`--admin`+"`"+` flag to this chef-automate sub-command:\n`+"`"+``+"`"+``+"`"+`\nchef-automate iam token create \u003cyour-token-name\u003e --admin`+"`"+`\n`+"`"+``+"`"+``+"`"+`\n\nAuthorization Action:\n`+"`"+``+"`"+``+"`"+`\niam:tokens:create\n`+"`"+``+"`"+``+"`"+`",
+        "description": "Creates a token.\nActive defaults to true when not specified.\nValue is auto-generated when not specified.\n\nNote that this creates *non-admin* tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using ` + "`" + `tokens:*` + "`" + `` + "`" + `).\n\nYou cannot create admin tokens via the REST API.\nAdmin tokens can only be created by specifying the ` + "`" + `--admin` + "`" + ` flag to this chef-automate sub-command:\n` + "`" + `` + "`" + `` + "`" + `\nchef-automate iam token create \u003cyour-token-name\u003e --admin` + "`" + `\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateToken",
         "responses": {
           "200": {
@@ -67,7 +67,7 @@ func init() {
     "/apis/iam/v2/tokens/{id}": {
       "get": {
         "summary": "Gets a token",
-        "description": "Returns the details for a token.\n\nAuthorization Action:\n`+"`"+``+"`"+``+"`"+`\niam:tokens:get\n`+"`"+``+"`"+``+"`"+`",
+        "description": "Returns the details for a token.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetToken",
         "responses": {
           "200": {
@@ -92,7 +92,7 @@ func init() {
       },
       "delete": {
         "summary": "Deletes a token",
-        "description": "Deletes a token and remove it from any policies.\n\nAuthorization Action:\n`+"`"+``+"`"+``+"`"+`\niam:tokens:delete\n`+"`"+``+"`"+``+"`"+`",
+        "description": "Deletes a token and remove it from any policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteToken",
         "responses": {
           "200": {
@@ -117,7 +117,7 @@ func init() {
       },
       "put": {
         "summary": "Updates a token",
-        "description": "This operation overwrites all fields excepting ID, timestamps, and value,\nincluding those omitted from the request, so be sure to specify all properties.\nProperties that you do not include are reset to empty values.\n\nAuthorization Action:\n`+"`"+``+"`"+``+"`"+`\niam:tokens:update\n`+"`"+``+"`"+``+"`"+`",
+        "description": "This operation overwrites all fields excepting ID, timestamps, and value,\nincluding those omitted from the request, so be sure to specify all properties.\nProperties that you do not include are reset to empty values.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateToken",
         "responses": {
           "200": {

@@ -17,7 +17,7 @@ func init() {
     "/api/v0/event_task_counts": {
       "get": {
         "summary": "List Counts Per Event Task Occurrence",
-        "description": "Returns totals for update, create, and delete event tasks, which are the actions taken on the event.\n\nExample:\n`+"`"+``+"`"+``+"`"+`\nevent_task_counts?start=1592546400000\u0026end=1593151199999\n`+"`"+``+"`"+``+"`"+`\n\nAuthorization Action:\n`+"`"+``+"`"+``+"`"+`\nevent:events:list\n`+"`"+``+"`"+``+"`"+`",
+        "description": "Returns totals for update, create, and delete event tasks, which are the actions taken on the event.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\nevent_task_counts?start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetEventTaskCounts",
         "responses": {
           "200": {
@@ -64,7 +64,7 @@ func init() {
     "/api/v0/event_type_counts": {
       "get": {
         "summary": "List Count of Event Type Occurrence",
-        "description": "Returns totals for role, cookbook, and organization event types.\n\nExample:\n`+"`"+``+"`"+``+"`"+`\nevent_type_counts?start=1592546400000\u0026end=1593151199999\n`+"`"+``+"`"+``+"`"+`\n\nAuthorization Action:\n`+"`"+``+"`"+``+"`"+`\nevent:events:list\n`+"`"+``+"`"+``+"`"+`",
+        "description": "Returns totals for role, cookbook, and organization event types.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\nevent_type_counts?start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetEventTypeCounts",
         "responses": {
           "200": {
@@ -111,7 +111,7 @@ func init() {
     "/api/v0/eventfeed": {
       "get": {
         "summary": "List Events",
-        "description": "Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).\nAdding a filter makes a list of all events that meet the filter criteria.\n\nExample:\n`+"`"+``+"`"+``+"`"+`\neventfeed?collapse=true\u0026filter=organization:The%2520Watchmen\u0026page_size=100\u0026start=1592546400000\u0026end=1593151199999\n`+"`"+``+"`"+``+"`"+`\n\nAuthorization Action:\n`+"`"+``+"`"+``+"`"+`\nevent:events:list\n`+"`"+``+"`"+``+"`"+`",
+        "description": "Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).\nAdding a filter makes a list of all events that meet the filter criteria.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\neventfeed?collapse=true\u0026filter=organization:The%2520Watchmen\u0026page_size=100\u0026start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetEventFeed",
         "responses": {
           "200": {
@@ -197,7 +197,7 @@ func init() {
     "/api/v0/eventstrings": {
       "get": {
         "summary": "List Summary Stats About Events",
-        "description": "Returns data that populates the guitar strings visual on the top of the event feed.\n\nExample:\n`+"`"+``+"`"+``+"`"+`\neventstrings?timezone=America/Denver\u0026hours_between=1\u0026start=2020-06-19\u0026end=2020-06-25\n`+"`"+``+"`"+``+"`"+`\n\nAuthorization Action:\n`+"`"+``+"`"+``+"`"+`\nevent:events:list\n`+"`"+``+"`"+``+"`"+`",
+        "description": "Returns data that populates the guitar strings visual on the top of the event feed.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\neventstrings?timezone=America/Denver\u0026hours_between=1\u0026start=2020-06-19\u0026end=2020-06-25\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetEventStringBuckets",
         "responses": {
           "200": {
