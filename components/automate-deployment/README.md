@@ -25,8 +25,8 @@ For most day-to-day development, you can use the Habitat studio-based
 development environment described in our [developer
 documentation](../../dev-docs/DEV_ENVIRONMENT)
 
-Most new development features and test should be designed to work in the
-studio if possible.
+Most new development features and test should be designed to work in
+the studio if possible.
 
 We also try to ensure that the build, unit tests, and linter work from
 outside the studio, using the Makefile directly:
@@ -113,5 +113,4 @@ In some cases, it is necessary to test the real migration code paths
 without the mock interfaces used by self-test. To facilitate this the
 `a1migration` directory has a docker-based test environment suited for
 that purpose.  See the README in that directory for more details.
-
 

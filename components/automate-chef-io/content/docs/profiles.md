@@ -98,7 +98,7 @@ Total tests
 
 Severity
 : The impact of a control, from 0 to 1.
-  See the Chef InSpec documentation for more information about the [severity measure](https://www.inspec.io/docs/reference/dsl_inspec#syntax)
+  See the Chef InSpec documentation for more information about the [severity measure](https://docs.chef.io/inspec/dsl_inspec#syntax)
 
 Selecting the shaded area next to the control name or the `+` on the right side expands the control to show a more detailed description.
 Selecting **View Code** displays the control's InSpec code.
@@ -119,7 +119,7 @@ Users in a Chef Automate instance with the same username in both saml and local 
 ## Interacting with Chef Automate Profiles
 
 You can interact with Chef Automate Profiles from the command line, as well as from the user interface.
-For more information, see the [InSpec CLI](https://www.inspec.io/docs/reference/cli/) subcommand.
+For more information, see the [InSpec CLI](https://docs.chef.io/inspec/cli/) subcommand.
 
 ### API Calls
 

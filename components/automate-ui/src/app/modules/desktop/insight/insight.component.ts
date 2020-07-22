@@ -5,8 +5,10 @@ import { saveAs } from 'file-saver';
 import { find } from 'lodash/fp';
 import * as moment from 'moment/moment';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Desktop, TermFilter, NodeMetadataCount, NodeMetadataCountValue, PageSizeChangeEvent } from 'app/entities/desktop/desktop.model';
-import { FilterUpdate } from 'app/page-components/insight-attributes-dropdown/insight-attributes-dropdown.model';
+import {
+  Desktop, TermFilter, NodeMetadataCount, NodeMetadataCountValue, PageSizeChangeEvent,
+  DesktopColumnOption, DesktopColumnOptionUpdate
+} from 'app/entities/desktop/desktop.model';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { ClientRunsRequests } from 'app/entities/client-runs/client-runs.requests';
 import { clientRunsState } from 'app/entities/client-runs/client-runs.selectors';
@@ -21,6 +23,8 @@ export class InsightComponent implements OnInit {
 
   @Input() desktops: Desktop[];
   @Input() selectedDesktop: Desktop;
+  @Input() desktopColumnOptions: DesktopColumnOption[] = [];
+  @Input() desktopColumnOptionsSaveAsDefault = false;
   @Input() currentPage: number;
   @Input() pageSize: number;
   @Input() totalDesktops: number;
@@ -38,6 +42,8 @@ export class InsightComponent implements OnInit {
   // Returns 'name', 'check-in', or 'platform'
   @Output() sortChange: EventEmitter<string> = new EventEmitter();
   @Output() desktopSelected: EventEmitter<Desktop> = new EventEmitter();
+  @Output() desktopColumnOptionsUpdated: EventEmitter<DesktopColumnOptionUpdate>
+    = new EventEmitter();
 
   public attributesMenuOpen = false;
   public downloadOptsVisible = false;
@@ -89,10 +95,6 @@ export class InsightComponent implements OnInit {
     this.attributesMenuOpen = !this.attributesMenuOpen;
   }
 
-  public updateFilters(event: FilterUpdate) {
-    console.log(event);
-  }
-
   toggleDownloadDropdown() {
     this.downloadOptsVisible = !this.downloadOptsVisible;
   }
@@ -126,5 +128,9 @@ export class InsightComponent implements OnInit {
 
   filterGroupValueTrackBy(_index: number, item: NodeMetadataCountValue): string {
     return item.value;
+  }
+
+  get activeDesktopColumnOptions() {
+    return this.desktopColumnOptions.filter(o => o.checked);
   }
 }

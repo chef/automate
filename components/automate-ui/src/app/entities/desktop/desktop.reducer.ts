@@ -14,8 +14,114 @@ import {
   TermFilter,
   SortOrder,
   Selected,
-  Terms
+  Terms,
+  DesktopColumnOption,
+  DesktopColumnName,
+  DesktopColumnLabel
 } from './desktop.model';
+
+export const desktopColumnOptions: DesktopColumnOption[] = [
+  {
+    name: DesktopColumnName.Platform,
+    label: DesktopColumnLabel.Platform,
+    checked: true
+  },
+  {
+    name: DesktopColumnName.Environment,
+    label: DesktopColumnLabel.Environment,
+    checked: true
+  },
+  {
+    name: DesktopColumnName.VirtualizationRole,
+    label: DesktopColumnLabel.VirtualizationRole,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.Domain,
+    label: DesktopColumnLabel.Domain,
+    checked: true
+  },
+  {
+    name: DesktopColumnName.KernelRelease,
+    label: DesktopColumnLabel.KernelRelease,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.Tag,
+    label: DesktopColumnLabel.Tag,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.KernelVersion,
+    label: DesktopColumnLabel.KernelVersion,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.ChefVersion,
+    label: DesktopColumnLabel.ChefVersion,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.Hostname,
+    label: DesktopColumnLabel.Hostname,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.IpAddress,
+    label: DesktopColumnLabel.IpAddress,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.Timezone,
+    label: DesktopColumnLabel.Timezone,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.Ip6Address,
+    label: DesktopColumnLabel.Ip6Address,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.MacAddress,
+    label: DesktopColumnLabel.MacAddress,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.DMIsystemManufacturer,
+    label: DesktopColumnLabel.DMIsystemManufacturer,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.Uptime,
+    label: DesktopColumnLabel.Uptime,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.DMIsystemSerialNumber,
+    label: DesktopColumnLabel.DMIsystemSerialNumber,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.MemoryTotal,
+    label: DesktopColumnLabel.MemoryTotal,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.CloudProvider,
+    label: DesktopColumnLabel.CloudProvider,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.VirtualizationSystem,
+    label: DesktopColumnLabel.VirtualizationSystem,
+    checked: false
+  },
+  {
+    name: DesktopColumnName.Status,
+    label: DesktopColumnLabel.Status,
+    checked: false
+  }
+];
 
 export interface DesktopEntityState {
   dailyCheckInCountCollection: DailyCheckInCountCollection;
@@ -29,6 +135,8 @@ export interface DesktopEntityState {
   getNodeMetadataCountsStatus: EntityStatus;
   dailyNodeRuns: DailyNodeRuns;
   desktopListTitle: string;
+  desktopListColumns: DesktopColumnOption[];
+  desktopListColumnsSaveAsDefault: boolean;
   desktops: Desktop[];
   getDesktopsStatus: EntityStatus;
   getDesktopStatus: EntityStatus;
@@ -52,6 +160,8 @@ export const desktopEntityInitialState: DesktopEntityState = {
   nodeMetadataCounts: [],
   getNodeMetadataCountsStatus: EntityStatus.notLoaded,
   desktopListTitle: 'Desktops',
+  desktopListColumns: desktopColumnOptions,
+  desktopListColumnsSaveAsDefault: false,
   desktops: [],
   getDesktopsStatus: EntityStatus.notLoaded,
   getDesktopStatus: EntityStatus.notLoaded,
@@ -179,6 +289,12 @@ export function desktopEntityReducer(state: DesktopEntityState = desktopEntityIn
 
     case DesktopActionTypes.UPDATE_DESKTOPS_FILTER_CURRENT_PAGE:
       return set('getDesktopsFilter.currentPage', action.payload.page)(state);
+
+    case DesktopActionTypes.UPDATE_DESKTOP_COLUMN_OPTIONS:
+      return pipe(
+        set('desktopListColumns', action.payload.options),
+        set('desktopListColumnsSaveAsDefault', action.payload.saveAsDefault)
+      )(state) as DesktopEntityState;
 
     case DesktopActionTypes.ADD_DESKTOPS_FILTER_TERM: {
       const terms = concat(state.getDesktopsFilter.terms, [action.payload.term]);
