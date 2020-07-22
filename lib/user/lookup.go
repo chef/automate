@@ -3,8 +3,10 @@ package user
 import (
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	gouser "os/user"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -20,7 +22,7 @@ type Group = gouser.Group
 var DefaultLookupProvider LookupProvider = &chainLookupProvider{
 	providers: []LookupProvider{
 		goLookupProvider{},
-		getentLookupProvider{},
+		newGetentLookupProvider(),
 	},
 }
 
@@ -118,10 +120,36 @@ func (goLookupProvider) LookupGroupId(gid string) (*gouser.Group, error) {
 	return gouser.LookupGroupId(gid)
 }
 
-type getentLookupProvider struct{}
+type getentLookupProvider struct {
+	getentPath string
+}
 
-func (getentLookupProvider) Lookup(username string) (*User, error) {
-	parts, err := getent("passwd", username, 7)
+func newGetentLookupProvider() getentLookupProvider {
+	getentPath := "getent"
+	if p := os.Getenv("CHEF_AUTOMATE_GETENT_PATH"); p != "" {
+		getentPath = p
+	} else {
+		// Find a system getent
+		for _, d := range []string{"/bin", "/usr/bin"} {
+			p := filepath.Join(d, "getent")
+			d, err := os.Stat(p)
+			if err != nil {
+				continue
+			}
+			if m := d.Mode(); !m.IsDir() && m&0111 != 0 {
+				getentPath = p
+				break
+			}
+		}
+	}
+
+	return getentLookupProvider{
+		getentPath: getentPath,
+	}
+}
+
+func (g getentLookupProvider) Lookup(username string) (*User, error) {
+	parts, err := g.getent("passwd", username, 7)
 	if err != nil {
 		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
@@ -139,8 +167,8 @@ func (getentLookupProvider) Lookup(username string) (*User, error) {
 	}, nil
 }
 
-func (getentLookupProvider) LookupId(uid string) (*User, error) {
-	parts, err := getent("passwd", uid, 7)
+func (g getentLookupProvider) LookupId(uid string) (*User, error) {
+	parts, err := g.getent("passwd", uid, 7)
 	if err != nil {
 		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
@@ -159,8 +187,8 @@ func (getentLookupProvider) LookupId(uid string) (*User, error) {
 	}, nil
 }
 
-func (getentLookupProvider) LookupGroup(groupname string) (*Group, error) {
-	parts, err := getent("group", groupname, 4)
+func (g getentLookupProvider) LookupGroup(groupname string) (*Group, error) {
+	parts, err := g.getent("group", groupname, 4)
 	if err != nil {
 		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
@@ -177,8 +205,8 @@ func (getentLookupProvider) LookupGroup(groupname string) (*Group, error) {
 	}, nil
 }
 
-func (getentLookupProvider) LookupGroupId(gid string) (*Group, error) {
-	parts, err := getent("group", gid, 4)
+func (g getentLookupProvider) LookupGroupId(gid string) (*Group, error) {
+	parts, err := g.getent("group", gid, 4)
 	if err != nil {
 		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
@@ -195,8 +223,8 @@ func (getentLookupProvider) LookupGroupId(gid string) (*Group, error) {
 	}, nil
 }
 
-func getent(database string, name string, numParts int) ([]string, error) {
-	cmd := exec.Command("getent", database, name)
+func (g getentLookupProvider) getent(database string, name string, numParts int) ([]string, error) {
+	cmd := exec.Command(g.getentPath, database, name)
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err

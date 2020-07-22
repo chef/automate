@@ -78,7 +78,7 @@ func (suite *LookupTestSuite) TestLookupGroupId() {
 
 func TestGetent(t *testing.T) {
 	s := &LookupTestSuite{
-		p: getentLookupProvider{},
+		p: newGetentLookupProvider(),
 	}
 	suite.Run(t, s)
 }
