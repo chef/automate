@@ -424,9 +424,6 @@ describe('Ingestion project tagging', () => {
           url: `api/v0/eventfeed?collapse=false&page_size=100&start=${actionStart}&end=${actionEnd}`
         }).then((response) => {
           expect(response.body.events.length).to.be.greaterThan(0);
-          if (!eventExist(entityName, response.body.events)) {
-            expect(entityName, response.body.events).to.equal('');
-          }
           expect(eventExist(entityName, response.body.events)).to.equal(true);
         });
       });

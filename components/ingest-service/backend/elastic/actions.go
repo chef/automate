@@ -48,7 +48,7 @@ func (es *Backend) UpdateActionProjectTagsForIndex(ctx context.Context, index st
 					if (condition.chefServers.length > 0) {
 						def found = false;
 						for (def chefServer : condition.chefServers){
-							if (ctx._source.remote_hostname == chefServer ) {
+							if (ctx._source.service_hostname == chefServer ) {
 								found = true;
 								break;
 							}
