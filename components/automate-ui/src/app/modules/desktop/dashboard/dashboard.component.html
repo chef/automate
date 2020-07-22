@@ -69,6 +69,8 @@
           [titleText]="desktopListTitle$ | async"
           [desktops]="desktops$ | async"
           [selectedDesktop]="selectedDesktop"
+          [desktopColumnOptions]="desktopListColumns$ | async"
+          [desktopColumnOptionsSaveAsDefault]="desktopListColumnsSaveAsDefault$ | async"
           [totalDesktops]="totalDesktopCount$ | async"
           [pageSize]="pageSize$ | async"
           [currentPage]="currentPage$ | async"
@@ -82,7 +84,8 @@
           (desktopSelected)="onDesktopSelected($event)"
           (closed)="onDesktopListClose()"
           (fullscreenToggled)="onDesktopListFullscreen()"
-          (sortChange)="onSortChange($event)">
+          (sortChange)="onSortChange($event)"
+          (desktopColumnOptionsUpdated)="onDesktopColumnOptionsUpdated($event)">
         </app-insight>
       </div>
       <div

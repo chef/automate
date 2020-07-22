@@ -2,16 +2,15 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { InsightAttributesDropdownComponent } from './insight-attributes-dropdown.component';
-
-import { FilterName } from './insight-attributes-dropdown.model';
+import { DesktopColumnName, DesktopColumnLabel } from 'app/entities/desktop/desktop.model';
 
 const testOptions = [
-  { name: FilterName.PlatformVersion, id: 'platform_version_filter' },
-  { name: FilterName.Domain, id: 'domain_filter' },
-  { name: FilterName.MacAddress, id: 'mac_address_filter' },
-  { name: FilterName.CloudProvider, id: 'cloud_provider_filter' },
-  { name: FilterName.Hostname, id: 'hostname_filter' },
-  { name: FilterName.Tag, id: 'tag_filter' }
+  { label: DesktopColumnLabel.Platform, name: DesktopColumnName.Platform, checked: false },
+  { label: DesktopColumnLabel.Domain, name: DesktopColumnName.Domain, checked: false },
+  { label: DesktopColumnLabel.MacAddress, name: DesktopColumnName.MacAddress, checked: false },
+  { label: DesktopColumnLabel.Status, name: DesktopColumnName.Status, checked: false },
+  { label: DesktopColumnLabel.Hostname, name: DesktopColumnName.Hostname, checked: false },
+  { label: DesktopColumnLabel.Tag, name: DesktopColumnName.Tag, checked: false }
 ];
 
 describe('OverviewTrendComponent', () => {
@@ -42,6 +41,12 @@ describe('OverviewTrendComponent', () => {
   describe('by default', () => {
     beforeEach(() => {
       component.options = testOptions;
+      component.ngOnChanges({ options: {
+        previousValue: [],
+        currentValue: testOptions,
+        firstChange: true,
+        isFirstChange: () => true
+      }});
       fixture.detectChanges();
     });
 
@@ -58,83 +63,61 @@ describe('OverviewTrendComponent', () => {
     });
   });
 
-  describe('when making selections to filter', () => {
+  describe('when making selections', () => {
     beforeEach(() => {
       component.options = testOptions;
+      component.ngOnChanges({ options: {
+        previousValue: [],
+        currentValue: testOptions,
+        firstChange: true,
+        isFirstChange: () => true
+      }});
       fixture.detectChanges();
     });
 
-    it('adds the selected button id to the selectedOptions array', () => {
-      const list = fixture.debugElement.nativeElement.querySelectorAll('.filter-button');
-      list[0].click();
-      list[1].click();
-      list[4].click();
+    it('marks the selected option as checked', () => {
+      component.handleOptionChange({ detail: true }, 0);
+      component.handleOptionChange({ detail: true }, 1);
+      component.handleOptionChange({ detail: true }, 4);
 
-      expect(component.selectedOptions.length).toBe(3);
-      expect(component.selectedOptions).toContain('platform_version_filter');
-      expect(component.selectedOptions).toContain('domain_filter');
-      expect(component.selectedOptions).toContain('hostname_filter');
-      expect(component.selectedOptions).not.toContain('mac_address_filter');
-      expect(component.selectedOptions).not.toContain('cloud_provider_filter');
+      expect(component.activeOptions.length).toBe(3);
+      expect(component.activeOptions[0].name).toEqual(testOptions[0].name);
+      expect(component.activeOptions[1].name).toEqual(testOptions[1].name);
+      expect(component.activeOptions[2].name).toEqual(testOptions[4].name);
     });
 
     it('allows a maximum of 5 selected options', () => {
-      const list = fixture.debugElement.nativeElement.querySelectorAll('.filter-button');
-      expect(list.length).toBeGreaterThan(5);
+      expect(component.maxOptionsActive).toBeFalsy();
 
-      list.forEach(option => option.click());
+      component.handleOptionChange({ detail: true }, 0);
+      component.handleOptionChange({ detail: true }, 1);
+      component.handleOptionChange({ detail: true }, 2);
+      component.handleOptionChange({ detail: true }, 3);
+      component.handleOptionChange({ detail: true }, 4);
+      fixture.detectChanges();
 
-      expect(component.selectedOptions.length).toBe(5);
+      expect(component.maxOptionsActive).toBeTruthy();
     });
 
     it('enables the submit button when filters are different than previous selection', () => {
-      component.selectedOptions = ['platform_version_filter', 'domain_filter'];
-      component.lastSelectedOptions = ['platform_version_filter', 'domain_filter'];
       const submitButton = fixture.debugElement.nativeElement.querySelector('chef-button[primary]');
-      const list = fixture.debugElement.nativeElement.querySelectorAll('.filter-button');
       const PLATFORM_FILTER_INDEX = 0;
       const DOMAIN_FILTER_INDEX = 4;
 
       expect(submitButton.disabled).toBeTruthy();
 
-      list[PLATFORM_FILTER_INDEX].click();
+      component.handleOptionChange({ detail: true }, PLATFORM_FILTER_INDEX);
       fixture.detectChanges();
       expect(submitButton.disabled).toBeFalsy();
 
-      list[DOMAIN_FILTER_INDEX].click();
+      component.handleOptionChange({ detail: true }, DOMAIN_FILTER_INDEX);
       fixture.detectChanges();
       expect(submitButton.disabled).toBeFalsy();
 
-      list[PLATFORM_FILTER_INDEX].click();
-      list[DOMAIN_FILTER_INDEX].click();
+      component.handleOptionChange({ detail: false }, PLATFORM_FILTER_INDEX);
+      component.handleOptionChange({ detail: false }, DOMAIN_FILTER_INDEX);
       fixture.detectChanges();
       expect(submitButton.disabled).toBeTruthy();
     });
-
-    it('updates selected class and aria-pressed value', () => {
-      let allSelected = fixture.debugElement.nativeElement
-        .querySelectorAll('.filter-button.selected');
-      let allPressed = fixture.debugElement.nativeElement
-        .querySelectorAll('[aria-pressed="true"]');
-
-      expect(allSelected.length).toBe(0);
-      expect(allPressed.length).toBe(0);
-
-      const list = fixture.debugElement.nativeElement.querySelectorAll('.filter-button');
-      list[0].click();
-      list[1].click();
-      list[4].click();
-      fixture.detectChanges();
-
-      allSelected = fixture.debugElement.nativeElement
-        .querySelectorAll('.filter-button.selected');
-      allPressed = fixture.debugElement.nativeElement
-        .querySelectorAll('[aria-pressed="true"]');
-
-      expect(allSelected.length).toBe(3);
-      expect(allPressed.length).toBe(3);
-    });
   });
-
-
 });

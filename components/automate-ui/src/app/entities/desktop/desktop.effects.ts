@@ -1,4 +1,4 @@
-import { catchError, mergeMap, map, withLatestFrom, switchMap } from 'rxjs/operators';
+import { catchError, mergeMap, map, withLatestFrom, switchMap, tap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of, combineLatest, from } from 'rxjs';
@@ -32,7 +32,9 @@ import {
   GetDesktopFailure,
   GetDesktopsTotal,
   GetDesktopsTotalSuccess,
-  GetDesktopsTotalFailure
+  GetDesktopsTotalFailure,
+  UpdateDesktopColumnOptions,
+  GetDesktopColumnOptionsDefaults
 } from './desktop.actions';
 import { DesktopRequests } from './desktop.requests';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -244,4 +246,22 @@ export class DesktopEffects {
   updateDesktopSortTerm$ = this.actions$.pipe(
       ofType(DesktopActionTypes.UPDATE_DESKTOPS_SORT_TERM),
       mergeMap(() => [ new GetDesktops() ]));
+
+  @Effect({ dispatch: false })
+  updateDesktopColumnOptions$ = this.actions$.pipe(
+    ofType<UpdateDesktopColumnOptions>(DesktopActionTypes.UPDATE_DESKTOP_COLUMN_OPTIONS),
+    tap(({ payload }) => {
+      if (payload.saveAsDefault) {
+        localStorage.setItem('desktopColumnOptions', JSON.stringify(payload.options));
+      }
+    }));
+
+  @Effect()
+  getDesktopColumnOptionsDefault$ = this.actions$.pipe(
+    ofType<GetDesktopColumnOptionsDefaults>(DesktopActionTypes.GET_DESKTOP_COLUMN_OPTIONS_DEFAULTS),
+    mergeMap(() => {
+      const stored = localStorage.getItem('desktopColumnOptions');
+      const options = stored ? JSON.parse(stored) : [];
+      return stored ? [new UpdateDesktopColumnOptions({ options, saveAsDefault: true })] : [];
+    }));
 }

@@ -77,6 +77,20 @@ export interface RespDesktop {
   deprecations_count: number;
   chef_version: string;
   domain: string;
+  tag: string;
+  ipaddress: string;
+  ip6address: string;
+  macaddress: string;
+  memory_total: string;
+  virtualization_system: string;
+  virtualization_role: string;
+  kernel_release: string;
+  kernel_version: string;
+  hostname: string;
+  timezone: string;
+  dmi_system_manufacturer: string;
+  dmi_system_serial_number: string;
+  cloud_provider: string;
 }
 
 export interface RespDesktopCount {
@@ -160,7 +174,22 @@ export class DesktopRequests {
       platformVersion: respDesktop.platform_version,
       chefVersion: respDesktop.chef_version,
       domain: respDesktop.domain,
-      latestRunId: respDesktop.latest_run_id
+      latestRunId: respDesktop.latest_run_id,
+      environment: respDesktop.environment,
+      tag: respDesktop.tag,
+      ipaddress: respDesktop.ipaddress,
+      ip6address: respDesktop.ip6address,
+      macaddress: respDesktop.macaddress,
+      memoryTotal: respDesktop.memory_total,
+      virtualizationSystem: respDesktop.virtualization_system,
+      virtualizationRole: respDesktop.virtualization_role,
+      kernelRelease: respDesktop.kernel_release,
+      kernelVersion: respDesktop.kernel_version,
+      hostname: respDesktop.hostname,
+      timezone: respDesktop.timezone,
+      dmiSystemManufacturer: respDesktop.dmi_system_manufacturer,
+      dmiSystemSerialNumber: respDesktop.dmi_system_serial_number,
+      cloudProvider: respDesktop.cloud_provider
     };
   }
 
