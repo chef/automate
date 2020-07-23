@@ -4,13 +4,13 @@ package chef.automate.domain.ingest;
 option go_package = "github.com/chef/automate/api/interservice/ingest";
 
 import "google/api/annotations.proto";
-import "api/external/ingest/request/chef.proto";
-import "api/external/ingest/request/action.proto";
-import "api/external/ingest/request/liveness.proto";
+import "external/ingest/request/chef.proto";
+import "external/ingest/request/action.proto";
+import "external/ingest/request/liveness.proto";
 
-import "api/external/ingest/response/chef.proto";
-import "api/external/ingest/response/action.proto";
-import "api/external/ingest/response/liveness.proto";
+import "external/ingest/response/chef.proto";
+import "external/ingest/response/action.proto";
+import "external/ingest/response/liveness.proto";
 
 // Version message
 //

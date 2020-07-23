@@ -33,6 +33,7 @@ function cleanup() {
 trap cleanup EXIT
 
 IMPORTS=(-I /src
+         -I /src/api
          -I vendor
          -I vendor/github.com/grpc-ecosystem/grpc-gateway
          -I vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis

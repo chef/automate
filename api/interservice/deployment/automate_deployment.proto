@@ -5,8 +5,8 @@ package chef.automate.domain.deployment;
 option go_package = "github.com/chef/automate/api/interservice/deployment";
 
 import "google/protobuf/timestamp.proto";
-import "api/config/deployment/config_request.proto";
-import "api/config/deployment/automate_config.proto";
+import "config/deployment/config_request.proto";
+import "config/deployment/automate_config.proto";
 
 service Deployment {
 	rpc Deploy (DeployRequest) returns (DeployResponse);

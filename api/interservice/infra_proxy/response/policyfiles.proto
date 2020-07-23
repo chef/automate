@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
 
-import "api/interservice/infra_proxy/response/roles.proto";
+import "interservice/infra_proxy/response/roles.proto";
 
 message Policyfiles {
     // Policyfiles list.

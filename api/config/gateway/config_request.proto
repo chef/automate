@@ -5,8 +5,8 @@ syntax = "proto3";
 package chef.automate.api.config;
 option go_package = "github.com/chef/automate/api/config/gateway";
 
-import "api/config/shared/global.proto";
-import "api/config/shared/tls.proto";
+import "config/shared/global.proto";
+import "config/shared/tls.proto";
 import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
