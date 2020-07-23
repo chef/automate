@@ -5,6 +5,8 @@ test_name="ldap_hab_user"
 test_backup_restore=true
 
 do_setup() {
+    do_setup_default
+
     previous_umask=$(umask)
     umask 022
     yum -y install openldap compat-openldap openldap-clients openldap-servers nslcd nss-pam-ldapd authconfig
