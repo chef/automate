@@ -118,39 +118,28 @@ document "send_chef_action_example" <<DOC
 DOC
 # shellcheck disable=SC2120
 function send_chef_action_example() {
-  install_if_missing core/curl curl
-  install_if_missing core/jq-static jq
+  generate_chef_action_example | send_chef_data_raw "$1"
+}
 
-  local event_types=(cookbook bag client node policy role scanjobs profile)
-  local event_type=${event_types[$((RANDOM % 8))]}
-  local event_tasks=(update create delete)
-  local event_task=${event_tasks[$((RANDOM % 3))]}
-  if [[ "$1" != "" ]]; then
-    event_type=$1
-  fi
-  if [[ "$2" != "" ]]; then
-    event_task=$2
-  fi
-  local endpoint="/api/v0/events/data-collector"
-  local examples_path="/src/components/ingest-service/examples"
-  local tmp_action_json
-  local rfc_time
-  rfc_time=$(date --rfc-3339=seconds  -d "$((RANDOM % 144)) hour ago" | sed 's/ /T/' | sed 's/\+.*/Z/')
 
-  # Update the 'recorded_at' time from the ChefAction Example; and set entity_type and task
-  tmp_action_json="$(jq --arg event_task "$event_task" \
-                        --arg rfc_time "$rfc_time" \
-                        --arg event_type "$event_type" \
-                        --arg random_key "this_is_surely_not_a_known_key" \
-                        '.task = $event_task |
-                         .recorded_at = $rfc_time |
-                         .entity_type = $event_type |
-                         .[$random_key] = "foo"' < $examples_path/chef_action.json)"
+document "generate_chef_action_example" <<DOC
+  Generates a unique Chef action report by updating the example document with new
+  UUIDS.
 
-  # note: this needs to be fed in via stdin, as passing it in as --data "$tmp_action_json"
-  # will exceed argmax
-  curl -f --insecure -H "api-token: $(get_api_token)" \
-    --data "@-" "${GATEWAY_URL}${endpoint}" <<< "$tmp_action_json"
+  Example: Generate the document and pretty print:
+  ------------------------------------------------
+  generate_chef_action_example | jq .
+
+  Example: Generate the document and send to automate:
+  ----------------------------------------------------
+  generate_chef_action_example | send_chef_data_raw
+DOC
+function generate_chef_action_example() {
+  local name="insights.$((RANDOM % 100))"
+
+  local examples_json_path=${JSON_FILE:-/src/components/ingest-service/examples/actions/item_bag_create.json}
+
+  uniqify_chef_action_report "$name" < "$examples_json_path"
 }
 
 document "generate_chef_run_example" <<DOC
@@ -282,10 +271,10 @@ document "send_chef_data_raw" <<DOC
   Send data from stdin to the given endpoint.
 
   One optional argument can be given to send the data via different paths:
-  * 'send_chef_data_raw legacy': send to automate-gateway's events/data-collector endpoint
+  * 'send_chef_data_raw legacy'(default): send to automate-gateway's events/data-collector endpoint
   * 'send_chef_data_raw lb': send to automate-load-balancer (nginx) data-collector/v0 endpoint
   * 'send_chef_data_raw SOME/PATH': send to automate-gateway at the given path
-  * 'send_chef_data_raw' (default): send to new ingest/events/chef/run endpoint
+  * 'send_chef_data_raw' run: send to new ingest/events/chef/run endpoint
 
   Example: Send a Chef Run failure example to the new ingest endpoint:
   --------------------------------------------------------
@@ -302,9 +291,11 @@ function send_chef_data_raw() {
   local token=$2
   if [[ "$1" == "legacy" ]]; then
     endpoint="${GATEWAY_URL}/api/v0/events/data-collector"
+  elif [[ "$1x" == "x" ]]; then
+    endpoint="${GATEWAY_URL}/api/v0/events/data-collector"
   elif [[ "$1" == "lb" ]]; then
     endpoint="https://localhost/data-collector/v0"
-  elif [[ "$1x" == "x" ]]; then
+  elif [[ "$1" == "run" ]]; then
     endpoint="${GATEWAY_URL}/api/v0/ingest/events/chef/run"
   else
     endpoint="$1"
@@ -318,6 +309,41 @@ function send_chef_data_raw() {
 
   curl -f --insecure -H "api-token: ${token}" \
   --data "@-" "${endpoint}"
+}
+
+function uniqify_chef_action_report() {
+  install_if_missing core/jq-static jq
+
+  local name="$1"
+
+  local uuid
+  uuid=$(uuidgen)
+
+  local rfc_time
+  rfc_time=$(date +%FT%TZ -d "$((RANDOM % 144)) hour ago")
+
+  local event_types=(cookbook bag client node policy role scanjobs profile)
+  local event_type=policy
+  local event_tasks=(update create delete)
+  local event_task=${event_tasks[$((RANDOM % 3))]}
+  if [[ "$2" != "" ]]; then
+    event_type=$2
+  fi
+  if [[ "$3" != "" ]]; then
+    event_task=$3
+  fi
+
+  jq --arg rfc_time "$rfc_time" \
+     --arg event_type "$event_type" \
+     --arg event_task "$event_task" \
+     --arg name "$name" \
+     --arg uuid "$uuid" \
+     --arg task "$task" \
+     '.recorded_at = $rfc_time |
+      .entity_name = $name |
+      .task = $event_task |
+      .entity_type = $event_type |
+      .id = $uuid'
 }
 
 function uniqify_chef_run_report() {
