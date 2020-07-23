@@ -76,6 +76,16 @@ EOF
     systemctl start nscd
 
     umask "$previous_umask"
+
+    if grep 'hab' /etc/passwd;then
+        log_error "found hab user in /etc/passwd"
+        return 1
+    fi
+
+    if grep 'hab' /etc/group;then
+        log_error "found hab user in /etc/group"
+        return 1
+    fi
 }
 
 do_test_restore() {
