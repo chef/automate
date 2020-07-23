@@ -55,6 +55,9 @@ import { NodeDetailsService } from './services/node-details/node-details.service
 import {
   NodeNoRunsDetailsResolverService
 } from './services/node-details/node-noruns-details-resolver.service';
+import {
+  NodeNoRunIdResolverService
+} from './services/node-details/node-norunid-resolver.service';
 import { NodeRunsService } from './services/node-details/node-runs.service';
 import { ProjectService } from './entities/projects/project.service';
 import { ProductDeployedService } from './services/product-deployed/product-deployed.service';
@@ -327,6 +330,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     NotificationRuleRequests,
     NodeDetailsResolverService,
     NodeNoRunsDetailsResolverService,
+    NodeNoRunIdResolverService,
     NodeDetailsService,
     NodeRunsService,
     PolicyRequests,
