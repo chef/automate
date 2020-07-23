@@ -2,7 +2,7 @@
 <h1>{{ .Title }}</h1>
 <div class="prose">
 {{ range .Site.Data.docs.cli_chef_automate.commands }}
-{{ $id := replace .name " " "-" }}
+{{ $id := urlize .name }}
   <h2 id="{{ $id }}">{{ .name }}</h2>
   <p>{{ .description }}</p>
 
@@ -25,8 +25,11 @@
   <div class="grid-x">
     {{ range .see_also }}
     {{ $sa_bits := split . " - " }}
-    {{ $sa_id := replace (index $sa_bits 0) " " "-" }}
-    <div class="cell medium-3"><a href="#chef-automate-{{ $sa_id }}">{{ index $sa_bits 0 }}</a></div>
+    {{ $sa_id := urlize (index $sa_bits 0) }}
+    {{ if not (hasPrefix $sa_id "chef-automate") }}
+      {{ $sa_id = delimit (slice "chef-automate" $sa_id) "-" }}
+    {{ end }}
+    <div class="cell medium-3"><a href="#{{ $sa_id }}">{{ index $sa_bits 0 }}</a></div>
     <div class="cell medium-9">{{ index $sa_bits 1 }}</div>
     {{ end }}
   </div>
