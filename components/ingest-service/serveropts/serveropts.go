@@ -45,6 +45,7 @@ type Opts struct {
 	ChefIngestServerConfig        ChefIngestServerConfig
 	CerealAddress                 string
 	Jobs                          JobsConfig
+	EventFeedAddress              string
 }
 
 // SetLogLevel sets the log level for the service

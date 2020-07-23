@@ -94,6 +94,7 @@ func readCliParams() *serveropts.Opts {
 		PGDatabase:                    viper.GetString("postgresql-database"),
 		AuthzAddress:                  viper.GetString("authz-address"),
 		CerealAddress:                 viper.GetString("cereal-address"),
+		EventFeedAddress:              viper.GetString("event-feed-address"),
 		EventAddress:                  viper.GetString("event-address"),
 		NodeManagerAddress:            viper.GetString("nodemanager-address"),
 		LogLevel:                      viper.GetString("log-level"),
@@ -144,5 +145,6 @@ func init() {
 	serveCmd.Flags().String("root-cert", "cacert.pem", "Root SSL CA Certificate for gRPC server")
 	serveCmd.Flags().String("missing-nodes-for-deletion-running-default", "true", "Default value for running the missing nodes for deletion job")
 	serveCmd.Flags().String("nodes-missing-running-default", "true", "Default value for running the nodes missing job")
+	serveCmd.Flags().String("event-feed-address", "localhost:10134", "address of event-feed (domain:<port>)")
 	viper.BindPFlags(serveCmd.Flags()) // nolint: errcheck
 }

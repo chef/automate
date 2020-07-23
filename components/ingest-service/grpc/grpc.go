@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
@@ -119,6 +120,17 @@ func Spawn(opts *serveropts.Opts) error {
 
 	eventServiceClient := automate_event.NewEventServiceClient(eventConn)
 
+	// event feed Interface
+	eventFeedConn, err := opts.ConnFactory.Dial("event-feed-service", opts.EventFeedAddress)
+	if err != nil {
+		// This should never happen
+		log.WithError(err).Error("Failed to create Event Feed connection")
+		return err
+	}
+	defer eventConn.Close() // nolint: errcheck
+
+	eventFeedServiceClient := event_feed.NewEventFeedServiceClient(eventFeedConn)
+
 	// nodemanager Interface
 	nodeMgrConn, err := opts.ConnFactory.Dial("nodemanager-service", opts.NodeManagerAddress)
 	if err != nil {
@@ -133,7 +145,7 @@ func Spawn(opts *serveropts.Opts) error {
 
 	// ChefRuns
 	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient,
-		opts.ChefIngestServerConfig, nodesServiceClient, eventServiceClient)
+		opts.ChefIngestServerConfig, nodesServiceClient, eventFeedServiceClient)
 	ingest.RegisterChefIngesterServer(grpcServer, chefIngest)
 
 	// Pass the chef ingest server to give status about the pipelines

@@ -24,6 +24,7 @@ import (
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	cfgBackend "github.com/chef/automate/components/config-mgmt-service/backend"
@@ -63,19 +64,20 @@ var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
 //   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
 // * A PurgeServer, the exposed gRPC Server that configures and runs purge workflows
 type Suite struct {
-	ChefIngestServer         *server.ChefIngestServer
-	JobSchedulerServer       *server.JobSchedulerServer
-	JobManager               *cereal.Manager
-	EventHandlerServer       *server.AutomateEventHandlerServer
-	PurgeServer              data_lifecycle.PurgeServer
-	cfgmgmt                  cfgBackend.Client
-	ingest                   iBackend.Client
-	client                   *elastic.Client
-	projectsClient           *authz.MockProjectsClient
-	eventServiceClientMock   *event.MockEventServiceClient
-	managerServiceClientMock *manager.MockNodeManagerServiceClient
-	nodesServiceClientMock   *nodes.MockNodesServiceClient
-	cleanup                  func() error
+	ChefIngestServer           *server.ChefIngestServer
+	JobSchedulerServer         *server.JobSchedulerServer
+	JobManager                 *cereal.Manager
+	EventHandlerServer         *server.AutomateEventHandlerServer
+	PurgeServer                data_lifecycle.PurgeServer
+	cfgmgmt                    cfgBackend.Client
+	ingest                     iBackend.Client
+	client                     *elastic.Client
+	projectsClient             *authz.MockProjectsClient
+	eventFeedServiceClientMock *event_feed.MockEventFeedServiceClient
+	eventServiceClientMock     *event.MockEventServiceClient
+	managerServiceClientMock   *manager.MockNodeManagerServiceClient
+	nodesServiceClientMock     *nodes.MockNodesServiceClient
+	cleanup                    func() error
 }
 
 // Initialize the test suite
@@ -351,7 +353,7 @@ func createServices(s *Suite) error {
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
 		s.managerServiceClientMock, chefIngestServerConfig, s.nodesServiceClientMock,
-		s.eventServiceClientMock)
+		s.eventFeedServiceClientMock)
 
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
 		s.projectsClient, s.eventServiceClientMock)
@@ -436,6 +438,10 @@ func createMocksWithDefaultFunctions(s *Suite) {
 	s.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&event.PublishResponse{}, nil)
 
+	s.eventFeedServiceClientMock = event_feed.NewMockEventFeedServiceClient(gomock.NewController(nil))
+	s.eventFeedServiceClientMock.EXPECT().HandleEvent(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&event.EventResponse{}, nil)
+
 	s.managerServiceClientMock = manager.NewMockNodeManagerServiceClient(gomock.NewController(nil))
 	s.managerServiceClientMock.EXPECT().ProcessNode(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&manager.ProcessNodeResponse{}, nil)
@@ -452,6 +458,7 @@ func createMocksWithDefaultFunctions(s *Suite) {
 func createMocksWithTestObject(s *Suite, t *testing.T) {
 	s.projectsClient = authz.NewMockProjectsClient(gomock.NewController(t))
 	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
+	s.eventFeedServiceClientMock = event_feed.NewMockEventFeedServiceClient(gomock.NewController(t))
 }
 
 func secureConnFactoryHab() (*secureconn.Factory, error) {

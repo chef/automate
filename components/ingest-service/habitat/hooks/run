@@ -126,6 +126,14 @@ CONFIG="$CONFIG --cereal-address {{cereal-service.sys.ip}}:{{cereal-service.cfg.
   {{~/if}}
 {{~/eachAlive}}
 
+# Bind to event-feed-service if it's available
+{{~#eachAlive bind.event-feed-service.members as |service|}}
+  {{~#if @last}}
+addNoProxy {{event-feed-service.sys.ip}}
+CONFIG="$CONFIG --event-feed-address {{service.sys.ip}}:{{service.cfg.port}}"
+  {{~/if}}
+{{~/eachAlive}}
+
 pg-helper ensure-service-database "$DBNAME"
 
 # Start Ingest Service

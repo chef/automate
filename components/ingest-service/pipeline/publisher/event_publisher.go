@@ -5,6 +5,7 @@ import (
 	"time"
 
 	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/api/interservice/event_feed"
 	event "github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/gofrs/uuid"
@@ -13,14 +14,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func BuildEventPublisher(eventServiceClient automate_event.EventServiceClient) message.ChefActionPipe {
+func BuildEventPublisher(
+	eventFeedServiceClient event_feed.EventFeedServiceClient) message.ChefActionPipe {
 	return func(in <-chan message.ChefAction) <-chan message.ChefAction {
-		return eventPublisher(in, eventServiceClient)
+		return eventPublisher(in, eventFeedServiceClient)
 	}
 }
 
 func eventPublisher(in <-chan message.ChefAction,
-	eventServiceClient automate_event.EventServiceClient) <-chan message.ChefAction {
+	eventFeedServiceClient event_feed.EventFeedServiceClient) <-chan message.ChefAction {
 	out := make(chan message.ChefAction, 100)
 	go func() {
 		for msg := range in {
@@ -37,10 +39,11 @@ func eventPublisher(in <-chan message.ChefAction,
 			}
 
 			start := time.Now()
-			req := &automate_event.PublishRequest{Msg: event}
-			_, err = eventServiceClient.Publish(context.Background(), req)
+			_, err = eventFeedServiceClient.HandleEvent(context.Background(), event)
 			if err != nil {
 				log.Errorf("unable to send event nodeID %s", msg.Action.NodeId)
+				msg.FinishProcessing(err)
+				continue
 			}
 			dur := time.Since(start)
 			log.WithFields(log.Fields{

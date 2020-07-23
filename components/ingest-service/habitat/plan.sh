@@ -17,6 +17,7 @@ pkg_binds=(
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
   [cereal-service]="port"
+  [event-feed-service]="port"
 )
 pkg_binds_optional=(
   [es-sidecar-service]="port"
