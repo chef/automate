@@ -26,6 +26,7 @@ chef_automate_hab_binding_mode="relaxed"
 pkg_svc_user="root"
 
 pkg_deps=(
+  core/coreutils
   chef/mlsa
   core/bash
   core/curl # health_check
