@@ -54,7 +54,7 @@ serve: sync generate_swagger $(REDOC_FILE)
 lint: themes/chef
 	hugo -D
 
-build: themes/chef generate_swagger $(REDOC_FILE)
+build: themes/chef $(REDOC_FILE)
 	hugo
 
 # Consult scripts/spellcheck.sh in the root Automate directory for notes on using cspell.
