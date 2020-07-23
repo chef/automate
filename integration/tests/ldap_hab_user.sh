@@ -71,11 +71,7 @@ EOF
     authconfig --enableldap --enableldapauth --ldapserver=127.0.0.1 --ldapbasedn="dc=example,dc=local" --enablemkhomedir --update
     systemctl restart nslcd
 
-    mkdir /etc/systemd/system/chef-automate.service.d
-    cat > /etc/systemd/system/chef-automate.service.d/custom.conf <<EOF
-[Service]
-Environment=LD_PRELOAD=/lib64/libnss_ldap.so
-EOF
+    systemctl start nscd
 
     umask "$previous_umask"
 }
