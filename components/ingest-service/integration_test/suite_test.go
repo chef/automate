@@ -74,7 +74,6 @@ type Suite struct {
 	client                     *elastic.Client
 	projectsClient             *authz.MockProjectsClient
 	eventFeedServiceClientMock *event_feed.MockEventFeedServiceClient
-	eventServiceClientMock     *event.MockEventServiceClient
 	managerServiceClientMock   *manager.MockNodeManagerServiceClient
 	nodesServiceClientMock     *nodes.MockNodesServiceClient
 	cleanup                    func() error
@@ -356,7 +355,7 @@ func createServices(s *Suite) error {
 		s.eventFeedServiceClientMock)
 
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
-		s.projectsClient, s.eventServiceClientMock)
+		s.projectsClient)
 
 	// A global JobSchedulerServer instance to call any rpc function
 	//
@@ -434,10 +433,6 @@ func createMocksWithDefaultFunctions(s *Suite) {
 	s.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&authz.ListRulesForAllProjectsResp{}, nil)
 
-	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(nil))
-	s.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&event.PublishResponse{}, nil)
-
 	s.eventFeedServiceClientMock = event_feed.NewMockEventFeedServiceClient(gomock.NewController(nil))
 	s.eventFeedServiceClientMock.EXPECT().HandleEvent(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&event.EventResponse{}, nil)
@@ -457,7 +452,6 @@ func createMocksWithDefaultFunctions(s *Suite) {
 
 func createMocksWithTestObject(s *Suite, t *testing.T) {
 	s.projectsClient = authz.NewMockProjectsClient(gomock.NewController(t))
-	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
 	s.eventFeedServiceClientMock = event_feed.NewMockEventFeedServiceClient(gomock.NewController(t))
 }
 
