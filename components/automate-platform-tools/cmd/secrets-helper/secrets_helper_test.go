@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"os/user"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -17,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/user"
 )
 
 type testSecretsHelper struct {

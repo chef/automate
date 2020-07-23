@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/user"
 	"path"
 	"path/filepath"
 	"sort"
@@ -26,6 +25,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/preflight"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/user"
 )
 
 const restoreRecovery = `Check the logs (journalctl -u chef-automate) for errors related

@@ -883,3 +883,18 @@ steps:
       executor:
         linux:
           privileged: true
+
+  - label: "ldap hab user"
+    command:
+      - integration/run_test integration/tests/ldap_hab_user.sh
+    timeout_in_minutes: 30
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
+

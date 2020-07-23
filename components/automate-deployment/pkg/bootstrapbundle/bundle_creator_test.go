@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
-	"os/user"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -12,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/lib/product"
+	"github.com/chef/automate/lib/user"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -11,7 +11,6 @@ import (
 	"encoding/hex"
 	"io/ioutil"
 	"os"
-	"os/user"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -19,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/user"
 )
 
 // Commonly used secrets names. When accessing this library from
