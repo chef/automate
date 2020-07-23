@@ -178,6 +178,20 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     return allowedKeys.includes(key);
   }
 
+  // Update the width of input when greater than one number
+  public autoUpdateInputWidth($event: KeyboardEvent): void {
+    const element = $event.target as HTMLInputElement;
+    // Keep default in sync with input width in automate-settings.component.scss
+    const DEFAULT_WIDTH = 64;
+    const length = element.value.length;
+
+    if (length > 1) {
+      element.style.width = `${DEFAULT_WIDTH + (9 * (length - 1))}px`;
+    } else {
+      element.style.width = `${DEFAULT_WIDTH}px`;
+    }
+  }
+
   private setEnabled(control: AbstractControl, enabled: boolean): void {
     if (enabled) {
       control.enable();
