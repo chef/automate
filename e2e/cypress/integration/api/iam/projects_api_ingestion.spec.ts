@@ -285,7 +285,7 @@ describe('Ingestion project tagging', () => {
     // Ingest an action with attributes that match all the projects
     cy.fixture('action/environment_create.json').then((action) => {
       action.organization_name = 'Team Pizza';
-      action.remote_hostname = 'example.pizza';
+      action.service_hostname = 'example.pizza';
       action.id = actionId;
       action.entity_name = entityName;
       action.recorded_at = Cypress.moment().utc().subtract(1, 'day').format();
