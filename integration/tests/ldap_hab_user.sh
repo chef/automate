@@ -5,6 +5,8 @@ test_name="ldap_hab_user"
 test_backup_restore=true
 
 do_setup() {
+    do_setup_default
+
     previous_umask=$(umask)
     umask 022
     yum -y install openldap compat-openldap openldap-clients openldap-servers nslcd nss-pam-ldapd authconfig
@@ -71,13 +73,19 @@ EOF
     authconfig --enableldap --enableldapauth --ldapserver=127.0.0.1 --ldapbasedn="dc=example,dc=local" --enablemkhomedir --update
     systemctl restart nslcd
 
-    mkdir /etc/systemd/system/chef-automate.service.d
-    cat > /etc/systemd/system/chef-automate.service.d/custom.conf <<EOF
-[Service]
-Environment=LD_PRELOAD=/lib64/libnss_ldap.so
-EOF
+    systemctl start nscd
 
     umask "$previous_umask"
+
+    if grep 'hab' /etc/passwd;then
+        log_error "found hab user in /etc/passwd"
+        return 1
+    fi
+
+    if grep 'hab' /etc/group;then
+        log_error "found hab user in /etc/group"
+        return 1
+    fi
 }
 
 do_test_restore() {
