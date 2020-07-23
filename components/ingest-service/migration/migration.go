@@ -7,8 +7,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
+	"github.com/chef/automate/components/ingest-service/pipeline"
 )
 
 var (
@@ -27,25 +29,28 @@ var (
 	a1NodeStateIndexName     = "node-state-2"
 	berlinNodeStateIndexName = "node-state-1"
 	nodeStateAliasName       = "node-state"
+	actionIndexName          = "actions-*"
 )
 
 type Status struct {
-	total     int64
-	completed int64
-	status    string
-	finished  bool
-	ctx       context.Context
-	client    backend.Client
+	total          int64
+	completed      int64
+	status         string
+	finished       bool
+	ctx            context.Context
+	client         backend.Client
+	actionPipeline pipeline.ChefActionPipeline
 }
 
-func New(client backend.Client) *Status {
+func New(client backend.Client, actionPipeline pipeline.ChefActionPipeline) *Status {
 	return &Status{
-		total:     0,
-		completed: 0,
-		status:    "There is no migration running",
-		finished:  false,
-		ctx:       context.Background(),
-		client:    client,
+		total:          0,
+		completed:      0,
+		status:         "There is no migration running",
+		finished:       false,
+		ctx:            context.Background(),
+		client:         client,
+		actionPipeline: actionPipeline,
 	}
 }
 
@@ -133,6 +138,21 @@ func (ms *Status) Start() error {
 		return nil
 	}
 
+	exists, err = ms.hasActionData()
+	if err != nil {
+		ms.updateErr(err.Error(), "Unable to detect migration status")
+		return err
+	}
+	if exists {
+		ms.update("Starting migration of actions to the event-feed-service")
+		err = ms.migrateAction()
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable run actions to current migration")
+			return err
+		}
+		return nil
+	}
+
 	return nil
 }
 
@@ -146,6 +166,7 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 		nodeState4Exists, err4     = ms.hasNodeState4Data()
 		nodeState5Exists, err5     = ms.hasNodeState5Data()
 		nodeState6Exists, err6     = ms.hasNodeState6Data()
+		actionsExists, err7        = ms.hasActionData()
 	)
 
 	if err1 != nil {
@@ -166,6 +187,9 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 	if err6 != nil {
 		logFatal(err4.Error(), "Error detecting migration status")
 	}
+	if err7 != nil {
+		logFatal(err4.Error(), "Error detecting migration status")
+	}
 
 	// If the node-state alias doesn't exist and it is an index
 	// instead, we might have corrupted data
@@ -175,7 +199,7 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 		return false, err
 	}
 
-	if a1Exists || BerlinExists || nodeState4Exists || nodeState5Exists || nodeState6Exists {
+	if a1Exists || BerlinExists || nodeState4Exists || nodeState5Exists || nodeState6Exists || actionsExists {
 		return true, nil
 	}
 
@@ -251,6 +275,10 @@ func (ms *Status) hasNodeState5Data() (bool, error) {
 
 func (ms *Status) hasNodeState6Data() (bool, error) {
 	return ms.client.DoesIndexExists(ms.ctx, a2NodeState6Index)
+}
+
+func (ms *Status) hasActionData() (bool, error) {
+	return ms.client.DoesIndexExists(ms.ctx, actionIndexName)
 }
 
 func (ms *Status) migrateBerlinToCurrent() error {
@@ -334,6 +362,124 @@ func (ms *Status) migrateNodeStateToCurrent(previousIndex string) error {
 
 	ms.finish("Migration to current finished successfully")
 	return nil
+}
+
+func (ms *Status) migrateAction() error {
+	ms.total = 2
+
+	ms.update("loop through each action and send it though the pipeline")
+	pager := &actionsPaginationContext{
+		pageSize: 100,
+		client:   ms.client,
+	}
+
+	for err := pager.Start(); !pager.IsDone(); err = pager.Next() {
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable to retrieve actions")
+			return err
+		}
+
+		for _, action := range pager.results {
+			err = ms.sendActionThroughPipeline(action)
+			if err != nil {
+				ms.updateErr(err.Error(), "Unable to retrieve actions")
+				return err
+			}
+		}
+	}
+	ms.taskCompleted()
+
+	ms.update("Delete all the actions indices")
+	err := ms.client.DeleteAllActionIndexes(ms.ctx)
+	if err != nil {
+		ms.updateErr(err.Error(), "Unable to delete action indexes")
+		return err
+	}
+	ms.taskCompleted()
+
+	ms.finish("Migration Actions to current finished successfully")
+	return nil
+}
+
+func (ms *Status) sendActionThroughPipeline(internalAction backend.InternalChefAction) error {
+	errc := make(chan error)
+	defer close(errc)
+
+	action := internalChefActionToRawAction(internalAction)
+	var err error
+	if errQ := ms.actionPipeline.Run(ms.ctx, action, errc); errQ != nil {
+		err = errQ
+	} else {
+		err = <-errc
+	}
+
+	return err
+}
+
+func internalChefActionToRawAction(internalAction backend.InternalChefAction) *chef.Action {
+	return &chef.Action{
+		Id:               internalAction.Id,
+		MessageType:      internalAction.MessageType,
+		MessageVersion:   internalAction.MessageVersion,
+		EntityName:       internalAction.EntityName,
+		EntityType:       internalAction.EntityType,
+		Task:             internalAction.Task,
+		OrganizationName: internalAction.OrganizationName,
+		RemoteHostname:   internalAction.RemoteHostname,
+		RunId:            internalAction.RunId,
+		NodeId:           internalAction.NodeId,
+		RecordedAt:       internalAction.RecordedAt.Format(time.RFC3339),
+		RemoteRequestId:  internalAction.RemoteRequestId,
+		RequestId:        internalAction.RequestId,
+		RequestorName:    internalAction.RequestorName,
+		RequestorType:    internalAction.RequestorType,
+		ServiceHostname:  internalAction.ServiceHostname,
+		UserAgent:        internalAction.UserAgent,
+		ParentName:       internalAction.ParentName,
+		ParentType:       internalAction.ParentType,
+		RevisionId:       internalAction.RevisionId,
+	}
+}
+
+type actionsPaginationContext struct {
+	cursorDate time.Time
+	cursorID   string
+	pageSize   int
+	results    []backend.InternalChefAction
+	client     backend.Client
+}
+
+func (p *actionsPaginationContext) Start() error {
+	actions, _, err := p.client.GetActions(p.pageSize, time.Time{}, "", false)
+	if err != nil {
+		return err
+	}
+
+	p.HandleResults(actions)
+	return nil
+}
+
+func (p *actionsPaginationContext) Next() error {
+	actions, _, err := p.client.GetActions(p.pageSize, p.cursorDate, p.cursorID, false)
+	if err != nil {
+		return err
+	}
+
+	p.HandleResults(actions)
+	return nil
+}
+
+func (p *actionsPaginationContext) HandleResults(actions []backend.InternalChefAction) {
+	p.results = actions
+	if len(actions) > 0 {
+		lastAction := actions[len(actions)-1]
+		p.cursorID = lastAction.Id
+		p.cursorDate = lastAction.RecordedAt
+	}
+}
+
+func (p *actionsPaginationContext) IsDone() bool {
+	return len(p.results) == 0
 }
 
 // All logging will have the tag type=migration for an easy way to search in the logs

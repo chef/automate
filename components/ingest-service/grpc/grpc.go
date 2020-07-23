@@ -21,6 +21,7 @@ import (
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/migration"
+	"github.com/chef/automate/components/ingest-service/pipeline"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -53,12 +54,52 @@ func Spawn(opts *serveropts.Opts) error {
 		}).Error("could not connect to elasticsearch")
 		return err
 	}
+	grpcServer := opts.ConnFactory.NewServer()
+	uri := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
 
-	var (
-		grpcServer = opts.ConnFactory.NewServer()
-		migrator   = migration.New(client)
-		uri        = fmt.Sprintf("%s:%d", opts.Host, opts.Port)
-	)
+	// Authz Interface
+	authzConn, err := opts.ConnFactory.Dial("authz-service", opts.AuthzAddress)
+	if err != nil {
+		// This should never happen
+		log.WithError(err).Error("Failed to create Authz connection")
+		return err
+	}
+	defer authzConn.Close() // nolint: errcheck
+
+	authzProjectsClient := authz.NewProjectsClient(authzConn)
+
+	// event feed Interface
+	eventFeedConn, err := opts.ConnFactory.Dial("event-feed-service", opts.EventFeedAddress)
+	if err != nil {
+		// This should never happen
+		log.WithError(err).Error("Failed to create Event Feed connection")
+		return err
+	}
+	defer eventFeedConn.Close() // nolint: errcheck
+
+	eventFeedServiceClient := event_feed.NewEventFeedServiceClient(eventFeedConn)
+
+	// nodemanager Interface
+	nodeMgrConn, err := opts.ConnFactory.Dial("nodemanager-service", opts.NodeManagerAddress)
+	if err != nil {
+		// This should never happen
+		log.WithError(err).Error("Failed to create NodeManager connection")
+		return err
+	}
+	defer nodeMgrConn.Close() // nolint: errcheck
+
+	nodeMgrServiceClient := manager.NewNodeManagerServiceClient(nodeMgrConn)
+	nodesServiceClient := nodes.NewNodesServiceClient(nodeMgrConn)
+
+	chefActionPipeline := pipeline.NewChefActionPipeline(client, authzProjectsClient, eventFeedServiceClient,
+		opts.ChefIngestServerConfig.MaxNumberOfBundledActionMsgs,
+		opts.ChefIngestServerConfig.MessageBufferSize)
+
+	chefRunPipeline := pipeline.NewChefRunPipeline(client, authzProjectsClient,
+		nodeMgrServiceClient, opts.ChefIngestServerConfig.ChefIngestRunPipelineConfig,
+		opts.ChefIngestServerConfig.MessageBufferSize)
+
+	migrator := migration.New(client, chefActionPipeline)
 
 	log.WithField("uri", uri).Info("Starting gRPC Server")
 	conn, err := net.Listen("tcp", uri)
@@ -97,43 +138,9 @@ func Spawn(opts *serveropts.Opts) error {
 		}
 	}
 
-	// Authz Interface
-	authzConn, err := opts.ConnFactory.Dial("authz-service", opts.AuthzAddress)
-	if err != nil {
-		// This should never happen
-		log.WithError(err).Error("Failed to create Authz connection")
-		return err
-	}
-	defer authzConn.Close() // nolint: errcheck
-
-	authzProjectsClient := authz.NewProjectsClient(authzConn)
-
-	// event feed Interface
-	eventFeedConn, err := opts.ConnFactory.Dial("event-feed-service", opts.EventFeedAddress)
-	if err != nil {
-		// This should never happen
-		log.WithError(err).Error("Failed to create Event Feed connection")
-		return err
-	}
-	defer eventFeedConn.Close() // nolint: errcheck
-
-	eventFeedServiceClient := event_feed.NewEventFeedServiceClient(eventFeedConn)
-
-	// nodemanager Interface
-	nodeMgrConn, err := opts.ConnFactory.Dial("nodemanager-service", opts.NodeManagerAddress)
-	if err != nil {
-		// This should never happen
-		log.WithError(err).Error("Failed to create NodeManager connection")
-		return err
-	}
-	defer nodeMgrConn.Close() // nolint: errcheck
-
-	nodeMgrServiceClient := manager.NewNodeManagerServiceClient(nodeMgrConn)
-	nodesServiceClient := nodes.NewNodesServiceClient(nodeMgrConn)
-
 	// ChefRuns
 	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient,
-		opts.ChefIngestServerConfig, nodesServiceClient, eventFeedServiceClient)
+		nodesServiceClient, chefActionPipeline, chefRunPipeline)
 	ingest.RegisterChefIngesterServer(grpcServer, chefIngest)
 
 	// Pass the chef ingest server to give status about the pipelines

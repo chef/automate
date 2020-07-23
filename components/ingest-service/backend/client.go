@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"time"
 
 	elastic "gopkg.in/olivere/elastic.v6"
 
@@ -91,4 +92,6 @@ type Client interface {
 	// @param (context, previousIndex)
 	// @return (taskID, error)
 	ReindexNodeStateToLatest(context.Context, string) (string, error)
+	GetActions(int, time.Time, string, bool) ([]InternalChefAction, int64, error)
+	DeleteAllActionIndexes(context.Context) error
 }

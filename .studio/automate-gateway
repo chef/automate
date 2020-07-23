@@ -323,7 +323,7 @@ function uniqify_chef_action_report() {
   rfc_time=$(date +%FT%TZ -d "$((RANDOM % 144)) hour ago")
 
   local event_types=(cookbook bag client node policy role scanjobs profile)
-  local event_type=policy
+  local event_type=${event_types[$((RANDOM % 8))]}
   local event_tasks=(update create delete)
   local event_task=${event_tasks[$((RANDOM % 3))]}
   if [[ "$2" != "" ]]; then
@@ -338,7 +338,6 @@ function uniqify_chef_action_report() {
      --arg event_task "$event_task" \
      --arg name "$name" \
      --arg uuid "$uuid" \
-     --arg task "$task" \
      '.recorded_at = $rfc_time |
       .entity_name = $name |
       .task = $event_task |

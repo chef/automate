@@ -11,13 +11,11 @@ import (
 	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/api/external/ingest/response"
 	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline"
-	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/lib/version"
 )
 
@@ -35,20 +33,16 @@ type ChefIngestServer struct {
 // backend client
 func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsClient,
 	nodeMgrClient manager.NodeManagerServiceClient,
-	chefIngestServerConfig serveropts.ChefIngestServerConfig,
 	nodesClient nodes.NodesServiceClient,
-	eventFeedServiceClient event_feed.EventFeedServiceClient) *ChefIngestServer {
+	actionPipeline pipeline.ChefActionPipeline,
+	chefRunPipeline pipeline.ChefRunPipeline) *ChefIngestServer {
 	return &ChefIngestServer{
-		chefRunPipeline: pipeline.NewChefRunPipeline(client, authzClient,
-			nodeMgrClient, chefIngestServerConfig.ChefIngestRunPipelineConfig,
-			chefIngestServerConfig.MessageBufferSize),
-		chefActionPipeline: pipeline.NewChefActionPipeline(client, authzClient, eventFeedServiceClient,
-			chefIngestServerConfig.MaxNumberOfBundledActionMsgs,
-			chefIngestServerConfig.MessageBufferSize),
-		client:        client,
-		authzClient:   authzClient,
-		nodeMgrClient: nodeMgrClient,
-		nodesClient:   nodesClient,
+		chefRunPipeline:    chefRunPipeline,
+		chefActionPipeline: actionPipeline,
+		client:             client,
+		authzClient:        authzClient,
+		nodeMgrClient:      nodeMgrClient,
+		nodesClient:        nodesClient,
 	}
 }
 
