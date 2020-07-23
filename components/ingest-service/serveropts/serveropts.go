@@ -36,7 +36,6 @@ type Opts struct {
 	PGURL                         string
 	PGDatabase                    string
 	AuthzAddress                  string
-	EventAddress                  string
 	LogLevel                      string
 	PurgeConvergeHistoryAfterDays int32
 	PurgeActionsAfterDays         int32

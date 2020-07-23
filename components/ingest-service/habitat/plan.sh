@@ -11,7 +11,6 @@ pkg_version="0.1.0"
 pkg_binds=(
   [automate-es-gateway]="http-port"
   [authz-service]="port"
-  [event-service]="port"
   [nodemanager-service]="port"
   # TODO(ssd) 2019-05-02: We could consider making these optional
   [automate-pg-gateway]="port"

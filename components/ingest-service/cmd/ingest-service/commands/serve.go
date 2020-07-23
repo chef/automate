@@ -95,7 +95,6 @@ func readCliParams() *serveropts.Opts {
 		AuthzAddress:                  viper.GetString("authz-address"),
 		CerealAddress:                 viper.GetString("cereal-address"),
 		EventFeedAddress:              viper.GetString("event-feed-address"),
-		EventAddress:                  viper.GetString("event-address"),
 		NodeManagerAddress:            viper.GetString("nodemanager-address"),
 		LogLevel:                      viper.GetString("log-level"),
 		PurgeConvergeHistoryAfterDays: int32(viper.GetInt("converge-history-days")),
@@ -127,7 +126,6 @@ func init() {
 	serveCmd.Flags().String("elasticsearch-url", "http://localhost:9200", "URL to ElasticSearch (<protocol>://domain:<port>)/")
 	serveCmd.Flags().String("es-sidecar-address", "localhost:10390", "address of es sidecar (domain:<port>)")
 	serveCmd.Flags().String("authz-address", "localhost:10130", "address of authz (domain:<port>)")
-	serveCmd.Flags().String("event-address", "localhost:10132", "address of event (domain:<port>)")
 	serveCmd.Flags().String("cereal-address", "localhost:10101", "address of cereal (domain:<port>)")
 	serveCmd.Flags().String("nodemanager-address", "localhost:10120", "address of nodemanager (domain:<port>)")
 	serveCmd.Flags().String("postgresql-url", "", "PG URI (postgres://host:port)")

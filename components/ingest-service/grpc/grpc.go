@@ -14,7 +14,6 @@ import (
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
-	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
@@ -109,17 +108,6 @@ func Spawn(opts *serveropts.Opts) error {
 
 	authzProjectsClient := authz.NewProjectsClient(authzConn)
 
-	// event Interface
-	eventConn, err := opts.ConnFactory.Dial("event-service", opts.EventAddress)
-	if err != nil {
-		// This should never happen
-		log.WithError(err).Error("Failed to create Event connection")
-		return err
-	}
-	defer eventConn.Close() // nolint: errcheck
-
-	eventServiceClient := automate_event.NewEventServiceClient(eventConn)
-
 	// event feed Interface
 	eventFeedConn, err := opts.ConnFactory.Dial("event-feed-service", opts.EventFeedAddress)
 	if err != nil {
@@ -127,7 +115,7 @@ func Spawn(opts *serveropts.Opts) error {
 		log.WithError(err).Error("Failed to create Event Feed connection")
 		return err
 	}
-	defer eventConn.Close() // nolint: errcheck
+	defer eventFeedConn.Close() // nolint: errcheck
 
 	eventFeedServiceClient := event_feed.NewEventFeedServiceClient(eventFeedConn)
 
@@ -237,7 +225,7 @@ func Spawn(opts *serveropts.Opts) error {
 
 	// EventHandler
 	eventHandlerServer := server.NewAutomateEventHandlerServer(client, *chefIngest,
-		authzProjectsClient, eventServiceClient)
+		authzProjectsClient)
 	ingest.RegisterEventHandlerServer(grpcServer, eventHandlerServer)
 
 	// Register reflection service on gRPC server.

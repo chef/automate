@@ -102,14 +102,6 @@ CONFIG="$CONFIG --authz-address {{authz-service.sys.ip}}:{{authz-service.cfg.por
   {{~/if}}
 {{~/eachAlive}}
 
-# Bind to event if it's available
-{{~#eachAlive bind.event-service.members as |event-service|}}
-  {{~#if @last}}
-addNoProxy {{event-service.sys.ip}}
-CONFIG="$CONFIG --event-address {{event-service.sys.ip}}:{{event-service.cfg.port}}"
-  {{~/if}}
-{{~/eachAlive}}
-
 # Bind to nodemanager if it's available
 {{~#eachAlive bind.nodemanager-service.members as |manager|}}
   {{~#if @last}}
