@@ -62,7 +62,7 @@ describe File.basename(__FILE__) do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'platform'
     )
-    assert_suggestions_text(["centos", "debian", "mac_os_x", "redhat", "ubuntu", "windows"], actual_data)
+    assert_suggestions_text(["centos", "debian", "mac_os_x", "redhat", "ubuntu", "unknown", "windows"], actual_data)
 
     # suggest platform, match given
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
