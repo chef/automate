@@ -143,21 +143,3 @@ func (migrator *Migrator) migrateComplianceFeedToCurrent(complianceFeedIndexName
 	log.Info("Migration from compliance-service finished successfully")
 	return nil
 }
-
-func (migrator *Migrator) migrateActions() error {
-	err := migrator.feedStore.InitializeStore(migrator.ctx)
-	if err != nil {
-		return err
-	}
-
-	// loop through all the actions in the action-* indexes.
-
-	// convert action to event
-	// ingest event
-
-	// Delete all actions-* indexes
-
-	// Run a project update because of the incorrect field was updated on in the ingest project update.
-
-	return nil
-}
