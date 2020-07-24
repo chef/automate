@@ -88,6 +88,11 @@ EOF
     fi
 }
 
+do_test_deploy() {
+    do_test_deploy_default
+    chef-automate bootstrap bundle create -o bootstrap.abb
+}
+
 do_test_restore() {
     do_test_restore_default || return 1
 }
