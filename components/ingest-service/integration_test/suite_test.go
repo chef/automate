@@ -32,6 +32,7 @@ import (
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	iElastic "github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
+	"github.com/chef/automate/components/ingest-service/pipeline"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/lib/cereal"
@@ -40,8 +41,6 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
 )
-
-var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
 
 // TODO @afiune most of this file is very similar to the suite_test.go living
 // inside config-mgmt-service, we could have a single suite file for both (or more)
@@ -194,17 +193,6 @@ func (s *Suite) IngestNodes(nodes []iBackend.Node) {
 	s.RefreshIndices(mappings.NodeState.Index)
 }
 
-// IngestActions ingests a number of actions then refreshes all the action indexes
-func (s *Suite) IngestActions(actions []iBackend.InternalChefAction) {
-	// Insert actions
-	for _, action := range actions {
-		s.ingest.InsertAction(context.Background(), action)
-	}
-
-	// Refresh Indices
-	s.RefreshIndices(actionIndexes)
-}
-
 // RefreshIndices will refresh the provided ES Index or list of Indices
 //
 // Example 1: To refresh a single index, the node-state index
@@ -344,6 +332,14 @@ func createServices(s *Suite) error {
 			NumberOfPublishers:            1,
 		},
 	}
+
+	chefActionPipeline := pipeline.NewChefActionPipeline(s.ingest, s.projectsClient, s.eventFeedServiceClientMock,
+		chefIngestServerConfig.MessageBufferSize)
+
+	chefRunPipeline := pipeline.NewChefRunPipeline(s.ingest, s.projectsClient,
+		s.managerServiceClientMock, chefIngestServerConfig.ChefIngestRunPipelineConfig,
+		chefIngestServerConfig.MessageBufferSize)
+
 	// A global ChefIngestServer instance to call any rpc function
 	//
 	// From any test you can directly call:
@@ -351,8 +347,7 @@ func createServices(s *Suite) error {
 	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
-		s.managerServiceClientMock, chefIngestServerConfig, s.nodesServiceClientMock,
-		s.eventFeedServiceClientMock)
+		s.managerServiceClientMock, s.nodesServiceClientMock, chefActionPipeline, chefRunPipeline)
 
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
 		s.projectsClient)

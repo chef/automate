@@ -1,6 +1,7 @@
 package migration
 
 import (
+	"fmt"
 	"time"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
@@ -50,8 +51,7 @@ func (ms *Status) SendAllActionsThroughPipeline() error {
 		for _, action := range pager.results {
 			err = ms.sendActionThroughPipeline(action)
 			if err != nil {
-				ms.updateErr(err.Error(), "Unable to retrieve actions")
-				return err
+				logWarning(err.Error(), fmt.Sprintf("Unable re-insert actions: %v", action))
 			}
 		}
 	}
