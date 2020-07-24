@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -15,9 +14,6 @@ import (
 )
 
 func (s *CfgMgmtServer) HandlePolicyUpdateAction(ctx context.Context, req *request.PolicyUpdateAction) (*response.PolicyUpdateAction, error) {
-	// FIXME remove this or make it debug w/e
-	log.Infof("got HandlePolicyUpdateAction call %+v", *req)
-
 	fieldsToCheck := [][]string{
 		{req.PolicyName, "policy_name"},
 		{req.PolicyGroup, "policy_group"},
