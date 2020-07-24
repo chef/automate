@@ -1,6 +1,6 @@
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/profiles/profiles_pb'
-require 'api/interservice/compliance/profiles/profiles_services_pb'
+require 'interservice/compliance/profiles/profiles_pb'
+require 'interservice/compliance/profiles/profiles_services_pb'
 
 describe File.basename(__FILE__) do
   Profiles = Chef::Automate::Domain::Compliance::Profiles unless defined?(Profiles)
