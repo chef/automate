@@ -32,7 +32,7 @@ pipelines:
       description: Nightly tests against master
       definition: .expeditor/nightly.pipeline.yml
   - post-promote:
-      description: Generate and Upload of release artifacts
+      description: Generate and upload release artifacts
       definition: .expeditor/post-promote.pipeline.yml
       env:
         - CHANNEL: dev
