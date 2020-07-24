@@ -412,7 +412,6 @@ func (backend ES2Backend) getProfileWithVersionSuggestions(ctx context.Context,
 			}
 		}
 	}
-
 	return suggs, nil
 }
 
