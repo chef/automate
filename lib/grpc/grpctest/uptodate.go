@@ -223,6 +223,13 @@ func toString(t *testing.T, fd *desc.FileDescriptor) string {
 }
 
 func findAllProtoFiles(t *testing.T, base string, dirs ...string) []string {
+	apiFiles := findRelProtoFiles(t, filepath.Join(base, "api"), dirs...)
+	componentsFiles := findRelProtoFiles(t, filepath.Join(base, "components"), dirs...)
+	return append(apiFiles, componentsFiles...)
+
+}
+
+func findRelProtoFiles(t *testing.T, base string, dirs ...string) []string {
 	t.Helper()
 
 	files := []string{}
@@ -230,6 +237,12 @@ func findAllProtoFiles(t *testing.T, base string, dirs ...string) []string {
 	for _, dir := range dirs {
 		containing := filepath.Join(base, dir)
 		err := filepath.Walk(containing, func(path string, info os.FileInfo, err error) error {
+			// We are now using import paths relative to api/ or components/, so we
+			// have to check both locations, which means we will get some "does not
+			// exist" errors in the search process.
+			if err != nil && os.IsNotExist(err) {
+				return nil
+			}
 			if err != nil {
 				t.Fatalf("access path %q: %v\n", dir, err)
 				return err
@@ -263,8 +276,10 @@ func ParseProtoFiles(files []string) ([]*desc.FileDescriptor, error) {
 
 	parser := protoparse.Parser{
 		ImportPaths: []string{
-			// top-level, to reference protos using their component/xyz-service/api/... paths
-			topLevel,
+			// top level for apis
+			filepath.Join(topLevel, "api"),
+			// top-level of protos that are located within the components
+			filepath.Join(topLevel, "components"),
 			// for google/api/{annotations,http}.proto
 			filepath.Join(topLevel, "vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/"),
 			// for validate/validate.proto

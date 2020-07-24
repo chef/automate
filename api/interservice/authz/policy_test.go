@@ -15,7 +15,7 @@ import (
 )
 
 func TestGeneratedProtobufUpToDate(t *testing.T) {
-	grpctest.AssertCompiledInUpToDate(t, "api/interservice/authz")
+	grpctest.AssertCompiledInUpToDate(t, "interservice/authz")
 }
 
 func TestWhatItLooksLikeInJSON(t *testing.T) {
