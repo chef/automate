@@ -16,9 +16,9 @@ export class NodeNoRunIdResolverService implements Resolve<NodeRun> {
       then(nodeRuns => {
         // if the node runs is found we select the latest run-id.
         // Go to node runs detail page
-        if (nodeRuns.length) {
+        if (Object.keys(nodeRuns[0]).length !== 0) {
           this.router.navigate(
-            ['/infrastructure/client-runs/' + nodeId + '/runs/' + nodeRuns[0].id]
+            ['/infrastructure/client-runs/' + nodeId + '/runs/' + nodeRuns[0].runId]
           );
           return null;
         } else {
