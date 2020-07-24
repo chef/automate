@@ -12,3 +12,5 @@ message CookbookLock {
   string cookbook = 1;
   string policy_identifier = 2;
 }
+
+message PolicyUpdateAction {}
