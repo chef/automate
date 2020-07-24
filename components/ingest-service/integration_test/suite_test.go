@@ -21,6 +21,7 @@ import (
 	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/interservice/authz"
+	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
@@ -63,6 +64,7 @@ import (
 //   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
 // * A PurgeServer, the exposed gRPC Server that configures and runs purge workflows
 type Suite struct {
+<<<<<<< HEAD
 	ChefIngestServer           *server.ChefIngestServer
 	JobSchedulerServer         *server.JobSchedulerServer
 	JobManager                 *cereal.Manager
@@ -76,6 +78,22 @@ type Suite struct {
 	managerServiceClientMock   *manager.MockNodeManagerServiceClient
 	nodesServiceClientMock     *nodes.MockNodesServiceClient
 	cleanup                    func() error
+=======
+	ChefIngestServer         *server.ChefIngestServer
+	JobSchedulerServer       *server.JobSchedulerServer
+	JobManager               *cereal.Manager
+	EventHandlerServer       *server.AutomateEventHandlerServer
+	PurgeServer              data_lifecycle.PurgeServer
+	cfgmgmt                  cfgBackend.Client
+	ingest                   iBackend.Client
+	client                   *elastic.Client
+	projectsClient           *authz.MockProjectsClient
+	eventServiceClientMock   *event.MockEventServiceClient
+	managerServiceClientMock *manager.MockNodeManagerServiceClient
+	nodesServiceClientMock   *nodes.MockNodesServiceClient
+	cfgmgmtClientMock        *cfgmgmt.MockCfgMgmtClient
+	cleanup                  func() error
+>>>>>>> 79553caae96fbfe6205eabea2ffeb232b9172cbf
 }
 
 // Initialize the test suite
@@ -347,7 +365,11 @@ func createServices(s *Suite) error {
 	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
+<<<<<<< HEAD
 		s.managerServiceClientMock, s.nodesServiceClientMock, chefActionPipeline, chefRunPipeline)
+=======
+		s.managerServiceClientMock, chefIngestServerConfig, s.nodesServiceClientMock, s.cfgmgmtClientMock)
+>>>>>>> 79553caae96fbfe6205eabea2ffeb232b9172cbf
 
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
 		s.projectsClient)

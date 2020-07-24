@@ -12,6 +12,7 @@ pkg_binds=(
   [automate-es-gateway]="http-port"
   [authz-service]="port"
   [nodemanager-service]="port"
+  [config-mgmt-service]="port"
   # TODO(ssd) 2019-05-02: We could consider making these optional
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"

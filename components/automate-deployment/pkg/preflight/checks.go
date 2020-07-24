@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"os/user"
 	"reflect"
 	"strings"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 	"github.com/chef/automate/lib/proc"
+	"github.com/chef/automate/lib/user"
 )
 
 func RootUserRequiredCheck() Check {

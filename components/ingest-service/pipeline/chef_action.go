@@ -7,6 +7,7 @@ import (
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/api/interservice/authz"
+	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
@@ -22,8 +23,9 @@ type ChefActionPipeline struct {
 
 // NewChefActionPipeline Create a new chef action pipeline
 func NewChefActionPipeline(client backend.Client, authzClient authz.ProjectsClient,
-	eventFeedServiceClient event_feed.EventFeedServiceClient,
-	messageBufferSize int) ChefActionPipeline {
+	configMgmtClient cfgmgmt.CfgMgmtClient, eventFeedServiceClient event_feed.EventFeedServiceClient,
+	messageBufferSize, maxNumberOfBundledActionMsgs int) ChefActionPipeline {
+
 	var (
 		in            = make(chan message.ChefAction, messageBufferSize)
 		counter int64 = 0
@@ -33,7 +35,8 @@ func NewChefActionPipeline(client backend.Client, authzClient authz.ProjectsClie
 		processor.BuildChefActionPerform(client),
 		processor.ChefActionTransmogrify,
 		processor.BuildActionProjectTagger(authzClient),
-		publisher.BuildEventPublisher(eventFeedServiceClient),
+		publisher.BuildEventPublisher(eventFeedServiceClient, maxNumberOfBundledActionMsgs),
+		publisher.BuildConfigMgmtPublisher(configMgmtClient, maxNumberOfBundledActionMsgs),
 		processor.CountActions(&counter),
 	)
 

@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/chef/automate/api/interservice/authz"
+	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event_feed"
@@ -91,8 +92,16 @@ func Spawn(opts *serveropts.Opts) error {
 	nodeMgrServiceClient := manager.NewNodeManagerServiceClient(nodeMgrConn)
 	nodesServiceClient := nodes.NewNodesServiceClient(nodeMgrConn)
 
-	chefActionPipeline := pipeline.NewChefActionPipeline(client, authzProjectsClient, eventFeedServiceClient,
-		opts.ChefIngestServerConfig.MessageBufferSize)
+	configMgmtConn, err := opts.ConnFactory.Dial("config-mgmt-service", opts.ConfigMgmtAddress)
+	if err != nil {
+		log.WithError(err).WithFields(log.Fields{"config_mgmt_address": opts.ConfigMgmtAddress}).Error("Failed to connect to config-mgmt-service")
+		return err
+	}
+	configMgmtClient := cfgmgmt.NewCfgMgmtClient(configMgmtConn)
+
+	chefActionPipeline := pipeline.NewChefActionPipeline(client, authzProjectsClient, configMgmtClient,
+		eventFeedServiceClient, opts.ChefIngestServerConfig.MessageBufferSize,
+		opts.ChefIngestServerConfig.MaxNumberOfBundledActionMsgs)
 
 	chefRunPipeline := pipeline.NewChefRunPipeline(client, authzProjectsClient,
 		nodeMgrServiceClient, opts.ChefIngestServerConfig.ChefIngestRunPipelineConfig,
@@ -140,6 +149,7 @@ func Spawn(opts *serveropts.Opts) error {
 	// ChefRuns
 	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient,
 		nodesServiceClient, chefActionPipeline, chefRunPipeline)
+
 	ingest.RegisterChefIngesterServer(grpcServer, chefIngest)
 
 	// Pass the chef ingest server to give status about the pipelines

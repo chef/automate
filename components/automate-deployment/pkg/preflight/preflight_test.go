@@ -3,7 +3,6 @@ package preflight_test
 import (
 	"fmt"
 	"os"
-	"os/user"
 	"strings"
 	"testing"
 
@@ -13,6 +12,7 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/preflight"
 	"github.com/chef/automate/lib/proc"
+	"github.com/chef/automate/lib/user"
 )
 
 type fileOrError struct {

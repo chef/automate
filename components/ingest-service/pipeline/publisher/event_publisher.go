@@ -15,55 +15,60 @@ import (
 )
 
 func BuildEventPublisher(
-	eventFeedServiceClient event_feed.EventFeedServiceClient) message.ChefActionPipe {
+	eventFeedServiceClient event_feed.EventFeedServiceClient, numPublishers int) message.ChefActionPipe {
 	return func(in <-chan message.ChefAction) <-chan message.ChefAction {
-		return eventPublisher(in, eventFeedServiceClient)
+		if numPublishers <= 0 || eventFeedServiceClient == nil {
+			log.Info("Direct publish to event feed service is disabled")
+			return actionsNoop(in)
+		}
+
+		out := make(chan message.ChefAction, 100)
+		log.Infof("Starting event feed service publisher")
+		for i := 0; i < numPublishers; i++ {
+			go eventPublisher(in, eventFeedServiceClient, out)
+		}
+		return out
 	}
 }
 
 func eventPublisher(in <-chan message.ChefAction,
-	eventFeedServiceClient event_feed.EventFeedServiceClient) <-chan message.ChefAction {
-	out := make(chan message.ChefAction, 100)
-	go func() {
-		for msg := range in {
-			if err := msg.Ctx.Err(); err != nil {
-				msg.FinishProcessing(err)
-				continue
-			}
+	client event_feed.EventFeedServiceClient, out chan<- message.ChefAction) {
+	for msg := range in {
+		eventHandleMessage(client, msg, out)
 
-			event, err := createEvent(msg)
-			if err != nil {
-				log.Errorf("unable to send event nodeID %s", msg.Action.NodeId)
-				message.PropagateChefAction(out, &msg)
-				continue
-			}
+	}
+	close(out)
+}
 
-			start := time.Now()
-			_, err = eventFeedServiceClient.HandleEvent(context.Background(), event)
-			if err != nil {
-				log.Errorf("unable to send event nodeID %s", msg.Action.NodeId)
-				msg.FinishProcessing(err)
-				continue
-			}
-			dur := time.Since(start)
-			log.WithFields(log.Fields{
-				"message_id":  msg.ID,
-				"buffer_size": len(out),
-				"dur":         dur,
-			}).Debug("Published to event-service")
+func eventHandleMessage(client event_feed.EventFeedServiceClient, msg message.ChefAction,
+	out chan<- message.ChefAction) {
+	if err := msg.Ctx.Err(); err != nil {
+		msg.FinishProcessing(err)
+		return
+	}
 
-			// We only need to store polyicy file information.
-			if msg.InternalChefAction.EntityType != "policy" {
-				msg.FinishProcessing(nil)
-				continue
-			}
+	event, err := createEvent(msg)
+	if err != nil {
+		log.Errorf("unable to send event nodeID %s", msg.Action.NodeId)
+		msg.FinishProcessing(err)
+		return
+	}
 
-			message.PropagateChefAction(out, &msg)
-		}
-		close(out)
-	}()
+	start := time.Now()
+	_, err = client.HandleEvent(context.Background(), event)
+	if err != nil {
+		log.Errorf("unable to send event nodeID %s", msg.Action.NodeId)
+		msg.FinishProcessing(err)
+		return
+	}
+	dur := time.Since(start)
+	log.WithFields(log.Fields{
+		"message_id":  msg.ID,
+		"buffer_size": len(out),
+		"dur":         dur,
+	}).Debug("Published to event-service")
 
-	return out
+	message.PropagateChefAction(out, &msg)
 }
 
 func createEvent(msg message.ChefAction) (*automate_event.EventMsg, error) {

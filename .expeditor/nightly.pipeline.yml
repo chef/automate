@@ -105,6 +105,80 @@ steps:
         linux:
           privileged: true
 
+  - label: "ha data services"
+    command:
+      - integration/run_test integration/tests/ha_data_services.sh
+    timeout_in_minutes: 35
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "ha data services migrate"
+    command:
+      - integration/run_test integration/tests/ha_data_services_migrate.sh
+    timeout_in_minutes: 35
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "backup w external es"
+    command:
+      - integration/run_test integration/tests/backup_external_es.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "backup w external es to gcs"
+    command:
+      - integration/run_test integration/tests/backup_external_es_gcs.sh
+    timeout_in_minutes: 35
+    expeditor:
+      accounts:
+        - aws/chef-cd
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+        GOOGLE_APPLICATION_JSON:
+          path: secret/a2/gcp
+          field: backup-creds
+
+  - label: "backup w external es to s3"
+    command:
+      - integration/run_test integration/tests/backup_external_es_s3.sh
+    timeout_in_minutes: 30
+    expeditor:
+      accounts:
+        - aws/chef-cd
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+        AWS_ACCESS_KEY_ID:
+          account: aws/chef-cd
+          field: access_key_id
+        AWS_SECRET_ACCESS_KEY:
+          account: aws/chef-cd
+          field: secret_access_key
+        AWS_SESSION_TOKEN:
+          account: aws/chef-cd
+          field: session_token
+
   # TODO(ssd) 2019-12-13: This test is broken given the current design
   # of config patch and backup/restore.  We are working on fixes for
   # the various problems that make this test incorrect.
@@ -118,12 +192,44 @@ steps:
   #       linux:
   #         single-use: true
   #         privileged: true
+  - label: "product deployment stress mode"
+    command:
+      - integration/run_test integration/tests/product_deployment_stress.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
 
   - label: "[integration] product mitm"
     command:
       - integration/run_test integration/tests/product_mitm.sh
     timeout_in_minutes: 20
     expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "cypress (flaky included) :cypress:"
+    command:
+      - FLAKY=yes integration/run_test integration/tests/cypress_e2e.sh
+    timeout_in_minutes: 35
+    soft_fail: true
+    expeditor:
+      secrets: &cypress_secrets
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST:
+          path: secret/a2/testing/target_host
+          field: data
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER:
+          path: secret/a2/testing/target_user
+          field: data
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY:
+          path: secret/a2/testing/target_key
+          field: data
       executor:
         linux:
           privileged: true

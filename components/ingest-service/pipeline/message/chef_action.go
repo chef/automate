@@ -50,6 +50,8 @@ func (chefAction ChefAction) FinishProcessing(err error) {
 	if err == nil {
 		// Adding new metric; Time for a message to go through the pipeline
 		log.WithFields(log.Fields{
+			"parent_type": chefAction.InternalChefAction.ParentType,
+			"parent_name": chefAction.InternalChefAction.ParentName,
 			"message_id":  chefAction.ID,
 			"message":     "ChefAction",
 			"metric":      "pipeline",

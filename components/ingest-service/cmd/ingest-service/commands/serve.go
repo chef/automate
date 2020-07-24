@@ -96,6 +96,7 @@ func readCliParams() *serveropts.Opts {
 		CerealAddress:                 viper.GetString("cereal-address"),
 		EventFeedAddress:              viper.GetString("event-feed-address"),
 		NodeManagerAddress:            viper.GetString("nodemanager-address"),
+		ConfigMgmtAddress:             viper.GetString("config-mgmt-address"),
 		LogLevel:                      viper.GetString("log-level"),
 		PurgeConvergeHistoryAfterDays: int32(viper.GetInt("converge-history-days")),
 		PurgeActionsAfterDays:         int32(viper.GetInt("actions-days")),
@@ -128,6 +129,7 @@ func init() {
 	serveCmd.Flags().String("authz-address", "localhost:10130", "address of authz (domain:<port>)")
 	serveCmd.Flags().String("cereal-address", "localhost:10101", "address of cereal (domain:<port>)")
 	serveCmd.Flags().String("nodemanager-address", "localhost:10120", "address of nodemanager (domain:<port>)")
+	serveCmd.Flags().String("config-mgmt-address", "localhost:10119", "address of config-mgmt-service (domain:<port>)")
 	serveCmd.Flags().String("postgresql-url", "", "PG URI (postgres://host:port)")
 	serveCmd.Flags().String("postgresql-database", "chef_ingest_service", "PG Database name")
 	serveCmd.Flags().Int32("converge-history-days", 30, "Number of days to keep converge history for. A number less than or equal to 0 means data should never be deleted")

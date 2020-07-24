@@ -24,8 +24,31 @@ fi
 ln -fs "{{pkg.svc_config_path}}/custom_s3.crt" "{{pkg.svc_var_path}}/config/certs/CAs/custom_s3.crt"
 {{/if}}
 
-secrets-helper generate backup-gateway.access_key 64 --if-not-exists
-secrets-helper generate backup-gateway.secret_key 64 --if-not-exists
+CURRENT_ACCESS_KEY=""
+CURRENT_SECRET_KEY=""
+{{#if cfg.gateway.backup.filesystem.path}}
+# minio uses the access and secret key to encrypt its config. We do
+# not need this. We work around this by storing those values in our
+# tmp directory that gets put in the folder.
+# Then, when we start up the backup gateway, we can check for that
+# file. If it exists, we tell backup-gateway that it should use those
+# values.
+# If we were not to do this, then it would be impossible to have 2
+# automates looking at a shared network drive.
+MINIO_CREDS_FILE="{{cfg.gateway.backup.filesystem.path}}/.tmp/.creds"
+if [[ -e "${MINIO_CREDS_FILE}" ]]; then
+  CURRENT_ACCESS_KEY=$(cut -f1 -d ':' < "${MINIO_CREDS_FILE}")
+  CURRENT_SECRET_KEY=$(cut -f2 -d ':' < "${MINIO_CREDS_FILE}")
+fi
+{{/if}}
+
+if [[ -z "${CURRENT_SECRET_KEY}" ]]; then
+  secrets-helper generate backup-gateway.access_key 64 --if-not-exists
+  secrets-helper generate backup-gateway.secret_key 64 --if-not-exists
+else
+  echo -n "${CURRENT_ACCESS_KEY}" | secrets-helper insert backup-gateway.access_key
+  echo -n "${CURRENT_SECRET_KEY}" | secrets-helper insert backup-gateway.secret_key
+fi
 
 MINIO_ACCESS_KEY="$(secrets-helper show backup-gateway.access_key)"
 export MINIO_ACCESS_KEY
@@ -59,6 +82,11 @@ if [ -w "{{cfg.gateway.backup.filesystem.path}}" ]; then
   # Clean up the old .minio.sys if it exists
   [[ ! -L "{{pkg.svc_data_path}}/.minio.sys" ]] && rm -rf "{{pkg.svc_data_path}}/.minio.sys"
   ln -sTnf "{{cfg.gateway.backup.filesystem.path}}/.tmp" "{{pkg.svc_data_path}}/.minio.sys"
+  if [[ ! -e "${MINIO_CREDS_FILE}" ]]; then
+    touch "${MINIO_CREDS_FILE}"
+    chmod 600 "${MINIO_CREDS_FILE}"
+    echo -n "${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}" > "${MINIO_CREDS_FILE}"
+  fi
 else
   # In disaster recovery setups where the backup volumes are mounted read-only, 
   # we must create the (unused) tmp directory somewhere writeable.

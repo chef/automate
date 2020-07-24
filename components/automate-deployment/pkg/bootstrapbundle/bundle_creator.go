@@ -4,15 +4,16 @@ import (
 	"archive/tar"
 	"io"
 	"os"
-	"os/user"
 	"path"
 	"strconv"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/product"
 	"github.com/chef/automate/lib/stringutils"
-	"github.com/pkg/errors"
+	"github.com/chef/automate/lib/user"
 )
 
 const magicHeader = "ABB-1\n\n"
@@ -263,6 +264,25 @@ func (b *Creator) headerForFile(relPath string) (*tar.Header, error) {
 		}
 
 		header.Name = relPath
+
+		// We need to make sure tar was able to figure out the user and group.
+		// It will fail to do so if the user/group is not local. In that case,
+		// we will use our own lookup mechanism
+		if header.Uname == "" {
+			u, err := user.LookupId(strconv.Itoa(header.Uid))
+			if err != nil {
+				return nil, errors.Errorf("could not determine user with id %d for %q", header.Uid, relPath)
+			}
+			header.Uname = u.Username
+		}
+
+		if header.Gname == "" {
+			g, err := user.LookupGroupId(strconv.Itoa(header.Gid))
+			if err != nil {
+				return nil, errors.Errorf("could not determine group with id %d for %q", header.Gid, relPath)
+			}
+			header.Gname = g.Name
+		}
 
 		if uid, err := stringutils.IndexOf(b.allowedUsers, header.Uname); err != nil {
 			return nil, errors.Errorf("%q is not an allowed user", header.Uname)

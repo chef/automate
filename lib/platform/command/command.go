@@ -11,7 +11,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"os/user"
 	"strconv"
 	"syscall"
 	"time"
@@ -20,6 +19,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/lib/platform/sys"
+	"github.com/chef/automate/lib/user"
 )
 
 type WaitFunc func() error

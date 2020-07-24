@@ -41,6 +41,7 @@ type Opts struct {
 	PurgeActionsAfterDays         int32
 	ConnFactory                   *secureconn.Factory
 	NodeManagerAddress            string
+	ConfigMgmtAddress             string
 	ChefIngestServerConfig        ChefIngestServerConfig
 	CerealAddress                 string
 	Jobs                          JobsConfig

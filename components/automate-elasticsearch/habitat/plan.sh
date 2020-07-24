@@ -15,8 +15,7 @@ pkg_build_deps=(
   core/patchelf
 )
 pkg_deps=(
-  core/coreutils-static
-  core/busybox-static
+  core/coreutils
   core/glibc
   core/zlib
 

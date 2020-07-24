@@ -31,6 +31,7 @@ pkg_binds_optional=(
 )
 inspec_release="chef/inspec/4.21.3/20200702113741"
 pkg_deps=(
+  core/coreutils
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   "${inspec_release}"
   chef/mlsa
