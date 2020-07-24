@@ -227,5 +227,17 @@ describe File.basename(__FILE__) do
         ]
       )
       assert_suggestions_text_id_version([], actual_data)
+
+      # suggest profile, text with space and filters
+      actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
+        type: 'profile',
+        text: 'devsec',
+        size: 4,
+        filters: [
+          Reporting::ListFilter.new(type: 'start_time', values: ['2018-04-03T03:59:59Z']),
+          Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+        ]
+      )
+      assert_suggestions_text_id_version( [], actual_data )
   end
 end

@@ -347,7 +347,7 @@ wait-for-ingestion:
 	i=1; \
 	curl_output="-=init=-"; \
 	max_loops=50; \
-	es_docs=30; \
+	es_docs=35; \
 	healthy_match="\"total\":$$es_docs,\"successful\":$$es_docs"; \
 	printf "\n===> ${blue}Checking ElasticSearch to ensure it has ingested our reports${reset}\n"; \
 	curl -s -X GET "$(ELASTICSEARCH_URL)/comp-*-r-20*/_doc/_count" | grep $$healthy_match > /dev/null; \

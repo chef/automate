@@ -38,4 +38,6 @@ message Report {
 	string automate_manager_id = 40;
 	float run_time_limit = 41;
 	string automate_manager_type = 42;
+	string status = 43;
+	string status_message = 44;
 }

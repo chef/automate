@@ -693,6 +693,24 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
 
+      # Get stats with end_time filter for the root fail 04-03 date
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        filters: [
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+        ])
+      expected_data = {
+        "reportSummary": {
+          "status": "failed",
+          "stats": {
+            "nodes": "1",
+            "platforms": 1,
+            "environments": 1,
+            "nodesCnt": 1
+          }
+        }
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
+
     end
   end
 end

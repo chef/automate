@@ -54,7 +54,8 @@ describe File.basename(__FILE__) do
                 "bb93e1b2-36d6-439e-ac70-cccccccccc08",
                 "bb93e1b2-36d6-439e-ac70-cccccccccc09",
                 "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                "bb93e1b2-36d6-439e-ac70-ccccccczzz20"
+                "bb93e1b2-36d6-439e-ac70-ccccccczzz20",
+                "zz93e1b2-36d6-439e-ac70-cccccccccckk"
             ],
             "reportData" => [
                 {"endTime" => "2018-03-04T10:18:41Z", "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"},
@@ -65,7 +66,8 @@ describe File.basename(__FILE__) do
                 {"endTime" => "2018-03-07T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
                 {"endTime" => "2018-03-04T09:18:43Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09"},
                 {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10"},
-                {"endTime" => "2018-04-02T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20"}
+                {"endTime" => "2018-04-02T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20"},
+                {"endTime" => "2018-04-03T11:02:02Z", "id" => "zz93e1b2-36d6-439e-ac70-cccccccccckk"}
             ]
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
@@ -138,7 +140,8 @@ describe File.basename(__FILE__) do
                       "bb93e1b2-36d6-439e-ac70-cccccccccc08",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc09",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                      "bb93e1b2-36d6-439e-ac70-ccccccczzz20"
+                      "bb93e1b2-36d6-439e-ac70-ccccccczzz20",
+                      "zz93e1b2-36d6-439e-ac70-cccccccccckk"
             ],
             "reportData" => [
                 {"endTime" => "2018-02-09T09:18:41Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"},
@@ -150,7 +153,8 @@ describe File.basename(__FILE__) do
                 {"endTime" => "2018-03-07T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
                 {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy"},
                 {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-dddd-wwwwwwwwwwww"},
-                {"endTime" => "2018-04-02T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20"}
+                {"endTime" => "2018-04-02T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20"},
+                {"endTime" => "2018-04-03T11:02:02Z", "id" => "zz93e1b2-36d6-439e-ac70-cccccccccckk"}
             ]
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
@@ -389,9 +393,23 @@ describe File.basename(__FILE__) do
                         "failed" => {},
                         "waived" => {}
                     }
+                },
+                {
+                    "id" => "zz93e1b2-36d6-439e-ac70-cccccccccckk",
+                    "ipaddress" => "188.38.98.166",
+                    "nodeId" => "888f4e51-b049-4b10-9555-111222333333",
+                    "nodeName" => "ubuntu(0)-alpha-failed",
+                    "endTime" => "2018-04-03T11:02:02Z",
+                    "status" => "failed",
+                    "controls" => {
+                      "failed" => {},
+                      "passed" => {},
+                      "skipped" => {},
+                      "waived" => {}
+                    }
                 }
             ],
-            "total" => 12
+            "total" => 13
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
@@ -444,7 +462,7 @@ describe File.basename(__FILE__) do
                 }
             }
         ],
-        "total" => 12
+        "total" => 13
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
@@ -517,7 +535,7 @@ describe File.basename(__FILE__) do
                     }
                 }
             ],
-            "total" => 12
+            "total" => 13
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
@@ -812,18 +830,20 @@ describe File.basename(__FILE__) do
 
 
     # Cover the other sort fields, node_name desc:
-    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'node_name', order: 1)
+    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'node_name', order: 1, per_page: 12)
     assert_equal(Reporting::Reports, resp.class)
     expected = [
         "windows(1)-zeta-apache(s)-skipped",
-	"ubuntu(4)-alpha-myskippy(s)-myfaily(f)-apache(f)-linux(p)-failed",
+        "ubuntu(4)-alpha-myskippy(s)-myfaily(f)-apache(f)-linux(p)-failed",
         "ubuntu(1)-alpha-myprofile(s)-skipped",
+        "ubuntu(0)-alpha-failed",
         "RedHat(2)-beta-nginx(f)-apache(s)-failed",
         "redhat(2)-alpha-nginx(f)-apache(s)-failed",
         "redhat(2)-alpha-nginx(f)-apache(f)-failed",
         "osx(2)-omega-pro1(f)-pro2(w)-failed",
         "osx(1)-omega-pro2(w)-waived",
         "debian(2)-zeta-linux(f)-apache(p)-failed",
+        "centos-beta",
         "centos-beta"
     ]
     assert_equal(expected, resp['reports'].map {|x| x['node_name']})
@@ -840,21 +860,21 @@ describe File.basename(__FILE__) do
         "redhat(2)-alpha-nginx(f)-apache(f)-failed",
         "redhat(2)-alpha-nginx(f)-apache(s)-failed",
         "RedHat(2)-beta-nginx(f)-apache(s)-failed",
-        "ubuntu(1)-alpha-myprofile(s)-skipped"
+        "ubuntu(0)-alpha-failed"
     ]
     assert_equal(expected, resp['reports'].map {|x| x['node_name']})
 
     resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.status', per_page: 20)
     assert_equal(Reporting::Reports, resp.class)
-    assert_equal(["failed", "failed", "failed", "failed", "failed", "failed", "failed", "passed", "passed", "skipped", "skipped", "waived"], resp['reports'].map {|x| x['status']})
+    assert_equal(["failed", "failed", "failed", "failed", "failed", "failed", "failed", "failed", "passed", "passed", "skipped", "skipped", "waived"], resp['reports'].map {|x| x['status']})
 
     resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.controls.failed.total', per_page: 20)
     assert_equal(Reporting::Reports, resp.class)
-    assert_equal([0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 21], resp['reports'].map {|x| x['controls']['failed']['total']})
+    assert_equal([0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 21], resp['reports'].map {|x| x['controls']['failed']['total']})
 
-    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.controls.failed.critical', order: 1)
+    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.controls.failed.critical', order: 1, per_page: 50)
     assert_equal(Reporting::Reports, resp.class)
-    assert_equal(10, resp['reports'].length)
+    assert_equal(13, resp['reports'].length)
 
     # Get a specific report; ensure only the control with the specified filter tag is returned
     res = GRPC reporting, :read_report, Reporting::Query.new(id: '44024b50-2e0d-42fa-a57c-dddddddddddd',
@@ -1375,5 +1395,22 @@ describe File.basename(__FILE__) do
       assert_equal('passed', res['profiles'][3]['status'])
       assert_equal("", res['profiles'][3]['status_message'])
     end
+
+
+    # Get the report that failed at runtime
+    res = GRPC reporting, :read_report, Reporting::Query.new(id: 'zz93e1b2-36d6-439e-ac70-cccccccccckk')
+    assert_equal(Reporting::Report, res.class)
+
+    assert_equal('4.22.0', res['version'])
+    assert_equal('zz93e1b2-36d6-439e-ac70-cccccccccckk', res['id'])
+    assert_equal('888f4e51-b049-4b10-9555-111222333333', res['node_id'])
+    assert_equal('ubuntu(0)-alpha-failed', res['node_name'])
+    assert_equal('DevSec Prod Alpha', res['environment'])
+    assert_equal('failed', res['status'])
+    assert_equal('ERROR: InSpec not found.', res['status_message'])
+    assert_equal([], res['roles'])
+    assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
+    assert_equal(0, res['profiles'].length)
+
   end
 end

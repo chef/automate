@@ -36,6 +36,7 @@ type Compliance struct {
 		EsProfilesMissingMeta map[string]interface{}
 		EndTime               time.Time
 		Status                string
+		StatusMessage         string
 	}
 }
 

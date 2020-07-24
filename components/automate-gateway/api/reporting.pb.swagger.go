@@ -1120,6 +1120,10 @@ func init() {
             "type": "string"
           },
           "description": "The projects the node is assigned to."
+        },
+        "status_message": {
+          "type": "string",
+          "description": "The status message of the report."
         }
       }
     },
