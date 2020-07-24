@@ -148,7 +148,7 @@ func bytesToString(data []byte) string {
 // backend (Elasticsearch).
 func ConvertAPIKeyToBackendKey(parameter string) string {
 	switch parameter {
-	case "event-type":
+	case "event-type", "entity_type":
 		return "object_object_type"
 	case "task":
 		return "verb"
