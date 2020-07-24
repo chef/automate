@@ -277,7 +277,7 @@ func (b *Creator) headerForFile(relPath string) (*tar.Header, error) {
 		}
 
 		if header.Gname == "" {
-			g, err := user.LookupGroupId(strconv.Itoa(header.Uid))
+			g, err := user.LookupGroupId(strconv.Itoa(header.Gid))
 			if err != nil {
 				return nil, errors.Errorf("could not determine group with id %d for %q", header.Gid, relPath)
 			}
