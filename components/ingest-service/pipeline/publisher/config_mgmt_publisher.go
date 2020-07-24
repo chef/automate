@@ -71,6 +71,7 @@ func cmpHandleMessage(client cfgmgmt.CfgMgmtClient, msg message.ChefAction, out 
 
 	if err != nil {
 		logCtx.WithError(err).Error("Failed to publish actions message to config management service")
+		msg.FinishProcessing(err)
 		return
 	}
 	logCtx.Debug("Published actions message to config manangement service")
