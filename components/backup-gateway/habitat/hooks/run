@@ -58,9 +58,6 @@ export MINIO_BROWSER=off
 export SSL_CERT_FILE={{pkgPathFor "core/cacerts"}}/ssl/cert.pem
 export SSL_CERT_DIR={{pkgPathFor "core/cacerts"}}/ssl/certs
 
-echo "ACCESS_KEY=${MINIO_ACCESS_KEY}"
-echo "SECRET_KEY=${MINIO_SECRET_KEY}"
-
 {{#if cfg.gateway.backup.s3.bucket.name~}}
 exec minio gateway s3 {{cfg.gateway.backup.s3.bucket.endpoint}} \
   --config-dir "{{pkg.svc_var_path}}/config" \
