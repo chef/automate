@@ -22,7 +22,7 @@ type ChefActionPipeline struct {
 
 // NewChefActionPipeline Create a new chef action pipeline
 func NewChefActionPipeline(client backend.Client, authzClient authz.ProjectsClient,
-	eventFeedServiceClient event_feed.EventFeedServiceClient, maxNumberOfBundledActionMsgs int,
+	eventFeedServiceClient event_feed.EventFeedServiceClient,
 	messageBufferSize int) ChefActionPipeline {
 	var (
 		in            = make(chan message.ChefAction, messageBufferSize)
@@ -34,8 +34,6 @@ func NewChefActionPipeline(client backend.Client, authzClient authz.ProjectsClie
 		processor.ChefActionTransmogrify,
 		processor.BuildActionProjectTagger(authzClient),
 		publisher.BuildEventPublisher(eventFeedServiceClient),
-		processor.BuildActionMsgToBulkRequestTransformer(client),
-		publisher.BuildBulkActionPublisher(client, maxNumberOfBundledActionMsgs),
 		processor.CountActions(&counter),
 	)
 

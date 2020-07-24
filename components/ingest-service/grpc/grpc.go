@@ -92,7 +92,6 @@ func Spawn(opts *serveropts.Opts) error {
 	nodesServiceClient := nodes.NewNodesServiceClient(nodeMgrConn)
 
 	chefActionPipeline := pipeline.NewChefActionPipeline(client, authzProjectsClient, eventFeedServiceClient,
-		opts.ChefIngestServerConfig.MaxNumberOfBundledActionMsgs,
 		opts.ChefIngestServerConfig.MessageBufferSize)
 
 	chefRunPipeline := pipeline.NewChefRunPipeline(client, authzProjectsClient,

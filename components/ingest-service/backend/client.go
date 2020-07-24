@@ -24,8 +24,6 @@ type Client interface {
 	InsertRun(context.Context, Run) error
 	// @param (context, UTC time, data)
 	InsertNodeAttribute(context.Context, NodeAttribute) error
-	// @param (context, backend.InternalChefAction)
-	InsertAction(context.Context, InternalChefAction) error
 	// @param (context, threshold)
 	MarkNodesMissing(context.Context, string) ([]string, error)
 	// @param (context, threshold)
@@ -66,8 +64,6 @@ type Client interface {
 	CreateBulkNodeAttributeUpdateRequest(NodeAttribute) elastic.BulkableRequest
 	// @param (data)
 	CreateBulkRunUpdateRequest(Run) elastic.BulkableRequest
-	// @param (data)
-	CreateBulkActionRequest(InternalChefAction) elastic.BulkableRequest
 	// @param (context, bulkableRequests)
 	SendBulkRequest(context.Context, []elastic.BulkableRequest) error
 	// @param (context, projectRules)
@@ -92,6 +88,6 @@ type Client interface {
 	// @param (context, previousIndex)
 	// @return (taskID, error)
 	ReindexNodeStateToLatest(context.Context, string) (string, error)
-	GetActions(int, time.Time, string, bool) ([]InternalChefAction, int64, error)
-	DeleteAllActionIndexes(context.Context) error
+	GetActions(string, int, time.Time, string, bool) ([]InternalChefAction, int64, error)
+	DeleteAllIndexesWithPrefix(string, context.Context) error
 }

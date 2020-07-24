@@ -65,14 +65,14 @@ func (es *Backend) DeleteIndex(ctx context.Context, index string) error {
 	return err
 }
 
-func (es *Backend) DeleteAllActionIndexes(ctx context.Context) error {
+func (es *Backend) DeleteAllIndexesWithPrefix(prefix string, ctx context.Context) error {
 	indexNames, err := es.client.IndexNames()
 	if err != nil {
 		return err
 	}
 
 	for _, indexName := range indexNames {
-		if strings.HasPrefix(indexName, mappings.Actions.Index) {
+		if strings.HasPrefix(indexName, prefix) {
 			_, err := es.client.DeleteIndex(indexName).Do(ctx)
 			if err != nil {
 				return err
