@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("iam_v2_tokens", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/iam/v2/tokens.proto",
+    "title": "automate-gateway/api/iam/v2/tokens.proto",
     "version": "version not set"
   },
   "consumes": [

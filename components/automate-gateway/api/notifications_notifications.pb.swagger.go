@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("notifications_notifications", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/notifications/notifications.proto",
+    "title": "automate-gateway/api/notifications/notifications.proto",
     "version": "version not set"
   },
   "consumes": [

@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("manager", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/nodes/manager/manager.proto",
+    "title": "external/nodes/manager/manager.proto",
     "version": "version not set"
   },
   "consumes": [

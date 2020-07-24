@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("license_license", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/license/license.proto",
+    "title": "automate-gateway/api/license/license.proto",
     "version": "version not set"
   },
   "consumes": [

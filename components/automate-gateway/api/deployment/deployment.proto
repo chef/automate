@@ -6,7 +6,7 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/de
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Deployment {
   rpc GetVersion (google.protobuf.Empty) returns (Version) {

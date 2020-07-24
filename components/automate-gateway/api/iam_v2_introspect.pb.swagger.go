@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("iam_v2_introspect", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/iam/v2/introspect.proto",
+    "title": "automate-gateway/api/iam/v2/introspect.proto",
     "version": "version not set"
   },
   "consumes": [

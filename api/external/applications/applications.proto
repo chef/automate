@@ -13,7 +13,7 @@ import "protoc-gen-swagger/options/annotations.proto";
 // TODO @afiune Move or re-create the common messages inside the api/ folder
 import "external/common/version/version.proto";
 
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 // for sorting and pagination
 import "external/common/query/parameters.proto";
 

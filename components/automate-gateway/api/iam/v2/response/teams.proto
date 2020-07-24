@@ -4,7 +4,7 @@ package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/response";
 
 import "protoc-gen-swagger/options/annotations.proto";
-import "components/automate-gateway/api/iam/v2/common/teams.proto";
+import "automate-gateway/api/iam/v2/common/teams.proto";
 
 message GetTeamResp {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {

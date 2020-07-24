@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("gateway_gateway", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/gateway/gateway.proto",
+    "title": "automate-gateway/api/gateway/gateway.proto",
     "version": "version not set"
   },
   "consumes": [

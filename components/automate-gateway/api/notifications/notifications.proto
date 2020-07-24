@@ -7,7 +7,7 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/no
 
 import "google/api/annotations.proto";
 
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 message SlackAlert {
   string url = 1;

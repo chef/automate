@@ -5,7 +5,7 @@ package chef.automate.api.debug;
 option go_package = "github.com/chef/automate/lib/grpc/debug/debug_api";
 
 import "google/protobuf/duration.proto";
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Debug {
 	rpc Trace(TraceRequest) returns (stream Chunk) {}

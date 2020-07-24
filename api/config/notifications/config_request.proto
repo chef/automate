@@ -5,7 +5,7 @@ option go_package = "github.com/chef/automate/api/config/notifications";
 
 import "config/shared/global.proto";
 import "config/shared/tls.proto";
-import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 
 import "google/protobuf/wrappers.proto";
 
