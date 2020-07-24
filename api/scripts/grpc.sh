@@ -23,8 +23,8 @@ fauxpath=$(mktemp -d)
 # the src directory.
 function sync_from_fauxpath() {
     base_dir=$(dirname "${1}")
-    gen_dir="${fauxpath}/github.com/chef/automate/${base_dir}/"
-    [[ -d "${gen_dir}" ]] && rsync -r "${gen_dir}" "/src/${base_dir}/"
+    gen_dir="${fauxpath}/github.com/chef/automate/api/${base_dir}/"
+    [[ -d "${gen_dir}" ]] && rsync -r "${gen_dir}" "/src/api/${base_dir}/"
 }
 
 function cleanup() {
@@ -32,17 +32,18 @@ function cleanup() {
 }
 trap cleanup EXIT
 
-IMPORTS=(-I /src
-         -I /src/api
-         -I vendor
-         -I vendor/github.com/grpc-ecosystem/grpc-gateway
-         -I vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
-         -I vendor/github.com/envoyproxy/protoc-gen-validate
-         -I lib/license
+IMPORTS=(-I /src/api
+         -I /src/components
+         -I /src/vendor
+         -I /src/vendor/github.com/grpc-ecosystem/grpc-gateway
+         -I /src/vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
+         -I /src/vendor/github.com/envoyproxy/protoc-gen-validate
+         -I /src/lib
         )
 
 shopt -s globstar
-for i in api/external/**/; do
+pushd api
+for i in external/**/; do
   # check if there are proto files in that directory
   protos=(`find "$i" -maxdepth 1 -name "*.proto"`)
   if [ ${#protos[@]} -gt 0 ]; then
@@ -51,7 +52,7 @@ for i in api/external/**/; do
 
     # service, grpc-gateway, policy mapping
     protoc ${IMPORTS[@]} \
-      --go_out=plugins=grpc,paths=source_relative:/src \
+      --go_out=plugins=grpc,paths=source_relative:/src/api \
       --grpc-gateway_out=request_context=true,logtostderr=true:$fauxpath  \
       --policy_out=logtostderr=true:$fauxpath  \
       ${list[@]} || exit 1
@@ -68,7 +69,7 @@ for i in api/external/**/; do
 done
 
 # This is a separate loop because we do not want to do policy generation
-for i in api/interservice/**/; do
+for i in interservice/**/; do
   # check if there are proto files in that directory
   protos=(`find "$i" -maxdepth 1 -name "*.proto"`)
   if [ ${#protos[@]} -gt 0 ]; then
@@ -77,7 +78,7 @@ for i in api/interservice/**/; do
 
     # service, grpc-gateway, policy mapping
     protoc ${IMPORTS[@]} \
-      --go_out=plugins=grpc,paths=source_relative:/src \
+      --go_out=plugins=grpc,paths=source_relative:/src/api \
       --grpc-gateway_out=request_context=true,logtostderr=true:$fauxpath  \
       ${list[@]} || exit 1
 
@@ -90,10 +91,10 @@ for i in api/interservice/**/; do
     # every plugin would be problematic as the Validate() functions
     # can conflict. For now we whitelist a set of them:
     case $i in
-        "api/interservice/local_user/"*|\
-        "api/interservice/teams/"*|\
-        "api/interservice/authn/"*|\
-        "api/interservice/authz/"*)
+        "interservice/local_user/"*|\
+        "interservice/teams/"*|\
+        "interservice/authn/"*|\
+        "interservice/authz/"*)
             printf 'VAL: %s\n' "${list[@]}"
             protoc ${IMPORTS[@]} \
                    --grpc-mock_out="${fauxpath}" \
@@ -121,6 +122,8 @@ for i in api/interservice/**/; do
     done
   fi
 done
+
+popd
 
 
 # This script reads all swagger '.json' files in the current folder
