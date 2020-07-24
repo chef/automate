@@ -31,6 +31,11 @@ pipelines:
   - nightly:
       description: Nightly tests against master
       definition: .expeditor/nightly.pipeline.yml
+  - post-promote:
+      description: Generate and upload release artifacts
+      definition: .expeditor/post-promote.pipeline.yml
+      env:
+        - CHANNEL: dev
   - deploy/dev:
       description: Deploy changes to a2-dev.cd.chef.co instances
       definition: .expeditor/deploy.pipeline.yml
@@ -47,11 +52,6 @@ pipelines:
   - deploy/ui-library:
       description: Deploy ui-library.cd.chef.co
       definition: .expeditor/deploy_ui_library.pipeline.yml
-  - code_coverage:
-      description: Generate code coverage reports and upload them to data store
-      definition: .expeditor/coverage.pipeline.yml
-      env:
-        - CHANNEL: dev
   - test-license-usage/dev:
       description: Test the license usage CLI command.
       definition: .expeditor/test-license-usage.pipeline.yml
@@ -151,13 +151,15 @@ subscriptions:
   - workload: buildkite_hab_build_group_published:{{agent_id}}:*
     actions:
       - built_in:promote_habitat_packages
-      - bash:.expeditor/upload-files.sh:
+      - trigger_pipeline:post-promote:
+          post_commit: true
+  - workload: buildkite_build_passed:{{agent_id}}:post-promote:*
+    actions:
+      - purge_packages_chef_io_fastly:dev/automate/latest:
           post_commit: true
       - trigger_pipeline:deploy/dev:
           post_commit: true
       - trigger_pipeline:deploy/automate-chef-io:
-          post_commit: true
-      - purge_packages_chef_io_fastly:dev/automate/latest:
           post_commit: true
   # Update our compliance-profile pinnings when new profiles are released
   - workload: hab_package_published:unstable:chef/automate-compliance-profiles/*

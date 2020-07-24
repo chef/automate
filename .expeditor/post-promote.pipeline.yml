@@ -1,0 +1,27 @@
+steps:
+  - command:
+      - .expeditor/upload-files.sh
+    label: "Manifest and CLI Upload"
+    concurrency: 1
+    concurrency_group: chef-automate-master/deploy/$CHANNEL
+    expeditor:
+      secrets:
+        GITHUB_TOKEN:
+          account: github/chef
+          field: token
+      accounts:
+        - aws/chef-cd
+      executor:
+        docker:
+  - command:
+      - .expeditor/coverage/automate-ui.sh
+    label: "Automate UI Coverage Report"
+    concurrency: 1
+    concurrency_group: chef-automate-master/coverage
+    soft_fail: true
+    expeditor:
+      accounts:
+        - aws/chef-cd
+        - github
+      executor:
+        docker:

@@ -1,9 +1,24 @@
 #!/bin/bash
-
 set -eou pipefail
+
+log_section_start() {
+    echo "--- [$(date -u)] $*"
+}
+
+log() {
+    echo "[$(date -u)] $*"
+}
+
+if [[ -z "${EXPEDITOR_ID:-}" ]]; then
+    log "No EXEDITOR_ID variable found. Doing nothing. This pipeline should not be manually triggered."
+    exit 1
+fi
 
 VERSION=$(date +"%Y%m%d%H%M%S")
 export VERSION
+
+log "Using VERSION=$VERSION"
+
 # Should ensure License Scout doesn't get rate limited
 OCTOKIT_ACCESS_TOKEN=$GITHUB_TOKEN
 export OCTOKIT_ACCESS_TOKEN
@@ -12,9 +27,14 @@ export OCTOKIT_ACCESS_TOKEN
 aws s3 cp s3://chef-cd-citadel/packages_at_chef.io.pgp packages_at_chef.io.pgp --profile=chef-cd
 gpg --import packages_at_chef.io.pgp
 
+log_section_start "Creating License Scout report"
 # Generate the License Scout Dependency Manifest
+#
+# TODO(ssd) 2020-07-24: We should probably be checking out the version
+# of chef/automate that the build_group relates to.
 .expeditor/license_scout.sh
 
+log_section_start "Uploading License Scout report"
 # Upload the License Scout Dependency Manifest to the S3 bucket
 aws s3 cp a2-dependency-licenses.json "s3://chef-automate-artifacts/licenses/automate/$VERSION.json" --acl public-read --profile chef-cd
 aws s3 cp a2-dependency-licenses.json s3://chef-automate-artifacts/dev/latest/automate/licenses.json --acl public-read --profile chef-cd
@@ -22,10 +42,10 @@ aws s3 cp a2-dependency-licenses.json s3://chef-automate-artifacts/dev/latest/au
 #
 # Generate the manifest.json
 #
+log_section_start "Creating new release manifest and updating release list"
 
 # Download or create the versions file
 aws s3 cp "s3://chef-automate-artifacts/dev/latest/automate/versions.json" existing-versions.json --profile chef-cd || echo "[]" > existing-versions.json
-
 # Download or create the releases file
 aws s3 cp "s3://chef-automate-artifacts/dev/latest/automate/releases.json" existing-releases.json --profile chef-cd || echo "[]" > existing-releases.json
 
@@ -43,6 +63,8 @@ licenses="https://packages.chef.io/licenses/automate/$VERSION.json"
 release=$(printf '{"version":"%s","release_date":"%s","_links":{"release_notes":"%s","manifest":"%s","licenses":"%s"}}' "$VERSION" "$release_date" "$release_notes" "$manifest" "$licenses")
 jq ". |= .+ [$release]" existing-releases.json > updated-releases.json
 
+
+log_section_start "Uploading new release manifest and release list"
 # Upload the manifest to the S3 bucket
 aws s3 cp "$VERSION.json" "s3://chef-automate-artifacts/manifests/automate/$VERSION.json" --acl public-read --profile chef-cd
 aws s3 cp "$VERSION.json" s3://chef-automate-artifacts/dev/latest/automate/manifest.json --acl public-read --profile chef-cd
@@ -62,7 +84,7 @@ aws s3 cp "$VERSION.json.sha256sum" s3://chef-automate-artifacts/dev/latest/auto
 #
 # Upload the chef-automate CLI
 #
-echo "Uploading automate-cli"
+log_section_start "Uploading automate-cli"
 if [[ -n "${EXPEDITOR_PKG_IDENTS_AUTOMATECLIX86_64LINUX:-""}" ]]; then
     automate_cli_ident="$EXPEDITOR_PKG_IDENTS_AUTOMATECLIX86_64LINUX"
     echo "Installing automate-cli version found in Expeditor environment: $automate_cli_ident"
@@ -95,7 +117,7 @@ popd
 #
 # Cleanup
 #
-
+log_section_start "Cleanup"
 rm "$VERSION.json"
 rm existing-versions.json
 rm existing-releases.json

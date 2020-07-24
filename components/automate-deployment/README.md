@@ -54,12 +54,12 @@ We try to test at 2 levels:
 
 - "unit" tests: `make unit`
 
-  These tests are written using the standard Go testing tools. You can
-  run them with `make unit` from the current directory. While we
-  currently have substantial mocking in our unit test, our goal is to
-  reduce and avoid mocking over time. Unit tests that talk to
-  databases and filesystems are absolutely fine provided they run
-  quickly and reliably.
+  These tests use the standard Go testing tools. You can run them with
+  `make unit` from the current directory. While we currently have
+  substantial mocking in our unit test, our goal is to reduce and
+  avoid mocking over time. Unit tests that talk to databases and
+  filesystems are absolutely fine provided they run quickly and
+  reliably.
 
 - Integration tests
 
