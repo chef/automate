@@ -19,16 +19,16 @@ describe File.basename(__FILE__) do
     # same node. so we expect the total here to be 9 nodes.
     nodes_list = MANAGER_GRPC nodes, :list, Nodes::Query.new()
     counter = 1
-    while nodes_list.total < 11 && counter < 40 do
+    while nodes_list.total < 13 && counter < 40 do
       puts "Got #{nodes_list.total} nodes, sleeping 5s and retrying (#{counter})..."
       sleep 5
       counter += 1
       nodes_list = MANAGER_GRPC nodes, :list, Nodes::Query.new()
     end
-    assert_equal(12, nodes_list.total)
+    assert_equal(13, nodes_list.total)
 
     state_nodes = MANAGER_GRPC nodes, :list, Nodes::Query.new(filters:[Common::Filter.new(key: "state", values: ["RUNNING", "STOPPED", ""])])
-    assert_equal(12, state_nodes.total)
+    assert_equal(13, state_nodes.total)
 
     # those nodes should not have been added to the manual node manager, as they were ingested nodes, not manually added nodes
     manually_managed_nodes = MANAGER_GRPC nodes, :list, Nodes::Query.new(filters: [Common::Filter.new(key: "manager_id", values: ["e69dc612-7e67-43f2-9b19-256afd385820"])])
