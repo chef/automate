@@ -18,7 +18,7 @@
         <chef-subheading>Manage the retention of events, service groups, Chef Infra Client runs, compliance reports and scans in Chef Automate.</chef-subheading>
       </chef-page-header>
 
-      <div class="page-body">
+      <div class="page-body" #dataLifeCycleFormElement>
 
         <div class="group-section">
           <chef-button primary [disabled]="(!automateSettingsForm.dirty || !automateSettingsForm.valid) || saving" (click)="applyChanges()">
@@ -39,6 +39,7 @@
             </div>
             <p>Remove event feed data after
               <input
+                class="auto-update-width"
                 aria-label="Days before removing event feed data"
                 chefInput
                 formControlName="threshold"
@@ -46,7 +47,7 @@
                 type="number"
                 min="0"
                 (keydown)="preventNegatives($event.key)"
-                (keyup)="autoUpdateInputWidth($event)"
+                (keyup)="autoUpdateInputWidth($event.target)"
               />days
             </p>
           </div>
@@ -60,6 +61,7 @@
             </div>
             <p>Remove Chef Infra Server actions after
               <input
+                class="auto-update-width"
                 aria-label="Days before removing Chef Infra Server actions"
                 chefInput
                 formControlName="threshold"
@@ -67,7 +69,7 @@
                 type="number"
                 min="0"
                 (keydown)="preventNegatives($event.key)"
-                (keyup)="autoUpdateInputWidth($event)"
+                (keyup)="autoUpdateInputWidth($event.target)"
               />days
             </p>
           </div>
@@ -87,6 +89,7 @@
 
             <p>When no health check reports have been received for a service in
               <input
+                class="auto-update-width"
                 aria-label="Amount of time before labeling a service disconnected"
                 chefInput
                 formControlName="threshold"
@@ -94,7 +97,7 @@
                 type="number"
                 min="0"
                 (keydown)="preventNegatives($event.key)"
-                (keyup)="autoUpdateInputWidth($event)"
+                (keyup)="autoUpdateInputWidth($event.target)"
               />
               <mat-form-field appearance="none">
                 <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
@@ -117,6 +120,7 @@
             </div>
             <p>Remove services labeled as disconnected after
               <input
+                class="auto-update-width"
                 aria-label="Amount of time before removing disconnected services"
                 chefInput
                 formControlName="threshold"
@@ -124,7 +128,7 @@
                 type="number"
                 min="0"
                 (keydown)="preventNegatives($event.key)"
-                (keyup)="autoUpdateInputWidth($event)"
+                (keyup)="autoUpdateInputWidth($event.target)"
               />
               <mat-form-field appearance="none">
                 <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
@@ -148,6 +152,7 @@
             </div>
             <p>Remove data for Chef Infra Client runs after
               <input
+                class="auto-update-width"
                 aria-label="Days before removing Chef Infra Client runs"
                 chefInput
                 formControlName="threshold"
@@ -155,7 +160,7 @@
                 type="number"
                 min="0"
                 (keydown)="preventNegatives($event.key)"
-                (keyup)="autoUpdateInputWidth($event)"
+                (keyup)="autoUpdateInputWidth($event.target)"
               />days
             </p>
           </div>
@@ -171,6 +176,7 @@
 
             <p>When no Chef Infra Client run data has been received from a node in
               <input
+                class="auto-update-width"
                 aria-label="Amount of time before labeling a node as missing"
                 chefInput
                 formControlName="threshold"
@@ -178,7 +184,7 @@
                 type="number"
                 min="0"
                 (keydown)="preventNegatives($event.key)"
-                (keyup)="autoUpdateInputWidth($event)"
+                (keyup)="autoUpdateInputWidth($event.target)"
               />
               <mat-form-field appearance="none">
                 <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
@@ -201,6 +207,7 @@
             </div>
             <p>Remove nodes labeled as missing after
               <input
+                class="auto-update-width"
                 aria-label="Days before removing missing nodes"
                 chefInput
                 formControlName="threshold"
@@ -208,7 +215,7 @@
                 type="number"
                 min="0"
                 (keydown)="preventNegatives($event.key)"
-                (keyup)="autoUpdateInputWidth($event)"
+                (keyup)="autoUpdateInputWidth($event.target)"
               />days
             </p>
           </div>
@@ -225,6 +232,7 @@
             </div>
             <p>Remove compliance reports after
               <input
+                class="auto-update-width"
                 aria-label="Days before removing compliance reports"
                 chefInput
                 formControlName="threshold"
@@ -232,7 +240,7 @@
                 type="number"
                 min="0"
                 (keydown)="preventNegatives($event.key)"
-                (keyup)="autoUpdateInputWidth($event)"
+                (keyup)="autoUpdateInputWidth($event.target)"
               />days
             </p>
           </div>
@@ -246,6 +254,7 @@
             </div>
             <p>Remove compliance scans after
               <input
+                class="auto-update-width"
                 aria-label="Days before removing compliance scans"
                 chefInput
                 formControlName="threshold"
@@ -253,7 +262,7 @@
                 type="number"
                 min="0"
                 (keydown)="preventNegatives($event.key)"
-                (keyup)="autoUpdateInputWidth($event)"
+                (keyup)="autoUpdateInputWidth($event.target)"
               />days
             </p>
           </div>

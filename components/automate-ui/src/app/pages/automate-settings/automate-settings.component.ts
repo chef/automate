@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
@@ -33,6 +33,7 @@ import { ProductDeployedService } from 'app/services/product-deployed/product-de
 })
 
 export class AutomateSettingsComponent implements OnInit, OnDestroy {
+  @ViewChild('dataLifeCycleFormElement', {read: ElementRef}) dataLifeCycleFormElement: ElementRef;
 
   public isDesktopView = false;
 
@@ -179,8 +180,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   }
 
   // Update the width of input when greater than one number
-  public autoUpdateInputWidth($event: KeyboardEvent): void {
-    const element = $event.target as HTMLInputElement;
+  public autoUpdateInputWidth(element: HTMLInputElement): void {
     // Keep default in sync with input width in automate-settings.component.scss
     const DEFAULT_WIDTH = 64;
     const length = element.value.length;
@@ -331,6 +331,12 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
           break;
       }
     });
+
+    // Update all number inputs to grow if holding number larger than two digits
+    const numberInputs = Array.from(
+      this.dataLifeCycleFormElement.nativeElement.querySelectorAll('.auto-update-width'));
+    numberInputs.forEach((element: HTMLInputElement) => this.autoUpdateInputWidth(element));
+
     // After a successful load of initial values, trigger a notification
     // to FormControlDirective to treat them as the "original" values.
     this.shouldResetValues = true;
