@@ -926,10 +926,13 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 								logrus.Errorf("could not convert the value of stringTagsBucket: %v, to a string!", stringTagsBucket)
 							}
 							logrus.Debugf("%s stringTagKey.Key: %s", myName, stringTagKey)
-							suggs = append(suggs, &reportingapi.Suggestion{
-								Text:  stringTagKey,
-								Score: 0,
-							})
+
+							if len(text) < 2 || strings.Contains(text, stringTagKey) {
+								suggs = append(suggs, &reportingapi.Suggestion{
+									Text:  stringTagKey,
+									Score: 0,
+								})
+							}
 						}
 					}
 				}
