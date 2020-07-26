@@ -926,8 +926,7 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 								logrus.Errorf("could not convert the value of stringTagsBucket: %v, to a string!", stringTagsBucket)
 							}
 
-
-							contains := strings.Contains(strings.ToLower(stringTagKey), strings.ToLower(text)
+							contains := strings.Contains(strings.ToLower(stringTagKey), strings.ToLower(text))
 							logrus.Debugf("%s stringTagKey.Key: %s, incoming text is: %s, after both lowered contains is: %t", myName, stringTagKey, text, contains)
 
 							if len(text) < 2 || strings.Contains(strings.ToLower(stringTagKey), strings.ToLower(text)) {
