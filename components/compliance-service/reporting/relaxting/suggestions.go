@@ -927,7 +927,7 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 							}
 							logrus.Debugf("%s stringTagKey.Key: %s", myName, stringTagKey)
 
-							if len(text) < 2 || strings.Contains(text, stringTagKey) {
+							if len(text) < 2 || strings.Contains(strings.ToLower(stringTagKey), strings.ToLower(text)) {
 								suggs = append(suggs, &reportingapi.Suggestion{
 									Text:  stringTagKey,
 									Score: 0,
