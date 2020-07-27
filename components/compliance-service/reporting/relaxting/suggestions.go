@@ -84,6 +84,7 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 	}
 
 	controlTagFilterKey := ""
+	candidateControlTagFilterKey := ""
 	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
 	for filterType := range filters {
 		if strings.HasPrefix(filterType, "control_tag:") {
@@ -92,9 +93,15 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 			// For suggestions, prefer control_tag filter key with no values to avoid clash with full control_tag filters
 			if len(filters[filterType]) == 0 || //the fitlertype itself has not items
 				len(filters[filterType][len(filters[filterType])-1]) == 0 { //the last item is empty.. this is how the ui sends it to use when it's about to add one
-				break
+				_, candidateControlTagFilterKey = leftSplit(filterType, ":")
 			}
 		}
+	}
+
+	//if the conroltagfilterkey closest to the end was empty, it is most likely the one that we're looking for suggestions for
+	//todo - we really need to pass in the name of this controlTagFilterKey so that we don't have to do this jenky guess work.
+	if len(candidateControlTagFilterKey) > 0 {
+		controlTagFilterKey = candidateControlTagFilterKey
 	}
 
 	suggs := make([]*reportingapi.Suggestion, 0)
