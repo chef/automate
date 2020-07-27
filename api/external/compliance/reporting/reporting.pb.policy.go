@@ -78,6 +78,8 @@ func init() {
 					return m.Type
 				case "text":
 					return m.Text
+				case "type_key":
+					return m.TypeKey
 				default:
 					return ""
 				}

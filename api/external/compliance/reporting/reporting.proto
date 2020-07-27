@@ -681,6 +681,8 @@ message SuggestionRequest {
 	int32 size = 3;
 	// The criteria used to filter the suggestions returned.
 	repeated ListFilter filters = 4;
+	// The key (e.g. control_tag_key) to use for the type search.
+	string type_key = 5;
 }
 
 message Suggestion {
