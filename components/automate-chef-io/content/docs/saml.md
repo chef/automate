@@ -42,11 +42,43 @@ Users who sign in via SAML will have a session time of 24 hours before needing t
 
 ## Supported Identity Management Systems
 
+- [Azure AD]({{< relref "#azure-ad" >}})
 - Office365
 - OKTA
 - OneLogin
 - Ping
 - Tivoli Federated Identity Manager
+
+In the following section, you can find further details about specific supported identity management systems.
+
+### Azure AD
+
+For using Chef Automate's SAML integration with Azure AD, please note that **signing key rotation** is
+not supported to be done automatically. The signing certificate used with Azure for SAML sign-ins
+has to be **managed manually**.
+
+After setting up your application as a _"non-gallery application"_, configure its SAML sign-on method.
+For both _Identifier (Entity ID)_ and _Reply URL (Assertion Consumer Service URL)_, enter
+`https://{{< example_fqdn "automate" >}}/dex/callback`.
+
+The default claims can be used, see below for their counterparts in the Chef Automate configuration.
+Download the _Certificate (Base64)_, and take note of the _Login URL_.
+
+The minimal configuration snippet then looks like this (replace `<<something>>` with the values
+noted above):
+
+```toml
+[dex.v1.sys.connectors.saml]
+ca_contents="""
+<<Certificate (Base64)>>
+"""
+sso_url = "<<Login URL>>"
+email_attr = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+username_attr = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+entity_issuer = "https://{{< example_fqdn "automate" >}}/dex/callback"
+```
+
+See below for further options.
 
 ## SAML Configuration Settings
 
