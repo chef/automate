@@ -109,34 +109,35 @@ describe File.basename(__FILE__) do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control', size: 10
     )
-    expected = ["Check Apache config file owner, group and permissions.--apache-05--",
-      "Disable Apache’s follows Symbolic Links for directories in alias.conf--apache-11--",
-      "Disable Directory Listing for directories in alias.conf--apache-12--",
-      "Disable insecure HTTP-methods--apache-10--",
-      "Disable TRACE-methods--apache-09--",
-      "Enable Apache Logging--apache-14--",
-      "Profile 1 - Control 1--pro1-con1--",
-      "Profile 1 - Control 2--pro1-con2--",
-      "Profile 1 - Control 3--pro1-con3--",
-      "Profile 1 - Control 4--pro1-con4--" ]
+    expected =
+        [
+            "Apache should be enabled--apache-02--",
+            "Apache should be running--apache-01--",
+            "Apache should start max. 1 root-task--apache-03--",
+            "Check Apache config file owner, group and permissions.--apache-05--",
+            "Check Apache config folder owner, group and permissions.--apache-04--",
+            "Disable Apache’s follows Symbolic Links for directories in alias.conf--apache-11--",
+            "Disable Directory Listing for directories in alias.conf--apache-12--",
+            "Disable insecure HTTP-methods--apache-10--",
+            "Disable TRACE-methods--apache-09--",
+            "Enable Apache Logging--apache-14--"
+        ]
     assert_suggestions_text_id_version(expected, actual_data)
 
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control', text: 'icmp', size: 3
     )
     expected = [
-      "ICMP ratemask--sysctl-06--",
-      "ICMP ratelimit--sysctl-05--",
-      "ICMP echo ignore broadcasts--sysctl-04--" ]
+        "ICMP echo ignore broadcasts--sysctl-04--",
+        "ICMP ignore bogus error responses--sysctl-03--",
+        "ICMP ratelimit--sysctl-05--"
+    ]
     assert_suggestions_text_id_version(expected, actual_data)
 
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control', text: 'ApAcHe-is-awesome', size: 3
     )
-    expected = [
-      "Enable Apache Logging--apache-14--",
-      "Apache should be enabled--apache-02--",
-      "Apache should be running--apache-01--" ]
+    expected = []
     assert_suggestions_text_id_version(expected, actual_data)
 
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
