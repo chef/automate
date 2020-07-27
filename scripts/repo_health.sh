@@ -13,7 +13,7 @@ hab pkg install -b "core/go/$(desired_golang_version)"
 
 echo "Checking Go Dependencies"
 go mod verify
-go mod tidy -v
+scripts/revendor.sh # `go mod tidy` would be preferred here but it removes some proto code we have vendored.
 git diff --exit-code --ignore-submodules=all # fail if anything's been changed
 
 echo "Checking automate-deployment binding data"

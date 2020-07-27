@@ -19,8 +19,12 @@ go mod verify
 # See https://github.com/golang/go/issues/26366
 grpcGatewayModPath=$(GOFLAGS="" go list -f "{{.Dir}}" -m "github.com/grpc-ecosystem/grpc-gateway")
 
-# have to `go get` it first for some reason
-go get github.com/googleapis/googleapis
+# have to `go get` it first for some reason.
+# NOTE: the version here isn't particularly special, it's just the version we
+# happened to get on a particular day. We have to lock to *a* version, because
+# the version ends up in the go.mod file and we check whether that file is
+# properly up-to-date in Ci.
+go get github.com/googleapis/googleapis@a94df49e8f20
 googleAPIsModPath=$(GOFLAGS="" go list -f "{{.Dir}}" -m "github.com/googleapis/googleapis")
 
 # Add files that go mod won't vendor that we need
