@@ -87,15 +87,12 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
 	for filterType := range filters {
 		if strings.HasPrefix(filterType, "control_tag:") {
+			_, controlTagFilterKey = leftSplit(filterType, ":")
 			useSummaryIndex = false
-
-			numFiltersOfFilterType := len(filters[filterType])
-			//For suggestions, prefer control_tag filter key with no values to avoid clash with full control_tag filters
-			if numFiltersOfFilterType == 0 || len(filters[filterType][numFiltersOfFilterType-1]) == 0 {
-				_, controlTagFilterKey = leftSplit(filterType, ":")
+			// For suggestions, prefer control_tag filter key with no values to avoid clash with full control_tag filters
+			if len(filters[filterType]) == 0 {
+				break
 			}
-			//clear the filter so it doesn't filter suggs
-			filters[filterType] = nil
 		}
 	}
 
