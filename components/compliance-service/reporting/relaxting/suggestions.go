@@ -89,10 +89,12 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 		if strings.HasPrefix(filterType, "control_tag:") {
 			useSummaryIndex = false
 
+			numFiltersOfFilterType := len(filters[filterType])
 			//For suggestions, prefer control_tag filter key with no values to avoid clash with full control_tag filters
-			if len(filters[filterType]) == 0 {
+			if numFiltersOfFilterType == 0 || len(filters[filterType][numFiltersOfFilterType]) == 0 {
 				_, controlTagFilterKey = leftSplit(filterType, ":")
 			}
+			//clear the filter so it doesn't filter suggs
 			filters[filterType] = nil
 		}
 	}
