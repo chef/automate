@@ -90,7 +90,8 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 			_, controlTagFilterKey = leftSplit(filterType, ":")
 			useSummaryIndex = false
 			// For suggestions, prefer control_tag filter key with no values to avoid clash with full control_tag filters
-			if len(filters[filterType]) == 0 {
+			if len(filters[filterType]) == 0 || //the fitlertype itself has not items
+				len(filters[filterType][len(filters[filterType])-1]) == 0 { //the last item is empty.. this is how the ui sends it to use when it's about to add one
 				break
 			}
 		}
