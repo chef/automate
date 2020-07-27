@@ -1276,6 +1276,10 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
           },
           "description": "The criteria used to filter the suggestions returned."
+        },
+        "type_key": {
+          "type": "string",
+          "description": "The key (e.g. control_tag_key) to use for the type search."
         }
       }
     },

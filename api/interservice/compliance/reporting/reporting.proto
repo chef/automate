@@ -243,6 +243,7 @@ message SuggestionRequest {
 	string text = 2;
 	int32 size = 3;
 	repeated ListFilter filters = 4;
+	string type_key = 5;
 }
 message Suggestion {
 	string text = 1;
