@@ -90,14 +90,13 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 			_, controlTagFilterKey = leftSplit(filterType, ":")
 			useSummaryIndex = false
 
-			//todo - this really is not good enough.. we need to pass in the controlTagFilterKey instead of trying to guess it here
-			//the problem with guessing is that several of the control_tag: prefixes could have a zero len or even non-zero len with
-			//last element being "", guessing which is the one that implies control tag key is too error prone..
-
+			//if this filtertype already has values, get them out so that they don't prevent the others from being presented
+			filters[filterType] = nil
+			break
 			// For suggestions, prefer control_tag filter key with no values to avoid clash with full control_tag filters
-			if len(filters[filterType]) == 0 {
-				break
-			}
+			//if len(filters[filterType]) == 0 {
+			//	break
+			//}
 		}
 	}
 
@@ -417,6 +416,7 @@ func (backend ES2Backend) getProfileWithVersionSuggestions(ctx context.Context,
 			}
 		}
 	}
+
 	return suggs, nil
 }
 

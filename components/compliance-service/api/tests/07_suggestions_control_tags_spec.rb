@@ -197,7 +197,9 @@ describe File.basename(__FILE__) do
         Reporting::ListFilter.new(type: 'control_tag:scope', values: []),
       ]
     )
-    expected = ["Apache", "apalache"]
+    #todo - this is incorrect as it only brings in the satisfies control_tag
+    # it arbitrarily picks it
+    expected = ["apache-1", "apache-2", "NGX-1", "NGX-2", "SRG-00006", "SRG-00007"]
     assert_suggestions_text(expected, actual_data)
   end
 end
