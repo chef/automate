@@ -91,7 +91,7 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 
 			numFiltersOfFilterType := len(filters[filterType])
 			//For suggestions, prefer control_tag filter key with no values to avoid clash with full control_tag filters
-			if numFiltersOfFilterType == 0 || len(filters[filterType][numFiltersOfFilterType]) == 0 {
+			if numFiltersOfFilterType == 0 || len(filters[filterType][numFiltersOfFilterType-1]) == 0 {
 				_, controlTagFilterKey = leftSplit(filterType, ":")
 			}
 			//clear the filter so it doesn't filter suggs
