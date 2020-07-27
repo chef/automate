@@ -104,7 +104,7 @@ func (m Backend) GetSuggestions(term string, text string, filters map[string][]s
 func (m Backend) GetPolicyCookbooks(revisionID string) (backend.PolicyCookbooks, error) {
 	return backend.PolicyCookbooks{
 		PolicyName: "infra_base",
-		CookbookLocks: []backend.PolicyCookbookLock{
+		CookbookLocks: []*backend.PolicyCookbookLock{
 			{
 				CookbookName: "apt",
 				PolicyID:     "any",
