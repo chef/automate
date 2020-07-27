@@ -169,7 +169,16 @@
           </chef-option>
         </chef-phat-radio>
 
-        <chef-table class="controls-table">
+        <div class="metadata-container err-container">
+          <div class="metadata failed err-failed-container">
+            <span class="metadata-title err-color">
+              <chef-icon id="err-icon-id">{{ statusIcon('failed') }}</chef-icon>
+              <b class="err-bold">Execution Error:</b> {{activeReport.status_message}}
+            </span>
+          </div>
+        </div>
+
+        <chef-table class="controls-table" *ngIf="activeReport.controls.total > 0">
           <chef-thead>
             <chef-tr>
               <chef-th>Control</chef-th>
