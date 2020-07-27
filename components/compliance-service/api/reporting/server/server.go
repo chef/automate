@@ -123,7 +123,7 @@ func (srv *Server) ListSuggestions(ctx context.Context, in *reporting.Suggestion
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
-	suggestionsList, err := srv.es.GetSuggestions(ctx, in.Type, formattedFilters, in.Text, in.Size)
+	suggestionsList, err := srv.es.GetSuggestions(ctx, in.Type, formattedFilters, in.Text, in.Size, in.TypeKey)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
