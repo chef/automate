@@ -127,13 +127,14 @@ describe File.basename(__FILE__) do
     assert_equal_json_sorted(expected_data, actual_data.to_json)
 
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
-      type: 'control', text: 'icMP'
+        type: 'control', text: 'icMP'
     )
     expected = [
-      "ICMP ratemask--sysctl-06--",
-      "ICMP ratelimit--sysctl-05--",
-      "ICMP echo ignore broadcasts--sysctl-04--",
-      "ICMP ignore bogus error responses--sysctl-03--" ]
+        "ICMP echo ignore broadcasts--sysctl-04--",
+        "ICMP ignore bogus error responses--sysctl-03--",
+        "ICMP ratelimit--sysctl-05--",
+        "ICMP ratemask--sysctl-06--"
+    ]
     assert_suggestions_text_id_version(expected, actual_data)
 
 
