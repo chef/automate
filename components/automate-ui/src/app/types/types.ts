@@ -64,7 +64,7 @@ export class ComplianceNode implements ComplianceData {
 export interface Chicklet {
   text: string;
   type: string;
-  type_key?: any;
+  type_key?: string;
 }
 
 export interface SuggestionItem {
