@@ -245,6 +245,10 @@ SCRIPT
 
 $enter_hab_studio = <<SCRIPT
 export HAB_LICENSE=accept-no-persist
+cat<<EOS >> /home/ubuntu/.screenrc
+caption always "%{-b ck}SCREEN SESSION%{= kc} on %{+b}$(curl -sS http://169.254.169.254/latest/meta-data/public-hostname)%{-} ($(curl -Ss http://169.254.169.254/latest/meta-data/local-ipv4)) %{+b kR}[system load: %l] %{-b kY}%f %t%{= kc}"
+EOS
+chown ubuntu:ubuntu /home/ubuntu/.screenrc
 cat<<EOF >/etc/profile.d/hab_studio_setup.sh
 export HAB_LICENSE=accept-no-persist
 if [ "\\$USER" == "ubuntu" ]; then
@@ -255,7 +259,6 @@ if [ "\\$USER" == "ubuntu" ]; then
   export AZURE_CLIENT_ID=#{ENV['AZURE_CLIENT_ID']}
   export AZURE_CLIENT_SECRET=#{ENV['AZURE_CLIENT_SECRET']}
   export AZURE_TENANT_ID=#{ENV['AZURE_TENANT_ID']}
-
   cd #{home_dir}/automate
   source .envrc
   if [ ! -f ~/.hab/etc/cli.toml ]; then
@@ -279,11 +282,13 @@ EOT
     hab studio run "mount -o discard /dev/\\$device_to_mount /hab/svc/automate-elasticsearch/data"
     hab studio run 'mkdir -p /hab/svc/automate-elasticsearch/data/es_data && chown -R hab:hab /hab/svc/automate-elasticsearch/data/es_data'
   fi
-  echo " * Running: 'hab studio enter' in 'screen'!!!"
-  if screen -ls; then
-    screen -r
+  if screen -ls hab_studio; then
+    screen -ls
+    echo " * Attaching to existing screen 'hab_studio'"
+    screen -x hab_studio
   else
-    screen hab studio enter
+    echo " * Running: 'hab studio enter' in 'screen'!!!"
+    screen -S hab_studio hab studio enter
   fi
 fi
 EOF
