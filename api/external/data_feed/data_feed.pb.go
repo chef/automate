@@ -855,8 +855,9 @@ type DatafeedServiceClient interface {
 	//
 	//Add a datafeed destination
 	//
-	//Adds a datafeed destination. Requires values for name, url, and secret.
-	//The secret is the id returned from creating a secret using the secrets api.
+	//Adds a datafeed destination.
+	//Requires values for `name`, `url`, and `secret` parameters.
+	//The secret is the ID returned from creating a secret using the secrets API.
 	//
 	//Example:
 	//```
@@ -873,9 +874,9 @@ type DatafeedServiceClient interface {
 	//```
 	AddDestination(ctx context.Context, in *AddDestinationRequest, opts ...grpc.CallOption) (*AddDestinationResponse, error)
 	//
-	//Get a datafeed destination
+	//Show a datafeed destination
 	//
-	//Gets a datafeed destination the ID of the destination.
+	//Gets a datafeed destination based on the destination ID.
 	//
 	//Authorization Action:
 	//```
@@ -885,7 +886,7 @@ type DatafeedServiceClient interface {
 	//
 	//Delete a datafeed destination
 	//
-	//Deletes a datafeed destination given the ID of the destination.
+	//Deletes a datafeed destination based on the given destination ID.
 	//
 	//Authorization Action:
 	//```
@@ -895,10 +896,8 @@ type DatafeedServiceClient interface {
 	//
 	//Update a datafeed destination
 	//
-	//Updates a datafeed destination.
-	//This is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.
-	//This will update the name, url or secret for the destination
-	//
+	//Updates a datafeed destination's `name`, `url` or `secret`.
+	//This is a PATCH operation, meaning the sent details will override/replace those stored in the database.
 	//
 	//Authorization Action:
 	//```
@@ -918,9 +917,10 @@ type DatafeedServiceClient interface {
 	//
 	//Test a datafeed destination
 	//
-	//Tests a datafeed destination endpoint with the details provided. Requires values for name, url, and secret.
-	//The secret is the id returned from creating a secret using the secrets api.
-	//Accepts either url, secret or url, username_password
+	//Tests a datafeed destination endpoint based on the provided details.
+	//Requires values for `name`, `url`, and `secret` parameters.
+	//The secret is the ID returned from creating a secret using the secrets API.
+	//Accepts either `url` and `secret` combination or `url` and `username_password` combination.
 	//
 	//Examples:
 	//```
@@ -1012,8 +1012,9 @@ type DatafeedServiceServer interface {
 	//
 	//Add a datafeed destination
 	//
-	//Adds a datafeed destination. Requires values for name, url, and secret.
-	//The secret is the id returned from creating a secret using the secrets api.
+	//Adds a datafeed destination.
+	//Requires values for `name`, `url`, and `secret` parameters.
+	//The secret is the ID returned from creating a secret using the secrets API.
 	//
 	//Example:
 	//```
@@ -1030,9 +1031,9 @@ type DatafeedServiceServer interface {
 	//```
 	AddDestination(context.Context, *AddDestinationRequest) (*AddDestinationResponse, error)
 	//
-	//Get a datafeed destination
+	//Show a datafeed destination
 	//
-	//Gets a datafeed destination the ID of the destination.
+	//Gets a datafeed destination based on the destination ID.
 	//
 	//Authorization Action:
 	//```
@@ -1042,7 +1043,7 @@ type DatafeedServiceServer interface {
 	//
 	//Delete a datafeed destination
 	//
-	//Deletes a datafeed destination given the ID of the destination.
+	//Deletes a datafeed destination based on the given destination ID.
 	//
 	//Authorization Action:
 	//```
@@ -1052,10 +1053,8 @@ type DatafeedServiceServer interface {
 	//
 	//Update a datafeed destination
 	//
-	//Updates a datafeed destination.
-	//This is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.
-	//This will update the name, url or secret for the destination
-	//
+	//Updates a datafeed destination's `name`, `url` or `secret`.
+	//This is a PATCH operation, meaning the sent details will override/replace those stored in the database.
 	//
 	//Authorization Action:
 	//```
@@ -1075,9 +1074,10 @@ type DatafeedServiceServer interface {
 	//
 	//Test a datafeed destination
 	//
-	//Tests a datafeed destination endpoint with the details provided. Requires values for name, url, and secret.
-	//The secret is the id returned from creating a secret using the secrets api.
-	//Accepts either url, secret or url, username_password
+	//Tests a datafeed destination endpoint based on the provided details.
+	//Requires values for `name`, `url`, and `secret` parameters.
+	//The secret is the ID returned from creating a secret using the secrets API.
+	//Accepts either `url` and `secret` combination or `url` and `username_password` combination.
 	//
 	//Examples:
 	//```
