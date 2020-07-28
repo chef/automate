@@ -124,7 +124,7 @@ func CreateCfgmgmtActionsDiagnostic() diagnostics.Diagnostic {
 			maxTries := 5
 
 			for _, entity := range loaded.CreatedEntities {
-				reqPath := fmt.Sprintf("/api/v0/eventfeed?collapse=true&page_size=100&start=%d&end=%d", entity.RecordedAtMillis-5000000, entity.RecordedAtMillis+5000000)
+				reqPath := fmt.Sprintf("/api/v0/eventfeed?collapse=true&page_size=100&start=%d&end=%d", entity.RecordedAtMillis-1, entity.RecordedAtMillis+1)
 				found := false
 
 				type eventsFeedResp struct {

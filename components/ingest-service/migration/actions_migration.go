@@ -6,6 +6,7 @@ import (
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/components/ingest-service/backend"
+	"github.com/sirupsen/logrus"
 )
 
 func (ms *Status) migrateAction() error {
@@ -38,7 +39,7 @@ func (ms *Status) DeleteAllActionsIndexes() error {
 func (ms *Status) SendAllActionsThroughPipeline() error {
 	ms.update("loop through each action and send it though the pipeline")
 	pager := &actionsPaginationContext{
-		pageSize: 100,
+		pageSize: 300,
 		client:   ms.client,
 	}
 
@@ -133,6 +134,7 @@ func (p *actionsPaginationContext) HandleResults(actions []backend.InternalChefA
 		lastAction := actions[len(actions)-1]
 		p.cursorID = lastAction.Id
 		p.cursorDate = lastAction.RecordedAt
+		logrus.Infof("cursor ID %q cursor date %v", p.cursorID, p.cursorDate)
 	}
 }
 

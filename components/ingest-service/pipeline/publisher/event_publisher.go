@@ -49,7 +49,7 @@ func eventHandleMessage(client event_feed.EventFeedServiceClient, msg message.Ch
 
 	event, err := createEvent(msg)
 	if err != nil {
-		log.Errorf("unable to send event nodeID %s", msg.Action.NodeId)
+		log.Errorf("unable to create event %v", msg.Action)
 		msg.FinishProcessing(err)
 		return
 	}
@@ -57,7 +57,7 @@ func eventHandleMessage(client event_feed.EventFeedServiceClient, msg message.Ch
 	start := time.Now()
 	_, err = client.HandleEvent(context.Background(), event)
 	if err != nil {
-		log.Errorf("unable to send event nodeID %s", msg.Action.NodeId)
+		log.Errorf("unable to send event %v", msg.Action)
 		msg.FinishProcessing(err)
 		return
 	}
