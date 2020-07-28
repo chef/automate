@@ -109,7 +109,7 @@ type actionsPaginationContext struct {
 }
 
 func (p *actionsPaginationContext) Start() error {
-	actions, _, err := p.client.GetActions(actionsIndexName, p.pageSize, time.Time{}, "", false)
+	actions, _, err := p.client.GetActions(actionsIndexName, p.pageSize, time.Time{}, "", true)
 	if err != nil {
 		return err
 	}

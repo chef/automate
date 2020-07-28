@@ -15,8 +15,9 @@ import (
 )
 
 func (es *Backend) GetActions(index string, pageSize int, cursorDate time.Time,
-	cursorID string, ascending bool) ([]backend.InternalChefAction, int64, error) {
+	cursorID string, first bool) ([]backend.InternalChefAction, int64, error) {
 	actions := []backend.InternalChefAction{}
+	ascending := false
 
 	searchService := es.client.Search().
 		Index(index).
@@ -24,7 +25,7 @@ func (es *Backend) GetActions(index string, pageSize int, cursorDate time.Time,
 		Sort("recorded_at", ascending).
 		Sort("id", ascending)
 
-	if cursorDate.Unix() != 0 && cursorID != "" {
+	if !first {
 		milliseconds := cursorDate.UnixNano() / int64(time.Millisecond)
 		searchService = searchService.SearchAfter(milliseconds, cursorID) // the date has to be in milliseconds
 	}
