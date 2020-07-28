@@ -83,10 +83,12 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 		useSummaryIndex = false
 	}
 
-	for filterType := range filters {
-		if strings.HasPrefix(filterType, "control_tag:") {
-			useSummaryIndex = false
-			break
+	if useSummaryIndex {
+		for filterType := range filters {
+			if strings.HasPrefix(filterType, "control_tag:") {
+				useSummaryIndex = false
+				break
+			}
 		}
 	}
 
@@ -133,6 +135,20 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 		return suggs[0:size], nil
 	}
 	return suggs, nil
+}
+
+func removeControlTagFilters(filters map[string][]string) {
+	for filterType := range filters {
+		if strings.HasPrefix(filterType, "control_tag:") {
+			delete(filters, filterType)
+		}
+	}
+}
+
+func removeControlFilters(filters map[string][]string) {
+	if len(filters["control"]) > 0 {
+		delete(filters, "control")
+	}
 }
 
 func suggestionFieldArray(field string) bool {
