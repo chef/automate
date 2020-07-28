@@ -49,23 +49,26 @@ Users who sign in via SAML will have a session time of 24 hours before needing t
 - Ping
 - Tivoli Federated Identity Manager
 
-In the following section, you can find further details about specific supported identity management systems.
-
 ### Azure AD
 
-For using Chef Automate's SAML integration with Azure AD, please note that **signing key rotation** is
-not supported to be done automatically. The signing certificate used with Azure for SAML sign-ins
-has to be **managed manually**.
+Using Azure AD as an SAML IdP requires specific configuration for both Azure AD and Chef Automate.
 
-After setting up your application as a _"non-gallery application"_, configure its SAML sign-on method.
-For both _Identifier (Entity ID)_ and _Reply URL (Assertion Consumer Service URL)_, enter
-`https://{{< example_fqdn "automate" >}}/dex/callback`.
+{{< info >}}
+The signing certificate used for Chef Automate's SAML integration with Azure AD requires manual management.
+Signing key rotation is not done automatically.
+{{< /info >}}
 
-The default claims can be used, see below for their counterparts in the Chef Automate configuration.
-Download the _Certificate (Base64)_, and take note of the _Login URL_.
+First, set up your configuration within Azure AD.
+Set up your application as a _"non-gallery application"_, and then configure its SAML log-in method.
+Enter `https://{{< example_fqdn "automate" >}}/dex/callback` as the value for both _Identifier (Entity ID)_ and _Reply URL (Assertion Consumer Service URL)_,.
 
-The minimal configuration snippet then looks like this (replace `<<something>>` with the values
-noted above):
+You may use the default claims provided by Azure AD.
+Remember to edit the Chef Automate configuration in `config.toml` to reflect this claims information.
+
+Download the _Certificate (Base64)_ and take note of the _Login URL_ for use in the Chef Automate configuration.
+
+After configuring Azure AD, edit your Chef Automate `config.toml` configuration file to reflect the values entered in the Azure AD interface.
+The minimal configuration snippet in `config.toml` will look similar to:
 
 ```toml
 [dex.v1.sys.connectors.saml]
@@ -78,7 +81,13 @@ username_attr = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddr
 entity_issuer = "https://{{< example_fqdn "automate" >}}/dex/callback"
 ```
 
-See below for further options.
+where
+
+- `ca_contents` contains the value of the _Certificate (Base64)_
+- `sso_url` contains the value of _Login URL_
+- `entity_issuer`  contains the value of _Identifier (Entity ID)_
+
+See the SAML Configuration Settings section below for further configuration options.
 
 ## SAML Configuration Settings
 
