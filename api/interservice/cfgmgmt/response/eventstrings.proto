@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package chef.automate.domain.cfgmgmt.response;
 option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/response";
-import "api/interservice/cfgmgmt/response/event.proto";
+import "interservice/cfgmgmt/response/event.proto";
 
 message EventStrings {
     repeated EventString strings = 1;

@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("data_lifecycle", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/data_lifecycle/data_lifecycle.proto",
+    "title": "external/data_lifecycle/data_lifecycle.proto",
     "version": "version not set"
   },
   "consumes": [

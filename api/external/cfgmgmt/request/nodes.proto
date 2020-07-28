@@ -4,7 +4,7 @@ package chef.automate.api.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
 
 import "google/protobuf/timestamp.proto";
-import "api/external/common/query/parameters.proto";
+import "external/common/query/parameters.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
 message Nodes {

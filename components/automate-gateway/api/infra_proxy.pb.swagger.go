@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("infra_proxy", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/infra_proxy/infra_proxy.proto",
+    "title": "external/infra_proxy/infra_proxy.proto",
     "version": "version not set"
   },
   "consumes": [

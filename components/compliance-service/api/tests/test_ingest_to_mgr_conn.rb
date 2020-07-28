@@ -1,8 +1,8 @@
 ##### GRPC SETUP #####
-require 'api/interservice/nodemanager/nodes/nodes_pb'
-require 'api/interservice/nodemanager/nodes/nodes_services_pb'
-require 'api/interservice/nodemanager/manager/manager_pb'
-require 'api/interservice/nodemanager/manager/manager_services_pb'
+require 'interservice/nodemanager/nodes/nodes_pb'
+require 'interservice/nodemanager/nodes/nodes_services_pb'
+require 'interservice/nodemanager/manager/manager_pb'
+require 'interservice/nodemanager/manager/manager_services_pb'
 
 describe File.basename(__FILE__) do
   it "works" do

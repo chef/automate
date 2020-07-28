@@ -4,11 +4,11 @@ package chef.automate.api.data_lifecycle;
 option go_package = "github.com/chef/automate/api/external/data_lifecycle";
 
 import "google/api/annotations.proto";
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
-import "api/interservice/data_lifecycle/purge.proto";
+import "interservice/data_lifecycle/purge.proto";
 
 // DataLifecycle allows accessing the status of the data lifecycle job scheduler,
 // and configuring and running jobs.

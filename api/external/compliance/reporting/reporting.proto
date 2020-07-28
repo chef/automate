@@ -8,10 +8,10 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
-import "api/external/common/version/version.proto";
-import "api/external/common/response.proto";
+import "external/common/version/version.proto";
+import "external/common/response.proto";
 
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service ReportingService {
 	/*

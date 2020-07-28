@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("cfgmgmt", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/cfgmgmt/cfgmgmt.proto",
+    "title": "external/cfgmgmt/cfgmgmt.proto",
     "version": "version not set"
   },
   "consumes": [

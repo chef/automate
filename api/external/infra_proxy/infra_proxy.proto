@@ -5,28 +5,28 @@ option go_package = "github.com/chef/automate/api/external/infra_proxy";
 
 import "google/api/annotations.proto";
 
-import "api/external/infra_proxy/request/orgs.proto";
-import "api/external/infra_proxy/request/servers.proto";
-import "api/external/infra_proxy/request/cookbooks.proto";
-import "api/external/infra_proxy/request/roles.proto";
-import "api/external/infra_proxy/request/clients.proto";
-import "api/external/infra_proxy/request/databags.proto";
-import "api/external/infra_proxy/request/environments.proto";
-import "api/external/infra_proxy/request/nodes.proto";
-import "api/external/infra_proxy/request/policyfiles.proto";
+import "external/infra_proxy/request/orgs.proto";
+import "external/infra_proxy/request/servers.proto";
+import "external/infra_proxy/request/cookbooks.proto";
+import "external/infra_proxy/request/roles.proto";
+import "external/infra_proxy/request/clients.proto";
+import "external/infra_proxy/request/databags.proto";
+import "external/infra_proxy/request/environments.proto";
+import "external/infra_proxy/request/nodes.proto";
+import "external/infra_proxy/request/policyfiles.proto";
 
-import "api/external/infra_proxy/response/orgs.proto";
-import "api/external/infra_proxy/response/servers.proto";
-import "api/external/infra_proxy/response/cookbooks.proto";
-import "api/external/infra_proxy/response/roles.proto";
-import "api/external/infra_proxy/response/clients.proto";
-import "api/external/infra_proxy/response/databags.proto";
-import "api/external/infra_proxy/response/environments.proto";
-import "api/external/infra_proxy/response/nodes.proto";
-import "api/external/infra_proxy/response/policyfiles.proto";
+import "external/infra_proxy/response/orgs.proto";
+import "external/infra_proxy/response/servers.proto";
+import "external/infra_proxy/response/cookbooks.proto";
+import "external/infra_proxy/response/roles.proto";
+import "external/infra_proxy/response/clients.proto";
+import "external/infra_proxy/response/databags.proto";
+import "external/infra_proxy/response/environments.proto";
+import "external/infra_proxy/response/nodes.proto";
+import "external/infra_proxy/response/policyfiles.proto";
 
-import "api/external/common/version/version.proto";
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "external/common/version/version.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service InfraProxy {
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {

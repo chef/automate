@@ -78,24 +78,24 @@ $small-down: new-breakpoint(max-width 670px 12);
 @import "modals/remove-scm-confirmation";
 
 // component imports
-@import "components/navigation";
-@import "components/header";
-@import "components/navbar";
-@import "components/form";
-@import "components/details-header";
-@import "components/comments";
-@import "components/diff";
-@import "components/diff_stats";
-@import "components/breadcrumb";
-@import "components/nocards";
-@import "components/quick_find";
-@import "components/sidebar";
-@import "components/tooltip";
-@import "components/feature_flags";
-@import "components/grouped_phase_list";
+@import "navigation";
+@import "header";
+@import "navbar";
+@import "form";
+@import "details-header";
+@import "comments";
+@import "diff";
+@import "diff_stats";
+@import "breadcrumb";
+@import "nocards";
+@import "quick_find";
+@import "sidebar";
+@import "tooltip";
+@import "feature_flags";
+@import "grouped_phase_list";
 
 // misc
 @import "style_guide";
 @import "syntax";
-@import "components/ace";
-@import "components/emoji";
+@import "ace";
+@import "emoji";

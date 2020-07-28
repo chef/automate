@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/interservice/compliance/ingest/ingest/compliance.proto",
+    "title": "interservice/compliance/ingest/ingest/compliance.proto",
     "version": "version not set"
   },
   "consumes": [

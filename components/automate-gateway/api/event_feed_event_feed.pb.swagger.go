@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("event_feed_event_feed", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/event_feed/event_feed.proto",
+    "title": "automate-gateway/api/event_feed/event_feed.proto",
     "version": "version not set"
   },
   "consumes": [

@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("cds", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/cds/cds.proto",
+    "title": "external/cds/cds.proto",
     "version": "version not set"
   },
   "consumes": [

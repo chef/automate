@@ -105,10 +105,9 @@ generate-ruby-grpc-secrets-service:
 
 %_pb.rb : %.proto
 	@printf " * ${blue}Compiling test proto${reset} for $<\n"
-	@-grpc_tools_ruby_protoc -I. \
-		-I../../ \
-		-Iapi/ \
-		-I$(GOPATH)/src \
+	@-grpc_tools_ruby_protoc \
+		-I../../api \
+		-I../../components \
 		-I../../vendor \
 		-I../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--ruby_out=. \

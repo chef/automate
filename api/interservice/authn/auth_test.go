@@ -10,7 +10,7 @@ import (
 )
 
 func TestGeneratedProtobufUpToDate(t *testing.T) {
-	grpctest.AssertCompiledInUpToDate(t, "api/interservice/authn/")
+	grpctest.AssertCompiledInUpToDate(t, "interservice/authn/")
 }
 
 func TestValidationCreateTokenID(t *testing.T) {

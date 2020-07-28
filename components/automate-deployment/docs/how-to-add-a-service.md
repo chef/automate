@@ -32,7 +32,7 @@ package chef.automate.infra.esgateway;
 option go_package = "github.com/chef/automate/components/NAME_OF_SERVICE/pkg/api";
 import "api/config/shared/global.proto";
 import "api/config/shared/tls.proto";
-import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
 message ConfigRequest {

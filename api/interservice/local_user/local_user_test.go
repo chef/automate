@@ -12,7 +12,7 @@ import (
 )
 
 func TestGeneratedProtobufUpToDate(t *testing.T) {
-	grpctest.AssertCompiledInUpToDate(t, "api/interservice/local_user/")
+	grpctest.AssertCompiledInUpToDate(t, "interservice/local_user/")
 }
 
 func TestValidation(t *testing.T) {

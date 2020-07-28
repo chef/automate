@@ -3,8 +3,8 @@ package chef.automate.domain.imported_method_arguments;
 option go_package = "github.com/chef/automate/components/mock-service/mock";
 
 import "google/api/annotations.proto";
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-import "components/automate-grpc/protoc-gen-policy/testdata/messages.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/testdata/messages.proto";
 
 service Mock {
   rpc MockMethod (messages.Foo) returns (messages.Bar) {
