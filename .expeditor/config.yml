@@ -73,6 +73,7 @@ subscriptions:
   # dev -> acceptance promotion
   # These actions are taken when `/expeditor promote` is run from Slack
   - workload: project_promoted:{{agent_id}}:dev:*
+    actions:
     - bash:.expeditor/promote-hab-pkgs-and-cli.sh:
         post_commit: true
     - purge_packages_chef_io_fastly:{{target_channel}}/automate/latest:
@@ -83,6 +84,7 @@ subscriptions:
     - trigger_pipeline:deploy/automate-chef-io
   # acceptance -> current promotion
   - workload: project_promoted:{{agent_id}}:acceptance:*
+    actions:
     - bash:.expeditor/promote-hab-pkgs-and-cli.sh:
         post_commit: true
     - purge_packages_chef_io_fastly:{{target_channel}}/automate/latest:
