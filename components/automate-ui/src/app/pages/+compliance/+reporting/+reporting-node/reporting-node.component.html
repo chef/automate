@@ -169,7 +169,7 @@
           </chef-option>
         </chef-phat-radio>
 
-        <div class="metadata-container err-container">
+        <div class="metadata-container err-container" *ngIf="activeReport.status == 'failed' && activeReport.status_message.length">
           <div class="metadata failed err-failed-container">
             <span class="metadata-title err-color">
               <chef-icon id="err-icon-id">{{ statusIcon('failed') }}</chef-icon>
