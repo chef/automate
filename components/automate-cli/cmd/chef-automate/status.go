@@ -33,7 +33,7 @@ func newStatusCmd() *cobra.Command {
 		"Wait until the status response is healthy or the timeout is reached",
 	)
 	statusCmd.PersistentFlags().Int64VarP(
-		&statusCmdFlags.waitTimeout, "wait-timeout", "t", 6000,
+		&statusCmdFlags.waitTimeout, "wait-timeout", "t", 600,
 		"How many seconds to wait for the status to be healthy before returning an error",
 	)
 	statusCmd.PersistentFlags().Int64VarP(

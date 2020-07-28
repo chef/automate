@@ -81,13 +81,13 @@ func Spawn(opts *serveropts.Opts) error {
 	eventFeedServiceClient := event_feed.NewEventFeedServiceClient(eventFeedConn)
 
 	// Need to ensure the event feed service is ready for requests.
-	// _, err = eventFeedServiceClient.GetFeed(context.Background(), &event_feed.FeedRequest{
-	// 	Size: 100,
-	// })
-	// if err != nil {
-	// 	log.WithError(err).Error("Event Feed is not ready")
-	// 	return err
-	// }
+	_, err = eventFeedServiceClient.GetFeed(context.Background(), &event_feed.FeedRequest{
+		Size: 100,
+	})
+	if err != nil {
+		log.WithError(err).Error("Event Feed is not ready")
+		return err
+	}
 
 	// nodemanager Interface
 	nodeMgrConn, err := opts.ConnFactory.Dial("nodemanager-service", opts.NodeManagerAddress)
