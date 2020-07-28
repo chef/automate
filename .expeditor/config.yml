@@ -58,44 +58,7 @@ pipelines:
       env:
         - CHANNEL: dev
 
-# These actions are taken when `/expeditor promote` is run from Slack
 promote:
-# actions is deprecated. we need to switch to subscription model
-  actions:
-    - bash:.expeditor/promote-hab-pkgs-and-cli.sh:
-        post_commit: true
-    - bash:.expeditor/publish-release-notes.sh:
-        post_commit: true
-        only_if_conditions:
-          - value_one: "{{target_channel}}"
-            operator: equals
-            value_two: current
-    - purge_packages_chef_io_fastly:{{target_channel}}/automate/latest:
-        post_commit: true
-    - bash:.expeditor/announce-release.sh:
-        post_commit: true
-        only_if_conditions:
-          - value_one: "{{target_channel}}"
-            operator: equals
-            value_two: current
-    - bash:.expeditor/push-git-tag.sh:
-        post_commit: true
-        only_if_conditions:
-          - value_one: "{{target_channel}}"
-            operator: equals
-            value_two: current
-    - bash:.expeditor/announce-acceptance.sh:
-        post_commit: true
-        only_if_conditions:
-          - value_one: "{{target_channel}}"
-            operator: equals
-            value_two: acceptance
-    - trigger_pipeline:deploy/acceptance:
-        only_if_conditions:
-          - value_one: "{{target_channel}}"
-            operator: equals
-            value_two: acceptance
-    - trigger_pipeline:deploy/automate-chef-io
   channels:
     - dev
     - acceptance
@@ -107,6 +70,33 @@ staging_areas:
       workload: pull_request_merged:chef/automate:master:*
 
 subscriptions:
+  # dev -> acceptance promotion
+  # These actions are taken when `/expeditor promote` is run from Slack
+  - workload: project_promoted:{{agent_id}}:dev:*
+    actions:
+    - bash:.expeditor/promote-hab-pkgs-and-cli.sh:
+        post_commit: true
+    - purge_packages_chef_io_fastly:{{target_channel}}/automate/latest:
+        post_commit: true
+    - bash:.expeditor/announce-acceptance.sh:
+        post_commit: true
+    - trigger_pipeline:deploy/acceptance
+    - trigger_pipeline:deploy/automate-chef-io
+  # acceptance -> current promotion
+  - workload: project_promoted:{{agent_id}}:acceptance:*
+    actions:
+    - bash:.expeditor/promote-hab-pkgs-and-cli.sh:
+        post_commit: true
+    - purge_packages_chef_io_fastly:{{target_channel}}/automate/latest:
+        post_commit: true
+    - bash:.expeditor/publish-release-notes.sh:
+        post_commit: true
+    - bash:.expeditor/announce-release.sh:
+        post_commit: true
+    - bash:.expeditor/push-git-tag.sh:
+        post_commit: true
+    - trigger_pipeline:deploy/automate-chef-io
+
   # These actions are taken, in order they are specified, anytime a Pull Request is merged.
   - workload: staged_workload_released:chef/automate:master:post_merge:*
     actions:
