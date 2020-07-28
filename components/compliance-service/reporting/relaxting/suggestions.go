@@ -137,17 +137,14 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 	return suggs, nil
 }
 
-func removeControlTagFilters(filters map[string][]string) {
+func removeControlLevelFilters(filters map[string][]string) {
+	if len(filters["control"]) > 0 {
+		delete(filters, "control")
+	}
 	for filterType := range filters {
 		if strings.HasPrefix(filterType, "control_tag:") {
 			delete(filters, filterType)
 		}
-	}
-}
-
-func removeControlFilters(filters map[string][]string) {
-	if len(filters["control"]) > 0 {
-		delete(filters, "control")
 	}
 }
 
@@ -534,6 +531,7 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 		return nil, errors.Wrap(err, "getControlSuggestions unable to get index dates")
 	}
 
+	removeControlLevelFilters(filters)
 	boolQuery := backend.getFiltersQuery(filters, true)
 
 	var innerQuery elastic.Query
@@ -649,6 +647,8 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 	if err != nil {
 		return nil, errors.Wrap(err, "getControlTagsSuggestions unable to get index dates")
 	}
+
+	removeControlLevelFilters(filters)
 	boolQuery := backend.getFiltersQuery(filters, true)
 	text = strings.ToLower(text)
 
