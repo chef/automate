@@ -109,7 +109,7 @@ type actionsPaginationContext struct {
 }
 
 func (p *actionsPaginationContext) Start() error {
-	actions, _, err := p.client.GetActions(actionsIndexName, p.pageSize, time.Time{}, "", true)
+	actions, _, err := p.client.GetActions(actionsIndexName, p.pageSize, time.Time{}, "", false)
 	if err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func (p *actionsPaginationContext) Start() error {
 }
 
 func (p *actionsPaginationContext) Next() error {
-	actions, _, err := p.client.GetActions(actionsIndexName, p.pageSize, p.cursorDate, p.cursorID, false)
+	actions, _, err := p.client.GetActions(actionsIndexName, p.pageSize, p.cursorDate, p.cursorID, true)
 	if err != nil {
 		return err
 	}
