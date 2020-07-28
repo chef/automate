@@ -42,7 +42,7 @@ require (
 	github.com/gofrs/uuid v2.1.0+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.4.3
-	github.com/golang/protobuf v1.4.0
+	github.com/golang/protobuf v1.4.2
 	github.com/googleapis/googleapis v0.0.0-20200727200613-a94df49e8f20 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20191106031601-ce3c9ade29de // indirect
 	github.com/gorilla/handlers v1.3.0 // indirect
@@ -117,8 +117,9 @@ require (
 	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20200422022333-3d57cf2e726e // indirect
 	google.golang.org/api v0.9.0
-	google.golang.org/genproto v0.0.0-20200211111953-2dc5924e3898
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
 	google.golang.org/grpc v1.27.1
+	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20170511165959-379148ca0225 // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.20
 	gopkg.in/ldap.v2 v2.5.1 // indirect
@@ -130,6 +131,3 @@ require (
 
 // https://github.com/dexidp/dex/issues/1578
 replace github.com/dexidp/dex => github.com/ryancragun/dex v2.19.0-incompatible+incompatible
-
-// bumping github.com/open-policy-agent/opa would drag in in protobuf 1.4.0
-replace github.com/golang/protobuf => github.com/golang/protobuf v1.3.5
