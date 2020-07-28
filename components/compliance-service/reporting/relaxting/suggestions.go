@@ -140,6 +140,17 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 	return suggs, nil
 }
 
+func removeControlLevelFilters(filters map[string][]string) {
+	if len(filters["control"]) > 0 {
+		delete(filters, "control")
+	}
+	for filterType := range filters {
+		if strings.HasPrefix(filterType, "control_tag:") {
+			delete(filters, filterType)
+		}
+	}
+}
+
 func suggestionFieldArray(field string) bool {
 	switch field {
 	case "recipe", "role", "chef_tags":
@@ -523,6 +534,7 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 		return nil, errors.Wrap(err, "getControlSuggestions unable to get index dates")
 	}
 
+	removeControlLevelFilters(filters)
 	boolQuery := backend.getFiltersQuery(filters, true)
 
 	var innerQuery elastic.Query
@@ -606,7 +618,6 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 							logrus.Errorf("could not convert the value of titleBucket: %v, to a string!", titleBucket)
 						}
 						logrus.Debugf("%s titleBucket.Key: %s", myName, title)
-
 						if idsBuckets, found := titleBucket.Aggregations.Terms("ids"); found && len(idsBuckets.Buckets) > 0 {
 							for _, idsBucket := range idsBuckets.Buckets {
 								id, ok := idsBucket.Key.(string)
@@ -638,6 +649,8 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 	if err != nil {
 		return nil, errors.Wrap(err, "getControlTagsSuggestions unable to get index dates")
 	}
+
+	removeControlLevelFilters(filters)
 	boolQuery := backend.getFiltersQuery(filters, true)
 	text = strings.ToLower(text)
 
