@@ -1,0 +1,17 @@
+@import "~styles/variables";
+@import "@carbon/layout/scss/layout";
+
+:host {
+  display: flex;
+  align-items: center;
+
+  .empty-icon {
+    margin: $spacing-05;
+    margin-left: 0;
+    width: 50px;
+  }
+
+  .empty-message {
+    margin: 0;
+  }
+}
