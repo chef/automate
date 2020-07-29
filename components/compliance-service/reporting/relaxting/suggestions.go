@@ -83,16 +83,23 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 		useSummaryIndex = false
 	}
 
-	for filterType := range filters {
-		if strings.HasPrefix(filterType, "control_tag:") {
-			useSummaryIndex = false
-			break
-		}
-	}
-
 	controlTagFilterKey := ""
 	if len(typeParamKey) > 0 {
 		_, controlTagFilterKey = leftSplit(typeParamKey, ":")
+	}
+
+	for filterType := range filters {
+		if strings.HasPrefix(filterType, "control_tag:") {
+			useSummaryIndex = false
+			if len(controlTagFilterKey) == 0 {
+				_, controlTagFilterKey = leftSplit(filterType, ":")
+				// For suggestions, prefer control_tag filter key with no values to avoid clash with full control_tag filters
+				if len(filters[filterType]) == 0 {
+					break
+				}
+			}
+			break
+		}
 	}
 
 	suggs := make([]*reportingapi.Suggestion, 0)
