@@ -76,6 +76,8 @@ function notifications_compile_protobuf() {
     PATH=$PATH:/root/.mix/escripts protoc --elixir_out=plugins=grpc:lib/pb \
       -I/src/components/notifications-service/server/priv/ \
       -I/src/api/external/secrets/ \
+      -I/src/api/ \
+      -I/src/components/ \
       -I/src/ \
       -I/src/vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/ \
       notifications.proto \
