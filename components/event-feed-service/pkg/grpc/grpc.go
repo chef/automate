@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	elastic "gopkg.in/olivere/elastic.v6"
 
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event_feed"
@@ -20,6 +21,7 @@ import (
 	"github.com/chef/automate/components/event-feed-service/pkg/migration"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-feed-service/pkg/server"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/cereal"
 	cereal_grpc "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/datalifecycle/purge"
@@ -96,6 +98,38 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 
 	grpcServer := newGRPCServer(connFactory, c, feedStore, purgeServer)
 
+	// Authz Interface
+	authzConn, err := connFactory.DialContext(timeoutCtx, "authz-service",
+		c.Authz.Address, libgrpc.WithBlock())
+	if err != nil {
+		// This should never happen
+		log.WithError(err).Error("Failed to create Authz connection")
+		return err
+	}
+	defer authzConn.Close() // nolint: errcheck
+
+	authzProjectsClient := authz.NewProjectsClient(authzConn)
+
+	projectUpdateManager, err := createProjectUpdateCerealManager(cerealConn)
+	if err != nil {
+		return err
+	}
+
+	err = project_update_lib.RegisterTaskExecutors(projectUpdateManager, "feed", feedStore, authzProjectsClient)
+	if err != nil {
+		return err
+	}
+
+	err = project_update_lib.RegisterSerialTaskExecutors(projectUpdateManager, "feed", feedStore, authzProjectsClient)
+	if err != nil {
+		return err
+	}
+
+	if err := projectUpdateManager.Start(context.Background()); err != nil {
+		return err
+	}
+	defer projectUpdateManager.Stop() // nolint: errcheck
+
 	return grpcServer.Serve(conn)
 }
 
@@ -121,6 +155,17 @@ func newGRPCServer(
 	reflection.Register(grpcServer)
 
 	return grpcServer
+}
+
+func createProjectUpdateCerealManager(conn *grpc.ClientConn) (*cereal.Manager, error) {
+	grpcBackend := project_update_lib.ProjectUpdateBackend(conn)
+	manager, err := cereal.NewManager(grpcBackend)
+	if err != nil {
+		grpcBackend.Close() // nolint: errcheck
+		return nil, err
+	}
+
+	return manager, nil
 }
 
 // newJobManager returns a cereal manager to handle scheduled jobs

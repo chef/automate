@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("iam_v2_introspect", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/iam/v2/introspect.proto",
+    "title": "automate-gateway/api/iam/v2/introspect.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/iam/v2/introspect": {
+    "/apis/iam/v2/introspect": {
       "get": {
         "operationId": "IntrospectAll",
         "responses": {
@@ -54,7 +54,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/introspect_some": {
+    "/apis/iam/v2/introspect_some": {
       "post": {
         "operationId": "IntrospectSome",
         "responses": {

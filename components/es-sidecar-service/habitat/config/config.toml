@@ -21,19 +21,23 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
   {{~/if}}
 {{~/eachAlive}}
 
+[backups]
 {{~#eachAlive bind.automate-elasticsearch.members as |member|}}
   {{~#if @last}}
     {{~#if member.cfg.deprecated_external_es}}
-[backups]
   backend = "fs"
     {{else}}
       {{~#if cfg.backups.backend}}
-[backups]
   backend = "{{cfg.backups.backend}}"
       {{~/if}}
     {{~/if}}
   {{~/if}}
 {{~/eachAlive}}
+{{~#if cfg.backups.verify_repo}}
+  verify_repo = true
+{{~else}}
+  verify_repo = false
+{{~/if}}
 
 {{~#if cfg.backups.fs.root_location}}
 [backups.fs]
@@ -79,6 +83,32 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
   {{~/if}}
   {{~#if cfg.backups.s3.es.chunk_size}}
   chunk_size = "{{cfg.backups.s3.es.chunk_size}}"
+  {{~/if}}
+{{~/if}}
+
+{{~#if cfg.backups.gcs.bucket}}
+[backups.gcs]
+  name = "{{cfg.backups.gcs.bucket}}"
+  {{~#if cfg.backups.gcs.client_name}}
+  client = "{{cfg.backups.gcs.client}}"
+  {{~/if}}
+  {{~#if cfg.backups.gcs.base_path}}
+  base_path = "{{cfg.backups.gcs.base_path}}"
+  {{~/if}}
+  {{~#if cfg.backups.gcs.es.compress}}
+  compress = {{cfg.backups.gcs.es.compress}}
+  {{~/if}}
+  {{~#if cfg.backups.gcs.es.application_name}}
+  server_side_encryption = "{{cfg.backups.gcs.es.application_name}}"
+  {{~/if}}
+  {{~#if cfg.backups.gcs.es.max_snapshot_bytes_per_sec}}
+  max_snapshot_bytes_per_sec = "{{cfg.backups.gcs.es.max_snapshot_bytes_per_sec}}"
+  {{~/if}}
+  {{~#if cfg.backups.gcs.es.max_restore_bytes_per_sec}}
+  max_restore_bytes_per_sec = "{{cfg.backups.gcs.es.max_restore_bytes_per_sec}}"
+  {{~/if}}
+  {{~#if cfg.backups.gcs.es.chunk_size}}
+  chunk_size = "{{cfg.backups.gcs.es.chunk_size}}"
   {{~/if}}
 {{~/if}}
 

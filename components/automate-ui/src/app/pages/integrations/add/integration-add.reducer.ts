@@ -17,8 +17,9 @@ export const IntegrationsAddInitialState: IntegrationsAddState = {
   status: Status.notCreated
 };
 
-export function integrationsAddReducer(state: IntegrationsAddState = IntegrationsAddInitialState,
-                                       action: ManagerActions | RouterAction<any>) {
+export function integrationsAddReducer(
+  state: IntegrationsAddState = IntegrationsAddInitialState,
+  action: ManagerActions | RouterAction<any>): IntegrationsAddState {
   switch (action.type) {
     case ManagerActionTypes.CREATE:
       return set('status', Status.saving, state);

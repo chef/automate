@@ -1,0 +1,71 @@
+@import "~styles/variables";
+
+:host {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  color: $chef-white;
+  background-color: $chef-dark-grey;
+  padding: 0.5em;
+  overflow: hidden;
+
+  p {
+    margin: 0;
+    color: $chef-white;
+  }
+
+  a {
+    color: $chef-white;
+  }
+
+  &.info {
+    background-color: transparentize($chef-success, 0.1);
+
+    &::before {
+      font-family: "Material Icons";
+      content: "\E86C";  // circle-check icon - https://material.io/resources/icons/?icon=check_circle&style=baseline
+      color: currentColor;
+      padding-right: 0.5em;
+    }
+  }
+
+  &.error {
+    background-color: transparentize($chef-critical, 0.1);
+
+    &::before {
+      font-family: "Material Icons";
+      content: "\E002";  // triangle warning icon - https://material.io/resources/icons/?icon=warning&style=baseline
+      color: currentColor;
+      padding-right: 0.5em;
+    }
+  }
+
+  chef-icon {
+    margin-left: auto;
+    cursor: pointer;
+  }
+
+  .shine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25%;
+    height: 100%;
+    background: linear-gradient(110deg, rgba(255, 255, 255, 0) 22%,
+      rgba(255, 255, 255, .11) 50%, rgba(255, 255, 255, 0) 83%);
+    animation: shine 3s cubic-bezier(.17, .71, .05, .98) forwards;
+    animation-delay: 1s;
+    cursor: none;
+  }
+}
+
+@keyframes shine {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(500%);
+  }
+}

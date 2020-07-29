@@ -1,0 +1,19 @@
+<section class="policy-files">
+  <chef-loading-spinner *ngIf="policyFilesListLoading" size="50"></chef-loading-spinner>
+  <ng-container *ngIf="!policyFilesListLoading">
+    <chef-table>
+      <chef-thead>
+        <chef-tr>
+          <chef-th>Policy Name</chef-th>
+          <chef-th>Policy Group</chef-th>
+        </chef-tr>
+      </chef-thead>
+      <chef-tbody>
+        <chef-tr *ngFor="let policyFile of policyFiles">
+          <chef-td>{{ policyFile.name }}</chef-td>
+          <chef-td>{{ policyFile.policy_group }}</chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+  </ng-container>
+</section>

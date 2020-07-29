@@ -14,7 +14,7 @@ const (
 	ServiceName = "authz-service"
 )
 
-// IAM v2 default policy IDs.
+// IAM default policy IDs.
 const (
 	AdminPolicyID  = "administrator-access"
 	EditorPolicyID = "editor-access"
@@ -22,7 +22,7 @@ const (
 	IngestPolicyID = "ingest-access"
 )
 
-// IAM v2 system policy IDs. These are never shown to the enduser
+// IAM system policy IDs. These are never shown to the enduser
 // so GUIDs are fine.
 const (
 	UniversalAccessPolicyID  = "e729c61f-c40a-4bfa-affe-2a541368169f"
@@ -45,7 +45,7 @@ const (
 	ComplianceTokenPolicyID = "compliance-profile-access-legacy"
 )
 
-// IAM v2 well-known role IDs
+// IAM well-known role IDs
 const (
 	OwnerRoleID        = "owner"
 	EditorRoleID       = "editor"
@@ -54,7 +54,7 @@ const (
 	ProjectOwnerRoleID = "project-owner"
 )
 
-// IAM v2 well-known project IDs
+// IAM well-known project IDs
 const (
 	AllProjectsID         = "~~ALL-PROJECTS~~" // must match rego file!
 	AllProjectsExternalID = "*"

@@ -430,8 +430,8 @@ func (s *server) configRenderer() (ConfigRenderer, error) {
 			return "", nil
 		}
 
-		if cfgv2, ok := preparableCfg.(config.PlatformServiceConfigurableV2); ok {
-			cfgv2.ConfigureProduct(productConfig)
+		if cfg_v2, ok := preparableCfg.(config.PlatformServiceConfigurableV2); ok {
+			cfg_v2.ConfigureProduct(productConfig)
 		}
 
 		preparedCfg, err := preparableCfg.PrepareSystemConfig(creds)

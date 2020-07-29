@@ -3,14 +3,15 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
-	"os/user"
 	"path"
 	"strconv"
 	"syscall"
 
 	"github.com/chef/automate/components/compliance-service/cmd/inspec_runner/platform"
+	"github.com/chef/automate/lib/user"
 )
 
 // Set at build time via linker flags.
@@ -31,7 +32,7 @@ func main() {
 	args := append([]string{cmd}, os.Args[1:]...)
 
 	if err := syscall.Exec(EXECUTABLE_PATH, args, os.Environ()); err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Errorf("inspec_runner unable to complete with executable path: %s, args: %v, env: %s - error %w", EXECUTABLE_PATH, args, os.Environ(), err))
 	}
 }
 
@@ -40,27 +41,27 @@ func main() {
 func changeToUser(username string) error {
 	user, err := user.Lookup(username)
 	if err != nil {
-		return err
+		return fmt.Errorf("inspec_runner unable to look up user %s: %w", username, err)
 	}
 
 	gid, err := strconv.Atoi(user.Gid)
 	if err != nil {
-		return err
+		return fmt.Errorf("inspec_runner unable to convert gid string to int %s: %w", user.Gid, err)
 	}
 
 	uid, err := strconv.Atoi(user.Uid)
 	if err != nil {
-		return err
+		return fmt.Errorf("inspec_runner unable to convert uid string to int %s: %w", user.Uid, err)
 	}
 
 	err = platform.Setgid(gid)
 	if err != nil {
-		return err
+		return fmt.Errorf("inspec_runner unable to set gid %d: %w", gid, err)
 	}
 
 	err = platform.Setuid(uid)
 	if err != nil {
-		return err
+		return fmt.Errorf("inspec_runner unable to set uid %d: %w", uid, err)
 	}
 
 	return nil

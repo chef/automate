@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
-	"os/user"
 	"path"
 	"path/filepath"
 	"sort"
@@ -25,7 +25,18 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/preflight"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/user"
 )
+
+const restoreRecovery = `Check the logs (journalctl -u chef-automate) for errors related
+to the failed restore.
+
+Before retrying the restore process, remove the file %s.
+
+Under normal circumstances, restoring over an existing Chef Automate installation where
+some services are down will work correctly. If such a restore does not work correctly, ensure that
+either all services are up (chef-automate restart-services)
+or all services are down (chef-automate stop) before retrying the restore.`
 
 var backupCmdFlags = struct {
 	noProgress     bool
@@ -55,6 +66,8 @@ var backupCmdFlags = struct {
 	s3SecretKey    string
 	s3SessionToken string
 
+	gcsCredentialsPath string
+
 	sha256 string
 
 	patchConfigPath string
@@ -81,6 +94,7 @@ func init() {
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3AccessKey, "s3-access-key", "", "The S3 access key ID")
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3SecretKey, "s3-secret-key", "", "The S3 secret access key")
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3SessionToken, "s3-session-token", "", "The S3 session token when assuming an IAM role")
+	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.gcsCredentialsPath, "gcs-credentials-path", "", "The path to the GCP service account json file")
 
 	createBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.createWaitTimeout, "wait-timeout", "t", 7200, "How long to wait for a operation to complete before raising an error")
 
@@ -282,6 +296,38 @@ func parseLocationSpecFromCLIArgs(location string) (backup.LocationSpecification
 			AccessKey:    backupCmdFlags.s3AccessKey,
 			SecretKey:    backupCmdFlags.s3SecretKey,
 			SessionToken: backupCmdFlags.s3SessionToken,
+		}, nil
+	} else if strings.HasPrefix(location, "gs://") {
+		bucketAndBasePath := strings.TrimPrefix(location, "gs://")
+		parts := strings.SplitN(bucketAndBasePath, "/", 2)
+		bucketName := ""
+		basePath := ""
+		if len(parts) == 1 {
+			bucketName = parts[0]
+		} else if len(parts) == 2 {
+			bucketName = parts[0]
+			basePath = parts[1]
+		} else {
+			return nil, status.Errorf(status.InvalidCommandArgsError,
+				"%q could not be parsed. The expected input is gs://bucket/base/path",
+				location,
+			)
+		}
+
+		creds := ""
+		if backupCmdFlags.gcsCredentialsPath != "" {
+			var err error
+			data, err := ioutil.ReadFile(backupCmdFlags.gcsCredentialsPath)
+			if err != nil {
+				return nil, status.Wrap(err, status.InvalidCommandArgsError, "Could not read credentials")
+			}
+			creds = string(data)
+		}
+
+		return backup.GCSLocationSpecification{
+			BucketName:                   bucketName,
+			BasePath:                     basePath,
+			GoogleApplicationCredentials: creds,
 		}, nil
 	}
 
@@ -840,18 +886,20 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 		client.WithDeploymentRestoreAirgapInstallBundle(backupCmdFlags.airgap),
 	)
 
+	restoreRecoveryMsg := fmt.Sprintf(restoreRecovery, api.ConvergeDisableFilePath)
+
 	if err := dsRestore.Restore(ctx); err != nil {
-		return status.Annotate(err, status.BackupError)
+		return status.WithRecovery(status.Annotate(err, status.BackupError), restoreRecoveryMsg)
 	}
 
 	manifest, err := dsRestore.ResolvedManifest()
 	if err != nil {
-		return status.Annotate(err, status.BackupError)
+		return status.WithRecovery(status.Annotate(err, status.BackupError), restoreRecoveryMsg)
 	}
 
 	jsManifest, err := json.Marshal(manifest)
 	if err != nil {
-		return status.Wrap(err, status.BackupError, "Failed to marshal package manifest to JSON")
+		return status.WithRecovery(status.Wrap(err, status.BackupError, "Failed to marshal package manifest to JSON"), restoreRecoveryMsg)
 	}
 
 	rt.Manifest = &api.ReleaseManifest{
@@ -866,7 +914,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 			rt,
 		)
 		if err != nil {
-			return err
+			return status.WithRecovery(err, restoreRecoveryMsg)
 		}
 
 		status.GlobalResult = restoreBackupResponse{
@@ -884,7 +932,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 		rt,
 	)
 	if err != nil {
-		return err
+		return status.WithRecovery(err, restoreRecoveryMsg)
 	}
 
 	status.GlobalResult = restoreBackupResponse{

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	csvHeader = "Node Name,End Time,Platform Name,Platform Release,Environment,IPAddress,FQDN,Profile Name,Profile Title,Profile Version,Profile Summary,Control ID,Control Title,Control Impact,Result Status,Result Run Time,Result Code Description,Result Message,Result Skip Message\n"
+	csvHeader = "Node Name,End Time,Platform Name,Platform Release,Environment,IPAddress,FQDN,Profile Name,Profile Title,Profile Version,Profile Summary,Control ID,Control Title,Control Impact,Waived (true/false),Result Status,Result Run Time,Result Code Description,Result Message,Result Skip Message,Waiver Justification,Waiver Expiration\n"
 )
 
 func TestMaxCharLimit(t *testing.T) {
@@ -49,6 +49,18 @@ func TestNilExport(t *testing.T) {
 }
 
 func TestSimpleExport(t *testing.T) {
+	report := getSampleReport()
+	data, err := ReportToCSV(report)
+	assert.Nil(t, err, "ReportToCSV with a simple report generates without errors.")
+
+	// Please note: We test the format for RFC 4180 compliance and
+	// we also test if commas are escaped properly!
+	// See https://tools.ietf.org/html/rfc4180
+	line := "Node1,0001-01-01T00:00:00Z,,,test-env,10.23.149.1,api.example.com,ProfileName,\"Profile, Title\",1.2.3,Profile summary,ControlID1,Control Title,0.12,false,passed,12345.000,super complex code,all done,we don't skip,,\n"
+	assert.Equal(t, csvHeader+line, data, "ReportToCSV with empty simple report works.")
+}
+
+func getSampleReport() *reportingapi.Report {
 	results := []*reportingapi.Result{
 		{
 			Status:      "passed",
@@ -86,12 +98,19 @@ func TestSimpleExport(t *testing.T) {
 		Fqdn:        "api.example.com",
 		Ipaddress:   "10.23.149.1",
 	}
-	data, err := ReportToCSV(report)
-	assert.Nil(t, err, "ReportToCSV with a simple report generates without errors.")
+	return report
+}
 
-	// Please note: We test the format for RFC 4180 compliance and
-	// we also test if commas are escaped properly!
-	// See https://tools.ietf.org/html/rfc4180
-	line := "Node1,0001-01-01T00:00:00Z,,,test-env,10.23.149.1,api.example.com,ProfileName,\"Profile, Title\",1.2.3,Profile summary,ControlID1,Control Title,0.12,passed,12345.000,super complex code,all done,we don't skip\n"
-	assert.Equal(t, csvHeader+line, data, "ReportToCSV with empty simple report works.")
+func TestExportWaiverData(t *testing.T) {
+	report := getSampleReport()
+	report.Profiles[0].Controls[0].WaivedStr = "yes_run"
+	report.Profiles[0].Controls[0].WaiverData = &reportingapi.OrigWaiverData{
+		ExpirationDate: "some-date",
+		Justification:  "some reason",
+	}
+
+	data, err := ReportToCSV(report)
+	assert.Nil(t, err, "ReportToCSV with a waiver report including waiver data generates without errors.")
+	line := "Node1,0001-01-01T00:00:00Z,,,test-env,10.23.149.1,api.example.com,ProfileName,\"Profile, Title\",1.2.3,Profile summary,ControlID1,Control Title,0.12,true,passed,12345.000,super complex code,all done,we don't skip,some reason,some-date\n"
+	assert.Equal(t, csvHeader+line, data, "ReportToCSV with a waiver report works.")
 }

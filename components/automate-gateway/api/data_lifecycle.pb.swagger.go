@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("data_lifecycle", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/data_lifecycle/data_lifecycle.proto",
+    "title": "external/data_lifecycle/data_lifecycle.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/data-lifecycle/compliance/config": {
+    "/api/v0/data-lifecycle/compliance/config": {
       "put": {
         "summary": "SetComplianceConfig configures the compliance data lifecycle scheduler and jobs",
         "operationId": "SetComplianceConfig",
@@ -41,7 +41,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/compliance/run": {
+    "/api/v0/data-lifecycle/compliance/run": {
       "post": {
         "summary": "RunCompliance runs the compliance data lifecycle jobs",
         "operationId": "RunCompliance",
@@ -68,7 +68,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/compliance/status": {
+    "/api/v0/data-lifecycle/compliance/status": {
       "get": {
         "summary": "GetComplianceStatus returns the compliance job scheduler status",
         "operationId": "GetComplianceStatus",
@@ -85,7 +85,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/config": {
+    "/api/v0/data-lifecycle/config": {
       "put": {
         "summary": "SetConfig provides a singular endpoint for configuring all data lifecycle jobs",
         "operationId": "SetConfig",
@@ -112,7 +112,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/event-feed/config": {
+    "/api/v0/data-lifecycle/event-feed/config": {
       "put": {
         "summary": "SetEventFeedConfig configures the event feed data lifecycle scheduler and jobs",
         "operationId": "SetEventFeedConfig",
@@ -139,7 +139,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/event-feed/run": {
+    "/api/v0/data-lifecycle/event-feed/run": {
       "post": {
         "summary": "RunEventFeed runs the event feed data lifecycle jobs",
         "operationId": "RunEventFeed",
@@ -166,7 +166,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/event-feed/status": {
+    "/api/v0/data-lifecycle/event-feed/status": {
       "get": {
         "summary": "GetEventFeedStatus returns the event feed job scheduler status",
         "operationId": "GetEventFeedStatus",
@@ -183,7 +183,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/infra/config": {
+    "/api/v0/data-lifecycle/infra/config": {
       "put": {
         "summary": "SetInfraConfig configures the infra data lifecycle scheduler and jobs",
         "operationId": "SetInfraConfig",
@@ -210,7 +210,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/infra/run": {
+    "/api/v0/data-lifecycle/infra/run": {
       "post": {
         "summary": "RunInfra runs the infra data lifecycle jobs",
         "operationId": "RunInfra",
@@ -237,7 +237,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/infra/status": {
+    "/api/v0/data-lifecycle/infra/status": {
       "get": {
         "summary": "GetInfraStatus returns the infra job scheduler status",
         "operationId": "GetInfraStatus",
@@ -254,7 +254,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/run": {
+    "/api/v0/data-lifecycle/run": {
       "post": {
         "summary": "Run runs all data lifecycle actions across all data lifecycle jobs",
         "operationId": "Run",
@@ -281,7 +281,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/services/config": {
+    "/api/v0/data-lifecycle/services/config": {
       "put": {
         "operationId": "SetServicesConfig",
         "responses": {
@@ -307,7 +307,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/services/run": {
+    "/api/v0/data-lifecycle/services/run": {
       "post": {
         "operationId": "RunServices",
         "responses": {
@@ -333,7 +333,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/services/status": {
+    "/api/v0/data-lifecycle/services/status": {
       "get": {
         "summary": "Services",
         "operationId": "GetServicesStatus",
@@ -350,7 +350,7 @@ func init() {
         ]
       }
     },
-    "/data-lifecycle/status": {
+    "/api/v0/data-lifecycle/status": {
       "get": {
         "summary": "GetStatus returns the aggregate status across all data lifecycle jobs",
         "operationId": "GetStatus",

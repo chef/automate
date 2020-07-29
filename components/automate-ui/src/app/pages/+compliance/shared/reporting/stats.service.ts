@@ -2,7 +2,8 @@ import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import * as moment from 'moment';
+import { ActivatedRoute } from '@angular/router';
+import * as moment from 'moment/moment';
 import { omitBy, isNil } from 'lodash';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
@@ -15,10 +16,13 @@ export interface DateRange {
   end: Date | moment.Moment;
 }
 
+export type ControlStatus = 'passed' | 'failed' | 'waived' | 'skipped';
+
 @Injectable()
 export class StatsService {
   constructor(
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private route: ActivatedRoute
   ) {}
 
   getFailures(types: Array<string>, reportQuery: ReportQuery): Observable<any> {
@@ -98,8 +102,9 @@ export class StatsService {
 
   getNodes(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/nodes/search`;
+    let formatted = this.formatFilters(reportQuery);
+    formatted = this.addStatusParam(formatted);
 
-    const formatted = this.formatFilters(reportQuery);
     let body = { filters: formatted };
 
     const {page, perPage} = listParams;
@@ -115,6 +120,14 @@ export class StatsService {
     return this.httpClient.post<any>(url, body).pipe(
       map(({ nodes, total, total_failed, total_passed, total_skipped, total_waived }) =>
         ({ total, total_failed, total_passed, total_skipped, total_waived, items: nodes })));
+  }
+
+  private addStatusParam(filters): any {
+    const statusValue = this.route.queryParams['_value'].status;
+    if (statusValue) {
+      filters.push({ type: 'status', values: [statusValue] });
+    }
+    return filters;
   }
 
   getProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
@@ -215,14 +228,25 @@ export class StatsService {
   /* TODO Auth team: Helper functions that are only not private because
      they have unit testing. Should we delete their tests and make
      them private? */
-  getControlStatus(control): string {
-    const statuses = control.results.map(r => r.status);
-    const waived = control.waiver_data && control.waiver_data.skipped_due_to_waiver;
+  getControlStatus(control): ControlStatus {
+    const waived = this.checkIfWaived(control.waived_str);
     if (waived) { return 'waived'; }
+
+    const statuses = control.results.map(r => r.status);
+    // If any of the results come back as failed, the control has failed
+    if (statuses.find(s => s === 'failed')) { return 'failed'; }
+
     if (statuses.every(s => s === 'passed')) { return 'passed'; }
     if (statuses.every(s => s === 'skipped')) { return 'skipped'; }
-    return 'failed';
+    // In some cases, controls don't have results data.  In these
+    // cases we want to display those controls as passed
+    return 'passed';
   }
+
+  private checkIfWaived(waivedStatus: string): boolean {
+    return waivedStatus === 'yes_run' || waivedStatus === 'yes';
+  }
+
 
   addDateRange(filters, dateRange) {
     if (filters) {

@@ -1,5 +1,5 @@
 +++
-title = "Backup & Restore"
+title = "Backup"
 description = "Procedures for Backing Up Chef Automate Data"
 date = 2018-03-26T15:27:52-07:00
 draft = false
@@ -12,56 +12,56 @@ toc = true
 +++
 
 Backups are crucial for protecting your data from catastrophic loss and preparing a recovery procedure.
-Back up Chef Automate either to a filesystem or an S3 bucket
+The `chef-automate backup create` command creates a single backup that contains data for all products deployed with Chef Automate, including [Chef Infra Server]({{< ref "infra-server.md" >}}) and [Chef Habitat Builder on-prem]({{< ref "on-prem-builder.md" >}}).
+By default, Chef Automate stores backups to the filesystem in the directory `/var/opt/chef-automate/backups`.
+You can also configure Chef Automate to store backups in Amazon S3 buckets.
 
 ## Backup Space Requirements
 
 This amount of space needed for a backup varies depending on your Chef Automate use. You need enough free space for:
 
-* Complete copies of each Chef Automate service PostgreSQL database.
+* Complete copies of each Chef Automate service PostgreSQL database
 * Complete copies of your configuration files
-* Elasticsearch snapshots your Chef Automate configuration and data, such as converge, scan, and report data. You will need enough disk space for the each Elasticsearch snapshot and the delta--or the list of changes--for each successive snapshot.
+* Elasticsearch snapshots of your Chef Automate configuration and data, such as converge, scan, and report data. You will need enough disk space for the each Elasticsearch snapshot and the delta--or the list of changes--for each successive snapshot
 * Chef Habitat Builder artifacts
 
 ## Backup to a Filesystem
 
-Backups can be stored in a configurable backup directory. The backup directory should be on network attached storage or synced periodically to a disk on another machine, to ensure that you can restore from your backup data during a hardware failure.
+To store backups in a configurable backup directory, the backup directory should be on network-attached storage or synced periodically to a disk on another machine.
+This best practice ensures that you can restore from your backup data during a hardware failure.
 
 The default backup directory is `/var/opt/chef-automate/backups`. If it does not exist, the deployment process creates it.
 
 To configure your Chef Automate installation's backup directory to another location:
 
-1. Create a `backup_config.toml` file in your current directory with the following content, replacing `/path/to/backups` with the path to your backup directory:
+1. Create a `backup_config.toml` file in your current directory with the following content. Replace `/path/to/backups` with the path to your backup directory:
 
     ```toml
     [global.v1.backups.filesystem]
       path = "/path/to/backups"
     ```
 
-2. Run the following command to apply your configuration:
+1. Run the following command to apply your configuration:
 
     ```shell
     chef-automate config patch backup_config.toml
     ```
 
-    Once this command is applied, the `backup_config.toml` file is no longer necessary, and can be removed.
+1. Remove the now-redundant `backup_config.toml` file.
 
 ### Store a Filesystem Backup in a Single-file Archive
 
-Some users prefer to store backups offline in single-file archives. Such archives must
-include both the configuration data and the reporting data contained in the standard
-backup.
+To store backups offline in single-file archives, single-file archives must include both the configuration data and the reporting data contained in the standard backup.
 
-The [configured]({{< ref "backup.md#backup-to-filesystem" >}}) backup directory contains both the timestamp-based directory for the configuration, and the reporting data stored in the `automate-elasticsearch-data` directory.
-You must archive both of these directory types in any single-file backups you create.
+The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}) contains both the timestamp-based directory for the configuration and the reporting data stored in the `automate-elasticsearch-data` directory.
 
-A timestamp-based directory can be distinguished from the `automate-elasticsearch-data` directory by its file name format, such as `20180518010336`.
+A timestamp-based directory has a date-based name, such as `20180518010336`, in the `automate-elasticsearch-data` directory.
+
+To provide externally-deployed Elasticsearch nodes access to Chef Automate's built-in backup storage services, you must [configure Elasticsearch backup]({{< relref "install.md#configuring-external-elasticsearch" >}}) settings separately from Chef Automate's primary backup settings.
 
 ## Backup to S3
 
-Backups can be stored in an existing S3 bucket.
-
-The following settings are supported:
+To store backups in an existing Amazon S3 bucket, use the supported S3-related settings below:
 
 ```toml
 [global.v1.backups]
@@ -97,9 +97,9 @@ The following settings are supported:
 
 ### S3 Permissions
 
-The following IAM policy describes the lowest permissions Automate requires to run backup and restore operations.
+The following IAM policy describes the basic permissions Chef Automate requires to run backup and restore operations.
 
-```JSON
+```json
 {
   "Statement": [
     {
@@ -175,23 +175,32 @@ Per [Elasticsearch's documentation](https://www.elastic.co/guide/en/cloud-enterp
 `storage.admin` to quote;
 > so that Elasticsearch clusters can read, write, and list the bucket objects.
 
-## Create a Backup
+## Backup Commands
 
-Make a backup with the following command:
+### Create a Backup
+
+Make a backup with the [`backup create`]({{< ref "cli-chef-automate/#chef-automate-backup-create" >}}) command:
 
 ```shell
 chef-automate backup create
 ```
 
-The command shows the backup progress for each service. A successful backup displays a success message containing the timestamp of the backup:
+The output shows the backup progress for each service. A successful backup displays a success message containing the timestamp of the backup:
 
 ```shell
 Success: Created backup 20180518010336
 ```
 
-## List Backups
+Restores from a filesystem backup may fail with incorrect directory permissions.
+Run the [`fix-repo-permissions` command]({{< ref "cli-chef-automate/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
 
-You can list existing backups with the `backup list` command:
+```shell
+sudo chef-automate backup fix-repo-permissions <path>
+```
+
+### List Backups
+
+You can list existing backups with the [`backup list`]({{< ref "cli-chef-automate/#chef-automate-backup-list" >}}) command:
 
 ```shell
 chef-automate backup list
@@ -219,7 +228,7 @@ Listing backups from local directory /var/opt/chef-automate/backups
 20180508201952    completed  8 minutes old
 ```
 
-For backups stored in an S3 bucket, use:
+For backups stored in an Amazon S3 bucket, use:
 
 ```shell
 chef-automate backup list s3://bucket_name/base_path
@@ -234,8 +243,6 @@ chef-automate backup list gs://bucket_name/base_path
 where `bucket_name` is the name of the S3 bucket `base_path` an optional path within the bucket where the backups live.
 
 ## Restore Chef Automate
-
-Restore Chef Automate to an instance on which Automate is not already installed.
 
 ### Restore From a Filesystem Backup
 
@@ -327,7 +334,7 @@ Success: Restored backup 20180517223558
 
 ## Delete Backups
 
-To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete it using `chef automate backup delete ID`.
+To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete it using [`chef automate backup delete ID`]({{< ref "cli-chef-automate/#chef-automate-backup-delete" >}}).
 
 ```shell
 chef-automate backup list
@@ -337,7 +344,7 @@ chef-automate backup list
 20181026184012    completed  15 seconds old
 ```
 
-You can delete a single backup with `chef-automate backup delete`:
+Delete a single backup with `chef-automate backup delete`:
 
 ```shell
 chef-automate backup delete 20181026183901
@@ -348,7 +355,7 @@ y
 Success: Backups deleted
 ```
 
-To delete multiple backups:
+To delete two or more backups, use `chef-automate backup delete` followed by the backup IDs:
 
 ```shell
 chef-automate backup delete 20181026183954 20181026184012
@@ -360,41 +367,21 @@ y
 Success: Backups deleted
 ```
 
+To prune all but a certain number of the most recent backups manually, parsing the output of `chef-automate backup list` and applying the command `chef-automate backup delete`.
+For example:
+
+```bash
+export KEEP=10; chef-automate backup list --result-json backup.json > /dev/null && jq "[.result.backups[].id] | sort | reverse | .[]" -rM backup.json | tail -n +$(($KEEP+1)) | xargs -L1 -i chef-automate backup delete --yes {}
+```
+
 ## Troubleshooting
 
-### Update the FQDN
+To debug a failed backup, set the log level to `debug` and re-run the backup. This outputs the debug information to the Chef Automate log:
 
-Chef Automate's restore process expects to run on a host with the same FQDN as the host FQDN at the time of the backup.
-If the restore runs on a host with a different FQDN, you will need to patch the FQDN and TLS certificate at the end of the restore process.
+```shell
+chef-automate debug set-log-level deployment-service debug
+```
 
-1. On the restored host, generate a configuration file on the host:
+## References
 
-    ```shell
-    chef-automate init-config
-    ```
-
-2. Create a `patch.toml` file that contains the FQDN, TLS certificate, and TLS key entries from the generated configuration:
-
-   ```toml
-    [global.v1]
-    fqdn = "<new-fqdn>"
-
-    [[global.v1.frontend_tls]]
-    # The TLS certificate for the load balancer frontend.
-    cert = """-----BEGIN CERTIFICATE-----
-    <certificate-for-new-fqdn>
-    -----END CERTIFICATE-----
-    """
-
-    # The TLS RSA key for the load balancer frontend.
-    key = """-----BEGIN RSA PRIVATE KEY-----
-    <key-for-new-fqdn>
-    -----END RSA PRIVATE KEY-----
-    """
-   ```
-
-3. Patch the restored Chef Automate installation with the new FQDN, TLS certificate, and TLS key configuration entries:
-
-   ```shell
-   chef-automate config patch </path/to/patch.toml>
-   ```
+See the [`chef-automate backup` command reference]({{< ref "cli-chef-automate/#chef-automate-backup" >}}).

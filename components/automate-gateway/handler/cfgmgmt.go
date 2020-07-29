@@ -224,6 +224,8 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context, request *cfgReq.Node
 
 	cfgMgmtRequest := &cmsReq.NodesCounts{
 		Filter: request.Filter,
+		Start:  request.Start,
+		End:    request.End,
 	}
 
 	cfgmgmtNodesCounts, err := s.cfgMgmtClient.GetNodesCounts(ctx, cfgMgmtRequest)
@@ -297,6 +299,82 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 	}, nil
 }
 
+// GetNodeRunsDailyStatusTimeSeries -   Provides the status of runs for each 24-hour duration.
+// For multiple runs in one 24-hour duration, the most recent failed run will be returned.
+// If there are no failed runs the most recent successful run will be returned. If no runs are
+// found in the 24-hour duration, the status will be "missing" and no run information will be returned.
+func (s *CfgMgmtServer) GetNodeRunsDailyStatusTimeSeries(ctx context.Context,
+	request *cfgReq.NodeRunsDailyStatusTimeSeries) (*cfgRes.NodeRunsDailyStatusTimeSeries, error) {
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	cfgMgmtRequest := &cmsReq.NodeRunsDailyStatusTimeSeries{
+		NodeId:  request.NodeId,
+		DaysAgo: request.DaysAgo,
+	}
+
+	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodeRunsDailyStatusTimeSeries(ctx, cfgMgmtRequest)
+	if err != nil {
+		return &cfgRes.NodeRunsDailyStatusTimeSeries{}, err
+	}
+	durations := make([]*cfgRes.RunDurationStatus, len(cfgmgmtResponse.Durations))
+	for index, cfgDuration := range cfgmgmtResponse.Durations {
+		durations[index] = &cfgRes.RunDurationStatus{
+			Start:  cfgDuration.Start,
+			End:    cfgDuration.End,
+			Status: cfgDuration.Status,
+			RunId:  cfgDuration.RunId,
+		}
+	}
+
+	return &cfgRes.NodeRunsDailyStatusTimeSeries{
+		Durations: durations,
+	}, nil
+}
+
+// GetNodeMetadataCounts - For each type of field provided return distinct values the amount for each.
+// For example, if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8
+// could be returned. The number next to each represents the number of nodes with that type of platform.
+func (s *CfgMgmtServer) GetNodeMetadataCounts(ctx context.Context,
+	request *cfgReq.NodeMetadataCounts) (*cfgRes.NodeMetadataCounts, error) {
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	cfgMgmtRequest := &cmsReq.NodeMetadataCounts{
+		Type:   request.Type,
+		Filter: request.Filter,
+		Start:  request.Start,
+		End:    request.End,
+	}
+
+	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodeMetadataCounts(ctx, cfgMgmtRequest)
+	if err != nil {
+		return &cfgRes.NodeMetadataCounts{}, err
+	}
+	types := make([]*cfgRes.TypeCount, len(cfgmgmtResponse.Types))
+	for index, cfgField := range cfgmgmtResponse.Types {
+		values := make([]*cfgRes.ValueCount, len(cfgField.Values))
+		for valueIndex, cfgValueCount := range cfgField.Values {
+			values[valueIndex] = &cfgRes.ValueCount{
+				Value: cfgValueCount.Value,
+				Count: cfgValueCount.Count,
+			}
+		}
+		types[index] = &cfgRes.TypeCount{
+			Values: values,
+			Type:   cfgField.Type,
+		}
+	}
+
+	return &cfgRes.NodeMetadataCounts{
+		Types: types,
+	}, nil
+}
+
 // GetNodeRun returns the requested run
 func (s *CfgMgmtServer) GetNodeRun(ctx context.Context, request *cfgReq.NodeRun) (*cfgRes.Run, error) {
 	log.WithFields(log.Fields{
@@ -337,6 +415,53 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context, request *sharedReq.S
 	return s.cfgMgmtClient.GetSuggestions(ctx, &sugRequest)
 }
 
+func (a *CfgMgmtServer) CreateRollout(ctx context.Context, req *cfgReq.CreateRollout) (*cfgRes.Rollout, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.CreateRollout(ctx, req)
+}
+func (a *CfgMgmtServer) GetRollouts(ctx context.Context, req *cfgReq.Rollouts) (*cfgRes.Rollouts, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.GetRollouts(ctx, req)
+}
+func (a *CfgMgmtServer) GetRolloutById(ctx context.Context, req *cfgReq.RolloutById) (*cfgRes.Rollout, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.GetRolloutById(ctx, req)
+}
+func (a *CfgMgmtServer) GetRolloutForChefRun(context.Context, *cfgReq.RolloutForChefRun) (*cfgRes.Rollout, error) {
+	// TODO
+	return nil, nil
+}
+
+func (a *CfgMgmtServer) ListNodeSegmentsWithRolloutProgress(ctx context.Context, req *cfgReq.ListNodeSegmentsWithRolloutProgress) (*cfgRes.NodeSegmentsWithRolloutProgress, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.ListNodeSegmentsWithRolloutProgress(ctx, req)
+}
+
+func (a *CfgMgmtServer) CreateRolloutTest(ctx context.Context, req *cfgReq.CreateRolloutTest) (*cfgRes.CreateRolloutTest, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.cfgMgmtClient.CreateRolloutTest(ctx, req)
+}
+
 func (a *CfgMgmtServer) NodeExport(*cfgReq.NodeExport, cfgService.ConfigMgmt_NodeExportServer) error {
 	// Please see components/automate-gateway/services.go configMgmtNodeExportHandler for implementation
 	return nil
@@ -349,41 +474,54 @@ func (a *CfgMgmtServer) ReportExport(*cfgReq.ReportExport, cfgService.ConfigMgmt
 
 func toResponseRun(run *cmsRes.Run) *cfgRes.Run {
 	return &cfgRes.Run{
-		Id:                   run.Id,
-		NodeId:               run.NodeId,
-		NodeName:             run.NodeName,
-		Organization:         run.Organization,
-		StartTime:            run.StartTime,
-		EndTime:              run.EndTime,
-		Source:               run.Source,
-		Status:               run.Status,
-		TotalResourceCount:   run.TotalResourceCount,
-		UpdatedResourceCount: run.UpdatedResourceCount,
-		ChefVersion:          run.ChefVersion,
-		UptimeSeconds:        run.UptimeSeconds,
-		Environment:          run.Environment,
-		Fqdn:                 run.Fqdn,
-		SourceFqdn:           run.SourceFqdn,
-		Ipaddress:            run.Ipaddress,
-		RunList:              run.RunList,
-		Tags:                 run.Tags,
-		ResourceNames:        run.ResourceNames,
-		Recipes:              run.Recipes,
-		ChefTags:             run.ChefTags,
-		Cookbooks:            run.Cookbooks,
-		Platform:             run.Platform,
-		PlatformFamily:       run.PlatformFamily,
-		PlatformVersion:      run.PlatformVersion,
-		Roles:                run.Roles,
-		PolicyName:           run.PolicyName,
-		PolicyGroup:          run.PolicyGroup,
-		PolicyRevision:       run.PolicyRevision,
-		ExpandedRunList:      toResponseExpandedRunList(run.ExpandedRunList),
-		Resources:            toResponseResources(run.Resources),
-		Deprecations:         toResponseDeprecations(run.Deprecations),
-		Error:                toResponseError(run.Error),
-		Projects:             run.Projects,
-		VersionedCookbooks:   toVersionsCookbooks(run.VersionedCookbooks),
+		Id:                    run.Id,
+		NodeId:                run.NodeId,
+		NodeName:              run.NodeName,
+		Organization:          run.Organization,
+		StartTime:             run.StartTime,
+		EndTime:               run.EndTime,
+		Source:                run.Source,
+		Status:                run.Status,
+		TotalResourceCount:    run.TotalResourceCount,
+		UpdatedResourceCount:  run.UpdatedResourceCount,
+		ChefVersion:           run.ChefVersion,
+		UptimeSeconds:         run.UptimeSeconds,
+		Environment:           run.Environment,
+		Fqdn:                  run.Fqdn,
+		SourceFqdn:            run.SourceFqdn,
+		Ipaddress:             run.Ipaddress,
+		RunList:               run.RunList,
+		Tags:                  run.Tags,
+		ResourceNames:         run.ResourceNames,
+		Recipes:               run.Recipes,
+		ChefTags:              run.ChefTags,
+		Cookbooks:             run.Cookbooks,
+		Platform:              run.Platform,
+		PlatformFamily:        run.PlatformFamily,
+		PlatformVersion:       run.PlatformVersion,
+		Roles:                 run.Roles,
+		PolicyName:            run.PolicyName,
+		PolicyGroup:           run.PolicyGroup,
+		PolicyRevision:        run.PolicyRevision,
+		ExpandedRunList:       toResponseExpandedRunList(run.ExpandedRunList),
+		Resources:             toResponseResources(run.Resources),
+		Deprecations:          toResponseDeprecations(run.Deprecations),
+		Error:                 toResponseError(run.Error),
+		Projects:              run.Projects,
+		VersionedCookbooks:    toVersionsCookbooks(run.VersionedCookbooks),
+		Timezone:              run.Timezone,
+		CloudProvider:         run.CloudProvider,
+		KernelRelease:         run.KernelRelease,
+		KernelVersion:         run.KernelVersion,
+		VirtualizationSystem:  run.VirtualizationSystem,
+		VirtualizationRole:    run.VirtualizationRole,
+		DmiSystemManufacturer: run.DmiSystemManufacturer,
+		DmiSystemSerialNumber: run.DmiSystemSerialNumber,
+		Domain:                run.Domain,
+		Hostname:              run.Hostname,
+		Macaddress:            run.Macaddress,
+		MemoryTotal:           run.MemoryTotal,
+		Ip6Address:            run.Ip6Address,
 	}
 }
 

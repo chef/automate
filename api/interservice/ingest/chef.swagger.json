@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/interservice/ingest/chef.proto",
+    "title": "interservice/ingest/chef.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/events/chef/action": {
+    "/api/v0/events/chef/action": {
       "post": {
         "operationId": "ProcessChefAction",
         "responses": {
@@ -37,7 +37,7 @@
         ]
       }
     },
-    "/events/chef/liveness": {
+    "/api/v0/events/chef/liveness": {
       "post": {
         "operationId": "ProcessLivenessPing",
         "responses": {
@@ -63,7 +63,7 @@
         ]
       }
     },
-    "/events/chef/nodedelete": {
+    "/api/v0/events/chef/nodedelete": {
       "post": {
         "operationId": "ProcessNodeDelete",
         "responses": {
@@ -89,7 +89,7 @@
         ]
       }
     },
-    "/events/chef/run": {
+    "/api/v0/events/chef/run": {
       "post": {
         "operationId": "ProcessChefRun",
         "responses": {
@@ -115,7 +115,7 @@
         ]
       }
     },
-    "/ingest/version": {
+    "/api/v0/ingest/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {

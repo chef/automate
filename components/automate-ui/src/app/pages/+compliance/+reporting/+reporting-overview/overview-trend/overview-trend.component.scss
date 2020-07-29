@@ -25,7 +25,7 @@
       }
 
       &.skipped {
-        stroke: $chef-grey;
+        stroke: $chef-dark-grey;
       }
     }
 
@@ -64,7 +64,7 @@
         }
 
         &.skipped {
-          stroke: $chef-grey;
+          stroke: $chef-dark-grey;
         }
       }
 
@@ -92,7 +92,7 @@
           }
 
           &.skipped {
-            fill: $chef-grey;
+            fill: $chef-dark-grey;
           }
         }
       }
@@ -167,7 +167,7 @@
       }
 
       &.skipped::before {
-        background: $chef-grey;
+        background: $chef-dark-grey;
       }
     }
   }

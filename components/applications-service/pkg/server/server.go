@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -19,7 +20,6 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/params"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/lib/grpc/health"
-	"github.com/chef/automate/lib/simpledatemath"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/timef"
 	"github.com/chef/automate/lib/version"
@@ -404,7 +404,10 @@ func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	res := &applications.PeriodicMandatoryJobConfig{
-		Threshold: config.Params.ThresholdDuration,
+		Running:    &wrappers.BoolValue{Value: config.Enabled},
+		Recurrence: config.Recurrence,
+		Threshold:  config.Params.ThresholdDuration,
+		JobInfo:    jobInfoForResponse(config.DisconnectedServicesInfo),
 	}
 	return res, nil
 }
@@ -412,13 +415,36 @@ func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context
 func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Context,
 	req *applications.PeriodicMandatoryJobConfig) (*applications.UpdateDisconnectedServicesConfigRes, error) {
 
-	err := simpledatemath.Validate(req.GetThreshold())
-	if err != nil {
-		err = errors.Wrapf(err, "unable to parse disconnected_services threshold %q", req.GetThreshold())
-		log.WithError(err).Error()
-		return nil, status.Error(codes.Internal, err.Error())
+	newConfig := &DisconnectedServicesConfigV0{
+		Recurrence: req.GetRecurrence(),
+		Params:     &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()},
 	}
-	err = app.jobScheduler.UpdateDisconnectedServicesJobParams(ctx, &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()})
+
+	if valid, msg := newConfig.Validate(); !valid {
+		log.WithFields(log.Fields{"validation_message": msg}).Error("Invalid Request")
+		return nil, status.Error(codes.InvalidArgument, msg)
+	}
+
+	if req.Running != nil {
+
+		if req.Running.GetValue() {
+			err := app.jobScheduler.EnableDisconnectedServicesJob(ctx)
+			if err != nil {
+				err = errors.Wrap(err, "failed to enable disconnected_services job")
+				log.WithError(err).Error()
+				return nil, status.Error(codes.Internal, err.Error())
+			}
+		} else {
+			err := app.jobScheduler.DisableDisconnectedServicesJob(ctx)
+			if err != nil {
+				err = errors.Wrap(err, "failed to disable disconnected_services job")
+				log.WithError(err).Error()
+				return nil, status.Error(codes.Internal, err.Error())
+			}
+		}
+	}
+
+	err := app.jobScheduler.UpdateDisconnectedServicesJobConfig(ctx, newConfig)
 	if err != nil {
 		err = errors.Wrapf(err, "unable to update disconnected services parameters to %q", req.GetThreshold())
 		log.WithError(err).Error()
@@ -426,6 +452,13 @@ func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Cont
 	}
 
 	return &applications.UpdateDisconnectedServicesConfigRes{}, nil
+}
+
+func (app *ApplicationsServer) RunDisconnectedServicesJob(ctx context.Context,
+	request *applications.RunDisconnectedServicesJobReq) (*applications.RunDisconnectedServicesJobResponse, error) {
+
+	err := app.jobScheduler.RunDisconnectedServicesJob(ctx)
+	return &applications.RunDisconnectedServicesJobResponse{}, err
 }
 
 func (app *ApplicationsServer) GetDeleteDisconnectedServicesConfig(ctx context.Context,
@@ -437,8 +470,10 @@ func (app *ApplicationsServer) GetDeleteDisconnectedServicesConfig(ctx context.C
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	res := &applications.PeriodicJobConfig{
-		Running:   config.Enabled,
-		Threshold: config.Params.ThresholdDuration,
+		Running:    config.Enabled,
+		Threshold:  config.Params.ThresholdDuration,
+		Recurrence: config.Recurrence,
+		JobInfo:    jobInfoForResponse(config.DisconnectedServicesInfo),
 	}
 	return res, nil
 }
@@ -462,13 +497,17 @@ func (app *ApplicationsServer) UpdateDeleteDisconnectedServicesConfig(ctx contex
 		}
 	}
 
-	err := simpledatemath.Validate(req.GetThreshold())
-	if err != nil {
-		err = errors.Wrapf(err, "unable to parse delete_disconnected_services threshold %q", req.GetThreshold())
-		log.WithError(err).Error()
-		return nil, status.Error(codes.Internal, err.Error())
+	newConfig := &DisconnectedServicesConfigV0{
+		Recurrence: req.GetRecurrence(),
+		Params:     &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()},
 	}
-	err = app.jobScheduler.UpdateDeleteDisconnectedServicesJobParams(ctx, &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()})
+
+	if valid, msg := newConfig.Validate(); !valid {
+		log.WithFields(log.Fields{"validation_message": msg}).Error("Invalid Request")
+		return nil, status.Error(codes.InvalidArgument, msg)
+	}
+
+	err := app.jobScheduler.UpdateDeleteDisconnectedServicesJobConfig(ctx, newConfig)
 	if err != nil {
 		err = errors.Wrapf(err, "unable to update delete_disconnected_services parameters to %q", req.GetThreshold())
 		log.WithError(err).Error()
@@ -476,6 +515,13 @@ func (app *ApplicationsServer) UpdateDeleteDisconnectedServicesConfig(ctx contex
 	}
 
 	return &applications.UpdateDeleteDisconnectedServicesConfigRes{}, nil
+}
+
+func (app *ApplicationsServer) RunDeleteDisconnectedServicesJob(ctx context.Context,
+	request *applications.RunDeleteDisconnectedServicesJobReq) (*applications.RunDeleteDisconnectedServicesJobResponse, error) {
+
+	err := app.jobScheduler.RunDeleteDisconnectedServicesJob(ctx)
+	return &applications.RunDeleteDisconnectedServicesJobResponse{}, err
 }
 
 // Convert storage.Service array to applications.Service array
@@ -528,4 +574,28 @@ func convertHealthCheckResult(svc *storage.Service) *applications.HealthCheckRes
 		Stderr:     svc.HCStderr,
 		ExitStatus: svc.HCExitStatus,
 	}
+}
+
+func jobInfoForResponse(info *DisconnectedServicesInfo) *applications.PeriodicJobInfo {
+	ret := &applications.PeriodicJobInfo{
+		LastEnqueuedAt: toProtoTimestamp(info.LastEnqueuedAt),
+		LastStartedAt:  toProtoTimestamp(info.LastStartedAt),
+		LastEndedAt:    toProtoTimestamp(info.LastEndedAt),
+		NextDueAt:      toProtoTimestamp(info.NextDueAt),
+	}
+	if info.LastElapsed != nil {
+		ret.LastElapsed = ptypes.DurationProto(*info.LastElapsed)
+	}
+	return ret
+}
+
+func toProtoTimestamp(t *time.Time) *timestamp.Timestamp {
+	if t == nil {
+		return nil
+	}
+	ts, err := ptypes.TimestampProto(*t)
+	if err != nil {
+		return nil
+	}
+	return ts
 }

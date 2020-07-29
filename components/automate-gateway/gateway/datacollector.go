@@ -24,6 +24,7 @@ import (
 	ingestProto "github.com/chef/automate/api/external/ingest/request"
 	complianceEvent "github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	inspecEvent "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	"github.com/chef/automate/components/automate-gateway/pkg/limiter"
 )
 
 type dataCollectorMsgType int
@@ -57,6 +58,18 @@ func (s *Server) dataCollectorHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
+
+	ticket, err := s.dataCollectorLimiter.TakeTicket()
+	if err != nil {
+		if errors.Is(err, limiter.ErrLimitExceeded) {
+			s.logger.Error(err.Error())
+			http.Error(w, err.Error(), http.StatusServiceUnavailable)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	defer ticket.Return()
 
 	// Read the body in bytes
 	body, err := ioutil.ReadAll(r.Body)
@@ -293,6 +306,8 @@ func ParseBytesToComplianceReport(body []byte) *complianceEvent.Report {
 		Ipaddress:        getStringIfExists("ipaddress", body),
 		Fqdn:             getStringIfExists("fqdn", body),
 		RunTimeLimit:     getFloat32IfExists("run_time_limit", body),
+		Status:           getStringIfExists("status", body),
+		StatusMessage:    getStringIfExists("status_message", body),
 	}
 }
 
@@ -514,6 +529,7 @@ func getInspecProfiles(body []byte) []*inspecEvent.Profile {
 				ParentProfile:  getStringIfExists("parent_profile", profile),
 				Status:         getStringIfExists("status", profile),
 				SkipMessage:    getStringIfExists("skip_message", profile),
+				StatusMessage:  getStringIfExists("status_message", profile),
 			}
 			inspecProfiles = append(inspecProfiles, inspecProfile)
 		}
@@ -604,16 +620,17 @@ func getInspecControls(profile []byte) []*inspecEvent.Control {
 	jsonparser.ArrayEach(profile, func(control []byte, _ jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			inspecControl := &inspecEvent.Control{
-				Id:             getStringIfExists("id", control),
-				Impact:         getFloat32IfExists("impact", control),
-				Title:          getStringIfExists("title", control),
-				Code:           getStringIfExists("code", control),
-				Desc:           getStringIfExists("desc", control),
-				SourceLocation: getInspecSourceLocation(control),
-				WaiverData:     getInspecControlWaiverData(control),
-				Refs:           getStructArray("refs", control),
-				Tags:           getStructIfExists("tags", control),
-				Results:        getInspecResults(control),
+				Id:                   getStringIfExists("id", control),
+				Impact:               getFloat32IfExists("impact", control),
+				Title:                getStringIfExists("title", control),
+				Code:                 getStringIfExists("code", control),
+				Desc:                 getStringIfExists("desc", control),
+				SourceLocation:       getInspecSourceLocation(control),
+				WaiverData:           getInspecControlWaiverData(control),
+				Refs:                 getStructArray("refs", control),
+				Tags:                 getStructIfExists("tags", control),
+				Results:              getInspecResults(control),
+				RemovedResultsCounts: getInspecControlRemovedResultsCounts(control),
 			}
 			inspecControls = append(inspecControls, inspecControl)
 		}
@@ -664,6 +681,19 @@ func getInspecControlWaiverData(control []byte) *inspecEvent.WaiverData {
 			Run:                getBoolIfExists("run", sourceLocationBytes),
 			SkippedDueToWaiver: getBoolIfExists("skipped_due_to_waiver", sourceLocationBytes),
 			Message:            getStringIfExists("message", sourceLocationBytes),
+		}
+	}
+	return dataToReturn
+}
+
+func getInspecControlRemovedResultsCounts(control []byte) *inspecEvent.RemovedResultsCounts {
+	var dataToReturn *inspecEvent.RemovedResultsCounts
+	sourceLocationBytes, _, _, err := jsonparser.Get(control, "removed_results_counts")
+	if err == nil {
+		dataToReturn = &inspecEvent.RemovedResultsCounts{
+			Failed:  getInt32IfExists("failed", sourceLocationBytes),
+			Skipped: getInt32IfExists("skipped", sourceLocationBytes),
+			Passed:  getInt32IfExists("passed", sourceLocationBytes),
 		}
 	}
 	return dataToReturn

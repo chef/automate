@@ -1,31 +1,56 @@
 @import "~styles/variables";
 
-.page-title {
-  color: var(--chef-primary-dark);
-  margin-top: 0;
-  margin-bottom: 12px;
-  font-weight: inherit;
-  font-style: inherit;
-  font-size: 18px;
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  select {
+    display: block;
+  }
 }
 
-.update-time {
-  color: var(--chef-primary-dark);
-  margin-top: 0;
-  margin-bottom: 12px;
-  font-weight: inherit;
-  font-style: inherit;
-  font-size: 10px;
+.heading {
+
+  .heading-title-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: .25em;
+
+    .heading-title {
+      color: var(--chef-primary-dark);
+      margin-top: 0;
+      margin-bottom: 0;
+      font-weight: inherit;
+      font-style: inherit;
+      font-size: 18px;
+    }
+
+    chef-icon {
+      margin-left: 4px;
+      font-size: 24px;
+      cursor: help;
+    }
+
+    chef-tooltip {
+      width: 288px;
+
+      .tooltip-text {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .heading-time {
+    color: var(--chef-primary-dark);
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 10px;
+  }
 }
 
-.content-container {
-  margin: 10px;
-  padding: 10px;
-  font-family: Muli;
-  font-size: 13px;
-  font-weight: 100;
-  width: 500px;
-  background-color: var(--chef-badge-primary-border);
-  border: 1px solid $chef-blue-medium;
-  border-radius: 4px;
+chef-tr:last-child {
+  margin-bottom: 0;
 }

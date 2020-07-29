@@ -52,7 +52,7 @@ variable "chef_environment" {
 #
 
 variable "chef_load_channel" {
-  default     = "stable"
+  default     = "unstable"
   description = "The habitat builder channel to use when deploying chef-load."
 }
 

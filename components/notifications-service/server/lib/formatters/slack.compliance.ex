@@ -13,7 +13,7 @@ defmodule Notifications.Formatters.Slack.Compliance do
                                     "InSpec found a critical control failure on node #{c.node_name}")
     %{
       username: "Chef Automate",
-      icon_url: "https://docs.chef.io/_static/chef_logo_v2.png",
+      icon_url: "https://docs.chef.io/images/chef-icon.png",
       text: msg,
       attachments: [attachment_note(c)],
     }
@@ -26,8 +26,7 @@ defmodule Notifications.Formatters.Slack.Compliance do
 
     {profile_name, control_value} = collect_profile_and_control_names(failed_profiles, crit_failed_controls)
 
-    message = message_from_failed_controls(crit_failed_controls, compliance
-                                           .test_totals.critical)
+    message = message_from_failed_controls(crit_failed_controls)
 
     truncated_message = Utils.truncate_slack_message(message)
     fallback = "InSpec critical control failure on node #{compliance.node_name}."
@@ -83,27 +82,19 @@ defmodule Notifications.Formatters.Slack.Compliance do
                     end)
   end
 
-  # If only one test fails the message from that test is used.
-  # If multiple, it's  "failed_count of total_count tests failed"
-  def all_failed_tests(failed_controls) do
-    failures_filter = fn(control) ->
-                        Enum.filter(control.failed_results,
-                                    &Utils.failed_test?(&1))
-    end
-
-    Enum.flat_map(failed_controls, failures_filter)
-  end
-
   # This evaluates the invidivual failed tests within the provided controls
   # and extracts a message.
-  def message_from_failed_controls(failed_controls, total_tests) do
-    case all_failed_tests(failed_controls) do
-      [] -> ""                # No failed tests
-      [test] -> test.message  # Exactly one failed test
-      failed_tests ->         # multiple failed tests
-        count = Enum.count(failed_tests)
-        # TODO: #{count} of {total_tests} failed across {controls} controls.
-        "#{count} of #{total_tests} tests failed. View in Chef Automate for full details."
+  def message_from_failed_controls(failed_controls) do
+    case Enum.reduce(failed_controls, 0,
+      fn control, total -> total + control.stats.num_failed_tests end)  do
+      0 -> "" # No failed tests
+      1 -> # Exactly one failed test return that test's message
+        failed_controls
+          |> Enum.flat_map(fn control -> control.failed_results end)
+          |> Enum.reduce("", fn result, message -> result.message end)
+      total_failed_tests ->   # multiple failed tests
+        total_tests = Enum.reduce(failed_controls, 0, fn control, total -> total + control.stats.num_tests end)
+        "#{total_failed_tests} of #{total_tests} tests failed. View in Chef Automate for full details."
     end
   end
 end

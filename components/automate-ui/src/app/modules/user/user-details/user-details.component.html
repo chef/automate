@@ -22,8 +22,8 @@
       <section class="page-body" *ngIf="tabValue === 'details'">
         <form [formGroup]="userDetails.displayNameForm">
           <chef-form-field>
-            <label>Display Name <span aria-hidden="true">*</span></label>
-            <input chefInput formControlName="displayName" type="text" [resetOrigin]="userDetails.saveSuccessful" autocomplete="off"
+            <label for="displayName">Display Name <span aria-hidden="true">*</span></label>
+            <input id="displayName" chefInput formControlName="displayName" type="text" [resetOrigin]="userDetails.saveSuccessful" autocomplete="off"
               data-cy="user-details-name-input">
             <chef-error
               *ngIf="(userDetails.displayNameForm.get('displayName').hasError('required') || userDetails.displayNameForm.get('displayName').hasError('pattern')) && userDetails.displayNameForm.get('displayName').dirty">

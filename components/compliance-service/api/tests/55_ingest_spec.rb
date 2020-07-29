@@ -1,11 +1,11 @@
 require_relative 'test_support'
 ##### GRPC SETUP #####
-require 'api/interservice/nodemanager/nodes/nodes_pb'
-require 'api/interservice/nodemanager/nodes/nodes_services_pb'
-require 'api/interservice/compliance/jobs/jobs_pb'
-require 'api/interservice/compliance/jobs/jobs_services_pb'
-require 'api/interservice/compliance/reporting/reporting_pb'
-require 'api/interservice/compliance/reporting/reporting_services_pb'
+require 'interservice/nodemanager/nodes/nodes_pb'
+require 'interservice/nodemanager/nodes/nodes_services_pb'
+require 'interservice/compliance/jobs/jobs_pb'
+require 'interservice/compliance/jobs/jobs_services_pb'
+require 'interservice/compliance/reporting/reporting_pb'
+require 'interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
   Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)

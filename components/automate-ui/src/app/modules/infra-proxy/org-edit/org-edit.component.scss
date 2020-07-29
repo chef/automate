@@ -1,0 +1,65 @@
+@import "~styles/variables";
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+chef-toolbar {
+  display: block;
+  position: relative;
+  margin-bottom: 5px;
+
+  small {
+    bottom: 2px;
+    color: $chef-dark-grey;
+    position: absolute;
+    right: 0;
+  }
+}
+
+form {
+  chef-form-field {
+    width: 310px;
+    margin-bottom: 30px;
+  }
+
+  textarea {
+    height: 200px;
+  }
+
+  input[type="text"]:disabled {
+    opacity: 0.5;
+    background-color: $chef-grey;
+    border: none;
+  }
+
+  #changes-not-allowed {
+    font-size: 12px;
+  }
+
+  #button-bar {
+    margin-top: 15px;
+
+    span#saved-note {
+      display: inline-block;
+      margin-top: 5px;
+      font-size: 12px;
+    }
+
+    chef-button {
+      margin-top: 0;
+      margin-left: 0;
+    }
+  }
+}
+
+chef-loading-spinner {
+  z-index: 199;
+}
+
+chef-loading-spinner {
+  display: block;
+  margin: 100px auto;
+  width: 100px;
+  z-index: 199;
+}

@@ -1,5 +1,11 @@
 +++
 title = "IAM Overview"
+aliases = [
+    "/docs/authorization-overview/",
+    "/docs/default-policies/",
+    "/docs/iam-v1-policies/",
+    "/docs/iam-v1-overview/"
+]
 description = "IAM Overview"
 draft = false
 bref = ""
@@ -105,7 +111,7 @@ Default Chef-managed roles cannot change, like Chef-managed policies.
 
 Chef Automate includes five *Chef-managed* roles and two *Custom* roles by default.
 You can edit these Custom roles, *Compliance Viewer* and *Compliance Editor*.
-To see the actions comprising the roles, see [Chef-managed Roles]({{< relref "api/#tag/roles" >}}).
+To see the actions comprising the roles, see [IAM Actions]({{< relref "iam-actions.md" >}}).
 
 Role              |Type          |Description
 ------------------|--------------|------------------------------

@@ -69,13 +69,11 @@ func DeletePolicy(tstCtx diagnostics.TestContext, id string) error {
 		reqPath = fmt.Sprintf("/api/v0/auth/policies/%s", id)
 	}
 
-	err = MustJSONDecodeSuccess(
+	if err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
 			reqPath,
 			lbrequest.WithMethod("DELETE"),
-		)).Error()
-
-	if err != nil {
+		)).WithValue(&struct{}{}); err != nil {
 		return errors.Wrap(err, "Could not delete policy")
 	}
 	return nil
@@ -121,7 +119,7 @@ func CreateIAMV1PoliciesDiagnostic() diagnostics.Diagnostic {
 				tstCtx.DoLBRequest(
 					"/api/v0/gateway/version",
 					lbrequest.WithAuthToken(loaded.TokenValue),
-				)).Error()
+				)).WithValue(&struct{}{})
 			require.NoError(tstCtx, err, "Expected to be able to read gateway version")
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {

@@ -1,7 +1,7 @@
 @import "~styles/variables";
 
 :host ::ng-deep {
-  @import "~diff2html/dist/diff2html";
+  @import "~diff2html/bundles/css/diff2html.min";
 
   .d2h-wrapper {
     margin-top: 1em;
@@ -17,7 +17,7 @@
   }
 
   .d2h-tag {
-    font-size: 9px;
+    font-size: 11px;
   }
 
   .d2h-diff-table {
@@ -27,5 +27,9 @@
 
   .d2h-diff-tbody > tr > td {
     height: 49px;
+  }
+
+  .d2h-lines-added {
+    color: $chef-green;
   }
 }

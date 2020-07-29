@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
@@ -16,7 +17,6 @@ import {
 } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectListComponent } from './project-list.component';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 
 describe('ProjectListComponent', () => {
   let component: ProjectListComponent;
@@ -63,7 +63,7 @@ describe('ProjectListComponent', () => {
         MockComponent({
           selector: 'app-create-object-modal',
           inputs: ['creating', 'createForm', 'visible', 'objectNoun',
-            'conflictErrorEvent', 'createProjectModal', 'resetCheckboxEvent'],
+            'conflictErrorEvent', 'createProjectModal', 'resetPoliciesCheckboxEvent'],
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({
@@ -150,8 +150,7 @@ describe('ProjectListComponent', () => {
     });
 
     describe('delete modal', () => {
-      const mockChefKeyEvent = new KeyboardEvent('keypress') as ChefKeyboardEvent;
-      mockChefKeyEvent.isUserInput = true;
+      const mockEvent = { isUserInput: true } as MatOptionSelectionChange;
 
       using([
         ['NO_RULES'],
@@ -159,7 +158,7 @@ describe('ProjectListComponent', () => {
       ], function (status: ProjectStatus) {
         it(`upon selecting delete from control menu, opens with ${status}`, () => {
           expect(component.deleteModalVisible).toBe(false);
-          component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', status));
+          component.startProjectDelete(mockEvent, genProject('uuid-111', status));
           expect(component.deleteModalVisible).toBe(true);
         });
       });
@@ -170,13 +169,13 @@ describe('ProjectListComponent', () => {
       ], function (status: ProjectStatus) {
         it(`upon selecting delete from control menu, does not open with ${status}`, () => {
           expect(component.deleteModalVisible).toBe(false);
-          component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', status));
+          component.startProjectDelete(mockEvent, genProject('uuid-111', status));
           expect(component.deleteModalVisible).toBe(false);
         });
       });
 
      it('closes upon sending request to back-end', () => {
-       component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', 'NO_RULES'));
+       component.startProjectDelete(mockEvent, genProject('uuid-111', 'NO_RULES'));
         expect(component.deleteModalVisible).toBe(true);
         component.deleteProject();
         expect(component.deleteModalVisible).toBe(false);
@@ -185,8 +184,7 @@ describe('ProjectListComponent', () => {
     });
 
     describe('message modal', () => {
-      const mockChefKeyEvent = new KeyboardEvent('keypress') as ChefKeyboardEvent;
-      mockChefKeyEvent.isUserInput = true;
+      const mockEvent = { isUserInput: true } as MatOptionSelectionChange;
 
       using([
         ['RULES_APPLIED'],
@@ -194,7 +192,7 @@ describe('ProjectListComponent', () => {
       ], function (status: ProjectStatus) {
         it(`upon selecting delete from control menu, opens with ${status}`, () => {
           expect(component.messageModalVisible).toBe(false);
-          component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', status));
+          component.startProjectDelete(mockEvent, genProject('uuid-111', status));
           expect(component.messageModalVisible).toBe(true);
         });
       });
@@ -205,13 +203,13 @@ describe('ProjectListComponent', () => {
       ], function (status: ProjectStatus) {
         it(`upon selecting delete from control menu, does not open with ${status}`, () => {
           expect(component.messageModalVisible).toBe(false);
-          component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', status));
+          component.startProjectDelete(mockEvent, genProject('uuid-111', status));
           expect(component.messageModalVisible).toBe(false);
         });
       });
 
       it('closes upon request', () => {
-        component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', 'EDITS_PENDING'));
+        component.startProjectDelete(mockEvent, genProject('uuid-111', 'EDITS_PENDING'));
         expect(component.messageModalVisible).toBe(true);
         component.closeMessageModal();
         expect(component.messageModalVisible).toBe(false);

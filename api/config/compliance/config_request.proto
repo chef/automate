@@ -4,9 +4,9 @@ syntax = "proto3";
 package chef.automate.domain.compliance.config;
 option go_package = "github.com/chef/automate/api/config/compliance";
 
-import "api/config/shared/global.proto";
-import "api/config/shared/tls.proto";
-import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "config/shared/global.proto";
+import "config/shared/tls.proto";
+import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
 message ConfigRequest {
@@ -41,10 +41,12 @@ message ConfigRequest {
 				google.protobuf.StringValue host = 1;
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10121, protocol: "grpc" } ];
 				google.protobuf.StringValue external_fqdn = 7;
+				google.protobuf.Int32Value message_buffer_size = 8;
 			}
 
 			message Profiles {
 				reserved 1;
+				google.protobuf.BoolValue install_market_profiles = 2;
 			}
 
 			message Storage {
@@ -66,6 +68,9 @@ message ConfigRequest {
 				google.protobuf.Int32Value workers = 1;
 				google.protobuf.Int32Value buffer_size = 2;
 				google.protobuf.StringValue remote_inspec_version = 3;
+				google.protobuf.Int32Value result_message_limit = 4;
+				google.protobuf.Int32Value control_results_limit = 5;
+				google.protobuf.FloatValue run_time_limit = 6;
 			}
 		}
 

@@ -101,7 +101,7 @@ func TestMain(t *testing.T) {
 		IssuerURL:    issuerURL,
 		DexURL:       baseURL,
 	}
-	sessionServer, err := server.NewInMemory(l, remainingDuration, cfg, signInURL, bldrClient, devSessionCerts(t))
+	sessionServer, err := server.NewInMemory(l, remainingDuration, cfg, signInURL, bldrClient, devSessionCerts(t), true)
 	require.NoError(t, err)
 
 	mux.PathPrefix("/session").

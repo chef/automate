@@ -1,0 +1,19 @@
+<section class="clients">
+  <chef-loading-spinner *ngIf="clientsListLoading" size="50"></chef-loading-spinner>
+  <ng-container *ngIf="!clientsListLoading">
+    <chef-table>
+      <chef-thead>
+        <chef-tr>
+          <chef-th>Clients Name</chef-th>
+        </chef-tr>
+      </chef-thead>
+      <chef-tbody>
+        <chef-tr *ngFor="let client of clients">
+          <chef-td>
+            <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'clients', client.name]">{{ client.name }}</a>
+          </chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+  </ng-container>
+</section>

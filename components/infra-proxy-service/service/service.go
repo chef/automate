@@ -1,14 +1,14 @@
 package service
 
 import (
+	"fmt"
 	"reflect"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	secrets "github.com/chef/automate/api/external/secrets"
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
@@ -21,14 +21,13 @@ type Service struct {
 	Logger      logger.Logger
 	ConnFactory *secureconn.Factory
 	Storage     storage.Storage
-	Authz       authz.SubjectPurgeClient
 	Secrets     secrets.SecretsServiceClient
 }
 
 // Start returns an instance of Service that connects to a postgres storage backend.
 func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secureconn.Factory, secretsClient secrets.SecretsServiceClient,
-	authzClient authz.SubjectPurgeClient, authzV2AuthorizationClient authz_v2.AuthorizationClient) (*Service, error) {
-	p, err := postgres.New(l, migrationsConfig, authzV2AuthorizationClient)
+	authzClient authz.AuthorizationClient) (*Service, error) {
+	p, err := postgres.New(l, migrationsConfig, authzClient)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +36,6 @@ func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secu
 		Logger:      l,
 		ConnFactory: connFactory,
 		Storage:     p,
-		Authz:       authzClient,
 		Secrets:     secretsClient,
 	}, nil
 }
@@ -47,16 +45,26 @@ func ParseStorageError(err error, v interface{}, noun string) error {
 	if err != nil {
 		switch err {
 		case storage.ErrNotFound:
-			return status.Errorf(codes.NotFound, "no %s found with ID %q", noun, reflect.Indirect(reflect.ValueOf(v)).FieldByName("Id"))
+			return status.Errorf(codes.NotFound, "no %s found with ID %q", noun, getFieldValue(v, "Id"))
 		case storage.ErrCannotDelete:
-			return status.Errorf(codes.FailedPrecondition, "cannot delete server %q because it still has organizations attached", reflect.Indirect(reflect.ValueOf(v)).FieldByName("Id"))
+			return status.Errorf(codes.FailedPrecondition, "cannot delete server %q because it still has organizations attached", getFieldValue(v, "Id"))
 		case storage.ErrConflict:
-			return status.Errorf(codes.AlreadyExists, "%s with that name %q already exists", noun, reflect.Indirect(reflect.ValueOf(v)).FieldByName("Name"))
+			return status.Errorf(codes.AlreadyExists, "%s with ID %q already exists", noun, getFieldValue(v, "Id"))
 		case storage.ErrForeignKeyViolation:
-			return status.Errorf(codes.NotFound, "no server found with ID %q", reflect.Indirect(reflect.ValueOf(v)).FieldByName("ServerId"))
+			return status.Errorf(codes.NotFound, "no server found with ID %q", getFieldValue(v, "ServerId"))
 		default:
 			return status.Error(codes.Internal, err.Error())
 		}
 	}
 	return nil
+}
+
+func getFieldValue(v interface{}, field string) string {
+	rv := reflect.ValueOf(v)
+	switch rv.Kind() {
+	case reflect.Struct:
+		return rv.FieldByName(field).String()
+	default:
+		return fmt.Sprintf("%v", rv)
+	}
 }

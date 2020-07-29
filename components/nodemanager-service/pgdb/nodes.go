@@ -31,6 +31,13 @@ const (
 	NodeManagersTableAbbrev = "nm"
 )
 
+const sqlGetNodeFields = `
+SELECT DISTINCT %s 
+from nodes n
+%s %s
+%s;
+`
+
 const selectSecretIdsFromNodes = `
 SELECT secret_id
 FROM nodes_secrets
@@ -57,7 +64,7 @@ SELECT
   COALESCE(n.source_id, '') AS source_id,
   COALESCE(n.source_region, '') AS source_region,
   COALESCE(n.source_account_id, '') AS source_account_id,
-  COALESCE(('[' || string_agg(DISTINCT '{"key":"' || t.key || '"' || ',"value": "' || t.value || '"}', ',') || ']'), '[]') :: JSON AS tags,
+  COALESCE(json_agg(DISTINCT jsonb_build_object('key', t.key, 'value', t.value)) FILTER (WHERE t.id IS NOT NULL), '[]') AS tags,
   COALESCE(array_to_json(array_remove(array_agg(DISTINCT m.manager_id), NULL)), '[]') AS manager_ids,
   COALESCE(array_to_json(array_remove(array_agg(DISTINCT p.project_id), NULL)), '[]') AS projects,
   COUNT(*) OVER () AS total_count
@@ -166,6 +173,7 @@ var nodesSortFields = map[string]string{
 	"status":           "LOWER(n.status)",
 	"manager":          "LOWER(n.manager)",
 	"last_contact":     "n.last_contact",
+	"state":            "n.source_state",
 }
 
 type dbNode struct {
@@ -664,7 +672,7 @@ func validateNodeFilters(filters []*common.Filter) error {
 		case "state":
 			for _, item := range filter.Values {
 				if !isValidState(item) {
-					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid state filter: %s. state must be one of the following: 'RUNNING', 'STOPPED', 'TERMINATED'", item)}
+					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid state filter: %s. state must be one of the following: 'RUNNING', 'STOPPED', 'TERMINATED', 'MISSING'", item)}
 				}
 			}
 		case "statechange_timerange":
@@ -689,7 +697,7 @@ func validateNodeFilters(filters []*common.Filter) error {
 func isValidNodeManagerType(item string) bool {
 	switch item {
 	// empty string covers legacy nodes (nodes created before we started associating all manual nodes with "automate" as a manager and nodes brought over from a1)
-	case "aws-ec2", "aws-api", "azure-api", "azure-vm", "automate", "":
+	case "aws-ec2", "aws-api", "azure-api", "azure-vm", "automate", "gcp-api", "chef", "":
 		return true
 	default:
 		return false
@@ -710,7 +718,7 @@ func isValidState(item string) bool {
 		return true // this covers the empty string case
 	}
 	switch item {
-	case "STOPPED", "RUNNING", "TERMINATED":
+	case "STOPPED", "RUNNING", "TERMINATED", "MISSING":
 		return true
 	default:
 		return false
@@ -1091,4 +1099,35 @@ func (tx *DBTrans) bulkUpdateNodeProjects(nodeUpdates []nodeUpdate) error {
 	}
 
 	return err
+}
+
+// GetNodeSuggestions returns "suggestions" for filtering the nodes list, given a field and filters
+// this is not used by any API/other function yet, but will be.
+// it only supports suggestions for columns that are in the nodes table.
+// it respects filters, it does not apply sorting to the returned list.
+func (db *DB) GetNodeSuggestions(ctx context.Context, field string, filters []*common.Filter) ([]string, error) {
+	sugg := []string{}
+	err := validateNodeFilters(filters)
+	if err != nil {
+		return sugg, err
+	}
+	whereFilter, havingFilter, err := buildWhereHavingFilter(filters, NodesTableAbbrev, nodesFilterField)
+	if err != nil {
+		return sugg, err
+	}
+
+	var noEmptyStringFilter string
+	if whereFilter != "" || havingFilter != "" {
+		noEmptyStringFilter = fmt.Sprintf("AND %s <> '' IS TRUE", field)
+	} else {
+		noEmptyStringFilter = fmt.Sprintf("WHERE %s <> '' IS TRUE", field)
+	}
+	query := fmt.Sprintf(sqlGetNodeFields, field, whereFilter, havingFilter, noEmptyStringFilter)
+
+	logrus.Debugf("SQL: %s", query)
+	_, err = db.Select(&sugg, query)
+	if err != nil {
+		return sugg, err
+	}
+	return sugg, nil
 }

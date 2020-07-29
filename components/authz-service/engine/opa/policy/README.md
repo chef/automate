@@ -30,7 +30,7 @@ NB: Assumes running from this directory; just adjust all paths if you want to st
 Note that the input still uses subjects as the field instead of members.
 
 ```opa
-$ opa run -w authz.rego common.rego policies:../example_v2/policies.json
+$ opa run -w authz.rego common.rego policies:../example/policies.json
 OPA 0.9.2 (commit 9fbff4c3, built at 2018-09-24T16:12:26Z)
 
 > data.authz.authorized
@@ -54,10 +54,10 @@ From the current directory, run V1 unit tests with:
 $ opa test authz.rego common.rego authz_test.rego
 ```
 
-From the current directory, run V2 unit tests with:
+From the current directory, run unit tests with:
 
 ```console
-$ opa test authz.rego common.rego authz_v2_test.rego
+$ opa test authz.rego common.rego authz_test.rego
 ```
 
 That will print just names of failing tests
@@ -65,7 +65,7 @@ along with a summary of pass/fail results.
 To explicitly show all tests, even if they pass, just add the verbose flag, e.g.:
 
 ```console
-$ opa test -v authz.rego common.rego authz_v2_test.rego
+$ opa test -v authz.rego common.rego authz_test.rego
 ```
 
 ## Using the VSCode Plugin
@@ -84,15 +84,15 @@ First follow the suggested setup on the plugin details page; the following notes
 
 ### VSCode
 
-- copy the example dir here: `cp -r ../example_v2 policies`
+- copy the example dir here: `cp -r ../example policies`
 - copy one of the input files from that new dir here: `cp policies/input_from_inline.json input.json`
 - open `authz.rego` in VSCode
 
 (Using `input_from_statement.json` is done in a similar fashion.)
 
 With your cursor in the authz.rego file run `OPA: Evaluate package` to see everything evaluated.
-A successful setup will yield something like this, showing everything in the `authz_v2` package
-evaluated (which means authz.rego **and** authz_v2_test.rego).
+A successful setup will yield something like this, showing everything in the `authz` package
+evaluated (which means authz.rego **and** authz_test.rego).
 
 ```json
 // Evaluated package in 8.229989ms.
@@ -145,4 +145,4 @@ run `OPA: Evaluate selection` to see just that rule evaluated, e.g.:
 ```
 
 Similarly, and saving the best to last, you can run an individual unit test by selecting
-a unit test name in auth_v2_test.rego and running `OPA: Evaluate selection` to see that test evaluated.
+a unit test name in auth_test.rego and running `OPA: Evaluate selection` to see that test evaluated.

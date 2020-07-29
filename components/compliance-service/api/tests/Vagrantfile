@@ -1,0 +1,173 @@
+#
+# Requires Ubuntu 18.04 ssh target
+#
+
+require 'json'
+require 'open-uri'
+
+def extract_from_manifest(manifest, build)
+  manifest_json = JSON.parse(open(manifest).read)
+  hab_version = manifest_json["hab"].find {|x| x.start_with?("core/hab/") }.split("/")[2]
+  git_sha = 'HEAD'
+  git_sha = manifest_json["git_sha"] if build != 'latest'
+  return hab_version, git_sha
+end
+
+def latest_build_from_versions(channel)
+  raise "Invalid channel #{channel}, can only be 'dev', 'current' or 'acceptance'" unless ['dev', 'current', 'acceptance'].include?(channel)
+  versions_url = "https://packages.chef.io/manifests/#{channel}/automate/versions.json"
+  puts " * Getting latest build from #{versions_url}"
+  versions_json = JSON.parse(open(versions_url).read)
+  build = versions_json.last
+  raise "Invalid build '#{build}' found for channel '#{channel}'" unless build =~ /^\d+$/
+  return build
+end
+
+if ['up', 'ssh', 'provision', 'halt'].include?(ARGV[0])
+  raise 'ENV variable SSH_HOST is not defined!' if ENV['SSH_HOST'].nil?
+  raise 'ENV variable SSH_KEY_PATH for the private key is not defined!' if ENV['SSH_KEY_PATH'].nil?
+  raise 'ENV variable SSH_USER is not defined!' if ENV['SSH_USER'].nil?
+  raise 'ENV variable SSH_USER can\'t be root!' if ENV['SSH_USER'] == 'root'
+end
+
+ssh_host = ENV['SSH_HOST']
+ssh_user = ENV['SSH_USER']
+ssh_key_path = ENV['SSH_KEY_PATH']
+home_dir = "/home/#{ssh_user}"
+current_branch = `git rev-parse --abbrev-ref HEAD`
+latest_head_commit = `git rev-parse HEAD`
+latest_origin_commit = `git rev-parse origin/#{current_branch}`
+clean_tree = system('git status | grep "nothing to commit"')
+automate_channel = 'dev'
+automate_build = 'latest'
+manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/#{automate_build}.json"
+
+# Only run these checks on `vagrant up`
+if ['up', 'provision'].include?(ARGV[0])
+  if !clean_tree
+    puts %q(
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      ! You have uncommitted changes that won't exist when we do the git clone on the remote instance !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    )
+  end
+  if latest_head_commit != latest_origin_commit
+    puts %q(
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      ! You have unpushed commits that won't exist when we do the git clone on the remote instance !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    )
+  end
+
+  if ENV['GITHUB_TOKEN'].nil?
+    raise "ENV variable GITHUB_TOKEN must be defined for this, aborting..."
+  end
+
+  if !ENV['VERSION'].nil?
+    version = ENV['VERSION'].strip.split('/')
+    automate_channel = version[0]
+    if version[1].to_s =~ /^\d+$/
+      automate_build = version[1]
+    else
+      automate_build = latest_build_from_versions(automate_channel)
+    end
+  end
+  hab_version_from_manifest, git_sha_from_manifest = extract_from_manifest(manifest_url, automate_build)
+end
+
+install_hab = <<SCRIPT
+# Install the hab version specifid in the automate manifest
+curl --silent https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh | sudo bash -s -- -v #{hab_version_from_manifest}
+SCRIPT
+
+github_clone_automate = <<SCRIPT
+ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+cd #{home_dir}
+git clone git@github.com:chef/automate.git
+cd automate
+echo "export GITHUB_TOKEN=\"#{ENV['GITHUB_TOKEN']}\"" > .secrets
+git checkout #{latest_head_commit}
+SCRIPT
+
+install_ruby_and_stuff = <<SCRIPT
+set -x
+wget --no-verbose https://packages.chef.io/files/stable/chef-workstation/20.7.81/ubuntu/18.04/chef-workstation_20.7.81-1_amd64.deb
+sudo dpkg -i chef-workstation_20.7.81-1_amd64.deb
+sudo apt-get install gcc libffi-dev make g++ ruby-dev
+echo 'eval "$(chef shell-init bash)"' >> ~/.bashrc
+/opt/chef-workstation/embedded/bin/gem install bundler
+SCRIPT
+
+install_docker = <<SCRIPT
+set -x
+sudo apt-get remove docker docker-engine docker.io containerd runc
+sudo apt-get update
+sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo apt-key fingerprint 0EBFCD88
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+sudo usermod -aG docker ${USER}
+SCRIPT
+
+install_victorias_bits = <<SCRIPT
+apt-get install git make -y
+snap install jq
+echo "* soft nofile 100000" >> /etc/security/limits.conf
+echo "* hard nofile 256000" >> /etc/security/limits.conf
+echo "root soft nofile 100000" >> /etc/security/limits.conf
+echo "root hard nofile 256000" >> /etc/security/limits.conf
+sysctl fs.inotify.max_user_watches=524288
+if ! grep -i -q "^vm.max_map_count=" /etc/sysctl.conf; then
+  echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf > /dev/null
+fi
+sysctl -p
+echo 'Defaults    env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/root_ssh_agent
+SSHD_CONFIG="/etc/ssh/sshd_config"
+if ! grep -q "^ClientAliveInterval" $SSHD_CONFIG; then
+  echo "ClientAliveInterval 60" >> $SSHD_CONFIG
+fi
+if ! grep -q "^ClientAliveCountMax" $SSHD_CONFIG; then
+  echo "ClientAliveCountMax 10000" >> $SSHD_CONFIG
+fi
+service ssh restart
+# permit root auth to bypass the hab studio if we wish so
+sed -r -i 's/^.+" ssh-/ssh-/' /root/.ssh/authorized_keys
+echo
+SCRIPT
+
+install_automate = <<SCRIPT
+cd automate
+sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/.local/bin:$HOME/bin:$HOME/go/bin' >> ~/.bashrc
+sudo ./scripts/install_inspec.sh
+sudo ./scripts/install_golang.sh
+sudo ./scripts/install_grpcurl.sh
+echo "------------------------------------------------------"
+echo "Done, run 'vagrant login' now and start running tests:"
+echo "  cd automate/components/compliance-service"
+echo "  TEST="00*" make run-test"
+echo "--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--"
+SCRIPT
+
+Vagrant.configure('2') do |config|
+  config.vm.box = 'tknerr/managed-server-dummy'
+
+  config.vm.provider :managed do |managed, override|
+    managed.server = ssh_host
+    override.ssh.port = "22"
+    override.ssh.username = ssh_user
+    override.ssh.private_key_path = ssh_key_path
+  end
+
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+
+  config.ssh.forward_agent = true
+  config.vm.provision 'Install hab', type: 'shell', inline: install_hab, privileged: false
+  config.vm.provision 'Github clone automate', type: 'shell', inline: github_clone_automate, privileged: false
+  config.vm.provision 'Install Ruby and Stuff', type: 'shell', inline: install_ruby_and_stuff, privileged: false
+  config.vm.provision 'Install docker', type: 'shell', inline: install_docker, privileged: false
+  config.vm.provision 'Install Victoria\'s bits', type: 'shell', inline: install_victorias_bits, :privileged => true
+  config.vm.provision 'Install automate', type: 'shell', inline: install_automate, privileged: false
+end

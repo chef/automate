@@ -1,5 +1,4 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MockComponent } from 'ng2-mock-component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
@@ -14,7 +13,6 @@ describe('ChefNotificationsComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-notification', inputs: ['type', 'timeout'] }),
         ChefNotificationsComponent
       ],
       imports: [

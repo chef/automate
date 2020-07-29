@@ -1,22 +1,26 @@
-import { of as observableOf,  Observable } from 'rxjs';
-
-import { map, filter } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-
+import { Store, select } from '@ngrx/store';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { Rule, ServiceActionType } from './rule';
-import { SortDirection } from '../../types/types';
-import { RulesService } from '../../services/rules/rules.service';
-import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NotificationRule, ServiceActionType } from 'app/entities/notification_rules/notification_rule.model';
+import { SortDirection } from 'app/types/types';
+import { RulesService } from 'app/services/rules/rules.service';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import {
-  DeleteNotificationDialogComponent
-} from 'app/page-components/delete-notification-dialog/delete-notification-dialog.component';
+ allRules
+} from 'app/entities/notification_rules/notification_rule.selectors';
+import {
+  GetNotificationRules
+} from 'app/entities/notification_rules/notification_rule.action';
 
 export interface FieldDirection {
-  node_name: SortDirection;
+  name: SortDirection;
   alert_type: SortDirection;
+  failure_type: SortDirection;
+  webhook_url: SortDirection;
 }
 
 @Component({
@@ -25,27 +29,31 @@ export interface FieldDirection {
   styleUrls: ['./notifications.component.scss']
 })
 export class NotificationsComponent implements OnInit {
-  rules$: Observable<Rule[]> = observableOf([]);
+  rules$: Observable<NotificationRule[]>;
   errorLoading = false;
   currentPage = 1;
   pageSize = 10;
   sortField: string;
   sortDir: FieldDirection;
-  permissionDenied = false;
+  direction = 'none';
+  permissionDenied = false; // not currently used
   // This is exposed here to allow the component HTML access to ServiceActionType
   serviceActionType = ServiceActionType;
+  public notificationToDelete: NotificationRule;
+  public deleteModalVisible = false;
 
   constructor(
+    private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
     private service: RulesService,
-    public dialog: MatDialog,
-    public snackBar: MatSnackBar,
     private telemetryService: TelemetryService
-  ) { }
+  ) {
+    this.rules$ = store.pipe(select(allRules));
+  }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
-    this.rules$ = this.service.fetchRules();
+    this.store.dispatch(new GetNotificationRules());
     this.rules$.subscribe(rules => {
         this.sendCountToTelemetry(rules);
       },
@@ -59,60 +67,84 @@ export class NotificationsComponent implements OnInit {
     );
 
     this.resetSortDir();
-    this.toggleSort('node_name');
+    this.toggleSort('name');
   }
 
   toggleSort(field: string) {
     if (field === this.sortField) {
       // when sorting is inverted for the currently sorted column
-      this.sortDir[field] = this.sortDir[field] === 'asc' ? 'desc' : 'asc';
+      switch (this.direction) {
+        case 'none':
+          this.direction = this.sortDir[field] = 'asc';
+          break;
+        case 'asc':
+          this.direction = this.sortDir[field] = 'desc';
+          break;
+        case 'desc':
+        default:
+          this.direction = this.sortDir[field] = 'none';
+      }
     } else {
       // when sorting a different column than the currently sorted one
       this.resetSortDir();
     }
+    if (this.sortDir[field] === 'none') {
+      this.resetSortDir();
+      this.toggleSort('name');
+    } else {
     this.sortField = field;
     this.updateSort(field, this.sortDir[field]);
+    }
   }
+
   sortIcon(field: string): string {
     if (field === this.sortField) {
       return 'sort-' + this.sortDir[field];
     } else {
-      return 'sort-asc';
+      return 'none';
     }
   }
 
-
-  deleteRule(rule: Rule) {
-    const dialogRef2 = this.dialog.open(DeleteNotificationDialogComponent);
-    dialogRef2.afterClosed().pipe(
-      filter((result: any) => result === 'delete' ))
-      .subscribe(_result => {
-        this.service.deleteRule(rule).subscribe(_res => {
-          this.snackBarMessage(`Rule '${rule.name}' was deleted.`);
-          this.refreshRules();
-        }, err => {
-          const body = err;
-          this.snackBarMessage(`Could not delete rule '${rule.name}': ${body}`);
-        });
-      });
+  public startNotificationDelete($event: MatOptionSelectionChange, rule: NotificationRule): void {
+    if ($event.isUserInput) {
+      this.notificationToDelete = rule;
+      this.deleteModalVisible = true;
+    }
   }
 
-  snackBarMessage(message) {
-    this.snackBar.open(message, '', { duration: 6000 } );
+  public deleteNotification(): void {
+    this.closeDeleteModal();
+    this.service.deleteRule(this.notificationToDelete).subscribe(_res => {
+      this.refreshRules();
+    });
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
   }
 
   private updateSort(field: string, direction: string) {
+    this.direction = direction;
     this.rules$ = this.rules$.pipe(map(rules => {
-      let sortedRules: Rule[] = [];
-      if (field === 'node_name') {
-        sortedRules = rules.sort((r1: Rule, r2: Rule) => {
+      let sortedRules: NotificationRule[] = [];
+      if (field === 'name') {
+        sortedRules = rules.sort((r1: NotificationRule, r2: NotificationRule) => {
           return r1.name.localeCompare(r2.name);
         });
       } else if (field === 'alert_type') {
-        sortedRules = rules.sort((r1: Rule, r2: Rule) => {
+        sortedRules = rules.sort((r1: NotificationRule, r2: NotificationRule) => {
+          return r1.targetType.localeCompare(r2.targetType);
+        });
+      } else if (field === 'failure_type') {
+        sortedRules = rules.sort((r1: NotificationRule, r2: NotificationRule) => {
           return r1.AlertTypeLabels[r1.ruleType].localeCompare(r2.AlertTypeLabels[r2.ruleType]);
         });
+      } else if (field === 'webhook_url') {
+        sortedRules = rules.sort((r1: NotificationRule, r2: NotificationRule) => {
+          return r1.targetUrl.localeCompare(r2.targetUrl);
+        });
       }
+
       if (direction === 'asc') {
         return sortedRules;
       } else {
@@ -123,14 +155,16 @@ export class NotificationsComponent implements OnInit {
 
   private resetSortDir(): void {
     this.sortDir = {
-      node_name: 'asc',
-      alert_type: 'asc'
+      name: 'asc',
+      alert_type: 'asc',
+      failure_type: 'asc',
+      webhook_url: 'asc'
     };
   }
 
-  private sendCountToTelemetry(rules: Rule[]) {
+  private sendCountToTelemetry(rules: NotificationRule[]) {
     const ruleCount = rules.reduce(
-      (acc, rule: Rule) => {
+      (acc, rule: NotificationRule) => {
         if (rule.ruleType === 'CCRFailure') {
           acc['ccrRuleCount'] += 1;
         } else if (rule.ruleType === 'ComplianceFailure') {

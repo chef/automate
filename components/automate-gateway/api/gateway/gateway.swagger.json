@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/gateway/gateway.proto",
+    "title": "automate-gateway/api/gateway/gateway.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/gateway/health": {
+    "/api/v0/gateway/health": {
       "get": {
         "operationId": "GetHealth",
         "responses": {
@@ -27,7 +27,7 @@
         ]
       }
     },
-    "/gateway/version": {
+    "/api/v0/gateway/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {

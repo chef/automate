@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("job_scheduler", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/ingest/job_scheduler.proto",
+    "title": "external/ingest/job_scheduler.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/retention/nodes/delete-nodes/config": {
+    "/api/v0/retention/nodes/delete-nodes/config": {
       "post": {
         "operationId": "ConfigureDeleteNodesScheduler",
         "responses": {
@@ -40,7 +40,7 @@ func init() {
         ]
       }
     },
-    "/retention/nodes/missing-nodes-deletion/config": {
+    "/api/v0/retention/nodes/missing-nodes-deletion/config": {
       "post": {
         "operationId": "ConfigureMissingNodesForDeletionScheduler",
         "responses": {
@@ -66,7 +66,7 @@ func init() {
         ]
       }
     },
-    "/retention/nodes/missing-nodes/config": {
+    "/api/v0/retention/nodes/missing-nodes/config": {
       "post": {
         "operationId": "ConfigureNodesMissingScheduler",
         "responses": {
@@ -92,7 +92,7 @@ func init() {
         ]
       }
     },
-    "/retention/nodes/status": {
+    "/api/v0/retention/nodes/status": {
       "get": {
         "operationId": "GetStatusJobScheduler",
         "responses": {

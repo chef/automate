@@ -1,83 +1,89 @@
 <div class="app-main-container">
   <div class="container">
     <main>
-      <chef-notification
-        *ngIf="downloadErrorVisible"
-        type="error"
-        timeout="5"
-        (dismissed)="hideDownloadError()">
-        Failed to install profile. Please try again later.
-      </chef-notification>
+      <div class="sticky-notifications">
+        <div class="sticky-inner">
+          <app-notification
+            *ngIf="downloadErrorVisible"
+            type="error"
+            timeout="5"
+            (dismissed)="hideDownloadError()">
+            Failed to install profile. Please try again later.
+          </app-notification>
+        </div>
+      </div>
 
       <chef-page-header class="profiles-header">
         <chef-heading>Profiles</chef-heading>
         <chef-subheading>Compliance profiles manage security and compliance scans.</chef-subheading>
 
-        <div class="profiles-search">
+        <div class="profiles-search" *ngIf="!profilesEmpty || isAvailableProfilesVisible">
           <input
             chefInput
             type="text"
+            aria-label="Search profiles"
             placeholder="Search profiles..."
             (input)="onSearchInput($event)"/>
         </div>
 
-        <chef-tab-selector class="profiles-tabs" [value]="selectedTab" (change)="onTabChange($event)">
-            <chef-option value='installed'>
-              <span *ngIf="userProfilesDataLoaded">{{ filteredProfiles.length }}</span> Profiles
-            </chef-option>
-            <chef-option value='available'>
-              <span *ngIf="availableProfilesDataLoaded">{{ filteredAvailableProfiles.length }}</span> Available
-            </chef-option>
-          </chef-tab-selector>
-        </chef-page-header>
-    
-        <div class="empty-help setup-help" *ngIf="!profilesEnabled">
-          <img class="help-icon" src="/assets/img/services.svg" alt="">
-          <div class="help-msg">
-            <p>You will need to enable the compliance profile asset store to use this feature.</p>
-            <p>Enable the service by adding this line:</p>
-            <chef-snippet code="compliance_profiles['enable'] = true" lang="ruby"></chef-snippet>
-            <p>into <code>/etc/delivery/delivery.rb</code> and running <code>automate-ctl reconfigure</code>. The <code>automate-ctl status</code> command should now list the status of the compliance_profiles service.</p>
-          </div>
+        <chef-tab-selector *ngIf="isAvailableProfilesVisible" class="profiles-tabs" [value]="selectedTab" (change)="onTabChange($event)">
+          <chef-option value='installed'>
+            <span *ngIf="userProfilesDataLoaded">{{ filteredProfiles.length }}</span> Profiles
+          </chef-option>
+          <chef-option value='available'>
+            <span *ngIf="availableProfilesDataLoaded">{{ filteredAvailableProfiles.length }}</span> Available
+          </chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+
+      <div class="empty-help setup-help" *ngIf="!profilesEnabled">
+        <img class="help-icon" src="/assets/img/services.svg" alt="">
+        <div class="help-msg">
+          <p>You will need to enable the compliance profile asset store to use this feature.</p>
+          <p>Enable the service by adding this line:</p>
+          <chef-snippet code="compliance_profiles['enable'] = true" lang="ruby"></chef-snippet>
+          <p>into <code>/etc/delivery/delivery.rb</code> and running <code>automate-ctl reconfigure</code>. The <code>automate-ctl status</code> command should now list the status of the compliance_profiles service.</p>
         </div>
-    
+      </div>
+
         <!--only show content if profile store is enabled-->
-        <div *ngIf="profilesEnabled" class="profiles-content">
-    
+      <div *ngIf="profilesEnabled" class="profiles-content">
+
           <!--profiles tab-->
-          <div *ngIf="selectedTab === 'installed'">
-    
-            <chef-modal
-              id="upload-modal"
-              [visible]="uploadModalVisible"
-              (closeModal)="hideUploadModal()">
-              <h2 id="upload-modal-title" slot="title">Upload an archived profile (.tar.gz or .zip)</h2>
-              <p id="upload-modal-subtitle">See the <a href="https://www.inspec.io/docs/reference/cli/#archive" target="_blank">Inspec CLI documentation</a> for more info on creating a profile archive.</p>
-              <chef-table class="file-upload-list">
-                <ng-container *ngFor="let file of fileUploads; trackBy: trackBy">
-                  <chef-tr>
-                    <chef-td>
-                      <chef-icon class="failed" *ngIf="file.failed">report_problem</chef-icon>
-                      <chef-icon class="passed" *ngIf="file.loaded">check_circle</chef-icon>
-                      <chef-loading-spinner size="14" *ngIf="file.loading"></chef-loading-spinner>
-                      <span>{{ file.name }}</span>
-                    </chef-td>
-                    <chef-td>
-                      <span *ngIf="file.loading && file.percent < 100" class="upload-percent">{{ file.percent }}%</span>
-                      <span *ngIf="file.loading && file.percent === 100" class="upload-percent">Verifying...</span>
-                      <chef-button *ngIf="file.failed" caution secondary (click)="toggleUploadResult(file)">
-                        <chef-icon>report_problem</chef-icon>
-                      </chef-button>
-                    </chef-td>
-                  </chef-tr>
-                  <div class="result-detail" *ngIf="isOpenUploadResult(file)">
-                    <pre>{{ file.response }}</pre>
-                  </div>
-              </ng-container>
+        <div *ngIf="selectedTab === 'installed'">
+
+          <chef-modal
+            id="upload-modal"
+            [visible]="uploadModalVisible"
+            (closeModal)="hideUploadModal()">
+            <h2 id="upload-modal-title" slot="title">Upload an archived profile (.tar.gz or .zip)</h2>
+            <p id="upload-modal-subtitle">See the <a href="https://www.inspec.io/docs/reference/cli/#archive" target="_blank">Inspec CLI documentation</a> for more info on creating a profile archive.</p>
+            <chef-table class="file-upload-list">
+              <ng-container *ngFor="let file of fileUploads; trackBy: trackBy">
+                <chef-tr>
+                  <chef-td>
+                    <chef-icon class="failed" *ngIf="file.failed">report_problem</chef-icon>
+                    <chef-icon class="passed" *ngIf="file.loaded">check_circle</chef-icon>
+                    <chef-loading-spinner size="14" *ngIf="file.loading"></chef-loading-spinner>
+                    <span>{{ file.name }}</span>
+                  </chef-td>
+                  <chef-td>
+                    <span *ngIf="file.loading && file.percent < 100" class="upload-percent">{{ file.percent }}%</span>
+                    <span *ngIf="file.loading && file.percent === 100" class="upload-percent">Verifying...</span>
+                    <chef-button *ngIf="file.failed" caution secondary (click)="toggleUploadResult(file)">
+                      <chef-icon>report_problem</chef-icon>
+                    </chef-button>
+                  </chef-td>
+                </chef-tr>
+                <div class="result-detail" *ngIf="isOpenUploadResult(file)">
+                  <pre>{{ file.response }}</pre>
+                </div>
+            </ng-container>
             </chef-table>
             <div class="actions">
               <label class="custom-file-input">
-                <input (change)="onFilesSelected($event)" type="file" accept=".gz,.zip,.tar" multiple>
+                Select Files
+                <input class="custom-file-input" (change)="onFilesSelected($event)" type="file" accept=".gz,.zip,.tar" multiple>
               </label>
               <chef-button tertiary (click)="hideUploadModal()">Cancel</chef-button>
             </div>
@@ -85,18 +91,30 @@
 
           <app-authorized [allOf]="['streaming::/compliance/profiles', 'post']">
             <chef-toolbar>
-              <chef-button primary (click)="showUploadModal()" *ngIf="!profilesEmpty">
-                <chef-icon>cloud_upload</chef-icon>
-                <span>Upload Profile</span>
-              </chef-button>
-            </chef-toolbar>
-
-            <div class="empty-help" *ngIf="profilesEmpty">
-              <img class="help-icon" src="/assets/img/profiles.svg" alt="">
-              <div class="help-msg">
-                <p>Seems like you need to install some profiles!</p>
-                <p>Install pre-packaged compliance profiles from the "Available" tab or <a (click)="showUploadModal()">upload your own</a>.</p>
+              <div *ngIf="profilesEmpty" class="empty-state">
+                  <div *ngIf="isAvailableProfilesVisible" >
+                    <p>Get a profile from the <a (click)="selectTab('available')">Available tab</a> or upload your own profile to get started!</p>
+                  </div>
+                  <div *ngIf="!isAvailableProfilesVisible" >
+                    <p>Upload a profile to get started!</p>
+                  </div>
+                  <chef-button class="upload-button" primary (click)="showUploadModal()" >
+                    <chef-icon>cloud_upload</chef-icon>
+                    <span>Upload Profile</span>
+                  </chef-button>
               </div>
+              <div *ngIf="!profilesEmpty">
+                  <chef-button class="upload-button" primary (click)="showUploadModal()" >
+                    <chef-icon>cloud_upload</chef-icon>
+                    <span>Upload Profile</span>
+                  </chef-button>
+              </div>
+            </chef-toolbar>
+          </app-authorized>
+          <app-authorized not [allOf]="['streaming::/compliance/profiles', 'post']">
+            <div *ngIf="profilesEmpty" class="empty-state">
+              <p>It looks like no one has uploaded any profiles yet and you don't have permission to upload them. <br/>
+              If this is a mistake, then reach out to your administrator.</p>
             </div>
           </app-authorized>
 

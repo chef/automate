@@ -4,7 +4,7 @@ var chakram = require('chakram'),
 var helpers = require('./helpers.js');
 
 function endpoint() {
-  return helpers.REST_SERVICE_URI + '/events/chef/run';
+  return helpers.REST_SERVICE_URI + '/api/v0/events/chef/run';
 }
 
 function nodeStateUrl() {
@@ -22,8 +22,8 @@ describe("creating node state", function () {
       let chefRun = helpers.ChefRun.clone();
       chefRun.set('entity_uuid', entityUuid);
       chefRun.set('end_time', endTime);
-      
-      // Wait for the post requests. 
+
+      // Wait for the post requests.
       return chakram.all([chakram.post(endpoint(), chefRun.json())]).then(function(responses) {
         expect(responses[0]).to.have.status(200);
         // Wait for the refresh requests.
@@ -38,7 +38,7 @@ describe("creating node state", function () {
             expect(source.exists).to.equal(true);
             expect(source.checkin).to.equal(endTime);
           });
-        });  
+        });
       });
     });
 
@@ -59,13 +59,13 @@ describe("creating node state", function () {
       chefRun2.set('entity_uuid', entityUuid2);
 
       let postResponses = [
-        chakram.post(endpoint(), chefRun1.json()), 
+        chakram.post(endpoint(), chefRun1.json()),
         chakram.post(endpoint(), chefRun2.json())
       ];
-      
-      // Wait to post both runs to pipeline 
+
+      // Wait to post both runs to pipeline
       return chakram.all(postResponses).then(function(responses) {
-        for (i = 0; i < responses.length; i++) { 
+        for (i = 0; i < responses.length; i++) {
           let response = responses[i];
           expect(response).to.have.status(200);
         }
@@ -90,7 +90,7 @@ describe("creating node state", function () {
 
   describe("two updates from the same node", function () {
     before(function () { return helpers.ESCleanupDocuments() });
-    // Commented out because it is being fix in separate PR. 
+    // Commented out because it is being fix in separate PR.
     it("should have one document in elastic search", function () {
       this.timeout(4000);
       let entityUuid = 'test-id';
@@ -105,8 +105,8 @@ describe("creating node state", function () {
       chefRun2.set('entity_uuid', entityUuid);
       chefRun2.set('status', 'success');
       chefRun2.set('run_id', runID2);
-      
-      // Wait for the chefRun1 post. 
+
+      // Wait for the chefRun1 post.
       return chakram.all([chakram.post(endpoint(), chefRun1.json())]).then(function(responses) {
         let response = responses[0];
         expect(response).to.have.status(200);
@@ -120,8 +120,9 @@ describe("creating node state", function () {
             let source = response.body.hits.hits[0]._source;
             expect(source.entity_uuid).to.equal(entityUuid);
             expect(source.status).to.equal('failure');
+            expect(source.chef_run_status).to.equal('failure');
             expect(source.latest_run_id).to.equal(runID1);
-            // Wait for the chefRun2 post. 
+            // Wait for the chefRun2 post.
             return chakram.all([chakram.post(endpoint(), chefRun2.json())]).then(function(responses) {
               // Wait for the refresh requests.
               return chakram.all([helpers.NodeStateRefresh()]).then(function(responses) {
@@ -133,6 +134,7 @@ describe("creating node state", function () {
                   let source = response.body.hits.hits[0]._source;
                   expect(source.entity_uuid).to.equal(entityUuid);
                   expect(source.status).to.equal('success');
+                  expect(source.chef_run_status).to.equal('success');
                   expect(source.latest_run_id).to.equal(runID2);
                 });
               });

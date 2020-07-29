@@ -26,6 +26,7 @@
     "chef/session-service",
     "chef/ingest-service",
     "chef/infra-proxy-service",
+    "chef/automate-cds",
     "chef/config-mgmt-service",
     "chef/deployment-service",
     "chef/data-feed-service",
@@ -145,7 +146,9 @@
       "type": "product",
       "hidden": true,
       "dependencies": ["automate"],
-      "services": []
+      "services": [
+        "chef/automate-cds"
+      ]
     },
     {
       "name": "chef-server",
@@ -188,6 +191,12 @@
       "services": [
         "chef/automate-prometheus"
       ]
+    },
+    {
+      "name": "desktop",
+      "type": "product",
+      "dependencies": ["automate"],
+      "services": []
     }
   ]
 }

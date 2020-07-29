@@ -33,14 +33,14 @@
         <form class="trial" [formGroup]="trialForm" (ngSubmit)="onTrialLicenseFormSubmit()" novalidate>
           <div class="name-container">
             <chef-form-field>
-              <label for="firstName">First Name *</label>
+              <label for="firstName">First Name <span aria-hidden="true">*</span></label>
               <div class="suggester-input-wrapper">
                 <input chefInput name="firstName" id="firstName" formControlName="firstName" type="text" autofocus>
               </div>
               <chef-error *ngIf="trialForm.get('firstName').hasError('required') && trialForm.get('firstName').dirty">First name required.</chef-error>
             </chef-form-field>
             <chef-form-field>
-              <label for="firstName">Last Name *</label>
+              <label for="lastName">Last Name <span aria-hidden="true">*</span></label>
               <div class="suggester-input-wrapper">
                 <input chefInput name="lastName" id="lastName" formControlName="lastName" type="text">
               </div>
@@ -49,7 +49,7 @@
           </div>
           <div class="email-container">
             <chef-form-field>
-              <label for="email">Email *</label>
+              <label for="email">Email <span aria-hidden="true">*</span></label>
               <div class="suggester-input-wrapper">
                 <input chefInput name="email" id="email" formControlName="email" type="text">
               </div>
@@ -71,7 +71,7 @@
           <chef-loading-spinner *ngIf="requestingLicense" size="30"></chef-loading-spinner>
         </div>
         <div class="footer">
-          <chef-button tertiary (click)="backToLicenseApply(); false">Apply Non-Trial License</chef-button>
+          <chef-button tertiary (click)="backToLicenseApply(); false">Already have a license?</chef-button>
           <chef-button tertiary (click)="logout()">Sign Out</chef-button>
         </div>
       </ng-container>

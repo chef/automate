@@ -1,39 +1,109 @@
-<div class="content-container" *ngIf="visible">
-  <div class="container">
-    <main>
-      <button (click)="close()" id="x">X</button>
-      <div class="page-title">Insight</div>
-
-      <ul>
-        <li *ngFor="let term of termFilters">
-          <button (click)="termFilterClicked(term)" id="filter-item">
-            {{term.type}}: {{term.value}}
-          </button>
-        </li>
-      </ul>
-      <div>Total: {{totalDesktops}}</div>
-      <table>
-        <thead>
-          <tr >
-            <th (click)="sortOn('name')" class="table-title">DESKTOP NAME</th>
-            <th (click)="sortOn('check-in')" class="table-title">LAST CHECK-IN TIME</th>
-            <th (click)="sortOn('platform')" class="table-title">PLATFORM</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let desktop of desktops">
-            <td>{{ desktop.name }}</td>
-            <td><chef-icon>{{ desktop.status | chefStatusIcon }}</chef-icon> {{ desktop.checkin | timeFromNow }}</td>
-            <td>{{ desktop.platform }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <app-page-picker
-        [total]="totalDesktops"
-        [perPage]="pageSize"
-        [page]="currentPage"
-        (pageChanged)="onPageChange($event)">
-      </app-page-picker>
-    </main>
+<div class="content-container">
+  <div class="header">
+    <div class="heading">
+      <h2 class="heading-title">{{ titleText }}</h2>
+    </div>
+    <div class="heading-actions">
+      <chef-button secondary (click)="fullscreenToggled.emit()">
+        <chef-icon *ngIf="!fullscreened">fullscreen</chef-icon>
+        <chef-icon *ngIf="fullscreened">fullscreen_exit</chef-icon>
+      </chef-button>
+      <chef-button secondary (click)="close()">
+        <chef-icon>close</chef-icon>
+      </chef-button>
+    </div>
   </div>
+  <div class="sub-header">
+    <div class="selected-filters">
+      <chef-button secondary *ngFor="let term of termFilters" (click)="termFilterRemoved.emit(term)">
+        <chef-icon>close</chef-icon>
+        <span>{{ term.value }}</span>
+      </chef-button>
+    </div>
+    <chef-button secondary (click)="toggleAttributeMenu()">
+      <span>Attributes</span>
+      <chef-icon>expand_more</chef-icon>
+    </chef-button>
+    <app-insight-attributes-dropdown 
+      *ngIf="attributesMenuOpen"
+      [options]="desktopColumnOptions"
+      [saveAsDefault]="desktopColumnOptionsSaveAsDefault"
+      (onUpdate)="desktopColumnOptionsUpdated.emit($event)"
+      (onToggleMenu)="toggleAttributeMenu()"
+    ></app-insight-attributes-dropdown>
+  </div>
+  <div class="filters">
+    <div class="filter-group" *ngFor="let filterGroup of nodeMetadataCounts; trackBy:filterGroupTrackBy">
+      <ng-container *ngIf="filterGroup.values.length">
+        <div class="filter-group-heading">{{ filterGroup.label }}</div>
+        <div class="filter-group-options">
+          <chef-pill *ngFor="let filterGroupItem of filterGroup.values; trackBy:filterGroupValueTrackBy">
+            <chef-checkbox
+              (change)="termFilterOptionToggled({ type: filterGroup.type, value: filterGroupItem.value })"
+              [checked]="filterGroupItem.checked"
+              [disabled]="filterGroupItem.disabled">
+              {{ filterGroupItem.value }} <chef-pill>{{ filterGroupItem.count }}</chef-pill>
+            </chef-checkbox>
+          </chef-pill>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="node-list-options">
+    <h4>Total: {{totalDesktops}}</h4>
+    <div class="download-nodes">
+      <chef-button secondary (click)="toggleDownloadDropdown()" class='download-nodes-toggle'>
+        <span>Download</span>
+        <chef-icon>expand_more</chef-icon>
+      </chef-button>
+        <chef-dropdown class='download' [visible]="downloadOptsVisible">
+          <chef-click-outside omit="download-nodes-toggle" (clickOutside)="hideDownloadDropdown()">
+            <chef-button tertiary (click)="onDownloadOptPressed('json')">JSON</chef-button>
+            <chef-button tertiary (click)="onDownloadOptPressed('csv')">CSV</chef-button>
+          </chef-click-outside>
+        </chef-dropdown>
+    </div>
+  </div>
+  <chef-table>
+    <chef-thead>
+      <chef-tr>
+        <chef-th (click)="sortOn('name')">Desktop Name</chef-th>
+        <chef-th (click)="sortOn('checkin')">Last Check-in</chef-th>
+        <chef-th
+          *ngFor="let column of activeDesktopColumnOptions"
+          (click)="sortOn(column.name)">
+          {{ column.label }}
+        </chef-th>
+      </chef-tr>
+    </chef-thead>
+    <chef-tbody>
+      <chef-tr
+        *ngFor="let desktop of desktops"
+        tabindex="0"
+        [ngClass]="{'selected': selectedDesktop?.id === desktop.id}"
+        (click)="desktopSelected.emit(desktop)"
+        (keyup.enter)="desktopSelected.emit(desktop)">
+        <chef-td>
+          <chef-icon>desktop_windows</chef-icon> {{ desktop.name }}
+        </chef-td>
+        <chef-td>
+          <chef-icon [ngClass]="desktop.status">{{ desktop.status | chefStatusIcon }}</chef-icon>
+          {{ desktop.checkin | timeFromNow }}
+        </chef-td>
+        <chef-td *ngFor="let column of activeDesktopColumnOptions" [attr.data-label]="column.label">
+          {{ desktop[column.name] }}
+        </chef-td>
+      </chef-tr>
+    </chef-tbody>
+  </chef-table>
+  <app-page-picker
+    [forDesktop]="true"
+    [fullScreened]="fullscreened"
+    [total]="totalDesktops"
+    [perPage]="pageSize"
+    [page]="currentPage"
+    (pageChanged)="onPageChange($event)"
+    (pageSizeChanged)="onPageSizeChanged($event)">
+  </app-page-picker>
 </div>

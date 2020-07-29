@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { cloneDeep } from 'lodash/fp';
+import { cloneDeep, isEqual } from 'lodash/fp';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 
@@ -32,6 +32,8 @@ export class ProjectsFilterDropdownComponent {
   // Filtered options is merely a copy of the editable options
   // so they can be filtered while maintaining the actual options.
   filteredOptions: ProjectsFilterOption[] = [];
+  // InitialFilters holds a boolean copy of the initial checked/unchecked state of filtered Options
+  initialFilters: boolean[] = [];
 
   optionsEdited = false;
 
@@ -40,6 +42,9 @@ export class ProjectsFilterDropdownComponent {
   resetOptions() {
     if (!this.optionsEdited) {
       this.filteredOptions = this.editableOptions = cloneDeep(this.options);
+      // Keep a reference to the filteredOptions in initialFilters
+      // to check deep equality when a user unchecks/checks same button
+      this.initialFilters = this.filteredOptions.map(option => option.checked);
     }
   }
 
@@ -71,7 +76,10 @@ export class ProjectsFilterDropdownComponent {
     // sets the new state of the specific checkbox
     this.editableOptions
       .find(option => option.label === label).checked = event.detail;
-    this.optionsEdited = true;
+
+    // Check for deep equality against new changes, disabling
+    // apply button if changes are not new
+    this.checkInitialEquality();
   }
 
   handleApplySelection() {
@@ -82,14 +90,13 @@ export class ProjectsFilterDropdownComponent {
   }
 
   handleClearSelection() {
-    // TODO: Should ideally set to true only when some projects were selected upon opening
-    this.optionsEdited = true; // mark as edited
-
     // clear only entries visible by current filter
     // TODO: Micro-optimization: use a hash to convert this O(n^2) to O(n).
     this.editableOptions
       .filter(option => this.filteredOptions.find(o => o.label === option.label))
       .map(option => option.checked = false);
+
+    this.checkInitialEquality();
   }
 
   handleArrowUp(event: KeyboardEvent) {
@@ -108,5 +115,15 @@ export class ProjectsFilterDropdownComponent {
     if (element) {
       (element as HTMLElement).focus();
     }
+  }
+
+  checkInitialEquality() {
+    // Check for equality against new changes, disabling
+    // apply button if changes are not new
+
+    // create a copy of checked/unchecked in most recently edited options
+    const currentEdits: boolean[] = this.editableOptions.map(option => option.checked);
+
+    this.optionsEdited = !isEqual(this.initialFilters, currentEdits);
   }
 }

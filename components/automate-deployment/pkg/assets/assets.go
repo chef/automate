@@ -1,6 +1,6 @@
 package assets
 
-const ChefAutomateUpgradeFromV1SeflTestCRL = `-----BEGIN X509 CRL-----
+const ChefAutomateUpgradeFromV1SelfTestCRL = `-----BEGIN X509 CRL-----
 MIICnDCBhQIBATANBgkqhkiG9w0BAQsFADAsMSowKAYDVQQDEyFDaGVmQXV0b21h
 dGVVcGdyYWRlRnJvbXYxU2VsZlRlc3QXDTE4MDIyNDE5MTE0NFoXDTE5MDgyNDE5
 MTEzNlowAKAjMCEwHwYDVR0jBBgwFoAUlHt1okFz9FXlssdhnjujlALh+McwDQYJ

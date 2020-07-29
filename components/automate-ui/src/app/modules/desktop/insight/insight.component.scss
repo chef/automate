@@ -1,15 +1,15 @@
 @import "~styles/variables";
+@import "@carbon/layout/scss/layout";
 
-.page-title {
+.heading-title {
+  margin: 0;
   color: var(--chef-primary-dark);
-  margin-top: 0;
-  margin-bottom: 12px;
   font-weight: inherit;
   font-style: inherit;
   font-size: 18px;
 }
 
-.update-time {
+.heading-time {
   color: var(--chef-primary-dark);
   margin-top: 0;
   margin-bottom: 12px;
@@ -18,38 +18,193 @@
   font-size: 10px;
 }
 
-.content-container {
-  margin: 10px;
-  padding: 10px;
-  font-family: Muli;
-  font-size: 13px;
-  font-weight: 100;
-  width: 500px;
-  background-color: $chef-med-grey;
-  border: 1px solid $chef-blue-medium;
-  border-radius: 4px;
+.header {
+  display: flex;
+  margin: -#{$spacing-05};
+  margin-bottom: $spacing-05;
+  padding: $spacing-03 $spacing-05;
+  align-items: center;
+  justify-content: space-between;
+  border-top-left-radius: $global-radius;
+  border-top-right-radius: $global-radius;
+  border-bottom: 1px solid $chef-grey;
+
+  chef-button {
+    margin: 0;
+  }
 }
 
-.item {
-  margin: 8px;
-  padding: 3px;
+.sub-header {
+  display: flex;
+  position: relative;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  chef-button {
+    margin: 0 0 $spacing-03 0;
+  }
 }
 
-chef-icon {
-  margin-right: 1em;
+.selected-filters {
+  flex-basis: 70%;
+
+  chef-button {
+    margin: 0 $spacing-03 $spacing-03 0;
+  }
 }
 
-.table-title {
-  text-align: left;
+.filters {
+  margin: $spacing-05 0;
+
+  .filter-group-heading {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #394261;
+  }
+
+  .filter-group-options {
+    #{--pill-background-color}: #{$chef-white};
+
+    > chef-pill {
+      display: inline-flex;
+      margin: 0 $spacing-03 $spacing-03 0;
+      padding: $spacing-03;
+      border: 1px solid $chef-grey;
+    }
+
+    chef-checkbox {
+      #{--pill-background-color}: #{$chef-grey};
+
+      chef-pill {
+        margin-left: $spacing-03;
+        padding: 0 $spacing-03;
+      }
+
+      ::ng-deep .check-wrap {
+        border: 1px solid $chef-grey;
+      }
+    }
+  }
 }
 
-#x {
-  margin-right: 5px;
-  margin-top: 5px;
-  position: absolute;
-  background: grey;
-  color: black;
-  top: -10px;
-  right: -10px;
-  border: 1px solid black;
+.node-list-options {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+
+  .download-nodes {
+    position: relative;
+    width: fit-content;
+
+    .download-nodes-toggle {
+      margin-bottom: 0;
+    }
+
+    .download {
+      margin: 0 8px;
+      position: absolute;
+      right: 0;
+      width: 114px;
+
+      chef-button {
+        margin: 0;
+        font-size: 14px;
+        text-align: center;
+        padding: 5px 0;
+        border-bottom: 1px solid $chef-grey;
+        width: 100%;
+        color: inherit;
+
+        button {
+          margin: 0;
+          padding: 0;
+        }
+
+        &:hover {
+          cursor: pointer;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
+
+
+chef-table {
+  chef-icon {
+    margin-right: $spacing-03;
+  }
+}
+
+chef-tr:hover {
+  cursor: pointer;
+}
+
+:host.fullscreened {
+  .filters {
+    display: flex;
+    flex-flow: row wrap;
+  }
+
+  .filter-group {
+    flex: 0 1 50%;
+  }
+
+  chef-tr:hover,
+  chef-tr.selected {
+    chef-th,
+    chef-td {
+      background: $chef-lightest-grey;
+    }
+  }
+}
+
+:host:not(.fullscreened) {
+  chef-thead {
+    display: none;
+  }
+
+  chef-tr {
+    flex-flow: row wrap;
+    border: 1px solid $chef-grey;
+    border-radius: $global-radius;
+    padding: 0 $spacing-05;
+    margin-bottom: $spacing-05;
+  }
+
+  chef-tbody chef-tr:hover,
+  chef-tbody chef-tr.selected {
+    background: $chef-lightest-grey;
+  }
+
+  chef-td {
+    flex-basis: 33.33%;
+    border: none;
+    border-radius: 0;
+    padding: $spacing-05 0;
+    font-size: 12px;
+  }
+
+  chef-td[data-label] {
+    flex-direction: column;
+    align-items: flex-start;
+
+    &::before {
+      display: block;
+      text-transform: uppercase;
+      content: attr(data-label) '';
+    }
+  }
+
+  chef-td:nth-child(1),
+  chef-td:nth-child(2) {
+    flex-basis: 50%;
+    border-bottom: 1px solid $chef-grey;
+    font-size: 14px;
+  }
 }

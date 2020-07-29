@@ -43,6 +43,10 @@ Uploads use either the `.tar.gz` or zip archive file formats.
 
 All profiles are stored in PostgreSQL, and are covered by backup and restore functionality.
 
+{{% info %}}
+All profiles should have a valid version in their `inspec.yml`. Older builds of Chef Automate require at least three elements of the x.y.z form -- for example, "1.2.0" -- and optionally can have one additional element, such as "1.2.0-20". Newer Chef Automate builds allow both two-element and three-element profile versions.
+{{% /info %}}
+
 ### Updating profiles
 
 New releases of profiles are shipped with the product when available.
@@ -94,7 +98,7 @@ Total tests
 
 Severity
 : The impact of a control, from 0 to 1.
-  See the Chef InSpec documentation for more information about the [severity measure](https://www.inspec.io/docs/reference/dsl_inspec#syntax)
+  See the Chef InSpec documentation for more information about the [severity measure](https://docs.chef.io/inspec/dsl_inspec#syntax)
 
 Selecting the shaded area next to the control name or the `+` on the right side expands the control to show a more detailed description.
 Selecting **View Code** displays the control's InSpec code.
@@ -115,7 +119,7 @@ Users in a Chef Automate instance with the same username in both saml and local 
 ## Interacting with Chef Automate Profiles
 
 You can interact with Chef Automate Profiles from the command line, as well as from the user interface.
-For more information, see the [InSpec CLI](https://www.inspec.io/docs/reference/cli/) subcommand.
+For more information, see the [InSpec CLI](https://docs.chef.io/inspec/cli/) subcommand.
 
 ### API Calls
 

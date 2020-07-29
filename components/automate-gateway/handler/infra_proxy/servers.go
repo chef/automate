@@ -37,27 +37,13 @@ func (a *InfraProxyServer) GetServer(ctx context.Context, r *gwreq.GetServer) (*
 	}, nil
 }
 
-// GetServerByName fetches a single server by Name
-func (a *InfraProxyServer) GetServerByName(ctx context.Context, r *gwreq.GetServerByName) (*gwres.GetServer, error) {
-	req := &infra_req.GetServerByName{
-		Name: r.Name,
-	}
-	res, err := a.client.GetServerByName(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	return &gwres.GetServer{
-		Server: fromUpstreamServer(res.Server),
-	}, nil
-}
-
 // CreateServer posts a server upstream
 func (a *InfraProxyServer) CreateServer(ctx context.Context, r *gwreq.CreateServer) (*gwres.CreateServer, error) {
 	req := &infra_req.CreateServer{
-		Name:        r.Name,
-		Description: r.Description,
-		Fqdn:        r.Fqdn,
-		IpAddress:   r.IpAddress,
+		Id:        r.Id,
+		Name:      r.Name,
+		Fqdn:      r.Fqdn,
+		IpAddress: r.IpAddress,
 	}
 	res, err := a.client.CreateServer(ctx, req)
 	if err != nil {
@@ -71,11 +57,10 @@ func (a *InfraProxyServer) CreateServer(ctx context.Context, r *gwreq.CreateServ
 // UpdateServer updates a server upstream
 func (a *InfraProxyServer) UpdateServer(ctx context.Context, r *gwreq.UpdateServer) (*gwres.UpdateServer, error) {
 	req := &infra_req.UpdateServer{
-		Id:          r.Id,
-		Name:        r.Name,
-		Description: r.Description,
-		Fqdn:        r.Fqdn,
-		IpAddress:   r.IpAddress,
+		Id:        r.Id,
+		Name:      r.Name,
+		Fqdn:      r.Fqdn,
+		IpAddress: r.IpAddress,
 	}
 	res, err := a.client.UpdateServer(ctx, req)
 	if err != nil {
@@ -102,12 +87,11 @@ func (a *InfraProxyServer) DeleteServer(ctx context.Context, r *gwreq.DeleteServ
 
 func fromUpstreamServer(t *infra_res.Server) *gwres.Server {
 	return &gwres.Server{
-		Id:          t.GetId(),
-		Name:        t.GetName(),
-		Description: t.GetDescription(),
-		Fqdn:        t.GetFqdn(),
-		IpAddress:   t.GetIpAddress(),
-		OrgsCount:   t.GetOrgsCount(),
+		Id:        t.GetId(),
+		Name:      t.GetName(),
+		Fqdn:      t.GetFqdn(),
+		IpAddress: t.GetIpAddress(),
+		OrgsCount: t.GetOrgsCount(),
 	}
 }
 

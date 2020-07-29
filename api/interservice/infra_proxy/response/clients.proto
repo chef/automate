@@ -4,23 +4,26 @@ package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
 
 message Clients {
+	// Client list.
     repeated ClientListItem clients = 1;
 }
 
 message ClientListItem {
+	// Client name.
     string name = 1;
 }
 
 message Client {
-    string name        = 1;
+	// Client name.
+	string name = 1;
+	// Client name return by Chef Infra Server API.
 	string client_name = 2;
-	string org_name    = 3;
-	bool   admin       = 4;
-	bool   validator   = 5;
-	string certificate = 6;
-	string public_key  = 7;
-	string private_key = 8;
-	string uri         = 9;
-	string json_class  = 10;
-	string chef_type   = 11;
+	// Chef organization name.
+	string org_name = 3;
+	// Boolean indicates client type is validator or not.
+	bool validator = 4;
+	// Client JSON class.
+	string json_class = 5;
+	// Chef object type.
+	string chef_type = 6;
 }

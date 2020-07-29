@@ -5,20 +5,22 @@ pkg_name="automate-elasticsearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"
 pkg_version="6.8.3"
-vendor_origin="core"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
+pkg_source="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${pkg_version}.tar.gz"
+pkg_shasum=824078e421c9f7e5ab9c875e4019d9ebfe3ada99db286b54dec090f97d1cbe25
+
 pkg_build_deps=(
-  "${vendor_origin}/elasticsearch/${pkg_version}"
+  core/patchelf
 )
 pkg_deps=(
-  chef/mlsa
+  core/coreutils
   core/glibc
-  core/coreutils-static
+  core/zlib
+
+  chef/mlsa
   core/curl # health_check
-  core/unzip
-  core/grep
   chef/automate-openjdk
   chef/automate-platform-tools
 )
@@ -41,18 +43,47 @@ pkg_binds=(
 pkg_exposes=(http-port transport-port)
 
 do_download() {
+  do_default_download
   download_file "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-s3/repository-s3-${pkg_version}.zip" "repository-s3.zip" "3dc05d6c20e683596ddabfcc3f63c9d4e9680da75bff1c904566b5508584a6d6"
 }
 
 do_build() {
-  :
+  return 0
 }
 
 do_install() {
-  cp -a "$(pkg_path_for ${vendor_origin}/elasticsearch)/es/"* "${pkg_prefix}/es/"
+  cd "$HAB_CACHE_SRC_PATH/elasticsearch-${pkg_version}"
+  install -vDm644 README.textile "${pkg_prefix}/README.textile"
+  install -vDm644 LICENSE.txt "${pkg_prefix}/LICENSE.txt"
+  install -vDm644 NOTICE.txt "${pkg_prefix}/NOTICE.txt"
+
+  # Elasticsearch is greedy when grabbing config files from /bin/..
+  # so we need to put the untemplated config dir out of reach
+  mkdir -p "${pkg_prefix}/es"
+  cp -a ./* "${pkg_prefix}/es"
+
+  # jvm.options needs to live relative to the binary.
+  # mkdir -p "$pkg_prefix/es/config"
+  # install -vDm644 config/jvm.options "$pkg_prefix/es/config/jvm.options"
+
+  # Delete unused binaries to save space
+  rm "${pkg_prefix}/es/bin/"*.bat "${pkg_prefix}/es/bin/"*.exe
+
+  LD_RUN_PATH=$LD_RUN_PATH:${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/lib
+  export LD_RUN_PATH
+
+  for bin in autoconfig autodetect categorize controller normalize; do
+    build_line "patch ${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/bin/${bin}"
+    patchelf --interpreter "$(pkg_path_for glibc)/lib/ld-linux-x86-64.so.2" --set-rpath "${LD_RUN_PATH}" \
+      "${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/bin/${bin}"
+  done
+
+  find "${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/lib" -type f -name "*.so" \
+      -exec patchelf --set-rpath "${LD_RUN_PATH}" {} \;
+
   "${pkg_prefix}/es/bin/elasticsearch-plugin" install -b "file://${HAB_CACHE_SRC_PATH}/repository-s3.zip"
 }
 
 do_strip() {
-  :
+  return 0
 }

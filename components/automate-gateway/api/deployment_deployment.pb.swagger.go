@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("deployment_deployment", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/deployment/deployment.proto",
+    "title": "automate-gateway/api/deployment/deployment.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/deployment/service_versions": {
+    "/api/v0/deployment/service_versions": {
       "get": {
         "operationId": "ServiceVersions",
         "responses": {
@@ -30,7 +30,7 @@ func init() {
         ]
       }
     },
-    "/version": {
+    "/api/v0/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {

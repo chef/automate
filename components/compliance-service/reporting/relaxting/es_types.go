@@ -16,6 +16,7 @@ type ESInSpecSummary struct {
 	Environment   string    `json:"environment"`
 	EndTime       time.Time `json:"end_time"`
 	Status        string    `json:"status"`
+	StatusMessage string    `json:"status_message"`
 	JobID         string    `json:"job_uuid"`
 	Roles         []string  `json:"roles"`
 	Recipes       []string  `json:"recipes"`
@@ -50,6 +51,7 @@ type ESInSpecReport struct {
 	Environment   string    `json:"environment"`
 	EndTime       time.Time `json:"end_time"`
 	Status        string    `json:"status"`
+	StatusMessage string    `json:"status_message"`
 	JobID         string    `json:"job_uuid"`
 	Roles         []string  `json:"roles"`
 	Recipes       []string  `json:"recipes"`
@@ -116,31 +118,39 @@ type ESInSpecReportControlRefs struct {
 	Url string `json:"url"`
 }
 
+type ESInSpecReportControlRemovedResultsCounts struct {
+	Failed  int `json:"failed"`
+	Skipped int `json:"skipped"`
+	Passed  int `json:"passed"`
+}
+
 type ESInSpecReportControl struct {
-	ID         string                            `json:"id"`
-	Impact     float32                           `json:"impact"`
-	Title      string                            `json:"title"`
-	Status     string                            `json:"status"`
-	Results    []*ESInSpecReportControlsResult   `json:"results"`
-	WaiverData *ESInSpecReportControlsWaiverData `json:"waiver_data"`
-	WaivedStr  string                            `json:"waived_str"`
-	StringTags []ESInSpecReportControlStringTags `json:"string_tags"`
-	Refs       []ESInSpecReportControlRefs       `json:"refs"`
+	ID                   string                                     `json:"id"`
+	Impact               float32                                    `json:"impact"`
+	Title                string                                     `json:"title"`
+	Status               string                                     `json:"status"`
+	Results              []*ESInSpecReportControlsResult            `json:"results"`
+	WaiverData           *ESInSpecReportControlsWaiverData          `json:"waiver_data"`
+	WaivedStr            string                                     `json:"waived_str"`
+	StringTags           []ESInSpecReportControlStringTags          `json:"string_tags"`
+	Refs                 []ESInSpecReportControlRefs                `json:"refs"`
+	RemovedResultsCounts *ESInSpecReportControlRemovedResultsCounts `json:"removed_results_counts"`
 }
 
 type ESInSpecReportProfile struct {
-	Name         string                       `json:"name"`
-	Title        string                       `json:"title"`
-	Profile      string                       `json:"profile"`
-	Full         string                       `json:"full"`
-	Version      string                       `json:"version"`
-	Namespace    string                       `json:"namespace,omitempty"`
-	SHA256       string                       `json:"sha256"`
-	Controls     []ESInSpecReportControl      `json:"controls"`
-	ControlsSums reporting.NodeControlSummary `json:"controls_sums"`
-	Depends      []ESInSpecReportDepends      `json:"depends"`
-	Status       string                       `json:"status"`
-	SkipMessage  string                       `json:"skip_message"`
+	Name          string                       `json:"name"`
+	Title         string                       `json:"title"`
+	Profile       string                       `json:"profile"`
+	Full          string                       `json:"full"`
+	Version       string                       `json:"version"`
+	Namespace     string                       `json:"namespace,omitempty"`
+	SHA256        string                       `json:"sha256"`
+	Controls      []ESInSpecReportControl      `json:"controls"`
+	ControlsSums  reporting.NodeControlSummary `json:"controls_sums"`
+	Depends       []ESInSpecReportDepends      `json:"depends"`
+	Status        string                       `json:"status"`
+	SkipMessage   string                       `json:"skip_message"`
+	StatusMessage string                       `json:"status_message"`
 }
 
 type ESInSpecReportDepends struct {

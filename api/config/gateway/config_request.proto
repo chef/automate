@@ -5,9 +5,9 @@ syntax = "proto3";
 package chef.automate.api.config;
 option go_package = "github.com/chef/automate/api/config/gateway";
 
-import "api/config/shared/global.proto";
-import "api/config/shared/tls.proto";
-import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "config/shared/global.proto";
+import "config/shared/tls.proto";
+import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
 message ConfigRequest {
@@ -26,6 +26,7 @@ message ConfigRequest {
 			chef.automate.infra.config.TLSCredentials tls = 2;
 			Service service = 3;
 			Log log = 4;
+			DataCollector data_collector = 5;
 
 			message Service {
 				google.protobuf.StringValue host = 1;
@@ -41,6 +42,14 @@ message ConfigRequest {
 			message Log {
 				google.protobuf.StringValue level = 1;
 				google.protobuf.StringValue format = 2;
+			}
+
+			message DataCollector {
+				Limiter limiter = 1;
+				message Limiter {
+					google.protobuf.BoolValue disable = 1;
+					google.protobuf.Int32Value max_inflight_requests = 2;
+				}
 			}
 		}
 

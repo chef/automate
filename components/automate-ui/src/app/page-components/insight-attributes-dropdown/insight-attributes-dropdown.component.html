@@ -1,0 +1,23 @@
+  <div class="bx--row">
+    <p class="instruction">Choose up to {{ max }} attributes to display in the table:</p>
+  </div>
+  <div class="bx--row options">
+    <chef-checkbox
+      *ngFor="let option of editableOptions; index as i"
+      class="filter-button"
+      [attr.title]="option.label"
+      [checked]="option.checked"
+      [disabled]="!option.checked && maxOptionsActive"
+      (change)="handleOptionChange($event, i)">{{ option.label }}</chef-checkbox>
+  </div>
+  <div class="bx--row action-button-row">
+    <chef-checkbox [checked]="editableSaveAsDefault" (change)="handleSaveAsDefaultChange($event)">
+      Save as default
+    </chef-checkbox>
+
+    <div>
+      <chef-button tertiary (click)="handleCancel()">Cancel</chef-button>
+      <chef-button primary [disabled]="disableSubmit" (click)="handleUpdate()">Update</chef-button>
+    </div>
+  </div>
+  

@@ -1,7 +1,4 @@
 <div class="suggester-wrapper" (focusout)="handleFocusOut()" tabindex="0">
-  <label class="hidden-label" for="search_box">
-    <span class="visually-hidden">Filter Node View Search Box</span>
-  </label>
   <div class="suggester-input-wrapper">
     <span (click)="handleCategoryClick()"
       class="category-marker"
@@ -10,6 +7,7 @@
     </span>
     <input #search_box
           id="search_box"
+          aria-label="Search"
           (click)="handleFocus($event)"
           (focus)="handleFocus($event)"
           (keyup)="handleInput($event.key, search_box.value)"

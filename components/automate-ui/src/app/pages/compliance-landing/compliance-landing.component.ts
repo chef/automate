@@ -8,22 +8,21 @@ import { RoutePerms } from 'app/components/landing/landing.component';
 })
 export class ComplianceLandingComponent {
 
-  // order determined by compliance-reporting-sidebar
-  // template and is vetted by compliance-reporting-sidebar unit tests
+  // order determined by LayoutSidebarService and vetted by SidebarComponent unit tests
   public routeList: RoutePerms[] = [
     {
-      allOfCheck: [['/compliance/reporting/stats/summary', 'post', ''],
-        ['/compliance/reporting/stats/failures', 'post', ''],
-        ['/compliance/reporting/stats/trend', 'post', '']],
+      allOfCheck: [['/api/v0/compliance/reporting/stats/summary', 'post'],
+        ['/api/v0/compliance/reporting/stats/failures', 'post'],
+        ['/api/v0/compliance/reporting/stats/trend', 'post']],
       route: '/compliance/reports'
     },
     {
-      allOfCheck: [['/compliance/scanner/jobs', 'post', ''],
-      ['/compliance/scanner/jobs/search', 'post', '']],
+      allOfCheck: [['/api/v0/compliance/scanner/jobs', 'post'],
+      ['/compliance/scanner/jobs/search', 'post']],
       route: '/compliance/scan-jobs'
     },
     {
-      allOfCheck: [['/compliance/profiles/search', 'post', '']],
+      allOfCheck: [['/api/v0/compliance/profiles/search', 'post']],
       route: '/compliance/compliance-profiles'
     }
   ];

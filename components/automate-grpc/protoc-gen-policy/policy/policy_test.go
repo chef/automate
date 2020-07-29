@@ -29,7 +29,7 @@ const a2Root = "github.com/chef/automate"
 
 func TestCreatesValidCode(t *testing.T) {
 	testdata := func(baseFileName string) string {
-		return fmt.Sprintf("components/automate-grpc/protoc-gen-policy/testdata/%s.proto", baseFileName)
+		return fmt.Sprintf("automate-grpc/protoc-gen-policy/testdata/%s.proto", baseFileName)
 	}
 	fullPath := func(baseFileName, pkgName string) string {
 		return filepath.Join(a2Root,
@@ -58,7 +58,7 @@ func TestCreatesValidCode(t *testing.T) {
 					"// source: "+testdata("one_method_plus_http"),
 					"package mock",
 					`policy.MapMethodTo("/chef.automate.domain.one_method.Mock/MockMethod", "mock:foo:{bar}", "action:item:verb", `+
-						`"GET", "/auth/foo/baz", func(unexpandedResource string, input interface{}) string {`),
+						`"GET", "/api/v0/auth/foo/baz", func(unexpandedResource string, input interface{}) string {`),
 			)},
 
 		"service with one method": {
@@ -112,8 +112,9 @@ func TestCreatesValidCode(t *testing.T) {
 
 	// Each call to GenerateCode (via runWithInputFile) will return a cleanup
 	// function referencing _the same cached executable_. So, it's fine to use
-	// any of them.
-	var cleanup func()
+	// any of them. But if all the tests fail, we need a not null pointer
+	// function to run, so make an empty function to start:
+	cleanup := func() {}
 
 	for desc, tc := range tests {
 		t.Run(desc, func(t *testing.T) {

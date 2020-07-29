@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
 	"github.com/chef/automate/components/config-mgmt-service/backend"
+	"github.com/chef/automate/components/config-mgmt-service/backend/postgres"
 	"github.com/chef/automate/components/config-mgmt-service/config"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
 	"github.com/chef/automate/components/config-mgmt-service/params"
@@ -25,6 +26,7 @@ import (
 type CfgMgmtServer struct {
 	client backend.Client
 	cs     *config.Service
+	pg     *postgres.Postgres
 }
 
 // NewCfgMgmtServer creates a new server instance and it automatically
@@ -34,6 +36,23 @@ func NewCfgMgmtServer(cs *config.Service) *CfgMgmtServer {
 		client: cs.GetBackend(),
 		cs:     cs,
 	}
+}
+
+func (s *CfgMgmtServer) ConnectPg() error {
+	pg, err := postgres.Open(&s.cs.Postgres)
+	if err != nil {
+		return err
+	}
+	s.pg = pg
+	return nil
+}
+
+func (s *CfgMgmtServer) PgConnection() *postgres.Postgres {
+	return s.pg
+}
+
+func (s *CfgMgmtServer) ClearPg() error {
+	return s.pg.Clear()
 }
 
 // GetPolicyCookbooks returns a list of cookbook name, policy
@@ -106,12 +125,18 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context,
 		return nodesCounts, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
+	// Date Range
+	if !params.ValidateDateTimeRange(request.GetStart(), request.GetEnd()) {
+		return nodesCounts, status.Errorf(codes.InvalidArgument,
+			"Invalid start/end time. (format: YYYY-MM-DD'T'HH:mm:ssZ)")
+	}
+
 	filters, err = filterByProjects(ctx, filters)
 	if err != nil {
 		return nodesCounts, errors.GrpcErrorFromErr(codes.Internal, err)
 	}
 
-	state, err := s.client.GetNodesCounts(filters)
+	state, err := s.client.GetNodesCounts(filters, request.GetStart(), request.GetEnd())
 	if err != nil {
 		return nodesCounts, errors.GrpcErrorFromErr(codes.Internal, err)
 	}
@@ -123,6 +148,50 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context,
 		Missing: int32(state.Missing),
 	}
 	return nodesCounts, nil
+}
+
+// This function provides the status of runs for each 24-hour duration. For multiple runs in one
+// 24-hour duration, the most recent failed run will be returned. If there are no failed runs the
+// most recent successful run will be returned. If no runs are found in the 24-hour duration, the
+// status will be "missing" and no run will be returned.
+func (s *CfgMgmtServer) GetNodeRunsDailyStatusTimeSeries(ctx context.Context,
+	request *request.NodeRunsDailyStatusTimeSeries) (*response.NodeRunsDailyStatusTimeSeries, error) {
+	if request.GetNodeId() == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Parameter 'node_id' not provided")
+	}
+
+	daysAgo := request.GetDaysAgo()
+	if daysAgo < 0 {
+		return &response.NodeRunsDailyStatusTimeSeries{}, errors.GrpcError(codes.InvalidArgument,
+			"daysAgo needs to be greater than zero")
+	}
+
+	// default to provide a time series for the past 24 hours
+	if daysAgo == 0 {
+		daysAgo = 1
+	}
+
+	startTime, endTime := calculateStartEndCheckInTimeSeries(daysAgo)
+
+	timeSeries, err := s.client.GetNodeRunsDailyStatusTimeSeries(request.GetNodeId(), startTime,
+		endTime.Add(-time.Millisecond))
+	if err != nil {
+		return &response.NodeRunsDailyStatusTimeSeries{}, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
+	runDurationStatusCollection := make([]*response.RunDurationStatus, len(timeSeries))
+	for index, duration := range timeSeries {
+		runDurationStatusCollection[index] = &response.RunDurationStatus{
+			Start:  duration.Start.Format(time.RFC3339),
+			End:    duration.End.Format(time.RFC3339),
+			Status: duration.Status,
+			RunId:  duration.RunID,
+		}
+	}
+
+	return &response.NodeRunsDailyStatusTimeSeries{
+		Durations: runDurationStatusCollection,
+	}, nil
 }
 
 // GetCheckInCountsTimeSeries - Returns a daily time series of unique node check-ins for the number of day requested
@@ -295,6 +364,48 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context,
 	}
 
 	return toResponseRun(run, getNodes.nodes[0])
+}
+
+// GetNodeMetadataCounts - For each type of field provided return distinct values the amount for each.
+// For example, if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8
+// could be returned. The number next to each represents the number of nodes with that type of platform.
+func (s *CfgMgmtServer) GetNodeMetadataCounts(ctx context.Context,
+	req *request.NodeMetadataCounts) (*response.NodeMetadataCounts, error) {
+
+	filters, err := stringutils.FormatFiltersWithKeyConverter(req.Filter,
+		params.ConvertParamToNodeStateBackendLowerFilter)
+
+	// Date Range
+	if !params.ValidateDateTimeRange(req.GetStart(), req.GetEnd()) {
+		return &response.NodeMetadataCounts{}, status.Errorf(codes.InvalidArgument,
+			"Invalid start/end time. (format: YYYY-MM-DD'T'HH:mm:ssZ)")
+	}
+
+	typeCounts, err := s.client.GetNodeMetadataCounts(filters,
+		req.Type, req.Start, req.End)
+	if err != nil {
+		return &response.NodeMetadataCounts{}, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
+	types := make([]*response.TypeCount, len(typeCounts))
+	for index := range typeCounts {
+		values := make([]*response.ValueCount, len(typeCounts[index].Values))
+		for valueIndex, valueCount := range typeCounts[index].Values {
+			values[valueIndex] = &response.ValueCount{
+				Count: int32(valueCount.Count),
+				Value: valueCount.Value,
+			}
+		}
+
+		types[index] = &response.TypeCount{
+			Type:   typeCounts[index].Type,
+			Values: values,
+		}
+	}
+
+	return &response.NodeMetadataCounts{
+		Types: types,
+	}, nil
 }
 
 func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,

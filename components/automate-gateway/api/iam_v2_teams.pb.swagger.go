@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("iam_v2_teams", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/iam/v2/teams.proto",
+    "title": "automate-gateway/api/iam/v2/teams.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/iam/v2/teams": {
+    "/apis/iam/v2/teams": {
       "get": {
         "summary": "Lists all local teams",
         "description": "Lists all local teams.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -64,7 +64,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/teams/{id}": {
+    "/apis/iam/v2/teams/{id}": {
       "get": {
         "summary": "Get a team",
         "description": "Returns the details for a team.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -152,7 +152,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/teams/{id}/users": {
+    "/apis/iam/v2/teams/{id}/users": {
       "get": {
         "summary": "Gets local team membership",
         "description": "Lists all users of a local team. Users are listed by their membership_id.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -178,10 +178,10 @@ func init() {
         ]
       }
     },
-    "/iam/v2/teams/{id}/users:add": {
+    "/apis/iam/v2/teams/{id}/users:add": {
       "post": {
         "summary": "Adds local team membership",
-        "description": "Adds a list of users to a local team. Users are added by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Adds a list of users to a local team. Users are added by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "AddTeamMembers",
         "responses": {
           "200": {
@@ -218,10 +218,10 @@ func init() {
         ]
       }
     },
-    "/iam/v2/teams/{id}/users:remove": {
+    "/apis/iam/v2/teams/{id}/users:remove": {
       "post": {
         "summary": "Removes local team membership",
-        "description": "Removes a list of users from a local team. Users are removed by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:delete\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Removes a list of users from a local team. Users are removed by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "RemoveTeamMembers",
         "responses": {
           "200": {
@@ -258,7 +258,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/users/{membership_id}/teams": {
+    "/apis/iam/v2/users/{membership_id}/teams": {
       "get": {
         "summary": "Gets team membership for a user",
         "description": "Lists all local teams for a specific user. You must use their membership_id in the request URL.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:userTeams:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -289,6 +289,7 @@ func init() {
     "chef.automate.api.iam.v2.AddTeamMembersReq": {
       "type": "object",
       "example": {
+        "id": "admins",
         "membership_ids": [
           "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
           "353a62d4-85fa-4423-b12a-f6608a562ae9"
@@ -330,7 +331,7 @@ func init() {
     "chef.automate.api.iam.v2.CreateTeamReq": {
       "type": "object",
       "example": {
-        "id": "test-id",
+        "id": "my-team-id",
         "name": "My Test Team",
         "projects": [
           "project1",
@@ -490,6 +491,7 @@ func init() {
     "chef.automate.api.iam.v2.RemoveTeamMembersReq": {
       "type": "object",
       "example": {
+        "id": "admins",
         "membership_ids": [
           "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
           "353a62d4-85fa-4423-b12a-f6608a562ae9"
@@ -548,6 +550,7 @@ func init() {
     "chef.automate.api.iam.v2.UpdateTeamReq": {
       "type": "object",
       "example": {
+        "id": "my-team-id",
         "name": "My Test Team",
         "projects": [
           "project1",

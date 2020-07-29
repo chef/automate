@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("iam_v2_rules", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/iam/v2/rules.proto",
+    "title": "automate-gateway/api/iam/v2/rules.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,10 +14,10 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/iam/v2/apply-rules": {
+    "/apis/iam/v2/apply-rules": {
       "get": {
         "summary": "Get the status of a project update",
-        "description": "Returns details about a project update operation.\n\nYou can poll this endpoint during a project update to monitor progress. \nQuerying this endpoint when there is no update in progress will return details \nabout the completion status of the most recent update.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:rules:status\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns details about a project update operation.\n\nYou can poll this endpoint during a project update to monitor progress.\nQuerying this endpoint when there is no update in progress will return details\nabout the completion status of the most recent update.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:rules:status\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ApplyRulesStatus",
         "responses": {
           "200": {
@@ -49,7 +49,7 @@ func init() {
       },
       "post": {
         "summary": "Start project update",
-        "description": "Any changes to a project's rules are staged first. They do not take effect until \nall projects are updated.\n\nUpdating all projects begins an operation that applies all pending rule edits \nand then moves ingested resources into the correct projects according to those latest changes.\n\nWith a large amount of historical compliance data, rule application can take a considerable amount of time.\nIt’s best to batch up rule changes and apply them all at once.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:rules:apply\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Any changes to a project's rules are staged first. They do not take effect until\nall projects are updated.\n\nUpdating all projects begins an operation that applies all pending rule edits\nand then moves ingested resources into the correct projects according to those latest changes.\n\nWith a large amount of historical compliance data, rule application can take a considerable amount of time.\nIt’s best to batch up rule changes and apply them all at once.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:rules:apply\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ApplyRulesStart",
         "responses": {
           "200": {
@@ -64,7 +64,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/projects/{id}/rules": {
+    "/apis/iam/v2/projects/{id}/rules": {
       "get": {
         "summary": "List a project's rules",
         "description": "Lists all of the project rules of a specific project.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -91,10 +91,10 @@ func init() {
         ]
       }
     },
-    "/iam/v2/projects/{project_id}/rules": {
+    "/apis/iam/v2/projects/{project_id}/rules": {
       "post": {
         "summary": "Create a project rule",
-        "description": "Creates a new project rule to move ingested resources into projects.\n\nA project rule contains conditions that determine if an ingested resource should be moved into the rule’s project. \n\nEach condition specifies one or more values to match for a particular attribute on an ingested resource.\n\nThe choice of attributes depends on the rule type.\nFor NODE type, specify any of the available attributes.\nFor EVENT type, specify either CHEF_ORGANIZATION or CHEF_SERVER.\n\nThe choice of operator depends on how many values you provide.\nIf you wish to match one among a group of values, set the operator to MEMBER_OF. \nFor a single value, use EQUALS.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:update\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a new project rule to move ingested resources into projects.\n\nA project rule contains conditions that determine if an ingested resource should be moved into the rule’s project.\n\nEach condition specifies one or more values to match for a particular attribute on an ingested resource.\n\nThe choice of attributes depends on the rule type.\nFor NODE type, specify any of the available attributes.\nFor EVENT type, specify either CHEF_ORGANIZATION or CHEF_SERVER.\n\nThe choice of operator depends on how many values you provide.\nIf you wish to match one among a group of values, set the operator to MEMBER_OF.\nFor a single value, use EQUALS.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateRule",
         "responses": {
           "200": {
@@ -132,7 +132,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/projects/{project_id}/rules/{id}": {
+    "/apis/iam/v2/projects/{project_id}/rules/{id}": {
       "get": {
         "summary": "Get a project rule",
         "description": "Returns the details for a project rule.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -167,7 +167,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a project rule",
-        "description": "The resulting change to the project's resources does not take effect immediately. \nUpdates to project rules must be applied to ingested resources by a project update.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:update\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "The resulting change to the project's resources does not take effect immediately.\nUpdates to project rules must be applied to ingested resources by a project update.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteRule",
         "responses": {
           "200": {
@@ -199,7 +199,7 @@ func init() {
       },
       "put": {
         "summary": "Update a project rule",
-        "description": "Updates the name and conditions of an existing project rule.\nNew conditions can be added. Existing conditions can be updated or removed.\n\nThis operation overwrites all fields excluding ID and Type,\nincluding those omitted from the request, so be sure to specify all properties.\nProperties that you do not include are reset to empty values.\n\nThe resulting change to the project's resources does not take effect immediately. \nUpdates to project rules must be applied to ingested resources by a project update.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:update\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Updates the name and conditions of an existing project rule.\nNew conditions can be added. Existing conditions can be updated or removed.\n\nThis operation overwrites all fields excluding ID and Type,\nincluding those omitted from the request, so be sure to specify all properties.\nProperties that you do not include are reset to empty values.\n\nThe resulting change to the project's resources does not take effect immediately.\nUpdates to project rules must be applied to ingested resources by a project update.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateRule",
         "responses": {
           "200": {
@@ -309,7 +309,7 @@ func init() {
         },
         "operator": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.ConditionOperator",
-          "description": "Whether the attribute matches a single value (` + "`" + `EQUALS` + "`" + `) or \nmatches at least one of a set of values (` + "`" + `MEMBER_OF` + "`" + `)."
+          "description": "Whether the attribute matches a single value (` + "`" + `EQUALS` + "`" + `) or\nmatches at least one of a set of values (` + "`" + `MEMBER_OF` + "`" + `)."
         }
       }
     },
@@ -369,14 +369,14 @@ func init() {
         },
         "type": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType",
-          "description": "Whether the rule is ` + "`" + `STAGED` + "`" + ` (not in effect) or ` + "`" + `APPLIED` + "`" + ` (in effect)."
+          "description": "Whether the rule affects nodes (` + "`" + `NODE` + "`" + `) or events (` + "`" + `EVENT` + "`" + `)."
         },
         "conditions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Condition"
           },
-          "description": "Conditions that ingested resources must match to belong to the project. \nWill contain one or more."
+          "description": "Conditions that ingested resources must match to belong to the project.\nWill contain one or more."
         }
       },
       "required": [
@@ -525,7 +525,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Condition"
           },
-          "description": "Conditions that ingested resources must match to belong to the project. \nWill contain one or more."
+          "description": "Conditions that ingested resources must match to belong to the project.\nWill contain one or more."
         },
         "status": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.RuleStatus",
@@ -583,14 +583,14 @@ func init() {
         },
         "type": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType",
-          "description": "Whether the rule applies to ingested ` + "`" + `NODE` + "`" + ` or ` + "`" + `EVENT resources.\nCannot be changed."
+          "description": "Whether the rule applies to ingested ` + "`" + `NODE` + "`" + ` or ` + "`" + `EVENT` + "`" + ` resources.\nCannot be changed."
         },
         "conditions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Condition"
           },
-          "description": "Conditions that ingested resources must match to belong to the project. \nWill contain one or more."
+          "description": "Conditions that ingested resources must match to belong to the project.\nWill contain one or more."
         }
       },
       "required": [

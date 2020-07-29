@@ -1,4 +1,6 @@
-import { Component, isDevMode } from '@angular/core';
+import { Component } from '@angular/core';
+import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
+
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
@@ -7,9 +9,9 @@ import { Component, isDevMode } from '@angular/core';
 
 export class NavbarComponent {
 
-  constructor() {}
+  public isDesktopView = false;
 
-  isDevMode() {
-    return isDevMode();
+  constructor(private productDeployedService: ProductDeployedService) {
+    this.isDesktopView = this.productDeployedService.isProductDeployed('desktop');
   }
 }

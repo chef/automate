@@ -56,11 +56,11 @@
       <section class="page-body" *ngIf="tabValue === 'rules'">
         <ng-container *ngIf="showRulesTable()">
           <chef-toolbar>
-            <app-authorized [allOf]="['/iam/v2/projects', 'post']">
+            <app-authorized [allOf]="['/apis/iam/v2/projects', 'post']">
               <chef-button [routerLink]="['/settings', 'projects', project?.id, 'rules']" primary>Create Rule</chef-button>
             </app-authorized>
           </chef-toolbar>
-          <app-authorized [allOf]="['/iam/v2/projects', 'get']">
+          <app-authorized [allOf]="['/apis/iam/v2/projects', 'get']">
             <chef-table id="project-rules-table">
               <chef-thead>
                 <chef-tr>
@@ -82,7 +82,7 @@
                   <chef-td>{{ rule.conditions.length | pluralize : 'condition' : 'conditions' }}</chef-td>
                   <chef-td>{{ getEditStatus(rule) }}</chef-td>
                   <chef-td class="three-dot-column">
-                    <app-authorized [allOf]="['/iam/v2/projects/{id}', 'delete', project?.id]">
+                    <app-authorized [allOf]="['/apis/iam/v2/projects/{id}', 'delete', project?.id]">
                       <mat-select panelClass="chef-control-menu">
                         <mat-option *ngIf="showDeleteRule()" class="delete-rule" (onSelectionChange)="startRuleDelete(rule)" data-cy="delete-rule">Delete Rule</mat-option>
                       </mat-select>
@@ -94,7 +94,7 @@
           </app-authorized>
         </ng-container>
         <ng-container *ngIf="showNoRulesMessage()">
-          <app-authorized [allOf]="['/iam/v2/projects', 'post']">
+          <app-authorized [allOf]="['/apis/iam/v2/projects', 'post']">
             <div class="empty-case-container">
               <small class="empty-case-entry" *ngIf="project?.status === 'EDITS_PENDING'">
                 Edits are pending: update <a [routerLink]="['/settings/projects']">projects</a> to apply edits.
@@ -105,7 +105,7 @@
           </app-authorized>
         </ng-container>
       </section>
-  
+
       <app-delete-object-modal
         [visible]="deleteModalVisible"
         objectNoun="rule"
@@ -114,7 +114,7 @@
         (deleteClicked)="deleteRule()"
         objectAction="Delete">
       </app-delete-object-modal>
-  
+
     </main>
   </div>
 </div>

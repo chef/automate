@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package chef.automate.api.cds.response;
+option go_package = "github.com/chef/automate/api/external/cds/response";
+
+message ContentItems {
+  repeated ContentItem items = 1;
+}
+
+message ContentItem {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string version = 5;
+  repeated string platforms = 6;
+  bool can_be_installed = 7;
+  string filename = 8;
+}
+
+message InstallContentItem {
+
+}
+
+message Credentials {
+
+}
+
+message ContentEnabled {
+  bool is_content_enabled = 1;
+}

@@ -36,12 +36,14 @@ type datafeedNotification struct {
 }
 
 type DataClient struct {
-	client http.Client
+	client              http.Client
+	acceptedStatusCodes []int32
 }
 
-func NewDataClient() DataClient {
+func NewDataClient(statusCodes []int32) DataClient {
 	return DataClient{
-		client: http.Client{},
+		client:              http.Client{},
+		acceptedStatusCodes: statusCodes,
 	}
 }
 
@@ -190,7 +192,7 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 	} else {
 		log.Infof("Asset data posted to %v, Status %v", notification.url, response.Status)
 	}
-	if response.StatusCode != http.StatusAccepted {
+	if !config.IsAcceptedStatusCode(int32(response.StatusCode), client.acceptedStatusCodes) {
 		return errors.New(response.Status)
 	}
 	err = response.Body.Close()
@@ -200,53 +202,45 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 	return nil
 }
 
-func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (map[string]interface{}, error) {
-
-	nodeData := make(map[string]interface{})
-	nodeId, lastRunId, err := getNodeFields(ctx, client, filters)
-	if err != nil {
-		return nodeData, err
-	}
-
-	attributesJson, err := getNodeAttributes(ctx, client, nodeId)
-	if err != nil {
-		return nodeData, err
-	}
-
-	nodeData["attributes"] = attributesJson
-
-	lastRun, err := client.GetNodeRun(ctx, &cfgmgmtRequest.NodeRun{NodeId: nodeId, RunId: lastRunId})
-
-	if err != nil {
-		log.Errorf("Error getting node run %v", err)
-		return nodeData, err
-	}
-	automaticAttrs := attributesJson["automatic"].(map[string]interface{})
-	ipaddress, macAddress, hostname := getHostAttributes(automaticAttrs)
-	nodeDataContent := make(map[string]interface{})
-	nodeData["client_run"] = lastRun
-	nodeDataContent["macaddress"] = macAddress
-	nodeDataContent["hostname"] = hostname
-	nodeDataContent["ipaddress"] = ipaddress
-	addDataContent(nodeDataContent, automaticAttrs)
-	nodeData["node"] = nodeDataContent
-	return nodeData, nil
-}
-
 func addDataContent(nodeDataContent map[string]interface{}, attributes map[string]interface{}) {
-	if strings.ToLower(attributes["os"].(string)) == "windows" {
-		kernel := attributes["kernel"].(map[string]interface{})
-		osInfo := kernel["os_info"].(map[string]interface{})
+	os, _ := attributes["os"].(string)
+	if strings.ToLower(os) == "windows" {
+		kernel, ok := attributes["kernel"].(map[string]interface{})
+		if !ok {
+			nodeDataContent["serial_number"] = ""
+			nodeDataContent["os_service_pack"] = ""
+			return
+		}
+
+		osInfo, ok := kernel["os_info"].(map[string]interface{})
+		if !ok {
+			nodeDataContent["serial_number"] = ""
+			nodeDataContent["os_service_pack"] = ""
+			return
+		}
 		nodeDataContent["serial_number"] = osInfo["serial_number"]
-		servicePackMajorVersion := fmt.Sprintf("%g", osInfo["service_pack_major_version"].(float64))
-		servicePackMinorVersion := fmt.Sprintf("%g", osInfo["service_pack_minor_version"].(float64))
+		nodeDataContent["os_service_pack"] = ""
+		majorVersion, ok := osInfo["service_pack_major_version"].(float64)
+		if !ok {
+			return
+		}
+		minorVersion, ok := osInfo["service_pack_minor_version"].(float64)
+		if !ok {
+			return
+		}
+		servicePackMajorVersion := fmt.Sprintf("%g", majorVersion)
+		servicePackMinorVersion := fmt.Sprintf("%g", minorVersion)
 		servicePack := strings.Join([]string{servicePackMajorVersion, servicePackMinorVersion}, ".")
 		nodeDataContent["os_service_pack"] = servicePack
 	} else {
 		// assume linux
-		dmi := attributes["dmi"].(map[string]interface{})
-		system := dmi["system"].(map[string]interface{})
-		nodeDataContent["serial_number"] = system["serial_number"]
+		dmi, _ := attributes["dmi"].(map[string]interface{})
+		system, _ := dmi["system"].(map[string]interface{})
+		serialNumber := system["serial_number"]
+		if serialNumber == nil {
+			serialNumber = ""
+		}
+		nodeDataContent["serial_number"] = serialNumber
 	}
 }
 
@@ -277,7 +271,7 @@ func getNodeAttributes(ctx context.Context, client cfgmgmt.CfgMgmtClient, nodeId
 
 	nodeAttributes, err := client.GetAttributes(ctx, &cfgmgmtRequest.Node{NodeId: nodeId})
 	if err != nil {
-		log.Errorf("Error getting attributes %v", err)
+		log.Warnf("Error getting attributes %v", err)
 		return attributesJson, err
 	}
 
@@ -321,5 +315,10 @@ func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filter
 }
 
 func getHostAttributes(attributesJson map[string]interface{}) (string, string, string) {
-	return attributesJson["ipaddress"].(string), attributesJson["macaddress"].(string), attributesJson["hostname"].(string)
+
+	ipAddress, _ := attributesJson["ipaddress"].(string)
+	macAddress, _ := attributesJson["macaddress"].(string)
+	hostname, _ := attributesJson["hostname"].(string)
+
+	return ipAddress, macAddress, hostname
 }

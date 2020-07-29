@@ -3,9 +3,9 @@ syntax = "proto3";
 package chef.automate.domain.authz;
 option go_package = "github.com/chef/automate/api/config/authz";
 
-import "api/config/shared/global.proto";
-import "api/config/shared/tls.proto";
-import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "config/shared/global.proto";
+import "config/shared/tls.proto";
+import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
 message ConfigRequest {
@@ -41,6 +41,8 @@ message ConfigRequest {
 				reserved 3 to 4;
 				google.protobuf.StringValue database = 1;
 				google.protobuf.StringValue user = 2;
+				google.protobuf.Int32Value max_connections = 5;
+				google.protobuf.Int32Value max_idle_connections = 6;
 			}
 		}
 

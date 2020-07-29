@@ -26,6 +26,6 @@ service Authentication {
   // request, or the tokens are wrong, the AuthenticationService will return the
   // corresponding error code, with details in the message.
   rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {
-    option (google.api.http).get = "/api/authenticate";
+    option (google.api.http).get = "/api/v0/api/authenticate";
   };
 }

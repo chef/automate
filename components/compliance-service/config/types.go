@@ -13,7 +13,8 @@ type Service struct {
 	LogLevel   string
 	ServerBind string
 	certs.TLSConfig
-	ConfigFilePath string
+	ConfigFilePath    string
+	MessageBufferSize int
 }
 
 // Compliance service specific config options
@@ -80,6 +81,9 @@ type InspecAgent struct {
 	AutomateFQDN        string
 	TmpDir              string
 	RemoteInspecVersion string
+	ResultMessageLimit  int
+	ControlResultsLimit int
+	RunTimeLimit        float32
 }
 
 // Postgres specific options

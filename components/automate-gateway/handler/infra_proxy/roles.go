@@ -9,10 +9,32 @@ import (
 	infra_res "github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
+// CreateRole fetches an infra role details
+func (a *InfraProxyServer) CreateRole(ctx context.Context, r *gwreq.CreateRole) (*gwres.Role, error) {
+	req := &infra_req.CreateRole{
+		OrgId:              r.OrgId,
+		ServerId:           r.ServerId,
+		Name:               r.Name,
+		Description:        r.Description,
+		DefaultAttributes:  r.DefaultAttributes,
+		OverrideAttributes: r.OverrideAttributes,
+		RunList:            r.RunList,
+	}
+	res, err := a.client.CreateRole(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Role{
+		Name: res.GetName(),
+	}, nil
+}
+
 // GetRoles fetches an array of existing roles
 func (a *InfraProxyServer) GetRoles(ctx context.Context, r *gwreq.Roles) (*gwres.Roles, error) {
 	req := &infra_req.Roles{
-		OrgId: r.OrgId,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
 	}
 	res, err := a.client.GetRoles(ctx, req)
 	if err != nil {
@@ -27,8 +49,9 @@ func (a *InfraProxyServer) GetRoles(ctx context.Context, r *gwreq.Roles) (*gwres
 // GetRole fetches an infra role details
 func (a *InfraProxyServer) GetRole(ctx context.Context, r *gwreq.Role) (*gwres.Role, error) {
 	req := &infra_req.Role{
-		OrgId: r.OrgId,
-		Name:  r.Name,
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
 	}
 	res, err := a.client.GetRole(ctx, req)
 	if err != nil {
@@ -42,8 +65,46 @@ func (a *InfraProxyServer) GetRole(ctx context.Context, r *gwreq.Role) (*gwres.R
 		DefaultAttributes:  res.GetDefaultAttributes(),
 		OverrideAttributes: res.GetOverrideAttributes(),
 		RunList:            res.GetRunList(),
-		ExpandedRunList:    fromUpstreamExpandedRunList(res.GetExpandedRunList()),
+		ExpandedRunList:    GetUpstreamExpandedRunList(res.GetExpandedRunList()),
 		JsonClass:          res.GetJsonClass(),
+	}, nil
+}
+
+// DeleteRole deletes the role
+func (a *InfraProxyServer) DeleteRole(ctx context.Context, r *gwreq.Role) (*gwres.Role, error) {
+	req := &infra_req.Role{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.DeleteRole(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Role{
+		Name: res.GetName(),
+	}, nil
+}
+
+// UpdateRole updates an infra role
+func (a *InfraProxyServer) UpdateRole(ctx context.Context, r *gwreq.UpdateRole) (*gwres.Role, error) {
+	req := &infra_req.UpdateRole{
+		OrgId:              r.OrgId,
+		ServerId:           r.ServerId,
+		Name:               r.Name,
+		Description:        r.Description,
+		DefaultAttributes:  r.DefaultAttributes,
+		OverrideAttributes: r.OverrideAttributes,
+		RunList:            r.RunList,
+	}
+	res, err := a.client.UpdateRole(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Role{
+		Name: res.GetName(),
 	}, nil
 }
 
@@ -61,7 +122,8 @@ func fromUpstreamRoles(roles []*infra_res.RoleListItem) []*gwres.RoleListItem {
 	return ts
 }
 
-func fromUpstreamExpandedRunList(expRunList []*infra_res.ExpandedRunList) []*gwres.ExpandedRunList {
+// GetUpstreamExpandedRunList gets the expanded run-list from upstream API.
+func GetUpstreamExpandedRunList(expRunList []*infra_res.ExpandedRunList) []*gwres.ExpandedRunList {
 	exp := make([]*gwres.ExpandedRunList, len(expRunList))
 
 	for i, e := range expRunList {

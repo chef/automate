@@ -27,7 +27,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"os/user"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -38,6 +37,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/lib/secrets"
+	"github.com/chef/automate/lib/user"
 )
 
 //

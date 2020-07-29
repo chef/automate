@@ -3,6 +3,8 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
 
+import "google/protobuf/struct.proto";
+
 message DataBags {
     // Chef organization ID.
     string org_id = 1;
@@ -21,4 +23,37 @@ message DataBag {
     string name = 3;
     // Data bag item name.
     string item = 4;
+}
+
+message CreateDataBag {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Data bag name.
+    string name = 3;
+}
+
+message CreateDataBagItem {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Data bag name.
+    string name = 3;
+    // Data bag item JSON data.
+    google.protobuf.Struct data = 4;
+}
+
+message UpdateDataBagItem {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Data bag name.
+    string name = 3;
+    // Data bag item ID.
+    string item_id = 4;
+    // Data bag item JSON data.
+    google.protobuf.Struct data = 5;
 }

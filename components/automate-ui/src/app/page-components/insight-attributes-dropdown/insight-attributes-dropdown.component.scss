@@ -1,0 +1,60 @@
+@import "~styles/variables";
+@import "@carbon/layout/scss/layout";
+@import "@carbon/grid/scss/grid";
+
+:host {
+  @extend .bx--grid;
+  position: absolute;
+  top: calc(100% + #{$spacing-03});
+  right: 0;
+  padding: $spacing-05;
+  width: 100%;
+  border-radius: $spacing-03;
+  background: $chef-white;
+  box-shadow: $spacing-03 $spacing-03 24px 0 rgba(197, 199, 209, 0.6);
+  z-index: 100;
+
+  @include carbon--breakpoint-up(md) {
+    max-width: 467px;
+  }
+
+  .bx--row {
+    margin-left: 0;
+    margin-right: 0;
+
+    &.action-button-row {
+      justify-content: space-between;
+      margin-top: $spacing-03;
+    }
+  }
+
+  .instruction {
+    margin: 0;
+  }
+
+  .options {
+    margin-top: 15px;
+    justify-content: space-between;
+
+    .filter-button {
+      margin-bottom: $spacing-03;
+      padding: $spacing-03;
+      border: 1px solid $chef-grey;
+      border-radius: $chef-border-radius;
+      width: 100%;
+
+      @include carbon--breakpoint-up(md) {
+        width: calc(50% - 0.25rem);
+      }
+
+      ::ng-deep .label-wrap {
+        font-size: 12px;
+      }
+
+      // selected styles
+      &[aria-checked="true"] {
+        border: 1px solid $chef-primary-bright;
+      }
+    }
+  }
+}

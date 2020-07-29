@@ -1,6 +1,6 @@
 <button class="dropdown-label"
   id="projects-filter-button"
-  aria-label="Projects filter"
+  aria-label="Filter projects"
   [attr.title]="selectionLabel"
   [disabled]="!dropdownCaretVisible"
   (click)="handleLabelClick()"
@@ -21,7 +21,9 @@
           <input
             chefInput
             type="text"
-            (keyup)="handleFilterKeyUp($event.target.value)"
+            aria-label="Filter projects"
+            #filter
+            (keyup)="handleFilterKeyUp(filter.value)"
             placeholder="Filter projects..." />
         </div>
 

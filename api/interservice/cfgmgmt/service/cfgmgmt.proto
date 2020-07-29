@@ -5,25 +5,27 @@ option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/service";
 
 import "google/protobuf/struct.proto";
 
-import "api/interservice/cfgmgmt/response/root.proto";
-import "api/interservice/cfgmgmt/response/stats.proto";
-import "api/interservice/cfgmgmt/response/nodes.proto";
-import "api/interservice/cfgmgmt/response/actions.proto";
-import "api/interservice/cfgmgmt/response/event.proto";
-import "api/interservice/cfgmgmt/response/eventstrings.proto";
-import "api/interservice/cfgmgmt/response/inventory_nodes.proto";
-import "api/external/cfgmgmt/response/errors.proto";
+import "interservice/cfgmgmt/response/root.proto";
+import "interservice/cfgmgmt/response/stats.proto";
+import "interservice/cfgmgmt/response/nodes.proto";
+import "interservice/cfgmgmt/response/actions.proto";
+import "interservice/cfgmgmt/response/event.proto";
+import "interservice/cfgmgmt/response/eventstrings.proto";
+import "interservice/cfgmgmt/response/inventory_nodes.proto";
+import "external/cfgmgmt/response/errors.proto";
+import "external/cfgmgmt/response/rollouts.proto";
 
-import "api/interservice/cfgmgmt/request/root.proto";
-import "api/interservice/cfgmgmt/request/stats.proto";
-import "api/interservice/cfgmgmt/request/nodes.proto";
-import "api/interservice/cfgmgmt/request/parameters.proto";
-import "api/interservice/cfgmgmt/request/actions.proto";
-import "api/interservice/cfgmgmt/request/event.proto";
-import "api/interservice/cfgmgmt/request/eventstrings.proto";
-import "api/interservice/cfgmgmt/request/inventory_nodes.proto";
-import "api/interservice/cfgmgmt/request/node_export.proto";
-import "api/external/cfgmgmt/request/errors.proto";
+import "interservice/cfgmgmt/request/root.proto";
+import "interservice/cfgmgmt/request/stats.proto";
+import "interservice/cfgmgmt/request/nodes.proto";
+import "interservice/cfgmgmt/request/parameters.proto";
+import "interservice/cfgmgmt/request/actions.proto";
+import "interservice/cfgmgmt/request/event.proto";
+import "interservice/cfgmgmt/request/eventstrings.proto";
+import "interservice/cfgmgmt/request/inventory_nodes.proto";
+import "interservice/cfgmgmt/request/node_export.proto";
+import "external/cfgmgmt/request/errors.proto";
+import "external/cfgmgmt/request/rollouts.proto";
 
 service CfgMgmt {
 	rpc GetVersion (chef.automate.domain.cfgmgmt.request.VersionInfo) returns (chef.automate.domain.cfgmgmt.response.VersionInfo);
@@ -48,4 +50,12 @@ service CfgMgmt {
 	rpc GetCheckInCountsTimeSeries(chef.automate.domain.cfgmgmt.request.CheckInCountsTimeSeries) returns (chef.automate.domain.cfgmgmt.response.CheckInCountsTimeSeries);
 	rpc GetErrors(chef.automate.api.cfgmgmt.request.Errors) returns (chef.automate.api.cfgmgmt.response.Errors);
 	rpc GetMissingNodeDurationCounts(chef.automate.domain.cfgmgmt.request.MissingNodeDurationCounts) returns (chef.automate.domain.cfgmgmt.response.MissingNodeDurationCounts);
+	rpc GetNodeMetadataCounts(chef.automate.domain.cfgmgmt.request.NodeMetadataCounts) returns (chef.automate.domain.cfgmgmt.response.NodeMetadataCounts);
+	rpc GetNodeRunsDailyStatusTimeSeries(chef.automate.domain.cfgmgmt.request.NodeRunsDailyStatusTimeSeries) returns (chef.automate.domain.cfgmgmt.response.NodeRunsDailyStatusTimeSeries);
+  rpc CreateRollout(chef.automate.api.cfgmgmt.request.CreateRollout) returns (chef.automate.api.cfgmgmt.response.Rollout);
+  rpc GetRollouts(chef.automate.api.cfgmgmt.request.Rollouts) returns (chef.automate.api.cfgmgmt.response.Rollouts);
+  rpc GetRolloutById(chef.automate.api.cfgmgmt.request.RolloutById) returns (chef.automate.api.cfgmgmt.response.Rollout);
+  rpc ListNodeSegmentsWithRolloutProgress(chef.automate.api.cfgmgmt.request.ListNodeSegmentsWithRolloutProgress) returns (chef.automate.api.cfgmgmt.response.NodeSegmentsWithRolloutProgress);
+  rpc CreateRolloutTest(chef.automate.api.cfgmgmt.request.CreateRolloutTest) returns (chef.automate.api.cfgmgmt.response.CreateRolloutTest);
+  rpc HandlePolicyUpdateAction(chef.automate.domain.cfgmgmt.request.PolicyUpdateAction) returns (chef.automate.domain.cfgmgmt.response.PolicyUpdateAction);
 }

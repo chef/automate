@@ -663,9 +663,25 @@ func TestEventFeedFilterChefServers(t *testing.T) {
 			expected: expectedEvents,
 		},
 		{
-			description: "should return only 'chef_1' chef server events",
+			description: "should return only 'chef_1' chef server events. Using 'source_fqdn' alias",
 			request: request.EventFilter{
 				Filter:   []string{"source_fqdn:chef_1"},
+				PageSize: pageSize,
+			},
+			expected: expectedEvents[0:5],
+		},
+		{
+			description: "should return only 'chef_1' chef server events. Using 'chef_server' alias",
+			request: request.EventFilter{
+				Filter:   []string{"chef_server:chef_1"},
+				PageSize: pageSize,
+			},
+			expected: expectedEvents[0:5],
+		},
+		{
+			description: "should return only 'chef_1' chef server events. Using 'service_hostname' alias",
+			request: request.EventFilter{
+				Filter:   []string{"service_hostname:chef_1"},
 				PageSize: pageSize,
 			},
 			expected: expectedEvents[0:5],

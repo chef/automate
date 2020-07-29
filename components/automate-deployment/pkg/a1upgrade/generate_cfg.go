@@ -1,18 +1,24 @@
 package a1upgrade
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"reflect"
 	"strings"
 
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/config/authn"
+	"github.com/chef/automate/api/config/bifrost"
+	"github.com/chef/automate/api/config/bookshelf"
+	"github.com/chef/automate/api/config/cs_nginx"
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/dex"
 	es "github.com/chef/automate/api/config/elasticsearch"
+	"github.com/chef/automate/api/config/erchef"
 	lb "github.com/chef/automate/api/config/load_balancer"
 	ns "github.com/chef/automate/api/config/notifications"
 	pg "github.com/chef/automate/api/config/postgresql"
@@ -352,7 +358,352 @@ func getProxySettings(r *DeliveryRunning) (*ac.Proxy, error) {
 	}, nil
 }
 
-func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets) (*dc.AutomateConfig, error) {
+// nolint: gocyclo
+func getErchefSettings(r *ChefServerRunning) (*erchef.ConfigRequest_V1_System, error) {
+	var err error
+
+	sys := erchef.NewConfigRequest().GetV1().GetSys()
+	c := r.PrivateChef.OpscodeErchef
+	d := r.PrivateChef.DataCollector
+
+	sys.Api.AuthSkew, err = to32w(c.AuthSkew)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Api.BaseResourceUrl = w.String(c.BaseResourceURL)
+
+	sys.Api.BulkFetchBatchSize, err = to32w(c.BulkFetchBatchSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Api.MaxRequestSize, err = to32w(c.MaxRequestSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Api.StrictSearchResultAcls = w.Bool(c.StrictSearchResultACLs)
+
+	sys.Authz.Fanout, err = to32w(c.AuthzFanout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Authz.PoolQueueTimeout, err = to32w(c.AuthzPoolerTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Authz.Timeout, err = to32w(c.AuthzTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.DataCollector.PoolInitSize, err = to32w(d.HTTPInitCount)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.DataCollector.PoolMaxSize, err = to32w(d.HTTPMaxCount)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.DataCollector.Timeout, err = to32w(d.Timeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Depsolver.PoolQueueMax, err = to32w(c.DepsolverPoolQueueMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Depsolver.PoolInitSize, err = to32w(c.DepsolverWorkerCount)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Depsolver.PoolQueueTimeout, err = to32w(c.DepsolverPoolerTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Depsolver.PoolMaxSize = sys.Depsolver.PoolInitSize // same as DepsolverWorkerCount
+
+	sys.Depsolver.Timeout, err = to32w(c.DepsolverTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.BatchMaxWait, err = to32w(c.SearchBatchSizeMaxWait)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.BatchSize, err = to32w(c.SearchBatchSizeMaxSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.PoolInitSize, err = to32w(c.SolrHTTPInitCount)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.PoolMaxSize, err = to32w(c.SolrHTTPMaxCount)
+	if err != nil {
+		return sys, err
+	}
+	sys.Index.ReindexBatchSize, err = to32w(c.ReindexBatchSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.ReindexItemRetries, err = to32w(c.ReindexItemRetries)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.ReindexSleepMaxMs, err = to32w(c.ReindexSleepMaxMs)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.ReindexSleepMinMs, err = to32w(c.ReindexSleepMinMs)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Index.Timeout, err = to32w(c.SolrTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Keygen.CacheSize, err = to32w(c.KeygenCacheSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Keygen.StartSize, err = to32w(c.KeygenStartSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Keygen.Timeout, err = to32w(c.KeygenTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Log.MaxErrorLogsPerSecond, err = to32w(c.LogRotation.MaxMessagesPerSecond)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Log.RotationMaxBytes, err = to64w(c.LogRotation.FileMaxbytes)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Log.RotationMaxFiles, err = to32w(c.LogRotation.NumToKeep)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Memory.MaxBytes, err = to64w(c.MemoryMaxbytes)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolInitSize, err = to32w(c.DBPoolInit)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolMaxSize, err = to32w(c.DBPoolMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueMax, err = to32w(c.DBPoolQueueMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueTimeout, err = to32w(c.DBPoolerTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.Timeout, err = to32w(c.SQLDBTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	return sys, nil
+}
+
+func getInfraServerNginxSettings(cs *ChefServerRunning) (*cs_nginx.ConfigRequest_V1_System, error) {
+	var err error
+
+	ngx := cs.PrivateChef.CSNginx
+	sys := cs_nginx.NewConfigRequest().GetV1().GetSys()
+
+	sys.Ngx.Events.WorkerConnections, err = to32w(ngx.WorkerConnections)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Http.ClientMaxBodySize = w.String(ngx.ClientMaxBodySize)
+	sys.Ngx.Http.Gzip = w.String(ngx.Gzip)
+	sys.Ngx.Http.GzipHttpVersion = w.String(ngx.GzipHTTPVersion)
+	sys.Ngx.Http.GzipCompLevel = w.String(ngx.GzipCompLevel)
+	sys.Ngx.Http.GzipProxied = w.String(ngx.GzipProxied)
+
+	sys.Ngx.Http.KeepaliveTimeout, err = to32w(ngx.KeepaliveTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Http.ProxyConnectTimeout, err = to32w(ngx.ProxyConnectTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Http.Sendfile = w.String(ngx.Sendfile)
+
+	sys.Ngx.Http.ServerNamesHashBucketSize, err = to32w(ngx.ServerNamesHashBucketSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Http.TcpNodelay = w.String(ngx.TCPNodelay)
+
+	sys.Ngx.Http.TcpNopush = w.String(ngx.TCPNopush)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Ngx.Main.WorkerProcesses, err = to32w(ngx.WorkerProcesses)
+	if err != nil {
+		return sys, err
+	}
+
+	return sys, nil
+}
+
+func getBookshelfSettings(cs *ChefServerRunning) (*bookshelf.ConfigRequest_V1_System, error) {
+	var err error
+
+	sys := bookshelf.NewConfigRequest().GetV1().GetSys()
+	bk := cs.PrivateChef.Bookshelf
+
+	sys.Bookshelf.AbandonedUploadCleanupInterval, err = to32w(bk.AbandonedUploadCleanupInterval)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Bookshelf.DeletedDataCleanupInterval, err = to32w(bk.DeleteDataCleanupInterval)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Bookshelf.SqlRetryCount, err = to32w(bk.SqlRetryCount)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Bookshelf.SqlRetryDelay, err = to32w(bk.SqlRetryDelay)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Bookshelf.StreamDownload = w.Bool(bk.StreamDownload)
+
+	sys.Log.RotationMaxBytes, err = to64w(bk.LogRotation.FileMaxbytes)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Log.RotationMaxFiles, err = to32w(bk.LogRotation.NumToKeep)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolInitSize, err = to32w(bk.DbPoolSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolMaxSize, err = to32w(bk.DbPoolMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueMax, err = to32w(bk.DbPoolQueueMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueTimeout, err = to32w(bk.DbPoolerTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.Timeout, err = to32w(bk.SqlDbTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	return sys, nil
+}
+
+func getBifrostSettings(cs *ChefServerRunning) (*bifrost.ConfigRequest_V1_System, error) {
+	var err error
+
+	sys := bifrost.NewConfigRequest().GetV1().GetSys()
+	bf := cs.PrivateChef.OcBifrost
+
+	sys.Log.MaxErrorLogsPerSecond, err = to32w(bf.LogRotation.MaxMessagesPerSecond)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Log.RotationMaxBytes, err = to64w(bf.LogRotation.FileMaxbytes)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Log.RotationMaxFiles, err = to32w(bf.LogRotation.NumToKeep)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolInitSize, err = to32w(bf.DbPoolSize)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolMaxSize, err = to32w(bf.DbPoolMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueMax, err = to32w(bf.DbPoolQueueMax)
+	if err != nil {
+		return sys, err
+	}
+
+	sys.Sql.PoolQueueTimeout, err = to32w(bf.DbPoolerTimeout)
+	if err != nil {
+		return sys, err
+	}
+
+	return sys, nil
+}
+
+func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets, cs *ChefServerRunning) (*dc.AutomateConfig, error) {
 	frontendTLSCreds, err := getFrontendTLSCreds(r)
 	if err != nil {
 		return nil, err
@@ -480,5 +831,79 @@ func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets) (*d
 		},
 	}
 
+	// Return early if we're not migrating Chef Infra Server config
+	if cs == nil {
+		return cfg, nil
+	}
+
+	erchefSys, err := getErchefSettings(cs)
+	if err != nil {
+		return cfg, errors.Wrap(err, "paring Chef Infra Server oc-erchef settings")
+	}
+
+	infraNginxSys, err := getInfraServerNginxSettings(cs)
+	if err != nil {
+		return cfg, errors.Wrap(err, "paring Chef Infra Server nginx settings")
+	}
+
+	bookshelfSys, err := getBookshelfSettings(cs)
+	if err != nil {
+		return cfg, errors.Wrap(err, "paring Chef Infra Server bookshelf settings")
+	}
+
+	bifrostSys, err := getBifrostSettings(cs)
+	if err != nil {
+		return cfg, errors.Wrap(err, "paring Chef Infra Server oc-bifrost settings")
+	}
+
+	cfg.Erchef = &erchef.ConfigRequest{
+		V1: &erchef.ConfigRequest_V1{
+			Sys: erchefSys,
+		},
+	}
+	cfg.CsNginx = &cs_nginx.ConfigRequest{
+		V1: &cs_nginx.ConfigRequest_V1{
+			Sys: infraNginxSys,
+		},
+	}
+	cfg.Bookshelf = &bookshelf.ConfigRequest{
+		V1: &bookshelf.ConfigRequest_V1{
+			Sys: bookshelfSys,
+		},
+	}
+	cfg.Bifrost = &bifrost.ConfigRequest{
+		V1: &bifrost.ConfigRequest_V1{
+			Sys: bifrostSys,
+		},
+	}
+
 	return cfg, nil
+}
+
+func to32w(in json.Number) (*wrappers.Int32Value, error) {
+	i, err := in.Int64()
+	if err != nil {
+		// If the value is not set we'll return an empty wrapper
+		if in.String() == "" {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return w.Int32(int32(i)), nil
+}
+
+func to64w(in json.Number) (*wrappers.Int64Value, error) {
+	i, err := in.Int64()
+	if err != nil {
+		// If the value is not set we'll return an empty wrapper
+		if in.String() == "" {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return w.Int64(i), nil
 }

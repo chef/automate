@@ -82,9 +82,9 @@ func AddControlSummary(total *reportingTypes.NodeControlSummary, sum reportingTy
 func ReportComplianceStatus(summary *reportingTypes.NodeControlSummary) (status string) {
 	if summary.Failed.Total > 0 {
 		status = inspec.ResultStatusFailed
-	} else if summary.Total == summary.Skipped.Total {
+	} else if summary.Total == summary.Skipped.Total && summary.Total > 0 {
 		status = inspec.ResultStatusSkipped
-	} else if summary.Total == summary.Waived.Total {
+	} else if summary.Total == summary.Waived.Total && summary.Total > 0 {
 		status = inspec.ResultStatusWaived
 	} else {
 		status = inspec.ResultStatusPassed
@@ -179,6 +179,14 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSu
 				WaivedStr:  controlWaivedStr,
 			}
 
+			if control.RemovedResultsCounts != nil {
+				minControls[i].RemovedResultsCounts = &relaxting.ESInSpecReportControlRemovedResultsCounts{
+					Failed:  int(control.RemovedResultsCounts.Failed),
+					Skipped: int(control.RemovedResultsCounts.Skipped),
+					Passed:  int(control.RemovedResultsCounts.Passed),
+				}
+			}
+
 			// In ingestion old inspec reports can come without control `waiver_data` and new ones can have `waiver_data: {}`
 			if controlWaivedStr != inspec.ControlWaivedStrNo {
 				minControls[i].WaiverData = &relaxting.ESInSpecReportControlsWaiverData{
@@ -200,18 +208,24 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSu
 			}
 		}
 
+		statusMessage := profile.StatusMessage
+		if profile.StatusMessage == "" {
+			// Legacy message only available for the skipped status
+			statusMessage = profile.SkipMessage
+		}
+
 		profilesRep = append(profilesRep, relaxting.ESInSpecReportProfile{
-			Name:         profile.Name,
-			Title:        profile.Title,
-			Profile:      profileSums.Profile,
-			Version:      profile.Version,
-			Full:         fmt.Sprintf("%s, v%s", profile.Title, profile.Version),
-			SHA256:       profile.Sha256,
-			Controls:     minControls,
-			ControlsSums: profileSums.ControlsSums,
-			Depends:      minDepends,
-			Status:       profileSums.Status,
-			SkipMessage:  profile.SkipMessage,
+			Name:          profile.Name,
+			Title:         profile.Title,
+			Profile:       profileSums.Profile,
+			Version:       profile.Version,
+			Full:          fmt.Sprintf("%s, v%s", profile.Title, profile.Version),
+			SHA256:        profile.Sha256,
+			Controls:      minControls,
+			ControlsSums:  profileSums.ControlsSums,
+			Depends:       minDepends,
+			Status:        profileSums.Status,
+			StatusMessage: statusMessage,
 		})
 	}
 	return profilesRep

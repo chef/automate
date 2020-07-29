@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package chef.automate.api.cds.request;
+option go_package = "github.com/chef/automate/api/external/cds/request";
+
+message ContentItems {
+
+}
+
+message InstallContentItem {
+  string id = 1;
+  string request_user = 2;
+}
+
+message DownloadContentItem {
+  string id = 1;
+}
+
+message Credentials {
+  string client_id = 1;
+  string client_secret = 2;
+  string tenant_specific_url = 3;
+}
+
+message ContentEnabled {
+
+}

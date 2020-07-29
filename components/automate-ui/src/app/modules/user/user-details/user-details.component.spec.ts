@@ -28,6 +28,7 @@ import {
   GetUserSelfSuccess
 } from 'app/entities/users/userself.actions';
 import { UserDetailsComponent } from './user-details.component';
+import { EntityStatus } from 'app/entities/entities';
 
 describe('UserDetailsComponent', () => {
   let component: UserDetailsComponent;
@@ -49,7 +50,14 @@ describe('UserDetailsComponent', () => {
       },
       users: UserEntityInitialState,
       userSelf: {
-        userSelfId: 'alice'
+        userSelfId: 'alice',
+        getStatus: EntityStatus.loading,
+        updateStatus: EntityStatus.loading,
+        userSelf: {
+          id: 'any',
+          name: 'any',
+          membership_id: 'any'
+        }
       }
     };
 
@@ -203,7 +211,14 @@ describe('UserDetailsComponent', () => {
       },
       users: UserEntityInitialState,
       userSelf: {
-        userSelfId: 'bob'
+        userSelfId: 'bob',
+        getStatus: EntityStatus.loading,
+        updateStatus: EntityStatus.loading,
+        userSelf: {
+          id: 'any',
+          name: 'any',
+          membership_id: 'any'
+        }
       }
     };
 

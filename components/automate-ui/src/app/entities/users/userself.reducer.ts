@@ -19,7 +19,7 @@ export const UserSelfEntityInitialState: UserSelfEntityState = {
 };
 
 export function userSelfEntityReducer(state: UserSelfEntityState = UserSelfEntityInitialState,
-  action: UserSelfActions) {
+  action: UserSelfActions): UserSelfEntityState {
 
   switch (action.type) {
     case UserSelfActionTypes.SET_ID:
@@ -35,7 +35,7 @@ export function userSelfEntityReducer(state: UserSelfEntityState = UserSelfEntit
       return pipe(
         set('getStatus', EntityStatus.loadingSuccess),
         set('userSelf', action.payload)
-      )(state);
+      )(state) as UserSelfEntityState;
 
     case UserSelfActionTypes.GET_FAILURE:
       return set('getStatus', EntityStatus.loadingFailure, state);
@@ -47,7 +47,7 @@ export function userSelfEntityReducer(state: UserSelfEntityState = UserSelfEntit
       return pipe(
         set('updateStatus', EntityStatus.loadingSuccess),
         set('userSelf', action.payload)
-      )(state);
+      )(state) as UserSelfEntityState;
 
     case UserSelfActionTypes.UPDATE_PASSWORD_SELF_FAILURE:
       return set('updateStatus', EntityStatus.loadingFailure, state);
@@ -59,7 +59,7 @@ export function userSelfEntityReducer(state: UserSelfEntityState = UserSelfEntit
       return pipe(
         set('updateStatus', EntityStatus.loadingSuccess),
         set('userSelf', action.payload)
-      )(state);
+      )(state) as UserSelfEntityState;
 
     case UserSelfActionTypes.UPDATE_NAME_SELF_FAILURE:
       return set('updateStatus', EntityStatus.loadingFailure, state);

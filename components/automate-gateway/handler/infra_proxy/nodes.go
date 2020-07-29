@@ -14,6 +14,7 @@ func (a *InfraProxyServer) GetAffectedNodes(ctx context.Context, r *gwreq.Affect
 
 	req := &infra_req.AffectedNodes{
 		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
 		ChefType: r.ChefType,
 		Name:     r.Name,
 		Version:  r.Version,
@@ -25,6 +26,24 @@ func (a *InfraProxyServer) GetAffectedNodes(ctx context.Context, r *gwreq.Affect
 
 	return &gwres.AffectedNodes{
 		Nodes: parseNodeAttributeFromRes(res.Nodes),
+	}, nil
+}
+
+// DeleteNode deletes the node by name
+func (a *InfraProxyServer) DeleteNode(ctx context.Context, r *gwreq.DeleteNode) (*gwres.DeleteNode, error) {
+
+	req := &infra_req.DeleteNode{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.DeleteNode(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.DeleteNode{
+		Name: res.GetName(),
 	}, nil
 }
 

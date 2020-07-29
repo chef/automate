@@ -9,16 +9,29 @@ pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="13.0.47"
 pkg_deps=(
+  core/coreutils
   chef/mlsa
-  # TODO: REMOVE PINS
-  # The following pins match those in the chef-server-* packages below
-  # and can be removed once we unblock upgrades of chef-server.
-  core/curl/7.65.3/20190826035620
-  core/bundler/1.17.3/20191007210608
-  core/ruby/2.5.7/20191007205439
+  # TODO 2020-05-12: PIN PIN PIN
+  #
+  # All dependencies that are shared between this package and the
+  # chef-server-* packages are pinned to the versions required by the
+  # chef-server-* packages.
+  #
+  # Currently, the chef-server-* packages we are pinned to were
+  # hand-built and any update to any of these three packages will
+  # require them to be re-built.
+  #
+  # We cannot follow the latest chef-server-* packages until the
+  # following issue is resolved:
+  #
+  # https://github.com/chef/automate/pull/2002#issuecomment-600343881
+  #
+  core/bundler/1.17.3/20200404130802
+  core/curl/7.68.0/20200319191535
+  core/ruby/2.5.7/20200404130135
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/chef-server-nginx/13.0.47/20191009112851"
-  "${vendor_origin}/chef-server-ctl/13.0.47/20191009112038"
+  "${vendor_origin}/chef-server-nginx/13.0.47/20200421235836"
+  "${vendor_origin}/chef-server-ctl/13.0.47/20200421235903"
 )
 
 pkg_bin_dirs=(bin)

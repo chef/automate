@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("data_feed", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/data_feed/data_feed.proto",
+    "title": "external/data_feed/data_feed.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/datafeed/destination": {
+    "/api/v0/datafeed/destination": {
       "post": {
         "operationId": "AddDestination",
         "responses": {
@@ -40,7 +40,7 @@ func init() {
         ]
       }
     },
-    "/datafeed/destination/{id}": {
+    "/api/v0/datafeed/destination/{id}": {
       "get": {
         "operationId": "GetDestination",
         "responses": {
@@ -118,7 +118,7 @@ func init() {
         ]
       }
     },
-    "/datafeed/destinations": {
+    "/api/v0/datafeed/destinations": {
       "post": {
         "operationId": "ListDestinations",
         "responses": {
@@ -144,7 +144,7 @@ func init() {
         ]
       }
     },
-    "/datafeed/destinations/test": {
+    "/api/v0/datafeed/destinations/test": {
       "post": {
         "operationId": "TestDestination",
         "responses": {

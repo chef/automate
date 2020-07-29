@@ -42,19 +42,18 @@
       <section class="page-body">
         <form [formGroup]="updateForm">
           <chef-form-field>
-            <label>Name <span aria-hidden="true">*</span></label>
-            <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="name-input"/>
+            <label for="name">Name <span aria-hidden="true">*</span></label>
+            <input id="name" chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="name-input"/>
             <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
               Name is required.
             </chef-error>
           </chef-form-field>
-          <div id='projects-container'>
+          <chef-form-field id='projects-container'>
             <app-projects-dropdown
-              [projects]="projects"
-              (onProjectChecked)="onProjectChecked($event)"
-              [disabled]="dropdownDisabled()">
+              [checkedProjectIDs]="token?.projects"
+              (onDropdownClosing)="onProjectDropdownClosing($event)">
             </app-projects-dropdown>
-          </div>
+          </chef-form-field>
           <chef-form-field>
             <label>Status <span aria-hidden="true">*</span></label>
             <chef-radio ngDefaultControl formControlName="status" [resetOrigin]="saveSuccessful">

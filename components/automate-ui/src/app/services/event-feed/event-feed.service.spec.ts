@@ -11,7 +11,7 @@ import {
 } from '../../types/types';
 
 import { EventFeedService } from './event-feed.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { initialState } from './event-feed.reducer';
 
 describe('EventFeedService', () => {
@@ -40,8 +40,8 @@ describe('EventFeedService', () => {
       const end = moment('20190827-2359', 'YYYYMMDD-HHmm');
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'},
-          {text: 'scan_job', type: 'entity_type'}
+          {text: 'node', type: 'event-type'},
+          {text: 'scan_job', type: 'event-type'}
         ],
         hoursBetween: 4,
         collapse: false,
@@ -55,8 +55,8 @@ describe('EventFeedService', () => {
 
       const httpFilters = httpParams.getAll('filter');
       expect(httpFilters.length).toEqual(3);
-      expect(httpFilters).toContain('entity_type:scan_job');
-      expect(httpFilters).toContain('entity_type:node');
+      expect(httpFilters).toContain('event-type:scan_job');
+      expect(httpFilters).toContain('event-type:node');
       expect(httpFilters).toContain('task:delete');
 
       expect(httpParams.get('page_size')).toEqual('77');
@@ -71,8 +71,8 @@ describe('EventFeedService', () => {
     it('full filter second page', () => {
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'},
-          {text: 'scan_job', type: 'entity_type'}
+          {text: 'node', type: 'event-type'},
+          {text: 'scan_job', type: 'event-type'}
         ],
         hoursBetween: 4,
         collapse: false,
@@ -107,8 +107,8 @@ describe('EventFeedService', () => {
     it('collapse not set', () => {
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'},
-          {text: 'scan_job', type: 'entity_type'}
+          {text: 'node', type: 'event-type'},
+          {text: 'scan_job', type: 'event-type'}
         ],
         hoursBetween: 4,
         task: 'delete',
@@ -125,8 +125,8 @@ describe('EventFeedService', () => {
     it('page not set', () => {
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'},
-          {text: 'scan_job', type: 'entity_type'}
+          {text: 'node', type: 'event-type'},
+          {text: 'scan_job', type: 'event-type'}
         ],
         hoursBetween: 4,
         collapse: false,
@@ -147,8 +147,8 @@ describe('EventFeedService', () => {
       const end = moment('20190827-2359', 'YYYYMMDD-HHmm');
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'},
-          {text: 'scan_job', type: 'entity_type'}
+          {text: 'node', type: 'event-type'},
+          {text: 'scan_job', type: 'event-type'}
         ],
         hoursBetween: 4,
         startDate: start,
@@ -161,8 +161,8 @@ describe('EventFeedService', () => {
 
       const httpFilters = httpParams.getAll('filter');
       expect(httpFilters.length).toEqual(2);
-      expect(httpFilters).toContain('entity_type:scan_job');
-      expect(httpFilters).toContain('entity_type:node');
+      expect(httpFilters).toContain('event-type:scan_job');
+      expect(httpFilters).toContain('event-type:node');
 
       expect(httpParams.get('hours_between')).toEqual('4');
 
@@ -173,8 +173,8 @@ describe('EventFeedService', () => {
     it('no start date', () => {
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'},
-          {text: 'scan_job', type: 'entity_type'}
+          {text: 'node', type: 'event-type'},
+          {text: 'scan_job', type: 'event-type'}
         ],
         hoursBetween: 4,
         endDate: moment('20190827-2359', 'YYYYMMDD-HHmm')
@@ -188,8 +188,8 @@ describe('EventFeedService', () => {
     it('no end date', () => {
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'},
-          {text: 'scan_job', type: 'entity_type'}
+          {text: 'node', type: 'event-type'},
+          {text: 'scan_job', type: 'event-type'}
         ],
         hoursBetween: 4,
         startDate: moment('20190822-0000', 'YYYYMMDD-HHmm')
@@ -214,7 +214,7 @@ describe('EventFeedService', () => {
     it('one search bar filter', () => {
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'}
+          {text: 'node', type: 'event-type'}
         ],
         startDate: moment('20190822-0000', 'YYYYMMDD-HHmm'),
         endDate: moment('20190827-2359', 'YYYYMMDD-HHmm'),
@@ -226,13 +226,13 @@ describe('EventFeedService', () => {
       const httpFilters = httpParams.getAll('filter');
 
       expect(httpFilters.length).toEqual(1);
-      expect(httpFilters).toContain('entity_type:node');
+      expect(httpFilters).toContain('event-type:node');
     });
 
     it('no hours between filter', () => {
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'}
+          {text: 'node', type: 'event-type'}
         ],
         startDate: moment('20190822-0000', 'YYYYMMDD-HHmm'),
         endDate: moment('20190827-2359', 'YYYYMMDD-HHmm')
@@ -250,8 +250,8 @@ describe('EventFeedService', () => {
       const end = moment('20190827-2359', 'YYYYMMDD-HHmm');
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'},
-          {text: 'scan_job', type: 'entity_type'}
+          {text: 'node', type: 'event-type'},
+          {text: 'scan_job', type: 'event-type'}
         ],
         startDate: start,
         endDate: end
@@ -262,8 +262,8 @@ describe('EventFeedService', () => {
       const httpFilters = httpParams.getAll('filter');
 
       expect(httpFilters.length).toEqual(2);
-      expect(httpFilters).toContain('entity_type:scan_job');
-      expect(httpFilters).toContain('entity_type:node');
+      expect(httpFilters).toContain('event-type:scan_job');
+      expect(httpFilters).toContain('event-type:node');
       expect(httpParams.get('start')).toEqual(start.valueOf().toString());
       expect(httpParams.get('end')).toEqual(end.valueOf().toString());
     });
@@ -271,8 +271,8 @@ describe('EventFeedService', () => {
     it('no start date', () => {
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'},
-          {text: 'scan_job', type: 'entity_type'}
+          {text: 'node', type: 'event-type'},
+          {text: 'scan_job', type: 'event-type'}
         ],
         endDate: moment('20190827-2359', 'YYYYMMDD-HHmm').utc()
       };
@@ -285,8 +285,8 @@ describe('EventFeedService', () => {
     it('no end date', () => {
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'},
-          {text: 'scan_job', type: 'entity_type'}
+          {text: 'node', type: 'event-type'},
+          {text: 'scan_job', type: 'event-type'}
         ],
         startDate: moment('20190822-0000', 'YYYYMMDD-HHmm').utc()
       };
@@ -310,7 +310,7 @@ describe('EventFeedService', () => {
     it('one search bar filter', () => {
       const filters: EventFeedFilter = {
         searchBar: [
-          {text: 'node', type: 'entity_type'}
+          {text: 'node', type: 'event-type'}
         ],
         startDate: moment('20190822-0000', 'YYYYMMDD-HHmm').utc(),
         endDate: moment('20190827-2359', 'YYYYMMDD-HHmm').utc()
@@ -321,15 +321,15 @@ describe('EventFeedService', () => {
       const httpFilters = httpParams.getAll('filter');
 
       expect(httpFilters.length).toEqual(1);
-      expect(httpFilters).toContain('entity_type:node');
+      expect(httpFilters).toContain('event-type:node');
     });
   });
 
   describe('addChildEventTypes', () => {
     it('no extra children filters', () => {
       const filters: Chicklet[] = [
-        {text: 'node', type: 'entity_type'},
-        {text: 'scan_job', type: 'entity_type'}
+        {text: 'node', type: 'event-type'},
+        {text: 'scan_job', type: 'event-type'}
       ];
 
       const filtersWithChildren = service.addChildEventTypes(filters);
@@ -339,40 +339,42 @@ describe('EventFeedService', () => {
 
     it('cookbook children filters added', () => {
       const filters: Chicklet[] = [
-        {text: 'cookbook', type: 'entity_type'}
-      ];
-
-      const filtersWithChildren = service.addChildEventTypes(filters);
-
-      expect(filtersWithChildren.length).toEqual(2);
-      expect(filtersWithChildren).toContain({text: 'cookbook', type: 'entity_type'});
-      expect(filtersWithChildren).toContain({text: 'version', type: 'entity_type'});
-    });
-
-    it('data bag children filters added', () => {
-      const filters: Chicklet[] = [
-        {text: 'bag', type: 'entity_type'}
-      ];
-
-      const filtersWithChildren = service.addChildEventTypes(filters);
-
-      expect(filtersWithChildren.length).toEqual(2);
-      expect(filtersWithChildren).toContain({text: 'bag', type: 'entity_type'});
-      expect(filtersWithChildren).toContain({text: 'item', type: 'entity_type'});
-    });
-
-    it('data bag children filters added with filter without children', () => {
-      const filters: Chicklet[] = [
-        {text: 'node', type: 'entity_type'},
-        {text: 'bag', type: 'entity_type'}
+        {text: 'cookbook', type: 'event-type'}
       ];
 
       const filtersWithChildren = service.addChildEventTypes(filters);
 
       expect(filtersWithChildren.length).toEqual(3);
-      expect(filtersWithChildren).toContain({text: 'bag', type: 'entity_type'});
-      expect(filtersWithChildren).toContain({text: 'item', type: 'entity_type'});
-      expect(filtersWithChildren).toContain({text: 'node', type: 'entity_type'});
+      expect(filtersWithChildren).toContain({text: 'cookbook', type: 'event-type'});
+      expect(filtersWithChildren).toContain({text: 'version', type: 'event-type'});
+      expect(filtersWithChildren).toContain(
+        {text: 'cookbook_artifact_version', type: 'event-type'});
+    });
+
+    it('data bag children filters added', () => {
+      const filters: Chicklet[] = [
+        {text: 'bag', type: 'event-type'}
+      ];
+
+      const filtersWithChildren = service.addChildEventTypes(filters);
+
+      expect(filtersWithChildren.length).toEqual(2);
+      expect(filtersWithChildren).toContain({text: 'bag', type: 'event-type'});
+      expect(filtersWithChildren).toContain({text: 'item', type: 'event-type'});
+    });
+
+    it('data bag children filters added with filter without children', () => {
+      const filters: Chicklet[] = [
+        {text: 'node', type: 'event-type'},
+        {text: 'bag', type: 'event-type'}
+      ];
+
+      const filtersWithChildren = service.addChildEventTypes(filters);
+
+      expect(filtersWithChildren.length).toEqual(3);
+      expect(filtersWithChildren).toContain({text: 'bag', type: 'event-type'});
+      expect(filtersWithChildren).toContain({text: 'item', type: 'event-type'});
+      expect(filtersWithChildren).toContain({text: 'node', type: 'event-type'});
     });
 
     it('empty filters', () => {

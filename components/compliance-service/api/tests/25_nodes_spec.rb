@@ -1,12 +1,12 @@
 ##### GRPC SETUP #####
-require 'api/interservice/nodemanager/nodes/nodes_pb'
-require 'api/interservice/nodemanager/nodes/nodes_services_pb'
-require 'api/external/secrets/secrets_services_pb'
-require 'api/interservice/compliance/jobs/jobs_pb'
-require 'api/interservice/compliance/jobs/jobs_services_pb'
-require 'api/interservice/nodemanager/manager/manager_pb'
-require 'api/interservice/nodemanager/manager/manager_services_pb'
-require 'api/external/common/query/parameters_pb'
+require 'interservice/nodemanager/nodes/nodes_pb'
+require 'interservice/nodemanager/nodes/nodes_services_pb'
+require 'external/secrets/secrets_services_pb'
+require 'interservice/compliance/jobs/jobs_pb'
+require 'interservice/compliance/jobs/jobs_services_pb'
+require 'interservice/nodemanager/manager/manager_pb'
+require 'interservice/nodemanager/manager/manager_services_pb'
+require 'external/common/query/parameters_pb'
 
 describe File.basename(__FILE__) do
   Manager = Chef::Automate::Domain::Nodemanager::Manager unless defined?(Manager)
@@ -45,7 +45,7 @@ describe File.basename(__FILE__) do
       MANAGER_GRPC nodes, :read, Nodes::Id.new(id: 'missing')
     end
 
-    assert_grpc_error("Invalid sort field, valid ones are: [last_contact manager name platform platform_version status]", 3) do
+    assert_grpc_error("Invalid sort field, valid ones are: [last_contact manager name platform platform_version state status]", 3) do
       MANAGER_GRPC nodes, :list, Nodes::Query.new(sort: "wrong")
     end
 
@@ -129,7 +129,8 @@ describe File.basename(__FILE__) do
       ),
       tags: [
         Common::Kv.new(key: "department", value: "marketing"),
-        Common::Kv.new(key: "boss", value: "John")
+        Common::Kv.new(key: "boss", value: "John"),
+        Common::Kv.new(key: "test&6^\"BAD", value: "Dot.Comma,Big;\"Trouble")
       ]
     )
     node_id2 = node2['id']
@@ -188,7 +189,11 @@ describe File.basename(__FILE__) do
             {
               "key": "boss",
               "value": "John"
-            }
+            },
+            {
+              "key": "test&6^\"BAD",
+              "value": "Dot.Comma,Big;\"Trouble"
+            },
           ],
           "status": "unknown",
           "managerIds": [
@@ -280,6 +285,10 @@ describe File.basename(__FILE__) do
         {
           "key": "boss",
           "value": "John"
+        },
+        {
+          "key": "test&6^\"BAD",
+          "value": "Dot.Comma,Big;\"Trouble"
         }
       ],
       "status": "unknown",
@@ -572,7 +581,7 @@ describe File.basename(__FILE__) do
       ),
       field: "tags"
     )
-    assert_same_elements(["department", "boss"], tag_keys["fields"])
+    assert_same_elements(["department", "boss", "test&6^\"BAD"], tag_keys["fields"])
 
     names = MANAGER_GRPC manager, :search_node_fields, Manager::FieldQuery.new(
       node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",

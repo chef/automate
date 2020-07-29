@@ -26,9 +26,8 @@
   }
 
   img {
-    width: 20px;
-    height: 20px;
-    margin-right: 1em;
+    width: 18px;
+    margin-right: 6px;
   }
 
   chef-td {
@@ -44,20 +43,9 @@
   }
 }
 
-chef-icon#sort-desc {
+::ng-deep .asc-icon,
+::ng-deep .desc-icon {
   color: $chef-primary-dark;
-
-  &::after {
-    color: $chef-dark-grey;
-  }
-}
-
-chef-icon#sort-asc {
-  color: $chef-dark-grey;
-
-  &::after {
-    color: $chef-primary-dark;
-  }
 }
 
 .actions {

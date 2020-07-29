@@ -249,7 +249,7 @@ describe('Ingestion project tagging', () => {
       });
     });
 
-    cy.applyRulesAndWait(100);
+    cy.applyRulesAndWait();
 
     // Ingest a InSpec report with attributes that match all the projects
     cy.fixture('compliance/inspec-report.json').then((report) => {
@@ -264,12 +264,8 @@ describe('Ingestion project tagging', () => {
       report.node_name = nodeName;
       report.end_time = Cypress.moment().utc().format();
       report.report_uuid = reportId;
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: report
-      });
+
+      cy.sendToDataCollector(report);
     });
 
     // Ingest a node with attributes that match all the projects
@@ -282,12 +278,8 @@ describe('Ingestion project tagging', () => {
       node.node.automatic.roles = ['backend'];
       node.node.normal.tags = ['v3'];
       node.entity_uuid = clientRunsNodeId;
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: node
-      });
+
+      cy.sendToDataCollector(node);
     });
 
     // Ingest an action with attributes that match all the projects
@@ -298,24 +290,19 @@ describe('Ingestion project tagging', () => {
       action.entity_name = entityName;
       action.recorded_at = Cypress.moment().utc().subtract(1, 'day').format();
 
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: action
-      });
+      cy.sendToDataCollector(action);
     });
 
     // wait for the report to be ingested
-    cy.waitForNodemanagerNode(complianceNodeId, 30);
-    cy.waitForComplianceNode(complianceNodeId, nodeStart, nodeEnd, 30);
+    cy.waitForNodemanagerNode(complianceNodeId);
+    cy.waitForComplianceNode(complianceNodeId, nodeStart, nodeEnd);
 
     // wait for the client run report to be ingested
-    cy.waitForNodemanagerNode(clientRunsNodeId, 30);
-    cy.waitForClientRunsNode(clientRunsNodeId, 30);
+    cy.waitForNodemanagerNode(clientRunsNodeId);
+    cy.waitForClientRunsNode(clientRunsNodeId);
 
     // wait for the action to be ingested
-    cy.waitForAction(entityName, eventStart, eventEnd, 30);
+    cy.waitForAction(entityName, eventStart, eventEnd);
   });
 
   after(() => {

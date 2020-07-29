@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"fmt"
-	"time"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
@@ -13,7 +12,8 @@ import (
 	"github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
+	cds "github.com/chef/automate/api/interservice/cds/service"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	cc_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
@@ -30,18 +30,21 @@ import (
 	"github.com/chef/automate/api/interservice/local_user"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/teams"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/notifier"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tracing"
 )
 
+var ErrNoConnectionConfigured = errors.New("Client not configured")
+
 // grpcServices are gRPC backend services that we'll connect to to build clients
 var grpcServices = []string{
 	"applications-service",
 	"authn-service",
 	"authz-service",
+	"automate-cds",
 	"compliance-service",
 	"config-mgmt-service",
 	"data-feed-service",
@@ -94,9 +97,9 @@ type ClientsFactory interface {
 	ComplianceIngesterClient() (cc_ingest.ComplianceIngesterClient, error)
 	NotificationsClient() (notifications.NotificationsClient, error)
 	AuthenticationClient() (authn.AuthenticationClient, error)
-	AuthorizationClient() (iam_v2.AuthorizationClient, error)
-	PoliciesClient() (iam_v2.PoliciesClient, error)
-	ProjectsClient() (iam_v2.ProjectsClient, error)
+	AuthorizationClient() (authz.AuthorizationClient, error)
+	PoliciesClient() (authz.PoliciesClient, error)
+	ProjectsClient() (authz.ProjectsClient, error)
 	TeamsClient() (teams.TeamsClient, error)
 	TokensMgmtClient() (authn.TokensMgmtClient, error)
 	UsersMgmtClient() (local_user.UsersMgmtClient, error)
@@ -116,6 +119,7 @@ type ClientsFactory interface {
 	DatafeedClient() (data_feed.DatafeedServiceClient, error)
 	PurgeClient(service string) (data_lifecycle.PurgeClient, error)
 	InfraProxyClient() (infra_proxy.InfraProxyClient, error)
+	CdsClient() (cds.AutomateCdsClient, error)
 	Close() error
 }
 
@@ -183,6 +187,16 @@ func (c *clientsFactory) CfgMgmtClient() (cfgmgmt.CfgMgmtClient, error) {
 	return cfgmgmt.NewCfgMgmtClient(conn), nil
 }
 
+// CdsClient returns a client for the automate-cds service.
+// It requires the `automate-cds` endpoint to be configured
+func (c *clientsFactory) CdsClient() (cds.AutomateCdsClient, error) {
+	conn, err := c.connectionByName("automate-cds")
+	if err != nil {
+		return nil, err
+	}
+	return cds.NewAutomateCdsClient(conn), nil
+}
+
 // IngestStatusClient returns a client for the IngestStatus service.
 // It requires the `ingest` endpoint to be configured
 func (c *clientsFactory) IngestStatusClient() (chef_ingest.IngestStatusClient, error) {
@@ -243,34 +257,34 @@ func (c *clientsFactory) AuthenticationClient() (authn.AuthenticationClient, err
 	return authn.NewAuthenticationClient(conn), nil
 }
 
-// AuthorizationClient returns a client for the Authorization (IAMv2) service.
+// AuthorizationClient returns a client for the Authorization service.
 // It requires the `authz` endpoint to be configured
-func (c *clientsFactory) AuthorizationClient() (iam_v2.AuthorizationClient, error) {
+func (c *clientsFactory) AuthorizationClient() (authz.AuthorizationClient, error) {
 	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
 	}
-	return iam_v2.NewAuthorizationClient(conn), nil
+	return authz.NewAuthorizationClient(conn), nil
 }
 
 // PoliciesClient returns a client for the Policies service.
 // It requires the `authz` endpoint to be configured
-func (c *clientsFactory) PoliciesClient() (iam_v2.PoliciesClient, error) {
+func (c *clientsFactory) PoliciesClient() (authz.PoliciesClient, error) {
 	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
 	}
-	return iam_v2.NewPoliciesClient(conn), nil
+	return authz.NewPoliciesClient(conn), nil
 }
 
 // ProjectsClient returns a client for the Projects service.
 // It requires the `authz` endpoint to be configured
-func (c *clientsFactory) ProjectsClient() (iam_v2.ProjectsClient, error) {
+func (c *clientsFactory) ProjectsClient() (authz.ProjectsClient, error) {
 	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
 	}
-	return iam_v2.NewProjectsClient(conn), nil
+	return authz.NewProjectsClient(conn), nil
 }
 
 // TeamsClient returns a client for the Teams Mgmt service.
@@ -437,7 +451,8 @@ func (c *clientsFactory) InfraProxyClient() (infra_proxy.InfraProxyClient, error
 func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error) {
 	conn, exists := c.connections[name]
 	if !exists {
-		err := fmt.Errorf("Expected connection for %s, but none was found. Check to make sure it is correctly configured", name)
+		err := fmt.Errorf("%w: Expected connection for %s, but none was found. Check to make sure it is correctly configured",
+			ErrNoConnectionConfigured, name)
 		return nil, err
 	}
 	return conn, nil
@@ -483,10 +498,6 @@ func (c *ClientConfig) DialEndpoints(connFactory *secureconn.Factory) (ClientCon
 				grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor))
 		}
 
-		if endpoint.Target == c.socketPath() {
-			opts = append(opts, grpc.WithBlock(), grpc.WithTimeout(1*time.Second))
-		}
-
 		if endpoint.Secure {
 			conn, err = connFactory.Dial(service, endpoint.Target, opts...)
 		} else {
@@ -511,7 +522,7 @@ func (c *ClientConfig) expandEndpoints() {
 		c.Endpoints = map[string]ConnectionOptions{}
 	}
 
-	// If we've been given a null backend socket and we're missing and enpoint
+	// If we've been given a null backend socket and we're missing an endpoint
 	// target for a service then we'll configure it to use the null backend.
 	if c.NullBackendSock != "" {
 		for _, service := range grpcServices {

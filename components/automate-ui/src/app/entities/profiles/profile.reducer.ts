@@ -16,7 +16,7 @@ export const ProfileEntityInitialState: ProfileEntityState = profileEntityAdapte
 });
 
 export function profileEntityReducer(state: ProfileEntityState = ProfileEntityInitialState,
-                                     action: ProfileActions) {
+                                     action: ProfileActions): ProfileEntityState {
 
   switch (action.type) {
 

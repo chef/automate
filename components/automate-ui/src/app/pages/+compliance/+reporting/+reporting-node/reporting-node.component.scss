@@ -126,7 +126,37 @@ chef-loading-spinner {
   }
 }
 
+#failed-count {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5em;
+  cursor: pointer;
+
+  chef-icon {
+    margin: 0 0 0 0.25em;
+    color: $chef-primary-bright;
+  }
+}
+
 chef-tooltip[for='skipped-count'] {
+  margin-right: 50px;
+
+  ul {
+    margin: 0;
+    padding-left: 1em;
+
+    li {
+      font-size: 14px;
+      margin-bottom: 1em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+chef-tooltip[for='failed-count'] {
   margin-right: 50px;
 
   ul {
@@ -555,4 +585,25 @@ dl.waiver-details {
     flex-basis: 85%;
     flex-grow: 1;
   }
+}
+
+.err-container {
+  background-color: $chef-lightest-grey;
+}
+
+.err-failed-container {
+  padding: 5px;
+}
+
+.err-color {
+  color: $chef-critical;
+}
+
+.err-bold {
+  padding-right: 5px;
+}
+
+#err-icon-id {
+  padding-left: 5px;
+  color: $chef-critical;
 }

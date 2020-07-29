@@ -1,11 +1,18 @@
-<app-authorized [allOf]="getPermissionsPath" [overrideVisible]="overridePermissionsCheck">
+<app-authorized [allOf]="getPermissionsPath">
   <ng-container *ngIf="showEmptyMessage">
-    <div class="empty-state">
-      <p>Add some users to get started!</p>
-    </div>
+    <app-authorized [allOf]="createPermissionsPath">
+      <div class="empty-state">
+        <p>Add some users to get started!</p>
+      </div>
+    </app-authorized>
+    <app-authorized not [allOf]="createPermissionsPath">
+      <div class="empty-state">
+        <ng-content></ng-content>
+     </div>
+    </app-authorized>
   </ng-container>
   <chef-toolbar>
-    <app-authorized [allOf]="createPermissionsPath" [overrideVisible]="overridePermissionsCheck">
+    <app-authorized [allOf]="createPermissionsPath">
       <div *ngIf="showEmptyMessage || showTable" [ngClass]="showEmptyMessage ? 'empty-state' : ''">
         <chef-button primary data-cy="app-user-table-add-button" [disabled]="!addButtonEnabled" (click)="addClicked.emit($event)"> {{ addButtonText }}
         </chef-button>
@@ -30,7 +37,7 @@
             {{ user.id }}
           </chef-td>
           <chef-td class="three-dot-column">
-            <!-- <app-authorized [allOf]="['/iam/v2/users/{id}', 'delete', user.id]"> -->
+            <!-- <app-authorized [allOf]="['/apis/iam/v2/users/{id}', 'delete', user.id]"> -->
             <mat-select panelClass="chef-control-menu" data-cy="select">
               <mat-option data-cy="delete" (onSelectionChange)="deleteUser($event, user)">{{ removeText }}</mat-option>
             </mat-select>

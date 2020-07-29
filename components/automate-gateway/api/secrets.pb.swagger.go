@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("secrets", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/secrets/secrets.proto",
+    "title": "external/secrets/secrets.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/secrets": {
+    "/api/v0/secrets": {
       "post": {
         "summary": "Create a secret",
         "description": "Creates a secret. Requires values for name, type, and data.\n\nSupported types: ssh, winrm, sudo, aws, azure, gcp, service_now\nSupported keys by type: \nssh: username, password, key\nwinrm: username, password\nsudo: username, password\nservice_now: username, password\naws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN\nazure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID\ngcp: GOOGLE_CREDENTIALS_JSON\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"my ssh secret\",\n\"type\": \"ssh\",\n\"data\": [\n{ \"key\": \"username\", \"value\": \"vagrant\" },\n{ \"key\": \"password\", \"value\": \"vagrant\"} \n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nsecrets:secrets:create\n` + "`" + `` + "`" + `` + "`" + `",
@@ -42,7 +42,7 @@ func init() {
         ]
       }
     },
-    "/secrets/id/{id}": {
+    "/api/v0/secrets/id/{id}": {
       "get": {
         "summary": "Read a secret",
         "description": "Reads a secret given the ID of the secret.\nNote that the secret information (password and key values) will not be returned by the API, as a safety measure.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nsecrets:secrets:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -127,7 +127,7 @@ func init() {
         ]
       }
     },
-    "/secrets/search": {
+    "/api/v0/secrets/search": {
       "post": {
         "summary": "List and filter secrets",
         "description": "Makes a list of secrets.\nSupports filtering, pagination, and sorting.\nAdding a filter narrows the list of secrets to only those that match the filter or filters.\nSupported filters: type\nSupported sort types: name, type, last modified\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"sort\": \"type\",\n\"order\": \"ASC\",\n\"filters\": [\n{ \"key\": \"type\", \"values\": [\"ssh\",\"winrm\",\"sudo\"] }\n],\n\"page\":1,\n\"per_page\":100\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nsecrets:secrets:list\n` + "`" + `` + "`" + `` + "`" + `",

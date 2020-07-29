@@ -15,14 +15,14 @@
   flex-basis: 100px;
 
   & > .event-time {
-    padding-bottom: 5pt;
-    padding-top: 5pt;
+    padding-bottom: 4pt;
+    padding-top: 4pt;
   }
 
   & > .event-day,
   & > .event-date {
-    font-size: .625em;
-    line-height: 10pt;
+    font-size: 11px;
+    line-height: 16px;
   }
 }
 
@@ -101,10 +101,6 @@
 // Side Panel
 $event-group-border: 1px solid $chef-light-grey;
 
-chef-side-panel {
-  z-index: 100;
-}
-
 .event-group-list {
   margin: 0;
   padding: 0;
@@ -133,14 +129,20 @@ chef-side-panel {
   }
 }
 
-.event-group-text {
-  margin: 0;
-  font-size: 10px;
-
-
+.event-group-text,
+.event-group-list h2.display4 {
   & > strong {
     display: block;
     margin-bottom: 4px;
+  }
+}
+
+.event-group-text {
+  margin: 0;
+  font-size: 11px;
+
+
+  & > strong {
     font-size: 12px;
   }
 

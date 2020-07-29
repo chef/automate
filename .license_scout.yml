@@ -198,6 +198,9 @@ fallbacks:
     - name: net-telnet
       license_id: Ruby
       license_content: https://raw.githubusercontent.com/ruby/net-telnet/master/LICENSE.txt
+    - name: unf
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/knu/ruby-unf/master/LICENSE
 
 exceptions:
   habitat:
@@ -270,6 +273,12 @@ exceptions:
     - name: chef/automate-openjdk
       reason: Exception made by Chef Legal
     - name: core/nss-myhostname
+      reason: Exception made by Chef Legal
+    - name: core/binutils
+      reason: (rc) dep of core/bundler. Exception made by Stephen Delano, 4/23/20
+    - name: core/perl
+      reason: (rc) dep of core/git, used by Workflow and sqitch. Exception made by Stephen Delano, 4/23/20
+    - name: core/procps-ng
       reason: Exception made by Chef Legal
 
   ruby:

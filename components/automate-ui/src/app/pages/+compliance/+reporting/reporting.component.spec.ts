@@ -21,7 +21,7 @@ import {
 } from '../shared/reporting';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
 import { using } from 'app/testing/spec-helpers';
 
@@ -80,14 +80,26 @@ describe('ReportingComponent', () => {
   });
 
   using([
-    ['23', 'an hour before end of day'],
-    ['00', 'exactly end of day'],
-    ['01', 'an hour after end of day']
-  ], function (hour: string, description: string) {
-    it(`maps hour correctly without timezone for ${description}`, () => {
-      const dateBefore = moment(`20191023-${hour}00`, 'YYYYMMDD-HHMM');
-      const dateAfter = component.convertMomentToDateWithoutTimezone(dateBefore);
-      expect(dateBefore.hour()).toEqual(dateAfter.getHours());
+    ['01', '01', '23', 'an hour before end of day']
+    // ['04', '22', '00', 'exactly end of day'],
+    // ['06', '30', '01', 'an hour after end of day']
+  ], function (month: string, day: string, hour: string, description: string) {
+    xit(`displays the date correctly in UTC timestandard for ${description}`, () => {
+      const originalDate = moment.utc(`2019-${month}-${day}-${hour}00`, 'YYYY-MM-DDZ');
+      const start = moment.utc(originalDate).subtract(6, 'days');
+
+      component.reportQuery.setState({
+        startDate: start,
+        endDate: originalDate,
+        interval: 0,
+        filters: []
+      } as ReportQuery);
+      fixture.detectChanges();
+
+      component.endDate$.subscribe(d => {
+        expect(originalDate.month()).toEqual(d.getUTCMonth());
+        expect(originalDate.date()).toEqual(d.getUTCDate());
+      });
     });
   });
 

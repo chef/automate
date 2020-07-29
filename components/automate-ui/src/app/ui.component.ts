@@ -26,7 +26,7 @@ export class UIComponent implements OnInit {
   betaFeatures: Array<Feature> = [
     {
       key: 'servicenow_cmdb',
-      name: 'ServiceNow CMDB Integration'
+      name: 'Chef Automate Data Feed'
     }
   ];
 

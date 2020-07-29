@@ -201,14 +201,27 @@ func (db *Postgres) GetServiceGroups(
 
 func formatQueryFilters(filters map[string][]string, includeStatusFilter bool) (string, error) {
 	var (
-		err                 error
-		whereQuery          string
-		selectAllPartsQuery string
-		selectQuery         string
-		statusFilters       []string
+		err                    error
+		err1                   error
+		whereQueryFragments    []string
+		pkgWhereQueryFragments []string
+		fragment               string
+		pkgQfrag               string
+		statusFilters          []string
+		selectAllPartsQuery    string
 	)
-	packageWhereQuery := ``
-	first := true
+	// Generate a SQL query that collects all the matching services into service
+	// groups, and calculates some statistics about the services within each group.
+	// Services are grouped by application, environment, service name, service
+	// group name (suffix), e.g., "website", "prod", and "database.default"
+	// (these attributes are fed into a hash function to make the service group
+	// ID at insertion time).
+	// Due to our query's structure, we need to make two "WHERE" clauses, one to
+	// filter all the services before we build up the groups, and one that
+	// filters the services we include for statistics collection. Since
+	// "environment," "application," "service," and "group" are part of the
+	// definition of a service group, we omit them from the "WHERE" clause used
+	// to select the services used for statistics computation.
 	for filter, values := range filters {
 		if len(values) == 0 {
 			continue
@@ -225,58 +238,68 @@ func formatQueryFilters(filters map[string][]string, includeStatusFilter bool) (
 				statusFilters = append(statusFilters, filter)
 			}
 		case "environment", "ENVIRONMENT":
-			selectQuery, err = queryFromFieldFilter("s.environment", values, first)
-			whereQuery = whereQuery + selectQuery
-
+			fragment, err = queryFromFieldFilter("s.environment", values)
+			whereQueryFragments = append(whereQueryFragments, fragment)
 		case "application", "APPLICATION":
-			selectQuery, err = queryFromFieldFilter("s.application", values, first)
-			whereQuery = whereQuery + selectQuery
-		case "group", "GROUP":
-			selectQuery, err = queryFromFieldFilter("s.service_group_name_suffix", values, first)
-			whereQuery = whereQuery + selectQuery
-		case "origin", "ORIGIN":
-			selectQuery, err := queryFromFieldFilter("s.origin", values, first)
-			whereQuery = whereQuery + selectQuery
-			q, err1 := queryFromFieldFilter("s_for_releases.origin", values, false)
-			packageWhereQuery = packageWhereQuery + q
-			if err != nil || err1 != nil {
-				return "", err
-			}
+			fragment, err = queryFromFieldFilter("s.application", values)
+			whereQueryFragments = append(whereQueryFragments, fragment)
 		case "service", "SERVICE":
-			selectQuery, err = queryFromFieldFilter("s.name", values, first)
-			whereQuery = whereQuery + selectQuery
-			break
+			fragment, err = queryFromFieldFilter("s.name", values)
+			whereQueryFragments = append(whereQueryFragments, fragment)
+		case "group", "GROUP":
+			fragment, err = queryFromFieldFilter("s.service_group_name_suffix", values)
+			whereQueryFragments = append(whereQueryFragments, fragment)
+		case "origin", "ORIGIN":
+			fragment, err = queryFromFieldFilter("s.origin", values)
+			whereQueryFragments = append(whereQueryFragments, fragment)
+			pkgQfrag, err1 = queryFromFieldFilter("s_for_releases.origin", values)
+			pkgWhereQueryFragments = append(pkgWhereQueryFragments, pkgQfrag)
 		case "site", "SITE":
-			selectQuery, err = queryFromFieldFilter("s.site", values, first)
-			whereQuery = whereQuery + selectQuery
+			fragment, err = queryFromFieldFilter("s.site", values)
+			whereQueryFragments = append(whereQueryFragments, fragment)
+			pkgQfrag, err1 = queryFromFieldFilter("s_for_releases.site", values)
+			pkgWhereQueryFragments = append(pkgWhereQueryFragments, pkgQfrag)
 		case "channel", "CHANNEL":
-			selectQuery, err = queryFromFieldFilter("s.channel", values, first)
-			whereQuery = whereQuery + selectQuery
-			break
+			fragment, err = queryFromFieldFilter("s.channel", values)
+			whereQueryFragments = append(whereQueryFragments, fragment)
+			pkgQfrag, err1 = queryFromFieldFilter("s_for_releases.channel", values)
+			pkgWhereQueryFragments = append(pkgWhereQueryFragments, pkgQfrag)
 		case "version", "VERSION":
-			selectQuery, err := queryFromFieldFilter("s.version", values, first)
-			whereQuery = whereQuery + selectQuery
-			q, err1 := queryFromFieldFilter("s_for_releases.version", values, false)
-			packageWhereQuery = packageWhereQuery + q
-			if err != nil || err1 != nil {
-				return "", err
-			}
+			fragment, err = queryFromFieldFilter("s.version", values)
+			whereQueryFragments = append(whereQueryFragments, fragment)
+			pkgQfrag, err1 = queryFromFieldFilter("s_for_releases.version", values)
+			pkgWhereQueryFragments = append(pkgWhereQueryFragments, pkgQfrag)
 		case "buildstamp", "BUILDSTAMP":
-			selectQuery, err = queryFromFieldFilter("s.release", values, first)
-			whereQuery = whereQuery + selectQuery
+			fragment, err = queryFromFieldFilter("s.release", values)
+			whereQueryFragments = append(whereQueryFragments, fragment)
+			pkgQfrag, err1 = queryFromFieldFilter("s_for_releases.release", values)
+			pkgWhereQueryFragments = append(pkgWhereQueryFragments, pkgQfrag)
 		default:
 			return "", errors.Errorf("invalid filter. (%s:%s)", filter, values)
 		}
 		if err != nil {
 			return "", err
 		}
-		if first && filter != "status" && filter != "STATUS" { //If status is first ignore it since it is special and happens outside the inner query.
-			first = false
+		if err1 != nil {
+			return "", err
 		}
 	}
+
+	whereQuery := ""
+	if len(whereQueryFragments) > 0 {
+		whereQuery = fmt.Sprintf("WHERE %s", strings.Join(whereQueryFragments, " AND "))
+	}
+
+	packageWhereQuery := ""
+	if len(pkgWhereQueryFragments) > 0 {
+		packageWhereQuery = fmt.Sprintf("AND %s", strings.Join(pkgWhereQueryFragments, " AND "))
+	}
+
+	allConstraints := strings.Join(statusFilters, " AND ")
+
 	statusFilterSQL := ""
 	if len(statusFilters) > 0 {
-		statusFilterSQL = fmt.Sprintf("WHERE %s", strings.Join(statusFilters, " AND "))
+		statusFilterSQL = fmt.Sprintf("WHERE %s", allConstraints)
 	}
 
 	// The status query has to go outside of the inner query because the health count filters need to be calculated
@@ -432,19 +455,13 @@ func queryFromStatusFilter(text string) (string, error) {
 	}
 }
 
-func queryFromFieldFilter(field string, arr []string, first bool) (string, error) {
+func queryFromFieldFilter(field string, arr []string) (string, error) {
 	var (
-		condition    string
-		preCondition string
-		wildcard     string
+		condition string
+		wildcard  string
 	)
 	isCondition := false
 	isWildcard := false
-	if first {
-		preCondition = ` WHERE `
-	} else { // not first, add on an AND before IN part
-		preCondition = ` AND `
-	}
 	if !pgutils.IsSqlSafe(field) {
 		return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
 	}
@@ -470,13 +487,13 @@ func queryFromFieldFilter(field string, arr []string, first bool) (string, error
 	}
 
 	if isCondition && !isWildcard {
-		return preCondition + " " + condition + ")", nil
+		return condition + ")", nil
 	} else if !isCondition && isWildcard {
 		//Add parenthesis to logically group wildcards together
-		return preCondition + " " + wildcard + " ", nil
+		return wildcard + " ", nil
 	} else if isCondition && isWildcard {
 		//Add parenthesis to logically group IN statement with OR'ed wildcard LIKE statements
-		return preCondition + " ( " + condition + ") OR " + wildcard + " )", nil
+		return " ( " + condition + ") OR " + wildcard + " )", nil
 	} // else !isCondition && !isWildcard (how would this happen?)
 	return "", nil
 

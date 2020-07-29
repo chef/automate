@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/stretchr/testify/require"
 
 	// needed to accommodate that most of our protobuf files define their own package
 	_ "github.com/chef/automate/api/external/cfgmgmt"
@@ -27,14 +28,19 @@ import (
 )
 
 func TestGeneratedProtobufUpToDate(t *testing.T) {
-	grpctest.AssertCompiledInUpToDate(t, "components/automate-gateway/api")
+	grpctest.AssertCompiledInUpToDate(t, "automate-gateway/api")
 }
 
 // Note: currently, we only generate policy code for the gateway. As long as
 // that holds, these checks are only applicable _here_.
 
 func TestGeneratedPolicyUpToDate(t *testing.T) {
-	for _, file := range grpctest.FindServiceProtos(t, "components/automate-gateway/api") {
+	foundProtos := grpctest.FindServiceProtos(t, "automate-gateway/api")
+	t.Run("ensure the test finds files to test", func(t *testing.T) {
+		require.NotEmpty(t, foundProtos)
+	})
+
+	for _, file := range foundProtos {
 		t.Run(file, func(t *testing.T) {
 			grpctest.AssertGeneratedPolicyUpToDate(t, file)
 		})
@@ -42,12 +48,15 @@ func TestGeneratedPolicyUpToDate(t *testing.T) {
 }
 
 func TestAllProtoFilesAnnotated(t *testing.T) {
-	const v1Annotations = "chef.automate.api.policy"
-	const v2Annotations = "chef.automate.api.iam.policy"
-	for _, file := range grpctest.FindServiceProtos(t, "components/automate-gateway/api") {
+	const annotations = "chef.automate.api.iam.policy"
+	foundProtos := grpctest.FindServiceProtos(t, "automate-gateway/api")
+	t.Run("ensure the test finds files to test", func(t *testing.T) {
+		require.NotEmpty(t, foundProtos)
+	})
+
+	for _, file := range foundProtos {
 		t.Run(file, func(t *testing.T) {
-			grpctest.AssertAllProtoMethodsAnnotated(t, file, v1Annotations)
-			grpctest.AssertAllProtoMethodsAnnotated(t, file, v2Annotations)
+			grpctest.AssertAllProtoMethodsAnnotated(t, file, annotations)
 		})
 	}
 }

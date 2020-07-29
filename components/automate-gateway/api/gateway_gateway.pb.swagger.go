@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("gateway_gateway", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/gateway/gateway.proto",
+    "title": "automate-gateway/api/gateway/gateway.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/gateway/health": {
+    "/api/v0/gateway/health": {
       "get": {
         "operationId": "GetHealth",
         "responses": {
@@ -30,7 +30,7 @@ func init() {
         ]
       }
     },
-    "/gateway/version": {
+    "/api/v0/gateway/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {

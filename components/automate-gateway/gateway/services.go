@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
@@ -20,6 +22,8 @@ import (
 
 	// PB-generated imports
 	pb_apps "github.com/chef/automate/api/external/applications"
+	pb_cds "github.com/chef/automate/api/external/cds"
+	cds_request "github.com/chef/automate/api/external/cds/request"
 	pb_cfgmgmt "github.com/chef/automate/api/external/cfgmgmt"
 	pb_profiles "github.com/chef/automate/api/external/compliance/profiles"
 	pb_cc_reporting "github.com/chef/automate/api/external/compliance/reporting"
@@ -110,6 +114,12 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		deploymentClient,
 		trialLicenseURL,
 	))
+
+	cdsClient, err := clients.CdsClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for content-delivery-service")
+	}
+	pb_cds.RegisterCdsServer(grpcServer, handler.NewCdsServer(cdsClient))
 
 	cfgMgmtClient, err := clients.CfgMgmtClient()
 	if err != nil {
@@ -296,6 +306,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		ingestPurgeClient,
 		compliancePurgeClient,
 		eventFeedPurgeClient,
+		applicationsClient,
 	)
 	pb_data_lifecycle.RegisterDataLifecycleServer(grpcServer, dataLifecycleServer)
 
@@ -329,28 +340,29 @@ type registerFunc func(context.Context, *runtime.ServeMux, string, []grpc.DialOp
 // unversionedRESTMux returns all endpoints for the GRPC rest gateway
 func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, func(), error) {
 	return muxFromRegisterMap(grpcURI, dopts, map[string]registerFunc{
-		"event feed":           pb_eventfeed.RegisterEventFeedHandlerFromEndpoint,
-		"config management":    pb_cfgmgmt.RegisterConfigMgmtHandlerFromEndpoint,
-		"chef ingestion":       pb_ingest.RegisterChefIngesterHandlerFromEndpoint,
-		"deployment":           pb_deployment.RegisterDeploymentHandlerFromEndpoint,
-		"ingest job scheduler": pb_ingest.RegisterJobSchedulerHandlerFromEndpoint,
-		"notifications":        pb_notifications.RegisterNotificationsHandlerFromEndpoint,
-		"gateway":              pb_gateway.RegisterGatewayHandlerFromEndpoint,
-		"legacy":               pb_legacy.RegisterLegacyDataCollectorHandlerFromEndpoint,
-		"license":              pb_license.RegisterLicenseHandlerFromEndpoint,
-		"secrets":              pb_secrets.RegisterSecretsServiceHandlerFromEndpoint,
-		"cc_reporting":         pb_cc_reporting.RegisterReportingServiceHandlerFromEndpoint,
-		"cc_stats":             pb_cc_stats.RegisterStatsServiceHandlerFromEndpoint,
-		"cc_jobs":              pb_cc_jobs.RegisterJobsServiceHandlerFromEndpoint,
-		"nodes":                pb_nodes.RegisterNodesServiceHandlerFromEndpoint,
-		"profiles":             pb_profiles.RegisterProfilesServiceHandlerFromEndpoint,
-		"teams-service":        pb_iam.RegisterTeamsHandlerFromEndpoint,
-		"node manager":         pb_nodes_manager.RegisterNodeManagerServiceHandlerFromEndpoint,
-		"telemetry":            pb_telemetry.RegisterTelemetryHandlerFromEndpoint,
-		"data-feed":            pb_data_feed.RegisterDatafeedServiceHandlerFromEndpoint,
-		"data-lifecycle":       pb_data_lifecycle.RegisterDataLifecycleHandlerFromEndpoint,
-		"applications":         pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
-		"infra-proxy":          pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
+		"event feed":               pb_eventfeed.RegisterEventFeedHandlerFromEndpoint,
+		"content delivery service": pb_cds.RegisterCdsHandlerFromEndpoint,
+		"config management":        pb_cfgmgmt.RegisterConfigMgmtHandlerFromEndpoint,
+		"chef ingestion":           pb_ingest.RegisterChefIngesterHandlerFromEndpoint,
+		"deployment":               pb_deployment.RegisterDeploymentHandlerFromEndpoint,
+		"ingest job scheduler":     pb_ingest.RegisterJobSchedulerHandlerFromEndpoint,
+		"notifications":            pb_notifications.RegisterNotificationsHandlerFromEndpoint,
+		"gateway":                  pb_gateway.RegisterGatewayHandlerFromEndpoint,
+		"legacy":                   pb_legacy.RegisterLegacyDataCollectorHandlerFromEndpoint,
+		"license":                  pb_license.RegisterLicenseHandlerFromEndpoint,
+		"secrets":                  pb_secrets.RegisterSecretsServiceHandlerFromEndpoint,
+		"cc_reporting":             pb_cc_reporting.RegisterReportingServiceHandlerFromEndpoint,
+		"cc_stats":                 pb_cc_stats.RegisterStatsServiceHandlerFromEndpoint,
+		"cc_jobs":                  pb_cc_jobs.RegisterJobsServiceHandlerFromEndpoint,
+		"nodes":                    pb_nodes.RegisterNodesServiceHandlerFromEndpoint,
+		"profiles":                 pb_profiles.RegisterProfilesServiceHandlerFromEndpoint,
+		"teams-service":            pb_iam.RegisterTeamsHandlerFromEndpoint,
+		"node manager":             pb_nodes_manager.RegisterNodeManagerServiceHandlerFromEndpoint,
+		"telemetry":                pb_telemetry.RegisterTelemetryHandlerFromEndpoint,
+		"data-feed":                pb_data_feed.RegisterDatafeedServiceHandlerFromEndpoint,
+		"data-lifecycle":           pb_data_lifecycle.RegisterDataLifecycleHandlerFromEndpoint,
+		"applications":             pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
+		"infra-proxy":              pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
 	})
 }
 
@@ -366,11 +378,39 @@ func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFe
 	return muxFromRegisterMap(grpcURI, dopts, endpointMap)
 }
 
+type m struct {
+	*runtime.JSONPb
+	unmarshaler *jsonpb.Unmarshaler
+}
+
+type decoderWrapper struct {
+	*json.Decoder
+	*jsonpb.Unmarshaler
+}
+
+func (n *m) NewDecoder(r io.Reader) runtime.Decoder {
+	d := json.NewDecoder(r)
+	return &decoderWrapper{Decoder: d, Unmarshaler: n.unmarshaler}
+}
+
+func (d *decoderWrapper) Decode(v interface{}) error {
+	p, ok := v.(proto.Message)
+	if !ok { // if it's not decoding into a proto.Message, there's no notion of unknown fields
+		return d.Decoder.Decode(v)
+	}
+	return d.UnmarshalNext(d.Decoder, p) // uses m's jsonpb.Unmarshaler configuration
+}
+
 func muxFromRegisterMap(grpcURI string, dopts []grpc.DialOption, localEndpoints map[string]registerFunc) (*runtime.ServeMux, func(), error) {
 	opts := []runtime.ServeMuxOption{
 		runtime.WithIncomingHeaderMatcher(headerMatcher),
-		runtime.WithMarshalerOption("application/json+pretty", &runtime.JSONPb{OrigName: true, EmitDefaults: true, Indent: "  "}),
-		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{OrigName: true, EmitDefaults: true}),
+		// Note(sr): pretty implies strict -- the assumption is that pretty is used by API usage from an
+		//           interactive console, so we'd want to tell them if they feed us garbage.
+		runtime.WithMarshalerOption("application/json+pretty",
+			&m{JSONPb: &runtime.JSONPb{OrigName: true, EmitDefaults: true, Indent: "  "}, unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: false}}),
+		runtime.WithMarshalerOption("application/json+lax", &runtime.JSONPb{OrigName: true, EmitDefaults: true}),
+		runtime.WithMarshalerOption(runtime.MIMEWildcard,
+			&m{JSONPb: &runtime.JSONPb{OrigName: true, EmitDefaults: true}, unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: false}}),
 		runtime.WithMetadata(middleware.CertificatePasser),
 	}
 	gwmux := runtime.NewServeMux(opts...)
@@ -397,7 +437,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	var cType, profileName, profileVersion string
 	contentTypeString := strings.Split(r.Header.Get("Content-type"), ";")
 	switch contentTypeString[0] {
-	case "application/json":
+	case "application/json", "application/json+lax":
 		cType = r.Header.Get("Content-type")
 		decoder := json.NewDecoder(r.Body)
 		var t ProfileRequest
@@ -480,18 +520,62 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(data) // nolint: errcheck
 }
 
+func (s *Server) cdsDownloadHandler(w http.ResponseWriter, r *http.Request) {
+	const (
+		action   = "content:items:download"
+		resource = "content:items"
+	)
+
+	ctx, err := s.authRequest(r, resource, action)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var request cds_request.DownloadContentItem
+	err = decoder.Decode(&request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	client, err := s.clientsFactory.CdsClient()
+	if err != nil {
+		http.Error(w, "grpc service for automate-cds unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
+	stream, err := client.DownloadContentItem(ctx, &request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		w.Write(data.GetContent()) // nolint: errcheck
+	}
+}
+
 func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 	var profileOwner, profileName, profileVersion string
 
 	url := r.URL.Path
 	splitURL := strings.Split(url, "/")
-	if len(splitURL) > 4 {
-		profileOwner = splitURL[3]
-		profileName = splitURL[4]
-	}
 	if len(splitURL) > 6 {
-		if splitURL[5] == "version" {
-			profileVersion = splitURL[6]
+		profileOwner = splitURL[5]
+		profileName = splitURL[6]
+	}
+	if len(splitURL) > 8 {
+		if splitURL[7] == "version" {
+			profileVersion = splitURL[8]
 		}
 	}
 
@@ -507,7 +591,8 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 		profileVersion = t.Version
 		profileOwner = t.Owner
 	}
-	log.Infof("processing profile tar request for owner: %s, name: %s %s", profileOwner, profileName, profileVersion)
+	log.Infof("processing profile tar request for owner: %s, name: %s (version %s)",
+		profileOwner, profileName, profileVersion)
 
 	var resource, action string
 	if len(profileOwner) > 0 {
@@ -558,7 +643,7 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 	// request body.
 	const (
 		resource = "compliance:reporting:reports"
-		action   = "compliance:reports:export"
+		action   = "compliance:reports:list"
 	)
 
 	ctx, err := s.authRequest(r, resource, action)
@@ -621,7 +706,7 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 func (s *Server) NodeExportHandler(w http.ResponseWriter, r *http.Request) {
 	const (
 		resource = "compliance:reporting:nodes:{id}"
-		action   = "compliance:reportNodes:export"
+		action   = "compliance:reportNodes:list"
 	)
 
 	ctx, err := s.authRequest(r, resource, action)

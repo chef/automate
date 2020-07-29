@@ -37,7 +37,8 @@ func (m Backend) NodeExists(id string, filters map[string][]string) (bool, error
 	return false, nil
 }
 
-func (m Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCounts, error) {
+func (m Backend) GetNodesCounts(filters map[string][]string,
+	startDate string, endDate string) (backend.NodesCounts, error) {
 	ns := backend.NodesCounts{}
 	return ns, nil
 }
@@ -196,5 +197,19 @@ func (m Backend) GetErrors(int32, map[string][]string) ([]*backend.ChefErrorCoun
 }
 
 func (m Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.CountedDuration, error) {
+	return nil, nil
+}
+
+func (m Backend) GetNodeMetadataCounts(filters map[string][]string, types []string, startDate,
+	endDate string) ([]backend.TypeCount, error) {
+	return nil, nil
+}
+
+func (m Backend) GetNodeRunsDailyStatusTimeSeries(nodeID string, startTime,
+	endTime time.Time) ([]backend.RunDurationStatus, error) {
+	return nil, nil
+}
+
+func (es Backend) GetLatestRunRolloutBreakdownCounts() (*backend.NodeSegmentRolloutProgress, error) {
 	return nil, nil
 }

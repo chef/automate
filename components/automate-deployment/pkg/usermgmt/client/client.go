@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/local_user"
-	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/automate-deployment/pkg/usermgmt"
 	teams_storage "github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -81,7 +81,7 @@ func (u *userMgmtClient) AddUserToAdminTeam(ctx context.Context, userID string) 
 	adminsTeam, err := u.teamsClient.GetTeam(ctx,
 		// (tc) By convention, this is the admins team name string and will properly be
 		// updated here should that change in teams-service.
-		&teams.GetTeamReq{Id: teams_storage.AdminsTeamName})
+		&teams.GetTeamReq{Id: teams_storage.AdminsTeamID})
 	if err != nil {
 		return err
 	}

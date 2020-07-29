@@ -137,7 +137,7 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 	return c.V1.Sys, nil
 }
 
-// SetGlobalConfig injects global confiugration overrides
+// SetGlobalConfig injects global configuration overrides
 func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	// Handle external configuration
 	if g.GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue() {

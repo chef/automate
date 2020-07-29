@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("jobs", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/compliance/scanner/jobs/jobs.proto",
+    "title": "external/compliance/scanner/jobs/jobs.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/compliance/scanner/jobs": {
+    "/api/v0/compliance/scanner/jobs": {
       "post": {
         "summary": "Create a scan job",
         "description": "Creates a scan job. A scan job executes Chef InSpec against the specified nodes.\nRequires a user-specified name. Type should be ` + "`" + `detect` + "`" + ` (checks if the node is reachable and reports the\nplatform information for the nodes) or ` + "`" + `exec` + "`" + ` (executes a set of profiles against the nodes).\nNodes to scan may be specified by including an array of node IDs to scan or a node manager ID along with some optional\nfiltering information.\nExec jobs require at least one profile to be used as part of the Chef InSpec scan.\nOptional recurrence schedules enable regularly scheduled (repeating) scans.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{  \n\"name\": \"my testjob\",\n\"tags\": [],\n\"type\": \"exec\",\n\"nodes\": [\"i07uc612-7e97-43f2-9b19-256abh785820\"],\n\"profiles\": [\"https://github.com/dev-sec/linux-baseline/archive/master.tar.gz\", \"compliance://admin/ssh-baseline#2.2.0\"],\n\"retries\": 1,\n\"node_selectors\":[\n{\n\"manager_id\":\"e69dc612-7e67-43f2-9b19-256afd385820\",\n\"filters\":[{\"key\":\"name\",\"values\":[\"ins*\"],\"exclude\":false}]\n}\n],\n\"recurrence\":\"DTSTART=20191231T045100Z;FREQ=DAILY;INTERVAL=1\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:scannerJobs:create\n` + "`" + `` + "`" + `` + "`" + `",
@@ -42,7 +42,7 @@ func init() {
         ]
       }
     },
-    "/compliance/scanner/jobs/id/{id}": {
+    "/api/v0/compliance/scanner/jobs/id/{id}": {
       "get": {
         "summary": "Read a scan job",
         "description": "Read the details of a scan job given an ID.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:scannerJobs:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -141,7 +141,7 @@ func init() {
         ]
       }
     },
-    "/compliance/scanner/jobs/rerun/id/{id}": {
+    "/api/v0/compliance/scanner/jobs/rerun/id/{id}": {
       "get": {
         "summary": "Rerun a scan job",
         "description": "Does not create a new job in the database. Reads the job info given the job ID\nand runs a scan. The latest job information is then updated to reflect this latest run.\t\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:scannerJobs:rerun\n` + "`" + `` + "`" + `` + "`" + `",
@@ -175,7 +175,7 @@ func init() {
         ]
       }
     },
-    "/compliance/scanner/jobs/search": {
+    "/api/v0/compliance/scanner/jobs/search": {
       "post": {
         "summary": "List of scan jobs",
         "description": "Returns a list of scan jobs matching the query.\nSupports filtering, sorting, and pagination.\nValid filtering fields: job_type, parent_job, status\nValid sorting fields: name, type, status, start_time, end_time\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filters\":[\n{\"key\":\"job_type\",\"values\":[\"exec\"]},\n{\"key\":\"parent_job\",\"values\":[\"\"]}\n],\n\"page\":1,\n\"per_page\":100,\n\"sort\":\"end_time\",\n\"order\":\"DESC\"\n} \n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:scannerJobs:list\n` + "`" + `` + "`" + `` + "`" + `",

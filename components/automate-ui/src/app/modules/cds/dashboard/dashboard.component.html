@@ -1,0 +1,13 @@
+<div class="content-container">
+
+  <app-enable-content-modal
+    [show] = "!(isContentEnabled$ | async)"
+    (onCredentialsSubmit) = "credentialsSubmit($event)">
+  </app-enable-content-modal>
+
+  <app-card-table
+    [contentItems] = "contentItems$ | async"
+    (onInstallItem) ="installContentItem($event)"
+    (onDownloadItem) ="downloadContentItem($event)">
+  </app-card-table>
+</div>

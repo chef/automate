@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"os/user"
 	"strings"
 	"time"
 
@@ -15,6 +14,7 @@ import (
 
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/sys"
+	"github.com/chef/automate/lib/user"
 )
 
 type Reporter interface {

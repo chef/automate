@@ -35,6 +35,10 @@ export interface RoutePerms {
 })
 export class LandingComponent implements OnInit {
 
+  public authorizedChecker: AuthorizedChecker;
+  private authComponent: AuthorizedComponent;
+  private index = 0;
+
   /**
    * The single input to this class is this list that corresponds
    * to the items in your sidebar component.
@@ -44,9 +48,14 @@ export class LandingComponent implements OnInit {
    */
   @Input() routePerms: RoutePerms[] = [];
 
-  public authorizedChecker: AuthorizedChecker;
-  private authComponent: AuthorizedComponent;
-  private index = 0;
+  /**
+   * A callback function to perform some actions in the event that no landing page was found.
+   * If no callback is provided, the caller guarantees one will always be found.
+   * (That should be the case for sidebars because we will never attempt to
+   * materialize a sidebar unless at least one item is permissible.)
+   * Thus, this defaults to a no-op function.
+   */
+  @Input() onNotFound: () => void = () => { };
 
   constructor(
     cdr: ChangeDetectorRef,
@@ -69,6 +78,8 @@ export class LandingComponent implements OnInit {
       this.router.navigate(this.routeToSegmentList(this.route), { replaceUrl: true });
     } else if (++this.index < this.routePerms.length) {
       this.setPerms();
+    } else {
+        this.onNotFound();
     }
   }
 

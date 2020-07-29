@@ -1,3 +1,6 @@
+#shellcheck disable=SC2034
+#shellcheck disable=SC2154
+
 pkg_name=automate-workflow-nginx
 pkg_origin=chef
 pkg_version=2.8.61
@@ -6,14 +9,14 @@ pkg_license=('Chef-MLSA')
 vendor_origin=${vendor_origin:-"chef"}
 
 pkg_deps=(
-  core/libossp-uuid
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/openresty-noroot/1.13.6.2/20191009112038"
+  "${vendor_origin}/openresty-noroot/1.13.6.2/20200421183321"
+  "${vendor_origin}/automate-workflow-web"
   chef/mlsa
   core/bash
   core/curl
   core/coreutils
-  "${vendor_origin}/automate-workflow-web"
+  core/libossp-uuid
 )
 
 pkg_exposes=(port ssl-port)
@@ -38,7 +41,7 @@ do_build() {
 
 do_install() {
     mkdir -pv "$pkg_prefix/www/workflow" "$pkg_prefix/www/loading"
-    cp -Rv "$(pkg_path_for ${vendor_origin}/automate-workflow-web)"/dist/* "$pkg_prefix/www/workflow"
+    cp -Rv "$(pkg_path_for "${vendor_origin}/automate-workflow-web")"/dist/* "${pkg_prefix}/www/workflow"
     cp -v "$SRC_PATH/loading.html" "$pkg_prefix/www/loading/index.html"
 }
 

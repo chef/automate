@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("license_license", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/license/license.proto",
+    "title": "automate-gateway/api/license/license.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/license/apply": {
+    "/api/v0/license/apply": {
       "post": {
         "operationId": "ApplyLicense",
         "responses": {
@@ -40,7 +40,7 @@ func init() {
         ]
       }
     },
-    "/license/request": {
+    "/api/v0/license/request": {
       "post": {
         "operationId": "RequestLicense",
         "responses": {
@@ -66,7 +66,7 @@ func init() {
         ]
       }
     },
-    "/license/status": {
+    "/api/v0/license/status": {
       "get": {
         "operationId": "GetStatus",
         "responses": {

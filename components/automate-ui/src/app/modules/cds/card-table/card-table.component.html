@@ -1,0 +1,26 @@
+<div class="content-container">
+  <div class="dashboard-grid">
+    <div class="dashboard-grid-row">
+      <div class="dashboard-overview-column">
+        <div class="dashboard-overview-grid">
+          <div class="dashboard-overview-row">
+            <div class="dashboard-overview-header">
+              <h1>
+                <chef-icon>local_library</chef-icon> Content Library
+              </h1>
+            </div>
+          </div>
+          <div *ngFor="let pairOfItems of collectionOfPairs" class="dashboard-overview-row">
+            <div *ngFor="let item of pairOfItems" class="dashboard-overview-col">
+              <app-card
+                [contentItem] = "item"
+                (onInstallItem) = "installContentItem(item)"
+                (onDownloadItem) = "downloadContentItem(item)">
+              </app-card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

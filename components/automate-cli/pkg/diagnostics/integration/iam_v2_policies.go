@@ -16,8 +16,8 @@ const createV2PolicyTemplateStr = `
 	"id": "{{ .ID }}",
 	"name": "{{ .ID }} test policy",
 	"members": [
-		"token:{{ .TokenID }}", 
-		"user:local:{{ .UserID }}", 
+		"token:{{ .TokenID }}",
+		"user:local:{{ .UserID }}",
 		"team:local:{{ .TeamID }}"
 	],
 	"statements": [
@@ -42,6 +42,7 @@ type PolicyParameters struct {
 	UserID    string
 	RoleID    string
 	ProjectID string
+	RuleID    string
 }
 
 type generatedV2PolicyData struct {
@@ -52,6 +53,7 @@ type generatedV2PolicyData struct {
 	UserID     string `json:"user_id"`
 	RoleID     string `json:"role_id"`
 	ProjectID  string `json:"project_id"`
+	RuleID     string `json:"rule_id"`
 	Skipped    bool   `json:"skipped"`
 }
 
@@ -118,6 +120,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 					UserID:     loaded.UserID,
 					RoleID:     loaded.RoleID,
 					ProjectID:  loaded.ProjectID,
+					RuleID:     loaded.RuleID,
 					Skipped:    loaded.Skipped,
 				})
 			}
@@ -157,6 +160,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				UserID:    userInfo.ID,
 				RoleID:    roleInfo.Role.ID,
 				ProjectID: projectInfo.Project.ID,
+				RuleID:    projectInfo.Project.Rule.ID,
 			}
 
 			policyInfo, err := CreateV2Policy(tstCtx, pol)
@@ -167,7 +171,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 			loaded := generatedV2PolicyData{}
 			err = tstCtx.GetValue("iam-policies-v2", &loaded)
 			if err != nil {
-				return errors.Errorf(err.Error(), "could not find generated context")
+				return errors.Wrap(err, "could not find generated context")
 			}
 
 			tstCtx.SetValue("iam-policies-v2", generatedV2PolicyData{
@@ -178,6 +182,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				UserID:     pol.UserID,
 				RoleID:     pol.RoleID,
 				ProjectID:  pol.ProjectID,
+				RuleID:     projectInfo.Project.Rule.ID,
 				Skipped:    loaded.Skipped,
 			})
 			return nil
@@ -193,14 +198,14 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				err = MustJSONDecodeSuccess(
 					tstCtx.DoLBRequest(
 						fmt.Sprintf("/apis/iam/v2/policies/%s", v1loaded.PolicyID),
-					)).Error()
+					)).WithValue(&struct{}{})
 				require.NoError(tstCtx, err, "Expected to be able to read gateway version")
 
 				err = MustJSONDecodeSuccess(
 					tstCtx.DoLBRequest(
 						"/api/v0/gateway/version",
 						lbrequest.WithAuthToken(v1loaded.TokenValue),
-					)).Error()
+					)).WithValue(&struct{}{})
 				require.NoError(tstCtx, err, "Expected to be able to read gateway version")
 			}
 
@@ -221,7 +226,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				tstCtx.DoLBRequest(
 					"/api/v0/gateway/version",
 					lbrequest.WithAuthToken(v2loaded.TokenValue),
-				)).Error()
+				)).WithValue(&struct{}{})
 			require.NoError(tstCtx, err, "Expected to be able to read gateway version")
 
 			type Statement struct {
@@ -271,7 +276,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				DeleteTeam(tstCtx, loaded.TeamID),
 				DeleteUser(tstCtx, loaded.UserID),
 				DeleteRole(tstCtx, loaded.RoleID),
-				DeleteProject(tstCtx, loaded.ProjectID),
+				DeleteProjectWithRule(tstCtx, loaded.ProjectID, loaded.RuleID),
 			)
 		},
 	}

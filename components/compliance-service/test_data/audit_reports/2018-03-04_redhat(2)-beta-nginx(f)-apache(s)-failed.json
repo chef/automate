@@ -90,15 +90,20 @@
               "run_time": 0.004013,
               "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
             }
-          ]
+          ],
+          "removed_results_counts": {
+            "failed": 15,
+            "skipped": 10,
+            "passed": 5
+          }
         },
         {
           "id": "nginx-02",
           "title": "Check NGINX config file owner, group and permissions.",
           "desc": "The NGINX config file should owned by root, only be writable by owner and not write- and readable by others.",
           "impact": 1,
-          "refs":[ 
-            { 
+          "refs":[
+            {
               "ref":"testing-ref", "url": "test-url"
             }
           ],

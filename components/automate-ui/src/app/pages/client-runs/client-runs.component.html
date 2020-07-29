@@ -1,18 +1,17 @@
-<div class="content-container">
-  <div *ngIf="permissionDenied$ | async" class="permission-denied-banner">
-    <p>You do not currently have permission to view this page.</p>
-    <p>Please contact your administrator for permission.</p>
-  </div>
-
+<div class="content-container" [ngClass]="loading(loadedStatus$ | async) ? 'lock-scrolling' : ''">
   <div class="container">
-    
-    <chef-notification
-      *ngIf="notificationVisible"
-      [type]="'error'"
-      [timeout]="8"
-      (dismissed)="hideNotification()">
-      Failed to retrieve data.
-    </chef-notification>
+
+    <div class="sticky-notifications">
+      <div class="sticky-inner">
+        <app-notification
+          *ngIf="notificationVisible"
+          [type]="'error'"
+          [timeout]="8"
+          (dismissed)="hideNotification()">
+          Failed to retrieve data.
+        </app-notification>
+      </div>
+    </div>
     <main>
       <div class="node-list-container">
         <chef-page-header>
@@ -35,7 +34,7 @@
               <chef-click-outside (clickOutside)="hideShareDropdown()" omit="dropdown-toggle">
                 <p>Copy this private URL to share:</p>
                 <div class="copy-input">
-                  <input type="text" [value]="shareUrl" readonly />
+                  <input type="text" aria-label="URL" [value]="shareUrl" readonly />
                   <chef-clipboard [value]="shareUrl"></chef-clipboard>
                 </div>
               </chef-click-outside>
@@ -120,10 +119,12 @@
         title="download-title"
         [visible]="downloadStatusVisible"
         (closeModal)="hideDownloadStatus()">
-        <h4 id="download-title" slot="title">
-          <ng-container *ngIf="downloadInProgress">Downloading report...</ng-container>
-          <ng-container *ngIf="downloadFailed">Download failed.</ng-container>
-        </h4>
+        <ng-container *ngIf="downloadInProgress">
+          <h2 id="download-report" class="display4" slot="title">Downloading report...</h2>
+        </ng-container>
+        <ng-container *ngIf="downloadFailed">
+          <h2 id="download-failed" class="display4" slot="title">Download failed.</h2>
+        </ng-container>
         <chef-loading-spinner *ngIf="downloadInProgress" size="50"></chef-loading-spinner>
       </chef-modal>
     </main>

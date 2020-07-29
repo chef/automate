@@ -1,60 +1,76 @@
-<chef-page
-  subheading="Only local users can be added to teams."
-  [attr.secondary-btn-show]="showSecondary"
-  [attr.heading]="getHeading()"
-  [attr.confirm-btn-text]="getConfirmBtnText()"
-  [attr.page-loading]="loading$ | async"
-  [attr.confirm-loading]="addingUsers"
-  [attr.disable-confirm]="usersToAddValues().length === 0"
-  [attr.error-message]="getErrorMessage()"
-  (confirm)="addUsers()"
-  (close)="closePage()">
-  <div *ngIf="!(loading$ | async)">
-    <app-create-user-modal [openEvent]="openUserModal"></app-create-user-modal>
-    <div id="no-users-container" *ngIf="usersNotFiltered().length === 0">
-      <app-authorized not [allOf]="['/iam/v2/users', 'post']">
-        <p>All local users have already been added.</p>
-      </app-authorized>
-      <app-authorized [allOf]="['/iam/v2/users', 'post']">
-        <p>All local users have already been added; create some more!</p>
-        <chef-button primary (click)="openModal()">Create User</chef-button>
-      </app-authorized>
-    </div>
-    <div id="table-container" *ngIf="usersNotFiltered()?.length > 0">
-      <div id="table-controls">
-        <app-authorized [allOf]="['/iam/v2/users', 'post']">
+<app-authorized not [allOf]="['/apis/iam/v2/teams/{id}', 'put', team?.id]">
+  <chef-page
+    [attr.heading]="triggerFullPageMessage()"
+    [attr.confirm-btn-text]="''"
+    (close)="closePage()">
+  <div class="no-permissions">
+    <p>It looks like you don't have permission to add users to this team.
+      <br/>
+      Reach out to your administrator or
+      contact <a href="https://www.chef.io/support/" target="_blank" class="error-msg">Chef support</a> for help.
+    </p>
+  </div>
+  </chef-page>
+</app-authorized>
+<app-authorized [allOf]="['/apis/iam/v2/teams/{id}', 'put', team?.id]">
+  <chef-page
+    subheading="Only local users can be added to teams."
+    [attr.secondary-btn-show]="showSecondary"
+    [attr.heading]="getHeading()"
+    [attr.confirm-btn-text]="getConfirmBtnText()"
+    [attr.page-loading]="loading$ | async"
+    [attr.confirm-loading]="addingUsers"
+    [attr.disable-confirm]="usersToAddValues().length === 0"
+    [attr.error-message]="getErrorMessage()"
+    (confirm)="addUsers()"
+    (close)="closePage()">
+    <div *ngIf="!(loading$ | async)">
+      <app-create-user-modal [openEvent]="openUserModal"></app-create-user-modal>
+      <div id="no-users-container" *ngIf="usersNotFiltered().length === 0">
+        <app-authorized not [allOf]="['/apis/iam/v2/users', 'post']">
+          <p>All local users have already been added.</p>
+        </app-authorized>
+        <app-authorized [allOf]="['/apis/iam/v2/users', 'post']">
+          <p>All local users have already been added; create some more!</p>
           <chef-button primary (click)="openModal()">Create User</chef-button>
         </app-authorized>
-        <div id="users-selected">
-          {{ usersToAddValues().length | pluralize : 'user' : '+s' }} selected
+      </div>
+      <div id="table-container" *ngIf="usersNotFiltered()?.length > 0">
+        <div id="table-controls">
+          <app-authorized [allOf]="['/apis/iam/v2/users', 'post']">
+            <chef-button primary (click)="openModal()">Create User</chef-button>
+          </app-authorized>
+          <div id="users-selected">
+            {{ usersToAddValues().length | pluralize : 'user' : '+s' }} selected
+          </div>
+        </div>
+        <div id="inner-container">
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th class="checkbox-row"></chef-th>
+                <chef-th>Name</chef-th>
+                <chef-th>Username</chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr *ngFor="let user of usersNotFiltered()">
+                <chef-td class="checkbox-row">
+                  <chef-checkbox (change)="addOrRemoveQueuedUser($event.detail, user)" [checked]="isUserChecked(user)"></chef-checkbox>
+                </chef-td>
+                <chef-td>
+                  <a [routerLink]="['/settings', 'users', user.id]" target="_blank">
+                    {{ user.name }}
+                  </a>
+                </chef-td>
+                <chef-td>
+                  {{ user.id }}
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
         </div>
       </div>
-      <div id="inner-container">
-        <chef-table>
-          <chef-thead>
-            <chef-tr>
-              <chef-th class="checkbox-row"></chef-th>
-              <chef-th>Name</chef-th>
-              <chef-th>Username</chef-th>
-            </chef-tr>
-          </chef-thead>
-          <chef-tbody>
-            <chef-tr *ngFor="let user of usersNotFiltered()">
-              <chef-td class="checkbox-row">
-                <chef-checkbox (change)="addOrRemoveQueuedUser($event.detail, user)" [checked]="isUserChecked(user)"></chef-checkbox>
-              </chef-td>
-              <chef-td>
-                <a [routerLink]="['/settings', 'users', user.id]" target="_blank">
-                  {{ user.name }}
-                </a>
-              </chef-td>
-              <chef-td>
-                {{ user.id }}
-              </chef-td>
-            </chef-tr>
-          </chef-tbody>
-        </chef-table>
-      </div>
     </div>
-  </div>
-</chef-page>
+  </chef-page>
+</app-authorized>

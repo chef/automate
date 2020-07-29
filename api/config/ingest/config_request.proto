@@ -3,9 +3,9 @@ syntax = "proto3";
 package chef.automate.domain.ingest;
 option go_package = "github.com/chef/automate/api/config/ingest";
 
-import "api/config/shared/global.proto";
-import "api/config/shared/tls.proto";
-import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "config/shared/global.proto";
+import "config/shared/tls.proto";
+import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
 message ConfigRequest {
@@ -40,6 +40,10 @@ message ConfigRequest {
 				google.protobuf.Int32Value max_number_of_bundled_action_msgs = 7;
 				google.protobuf.Int32Value number_of_run_msgs_transformers = 8;
 				google.protobuf.Int32Value number_of_run_msg_publishers = 9;
+				google.protobuf.Int32Value message_buffer_size = 10;
+				google.protobuf.BoolValue nodes_missing_running_default = 11;
+				google.protobuf.BoolValue missing_nodes_for_deletion_running_default = 12;
+				google.protobuf.Int32Value number_of_nodemanager_publishers = 13;
 			}
 
 			message Log {

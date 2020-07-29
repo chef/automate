@@ -74,6 +74,16 @@ func readCliParams() *serveropts.Opts {
 		version.GitSHA,
 	))
 
+	missingNodesForDeletionRunningDefault := true
+	if viper.GetString("missing-nodes-for-deletion-running-default") == "false" {
+		missingNodesForDeletionRunningDefault = false
+	}
+
+	nodesMissingRunningDefault := true
+	if viper.GetString("nodes-missing-running-default") == "false" {
+		nodesMissingRunningDefault = false
+	}
+
 	return &serveropts.Opts{
 		Host:                          viper.GetString("host"),
 		Port:                          viper.GetInt("port"),
@@ -86,16 +96,23 @@ func readCliParams() *serveropts.Opts {
 		CerealAddress:                 viper.GetString("cereal-address"),
 		EventAddress:                  viper.GetString("event-address"),
 		NodeManagerAddress:            viper.GetString("nodemanager-address"),
+		ConfigMgmtAddress:             viper.GetString("config-mgmt-address"),
 		LogLevel:                      viper.GetString("log-level"),
 		PurgeConvergeHistoryAfterDays: int32(viper.GetInt("converge-history-days")),
 		PurgeActionsAfterDays:         int32(viper.GetInt("actions-days")),
 		ChefIngestServerConfig: serveropts.ChefIngestServerConfig{
+			MessageBufferSize:            viper.GetInt("message-buffer-size"),
 			MaxNumberOfBundledActionMsgs: viper.GetInt("max-number-of-bundled-action-msgs"),
 			ChefIngestRunPipelineConfig: serveropts.ChefIngestRunPipelineConfig{
-				MaxNumberOfBundledMsgs:   viper.GetInt("max-number-of-bundled-run-msgs"),
-				NumberOfMsgsTransformers: viper.GetInt("number-of-run-msgs-transformers"),
-				NumberOfPublishers:       viper.GetInt("number-of-run-msg-publishers"),
+				MaxNumberOfBundledMsgs:        viper.GetInt("max-number-of-bundled-run-msgs"),
+				NumberOfMsgsTransformers:      viper.GetInt("number-of-run-msgs-transformers"),
+				NumberOfPublishers:            viper.GetInt("number-of-run-msg-publishers"),
+				NumberOfNodemanagerPublishers: viper.GetInt("number-of-nodemanager-publishers"),
 			},
+		},
+		Jobs: serveropts.JobsConfig{
+			MissingNodesForDeletionRunningDefault: missingNodesForDeletionRunningDefault,
+			NodesMissingRunningDefault:            nodesMissingRunningDefault,
 		},
 		ConnFactory: factory,
 	}
@@ -113,6 +130,7 @@ func init() {
 	serveCmd.Flags().String("event-address", "localhost:10132", "address of event (domain:<port>)")
 	serveCmd.Flags().String("cereal-address", "localhost:10101", "address of cereal (domain:<port>)")
 	serveCmd.Flags().String("nodemanager-address", "localhost:10120", "address of nodemanager (domain:<port>)")
+	serveCmd.Flags().String("config-mgmt-address", "localhost:10119", "address of config-mgmt-service (domain:<port>)")
 	serveCmd.Flags().String("postgresql-url", "", "PG URI (postgres://host:port)")
 	serveCmd.Flags().String("postgresql-database", "chef_ingest_service", "PG Database name")
 	serveCmd.Flags().Int32("converge-history-days", 30, "Number of days to keep converge history for. A number less than or equal to 0 means data should never be deleted")
@@ -121,8 +139,12 @@ func init() {
 	serveCmd.Flags().Int("max-number-of-bundled-action-msgs", 10000, "The maximum number of action messages to bundle together during ingestion")
 	serveCmd.Flags().Int("number-of-run-msgs-transformers", 9, "The number of run messages to transform at a time")
 	serveCmd.Flags().Int("number-of-run-msg-publishers", 2, "The number of run messages publishers")
+	serveCmd.Flags().Int("number-of-nodemanager-publishers", 2, "The number of nodemanager publishers")
+	serveCmd.Flags().Int("message-buffer-size", 100, "The number of messages that can be buffered")
 	serveCmd.Flags().String("key", "key.pem", "SSL Private key for gRPC server")
 	serveCmd.Flags().String("cert", "cert.pem", "SSL Certificate for gRPC server")
 	serveCmd.Flags().String("root-cert", "cacert.pem", "Root SSL CA Certificate for gRPC server")
+	serveCmd.Flags().String("missing-nodes-for-deletion-running-default", "true", "Default value for running the missing nodes for deletion job")
+	serveCmd.Flags().String("nodes-missing-running-default", "true", "Default value for running the nodes missing job")
 	viper.BindPFlags(serveCmd.Flags()) // nolint: errcheck
 }

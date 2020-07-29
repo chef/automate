@@ -1,6 +1,6 @@
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/reporting/reporting_pb'
-require 'api/interservice/compliance/reporting/reporting_services_pb'
+require 'interservice/compliance/reporting/reporting_pb'
+require 'interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
   Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)
@@ -658,6 +658,20 @@ describe File.basename(__FILE__) do
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
+    # Test filters by skipped status
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'environment', values: ['DevSec Prod beta']),
+      Reporting::ListFilter.new(type: 'status', values: ['skipped']),
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+    ])
+    # expect 0 nodes, but expect counts to not be 0
+    expected_nodes = {
+      "total" => 2,
+      "totalFailed" => 1,
+      "totalPassed" => 1
+  }.to_json
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+
     # Test filters by env and status
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'recipe', values: ['apache_extras']),
@@ -790,7 +804,12 @@ describe File.basename(__FILE__) do
         Reporting::ListFilter.new(type: 'status', values: ['skipped', 'failed']),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-05T23:59:59Z'])
     ])
-    assert_equal(Reporting::Nodes.new(), actual)
+    # expect 0 nodes, but expect counts to not be 0
+    expected_nodes = {
+      "total" => 1,
+      "totalPassed" => 1
+    }.to_json
+    assert_equal_json_sorted(expected_nodes, actual.to_json)
 
     # Get nodes with platform 'centos', 'windows' or 'aix'(we don't have a matching aix node, but it doesn't hurt to test this)
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -1444,6 +1463,90 @@ describe File.basename(__FILE__) do
         }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
+    # Get nodes from 2018-04-02
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'profile_id', values: [
+          '5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777',
+          '5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888'
+      ]),
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+    ])
+    expected_nodes =
+    {"nodes" =>
+      [{"environment" => "DevSec Prod Alpha",
+      "id" => "999f4e51-b049-4b10-9555-555789999967",
+      "latestReport" =>
+       {"controls" =>
+         {"failed" => {},
+          "passed" => {"total" => 1},
+          "skipped" => {},
+          "total" => 1,
+          "waived" => {}},
+        "endTime" => "2018-04-02T03:02:02Z",
+        "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20",
+        "status" => "failed"},
+      "name" => "ubuntu(4)-alpha-myskippy(s)-myfaily(f)-apache(f)-linux(p)-failed",
+      "platform" => {"full" => "ubuntu 18.04", "name" => "ubuntu", "release" => "18.04"},
+      "profiles" =>
+       [{"full" => "DevSec Apache Baseline, v2.0.0",
+         "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
+         "name" => "apache-baseline",
+         "status" => "failed",
+         "version" => "2.0.0"},
+        {"full" => "DevSec Linux Security Baseline, v2.0.1",
+         "id" => "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015",
+         "name" => "linux-baseline",
+         "status" => "passed",
+         "version" => "2.0.1"},
+        {"full" => "My Faily Profile title, v1.0.0",
+         "id" => "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888",
+         "name" => "myfaily",
+         "status" => "failed",
+         "version" => "1.0.0"},
+        {"full" => "My Skipped Profile title, v1.0.0",
+         "id" => "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777",
+         "name" => "myskippy",
+         "status" => "skipped",
+         "version" => "1.0.0"}]}],
+      "total" => 1,
+      "totalFailed" => 1}.to_json
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+
+
+    # Get nodes from 2018-04-03 with non matching profile
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'profile_id', values: [
+        '5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777'
+      ]),
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+    ])
+    expected_nodes = {}.to_json
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+
+
+    # Get nodes from 2018-04-03
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+    ])
+    expected_nodes = {
+      "nodes" => [
+        {
+          "environment" => "DevSec Prod Alpha",
+          "id" => "888f4e51-b049-4b10-9555-111222333333",
+          "latestReport" => {
+            "controls" => { "failed" => {}, "passed" => {}, "skipped" => {}, "waived" => {}},
+            "endTime" => "2018-04-03T11:02:02Z",
+            "id" => "zz93e1b2-36d6-439e-ac70-cccccccccckk",
+            "status" => "failed"
+          },
+          "name" => "ubuntu(0)-alpha-failed",
+          "platform" => { "full" => "unknown unknown", "name" => "unknown", "release" => "unknown"}
+        }
+      ],
+      "total" => 1,
+      "totalFailed" => 1
+    }.to_json
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Cover the other sort fields:
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(
@@ -1549,6 +1652,62 @@ describe File.basename(__FILE__) do
     }
     assert_equal_json_sorted( expected_node.to_json, actual_node.to_json)
 
+    # Node details API
+    actual_node = GRPC reporting, :read_node, Reporting::Id.new(id: '888f4e51-b049-4b10-9555-111222333333')
+    expected_node = {
+      "environment" => "DevSec Prod Alpha",
+      "id" => "888f4e51-b049-4b10-9555-111222333333",
+      "latestReport" => {
+        "controls" => { "failed" => {}, "passed" => {}, "skipped" => {}, "waived" => {} },
+        "endTime" => "2018-04-03T11:02:02Z",
+        "id" => "zz93e1b2-36d6-439e-ac70-cccccccccckk",
+        "status" => "failed"
+      },
+      "name" => "ubuntu(0)-alpha-failed",
+      "platform" => { "full" => "unknown unknown", "name" => "unknown", "release" => "unknown" }
+    }
+    assert_equal_json_sorted( expected_node.to_json, actual_node.to_json)
+
+    # Node details API
+    actual_node = GRPC reporting, :read_node, Reporting::Id.new(id: '999f4e51-b049-4b10-9555-555789999967')
+    expected_node = {
+     "environment" => "DevSec Prod Alpha",
+     "id" => "999f4e51-b049-4b10-9555-555789999967",
+     "latestReport" =>
+      {"controls" =>
+        {"failed" => {},
+         "passed" => {"total" => 1},
+         "skipped" => {},
+         "total" => 1,
+         "waived" => {}},
+       "endTime" => "2018-04-02T03:02:02Z",
+       "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20",
+       "status" => "failed"},
+     "name" => "ubuntu(4)-alpha-myskippy(s)-myfaily(f)-apache(f)-linux(p)-failed",
+     "platform" => {"full" => "ubuntu 18.04", "name" => "ubuntu", "release" => "18.04"},
+     "profiles" =>
+      [{"full" => "DevSec Apache Baseline, v2.0.0",
+        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
+        "name" => "apache-baseline",
+        "status" => "failed",
+        "version" => "2.0.0"},
+       {"full" => "DevSec Linux Security Baseline, v2.0.1",
+        "id" => "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015",
+        "name" => "linux-baseline",
+        "status" => "passed",
+        "version" => "2.0.1"},
+       {"full" => "My Faily Profile title, v1.0.0",
+        "id" => "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888",
+        "name" => "myfaily",
+        "status" => "failed",
+        "version" => "1.0.0"},
+       {"full" => "My Skipped Profile title, v1.0.0",
+        "id" => "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777",
+        "name" => "myskippy",
+        "status" => "skipped",
+        "version" => "1.0.0"}]
+    }
+    assert_equal_json_sorted( expected_node.to_json, actual_node.to_json)
 
     # sort by node name ASC when a profile filter is used
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [

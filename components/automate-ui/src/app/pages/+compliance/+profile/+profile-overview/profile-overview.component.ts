@@ -1,8 +1,11 @@
-import { combineLatest as observableCombineLatest,
-         throwError as observableThrowError,
-         forkJoin as observableForkJoin,
-         Subject,
-         Observable } from 'rxjs';
+import {
+  combineLatest as observableCombineLatest,
+  throwError as observableThrowError,
+  forkJoin as observableForkJoin,
+  Subject,
+  Observable,
+  of
+} from 'rxjs';
 
 import { map, takeUntil, catchError } from 'rxjs/operators';
 import {
@@ -18,6 +21,7 @@ import { UploadService } from 'app/services/profiles/upload.service';
 import { AvailableProfilesService } from 'app/services/profiles/available-profiles.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { find } from 'lodash';
+import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
 
 interface Profile {
     name: String;
@@ -72,6 +76,8 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   // Empty Page
   profilesEmpty = false;
 
+  public isAvailableProfilesVisible = false;
+
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   constructor(
@@ -79,8 +85,11 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
     private availableProfilesService: AvailableProfilesService,
     private uploadService: UploadService,
     private chefSessionService: ChefSessionService,
-    private layoutFacade: LayoutFacadeService
-  ) {}
+    private layoutFacade: LayoutFacadeService,
+    private productDeployedService: ProductDeployedService
+  ) {
+    this.isAvailableProfilesVisible = !this.productDeployedService.isProductDeployed('desktop');
+  }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Compliance);
@@ -138,6 +147,11 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
 
   // load profiles available to the user
   loadAvailableProfiles() {
+    if (!this.isAvailableProfilesVisible) {
+      this.availableListLoading = false;
+      this.availableProfilesDataLoaded = true;
+      return of([]);
+    }
     this.availableListLoading = true;
     return this.availableProfilesService.getAllProfiles().pipe(
       map(availableProfiles => {
@@ -285,5 +299,9 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
     this.layoutFacade.ShowPageLoading(false);
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  selectTab(tabToSelect: 'installed' | 'available') {
+    this.selectedTab = tabToSelect;
   }
 }

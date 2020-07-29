@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/interservice/ingest/automate_event.proto",
+    "title": "interservice/ingest/automate_event.proto",
     "version": "version not set"
   },
   "consumes": [

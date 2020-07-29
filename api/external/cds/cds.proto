@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package chef.automate.api.cds;
+option go_package = "github.com/chef/automate/api/external/cds";
+
+import "external/cds/request/root.proto";
+import "external/cds/response/root.proto";
+import "external/common/response.proto";
+
+import "google/protobuf/struct.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
+
+service Cds {
+  /*
+  ListContentItems
+
+  Returns a list of metadata for each CDS content. Provides a description and current 
+  state of each content item.
+
+  Authorization Action:
+  ```
+  content:items:list
+  ```
+  */
+  rpc ListContentItems(cds.request.ContentItems) returns (cds.response.ContentItems) {
+    option (google.api.http).get = "/api/beta/content/items";
+    option (chef.automate.api.iam.policy).resource = "content:items";
+    option (chef.automate.api.iam.policy).action = "content:items:list";
+  };
+
+  /*
+  SubmitCredentials
+
+  Submit a Chef Cloud Credentials to enable content
+
+  Authorization Action:
+  ```
+  content:credentials:add
+  ```
+  */
+  rpc SubmitCredentials(cds.request.Credentials) returns (cds.response.Credentials) {
+    option (google.api.http) = {
+      post: "/api/beta/content/credentials"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "content:credentials";
+    option (chef.automate.api.iam.policy).action = "content:credentials:add";
+  };
+
+  /*
+  IsContentEnabled
+
+  Check if the content is enable for this Automate instance. 
+
+  Authorization Action:
+  ```
+  content:credentials:enabled
+  ```
+  */
+  rpc IsContentEnabled(cds.request.ContentEnabled) returns (cds.response.ContentEnabled) {
+    option (google.api.http).get = "/api/beta/content/enabled";
+    option (chef.automate.api.iam.policy).resource = "content:credentials";
+    option (chef.automate.api.iam.policy).action = "content:credentials:enabled";
+  };
+
+  /*
+  InstallContentItem
+
+  Installs a content item from its ID
+
+  Authorization Action:
+  ```
+  content:items:install
+  ```
+  */
+  rpc InstallContentItem(cds.request.InstallContentItem) returns (cds.response.InstallContentItem) {
+    option (google.api.http) = {
+      post: "/api/beta/content/install"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "content:items";
+    option (chef.automate.api.iam.policy).action = "content:items:install";
+  };
+
+  /*
+  DownloadContentItem
+
+  Download a content item from its ID
+
+  grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
+	so we do not auto-generate the route for download; we instead custom handle with mux
+
+  Authorization Action:
+  ```
+  content:items:download
+  ```
+  */
+  rpc DownloadContentItem(cds.request.DownloadContentItem) returns (stream chef.automate.api.common.ExportData) { }
+  //   option (google.api.http) = {
+  //     post: "/api/beta/content/download"
+  //     body: "*"
+  //   };
+  //   option (chef.automate.api.iam.policy).resource = "content:items";
+  //   option (chef.automate.api.iam.policy).action = "content:items:download";
+  // };
+}

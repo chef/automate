@@ -7,6 +7,14 @@ trial_license_url = "{{cfg.service.trial_license_url}}"
 {{/if ~}}
 open_api_ui_dir = "{{pkg.path}}/static/swagger-ui/"
 
+[data_collector]
+{{#if cfg.data_collector.limiter.disable ~}}
+disable_limiter = {{ cfg.data_collector.limiter.disable }}
+{{/if ~}}
+{{#if cfg.data_collector.limiter.max_inflight_requests ~}}
+limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
+{{/if ~}}
+
 [log]
 {{~#if cfg.log.level}}
   level = "{{cfg.log.level}}"
@@ -135,6 +143,13 @@ open_api_ui_dir = "{{pkg.path}}/static/swagger-ui/"
 {{~#if @last}}
   [grpc_clients.endpoints.secrets-service]
     target = "{{secrets.sys.ip}}:{{secrets.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.automate-cds.members as |cds|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.automate-cds]
+    target = "{{cds.sys.ip}}:{{cds.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}

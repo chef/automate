@@ -1,0 +1,76 @@
+@import "~styles/variables";
+@import "@carbon/layout/scss/layout";
+
+chef-td {
+  font-size: 80%;
+
+  &.help-pointer {
+    cursor: help;
+  }
+}
+
+chef-tr {
+  height: 60px;
+}
+
+chef-icon.FAILED {
+  color: $chef-critical;
+}
+
+chef-icon.PASSED {
+  color: $chef-success;
+}
+
+chef-icon.UNKNOWN {
+  color: $chef-dark-grey;
+}
+
+chef-icon.SKIPPED {
+  color: $chef-dark-grey;
+}
+
+.run-info-tooltip {
+  border-left: $spacing-03 solid;
+
+  &.FAILED {
+    border-left-color: $status-error;
+  }
+
+  &.PASSED {
+    border-left-color: $status-success;
+  }
+
+  &.UKNOWN, &.SKIPPED {
+    border-left-color: $status-unknown;
+  }
+}
+
+.run-info-tooltip-link {
+  display: block;
+  margin-top: $spacing-05;
+}
+
+.run-info-tooltip-info,
+.run-info-tooltip-link {
+  margin: 0;
+  font-size: 14px;
+  white-space: nowrap;
+
+  chef-icon {
+    margin-left: $spacing-03;
+    color: inherit;
+  }
+}
+
+.run-info-tooltip-text {
+  display: block;
+  font-weight: 700;
+  padding-bottom: 3px;
+}
+
+.run-info-tooltip.UNKNOWN {
+  .run-info-tooltip-date,
+  .run-info-tooltip-link {
+    display: none;
+  }
+}

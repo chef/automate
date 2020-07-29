@@ -4,7 +4,7 @@ package chef.automate.domain.compliance.stats;
 option go_package = "github.com/chef/automate/api/interservice/compliance/stats";
 
 import "google/api/annotations.proto";
-import "api/interservice/compliance/reporting/reporting.proto";
+import "interservice/compliance/reporting/reporting.proto";
 
 service StatsService {
 	rpc ReadSummary(Query) returns (Summary) {};

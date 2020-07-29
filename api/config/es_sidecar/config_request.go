@@ -17,6 +17,9 @@ func NewConfigRequest() *ConfigRequest {
 					S3: &ConfigRequest_V1_System_Backups_S3Settings{
 						Es: &ac.Backups_S3_Elasticsearch{},
 					},
+					Gcs: &ConfigRequest_V1_System_Backups_GCSSettings{
+						Es: &ac.Backups_GCS_Elasticsearch{},
+					},
 				},
 				Log: &ConfigRequest_V1_System_Log{},
 			},
@@ -88,7 +91,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	c.applyGlobalBackupConfig(backupsCfg, g.GetV1().GetBackups())
 
 	if externalCfg.GetEnable().GetValue() {
-		c.applyExternalConfig(backupsCfg, externalCfg.GetBackup())
+		c.applyExternalConfig(backupsCfg, g.GetV1().GetBackups(), externalCfg.GetBackup())
 		// Early return as we don't need to migrate to the backup-gateway with
 		// external es
 		return
@@ -103,6 +106,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 // into the backup config
 func (c *ConfigRequest) applyExternalConfig(
 	cfg *ConfigRequest_V1_System_Backups,
+	global *ac.Backups,
 	override *ac.External_Elasticsearch_Backup) {
 
 	// If backups are disabled we don't need to worry about applying any other
@@ -110,6 +114,14 @@ func (c *ConfigRequest) applyExternalConfig(
 	if !override.GetEnable().GetValue() {
 		cfg.Backend = w.String("disable")
 		return
+	}
+
+	// Repo verification is only useful on multi-node clusters, as such it is
+	// disabled by default. If we're applying global config we're using an external
+	// cluster that likely has multiple nodes so we'll enable it if the user
+	// has not configured it.
+	if cfg.GetVerifyRepo() == nil {
+		cfg.VerifyRepo = w.Bool(true)
 	}
 
 	backend := override.GetLocation().GetValue()
@@ -135,6 +147,35 @@ func (c *ConfigRequest) applyExternalConfig(
 
 		if s := extS3cfg.GetSettings(); s != nil {
 			cfg.S3.Es = s
+		}
+	case "gcs":
+		cfg.Backend = w.String(backend)
+		if cfg.Gcs == nil {
+			cfg.Gcs = &ConfigRequest_V1_System_Backups_GCSSettings{}
+		}
+
+		globalGcs := global.GetGcs()
+		extGcscfg := override.GetGcs()
+		if b := extGcscfg.GetBucket(); b != nil {
+			cfg.Gcs.Bucket = b
+		} else if gb := globalGcs.GetBucket().GetName(); gb != nil {
+			// Unlike the s3 case, we need to grab these values manually.
+			// S3 gets treated special by applyGlobalBackupConfig
+			cfg.Gcs.Bucket = gb
+		}
+
+		if bp := extGcscfg.GetBasePath(); bp != nil {
+			cfg.Gcs.BasePath = bp
+		} else if gbp := globalGcs.GetBucket().GetBasePath(); gbp != nil {
+			cfg.Gcs.BasePath = gbp
+		}
+
+		if c := extGcscfg.GetClient(); c != nil {
+			cfg.Gcs.Client = c
+		}
+
+		if s := extGcscfg.GetSettings(); s != nil {
+			cfg.Gcs.Es = s
 		}
 	case "fs":
 		cfg.Backend = w.String(backend)
@@ -197,6 +238,30 @@ func (c *ConfigRequest) applyGlobalBackupConfig(
 		}
 	}
 
+	if globalGcs := global.GetGcs(); globalGcs != nil {
+		// ES is configured to talk to minio which presents ALL buckets as 'S3' buckets so we have to pass the same config as S3
+		cfg.Backend = w.String("s3")
+
+		if cfg.GetS3() == nil {
+			cfg.S3 = &ConfigRequest_V1_System_Backups_S3Settings{}
+		}
+
+		if name := globalGcs.GetBucket().GetName(); name != nil {
+			cfg.S3.Bucket = name
+		}
+
+		if bp := globalGcs.GetBucket().GetBasePath(); bp != nil {
+			cfg.S3.BasePath = bp
+		}
+
+		if es := globalGcs.GetEs(); es != nil {
+			newEs := &ac.Backups_S3_Elasticsearch{}
+			_ = ac.Merge(cfg.S3.GetEs(), es, newEs)
+
+			cfg.S3.Es = newEs
+		}
+	}
+
 	if globalFs := global.GetFilesystem(); globalFs != nil {
 		if p := globalFs.GetPath(); p != nil {
 			cfg.Fs.RootLocation = p
@@ -218,7 +283,7 @@ func (c *ConfigRequest) applyGlobalBackupConfig(
 // old fs backend to the s3 compatible backup-gateway
 func (c *ConfigRequest) migrateToBackupGateway(cfg *ConfigRequest_V1_System_Backups) {
 	// If the backend is configured to use S3 then we need not worry about fallback
-	if cfg.GetBackend().GetValue() == "s3" {
+	if cfg.GetBackend().GetValue() == "s3" || cfg.GetBackend().GetValue() == "gcs" {
 		return
 	}
 

@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("telemetry_telemetry", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/telemetry/telemetry.proto",
+    "title": "automate-gateway/api/telemetry/telemetry.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/telemetry/config": {
+    "/api/v0/telemetry/config": {
       "get": {
         "operationId": "GetTelemetryConfiguration",
         "responses": {

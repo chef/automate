@@ -1,19 +1,40 @@
 <div class="content-container">
-  <div class="container">
-    <main>
-      <div class="page-title">Unknown Duration</div>
-      <div class="update-time">Updated {{ lastUpdatedMessage }}</div>
-
-      <table>
-        <tbody>
-          <tr *ngFor="let items of countedDurationItems">
-            <td>{{ formatDuration(items.duration) }}</td>
-            <td>{{ items.count }}</td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
-
-    </main>
+  <div class="heading">
+    <div class="heading-title-container">
+      <h2 class="heading-title">Time since Last Check-in</h2>
+      <chef-icon id="since-last-checkin-info">info_outline</chef-icon>
+      <chef-tooltip for='since-last-checkin-info'>
+        <p class="tooltip-text">Count of desktops that haven't checked-in over different periods of time.</p>
+      </chef-tooltip>
+    </div>
+    <h6 class="heading-time">Updated {{ lastUpdatedMessage }}</h6>
   </div>
+  <chef-table class="chart-list">
+    <chef-tbody>
+      <chef-tr
+        *ngFor="let item of countedDurationItems"
+        class="chart-list-item"
+        [ngClass]="{'selected': item.duration === selectedDuration}"
+        tabindex="0"
+        (click)="onDurationSelect(item.duration)"
+        (keyup.enter)="onDurationSelect(item.duration)">
+        <chef-td class="chart-list-item-label-cell">
+          {{ formatDuration(item.duration) }}
+        </chef-td>
+        <chef-td class="chart-list-item-count-cell">
+          <span>
+            {{ item.count }}
+            <chef-icon>desktop_windows</chef-icon>
+          </span>
+        </chef-td>
+        <chef-td class="chart-list-item-chart-cell">
+          <app-chart-progress-bar
+            size="small"
+            [value]="item.count"
+            [max]="countedDurationItemsMax.count">
+          </app-chart-progress-bar>
+        </chef-td>
+      </chef-tr>
+    </chef-tbody>
+  </chef-table>
 </div>

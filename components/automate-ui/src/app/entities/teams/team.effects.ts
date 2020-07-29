@@ -113,10 +113,12 @@ export class TeamEffects {
   @Effect()
   createTeamSuccess$ = this.actions$.pipe(
     ofType<CreateTeamSuccess>(TeamActionTypes.CREATE_SUCCESS),
-    map(() => new CreateNotification({
+    map(( { payload: resp }: CreateTeamSuccess) =>
+    new CreateNotification({
       type: Type.info,
-      message: 'Created a new team.'
-    })));
+      message: `Created team ${resp.id}.`
+    })
+  ));
 
   @Effect()
   createTeamFailure$ = this.actions$.pipe(
@@ -189,7 +191,7 @@ export class TeamEffects {
   addTeamUsers$ = this.actions$.pipe(ofType<AddTeamUsers>(TeamActionTypes.ADD_USERS),
     mergeMap(({ payload }: AddTeamUsers) =>
       this.requests.addTeamUsers(payload).pipe(
-        map((resp: UsersResponse) => new AddTeamUsersSuccess({...resp, id: payload.id})),
+        map((_: UsersResponse) => new AddTeamUsersSuccess(payload)),
         catchError((error: HttpErrorResponse) => observableOf(new AddTeamUsersFailure(error))))
     ));
 

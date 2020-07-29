@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Store } from '@ngrx/store';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
@@ -15,7 +16,6 @@ import {
   Policy, Member, Type, stringToMember
 } from 'app/entities/policies/policy.model';
 import { RemovePolicyMembers } from 'app/entities/policies/policy.actions';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 
 export type PolicyTabName = 'definition' | 'members';
 
@@ -27,7 +27,7 @@ const POLICY_DETAILS_ROUTE = /^\/settings\/policies/;
   styleUrls: ['./policy-details.component.scss']
 })
 export class PolicyDetailsComponent implements OnInit, OnDestroy {
-  public policy: Policy;
+  public policy: Omit<Policy, 'members'>; // policy without 'members' key
   public policyJSON: string;
   public members: Member[] = [];
   public tabValue: PolicyTabName = 'definition';
@@ -62,13 +62,23 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
       filter(([status, _]) => status === EntityStatus.loadingSuccess),
       filter(([_, state]) => !isNil(state)),
       takeUntil(this.isDestroyed)
-    ).subscribe(([_, state]) => {
-        this.policy = <Policy>Object.assign({}, state);
-        this.policyJSON = this.policyToString(this.policy);
-        this.members = [];
-        this.policy.members.forEach(element => {
-          const member = stringToMember(element);
-          this.members.push(member);
+    ).subscribe(([_, { id, type, name, members, projects, statements: allStatements }]) => {
+        // massage statements: remove '*' resources
+        const statements = allStatements.map(
+          ({resources: allResources, effect, actions, projects: stmtProjects, role }) => {
+          const resources = allResources.filter(res => res !== '*');
+          // include remaining resources if there are some
+          if (resources.length > 0) {
+            return { effect, role, actions, resources, projects: stmtProjects };
+          } else {
+            return { effect, role, actions, projects: stmtProjects }; // omit resources
+          }
+        });
+        // we do this to sort the keys in the json output
+        this.policy =  { name, id, type, projects, statements }; // omit members
+        this.policyJSON = this.policyToString({ name, id, type, projects, members, statements });
+        this.members = members.map(e => stringToMember(e));
+        this.members.forEach(member => {
           if (member.type === Type.LocalUser) {
             this.memberURLs[member.name] = ['/settings', 'users', member.displayName];
           } else if (member.type === Type.LocalTeam) {
@@ -77,7 +87,6 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
             this.memberURLs[member.name] = ['/settings', 'tokens', member.displayName];
           }
         });
-        delete this.policy.members;
       });
 
     this.store.select(routeState).pipe(
@@ -99,10 +108,10 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
   }
 
   private policyToString(policy: Policy): string {
-    return JSON.stringify(policy);
+    return JSON.stringify(policy, null, '  ');
   }
 
-  removeMember($event: ChefKeyboardEvent, member: Member): void {
+  removeMember($event: MatOptionSelectionChange, member: Member): void {
     if ($event.isUserInput) {
       this.store.dispatch(new RemovePolicyMembers({
         id: this.policy.id,

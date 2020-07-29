@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package chef.automate.api.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
+
+enum SCMType {
+  UNKNOWN_SCM = 0;
+  GIT = 1;
+}
+
+enum SCMWebType {
+  UNKNOWN_SCM_WEB = 0;
+  GITHUB = 1;
+}
+
+// CreateRollout is a request to create a new Rollout. All
+// fields have the same meaning as with the response Rollout
+// type.
+message CreateRollout {
+  string policy_name = 1;
+  string policy_node_group = 2;
+  string policy_revision_id = 3;
+  string policy_domain_url = 4;
+  SCMType scm_type = 5;
+  SCMWebType scm_web_type = 6;
+  string policy_scm_url = 7;
+  string policy_scm_web_url = 8;
+  string policy_scm_commit = 9;
+  string description = 10;
+  string ci_job_url = 11;
+  string ci_job_id = 12;
+  string scm_author_name = 13;
+  string scm_author_email = 14;
+  string policy_domain_username = 15;
+}
+
+message Rollouts {
+  // Filters to apply to the request for the rollouts list.
+  repeated string filter = 1;
+}
+
+message RolloutById {
+  string rollout_id = 1;
+}
+
+message RolloutForChefRun {
+  string policy_name = 1;
+  string policy_group = 2;
+  string policy_revision_id = 3;
+}
+
+message ListNodeSegmentsWithRolloutProgress {
+  // Filters to apply to the request for the node segments list.
+  repeated string filter = 1;
+}
+
+message CreateRolloutTest {}

@@ -81,13 +81,9 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/es-sidecar-service",
-      "metadata": null
-    },
-    {
-      "name": "chef/event-feed-service",
+      "name": "chef/authz-service",
       "metadata": {
-        "name": "chef/event-feed-service",
+        "name": "chef/authz-service",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
@@ -95,9 +91,13 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/authz-service",
+      "name": "chef/es-sidecar-service",
+      "metadata": null
+    },
+    {
+      "name": "chef/event-feed-service",
       "metadata": {
-        "name": "chef/authz-service",
+        "name": "chef/event-feed-service",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
@@ -215,6 +215,16 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/config-mgmt-service",
+      "metadata": {
+        "name": "chef/config-mgmt-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/ingest-service",
       "metadata": {
         "name": "chef/ingest-service",
@@ -235,8 +245,14 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/config-mgmt-service",
-      "metadata": null
+      "name": "chef/automate-cds",
+      "metadata": {
+        "name": "chef/automate-cds",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/data-feed-service",
@@ -524,7 +540,9 @@ var ProductMetadataJSON = `
       "name": "automate-dev",
       "aliases": null,
       "type": "product",
-      "services": [],
+      "services": [
+        "chef/automate-cds"
+      ],
       "packages": null,
       "dependencies": [
         "automate"
@@ -599,6 +617,17 @@ var ProductMetadataJSON = `
         "automate"
       ],
       "hidden": true
+    },
+    {
+      "name": "desktop",
+      "aliases": null,
+      "type": "product",
+      "services": [],
+      "packages": null,
+      "dependencies": [
+        "automate"
+      ],
+      "hidden": false
     }
   ]
 }

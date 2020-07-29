@@ -6,6 +6,12 @@ ci: review build
 
 review: lint
 
+hab_test: lint cover
+
+test: cover
+
+dev_test: imports fmt lint cover
+
 # Utilities
 build:
 	go build cmd/data-feed-service/data-feed-service.go
@@ -17,7 +23,7 @@ clean:
 proto:
 	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component data-feed-service'
 
-test:
+cover:
 	mkdir -p .cover
 	GOMAXPROCS=4 go test -v -covermode=atomic -coverprofile=.cover/cover.out ./...
 	go tool cover -html=.cover/cover.out -o .cover/coverage.html

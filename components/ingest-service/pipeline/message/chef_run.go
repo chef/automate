@@ -14,6 +14,14 @@ import (
 
 type ChefRunPipe func(<-chan ChefRun) <-chan ChefRun
 
+func PropagateChefRun(out chan<- ChefRun, msg *ChefRun) {
+	select {
+	case out <- *msg:
+	case <-msg.Ctx.Done():
+		msg.FinishProcessing(msg.Ctx.Err())
+	}
+}
+
 type ChefRun struct {
 	ID               uuid.UUID
 	QueueTime        time.Time
@@ -22,6 +30,7 @@ type ChefRun struct {
 	NodeRun          backend.Run
 	NodeAttribute    backend.NodeAttribute
 	BulkableRequests []elastic.BulkableRequest
+	Platform         string
 	Ctx              context.Context
 	errc             chan<- error
 }
@@ -35,6 +44,7 @@ func NewChefRun(ctx context.Context, run *chef.Run, err chan<- error) ChefRun {
 		backend.Run{},
 		backend.NodeAttribute{},
 		[]elastic.BulkableRequest{},
+		"",
 		ctx,
 		err,
 	}

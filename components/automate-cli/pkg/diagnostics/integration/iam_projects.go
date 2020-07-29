@@ -130,16 +130,19 @@ func GetProject(tstCtx diagnostics.TestContext, id string) (*ProjectInfo, error)
 	return &projectInfo, nil
 }
 
-// DeleteProject deletes the project with the given id
-func DeleteProject(tstCtx diagnostics.TestContext, id string) error {
-	// any associated rules are cascade-deleted with the project
-	err := MustJSONDecodeSuccess(
-		tstCtx.DoLBRequest(
-			fmt.Sprintf("/apis/iam/v2/projects/%s", id),
-			lbrequest.WithMethod("DELETE"),
-		)).Error()
+// DeleteProjectWithRule deletes the project with the given id and its associated rule
+func DeleteProjectWithRule(tstCtx diagnostics.TestContext, projectID, ruleID string) error {
+	if err := MustJSONDecodeSuccess(tstCtx.DoLBRequest(
+		fmt.Sprintf("/apis/iam/v2/projects/%s/rules/%s", projectID, ruleID),
+		lbrequest.WithMethod("DELETE"),
+	)).WithValue(&struct{}{}); err != nil {
+		return errors.Wrap(err, "Could not delete rule")
+	}
 
-	if err != nil {
+	if err := MustJSONDecodeSuccess(tstCtx.DoLBRequest(
+		fmt.Sprintf("/apis/iam/v2/projects/%s", projectID),
+		lbrequest.WithMethod("DELETE"),
+	)).WithValue(&struct{}{}); err != nil {
 		return errors.Wrap(err, "Could not delete project")
 	}
 	return nil
@@ -186,7 +189,7 @@ func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 			loaded := generatedProjectData{}
 			err = tstCtx.GetValue("iam-projects", &loaded)
 			if err != nil {
-				return errors.Errorf(err.Error(), "could not find generated context")
+				return errors.Wrap(err, "could not find generated context")
 			}
 
 			tstCtx.SetValue("iam-projects", &generatedProjectData{
@@ -228,7 +231,7 @@ func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 				return errors.Wrap(err, "Could not find generated context")
 			}
 
-			return DeleteProject(tstCtx, loaded.ID)
+			return DeleteProjectWithRule(tstCtx, loaded.ID, loaded.RuleID)
 		},
 	}
 }

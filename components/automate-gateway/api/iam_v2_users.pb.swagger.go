@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("iam_v2_users", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/iam/v2/users.proto",
+    "title": "automate-gateway/api/iam/v2/users.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/iam/v2/self/{id}": {
+    "/apis/iam/v2/self/{id}": {
       "put": {
         "summary": "Update self (as user)",
         "description": "Updates a local user's own name or password.\nIf changing the password, both \"password\" and \"previous_password\" are required.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:usersSelf:update\n` + "`" + `` + "`" + `` + "`" + `",
@@ -55,7 +55,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/users": {
+    "/apis/iam/v2/users": {
       "get": {
         "summary": "List all users",
         "description": "Lists all local users.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -105,7 +105,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/users/{id}": {
+    "/apis/iam/v2/users/{id}": {
       "get": {
         "summary": "Get a user",
         "description": "Returns the details for a local user.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:get\n` + "`" + `` + "`" + `` + "`" + `",

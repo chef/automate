@@ -1,6 +1,6 @@
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/stats/stats_pb'
-require 'api/interservice/compliance/stats/stats_services_pb'
+require 'interservice/compliance/stats/stats_pb'
+require 'interservice/compliance/stats/stats_services_pb'
 
 if !ENV['NO_STATS_SUMMARY_TESTS']
   describe File.basename(__FILE__) do
@@ -46,7 +46,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "failed",
               "stats" => {
-                  "nodes" => 5,
+                  "nodes" => "5",
                   "platforms" => 3,
                   "environments" => 3,
                   "profiles" => 3,
@@ -67,7 +67,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "failed",
               "stats" => {
-                  "nodes" => 4,
+                  "nodes" => "4",
                   "platforms" => 2,
                   "environments" => 2,
                   "profiles" => 1,
@@ -87,7 +87,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "waived",
               "stats" => {
-                  "nodes" => 2,
+                  "nodes" => "2",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -107,7 +107,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "failed",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -127,7 +127,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "failed",
               "stats" => {
-                  "nodes" => 3,
+                  "nodes" => "3",
                   "platforms" => 3,
                   "environments" => 2,
                   "profiles" => 3,
@@ -147,7 +147,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "skipped",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -170,7 +170,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "failed",
               "stats" => {
-                  "nodes" => 5,
+                  "nodes" => "5",
                   "platforms" => 3,
                   "environments" => 3,
                   "profiles" => 2,
@@ -191,7 +191,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "passed",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 3,
@@ -212,7 +212,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "waived",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -233,7 +233,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "passed",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -270,7 +270,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "skipped",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -307,7 +307,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "skipped",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -328,7 +328,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "passed",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 3,
@@ -350,7 +350,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "failed",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 2,
@@ -374,7 +374,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "failed",
               "stats" => {
-                  "nodes" => 4,
+                  "nodes" => "4",
                   "platforms" => 2,
                   "environments" => 2,
                   "profiles" => 1,
@@ -396,7 +396,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "skipped",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -418,7 +418,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "passed",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -439,7 +439,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "failed",
               "stats" => {
-                  "nodes" => 4,
+                  "nodes" => "4",
                   "platforms" => 2,
                   "environments" => 2,
                   "profiles" => 1,
@@ -461,7 +461,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "passed", #look at this business! yes! for this control, we have a status of passed! notice the test above, we had 4 nodes with a status of failed
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -482,7 +482,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "waived",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -503,7 +503,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           "reportSummary" => {
               "status" => "failed",
               "stats" => {
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
@@ -527,7 +527,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
               "status" => "failed",
               "stats" => {
                   "nodesCnt" => 1,
-                  "nodes" => 1,
+                  "nodes" => "1",
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 2,
@@ -673,6 +673,43 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
+      # Get stats with end_time filter for the faily/skippy 04-02 date
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        filters: [
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+        ])
+      expected_data = {
+        "reportSummary": {
+          "status": "failed",
+          "stats": {
+            "nodes": "1",
+            "platforms": 1,
+            "environments": 1,
+            "profiles": 4,
+            "nodesCnt": 1,
+            "controls": 1
+          }
+        }
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
+
+      # Get stats with end_time filter for the root fail 04-03 date
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        filters: [
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+        ])
+      expected_data = {
+        "reportSummary": {
+          "status": "failed",
+          "stats": {
+            "nodes": "1",
+            "platforms": 1,
+            "environments": 1,
+            "nodesCnt": 1
+          }
+        }
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
 
     end
   end

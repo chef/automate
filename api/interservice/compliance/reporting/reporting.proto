@@ -120,6 +120,7 @@ message Report {
 	repeated string roles = 17;
 	repeated string chef_tags = 18;
 	repeated string projects = 20;
+	string status_message = 21;
 }
 message Profile {
 	string name = 1;
@@ -141,6 +142,7 @@ message Profile {
 	string latest_version = 22;
 	string status = 23;
 	string skip_message = 24;
+	string status_message = 25;
 }
 message Ref {
 	string url = 1;
@@ -202,6 +204,7 @@ message Control {
 	map<string, TagValues> string_tags = 10;
 	string waived_str = 11;
 	OrigWaiverData waiver_data = 12;
+    RemovedResultsCounts removed_results_counts = 13;
 }
 
 // WaiverData as it originally came from the InSpec report
@@ -212,6 +215,12 @@ message OrigWaiverData {
 	bool run = 3;
 	bool skipped_due_to_waiver = 4;
 	string message = 5;
+}
+
+message RemovedResultsCounts {
+	int32 failed = 1;
+	int32 skipped = 2;
+	int32 passed = 3;
 }
 
 message TagValues {

@@ -6,8 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	authz "github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/memstore"
 	"github.com/chef/automate/components/teams-service/storage/postgres"
@@ -21,12 +20,12 @@ type Service struct {
 	Logger      logger.Logger
 	ConnFactory *secureconn.Factory
 	Storage     storage.Storage
-	AuthzClient authz.SubjectPurgeClient
+	AuthzClient authz.PoliciesClient
 }
 
 // NewInMemoryService returns an instance of Service that uses the memstore storage backend.
 func NewInMemoryService(l logger.Logger, connFactory *secureconn.Factory,
-	authzClient authz.SubjectPurgeClient) (*Service, error) {
+	authzClient authz.PoliciesClient) (*Service, error) {
 
 	m, err := memstore.New(context.Background(), l)
 	if err != nil {
@@ -43,21 +42,16 @@ func NewInMemoryService(l logger.Logger, connFactory *secureconn.Factory,
 
 // NewPostgresService returns an instance of Service that connects to a postgres storage backend.
 func NewPostgresService(l logger.Logger, connFactory *secureconn.Factory, migrationsConfig migration.Config,
-	authzSubjectClient authz.SubjectPurgeClient, authzV2PoliciesClient authz_v2.PoliciesClient,
-	authzV2AuthorizationClient authz_v2.AuthorizationClient) (*Service, error) {
+	authzPoliciesClient authz.PoliciesClient, authzAuthorizationClient authz.AuthorizationClient) (*Service, error) {
 
-	resp, err := authzV2PoliciesClient.GetPolicyVersion(context.Background(), &authz_v2.GetPolicyVersionReq{})
-	if err != nil {
-		return nil, err
-	}
+	p, err := postgres.New(l, migrationsConfig, authzAuthorizationClient)
 
-	p, err := postgres.New(l, migrationsConfig, resp.Version.Major == authz_v2.Version_V2, authzV2AuthorizationClient)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		AuthzClient: authzSubjectClient,
+		AuthzClient: authzPoliciesClient,
 		Logger:      l,
 		ConnFactory: connFactory,
 		Storage:     p,

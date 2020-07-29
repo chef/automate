@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/interservice/authn/tokens.proto",
+    "title": "interservice/authn/tokens.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -13,9 +13,6 @@
   "paths": {},
   "definitions": {
     "chef.automate.domain.authn.DeleteTokenResp": {
-      "type": "object"
-    },
-    "chef.automate.domain.authn.ResetToV1Resp": {
       "type": "object"
     },
     "chef.automate.domain.authn.Token": {

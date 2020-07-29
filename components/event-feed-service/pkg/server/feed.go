@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -14,6 +15,7 @@ import (
 	e "github.com/chef/automate/components/event-feed-service/pkg/errors"
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -25,7 +27,7 @@ func NewFeedService(feedStore persistence.FeedStore) *FeedService {
 	return &FeedService{store: feedStore}
 }
 
-func (f *FeedService) GetFeed(req *event_feed.FeedRequest) ([]*feed.FeedEntry, int64, error) {
+func (f *FeedService) GetFeed(ctx context.Context, req *event_feed.FeedRequest) ([]*feed.FeedEntry, int64, error) {
 
 	// Date Range
 	startTime, endTime, err := feed.ValidateMillisecondDateRange(req.Start, req.End)
@@ -49,6 +51,11 @@ func (f *FeedService) GetFeed(req *event_feed.FeedRequest) ([]*feed.FeedEntry, i
 		return nil, 0, err
 	}
 
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return nil, 0, e.GrpcErrorFromErr(codes.Internal, err)
+	}
+
 	fq := feed.FeedQuery{
 		UserID:     req.UserID,
 		Size:       int(req.Size),
@@ -67,13 +74,18 @@ func (f *FeedService) GetFeed(req *event_feed.FeedRequest) ([]*feed.FeedEntry, i
 	return resp, hits, nil
 }
 
-func (f *FeedService) GetFeedSummary(countCategory string, filters []string,
+func (f *FeedService) GetFeedSummary(ctx context.Context, countCategory string, filters []string,
 	start time.Time, end time.Time) (*feed.FeedSummary, error) {
 
 	// remove count category from the filters array
 	filters = stringutils.SliceReject(filters, countCategory)
 
 	mapFilters, err := feed.FormatFilters(filters)
+	if err != nil {
+		return nil, err
+	}
+
+	mapFilters, err = filterByProjects(ctx, mapFilters)
 	if err != nil {
 		return nil, err
 	}
@@ -94,12 +106,20 @@ func (f *FeedService) GetFeedSummary(countCategory string, filters []string,
 }
 
 // interval = time span for which to collect activity entries in hours
-func (f *FeedService) GetActionLine(filters []string, startDate string, endDate string, timezone string, interval int, action string) (*feed.ActionLine, error) {
+func (f *FeedService) GetActionLine(ctx context.Context, filters []string, startDate string, endDate string, timezone string, interval int, action string) (*feed.ActionLine, error) {
 
 	// remove action (aka "task") from the filters array...
 	// we're already filtering lines by action
 	filters = stringutils.SliceReject(filters, action)
-	line, err := f.store.GetActionLine(filters, startDate, endDate, timezone, interval, action)
+	formattedFilters, err := feed.FormatFilters(filters)
+	if err != nil {
+		return &feed.ActionLine{}, err
+	}
+	formattedFilters, err = filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, err
+	}
+	line, err := f.store.GetActionLine(formattedFilters, startDate, endDate, timezone, interval, action)
 	if err != nil {
 		return &feed.ActionLine{}, errors.Wrap(err, "getting timeline from persistence store")
 	}
@@ -118,7 +138,7 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 	}
 
 	// translate event message into feed entry
-	feedEntry := feed.FeedEntry{
+	feedEntry := &feed.FeedEntry{
 		ID:                 uuid.Must(uuid.NewV4()).String(),
 		ProducerID:         req.Producer.ID,
 		ProducerName:       req.Producer.ProducerName,
@@ -139,12 +159,48 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 		TargetName:         req.Target.DisplayName,
 		TargetObjectType:   req.Target.ObjectType,
 		Created:            time.Now().UTC(),
+		Projects:           req.Projects,
 	}
 
-	success, err := f.store.CreateFeedEntry(&feedEntry)
+	if isEventFromChefServer(req) {
+		feedEntry.ChefInfraServer = getChefInfraServer(req)
+		feedEntry.ChefOrganization = getChefOrganization(req)
+	}
+
+	success, err := f.store.CreateFeedEntry(feedEntry)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating feed entry in persistence store")
 	}
 
 	return &api.EventResponse{Success: success}, nil
+}
+
+func getChefInfraServer(req *api.EventMsg) string {
+	if req.Data != nil && req.Data.Fields != nil {
+		return req.Data.Fields[feed.ChefServerFieldTag].GetStringValue()
+	}
+	return ""
+}
+
+func getChefOrganization(req *api.EventMsg) string {
+	if req.Data != nil && req.Data.Fields != nil {
+		return req.Data.Fields[feed.ChefOrganizationFieldTag].GetStringValue()
+	}
+	return ""
+}
+func isEventFromChefServer(req *api.EventMsg) bool {
+	return req.Producer.ProducerType == feed.ChefServerProducerTypeTag
+}
+
+func filterByProjects(ctx context.Context, filters map[string][]string) (map[string][]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		return filters, nil
+	}
+
+	filters[feed.ProjectTag] = projectsFilter
+	return filters, nil
 }

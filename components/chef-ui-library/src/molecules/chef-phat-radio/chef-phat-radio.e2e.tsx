@@ -119,4 +119,40 @@ describe('chef-phat-radio', () => {
 
   });
 
+  describe('when group is deselectable by canDeselect prop', () => {
+    let html, page;
+    beforeEach(async () => {
+      html = `
+        <chef-phat-radio deselectable>
+          <chef-option value='opt1'>Option 1</chef-option>
+          <chef-option value='opt2'>Option 2</chef-option>
+          <chef-option value='opt3'>Option 3</chef-option>
+        </chef-phat-radio
+      `;
+      page = await newE2EPage();
+      await page.setContent(html);
+    });
+
+    it('does not select any options by default', async () => {
+      const options = await page.findAll('chef-option');
+
+      expect(await options[0].getProperty('selected')).not.toBeTruthy();
+      expect(await options[1].getProperty('selected')).not.toBeTruthy();
+      expect(await options[2].getProperty('selected')).not.toBeTruthy();
+    });
+
+    it('marks only the selected option as selected', async () => {
+      const element = await page.find('chef-phat-radio');
+      element.setProperty('value', 'opt2');
+
+      await page.waitForChanges();
+
+      const options = await page.findAll('chef-option');
+
+      expect(await options[0].getProperty('selected')).not.toBeTruthy();
+      expect(await options[1].getProperty('selected')).toBeTruthy();
+      expect(await options[2].getProperty('selected')).not.toBeTruthy();
+    });
+  });
+
 });

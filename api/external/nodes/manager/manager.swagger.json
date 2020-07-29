@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/external/nodes/manager/manager.proto",
+    "title": "external/nodes/manager/manager.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/nodemanagers": {
+    "/api/v0/nodemanagers": {
       "post": {
         "summary": "Create a Node Manager",
         "description": "Creates a node manager given a name, credential id *or* credential data, and type.\n\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:create\n```",
@@ -39,7 +39,7 @@
         ]
       }
     },
-    "/nodemanagers/id/{id}": {
+    "/api/v0/nodemanagers/id/{id}": {
       "get": {
         "summary": "View a Node Manager",
         "description": "List the details of a node manager.\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:get\n```",
@@ -124,7 +124,7 @@
         ]
       }
     },
-    "/nodemanagers/id/{id}/with-node-state/stopped": {
+    "/api/v0/nodemanagers/id/{id}/with-node-state/stopped": {
       "delete": {
         "summary": "Delete a Node Manager and Stop Nodes",
         "description": "Delete a node manager and update its associated nodes to `stopped`.\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:delete\n```",
@@ -151,7 +151,7 @@
         ]
       }
     },
-    "/nodemanagers/id/{id}/with-node-state/terminated": {
+    "/api/v0/nodemanagers/id/{id}/with-node-state/terminated": {
       "delete": {
         "summary": "Delete a Node Manager and Terminate Nodes",
         "description": "Delete a node manager and update its associated nodes to `terminated`.\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:delete\n```",
@@ -178,7 +178,7 @@
         ]
       }
     },
-    "/nodemanagers/id/{id}/with-nodes": {
+    "/api/v0/nodemanagers/id/{id}/with-nodes": {
       "delete": {
         "summary": "Delete a Node Manager and Delete Nodes",
         "description": "Delete a node manager and all of its associated nodes.\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:delete\n```",
@@ -205,7 +205,7 @@
         ]
       }
     },
-    "/nodemanagers/id/{node_manager_id}/search-fields": {
+    "/api/v0/nodemanagers/id/{node_manager_id}/search-fields": {
       "post": {
         "summary": "Search Node Fields",
         "description": "Searches the available values for a given field across all nodes associated with the nodemanager id.\n\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:list\n```",
@@ -240,7 +240,7 @@
         ]
       }
     },
-    "/nodemanagers/id/{node_manager_id}/search-nodes": {
+    "/api/v0/nodemanagers/id/{node_manager_id}/search-nodes": {
       "post": {
         "summary": "Search nodes",
         "description": "Searches the available nodes for a single node manager by id.\n\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:list\n```",
@@ -275,7 +275,7 @@
         ]
       }
     },
-    "/nodemanagers/rerun/id/{id}": {
+    "/api/v0/nodemanagers/rerun/id/{id}": {
       "post": {
         "summary": "Connect",
         "description": "Attempts to reach the API for the given nodemanager id to validate the\ncredentials associated with the nodemanager.\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:rerun\n```",
@@ -310,7 +310,7 @@
         ]
       }
     },
-    "/nodemanagers/search": {
+    "/api/v0/nodemanagers/search": {
       "post": {
         "summary": "List all Node Managers",
         "description": "Returns a list of node managers.\nSupports filtering, sorting, and pagination.\n\nValid filtering fields: manager_type\n\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:list\n```",

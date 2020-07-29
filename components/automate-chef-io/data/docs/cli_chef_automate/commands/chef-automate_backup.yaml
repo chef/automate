@@ -2,6 +2,8 @@ name: chef-automate backup
 synopsis: Chef Automate backup
 usage: chef-automate backup COMMAND [flags]
 options:
+- name: gcs-credentials-path
+  usage: The path to the GCP service account json file
 - name: help
   shorthand: h
   default_value: "false"

@@ -15,7 +15,7 @@ describe('Admin pages', () => {
         .reply(200, JSON.stringify(
           {
             endpoints: {
-              '/iam/v2/users': {
+              '/apis/iam/v2/users': {
                 get: true,
                 put: false,
                 post: true,
@@ -100,7 +100,7 @@ describe('Admin pages', () => {
         .reply(200, JSON.stringify(
           {
             endpoints: {
-              '/iam/v2/policies': {
+              '/apis/iam/v2/policies': {
                 get: true,
                 put: false,
                 post: true,
@@ -121,13 +121,21 @@ describe('Admin pages', () => {
                 id: 'some-policy-id',
                 name: 'Some policy whose name does not start with A',
                 members: [],
-                type: 'CUSTOM'
+                type: 'CUSTOM',
+                statements: [
+                  { effect: 'ALLOW', role: 'some-role', resources: ['*'], projects: [] }
+                ],
+                projects: []
               },
               {
                 id: 'chef-managed-administrator',
                 name: 'Administrator All Access',
                 members: ['team:local:admins'],
-                type: 'CHEF_MANAGED'
+                statements: [
+                  { effect: 'ALLOW', actions: ['*'], resources: ['*'], projects: [] }
+                ],
+                type: 'CHEF_MANAGED',
+                projects: []
               }
             ]
           }
@@ -258,7 +266,11 @@ describe('Admin pages', () => {
               id: 'some-test-policy',
               name: 'All access policy',
               members: ['team:local:admins'],
-              type: 'CHEF_MANAGED'
+              type: 'CHEF_MANAGED',
+              statements: [
+                { effect: 'ALLOW', role: 'some-role', resources: ['*'], projects: [] }
+              ],
+              projects: []
             }
           }
         ));
@@ -303,7 +315,7 @@ describe('Admin pages', () => {
         .reply(200, JSON.stringify(
           {
             endpoints: {
-              '/iam/v2/roles': {
+              '/apis/iam/v2/roles': {
                 get: true,
                 put: false,
                 post: true,
@@ -422,7 +434,7 @@ describe('Admin pages', () => {
         .reply(200, JSON.stringify(
           {
             endpoints: {
-              '/iam/v2/projects': {
+              '/apis/iam/v2/projects': {
                 get: true,
                 put: false,
                 post: true,
@@ -464,7 +476,7 @@ describe('Admin pages', () => {
         ['default', false],
         ['project-19', true]
       ].forEach(([id, deletable]) => {
-        const path = `/iam/v2/projects/${id}`;
+        const path = `/apis/iam/v2/projects/${id}`;
         const endpoints = {
           [path]: {
             get: true,

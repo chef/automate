@@ -1,6 +1,6 @@
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/reporting/reporting_pb'
-require 'api/interservice/compliance/reporting/reporting_services_pb'
+require 'interservice/compliance/reporting/reporting_pb'
+require 'interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
   Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)
@@ -406,6 +406,35 @@ describe File.basename(__FILE__) do
         }
       ]
     }.to_json
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
+
+
+    # Filter by a failed profile, making it deep
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
+        filters: [
+          Reporting::ListFilter.new(type: 'profile_id', values: ['5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888']),
+          Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+        ],
+        page: 1, per_page: 2)
+    expected_data = {
+      "counts" => {"failed" => 1, "total" => 1},
+      "profiles" =>
+        [{"id" => "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888",
+          "name" => "myfaily",
+          "status" => "failed",
+          "title" => "My Faily Profile title",
+          "version" => "1.0.0"}]
+      }.to_json
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
+
+    # Filter by a missing profile, in the no profiles report
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
+        filters: [
+          Reporting::ListFilter.new(type: 'profile_id', values: ['5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888']),
+          Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+        ],
+        page: 1, per_page: 2)
+    expected_data = { "counts" => {} }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
   end
 end

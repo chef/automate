@@ -1,0 +1,44 @@
+<chef-modal label="license-lockout-label" [locked]="modalLocked" [visible]="modalVisible" (closeModal)="closeModal()">
+  <div class="register-wrapper">
+
+    <h2 class="title">Welcome to Chef Automate Content Library!</h2>
+    <form class="credentials" [formGroup]="credentialsForm" (ngSubmit)="onFormSubmit()" novalidate>
+      <div class="credentials-container">
+        <chef-form-field>
+          <label for="clientId">Client ID<span aria-hidden="true"></span></label>
+          <div class="suggester-input-wrapper">
+            <input chefInput name="client-id" id="client-id" formControlName="clientId" type="text" autofocus>
+          </div>
+          <chef-error *ngIf="credentialsForm.get('clientId').hasError('required') && credentialsForm.get('clientId').dirty">
+            Client ID required.
+          </chef-error>
+        </chef-form-field>
+      </div>
+      <div class="credentials-container">
+        <chef-form-field>
+          <label for="clientSecret">Client Secret<span aria-hidden="true"></span></label>
+          <div class="suggester-input-wrapper">
+            <input chefInput name="client-secret" id="client-secret" formControlName="clientSecret" type="text" autofocus>
+          </div>
+          <chef-error *ngIf="credentialsForm.get('clientSecret').hasError('required') && credentialsForm.get('clientSecret').dirty">
+            Client Secret required.
+          </chef-error>
+        </chef-form-field>
+      </div>
+      <div class="credentials-container">
+        <chef-form-field>
+          <label for="tenantSpecificUrl">Tenant Specific URL<span aria-hidden="true"></span></label>
+          <div class="suggester-input-wrapper">
+            <input chefInput name="tenant-specific-url" id="tenant-specific-url" formControlName="tenantSpecificUrl" type="text" autofocus>
+          </div>
+          <chef-error *ngIf="credentialsForm.get('tenantSpecificUrl').hasError('required') && credentialsForm.get('tenantSpecificUrl').dirty">
+            Tenant Specific URL required.
+          </chef-error>
+        </chef-form-field>
+      </div>
+      <div class="button">
+        <chef-button primary type="submit">Apply Credentials</chef-button>
+      </div>
+    </form>
+  </div>
+</chef-modal>

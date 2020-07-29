@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 export type Status = 'success' | 'failure' | 'missing' | 'skipped';
 export type Compliance = 'compliant' | 'uncompliant' | 'skipped';
@@ -7,7 +7,7 @@ export type HealthStatus = 'ok' | 'critical' | 'warning' | 'unknown';
 export type RollupServiceStatus = HealthStatus | 'total';
 export type RollupState = Status | 'total';
 export type RollupCompliance = Compliance | 'total';
-export type SortDirection = 'asc' | 'desc' | 'ASC' | 'DESC';
+export type SortDirection = 'asc' | 'desc' | 'ASC' | 'DESC' | 'none';
 
 
 export enum LoadingStatus {
@@ -294,6 +294,19 @@ export interface RespNodeRun {
     run_list: ExpandedRunListItem[];
   };
   versioned_cookbooks: VersionedCookbook[];
+  ip6address?: string;
+  timezone?: string;
+  domain?: string;
+  hostname?: string;
+  memory_total?: string;
+  macaddress?: string;
+  dmi_system_serial_number?: string;
+  dmi_system_manufacturer?: string;
+  virtualization_role?: string;
+  virtualization_system?: string;
+  kernel_version?: string;
+  kernel_release?: string;
+  cloud_provider?: string;
 }
 
 export interface Deprecation {
@@ -371,7 +384,20 @@ export class NodeRun {
        name: '',
        version: ''
      }
-   ]
+   ],
+    ip6address: '',
+    timezone: '',
+    domain: '',
+    hostname: '',
+    memory_total: '',
+    macaddress: '',
+    dmi_system_serial_number: '',
+    dmi_system_manufacturer: '',
+    virtualization_role: '',
+    virtualization_system: '',
+    kernel_version: '',
+    kernel_release: '',
+    cloud_provider: ''
   });
 
   nodeId: string;
@@ -420,6 +446,19 @@ export class NodeRun {
     run_list: ExpandedRunListItem[];
   };
   versionedCookbooks: VersionedCookbook[];
+  ip6address?: string;
+  timezone?: string;
+  domain?: string;
+  hostname?: string;
+  memoryTotal?: string;
+  macaddress?: string;
+  dmiSystemSerialNumber?: string;
+  dmiSystemManufacturer?: string;
+  virtualizationRole?: string;
+  virtualizationSystem?: string;
+  kernelVersion?: string;
+  kernelRelease?: string;
+  cloudProvider?: string;
 
   constructor(respNodeRun: RespNodeRun) {
     this.nodeId = respNodeRun.node_id;
@@ -457,6 +496,19 @@ export class NodeRun {
     this.uptimeSeconds = respNodeRun.uptime_seconds;
     this.deprecations = respNodeRun.deprecations;
     this.versionedCookbooks = respNodeRun.versioned_cookbooks;
+    this.ip6address = respNodeRun.ip6address;
+    this.timezone = respNodeRun.timezone;
+    this.domain = respNodeRun.domain;
+    this.hostname = respNodeRun.hostname;
+    this.memoryTotal = respNodeRun.memory_total;
+    this.macaddress = respNodeRun.macaddress;
+    this.dmiSystemSerialNumber = respNodeRun.dmi_system_serial_number;
+    this.dmiSystemManufacturer = respNodeRun.dmi_system_manufacturer;
+    this.virtualizationRole = respNodeRun.virtualization_role;
+    this.virtualizationSystem = respNodeRun.virtualization_system;
+    this.kernelVersion = respNodeRun.kernel_version;
+    this.kernelRelease = respNodeRun.kernel_release;
+    this.cloudProvider = respNodeRun.cloud_provider;
   }
 
   isPolicyFile(): boolean {
@@ -844,3 +896,30 @@ export enum HttpStatus {
 
 // Map of gRPC codes to HTTP codes is available at:
 // vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/rpc/code.proto
+
+
+// The full list of filter types for filtering node and profile reports inclusive of dates
+export enum ReportingFilterTypes {
+  CHEF_SERVER = 'chef_server',
+  CHEF_TAGS = 'chef_tags',
+  CONTROL_ID = 'control_id',
+  CONTROL_NAME = 'control_name',
+  CONTROL_TAG_KEY = 'control_tag_key',
+  CONTROL_TAG_VALUE = 'control_tag_value',
+  ENVIRONMENT = 'environment',
+  INSPEC_VERSION = 'inspec_version',
+  JOB_ID = 'job_id',
+  NODE_ID = 'node_id',
+  NODE_NAME = 'node_name',
+  ORGANIZATION = 'organization',
+  PLATFORM_WITH_VERSION = 'platform_with_version',
+  POLICY_GROUP = 'policy_group',
+  POLICY_NAME = 'policy_name',
+  PROFILE_ID = 'profile_id',
+  PROFILE_WITH_VERSION = 'profile_with_version',
+  PROFILE_NAME = 'profile_name',
+  RECIPE = 'recipe',
+  ROLE = 'role',
+  END_TIME = 'end_time',
+  DATE_INTERVAL = 'date_interval'
+}

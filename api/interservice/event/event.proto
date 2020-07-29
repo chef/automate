@@ -51,6 +51,7 @@ message EventMsg {
     Object Object                          = 8;
     Target Target                          = 9;
     google.protobuf.Struct data            = 10;
+    repeated string Projects               = 11;
 }
 
 message EventResponse { bool Success = 1; }

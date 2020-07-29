@@ -1,6 +1,6 @@
 <div class="content-container">
   <div class="container">
-    
+
     <main class="notification-add-main">
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/settings/notifications']">Notifications</chef-breadcrumb>
@@ -47,8 +47,8 @@
           </label>
           <div *ngIf="targetTypeChosen() || isEditRule">
             <chef-form-field>
-              <label>Assign a unique name for your notification <span class="asterisk">*</span></label>
-              <input chefInput
+              <label for="name">Assign a unique name for your notification <span class="asterisk">*</span></label>
+              <input chefInput id="name"
                 type="text"
                 name="name"
                 placeholder="Enter notification name"
@@ -60,8 +60,8 @@
               <div *ngIf="!name.invalid && name.dirty" class="check-icon"><chef-icon>check</chef-icon></div>
               <chef-error *ngIf="name.invalid && name.dirty">Name must be supplied</chef-error>
             </chef-form-field>
-            <label>Select a failure type <span class="asterisk">*</span></label>
-            <chef-select
+            <label for="failure">Select a failure type <span class="asterisk">*</span></label>
+            <chef-select id="failure"
               (change)="setFailureType($event)"
               class="notification-select-menu"
               [value]="model.rule.ruleType">

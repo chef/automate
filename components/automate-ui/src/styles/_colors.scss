@@ -2,6 +2,44 @@
 // ------------------------------------------------------------------------------------- //
 // DO NOT DIRECTLY IMPORT COLORS FROM THIS FILE : CREATE A VARIABLE in _variables.scss //
 // ------------------------------------------------------------------------------------- //
+$white: #FFFFFF;
+$eggplant: #394261;
+$lavender: #BBCDF2;
+$eggplant-light-1: #C5C7D1;
+$eggplant-light-2: #B1B4C1;
+$eggplant-light-3: #9DA1B1;
+$eggplant-light-4: #898EA1;
+$eggplant-light-5: #757B91;
+$eggplant-light-6: #616881;
+$eggplant-light-7: #4D5571;
+$eggplant-dark-1: #333B57;
+$eggplant-dark-2: #2D344D;
+$lavender-light-1: #ECF0F9;
+$lavender-light-2: #E5EBF8;
+$lavender-light-3: #DEE6F7;
+$lavender-light-4: #D7E1F6;
+$lavender-light-5: #D0DCF5;
+$lavender-light-6: #C9D7F4;
+$lavender-light-7: #C2D2F3;
+$lavender-dark-1: #A8B8DA;
+$lavender-dark-2: #95A3C2;
+$lavender-dark-3: #7C8296;
+$grape-light-1: #D0D4EE;
+$grape-light-2: #BFC5E8;
+$grape-light-3: #AEB6E2;
+$grape-light-4: #9DA7DC;
+$grape-light-5: #8C98D6;
+$grape-light-6: #7B89D0;
+$grape-light-7: #6A7ACA;
+$grape-dark-1: #5060B0;
+$grape-dark-2: #47559C;
+$cornflower: #3023AE;
+$orchid: #C86DD7;
+$daylily: #FEA900;
+$crimson: #E71D36;
+$rose: #E61F36;
+$winter-green: #4FC293;
+
 
 // LOCAL COLOR VARIABLES
 // ONLY to be used to set color configs in _variables.scss
@@ -13,16 +51,17 @@ $blue: #174AF0;
 $malibu: #648FFF;
 // secondary
 $pink: #DC267F;
-$violet: #C22DD5;
+$violet: #A424B4;
 $indigo: #785EF0;
 $science-blue: #0075DB;
+$medium-teal-blue: #005BAB;
 $fuchsia: #A424B4;
 $fuchsia-light: #FADAFA;
 $fuchsia-dark: #440F4B;
 $maroon: #BA1E6A;
 // greyscale
 $charcoal: #26293A;
-$sirocco: #6F7878;
+$sirocco: #697272;
 $darksea: #819BA9;
 $steel: #CDD7DD;
 $iron: #DFE3E5;
@@ -32,6 +71,7 @@ $white: #FFFFFF;
 $black: #000000;
 // charts
 $atomic-tangerine: #FF9654;
+$mahogany: #B74500;
 $blue-de-france: #3DA5FF;
 $gray: #B7BCBC;
 
@@ -61,7 +101,7 @@ $chef-blue-medium: #3883B3;
 $chef-blue-light: #57ABE0;
 $chef-blue-lighter: #E8F3FA;
 $chef-purple: #9013FE;
-$chef-green: #1FB899;
+$chef-green: #307E30;
 $chef-light-green: #3DC5AA;
 $chef-red: #E27C79;
 $blue-light: #E1E5EC;

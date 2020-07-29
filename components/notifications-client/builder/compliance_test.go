@@ -11,6 +11,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	proto "github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const URL = "http://localhost"
@@ -174,6 +175,27 @@ func TestParseInspecReportWithRefBug(t *testing.T) {
 
 	_, err := Compliance(URL, &report)
 	assert.NoError(t, err)
+}
+
+func TestRemovedControlsFailure(t *testing.T) {
+	var report compliance.Report
+
+	fromJSON("inspec-removed-controls-failure.json", &report)
+
+	ev, _ := Compliance(URL, &report)
+
+	failure := ev.GetComplianceFailure()
+
+	require.Equal(t, 1, len(failure.FailedProfiles))
+	failedProfile := failure.FailedProfiles[0]
+
+	require.Equal(t, 1, len(failedProfile.FailedControls))
+	failedControl := failedProfile.FailedControls[0]
+
+	assert.Equal(t, int32(311), failedControl.Stats.NumTests)
+	assert.Equal(t, int32(154), failedControl.Stats.NumFailedTests)
+	assert.Equal(t, int32(100), failedControl.Stats.NumSkippedTests)
+	assert.Equal(t, int32(57), failedControl.Stats.NumPassedTests)
 }
 
 func fromJSON(name string, out proto.Message) error {

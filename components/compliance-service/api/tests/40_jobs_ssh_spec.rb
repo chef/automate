@@ -1,13 +1,13 @@
 require_relative 'test_support'
 ##### GRPC SETUP #####
-require 'api/interservice/nodemanager/nodes/nodes_pb'
-require 'api/interservice/nodemanager/nodes/nodes_services_pb'
-require 'api/external/secrets/secrets_services_pb'
-require 'api/interservice/compliance/jobs/jobs_pb'
-require 'api/interservice/compliance/jobs/jobs_services_pb'
-require 'api/interservice/compliance/profiles/profiles_pb'
-require 'api/interservice/compliance/profiles/profiles_services_pb'
-require 'api/external/common/query/parameters_pb'
+require 'interservice/nodemanager/nodes/nodes_pb'
+require 'interservice/nodemanager/nodes/nodes_services_pb'
+require 'external/secrets/secrets_services_pb'
+require 'interservice/compliance/jobs/jobs_pb'
+require 'interservice/compliance/jobs/jobs_services_pb'
+require 'interservice/compliance/profiles/profiles_pb'
+require 'interservice/compliance/profiles/profiles_services_pb'
+require 'external/common/query/parameters_pb'
 
 describe File.basename(__FILE__) do
   Profiles = Chef::Automate::Domain::Compliance::Profiles unless defined?(Profiles)

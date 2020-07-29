@@ -116,16 +116,6 @@ func (s *Server) ListTokens(
 	return &pb_resp.ListTokensResp{Tokens: tokens}, nil
 }
 
-// ResetAllTokenProjects removes all projects from every token
-func (s *Server) ResetAllTokenProjects(
-	ctx context.Context, _ *pb_req.ResetAllTokenProjectsReq) (*pb_resp.ResetAllTokenProjectsResp, error) {
-	_, err := s.client.ResetToV1(ctx, &authn.ResetToV1Req{})
-	if err != nil {
-		return nil, err
-	}
-	return &pb_resp.ResetAllTokenProjectsResp{}, nil
-}
-
 // Maps internal type to gateway type
 func convert(token *authn.Token) *pb_common.Token {
 	return &pb_common.Token{

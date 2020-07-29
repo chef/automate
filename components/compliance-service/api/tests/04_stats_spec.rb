@@ -1,5 +1,5 @@
-require 'api/interservice/compliance/stats/stats_pb'
-require 'api/interservice/compliance/stats/stats_services_pb'
+require 'interservice/compliance/stats/stats_pb'
+require 'interservice/compliance/stats/stats_services_pb'
 
 if !ENV['NO_STATS_TESTS']
   describe File.basename(__FILE__) do
@@ -281,6 +281,34 @@ if !ENV['NO_STATS_TESTS']
       expected_data = {}
       assert_equal_json_content(expected_data, actual_data)
 
+      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "types", values: ["profile", "platform", "environment", "control"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+      ])
+      expected_data = {
+        "profiles" => [
+          {"name" => "apache-baseline",
+            "failures" => 1,
+            "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8"},
+          {"name" => "myfaily",
+            "failures" => 1,
+            "id" => "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888"}
+        ],
+        "platforms" => [{"name" => "ubuntu", "failures" => 1}],
+        "environments" => [{"name" => "DevSec Prod Alpha", "failures" => 1}]
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "types", values: ["profile", "platform", "environment", "control"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+      ])
+      expected_data = {
+        "platforms" => [{"name" => "unknown", "failures" => 1}],
+        "environments" => [{"name" => "DevSec Prod Alpha", "failures" => 1}]
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
 
       ##read profiles
       actual_data = GRPC stats, :read_profiles, Stats::Query.new()
@@ -419,16 +447,42 @@ if !ENV['NO_STATS_TESTS']
       assert_equal_json_content(expected_data, actual_data)
       # {"profileList":[],"profileSummary":{"name":"nginx-baseline","title":"DevSec Nginx Baseline","version":"2.1.0","license":"Apache-2.0","maintainer":"DevSec Hardening Framework Team","copyright":"DevSec Hardening Framework Team","copyrightEmail":"hello@dev-sec.io","summary":"Test-suite for best-practice nginx hardening","supports":[{"osFamily":"unix"}],"stats":{"failed":1,"passed":5,"skipped":2}},"controlStats":[]}
 
+
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+        Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+      ])
+      expected_data = {
+        "profileList" => [
+          { "name" => "apache-baseline",
+            "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8"},
+          { "name" => "linux-baseline",
+            "id" => "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015",
+            "passed" => 1},
+          { "name" => "myfaily",
+            "id" => "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888"},
+          { "name" => "myskippy",
+            "id" => "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777"}]}
+      assert_equal_json_content(expected_data, actual_data)
+
+      # Get the profiles used on the day when we got the failed report with no profiles
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+        Stats::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+      ])
+      expected_data = {}
+      assert_equal_json_content(expected_data, actual_data)
+
+
       #description: Profile stats list for nodes
       #filter: in one of the two profiles and end_time
       #calls: stats::ReadProfiles::GetProfileSummaryByProfileId
       #depth: Report
-      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(
+        filters: [
           Stats::ListFilter.new(type: "environment", values: ["DevSec Prod Zeta"]),
           Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
-      ],
-                                                                 type: "summary",
-                                                                 id: "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"
+        ],
+        type: "summary",
+        id: "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"
       )
       expected_data = {
           "profileSummary" => {
@@ -440,6 +494,28 @@ if !ENV['NO_STATS_TESTS']
               "summary" => "Test-suite for best-preactice os hardening",
               "stats" => {"failed" => 21, "passed" => 22, "waived" => 2}
           }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        type: "nodes",
+        filters: [
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+        ])
+      expected_data = {
+        "nodeSummary" => { "noncompliant" => 1 }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        type: "nodes",
+        filters: [
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+        ])
+      expected_data = {
+        "nodeSummary" => { "noncompliant" => 1 }
       }
       assert_equal_json_content(expected_data, actual_data)
     end

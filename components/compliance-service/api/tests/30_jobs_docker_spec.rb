@@ -1,13 +1,13 @@
 require_relative 'test_support'
 ##### GRPC SETUP #####
-require 'api/interservice/nodemanager/nodes/nodes_pb'
-require 'api/interservice/nodemanager/nodes/nodes_services_pb'
-require 'api/external/secrets/secrets_services_pb'
-require 'api/interservice/compliance/jobs/jobs_pb'
-require 'api/interservice/compliance/jobs/jobs_services_pb'
-require 'api/interservice/nodemanager/manager/manager_pb'
-require 'api/interservice/nodemanager/manager/manager_services_pb'
-require 'api/external/common/query/parameters_pb'
+require 'interservice/nodemanager/nodes/nodes_pb'
+require 'interservice/nodemanager/nodes/nodes_services_pb'
+require 'external/secrets/secrets_services_pb'
+require 'interservice/compliance/jobs/jobs_pb'
+require 'interservice/compliance/jobs/jobs_services_pb'
+require 'interservice/nodemanager/manager/manager_pb'
+require 'interservice/nodemanager/manager/manager_services_pb'
+require 'external/common/query/parameters_pb'
 
 describe File.basename(__FILE__) do
   Manager = Chef::Automate::Domain::Nodemanager::Manager unless defined?(Manager)
@@ -234,7 +234,7 @@ describe File.basename(__FILE__) do
     # Get job by id with all details
     job1 = GRPC jobs, :read, Jobs::Id.new(id: job_id1)
     assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, job1, 'start_time'))
-    job1_hash = job1.to_hash
+    job1_hash = job1.to_h
     job1_hash[:status] = 'GOOOOD'
     job1_hash[:results] = ['GOOOOOOOOD']
     job1_hash[:end_time] = 'GOOOOD'
@@ -276,7 +276,7 @@ describe File.basename(__FILE__) do
     # Get job by id with all details
     job2 = GRPC jobs, :read, Jobs::Id.new(id: job_id2)
     assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, job2, 'start_time'))
-    job2_hash = job2.to_hash
+    job2_hash = job2.to_h
     job2_hash[:status] = 'GOOOOD'
     job2_hash[:results] = ['GOOOOOOOOD']
     job2_hash[:end_time] = 'GOOOOD'
@@ -468,6 +468,12 @@ describe File.basename(__FILE__) do
             "e69dc612-7e67-43f2-9b19-256afd385820"
           ],
           "state": "RUNNING",
+          "projectsData": [
+            {
+              "key": "environment",
+              "values": ["trouble"]
+            }
+          ],
           "runData": {},
           "scanData": {
             "id": "some-id",
@@ -763,6 +769,12 @@ describe File.basename(__FILE__) do
             "e69dc612-7e67-43f2-9b19-256afd385820"
           ],
           "state": "TERMINATED",
+          "projectsData": [
+            {
+              "key": "environment",
+              "values": ["trouble"]
+            }
+          ],
           "runData": {},
           "scanData": {
             "id": "some-id",

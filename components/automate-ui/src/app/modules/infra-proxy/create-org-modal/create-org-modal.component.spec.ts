@@ -21,7 +21,11 @@ describe('CreateOrgModalComponent', () => {
         MockComponent({ selector: 'chef-checkbox' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] })
+        MockComponent({ selector: 'chef-modal', inputs: ['visible']}),
+        MockComponent({ selector: 'app-resource-dropdown',
+        inputs: ['resources', 'resourcesUpdated', 'objectNounPlural'] }),
+        MockComponent({ selector: 'app-projects-dropdown',
+        inputs: ['projects', 'projectsUpdated'] })
       ],
       imports: [
         CommonModule,

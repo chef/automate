@@ -150,7 +150,7 @@ func (srv *PGProfileServer) Create(stream profiles.ProfilesService_CreateServer)
 	// verify that we accept the content
 	logrus.Debugf("Content Type %s", in.GetMeta().ContentType)
 	var reader io.ReadCloser
-	if in.GetMeta().ContentType == "application/json" {
+	if in.GetMeta().ContentType == "application/json" || in.GetMeta().ContentType == "application/json+lax" {
 		namespace := in.Owner
 		name := in.GetMeta().Name
 		version := in.GetMeta().Version
@@ -270,7 +270,7 @@ func (srv *PGProfileServer) ReadTar(in *profiles.ProfileDetails, stream profiles
 	return nil
 }
 
-// Check the existance of profile IDs(sha256) in the comp-*-profiles ES index
+// Check the existence of profile IDs(sha256) in the comp-*-profiles ES index
 func (srv *PGProfileServer) MetaSearch(ctx context.Context, profileSha256 *profiles.Sha256) (*profiles.Missing, error) {
 	logrus.Debugf("Checking if profiles with sha256 IDs %v are already stored in ElasticSearch", profileSha256.Sha256)
 

@@ -6,35 +6,10 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
-
-    <!--
-    ReDoc doesn't change outer page styles
-    -->
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-      }
-      redoc[spec-url] a img[src^="/images/chef-automate-logo.svg"] {
-        width: 220px;
-        margin: 20px;
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/api-styles.css">
   </head>
   <body>
-    <a style="
-          background: #EF9600;
-          display: block;
-          text-align: center;
-          width: 260px;
-          padding: 8px 0;
-          color: white;
-          text-decoration: none;
-          font-family: montserrat;
-          font-size: 14px;
-          position: fixed;
-          z-index: 1;
-        " href='/docs'>Return to Docs</a>
+    <a class="return" href="/docs">Return to Docs</a>
     <ReDoc spec-url="/api-docs/all-apis.swagger.json" scroll-y-offset="34"></ReDoc>
     <script src="/redoc.standalone.js"></script>
   </body>

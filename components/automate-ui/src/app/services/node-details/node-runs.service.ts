@@ -15,7 +15,7 @@ import {
   PolicyCookbooks } from '../../types/types';
 
 import { environment } from '../../../environments/environment';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 const CONFIG_MGMT_URL = environment.config_mgmt_url;
 
 @Injectable()
@@ -91,9 +91,13 @@ export class NodeRunsService {
       .then((res) => new PolicyCookbooks(res));
   }
 
-  getNodeRun(nodeId: string, runId: string, endTime: Date): Promise<NodeRun> {
+  getNodeRun(nodeId: string, runId: string, endTime?: Date): Promise<NodeRun> {
     const url = `${CONFIG_MGMT_URL}/nodes/${nodeId}/runs/${runId}`;
-    const searchParam = new HttpParams().set('end_time', endTime.toISOString());
+    let searchParam = new HttpParams();
+
+    if (endTime) {
+      searchParam = searchParam.set('end_time', endTime.toISOString());
+    }
 
     const options = {
       params: searchParam

@@ -14,9 +14,29 @@ export const dailyCheckInCountCollection = createSelector(
   (state) => state.dailyCheckInCountCollection
 );
 
+export const getSelected = createSelector(
+  desktopState,
+  (state) => state.selected
+);
+
 export const getSelectedDaysAgo = createSelector(
   desktopState,
-  (state) => state.selectedDaysAgo
+  (state) => state.selected.daysAgo
+);
+
+export const getSelectedDesktop = createSelector(
+  desktopState,
+  (state) => state.selected.desktop
+);
+
+export const getSelectedNodeRun = createSelector(
+  desktopState,
+  (state) => state.selected.nodeRun
+);
+
+export const getDailyNodeRuns = createSelector(
+  desktopState,
+  (state) => state.dailyNodeRuns
 );
 
 export const topErrorsCollection = createSelector(
@@ -27,6 +47,26 @@ export const topErrorsCollection = createSelector(
 export const unknownDesktopDurationCounts = createSelector(
   desktopState,
   (state) => state.unknownDesktopDurationCounts
+);
+
+export const nodeMetadataCounts = createSelector(
+  desktopState,
+  (state) => state.nodeMetadataCounts
+);
+
+export const desktopListTitle = createSelector(
+  desktopState,
+  (state) => state.desktopListTitle
+);
+
+export const desktopListColumns = createSelector(
+  desktopState,
+  (state) => state.desktopListColumns
+);
+
+export const desktopListColumnsSaveAsDefault = createSelector(
+  desktopState,
+  (state) => state.desktopListColumnsSaveAsDefault
 );
 
 export const desktops = createSelector(

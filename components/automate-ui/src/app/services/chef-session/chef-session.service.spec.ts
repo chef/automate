@@ -5,6 +5,7 @@ import {
   ngrxReducers,
   runtimeChecks
 } from 'app/ngrx.reducers';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('ChefSessionService', () => {
   let service: ChefSessionService;
@@ -13,7 +14,8 @@ describe('ChefSessionService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks }),
+        HttpClientTestingModule
       ],
       providers: [
         ChefSessionService
@@ -119,45 +121,6 @@ describe('ChefSessionService', () => {
       it('sets the user telemetry preference to false', () => {
         service.storeTelemetryPreference(false);
         expect(localStorage.getItem((service as any).userTelemetryStorageKey())).toEqual('false');
-      });
-    });
-  });
-
-  describe('#refreshSessionCallback', () => {
-    let event, xhr;
-    beforeEach(() => {
-      service.setDefaultSession();
-      service.tryInitializeSession();
-      event = {};
-      xhr = {};
-      event.target = xhr;
-      xhr.readyState = 4;
-      spyOn(service, 'ingestIDToken');
-    });
-
-    describe('when session refresh succeeds', () => {
-      beforeEach(() => {
-        xhr.status = 200;
-        xhr.response = { id_token: 'refreshed_id_token'};
-      });
-
-      it('ingests the returned ID token', () => {
-        service.refreshSessionCallback(event);
-        expect(service.ingestIDToken).toHaveBeenCalledWith('refreshed_id_token');
-      });
-    });
-
-    describe('when session refresh fails', () => {
-      beforeEach(() => {
-        xhr.status = 401;
-        spyOn(service, 'currentPath').and.returnValue('/some/path');
-        spyOn(service, 'logout');
-      });
-
-      it('does not ingest any token, but calls logout', () => {
-        service.refreshSessionCallback(event);
-        expect(service.logout).toHaveBeenCalledWith();
-        expect(service.ingestIDToken).not.toHaveBeenCalled();
       });
     });
   });

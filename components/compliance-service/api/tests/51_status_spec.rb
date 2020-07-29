@@ -1,6 +1,6 @@
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/status/status_pb'
-require 'api/interservice/compliance/status/status_services_pb'
+require 'interservice/compliance/status/status_pb'
+require 'interservice/compliance/status/status_services_pb'
 
 describe File.basename(__FILE__) do
   it "works" do

@@ -37,7 +37,7 @@ func WithMaxConnectionLifetimeJitter(d time.Duration) PGOpenOption {
 	}
 }
 
-// WithPingInterval configures a background gorountine that
+// WithPingInterval configures a background goroutine that
 // will ping the database every interval. A zero duration disables the
 // pinger. Default: 20s
 func WithPingInterval(d time.Duration) PGOpenOption {

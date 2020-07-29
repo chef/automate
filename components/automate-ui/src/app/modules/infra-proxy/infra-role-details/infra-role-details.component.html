@@ -1,0 +1,71 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Servers</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Roles</chef-breadcrumb>
+         {{role?.name}}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <chef-heading>{{role?.name}}</chef-heading>
+        <table>
+          <thead>
+            <tr class="detail-row">
+              <th class="id-column">Name</th>
+              <th class="id-column">Description</th>
+              <th class="id-column">Chef Type</th>
+              <th class="id-column">JSON</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="detail-row">
+              <td class="id-column">{{role?.name}}</td>
+              <td class="id-column">{{role?.description == "" ? 'N/A' : role?.description }}</td>
+              <td class="id-column">{{role?.chef_type}}</td>
+              <td class="id-column">{{role?.json_class}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+          <chef-option value='runList' data-cy="runList-tab">Run List</chef-option>
+          <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      <section class="page-body" *ngIf="tabValue === 'runList'">
+        <chef-loading-spinner *ngIf="roleDetailsLoading" size="50"></chef-loading-spinner>
+        <div *ngIf="show">
+          <div class="version-dropdown">
+            <chef-select #li [value]="env_id" (change)="selectChangeHandler(li.value)" >
+              <chef-option *ngFor="let list of idList" [value]="list">{{ list }}</chef-option>
+            </chef-select>
+          </div>
+          <div *ngIf="hasRun_List">
+            <app-tree-table [tree]="arrayOfNodesTree" [options]="treeOptions"></app-tree-table>
+          </div>
+          <div *ngIf="!hasRun_List" class="center">
+            <p>Run list details are not available for the <b>{{env_id}}</b> environment.</p>
+          </div>
+        </div>
+        <div *ngIf="!show && !roleDetailsLoading" class="center">
+          <p>Expanded run list not available for the role <b>{{role?.name}}</b>.</p>
+        </div>
+      </section>
+      <section class="page-body" *ngIf="tabValue === 'attributes'">
+        <chef-loading-spinner *ngIf="roleDetailsLoading" size="50"></chef-loading-spinner>
+        <div class="expand-collapse">
+          <span class="action" (click)="tree.expand()">
+            <chef-icon>add_circle</chef-icon>
+            <span>Expand All</span>
+          </span>
+          <span class="separator">|</span>
+          <span class="action" (click)="tree.collapse()">
+            <chef-icon>remove_circle</chef-icon>
+            <span>Collapse All</span>
+          </span>
+        </div>
+        <app-json-tree-table class="json-tree-container" #tree [json]="selectedAttrs"></app-json-tree-table>
+      </section>
+    </main>
+  </div>
+</div>

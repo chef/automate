@@ -5,8 +5,8 @@ package chef.automate.domain.deployment;
 option go_package = "github.com/chef/automate/api/interservice/deployment";
 
 import "google/protobuf/timestamp.proto";
-import "api/config/deployment/config_request.proto";
-import "api/config/deployment/automate_config.proto";
+import "config/deployment/config_request.proto";
+import "config/deployment/automate_config.proto";
 
 service Deployment {
 	rpc Deploy (DeployRequest) returns (DeployResponse);
@@ -123,7 +123,8 @@ message GenerateAdminTokenRequest {
 }
 
 message GenerateAdminTokenResponse {
-	string api_token = 1;
+	string token_value = 1;
+	string token_id = 2;
 }
 
 message NewDeploymentRequest {
@@ -525,6 +526,12 @@ message S3BackupLocation {
 	string session_token = 6;
 }
 
+message GCSBackupLocation {
+	string bucket_name = 1;
+	string base_path = 2;
+	string google_application_credentials = 3;
+}
+
 message BackupRestoreTask {
 	google.protobuf.Timestamp id = 1;
 	BackupTask backup = 2;
@@ -551,6 +558,8 @@ message BackupRestoreTask {
 	ReleaseManifest manifest = 11;
 	AutomateConfig patch_config = 12;
 	AutomateConfig set_config = 13;
+
+	GCSBackupLocation gcs_backup_location = 14;
 }
 
 message BackupDeleteTask {

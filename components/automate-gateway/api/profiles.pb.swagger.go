@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("profiles", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/compliance/profiles/profiles.proto",
+    "title": "external/compliance/profiles/profiles.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/compliance/market/read/{name}/version/{version}": {
+    "/api/v0/compliance/market/read/{name}/version/{version}": {
       "get": {
         "summary": "Show an available profile",
         "description": "Show the details of an un-installed profile using the profile name and version.\nin the UI, these are the profiles under the \"Available\" tab.\nThese profiles are created and maintained by Chef, shipped with Chef Automate.\n\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:marketProfiles:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -55,7 +55,7 @@ func init() {
         ]
       }
     },
-    "/compliance/profiles/metasearch": {
+    "/api/v0/compliance/profiles/metasearch": {
       "post": {
         "summary": "Check if one or multiple profiles exist in the metadata database.",
         "description": "The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend\ndoesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.\nThis is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:profiles:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -83,7 +83,7 @@ func init() {
         ]
       }
     },
-    "/compliance/profiles/read/{owner}/{name}/version/{version}": {
+    "/api/v0/compliance/profiles/read/{owner}/{name}/version/{version}": {
       "get": {
         "summary": "Show an installed profile",
         "description": "Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.\n\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:profiles:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -124,7 +124,7 @@ func init() {
         ]
       }
     },
-    "/compliance/profiles/search": {
+    "/api/v0/compliance/profiles/search": {
       "post": {
         "summary": "List all available profiles",
         "description": "Lists all profiles available for the Automate instance.\nEmpty params return all \"market\" profiles.\nSpecifying the ` + "`" + `owner` + "`" + ` field returns all profiles installed for the specified user.\n\nSupports pagination, sorting, and filtering (wildcard supported).\n\nSupported sort fields: title, name (default: title)\nSupported filter fields: name, version, title\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filters\":[\n{\"type\": \"title\", \"values\": [ \"Dev*\"]}\n],\n\"page\": 1,\n\"per_page\": 3,\n\"owner\": \"admin\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:profiles:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -152,7 +152,7 @@ func init() {
         ]
       }
     },
-    "/compliance/profiles/{owner}/{name}/version/{version}": {
+    "/api/v0/compliance/profiles/{owner}/{name}/version/{version}": {
       "delete": {
         "summary": "Delete an installed profile",
         "description": "Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.\nNote: this action \"uninstalls\" the profile. This has no impact on the market profiles.\n\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:profiles:delete\n` + "`" + `` + "`" + `` + "`" + `",

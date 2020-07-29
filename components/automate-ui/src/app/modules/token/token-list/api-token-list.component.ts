@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { filter, takeUntil, map } from 'rxjs/operators';
@@ -10,7 +11,6 @@ import { DateTime } from 'app/helpers/datetime/datetime';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 import { loading, EntityStatus, pending } from 'app/entities/entities';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { Type } from 'app/entities/notifications/notification.model';
@@ -24,9 +24,9 @@ import {
 } from 'app/entities/api-tokens/api-token.actions';
 import { CreateToken } from 'app/entities/api-tokens/api-token.actions';
 import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selectors';
-import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
-import { Project, ProjectConstants } from 'app/entities/projects/project.model';
-import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
+import { ProjectConstants } from 'app/entities/projects/project.model';
+import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policies/policy.actions';
+import { stringToMember } from 'app/entities/policies/policy.model';
 
 @Component({
   selector: 'app-api-tokens',
@@ -44,7 +44,6 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   private isDestroyed = new Subject<boolean>();
 
-  public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public readonly RFC2822 = DateTime.RFC2822;
 
@@ -72,25 +71,14 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       name: ['', Validators.required],
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
-      projects: [[]]
+      projects: [[]],
+      policies: [[]]
     });
   }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetAllTokens());
-
-    this.store.select(assignableProjects)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((assignable: ProjectsFilterOption[]) => {
-        this.dropdownProjects = assignable.map(p => {
-          return <Project>{
-            id: p.value,
-            name: p.label,
-            type: p.type
-          };
-        });
-      });
 
     this.store.pipe(
       select(saveStatus),
@@ -99,6 +87,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       .subscribe(state => {
         this.creatingToken = false;
         if (state === EntityStatus.loadingSuccess) {
+          this.assignPolicies();
           this.closeCreateModal();
         }
       });
@@ -129,7 +118,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public startTokenDelete($event: ChefKeyboardEvent, token: ApiToken): void {
+  public startTokenDelete($event: MatOptionSelectionChange, token: ApiToken): void {
     if ($event.isUserInput) {
       this.tokenToDelete = token;
       this.deleteModalVisible = true;
@@ -144,15 +133,23 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public createToken(): void {
     this.creatingToken = true;
     const tok = {
-      id: this.createTokenForm.controls['id'].value,
-      name: this.createTokenForm.controls['name'].value.trim(),
+      id: this.createTokenForm.controls.id.value,
+      name: this.createTokenForm.controls.name.value.trim(),
       projects: this.createTokenForm.controls.projects.value
     };
     this.store.dispatch(new CreateToken(tok));
-
   }
 
-  public toggleActive($event: ChefKeyboardEvent, token: ApiToken): void {
+  private assignPolicies(): void {
+    const member = stringToMember(`token:${this.createTokenForm.controls.id.value}`);
+    const policies: string[] = this.createTokenForm.controls.policies.value || [];
+    policies.forEach(id => this.store.dispatch(new AddPolicyMembers(<PolicyMembersMgmtPayload>{
+      id,
+      members: [member]
+    })));
+  }
+
+  public toggleActive($event: MatOptionSelectionChange, token: ApiToken): void {
     if ($event.isUserInput) {
       this.store.dispatch(new ToggleTokenActive(token));
     }
@@ -168,7 +165,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     this.resetCreateModal();
   }
 
-  public notifyCopy($event: ChefKeyboardEvent): void {
+  public notifyCopy($event: MatOptionSelectionChange): void {
     if ($event.isUserInput) {
       this.store.dispatch(new CreateNotification({
         type: Type.info,

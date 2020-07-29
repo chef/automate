@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/interservice/ingest/status.proto",
+    "title": "interservice/ingest/status.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/health": {
+    "/api/v0/health": {
       "get": {
         "operationId": "GetHealth",
         "responses": {
@@ -27,7 +27,7 @@
         ]
       }
     },
-    "/migration": {
+    "/api/v0/migration": {
       "get": {
         "operationId": "GetMigrationStatus",
         "responses": {

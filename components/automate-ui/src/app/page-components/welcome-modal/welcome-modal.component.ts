@@ -42,21 +42,21 @@ export class WelcomeModalComponent {
     private chefSessionService: ChefSessionService,
     private telemetryService: TelemetryService
   ) {
-    this.statusSubscription =
-      store.select(triggerWelcome).subscribe(this.handleTriggerWelcome.bind(this));
-
     if (this.telemetryService.hasTelemetryResponse) {
       this.isTelemetryServiceEnabled = this.telemetryService.telemetryEnabled;
+      this.statusSubscription =
+        store.select(triggerWelcome).subscribe(this.handleTriggerWelcome.bind(this));
     } else {
       this.telemetryServiceSubscription =
         this.telemetryService.enabled.subscribe(telemetryEnabled => {
           this.isTelemetryServiceEnabled = telemetryEnabled;
+          this.statusSubscription =
+            store.select(triggerWelcome).subscribe(this.handleTriggerWelcome.bind(this));
         });
     }
-}
+  }
 
   public handleTriggerWelcome(state: TriggerWelcomeStatus): void {
-
     // no code should be before the pending check!
 
     if (pendingState(state)) { return; }
@@ -91,7 +91,6 @@ export class WelcomeModalComponent {
       case null:
         // If the user has not set a preference this is their first visit
         // with this browser. So we show them the modal and store the default pref.
-        this.localStorage.putBoolean(SHOW_AT_START_PREF_KEY, this.showAtStartPref);
         this.showModal();
         break;
     }
@@ -117,7 +116,9 @@ export class WelcomeModalComponent {
   // Shows the modal and sets the has_been_seen flag to true.
   public showModal(): void {
     this.isVisible = true;
-    this.sessionStorage.putBoolean(this.chefSessionService.userWelcomeModalSeenKey(), true);
+    this.localStorage.putBoolean(SHOW_AT_START_PREF_KEY, this.showAtStartPref);
+    this.sessionStorage.putBoolean(
+      this.chefSessionService.userWelcomeModalSeenKey(), true);
   }
 
   // Determines whether or not to show the modal based on the user's
@@ -127,7 +128,8 @@ export class WelcomeModalComponent {
     // The result of this query to sessionStorage should always result in
     // either a 'true' or a 'null' value but we are explicitly checking for
     // true here for clarity.
-    if (this.sessionStorage.getBoolean(this.chefSessionService.MODAL_HAS_BEEN_SEEN_KEY) === true) {
+    if (this.sessionStorage.getBoolean(
+      this.chefSessionService.userWelcomeModalSeenKey()) === true) {
       // If the modal has already been seen we return early and do nothing.
       return;
     } else if (showPref) {

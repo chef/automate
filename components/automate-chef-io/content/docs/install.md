@@ -10,15 +10,13 @@ toc = true
     weight = 30
 +++
 
-Before beginning your installation, check the [System Requirements]({{< relref "system-requirements.md" >}}) for Automate.
+Before beginning your installation, check the [System Requirements]({{< relref "system-requirements.md" >}}) for Chef Automate.
 
-See [Airgapped Installation]({{< relref "airgapped-installation.md" >}}) for
-installing Chef Automate to a host with no inbound or outbound internet
-traffic.
+See [Airgapped Installation]({{< relref "airgapped-installation.md" >}}) for installing Chef Automate to a host with no inbound or outbound internet traffic.
 
-## Download the Chef Automate
+## Download the Chef Automate Command-Line Tool
 
-Download and unzip Chef Automate:
+Download and unzip the Chef Automate command-line tool:
 
 ```shell
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
@@ -64,7 +62,7 @@ The deployment process writes login credentials to the `automate-credentials.tom
 
 ## Open Chef Automate
 
-Navigate to `https://<chef-automate-fqdn>` in a browser and log in to Chef Automate with
+Navigate to `https://{{< example_fqdn "automate" >}}` in a browser and log in to Chef Automate with
 the credentials provided in `automate-credentials.toml`.  Once you log in, Chef Automate
 prompts you for a license.
 
@@ -151,20 +149,28 @@ Add the following to your config.toml:
 # [global.v1.external.elasticsearch.auth]
 #   scheme = "basic_auth"
 # [global.v1.external.elasticsearch.auth.basic_auth]
+## Create this elasticsearch user before starting the Automate deployment;
+## Automate assumes it exists.
 #   username = "<admin username>"
 #   password = "<admin password>"
 # [global.v1.external.elasticsearch.ssl]
 #  Specify either a root_cert or a root_cert_file
 #  root_cert = """$(cat </path/to/cert_file.crt>)"""
-#  root_cert_file = "</path/to/cert/file>"
 #  server_name = "<elasticsearch server name>"
+
+# Uncomment and fill out if using external elasticsearch that uses hostname-based routing/load balancing
+# [esgateway.v1.sys.ngx.http]
+#  proxy_set_header_host = "<your external es hostname>:1234"
+
+# Uncomment and add to change the ssl_verify_depth for the root cert bundle
+#  ssl_verify_depth = "2"
 ```
 
-Because externally-deployed Elasticsearch nodes will not have access to Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
+Because externally-deployed Elasticsearch nodes will not have access to Chef Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Chef Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
 
-##### Backup to Local Filesystem
+##### Backup Externally-Deployed Elasticsearch to Local Filesystem
 
-To configure backups to use a local filesystem,
+To configure local filesystem backups of Chef Automate data stored in an externally-deployed Elasticsearch cluster:
 
 1. Ensure that the filesystems you intend to use for backups are mounted to the same path on all Elasticsearch master and data nodes.
 2. Configure the [Elasticsearch `path.repo`](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/modules-snapshots.html#_shared_file_system_repository) setting on each node as described in the Elasticsearch documentation.
@@ -181,9 +187,9 @@ location = "fs"
 path = "/var/opt/chef-automate/backups"
 ```
 
-##### Backup to S3
+##### Backup Externally-Deployed Elasticsearch to S3
 
-To configure backups to use S3,
+To configure S3 backups of Chef Automate data stored in an externally-deployed Elasticsearch cluster:
 
 1. Install the [`repository-s3` plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3.html) on all nodes in your Elasticsearch cluster.
 2. If you wish to use IAM authentication to provide your Elasticsearch nodes access to the S3 bucket, you must apply the appropriate IAM policy to each host system in the cluster.
@@ -269,7 +275,7 @@ To configure backups to use GCS,
     # access control = uniform
     ```
 
-#### Configuring An External PostgreSQL Database
+#### Configuring an External PostgreSQL Database
 
 Add the following to your config.toml:
 
@@ -286,6 +292,8 @@ nodes = ["<pghostname1>:<port1>", "<pghostname2>:<port2>", "..."]
 [global.v1.external.postgresql.auth]
 scheme = "password"
 
+# Create these postgres users before starting the Automate deployment;
+# Automate assumes they already exist.
 [global.v1.external.postgresql.auth.password.superuser]
 username = "<admin username>"
 password = "<admin password>"

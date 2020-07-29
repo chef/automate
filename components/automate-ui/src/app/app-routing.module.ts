@@ -7,6 +7,7 @@ import {
 } from './modules/token/token-details/api-token-details.component';
 import { ApiTokenListComponent } from './modules/token/token-list/api-token-list.component';
 import { ApplicationsComponent } from './pages/applications/applications.component';
+import { ClientDetailsComponent } from './modules/infra-proxy/client-details/client-details.component';
 import { EventFeedComponent } from './pages/event-feed/event-feed.component';
 import { IntegrationsAddComponent } from './pages/integrations/add/integrations-add.component';
 import {
@@ -14,24 +15,31 @@ import {
 } from './pages/integrations/detail/integrations-detail.component';
 import { IntegrationsEditComponent } from './pages/integrations/edit/integrations-edit.component';
 import { IntegrationsListComponent } from './pages/integrations/list/integrations-list.component';
+import { InfraRoleDetailsComponent } from './modules/infra-proxy/infra-role-details/infra-role-details.component';
 import { JobAddComponent } from './pages/job-add/job-add.component';
 import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
+import { DataFeedComponent } from './pages/data-feed/data-feed.component';
+import { DataFeedDetailsComponent } from './pages/data-feed-details/data-feed-details.component';
+import { NotificationDetailsComponent } from './pages/notification-details/notification-details.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
-import { DatafeedComponent } from './pages/data-feed/data-feed.component';
-import { DatafeedFormComponent } from './pages/data-feed-form/data-feed-form.component';
 import { SigninComponent } from './pages/signin/signin.component';
 
 // Components
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
 import { ChefServerDetailsComponent } from './modules/infra-proxy/chef-server-details/chef-server-details.component';
-import { CookbooksListComponent } from './modules/infra-proxy/cookbook-list/cookbooks-list.component';
+import { CookbookDetailsComponent } from './modules/infra-proxy/cookbook-details/cookbook-details.component';
+import { DataBagsDetailsComponent } from './modules/infra-proxy/data-bags-details/data-bags-details.component';
+import {
+  EnvironmentDetailsComponent
+} from './modules/infra-proxy/environment-details/environment-details.component';
 import { NodeDetailsComponent } from './pages/node-details/node-details.component';
 import {
   NodeNoRunsDetailsComponent
 } from './pages/node-noruns-details/node-noruns-details.component';
+import { OrgDetailsComponent } from './modules/infra-proxy/org-details/org-details.component';
 import { PolicyListComponent } from './modules/policy/list/policy-list.component';
 import { PolicyDetailsComponent } from './modules/policy/details/policy-details.component';
 import { PolicyAddMembersComponent } from './modules/policy/add-members/policy-add-members.component';
@@ -53,6 +61,7 @@ import {
 
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
+import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 
 const routes: Routes = [
   {
@@ -61,8 +70,8 @@ const routes: Routes = [
     canActivate: [ChefSessionService],
     children: [{
       path: '',
-      redirectTo: 'dashboards/event-feed',
-      pathMatch: 'full'
+      pathMatch: 'full',
+      component: TopNavLandingComponent
     },
     {
       path: 'settings',
@@ -171,23 +180,23 @@ const routes: Routes = [
             {
               path: 'form/:id',
               component: NotificationFormComponent
+            },
+            {
+              path: ':id',
+              component: NotificationDetailsComponent
             }
           ]
         },
         {
-          path: 'data-feed',
+          path: 'data-feeds',
           children: [
             {
               path: '',
-              component: DatafeedComponent
+              component: DataFeedComponent
             },
             {
-              path: 'form',
-              component: DatafeedFormComponent
-            },
-            {
-              path: 'form/:id',
-              component: DatafeedFormComponent
+              path: ':id',
+              component: DataFeedDetailsComponent
             }
           ]
         }
@@ -246,8 +255,28 @@ const routes: Routes = [
               component: ChefServerDetailsComponent
             },
             {
-              path: ':id/org/:orgid/cookbooks',
-              component: CookbooksListComponent
+              path: ':id/organizations/:orgid',
+              component: OrgDetailsComponent
+            },
+            {
+              path: ':id/organizations/:orgid/cookbooks/:cookbook_name',
+              component: CookbookDetailsComponent
+            },
+            {
+              path: ':id/organizations/:orgid/roles/:name',
+              component: InfraRoleDetailsComponent
+            },
+            {
+              path: ':id/organizations/:orgid/environments/:name',
+              component: EnvironmentDetailsComponent
+            },
+            {
+              path: ':id/organizations/:orgid/data_bags/:name',
+              component: DataBagsDetailsComponent
+            },
+            {
+              path: ':id/organizations/:orgid/clients/:name',
+              component: ClientDetailsComponent
             }
           ]
         }
@@ -274,6 +303,14 @@ const routes: Routes = [
     {
       path: 'desktop',
       loadChildren: () => import('./modules/desktop/desktop.module').then(m => m.DesktopModule)
+    },
+    {
+      path: 'cds',
+      loadChildren: () => import('./modules/cds/cds.module').then(m => m.CdsModule)
+    },
+    {
+      path: 'nodes',
+      loadChildren: () => import('./modules/nodes/nodes.module').then(m => m.NodesModule)
     },
     {
       path: 'profiles',
@@ -363,7 +400,7 @@ const routes: Routes = [
   // END Deprecated routes.
   {
     path: '**',
-    redirectTo: 'dashboards/event-feed'
+    redirectTo: ''
   }
 ];
 

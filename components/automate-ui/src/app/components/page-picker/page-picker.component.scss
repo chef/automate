@@ -1,10 +1,150 @@
 @import "~styles/variables";
+@import "@carbon/layout/scss/layout";
+@import "@carbon/grid/scss/grid";
 
 :host {
   display: flex;
   align-items: center;
 
   chef-button {
-    margin: 0 0.5em 0 0;
+    margin: 0 $spacing-03 0 0;
   }
+
+  // desktop styles
+  &.forDesktop {
+    @extend .bx--grid;
+    justify-content: space-between;
+    background: $chef-white;
+    padding-left: 0;
+    padding-right: 0;
+
+    .bx--row {
+      margin-left: 0;
+      margin-right: 0;
+      width: 100%;
+    }
+
+    .column {
+      @extend .bx--col-lg-8;
+      @extend .bx--col-md-4;
+      @extend .bx--col-sm-4;
+      display: flex;
+      padding-left: 0;
+      padding-right: 0;
+
+      &--2 {
+        justify-content: flex-end;
+
+        @include carbon--breakpoint-down(md) {
+          margin-top: 15px;
+        }
+      }
+    }
+
+    .arrow-field-container {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: flex-end;
+      height: 49px;
+      border-radius: $chef-border-radius;
+
+      .arrow-field-item {
+        display: flex;
+      }
+    }
+
+    .information-container {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .per-page-container {
+      display: none;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-right: $spacing-05;
+      height: 49px;
+      min-width: 193px;
+      border-radius: $chef-border-radius;
+
+      span.items-per {
+        padding: $spacing-05 $spacing-02 15px $spacing-05;
+      }
+    }
+
+    .of-pages-container {
+      span {
+        padding: $spacing-05 $spacing-05 15px $spacing-02;
+        font-size: 14px;
+      }
+    }
+
+    // full screen styles
+    &.fullScreened {
+      .per-page-container {
+        display: flex;
+
+        @include carbon--breakpoint-down(lg) {
+          display: none;
+        }
+      }
+    }
+
+    ::ng-deep {
+
+      mat-form-field {
+
+        .mat-form-field-infix {
+          border-top: 0;
+          padding: 0;
+          width: unset;
+        }
+
+        .mat-form-field-wrapper {
+          padding: 0;
+        }
+      }
+
+      .mat-select-panel {
+        min-width: 100%;
+      }
+    }
+
+    chef-button {
+      width: 49px;
+      height: 49px;
+
+      &:last-child {
+        border-bottom-right-radius: $chef-border-radius;
+        border-top-right-radius: $chef-border-radius;
+      }
+
+      &:focus-within {
+        position: relative;
+        z-index: 2;
+      }
+    }
+
+    [panelClass="chef-dropdown"] {
+      height: 49px;
+      width: 60px;
+
+      &:focus {
+        border-color: $chef-primary-bright;
+        outline: none;
+      }
+    }
+
+    .arrow-field-item [panelClass="chef-dropdown"] {
+      padding: $spacing-05 $spacing-02 17px $spacing-05;
+    }
+
+    .information-container [panelClass="chef-dropdown"] {
+      padding: $spacing-05 $spacing-04 15px $spacing-02;
+    }
+  } // end desktop
 }

@@ -1,11 +1,12 @@
 import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { CookieModule } from 'ngx-cookie';
 import { SuggestionsService } from './suggestions.service';
 import { StatsService } from './stats.service';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 
 const COMPLIANCE_URL = environment.compliance_url;
 
@@ -16,6 +17,7 @@ describe('SuggestionsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
+        RouterTestingModule,
         CookieModule.forRoot(),
         HttpClientTestingModule
       ],

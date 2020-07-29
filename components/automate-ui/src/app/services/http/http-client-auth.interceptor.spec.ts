@@ -10,6 +10,7 @@ import {
 } from '../projects-filter/projects-filter.reducer';
 import { HttpClientAuthInterceptor } from './http-client-auth.interceptor';
 import { using } from 'app/testing/spec-helpers';
+import { ReplaySubject } from 'rxjs';
 
 describe('HttpClientAuthInterceptor', () => {
   let httpClient: HttpClient;
@@ -22,7 +23,11 @@ describe('HttpClientAuthInterceptor', () => {
       httpClient = TestBed.inject(HttpClient);
       httpMock = TestBed.inject(HttpTestingController);
       chefSession = TestBed.inject(ChefSessionService);
+
       spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+      const tokenProvider = new ReplaySubject<String>(1);
+      tokenProvider.next(chefSession.id_token);
+      spyOnProperty(chefSession, 'token_provider', 'get').and.returnValue(tokenProvider);
     });
 
     it('includes auth token in all requests', done => {
@@ -33,6 +38,16 @@ describe('HttpClientAuthInterceptor', () => {
 
       expect(httpRequest.request.headers.get('Authorization'))
         .toEqual(`Bearer ${chefSession.id_token}`);
+    });
+
+    it('sets the lax API header all requests', done => {
+      httpClient.get('/endpoint').subscribe(done);
+
+      const httpRequest = httpMock.expectOne('/endpoint');
+      httpRequest.flush('response');
+
+      expect(httpRequest.request.headers.get('Content-Type'))
+        .toEqual('application/json+lax');
     });
 
     it('when a 401 response is intercepted logs out the session', done => {
@@ -79,6 +94,9 @@ describe('HttpClientAuthInterceptor', () => {
           httpMock = TestBed.inject(HttpTestingController);
           chefSession = TestBed.inject(ChefSessionService);
           spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+          const tokenProvider = new ReplaySubject<String>(1);
+          tokenProvider.next(chefSession.id_token);
+          spyOnProperty(chefSession, 'token_provider', 'get').and.returnValue(tokenProvider);
         });
 
         it('includes checked projects', done => {
@@ -114,6 +132,9 @@ describe('HttpClientAuthInterceptor', () => {
           httpMock = TestBed.inject(HttpTestingController);
           chefSession = TestBed.inject(ChefSessionService);
           spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+          const tokenProvider = new ReplaySubject<String>(1);
+          tokenProvider.next(chefSession.id_token);
+          spyOnProperty(chefSession, 'token_provider', 'get').and.returnValue(tokenProvider);
         });
 
         it('does not include projects header', done => {
@@ -140,6 +161,9 @@ describe('HttpClientAuthInterceptor', () => {
         httpMock = TestBed.inject(HttpTestingController);
         chefSession = TestBed.inject(ChefSessionService);
         spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+        const tokenProvider = new ReplaySubject<String>(1);
+        tokenProvider.next(chefSession.id_token);
+        spyOnProperty(chefSession, 'token_provider', 'get').and.returnValue(tokenProvider);
       });
 
       using([
@@ -151,7 +175,7 @@ describe('HttpClientAuthInterceptor', () => {
           const options = { params: { unfiltered: String(setting) } };
           httpClient.get('/endpoint', options).subscribe(done);
 
-          const httpRequest = httpMock.expectOne(`/endpoint?unfiltered=${setting}`);
+          const httpRequest = httpMock.expectOne('/endpoint');
           httpRequest.flush('response');
 
           const headerKeys = httpRequest.request.headers.keys();
@@ -162,18 +186,17 @@ describe('HttpClientAuthInterceptor', () => {
           }
         });
 
-        // Uncomment test after https://github.com/angular/angular/issues/18812 is fixed.
-        // it('strips unfiltered param when set to ' + setting, done => {
-        //   const options = { params: { unfiltered: String(setting), dummy: 'foobar' } };
-        //   httpClient.get('/endpoint', options).subscribe(done);
+        it('strips unfiltered param when set to ' + setting, done => {
+          const options = { params: { unfiltered: String(setting), dummy: 'foobar' } };
+          httpClient.get('/endpoint', options).subscribe(done);
 
-        //   const httpRequest = httpMock.expectOne('/endpoint?dummy=foobar');
-        //   httpRequest.flush('response');
+          const httpRequest = httpMock.expectOne('/endpoint?dummy=foobar');
+          httpRequest.flush('response');
 
-        //   // This assertion is completely redundant with the expectOne above,
-        //   // but having it adds to clarity.
-        //   expect(httpRequest.request.params.get('unfiltered')).toBeFalsy();
-        // });
+          // This assertion is completely redundant with the expectOne above,
+          // but having it adds to clarity.
+          expect(httpRequest.request.params.get('unfiltered')).toBeFalsy();
+        });
       });
     });
   });

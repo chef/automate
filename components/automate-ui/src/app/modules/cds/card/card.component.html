@@ -1,0 +1,18 @@
+<div class="content-container">
+  <div class="description" >
+    <h2 class="type">{{ type | uppercase }}</h2>
+    <div class="name">{{ name }}</div>
+    <div class="version">{{ version }}</div>
+    <figcaption>{{ description }}</figcaption>
+    <div class="platform-label">SUPPORTED PLATFORMS</div>
+    <div class="platform">{{ platforms }}</div>
+  </div>
+  <div class="button-group">
+    <chef-button *ngIf="canBeInstall" class="install-button" secondary (click)="clickedInstall(contentItem.id)">
+      INSTALL
+    </chef-button>
+    <chef-button class="download-button" secondary (click)="clickedDownload(contentItem.id)">
+      DOWNLOAD
+    </chef-button>
+  </div>
+</div>

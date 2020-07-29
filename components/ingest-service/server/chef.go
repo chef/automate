@@ -10,7 +10,8 @@ import (
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/api/external/ingest/response"
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
+	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
@@ -24,27 +25,33 @@ type ChefIngestServer struct {
 	chefRunPipeline    pipeline.ChefRunPipeline
 	chefActionPipeline pipeline.ChefActionPipeline
 	client             backend.Client
-	authzClient        iam_v2.ProjectsClient
+	authzClient        authz.ProjectsClient
 	nodeMgrClient      manager.NodeManagerServiceClient
 	nodesClient        nodes.NodesServiceClient
+	cfgMgmtClient      cfgmgmt.CfgMgmtClient
 }
 
 // NewChefIngestServer creates a new server instance and it automatically
 // initializes the ChefRun Pipeline by consuming the provided
 // backend client
-func NewChefIngestServer(client backend.Client, authzClient iam_v2.ProjectsClient,
+func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsClient,
 	nodeMgrClient manager.NodeManagerServiceClient,
 	chefIngestServerConfig serveropts.ChefIngestServerConfig,
-	nodesClient nodes.NodesServiceClient) *ChefIngestServer {
+	nodesClient nodes.NodesServiceClient,
+	cfgMgmtClient cfgmgmt.CfgMgmtClient,
+) *ChefIngestServer {
 	return &ChefIngestServer{
 		chefRunPipeline: pipeline.NewChefRunPipeline(client, authzClient,
-			nodeMgrClient, chefIngestServerConfig.ChefIngestRunPipelineConfig),
+			nodeMgrClient, chefIngestServerConfig.ChefIngestRunPipelineConfig,
+			chefIngestServerConfig.MessageBufferSize),
 		chefActionPipeline: pipeline.NewChefActionPipeline(client, authzClient,
-			chefIngestServerConfig.MaxNumberOfBundledActionMsgs),
+			cfgMgmtClient, chefIngestServerConfig.MaxNumberOfBundledActionMsgs,
+			chefIngestServerConfig.MessageBufferSize),
 		client:        client,
 		authzClient:   authzClient,
 		nodeMgrClient: nodeMgrClient,
 		nodesClient:   nodesClient,
+		cfgMgmtClient: cfgMgmtClient,
 	}
 }
 
@@ -65,8 +72,11 @@ func (s *ChefIngestServer) ProcessChefRun(ctx context.Context, run *chef.Run) (*
 		errc := make(chan error)
 		defer close(errc)
 
-		s.chefRunPipeline.Run(run, errc)
-		err = <-errc
+		if errQ := s.chefRunPipeline.Run(ctx, run, errc); errQ != nil {
+			err = errQ
+		} else {
+			err = <-errc
+		}
 
 		if err != nil {
 			log.WithError(err).Error("Chef run ingestion failure")
@@ -95,8 +105,12 @@ func (s *ChefIngestServer) ProcessChefAction(ctx context.Context, action *chef.A
 		errc := make(chan error)
 		defer close(errc)
 
-		s.chefActionPipeline.Run(action, errc)
-		err := <-errc
+		var err error
+		if errQ := s.chefActionPipeline.Run(ctx, action, errc); errQ != nil {
+			err = errQ
+		} else {
+			err = <-errc
+		}
 
 		if err != nil {
 			log.WithError(err).Error("Chef Action ingestion failure")

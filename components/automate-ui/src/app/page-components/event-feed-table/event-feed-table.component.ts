@@ -4,7 +4,7 @@ import { Subject, Observable } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { ChefEvent, ChefEventCollection, EventFeedFilter, Chicklet } from '../../types/types';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 
 const ENTITY_TYPE_TAG = 'event-type';
@@ -107,6 +107,7 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
   getEventTypeLabel(event: ChefEvent): string {
     const labelMap = {
       version: 'cookbook',
+      cookbook_artifact_version: 'cookbook',
       item: 'data bag item',
       bag: 'data bag',
       scanjobs: 'scan job'

@@ -2,6 +2,7 @@ package publisher
 
 import (
 	"context"
+	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
@@ -9,44 +10,69 @@ import (
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
-func BuildNodeManagerPublisher(nodeManagerClient manager.NodeManagerServiceClient) message.ChefRunPipe {
+func BuildNodeManagerPublisher(nodeManagerClient manager.NodeManagerServiceClient, numPublishers int) message.ChefRunPipe {
 	return func(in <-chan message.ChefRun) <-chan message.ChefRun {
-		return nodeManagerPublisher(in, nodeManagerClient)
+		if numPublishers <= 0 {
+			logrus.Info("Publishing to nodemanager is disabled")
+			return noop(in)
+		}
+		logrus.Infof("Starting %d nodemanager publishers", numPublishers)
+		return nodeManagerPublisher(in, nodeManagerClient, numPublishers)
 	}
 }
 
-func nodeManagerPublisher(in <-chan message.ChefRun, nodeManagerClient manager.NodeManagerServiceClient) <-chan message.ChefRun {
+func nodeManagerPublisher(in <-chan message.ChefRun, nodeManagerClient manager.NodeManagerServiceClient,
+	numPublishers int) <-chan message.ChefRun {
 	ctx := context.Background()
 	maxNumberOfBundledMsgs := 100
 	out := make(chan message.ChefRun, maxNumberOfBundledMsgs)
-	go func() {
-		for msg := range in {
-			// send to node manager from here.
-			log.Debugf("send info about node %s to node manager", msg.Node.NodeName)
+	for i := 0; i < numPublishers; i++ {
+		go func() {
+			for msg := range in {
+				// send to node manager from here.
+				log.Debugf("send info about node %s to node manager", msg.Node.NodeName)
 
-			nodeMetadata, err := gatherInfoForNode(msg.Node)
-			if err != nil {
-				log.Errorf("unable parse node data to be send to manager. aborting attempt to send info to mgr for node %s -- %v", msg.Node.NodeName, err)
-				out <- msg
-				continue
-			}
-			_, err = nodeManagerClient.ProcessNode(ctx, nodeMetadata)
-			if err != nil {
-				log.Errorf("unable to send info about node %s to node manager", msg.Node.NodeName)
-			}
+				if err := msg.Ctx.Err(); err != nil {
+					msg.FinishProcessing(err)
+					continue
+				}
 
-			out <- msg
-		}
-		close(out)
-	}()
+				nodeMetadata, err := gatherInfoForNode(msg)
+				if err != nil {
+					log.Errorf("unable parse node data to be send to manager. aborting attempt to send info to mgr for node %s -- %v", msg.Node.NodeName, err)
+					out <- msg
+					continue
+				}
+
+				start := time.Now()
+				_, err = nodeManagerClient.ProcessNode(ctx, nodeMetadata)
+				if err != nil {
+					log.Errorf("unable to send info about node %s to node manager", msg.Node.NodeName)
+				}
+				dur := time.Since(start)
+				log.WithFields(log.Fields{
+					"message_id":  msg.ID,
+					"buffer_size": len(out),
+					"dur":         dur,
+					"tags":        len(nodeMetadata.Tags),
+				}).Debug("Published to nodemanager")
+
+				message.PropagateChefRun(out, &msg)
+			}
+			close(out)
+		}()
+	}
 
 	return out
 }
 
-func gatherInfoForNode(node backend.Node) (*manager.NodeMetadata, error) {
+func gatherInfoForNode(msg message.ChefRun) (*manager.NodeMetadata, error) {
+	node := msg.Node
+
 	// convert node check in time to proto timestamp
 	timestamp, err := ptypes.TimestampProto(node.Checkin)
 	if err != nil {
@@ -70,11 +96,14 @@ func gatherInfoForNode(node backend.Node) (*manager.NodeMetadata, error) {
 			Value: tag,
 		}
 	}
+	if node.Environment != "" {
+		tags = append(tags, &common.Kv{Key: "environment", Value: node.Environment})
+	}
 
 	return &manager.NodeMetadata{
 		Uuid:            node.EntityUuid,
 		Name:            node.NodeName,
-		PlatformName:    node.Platform,
+		PlatformName:    msg.Platform,
 		PlatformRelease: node.PlatformVersion,
 		LastContact:     timestamp,
 		SourceId:        node.CloudID,
@@ -88,6 +117,7 @@ func gatherInfoForNode(node backend.Node) (*manager.NodeMetadata, error) {
 			EndTime: timestamp,
 			Status:  status,
 		},
+		ManagerType: "chef",
 	}, nil
 }
 

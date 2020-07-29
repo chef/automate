@@ -11,5 +11,7 @@ bin
 
 # Avoid adding the binary
 config-mgmt-service
+chef-automate-collect
 # But make sure to add the cmd/config-mgmt-service/ dir
 !config-mgmt-service/
+!chef-automate-collect/

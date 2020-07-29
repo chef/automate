@@ -3,9 +3,9 @@ syntax = "proto3";
 package chef.automate.domain.session;
 option go_package = "github.com/chef/automate/api/config/session";
 
-import "api/config/shared/global.proto";
-import "api/config/shared/tls.proto";
-import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "config/shared/global.proto";
+import "config/shared/tls.proto";
+import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
 
@@ -37,6 +37,8 @@ message ConfigRequest {
 				google.protobuf.StringValue bldr_signin_url = 5;
 				google.protobuf.StringValue bldr_client_id = 6;
 				google.protobuf.StringValue bldr_client_secret = 7;
+
+				google.protobuf.BoolValue persistent = 8;
 			}
 
 			message Oidc {

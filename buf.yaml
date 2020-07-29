@@ -1,0 +1,31 @@
+build:
+  roots:
+    - api
+    - components
+    - lib
+    - vendor/github.com/googleapis/googleapis
+    - vendor/github.com/grpc-ecosystem/grpc-gateway
+    - vendor/github.com/envoyproxy/protoc-gen-validate
+  excludes:
+    - components/notifications-service/
+    - components/automate-grpc/protoc-gen-policy/testdata
+    - vendor/github.com/googleapis/googleapis/google/api/expr
+    - vendor/github.com/googleapis/googleapis/google/api/servicecontrol
+    - vendor/github.com/googleapis/googleapis/google/api/servicemanagement
+    - vendor/github.com/envoyproxy/protoc-gen-validate/license
+    - vendor/github.com/grpc-ecosystem/grpc-gateway/third_party
+lint:
+  use:
+    - DEFAULT
+  except:
+    - PACKAGE_VERSION_SUFFIX # we can adopt this with .v2 if we should need that
+  ignore:
+    - protoc-gen-swagger # grpc gateway
+    - internal # grpc gateway
+    - grafeas # googleapis
+    - google # googleapis
+    - validate # envoyproxy/protoc-gen-validate
+    - gogoproto # envoyproxy/protoc-gen-validate
+breaking:
+  use:
+    - WIRE_JSON

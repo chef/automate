@@ -4,36 +4,48 @@
   </div>
   <nav role="navigation" class="sidebar-nav">
     <div class="nav-items">
-      <span *ngFor="let menuGroup of menuGroups$ | async">
+      <ng-container *ngFor="let menuGroup of menuGroups$ | async; index as groupIndex">
         <div
           [hidden]="!((menuGroup.visible$ | async) && menuGroup.hasVisibleMenuItems)"
-          class="menu-item-groups"
-        >
+          class="menu-item-groups">
           <div class="group">{{ menuGroup.name }}</div>
-          <span *ngFor="let menuItem of menuGroup.items">
-            <span *ngIf="!menuItem.authorized && (menuItem.visible$ | async)">
+          <div class="group-item" *ngFor="let menuItem of menuGroup.items; index as itemIndex">
+            <ng-container *ngIf="!menuItem.authorized && (menuItem.visible$ | async)">
               <chef-sidebar-entry
+                [id]="'entry' + groupIndex + '-' + itemIndex"
                 [route]="menuItem.route"
                 [icon]="menuItem.icon"
+                [iconRotation]="menuItem.iconRotation"
+                [customIcon]="menuItem.customIcon"
                 [openInNewPage]="menuItem.openInNewPage"
               >{{ menuItem.name }}</chef-sidebar-entry>
-            </span>
-            <span *ngIf="menuItem.authorized && (menuItem.visible$ | async)">
-                <app-authorized
-                  [anyOf]="menuItem.authorized.anyOf"
-                  [allOf]="menuItem.authorized.allOf"
-                  (isAuthorized)="isAuthorized($event, menuItem, menuGroup)"
-                >
-                  <chef-sidebar-entry
-                    [route]="menuItem.route"
-                    [icon]="menuItem.icon"
-                    [openInNewPage]="menuItem.openInNewPage"
-                  >{{ menuItem.name }}</chef-sidebar-entry>
-                </app-authorized>
-              </span>
-          </span>
+              <chef-tooltip
+              [attr.for]="'entry' + groupIndex + '-' + itemIndex"
+              position="right"
+              delay="0">{{ menuItem.name }}</chef-tooltip>
+            </ng-container>
+            <ng-container *ngIf="menuItem.authorized && (menuItem.visible$ | async)">
+              <app-authorized
+                [anyOf]="menuItem.authorized.anyOf"
+                [allOf]="menuItem.authorized.allOf"
+                (isAuthorized)="isAuthorized($event, menuItem, menuGroup)">
+                <chef-sidebar-entry
+                  [id]="'entry' + groupIndex + '-' + itemIndex"
+                  [route]="menuItem.route"
+                  [icon]="menuItem.icon"
+                  [iconRotation]="menuItem.iconRotation"
+                  [customIcon]="menuItem.customIcon"
+                  [openInNewPage]="menuItem.openInNewPage"
+                >{{ menuItem.name }}</chef-sidebar-entry>
+                <chef-tooltip
+                  [attr.for]="'entry' + groupIndex + '-' + itemIndex"
+                  position="right"
+                  delay="0">{{ menuItem.name }}</chef-tooltip>
+              </app-authorized>
+            </ng-container>
+          </div>
         </div>
-      </span>
+      </ng-container>
     </div>
 
     <ng-content select=".nav-items"></ng-content>

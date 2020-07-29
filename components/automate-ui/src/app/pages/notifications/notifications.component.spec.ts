@@ -1,14 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { Store, StoreModule } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
-import { MockComponent } from 'ng2-mock-component';
 
-import { Rule, ServiceActionType } from './rule';
+import { NotificationRule, ServiceActionType } from 'app/entities/notification_rules/notification_rule.model';
+import {
+  GetNotificationRulesSuccess
+} from 'app/entities/notification_rules/notification_rule.action';
+
 import { RulesService } from '../../services/rules/rules.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { NotificationsComponent } from './notifications.component';
@@ -17,10 +18,10 @@ import { FeatureFlagsService } from '../../services/feature-flags/feature-flags.
 
 describe('NotificationsComponent', () => {
   let store: Store<NgrxStateAtom>;
-  const rules: Rule[] = [
-    new Rule('id1', 'test rule1', 'ComplianceFailure',
+  const rules: NotificationRule[] = [
+    new NotificationRule('id1', 'test rule1', 'ComplianceFailure',
       'http://foo.com', ServiceActionType.SLACK, '', false),
-    new Rule('id2', 'test rule2', 'CCRFailure',
+    new NotificationRule('id2', 'test rule2', 'CCRFailure',
       'http://foo.com', ServiceActionType.WEBHOOK, '', false)
   ];
 
@@ -33,29 +34,13 @@ describe('NotificationsComponent', () => {
   }
 
   class MockRulesService {
-    fetchRules(): Observable<Rule[]> {
+    fetchRules(): Observable<NotificationRule[]> {
       return observableOf(rules);
     }
 
     deleteRule(rule) {
     return observableOf(rule);
     }
-  }
-
-  class MockDeleteDialog {
-    afterClosed() {
-      return observableOf('delete');
-    }
-  }
-
-  class MockMdDialog {
-    open(_dialogType) {
-      return new MockDeleteDialog();
-    }
-  }
-
-  class MockMdSnackBar {
-    open(_message, _m, _time) { }
   }
 
   let telemetryService: TelemetryService;
@@ -68,14 +53,11 @@ describe('NotificationsComponent', () => {
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
-        NotificationsComponent,
-        MockComponent({ selector: 'chef-notification'})
+        NotificationsComponent
       ],
       providers: [
-        { provide: MatDialog, useClass: MockMdDialog },
         { provide: TelemetryService, useClass: MockTelemetryService },
         { provide: RulesService, useClass: MockRulesService },
-        { provide: MatSnackBar, useClass: MockMdSnackBar},
         FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
@@ -90,6 +72,8 @@ describe('NotificationsComponent', () => {
 
   describe ('in list view', () => {
     beforeEach(() => {
+      store = TestBed.inject(Store);
+      store.dispatch(new GetNotificationRulesSuccess(rules));
       component.cardView = false;
       fixture.detectChanges();
     });
@@ -103,7 +87,7 @@ describe('NotificationsComponent', () => {
 
     it('shows expected item count', () => {
       const tableBody = getElementByCss(`${listId} chef-tr`);
-      expect(tableBody.children.length).toBe(rules.length + 1);
+      expect(tableBody.children.length).toBe(rules.length + 3);
     });
 
   });
@@ -114,7 +98,7 @@ describe('NotificationsComponent', () => {
     });
 
     it('ensure telemetry is sent on deleting a rule', () => {
-      component.deleteRule(new Rule('', '', null, '', ServiceActionType.SLACK, '', false));
+      component.deleteNotification();
 
       expect(telemetryService.track).toHaveBeenCalled();
     });

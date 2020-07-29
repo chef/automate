@@ -10,14 +10,21 @@ import (
 )
 
 type ChefIngestRunPipelineConfig struct {
-	MaxNumberOfBundledMsgs   int
-	NumberOfMsgsTransformers int
-	NumberOfPublishers       int
+	MaxNumberOfBundledMsgs        int
+	NumberOfMsgsTransformers      int
+	NumberOfPublishers            int
+	NumberOfNodemanagerPublishers int
 }
 
 type ChefIngestServerConfig struct {
+	MessageBufferSize            int
 	MaxNumberOfBundledActionMsgs int
 	ChefIngestRunPipelineConfig  ChefIngestRunPipelineConfig
+}
+
+type JobsConfig struct {
+	MissingNodesForDeletionRunningDefault bool
+	NodesMissingRunningDefault            bool
 }
 
 type Opts struct {
@@ -35,8 +42,10 @@ type Opts struct {
 	PurgeActionsAfterDays         int32
 	ConnFactory                   *secureconn.Factory
 	NodeManagerAddress            string
+	ConfigMgmtAddress             string
 	ChefIngestServerConfig        ChefIngestServerConfig
 	CerealAddress                 string
+	Jobs                          JobsConfig
 }
 
 // SetLogLevel sets the log level for the service

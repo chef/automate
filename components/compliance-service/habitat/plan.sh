@@ -29,17 +29,15 @@ pkg_binds_optional=(
   [authn-service]="port"
   [notifications-service]="port"
 )
-inspec_release="chef/inspec/4.18.104/20200407121143"
+inspec_release="chef/inspec/4.21.3/20200702113741"
 pkg_deps=(
-  core/bash
-  core/grpcurl              # Used in habitat/hooks/health_check
-  core/jq-static            # Used in habitat/hooks/health_check
+  core/coreutils
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
-  # WARNING: Update with care. The chef/inspec is managed with Expeditor.
-
-  # See .expeditor/update-inspec-version.sh for details
   "${inspec_release}"
   chef/mlsa
+  core/grpcurl              # Used in habitat/hooks/health_check
+  core/jq-static            # Used in habitat/hooks/health_check
+  core/bash
 )
 
 if [[ -n "$AUTOMATE_OSS_BUILD" ]]; then
@@ -48,7 +46,7 @@ else
   # WARNING: chef/automate-compliance-profiles is managed by Expeditor
   # See .expeditor/update-compliance-profiles.sh for details
   pkg_deps+=(
-      chef/automate-compliance-profiles/1.0.0/20200408145038
+      chef/automate-compliance-profiles/1.0.0/20200714091010
   )
 fi
 

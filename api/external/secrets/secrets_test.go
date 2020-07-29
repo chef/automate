@@ -115,6 +115,11 @@ var exampleValidationFailures = []struct {
 		Data: appendKvs(&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"}, &query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})},
 		"Invalid data content for secret type 'azure'. AZURE_CLIENT_ID not provided",
 	},
+	//chef-server
+	{Secret{
+		Name: "name",
+		Type: "chef-server",
+	}, "Invalid data content for secret type 'chef-server'. A 'key' field is required"},
 }
 
 var exampleValidationSuccesses = []struct {
@@ -163,6 +168,11 @@ var exampleValidationSuccesses = []struct {
 		Data: appendKvs(&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
 			&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"},
 			&query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})}},
+	//chef-server
+	{Secret{
+		Name: "name",
+		Type: "chef-server",
+		Data: appendKvs(&query.Kv{Key: "key", Value: "--KEY--"})}},
 }
 
 func appendKvs(kvs ...*query.Kv) []*query.Kv {

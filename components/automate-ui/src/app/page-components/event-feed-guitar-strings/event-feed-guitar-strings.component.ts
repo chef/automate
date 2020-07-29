@@ -10,7 +10,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { reduce } from 'lodash/fp';
 import * as d3 from 'd3';
 import { GuitarString,
@@ -324,12 +324,6 @@ export class EventFeedGuitarStringsComponent implements OnInit, OnChanges {
   @HostListener('window:resize', ['$event.target'])
   onResize() {
     this.updateGraphic();
-  }
-
-  @HostListener('window:keydown', ['$event']) onKeyDown(e) {
-    if (e.shiftKey && e.key === 'R') {
-      this.resetSliders();
-    }
   }
 
   // Tooltips: Build the sentence that goes in the tooltips

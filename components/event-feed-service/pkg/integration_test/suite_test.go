@@ -4,18 +4,19 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 	olivere "gopkg.in/olivere/elastic.v6"
 
+	"path"
+
 	"github.com/chef/automate/api/interservice/data_lifecycle"
-	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
+	"github.com/chef/automate/components/event-feed-service/pkg/server"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
+	"google.golang.org/grpc"
 )
 
 // Suite helps you manipulate various stages of your tests. It provides
@@ -30,7 +31,7 @@ import (
 // * An Elasticsearch client for ES queries to build up and tear down test cases
 //   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
 type Suite struct {
-	feedClient  event_feed.EventFeedServiceClient
+	feedClient  *server.EventFeedServer
 	feedBackend persistence.FeedStore
 	purgeClient data_lifecycle.PurgeClient
 	esClient    *olivere.Client
@@ -69,13 +70,19 @@ func NewSuite(url string) (*Suite, error) {
 		return nil, errors.Wrap(err, "loading hab grpc conn factory")
 	}
 
-	feedClient, purgeClient, cleanup, err := initClients(factory)
+	conn, err := factory.DialContext(
+		context.Background(),
+		"event-feed-service",
+		"localhost:10134",
+		grpc.WithBlock(),
+	)
 	if err != nil {
 		return nil, errors.Wrap(err, "initializing gRPC clients")
 	}
-	s.feedClient = feedClient
-	s.purgeClient = purgeClient
-	s.cleanup = cleanup
+
+	s.feedClient = server.New(s.feedBackend)
+	s.purgeClient = data_lifecycle.NewPurgeClient(conn)
+	s.cleanup = conn.Close
 
 	return s, nil
 }
@@ -172,29 +179,6 @@ func (s *Suite) verifyIndices(indices ...string) []string {
 func (s *Suite) indexExists(i string) bool {
 	exists, _ := s.esClient.IndexExists(i).Do(context.Background())
 	return exists
-}
-
-func initClients(connFactory *secureconn.Factory) (event_feed.EventFeedServiceClient, data_lifecycle.PurgeClient, func() error, error) {
-	var (
-		efc     event_feed.EventFeedServiceClient
-		pc      data_lifecycle.PurgeClient
-		err     error
-		conn    *grpc.ClientConn
-		cleanup func() error
-	)
-
-	conn, err = connFactory.DialContext(
-		context.Background(),
-		"event-feed-service",
-		"localhost:10134",
-		grpc.WithBlock(),
-	)
-
-	if err != nil {
-		return efc, pc, cleanup, err
-	}
-
-	return event_feed.NewEventFeedServiceClient(conn), data_lifecycle.NewPurgeClient(conn), conn.Close, nil
 }
 
 func secureConnFactoryHab() (*secureconn.Factory, error) {

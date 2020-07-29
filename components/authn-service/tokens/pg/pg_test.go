@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/tokens/pg"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -58,15 +58,15 @@ func setup(t *testing.T) (tokens.Storage, *sql.DB) {
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
-	mockV2Authz := authz_v2.NewAuthorizationServerMock()
-	mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-	authz_v2.RegisterAuthorizationServer(grpcAuthz, mockV2Authz)
+	mockAuthz := authz.NewAuthorizationServerMock()
+	mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
+	authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
-	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
+	authzClient := authz.NewAuthorizationClient(authzConn)
 
-	backend, err := pgCfg.Open(nil, l, authzV2Client)
+	backend, err := pgCfg.Open(nil, l, authzClient)
 	require.NoError(t, err)
 
 	db := openDB(t, pgCfg.PGURL)
@@ -76,8 +76,8 @@ func setup(t *testing.T) (tokens.Storage, *sql.DB) {
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,
-	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
-	return &authz_v2.ValidateProjectAssignmentResp{}, nil
+	*authz.ValidateProjectAssignmentReq) (*authz.ValidateProjectAssignmentResp, error) {
+	return &authz.ValidateProjectAssignmentResp{}, nil
 }
 
 func initializePG() (*pg.Config, error) {
@@ -497,38 +497,6 @@ func TestCreateToken(t *testing.T) {
 		reset(t, db)
 		t.Run(name, test)
 	}
-}
-
-func TestResetToV1(t *testing.T) {
-	ctx := context.Background()
-	store, db := setup(t)
-	assert := assert.New(t)
-	name := "Test Token Name"
-
-	reset(t, db)
-	t.Run("every project is removed from every token", func(*testing.T) {
-		resp1, err := store.CreateToken(ctx, "test1", name, true, []string{})
-		assert.NoError(err, "failed to store token1")
-		assert.ElementsMatch([]string{}, resp1.Projects)
-
-		resp2, err := store.CreateToken(ctx, "test2", name, true, []string{"proj1"})
-		assert.NoError(err, "failed to store token2")
-		assert.ElementsMatch([]string{"proj1"}, resp2.Projects)
-
-		resp3, err := store.CreateToken(ctx, "test3", name, true, []string{"proj1", "proj2"})
-		assert.NoError(err, "failed to store token3")
-		assert.ElementsMatch([]string{"proj1", "proj2"}, resp3.Projects)
-
-		err = store.ResetToV1(ctx)
-		assert.NoError(err, "failed reset to v1")
-
-		tokens, err := store.GetTokens(ctx)
-		assert.NoError(err, "failed to list tokens")
-		assert.Equal(3, len(tokens))
-		for _, token := range tokens {
-			assert.ElementsMatch([]string{}, token.Projects)
-		}
-	})
 }
 
 func TestPurgeProject(t *testing.T) {

@@ -24,6 +24,10 @@ chef-tooltip {
   font-size: 14px;
 }
 
+chef-status-filter-group {
+  padding-top: 5px;
+}
+
 app-page-picker {
   padding-left: 35px;
   padding-bottom: 35px;
@@ -74,35 +78,31 @@ chef-alert {
 
   .fqdn-line {
     display: flex;
-    align-items: center;
     margin-bottom: 8px;
     font-size: 14px;
   }
 
   .supervisor-line {
     display: flex;
-    align-items: center;
     margin-bottom: 4px;
     font-size: 12px;
 
-    b {
+    strong {
       margin-right: 4px;
     }
   }
 
   .site-line {
     display: flex;
-    align-items: center;
     font-size: 12px;
 
-    b {
+    strong {
       margin-right: 4px;
     }
   }
 
   .release-line {
     display: flex;
-    align-items: center;
     margin-bottom: 8px;
     font-size: 14px;
   }
@@ -283,19 +283,19 @@ chef-alert {
     margin-right: 8px;
 
     &.OK {
-      color: $chef-success;
+      color: var(--chef-badge-success-color);
     }
 
     &.WARNING {
-      color: $chef-primary;
+      color: var(--chef-badge-warning-color);
     }
 
     &.UNKNOWN {
-      color: $chef-dark-grey;
+      color: var(--chef-primary-dark);
     }
 
     &.CRITICAL {
-      color: $chef-critical;
+      color: var(--chef-badge-critical-color);
     }
   }
 }
@@ -312,3 +312,21 @@ chef-alert {
   padding-right: 35px;
 }
 
+.fqdn-data {
+  margin-bottom: 0px;
+  word-break: break-all;
+}
+
+.site-data,
+.supervisor-data {
+  margin-bottom: 0px;
+  font-size: 12px;
+  padding-top: 2px;
+  word-break: break-all;
+}
+
+.release-data {
+  margin-bottom: 0px;
+  font-size: 14px;
+  word-break: break-all;
+}

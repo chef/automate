@@ -6,7 +6,7 @@ import (
 
 	"encoding/json"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/stringutils"
@@ -28,7 +28,7 @@ func (db *DB) JobCancel(ctx context.Context, jobID string) error {
 
 // UpdateProjectTags - start a project update
 func (db *DB) UpdateProjectTags(ctx context.Context,
-	projectRules map[string]*iam_v2.ProjectRules) ([]string, error) {
+	projectRules map[string]*authz.ProjectRules) ([]string, error) {
 	return nil, errors.New("Unimplemented")
 }
 
@@ -37,7 +37,7 @@ func (db *DB) JobStatus(ctx context.Context, jobID string) (project_update_lib.J
 	return project_update_lib.JobStatus{}, errors.New("Unimplemented")
 }
 
-func (db *DB) updateNodes(nodes []*NodeProjectData, projectRules map[string]*iam_v2.ProjectRules) error {
+func (db *DB) updateNodes(nodes []*NodeProjectData, projectRules map[string]*authz.ProjectRules) error {
 	allProjectIDs := collectProjectIDs(projectRules)
 	err := Transact(db, func(tx *DBTrans) error {
 		err := tx.ensureProjects(allProjectIDs)
@@ -73,7 +73,7 @@ func (db *DB) updateNodeProjectIDs(nodeUpdates []nodeUpdate) error {
 	})
 }
 
-func getMatchingProjectIDs(node *NodeProjectData, projectRules map[string]*iam_v2.ProjectRules) []string {
+func getMatchingProjectIDs(node *NodeProjectData, projectRules map[string]*authz.ProjectRules) []string {
 	matchingProjects := make([]string, 0)
 
 	for projectName, project := range projectRules {
@@ -85,7 +85,7 @@ func getMatchingProjectIDs(node *NodeProjectData, projectRules map[string]*iam_v
 	return matchingProjects
 }
 
-func collectProjectIDs(projectRules map[string]*iam_v2.ProjectRules) []string {
+func collectProjectIDs(projectRules map[string]*authz.ProjectRules) []string {
 	projects := make([]string, 0, len(projectRules))
 
 	for projectName := range projectRules {
@@ -96,9 +96,9 @@ func collectProjectIDs(projectRules map[string]*iam_v2.ProjectRules) []string {
 }
 
 // Only one rule has to be true for the project to match (ORed together).
-func nodeMatchesRules(node *NodeProjectData, rules []*iam_v2.ProjectRule) bool {
+func nodeMatchesRules(node *NodeProjectData, rules []*authz.ProjectRule) bool {
 	for _, rule := range rules {
-		if rule.Type == iam_v2.ProjectRuleTypes_NODE && nodeMatchesAllConditions(node, rule.Conditions) {
+		if rule.Type == authz.ProjectRuleTypes_NODE && nodeMatchesAllConditions(node, rule.Conditions) {
 			return true
 		}
 	}
@@ -108,44 +108,44 @@ func nodeMatchesRules(node *NodeProjectData, rules []*iam_v2.ProjectRule) bool {
 
 // All the conditions must be true for a rule to be true (ANDed together).
 // If there are no conditions then the rule is false
-func nodeMatchesAllConditions(node *NodeProjectData, conditions []*iam_v2.Condition) bool {
+func nodeMatchesAllConditions(node *NodeProjectData, conditions []*authz.Condition) bool {
 	if len(conditions) == 0 {
 		return false
 	}
 
 	for _, condition := range conditions {
 		switch condition.Attribute {
-		case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER:
+		case authz.ProjectRuleConditionAttributes_CHEF_SERVER:
 			values := node.getValues("chef_server")
 
 			if len(values) == 0 || !stringutils.SliceContains(condition.Values, values[0]) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION:
+		case authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION:
 			values := node.getValues("organization_name")
 
 			if len(values) == 0 || !stringutils.SliceContains(condition.Values, values[0]) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT:
+		case authz.ProjectRuleConditionAttributes_ENVIRONMENT:
 			values := node.getValues("environment")
 
 			if len(values) == 0 || !stringutils.SliceContains(condition.Values, values[0]) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP:
+		case authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP:
 			values := node.getValues("policy_group")
 
 			if len(values) == 0 || !stringutils.SliceContains(condition.Values, values[0]) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME:
+		case authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME:
 			values := node.getValues("policy_name")
 
 			if len(values) == 0 || !stringutils.SliceContains(condition.Values, values[0]) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE:
+		case authz.ProjectRuleConditionAttributes_CHEF_ROLE:
 			foundMatch := false
 			values := node.getValues("roles")
 			if len(values) == 0 {
@@ -160,7 +160,7 @@ func nodeMatchesAllConditions(node *NodeProjectData, conditions []*iam_v2.Condit
 			if !foundMatch {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionAttributes_CHEF_TAG:
+		case authz.ProjectRuleConditionAttributes_CHEF_TAG:
 			foundMatch := false
 			values := node.getValues("chef_tags")
 			if len(values) == 0 {
@@ -198,9 +198,8 @@ const selectNodesProjectDataRange = `
 SELECT
   n.id,
   n.projects_data
-FROM nodes n 
-WHERE 
-  n.manager = '' AND
+FROM nodes n
+WHERE
   n.id > $1 AND
   n.id < $2
 ORDER BY id asc
@@ -316,7 +315,7 @@ func (db *DB) ListProjectUpdateTasks(ctx context.Context) ([]project_update_lib.
 }
 
 func (db *DB) RunProjectUpdateTask(ctx context.Context, projectUpdateID string,
-	params map[string]string, projectTaggingRules map[string]*iam_v2.ProjectRules) (
+	params map[string]string, projectTaggingRules map[string]*authz.ProjectRules) (
 	project_update_lib.SerializedProjectUpdateTaskID,
 	project_update_lib.SerializedProjectUpdateTaskStatus,
 	error) {

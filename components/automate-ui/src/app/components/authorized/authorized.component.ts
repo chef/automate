@@ -9,17 +9,17 @@ import { AuthorizedChecker, CheckObj } from 'app/helpers/auth/authorized';
 import { allPerms } from 'app/entities/userperms/userperms.selectors';
 
 // Data arrives in this form for user convenience,
-// i.e. just [allOf]="['/iam/v2/users', 'get']
+// i.e. just [allOf]="['/apis/iam/v2/users', 'get']
 // rather than having to build a more verbose object like:
-// [allOf]="{ endpoint: '/iam/v2/users', verb: 'get'}
+// [allOf]="{ endpoint: '/apis/iam/v2/users', verb: 'get'}
 // Each input datum is converted to a CheckObj upon arrival.
 // Internally, this allows for more robust handling of the data.
 // (So properties must be in sync with `CheckObj`!)
-export type Check = [string, string, string | string[]];
+export type Check = [string, string] | [string, string, string | string[]];
 
 @Component({
   selector: 'app-authorized',
-  template: '<ng-content *ngIf="visible || overrideVisible"></ng-content>'
+  template: '<ng-content *ngIf="visible"></ng-content>'
 })
 export class AuthorizedComponent implements OnInit, OnDestroy {
 
@@ -40,11 +40,6 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
 
   // Include the bare `not` attribute in your HTML element to negate the check.
   @Input() not?: boolean;
-
-  // If you wish to override the permissions check and set content to visible anyway.
-  // Defaults to false. Useful when trying to generalize components that contain
-  // this component.
-  @Input() overrideVisible = false;
 
   // if you wish to output visible
   @Output() isAuthorized: EventEmitter<boolean> = new EventEmitter();
@@ -103,14 +98,14 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
 
   private convertToObject(input: Check[]): CheckObj[] {
     return input.map(
-      ([endpoint, verb, paramList]: Check) =>
-        <CheckObj>{ endpoint, verb, paramList });
+      ([endpoint, verb, paramList]: Check): CheckObj =>
+        ({ endpoint, verb, paramList }));
   }
 
   private downcaseVerb(input: CheckObj[]): CheckObj[] {
     return input.map(
-      ({ endpoint, verb, paramList }: CheckObj) =>
-        <CheckObj>{ endpoint, verb: verb.toLowerCase(), paramList }
+      ({ endpoint, verb, paramList }: CheckObj): CheckObj =>
+        ({ endpoint, verb: verb.toLowerCase(), paramList })
     );
   }
 

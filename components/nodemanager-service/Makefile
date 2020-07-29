@@ -104,11 +104,11 @@ run-with-1-min-polls:
 run: clean create-ss-config create-event-config
 	mkdir -p /tmp/
 	@printf "\n===> ${blue}Running secret-service in background${reset} with logs redirected to ${yellow}$(SS_LOG_PATH)${reset}\n"
-	$(RUN_SS_COMMAND_DEBUG) &> $(SS_LOG_PATH)&
+	$(RUN_SS_COMMAND_DEBUG) > $(SS_LOG_PATH) 2>&1 &
 	@printf "\n===> ${blue}Running event-service in background${reset} with logs redirected to ${yellow}$(EVENT_LOG_PATH)${reset}\n"
-	$(RUN_EVENT_SERVICE_COMMAND) &> $(EVENT_LOG_PATH)&
+	$(RUN_EVENT_SERVICE_COMMAND) > $(EVENT_LOG_PATH) 2>&1 &
 	@printf "\n===> ${blue}Running nodemanager-service in background${reset} with logs redirected to ${yellow}$(MANAGER_LOG_PATH)${reset}\n"
-	go run cmd/nodemanager-service/nodemanager.go run --port $(PORT) --cert $(SSL_CERT) --key $(SSL_KEY) --root-cert $(SSL_ROOT_CERT) --postgres-uri $(POSTGRES_URI) --secrets-port $(SS_PORT) --event-endpoint $(EVENT_ENDPOINT) --skip-cereal --log-level debug &> $(MANAGER_LOG_PATH)&
+	go run cmd/nodemanager-service/nodemanager.go run --port $(PORT) --cert $(SSL_CERT) --key $(SSL_KEY) --root-cert $(SSL_ROOT_CERT) --postgres-uri $(POSTGRES_URI) --secrets-port $(SS_PORT) --event-endpoint $(EVENT_ENDPOINT) --skip-cereal --log-level debug > $(MANAGER_LOG_PATH) 2>&1 &
 	@$(MAKE) wait-for-nodemanager-service
 
 run-compliance-service:
@@ -142,9 +142,9 @@ generate-ruby-grpc: ruby-grpc-tools $(RUBY_PROTOS)
 
 %_pb.rb : %.proto
 	@printf "\n * Compiling test proto for $<\n"
-	@-grpc_tools_ruby_protoc -I. \
-		-I../.. \
-		-I$(GOPATH)/src \
+	@-grpc_tools_ruby_protoc \
+		-I../../api \
+		-I../../components \
 		-I../../vendor \
 		-I../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--ruby_out=. \
@@ -202,18 +202,19 @@ clean:
 	@printf "\n===> ${yellow}Clearing nodemanager and dependent services...${reset}\n"
 	@# dirs(create-ss-config, create-event-config) have been created by a bug in the past and confuse Makefile targets with the same name
 	@rm -rf create-ss-config create-event-config
-	@-pkill -f "nodemanager.* run --port" || true
-	@-pkill -f "event-service.* serve --config" || true
-	@-pkill -f "secrets-service.* serve --config" || true
+	@# If we don't match he process with /(tmp|var) at the beginning, in pkill will fail itself and fail the make.
+	@pkill -x -f "/(tmp|var).+nodemanager.* run --port.*" || true
+	@pkill -x -f "/(tmp|var).+event-service.* serve --config" || true
+	@pkill -x -f "/(tmp|var).+secrets-service.* serve --config" || true
 
 wait-for-nodemanager-service:
 	@i=1; \
-	max_loops=30; \
+	max_loops=40; \
 	printf "\n===> ${blue}Checking NodeManager Service health to ensure it's ready to receive connections...${reset}\n"; \
 	$(RUN_GRPCURL_NODEMANAGER_CHECK); \
 	while [ $$? -ne 0 -a $$i -lt $$max_loops ]; do \
 	  printf " * ${yellow}$$i NodeManager Service is not running, retrying...${reset}\n"; \
-	  sleep 4; \
+	  sleep 6; \
 	  i=$$(( $$i + 1 )); \
 	  $(RUN_GRPCURL_NODEMANAGER_CHECK); \
 	done; \

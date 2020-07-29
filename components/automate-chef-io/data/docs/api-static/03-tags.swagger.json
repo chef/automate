@@ -23,6 +23,12 @@
       ]
     },
     {
+      "name": "Event Feed",
+      "tags": [
+        "EventFeed"
+      ]
+    },
+    {
       "name": "Secrets",
       "tags": [
         "SecretsService"
@@ -73,6 +79,10 @@
     {
       "name": "NodesService",
       "x-displayName": "Managed Nodes"
+    },
+    {
+      "name": "EventFeed",
+      "x-displayName": "Event Feed"
     },
     {
       "name": "SecretsService",

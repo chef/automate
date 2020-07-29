@@ -1,5 +1,3 @@
-import { itFlaky } from '../../../support/constants';
-
 describe('team add users', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'test-add-users';
@@ -52,6 +50,7 @@ describe('team add users', () => {
     // the whole app has to reload, slowing down the test and causing timeouts
     cy.visit(`/settings/teams/${teamID}/add-users`);
     cy.wait(['@getTeam', '@getTeamUsers', '@getUsers']);
+    cy.get('app-welcome-modal').invoke('hide');
   });
 
   afterEach(() => {
@@ -62,17 +61,17 @@ describe('team add users', () => {
     cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['users', 'teams']);
   });
 
-  itFlaky('when the x is clicked, it returns to the team details page', () => {
+  it('when the x is clicked, it returns to the team details page', () => {
     cy.get('chef-page chef-button.close-button').click();
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamID}`);
   });
 
-  itFlaky('when the cancel button is clicked, it returns to the team details page', () => {
+  it('when the cancel button is clicked, it returns to the team details page', () => {
     cy.get('#page-footer #right-buttons chef-button').last().click();
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamID}`);
   });
 
-  itFlaky('navigates to the team users add page', () => {
+  it('navigates to the team users add page', () => {
     cy.get('chef-page-header h1').contains(`Add Users to ${teamName}`);
 
     cy.get('chef-tbody chef-tr').contains(userID);
@@ -84,7 +83,7 @@ describe('team add users', () => {
     cy.get('#page-footer #right-buttons chef-button ng-container').first().contains('Add User');
   });
 
-  itFlaky('adds a single user', () => {
+  it('adds a single user', () => {
     cy.get('chef-tbody').contains('chef-tr', userID)
       .find('chef-checkbox').click();
     cy.get('#users-selected').contains('1 user selected');
@@ -105,16 +104,16 @@ describe('team add users', () => {
     }).then((resp) => {
       cy.request({
         auth: { bearer: adminIdToken },
-        method: 'PUT',
-        url: `/apis/iam/v2/teams/${teamID}/users`,
+        method: 'POST',
+        url: `/apis/iam/v2/teams/${teamID}/users:remove`,
         body: {
-          membership_ids: [resp.body.id]
+          membership_ids: [resp.body.user.membership_id]
         }
       });
     });
   });
 
-  itFlaky('adds all users then sees empty message on attempting to add more users', () => {
+  it('adds all users then sees empty message on attempting to add more users', () => {
     // Note: we add one user, and there always is an admin user. So,
     // we don't need to care for singular texts here ("Add 1 user" etc).
     cy.get('chef-tbody').find('chef-tr').then(rows => {
@@ -132,7 +131,7 @@ describe('team add users', () => {
     cy.get('chef-tbody chef-td a').contains('Local Administrator');
 
     // navigate back to add users and see empty page and message
-    cy.get('chef-toolbar chef-button').contains('Add User').click();
+    cy.get('chef-toolbar chef-button').contains('Add Users').click();
     cy.url().should('eq',
     `${Cypress.config().baseUrl}/settings/teams/${teamID}/add-users`);
     cy.get('chef-table').should('not.exist');

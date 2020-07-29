@@ -11,13 +11,44 @@ import (
 	"os"
 	"time"
 
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	elastic "gopkg.in/olivere/elastic.v6"
 
+	cElastic "github.com/chef/automate/components/config-mgmt-service/backend/elastic"
+	"github.com/chef/automate/components/config-mgmt-service/backend/postgres"
+	"github.com/chef/automate/components/config-mgmt-service/config"
+	grpc "github.com/chef/automate/components/config-mgmt-service/grpcserver"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	iElastic "github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 	"github.com/chef/automate/lib/grpc/auth_context"
+	platform_config "github.com/chef/automate/lib/platform/config"
+)
+
+// Global variables
+var (
+	// The elasticsearch URL is coming from the environment variable ELASTICSEARCH_URL
+	//elasticsearchUrl = os.Getenv("ELASTICSEARCH_URL")
+	elasticsearchUrl string
+
+	esBackend *cElastic.Backend
+
+	// A global CfgMgmt Server instance to call any rpc function
+	//
+	// From any test you can directly call:
+	// ```
+	// res, err := cfgmgmt.GetNodesCounts(ctx, &req)
+	// ```
+	cfgmgmt *grpc.CfgMgmtServer
+)
+
+const (
+	pgDatabaseName       = "chef_config_mgmt_service"
+	A2_SVC_NAME          = "A2_SVC_NAME"
+	A2_SVC_PATH          = "A2_SVC_PATH"
+	defaultA2ServiceName = "config-mgmt-service"
+	defaultA2ServicePath = "/hab/svc/config-mgmt-service"
 )
 
 // Suite helps you manipulate various stages of your tests, it provides
@@ -36,40 +67,54 @@ type Suite struct {
 	client *elastic.Client
 }
 
-// Initialize the test suite
-//
-// This verifies the connectivity with Elasticsearch; if we couldn't
-// connect, we do not start the tests and print an error message
-func NewSuite(url string) *Suite {
-	s := new(Suite)
+// Just returns a new struct. You have to call GlobalSetup() to setup the
+// backend connections and such.
+func NewSuite() *Suite {
+	return new(Suite)
+}
+
+// GlobalSetup makes backend connections to elastic and postgres. It also sets
+// global vars to usable values.
+func (s *Suite) GlobalSetup() error {
+	// set global elasticsearchUrl
+	var haveURL bool
+	elasticsearchUrl, haveURL = os.LookupEnv("ELASTICSEARCH_URL")
+	if !haveURL {
+		return errors.New("The environment variable ELASTICSEARCH_URL must be set for integration tests to run")
+	}
+
+	// set global esBackend
+	esBackend = cElastic.New(elasticsearchUrl)
+
+	// set global cfgmgmt
+	var err error
+	cfgmgmt, err = newCfgMgmtServer(esBackend)
+
+	if err != nil {
+		return err
+	}
 
 	// Create a new elastic Client
 	esClient, err := elastic.NewClient(
-		elastic.SetURL(url),
+		elastic.SetURL(elasticsearchUrl),
 		elastic.SetSniff(false),
 	)
 
 	if err != nil {
-		fmt.Printf("Could not create elasticsearch client from '%s': %s\n", url, err)
-		os.Exit(1)
+		return errors.Wrapf(err, "Could not create elasticsearch client from %q", elasticsearchUrl)
 	}
 
 	s.client = esClient
 
 	iClient, err := iElastic.New(elasticsearchUrl)
 	if err != nil {
-		fmt.Printf("Could not create ingest backend client from '%s': %s\n", url, err)
-		os.Exit(3)
+		return errors.Wrapf(err, "Could not create ingest backend client from %q", elasticsearchUrl)
 	}
 
 	s.ingest = iClient
-	return s
-}
-
-// GlobalSetup is the place where you prepare anything that we need before
-// executing all our test suite, at the moment we are just initializing ES Indices
-func (s *Suite) GlobalSetup() {
 	s.ingest.InitializeStore(context.Background())
+
+	return nil
 }
 
 // GlobalTeardown is the place where you tear everything down after we have finished
@@ -88,6 +133,45 @@ func (s *Suite) GlobalTeardown() {
 		fmt.Printf("Could not 'delete' ES indices: '%s'\nError: %s", indices, err)
 		os.Exit(3)
 	}
+}
+
+// newCfgMgmtServer initializes a CfgMgmtServer with the default config
+// and points to our preferred backend that is elasticsearch.
+//
+// This function expects ES and postgres to be already up and running.
+func newCfgMgmtServer(esBackend *cElastic.Backend) (*grpc.CfgMgmtServer, error) {
+	_, haveSvcName := os.LookupEnv(A2_SVC_NAME)
+	_, haveSvcPath := os.LookupEnv(A2_SVC_PATH)
+	if !(haveSvcName && haveSvcPath) {
+		_ = os.Setenv(A2_SVC_NAME, defaultA2ServiceName)
+		_ = os.Setenv(A2_SVC_PATH, defaultA2ServicePath)
+	}
+
+	uri, err := platform_config.PGURIFromEnvironment(pgDatabaseName)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to get pg uri from environment variables")
+	}
+
+	cfg := config.Default()
+	cfg.Postgres = config.Postgres{
+		URI:        uri,
+		Database:   pgDatabaseName,
+		SchemaPath: "/src/components/config-mgmt-service/backend/postgres/schema/sql/",
+	}
+
+	err = postgres.DestructiveReMigrateForTest(&cfg.Postgres)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.SetBackend(esBackend)
+	srv := grpc.NewCfgMgmtServer(cfg)
+	err = srv.ConnectPg()
+	if err != nil {
+		return nil, err
+	}
+	return srv, nil
 }
 
 // verifyIndices receives a list of indices and verifies that they exist,

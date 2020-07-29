@@ -125,6 +125,11 @@ func TestConvertControlFiltersByTagOnlyMatch(t *testing.T) {
 			SkippedDueToWaiver: false,
 			Message:            "Some message",
 		},
+		RemovedResultsCounts: &ESInSpecReportControlRemovedResultsCounts{
+			Failed:  11,
+			Passed:  12,
+			Skipped: 13,
+		},
 	}
 
 	filters["control_tag:cci"] = []string{""}
@@ -148,5 +153,56 @@ func TestConvertControlFiltersByTagOnlyMatch(t *testing.T) {
 			SkippedDueToWaiver: false,
 			Message:            "Some message",
 		},
+		RemovedResultsCounts: &reportingapi.RemovedResultsCounts{
+			Failed:  11,
+			Passed:  12,
+			Skipped: 13,
+		},
 	}, convertedControl)
+}
+
+func TestDoesControlTagMatchFilter(t *testing.T) {
+	// json tags set one
+	tags1 := map[string]*reportingapi.TagValues{}
+	tags1["test"] = &reportingapi.TagValues{
+		Values: []string{"one", "two"},
+	}
+	// json tags set two
+	tags2 := map[string]*reportingapi.TagValues{}
+	tags2["shoe"] = &reportingapi.TagValues{
+		Values: []string{"blue"},
+	}
+	tags2["sock"] = &reportingapi.TagValues{
+		Values: []string{"yellow", "pink"},
+	}
+	// json tags set three
+	tags3 := map[string]*reportingapi.TagValues{}
+	tags3["key_only"] = &reportingapi.TagValues{
+		Values: []string{"null"},
+	}
+
+	filterSock := map[string][]string{}
+	filterSock["control_tag:sock"] = []string{"yellow"}
+
+	filterShoe := map[string][]string{}
+	filterShoe["control_tag:shoe"] = []string{"blue"}
+
+	filterNull := map[string][]string{}
+	filterNull["control_tag:key_only"] = []string{"null"}
+
+	// test matching filter
+	assert.Equal(t, true, doesControlTagMatchFilter(filterSock, tags2))
+	assert.Equal(t, true, doesControlTagMatchFilter(filterShoe, tags2))
+
+	// test no match filter
+	assert.Equal(t, false, doesControlTagMatchFilter(filterSock, tags3))
+	assert.Equal(t, false, doesControlTagMatchFilter(filterNull, tags2))
+
+	// test null match
+	assert.Equal(t, true, doesControlTagMatchFilter(filterNull, tags3))
+
+	// test multiple control tag filters
+	multFilters := filterSock
+	multFilters["control_tag:shoe"] = []string{"blue"}
+	assert.Equal(t, true, doesControlTagMatchFilter(multFilters, tags2))
 }

@@ -1,0 +1,2997 @@
+{
+    "chef_server_fqdn": "api.chef.io",
+    "entity_uuid": "9d049b11-1107-4324-ac40-3909f5694726",
+    "expanded_run_list": {
+        "id": "_default",
+        "run_list": [
+            {
+                "type": "role",
+                "name": "cpe_base",
+                "children": [
+                    {
+                        "type": "recipe",
+                        "name": "cpe_init",
+                        "version": null,
+                        "skipped": false
+                    }
+                ],
+                "missing": null,
+                "error": null,
+                "skipped": null
+            }
+        ]
+    },
+    "id": "8e2886dd-58f5-4db0-b0d1-70e1f1af5466",
+    "message_version": "1.1.0",
+    "message_type": "run_converge",
+    "node": {
+        "name": "LAPTOP-03J74NE1",
+        "chef_environment": "_default",
+        "json_class": "Chef::Node",
+        "automatic": {
+            "kernel": {
+                "os_info": {
+                    "boot_device": "\\Device\\HarddiskVolume1",
+                    "build_number": "18363",
+                    "build_type": "Multiprocessor Free",
+                    "caption": "Microsoft Windows 10 Enterprise",
+                    "code_set": "1252",
+                    "country_code": "1",
+                    "csd_version": null,
+                    "cs_name": "LAPTOP-03J74NE1",
+                    "current_time_zone": -420,
+                    "data_execution_prevention_32_bit_applications": true,
+                    "data_execution_prevention_available": true,
+                    "data_execution_prevention_drivers": true,
+                    "data_execution_prevention_support_policy": 2,
+                    "debug": false,
+                    "description": "",
+                    "distributed": false,
+                    "encryption_level": 256,
+                    "foreground_application_boost": 2,
+                    "install_date": "20200314073623.000000-420",
+                    "large_system_cache": null,
+                    "last_boot_up_time": "20200329233853.323650-420",
+                    "local_date_time": "20200406134519.257000-420",
+                    "locale": "0409",
+                    "manufacturer": "Microsoft Corporation",
+                    "max_number_of_processes": -1,
+                    "max_process_memory_size": "137438953344",
+                    "mui_languages": [
+                        "en-US",
+                        "en-GB"
+                    ],
+                    "name": "Microsoft Windows 10 Enterprise|C:\\WINDOWS|\\Device\\Harddisk0\\Partition3",
+                    "number_of_licensed_users": 0,
+                    "number_of_processes": 324,
+                    "number_of_users": 2,
+                    "operating_system_sku": 4,
+                    "organization": "",
+                    "os_architecture": "64-bit",
+                    "os_language": 1033,
+                    "os_product_suite": 256,
+                    "os_type": 18,
+                    "other_type_description": null,
+                    "pae_enabled": null,
+                    "plus_product_id": null,
+                    "plus_version_number": null,
+                    "portable_operating_system": false,
+                    "primary": true,
+                    "product_type": 1,
+                    "registered_user": "Windows User",
+                    "serial_number": "00330-80000-00000-AA524",
+                    "service_pack_major_version": 0,
+                    "service_pack_minor_version": 0,
+                    "size_stored_in_paging_files": "4980736",
+                    "status": "OK",
+                    "suite_mask": 272,
+                    "system_device": "\\Device\\HarddiskVolume3",
+                    "system_directory": "C:\\WINDOWS\\system32",
+                    "system_drive": "C:",
+                    "total_visible_memory_size": "33120380",
+                    "version": "10.0.18363",
+                    "windows_directory": "C:\\WINDOWS"
+                },
+                "name": "Microsoft Windows 10 Enterprise",
+                "release": "10.0.18363",
+                "version": "10.0.18363  Build 18363",
+                "os": "WINNT",
+                "product_type": "Workstation",
+                "server_core": false,
+                "cs_info": {
+                    "admin_password_status": 0,
+                    "automatic_managed_pagefile": true,
+                    "automatic_reset_boot_option": true,
+                    "automatic_reset_capability": true,
+                    "boot_option_on_limit": null,
+                    "boot_option_on_watch_dog": null,
+                    "boot_rom_supported": true,
+                    "boot_status": null,
+                    "bootup_state": "Normal boot",
+                    "caption": "LAPTOP-03J74NE1",
+                    "chassis_bootup_state": 2,
+                    "chassis_sku_number": null,
+                    "current_time_zone": -420,
+                    "daylight_in_effect": true,
+                    "description": "AT/AT COMPATIBLE",
+                    "dns_host_name": "LAPTOP-03J74NE1",
+                    "domain": "WORKGROUP",
+                    "domain_role": 0,
+                    "enable_daylight_savings_time": true,
+                    "front_panel_reset_status": 2,
+                    "hypervisor_present": false,
+                    "infrared_supported": false,
+                    "initial_load_info": null,
+                    "install_date": null,
+                    "keyboard_password_status": 2,
+                    "last_load_info": null,
+                    "manufacturer": "LENOVO",
+                    "model": "20MD0026US",
+                    "name": "LAPTOP-03J74NE1",
+                    "name_format": null,
+                    "network_server_mode_enabled": true,
+                    "number_of_logical_processors": 12,
+                    "number_of_processors": 1,
+                    "oem_string_array": null,
+                    "part_of_domain": false,
+                    "pause_after_reset": "-1",
+                    "pc_system_type": 2,
+                    "pc_system_type_ex": 2,
+                    "power_management_capabilities": null,
+                    "power_management_supported": null,
+                    "power_on_password_status": 0,
+                    "power_state": 0,
+                    "power_supply_state": 2,
+                    "primary_owner_contact": null,
+                    "primary_owner_name": "Windows User",
+                    "reset_capability": 1,
+                    "reset_count": -1,
+                    "reset_limit": -1,
+                    "roles": [
+                        "LM_Workstation",
+                        "LM_Server",
+                        "NT"
+                    ],
+                    "status": "OK",
+                    "support_contact_description": null,
+                    "system_family": "ThinkPad P1",
+                    "system_sku_number": "LENOVO_MT_20MD_BU_Think_FM_ThinkPad P1",
+                    "system_startup_delay": null,
+                    "system_startup_options": null,
+                    "system_startup_setting": null,
+                    "system_type": "x64-based PC",
+                    "thermal_state": 2,
+                    "total_physical_memory": "33915269120",
+                    "user_name": "OPSCODECORP\\jmccrae",
+                    "wake_up_type": 6,
+                    "workgroup": "WORKGROUP"
+                },
+                "machine": "x86_64",
+                "system_type": "Mobile"
+            },
+            "memory": {
+                "swap": {
+                    "total": "4980736kB",
+                    "free": "4923128kB"
+                },
+                "total": "33120380kB",
+                "free": "21884808kB"
+            },
+            "network": {
+                "interfaces": {
+                    "0x8": {
+                        "configuration": {
+                            "ip_address": [
+                                "192.168.1.54",
+                                "fe80::7809:a598:40be:f1b7"
+                            ],
+                            "arp_always_source_route": null,
+                            "arp_use_ether_snap": null,
+                            "caption": "[00000002] Intel(R) Wireless-AC 9560 160MHz",
+                            "database_path": "%SystemRoot%\\System32\\drivers\\etc",
+                            "dead_gw_detect_enabled": null,
+                            "default_ip_gateway": [
+                                "192.168.1.1"
+                            ],
+                            "default_tos": null,
+                            "default_ttl": null,
+                            "description": "Intel(R) Wireless-AC 9560 160MHz",
+                            "dhcp_enabled": true,
+                            "dhcp_lease_expires": "20200407133415.000000-420",
+                            "dhcp_lease_obtained": "20200406133415.000000-420",
+                            "dhcp_server": "192.168.1.1",
+                            "dns_domain": null,
+                            "dns_domain_suffix_search_order": [],
+                            "dns_enabled_for_wins_resolution": false,
+                            "dns_host_name": "LAPTOP-03J74NE1",
+                            "dns_server_search_order": [
+                                "192.168.1.1"
+                            ],
+                            "domain_dns_registration_enabled": false,
+                            "forward_buffer_memory": null,
+                            "full_dns_registration_enabled": true,
+                            "gateway_cost_metric": [
+                                0
+                            ],
+                            "igmp_level": null,
+                            "index": 2,
+                            "interface_index": 8,
+                            "ip_connection_metric": 35,
+                            "ip_enabled": true,
+                            "ip_filter_security_enabled": false,
+                            "ip_port_security_enabled": null,
+                            "ip_sec_permit_ip_protocols": [],
+                            "ip_sec_permit_tcp_ports": [],
+                            "ip_sec_permit_udp_ports": [],
+                            "ip_subnet": [
+                                "255.255.255.0",
+                                "64"
+                            ],
+                            "ip_use_zero_broadcast": null,
+                            "ipx_address": null,
+                            "ipx_enabled": null,
+                            "ipx_frame_type": null,
+                            "ipx_media_type": null,
+                            "ipx_network_number": null,
+                            "ipx_virtual_net_number": null,
+                            "keep_alive_interval": null,
+                            "keep_alive_time": null,
+                            "mac_address": "48:F1:7F:90:BC:3A",
+                            "mtu": null,
+                            "num_forward_packets": null,
+                            "pmtubh_detect_enabled": null,
+                            "pmtu_discovery_enabled": null,
+                            "service_name": "Netwtw08",
+                            "setting_id": "{4957E994-91D6-4005-B0F4-20FFBFA02254}",
+                            "tcpip_netbios_options": 0,
+                            "tcp_max_connect_retransmissions": null,
+                            "tcp_max_data_retransmissions": null,
+                            "tcp_num_connections": null,
+                            "tcp_use_rfc1122_urgent_pointer": null,
+                            "tcp_window_size": null,
+                            "wins_enable_lm_hosts_lookup": true,
+                            "wins_host_lookup_file": null,
+                            "wins_primary_server": null,
+                            "wins_scope_id": "",
+                            "wins_secondary_server": null
+                        },
+                        "instance": {
+                            "adapter_type": "Ethernet 802.3",
+                            "adapter_type_id": 0,
+                            "auto_sense": null,
+                            "availability": 3,
+                            "caption": "[00000002] Intel(R) Wireless-AC 9560 160MHz",
+                            "config_manager_error_code": 0,
+                            "config_manager_user_config": false,
+                            "description": "Intel(R) Wireless-AC 9560 160MHz",
+                            "device_id": "2",
+                            "error_cleared": null,
+                            "error_description": null,
+                            "guid": "{4957E994-91D6-4005-B0F4-20FFBFA02254}",
+                            "index": 2,
+                            "install_date": null,
+                            "installed": true,
+                            "interface_index": 8,
+                            "last_error_code": null,
+                            "mac_address": "48:F1:7F:90:BC:3A",
+                            "manufacturer": "Intel Corporation",
+                            "max_number_controlled": 0,
+                            "max_speed": null,
+                            "name": "Intel(R) Wireless-AC 9560 160MHz",
+                            "net_connection_id": "Wi-Fi",
+                            "net_connection_status": 2,
+                            "net_enabled": true,
+                            "network_addresses": null,
+                            "permanent_address": null,
+                            "physical_adapter": true,
+                            "pnp_device_id": "PCI\\VEN_8086&DEV_A370&SUBSYS_00308086&REV_10\\3&11583659&1&A3",
+                            "power_management_capabilities": null,
+                            "power_management_supported": false,
+                            "product_name": "Intel(R) Wireless-AC 9560 160MHz",
+                            "service_name": "Netwtw08",
+                            "speed": "400000000",
+                            "status": null,
+                            "status_info": null,
+                            "system_name": "LAPTOP-03J74NE1",
+                            "time_of_last_reset": "20200329233853.323650-420"
+                        },
+                        "counters": {},
+                        "addresses": {
+                            "192.168.1.54": {
+                                "prefixlen": "24",
+                                "netmask": "255.255.255.0",
+                                "broadcast": "192.168.1.255",
+                                "family": "inet"
+                            },
+                            "fe80::7809:a598:40be:f1b7": {
+                                "prefixlen": "64",
+                                "family": "inet6",
+                                "scope": "Link"
+                            },
+                            "48:F1:7F:90:BC:3A": {
+                                "family": "lladdr"
+                            }
+                        },
+                        "mtu": null,
+                        "type": "Ethernet 802.3",
+                        "arp": {
+                            "192.168.1.1": "18:e8:29:45:19:0a",
+                            "192.168.1.45": "dc:3a:5e:96:07:46",
+                            "192.168.1.51": "5c:41:5a:a9:cb:17",
+                            "192.168.1.255": "ff:ff:ff:ff:ff:ff",
+                            "224.0.0.22": "01:00:5e:00:00:16",
+                            "224.0.0.251": "01:00:5e:00:00:fb",
+                            "224.0.0.252": "01:00:5e:00:00:fc",
+                            "239.255.255.250": "01:00:5e:7f:ff:fa",
+                            "255.255.255.255": "ff:ff:ff:ff:ff:ff"
+                        },
+                        "encapsulation": "Ethernet"
+                    }
+                },
+                "default_gateway": "192.168.1.1",
+                "default_interface": "0x8"
+            },
+            "counters": {
+                "network": {}
+            },
+            "ipaddress": "192.168.1.54",
+            "macaddress": "48:F1:7F:90:BC:3A",
+            "ip6address": "fe80::7809:a598:40be:f1b7",
+            "os": "windows",
+            "os_version": "10.0.18363",
+            "platform": "windows",
+            "platform_version": "10.0.18363",
+            "platform_family": "windows",
+            "uptime_seconds": 655586,
+            "uptime": "7 days 14 hours 06 minutes 26 seconds",
+            "dmi": {},
+            "virtualization": {
+                "systems": {}
+            },
+            "languages": {
+                "perl": {
+                    "version": "5.8.8",
+                    "archname": "msys-64int"
+                },
+                "powershell": {
+                    "version": "5.1.18362.752",
+                    "ws_man_stack_version": "3.0",
+                    "serialization_version": "1.1.0.1",
+                    "clr_version": "4.0.30319.42000",
+                    "build_version": "10.0.18362.752",
+                    "compatible_versions": [
+                        "1.0",
+                        "2.0",
+                        "3.0",
+                        "4.0",
+                        "5.0",
+                        "5.1.18362.752"
+                    ],
+                    "remoting_protocol_version": "2.3"
+                },
+                "python": {
+                    "version": "3.7.7",
+                    "builddate": "Mar 10 2020, 10:41:24"
+                },
+                "ruby": {
+                    "platform": "x64-mingw32",
+                    "version": "2.6.5",
+                    "release_date": "2019-10-01",
+                    "target": "x86_64-w64-mingw32",
+                    "target_cpu": "x64",
+                    "target_vendor": "w64",
+                    "target_os": "mingw32",
+                    "host": "x86_64-w64-mingw32",
+                    "host_cpu": "x86_64",
+                    "host_os": "mingw32",
+                    "host_vendor": "w64",
+                    "bin_dir": "C:/opscode/chef-workstation/embedded/bin",
+                    "ruby_bin": "C:/opscode/chef-workstation/embedded/bin/ruby",
+                    "gems_dir": "C:/opscode/chef-workstation/embedded/lib/ruby/gems/2.6.0",
+                    "gem_bin": "C:/opscode/chef-workstation/embedded/bin/gem"
+                }
+            },
+            "chef_packages": {
+                "chef": {
+                    "version": "15.8.23",
+                    "chef_root": "C:/opscode/chef-workstation/embedded/lib/ruby/gems/2.6.0/gems/chef-15.8.23-universal-mingw32/lib"
+                },
+                "ohai": {
+                    "version": "15.7.4",
+                    "ohai_root": "C:/opscode/chef-workstation/embedded/lib/ruby/gems/2.6.0/gems/ohai-15.7.4/lib/ohai"
+                }
+            },
+            "cloud": null,
+            "command": {},
+            "cpu": {
+                "0": {
+                    "cores": 6,
+                    "vendor_id": "GenuineIntel",
+                    "family": "198",
+                    "model": "",
+                    "stepping": "10",
+                    "physical_id": "CPU0",
+                    "model_name": "Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz",
+                    "description": "Intel64 Family 6 Model 158 Stepping 10",
+                    "mhz": "2592",
+                    "cache_size": "1536 KB"
+                },
+                "total": 12,
+                "cores": 6,
+                "real": 1
+            },
+            "filesystem": {
+                "C:": {
+                    "kb_size": 1022869106,
+                    "kb_available": 911805657,
+                    "kb_used": 111063449,
+                    "percent_used": 10,
+                    "fs_type": "ntfs",
+                    "drive_type": 3,
+                    "drive_type_string": "local",
+                    "drive_type_human": "Local Fixed Disk",
+                    "volume_name": "Windows",
+                    "encryption_status": "FullyEncrypted"
+                }
+            },
+            "filesystem2": {
+                "by_device": {
+                    "windows": {
+                        "kb_size": 1022869106,
+                        "kb_available": 911805657,
+                        "kb_used": 111063449,
+                        "percent_used": 10,
+                        "fs_type": "ntfs",
+                        "drive_type": 3,
+                        "drive_type_string": "local",
+                        "drive_type_human": "Local Fixed Disk",
+                        "volume_name": "Windows",
+                        "encryption_status": "FullyEncrypted",
+                        "mounts": [
+                            "C:"
+                        ]
+                    }
+                },
+                "by_mountpoint": {
+                    "C:": {
+                        "kb_size": 1022869106,
+                        "kb_available": 911805657,
+                        "kb_used": 111063449,
+                        "percent_used": 10,
+                        "fs_type": "ntfs",
+                        "drive_type": 3,
+                        "drive_type_string": "local",
+                        "drive_type_human": "Local Fixed Disk",
+                        "volume_name": "Windows",
+                        "encryption_status": "FullyEncrypted",
+                        "devices": [
+                            "windows"
+                        ]
+                    }
+                },
+                "by_pair": {
+                    "windows,C:": {
+                        "kb_size": 1022869106,
+                        "kb_available": 911805657,
+                        "kb_used": 111063449,
+                        "percent_used": 10,
+                        "mount": "C:",
+                        "fs_type": "ntfs",
+                        "drive_type": 3,
+                        "drive_type_string": "local",
+                        "drive_type_human": "Local Fixed Disk",
+                        "volume_name": "Windows",
+                        "device": "windows",
+                        "encryption_status": "FullyEncrypted"
+                    }
+                }
+            },
+            "hostname": "LAPTOP-03J74NE1",
+            "machinename": "LAPTOP-03J74NE1",
+            "fqdn": "LAPTOP-03J74NE1",
+            "domain": null,
+            "keys": {
+                "ssh": {}
+            },
+            "fips": {
+                "kernel": {
+                    "enabled": false
+                }
+            },
+            "ohai_time": 1586205923.3443272,
+            "packages": {
+                "7-Zip 19.00 (x64)": {
+                    "version": "19.00",
+                    "publisher": "Igor Pavlov"
+                },
+                "Beyond Compare 4.3.4": {
+                    "version": "4.3.4.24657",
+                    "publisher": "Scooter Software",
+                    "installdate": "20200327"
+                },
+                "Git version 2.25.1": {
+                    "version": "2.25.1",
+                    "publisher": "The Git Development Community",
+                    "installdate": "20200314"
+                },
+                "Microsoft Azure Compute Emulator - v2.9.6": {
+                    "version": "2.9.8899.26",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Mouse and Keyboard Center": {
+                    "version": "12.181.137.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200317"
+                },
+                "Microsoft Visual Studio 2010 Tools for Office Runtime (x64)": {
+                    "version": "10.0.50908",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Office 365 ProPlus - en-us": {
+                    "version": "16.0.12527.20278",
+                    "publisher": "Microsoft Corporation"
+                },
+                "UNO": {
+                    "publisher": "Ubisoft Entertainment"
+                },
+                "Microsoft ASP.NET Core 3.1.2 Shared Framework (x64)": {
+                    "version": "3.1.2.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Intel® PROSet/Wireless WiFi Software": {
+                    "version": "21.10.1.3139",
+                    "publisher": "Intel Corporation",
+                    "installdate": "20200314"
+                },
+                "IIS Express Application Compatibility Database for x64": {},
+                "Microsoft .NET Core AppHost Pack - 3.1.2 (x64_x86)": {
+                    "version": "24.72.28517",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "ConEmu 191012.x64": {
+                    "version": "11.191.0120",
+                    "publisher": "ConEmu-Maximus5",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core AppHost Pack - 3.1.1 (x64_arm)": {
+                    "version": "24.68.28408",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Application Verifier x64 External Package": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core Toolset 3.1.102 (x64)": {
+                    "version": "12.16.47641",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Microsoft ASP.NET Core 3.1.1 Shared Framework (x64)": {
+                    "version": "3.1.1.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "IntelliTraceProfilerProxy": {
+                    "version": "15.0.18198.01",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "DiagnosticsHub_CollectionService": {
+                    "version": "16.1.28901",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows App Certification Kit Native Components": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft ASP.NET Core 2.1.15 Shared Framework (x64)": {
+                    "version": "2.1.15.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core Runtime - 2.1.15 (x64)": {
+                    "version": "16.124.28327",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Chef Infra Client v15.8.23": {
+                    "version": "15.8.23.1",
+                    "publisher": "Chef Software, Inc.",
+                    "installdate": "20200314"
+                },
+                "Microsoft .NET Core Targeting Pack - 3.1.0 (x64)": {
+                    "version": "24.64.28315",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Typora version 0.9.86": {
+                    "version": "0.9.86",
+                    "publisher": "typora.io",
+                    "installdate": "20200318"
+                },
+                "Microsoft Visual C++ 2012 x64 Additional Runtime - 11.0.61030": {
+                    "version": "11.0.61030",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200323"
+                },
+                "Python 3.7.7 Utility Scripts (64-bit)": {
+                    "version": "3.7.7150.0",
+                    "publisher": "Python Software Foundation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Azure PowerShell - April 2018": {
+                    "version": "5.7.0.18831",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "icecap_collection_x64": {
+                    "version": "16.4.29904",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Python 3.7.7 Test Suite (64-bit)": {
+                    "version": "3.7.7150.0",
+                    "publisher": "Python Software Foundation",
+                    "installdate": "20200315"
+                },
+                "VS JIT Debugger": {
+                    "version": "16.0.98.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Command Line Utilities 15 for SQL Server": {
+                    "version": "15.0.1300.359",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core Host FX Resolver - 3.1.2 (x64)": {
+                    "version": "24.72.28517",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Microsoft .NET Core AppHost Pack - 3.1.1 (x64_x86)": {
+                    "version": "24.68.28408",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core 3.1 Templates 3.1.101 (x64)": {
+                    "version": "3.1.1.014848",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Workflow Diagnostic Pack for x64": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft",
+                    "installdate": "20200315"
+                },
+                "Universal CRT Tools x64": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core Toolset 3.1.101 (x64)": {
+                    "version": "12.16.31232",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Windows Desktop Runtime - 3.1.1 (x64)": {
+                    "version": "24.68.28408",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Python 3.7.7 Standard Library (64-bit)": {
+                    "version": "3.7.7150.0",
+                    "publisher": "Python Software Foundation",
+                    "installdate": "20200315"
+                },
+                "Python 3.7.7 Executables (64-bit)": {
+                    "version": "3.7.7150.0",
+                    "publisher": "Python Software Foundation",
+                    "installdate": "20200315"
+                },
+                "Intel(R) Chipset Device Software": {
+                    "version": "10.1.17695.8086",
+                    "publisher": "Intel(R) Corporation"
+                },
+                "IIS 10.0 Express": {
+                    "version": "10.0.03203",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Workflow Manager Client 1.0": {
+                    "version": "2.1.10525.2",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Active Directory Authentication Library for SQL Server": {
+                    "version": "15.0.1300.359",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Workflow Debugger v1.0 for amd64": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft",
+                    "installdate": "20200315"
+                },
+                "Windows SDK DirectX x64 Remote": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual Studio Installer": {
+                    "version": "2.4.1083.303",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core Host FX Resolver - 3.1.1 (x64)": {
+                    "version": "24.68.28408",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Windows Desktop Targeting Pack - 3.1.0 (x64)": {
+                    "version": "24.64.28315",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Microsoft Visual C++ 2019 X64 Minimum Runtime - 14.24.28127": {
+                    "version": "14.24.28127",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2019 X64 Additional Runtime - 14.24.28127": {
+                    "version": "14.24.28127",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core AppHost Pack - 3.1.2 (x64)": {
+                    "version": "24.72.28517",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Microsoft .NET Core AppHost Pack - 3.1.1 (x64_arm64)": {
+                    "version": "24.68.28408",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft System CLR Types for SQL Server 2019 CTP2.2": {
+                    "version": "15.0.1200.24",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft ODBC Driver 17 for SQL Server": {
+                    "version": "17.2.0.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Office 16 Click-to-Run Licensing Component": {
+                    "version": "16.0.12527.20242",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Office 16 Click-to-Run Extensibility Component": {
+                    "version": "16.0.12527.20278",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200326"
+                },
+                "Office 16 Click-to-Run Localization Component": {
+                    "version": "16.0.12527.20278",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200326"
+                },
+                "Microsoft SQL Server 2016 LocalDB ": {
+                    "version": "13.1.4001.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Chef Workstation v0.17.5": {
+                    "version": "0.17.5.1",
+                    "publisher": "\"Chef Software, Inc. <maintainers@chef.io>\"",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2013 x64 Additional Runtime - 12.0.21005": {
+                    "version": "12.0.21005",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20190224"
+                },
+                "Python 3.7.7 Development Libraries (64-bit)": {
+                    "version": "3.7.7150.0",
+                    "publisher": "Python Software Foundation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core Runtime - 3.1.2 (x64)": {
+                    "version": "24.72.28517",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Microsoft .NET Core SDK 3.1.101 (x64) from Visual Studio": {
+                    "version": "3.1.101.014848",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Python 3.7.7 Core Interpreter (64-bit)": {
+                    "version": "3.7.7150.0",
+                    "publisher": "Python Software Foundation",
+                    "installdate": "20200315"
+                },
+                "Python 3.7.7 Documentation (64-bit)": {
+                    "version": "3.7.7150.0",
+                    "publisher": "Python Software Foundation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Standard Targeting Pack - 2.1.0 (x64)": {
+                    "version": "24.0.28113",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Microsoft Visual C++ 2013 x64 Minimum Runtime - 12.0.21005": {
+                    "version": "12.0.21005",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20190224"
+                },
+                "vs_Graphics_Singletonx64": {
+                    "version": "16.4.29411",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "IIS Express Application Compatibility Database for x86": {},
+                "Microsoft .NET Core Host - 3.1.1 (x64)": {
+                    "version": "24.68.28408",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "NVIDIA Ansel": {
+                    "version": "7.0.506.0",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20200314"
+                },
+                "NVIDIA Control Panel 416.16": {
+                    "version": "416.16",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "NVIDIA Graphics Driver 431.94": {
+                    "version": "431.94",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20200314"
+                },
+                "NVIDIA 3D Vision Controller Driver 390.41": {
+                    "version": "390.41",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "NVIDIA WMI 2.33.0": {
+                    "version": "2.33.0",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "NVIDIA Optimus Update 33.2.0.0": {
+                    "version": "33.2.0.0",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "NVIDIA Update 33.2.0.0": {
+                    "version": "33.2.0.0",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "NVIDIA Install Application": {
+                    "version": "2.1002.324.0",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20200314"
+                },
+                "NVIDIA Display Container": {
+                    "version": "1.11",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "NVIDIA Display Container LS": {
+                    "version": "1.11",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "NVIDIA Display Watchdog Plugin": {
+                    "version": "1.11",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "NVIDIA Display Session Container": {
+                    "version": "1.11",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "NVIDIA Telemetry Client": {
+                    "version": "13.2.22.0",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "NVIDIA Telemetry Container": {
+                    "version": "13.2.22.0",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "NVIDIA Update Core": {
+                    "version": "33.2.0.0",
+                    "publisher": "NVIDIA Corporation",
+                    "installdate": "20190224"
+                },
+                "PowerShell 7-x64": {
+                    "version": "7.0.0.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Windows Desktop Runtime - 3.1.2 (x64)": {
+                    "version": "24.72.28517",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Microsoft Web Deploy 4.0": {
+                    "version": "10.0.2606",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft ASP.NET Core Module V2 for IIS Express": {
+                    "version": "13.0.19213.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core Host - 3.1.2 (x64)": {
+                    "version": "24.72.28517",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Workflow Manager Tools 1.0 for Visual Studio": {
+                    "version": "2.1.30411.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Azure Libraries for .NET – v2.9": {
+                    "version": "3.0.0127.060",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Python 3.7.7 Add to Path (64-bit)": {
+                    "version": "3.7.7150.0",
+                    "publisher": "Python Software Foundation",
+                    "installdate": "20200315"
+                },
+                "VS WCF Debugging": {
+                    "version": "16.0.98.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core 3.1 Templates 3.1.102 (x64)": {
+                    "version": "3.1.3.014873",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Microsoft Visual C++ 2012 x64 Minimum Runtime - 11.0.61030": {
+                    "version": "11.0.61030",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200323"
+                },
+                "Microsoft .NET Core AppHost Pack - 3.1.2 (x64_arm64)": {
+                    "version": "24.72.28517",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Microsoft ASP.NET Core 3.1.0 Targeting Pack (x64)": {
+                    "version": "3.1.0.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "VS Script Debugging Common": {
+                    "version": "16.0.98.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Python 3.7.7 pip Bootstrap (64-bit)": {
+                    "version": "3.7.7150.0",
+                    "publisher": "Python Software Foundation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core 2.1 Templates 3.1.101 (x64)": {
+                    "version": "2.1.14.014848",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft ASP.NET Core 3.1.2 Targeting Pack (x64)": {
+                    "version": "3.1.2.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Microsoft .NET Core Runtime - 3.1.1 (x64)": {
+                    "version": "24.68.28408",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Azure Authoring Tools - v2.9.6": {
+                    "version": "2.9.8899.26",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core AppHost Pack - 3.1.2 (x64_arm)": {
+                    "version": "24.72.28517",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "Python 3.7.7 Tcl/Tk Support (64-bit)": {
+                    "version": "3.7.7150.0",
+                    "publisher": "Python Software Foundation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core AppHost Pack - 3.1.1 (x64)": {
+                    "version": "24.68.28408",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Identity Extensions": {
+                    "version": "2.0.1459.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2019 X64 Debug Runtime - 14.24.28127": {
+                    "version": "14.24.28127",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft ASP.NET Core Module for IIS Express": {
+                    "version": "12.2.18292.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Visual Studio Enterprise 2019": {
+                    "version": "16.4.29905.134",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Google Chrome": {
+                    "version": "80.0.3987.163",
+                    "publisher": "Google LLC",
+                    "installdate": "20200406"
+                },
+                "Microsoft Azure Storage Emulator - v5.10": {
+                    "version": "5.10.19227.2113",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Edge": {
+                    "version": "80.0.361.109",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200401"
+                },
+                "Microsoft Edge Update": {
+                    "version": "1.3.121.21"
+                },
+                "Steam": {
+                    "version": "2.10.91.91",
+                    "publisher": "Valve Corporation"
+                },
+                "Uplay": {
+                    "version": "104.0",
+                    "publisher": "Ubisoft"
+                },
+                "Microsoft Workflow Debugger v1.0 for x86": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft",
+                    "installdate": "20200315"
+                },
+                "Universal CRT Redistributable": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2013 Redistributable (x64) - 12.0.30501": {
+                    "version": "12.0.30501.0",
+                    "publisher": "Microsoft Corporation"
+                },
+                "vs_loadtestexceladdinmsi": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Python Launcher": {
+                    "version": "3.7.7008.0",
+                    "publisher": "Python Software Foundation",
+                    "installdate": "20200315"
+                },
+                "Windows Simulator - ENU": {
+                    "version": "16.0.28522",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft ASP.NET Web Tools Packages 16.0 - ENU": {
+                    "version": "1.0.20910.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft UniversalWindowsPlatform SDK": {
+                    "version": "15.9.11",
+                    "publisher": "Microsoft",
+                    "installdate": "20200315"
+                },
+                "Windows Software Development Kit - Windows 10.0.18362.1": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation"
+                },
+                "Microsoft .NET CoreRuntime SDK": {
+                    "version": "1.1.27004.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Universal CRT Extension SDK": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2013 x86 Minimum Runtime - 12.0.21005": {
+                    "version": "12.0.21005",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20190224"
+                },
+                "Windows Mobile Extension SDK Contracts": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows App Certification Kit x64": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Desktop Libs arm64": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Framework 4.7.2 Targeting Pack": {
+                    "version": "4.7.03062",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft ASP.NET Diagnostic Pack for Visual Studio": {
+                    "version": "16.4.462.24200",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Visual C++ Library CRT Desktop Appx Package": {
+                    "version": "14.24.28314",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Framework 4.5.2 Multi-Targeting Pack": {
+                    "version": "4.5.51651",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Thunderbolt™ Software": {
+                    "version": "17.4.80.550",
+                    "publisher": "Intel Corporation",
+                    "installdate": "20200316"
+                },
+                "Windows Phone SDK 8.0 Assemblies for Visual Studio 2019": {
+                    "version": "16.0.29430",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_webtestrecordermsi": {
+                    "version": "16.4.29430",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK ARM Desktop Tools": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Modern Versioned Developer Tools": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK for Windows Store Apps Libs": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Desktop Libs x86": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Exchange Web Services Managed API 2.1": {
+                    "version": "15.0.847.30",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "WinRT Intellisense UAP - Other Languages": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_clickoncebootstrappermsires": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_minshellinteropmsi": {
+                    "version": "16.2.28917",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2015-2019 Redistributable (x64) - 14.24.28127": {
+                    "version": "14.24.28127.4",
+                    "publisher": "Microsoft Corporation"
+                },
+                "Microsoft .NET Framework 4.6 Targeting Pack": {
+                    "version": "4.6.00081",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Desktop Tools arm64": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2019 X86 Minimum Runtime - 14.24.28127": {
+                    "version": "14.24.28127",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows Mobile Extension SDK": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_clickoncesigntoolmsi": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Windows Desktop Runtime - 3.1.1 (x86)": {
+                    "version": "24.68.28408",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2012 Redistributable (x86) - 11.0.61030": {
+                    "version": "11.0.61030.0",
+                    "publisher": "Microsoft Corporation"
+                },
+                "Windows SDK Redistributables": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "WinRT Intellisense IoT - en-us": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Visual C++ Library CRT Appx Package": {
+                    "version": "14.24.28314",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK for Windows Store Apps": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows Desktop Extension SDK Contracts": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows IoT Extension SDK Contracts": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "sptools_Microsoft.VisualStudio.Vsto.Msi.Resources": {
+                    "version": "16.0.28030",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Desktop Headers arm": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Open XML SDK 2.5 for Microsoft Office": {
+                    "version": "2.5.5631",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Chocolatey GUI": {
+                    "version": "0.17.0.0",
+                    "publisher": "Chocolatey",
+                    "installdate": "20200331"
+                },
+                "Windows SDK Desktop Headers arm64": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_minshellmsi": {
+                    "version": "16.4.29709",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET CoreRuntime For CoreCon": {
+                    "version": "1.0.0.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_networkemulationmsi_x64": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Signing Tools": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "TypeScript SDK": {
+                    "version": "3.7.4.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK DirectX x86 Remote": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Desktop Tools x86": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Desktop Libs x64": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core Host FX Resolver - 3.1.1 (x86)": {
+                    "version": "24.68.28408",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Framework 4.5 Multi-Targeting Pack": {
+                    "version": "4.5.50710",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_cuitextensionmsi16": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_communitymsi": {
+                    "version": "16.4.29709",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows App Certification Kit SupportedApiList x86": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows Team Extension SDK Contracts": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Core Runtime - 3.1.1 (x86)": {
+                    "version": "24.68.28408",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK EULA": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporations",
+                    "installdate": "20200315"
+                },
+                "Windows SDK for Windows Store Apps Metadata": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "ClickOnce Bootstrapper Package for Microsoft .NET Framework": {
+                    "version": "4.8.03928",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Google Update Helper": {
+                    "version": "1.3.35.451",
+                    "publisher": "Google LLC",
+                    "installdate": "20200321"
+                },
+                "Microsoft .NET Core SDK 3.1.102 (x64)": {
+                    "version": "3.1.102.14873",
+                    "publisher": "Microsoft Corporation"
+                },
+                "Kits Configuration Installer": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft",
+                    "installdate": "20200315"
+                },
+                "Windows SDK for Windows Store Apps Headers": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "WinRT Intellisense PPI - en-us": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "SDK ARM Redistributables": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_FileTracker_Singleton": {
+                    "version": "16.3.29209",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Framework 4.5.1 Multi-Targeting Pack": {
+                    "version": "4.5.50932",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_webtestrecordermsi_x64": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Desktop Headers x64": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "WinRT Intellisense IoT - Other Languages": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "WinRT Intellisense UAP - en-us": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_filehandler_x86": {
+                    "version": "16.4.29709",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows Team Extension SDK": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Universal General MIDI DLS Extension SDK": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_filehandler_amd64": {
+                    "version": "16.4.29709",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "sptools_Microsoft.VisualStudio.OfficeDeveloperTools.Msi": {
+                    "version": "15.0.26501",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Teams Machine-Wide Installer": {
+                    "version": "1.3.0.362",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200314"
+                },
+                "SDK ARM Additions": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft NetStandard SDK": {
+                    "version": "15.0.51105",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Universal CRT Headers Libraries and Sources": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "VS Immersive Activate Helper": {
+                    "version": "16.0.98.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Desktop Tools x64": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Entity Framework 6.2.0 Tools  for Visual Studio 2019": {
+                    "version": "6.2.0.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "icecap_collection_neutral": {
+                    "version": "16.4.29904",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Visual C++ Library CRT ARM64 Appx Package": {
+                    "version": "14.24.28314",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "WinRT Intellisense Desktop - Other Languages": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Desktop Headers x86": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Azure Storage Tools - v6.2.0": {
+                    "version": "6.2.0.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Framework 4.6.1 Targeting Pack": {
+                    "version": "4.6.01055",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft TestPlatform SDK Local Feed": {
+                    "version": "16.0.0.3069091",
+                    "publisher": "Microsoft",
+                    "installdate": "20200315"
+                },
+                "WinAppDeploy": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK for Windows Store Apps DirectX x86 Remote": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "WinRT Intellisense Mobile - en-us": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Intel® PROSet/Wireless Software": {
+                    "version": "21.10.1.0u",
+                    "publisher": "Intel Corporation"
+                },
+                "vs_SQLClickOnceBootstrappermsi": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_codeduitestframeworkmsi": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Framework 4.8 SDK": {
+                    "version": "4.8.03928",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_communitymsires": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Desktop Libs arm": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "WinRT Intellisense PPI - Other Languages": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows IoT Extension SDK": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "icecap_collectionresources": {
+                    "version": "16.4.29430",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Universal CRT Tools x86": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_cuitcommoncoremsi16": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK for Windows Store Apps Tools": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Facade Windows WinMD Versioned": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vcpp_crt.redist.clickonce": {
+                    "version": "14.24.28127",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_devenvmsi": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2012 x86 Additional Runtime - 11.0.61030": {
+                    "version": "11.0.61030",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200323"
+                },
+                "windows_toolscorepkg": {
+                    "version": "16.2.29006",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows Desktop Extension SDK": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Framework 4.7.2 Targeting Pack (ENU)": {
+                    "version": "4.7.03062",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_BlendMsi": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_clickoncebootstrappermsi": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2012 x86 Minimum Runtime - 11.0.61030": {
+                    "version": "11.0.61030",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200323"
+                },
+                "Microsoft Intune Management Extension": {
+                    "version": "1.29.201.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200318"
+                },
+                "Windows SDK for Windows Store Apps Contracts": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Framework Cumulative Intellisense Pack for Visual Studio (ENU)": {
+                    "version": "4.8.03761",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft ASP.NET Core 3.1.1 Shared Framework (x86)": {
+                    "version": "3.1.1.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2012 Redistributable (x64) - 11.0.61030": {
+                    "version": "11.0.61030.0",
+                    "publisher": "Microsoft Corporation"
+                },
+                "vs_codecoveragemsi": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK for Windows Store Managed Apps Libs": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Framework 4 Multi-Targeting Pack": {
+                    "version": "4.0.30319",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Update for  (KB2504637)": {
+                    "version": "1",
+                    "publisher": "Microsoft Corporation"
+                },
+                "sptools_Microsoft.VisualStudio.Vsto.Msi.x64": {
+                    "version": "16.0.28030",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "MSI Development Tools": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK Modern Non-Versioned Developer Tools": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_tipsmsi": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2015-2019 Redistributable (x86) - 14.24.28127": {
+                    "version": "14.24.28127.4",
+                    "publisher": "Microsoft Corporation"
+                },
+                "vs_Graphics_Singletonx86": {
+                    "version": "16.4.29411",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "WinRT Intellisense Desktop - en-us": {
+                    "version": "10.1.18362.1",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows SDK AddOn": {
+                    "version": "10.1.0.0",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Windows Simulator": {
+                    "version": "16.0.28522",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2019 X86 Additional Runtime - 14.24.28127": {
+                    "version": "14.24.28127",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_minshellmsires": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "vs_cuitextensionmsi16_x64": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual Studio Setup Configuration": {
+                    "version": "2.3.2200.14893",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft .NET Native SDK": {
+                    "version": "15.0.24211.07",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Intel(R) Processor Graphics": {
+                    "version": "24.20.100.6346",
+                    "publisher": "Intel Corporation"
+                },
+                "Visual C++ Library CRT Appx Resource Package": {
+                    "version": "14.24.28314",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "icecap_collectionresourcesx64": {
+                    "version": "16.4.29411",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2013 Redistributable (x86) - 12.0.30501": {
+                    "version": "12.0.30501.0",
+                    "publisher": "Microsoft Corporation"
+                },
+                "Microsoft Visual C++ 2019 X86 Debug Runtime - 14.24.28127": {
+                    "version": "14.24.28127",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "sptools_Microsoft.VisualStudio.Vsto.Msi": {
+                    "version": "16.0.28030",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20200315"
+                },
+                "Microsoft Visual C++ 2013 x86 Additional Runtime - 12.0.21005": {
+                    "version": "12.0.21005",
+                    "publisher": "Microsoft Corporation",
+                    "installdate": "20190224"
+                },
+                "Microsoft Windows Communication Foundation Diagnostic Pack for x86": {
+                    "version": "16.0.28329",
+                    "publisher": "Microsoft",
+                    "installdate": "20200315"
+                }
+            },
+            "root_group": "Administrators",
+            "shard_seed": 216945772,
+            "time": {
+                "timezone": "Pacific Daylight Time"
+            },
+            "system_enclosure": {
+                "manufacturer": "LENOVO",
+                "serialnumber": "R90T7HK1"
+            },
+            "chef_guid": "9d049b11-1107-4324-ac40-3909f5694726",
+            "name": "LAPTOP-03J74NE1",
+            "chef_environment": "_default",
+            "recipes": [
+                "cpe_init",
+                "cpe_init::default",
+                "cpe_init::windows_init",
+                "audit::default",
+                "audit::inspec",
+                "chefit-masterclient::default",
+                "windows_localadminaccount::default",
+                "windows_screensaver::default",
+                "cpe_init::company_init"
+            ],
+            "expanded_run_list": [
+                "cpe_init::default"
+            ],
+            "roles": [
+                "cpe_base"
+            ],
+            "cookbooks": {
+                "cpe_init": {
+                    "version": "0.1.105"
+                },
+                "cpe_utils": {
+                    "version": "0.1.0"
+                },
+                "audit": {
+                    "version": "7.4.1"
+                },
+                "chef-client": {
+                    "version": "11.0.3"
+                },
+                "cron": {
+                    "version": "5.1.0"
+                },
+                "logrotate": {
+                    "version": "2.1.0"
+                },
+                "compat_resource": {
+                    "version": "12.19.1"
+                },
+                "cpe_bluetooth": {
+                    "version": "0.1.0"
+                },
+                "cpe_profiles": {
+                    "version": "0.1.0"
+                },
+                "chefit-masterclient": {
+                    "version": "0.1.20"
+                },
+                "cpe_desktop": {
+                    "version": "0.1.0"
+                },
+                "cpe_chrome": {
+                    "version": "0.1.0"
+                },
+                "cpe_choco": {
+                    "version": "0.1.2"
+                },
+                "cpe_chef": {
+                    "version": "0.1.2"
+                },
+                "cpe_crypt": {
+                    "version": "0.1.0"
+                },
+                "cpe_launchd": {
+                    "version": "0.1.2"
+                },
+                "cpe_remote": {
+                    "version": "0.1.0"
+                },
+                "cpe_logger": {
+                    "version": "0.1.0"
+                },
+                "cpe_hosts": {
+                    "version": "0.2.0"
+                },
+                "cpe_macos_server": {
+                    "version": "0.1.0"
+                },
+                "cpe_munki": {
+                    "version": "0.3.0"
+                },
+                "cpe_nightly_reboot": {
+                    "version": "0.1.0"
+                },
+                "cpe_pathsd": {
+                    "version": "0.1.0"
+                },
+                "cpe_powermanagement": {
+                    "version": "0.1.0"
+                },
+                "cpe_preferencepanes": {
+                    "version": "0.1.0"
+                },
+                "cpe_prompt_user": {
+                    "version": "0.1.0"
+                },
+                "cpe_screensaver": {
+                    "version": "0.1.0"
+                },
+                "cpe_spotlight": {
+                    "version": "0.1.0"
+                },
+                "cpe_batterycheck": {
+                    "version": "0.1.0"
+                },
+                "cpe_botmanagement": {
+                    "version": "0.1.0"
+                },
+                "slack_handler": {
+                    "version": "1.0.0"
+                },
+                "windows_localadminaccount": {
+                    "version": "0.1.3"
+                },
+                "windows_screensaver": {
+                    "version": "0.1.11"
+                }
+            }
+        },
+        "normal": {
+            "tags": []
+        },
+        "chef_type": "node",
+        "default": {
+            "audit": {
+                "inspec_version": null,
+                "inspec_gem_source": null,
+                "inspec_backend_cache": true,
+                "reporter": "chef-automate",
+                "fetcher": "chef-automate",
+                "server": null,
+                "refresh_token": null,
+                "token": null,
+                "insecure": null,
+                "owner": null,
+                "raise_if_unreachable": true,
+                "fail_if_not_present": false,
+                "interval": {
+                    "enabled": false,
+                    "time": 1440
+                },
+                "quiet": true,
+                "overwrite": true,
+                "profiles": [
+                    {
+                        "name": "mac_os_x",
+                        "compliance": "jmccrae@chef.io/mac_os_x"
+                    }
+                ],
+                "attributes": {},
+                "chef_node_attribute_enabled": false,
+                "json_file": {
+                    "location": "C:/chef/cache/cookbooks/audit/inspec-20200406204528.json"
+                }
+            },
+            "cron": {
+                "package_name": [],
+                "service_name": "cron",
+                "emulate_cron.d": false
+            },
+            "logrotate": {
+                "package": {
+                    "name": "logrotate",
+                    "source": null,
+                    "version": null,
+                    "provider": null
+                },
+                "directory": "/etc/logrotate.d",
+                "cron": {
+                    "install": false,
+                    "name": "logrotate",
+                    "command": "/usr/sbin/logrotate /etc/logrotate.conf",
+                    "minute": 35,
+                    "hour": 2
+                },
+                "global": {
+                    "weekly": true,
+                    "rotate": 4,
+                    "create": "",
+                    "/var/log/wtmp": {
+                        "missingok": true,
+                        "monthly": true,
+                        "create": "0664 root utmp",
+                        "rotate": 1
+                    },
+                    "/var/log/btmp": {
+                        "missingok": true,
+                        "monthly": true,
+                        "create": "0660 root utmp",
+                        "rotate": 1
+                    }
+                }
+            },
+            "chef_client": {
+                "config": {
+                    "chef_server_url": "https://api.chef.io/organizations/chefitproduction",
+                    "validation_client_name": "chefitproduction-validator",
+                    "node_name": "LAPTOP-03J74NE1",
+                    "verify_api_cert": true,
+                    "client_fork": true,
+                    "start_handlers": [],
+                    "report_handlers": [],
+                    "exception_handlers": []
+                },
+                "log_file": "client.log",
+                "interval": "1800",
+                "splay": "300",
+                "conf_dir": "C:/chef",
+                "bin": "C:/opscode/chef/bin/chef-client",
+                "log_dir": "C:/chef/log",
+                "log_perm": "640",
+                "cron": {
+                    "minute": "0",
+                    "hour": "0,4,8,12,16,20",
+                    "weekday": "*",
+                    "path": null,
+                    "environment_variables": null,
+                    "log_file": "/dev/null",
+                    "append_log": false,
+                    "use_cron_d": false,
+                    "mailto": null
+                },
+                "systemd": {
+                    "timer": false,
+                    "timeout": false,
+                    "restart": "always"
+                },
+                "task": {
+                    "frequency": "minute",
+                    "frequency_modifier": 30,
+                    "user": "Boiardie",
+                    "password": "0psCode!!",
+                    "start_time": null,
+                    "start_date": null,
+                    "name": "chef-client"
+                },
+                "load_gems": {},
+                "reload_config": true,
+                "daemon_options": [],
+                "logrotate": {
+                    "rotate": 12,
+                    "frequency": "weekly"
+                },
+                "init_style": "windows",
+                "run_path": "C:/chef/run",
+                "cache_path": "C:/chef/cache",
+                "backup_path": "C:/chef/backup",
+                "log_rotation": {
+                    "options": [
+                        "compress"
+                    ],
+                    "prerotate": null,
+                    "postrotate": "/etc/init.d/chef-client reload >/dev/null || :"
+                },
+                "handler": {
+                    "slack": {
+                        "team": null,
+                        "api_key": null,
+                        "channel": null,
+                        "webhooks": {
+                            "name": [
+                                "itchannel"
+                            ],
+                            "itchannel": {
+                                "url": "https://some-url"
+                            }
+                        },
+                        "timeout": 15,
+                        "username": "Chef Run Bot",
+                        "icon_url": "https://avatars1.githubusercontent.com/u/29740",
+                        "icon_emoji": ":fork_and_knife:",
+                        "message_detail_level": "elapsed",
+                        "cookbook_detail_level": "all",
+                        "fail_only": true,
+                        "send_start_message": false,
+                        "send_environment": false,
+                        "send_organization": false
+                    }
+                }
+            },
+            "ohai": {
+                "disabled_plugins": [],
+                "plugin_path": null
+            },
+            "cpe_profiles": {
+                "prefix": "com.chef.chefit"
+            },
+            "cpe_bluetooth": {
+                "BluetoothAutoSeekKeyboard": null,
+                "BluetoothAutoSeekPointingDevice": null
+            },
+            "cpe_chef": {
+                "config": true,
+                "interval": 1800,
+                "knife": false
+            },
+            "cpe_choco": {
+                "bootstrap": {
+                    "installation_uri": "https://chocolatey.org/install.ps1",
+                    "upgrade_source": "https://chocolatey.org/api/v2",
+                    "version": "0.10.3",
+                    "choco_download_url": "https://chocolatey.org/api/v2/Packages()?$filter=((Id%20eq%20%27chocolatey%27)%20and%20(not%20IsPrerelease))%20and%20IsLatestVersion",
+                    "zip_location": "https://chocolatey.org/7za.exe",
+                    "use_windows_compression": "true"
+                },
+                "install": {},
+                "uninstall": {},
+                "source_blacklist": [],
+                "default_feed": "https://chocolatey.org/api/v2",
+                "sources": {
+                    "chocolatey": {
+                        "source": "https://chocolatey.org/api/v2"
+                    }
+                },
+                "config": {
+                    "cacheLocation": {
+                        "value": "",
+                        "description": "Cache location if not TEMP folder."
+                    },
+                    "commandExecutionTimeoutSeconds": {
+                        "value": 2700,
+                        "description": "Default timeout for command execution."
+                    },
+                    "webRequestTimeoutSeconds": {
+                        "value": 30,
+                        "description": "Default timeout for web requests. Available in 0.9.10+."
+                    },
+                    "containsLegacyPackageInstalls": {
+                        "value": true,
+                        "description": "Install has packages installed prior to 0.9.9 series."
+                    },
+                    "proxy": {
+                        "value": "",
+                        "description": "Explicit proxy location."
+                    },
+                    "proxyUser": {
+                        "value": "",
+                        "description": "Optional proxy user."
+                    },
+                    "proxyPassword": {
+                        "value": "",
+                        "description": "Optional proxy password. Encrypted."
+                    }
+                },
+                "features": {
+                    "checksumFiles": {
+                        "enabled": true,
+                        "setExplicitly": true,
+                        "description": "Checksum files when pulled in from internet (based on package)."
+                    },
+                    "autoUninstaller": {
+                        "enabled": true,
+                        "setExplicitly": true,
+                        "description": "Uninstall from programs and features without requiring an explicit uninstall script."
+                    },
+                    "allowGlobalConfirmation": {
+                        "enabled": false,
+                        "setExplicitly": true,
+                        "description": "Prompt for confirmation in scripts or bypass."
+                    },
+                    "failOnAutoUninstaller": {
+                        "enabled": true,
+                        "setExplicitly": true,
+                        "description": "Fail if automatic uninstaller fails."
+                    },
+                    "failOnStandardError": {
+                        "enabled": true,
+                        "setExplicitly": true,
+                        "description": "Fail if install provider writes to stderr. Available in 0.9.10+."
+                    },
+                    "powershellHost": {
+                        "enabled": true,
+                        "setExplicitly": true,
+                        "description": "Use Chocolatey's built-in PowerShell host. Available in 0.9.10+."
+                    },
+                    "logEnvironmentValues": {
+                        "enabled": false,
+                        "setExplicitly": true,
+                        "description": "Log Environment Values - will log values of environment before and after install (could disclose sensitive data). Available in 0.9.10+."
+                    },
+                    "virusCheck": {
+                        "enabled": false,
+                        "setExplicitly": true,
+                        "description": "Virus Check - perform virus checking on downloaded files. Available in 0.9.10+. Licensed versions only."
+                    },
+                    "failOnInvalidOrMissingLicense": {
+                        "enabled": false,
+                        "setExplicitly": true,
+                        "description": "Fail On Invalid Or Missing License - allows knowing when a license is expired or not applied to a machine. Available in 0.9.10+."
+                    },
+                    "ignoreInvalidOptionsSwitches": {
+                        "enabled": true,
+                        "setExplicitly": true,
+                        "description": "Ignore Invalid Options/Switches - If a switch or option is passed that is not recognized, should choco fail? Available in 0.9.10+."
+                    },
+                    "usePackageExitCodes": {
+                        "enabled": true,
+                        "setExplicitly": true,
+                        "description": "Use Package Exit Codes - Package scripts can provide exit codes. With this on, package exit codes will be what choco uses for exit when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. With this feature off, choco will exit with a 0 or a 1 (matching previous behavior). Available in 0.9.10+."
+                    },
+                    "useFipsCompliantChecksums": {
+                        "enabled": false,
+                        "setExplicitly": true,
+                        "description": "Use FIPS Compliant Checksums - Ensure checksumming done by choco uses FIPS compliant algorithms. Not recommended unless required by FIPS Mode. Enabling on an existing installation could have unintended consequences related to upgrades/uninstalls. Available in 0.9.10+."
+                    },
+                    "allowEmptyChecksums": {
+                        "enabled": false,
+                        "setExplicitly": true,
+                        "description": "Allow packages to have empty/missing checksums for downloaded resources from non-secure locations (HTTP, FTP). Enabling is not recommended if using sources that download resources from the internet. Available in 0.10.0+."
+                    },
+                    "allowEmptyChecksumsSecure": {
+                        "enabled": false,
+                        "setExplicitly": true,
+                        "description": "Allow packages to have empty/missing checksums for downloaded resources from secure locations (HTTPS). Available in 0.10.0+."
+                    },
+                    "scriptsCheckLastExitCode": {
+                        "enabled": false,
+                        "setExplicitly": true,
+                        "description": "Scripts Check $LastExitCode (external commands) - Leave this off unless you absolutely need it while you fix your package scripts  to use `throw 'error message'` or `Set-PowerShellExitCode #` instead of `exit #`. This behavior started in 0.9.10 and produced hard to find bugs. If the last external process exits successfully but with an exit code of not zero, this could cause hard to detect package failures. Available in 0.10.3+. Will be removed in 0.11.0."
+                    }
+                }
+            },
+            "cpe_chrome": {
+                "profile": {
+                    "ExtensionInstallForcelist": [],
+                    "ExtensionInstallBlacklist": [],
+                    "EnabledPlugins": [],
+                    "DisabledPlugins": [],
+                    "DefaultPluginsSetting": 1,
+                    "ExtensionInstallSources": [],
+                    "PluginsAllowedForUrls": []
+                },
+                "mp": {
+                    "UseMasterPreferencesFile": false,
+                    "FileContents": {}
+                }
+            },
+            "cpe_launchd": {
+                "prefix": "com.chef.chefit"
+            },
+            "cpe_remote": {
+                "base_url": "munki.opscodecorp.com/munki_repo/chef",
+                "server_accessible": true
+            },
+            "cpe_crypt": {
+                "install": false,
+                "uninstall": false,
+                "profile": true,
+                "manage_authdb": true,
+                "manage_ld": true,
+                "ld": {
+                    "program_arguments": [
+                        "/Library/Crypt/checkin"
+                    ],
+                    "disabled": false,
+                    "run_at_load": true,
+                    "start_interval": 120,
+                    "type": "daemon"
+                },
+                "prefs": {
+                    "ServerURL": null,
+                    "SkipUsers": null,
+                    "RemovePlist": null,
+                    "RotateUsedKey": null,
+                    "ValidateKey": null,
+                    "FDEAddUser": null,
+                    "OutputPath": null,
+                    "KeyEscrowInterval": null
+                },
+                "pkg": {
+                    "name": "crypt",
+                    "checksum": "1582e974820a5b27cfe462521cb0d4802319224753f3d6417ee23fff9333872a",
+                    "receipt": "com.grahamgilbert.Crypt",
+                    "version": "3.0.0.109",
+                    "pkg_name": null,
+                    "pkg_url": null
+                }
+            },
+            "cpe_desktop": {
+                "override-picture-path": null
+            },
+            "cpe_hosts": {
+                "extra_entries": {
+                    "::1": [],
+                    "127.0.0.1": []
+                }
+            },
+            "cpe_macos_server": {
+                "setup": false,
+                "manage": false,
+                "services": {}
+            },
+            "cpe_munki": {
+                "install": false,
+                "configure": false,
+                "auto_remediate": null,
+                "local": {
+                    "managed_installs": [],
+                    "managed_uninstalls": []
+                },
+                "preferences": {
+                    "AppleSoftwareUpdatesOnly": false,
+                    "DaysBetweenNotifications": 1,
+                    "FollowHTTPRedirects": "none",
+                    "InstallAppleSoftwareUpdates": false,
+                    "LogFile": "/Library/Managed Installs/Logs/ManagedSoftwareUpdate.log",
+                    "LoggingLevel": 1,
+                    "LogToSyslog": false,
+                    "PerformAuthRestarts": false,
+                    "RecoveryKeyFile": null,
+                    "SoftwareRepoURL": "https://munki/repo",
+                    "SuppressAutoInstall": false,
+                    "SuppressStopButtonOnInstall": false,
+                    "SuppressUserNotification": false,
+                    "UnattendedAppleUpdates": false,
+                    "UseClientCertificate": false,
+                    "UseNotificationCenterDays": null
+                },
+                "munki_version_to_install": {}
+            },
+            "cpe_nightly_reboot": {
+                "script": "/opt/chef/scripts/logout_bootstrap.py",
+                "restart": {
+                    "Month": null,
+                    "Day": null,
+                    "Weekday": null,
+                    "Hour": null,
+                    "Minute": null
+                },
+                "logout": {
+                    "Month": null,
+                    "Day": null,
+                    "Weekday": null,
+                    "Hour": null,
+                    "Minute": null
+                }
+            },
+            "cpe_pathsd": [],
+            "cpe_powermanagement": {
+                "ACPower": {
+                    "Automatic Restart On Power Loss": null,
+                    "Disk Sleep Timer": null,
+                    "Display Sleep Timer": null,
+                    "Sleep On Power Button": null,
+                    "System Sleep Timer": null,
+                    "Wake On LAN": null,
+                    "RestartAfterKernelPanic": null
+                },
+                "Battery": {
+                    "Automatic Restart On Power Loss": null,
+                    "Disk Sleep Timer": null,
+                    "Display Sleep Timer": null,
+                    "Sleep On Power Button": null,
+                    "System Sleep Timer": null,
+                    "Wake On LAN": null,
+                    "RestartAfterKernelPanic": null
+                }
+            },
+            "cpe_preferencepanes": {
+                "DisabledPreferencePanes": null,
+                "HiddenPreferencePanes": null
+            },
+            "cpe_prompt_user": {
+                "CocoaDialog": "/Applications/CocoaDialog.app/Contents/MacOS/CocoaDialog",
+                "icon": null,
+                "prompts": {}
+            },
+            "cpe_screensaver": {
+                "idleTime": null,
+                "askForPassword": null,
+                "askForPasswordDelay": null
+            },
+            "cpe_spotlight": {
+                "exclusions": []
+            },
+            "screensaver": {
+                "idle_time": 1200
+            },
+            "organization": "chef"
+        },
+        "override": {},
+        "run_list": [
+            "role[cpe_base]"
+        ]
+    },
+    "node_name": "LAPTOP-03J74NE1",
+    "organization_name": "chefitproduction",
+    "resources": [
+        {
+            "type": "inspec_gem",
+            "name": "inspec",
+            "id": "inspec",
+            "after": {
+                "version": null,
+                "source": null
+            },
+            "before": {},
+            "duration": "78",
+            "delta": "",
+            "ignore_failure": false,
+            "result": "install",
+            "status": "up-to-date",
+            "cookbook_name": "audit",
+            "cookbook_version": "7.4.1",
+            "recipe_name": "inspec"
+        },
+        {
+            "type": "inspec_gem",
+            "name": "inspec",
+            "id": "inspec",
+            "after": {
+                "version": null,
+                "source": null
+            },
+            "before": {},
+            "duration": "0",
+            "delta": "",
+            "ignore_failure": false,
+            "result": "nothing",
+            "status": "skipped",
+            "cookbook_name": "audit",
+            "cookbook_version": "7.4.1",
+            "recipe_name": "inspec",
+            "conditional": "not_if { action == :nothing }"
+        },
+        {
+            "type": "directory",
+            "name": "c:\\chef",
+            "id": "c:\\chef",
+            "after": {
+                "group": null,
+                "mode": null,
+                "owner": null,
+                "path": "c:\\chef"
+            },
+            "before": {
+                "group": null,
+                "mode": null,
+                "owner": null,
+                "path": "c:\\chef"
+            },
+            "duration": "2",
+            "delta": "",
+            "ignore_failure": false,
+            "result": "create",
+            "status": "up-to-date",
+            "cookbook_name": "chefit-masterclient",
+            "cookbook_version": "0.1.20",
+            "recipe_name": "default"
+        },
+        {
+            "type": "template",
+            "name": "/templates/default/windows.rb",
+            "id": "c:\\chef\\client.rb",
+            "after": {
+                "rights": null,
+                "deny_rights": null,
+                "path": "c:\\chef\\client.rb",
+                "verifications": [],
+                "variables": {
+                    "erb_token": "tNU9pwnSHSZXjAEkNGHpZeLFCMg=",
+                    "erb_server_url": "https://chefit.automate.chef.io/data-collector/v0"
+                },
+                "checksum": "73630fe0a50814fb5abba6815bf8bfa8eb6e146e07eab4e9b9f670c4e82b8449"
+            },
+            "before": {
+                "checksum": "efde2862d591b6e532abd6175c5ba2bf31ee689c6cb546eff677d3209ea9ec9f",
+                "rights": null,
+                "deny_rights": null,
+                "path": "c:\\chef\\client.rb"
+            },
+            "duration": "49",
+            "delta": "--- c:\\chef\\client.rb\t2020-04-06 13:44:59.621902000 -0700\\n+++ c:\\chef/chef-client20200406-3128-1c5dlwd.rb\t2020-04-06 13:45:31.455029100 -0700\\n@@ -3,17 +3,16 @@\\n validation_client_name 'chefitproduction-validator'\\n validation_key         File.expand_path('/chef/validation.pem')\\n chef_server_url        \"https://api.chef.io/organizations/chefitproduction\"\\n-#json_attribs           '/chef/run-list.json'\\n+json_attribs           '/chef/run-list.json'\\n ssl_verify_mode        :verify_peer\\n local_key_generation   true\\n rest_timeout           30\\n http_retry_count       3\\n \\n node_name \"LAPTOP-03J74NE1\"\\n-Chef::Config[:data_collector][:output_locations] = { files:  [ \"C:\\\\Users\\\\jmccrae\\\\data_collector.out\" ] }\\n data_collector.server_url \"https://chefit.automate.chef.io/data-collector/v0\"\\n data_collector.token \"tNU9pwnSHSZXjAEkNGHpZeLFCMg=\"\\n-slack_webhook_url \"\"\\n+slack_webhook_url \"\" \\n \\n ohai.directory = \"/chef/ohai_plugins\"\\n ohai.disabled_plugins = [:Passwd]",
+            "ignore_failure": false,
+            "result": "create",
+            "status": "updated",
+            "cookbook_name": "chefit-masterclient",
+            "cookbook_version": "0.1.20",
+            "recipe_name": "default"
+        },
+        {
+            "type": "powershell_script",
+            "name": "create_admin_user",
+            "id": "create_admin_user",
+            "after": {
+                "command": null,
+                "user": null,
+                "domain": null,
+                "code": "  $user = \"Boiardie\"\n  $pwd = \"0psCode!!\"\n  New-LocalUser -PasswordNeverExpires -Password (ConvertTo-SecureString -AsPlainText $pwd -Force) -Name $user\n",
+                "interpreter": "powershell.exe"
+            },
+            "before": {},
+            "duration": "775",
+            "delta": "",
+            "ignore_failure": false,
+            "result": "run",
+            "status": "skipped",
+            "cookbook_name": "windows_localadminaccount",
+            "cookbook_version": "0.1.3",
+            "recipe_name": "default",
+            "conditional": "not_if \"Get-Localuser -Name Boiardie\""
+        },
+        {
+            "type": "group",
+            "name": "Administrators",
+            "id": "Administrators",
+            "after": {
+                "members": [
+                    "Boiardie"
+                ],
+                "group_name": "Administrators",
+                "excluded_members": [],
+                "append": true
+            },
+            "before": {
+                "members": [
+                    "S-1-5-21-4139225701-1809223480-1368843279-500",
+                    "S-1-12-1-610816556-1296309953-3772466358-3886913440",
+                    "S-1-12-1-601528976-1246840496-2885518471-1582481920",
+                    "S-1-12-1-4293681624-1320698286-1406452144-2493789976",
+                    "S-1-5-21-4139225701-1809223480-1368843279-1001"
+                ],
+                "group_name": "Administrators"
+            },
+            "duration": "10",
+            "delta": "",
+            "ignore_failure": false,
+            "result": "modify",
+            "status": "up-to-date",
+            "cookbook_name": "windows_localadminaccount",
+            "cookbook_version": "0.1.3",
+            "recipe_name": "default"
+        },
+        {
+            "type": "registry_key",
+            "name": "Update or Set Screensaver",
+            "id": "HKEY_CURRENT_USER\\Control Panel\\Desktop",
+            "after": {
+                "values": [
+                    {
+                        "name": "ScreenSaveActive",
+                        "type": "string",
+                        "data": "1"
+                    },
+                    {
+                        "name": "ScreenSaverIsSecure",
+                        "type": "string",
+                        "data": "1"
+                    },
+                    {
+                        "name": "scrnsave.exe",
+                        "type": "string",
+                        "data": "c:\\windows\\system32\\mystify.scr"
+                    },
+                    {
+                        "name": "ScreenSaveTimeOut",
+                        "type": "string",
+                        "data": 1200
+                    }
+                ],
+                "key": "HKEY_CURRENT_USER\\Control Panel\\Desktop",
+                "recursive": true
+            },
+            "before": {
+                "values": [
+                    {
+                        "name": "ActiveWndTrackTimeout",
+                        "type": "dword",
+                        "data": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+                    },
+                    {
+                        "name": "BlockSendInputResets",
+                        "type": "string",
+                        "data": "0"
+                    },
+                    {
+                        "name": "CaretTimeout",
+                        "type": "dword",
+                        "data": "0f8eb4b72b6e0c9e88b388eb967b49e067ef1004bf07bffc22c3acb13b43580a"
+                    },
+                    {
+                        "name": "CaretWidth",
+                        "type": "dword",
+                        "data": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+                    },
+                    {
+                        "name": "ClickLockTime",
+                        "type": "dword",
+                        "data": "15197cf7214b58e67cae565e573ffd9aa44bcb81f8ee5d7185dfe8da0a16ef43"
+                    },
+                    {
+                        "name": "CoolSwitchColumns",
+                        "type": "string",
+                        "data": "7"
+                    },
+                    {
+                        "name": "CoolSwitchRows",
+                        "type": "string",
+                        "data": "3"
+                    },
+                    {
+                        "name": "CursorBlinkRate",
+                        "type": "string",
+                        "data": "530"
+                    },
+                    {
+                        "name": "DockMoving",
+                        "type": "string",
+                        "data": "1"
+                    },
+                    {
+                        "name": "DragFromMaximize",
+                        "type": "string",
+                        "data": "1"
+                    },
+                    {
+                        "name": "DragFullWindows",
+                        "type": "string",
+                        "data": "1"
+                    },
+                    {
+                        "name": "DragHeight",
+                        "type": "string",
+                        "data": "4"
+                    },
+                    {
+                        "name": "DragWidth",
+                        "type": "string",
+                        "data": "4"
+                    },
+                    {
+                        "name": "FocusBorderHeight",
+                        "type": "dword",
+                        "data": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+                    },
+                    {
+                        "name": "FocusBorderWidth",
+                        "type": "dword",
+                        "data": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+                    },
+                    {
+                        "name": "FontSmoothing",
+                        "type": "string",
+                        "data": "2"
+                    },
+                    {
+                        "name": "FontSmoothingGamma",
+                        "type": "dword",
+                        "data": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+                    },
+                    {
+                        "name": "FontSmoothingOrientation",
+                        "type": "dword",
+                        "data": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+                    },
+                    {
+                        "name": "FontSmoothingType",
+                        "type": "dword",
+                        "data": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+                    },
+                    {
+                        "name": "ForegroundFlashCount",
+                        "type": "dword",
+                        "data": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451"
+                    },
+                    {
+                        "name": "ForegroundLockTimeout",
+                        "type": "dword",
+                        "data": "b552e632666bbf6125e3109e28a4fecc08340d017e44109dadbf497a280b8f82"
+                    },
+                    {
+                        "name": "LeftOverlapChars",
+                        "type": "string",
+                        "data": "3"
+                    },
+                    {
+                        "name": "MenuShowDelay",
+                        "type": "string",
+                        "data": "400"
+                    },
+                    {
+                        "name": "MouseWheelRouting",
+                        "type": "dword",
+                        "data": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+                    },
+                    {
+                        "name": "PaintDesktopVersion",
+                        "type": "dword",
+                        "data": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+                    },
+                    {
+                        "name": "Pattern",
+                        "type": "dword",
+                        "data": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+                    },
+                    {
+                        "name": "RightOverlapChars",
+                        "type": "string",
+                        "data": "3"
+                    },
+                    {
+                        "name": "ScreenSaveActive",
+                        "type": "string",
+                        "data": "1"
+                    },
+                    {
+                        "name": "SnapSizing",
+                        "type": "string",
+                        "data": "1"
+                    },
+                    {
+                        "name": "TileWallpaper",
+                        "type": "string",
+                        "data": "0"
+                    },
+                    {
+                        "name": "WallPaper",
+                        "type": "string",
+                        "data": "C:\\WINDOWS\\resources\\Themes\\W10_Dark_Graphite\\Wallpaper\\wall.jpg"
+                    },
+                    {
+                        "name": "WallpaperOriginX",
+                        "type": "dword",
+                        "data": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+                    },
+                    {
+                        "name": "WallpaperOriginY",
+                        "type": "dword",
+                        "data": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+                    },
+                    {
+                        "name": "WallpaperStyle",
+                        "type": "string",
+                        "data": "10"
+                    },
+                    {
+                        "name": "WheelScrollChars",
+                        "type": "string",
+                        "data": "3"
+                    },
+                    {
+                        "name": "WheelScrollLines",
+                        "type": "string",
+                        "data": "3"
+                    },
+                    {
+                        "name": "WindowArrangementActive",
+                        "type": "string",
+                        "data": "1"
+                    },
+                    {
+                        "name": "Win8DpiScaling",
+                        "type": "dword",
+                        "data": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+                    },
+                    {
+                        "name": "DpiScalingVer",
+                        "type": "dword",
+                        "data": "8b926d75599a618e21f1341318e66517be26e18cc7496783d2b59758c1333be8"
+                    },
+                    {
+                        "name": "UserPreferencesMask",
+                        "type": "binary",
+                        "data": "2d233bca82cd83699c9b0fc61e62acbfa2c7f9092084b792449993fe0c998d18"
+                    },
+                    {
+                        "name": "MaxVirtualDesktopDimension",
+                        "type": "dword",
+                        "data": "84b504f830bf8b6d2c233eead51d27a08d46a33ddf8225d90197e3f565f5d621"
+                    },
+                    {
+                        "name": "MaxMonitorDimension",
+                        "type": "dword",
+                        "data": "13105809c5b30ef11331cc0b62b71c70623c0353e7c32de4cf1d6d589bf3f286"
+                    },
+                    {
+                        "name": "TranscodedImageCount",
+                        "type": "dword",
+                        "data": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+                    },
+                    {
+                        "name": "LastUpdated",
+                        "type": "dword",
+                        "data": "f807212b6748a8300fc3702322caa515edf0a6ed9bbc86e94c451e351b080c60"
+                    },
+                    {
+                        "name": "TranscodedImageCache",
+                        "type": "binary",
+                        "data": "eb9053233698dc8c9136e743d2c5c471f603a44191034960244da86161950e38"
+                    },
+                    {
+                        "name": "SCRNSAVE.EXE",
+                        "type": "string",
+                        "data": "c:\\windows\\system32\\mystify.scr"
+                    },
+                    {
+                        "name": "LockScreenAutoLockActive",
+                        "type": "string",
+                        "data": "0"
+                    },
+                    {
+                        "name": "ScreenSaveTimeOut",
+                        "type": "string",
+                        "data": "1200"
+                    },
+                    {
+                        "name": "ScreenSaverIsSecure",
+                        "type": "string",
+                        "data": "1"
+                    }
+                ],
+                "key": "HKEY_CURRENT_USER\\Control Panel\\Desktop",
+                "recursive": true,
+                "architecture": "machine"
+            },
+            "duration": "56",
+            "delta": "",
+            "ignore_failure": false,
+            "result": "create",
+            "status": "updated",
+            "cookbook_name": "windows_screensaver",
+            "cookbook_version": "0.1.11",
+            "recipe_name": "default"
+        }
+    ],
+    "run_id": "8e2886dd-58f5-4db0-b0d1-70e1f1af5466",
+    "run_list": [
+        "role[cpe_base]"
+    ],
+    "cookbooks": {
+        "cpe_init": {
+            "version": "0.1.105"
+        },
+        "cpe_utils": {
+            "version": "0.1.0"
+        },
+        "audit": {
+            "version": "7.4.1"
+        },
+        "chef-client": {
+            "version": "11.0.3"
+        },
+        "cron": {
+            "version": "5.1.0"
+        },
+        "logrotate": {
+            "version": "2.1.0"
+        },
+        "compat_resource": {
+            "version": "12.19.1"
+        },
+        "cpe_bluetooth": {
+            "version": "0.1.0"
+        },
+        "cpe_profiles": {
+            "version": "0.1.0"
+        },
+        "chefit-masterclient": {
+            "version": "0.1.20"
+        },
+        "cpe_desktop": {
+            "version": "0.1.0"
+        },
+        "cpe_chrome": {
+            "version": "0.1.0"
+        },
+        "cpe_choco": {
+            "version": "0.1.2"
+        },
+        "cpe_chef": {
+            "version": "0.1.2"
+        },
+        "cpe_crypt": {
+            "version": "0.1.0"
+        },
+        "cpe_launchd": {
+            "version": "0.1.2"
+        },
+        "cpe_remote": {
+            "version": "0.1.0"
+        },
+        "cpe_logger": {
+            "version": "0.1.0"
+        },
+        "cpe_hosts": {
+            "version": "0.2.0"
+        },
+        "cpe_macos_server": {
+            "version": "0.1.0"
+        },
+        "cpe_munki": {
+            "version": "0.3.0"
+        },
+        "cpe_nightly_reboot": {
+            "version": "0.1.0"
+        },
+        "cpe_pathsd": {
+            "version": "0.1.0"
+        },
+        "cpe_powermanagement": {
+            "version": "0.1.0"
+        },
+        "cpe_preferencepanes": {
+            "version": "0.1.0"
+        },
+        "cpe_prompt_user": {
+            "version": "0.1.0"
+        },
+        "cpe_screensaver": {
+            "version": "0.1.0"
+        },
+        "cpe_spotlight": {
+            "version": "0.1.0"
+        },
+        "cpe_batterycheck": {
+            "version": "0.1.0"
+        },
+        "cpe_botmanagement": {
+            "version": "0.1.0"
+        },
+        "slack_handler": {
+            "version": "1.0.0"
+        },
+        "windows_localadminaccount": {
+            "version": "0.1.3"
+        },
+        "windows_screensaver": {
+            "version": "0.1.11"
+        }
+    },
+    "policy_name": null,
+    "policy_group": null,
+    "start_time": "2020-04-06T20:45:25Z",
+    "end_time": "2020-04-06T20:45:33Z",
+    "source": "chef_client",
+    "status": "success",
+    "total_resource_count": 7,
+    "updated_resource_count": 2,
+    "deprecations": []
+}

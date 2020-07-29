@@ -5,7 +5,7 @@ import (
 	"context"
 	"sort"
 
-	chef "github.com/chef/go-chef"
+	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -16,14 +16,14 @@ import (
 // GetCookbooks get cookbooks list
 func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*response.Cookbooks, error) {
 
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	cookbookList, err := c.client.Cookbooks.List()
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Cookbooks{
@@ -34,14 +34,14 @@ func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*res
 // GetCookbookVersions get cookbook with all available versions
 func (s *Server) GetCookbookVersions(ctx context.Context, req *request.CookbookVersions) (*response.CookbookVersions, error) {
 
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	res, err := c.client.Cookbooks.GetAvailableVersions(req.Name, "")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err)
 	}
 
 	cookbook, success := res[req.Name]
@@ -57,13 +57,12 @@ func (s *Server) GetCookbookVersions(ctx context.Context, req *request.CookbookV
 // GetCookbook get cookbook detail
 func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*response.Cookbook, error) {
 
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	if req.Name == "" {
-		s.service.Logger.Debug("Cookbook Fetch: missing cookbook name")
 		return nil, status.Error(codes.InvalidArgument, "must supply cookbook name")
 	}
 
@@ -74,7 +73,7 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 
 	cookbook, err := c.client.Cookbooks.GetVersion(req.Name, version)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, ParseAPIError(err)
 	}
 
 	return &response.Cookbook{
@@ -101,9 +100,9 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 // GetCookbookFileContent get the data file content of the cookbook
 func (s *Server) GetCookbookFileContent(ctx context.Context, req *request.CookbookFileContent) (*response.CookbookFileContent, error) {
 	var writer bytes.Buffer
-	c, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
+		return nil, err
 	}
 
 	clientReq, err := c.client.NewRequest("GET", req.Url, nil)

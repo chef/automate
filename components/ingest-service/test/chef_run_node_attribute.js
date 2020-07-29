@@ -4,7 +4,7 @@ var chakram = require('chakram'),
 var helpers = require('./helpers.js');
 
 function endpoint() {
-  return helpers.REST_SERVICE_URI + '/events/chef/run';
+  return helpers.REST_SERVICE_URI + '/api/v0/events/chef/run';
 }
 
 function nodeAttributeUrl() {
@@ -20,8 +20,8 @@ describe("creating node attribute", function () {
       let entityUuid = 'test_id';
       let chefRun = helpers.ChefRun.clone();
       chefRun.set('entity_uuid', entityUuid);
-      
-      // Wait until after the chef run is posted. 
+
+      // Wait until after the chef run is posted.
       return chakram.all([chakram.post(endpoint(), chefRun.json())]).then(function(responses) {
         expect(responses[0]).to.have.status(200);
         // Wait until the node-attribute index is refreshed.
@@ -39,7 +39,7 @@ describe("creating node attribute", function () {
             expect(source.override_value_count).to.equal(7);
             expect(source.automatic_value_count).to.equal(1281);
             expect(source.all_value_count).to.equal(1790);
-            
+
           });
         });
       });
@@ -62,13 +62,13 @@ describe("creating node attribute", function () {
       chefRun2.set('entity_uuid', entityUuid2);
 
       let postResponses = [
-        chakram.post(endpoint(), chefRun1.json()), 
+        chakram.post(endpoint(), chefRun1.json()),
         chakram.post(endpoint(), chefRun2.json())
       ];
-      
-      // Wait for the post. 
+
+      // Wait for the post.
       return chakram.all(postResponses).then(function(responses) {
-        for (i = 0; i < responses.length; i++) { 
+        for (i = 0; i < responses.length; i++) {
           let response = responses[i];
           expect(response).to.have.status(200);
         }
@@ -106,14 +106,14 @@ describe("creating node attribute", function () {
       let chefRun2 = helpers.ChefRun.clone();
       chefRun2.set('entity_uuid', entityUuid);
       chefRun2.set('chef_environment', 'second');
-      
-      // Wait for the chefRun1 post. 
+
+      // Wait for the chefRun1 post.
       return chakram.all([chakram.post(endpoint(), chefRun1.json())]).then(function(responses) {
         let response = responses[0];
         expect(response).to.have.status(200);
         // Wait for the refresh requests.
         return chakram.all([helpers.NodeAttributeRefresh()]).then(function(responses) {
-          // Wait for the chefRun2 post. 
+          // Wait for the chefRun2 post.
           return chakram.all([chakram.post(endpoint(), chefRun2.json())]).then(function(responses) {
             // Wait for the refresh requests.
             return chakram.all([helpers.NodeAttributeRefresh()]).then(function(responses) {

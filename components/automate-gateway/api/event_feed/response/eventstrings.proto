@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package chef.automate.api.event_feed.response;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/event_feed/response";
-import "components/automate-gateway/api/event_feed/response/event.proto";
+import "automate-gateway/api/event_feed/response/event.proto";
 
 
 message EventStrings {

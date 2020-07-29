@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
@@ -63,14 +63,14 @@ func TestListProfiles(t *testing.T) {
 		"project3": reportIds[3:],
 	}
 
-	projectRules := map[string]*iam_v2.ProjectRules{}
+	projectRules := map[string]*authz.ProjectRules{}
 	for k, v := range reportsProjects {
-		projectRules[k] = &iam_v2.ProjectRules{
-			Rules: []*iam_v2.ProjectRule{
+		projectRules[k] = &authz.ProjectRules{
+			Rules: []*authz.ProjectRule{
 				{
-					Conditions: []*iam_v2.Condition{
+					Conditions: []*authz.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Attribute: authz.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values:    v,
 						},
 					},

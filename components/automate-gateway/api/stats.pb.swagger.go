@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("stats", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/compliance/reporting/stats/stats.proto",
+    "title": "external/compliance/reporting/stats/stats.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/compliance/reporting/stats/failures": {
+    "/api/v0/compliance/reporting/stats/failures": {
       "post": {
         "summary": "Read Failures",
         "description": "Returns the top failures for the specified object. A types filter is required for this api.\nSupported values are ` + "`" + `platform` + "`" + `, ` + "`" + `environment` + "`" + `, ` + "`" + `control` + "`" + `, and ` + "`" + `profile` + "`" + `.\nBy default, the top ten failed objects for the specified type are returned.\nSupports filtering and respects ` + "`" + `size` + "`" + ` parameter.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filters\":[\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]},\n{\"type\":\"types\",\"values\":[\"platform\",\"environment\"]}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportFailures:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -42,7 +42,7 @@ func init() {
         ]
       }
     },
-    "/compliance/reporting/stats/profiles": {
+    "/api/v0/compliance/reporting/stats/profiles": {
       "post": {
         "summary": "Read Profiles",
         "description": "Returns statistics and summary information for profiles executed as part of the compliance reports. \nIf called without specifying a profile ID (` + "`" + `id` + "`" + `), the API will return stats on all the profiles.\nIf the ` + "`" + `id` + "`" + ` field is provided (profile ID) as part of the query object, the ` + "`" + `type` + "`" + ` field must also be specified. Options are ` + "`" + `controls` + "`" + ` or ` + "`" + `summary` + "`" + `.\nSupports filtering.\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"type\":\"controls\",\n\"id\":\"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988\",\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportProfiles:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -70,7 +70,7 @@ func init() {
         ]
       }
     },
-    "/compliance/reporting/stats/summary": {
+    "/api/v0/compliance/reporting/stats/summary": {
       "post": {
         "summary": "Read Summary",
         "description": "Returns summary statistics for compliance reports. \nGeneral report summary information is the default. \nAdding a ` + "`" + `type` + "`" + ` value of ` + "`" + `nodes` + "`" + ` or ` + "`" + `controls` + "`" + ` will return summary statistics for that object.\nSupports filtering.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"type\":\"nodes\",\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportSummary:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -98,7 +98,7 @@ func init() {
         ]
       }
     },
-    "/compliance/reporting/stats/trend": {
+    "/api/v0/compliance/reporting/stats/trend": {
       "post": {
         "summary": "Read Trend",
         "description": "Returns trendgraph statistics for compliance reports. \nThe ` + "`" + `type` + "`" + ` field is required for this api call. Options are ` + "`" + `nodes` + "`" + ` or ` + "`" + `controls` + "`" + `.\nRequires minimum ` + "`" + `interval` + "`" + ` field of 3600 and defined start time and end time filters.\nSupports filtering.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"type\":\"nodes\",\n\"interval\":86400,\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportTrend:get\n` + "`" + `` + "`" + `` + "`" + `",

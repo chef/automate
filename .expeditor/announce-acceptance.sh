@@ -11,5 +11,4 @@ The list of changes can be found here: https://github.com/chef/automate/compare/
 Please take your time to fill out the release notes by *EOD WEDNESDAY*: https://github.com/chef/automate/wiki/Pending-Release-Notes
 EOF
 
-post_slack_message "a2-team" "$message"
 post_slack_message "a2-release-coordinate" "$message"

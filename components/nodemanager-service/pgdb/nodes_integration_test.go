@@ -2,6 +2,7 @@ package pgdb_test
 
 import (
 	"context"
+	"sort"
 	"testing"
 
 	"github.com/chef/automate/api/interservice/compliance/common"
@@ -198,6 +199,70 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByTags() {
 
 	suite.Equal(node1Id, fetchedNodes[0].Id)
 	suite.Equal("Taco Node", fetchedNodes[0].Name)
+}
+
+func (suite *NodesIntegrationSuite) TestGetNodesCanSort() {
+	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Platform: "ubuntu", PlatformVersion: "14.04", LastContact: ptypes.TimestampNow(),
+		Tags: []*common.Kv{{Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	timestamp, err := ptypes.TimestampProto(time.Now().Add(time.Minute * -10))
+	node2, err := suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "aws-ec2", Platform: "ubuntu", PlatformVersion: "16.04", LastContact: timestamp,
+		Tags: []*common.Kv{{Key: "nachos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	node3, err := suite.Database.AddNode(&nodes.Node{Name: "No Nacho Node", Manager: "azure-vm", Platform: "centos", PlatformVersion: "7",
+		Tags: []*common.Kv{{Key: "nachos", Value: "no"}, {Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	// sort by name
+	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 3, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
+	suite.Equal("Nacho Node", fetchedNodes[0].GetName())
+	suite.Equal("No Nacho Node", fetchedNodes[1].GetName())
+
+	// sort by manager
+	fetchedNodes, count, err = suite.Database.GetNodes("manager", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 3, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
+	suite.Equal("automate", fetchedNodes[0].GetManager())
+	suite.Equal("aws-ec2", fetchedNodes[1].GetManager())
+	suite.Equal("azure-vm", fetchedNodes[2].GetManager())
+
+	// sort by platform
+	fetchedNodes, count, err = suite.Database.GetNodes("platform", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 3, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
+	suite.Equal("centos", fetchedNodes[0].GetPlatform())
+	suite.Equal("ubuntu", fetchedNodes[1].GetPlatform())
+	suite.Equal("ubuntu", fetchedNodes[2].GetPlatform())
+
+	// sort by state
+	stopped := manager.NodeState{
+		Id:    node2,
+		State: manager.NodeState_STOPPED,
+	}
+	err = suite.Database.ChangeNodeState(&stopped)
+	suite.Require().NoError(err)
+
+	missing := manager.NodeState{
+		Id:    node3,
+		State: manager.NodeState_MISSING,
+	}
+	err = suite.Database.ChangeNodeState(&missing)
+	suite.Require().NoError(err)
+
+	fetchedNodes, count, err = suite.Database.GetNodes("state", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 3, Unreachable: 2, Reachable: 0, Unknown: 1}, count)
+	suite.Equal("", fetchedNodes[0].GetState())
+	suite.Equal("MISSING", fetchedNodes[1].GetState())
+	suite.Equal("STOPPED", fetchedNodes[2].GetState())
 }
 
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByMultipleTags() {
@@ -632,4 +697,95 @@ func (suite *NodesIntegrationSuite) TestGetNodeDoesNotReturnDuplicatedData() {
 	suite.Require().NoError(err)
 	suite.Equal(projects, testNode.Projects)
 	suite.Equal(tags, testNode.Tags)
+}
+
+func (suite *NodesIntegrationSuite) TestGetNodeSuggestions() {
+	ctx := context.Background()
+	// add nodes
+	node1, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Platform: "debian", State: "MISSING", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	node2, err := suite.Database.AddNode(&nodes.Node{Name: "Tostada Node", Manager: "aws-ec2", Platform: "ubuntu", State: "RUNNING", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "automate", Platform: "debian", State: "TERMINATED", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	// get suggestions: name
+	sugg, err := suite.Database.GetNodeSuggestions(ctx, "name", []*common.Filter{})
+	suite.Require().NoError(err)
+	sort.Strings(sugg)
+	suite.Equal([]string{"Nacho Node", "Taco Node", "Tostada Node"}, sugg)
+
+	// get suggestions: platform
+	sugg, err = suite.Database.GetNodeSuggestions(ctx, "platform", []*common.Filter{})
+	suite.Require().NoError(err)
+	sort.Strings(sugg)
+	suite.Equal([]string{"debian", "ubuntu"}, sugg)
+
+	// get suggestions: mgr
+	sugg, err = suite.Database.GetNodeSuggestions(ctx, "manager", []*common.Filter{})
+	suite.Require().NoError(err)
+	sort.Strings(sugg)
+	suite.Equal([]string{"automate", "aws-ec2"}, sugg)
+
+	err = suite.Database.ChangeNodeState(&manager.NodeState{Id: node1, State: manager.NodeState_STOPPED})
+	suite.Require().NoError(err)
+	err = suite.Database.ChangeNodeState(&manager.NodeState{Id: node2, State: manager.NodeState_MISSING})
+	suite.Require().NoError(err)
+
+	// get suggestions: state
+	sugg, err = suite.Database.GetNodeSuggestions(ctx, "source_state", []*common.Filter{})
+	suite.Require().NoError(err)
+	sort.Strings(sugg)
+	suite.Equal([]string{"MISSING", "STOPPED"}, sugg)
+}
+
+func (suite *NodesIntegrationSuite) TestGetNodeSuggestionsWithFilters() {
+	ctx := context.Background()
+	// add nodes
+	node1, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Platform: "debian", State: "MISSING", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	node2, err := suite.Database.AddNode(&nodes.Node{Name: "Tostada Node", Manager: "aws-ec2", Platform: "ubuntu", State: "RUNNING", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "aws-ec2", Platform: "ubuntu", State: "RUNNING", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Toasted Node", Manager: "automate", Platform: "debian", State: "TERMINATED", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	// get suggestions: name
+	sugg, err := suite.Database.GetNodeSuggestions(ctx, "name", []*common.Filter{
+		{Key: "manager_type", Values: []string{"aws-ec2"}},
+	})
+	suite.Require().NoError(err)
+	sort.Strings(sugg)
+	suite.Equal([]string{"Nacho Node", "Tostada Node"}, sugg)
+
+	// get suggestions: platform
+	sugg, err = suite.Database.GetNodeSuggestions(ctx, "platform", []*common.Filter{
+		{Key: "name", Values: []string{"To*"}},
+	})
+	suite.Require().NoError(err)
+	sort.Strings(sugg)
+	suite.Equal([]string{"debian", "ubuntu"}, sugg)
+
+	// get suggestions: mgr
+	sugg, err = suite.Database.GetNodeSuggestions(ctx, "manager", []*common.Filter{
+		{Key: "platform_name", Values: []string{"debian"}},
+	})
+	suite.Require().NoError(err)
+	suite.Equal([]string{"automate"}, sugg)
+
+	suite.Database.ChangeNodeState(&manager.NodeState{Id: node1, State: manager.NodeState_STOPPED})
+	suite.Database.ChangeNodeState(&manager.NodeState{Id: node2, State: manager.NodeState_MISSING})
+
+	// get suggestions: state
+	sugg, err = suite.Database.GetNodeSuggestions(ctx, "source_state", []*common.Filter{
+		{Key: "name", Values: []string{"Taco*"}},
+	})
+	suite.Require().NoError(err)
+	suite.Equal([]string{"STOPPED"}, sugg)
 }

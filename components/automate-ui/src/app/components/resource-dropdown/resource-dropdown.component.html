@@ -1,0 +1,49 @@
+<label for="{{ objectNounPlural }}">{{ objectNounPlural | capitalize }}</label>
+<div class="dropdown-wrap">
+  <button class="dropdown-button" attr.aria-label="Select {{ objectNounPlural }}"
+    (click)="toggleDropdown()"
+    [ngClass]="{'active': dropdownState === 'open'}"
+    [disabled]="disabled"
+    (keydown.arrowup)="moveFocus($event)"
+    (keydown.arrowdown)="moveFocus($event)">
+    <div id="resources-selected">{{ (label.length &gt; 25)? (label | slice:0:25)+'...' : label }}
+    </div>
+    <chef-icon aria-hidden>keyboard_arrow_down</chef-icon>
+  </button>
+  <chef-click-outside (clickOutside)="handleClickOutside()">
+    <chef-dropdown [attr.visible]="dropdownState === 'open'">
+
+      <div id="filter-container">
+        <input chefInput
+          id="{{ objectNounPlural }}"
+          type="text"
+          [(ngModel)]="filterValue"
+          placeholder="Filter {{ objectNounPlural }}..."
+          (keyup)="handleFilterKeyUp()" />
+      </div>
+
+      <div id="resource-container">
+        <ng-container *ngFor="let section of filteredResources">
+          <h3 class="resource-section" *ngIf="section.title && section.itemList.length">{{ section.title }}</h3>
+          <chef-checkbox *ngFor="let resource of section.itemList"
+            [checked]="resource.checked"
+            [attr.title]="resource.name"
+            (change)="resourceChecked($event.detail, resource)"
+            (keydown.enter)="closeDropdown()"
+            (keydown.esc)="closeDropdown()"
+            (keydown.arrowup)="moveFocus($event)"
+            (keydown.arrowdown)="moveFocus($event)">{{ resource.name }}</chef-checkbox>
+        </ng-container>
+      </div>
+
+      <div class="no-resources" *ngIf="allFilteredResourcesCount === 0">
+        <p>No {{ objectNounPlural }} found.</p>
+        <p>You don't have access to any {{ objectNounPlural }} that match your search.</p>
+      </div>
+
+    </chef-dropdown>
+  </chef-click-outside>
+</div>
+<p class="help-text light">
+  <ng-content></ng-content>
+</p>

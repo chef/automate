@@ -2,7 +2,8 @@
   <div class="container">
     <main>
       <chef-breadcrumbs>
-        <chef-breadcrumb [link]="['/compliance/reports/profiles']">Reports</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/compliance/reports/profiles']"
+          [queryParams]="returnParams">Reports</chef-breadcrumb>
         {{ profile?.title }}
       </chef-breadcrumbs>
 
@@ -47,7 +48,7 @@
           <chef-thead>
             <chef-tr>
               <chef-th>{{ controls.length }} Controls</chef-th>
-              <chef-th>Impact</chef-th>
+              <chef-th class="impact-status">Impact</chef-th>
               <chef-th>Test Results</chef-th>
               <chef-th></chef-th>
             </chef-tr>

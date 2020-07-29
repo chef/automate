@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/lib/tls/certs"
 )
 
@@ -37,7 +37,6 @@ type Storage interface {
 	GetTokenIDWithValue(ctx context.Context, value string) (string, error)
 	GetTokens(context.Context) ([]*Token, error)
 	PurgeProject(context.Context, string) error
-	ResetToV1(context.Context) error
 }
 
 // Resetter allows resetting the adapter to factory settings (e.g. deletes all
@@ -48,7 +47,7 @@ type Resetter interface {
 
 // ProjectValidator is a more limited interface for authz-service
 type ProjectValidator interface {
-	ValidateProjectAssignment(context.Context, *authz_v2.ValidateProjectAssignmentReq, ...grpc.CallOption) (*authz_v2.ValidateProjectAssignmentResp, error)
+	ValidateProjectAssignment(context.Context, *authz.ValidateProjectAssignmentReq, ...grpc.CallOption) (*authz.ValidateProjectAssignmentResp, error)
 }
 
 // TokenConfig is a configuration that can open a storage adapter

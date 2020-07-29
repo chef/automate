@@ -3,9 +3,9 @@ syntax = "proto3";
 
 package chef.automate.infra.esgateway;
 option go_package = "github.com/chef/automate/api/config/esgateway";
-import "api/config/shared/global.proto";
-import "api/config/shared/tls.proto";
-import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "config/shared/global.proto";
+import "config/shared/tls.proto";
+import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
 message ConfigRequest {
@@ -70,6 +70,8 @@ message ConfigRequest {
 					google.protobuf.StringValue client_body_buffer_size = 17;
 					google.protobuf.Int32Value proxy_read_timeout = 18;
 					google.protobuf.Int32Value proxy_send_timeout = 19;
+					google.protobuf.StringValue proxy_set_header_host = 20;
+
 				}
 
 			}

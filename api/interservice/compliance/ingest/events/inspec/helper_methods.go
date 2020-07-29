@@ -17,7 +17,7 @@ const (
 
 // "waived": "no" / "no_expired" / "yes" / "yes_run"
 
-// Status calculates the overall status of all controls based on all results
+// Status calculates the overall status of a control based on all results
 func (control *Control) Status() (status string) {
 	status = ResultStatusPassed
 	for _, result := range control.Results {

@@ -1,13 +1,17 @@
 <div class="content-container">
   <div class="container">
     <main>
-      <chef-notification
-        *ngIf="notificationVisible"
-        [type]="notificationType"
-        [timeout]="notificationTimeout()"
-        (dismissed)="hideNotification()">
-        {{ notificationMessage }}
-      </chef-notification>
+      <div class="sticky-notifications">
+        <div class="sticky-inner">
+          <app-notification
+            *ngIf="notificationVisible"
+            [type]="notificationType"
+            [timeout]="notificationTimeout()"
+            (dismissed)="hideNotification()">
+            {{ notificationMessage }}
+          </app-notification>
+        </div>
+      </div>
 
       <chef-page-header>
         <chef-heading>Data Lifecycle</chef-heading>
@@ -34,8 +38,15 @@
               </chef-checkbox>
             </div>
             <p>Remove event feed data after
-              <input chefInput formControlName="threshold" type="number" min="0" 
-                (keydown)="preventNegatives($event.key)"/>days
+              <input
+                aria-label="Days before removing event feed data"
+                chefInput
+                formControlName="threshold"
+                [resetOrigin]="shouldResetValues"
+                type="number"
+                min="0"
+                (keydown)="preventNegatives($event.key)"
+              />days
             </p>
           </div>
 
@@ -46,9 +57,16 @@
                 (change)="handleFormActivation(eventFeedServerActions, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove Chef Server actions after
-              <input chefInput type="number" min="0" formControlName="threshold" 
-                (keydown)="preventNegatives($event.key)"/>days
+            <p>Remove Chef Infra Server actions after
+              <input
+                aria-label="Days before removing Chef Infra Server actions"
+                chefInput
+                formControlName="threshold"
+                [resetOrigin]="shouldResetValues"
+                type="number"
+                min="0"
+                (keydown)="preventNegatives($event.key)"
+              />days
             </p>
           </div>
         </div>
@@ -57,23 +75,26 @@
           <h2>Service Groups</h2>
           <div class="checkbox-row" [formGroup]="serviceGroupNoHealthChecks">
             <div class="checkbox-container">
-              <chef-tooltip follow position="top" for='service-group-no-health'>
-                Changing this setting in the UI is not supported.
-              </chef-tooltip>
               <span id="service-group-no-health">
                 <chef-checkbox
                 [checked]="!serviceGroupNoHealthChecks.value.disabled"
-                disabled="true">
-                <!-- this is currently not changeable by the user in the UI -->
+                (change)="handleFormActivation(serviceGroupNoHealthChecks, $event.detail)">
                 </chef-checkbox>
               </span>
             </div>
 
             <p>When no health check reports have been received for a service in
-              <input chefInput type="number" min="0" formControlName="threshold" 
-                (keydown)="preventNegatives($event.key)" />
+              <input
+                aria-label="Amount of time before labeling a service disconnected"
+                chefInput
+                formControlName="threshold"
+                [resetOrigin]="shouldResetValues"
+                type="number"
+                min="0"
+                (keydown)="preventNegatives($event.key)"
+              />
               <mat-form-field appearance="none">
-                <mat-select panelClass="chef-dropdown" formControlName="unit">
+                <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
                   <mat-option value="m">minutes</mat-option>
                   <mat-option value="h">hours</mat-option>
                   <mat-option value="d">days</mat-option>
@@ -81,26 +102,28 @@
               </mat-form-field>
               , label the service as disconnected</p>
           </div>
-          
+
           <div class="checkbox-row secondary-row" [formGroup]="serviceGroupRemoveServices">
             <div class="checkbox-container">
-              <chef-tooltip follow position="top" for='service-group-remove-services'>
-                Changing this setting in the UI is not supported.
-              </chef-tooltip>
               <span id="service-group-remove-services">
                 <chef-checkbox
                 [checked]="!serviceGroupRemoveServices.value.disabled"
-                (change)="handleFormActivation(serviceGroupRemoveServices, $event.detail)"
-                disabled="true">
-                <!-- this is currently not changeable by the user in the UI -->
+                (change)="handleFormActivation(serviceGroupRemoveServices, $event.detail)">
                 </chef-checkbox>
               </span>
             </div>
             <p>Remove services labeled as disconnected after
-              <input chefInput type="number" min="0" formControlName="threshold"
-                (keydown)="preventNegatives($event.key)" />
+              <input
+                aria-label="Amount of time before removing disconnected services"
+                chefInput
+                formControlName="threshold"
+                [resetOrigin]="shouldResetValues"
+                type="number"
+                min="0"
+                (keydown)="preventNegatives($event.key)"
+              />
               <mat-form-field appearance="none">
-                <mat-select panelClass="chef-dropdown" formControlName="unit">
+                <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
                   <mat-option value="m">minutes</mat-option>
                   <mat-option value="h">hours</mat-option>
                   <mat-option value="d">days</mat-option>
@@ -120,8 +143,15 @@
               </chef-checkbox>
             </div>
             <p>Remove data for Chef Infra Client runs after
-              <input chefInput type="number" min="0" formControlName="threshold"
-                (keydown)="preventNegatives($event.key)" />days
+              <input
+                aria-label="Days before removing Chef Infra Client runs"
+                chefInput
+                formControlName="threshold"
+                [resetOrigin]="shouldResetValues"
+                type="number"
+                min="0"
+                (keydown)="preventNegatives($event.key)"
+              />days
             </p>
           </div>
 
@@ -129,18 +159,23 @@
             <div class="checkbox-container">
               <chef-checkbox
               [checked]="!clientRunsLabelMissing.value.disabled"
-              (change)="handleFormActivation(clientRunsLabelMissing, $event.detail)">
+              (change)="handleFormActivation(clientRunsLabelMissing, $event.detail)"
+              [disabled]="isDesktopView">
               </chef-checkbox>
             </div>
-          
+
             <p>When no Chef Infra Client run data has been received from a node in
-              <input chefInput 
-                type="number" 
-                min="0" 
-                formControlName="threshold" 
-                (keydown)="preventNegatives($event.key)" />
+              <input
+                aria-label="Amount of time before labeling a node as missing"
+                chefInput
+                formControlName="threshold"
+                [resetOrigin]="shouldResetValues"
+                type="number"
+                min="0"
+                (keydown)="preventNegatives($event.key)"
+              />
               <mat-form-field appearance="none">
-                <mat-select panelClass="chef-dropdown" formControlName="unit">
+                <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
                   <mat-option value="m">minutes</mat-option>
                   <mat-option value="h">hours</mat-option>
                   <mat-option value="d">days</mat-option>
@@ -154,12 +189,20 @@
             <div class="checkbox-container">
               <chef-checkbox
               [checked]="!clientRunsRemoveNodes.value.disabled"
-              (change)="handleFormActivation(clientRunsRemoveNodes, $event.detail)">
+              (change)="handleFormActivation(clientRunsRemoveNodes, $event.detail)"
+              [disabled]="isDesktopView">
               </chef-checkbox>
             </div>
             <p>Remove nodes labeled as missing after
-              <input chefInput type="number" min="0" formControlName="threshold" 
-                (keydown)="preventNegatives($event.key)" />days
+              <input
+                aria-label="Days before removing missing nodes"
+                chefInput
+                formControlName="threshold"
+                [resetOrigin]="shouldResetValues"
+                type="number"
+                min="0"
+                (keydown)="preventNegatives($event.key)"
+              />days
             </p>
           </div>
         </div>
@@ -174,8 +217,15 @@
               </chef-checkbox>
             </div>
             <p>Remove compliance reports after
-              <input chefInput type="number" min="0" formControlName="threshold" 
-                (keydown)="preventNegatives($event.key)" />days
+              <input
+                aria-label="Days before removing compliance reports"
+                chefInput
+                formControlName="threshold"
+                [resetOrigin]="shouldResetValues"
+                type="number"
+                min="0"
+                (keydown)="preventNegatives($event.key)"
+              />days
             </p>
           </div>
 
@@ -187,8 +237,15 @@
               </chef-checkbox>
             </div>
             <p>Remove compliance scans after
-              <input chefInput type="number" min="0" formControlName="threshold" 
-                (keydown)="preventNegatives($event.key)" />days
+              <input
+                aria-label="Days before removing compliance scans"
+                chefInput
+                formControlName="threshold"
+                [resetOrigin]="shouldResetValues"
+                type="number"
+                min="0"
+                (keydown)="preventNegatives($event.key)"
+              />days
             </p>
           </div>
         </div>

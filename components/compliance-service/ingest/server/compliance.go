@@ -12,14 +12,13 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	ingest_api "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline"
-	"github.com/chef/automate/components/notifications-client/builder"
 	"github.com/chef/automate/components/notifications-client/notifier"
 )
 
@@ -34,9 +33,11 @@ type ComplianceIngestServer struct {
 var MinimumSupportedInspecVersion = semver.MustParse("2.0.0")
 
 func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.NodeManagerServiceClient,
-	automateURL string, notifierClient notifier.Notifier, authzProjectsClient iam_v2.ProjectsClient) *ComplianceIngestServer {
+	automateURL string, notifierClient notifier.Notifier, authzProjectsClient authz.ProjectsClient,
+	messageBufferSize int) *ComplianceIngestServer {
 
-	compliancePipeline := pipeline.NewCompliancePipeline(esClient, authzProjectsClient, mgrClient)
+	compliancePipeline := pipeline.NewCompliancePipeline(esClient,
+		authzProjectsClient, mgrClient, messageBufferSize, notifierClient, automateURL)
 
 	return &ComplianceIngestServer{
 		compliancePipeline: compliancePipeline,
@@ -85,29 +86,7 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 			}
 		}
 	}
-
-	logrus.Debugf("Calling handleNotifications for report id %s", in.ReportUuid)
-	err = s.handleNotifications(ctx, in)
-	if err != nil {
-		logrus.Errorf("ProcessComplianceReport unable to send notification: %s", err.Error())
-	}
 	logrus.Debugf("Calling compliancePipeline.Run for report id %s", in.ReportUuid)
 	err = s.compliancePipeline.Run(in)
 	return &gp.Empty{}, err
-}
-
-func (s *ComplianceIngestServer) handleNotifications(ctx context.Context, report *compliance.Report) error {
-	if s.notifierClient == nil {
-		return fmt.Errorf("no notifier client found")
-	}
-
-	ev, err := builder.Compliance(s.automateURL, report)
-	if err != nil {
-		// We treat notification errors as non fatal
-		logrus.WithFields(logrus.Fields{"id": report.ReportUuid}).Warnf("Could not build notifications InSpec event: %v", err)
-	} else {
-		// This happens asynchronously
-		s.notifierClient.Send(ctx, ev)
-	}
-	return nil
 }

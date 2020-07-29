@@ -10,6 +10,8 @@ message Report {
 	Platform platform = 2;
 	Statistics statistics = 3;
 	repeated string other_checks = 4;
+	string status = 5;
+	string status_message = 6;
 	repeated Profile profiles = 20;
 }
 
@@ -40,6 +42,7 @@ message Profile {
 	string parent_profile = 34;
 	string status = 35;
 	string skip_message= 36;
+	string status_message = 37;
 }
 
 message Control {
@@ -54,6 +57,7 @@ message Control {
 	google.protobuf.Struct tags = 24;
 	repeated Result results = 25;
 	WaiverData waiver_data = 26;
+	RemovedResultsCounts removed_results_counts = 27;
 }
 
 message WaiverData {
@@ -62,6 +66,12 @@ message WaiverData {
 	bool run = 3;
 	bool skipped_due_to_waiver = 4;
 	string message = 5;
+}
+
+message RemovedResultsCounts {
+	int32 failed = 1;
+	int32 skipped = 2;
+	int32 passed = 3;
 }
 
 message Result {

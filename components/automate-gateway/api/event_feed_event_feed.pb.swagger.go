@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("event_feed_event_feed", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/event_feed/event_feed.proto",
+    "title": "automate-gateway/api/event_feed/event_feed.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,8 +14,10 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/event_task_counts": {
+    "/api/v0/event_task_counts": {
       "get": {
+        "summary": "List Counts Per Event Task Occurrence",
+        "description": "Returns totals for update, create, and delete event tasks, which are the actions taken on the event.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\nevent_task_counts?start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetEventTaskCounts",
         "responses": {
           "200": {
@@ -28,6 +30,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
+            "description": "Filters to be applied to the request.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -38,6 +41,7 @@ func init() {
           },
           {
             "name": "start",
+            "description": "Earliest events to return.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -45,6 +49,7 @@ func init() {
           },
           {
             "name": "end",
+            "description": "Latest events to return.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -56,8 +61,10 @@ func init() {
         ]
       }
     },
-    "/event_type_counts": {
+    "/api/v0/event_type_counts": {
       "get": {
+        "summary": "List Count of Event Type Occurrence",
+        "description": "Returns totals for role, cookbook, and organization event types.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\nevent_type_counts?start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetEventTypeCounts",
         "responses": {
           "200": {
@@ -70,6 +77,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
+            "description": "Filters to be applied to the request.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -80,6 +88,7 @@ func init() {
           },
           {
             "name": "start",
+            "description": "Earliest events to return.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -87,6 +96,7 @@ func init() {
           },
           {
             "name": "end",
+            "description": "Latest events to return.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -98,8 +108,10 @@ func init() {
         ]
       }
     },
-    "/eventfeed": {
+    "/api/v0/eventfeed": {
       "get": {
+        "summary": "List Events",
+        "description": "Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).\nAdding a filter makes a list of all events that meet the filter criteria.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\neventfeed?collapse=true\u0026filter=organization:The%2520Watchmen\u0026page_size=100\u0026start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetEventFeed",
         "responses": {
           "200": {
@@ -112,6 +124,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
+            "description": "Filters to be applied to the request.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -122,6 +135,7 @@ func init() {
           },
           {
             "name": "start",
+            "description": "Earliest events to return.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -129,6 +143,7 @@ func init() {
           },
           {
             "name": "end",
+            "description": "Latest events to return.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -136,6 +151,7 @@ func init() {
           },
           {
             "name": "page_size",
+            "description": "Count of events to return per page.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -143,6 +159,7 @@ func init() {
           },
           {
             "name": "after",
+            "description": "Used for pagination, to request results in ascending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -150,6 +167,7 @@ func init() {
           },
           {
             "name": "before",
+            "description": "Used for pagination, to request results in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -157,12 +175,14 @@ func init() {
           },
           {
             "name": "cursor",
+            "description": "Used for pagination, to bookmark next set of results.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "collapse",
+            "description": "Used to group similar events together.",
             "in": "query",
             "required": false,
             "type": "boolean",
@@ -174,8 +194,10 @@ func init() {
         ]
       }
     },
-    "/eventstrings": {
+    "/api/v0/eventstrings": {
       "get": {
+        "summary": "List Summary Stats About Events",
+        "description": "Returns data that populates the guitar strings visual on the top of the event feed.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\neventstrings?timezone=America/Denver\u0026hours_between=1\u0026start=2020-06-19\u0026end=2020-06-25\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetEventStringBuckets",
         "responses": {
           "200": {
@@ -188,24 +210,28 @@ func init() {
         "parameters": [
           {
             "name": "start",
+            "description": "Earliest events to return.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "end",
+            "description": "Latest events to return.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "timezone",
+            "description": "User timezone to apply to request.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "hours_between",
+            "description": "Interval for returned results, for example: 1 hour buckets.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -213,6 +239,7 @@ func init() {
           },
           {
             "name": "filter",
+            "description": "Filters to be applied to the request.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -233,46 +260,58 @@ func init() {
       "type": "object",
       "properties": {
         "event_type": {
-          "type": "string"
+          "type": "string",
+          "description": "Type of event (cookbook, role, etc)."
         },
         "task": {
-          "type": "string"
+          "type": "string",
+          "description": "Type of event task (create, update, delete)."
         },
         "start_time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Event start time."
         },
         "entity_name": {
           "type": "string"
         },
         "requestor_type": {
-          "type": "string"
+          "type": "string",
+          "description": "Event record requestor type."
         },
         "requestor_name": {
-          "type": "string"
+          "type": "string",
+          "description": "Event record requestor name."
         },
         "service_hostname": {
-          "type": "string"
+          "type": "string",
+          "description": "Hostname from which the record was gathered."
         },
         "start_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Used for grouping events together."
         },
         "event_count": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Used for grouping events together."
         },
         "parent_name": {
-          "type": "string"
+          "type": "string",
+          "description": "Used for grouping events together."
         },
         "parent_type": {
-          "type": "string"
+          "type": "string",
+          "description": "Used for grouping events together."
         },
         "end_time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "title": "Used for grouping events together; equal to start_time if not grouped"
         },
         "end_id": {
-          "type": "string"
+          "type": "string",
+          "title": "Used for grouping events together; equal to start_id if not grouped"
         }
       }
     },
@@ -291,11 +330,13 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Event name."
         },
         "count": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Count of events."
         }
       }
     },
@@ -304,13 +345,15 @@ func init() {
       "properties": {
         "total": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Total count of events."
         },
         "counts": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.event_feed.response.EventCount"
-          }
+          },
+          "description": "Total count of events per type."
         }
       }
     },
@@ -356,11 +399,13 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.event_feed.response.Event"
-          }
+          },
+          "description": "List of events."
         },
         "total_events": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Total count of events."
         }
       }
     }

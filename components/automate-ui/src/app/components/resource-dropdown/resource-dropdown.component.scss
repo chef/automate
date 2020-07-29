@@ -1,0 +1,124 @@
+@import "~styles/variables";
+
+:host {
+  display: block;
+}
+
+label {
+  padding-bottom: 0.75em;
+}
+
+// todo: update dropdown to have min-width of 250px and increase in width based on length of resource name
+.dropdown-wrap {
+  position: relative;
+
+  #resources-selected {
+    color: $chef-primary-dark;
+  }
+}
+
+.dropdown-button {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 18px;
+  background: $chef-white;
+  border: 1px solid $chef-light-grey;
+  border-radius: $global-radius;
+  text-align: left;
+  font-size: 14px;
+  color: $chef-dark-grey;
+  cursor: pointer;
+
+  &.active {
+    z-index: 4;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  &[disabled] {
+    background: $chef-light-grey;
+    color: rgba($chef-primary-dark, 0.5);
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $chef-grey;
+  }
+
+  > chef-icon {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    margin-top: -10px;
+    font-size: 23px;
+    color: $chef-primary-dark;
+  }
+}
+
+chef-dropdown {
+  width: 100%;
+  font-size: 14px;
+  z-index: 3;
+  border: 1px solid $chef-grey;
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+
+  #filter-container {
+    padding: 14px 18px;
+    border-bottom: 1px solid $chef-grey;
+  }
+
+  #resource-container {
+    max-height: 210px;
+    overflow-y: scroll;
+  }
+
+  .no-resources {
+    padding: 14px 18px 0px;
+    font-style: italic;
+  }
+
+  .resource-section {
+    font-size: 11px;
+    font-weight: 600;
+    color: $chef-dark-grey;
+    padding-top: 24px;
+    padding-bottom: 1px;
+    padding-left: 18px;
+
+    &:first-child {
+      padding-top: 12px;
+    }
+  }
+
+  chef-checkbox {
+    display: flex;
+    padding: 9px 18px;
+    align-items: flex-start;
+    white-space: normal; // prevents text from going outside of the element's container
+
+    &:first-child {
+      padding-top: 18px;
+    }
+  }
+}
+
+.error {
+  padding: 8px 10px;
+  font-size: 10px;
+  background-color: $chef-critical;
+  color: $white;
+  border-radius: 0 0 $global-radius $global-radius;
+  box-shadow: 0 0 0 1px $chef-critical;
+}
+
+.help-text {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+}

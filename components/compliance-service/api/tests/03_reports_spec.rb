@@ -1,5 +1,5 @@
-require 'api/interservice/compliance/reporting/reporting_pb'
-require 'api/interservice/compliance/reporting/reporting_services_pb'
+require 'interservice/compliance/reporting/reporting_pb'
+require 'interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
   Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)
@@ -53,7 +53,9 @@ describe File.basename(__FILE__) do
                 "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                 "bb93e1b2-36d6-439e-ac70-cccccccccc08",
                 "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                "bb93e1b2-36d6-439e-ac70-cccccccccc10"
+                "bb93e1b2-36d6-439e-ac70-cccccccccc10",
+                "bb93e1b2-36d6-439e-ac70-ccccccczzz20",
+                "zz93e1b2-36d6-439e-ac70-cccccccccckk"
             ],
             "reportData" => [
                 {"endTime" => "2018-03-04T10:18:41Z", "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"},
@@ -63,7 +65,9 @@ describe File.basename(__FILE__) do
                 {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06"},
                 {"endTime" => "2018-03-07T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
                 {"endTime" => "2018-03-04T09:18:43Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09"},
-                {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10"}
+                {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10"},
+                {"endTime" => "2018-04-02T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20"},
+                {"endTime" => "2018-04-03T11:02:02Z", "id" => "zz93e1b2-36d6-439e-ac70-cccccccccckk"}
             ]
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
@@ -135,7 +139,9 @@ describe File.basename(__FILE__) do
                       "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc08",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                      "bb93e1b2-36d6-439e-ac70-cccccccccc10"
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc10",
+                      "bb93e1b2-36d6-439e-ac70-ccccccczzz20",
+                      "zz93e1b2-36d6-439e-ac70-cccccccccckk"
             ],
             "reportData" => [
                 {"endTime" => "2018-02-09T09:18:41Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"},
@@ -146,7 +152,9 @@ describe File.basename(__FILE__) do
                 {"endTime" => "2018-03-05T02:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05"},
                 {"endTime" => "2018-03-07T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
                 {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy"},
-                {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-dddd-wwwwwwwwwwww"}
+                {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-dddd-wwwwwwwwwwww"},
+                {"endTime" => "2018-04-02T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20"},
+                {"endTime" => "2018-04-03T11:02:02Z", "id" => "zz93e1b2-36d6-439e-ac70-cccccccccckk"}
             ]
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
@@ -336,6 +344,21 @@ describe File.basename(__FILE__) do
                     }
                 },
                 {
+                   "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20",
+                   "ipaddress" => "188.38.98.100",
+                   "nodeId" => "999f4e51-b049-4b10-9555-555789999967",
+                   "nodeName" => "ubuntu(4)-alpha-myskippy(s)-myfaily(f)-apache(f)-linux(p)-failed",
+                   "endTime" => "2018-04-02T03:02:02Z",
+                   "status" => "failed",
+                   "controls" => {
+                     "failed" => {},
+                     "passed" => {"total" => 1},
+                     "skipped" => {},
+                     "total" => 1,
+                     "waived" => {}
+                   }
+                },
+                {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
                     "ipaddress" => "10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
@@ -370,9 +393,23 @@ describe File.basename(__FILE__) do
                         "failed" => {},
                         "waived" => {}
                     }
+                },
+                {
+                    "id" => "zz93e1b2-36d6-439e-ac70-cccccccccckk",
+                    "ipaddress" => "188.38.98.166",
+                    "nodeId" => "888f4e51-b049-4b10-9555-111222333333",
+                    "nodeName" => "ubuntu(0)-alpha-failed",
+                    "endTime" => "2018-04-03T11:02:02Z",
+                    "status" => "failed",
+                    "controls" => {
+                      "failed" => {},
+                      "passed" => {},
+                      "skipped" => {},
+                      "waived" => {}
+                    }
                 }
             ],
-            "total" => 11
+            "total" => 13
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
@@ -425,7 +462,7 @@ describe File.basename(__FILE__) do
                 }
             }
         ],
-        "total" => 11
+        "total" => 13
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
@@ -498,7 +535,7 @@ describe File.basename(__FILE__) do
                     }
                 }
             ],
-            "total" => 11
+            "total" => 13
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
@@ -793,11 +830,13 @@ describe File.basename(__FILE__) do
 
 
     # Cover the other sort fields, node_name desc:
-    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'node_name', order: 1)
+    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'node_name', order: 1, per_page: 12)
     assert_equal(Reporting::Reports, resp.class)
     expected = [
         "windows(1)-zeta-apache(s)-skipped",
+        "ubuntu(4)-alpha-myskippy(s)-myfaily(f)-apache(f)-linux(p)-failed",
         "ubuntu(1)-alpha-myprofile(s)-skipped",
+        "ubuntu(0)-alpha-failed",
         "RedHat(2)-beta-nginx(f)-apache(s)-failed",
         "redhat(2)-alpha-nginx(f)-apache(s)-failed",
         "redhat(2)-alpha-nginx(f)-apache(f)-failed",
@@ -821,21 +860,21 @@ describe File.basename(__FILE__) do
         "redhat(2)-alpha-nginx(f)-apache(f)-failed",
         "redhat(2)-alpha-nginx(f)-apache(s)-failed",
         "RedHat(2)-beta-nginx(f)-apache(s)-failed",
-        "ubuntu(1)-alpha-myprofile(s)-skipped"
+        "ubuntu(0)-alpha-failed"
     ]
     assert_equal(expected, resp['reports'].map {|x| x['node_name']})
 
-    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.status')
+    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.status', per_page: 20)
     assert_equal(Reporting::Reports, resp.class)
-    assert_equal(["failed", "failed", "failed", "failed", "failed", "failed", "passed", "passed", "skipped", "skipped"], resp['reports'].map {|x| x['status']})
+    assert_equal(["failed", "failed", "failed", "failed", "failed", "failed", "failed", "failed", "passed", "passed", "skipped", "skipped", "waived"], resp['reports'].map {|x| x['status']})
 
     resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.controls.failed.total', per_page: 20)
     assert_equal(Reporting::Reports, resp.class)
-    assert_equal([0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 21], resp['reports'].map {|x| x['controls']['failed']['total']})
+    assert_equal([0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 21], resp['reports'].map {|x| x['controls']['failed']['total']})
 
-    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.controls.failed.critical', order: 1)
+    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.controls.failed.critical', order: 1, per_page: 50)
     assert_equal(Reporting::Reports, resp.class)
-    assert_equal(10, resp['reports'].length)
+    assert_equal(13, resp['reports'].length)
 
     # Get a specific report; ensure only the control with the specified filter tag is returned
     res = GRPC reporting, :read_report, Reporting::Query.new(id: '44024b50-2e0d-42fa-a57c-dddddddddddd',
@@ -854,7 +893,6 @@ describe File.basename(__FILE__) do
     res = GRPC reporting, :read_report, Reporting::Query.new(id: 'bb93e1b2-36d6-439e-ac70-cccccccccc04')
     assert_equal(Reporting::Report, res.class)
 
-    puts res['version']
     assert_equal('3.1.0', res['version'])
     assert_equal('bb93e1b2-36d6-439e-ac70-cccccccccc04', res['id'])
     assert_equal('9b9f4e51-b049-4b10-9555-10578916e149', res['node_id'])
@@ -871,7 +909,6 @@ describe File.basename(__FILE__) do
     assert_equal(Reporting::Platform.new(name: "centos", release: "5.11", full: "centos 5.11"), res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 3.309065103530884), res['statistics'])
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
-    puts res['profiles'].class
 
     if res['profiles'].is_a?(Google::Protobuf::RepeatedField)
       assert_equal(3, res['profiles'].length)
@@ -901,7 +938,7 @@ describe File.basename(__FILE__) do
       assert_equal("Skipping profile: 'myprofile1' on unsupported platform: 'mac_os_x/17.7.0'.", res['profiles'][0]['depends'][0]['skip_message'])
 
       assert_equal('skipped', res['profiles'][2]['status'])
-      assert_equal("Skipping profile: 'fake-baseline' on unsupported platform: 'amazon/2'.", res['profiles'][2]['skip_message'])
+      assert_equal("Skipping profile: 'fake-baseline' on unsupported platform: 'amazon/2'.", res['profiles'][2]['status_message'])
     end
 
     # Get a specific report
@@ -1319,5 +1356,61 @@ describe File.basename(__FILE__) do
       assert_equal('no_expired', res['profiles'][0]['controls'][2]['waived_str'])
       assert_equal_json_sorted('{"expirationDate": "1977-06-01", "justification": "Necessity", "message": "Waiver expired on 1977-06-01, evaluating control normally"}', res['profiles'][0]['controls'][2]['waiver_data'].to_json)
     end
+
+
+    # Get a specific report1
+    res = GRPC reporting, :read_report, Reporting::Query.new(id: 'bb93e1b2-36d6-439e-ac70-ccccccczzz20')
+    assert_equal(Reporting::Report, res.class)
+
+    assert_equal('4.22.0', res['version'])
+    assert_equal('bb93e1b2-36d6-439e-ac70-ccccccczzz20', res['id'])
+    assert_equal('999f4e51-b049-4b10-9555-555789999967', res['node_id'])
+    assert_equal('ubuntu(4)-alpha-myskippy(s)-myfaily(f)-apache(f)-linux(p)-failed', res['node_name'])
+    assert_equal('DevSec Prod Alpha', res['environment'])
+    assert_equal('failed', res['status'])
+    assert_equal([], res['roles'])
+
+    assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
+
+    if res['profiles'].is_a?(Google::Protobuf::RepeatedField)
+      assert_equal(4, res['profiles'].length)
+      assert_equal([], res['profiles'][0]['controls'])
+      assert_equal('myskippy', res['profiles'][0]['name'])
+      assert_equal('skipped', res['profiles'][0]['status'])
+      assert_equal("Skipping profile: 'myprofile' on unsupported platform: 'ubuntu/18.04'.", res['profiles'][0]['status_message'])
+
+      assert_equal([], res['profiles'][1]['controls'])
+      assert_equal('myfaily', res['profiles'][1]['name'])
+      assert_equal('failed', res['profiles'][1]['status'])
+      assert_equal("ERROR: cannot load such file -- inspec/resources/something (LoadError)", res['profiles'][1]['status_message'])
+
+      assert_equal([], res['profiles'][2]['controls'])
+      assert_equal('apache-baseline', res['profiles'][2]['name'])
+      assert_equal('failed', res['profiles'][2]['status'])
+      assert_equal("ERROR: DEPRECATION: The apache resource is deprecated This resource was removed in InSpec 4.0. (used at apache-baseline-0b5f21e668940d53e85c2ca36b41ba7ae18fac01/controls/apache_spec.rb:25)", res['profiles'][2]['status_message'])
+
+      assert_equal(1, res['profiles'][3]['controls'].length)
+      assert_equal('os-01', res['profiles'][3]['controls'][0]['id'])
+      assert_equal('linux-baseline', res['profiles'][3]['name'])
+      assert_equal('passed', res['profiles'][3]['status'])
+      assert_equal("", res['profiles'][3]['status_message'])
+    end
+
+
+    # Get the report that failed at runtime
+    res = GRPC reporting, :read_report, Reporting::Query.new(id: 'zz93e1b2-36d6-439e-ac70-cccccccccckk')
+    assert_equal(Reporting::Report, res.class)
+
+    assert_equal('4.22.0', res['version'])
+    assert_equal('zz93e1b2-36d6-439e-ac70-cccccccccckk', res['id'])
+    assert_equal('888f4e51-b049-4b10-9555-111222333333', res['node_id'])
+    assert_equal('ubuntu(0)-alpha-failed', res['node_name'])
+    assert_equal('DevSec Prod Alpha', res['environment'])
+    assert_equal('failed', res['status'])
+    assert_equal('ERROR: InSpec not found.', res['status_message'])
+    assert_equal([], res['roles'])
+    assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
+    assert_equal(0, res['profiles'].length)
+
   end
 end

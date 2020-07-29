@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("iam_v2_tokens", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/iam/v2/tokens.proto",
+    "title": "automate-gateway/api/iam/v2/tokens.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/iam/v2/tokens": {
+    "/apis/iam/v2/tokens": {
       "get": {
         "summary": "Lists all tokens",
         "description": "Lists all tokens, both admin and non-admin.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:list\n` + "`" + `` + "`" + `` + "`" + `",
@@ -64,7 +64,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2/tokens/{id}": {
+    "/apis/iam/v2/tokens/{id}": {
       "get": {
         "summary": "Gets a token",
         "description": "Returns the details for a token.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:get\n` + "`" + `` + "`" + `` + "`" + `",
@@ -268,9 +268,6 @@ func init() {
           }
         }
       }
-    },
-    "chef.automate.api.iam.v2.ResetAllTokenProjectsResp": {
-      "type": "object"
     },
     "chef.automate.api.iam.v2.Token": {
       "type": "object",

@@ -1,6 +1,6 @@
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/stats/stats_pb'
-require 'api/interservice/compliance/stats/stats_services_pb'
+require 'interservice/compliance/stats/stats_pb'
+require 'interservice/compliance/stats/stats_services_pb'
 
 if !ENV['NO_STATS_TESTS']
   describe File.basename(__FILE__) do
@@ -178,6 +178,27 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
+      # Read Failures with root failed profile filter
+      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "types", values: ["profile", "platform", "environment", "control"]),
+          Stats::ListFilter.new(type: "profile_id", values: ["5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+      ])
+      expected_data = {
+        "profiles" => [{"name" => "myfaily", "failures" => 1}],
+        "platforms" => [{"name" => "ubuntu", "failures" => 1}],
+        "environments" => [{"name" => "DevSec Prod Alpha", "failures" => 1}]
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      # Read Failures with root skipped profile filter
+      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "types", values: ["profile", "platform", "environment", "control"]),
+          Stats::ListFilter.new(type: "profile_id", values: ["5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+      ])
+      expected_data = {}
+      assert_equal_json_content(expected_data, actual_data)
 
       #todo- test top failures. the profile overview batch - deep profile level
       # Use profile_id, env and end_time filters, whoaaa
@@ -419,12 +440,13 @@ if !ENV['NO_STATS_TESTS']
       #filter: missing env for a specific profile_id and end_time
       #calls: stats::ReadProfiles::GetControlListStatsByProfileID
       #depth: Profile
-      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(
+        filters: [
           Stats::ListFilter.new(type: "environment", values: ["Missing In Action"]),
           Stats::ListFilter.new(type: 'end_time', values: ['2018-03-05T23:59:59Z'])
-      ],
-                                                                 type: "controls",
-                                                                 id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
+        ],
+        type: "controls",
+        id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
       )
       expected_data = {}
       assert_equal_json_content(expected_data, actual_data)
@@ -434,12 +456,13 @@ if !ENV['NO_STATS_TESTS']
       #filter: env and profile_id and end_time
       #calls: stats::ReadProfiles::GetControlListStatsByProfileID
       #depth: Profile
-      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(
+        filters: [
           Stats::ListFilter.new(type: "environment", values: ["DevSec Prod beta"]),
           Stats::ListFilter.new(type: 'end_time', values: ['2018-03-05T23:59:59Z'])
-      ],
-                                                                 type: "controls",
-                                                                 id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
+        ],
+        type: "controls",
+        id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
       )
       expected_data = {
           "controlStats" => [
@@ -520,6 +543,65 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, profile_controls)
 
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(
+        filters: [
+          Stats::ListFilter.new(type: "profile_id", values: ["5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+        ]
+      )
+      expected_data = {
+        "profileList" => [
+          { "name" => "myfaily",
+            "id" => "5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888"
+          }
+        ]
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        type: "nodes",
+        filters: [
+          Stats::ListFilter.new(type: "profile_id", values: ["5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+        ])
+      expected_data = {
+        "nodeSummary" => { "noncompliant" => 1 }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        type: "controls",
+        filters: [
+          Stats::ListFilter.new(type: "profile_id", values: ["5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+        ])
+      expected_data = {
+        "controlsSummary" => {}
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        type: "nodes",
+        filters: [
+          Stats::ListFilter.new(type: "profile_id", values: ["5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+        ])
+      expected_data = {
+        "nodeSummary" => { "skipped" => 1 }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        type: "controls",
+        filters: [
+          Stats::ListFilter.new(type: "profile_id", values: ["b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+        ])
+      expected_data = {
+        "controlsSummary" => { "passed" => 1 }
+      }
+      assert_equal_json_content(expected_data, actual_data)
 
       #####deep summary stats
       #description: Node stats for profile depth.
@@ -594,6 +676,25 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
+      # Get stats with end_time filter for the faily/skippy 04-02 date with deep for skipped profile
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        filters: [
+          Stats::ListFilter.new(type: "profile_id", values: ["5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+        ])
+      expected_data = {
+        "reportSummary": {
+          "status": "skipped",
+          "stats": {
+            "nodes": "1",
+            "platforms": 1,
+            "environments": 1,
+            "profiles": 1,
+            "nodesCnt": 1
+          }
+        }
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
     end
   end
 end

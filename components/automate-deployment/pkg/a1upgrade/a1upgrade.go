@@ -403,7 +403,7 @@ func (u *A1Upgrade) GenerateA2ConfigIfNoneProvided(a2ConfigPath string) error {
 	if a2ConfigPath != "" {
 		return nil
 	}
-	cfg, err := generateMigrationOverrideConfig(u.DeliveryRunning, u.DeliverySecrets)
+	cfg, err := generateMigrationOverrideConfig(u.DeliveryRunning, u.DeliverySecrets, u.ChefServerRunning)
 	if err != nil {
 		return err
 	}

@@ -13,7 +13,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/user"
 	"path"
 	"path/filepath"
 	"strings"
@@ -35,6 +34,7 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/platform/sys"
+	"github.com/chef/automate/lib/user"
 )
 
 // LocalTarget struct
@@ -223,8 +223,10 @@ func (t *LocalTarget) SetupSupervisor(ctx context.Context, config *dc.ConfigRequ
 		}
 	}
 
-	if err := t.EnsureHabUser(writer); err != nil {
-		return err
+	if os.Getenv("CHEF_AUTOMATE_SKIP_HAB_USER") != "true" {
+		if err := t.EnsureHabUser(writer); err != nil {
+			return err
+		}
 	}
 
 	if os.Getenv("CHEF_AUTOMATE_SKIP_SYSTEMD") != "true" {

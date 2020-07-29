@@ -8,24 +8,20 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
-import "api/external/common/version/version.proto";
-import "api/external/common/response.proto";
+import "external/common/version/version.proto";
+import "external/common/response.proto";
 
-// for option (chef.automate.api.policy)
-import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
-// for option (chef.automate.api.iam.policy)
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service ReportingService {
 	/*
-	List reports
+	List Reports
 
 	Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	Supports pagination, filtering, and sorting.
 	Limited to 10k results.
 
-	Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
-	latest_report.end_time, latest_report.status, node_name
+	Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 
 	Example:
 	```
@@ -46,12 +42,8 @@ service ReportingService {
 	*/
 	rpc ListReports(Query) returns (Reports) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/reports"
+			post: "/api/v0/compliance/reporting/reports"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:reports"
-			action: "search"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:reports"
@@ -60,7 +52,7 @@ service ReportingService {
 	};
 
 	/*
-	List report IDs
+	List Report IDs
 
 	List all IDs for the latest report for each node, with optional filtering.
 	Supports filtering, but not pagination or sorting.
@@ -75,12 +67,8 @@ service ReportingService {
 	*/
 	rpc ListReportIds(Query) returns (ReportIds) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/report-ids"
+			post: "/api/v0/compliance/reporting/report-ids"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:report-ids"
-			action: "search"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:report-ids"
@@ -89,7 +77,7 @@ service ReportingService {
 	};
 
 	/*
-	List controls
+	List Controls
 
 	Lists controls from the last run, with optional filtering.
 	Supports filtering, but not pagination or sorting.
@@ -102,12 +90,8 @@ service ReportingService {
 	*/
 	rpc ListControlItems(ControlItemRequest) returns (ControlItems) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/controls"
+			post: "/api/v0/compliance/reporting/controls"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:controls"
-			action: "search"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:control"
@@ -116,9 +100,9 @@ service ReportingService {
 	};
 
 	/*
-	Fetch a report
+	Show Report by ID
 
-	Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
+	Show a specific report by ID. Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.
 
@@ -129,12 +113,8 @@ service ReportingService {
 	*/
 	rpc ReadReport(Query) returns (Report) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/reports/id/{id}"
+			post: "/api/v0/compliance/reporting/reports/id/{id}"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:reports:{id}"
-			action: "read"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:reports:{id}"
@@ -143,7 +123,7 @@ service ReportingService {
 	};
 
 	/*
-	List suggestions
+	List Reporting Suggestions
 
 	Get suggestions for compliance reporting resources based on matching text substrings.
 	Supports filtering, but not pagination or sorting.
@@ -188,12 +168,8 @@ service ReportingService {
 	*/
 	rpc ListSuggestions(SuggestionRequest) returns (Suggestions) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/suggestions"
+			post: "/api/v0/compliance/reporting/suggestions"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:suggestions"
-			action: "search"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:suggestions"
@@ -202,7 +178,7 @@ service ReportingService {
 	};
 
 	/*
-	List profiles
+	List Profiles
 
 	List all profiles in use, with optional filtering.
 	Supports pagination, filtering, and sorting.
@@ -215,12 +191,8 @@ service ReportingService {
 	*/
 	rpc ListProfiles(Query) returns (ProfileMins) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/profiles"
+			post: "/api/v0/compliance/reporting/profiles"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:profiles"
-			action: "search"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:profiles"
@@ -233,9 +205,9 @@ service ReportingService {
 	rpc ExportNode(Query) returns (stream chef.automate.api.common.ExportData) {};
 
 	/*
-	Fetch a node
+	Show Node by ID
 
-	Fetch a specific node by ID.
+	Show a specific node by ID.
 	Supports filtering by profile or control.
 	Does not support pagination or sorting.
 
@@ -246,11 +218,7 @@ service ReportingService {
 	*/
 	rpc ReadNode(Id) returns (Node) {
 		option (google.api.http) = {
-			get: "/compliance/reporting/nodes/id/{id}"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:nodes:{id}"
-			action: "read"
+			get: "/api/v0/compliance/reporting/nodes/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:nodes:{id}"
@@ -259,7 +227,7 @@ service ReportingService {
 	};
 
 	/*
-	List nodes
+	List Nodes
 
 	List all nodes, with optional filtering, pagination, and sorting.
 	Limited to 10k results.
@@ -295,12 +263,8 @@ service ReportingService {
 	*/
 	rpc ListNodes(Query) returns (Nodes) {
 		option (google.api.http) = {
-			post: "/compliance/reporting/nodes/search"
+			post: "/api/v0/compliance/reporting/nodes/search"
 			body: "*"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:nodes"
-			action: "search"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:nodes"
@@ -310,11 +274,7 @@ service ReportingService {
 
 	rpc GetVersion(google.protobuf.Empty) returns (common.version.VersionInfo) {
 		option (google.api.http) = {
-			get: "/compliance/reporting/version"
-		};
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:version"
-			action: "read"
+			get: "/api/v0/compliance/reporting/version"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "system:service:version"
@@ -326,10 +286,6 @@ service ReportingService {
 	};
 
 	rpc LicenseUsageNodes(TimeQuery) returns (Reports) {
-		option (chef.automate.api.policy) = {
-			resource: "compliance:reporting:licenseusage"
-			action: "list"
-		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:licenseusage"
 			action: "compliance:reportingLicenseUsage:list"
@@ -358,6 +314,15 @@ message WaiverData {
 	string justification = 3;
 	// Intentionally blank.
 	ControlSummary waiver_summary= 4;
+}
+
+message RemovedResultsCounts {
+	// The number of results with status of `failed` that have been trimmed (removed) from a control
+	int32 failed = 1;
+	// The number of results with status of `skipped` that have been trimmed (removed) from a control
+	int32 skipped = 2;
+	// The number of results with status of `passed` that have been trimmed (removed) from a control
+	int32 passed = 3;
 }
 
 message ControlItem {
@@ -408,7 +373,7 @@ message Query {
 	OrderType order = 21;
 	// Sort the list of results by a field.
 	string sort = 22;
-	// The offset for paginating requests. An offset defines a place in the results in order to fetch the next page of the results.
+	// The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results.
 	int32 page = 23;
 	// The number of results on each paginated request page.
 	int32 per_page = 24;
@@ -511,8 +476,10 @@ message Report {
 	repeated string roles = 17;
 	// The Chef Tags associated with the node.
 	repeated string chef_tags = 18;
-	// The projects the node is assigned to. This is a resource-scoped access control feature of IAMv2.
+	// The projects the node is assigned to.
 	repeated string projects = 20;
+	// The status message of the report.
+	string status_message = 21;
 }
 
 message Profile {
@@ -554,6 +521,8 @@ message Profile {
 	string status = 23;
 	// The reason this profile was skipped in the generated report, if any.
 	string skip_message = 24;
+	// A message to detail the reason why a profile is skipped or failed in the generated report.
+	string status_message = 25;
 }
 
 message Ref {
@@ -666,6 +635,8 @@ message Control {
 	string waived_str = 11;
 	// Additional details for waived controls
 	OrigWaiverData waiver_data = 12;
+	// When the control results are removed to reduce the size of the report, this summarize the status of the trimmed results.
+	RemovedResultsCounts removed_results_counts = 13;
 }
 
 // OrigWaiverData as it originally came from the InSpec report

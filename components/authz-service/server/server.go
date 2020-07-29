@@ -21,13 +21,11 @@ import (
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/tracing"
 
-	"github.com/chef/automate/api/interservice/authz/common"
-	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	api "github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/authz-service/engine"
-	v2 "github.com/chef/automate/components/authz-service/server/v2"
+	"github.com/chef/automate/components/authz-service/storage/postgres"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
-	v2_postgres "github.com/chef/automate/components/authz-service/storage/v2/postgres"
 )
 
 // GRPC creates and listens on grpc server.
@@ -44,13 +42,13 @@ func GRPC(ctx context.Context,
 	}
 	l.Printf("Authz GRPC API listening on %s", addr)
 
-	server, err := NewGRPCServer(ctx, connFactory, l, e, migrationsConfig,
+	serv, err := NewGRPCServer(ctx, connFactory, l, e, migrationsConfig,
 		dataMigrationsConfig, cerealAddress, projectLimit)
 	if err != nil {
 		return err
 	}
 
-	return server.Serve(list)
+	return serv.Serve(list)
 }
 
 // NewGRPCServer creates a grpc server.
@@ -60,9 +58,9 @@ func NewGRPCServer(ctx context.Context,
 	dataMigrationsConfig datamigration.Config, cerealAddress string,
 	projectLimit int) (*grpc.Server, error) {
 
-	err := v2_postgres.Initialize(ctx, e, l, migrationsConfig, dataMigrationsConfig, projectLimit)
+	err := postgres.Initialize(ctx, e, l, migrationsConfig, dataMigrationsConfig, projectLimit)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v2 postgres singleton")
+		return nil, errors.Wrap(err, "could not initialize postgres singleton")
 	}
 
 	cerealManager, err := createProjectUpdateCerealManager(connFactory, cerealAddress)
@@ -70,29 +68,24 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not create cereal manager")
 	}
 
-	policyRefresher, err := v2.NewPostgresPolicyRefresher(ctx, l, e)
+	policyRefresher, err := NewPostgresPolicyRefresher(ctx, l, e)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v2 policy refresher")
+		return nil, errors.Wrap(err, "could not initialize policy refresher")
 	}
 
-	v2ProjectsServer, err := v2.NewPostgresProjectsServer(ctx, l, cerealManager, policyRefresher)
+	projectsServer, err := NewPostgresProjectsServer(ctx, l, cerealManager, policyRefresher)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v2 projects server")
+		return nil, errors.Wrap(err, "could not initialize projects server")
 	}
 
-	v2AuthzServer, err := v2.NewPostgresAuthzServer(l, e, v2ProjectsServer)
+	authzServer, err := NewPostgresAuthzServer(l, e, projectsServer)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v2 authz server")
+		return nil, errors.Wrap(err, "could not initialize authz server")
 	}
 
-	v2PolServer, err := v2.NewPostgresPolicyServer(ctx, l, policyRefresher, e)
+	polServer, err := NewPostgresPolicyServer(ctx, l, policyRefresher, e)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v2 policy server")
-	}
-
-	subjectPurgeServer, err := v2.NewSubjectPurgeServer(ctx, l, v2PolServer)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize subject purge server")
+		return nil, errors.Wrap(err, "could not initialize policy server")
 	}
 
 	// This function determines the log level based on the returned status code:
@@ -122,17 +115,16 @@ func NewGRPCServer(ctx context.Context,
 				tracing.ServerInterceptor(tracing.GlobalTracer()),
 				grpc_logrus.UnaryServerInterceptor(logrusEntry, logrusOpts...),
 				InputValidationInterceptor(),
-				v2PolServer.EngineUpdateInterceptor(),
+				polServer.EngineUpdateInterceptor(),
 			),
 		),
 	)
 
 	// register all services
 	health.RegisterHealthServer(g, health.NewService())
-	api_v2.RegisterPoliciesServer(g, v2PolServer)
-	api_v2.RegisterProjectsServer(g, v2ProjectsServer)
-	api_v2.RegisterAuthorizationServer(g, v2AuthzServer)
-	common.RegisterSubjectPurgeServer(g, subjectPurgeServer)
+	api.RegisterPoliciesServer(g, polServer)
+	api.RegisterProjectsServer(g, projectsServer)
+	api.RegisterAuthorizationServer(g, authzServer)
 	reflection.Register(g)
 
 	if err := cerealManager.Start(ctx); err != nil {

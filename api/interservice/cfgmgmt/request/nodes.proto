@@ -4,7 +4,7 @@ package chef.automate.domain.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
 
 import "google/protobuf/timestamp.proto";
-import "api/interservice/cfgmgmt/request/parameters.proto";
+import "interservice/cfgmgmt/request/parameters.proto";
 
 message NodeRun {
   string node_id = 1;
@@ -28,11 +28,24 @@ message Runs {
   string node_id = 1;
   repeated string filter = 2;
   Pagination pagination = 3;
-  // TODO: (@afiune) Should we standardize these parameters as well?
   string start = 4;
   string end = 5;
 }
 
 message MissingNodeDurationCounts {
   repeated string durations = 1;
+}
+
+message NodeMetadataCounts {
+  repeated string type = 1;
+  repeated string filter = 2;
+  string start = 3;
+  string end = 4;
+}
+
+message NodeRunsDailyStatusTimeSeries {
+  // Node ID of the runs
+  string node_id = 1;
+  // Number of past days
+  int32 days_ago = 2;
 }

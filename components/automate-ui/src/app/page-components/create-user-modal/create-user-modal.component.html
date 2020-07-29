@@ -5,8 +5,9 @@
       <div class="field-margin">
         <chef-form-field>
           <label>
-            Display Name <span aria-hidden="true">*</span>
-            <input chefInput formControlName="displayName" type="text" (keyup)="handleNameInput($event)" autocomplete="off" />
+            <span id="display_name" class="label-text">Display Name <span aria-hidden="true">*</span></span>
+            <input chefInput formControlName="displayName" type="text"
+            (keyup)="handleNameInput($event)" autocomplete="off" aria-labelledby="display_name"/>
           </label>
           <chef-error *ngIf="hasAttemptedInputWithRequiredError('displayName') || 
             (createUserForm.get('displayName').hasError('pattern') && hasAttemptedInput('displayName'))">
@@ -18,7 +19,7 @@
       <div class="field-margin" *ngIf="modifyUsername">
         <chef-form-field>
           <label>
-            Username <span aria-hidden="true">*</span>
+            <span id="username" class="label-text">Username <span aria-hidden="true">*</span></span>
             <input chefInput formControlName="username" type="text" (keyup)="handleUsernameInput($event)" autocomplete="off" />
           </label>
           <chef-error *ngIf="hasAttemptedInputWithRequiredError('username')">
@@ -45,8 +46,8 @@
       <div class="field-margin">
         <chef-form-field>
           <label>
-            Password <span aria-hidden="true">*</span>
-            <input chefInput formControlName="password" type="password" (keyup)="handlePasswordInput($event)"/>
+            <span id="password" class="label-text">Password <span aria-hidden="true">*</span></span>
+            <input chefInput formControlName="password" type="password" (keyup)="handlePasswordInput($event)" aria-labelledby="password"/>
           </label>
           <chef-error *ngIf="hasAttemptedInputWithRequiredError('password') || 
             (createUserForm.get('password').hasError('pattern') && hasAttemptedInput('password'))">
@@ -65,8 +66,8 @@
       <div class="field-margin">
         <chef-form-field>
           <label>
-            Confirm Password <span aria-hidden="true">*</span>
-            <input chefInput formControlName="confirmPassword" type="password" />
+            <span id="confirm_password" class="label-text">Confirm Password <span aria-hidden="true">*</span></span>
+            <input chefInput formControlName="confirmPassword" type="password" aria-labelledby="confirm_password"/>
           </label>
           <chef-error *ngIf="hasAttemptedInputWithRequiredError('confirmPassword')">
             Confirm Password is required.

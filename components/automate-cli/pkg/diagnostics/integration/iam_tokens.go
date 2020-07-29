@@ -126,13 +126,11 @@ func DeleteToken(tstCtx diagnostics.TestContext, id string) error {
 		reqPath = fmt.Sprintf("/api/v0/auth/tokens/%s", id)
 	}
 
-	err = MustJSONDecodeSuccess(
+	if err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
 			reqPath,
 			lbrequest.WithMethod("DELETE"),
-		)).Error()
-
-	if err != nil {
+		)).WithValue(&struct{}{}); err != nil {
 		return errors.Wrap(err, "Could not delete token")
 	}
 	return nil

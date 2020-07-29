@@ -64,22 +64,24 @@ export const ServiceGroupEntityInitialState: ServiceGroupsEntityState = {
 
 export function serviceGroupsEntityReducer(
   state: ServiceGroupsEntityState = ServiceGroupEntityInitialState,
-  action: ServiceGroupsActions) {
+  action: ServiceGroupsActions): ServiceGroupsEntityState {
 
   switch (action.type) {
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS:
-      return set('status', EntityStatus.loading, state);
+      return pipe(
+        set('status', EntityStatus.loading),
+        set('list', {}))(state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUCCESS:
       return pipe(
         set('status', EntityStatus.loadingSuccess),
-        set('list', action.payload.service_groups))(state);
+        set('list', action.payload.service_groups))(state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_FAILURE:
       return pipe(
         set('status', EntityStatus.loadingFailure),
-        set('error', action.payload))(state);
+        set('error', action.payload))(state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.UPDATE_SERVICE_GROUPS_FILTER: {
       const {filters: filters} = action.payload;
@@ -92,46 +94,49 @@ export function serviceGroupsEntityReducer(
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_SUCCESS:
       return pipe(
         set('status', EntityStatus.loadingSuccess),
-        set('healthSummary', action.payload))(state);
+        set('healthSummary', action.payload))(state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_FAILURE:
       return pipe(
         set('status', EntityStatus.loadingFailure),
-        set('error', action.payload))(state);
+        set('error', action.payload))(state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP:
       return set('selectedGroup.services.filters', action.payload, state);
 
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP:
-      return set('selectedGroup.services.status', EntityStatus.loading, state);
+      return pipe(
+        set('selectedGroup.services.status', EntityStatus.loading),
+        set('selectedGroup.services.list', []))(state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP_SUCCESS:
       return pipe(
         set('selectedGroup.name', action.payload.group),
-        set('selectedGroup.services.status', EntityStatus.loadingSuccess),
         set('selectedGroup.services.healthSummary', action.payload.services_health_counts),
-        set('selectedGroup.services.list', action.payload.services))(state);
+        set('selectedGroup.services.list', action.payload.services))
+        (state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP_FAILURE:
       return pipe(
         set('selectedGroup.services.status', EntityStatus.loadingFailure),
-        set('selectedGroup.services.error', action.payload))(state);
+        set('selectedGroup.services.error', action.payload))(state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS:
       return pipe(
         set('suggestions.status', EntityStatus.loading),
-        set('suggestions.values', []))(state);
+        set('suggestions.values', []))(state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS_SUCCESS:
       return pipe(
         set('suggestions.status', EntityStatus.loadingSuccess),
-        set('suggestions.values', action.payload.serviceGroupsSuggestions))(state);
+        set('suggestions.values', action.payload.serviceGroupsSuggestions))
+        (state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS_FAILURE:
       return pipe(
         set('suggestions.values', []),
         set('suggestions.status', EntityStatus.loadingFailure),
-        set('error', action.payload))(state);
+        set('error', action.payload))(state) as ServiceGroupsEntityState;
 
     default:
       return state;

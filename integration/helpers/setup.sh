@@ -40,11 +40,13 @@ EOF
 }
 
 # Start elasticsearch, if an S3 endpoint argument is passed in then enable it
+#
+# start_external_elasticsearch 
+# start_external_elasticsearch "s3" ${s3_endpoint}
+# start_external_elasticsearch "gcs" /path/to/creds
 start_external_elasticsearch() {
-  local s3_endpoint
   local version
   version="6.8.3"
-  s3_endpoint=$1
 
   if [ ! -f elasticsearch.rpm ]; then
     curl -o elasticsearch.rpm "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${version}.rpm"
@@ -69,10 +71,23 @@ path.repo: "/var/opt/chef-automate/backups"
 discovery.zen.minimum_master_nodes: 1
 EOF
 
-  if [[ -n "${s3_endpoint}" ]]; then
-    echo "y" | /usr/share/elasticsearch/bin/elasticsearch-plugin install "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-s3/repository-s3-${version}.zip"
+  local backup_type="$1"
+  if [[ "$#" -gt 0 ]]; then
+      shift
+  fi
 
-    cat >> /etc/elasticsearch/elasticsearch.yml <<EOF
+  case "${backup_type}" in
+    "")
+        log_info "no external backup configuration"
+        ;;
+    "s3")
+        log_info "s3 backup configuration"
+        local s3_endpoint="$1"
+
+        echo "y" | /usr/share/elasticsearch/bin/elasticsearch-plugin install \
+            "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-s3/repository-s3-${version}.zip"
+
+        cat >> /etc/elasticsearch/elasticsearch.yml <<EOF
 s3.client.default.protocol: "https"
 s3.client.default.read_timeout: "50s"
 s3.client.default.max_retries: 3
@@ -80,10 +95,27 @@ s3.client.default.use_throttle_retries: true
 s3.client.default.endpoint: "${s3_endpoint}"
 EOF
 
-    echo "$AWS_ACCESS_KEY_ID" | /usr/share/elasticsearch/bin/elasticsearch-keystore add s3.client.default.access_key
-    echo "$AWS_SECRET_ACCESS_KEY" | /usr/share/elasticsearch/bin/elasticsearch-keystore add s3.client.default.secret_key
-    echo "$AWS_SESSION_TOKEN" | /usr/share/elasticsearch/bin/elasticsearch-keystore add s3.client.default.session_token
-  fi
+        echo "$AWS_ACCESS_KEY_ID" | /usr/share/elasticsearch/bin/elasticsearch-keystore add s3.client.default.access_key
+        echo "$AWS_SECRET_ACCESS_KEY" | /usr/share/elasticsearch/bin/elasticsearch-keystore add s3.client.default.secret_key
+        echo "$AWS_SESSION_TOKEN" | /usr/share/elasticsearch/bin/elasticsearch-keystore add s3.client.default.session_token
+        ;;
+    "gcs")
+        log_info "gcs backup configuration"
 
+        local gcs_creds="$1"
+
+        echo "y" | /usr/share/elasticsearch/bin/elasticsearch-plugin install "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-gcs/repository-gcs-${version}.zip"
+
+        cat >> /etc/elasticsearch/elasticsearch.yml <<EOF
+gcs.client.default.read_timeout: "50s"
+EOF
+        /usr/share/elasticsearch/bin/elasticsearch-keystore add-file gcs.client.default.credentials_file "${gcs_creds}"
+        ;;
+    *)
+        log_error "Unknown backup type"
+        return 1
+  esac
+
+  log_info "starting external elasticsearch"
   systemctl start elasticsearch.service
 }

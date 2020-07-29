@@ -26,6 +26,10 @@
           [showEmptyMessage]="showEmptyStateMessage()"
           (addClicked)="openCreateModal()"
           (removeClicked)="startUserDelete($event)">
+          <p>It looks like there are no users and you<br/>
+            don't have permission to add them.<br/><br/>
+            If this is a mistake, then reach out to your administrator.
+          </p>
         </app-user-table>
       </section>
     </main>

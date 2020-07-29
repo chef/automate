@@ -1,8 +1,8 @@
 require 'cgi'
 
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/stats/stats_pb'
-require 'api/interservice/compliance/stats/stats_services_pb'
+require 'interservice/compliance/stats/stats_pb'
+require 'interservice/compliance/stats/stats_services_pb'
 
 if !ENV['NO_STATS_TREND_TESTS']
   describe File.basename(__FILE__) do
@@ -165,6 +165,104 @@ if !ENV['NO_STATS_TREND_TESTS']
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
 
+      # Nodes trend for the special April month
+      actual_data = GRPC stats, :read_trend, Stats::Query.new(
+        type: "nodes",
+        interval: 86400,
+        filters: [
+          Stats::ListFilter.new(type: "start_time", values: ['2018-04-01T00:00:00Z']),
+          Stats::ListFilter.new(type: "end_time", values: ["2018-04-05T#{END_OF_DAY}"])
+        ]
+      )
+      expected_data = {
+        "trends": [
+          {
+            "reportTime": "2018-04-01T23:59:59Z",
+            "failed": 1,
+            "waived": 1
+          },
+          {
+            "reportTime": "2018-04-02T23:59:59Z",
+            "failed": 1
+          },
+          {
+            "reportTime": "2018-04-03T23:59:59Z",
+            "failed": 1
+          },
+          {
+            "reportTime": "2018-04-04T23:59:59Z"
+          },
+          {
+            "reportTime": "2018-04-05T23:59:59Z"
+          }
+        ]
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
+
+      # Nodes trend for the special April month skipped profile deep
+      actual_data = GRPC stats, :read_trend, Stats::Query.new(
+        type: "nodes",
+        interval: 86400,
+        filters: [
+          Stats::ListFilter.new(type: "start_time", values: ['2018-04-01T00:00:00Z']),
+          Stats::ListFilter.new(type: "end_time", values: ["2018-04-05T#{END_OF_DAY}"]),
+          Stats::ListFilter.new(type: "profile_id", values: ['5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777'])
+        ]
+      )
+      expected_data = {
+        "trends": [
+          {
+            "reportTime": "2018-04-01T23:59:59Z"
+          },
+          {
+            "reportTime": "2018-04-02T23:59:59Z",
+            "skipped": 1
+          },
+          {
+            "reportTime": "2018-04-03T23:59:59Z"
+          },
+          {
+            "reportTime": "2018-04-04T23:59:59Z"
+          },
+          {
+            "reportTime": "2018-04-05T23:59:59Z"
+          }
+        ]
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
+
+      # Controls trend for the special April month
+      actual_data = GRPC stats, :read_trend, Stats::Query.new(
+        type: "controls",
+        interval: 86400,
+        filters: [
+          Stats::ListFilter.new(type: "start_time", values: ['2018-04-01T00:00:00Z']),
+          Stats::ListFilter.new(type: "end_time", values: ["2018-04-05T#{END_OF_DAY}"])
+        ]
+      )
+      expected_data = {
+        "trends": [
+          {
+            "reportTime": "2018-04-01T23:59:59Z",
+            "failed": 2,
+            "waived": 5
+          },
+          {
+            "reportTime": "2018-04-02T23:59:59Z",
+            "passed": 1
+          },
+          {
+            "reportTime": "2018-04-03T23:59:59Z"
+          },
+          {
+            "reportTime": "2018-04-04T23:59:59Z"
+          },
+          {
+            "reportTime": "2018-04-05T23:59:59Z"
+          }
+        ]
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
 
       # The whole range. for controls
       # Filter: environment="DevSec Prod Zeta"

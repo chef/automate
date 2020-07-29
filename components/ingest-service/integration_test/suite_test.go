@@ -20,7 +20,8 @@ import (
 	"github.com/spf13/viper"
 	elastic "gopkg.in/olivere/elastic.v6"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
+	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
@@ -71,10 +72,11 @@ type Suite struct {
 	cfgmgmt                  cfgBackend.Client
 	ingest                   iBackend.Client
 	client                   *elastic.Client
-	projectsClient           *iam_v2.MockProjectsClient
+	projectsClient           *authz.MockProjectsClient
 	eventServiceClientMock   *event.MockEventServiceClient
 	managerServiceClientMock *manager.MockNodeManagerServiceClient
 	nodesServiceClientMock   *nodes.MockNodesServiceClient
+	cfgmgmtClientMock        *cfgmgmt.MockCfgMgmtClient
 	cleanup                  func() error
 }
 
@@ -346,9 +348,10 @@ func createServices(s *Suite) error {
 	chefIngestServerConfig := serveropts.ChefIngestServerConfig{
 		MaxNumberOfBundledActionMsgs: 100,
 		ChefIngestRunPipelineConfig: serveropts.ChefIngestRunPipelineConfig{
-			MaxNumberOfBundledMsgs:   100,
-			NumberOfMsgsTransformers: 1,
-			NumberOfPublishers:       1,
+			MaxNumberOfBundledMsgs:        100,
+			NumberOfNodemanagerPublishers: 1,
+			NumberOfMsgsTransformers:      1,
+			NumberOfPublishers:            1,
 		},
 	}
 	// A global ChefIngestServer instance to call any rpc function
@@ -358,7 +361,7 @@ func createServices(s *Suite) error {
 	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
-		s.managerServiceClientMock, chefIngestServerConfig, s.nodesServiceClientMock)
+		s.managerServiceClientMock, chefIngestServerConfig, s.nodesServiceClientMock, s.cfgmgmtClientMock)
 
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
 		s.projectsClient, s.eventServiceClientMock)
@@ -398,7 +401,9 @@ func createServices(s *Suite) error {
 		return errors.Wrap(err, "could not initialize job manager")
 	}
 
-	err = server.MigrateJobsSchedule(context.Background(), jobManager, viper.ConfigFileUsed())
+	err = server.MigrateJobsSchedule(context.Background(), jobManager, viper.ConfigFileUsed(),
+		serveropts.JobsConfig{MissingNodesForDeletionRunningDefault: true,
+			NodesMissingRunningDefault: true})
 	if err != nil {
 		return errors.Wrap(err, "could not migrate old job schedules")
 	}
@@ -433,9 +438,9 @@ func createServices(s *Suite) error {
 }
 
 func createMocksWithDefaultFunctions(s *Suite) {
-	s.projectsClient = iam_v2.NewMockProjectsClient(gomock.NewController(nil))
+	s.projectsClient = authz.NewMockProjectsClient(gomock.NewController(nil))
 	s.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ListRulesForAllProjectsResp{}, nil)
+		&authz.ListRulesForAllProjectsResp{}, nil)
 
 	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(nil))
 	s.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
@@ -451,7 +456,7 @@ func createMocksWithDefaultFunctions(s *Suite) {
 }
 
 func createMocksWithTestObject(s *Suite, t *testing.T) {
-	s.projectsClient = iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	s.projectsClient = authz.NewMockProjectsClient(gomock.NewController(t))
 	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
 }
 

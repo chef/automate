@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/interservice/compliance/ingest/ingest/compliance.proto",
+    "title": "interservice/compliance/ingest/ingest/compliance.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/events/compliance/report": {
+    "/api/v0/events/compliance/report": {
       "post": {
         "operationId": "ProcessComplianceReport",
         "responses": {
@@ -156,6 +156,15 @@
         "run_time_limit": {
           "type": "number",
           "format": "float"
+        },
+        "automate_manager_type": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "status_message": {
+          "type": "string"
         }
       }
     },
@@ -211,6 +220,9 @@
         },
         "waiver_data": {
           "$ref": "#/definitions/chef.automate.domain.compliance.ingest.events.inspec.WaiverData"
+        },
+        "removed_results_counts": {
+          "$ref": "#/definitions/chef.automate.domain.compliance.ingest.events.inspec.RemovedResultsCounts"
         }
       }
     },
@@ -351,6 +363,26 @@
         },
         "skip_message": {
           "type": "string"
+        },
+        "status_message": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.domain.compliance.ingest.events.inspec.RemovedResultsCounts": {
+      "type": "object",
+      "properties": {
+        "failed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

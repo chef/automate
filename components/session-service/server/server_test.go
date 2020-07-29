@@ -53,7 +53,8 @@ func TestSafeCmpStrings(t *testing.T) {
 
 func TestHealthHandler(t *testing.T) {
 	ms := memstore.New(time.Minute)
-	hdlrFunc := newTestServer(t, ms).mux.ServeHTTP
+	_, mux := newTestServer(t, ms, true)
+	hdlrFunc := mux.ServeHTTP
 
 	t.Run("GET /health", func(t *testing.T) {
 		expected := `{"status":"SERVING"}`
@@ -64,8 +65,7 @@ func TestHealthHandler(t *testing.T) {
 
 func TestNewHandler(t *testing.T) {
 	ms := memstore.New(time.Minute)
-	s := newTestServer(t, ms)
-	hdlr := s.mux
+	_, hdlr := newTestServer(t, ms, true)
 
 	cases := map[string]func(*testing.T){
 		"GET /new?state=xyz is redirected to dex, stores generated relay_state": func(t *testing.T) {
@@ -281,11 +281,9 @@ func TestRefreshHandler(t *testing.T) {
 	}
 
 	ms := memstore.New(time.Minute)
-	s := newTestServer(t, ms)
-	hdlr := s.mux
 
-	cases := map[string]func(*testing.T){
-		"GET /refresh without a session cookie is forbidden": func(t *testing.T) {
+	cases := map[string]func(t *testing.T, persistent bool, s *Server, hdlr http.Handler){
+		"GET /refresh without a session cookie is forbidden": func(t *testing.T, persistent bool, s *Server, hdlr http.Handler) {
 			r := newRefreshRequest()
 			w := httptest.NewRecorder()
 			hdlr.ServeHTTP(w, r)
@@ -294,7 +292,7 @@ func TestRefreshHandler(t *testing.T) {
 			require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 			require.Empty(t, resp.Cookies(), "no cookie was given")
 		},
-		"GET /refresh with an unknown session cookie is forbidden": func(t *testing.T) {
+		"GET /refresh with an unknown session cookie is forbidden": func(t *testing.T, persistent bool, s *Server, hdlr http.Handler) {
 			r := newRefreshRequest()
 			r.AddCookie(&http.Cookie{Name: "session", Value: "nicetry"})
 			w := httptest.NewRecorder()
@@ -305,7 +303,7 @@ func TestRefreshHandler(t *testing.T) {
 			require.Empty(t, resp.Cookies(), "no cookie was given")
 		},
 
-		"GET /refresh with a good session cookie": func(t *testing.T) {
+		"GET /refresh with a good session cookie": func(t *testing.T, persistent bool, s *Server, hdlr http.Handler) {
 			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
 			refreshToken := "somethingopaque"
 			newRefreshToken := "somethingopaqueandnewforrefresh"
@@ -334,13 +332,13 @@ func TestRefreshHandler(t *testing.T) {
 			require.JSONEq(t, fmt.Sprintf(`{"id_token": %q}`, newIDToken), string(body))
 			hasNoCookieWithSessionID(t, resp, sessionID)
 			hasCookieWithAnySessionID(t, resp)
-			hasCookieWithSecureSessionSettings(t, resp)
+			hasCookieWithSecureSessionSettings(t, resp, persistent)
 		},
 
 		// Note: the situation "good session cookie + no refresh_token + expired id_token"
 		//       is covered by the "token exchange failing" test case below (since that
 		//       is how it will look like).
-		"GET /refresh with a good session cookie that doesn't have a refresh_token": func(t *testing.T) {
+		"GET /refresh with a good session cookie that doesn't have a refresh_token": func(t *testing.T, persistent bool, s *Server, hdlr http.Handler) {
 			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-50Q"
 
 			// set up the oauth2 token source to return the existing id_token (mocking
@@ -367,10 +365,10 @@ func TestRefreshHandler(t *testing.T) {
 			require.JSONEq(t, fmt.Sprintf(`{"id_token": %q}`, incomingIDToken), string(body))
 			hasNoCookieWithSessionID(t, resp, sessionID)
 			hasCookieWithAnySessionID(t, resp)
-			hasCookieWithSecureSessionSettings(t, resp)
+			hasCookieWithSecureSessionSettings(t, resp, persistent)
 		},
 
-		"GET /refresh with a good session cookie, but token exchange failing": func(t *testing.T) {
+		"GET /refresh with a good session cookie, but token exchange failing": func(t *testing.T, persistent bool, s *Server, hdlr http.Handler) {
 			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
 			refreshToken := "somethingopaque"
 
@@ -393,23 +391,27 @@ func TestRefreshHandler(t *testing.T) {
 			// httptest's http.Response.Body can always be read safely
 			hasNoCookieWithSessionID(t, resp, sessionID)
 			hasCookieWithAnySessionID(t, resp)
-			hasCookieWithSecureSessionSettings(t, resp)
+			hasCookieWithSecureSessionSettings(t, resp, persistent)
 		},
 	}
 
 	for name, tc := range cases {
-		t.Run(name, tc)
+		for _, persistent := range []bool{false, true} {
+			s, hdlr := newTestServer(t, ms, persistent)
+			t.Run(fmt.Sprintf("with persistent=%s;%s", strconv.FormatBool(persistent), name), func(t *testing.T) {
+				tc(t, persistent, s, hdlr)
+			})
+		}
 	}
 }
 
 func TestCallbackHandler(t *testing.T) {
 	ms := memstore.New(time.Minute)
-	s := newTestServer(t, ms)
-	hdlr := s.mux
 
-	cases := map[string]func(*testing.T){
+	cases := map[string]func(t *testing.T, persistent bool, s *Server, hdlr http.Handler){
 
-		"GET /callback without a session cookie is forbidden": func(t *testing.T) {
+		"GET /callback without a session cookie is forbidden": func(t *testing.T,
+			persistent bool, s *Server, hdlr http.Handler) {
 			r := httptest.NewRequest("GET", "/callback", nil)
 			w := httptest.NewRecorder()
 			hdlr.ServeHTTP(w, r)
@@ -419,7 +421,8 @@ func TestCallbackHandler(t *testing.T) {
 			require.Empty(t, resp.Cookies(), "no cookie was given")
 		},
 
-		"GET /callback with a session cookie but missing code and state is rejected": func(t *testing.T) {
+		"GET /callback with a session cookie but missing code and state is rejected": func(t *testing.T,
+			persistent bool, s *Server, hdlr http.Handler) {
 			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
 			r := httptest.NewRequest("GET", "/callback", nil)
 			r.AddCookie(&http.Cookie{Name: "session", Value: sessionID})
@@ -432,7 +435,7 @@ func TestCallbackHandler(t *testing.T) {
 		},
 
 		`GET /callback?code=X&state=Y with a session cookie when code exchange
-     succeeds, stores refresh_token and redirects to signin`: func(t *testing.T) {
+     succeeds, stores refresh_token and redirects to signin`: func(t *testing.T, persistent bool, s *Server, hdlr http.Handler) {
 			code := "randomstringcode"
 			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
 			relayState := "relaaay"
@@ -462,7 +465,7 @@ func TestCallbackHandler(t *testing.T) {
 			// is no more, and find new one
 			hasNoCookieWithSessionID(t, resp, sessionID)
 			hasCookieWithAnySessionID(t, resp)
-			hasCookieWithSecureSessionSettings(t, resp)
+			hasCookieWithSecureSessionSettings(t, resp, persistent)
 
 			var newSessionID string
 			for _, k := range resp.Cookies() {
@@ -496,7 +499,7 @@ func TestCallbackHandler(t *testing.T) {
 		},
 
 		`GET /callback?code=X&state=Y with a session cookie when code exchange
-     succeeds without a refresh_token, removes existing refresh_token and redirects to signin`: func(t *testing.T) {
+     succeeds without a refresh_token, removes existing refresh_token and redirects to signin`: func(t *testing.T, persistent bool, s *Server, hdlr http.Handler) {
 			code := "randomstringcode"
 			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
 			relayState := "relaaay"
@@ -527,7 +530,7 @@ func TestCallbackHandler(t *testing.T) {
 			// is no more, and find new one
 			hasNoCookieWithSessionID(t, resp, sessionID)
 			hasCookieWithAnySessionID(t, resp)
-			hasCookieWithSecureSessionSettings(t, resp)
+			hasCookieWithSecureSessionSettings(t, resp, persistent)
 
 			var newSessionID string
 			for _, k := range resp.Cookies() {
@@ -550,7 +553,7 @@ func TestCallbackHandler(t *testing.T) {
 		},
 
 		`GET /callback?code=X&state=Y with a session cookie and two state pairs when code exchange
-     succeeds, stores refresh_token and redirects to signin, removes one relay state, keeps the other`: func(t *testing.T) {
+     succeeds, stores refresh_token and redirects to signin, removes one relay state, keeps the other`: func(t *testing.T, persistent bool, s *Server, hdlr http.Handler) {
 			code := "randomstringcode"
 			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
 			relayState0 := "relaaay"
@@ -587,7 +590,7 @@ func TestCallbackHandler(t *testing.T) {
 			// is no more, and find new one
 			hasNoCookieWithSessionID(t, resp, sessionID)
 			hasCookieWithAnySessionID(t, resp)
-			hasCookieWithSecureSessionSettings(t, resp)
+			hasCookieWithSecureSessionSettings(t, resp, persistent)
 
 			var newSessionID string
 			for _, k := range resp.Cookies() {
@@ -615,7 +618,7 @@ func TestCallbackHandler(t *testing.T) {
 		},
 
 		`GET /callback?code=X&state=Y with a session cookie
-     when relay state mismatches, stores nothing`: func(t *testing.T) {
+     when relay state mismatches, stores nothing`: func(t *testing.T, persistent bool, s *Server, hdlr http.Handler) {
 			code := "randomstringcode"
 			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
 			storedRelayState := "relaaay"
@@ -640,7 +643,7 @@ func TestCallbackHandler(t *testing.T) {
 		},
 
 		`GET /callback?code=X&state=Y with a session cookie
-     when code exchange fails, stores nothing`: func(t *testing.T) {
+     when code exchange fails, stores nothing`: func(t *testing.T, persistent bool, s *Server, hdlr http.Handler) {
 			code := "randomstringcode"
 			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
 			relayState := "relaaay"
@@ -665,16 +668,20 @@ func TestCallbackHandler(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		t.Run(name, tc)
+		for _, persistent := range []bool{false, true} {
+			s, hdlr := newTestServer(t, ms, persistent)
+			t.Run(fmt.Sprintf("with persistent=%s;%s", strconv.FormatBool(persistent), name), func(t *testing.T) {
+				tc(t, persistent, s, hdlr)
+			})
+		}
 	}
 }
 
 func TestTokenHandler(t *testing.T) {
 	ms := memstore.New(time.Minute)
-	s := newTestServer(t, ms)
+	s, hdlr := newTestServer(t, ms, true)
 	relayState := "relaaay"
 	clientState := "xyz"
-	hdlr := s.mux
 	sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
 	newTokenRequest := func(code string) *http.Request {
 		data := url.Values{}
@@ -932,8 +939,7 @@ func TestTokenHandler(t *testing.T) {
 
 func TestUserInfoHandler(t *testing.T) {
 	ms := memstore.New(time.Minute)
-	s := newTestServer(t, ms)
-	hdlr := s.mux
+	s, hdlr := newTestServer(t, ms, true)
 
 	cases := map[string]func(*testing.T){
 
@@ -992,7 +998,7 @@ func hasCookieRemovingAnySessionIDs(t *testing.T, resp *http.Response) {
 	require.True(t, assertion, "there is a `session=` cookie (removing session cookie)")
 }
 
-func hasCookieWithSecureSessionSettings(t *testing.T, resp *http.Response) {
+func hasCookieWithSecureSessionSettings(t *testing.T, resp *http.Response, persistent bool) {
 	t.Helper()
 	for _, k := range resp.Cookies() {
 		if k.Name == "session" {
@@ -1004,8 +1010,14 @@ func hasCookieWithSecureSessionSettings(t *testing.T, resp *http.Response) {
 			// https://godoc.org/github.com/alexedwards/scs#Manager.Persist
 			// until we modify those defaults, checking that they're not
 			// empty is enough
-			require.NotEmpty(t, k.MaxAge)
-			require.NotEmpty(t, k.Expires)
+			if persistent {
+				require.NotEmpty(t, k.MaxAge)
+				require.NotEmpty(t, k.Expires)
+			} else {
+				require.Empty(t, k.MaxAge)
+				require.Empty(t, k.Expires)
+			}
+
 		}
 	}
 }
@@ -1066,7 +1078,7 @@ func findClientStateInCookieData(t *testing.T, d map[string]interface{}, rs stri
 	return cs
 }
 
-func newTestServer(t *testing.T, store scs.Store) *Server {
+func newTestServer(t *testing.T, store scs.Store, persistent bool) (*Server, http.Handler) {
 	var l logger.Logger
 	var err error
 	if wantLogs {
@@ -1084,9 +1096,9 @@ func newTestServer(t *testing.T, store scs.Store) *Server {
 	// This isn't an ideal test setup as we're calling the helper
 	// in code & test, but it lets us assert that the helper is doing
 	// the right thing
-	scsManager := createSCSManager(store)
+	scsManager := createSCSManager(store, persistent)
 
-	s := Server{
+	s := &Server{
 		log:        l,
 		mgr:        scsManager,
 		signInURL:  u,
@@ -1095,7 +1107,7 @@ func newTestServer(t *testing.T, store scs.Store) *Server {
 	}
 	s.initHandlers()
 
-	return &s
+	return s, s.mux
 }
 
 func getBldrStruct(t *testing.T) *BldrClient {

@@ -1,5 +1,6 @@
 import { Router } from '@angular/router';
 import { Component } from '@angular/core';
+import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
@@ -13,7 +14,6 @@ import {
 } from '../../../entities/managers/manager.selectors';
 import { DeleteManager } from '../../../entities/managers/manager.actions';
 import { routeParams } from '../../../route.selectors';
-import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
   selector: 'app-integrations',
@@ -48,7 +48,7 @@ export class IntegrationsListComponent {
     return status === 'loading';
   }
 
-  handleDelete($event: ChefKeyboardEvent, id: string) {
+  handleDelete($event: MatOptionSelectionChange, id: string) {
     if ($event.isUserInput) {
       this.store.dispatch(new DeleteManager({id}));
     }

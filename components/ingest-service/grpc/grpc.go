@@ -11,7 +11,8 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc/reflection"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/authz"
+	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	automate_event "github.com/chef/automate/api/interservice/event"
@@ -106,7 +107,7 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 	defer authzConn.Close() // nolint: errcheck
 
-	authzProjectsClient := iam_v2.NewProjectsClient(authzConn)
+	authzProjectsClient := authz.NewProjectsClient(authzConn)
 
 	// event Interface
 	eventConn, err := opts.ConnFactory.Dial("event-service", opts.EventAddress)
@@ -131,9 +132,16 @@ func Spawn(opts *serveropts.Opts) error {
 	nodeMgrServiceClient := manager.NewNodeManagerServiceClient(nodeMgrConn)
 	nodesServiceClient := nodes.NewNodesServiceClient(nodeMgrConn)
 
+	configMgmtConn, err := opts.ConnFactory.Dial("config-mgmt-service", opts.ConfigMgmtAddress)
+	if err != nil {
+		log.WithError(err).WithFields(log.Fields{"config_mgmt_address": opts.ConfigMgmtAddress}).Error("Failed to connect to config-mgmt-service")
+		return err
+	}
+	configMgmtClient := cfgmgmt.NewCfgMgmtClient(configMgmtConn)
+
 	// ChefRuns
 	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient,
-		opts.ChefIngestServerConfig, nodesServiceClient)
+		opts.ChefIngestServerConfig, nodesServiceClient, configMgmtClient)
 	ingest.RegisterChefIngesterServer(grpcServer, chefIngest)
 
 	// Pass the chef ingest server to give status about the pipelines
@@ -168,7 +176,7 @@ func Spawn(opts *serveropts.Opts) error {
 		return err
 	}
 
-	err = server.MigrateJobsSchedule(context.Background(), jobManager, viper.ConfigFileUsed())
+	err = server.MigrateJobsSchedule(context.Background(), jobManager, viper.ConfigFileUsed(), opts.Jobs)
 	if err != nil {
 		logrus.WithError(err).Fatal("could not migrate old job schedules")
 		return err

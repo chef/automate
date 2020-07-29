@@ -133,6 +133,17 @@ var feedProps = `
 		"created":{
 			"type":"date",
 			"format":"strict_date_optional_time||epoch_millis"
+		},
+		"chef_organization": {
+			"type": "keyword",
+			"ignore_above": 256
+		},
+		"chef_infra_server": {
+			"type": "keyword",
+			"ignore_above": 256
+		},
+		"projects": {
+			"type": "keyword"
 		}
 	}
 `

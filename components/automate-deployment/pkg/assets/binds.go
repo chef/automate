@@ -13,6 +13,8 @@ automate-builder-api BINDING_MODE strict
 automate-builder-api-proxy REQUIRED automate-builder-api
 automate-builder-api-proxy BINDING_MODE strict
 automate-builder-memcached BINDING_MODE strict
+automate-cds REQUIRED compliance-service
+automate-cds BINDING_MODE strict
 automate-cs-bookshelf REQUIRED automate-pg-gateway pg-sidecar-service
 automate-cs-bookshelf BINDING_MODE strict
 automate-cs-nginx REQUIRED automate-cs-bookshelf automate-cs-oc-erchef automate-es-gateway
@@ -30,7 +32,7 @@ automate-elasticsearch REQUIRED backup-gateway
 automate-elasticsearch BINDING_MODE strict
 automate-es-gateway REQUIRED automate-elasticsearch
 automate-es-gateway BINDING_MODE relaxed
-automate-gateway OPTIONAL applications-service authn-service authz-service compliance-service config-mgmt-service data-feed-service deployment-service event-feed-service infra-proxy-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service
+automate-gateway OPTIONAL applications-service authn-service authz-service automate-cds compliance-service config-mgmt-service data-feed-service deployment-service event-feed-service infra-proxy-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service
 automate-gateway BINDING_MODE relaxed
 automate-load-balancer OPTIONAL automate-builder-api-proxy automate-cs-nginx automate-dex automate-gateway automate-ui automate-workflow-nginx session-service
 automate-load-balancer BINDING_MODE relaxed
@@ -51,13 +53,13 @@ cereal-service BINDING_MODE strict
 compliance-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service event-service nodemanager-service pg-sidecar-service secrets-service
 compliance-service OPTIONAL authn-service es-sidecar-service notifications-service
 compliance-service BINDING_MODE strict
-config-mgmt-service REQUIRED automate-es-gateway
+config-mgmt-service REQUIRED automate-es-gateway automate-pg-gateway pg-sidecar-service
 config-mgmt-service BINDING_MODE strict
 data-feed-service REQUIRED automate-pg-gateway cereal-service compliance-service config-mgmt-service pg-sidecar-service secrets-service
 data-feed-service BINDING_MODE strict
 es-sidecar-service REQUIRED automate-elasticsearch automate-es-gateway
 es-sidecar-service BINDING_MODE strict
-event-feed-service REQUIRED automate-es-gateway cereal-service
+event-feed-service REQUIRED authz-service automate-es-gateway cereal-service
 event-feed-service OPTIONAL es-sidecar-service
 event-feed-service BINDING_MODE strict
 event-gateway REQUIRED authn-service authz-service event-service
@@ -65,7 +67,7 @@ event-gateway BINDING_MODE strict
 event-service BINDING_MODE strict
 infra-proxy-service REQUIRED authz-service automate-pg-gateway pg-sidecar-service secrets-service
 infra-proxy-service BINDING_MODE strict
-ingest-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service event-service nodemanager-service pg-sidecar-service
+ingest-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service config-mgmt-service event-service nodemanager-service pg-sidecar-service
 ingest-service OPTIONAL es-sidecar-service
 ingest-service BINDING_MODE strict
 license-control-service REQUIRED automate-pg-gateway pg-sidecar-service

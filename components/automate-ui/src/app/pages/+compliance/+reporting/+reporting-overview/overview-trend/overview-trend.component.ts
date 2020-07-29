@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
-import * as moment from 'moment';
+import * as moment from 'moment/moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 
 export interface TrendData {

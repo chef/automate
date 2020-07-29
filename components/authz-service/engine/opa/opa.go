@@ -147,7 +147,7 @@ func (s *State) makeAuthorizedProjectPreparedQuery(ctx context.Context) error {
 	// This will be the ruleset that is ultimately queried for authorization
 	// checks. Add the module to the compiler.
 	main := &ast.Module{
-		Package: ast.MustParsePackage("package __partialauthzv2"),
+		Package: ast.MustParsePackage("package __partialauthz"),
 	}
 
 	for i := range pq.Queries {
@@ -159,7 +159,7 @@ func (s *State) makeAuthorizedProjectPreparedQuery(ctx context.Context) error {
 		main.Rules = append(main.Rules, rule)
 	}
 
-	compiler.Modules["__partialauthzv2"] = main
+	compiler.Modules["__partialauthz"] = main
 
 	// Finally, compile everything and make a prepared query that can be
 	// executed for authorization checks.
@@ -172,7 +172,7 @@ func (s *State) makeAuthorizedProjectPreparedQuery(ctx context.Context) error {
 	r2 := rego.New(
 		rego.Store(s.store),
 		rego.Compiler(compiler),
-		rego.Query("data.__partialauthzv2.authorized_project[project]"),
+		rego.Query("data.__partialauthz.authorized_project[project]"),
 	)
 
 	query, err := r2.PrepareForEval(ctx)

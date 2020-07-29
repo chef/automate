@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"fmt"
 	"regexp"
 	"testing"
 
@@ -59,7 +60,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 			filters: map[string][]string{
 				"service_group_id": {"123"},
 			},
-			expected:          "WHERE service_group_id = '123'",
+			expected:          "WHERE (service_group_id = '123')",
 			shouldReturnError: false,
 		},
 		{
@@ -67,7 +68,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 			filters: map[string][]string{
 				"service_group_id": {"123", "456"},
 			},
-			expected:          "WHERE service_group_id = '123' OR service_group_id = '456'",
+			expected:          "WHERE (service_group_id = '123' OR service_group_id = '456')",
 			shouldReturnError: false,
 		},
 		{
@@ -75,7 +76,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 			filters: map[string][]string{
 				"status": {"UNKNOWN"},
 			},
-			expected:          "WHERE health = 'UNKNOWN'",
+			expected:          "WHERE (health = 'UNKNOWN')",
 			shouldReturnError: false,
 		},
 		{
@@ -84,7 +85,17 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 				"service_group_id": {"123", "456"},
 				"status":           {"WARNING", "OK"},
 			},
-			expected:          "WHERE service_group_id = '123' OR service_group_id = '456' AND health = 'WARNING' OR health = 'OK'",
+			//
+			// NOTE: If you change the query generation, you must keep the parenthesis
+			// or have flawless operator precedence, because this:
+			//
+			//   WHERE service_group_id = '123' OR service_group_id = '456' AND health = 'WARNING' OR health = 'OK'
+			//
+			// actually means this:
+			//
+			//   WHERE (service_group_id = '123') OR (service_group_id = '456' AND health = 'WARNING' OR health = 'OK')
+			//
+			expected:          "WHERE (service_group_id = '123' OR service_group_id = '456') AND (health = 'WARNING' OR health = 'OK')",
 			shouldReturnError: false,
 		},
 		{
@@ -143,10 +154,12 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Contains(t, err.Error(), test.errMsg)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 			}
 
-			assert.ElementsMatch(t, clauses(test.expected), clauses(actual))
+			extraFailureMessage := fmt.Sprintf("\nactual: >>%s<<\nexpect: >>%s<<\n", actual, test.expected)
+
+			assert.ElementsMatch(t, clauses(test.expected), clauses(actual), extraFailureMessage)
 		})
 	}
 }

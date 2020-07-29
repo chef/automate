@@ -7,7 +7,6 @@ import (
 	"net"
 	"os"
 	"os/exec"
-	"os/user"
 	"path"
 	"strconv"
 	"testing"
@@ -19,6 +18,7 @@ import (
 
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/platform/pg"
+	"github.com/chef/automate/lib/user"
 )
 
 var testConnInfo *pg.A1ConnInfo

@@ -133,7 +133,7 @@ describe('assigning projects', () => {
 
     it(`when creating ${iamResources}, successfully assigns an existing authorized project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'POST',
         url: `/apis/iam/v2/${iamResources}`,
         body: {
@@ -150,7 +150,8 @@ describe('assigning projects', () => {
     it(`when creating ${iamResources} without projects is allowed, ` +
     `successfully creates unassigned ${iamResource}`,  () => {
       cy.request({
-        headers: { 'api-token': unassignedAndProjectAllowedTok },
+        headers: { 'api-token': unassignedAndProjectAllowedTok,
+          'content-type': 'application/json+lax' },
         method: 'POST',
         url: `/apis/iam/v2/${iamResources}`,
         failOnStatusCode: false,
@@ -167,7 +168,7 @@ describe('assigning projects', () => {
 
     it(`when updating ${iamResources}, successfully assigns an existing authorized project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}`,
         body: {
@@ -185,7 +186,7 @@ describe('assigning projects', () => {
 
     it(`when creating ${iamResources}, fails to assign a non-existing project`, () => {
         cy.request({
-          headers: { 'api-token': twoAllowedProjectsTok },
+          headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
           method: 'POST',
           url: `/apis/iam/v2/${iamResources}`,
           failOnStatusCode: false,
@@ -201,7 +202,7 @@ describe('assigning projects', () => {
 
     it(`when updating ${iamResources}, fails to assign a non-existing project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}`,
         failOnStatusCode: false,
@@ -217,7 +218,7 @@ describe('assigning projects', () => {
 
     it(`when creating ${iamResources}, fails to assign an unauthorized project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'POST',
         url: `/apis/iam/v2/${iamResources}`,
         failOnStatusCode: false,
@@ -235,7 +236,7 @@ describe('assigning projects', () => {
     'project assignment permission is missing for (unassigned), ' +
     `fails to create unassigned ${iamResource}`,  () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'POST',
         url: `/apis/iam/v2/${iamResources}`,
         failOnStatusCode: false,
@@ -250,7 +251,7 @@ describe('assigning projects', () => {
 
     it(`when updating ${iamResources}, fails to assign an unauthorized project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}`,
         failOnStatusCode: false,
@@ -266,7 +267,7 @@ describe('assigning projects', () => {
 
     it(`when updating ${iamResources}, succeeds updating without changing projects`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}`,
         body: {
@@ -286,7 +287,8 @@ describe('assigning projects', () => {
     it(`when assigning one project and (unassigned) is allowed,
       succeeds creating (unassigned) ${iamResource}`, () => {
       cy.request({
-        headers: { 'api-token': unassignedAndProjectAllowedTok },
+        headers: { 'api-token': unassignedAndProjectAllowedTok,
+          'content-type': 'application/json+lax' },
         method: 'POST',
         url: `/apis/iam/v2/${iamResources}`,
         body: {
@@ -306,7 +308,8 @@ describe('assigning projects', () => {
       succeeds updating ${iamResource} from (unassigned)
       to authorized project`, () => {
       cy.request({
-        headers: { 'api-token': unassignedAndProjectAllowedTok },
+        headers: { 'api-token': unassignedAndProjectAllowedTok,
+         'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-2`,
         body: {
@@ -325,7 +328,8 @@ describe('assigning projects', () => {
     it(`when assigning one project and (unassigned) is allowed,
       succeeds updating ${iamResource} from authorized project to (unassigned)`, () => {
       cy.request({
-        headers: { 'api-token': unassignedAndProjectAllowedTok },
+        headers: { 'api-token': unassignedAndProjectAllowedTok,
+          'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-2`,
         body: {
@@ -343,7 +347,8 @@ describe('assigning projects', () => {
     it(`when assigning one project and (unassigned) is allowed,
       fails to update ${iamResource} from unassigned to unauthorized project`, () => {
       cy.request({
-        headers: { 'api-token': unassignedAndProjectAllowedTok },
+        headers: { 'api-token': unassignedAndProjectAllowedTok,
+          'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-2`,
         failOnStatusCode: false,
@@ -361,7 +366,7 @@ describe('assigning projects', () => {
     it(`when assigning only two projects is allowed,
       fails to update ${iamResource} from (unassigned) to authorized project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-2`,
         failOnStatusCode: false,
@@ -381,7 +386,7 @@ describe('assigning projects', () => {
     it(`when assigning only two projects is allowed,
       fails to create ${iamResource} with authorized and unauthorized projects`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'POST',
         url: `/apis/iam/v2/${iamResources}`,
         failOnStatusCode: false,
@@ -399,7 +404,8 @@ describe('assigning projects', () => {
     it(`when assigning one project and (unassigned) is allowed,
     succeeds updating ${iamResource} from authorized to (unassigned)`, () => {
         cy.request({
-          headers: { 'api-token': unassignedAndProjectAllowedTok },
+          headers: { 'api-token': unassignedAndProjectAllowedTok,
+            'content-type': 'application/json+lax' },
           method: 'POST',
           url: `/apis/iam/v2/${iamResources}`,
           body: {
@@ -410,7 +416,8 @@ describe('assigning projects', () => {
         });
 
       cy.request({
-        headers: { 'api-token': unassignedAndProjectAllowedTok},
+        headers: { 'api-token': unassignedAndProjectAllowedTok,
+          'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-4a`,
         body: {
@@ -430,7 +437,7 @@ describe('assigning projects', () => {
     it(`when assigning only two projects is allowed and (unassigned) is not allowed,
       succeeds removing authorized project from ${iamResource} to make it (unassigned)`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'POST',
         url: `/apis/iam/v2/${iamResources}`,
         body: {
@@ -441,7 +448,7 @@ describe('assigning projects', () => {
       });
 
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-4b`,
         body: {
@@ -459,7 +466,7 @@ describe('assigning projects', () => {
     it(`when assigning only two projects is allowed and (unassigned) is not allowed,
       fails to update ${iamResource} from authorized to unauthorized project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'POST',
         url: `/apis/iam/v2/${iamResources}`,
         body: {
@@ -470,7 +477,7 @@ describe('assigning projects', () => {
       });
 
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-5`,
         failOnStatusCode: false,
@@ -488,7 +495,7 @@ describe('assigning projects', () => {
     it(`when assigning only two projects is allowed and (unassigned) is not allowed,
       fails to update ${iamResource} from authorized to non-existent project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-5`,
         failOnStatusCode: false,
@@ -507,7 +514,7 @@ describe('assigning projects', () => {
       fails to update ${iamResource} from authorized project
       to a different authorized project and non-existent project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-5`,
         failOnStatusCode: false,
@@ -526,7 +533,7 @@ describe('assigning projects', () => {
       fails to update ${iamResource} from authorized project
       to an unauthorized project and non-existent project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-5`,
         failOnStatusCode: false,
@@ -545,7 +552,7 @@ describe('assigning projects', () => {
       fails to update ${iamResource} from authorized project
       to a different authorized project and unauthorized project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-5`,
         failOnStatusCode: false,
@@ -564,7 +571,7 @@ describe('assigning projects', () => {
     it(`when assigning only two projects is allowed and (unassigned) is not allowed,
       fails to create (unassigned) ${iamResource}`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'POST',
         url: `/apis/iam/v2/${iamResources}`,
         failOnStatusCode: false,
@@ -582,7 +589,7 @@ describe('assigning projects', () => {
     it(`when assigning only two projects is allowed,
     fails to update ${iamResource} to remove unauthorized project`, () => {
       cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
+        headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
         method: 'POST',
         url: `/apis/iam/v2/${iamResources}`,
         body: {
@@ -593,7 +600,8 @@ describe('assigning projects', () => {
       });
 
       cy.request({
-        headers: { 'api-token': unassignedAndProjectAllowedTok },
+        headers: { 'api-token': unassignedAndProjectAllowedTok,
+          'content-type': 'application/json+lax' },
         method: 'PUT',
         url: `/apis/iam/v2/${iamResources}/${resource.id}-7`,
         failOnStatusCode: false,
@@ -645,7 +653,8 @@ describe('assigning projects', () => {
 
       it('succeeds updating without changing project assignment when there are no projects', () => {
         cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN'),
+            'content-type': 'application/json+lax' },
           method: 'POST',
           url: `/apis/iam/v2/${iamResources}`,
           body: {
@@ -656,7 +665,7 @@ describe('assigning projects', () => {
         });
 
         cy.request({
-          headers: { 'api-token': twoAllowedProjectsTok },
+          headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
           method: 'PUT',
           url: `/apis/iam/v2/${iamResources}/${resource.id}-8`,
           body: {
@@ -676,7 +685,8 @@ describe('assigning projects', () => {
       it('succeeds updating without changing project assignment ' +
       'when there there are unauthorizerd projects', () => {
         cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN'),
+            'content-type': 'application/json+lax' },
           method: 'POST',
           url: `/apis/iam/v2/${iamResources}`,
           body: {
@@ -687,7 +697,7 @@ describe('assigning projects', () => {
         });
 
         cy.request({
-          headers: { 'api-token': twoAllowedProjectsTok },
+          headers: { 'api-token': twoAllowedProjectsTok, 'content-type': 'application/json+lax' },
           method: 'PUT',
           url: `/apis/iam/v2/${iamResources}/${resource.id}-9`,
           body: {

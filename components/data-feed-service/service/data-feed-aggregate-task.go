@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"time"
 
+	cfgmgmtRequest "github.com/chef/automate/api/interservice/cfgmgmt/request"
+
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
@@ -30,18 +32,22 @@ type DataFeedAggregateTaskParams struct {
 }
 
 type DataFeedAggregateTask struct {
-	cfgMgmt   cfgmgmt.CfgMgmtClient
-	reporting reporting.ReportingServiceClient
-	secrets   secrets.SecretsServiceClient
-	db        *dao.DB
+	cfgMgmt             cfgmgmt.CfgMgmtClient
+	reporting           reporting.ReportingServiceClient
+	secrets             secrets.SecretsServiceClient
+	db                  *dao.DB
+	externalFqdn        string
+	acceptedStatusCodes []int32
 }
 
 func NewDataFeedAggregateTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grpc.ClientConn, complianceConn *grpc.ClientConn, secretsConn *grpc.ClientConn, db *dao.DB) *DataFeedAggregateTask {
 	return &DataFeedAggregateTask{
-		reporting: reporting.NewReportingServiceClient(complianceConn),
-		cfgMgmt:   cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
-		secrets:   secrets.NewSecretsServiceClient(secretsConn),
-		db:        db,
+		reporting:           reporting.NewReportingServiceClient(complianceConn),
+		cfgMgmt:             cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
+		secrets:             secrets.NewSecretsServiceClient(secretsConn),
+		db:                  db,
+		externalFqdn:        dataFeedConfig.ServiceConfig.ExternalFqdn,
+		acceptedStatusCodes: dataFeedConfig.ServiceConfig.AcceptedStatusCodes,
 	}
 }
 
@@ -89,7 +95,7 @@ func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (inte
 			// build and send notification for this rule
 			notification := datafeedNotification{username: username, password: password, url: destinations[destination].URL, data: buffer}
 
-			client := NewDataClient()
+			client := NewDataClient(d.acceptedStatusCodes)
 			err = send(client, notification)
 			if err != nil {
 				handleSendErr(notification, params.FeedStart, params.FeedEnd, err)
@@ -115,14 +121,12 @@ func (d *DataFeedAggregateTask) buildDatafeed(ctx context.Context, nodeIDs map[s
 
 		nodeData, err := d.getNodeClientData(ctx, ip, nodeID, updatedNodesOnly)
 		if err != nil {
-			log.Errorf("Error getting node data %v", err)
-			continue
+			log.Warnf("Error getting node data %v", err)
 		}
 
 		report, err := d.getNodeComplianceData(ctx, ip, nodeID, updatedNodesOnly)
 		if err != nil {
-			log.Errorf("Error getting compliance data %v", err)
-			continue
+			log.Warnf("Error getting compliance data %v", err)
 		}
 		// update the message with the full report
 		if report != nil {
@@ -148,24 +152,60 @@ func (d *DataFeedAggregateTask) getNodeClientData(ctx context.Context, ipaddress
 			filters = []string{"ipaddress:" + ipaddress}
 		}
 		// get the attributes and last client run data of each node
-		nodeData, err = getNodeData(ctx, d.cfgMgmt, filters)
+		nodeData, err = d.getNodeData(ctx, filters)
 
 	} else if nodeID.ClientID == "" && updatedNodesOnly {
 		// get hosts data
 		filters := []string{"ipaddress:" + ipaddress}
 		_, macAddress, hostname, err := getNodeHostFields(ctx, d.cfgMgmt, filters)
 		if err != nil {
-			log.Errorf("Error getting node macaddress and hostname %v", err)
+			log.Warnf("Error getting node macaddress and hostname %v", err)
 		}
 		nodeDataContent := make(map[string]interface{})
 		nodeDataContent["macaddress"] = macAddress
 		nodeDataContent["hostname"] = hostname
 		nodeDataContent["ipaddress"] = ipaddress
+		nodeDataContent["automate_fqdn"] = d.externalFqdn
 		nodeData["node"] = nodeDataContent
 	}
 	if err != nil {
 		return nodeData, err
 	}
+	return nodeData, nil
+}
+
+func (d *DataFeedAggregateTask) getNodeData(ctx context.Context, filters []string) (map[string]interface{}, error) {
+
+	nodeData := make(map[string]interface{})
+	client := d.cfgMgmt
+	nodeId, lastRunId, err := getNodeFields(ctx, client, filters)
+	if err != nil {
+		return nodeData, err
+	}
+
+	attributesJson, err := getNodeAttributes(ctx, client, nodeId)
+	if err != nil {
+		return nodeData, err
+	}
+
+	nodeData["attributes"] = attributesJson
+
+	lastRun, err := client.GetNodeRun(ctx, &cfgmgmtRequest.NodeRun{NodeId: nodeId, RunId: lastRunId})
+
+	if err != nil {
+		log.Errorf("Error getting node run %v", err)
+		return nodeData, err
+	}
+	automaticAttrs := attributesJson["automatic"].(map[string]interface{})
+	ipaddress, macAddress, hostname := getHostAttributes(automaticAttrs)
+	nodeDataContent := make(map[string]interface{})
+	nodeData["client_run"] = lastRun
+	nodeDataContent["macaddress"] = macAddress
+	nodeDataContent["hostname"] = hostname
+	nodeDataContent["ipaddress"] = ipaddress
+	nodeDataContent["automate_fqdn"] = d.externalFqdn
+	addDataContent(nodeDataContent, automaticAttrs)
+	nodeData["node"] = nodeDataContent
 	return nodeData, nil
 }
 
