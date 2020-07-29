@@ -84,6 +84,7 @@ entity_issuer = "https://{{< example_fqdn "automate" >}}/dex/callback"
 where
 
 - `ca_contents` contains the value of the _Certificate (Base64)_
+  (including the `-----BEGIN CERTIFICATE-----` and `-----END CERTIFICATE-----` markers)
 - `sso_url` contains the value of _Login URL_
 - `entity_issuer`  contains the value of _Identifier (Entity ID)_
 
