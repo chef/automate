@@ -67,7 +67,7 @@ func (s *Server) UpdateNode(ctx context.Context, req *request.UpdateNode) (*resp
 		return nil, err
 	}
 
-	automate, err := StructToJSON(req.AutomaticAttributes)
+	automatic, err := StructToJSON(req.AutomaticAttributes)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (s *Server) UpdateNode(ctx context.Context, req *request.UpdateNode) (*resp
 		Name:                req.Name,
 		Environment:         req.Environment,
 		RunList:             req.RunList,
-		AutomaticAttributes: automate.(map[string]interface{}),
+		AutomaticAttributes: automatic.(map[string]interface{}),
 		NormalAttributes:    normal.(map[string]interface{}),
 		DefaultAttributes:   defaults.(map[string]interface{}),
 		OverrideAttributes:  override.(map[string]interface{}),
