@@ -1,5 +1,5 @@
-require 'api/external/secrets/secrets_services_pb'
-require 'api/external/common/query/parameters_pb'
+require 'external/secrets/secrets_services_pb'
+require 'external/common/query/parameters_pb'
 
 describe File.basename(__FILE__) do
   Secrets = Chef::Automate::Api::Secrets unless defined?(Secrets)

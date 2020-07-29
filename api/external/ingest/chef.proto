@@ -5,17 +5,17 @@ option go_package = "github.com/chef/automate/api/external/ingest";
 
 import "google/api/annotations.proto";
 
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
-import "api/external/common/version/version.proto";
+import "external/common/version/version.proto";
 
-import "api/external/ingest/request/chef.proto";
-import "api/external/ingest/request/action.proto";
-import "api/external/ingest/request/liveness.proto";
+import "external/ingest/request/chef.proto";
+import "external/ingest/request/action.proto";
+import "external/ingest/request/liveness.proto";
 
-import "api/external/ingest/response/chef.proto";
-import "api/external/ingest/response/action.proto";
-import "api/external/ingest/response/liveness.proto";
+import "external/ingest/response/chef.proto";
+import "external/ingest/response/action.proto";
+import "external/ingest/response/liveness.proto";
 
 service ChefIngester {
   rpc ProcessChefRun (ingest.request.Run) returns (ingest.response.ProcessChefRunResponse) {

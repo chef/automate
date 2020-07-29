@@ -1,6 +1,6 @@
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/stats/stats_pb'
-require 'api/interservice/compliance/stats/stats_services_pb'
+require 'interservice/compliance/stats/stats_pb'
+require 'interservice/compliance/stats/stats_services_pb'
 
 if !ENV['NO_STATS_SUMMARY_TESTS']
   describe File.basename(__FILE__) do
@@ -688,6 +688,24 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
             "profiles": 4,
             "nodesCnt": 1,
             "controls": 1
+          }
+        }
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
+
+      # Get stats with end_time filter for the root fail 04-03 date
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+        filters: [
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+        ])
+      expected_data = {
+        "reportSummary": {
+          "status": "failed",
+          "stats": {
+            "nodes": "1",
+            "platforms": 1,
+            "environments": 1,
+            "nodesCnt": 1
           }
         }
       }.to_json

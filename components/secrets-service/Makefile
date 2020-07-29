@@ -12,8 +12,8 @@ generate-ruby-grpc: ruby-grpc-tools $(RUBY_PROTOS)
 %_pb.rb : %.proto
 	@echo " * Compiling test proto for $<"
 	grpc_tools_ruby_protoc \
-		-I../.. \
-		-I$(GOPATH)/src \
+		-I../../api \
+		-I../../components \
 		-I../../vendor \
 		-I../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--ruby_out=../.. \

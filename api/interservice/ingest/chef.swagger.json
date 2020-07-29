@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/interservice/ingest/chef.proto",
+    "title": "interservice/ingest/chef.proto",
     "version": "version not set"
   },
   "consumes": [

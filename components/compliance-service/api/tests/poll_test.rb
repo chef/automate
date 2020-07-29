@@ -1,10 +1,10 @@
 ##### GRPC SETUP #####
-require 'api/interservice/nodemanager/manager/manager_pb'
-require 'api/interservice/nodemanager/manager/manager_services_pb'
-require 'api/secrets/secrets_pb'
-require 'api/secrets/secrets_services_pb'
-require 'api/interservice/nodemanager/nodes/nodes_pb'
-require 'api/interservice/nodemanager/nodes/nodes_services_pb'
+require 'interservice/nodemanager/manager/manager_pb'
+require 'interservice/nodemanager/manager/manager_services_pb'
+require 'secrets/secrets_pb'
+require 'secrets/secrets_services_pb'
+require 'interservice/nodemanager/nodes/nodes_pb'
+require 'interservice/nodemanager/nodes/nodes_services_pb'
 
 Manager = Chef::Automate::Domain::Nodemanager::Manager
 Secrets = Chef::Automate::Domain::Compliance::Secrets

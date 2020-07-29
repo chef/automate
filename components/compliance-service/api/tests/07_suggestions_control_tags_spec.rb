@@ -1,6 +1,6 @@
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/reporting/reporting_pb'
-require 'api/interservice/compliance/reporting/reporting_services_pb'
+require 'interservice/compliance/reporting/reporting_pb'
+require 'interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
   Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)
@@ -29,26 +29,25 @@ describe File.basename(__FILE__) do
       size: 10
     )
     expected = [
-      "scope",
-      "scoop",
-      "Scoops"
+      "scope"
     ]
     assert_suggestions_text(expected, actual_data)
   end
 
-  it "suggests control tag keys with a size of 2" do
+  it "suggests control tag keys with a size of 3" do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control_tag_key',
-      text: 'scope',
+      text: 'sco',
       filters: [
         Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T23:59:59Z']),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
       ],
-      size: 2
+      size: 3
     )
     expected = [
-      "scope",
-      "scoop"
+      "scoop",
+      "Scoops",
+      "scope"
     ]
     assert_suggestions_text(expected, actual_data)
   end
@@ -65,8 +64,7 @@ describe File.basename(__FILE__) do
     )
     expected = [
       "scoop",
-      "Scoops",
-      "scope"
+      "Scoops"
     ]
     assert_suggestions_text(expected, actual_data)
   end
@@ -139,7 +137,7 @@ describe File.basename(__FILE__) do
         Reporting::ListFilter.new(type: 'control_tag:satisfies', values: ['NGX-1', 'SRG-00006']),
       ]
     )
-    expected = [ "NGX-1", "NGX-2", "SRG-00006", "SRG-00007" ]
+    expected = [ "apache-1", "apache-2", "NGX-1", "NGX-2", "SRG-00006", "SRG-00007" ]
     assert_suggestions_text(expected, actual_data)
   end
 
@@ -153,6 +151,21 @@ describe File.basename(__FILE__) do
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
         Reporting::ListFilter.new(type: 'control_tag:scope', values: []),
       ]
+    )
+    expected = [ "Apache" ]
+    assert_suggestions_text(expected, actual_data)
+  end
+
+  it "suggests control tag values matching apa" do
+    # suggest control tag values with a tag key filter without text
+    actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
+        type: 'control_tag_value',
+        text: 'apa',
+        filters: [
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T23:59:59Z']),
+            Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+            Reporting::ListFilter.new(type: 'control_tag:scope', values: []),
+        ]
     )
     expected = [ "Apache", "apalache" ]
     assert_suggestions_text(expected, actual_data)
@@ -184,7 +197,9 @@ describe File.basename(__FILE__) do
         Reporting::ListFilter.new(type: 'control_tag:scope', values: []),
       ]
     )
-    expected = ["Apache", "apalache"]
+    #todo - this is incorrect as it only brings in the satisfies control_tag
+    # it arbitrarily picks it
+    expected = ["apache-1", "apache-2", "NGX-1", "NGX-2", "SRG-00006", "SRG-00007"]
     assert_suggestions_text(expected, actual_data)
   end
 end

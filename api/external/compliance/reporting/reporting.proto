@@ -8,10 +8,10 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
-import "api/external/common/version/version.proto";
-import "api/external/common/response.proto";
+import "external/common/version/version.proto";
+import "external/common/response.proto";
 
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service ReportingService {
 	/*
@@ -478,6 +478,8 @@ message Report {
 	repeated string chef_tags = 18;
 	// The projects the node is assigned to.
 	repeated string projects = 20;
+	// The status message of the report.
+	string status_message = 21;
 }
 
 message Profile {

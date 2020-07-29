@@ -105,10 +105,9 @@ generate-ruby-grpc-secrets-service:
 
 %_pb.rb : %.proto
 	@printf " * ${blue}Compiling test proto${reset} for $<\n"
-	@-grpc_tools_ruby_protoc -I. \
-		-I../../ \
-		-Iapi/ \
-		-I$(GOPATH)/src \
+	@-grpc_tools_ruby_protoc \
+		-I../../api \
+		-I../../components \
 		-I../../vendor \
 		-I../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--ruby_out=. \
@@ -347,7 +346,7 @@ wait-for-ingestion:
 	i=1; \
 	curl_output="-=init=-"; \
 	max_loops=50; \
-	es_docs=30; \
+	es_docs=35; \
 	healthy_match="\"total\":$$es_docs,\"successful\":$$es_docs"; \
 	printf "\n===> ${blue}Checking ElasticSearch to ensure it has ingested our reports${reset}\n"; \
 	curl -s -X GET "$(ELASTICSEARCH_URL)/comp-*-r-20*/_doc/_count" | grep $$healthy_match > /dev/null; \

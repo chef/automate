@@ -5,10 +5,10 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/ia
 
 import "google/api/annotations.proto";
 
-import "components/automate-gateway/api/iam/v2/request/introspect.proto";
-import "components/automate-gateway/api/iam/v2/response/introspect.proto";
+import "automate-gateway/api/iam/v2/request/introspect.proto";
+import "automate-gateway/api/iam/v2/response/introspect.proto";
 
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Authorization {
   rpc IntrospectAll (IntrospectAllReq) returns (IntrospectResp) {

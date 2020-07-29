@@ -306,6 +306,8 @@ func ParseBytesToComplianceReport(body []byte) *complianceEvent.Report {
 		Ipaddress:        getStringIfExists("ipaddress", body),
 		Fqdn:             getStringIfExists("fqdn", body),
 		RunTimeLimit:     getFloat32IfExists("run_time_limit", body),
+		Status:           getStringIfExists("status", body),
+		StatusMessage:    getStringIfExists("status_message", body),
 	}
 }
 

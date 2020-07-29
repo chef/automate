@@ -60,7 +60,8 @@ pipelines:
 
 # These actions are taken when `/expeditor promote` is run from Slack
 promote:
-  action:
+# actions is deprecated. we need to switch to subscription model
+  actions:
     - bash:.expeditor/promote-hab-pkgs-and-cli.sh:
         post_commit: true
     - bash:.expeditor/publish-release-notes.sh:

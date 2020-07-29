@@ -3,11 +3,11 @@ syntax = "proto3";
 package chef.automate.domain.autoamte_cds.service;
 option go_package = "github.com/chef/automate/api/interservice/autoamte_cds/service";
 
-import "api/external/cds/request/root.proto";
-import "api/external/cds/response/root.proto";
-import "api/external/common/response.proto";
+import "external/cds/request/root.proto";
+import "external/cds/response/root.proto";
+import "external/common/response.proto";
 
-import "api/external/common/version/version.proto";
+import "external/common/version/version.proto";
 
 service AutomateCds {
     rpc GetVersion (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo);

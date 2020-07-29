@@ -4,28 +4,28 @@ package chef.automate.api.cfgmgmt;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt";
 
 // Local request & response messages
-import "api/external/cfgmgmt/request/actions.proto";
-import "api/external/cfgmgmt/request/nodes.proto";
-import "api/external/cfgmgmt/request/rollouts.proto";
-import "api/external/cfgmgmt/request/stats.proto";
-import "api/external/cfgmgmt/request/errors.proto";
-import "api/external/cfgmgmt/request/root.proto";
+import "external/cfgmgmt/request/actions.proto";
+import "external/cfgmgmt/request/nodes.proto";
+import "external/cfgmgmt/request/rollouts.proto";
+import "external/cfgmgmt/request/stats.proto";
+import "external/cfgmgmt/request/errors.proto";
+import "external/cfgmgmt/request/root.proto";
 
-import "api/external/cfgmgmt/response/actions.proto";
-import "api/external/cfgmgmt/response/nodes.proto";
-import "api/external/cfgmgmt/response/rollouts.proto";
-import "api/external/cfgmgmt/response/stats.proto";
-import "api/external/cfgmgmt/response/errors.proto";
+import "external/cfgmgmt/response/actions.proto";
+import "external/cfgmgmt/response/nodes.proto";
+import "external/cfgmgmt/response/rollouts.proto";
+import "external/cfgmgmt/response/stats.proto";
+import "external/cfgmgmt/response/errors.proto";
 
-import "api/external/common/query/parameters.proto";
-import "api/external/common/version/version.proto";
-import "api/external/common/response.proto";
+import "external/common/query/parameters.proto";
+import "external/common/version/version.proto";
+import "external/common/response.proto";
 
 import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service ConfigMgmt {
   /*

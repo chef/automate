@@ -142,9 +142,9 @@ generate-ruby-grpc: ruby-grpc-tools $(RUBY_PROTOS)
 
 %_pb.rb : %.proto
 	@printf "\n * Compiling test proto for $<\n"
-	@-grpc_tools_ruby_protoc -I. \
-		-I../.. \
-		-I$(GOPATH)/src \
+	@-grpc_tools_ruby_protoc \
+		-I../../api \
+		-I../../components \
 		-I../../vendor \
 		-I../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--ruby_out=. \

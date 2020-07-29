@@ -301,7 +301,7 @@ func TestOverrideBooleans(t *testing.T) {
 func TestCorrectlyAnnotated(t *testing.T) {
 	// All service configs require an annotation like this:
 	// ```
-	// import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+	// import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 
 	// message ConfigRequest {
 	// 		option (chef.automate.api.service_config) = {name: "es-sidecar-service"};

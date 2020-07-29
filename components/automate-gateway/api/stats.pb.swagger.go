@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("stats", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/compliance/reporting/stats/stats.proto",
+    "title": "external/compliance/reporting/stats/stats.proto",
     "version": "version not set"
   },
   "consumes": [

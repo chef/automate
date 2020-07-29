@@ -4,9 +4,9 @@ syntax = "proto3";
 package chef.automate.domain.deployment;
 option go_package = "github.com/chef/automate/api/config/deployment";
 
-import "api/config/shared/global.proto";
+import "config/shared/global.proto";
 import "google/protobuf/wrappers.proto";
-import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 
 message ConfigRequest {
   option (chef.automate.api.service_config) = {name: "deployment-service"};
