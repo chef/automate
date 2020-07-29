@@ -170,13 +170,13 @@ type UpdateNode struct {
 	PolicyGroup string `protobuf:"bytes,6,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty" toml:"policy_group,omitempty" mapstructure:"policy_group,omitempty"`
 	// Node run-list.
 	RunList []string `protobuf:"bytes,7,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty" toml:"run_list,omitempty" mapstructure:"run_list,omitempty"`
-	// Node automatic JSON attributes.
+	// Node automatic attributes JSON.
 	AutomaticAttributes *_struct.Struct `protobuf:"bytes,8,opt,name=automatic_attributes,json=automaticAttributes,proto3" json:"automatic_attributes,omitempty" toml:"automatic_attributes,omitempty" mapstructure:"automatic_attributes,omitempty"`
-	// Node default JSON attributes.
+	// Node default attributes JSON.
 	DefaultAttributes *_struct.Struct `protobuf:"bytes,9,opt,name=default_attributes,json=defaultAttributes,proto3" json:"default_attributes,omitempty" toml:"default_attributes,omitempty" mapstructure:"default_attributes,omitempty"`
-	// Node normal JSON attributes.
+	// Node normal attributes JSON.
 	NormalAttributes *_struct.Struct `protobuf:"bytes,10,opt,name=normal_attributes,json=normalAttributes,proto3" json:"normal_attributes,omitempty" toml:"normal_attributes,omitempty" mapstructure:"normal_attributes,omitempty"`
-	// Node override JSON attributes.
+	// Node override attributes JSON.
 	OverrideAttributes   *_struct.Struct `protobuf:"bytes,11,opt,name=override_attributes,json=overrideAttributes,proto3" json:"override_attributes,omitempty" toml:"override_attributes,omitempty" mapstructure:"override_attributes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte          `json:"-" toml:"-" mapstructure:"-,omitempty"`

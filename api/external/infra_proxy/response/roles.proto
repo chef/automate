@@ -24,9 +24,9 @@ message Role {
     string chef_type = 2;
     // Descrption of the role.
     string description = 3;
-    // Stringified json of the default attributes.
+    // Role default attributes JSON.
     string default_attributes = 4;
-    // Stringified json of the override attributes.
+    // Role override attributes JSON.
     string override_attributes = 5;
     // Json class name.
     string json_class = 6;

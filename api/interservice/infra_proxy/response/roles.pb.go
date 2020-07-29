@@ -125,9 +125,9 @@ type Role struct {
 	ChefType string `protobuf:"bytes,2,opt,name=chef_type,json=chefType,proto3" json:"chef_type,omitempty" toml:"chef_type,omitempty" mapstructure:"chef_type,omitempty"`
 	// Descrption of the role.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty" toml:"description,omitempty" mapstructure:"description,omitempty"`
-	// Stringified json of the default attributes.
+	// Role default attributes JSON.
 	DefaultAttributes string `protobuf:"bytes,4,opt,name=default_attributes,json=defaultAttributes,proto3" json:"default_attributes,omitempty" toml:"default_attributes,omitempty" mapstructure:"default_attributes,omitempty"`
-	// Stringified json of the override attributes.
+	// Role override attributes JSON.
 	OverrideAttributes string `protobuf:"bytes,5,opt,name=override_attributes,json=overrideAttributes,proto3" json:"override_attributes,omitempty" toml:"override_attributes,omitempty" mapstructure:"override_attributes,omitempty"`
 	// Json class name.
 	JsonClass string `protobuf:"bytes,6,opt,name=json_class,json=jsonClass,proto3" json:"json_class,omitempty" toml:"json_class,omitempty" mapstructure:"json_class,omitempty"`

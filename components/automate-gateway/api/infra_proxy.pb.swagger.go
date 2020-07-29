@@ -1778,19 +1778,19 @@ func init() {
         },
         "automatic_attributes": {
           "type": "object",
-          "description": "Node automatic JSON attributes."
+          "description": "Node automatic attributes JSON."
         },
         "default_attributes": {
           "type": "object",
-          "description": "Node default JSON attributes."
+          "description": "Node default attributes JSON."
         },
         "normal_attributes": {
           "type": "object",
-          "description": "Node normal JSON attributes."
+          "description": "Node normal attributes JSON."
         },
         "override_attributes": {
           "type": "object",
-          "description": "Node override JSON attributes."
+          "description": "Node override attributes JSON."
         }
       }
     },
@@ -2324,11 +2324,11 @@ func init() {
         },
         "default_attributes": {
           "type": "string",
-          "description": "Stringified json of the default attributes."
+          "description": "Environment default attributes JSON."
         },
         "override_attributes": {
           "type": "string",
-          "description": "Stringified json of the override attributes."
+          "description": "Environment override attributes JSON."
         }
       }
     },
@@ -2554,11 +2554,11 @@ func init() {
         },
         "default_attributes": {
           "type": "string",
-          "description": "Stringified JSON of the default attributes."
+          "description": "Policyfile default attributes JSON."
         },
         "override_attributes": {
           "type": "string",
-          "description": "Stringified JSON of the override attributes."
+          "description": "Policyfile override attributes JSON."
         },
         "expanded_run_list": {
           "type": "array",
@@ -2624,11 +2624,11 @@ func init() {
         },
         "default_attributes": {
           "type": "string",
-          "description": "Stringified json of the default attributes."
+          "description": "Role default attributes JSON."
         },
         "override_attributes": {
           "type": "string",
-          "description": "Stringified json of the override attributes."
+          "description": "Role override attributes JSON."
         },
         "json_class": {
           "type": "string",

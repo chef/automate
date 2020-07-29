@@ -42,12 +42,12 @@ message UpdateNode {
     string policy_group = 6;
     // Node run-list.
     repeated string run_list = 7;
-    // Node automatic JSON attributes.
+    // Node automatic attributes JSON.
     google.protobuf.Struct automatic_attributes = 8;
-    // Node default JSON attributes.
+    // Node default attributes JSON.
     google.protobuf.Struct default_attributes = 9;
-    // Node normal JSON attributes.
+    // Node normal attributes JSON.
     google.protobuf.Struct normal_attributes = 10;
-    // Node override JSON attributes.
+    // Node override attributes JSON.
     google.protobuf.Struct override_attributes = 11;
 }
