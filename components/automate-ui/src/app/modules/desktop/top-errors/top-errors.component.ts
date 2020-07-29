@@ -54,4 +54,8 @@ export class TopErrorsComponent  implements OnInit, OnDestroy, OnChanges  {
   get topErrorsItemsMax() {
     return maxBy('count', this.topErrorsItems);
   }
+
+  get hasData(): boolean {
+    return this.topErrorsItems.length > 0;
+  }
 }
