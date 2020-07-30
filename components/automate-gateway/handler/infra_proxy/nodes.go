@@ -47,6 +47,31 @@ func (a *InfraProxyServer) DeleteNode(ctx context.Context, r *gwreq.DeleteNode) 
 	}, nil
 }
 
+// UpdateNode updates the node attributes
+func (a *InfraProxyServer) UpdateNode(ctx context.Context, r *gwreq.UpdateNode) (*gwres.UpdateNode, error) {
+	req := &infra_req.UpdateNode{
+		OrgId:               r.OrgId,
+		ServerId:            r.ServerId,
+		Name:                r.Name,
+		Environment:         r.Environment,
+		RunList:             r.RunList,
+		AutomaticAttributes: r.AutomaticAttributes,
+		DefaultAttributes:   r.DefaultAttributes,
+		NormalAttributes:    r.NormalAttributes,
+		OverrideAttributes:  r.OverrideAttributes,
+		PolicyName:          r.PolicyName,
+		PolicyGroup:         r.PolicyGroup,
+	}
+	res, err := a.client.UpdateNode(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.UpdateNode{
+		Name: res.GetName(),
+	}, nil
+}
+
 func parseNodeAttributeFromRes(nodes []*infra_res.NodeAttribute) []*gwres.NodeAttribute {
 	nl := make([]*gwres.NodeAttribute, len(nodes))
 

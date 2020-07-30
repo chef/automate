@@ -133,9 +133,9 @@ type Policyfile struct {
 	IncludedPolicyLocks []*IncludedPolicyLock `protobuf:"bytes,6,rep,name=included_policy_locks,json=includedPolicyLocks,proto3" json:"included_policy_locks,omitempty" toml:"included_policy_locks,omitempty" mapstructure:"included_policy_locks,omitempty"`
 	// List of cookbook locks under this policy.
 	CookbookLocks []*CookbookLock `protobuf:"bytes,7,rep,name=cookbook_locks,json=cookbookLocks,proto3" json:"cookbook_locks,omitempty" toml:"cookbook_locks,omitempty" mapstructure:"cookbook_locks,omitempty"`
-	// Stringified JSON of the default attributes.
+	// Policyfile default attributes JSON.
 	DefaultAttributes string `protobuf:"bytes,8,opt,name=default_attributes,json=defaultAttributes,proto3" json:"default_attributes,omitempty" toml:"default_attributes,omitempty" mapstructure:"default_attributes,omitempty"`
-	// Stringified JSON of the override attributes.
+	// Policyfile override attributes JSON.
 	OverrideAttributes string `protobuf:"bytes,9,opt,name=override_attributes,json=overrideAttributes,proto3" json:"override_attributes,omitempty" toml:"override_attributes,omitempty" mapstructure:"override_attributes,omitempty"`
 	// Expanded run-list associated with the policy.
 	ExpandedRunList      []*ExpandedRunList `protobuf:"bytes,10,rep,name=expanded_run_list,json=expandedRunList,proto3" json:"expanded_run_list,omitempty" toml:"expanded_run_list,omitempty" mapstructure:"expanded_run_list,omitempty"`

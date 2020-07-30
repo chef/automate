@@ -111,9 +111,9 @@ type Environment struct {
 	JsonClass string `protobuf:"bytes,4,opt,name=json_class,json=jsonClass,proto3" json:"json_class,omitempty"`
 	// Environment versined cookbooks constraints.
 	CookbookVersions map[string]string `protobuf:"bytes,5,rep,name=cookbook_versions,json=cookbookVersions,proto3" json:"cookbook_versions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// Stringified json of the default attributes.
+	// Environment default attributes JSON.
 	DefaultAttributes string `protobuf:"bytes,6,opt,name=default_attributes,json=defaultAttributes,proto3" json:"default_attributes,omitempty"`
-	// Stringified json of the override attributes.
+	// Environment override attributes JSON.
 	OverrideAttributes   string   `protobuf:"bytes,7,opt,name=override_attributes,json=overrideAttributes,proto3" json:"override_attributes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
