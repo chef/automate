@@ -1366,6 +1366,34 @@
         }
       }
     },
+    "/api/v0/compliance/profiles": {
+      "post": {
+        "description": "Upload a profile to Automate. This can be a tarball or zip of the profile, or a reference to one of the market profiles.\n\n Example: \n\n ```api/v0/compliance/profiles?owner=admin -d '{\"name\":\"cis-amazonlinux-2014.09-2015.03-level2\",\"version\":\"1.1.0-5\"}'```\n\n Example: \n\n ```-F file=@/path-to-local-file/linux-baseline-2.0.0.zip api/v0compliance/profiles?contentType=application/x-gzip&owner=admin```",
+        "tags": [
+          "ProfilesService"
+        ],
+        "summary": "Create a Profile",
+        "operationId": "Create",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.ProfilePostRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.CheckResult"
+            }
+          }
+        }
+      }
+    },
     "/api/v0/compliance/profiles/metasearch": {
       "post": {
         "description": "The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend\ndoesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.\nThis is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.\n\nAuthorization Action:\n```\ncompliance:profiles:list\n```",
@@ -1401,7 +1429,7 @@
           "ProfilesService"
         ],
         "summary": "Show an installed profile",
-        "operationId": "ReadMixin19",
+        "operationId": "ReadMixin20",
         "parameters": [
           {
             "type": "string",
@@ -1442,7 +1470,7 @@
           "ProfilesService"
         ],
         "summary": "List all available profiles",
-        "operationId": "ListMixin19",
+        "operationId": "ListMixin20",
         "parameters": [
           {
             "name": "body",
@@ -1463,6 +1491,34 @@
         }
       }
     },
+    "/api/v0/compliance/profiles/tar": {
+      "post": {
+        "description": "Download a profile in tarball form. The profile will be downloaded to the user's local workstation.\n\nExample: \n\n ```{\"name\":\"cis-amazonlinux2-level1\",\"version\":\"1.0.0-5\"}'```",
+        "tags": [
+          "ProfilesService"
+        ],
+        "summary": "Download a Profile",
+        "operationId": "ReadTar",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.ProfileDetails"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.ProfileData"
+            }
+          }
+        }
+      }
+    },
     "/api/v0/compliance/profiles/{owner}/{name}/version/{version}": {
       "delete": {
         "description": "Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.\nNote: this action \"uninstalls\" the profile. This has no impact on the market profiles.\n\n\nAuthorization Action:\n```\ncompliance:profiles:delete\n```",
@@ -1470,7 +1526,7 @@
           "ProfilesService"
         ],
         "summary": "Delete an installed profile",
-        "operationId": "DeleteMixin19",
+        "operationId": "DeleteMixin20",
         "parameters": [
           {
             "type": "string",
@@ -1915,7 +1971,7 @@
           "JobsService"
         ],
         "summary": "Create a scan job",
-        "operationId": "CreateMixin20",
+        "operationId": "CreateMixin21",
         "parameters": [
           {
             "name": "body",
@@ -1943,7 +1999,7 @@
           "JobsService"
         ],
         "summary": "Read a scan job",
-        "operationId": "ReadMixin20",
+        "operationId": "ReadMixin21",
         "parameters": [
           {
             "type": "string",
@@ -1974,7 +2030,7 @@
           "JobsService"
         ],
         "summary": "Update a job",
-        "operationId": "UpdateMixin20",
+        "operationId": "UpdateMixin21",
         "parameters": [
           {
             "type": "string",
@@ -2005,7 +2061,7 @@
           "JobsService"
         ],
         "summary": "Delete a scan job",
-        "operationId": "DeleteMixin20",
+        "operationId": "DeleteMixin21",
         "parameters": [
           {
             "type": "string",
@@ -2036,7 +2092,7 @@
           "JobsService"
         ],
         "summary": "Rerun a scan job",
-        "operationId": "RerunMixin20",
+        "operationId": "RerunMixin21",
         "parameters": [
           {
             "type": "string",
@@ -2069,7 +2125,7 @@
           "JobsService"
         ],
         "summary": "List of scan jobs",
-        "operationId": "ListMixin20",
+        "operationId": "ListMixin21",
         "parameters": [
           {
             "name": "body",
@@ -2432,7 +2488,7 @@
           "DataLifecycle"
         ],
         "summary": "GetStatus returns the aggregate status across all data lifecycle jobs",
-        "operationId": "GetStatusMixin22",
+        "operationId": "GetStatusMixin23",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2874,7 +2930,7 @@
         "tags": [
           "Gateway"
         ],
-        "operationId": "GetVersionMixin53",
+        "operationId": "GetVersionMixin54",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4100,7 +4156,7 @@
         "tags": [
           "InfraProxy"
         ],
-        "operationId": "CreateRoleMixin50",
+        "operationId": "CreateRoleMixin51",
         "parameters": [
           {
             "type": "string",
@@ -4140,7 +4196,7 @@
         "tags": [
           "InfraProxy"
         ],
-        "operationId": "GetRoleMixin50",
+        "operationId": "GetRoleMixin51",
         "parameters": [
           {
             "type": "string",
@@ -4177,7 +4233,7 @@
         "tags": [
           "InfraProxy"
         ],
-        "operationId": "UpdateRoleMixin50",
+        "operationId": "UpdateRoleMixin51",
         "parameters": [
           {
             "type": "string",
@@ -4222,7 +4278,7 @@
         "tags": [
           "InfraProxy"
         ],
-        "operationId": "DeleteRoleMixin50",
+        "operationId": "DeleteRoleMixin51",
         "parameters": [
           {
             "type": "string",
@@ -4261,7 +4317,7 @@
         "tags": [
           "InfraProxy"
         ],
-        "operationId": "GetVersionMixin50",
+        "operationId": "GetVersionMixin51",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4493,7 +4549,7 @@
           "NodeManagerService"
         ],
         "summary": "Create a Node Manager",
-        "operationId": "CreateMixin12",
+        "operationId": "CreateMixin13",
         "parameters": [
           {
             "name": "body",
@@ -4521,7 +4577,7 @@
           "NodeManagerService"
         ],
         "summary": "View a Node Manager",
-        "operationId": "ReadMixin12",
+        "operationId": "ReadMixin13",
         "parameters": [
           {
             "type": "string",
@@ -4546,7 +4602,7 @@
           "NodeManagerService"
         ],
         "summary": "Update a Node Manager",
-        "operationId": "UpdateMixin12",
+        "operationId": "UpdateMixin13",
         "parameters": [
           {
             "type": "string",
@@ -4577,7 +4633,7 @@
           "NodeManagerService"
         ],
         "summary": "Delete a Node Manager",
-        "operationId": "DeleteMixin12",
+        "operationId": "DeleteMixin13",
         "parameters": [
           {
             "type": "string",
@@ -4784,7 +4840,7 @@
           "NodeManagerService"
         ],
         "summary": "List all Node Managers",
-        "operationId": "ListMixin12",
+        "operationId": "ListMixin13",
         "parameters": [
           {
             "name": "body",
@@ -4812,7 +4868,7 @@
           "NodesService"
         ],
         "summary": "Create a Node",
-        "operationId": "Create",
+        "operationId": "CreateMixin12",
         "parameters": [
           {
             "name": "body",
@@ -5098,7 +5154,7 @@
         "tags": [
           "Notifications"
         ],
-        "operationId": "GetRuleMixin52",
+        "operationId": "GetRuleMixin53",
         "parameters": [
           {
             "type": "string",
@@ -5120,7 +5176,7 @@
         "tags": [
           "Notifications"
         ],
-        "operationId": "UpdateRuleMixin52",
+        "operationId": "UpdateRuleMixin53",
         "parameters": [
           {
             "type": "string",
@@ -5150,7 +5206,7 @@
         "tags": [
           "Notifications"
         ],
-        "operationId": "DeleteRuleMixin52",
+        "operationId": "DeleteRuleMixin53",
         "parameters": [
           {
             "type": "string",
@@ -5454,7 +5510,7 @@
           "SecretsService"
         ],
         "summary": "Create a secret",
-        "operationId": "CreateMixin13",
+        "operationId": "CreateMixin14",
         "parameters": [
           {
             "name": "body",
@@ -5482,7 +5538,7 @@
           "SecretsService"
         ],
         "summary": "Read a secret",
-        "operationId": "ReadMixin13",
+        "operationId": "ReadMixin14",
         "parameters": [
           {
             "type": "string",
@@ -5507,7 +5563,7 @@
           "SecretsService"
         ],
         "summary": "Delete a secret",
-        "operationId": "DeleteMixin13",
+        "operationId": "DeleteMixin14",
         "parameters": [
           {
             "type": "string",
@@ -5532,7 +5588,7 @@
           "SecretsService"
         ],
         "summary": "Update a secret",
-        "operationId": "UpdateMixin13",
+        "operationId": "UpdateMixin14",
         "parameters": [
           {
             "type": "string",
@@ -5567,7 +5623,7 @@
           "SecretsService"
         ],
         "summary": "List and filter secrets",
-        "operationId": "ListMixin13",
+        "operationId": "ListMixin14",
         "parameters": [
           {
             "name": "body",
@@ -5609,7 +5665,7 @@
         "tags": [
           "Deployment"
         ],
-        "operationId": "GetVersionMixin46",
+        "operationId": "GetVersionMixin47",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -9066,6 +9122,44 @@
         },
         "version": {
           "description": "Version of the profile.",
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.compliance.profiles.v1.ProfileDetails": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Profile contents in byte form.",
+          "type": "bytes"
+        },
+        "name": {
+          "description": "Name of the profile.",
+          "type": "string"
+        },
+        "owner": {
+          "description": "Automate user associated with the profile.",
+          "type": "string"
+        },
+        "version": {
+          "description": "Version of the profile.",
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.compliance.profiles.v1.ProfilePostRequest": {
+      "type": "object",
+      "properties": {
+        "chunk": {
+          "description": "Profile contents in byte form.",
+          "ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Chunk"
+        },
+        "meta": {
+          "description": "Metadata about the profile.",
+          "ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Metadata"
+        },
+        "owner": {
+          "description": "Associate an automate user with a profile. A profile is visible only to its associated user.",
           "type": "string"
         }
       }
