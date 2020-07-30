@@ -29,7 +29,11 @@ EOF
 }
 
 do_deploy() {
+    local frontend1_ip frontend2_ip
+
     cli_bin=$(command -v "chef-automate")
+
+    hab pkg install --channel="$test_channel" --binlink chef/automate-cs-nginx
 
     docker_run "${_frontend1_container_name}"
     docker_run "${_frontend2_container_name}"
@@ -39,6 +43,8 @@ do_deploy() {
     docker exec -t "$_frontend2_container_name" \
         "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
 
+    frontend1_ip=$(container_ip "$_frontend1_container_name")
+    frontend2_ip=$(container_ip "$_frontend2_container_name")
 
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
@@ -63,11 +69,13 @@ do_deploy() {
             --bootstrap-bundle bootstrap.abb \
             --accept-terms-and-mlsa
 
+    "$cli_bin" bootstrap bundle create -o bootstrap.abb
+
+    start_loadbalancer "$frontend1_ip" "$frontend2_ip"
 }
 
 do_test_deploy() {
-    docker exec --env "PATH=/hab/bin:/bin" -t "$_frontend2_container_name" chef-server-ctl test
-    docker exec --env "PATH=/hab/bin:/bin" -t "$_frontend1_container_name" chef-server-ctl test
+    chef-server-ctl test
 }
 
 do_cleanup() {
