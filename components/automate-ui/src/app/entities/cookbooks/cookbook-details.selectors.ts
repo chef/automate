@@ -21,5 +21,5 @@ export const getStatus = createSelector(
 export const cookbookDetailsFromRoute = createSelector(
   cookbookDetailsEntities,
   routeParams,
-  (state, { cookbook_name }) => find({ cookbook_name }, state)
+  (state, { 'cookbook-name': cookbook_name }) => find({ cookbook_name }, state)
 );

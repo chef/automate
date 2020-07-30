@@ -255,23 +255,23 @@ const routes: Routes = [
               component: ChefServerDetailsComponent
             },
             {
-              path: ':id/organizations/:orgid',
+              path: ':id/organizations/:org-id',
               component: OrgDetailsComponent
             },
             {
-              path: ':id/organizations/:orgid/cookbooks/:cookbook_name',
+              path: ':id/organizations/:org-id/cookbooks/:cookbook-name',
               component: CookbookDetailsComponent
             },
             {
-              path: ':id/organizations/:orgid/roles/:name',
+              path: ':id/organizations/:org-id/roles/:name',
               component: InfraRoleDetailsComponent
             },
             {
-              path: ':id/organizations/:orgid/environments/:name',
+              path: ':id/organizations/:org-id/environments/:name',
               component: EnvironmentDetailsComponent
             },
             {
-              path: ':id/organizations/:orgid/data_bags/:name',
+              path: ':id/organizations/:org-id/data-bags/:name',
               component: DataBagsDetailsComponent
             },
             {

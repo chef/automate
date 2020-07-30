@@ -73,7 +73,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
-      this.store.select(routeParams).pipe(pluck('orgid'), filter(identity)),
+      this.store.select(routeParams).pipe(pluck('org-id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('name'), filter(identity))
     ]).pipe(
       takeUntil(this.isDestroyed)
