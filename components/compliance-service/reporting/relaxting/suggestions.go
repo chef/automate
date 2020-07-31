@@ -91,12 +91,9 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 	for filterType := range filters {
 		if strings.HasPrefix(filterType, "control_tag:") {
 			useSummaryIndex = false
-			if len(controlTagFilterKey) == 0 {
+			if len(controlTagFilterKey) == 0 && typeParam == "control_tag_value" {
+				logrus.Warn("please consider using the `type_key` field on the API to specify the control tag key for which values are being requested")
 				_, controlTagFilterKey = leftSplit(filterType, ":")
-				// For suggestions, prefer control_tag filter key with no values to avoid clash with full control_tag filters
-				if len(filters[filterType]) == 0 {
-					break
-				}
 			}
 			break
 		}
