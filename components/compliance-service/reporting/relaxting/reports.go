@@ -1192,13 +1192,21 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 }
 
 func getControlTagsQuery(boolQuery *elastic.BoolQuery, filters map[string][]string) {
+	tagsQuery := elastic.NewBoolQuery()
+	var hasTags bool
+
 	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
 	for filterType := range filters {
 		if strings.HasPrefix(filterType, "control_tag:") {
+			hasTags = true
 			_, tagKey := leftSplit(filterType, ":")
 			termQuery := newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
-			boolQuery = boolQuery.Should(termQuery)
+			tagsQuery = tagsQuery.Should(termQuery)
 		}
+	}
+
+	if hasTags {
+		boolQuery = boolQuery.Must(tagsQuery)
 	}
 }
 
