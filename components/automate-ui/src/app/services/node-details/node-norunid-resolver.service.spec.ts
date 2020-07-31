@@ -51,6 +51,25 @@ describe('NodeDetailsResolverService', () => {
     route = new MockRoute();
   });
 
+  describe('null nodeRun is returned', () => {
+    beforeEach(() => {
+      nodeRunsService.setResponse(Promise.resolve<NodeRun>(null));
+    });
+
+    it('should redirect to missing runs page', (done) => {
+
+      spyOn(route.paramMap, 'get').and.callFake(() => 'fake-node-id');
+      spyOn(router, 'navigate');
+
+      service.resolve(route, null).then((_nodeRun: NodeRun) => {
+        expect(router.navigate)
+          .toHaveBeenCalledWith(['/infrastructure/client-runs/fake-node-id/missing-runs']);
+        done();
+      });
+
+    });
+  });
+
   describe('non404 error in requesting nodeRun', () => {
     beforeEach(() => {
       nodeRunsService.setResponse(Promise.reject<NodeRun>('no real reason'));
