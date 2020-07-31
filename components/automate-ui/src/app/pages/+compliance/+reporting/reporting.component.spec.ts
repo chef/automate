@@ -105,7 +105,9 @@ describe('ReportingComponent', () => {
 
   it('extracting end time from the URL', () => {
     const expectedDate = moment('20191023GMT+00:00', 'YYYYMMDDZ').startOf('day').add(12, 'hours');
-    const beforeEndDate = component.getEndDate([{type: 'end_time', text: '2019-10-23'}]);
+    const beforeEndDate = component.getEndDate(
+      [{type: 'end_time', text: '2019-10-23', type_key: ''}]
+    );
     expect(expectedDate.hours()).toEqual(beforeEndDate.hours());
   });
 
@@ -293,8 +295,8 @@ describe('ReportingComponent', () => {
         ]
       };
       component.applyParamFilters([
-        {type: 'chef_tags', text: '123'},
-        {type: 'chef_tags', text: '456'}]);
+        {type: 'chef_tags', text: '123', type_key: ''},
+        {type: 'chef_tags', text: '456', type_key: ''}]);
       expect(reportQueryService.setState).toHaveBeenCalledWith(reportQuery);
     });
 
@@ -310,7 +312,7 @@ describe('ReportingComponent', () => {
         ]
       };
 
-      component.applyParamFilters([{type: 'chef_tags', text: '123'}]);
+      component.applyParamFilters([{type: 'chef_tags', text: '123', type_key: ''}]);
       expect(reportQueryService.setState).toHaveBeenCalledWith(
         reportQuery
       );
@@ -333,8 +335,8 @@ describe('ReportingComponent', () => {
       };
 
       component.applyParamFilters([
-        {type: 'chef_tags', text: '123'},
-        {type: 'end_time', text: 'bad-date'}]);
+        {type: 'chef_tags', text: '123', type_key: ''},
+        {type: 'end_time', text: 'bad-date', type_key: ''}]);
       expect(reportQueryService.setState).toHaveBeenCalledWith(
         reportQuery
       );
@@ -356,8 +358,8 @@ describe('ReportingComponent', () => {
       };
 
       component.applyParamFilters([
-        {type: 'chef_tags', text: '123'},
-        {type: 'date_interval', text: '2'}]);
+        {type: 'chef_tags', text: '123', type_key: ''},
+        {type: 'date_interval', text: '2', type_key: ''}]);
       expect(reportQueryService.setState).toHaveBeenCalledWith(
         reportQuery
       );
@@ -379,8 +381,8 @@ describe('ReportingComponent', () => {
       };
 
       component.applyParamFilters([
-        {type: 'chef_tags', text: '123'},
-        {type: 'date_interval', text: 'bad-number'}]);
+        {type: 'chef_tags', text: '123', type_key: ''},
+        {type: 'date_interval', text: 'bad-number', type_key: ''}]);
       expect(reportQueryService.setState).toHaveBeenCalledWith(
         reportQuery
       );
@@ -402,8 +404,8 @@ describe('ReportingComponent', () => {
       };
 
       component.applyParamFilters([
-        {type: 'chef_tags', text: '123'},
-        {type: 'date_interval', text: '-1'}]);
+        {type: 'chef_tags', text: '123', type_key: ''},
+        {type: 'date_interval', text: '-1', type_key: ''}]);
       expect(reportQueryService.setState).toHaveBeenCalledWith(
         reportQuery
       );
@@ -425,8 +427,8 @@ describe('ReportingComponent', () => {
       };
 
       component.applyParamFilters([
-        {type: 'chef_tags', text: '123'},
-        {type: 'date_interval', text: '10'}]);
+        {type: 'chef_tags', text: '123', type_key: ''},
+        {type: 'date_interval', text: '10', type_key: ''}]);
       expect(reportQueryService.setState).toHaveBeenCalledWith(
         reportQuery
       );

@@ -32,8 +32,8 @@ describe('SuggestionsService', () => {
   });
 
   describe('getSuggestions()', () => {
-
     it('fetches suggestions', () => {
+      service.selectedControlTagKey = 'test1';
       const type = 'platform';
       const text = 'win';
       const startDate = moment('2017-11-14T00:00:00Z').utc();
@@ -56,7 +56,7 @@ describe('SuggestionsService', () => {
       const req = httpTestingController.expectOne(expectedUrl);
 
       expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual({type, text,
+      expect(req.request.body).toEqual({type, text, 'type_key': 'test1',
         filters: [
           { type: 'start_time', values: ['2017-11-14T00:00:00Z'] },
           { type: 'end_time', values: ['2017-11-15T23:59:59Z'] }
@@ -67,6 +67,7 @@ describe('SuggestionsService', () => {
     });
 
     it('returns maximum of 100 items', () => {
+      service.selectedControlTagKey = 'test2';
       const type = 'platform';
       const text = 'win';
       const startDate = moment('2017-11-14T00:00:00Z').utc();
@@ -89,7 +90,7 @@ describe('SuggestionsService', () => {
       const req = httpTestingController.expectOne(expectedUrl);
 
       expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual({type, text,
+      expect(req.request.body).toEqual({type, text, 'type_key': 'test2',
         filters: [
           { type: 'start_time', values: ['2017-11-14T00:00:00Z'] },
           { type: 'end_time', values: ['2017-11-15T23:59:59Z'] }
