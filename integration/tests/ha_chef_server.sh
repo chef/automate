@@ -12,6 +12,10 @@ _frontend2_container_name="$(service_container_name "cs2")"
 do_setup() {
     do_setup_default
 
+    echo "Setting up Habitat"
+    groupadd hab
+    useradd -g hab hab
+
     echo "Installing docker"
     hab pkg install --binlink core/docker
     echo "Installed docker"
