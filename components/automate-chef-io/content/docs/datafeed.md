@@ -69,9 +69,10 @@ To delete a Data Feed instance in Chef Automate:
 The settings in `config.toml` apply across all configured Data Feed instances.
 {{< /info >}}
 
-Modify Data Feed behavior with configuration settings in `config.toml`.
+Modify Data Feed behavior with configuration settings.
 
-1. Navigate to `/hab/svc/data-feed-service/config/config.toml` using the Chef Automate command-line tool.
+1. Create a patch file e.g. data-feed-patch.toml and patch the configuration using the Chef Automate command-line tool.
+
 1. Change one or more configuration settings to reflect the desired global Data Feed behavior:
 
   - Update the `feed_interval` setting to change the interval for the Data Feed collection. The default value is four hours
@@ -83,33 +84,29 @@ Modify Data Feed behavior with configuration settings in `config.toml`.
 1. Apply your changes with the Chef Automate command-line tool:
 
 ```bash
-    chef-automate config patch /hab/svc/data-feed-service/config/config.toml
+    chef-automate config patch data-feed-patch.toml
 ```
 
-### Config.toml Example
+### data-feed-patch.toml Example
 
-```toml
-    [service]
-
-    host = "localhost"
-    port = 14001
-    feed_interval = "4h"
-    asset_page_size = 100
-    reports_page_size = 1000
-    node_batch_size = 50
-    updated_nodes_only = true
-    disable_cidr_filter = true
-    cidr_filter = "0.0.0.0/0"
-    external_fqdn = ""
-    accepted_status_codes = [ 200, 201, 202, 203, 204 ]
+```
+[data_feed_service.v1.sys]
+  [data_feed_service.v1.sys.service]
+        feed_interval = "4h"
+        node_batch_size = 50
+        updated_nodes_only = true
+        disable_cidr_filter = true
+        cidr_filter = "0.0.0.0/0"
+        accepted_status_codes = [200, 201, 202, 203, 204]
+      [data_feed_service.v1.sys.log]
+        level = "info"
 ```
 
-To debug any issues with the Data Feed Service in Chef Automate, update the following section in `config.toml` by changing the `log_level` value to "debug":
+To debug any issues with the Data Feed Service in Chef Automate, update the following section in `data-feed-patch.toml` by changing the `log_level` value to "debug":
 
-```toml
-    [log]
-    log_format = "text"
-    log_level = "info"
+```
+    [data_feed_service.v1.sys.log]
+    log_level = "debug"
 ```
 
 ## Data Feed Output Syntax and Details
