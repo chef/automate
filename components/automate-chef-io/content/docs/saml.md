@@ -58,7 +58,7 @@ The signing certificate used for Chef Automate's SAML integration with Azure AD 
 Signing key rotation is not done automatically.
 {{< /info >}}
 
-In Azure AD, add Chef Automate as a _"non-gallery application"_, and then configure its SAML log-in method.
+In Azure AD, add Chef Automate as a _"non-gallery application"_, and then configure its SAML sign-in method.
 [The Azure AD documentation](https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/configure-saml-single-sign-on) provides a detailed guide.
 Enter `https://{{< example_fqdn "automate" >}}/dex/callback` as the value for both _Identifier (Entity ID)_ and _Reply URL (Assertion Consumer Service URL)_.
 
