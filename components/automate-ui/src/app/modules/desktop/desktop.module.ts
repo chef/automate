@@ -18,6 +18,7 @@ import { InsightComponent } from './insight/insight.component';
 import {
   InsightAttributesDropdownComponent
 } from 'app/page-components/insight-attributes-dropdown/insight-attributes-dropdown.component';
+import { EmptyDataComponent } from './empty-data/empty-data.component';
 import { DesktopRoutingModule } from './desktop-routing.module';
 
 @NgModule({
@@ -33,6 +34,7 @@ import { DesktopRoutingModule } from './desktop-routing.module';
     CheckInTimeSeriesComponent,
     DailyCheckInComponent,
     DashboardComponent,
+    EmptyDataComponent,
     InsightComponent,
     InsightAttributesDropdownComponent,
     SimpleLineGraphComponent,
@@ -44,6 +46,7 @@ import { DesktopRoutingModule } from './desktop-routing.module';
     DailyCheckInComponent,
     DashboardComponent,
     DesktopDetailComponent,
+    EmptyDataComponent,
     InsightComponent,
     InsightAttributesDropdownComponent,
     SimpleLineGraphComponent,

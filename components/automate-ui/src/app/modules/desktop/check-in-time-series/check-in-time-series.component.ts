@@ -48,4 +48,8 @@ export class CheckInTimeSeriesComponent implements OnInit, OnDestroy, OnChanges 
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
+
+  get hasData(): boolean {
+    return this.days && this.days.some(item => item.total > 0);
+  }
 }

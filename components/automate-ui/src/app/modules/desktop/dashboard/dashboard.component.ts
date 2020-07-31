@@ -138,7 +138,7 @@ export class DashboardComponent implements OnInit {
           if (bucket.total > 0) {
             percentage = (bucket.checkInCount / bucket.total) * 100;
           }
-          return {daysAgo: index, percentage: percentage};
+          return {daysAgo: index, percentage: percentage, total: bucket.total};
         }))
     );
 

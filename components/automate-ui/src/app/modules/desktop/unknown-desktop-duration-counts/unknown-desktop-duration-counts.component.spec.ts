@@ -36,4 +36,32 @@ describe('UnknownDesktopDurationCountsComponent', () => {
       expect(tooltip.getAttribute('for')).toEqual('since-last-checkin-info');
     });
   });
+
+  describe('when data is available', () => {
+    it('does not display empty data message', () => {
+      component.countedDurationItems = [
+        { 'count': 10, 'duration': '1M' },
+        { 'count': 0, 'duration': '2w' }
+      ];
+
+      fixture.detectChanges();
+
+      const emptyMsg = fixture.debugElement.query(By.css('app-empty-data'));
+      expect(emptyMsg).toBeFalsy();
+    });
+  });
+
+  describe('when no data is available', () => {
+    it('displays empty data message', () => {
+      component.countedDurationItems = [
+        { 'count': 0, 'duration': '1M' },
+        { 'count': 0, 'duration': '2w' }
+      ];
+
+      fixture.detectChanges();
+
+      const emptyMsg = fixture.debugElement.query(By.css('app-empty-data'));
+      expect(emptyMsg).toBeTruthy();
+    });
+  });
 });
