@@ -3950,6 +3950,51 @@
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}": {
+      "put": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "UpdateNode",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Chef organization ID.",
+            "name": "org_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Node name.",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateNode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateNode"
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "InfraProxy"
@@ -14005,6 +14050,58 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.request.UpdateNode": {
+      "type": "object",
+      "properties": {
+        "automatic_attributes": {
+          "description": "Node automatic attributes JSON.",
+          "type": "object"
+        },
+        "default_attributes": {
+          "description": "Node default attributes JSON.",
+          "type": "object"
+        },
+        "environment": {
+          "description": "Node environment.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Node name.",
+          "type": "string"
+        },
+        "normal_attributes": {
+          "description": "Node normal attributes JSON.",
+          "type": "object"
+        },
+        "org_id": {
+          "description": "Chef organization ID.",
+          "type": "string"
+        },
+        "override_attributes": {
+          "description": "Node override attributes JSON.",
+          "type": "object"
+        },
+        "policy_group": {
+          "description": "Node policy group.",
+          "type": "string"
+        },
+        "policy_name": {
+          "description": "Node policy name.",
+          "type": "string"
+        },
+        "run_list": {
+          "description": "Node run-list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "server_id": {
+          "description": "Chef Infra Server ID.",
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.UpdateOrg": {
       "type": "object",
       "properties": {
@@ -14522,7 +14619,7 @@
           }
         },
         "default_attributes": {
-          "description": "Stringified json of the default attributes.",
+          "description": "Environment default attributes JSON.",
           "type": "string"
         },
         "description": {
@@ -14538,7 +14635,7 @@
           "type": "string"
         },
         "override_attributes": {
-          "description": "Stringified json of the override attributes.",
+          "description": "Environment override attributes JSON.",
           "type": "string"
         }
       }
@@ -14731,7 +14828,7 @@
           }
         },
         "default_attributes": {
-          "description": "Stringified JSON of the default attributes.",
+          "description": "Policyfile default attributes JSON.",
           "type": "string"
         },
         "expanded_run_list": {
@@ -14760,7 +14857,7 @@
           }
         },
         "override_attributes": {
-          "description": "Stringified JSON of the override attributes.",
+          "description": "Policyfile override attributes JSON.",
           "type": "string"
         },
         "policy_group": {
@@ -14826,7 +14923,7 @@
           "type": "string"
         },
         "default_attributes": {
-          "description": "Stringified json of the default attributes.",
+          "description": "Role default attributes JSON.",
           "type": "string"
         },
         "description": {
@@ -14849,7 +14946,7 @@
           "type": "string"
         },
         "override_attributes": {
-          "description": "Stringified json of the override attributes.",
+          "description": "Role override attributes JSON.",
           "type": "string"
         },
         "run_list": {
@@ -15000,6 +15097,15 @@
         },
         "name": {
           "description": "Data bag name.",
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.UpdateNode": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Node name.",
           "type": "string"
         }
       }
