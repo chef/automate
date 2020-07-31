@@ -791,14 +791,17 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	controlTermsAgg.SubAggregation("profile", profileInfoAgg)
 
 	controlsQuery := &elastic.BoolQuery{}
-	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
-	for filterType := range filters {
-		if strings.HasPrefix(filterType, "control_tag:") {
-			_, tagKey := leftSplit(filterType, ":")
-			termQuery := newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
-			controlsQuery = controlsQuery.Must(termQuery)
-		}
-	}
+	//// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	//for filterType := range filters {
+	//	if strings.HasPrefix(filterType, "control_tag:") {
+	//		_, tagKey := leftSplit(filterType, ":")
+	//		termQuery := newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
+	//		//todo - this should be a Should instead of a Must
+	//		controlsQuery = controlsQuery.Must(termQuery)
+	//	}
+	//}
+	getControlTagsQuery(controlsQuery, filters)
+
 	if len(filters["control_status"]) > 0 {
 		controlStatusQuery := newTermQueryFromFilter("profiles.controls.status", filters["control_status"])
 		controlsQuery = controlsQuery.Must(controlStatusQuery)
@@ -1174,16 +1177,29 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		boolQuery = boolQuery.Must(timeRangeQuery)
 	}
 
+	//// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	//for filterType := range filters {
+	//	if strings.HasPrefix(filterType, "control_tag:") {
+	//		_, tagKey := leftSplit(filterType, ":")
+	//		termQuery := newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
+	//		boolQuery = boolQuery.Must(termQuery)
+	//	}
+	//}
+
+	getControlTagsQuery(boolQuery, filters)
+
+	return boolQuery
+}
+
+func getControlTagsQuery(boolQuery *elastic.BoolQuery, filters map[string][]string) {
 	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
 	for filterType := range filters {
 		if strings.HasPrefix(filterType, "control_tag:") {
 			_, tagKey := leftSplit(filterType, ":")
 			termQuery := newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
-			boolQuery = boolQuery.Must(termQuery)
+			boolQuery = boolQuery.Should(termQuery)
 		}
 	}
-
-	return boolQuery
 }
 
 func (backend ES2Backend) getESFieldName(filterType string) string {

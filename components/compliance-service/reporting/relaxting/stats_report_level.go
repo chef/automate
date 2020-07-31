@@ -2,7 +2,6 @@ package relaxting
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -296,14 +295,16 @@ func (depth *ReportDepth) getStatsSummaryAggs() map[string]elastic.Aggregation {
 	filters := depth.filters
 
 	controlsQuery := &elastic.BoolQuery{}
-	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
-	for filterType := range filters {
-		if strings.HasPrefix(filterType, "control_tag:") {
-			_, tagKey := leftSplit(filterType, ":")
-			termQuery := newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
-			controlsQuery = controlsQuery.Must(termQuery)
-		}
-	}
+	//// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	//for filterType := range filters {
+	//	if strings.HasPrefix(filterType, "control_tag:") {
+	//		_, tagKey := leftSplit(filterType, ":")
+	//		termQuery := newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
+	//		controlsQuery = controlsQuery.Must(termQuery)
+	//	}
+	//}
+
+	getControlTagsQuery(controlsQuery, filters)
 
 	if len(filters["control"]) > 0 {
 		controlIdsQuery := newTermQueryFromFilter("profiles.controls.id", filters["control"])
