@@ -16,6 +16,9 @@ do_setup() {
     groupadd hab
     useradd -g hab hab
 
+    echo "Making /hab/svc"
+    mkdir -p /hab/svc
+
     echo "Installing docker"
     hab pkg install --binlink core/docker
     echo "Installed docker"
