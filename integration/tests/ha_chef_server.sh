@@ -69,13 +69,21 @@ do_deploy() {
             --bootstrap-bundle bootstrap.abb \
             --accept-terms-and-mlsa
 
-    "$cli_bin" bootstrap bundle create -o bootstrap.abb
+    "$cli_bin" bootstrap bundle unpack bootstrap.abb
 
     start_loadbalancer "$frontend1_ip" "$frontend2_ip"
 }
 
 do_test_deploy() {
-    chef-server-ctl test
+    cat << EOH > /tmp/pivotal.rb
+log_location     STDOUT
+node_name        'pivotal'
+chef_server_url  'https://localhost'
+chef_server_root 'https://localhost'
+ssl_verify_mode  :verify_none
+client_key       '/hab/svc/automate-cs-oc-erchef/data/pivotal.pem'
+EOH
+    chef-server-ctl test -c /tmp/pivotal.rb
 }
 
 do_cleanup() {
