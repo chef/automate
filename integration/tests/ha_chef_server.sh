@@ -169,7 +169,7 @@ EOH
 }
 
 do_test_deploy() {
-    hab pkg exec chef/automate-cs-nginx chef-server-ctl test
+    hab pkg exec chef/automate-cs-nginx chef-server-ctl test --skip-association
 }
 
 do_cleanup() {
