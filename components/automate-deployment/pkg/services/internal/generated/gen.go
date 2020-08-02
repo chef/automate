@@ -324,7 +324,13 @@ var ProductMetadataJSON = `
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
-        "bootstrap": null
+        "bootstrap": [
+          {
+            "type": "secret",
+            "optional": false,
+            "secret_spec": "oc_bifrost.superuser_id"
+          }
+        ]
       }
     },
     {
