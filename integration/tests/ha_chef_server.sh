@@ -40,6 +40,7 @@ do_deploy() {
 
     cli_bin=$(command -v "chef-automate")
 
+    #shellcheck disable=SC2154
     hab pkg install --channel="$test_channel" --binlink chef/automate-cs-nginx
 
     docker_run "${_frontend1_container_name}"
@@ -169,7 +170,7 @@ EOH
 }
 
 do_test_deploy() {
-    hab pkg exec chef/automate-cs-nginx chef-server-ctl test --skip-association
+    hab pkg exec chef/automate-cs-nginx chef-server-ctl test
 }
 
 do_cleanup() {
