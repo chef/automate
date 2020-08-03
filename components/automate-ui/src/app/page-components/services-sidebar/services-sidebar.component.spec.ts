@@ -6,7 +6,7 @@ import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import {
   GroupService
-} from '../../entities/service-groups/service-groups.model';
+} from 'app/entities/service-groups/service-groups.model';
 
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { By } from '@angular/platform-browser';
@@ -66,7 +66,9 @@ describe('ServicesSidebarComponent', () => {
         current_health_since: '23 hours 54 minutes',
         health_updated_at: new Date(),
         health_check_result: {
-            stdout: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF…FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', stderr: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF…FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', exit_status: 2
+          stdout: 'This is the stdout for 300',
+          stderr: 'Here is the stderr for 300',
+            exit_status: 2
           }
         },
         {
@@ -86,7 +88,9 @@ describe('ServicesSidebarComponent', () => {
           current_health_since: '23 hours 54 minutes',
           health_updated_at: new Date(),
           health_check_result: {
-            stdout: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF…FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', stderr: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF…FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', exit_status: 2
+            stdout: 'This is the stdout for 400',
+            stderr: 'Here is the stderr for 400',
+            exit_status: 2
           }
         },
         {
@@ -106,7 +110,9 @@ describe('ServicesSidebarComponent', () => {
           current_health_since: '23 hours 54 minutes',
           health_updated_at: new Date(),
           health_check_result: {
-            stdout: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF…FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', stderr: 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF…FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', exit_status: 2
+            stdout: 'This is the stdout for 500',
+            stderr: 'Here is the stderr for 500',
+            exit_status: 2
           }
         }
       ];

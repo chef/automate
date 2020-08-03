@@ -55,7 +55,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public checkedServices: number[] = [];
   public isAllSelected = false;
   public isIndeterminate = false;
-  public checkedServicesDisplay: string | number = '';
+  public checkedServicesDisplay = '';
   public deleteModalVisible = false;
 
   constructor(

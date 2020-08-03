@@ -141,17 +141,13 @@ export function serviceGroupsEntityReducer(
         set('error', action.payload))(state) as ServiceGroupsEntityState;
 
     case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID:
-      return set('serviceDeletionStatus', EntityStatus.loading, state ) as ServiceGroupsEntityState;
+      return set('serviceDeletionStatus', EntityStatus.loading, state);
 
     case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS:
-      return set(
-        'serviceDeletionStatus', EntityStatus.loadingSuccess, state
-        ) as ServiceGroupsEntityState;
+      return set('serviceDeletionStatus', EntityStatus.loadingSuccess, state);
 
     case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_FAILURE:
-      return set(
-        'serviceDeletionStatus', EntityStatus.loadingFailure, state
-        ) as ServiceGroupsEntityState;
+      return set('serviceDeletionStatus', EntityStatus.loadingFailure, state);
 
     default:
       return state;

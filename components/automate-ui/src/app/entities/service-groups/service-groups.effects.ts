@@ -40,8 +40,8 @@ import {
   DeleteServicesByIdFailure
 } from './service-groups.actions';
 
-import { CreateNotification } from '../notifications/notification.actions';
-import { Type } from '../notifications/notification.model';
+import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { Type } from 'app/entities/notifications/notification.model';
 
 @Injectable()
 export class ServiceGroupsEffects {
@@ -136,7 +136,7 @@ export class ServiceGroupsEffects {
     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS),
     mergeMap((payload: any) => {
       const amount = payload.payload.amount;
-      const msg = amount > 1 ? `${amount} services deleted.` : '1 service deleted.';
+      const msg = amount === 1 ? '1 service deleted.' : `${amount} services deleted.`;
       return [
         new GetServiceGroups(),
         new GetServiceGroupsCounts(),
