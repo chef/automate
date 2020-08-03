@@ -179,16 +179,16 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     return allowedKeys.includes(key);
   }
 
-  // Update the width of input when greater than one number
+  // Update the width of input when greater than one digit
   public autoUpdateInputWidth(element: HTMLInputElement): void {
     // Keep default in sync with input width in automate-settings.component.scss
-    const DEFAULT_WIDTH = 64;
-    const length = element.value.length;
+    const DEFAULT_WIDTH_PIXELS = 64;
+    const numDigits = element.value.length;
 
-    if (length > 1) {
-      element.style.width = `${DEFAULT_WIDTH + (9 * (length - 1))}px`;
+    if (numDigits > 1) {
+      element.style.width = `${DEFAULT_WIDTH_PIXELS + (9 * (numDigits - 1))}px`;
     } else {
-      element.style.width = `${DEFAULT_WIDTH}px`;
+      element.style.width = `${DEFAULT_WIDTH_PIXELS}px`;
     }
   }
 
