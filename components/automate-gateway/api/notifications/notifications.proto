@@ -65,6 +65,8 @@ message RuleAddRequest {
 message RuleAddResponse {
   repeated string messages = 1;
   string id = 2;
+  string name = 3;
+  Rule rule = 4;
 }
 
 message RuleGetResponse {
