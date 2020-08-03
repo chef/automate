@@ -713,7 +713,7 @@ func findLatestComplete(backups []*api.BackupTask) (*api.BackupTask, error) {
 
 		date, err := time.Parse(api.BackupTaskFormat, b.TaskID())
 		if err != nil {
-			return nil, status.Errorf(status.BackupError, "Unable to parse backup ID '%d' to time", b.Id)
+			return nil, status.Errorf(status.BackupError, "Unable to parse backup ID '%s' to time", b.Id)
 		}
 
 		parsedBackups = append(parsedBackups, parsed{task: b, date: date})

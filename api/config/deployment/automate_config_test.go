@@ -4,11 +4,14 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/chef/automate/api/config/compliance"
 	es "github.com/chef/automate/api/config/elasticsearch"
 	config "github.com/chef/automate/api/config/shared"
 	"github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
+	"github.com/chef/automate/lib/pcmp/passert"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -258,10 +261,10 @@ func TestDeepCopy(t *testing.T) {
 	require.NoError(t, err)
 
 	// make sure they're the same
-	assert.True(t, reflect.DeepEqual(cfg, copy))
+	passert.Equal(t, cfg, copy)
 	cfg.Deployment = nil
 	assert.Nil(t, cfg.Deployment)
-	assert.Equal(t, copy.Deployment, DefaultConfigRequest())
+	passert.Equal(t, copy.Deployment, DefaultConfigRequest())
 }
 
 func TestOverrideBooleans(t *testing.T) {
@@ -294,8 +297,8 @@ func TestOverrideBooleans(t *testing.T) {
 	err := defaultConfig.OverrideConfigValues(overrideConfig)
 
 	assert.NoError(err)
-	assert.Equal(w.Bool(false), defaultConfig.Elasticsearch.V1.Sys.Node.Data)
-	assert.Equal(w.Bool(true), defaultConfig.Elasticsearch.V1.Sys.Node.Master)
+	passert.Equal(t, w.Bool(false), defaultConfig.Elasticsearch.V1.Sys.Node.Data)
+	passert.Equal(t, w.Bool(true), defaultConfig.Elasticsearch.V1.Sys.Node.Master)
 }
 
 func TestCorrectlyAnnotated(t *testing.T) {
@@ -321,7 +324,8 @@ func TestCorrectlyAnnotated(t *testing.T) {
 	root := reflect.TypeOf(cfg)
 	for i := 0; i < root.NumField(); i++ {
 		f := root.Field(i)
-		if f.Name == "Global" || strings.HasPrefix(f.Name, "XXX_") {
+		r, _ := utf8.DecodeRuneInString(f.Name)
+		if f.Name == "Global" || strings.HasPrefix(f.Name, "XXX_") || !unicode.IsUpper(r) {
 			continue
 		}
 

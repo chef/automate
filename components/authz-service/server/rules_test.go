@@ -13,6 +13,7 @@ import (
 	api "github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/pcmp/passert"
 )
 
 const applied = "applied"
@@ -666,7 +667,7 @@ func TestListRulesForProject(t *testing.T) {
 			addProjectToStore(t, projects, projectID, "my bar", storage.Custom)
 			resp, err := cl.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: projectID})
 			require.NoError(t, err)
-			assert.Equal(t, &api.ListRulesForProjectResp{Status: storage.NoRules.String()}, resp)
+			passert.Equal(t, &api.ListRulesForProjectResp{Status: storage.NoRules.String()}, resp)
 		}},
 		{"if multiple rules exist, returns rules for specific project", func(t *testing.T) {
 			projectID1 := "foo-project"
@@ -805,7 +806,7 @@ func TestDeleteRule(t *testing.T) {
 
 			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: id1, ProjectId: projectID})
 			require.NoError(t, err)
-			assert.Equal(t, &api.DeleteRuleResp{}, resp)
+			passert.Equal(t, &api.DeleteRuleResp{}, resp)
 
 			rule, exists := rules.Get(id1)
 			assert.Nil(t, rule)
