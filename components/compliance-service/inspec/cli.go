@@ -179,7 +179,7 @@ func run(args []string, conf *TargetConfig, timeout time.Duration, env map[strin
 			return nil, nil, err
 		}
 
-		args = append(args, "--json-config=-") // read config from stdin
+		args = append(args, "--config=-") // read config from stdin
 		cmd = exec.CommandContext(ctx, args[0], args[1:]...)
 		cmd.Stdin = bytes.NewBuffer(jsonConf)
 		if logSensitiveData {
