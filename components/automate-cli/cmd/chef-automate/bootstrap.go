@@ -6,9 +6,14 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
+	"strconv"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/bootstrapbundle"
+	"github.com/chef/automate/lib/secrets"
+	"github.com/chef/automate/lib/user"
+	"github.com/pkg/errors"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -148,7 +153,32 @@ func runBootstrapBundleCreate(cmd *cobra.Command, args []string) error {
 }
 
 func runBootstrapBundleUnpack(cmd *cobra.Command, args []string) error {
+	u, err := user.Lookup(secrets.DefaultDiskStoreDataOwner)
+	if err != nil {
+		return errors.Wrap(err, "user lookup")
+	}
+
+	uid, err := strconv.Atoi(u.Uid)
+	if err != nil {
+		return errors.Wrap(err, "converting uid to integer")
+	}
+
+	gid, err := strconv.Atoi(u.Gid)
+	if err != nil {
+		return errors.Wrap(err, "converting gid to integer")
+	}
+
+	var secretStorePath string
+	if bootstrapBundleCmdFlags.rootDir == "" {
+		secretStorePath = secrets.DefaultDiskStoreDataDir
+	} else {
+		secretStorePath = path.Join(bootstrapBundleCmdFlags.rootDir, "deployment-service/data/shared")
+	}
+	secretStore := secrets.NewDiskStore(
+		secretStorePath, uid, gid)
+
 	b := bootstrapbundle.NewCreator(
+		secretStore,
 		bootstrapbundle.WithRootDir(bootstrapBundleCmdFlags.rootDir))
 	f, err := os.Open(args[0])
 	if err != nil {
