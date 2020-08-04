@@ -55,7 +55,7 @@
     </div>
     <div class="bulk-action-bar">
       <chef-checkbox
-        [checked]="isAllSelected"
+        [checked]="hasAllSelected"
         [indeterminate]="isIndeterminate"
         (change)="handleSelectAll($event.detail)">Select All</chef-checkbox>
       <chef-button tertiary caution
