@@ -1,7 +1,10 @@
 package migrator
 
 import (
+	"crypto/sha256"
+	"fmt"
 	"net/url"
+	"strconv"
 
 	"github.com/golang-migrate/migrate"
 	_ "github.com/golang-migrate/migrate/database/postgres" // make driver available
@@ -33,30 +36,49 @@ func MigrateWithMigrationsTable(pgURL, migrationsPath, migrationsTable string, l
 	if err != nil {
 		return errors.Wrap(err, "parse PG URL")
 	}
+
 	m, err := migrate.New(addScheme(migrationsPath), purl)
 	if err != nil {
 		return errors.Wrap(err, "init migrator")
 	}
 	m.Log = migrationLog{Logger: l, verbose: verbose}
+
 	version, dirty, err := m.Version()
 	if err != nil && err != migrate.ErrNilVersion {
 		return errors.Wrap(err, "init migrator - error getting migration version")
 	}
 
-	if dirty {
-		// force to prior version to reattempt migration
-		err := m.Force(int(version) - 1)
-		if err != nil {
-			return errors.Wrap(err, "force to working schema version")
-		}
-		l.Infof("Forced to previous version: %v to reattempt migration", int(version)-1)
-	} else {
-		l.Infof("Current schema version: %v", version)
-	}
+	// Do not take action based on the return value of m.Version(); Version() is
+	// not protected by the exclusive lock, if it reports dirty, it could be
+	// another front-end is running a migration now.
+	l.Infof("Current schema version: %v dirty: %t", version, dirty)
 
 	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
 		return errors.Wrap(err, "migration attempt failed")
+	}
+	if err != nil && err == migrate.ErrLocked {
+		return errors.Wrap(err, "database locked: peer attempting migration?")
+	}
+	if _, ok := err.(migrate.ErrDirty); ok {
+		l.WithError(err).Error("Migration attempt failed due to previous migration error leaving database in a dirty state")
+		// this is vulnerable to a race condition if two or more front-ends reach
+		// this branch of the code at once, they might both run all of the steps,
+		// but they had to have gotten a dirty schema state while no process had
+		// the lock, so this will only happen following some other error.
+		version, _, err := m.Version()
+		if err != nil {
+			return errors.Wrap(err, "init migrator - error getting migration version")
+		}
+		l.Infof("Attempting to set recorded schema level to %d and rerun subsequent migration(s)", version)
+		err = m.Force(int(version) - 1)
+		if err != nil {
+			return errors.Wrap(err, "force to previous schema version")
+		}
+		err = m.Up()
+		if err != nil {
+			return errors.Wrap(err, "re-migration attempt after force schema version failed")
+		}
 	}
 
 	l.Infof("Completed db migrations")
@@ -85,4 +107,17 @@ func addMigrationsTable(u, table string) (string, error) {
 		pgURL.RawQuery = q.Encode()
 	}
 	return pgURL.String(), nil
+}
+
+func lockIdForURL(pgURL string) (int64, error) {
+	u, err := url.Parse(pgURL)
+	if err != nil {
+		return 0, err
+	}
+	hex := fmt.Sprintf("%x", sha256.Sum256([]byte(u.Path)))
+	dec, err := strconv.ParseInt(hex, 16, 64)
+	if err != nil {
+		return 0, err
+	}
+	return dec, nil
 }
