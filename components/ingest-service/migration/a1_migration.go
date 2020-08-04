@@ -55,6 +55,9 @@ func (ms *Status) calculateA1Tasks() {
 
 	// 4) finalCleanup
 	ms.total++
+
+	// migrating actions to events
+	ms.total += 2
 }
 
 // stage1 - this is all done before the service says it is healthy.
@@ -98,6 +101,18 @@ func (ms *Status) stage2() {
 
 	ms.update("Finishing migration by deleting old templates and indexes")
 	ms.finalCleanup()
+	ms.taskCompleted()
+
+	err := ms.SendAllActionsThroughPipeline()
+	if err != nil {
+		logFatal(err.Error(), "Unable to re-insert actions")
+	}
+	ms.taskCompleted()
+
+	err = ms.DeleteAllActionsIndexes()
+	if err != nil {
+		logFatal(err.Error(), "Unable to delete action indexes")
+	}
 	ms.taskCompleted()
 
 	ms.finish("Migration from Automate 1.x finished successfully")
@@ -236,7 +251,7 @@ func (ms *Status) reindexAllInsightsIndexes() {
 			logWarning(err.Error(), "ReindexInsightsToConvergeHistory")
 		}
 
-		actionsIndexName := RenameFromInsightsIndexName(insightsIndexName, mappings.Actions.Index)
+		actionsIndexName := RenameFromInsightsIndexName(insightsIndexName, actionPrefixIndexName)
 		err = ms.client.ReindexInsightstoActions(ms.ctx, insightsIndexName, actionsIndexName)
 		if err != nil {
 			logWarning(err.Error(), "ReindexInsightsToActions")

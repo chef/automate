@@ -9,7 +9,6 @@ import (
 	"github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/api/interservice/data_lifecycle"
-	iBackend "github.com/chef/automate/components/ingest-service/backend"
 )
 
 // TestPurge tests the Purge server
@@ -131,80 +130,5 @@ func TestPurge(t *testing.T) {
 
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "not a valid ES policy")
-	})
-
-	t.Run("Run", func(t *testing.T) {
-		defer suite.DeleteAllDocuments()
-
-		var (
-			ctx        = context.Background()
-			err        error
-			recurrence *rrule.RRule
-		)
-
-		actions := []iBackend.InternalChefAction{
-			{
-				RemoteHostname:   "chef-server.org",
-				OrganizationName: "org1",
-				Projects:         []string{"org1"},
-				RecordedAt:       time.Now(), // today's index
-			},
-			{
-				RemoteHostname:   "chef-server.org",
-				OrganizationName: "org2",
-				Projects:         []string{"org2"},
-				RecordedAt:       time.Now().Add(time.Hour * -24),
-			},
-			{
-				RemoteHostname:   "chef-server.org",
-				OrganizationName: "org1",
-				Projects:         []string{"org1"},
-				RecordedAt:       time.Now().Add(time.Hour * -48),
-			},
-			{
-				RemoteHostname:   "chef-server.org",
-				OrganizationName: "org2",
-				Projects:         []string{"org2"},
-				RecordedAt:       time.Now().Add(time.Hour * -64),
-			},
-		}
-
-		recurrence, err = rrule.NewRRule(rrule.ROption{
-			Freq:     rrule.HOURLY,
-			Interval: 2,
-			Dtstart:  time.Now(),
-		})
-		require.NoError(t, err)
-
-		suite.IngestActions(actions)
-		suite.RefreshIndices(suite.Indices()...)
-		waitForModificationsToApply()
-
-		actualActions, err := suite.GetActions(5)
-		require.NoError(t, err)
-		require.Equal(t, 4, len(actualActions), "wrong number of actions retrieved")
-
-		_, err = suite.PurgeServer.Configure(ctx, &data_lifecycle.ConfigureRequest{
-			Enabled:    true,
-			Recurrence: recurrence.String(),
-			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*data_lifecycle.EsPolicyUpdate{
-					{
-						PolicyName:    "actions",
-						OlderThanDays: 1,
-					},
-				},
-			},
-		})
-		require.NoError(t, err)
-		waitForModificationsToApply()
-
-		_, err = suite.PurgeServer.Run(ctx, &data_lifecycle.RunRequest{})
-		require.NoError(t, err)
-		suite.RefreshIndices(suite.Indices()...)
-		waitForModificationsToApply()
-		actualActions, err = suite.GetActions(5)
-		require.NoError(t, err)
-		require.Equal(t, 2, len(actualActions), "wrong number of actions retrieved")
 	})
 }

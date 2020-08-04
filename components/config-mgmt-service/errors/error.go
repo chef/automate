@@ -23,17 +23,17 @@ const (
 	NodeNotFound
 	NodeAttributeNotFound
 	RunNotFound
-	ActionNotFound
+	PolicyCookbooksNotFound
 )
 
 var typeString = map[ErrorType]string{
-	GrpcClient:            "GrpcClient",
-	Backend:               "Backend",
-	InvalidParameter:      "InvalidParameter",
-	NodeNotFound:          "NodeNotFound",
-	NodeAttributeNotFound: "NodeAttributeNotFound",
-	RunNotFound:           "RunNotFound",
-	ActionNotFound:        "ActionNotFound",
+	GrpcClient:              "GrpcClient",
+	Backend:                 "Backend",
+	InvalidParameter:        "InvalidParameter",
+	NodeNotFound:            "NodeNotFound",
+	NodeAttributeNotFound:   "NodeAttributeNotFound",
+	RunNotFound:             "RunNotFound",
+	PolicyCookbooksNotFound: "PolicyCookbooksNotFound",
 }
 
 // StandardError type

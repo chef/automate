@@ -102,14 +102,6 @@ CONFIG="$CONFIG --authz-address {{authz-service.sys.ip}}:{{authz-service.cfg.por
   {{~/if}}
 {{~/eachAlive}}
 
-# Bind to event if it's available
-{{~#eachAlive bind.event-service.members as |event-service|}}
-  {{~#if @last}}
-addNoProxy {{event-service.sys.ip}}
-CONFIG="$CONFIG --event-address {{event-service.sys.ip}}:{{event-service.cfg.port}}"
-  {{~/if}}
-{{~/eachAlive}}
-
 # Bind to nodemanager if it's available
 {{~#eachAlive bind.nodemanager-service.members as |manager|}}
   {{~#if @last}}
@@ -131,6 +123,14 @@ CONFIG="$CONFIG --config-mgmt-address {{config_mgmt.sys.ip}}:{{config_mgmt.cfg.p
   {{~#if @last}}
 addNoProxy {{cereal-service.sys.ip}}
 CONFIG="$CONFIG --cereal-address {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}"
+  {{~/if}}
+{{~/eachAlive}}
+
+# Bind to event-feed-service if it's available
+{{~#eachAlive bind.event-feed-service.members as |service|}}
+  {{~#if @last}}
+addNoProxy {{event-feed-service.sys.ip}}
+CONFIG="$CONFIG --event-feed-address {{service.sys.ip}}:{{service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 

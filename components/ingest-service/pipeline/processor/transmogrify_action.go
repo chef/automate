@@ -70,15 +70,6 @@ func ChefActionTransmogrify(in <-chan message.ChefAction) <-chan message.ChefAct
 					"entity_type": "policy",
 				}).Debug("Parsing the 'data' field to be stored")
 
-				// The current implementation of how we ingest policy file actions involves storing
-				// the data field in elasticsearch so that the config-mgmt-service can, once again,
-				// unmarshal this object and get the PolicyCookbooks information.
-				//
-				// Code:
-				// => https://github.com/chef/automate/blob/master/components/config-mgmt-service/backend/elastic/actions.go#L49
-				//
-				// TODO: @afiune there should be something better we can do here but for now,
-				// we will continue storing to avoid heavy modifications in the system.
 				dataBytes, err := getActionDataFieldInBytes(msg.Action.GetContent())
 				if err != nil {
 					msg.FinishProcessing(err)
