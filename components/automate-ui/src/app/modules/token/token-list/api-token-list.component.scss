@@ -1,22 +1,25 @@
 @import "~styles/variables";
 
-.empty-state {
-  text-align: center;
+:host {
 
-  p {
-    font-size: 18px;
-    font-weight: 400;
-    margin-top: 42px;
+  ::ng-deep .mat-select-panel {
+    position: relative;
+    margin-top: 12px;
+    right: 24px;
+    width: 54px;
   }
-}
 
-::ng-deep .mat-select-panel {
-  position: relative;
-  margin-top: 12px;
-  right: 24px;
-  width: 54px;
-}
+  ::ng-deep .mat-select-panel-wrap {
+    margin-left: -75px;
+  }
 
-::ng-deep .mat-select-panel-wrap {
-  margin-left: -75px;
+  .empty-state {
+    text-align: center;
+
+    p {
+      font-size: 18px;
+      font-weight: 400;
+      margin-top: 42px;
+    }
+  }
 }
