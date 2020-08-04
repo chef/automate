@@ -31,6 +31,8 @@ import (
 	pb_cc_jobs "github.com/chef/automate/api/external/compliance/scanner/jobs"
 	pb_data_feed "github.com/chef/automate/api/external/data_feed"
 	pb_data_lifecycle "github.com/chef/automate/api/external/data_lifecycle"
+	pb_eventfeed "github.com/chef/automate/api/external/event_feed"
+	eventfeed_Req "github.com/chef/automate/api/external/event_feed/request"
 	pb_infra_proxy "github.com/chef/automate/api/external/infra_proxy"
 	pb_ingest "github.com/chef/automate/api/external/ingest"
 	pb_nodes "github.com/chef/automate/api/external/nodes"
@@ -43,7 +45,6 @@ import (
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
-	pb_eventfeed "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
 	pb_iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
@@ -763,6 +764,49 @@ func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	stream, err := cfgMgmtClient.NodeExport(ctx, &nodeExportRequest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		w.Write(data.GetContent()) // nolint: errcheck
+	}
+}
+
+func (s *Server) eventFeedExportHandler(w http.ResponseWriter, r *http.Request) {
+	const (
+		action   = "event:events:list"
+		resource = "event:events"
+	)
+
+	ctx, err := s.authRequest(r, resource, action)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var exportRequest eventfeed_Req.EventExport
+	if err := decoder.Decode(&exportRequest); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	eventFeedClient, err := s.clientsFactory.FeedClient()
+	if err != nil {
+		http.Error(w, "grpc service for config mgmt unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
+	stream, err := eventFeedClient.EventExport(ctx, &exportRequest)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

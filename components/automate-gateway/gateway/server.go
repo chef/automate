@@ -459,6 +459,9 @@ func (s *Server) startHTTPServer() error {
 	// rpc ReportExport(ReportExport) returns (stream ReportExportData);
 	mux.HandleFunc("/api/v0/cfgmgmt/reports/export", s.configMgmtReportExportHandler)
 
+	// rpc EventExport(request.EventExport) returns (stream chef.automate.api.common.ExportData);
+	mux.HandleFunc("/api/v0/eventfeed/export", s.eventFeedExportHandler)
+
 	// "GET /status" is used for monitoring
 	// We made it a custom handler in order to be able to return 500 when some services are down.
 	mux.HandleFunc("/api/v0/status", s.DeploymentStatusHandler)

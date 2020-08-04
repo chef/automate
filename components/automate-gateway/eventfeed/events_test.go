@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
+	agReq "github.com/chef/automate/api/external/event_feed/request"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
-	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes"

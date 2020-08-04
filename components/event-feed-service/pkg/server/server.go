@@ -245,6 +245,8 @@ func fromInternalFormat(entry *feed.FeedEntry) (*event_feed.FeedEntry, error) {
 			ID:   entry.ParentID,
 			Name: entry.ParentName,
 		},
+		ChefInfraServer:  entry.ChefInfraServer,
+		ChefOrganization: entry.ChefOrganization,
 	}, nil
 }
 

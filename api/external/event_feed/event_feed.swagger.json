@@ -1,10 +1,7 @@
-package api
-
-func init() {
-	Swagger.Add("event_feed_event_feed", `{
+{
   "swagger": "2.0",
   "info": {
-    "title": "automate-gateway/api/event_feed/event_feed.proto",
+    "title": "external/event_feed/event_feed.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -17,7 +14,7 @@ func init() {
     "/api/v0/event_task_counts": {
       "get": {
         "summary": "List Counts Per Event Task Occurrence",
-        "description": "Returns totals for update, create, and delete event tasks, which are the actions taken on the event.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\nevent_task_counts?start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns totals for update, create, and delete event tasks, which are the actions taken on the event.\n\nExample:\n```\nevent_task_counts?start=1592546400000\u0026end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
         "operationId": "GetEventTaskCounts",
         "responses": {
           "200": {
@@ -64,7 +61,7 @@ func init() {
     "/api/v0/event_type_counts": {
       "get": {
         "summary": "List Count of Event Type Occurrence",
-        "description": "Returns totals for role, cookbook, and organization event types.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\nevent_type_counts?start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns totals for role, cookbook, and organization event types.\n\nExample:\n```\nevent_type_counts?start=1592546400000\u0026end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
         "operationId": "GetEventTypeCounts",
         "responses": {
           "200": {
@@ -111,7 +108,7 @@ func init() {
     "/api/v0/eventfeed": {
       "get": {
         "summary": "List Events",
-        "description": "Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).\nAdding a filter makes a list of all events that meet the filter criteria.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\neventfeed?collapse=true\u0026filter=organization:The%2520Watchmen\u0026page_size=100\u0026start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).\nAdding a filter makes a list of all events that meet the filter criteria.\n\nExample:\n```\neventfeed?collapse=true\u0026filter=organization:The%2520Watchmen\u0026page_size=100\u0026start=1592546400000\u0026end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
         "operationId": "GetEventFeed",
         "responses": {
           "200": {
@@ -197,7 +194,7 @@ func init() {
     "/api/v0/eventstrings": {
       "get": {
         "summary": "List Summary Stats About Events",
-        "description": "Returns data that populates the guitar strings visual on the top of the event feed.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\neventstrings?timezone=America/Denver\u0026hours_between=1\u0026start=2020-06-19\u0026end=2020-06-25\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns data that populates the guitar strings visual on the top of the event feed.\n\nExample:\n```\neventstrings?timezone=America/Denver\u0026hours_between=1\u0026start=2020-06-19\u0026end=2020-06-25\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
         "operationId": "GetEventStringBuckets",
         "responses": {
           "200": {
@@ -256,6 +253,24 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.common.ExportData": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "format": "byte",
+          "description": "Exported reports in JSON or CSV."
+        }
+      }
+    },
+    "chef.automate.api.common.query.SortOrder": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
     "chef.automate.api.event_feed.response.Event": {
       "type": "object",
       "properties": {
@@ -312,6 +327,14 @@ func init() {
         "end_id": {
           "type": "string",
           "title": "Used for grouping events together; equal to start_id if not grouped"
+        },
+        "chef_organization": {
+          "type": "string",
+          "title": "Event's Chef Organization"
+        },
+        "chef_infra_server": {
+          "type": "string",
+          "title": "Event's Chef Infra Server"
         }
       }
     },
@@ -408,8 +431,57 @@ func init() {
           "description": "Total count of events."
         }
       }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.StreamError": {
+      "type": "object",
+      "properties": {
+        "grpc_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "http_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "http_status": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
+    }
+  },
+  "x-stream-definitions": {
+    "chef.automate.api.common.ExportData": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/chef.automate.api.common.ExportData"
+        },
+        "error": {
+          "$ref": "#/definitions/grpc.gateway.runtime.StreamError"
+        }
+      },
+      "title": "Stream result of chef.automate.api.common.ExportData"
     }
   }
-}
-`)
 }

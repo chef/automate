@@ -77,7 +77,6 @@ function generate_random_chef_server_event() {
     '.Producer.ID = "environment" |
      .Producer.ProducerName = "Environment" |
      .Producer.ProducerType = "chef_server" |
-     .Verb = "create" |
      .Actor.ObjectType = "User" |
      .Actor.DisplayName = "krasnow" |
      .Object.ObjectType = "environment" |
@@ -98,8 +97,16 @@ function generate_random_event_example() {
   uuid=$(uuidgen)
   local rfc_time
   rfc_time=$(date +%FT%TZ -d "$((RANDOM % 144)) hour ago")
+  local verbs=(create delete update)
+  local verb=${verbs[$((RANDOM % 3))]}
 
-  generate_event_example | jq --arg uuid "$uuid" --arg rfc_time "$rfc_time" '.EventID = $uuid | .Published = $rfc_time'
+  generate_event_example | jq \
+  --arg uuid "$uuid" \
+  --arg rfc_time "$rfc_time" \
+  --arg verb "$verb" \
+  '.EventID = $uuid | 
+  .Verb = $verb | 
+  .Published = $rfc_time'
 }
 
 document "event_feed_summary" <<DOC
