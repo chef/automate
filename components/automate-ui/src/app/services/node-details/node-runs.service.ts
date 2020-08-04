@@ -59,7 +59,7 @@ export class NodeRunsService {
       });
   }
 
-  getNodeRunsByID(nodeId: string) {
+  getNodeRunsByID(nodeId: string): Promise<AbridgedNodeRun[]> {
     const url = `${CONFIG_MGMT_URL}/nodes/${nodeId}/runs`;
 
     return this.httpClient

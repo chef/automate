@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router, Resolve, RouterStateSnapshot,
          ActivatedRouteSnapshot } from '@angular/router';
 
-import { NodeRun } from '../../types/types';
+import { NodeRun } from 'app/types/types';
 import { NodeRunsService } from './node-runs.service';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class NodeNoRunIdResolverService implements Resolve<NodeRun> {
       then(nodeRuns => {
         // if the node runs is found we select the latest run-id.
         // Go to node runs detail page
-        if (nodeRuns && Object.keys(nodeRuns[0]).length !== 0) {
+        if (nodeRuns && nodeRuns.length) {
           this.router.navigate(
             ['/infrastructure/client-runs/' + nodeId + '/runs/' + nodeRuns[0].runId]
           );

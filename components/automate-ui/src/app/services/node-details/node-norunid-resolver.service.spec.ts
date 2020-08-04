@@ -1,12 +1,12 @@
+import { Router, ActivatedRouteSnapshot } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 
+import { NodeRun } from 'app/types/types';
 import { NodeNoRunIdResolverService } from './node-norunid-resolver.service';
 import { NodeRunsService } from './node-runs.service';
-import { Router } from '@angular/router';
-import { NodeRun } from '../../types/types';
 
 class MockRouter {
-  constructor() {}
+  constructor() { }
   navigate(_route: Array<string>) {
   }
 }
@@ -14,7 +14,7 @@ class MockRouter {
 class MockNodeRunsService {
   response: Promise<NodeRun> = Promise.resolve<NodeRun>(null);
 
-  constructor() {}
+  constructor() { }
 
   public getNodeRunsByID(_nodeId: string) {
     return this.response;
@@ -27,17 +27,16 @@ class MockNodeRunsService {
 
 class MockRoute {
   paramMap = {
-    get() {}
+    get() { }
   };
 }
 
 describe('NodeDetailsResolverService', () => {
-  let route;
+  let route: ActivatedRouteSnapshot;
   let service: NodeNoRunIdResolverService;
   const router = new MockRouter();
-  let nodeRunsService: MockNodeRunsService;
 
-  nodeRunsService = new MockNodeRunsService();
+  const nodeRunsService = new MockNodeRunsService();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,57 +47,42 @@ describe('NodeDetailsResolverService', () => {
     });
 
     service = TestBed.inject(NodeNoRunIdResolverService);
-    route = new MockRoute();
+    route = new MockRoute() as unknown as ActivatedRouteSnapshot;
   });
 
-  describe('null nodeRun is returned', () => {
-    beforeEach(() => {
-      nodeRunsService.setResponse(Promise.resolve<NodeRun>(null));
+  it('redirects to missing runs page when null nodeRun is returned', (done) => {
+
+    nodeRunsService.setResponse(Promise.resolve<NodeRun>(null));
+    spyOn(route.paramMap, 'get').and.callFake(() => 'fake-node-id');
+    spyOn(router, 'navigate');
+
+    service.resolve(route, null).then((_nodeRun: NodeRun) => {
+      expect(router.navigate)
+        .toHaveBeenCalledWith(['/infrastructure/client-runs/fake-node-id/missing-runs']);
+      done();
     });
 
-    it('should redirect to missing runs page', (done) => {
-
-      spyOn(route.paramMap, 'get').and.callFake(() => 'fake-node-id');
-      spyOn(router, 'navigate');
-
-      service.resolve(route, null).then((_nodeRun: NodeRun) => {
-        expect(router.navigate)
-          .toHaveBeenCalledWith(['/infrastructure/client-runs/fake-node-id/missing-runs']);
-        done();
-      });
-
-    });
   });
 
-  describe('non404 error in requesting nodeRun', () => {
-    beforeEach(() => {
-      nodeRunsService.setResponse(Promise.reject<NodeRun>('no real reason'));
-    });
+  it('redirects to client runs page when non-404 error is returned', (done) => {
+    nodeRunsService.setResponse(Promise.reject<NodeRun>('no real reason'));
+    spyOn(router, 'navigate');
 
-    it('should redirect to client runs page', (done) => {
-      spyOn(router, 'navigate');
-
-      service.resolve(route, null).then((_nodeRun: NodeRun) => {
-        expect(router.navigate).toHaveBeenCalledWith(['/infrastructure/client-runs']);
-        done();
-      });
+    service.resolve(route, null).then((_nodeRun: NodeRun) => {
+      expect(router.navigate).toHaveBeenCalledWith(['/infrastructure/client-runs']);
+      done();
     });
   });
 
-  describe('404 error in requesting nodeRun', () => {
-    beforeEach(() => {
-      nodeRunsService.setResponse(Promise.reject<NodeRun>('run not found 404'));
-    });
+  it('redirects to missing runs page when 404 error is returned', (done) => {
+    nodeRunsService.setResponse(Promise.reject<NodeRun>('run not found 404'));
+    spyOn(router, 'navigate');
+    spyOn(route.paramMap, 'get').and.callFake(() => 'fake-node-id');
 
-    it('should redirect to missing runs page', (done) => {
-      spyOn(router, 'navigate');
-      spyOn(route.paramMap, 'get').and.callFake(() => 'fake-node-id');
-
-      service.resolve(route, null).then((_nodeRun: NodeRun) => {
-        expect(router.navigate)
-          .toHaveBeenCalledWith(['/infrastructure/client-runs/fake-node-id/missing-runs']);
-        done();
-      });
+    service.resolve(route, null).then((_nodeRun: NodeRun) => {
+      expect(router.navigate)
+        .toHaveBeenCalledWith(['/infrastructure/client-runs/fake-node-id/missing-runs']);
+      done();
     });
   });
 });
