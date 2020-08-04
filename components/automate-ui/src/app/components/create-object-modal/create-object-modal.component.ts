@@ -37,7 +37,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   public modifyID = false; // Whether the edit ID form is open or not.
   public conflictError = false;
   public addPolicies = true;
-  public addTeams = true;
   public projectsUpdatedEvent = new EventEmitter();
   public policiesUpdatedEvent = new EventEmitter();
   public UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
@@ -96,7 +95,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
       if (this.createProjectModal) {
          // default to checked upon opening
         this.updatePolicyCheckbox(true);
-        this.updateTeamCheckbox(true);
       }
     }
   }
@@ -112,11 +110,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   updatePolicyCheckbox(event: boolean): void {
     this.addPolicies = event;
     this.createForm.controls.addPolicies.setValue(this.addPolicies);
-  }
-
-  updateTeamCheckbox(event: boolean): void {
-    this.addTeams = event;
-    this.createForm.controls.addTeams.setValue(this.addTeams);
   }
 
   handleNameInput(event: KeyboardEvent): void {
