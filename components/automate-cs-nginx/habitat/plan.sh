@@ -7,7 +7,7 @@ vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="13.0.47"
+pkg_version="13.2.7"
 pkg_deps=(
   core/coreutils
   chef/mlsa
@@ -21,17 +21,12 @@ pkg_deps=(
   # hand-built and any update to any of these three packages will
   # require them to be re-built.
   #
-  # We cannot follow the latest chef-server-* packages until the
-  # following issue is resolved:
-  #
-  # https://github.com/chef/automate/pull/2002#issuecomment-600343881
-  #
   core/bundler/1.17.3/20200404130802
   core/curl/7.68.0/20200319191535
   core/ruby/2.5.7/20200404130135
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/chef-server-nginx/13.0.47/20200421235836"
-  "${vendor_origin}/chef-server-ctl/13.0.47/20200421235903"
+  "${vendor_origin}/chef-server-nginx/13.2.7/20200429211316"
+  "${vendor_origin}/chef-server-ctl/13.2.7/20200429210734"
 )
 
 pkg_bin_dirs=(bin)
