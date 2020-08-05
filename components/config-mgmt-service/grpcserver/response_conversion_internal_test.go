@@ -5,6 +5,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
 	ingestBackend "github.com/chef/automate/components/ingest-service/backend"
+	"github.com/chef/automate/lib/pcmp/passert"
 	stpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 )
@@ -73,5 +74,5 @@ func TestComplexChefErrorToResponseError(t *testing.T) {
 	gotResponse, err := toResponseError(complexChefError)
 	assert.Nil(t, err)
 	assert.ObjectsAreEqual(expectedResponse, gotResponse)
-	assert.Equal(t, expectedResponse, gotResponse)
+	passert.Equal(t, expectedResponse, gotResponse)
 }

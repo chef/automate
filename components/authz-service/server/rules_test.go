@@ -330,7 +330,7 @@ func TestUpdateRule(t *testing.T) {
 				},
 			})
 			assert.NoError(t, err)
-			assert.Equal(t, &api.UpdateRuleResp{
+			passert.Equal(t, &api.UpdateRuleResp{
 				Rule: &api.ProjectRule{
 					Id:        id,
 					Name:      "updated name",
@@ -375,7 +375,7 @@ func TestUpdateRule(t *testing.T) {
 				},
 			})
 			assert.NoError(t, err)
-			assert.Equal(t, &api.UpdateRuleResp{
+			passert.Equal(t, &api.UpdateRuleResp{
 				Rule: &api.ProjectRule{
 					Id:        id,
 					Name:      "updated name",
@@ -420,7 +420,7 @@ func TestUpdateRule(t *testing.T) {
 				},
 			})
 			assert.NoError(t, err)
-			assert.Equal(t, &api.UpdateRuleResp{
+			passert.Equal(t, &api.UpdateRuleResp{
 				Rule: &api.ProjectRule{
 					Id:        id,
 					Name:      "updated name",
@@ -571,7 +571,7 @@ func TestListRules(t *testing.T) {
 		{"if no rules exist, returns empty list", func(t *testing.T) {
 			resp, err := cl.ListRules(ctx, &api.ListRulesReq{})
 			require.NoError(t, err)
-			assert.Equal(t, &api.ListRulesResp{}, resp)
+			passert.Equal(t, &api.ListRulesResp{}, resp)
 		}},
 		{"if multiple rules exist, returns all rules", func(t *testing.T) {
 			id1, id2 := "rule-number-1", "rule-number-2"

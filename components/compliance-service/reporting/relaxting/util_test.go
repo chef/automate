@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/lib/pcmp/passert"
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
@@ -95,7 +96,7 @@ func TestStringTagsFromProtoFields(t *testing.T) {
 	err = (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(jsonTags), &controlTags)
 	if err == nil {
 		for tKey, tValue := range controlTags.Fields {
-			assert.Equal(t, &ESInSpecReportControlStringTags{"tag3", []string{}}, StringTagsFromProtoFields(tKey, tValue))
+			passert.Equal(t, &ESInSpecReportControlStringTags{"tag3", []string{}}, StringTagsFromProtoFields(tKey, tValue))
 		}
 	}
 
@@ -103,7 +104,7 @@ func TestStringTagsFromProtoFields(t *testing.T) {
 	err = (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(jsonTags), &controlTags)
 	if err == nil {
 		for tKey, tValue := range controlTags.Fields {
-			assert.Equal(t, &ESInSpecReportControlStringTags{"tag4", []string{"value4"}}, StringTagsFromProtoFields(tKey, tValue))
+			passert.Equal(t, &ESInSpecReportControlStringTags{"tag4", []string{"value4"}}, StringTagsFromProtoFields(tKey, tValue))
 		}
 	}
 
@@ -111,7 +112,7 @@ func TestStringTagsFromProtoFields(t *testing.T) {
 	err = (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(jsonTags), &controlTags)
 	if err == nil {
 		for tKey, tValue := range controlTags.Fields {
-			assert.Equal(t, &ESInSpecReportControlStringTags{"tag5", []string{"a", "b"}}, StringTagsFromProtoFields(tKey, tValue))
+			passert.Equal(t, &ESInSpecReportControlStringTags{"tag5", []string{"a", "b"}}, StringTagsFromProtoFields(tKey, tValue))
 		}
 	}
 }
