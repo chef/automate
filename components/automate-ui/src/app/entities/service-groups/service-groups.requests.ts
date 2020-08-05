@@ -11,7 +11,8 @@ import {
   ServiceGroupsHealthSummary,
   GroupServicesPayload,
   GroupServicesFilters,
-  ServicesStats
+  ServicesStats,
+  GroupService
 } from './service-groups.model';
 import { Chicklet } from 'app/types/types';
 import { environment } from 'environments/environment';
@@ -145,5 +146,12 @@ export class ServiceGroupsRequests {
       const filterParam = `${encodeURIComponent(filter.type)}:${encodeURIComponent(filter.text)}`;
       return params.append('filter', filterParam);
     }, searchParam, filters);
+  }
+
+  public deleteServicesById(listOfIds: number[]): any {
+    const url = `${APPLICATIONS_URL}/delete_services_by_id`;
+
+    const params = { ids: listOfIds };
+    return this.httpClient.post<GroupService[]>(url, params);
   }
 }
