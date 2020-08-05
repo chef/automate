@@ -112,13 +112,13 @@ export class TestNotificationFailure implements Action {
 export class DeleteNotificationRule implements Action {
   readonly type = NotificationRuleActionTypes.DELETE;
 
-  constructor(public payload: { rule: NotificationRule }) { }
+  constructor(public payload: { id: string, name: string }) { }
 }
 
 export class DeleteNotificationRuleSuccess implements Action {
   readonly type = NotificationRuleActionTypes.DELETE_SUCCESS;
 
-  constructor(public payload: { rule: NotificationRule }) { }
+  constructor(public payload: { id: string, name: string }) { }
 }
 
 export class DeleteNotificationRuleFailure implements Action {

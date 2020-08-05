@@ -98,9 +98,9 @@ export class NotificationRuleRequests {
   }
 
 
-  public deleteNotificationRule(rule: NotificationRule): Observable<RuleResponse> {
+  public deleteNotificationRule(id: string): Observable<RuleResponse> {
     return this.http.delete<RuleResponse>(encodeURI(
-      this.joinToNotifierUrl(['rules', rule.id])));
+      this.joinToNotifierUrl(['rules', id.toString()])));
   }
 
   private createSecret(rule: NotificationRule, targetUsername: string,

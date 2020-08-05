@@ -24,7 +24,7 @@ const DELETE_STATUS  = 'deleteStatus';
 
 export const notificationRuleEntityAdapter:
   EntityAdapter<NotificationRule> = createEntityAdapter<NotificationRule>({
-  selectId: (rule: NotificationRule) => rule.name
+  selectId: (rule: NotificationRule) => rule.id
 });
 
 export const NotificationRuleEntityInitialState: NotificationRuleEntityState =
@@ -139,7 +139,7 @@ export function notificationRuleEntityReducer(
       return set(
         DELETE_STATUS,
         EntityStatus.loadingSuccess,
-        notificationRuleEntityAdapter.removeOne(action.payload.rule.name, state)
+        notificationRuleEntityAdapter.removeOne(action.payload.id, state)
       ) as NotificationRuleEntityState;
 
     case NotificationRuleActionTypes.DELETE_FAILURE:

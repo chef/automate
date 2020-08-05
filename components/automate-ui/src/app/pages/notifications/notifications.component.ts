@@ -80,7 +80,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     private notificationRuleRequests: NotificationRuleRequests,
     private telemetryService: TelemetryService
   ) {
-     this.rules$ = store.pipe(select(allRules));
+    this.rules$ = store.pipe(select(allRules));
     this.createNotificationForm = this.fb.group({
       // Must stay in sync with error checks in create-notification-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -95,7 +95,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
     this.targetKeys = this.notificationObj.getTargetTypeKeys();
     this.alertTypeKeys = this.notificationObj.getAlertTypeKeys();
-   }
+  }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
@@ -213,7 +213,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   public deleteNotification(): void {
     this.closeDeleteModal();
-    this.store.dispatch(new DeleteNotificationRule({ rule: this.notificationToDelete}));
+    this.store.dispatch(new DeleteNotificationRule(this.notificationToDelete));
   }
 
   public closeDeleteModal(): void {

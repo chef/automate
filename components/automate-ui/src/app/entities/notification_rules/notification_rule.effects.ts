@@ -87,19 +87,19 @@ export class NotificationRuleEffects {
   @Effect()
   deleteNotificationRule$ = this.actions$.pipe(
       ofType(NotificationRuleActionTypes.DELETE),
-      mergeMap(({ payload: { rule } }: DeleteNotificationRule) =>
-        this.requests.deleteNotificationRule(rule).pipe(
-          map(() => new DeleteNotificationRuleSuccess({rule})),
+      mergeMap(({ payload: { id, name } }: DeleteNotificationRule) =>
+        this.requests.deleteNotificationRule(id).pipe(
+          map(() => new DeleteNotificationRuleSuccess({id, name})),
           catchError((error: HttpErrorResponse) =>
             observableOf(new DeleteNotificationRuleFailure(error))))));
 
   @Effect()
   deleteNotificationRuleSuccess$ = this.actions$.pipe(
       ofType(NotificationRuleActionTypes.DELETE_SUCCESS),
-      map(({ payload: { rule } }: DeleteNotificationRuleSuccess) => {
+      map(({ payload: { name } }: DeleteNotificationRuleSuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Deleted rule ${rule.name}.`
+          message: `Deleted rule ${name}.`
         });
       }));
 
