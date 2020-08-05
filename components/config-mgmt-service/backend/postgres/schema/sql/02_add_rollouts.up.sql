@@ -18,10 +18,10 @@ CREATE TABLE IF NOT EXISTS rollouts (
   end_time                  TIMESTAMP
 );
 
-CREATE INDEX policy_name_idx        ON rollouts (policy_name);
-CREATE INDEX policy_node_group_idx  ON rollouts (policy_node_group);
-CREATE INDEX policy_revision_id_idx ON rollouts (policy_revision_id);
-CREATE INDEX policy_domain_url_idx  ON rollouts (policy_domain_url);
+CREATE INDEX IF NOT EXISTS policy_name_idx        ON rollouts (policy_name);
+CREATE INDEX IF NOT EXISTS policy_node_group_idx  ON rollouts (policy_node_group);
+CREATE INDEX IF NOT EXISTS policy_revision_id_idx ON rollouts (policy_revision_id);
+CREATE INDEX IF NOT EXISTS policy_domain_url_idx  ON rollouts (policy_domain_url);
 
 
 -- We call the policy name, policy node group, and policy domain URL the

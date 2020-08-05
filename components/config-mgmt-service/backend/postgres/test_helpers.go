@@ -2,6 +2,11 @@ package postgres
 
 import (
 	"github.com/chef/automate/components/config-mgmt-service/config"
+	"github.com/chef/automate/lib/db/migrator"
+	"github.com/chef/automate/lib/logger"
+
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 func DestructiveReMigrateForTest(cfg *config.Postgres) error {
@@ -23,17 +28,13 @@ func DestructiveReMigrateForTest(cfg *config.Postgres) error {
 }
 
 func (db *Postgres) DestructiveReMigrateForTest() error {
-	_, err := db.db.Exec("DROP TABLE IF EXISTS schema_migrations;")
-	if err != nil {
-		return err
-	}
-	_, err = db.db.Exec("DROP TABLE IF EXISTS rollouts;")
-	if err != nil {
-		return err
-	}
-	err = db.Migrate()
-	if err != nil {
-		return err
+	logger := logger.NewLogrusStandardLogger()
+	if err := migrator.DestructiveMigrateForTests(db.URI, db.SchemaPath, logger, true); err != nil {
+		log.WithError(err).WithFields(log.Fields{
+			"uri":         db.URI,
+			"schema_path": db.SchemaPath,
+		}).Error("Failed migrating database")
+		return errors.Wrapf(err, "Unable to create database schema. [path:%s]", db.SchemaPath)
 	}
 	return nil
 }
