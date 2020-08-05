@@ -113,20 +113,22 @@ export class ServiceGroupsEffects {
   @Effect()
   deleteServicesById$ = this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
-    mergeMap((action: DeleteServicesById) =>
-      this.requests.deleteServicesById(action.payload.servicesToDelete)),
-    map((response: GroupServicesPayload) =>
-      new DeleteServicesByIdSuccess({ amount: response.services.length })),
-    catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error))
-  ));
+    mergeMap((action: DeleteServicesById) => {
+      return this.requests.deleteServicesById(action.payload.servicesToDelete).pipe(
+        map((response: GroupServicesPayload) =>
+          new DeleteServicesByIdSuccess({ amount: response.services.length })),
+        catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error)))
+      );
+    }));
 
   @Effect()
   deleteServicesByIdFailure$ = this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_FAILURE),
-    map(() => {
+    map((action: DeleteServicesByIdFailure) => {
+      const msg = `Could not delete service: ${action.payload.error}`;
       return new CreateNotification({
         type: Type.error,
-        message: 'Unable to delete service. Please try again, or contact Chef Support.'
+        message: msg
       });
     })
   );
@@ -134,8 +136,8 @@ export class ServiceGroupsEffects {
   @Effect()
   deleteServicesByIdSuccess$ = this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS),
-    mergeMap((payload: any) => {
-      const amount = payload.payload.amount;
+    mergeMap((action: DeleteServicesByIdSuccess) => {
+      const amount = action.payload.amount;
       const msg = amount === 1 ? '1 service deleted.' : `${amount} services deleted.`;
       return [
         new GetServiceGroups(),
