@@ -145,11 +145,7 @@ func (ms *Status) Start() error {
 	}
 	if exists {
 		ms.update("Starting migration of actions to the event-feed-service")
-		err = ms.migrateAction()
-		if err != nil {
-			ms.updateErr(err.Error(), "Unable run actions to current migration")
-			return err
-		}
+		go ms.migrateAction()
 		return nil
 	}
 
@@ -301,7 +297,7 @@ func (ms *Status) migrateBerlinToCurrent() error {
 // NOTE: If any of these steps fails, we won't be in a healthy state, so we throw
 // an error to the end user to verify what happened with the migration.
 func (ms *Status) migrateNodeStateToCurrent(previousIndex string) error {
-	ms.total = 7
+	ms.total = 6
 
 	ms.update("Initializing new node state index")
 	err := ms.client.InitializeStore(ms.ctx)
@@ -363,13 +359,6 @@ func (ms *Status) migrateNodeStateToCurrent(previousIndex string) error {
 	err = ms.SendAllActionsThroughPipeline()
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to re-insert actions")
-		return err
-	}
-	ms.taskCompleted()
-
-	err = ms.DeleteAllActionsIndexes()
-	if err != nil {
-		ms.updateErr(err.Error(), "Unable to delete action indexes")
 		return err
 	}
 	ms.taskCompleted()
