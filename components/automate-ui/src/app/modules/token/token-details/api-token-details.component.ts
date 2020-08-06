@@ -86,6 +86,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         if (this.saveSuccessful) {
           this.updateForm.markAsPristine();
 
+          // Delay 1.5 seconds so that a success message can be displayed.
           setTimeout(() => {
             this.saveSuccessful = false;
           }, 1500);
