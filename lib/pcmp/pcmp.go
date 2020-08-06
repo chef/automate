@@ -37,6 +37,10 @@ var CompareOptsForProtos = []cmp.Option{cmpopts.IgnoreTypes(
 	cmpopts.EquateEmpty(),
 }
 
+func DeepEqual(x, y interface{}) bool {
+	return cmp.Equal(x, y, CompareOptsForProtos...)
+}
+
 func FormatUnequalValues(expected, actual interface{}) (e string, a string) {
 	if reflect.TypeOf(expected) != reflect.TypeOf(actual) {
 		return fmt.Sprintf("%T(%s)", expected, truncatingFormat(expected)),
