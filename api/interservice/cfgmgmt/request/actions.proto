@@ -15,10 +15,4 @@ message PolicyUpdateAction {
   string chef_server_orgname = 5;
   string chef_server_username = 6;
   string policyfile_content = 7;
-  repeated PolicyCookbookLock cookbooks = 8;
-}
-
-message PolicyCookbookLock {
-  string cookbook_name = 1;
-  string policy_id = 2;
 }

@@ -256,7 +256,7 @@ describe('project update re-tagging', () => {
     // Ingest an action with attributes that match all the projects
     cy.fixture('action/environment_create.json').then((action) => {
       action.organization_name = '75th Rangers';
-      action.service_hostname = 'example.org';
+      action.remote_hostname = 'example.org';
       action.id = actionId;
       action.entity_name = entityName;
       action.recorded_at = Cypress.moment().utc().subtract(1, 'day').format();

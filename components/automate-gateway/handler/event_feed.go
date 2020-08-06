@@ -5,6 +5,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
@@ -17,9 +18,10 @@ type EventFeedServer struct {
 }
 
 // NewEventFeedServer creates a new server instance
-func NewEventFeedServer(feedClient event_feed_api.EventFeedServiceClient) *EventFeedServer {
+func NewEventFeedServer(cfgMgmtClient cmsService.CfgMgmtClient,
+	feedClient event_feed_api.EventFeedServiceClient) *EventFeedServer {
 	return &EventFeedServer{
-		eventFeedAggregate: eventfeed.NewEventFeedAggregate(feedClient),
+		eventFeedAggregate: eventfeed.NewEventFeedAggregate(cfgMgmtClient, feedClient),
 	}
 }
 

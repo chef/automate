@@ -9,7 +9,6 @@ import (
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
-	"github.com/chef/automate/components/ingest-service/pipeline"
 )
 
 var (
@@ -28,29 +27,25 @@ var (
 	a1NodeStateIndexName     = "node-state-2"
 	berlinNodeStateIndexName = "node-state-1"
 	nodeStateAliasName       = "node-state"
-	actionPrefixIndexName    = "actions"
-	actionsIndexName         = actionPrefixIndexName + "-*"
 )
 
 type Status struct {
-	total          int64
-	completed      int64
-	status         string
-	finished       bool
-	ctx            context.Context
-	client         backend.Client
-	actionPipeline pipeline.ChefActionPipeline
+	total     int64
+	completed int64
+	status    string
+	finished  bool
+	ctx       context.Context
+	client    backend.Client
 }
 
-func New(client backend.Client, actionPipeline pipeline.ChefActionPipeline) *Status {
+func New(client backend.Client) *Status {
 	return &Status{
-		total:          0,
-		completed:      0,
-		status:         "There is no migration running",
-		finished:       false,
-		ctx:            context.Background(),
-		client:         client,
-		actionPipeline: actionPipeline,
+		total:     0,
+		completed: 0,
+		status:    "There is no migration running",
+		finished:  false,
+		ctx:       context.Background(),
+		client:    client,
 	}
 }
 
@@ -138,21 +133,6 @@ func (ms *Status) Start() error {
 		return nil
 	}
 
-	exists, err = ms.hasActionData()
-	if err != nil {
-		ms.updateErr(err.Error(), "Unable to detect migration status")
-		return err
-	}
-	if exists {
-		ms.update("Starting migration of actions to the event-feed-service")
-		err = ms.migrateAction()
-		if err != nil {
-			ms.updateErr(err.Error(), "Unable run actions to current migration")
-			return err
-		}
-		return nil
-	}
-
 	return nil
 }
 
@@ -166,7 +146,6 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 		nodeState4Exists, err4     = ms.hasNodeState4Data()
 		nodeState5Exists, err5     = ms.hasNodeState5Data()
 		nodeState6Exists, err6     = ms.hasNodeState6Data()
-		actionsExists, err7        = ms.hasActionData()
 	)
 
 	if err1 != nil {
@@ -187,9 +166,6 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 	if err6 != nil {
 		logFatal(err4.Error(), "Error detecting migration status")
 	}
-	if err7 != nil {
-		logFatal(err4.Error(), "Error detecting migration status")
-	}
 
 	// If the node-state alias doesn't exist and it is an index
 	// instead, we might have corrupted data
@@ -199,7 +175,7 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 		return false, err
 	}
 
-	if a1Exists || BerlinExists || nodeState4Exists || nodeState5Exists || nodeState6Exists || actionsExists {
+	if a1Exists || BerlinExists || nodeState4Exists || nodeState5Exists || nodeState6Exists {
 		return true, nil
 	}
 
@@ -277,10 +253,6 @@ func (ms *Status) hasNodeState6Data() (bool, error) {
 	return ms.client.DoesIndexExists(ms.ctx, a2NodeState6Index)
 }
 
-func (ms *Status) hasActionData() (bool, error) {
-	return ms.client.DoesIndexExists(ms.ctx, actionsIndexName)
-}
-
 func (ms *Status) migrateBerlinToCurrent() error {
 	err := ms.migrateNodeStateToCurrent(berlinNodeStateIndexName)
 	if err != nil {
@@ -301,7 +273,7 @@ func (ms *Status) migrateBerlinToCurrent() error {
 // NOTE: If any of these steps fails, we won't be in a healthy state, so we throw
 // an error to the end user to verify what happened with the migration.
 func (ms *Status) migrateNodeStateToCurrent(previousIndex string) error {
-	ms.total = 7
+	ms.total = 5
 
 	ms.update("Initializing new node state index")
 	err := ms.client.InitializeStore(ms.ctx)
@@ -356,20 +328,6 @@ func (ms *Status) migrateNodeStateToCurrent(previousIndex string) error {
 	err = ms.client.DeleteIndex(ms.ctx, previousIndex)
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to delete previous index")
-		return err
-	}
-	ms.taskCompleted()
-
-	err = ms.SendAllActionsThroughPipeline()
-	if err != nil {
-		ms.updateErr(err.Error(), "Unable to re-insert actions")
-		return err
-	}
-	ms.taskCompleted()
-
-	err = ms.DeleteAllActionsIndexes()
-	if err != nil {
-		ms.updateErr(err.Error(), "Unable to delete action indexes")
 		return err
 	}
 	ms.taskCompleted()

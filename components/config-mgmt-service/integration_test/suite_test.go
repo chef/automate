@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	elastic "gopkg.in/olivere/elastic.v6"
 
 	cElastic "github.com/chef/automate/components/config-mgmt-service/backend/elastic"
@@ -325,6 +326,20 @@ func (s *Suite) IngestNodeAttributes(nodeAttributes []iBackend.NodeAttribute) {
 
 	// Refresh Indices
 	s.RefreshIndices(mappings.NodeAttribute.Index)
+}
+
+// IngestActions ingests a number of chef-server action(s) and at the end, refreshes actions index
+func (s *Suite) IngestActions(actions []iBackend.InternalChefAction) {
+	// Insert action(s)
+	for _, action := range actions {
+		err := s.ingest.InsertAction(context.Background(), action)
+		if err != nil {
+			log.WithFields(log.Fields{"error": err}).Error("Error ingesting action")
+		}
+	}
+
+	// Refresh Indices
+	s.RefreshIndices(mappings.Actions.Index + "-*")
 }
 
 func contextWithProjects(projects []string) context.Context {

@@ -144,14 +144,6 @@ var feedProps = `
 		},
 		"projects": {
 			"type": "keyword"
-		},
-		"parent_name": {
-			"type": "keyword",
-			"ignore_above": 256
-		},
-		"parent_type": {
-			"type": "keyword",
-			"ignore_above": 256
 		}
 	}
 `

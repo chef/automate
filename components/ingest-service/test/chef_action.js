@@ -65,6 +65,25 @@ describe("/events/chef/action", function () {
       });
     });
 
+    describe("actions with user updates are persisted", function () {
+      before(function () { return helpers.ESCleanupDocuments() });
+      it("should return 200 and persist action", function () {
+        this.timeout(4000);
+
+        let ChefAction = helpers.ChefAction.clone();
+
+        return chakram.post(endpoint(), ChefAction.json()).then(function(response) {
+          expect(response).to.have.status(200)
+          return helpers.ActionRefresh().then(function(response) {
+            return chakram.get(actionsUrl()).then(function(response) {
+              expect(response).to.have.status(200);
+              expect(response.body.hits.total).to.equal(1);
+            });
+          });
+        });
+      });
+    });
+
     describe("Delete action by node_id", function () {
       before(function () { return helpers.ESCleanupDocuments() });
 

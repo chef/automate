@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
+
+message EventFilter {
+  repeated string filter = 1;
+  int64 start = 2;
+  int64 end = 3;
+  int32 page_size = 4;
+  int64 after = 5;
+  int64 before = 6;
+  string cursor = 7;
+}
+
+message EventCountsFilter {
+  repeated string filter = 1;
+  int64 start = 2;
+  int64 end = 3;
+}

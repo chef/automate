@@ -2,7 +2,6 @@ package backend
 
 import (
 	"context"
-	"time"
 
 	elastic "gopkg.in/olivere/elastic.v6"
 
@@ -24,6 +23,8 @@ type Client interface {
 	InsertRun(context.Context, Run) error
 	// @param (context, UTC time, data)
 	InsertNodeAttribute(context.Context, NodeAttribute) error
+	// @param (context, backend.InternalChefAction)
+	InsertAction(context.Context, InternalChefAction) error
 	// @param (context, threshold)
 	MarkNodesMissing(context.Context, string) ([]string, error)
 	// @param (context, threshold)
@@ -64,10 +65,14 @@ type Client interface {
 	CreateBulkNodeAttributeUpdateRequest(NodeAttribute) elastic.BulkableRequest
 	// @param (data)
 	CreateBulkRunUpdateRequest(Run) elastic.BulkableRequest
+	// @param (data)
+	CreateBulkActionRequest(InternalChefAction) elastic.BulkableRequest
 	// @param (context, bulkableRequests)
 	SendBulkRequest(context.Context, []elastic.BulkableRequest) error
 	// @param (context, projectRules)
 	UpdateNodeProjectTags(context.Context, map[string]*authz.ProjectRules) (string, error)
+	// @param (context, projectRules)
+	UpdateActionProjectTags(context.Context, map[string]*authz.ProjectRules) (string, error)
 	// @param (context, jobID)
 	JobStatus(context.Context, string) (project_update_lib.JobStatus, error)
 	// @param (context, jobID)
@@ -88,6 +93,4 @@ type Client interface {
 	// @param (context, previousIndex)
 	// @return (taskID, error)
 	ReindexNodeStateToLatest(context.Context, string) (string, error)
-	GetActions(string, int, time.Time, string, bool) ([]InternalChefAction, int64, error)
-	DeleteAllIndexesWithPrefix(string, context.Context) error
 }

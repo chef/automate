@@ -36,6 +36,7 @@ type Opts struct {
 	PGURL                         string
 	PGDatabase                    string
 	AuthzAddress                  string
+	EventAddress                  string
 	LogLevel                      string
 	PurgeConvergeHistoryAfterDays int32
 	PurgeActionsAfterDays         int32
@@ -45,7 +46,6 @@ type Opts struct {
 	ChefIngestServerConfig        ChefIngestServerConfig
 	CerealAddress                 string
 	Jobs                          JobsConfig
-	EventFeedAddress              string
 }
 
 // SetLogLevel sets the log level for the service

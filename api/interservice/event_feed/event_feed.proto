@@ -42,12 +42,6 @@ message FeedEntry {
   string Verb                                     = 9;
   Object Object                                   = 10;
   Target Target                                   = 11;
-  Parent Parent                                   = 12;
-}
-
-message Parent {
-  string ID = 1;
-  string Name = 2;
 }
 
 message Producer {

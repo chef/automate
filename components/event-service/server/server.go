@@ -15,7 +15,6 @@ import (
 
 var (
 	defaultRegistry = event.Registry{
-		config.EventFeedEventName:      []string{config.EventFeedEventName},
 		config.ScanJobCreatedEventName: []string{config.EventFeedEventName},
 		config.ScanJobUpdatedEventName: []string{config.EventFeedEventName},
 		config.ScanJobDeletedEventName: []string{config.EventFeedEventName},
