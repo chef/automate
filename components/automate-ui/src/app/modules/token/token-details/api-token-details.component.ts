@@ -85,6 +85,10 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         this.saveSuccessful = (state === EntityStatus.loadingSuccess);
         if (this.saveSuccessful) {
           this.updateForm.markAsPristine();
+
+          setTimeout(() => {
+            this.saveSuccessful = false;
+          }, 1500);
         }
       });
   }
@@ -95,7 +99,6 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   }
 
   public saveToken(): void {
-    this.saveSuccessful = false;
     this.saveInProgress = true;
     const name: string = this.updateForm.controls.name.value.trim();
     const active = <TokenStatus>this.updateForm.controls.status.value === 'active';
