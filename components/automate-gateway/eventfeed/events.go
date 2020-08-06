@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
+	agReq "github.com/chef/automate/api/external/event_feed/request"
+	agRes "github.com/chef/automate/api/external/event_feed/response"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
-	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
-	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -202,19 +202,21 @@ func groupEvents(events []*agRes.Event) []*agRes.Event {
 		}
 
 		groupedEvents = append(groupedEvents, &agRes.Event{
-			StartId:         event.GetStartId(),
-			EndId:           event.GetEndId(),
-			EventType:       event.GetEventType(),
-			Task:            event.GetTask(),
-			StartTime:       event.GetStartTime(),
-			EndTime:         event.GetEndTime(),
-			EntityName:      event.GetEntityName(),
-			RequestorType:   event.GetRequestorType(),
-			RequestorName:   event.GetRequestorName(),
-			ServiceHostname: event.GetServiceHostname(),
-			ParentName:      event.GetParentName(),
-			ParentType:      event.GetParentType(),
-			EventCount:      1,
+			StartId:          event.GetStartId(),
+			EndId:            event.GetEndId(),
+			EventType:        event.GetEventType(),
+			Task:             event.GetTask(),
+			StartTime:        event.GetStartTime(),
+			EndTime:          event.GetEndTime(),
+			EntityName:       event.GetEntityName(),
+			RequestorType:    event.GetRequestorType(),
+			RequestorName:    event.GetRequestorName(),
+			ServiceHostname:  event.GetServiceHostname(),
+			ParentName:       event.GetParentName(),
+			ParentType:       event.GetParentType(),
+			ChefInfraServer:  event.ChefInfraServer,
+			ChefOrganization: event.ChefOrganization,
+			EventCount:       1,
 		})
 
 		index++
@@ -244,19 +246,21 @@ func collectEventFeed(ctx context.Context,
 	agEvents := make([]*agRes.Event, len(eventCollection.FeedEntries))
 	for index, entry := range eventCollection.FeedEntries {
 		agEvents[index] = &agRes.Event{
-			StartId:         entry.GetID(),
-			EndId:           entry.GetID(),
-			EventType:       entry.GetProducer().GetID(),
-			Task:            entry.GetVerb(),
-			StartTime:       entry.GetSourceEventPublished(),
-			EndTime:         entry.GetSourceEventPublished(),
-			EntityName:      entry.GetObject().GetName(),
-			RequestorType:   entry.GetActor().GetObjectType(),
-			RequestorName:   entry.GetActor().GetName(),
-			ServiceHostname: entry.GetTarget().GetName(),
-			ParentName:      entry.GetParent().GetName(),
-			ParentType:      entry.GetParent().GetID(),
-			EventCount:      1,
+			StartId:          entry.GetID(),
+			EndId:            entry.GetID(),
+			EventType:        entry.GetProducer().GetID(),
+			Task:             entry.GetVerb(),
+			StartTime:        entry.GetSourceEventPublished(),
+			EndTime:          entry.GetSourceEventPublished(),
+			EntityName:       entry.GetObject().GetName(),
+			RequestorType:    entry.GetActor().GetObjectType(),
+			RequestorName:    entry.GetActor().GetName(),
+			ServiceHostname:  entry.GetTarget().GetName(),
+			ParentName:       entry.GetParent().GetName(),
+			ParentType:       entry.GetParent().GetID(),
+			EventCount:       1,
+			ChefInfraServer:  entry.ChefInfraServer,
+			ChefOrganization: entry.ChefOrganization,
 		}
 	}
 

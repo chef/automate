@@ -3,9 +3,9 @@ package eventfeed
 import (
 	"context"
 
+	agReq "github.com/chef/automate/api/external/event_feed/request"
+	agRes "github.com/chef/automate/api/external/event_feed/response"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
-	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
-	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 )
 
 // CollectEventTaskCounts - collect the event task counts from all the components

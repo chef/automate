@@ -1,7 +1,8 @@
 syntax = "proto3";
 
 package chef.automate.api.event_feed.request;
-option go_package = "github.com/chef/automate/components/automate-gateway/api/event_feed/request";
+option go_package = "github.com/chef/automate/api/external/event_feed/request";
+import "external/common/query/parameters.proto";
 
 message EventFilter {
   // Filters to be applied to the request.
@@ -29,4 +30,17 @@ message EventCountsFilter {
   int64 start = 2;
   // Latest events to return.
   int64 end = 3;
+}
+
+message EventExport {
+  // JSON or CSV
+  string output_type      = 1;
+  // Filters to be applied to the request.
+  repeated string filter = 2;
+  // Earliest events to return.
+  int64 start = 3;
+  // Latest events to return.
+  int64 end = 4;
+  // Order the results should be returned in.
+  chef.automate.api.common.query.SortOrder order = 5;
 }
