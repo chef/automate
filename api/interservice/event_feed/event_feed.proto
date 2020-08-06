@@ -4,8 +4,6 @@ package chef.automate.domain.event_feed.api;
 option go_package = "github.com/chef/automate/api/interservice/event_feed";
 
 import "interservice/event/event.proto";
-import "external/event_feed/request/event.proto";
-import "external/common/response.proto";
 import "google/protobuf/timestamp.proto";
 
 service EventFeedService {
@@ -13,7 +11,6 @@ service EventFeedService {
   rpc GetFeedSummary(FeedSummaryRequest) returns (FeedSummaryResponse);
   rpc GetFeedTimeline(FeedTimelineRequest) returns (FeedTimelineResponse);
   rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
-  rpc EventExport(chef.automate.api.event_feed.request.EventExport) returns (stream chef.automate.api.common.ExportData);
 }
 
 message FeedRequest {
@@ -46,10 +43,6 @@ message FeedEntry {
   Object Object                                   = 10;
   Target Target                                   = 11;
   Parent Parent                                   = 12;
-  // Event's Chef Organization
-  string chef_organization                        = 13;
-  // Event's Chef Infra Server
-  string chef_infra_server                        = 14;
 }
 
 message Parent {

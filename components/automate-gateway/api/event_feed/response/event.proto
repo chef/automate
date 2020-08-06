@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package chef.automate.api.event_feed.response;
-option go_package = "github.com/chef/automate/api/external/event_feed/response";
+option go_package = "github.com/chef/automate/components/automate-gateway/api/event_feed/response";
 
 import "google/protobuf/timestamp.proto";
 
@@ -38,10 +38,6 @@ message Event {
   google.protobuf.Timestamp end_time = 18; 
   // Used for grouping events together; equal to start_id if not grouped
   string end_id = 19;
-  // Event's Chef Organization
-  string chef_organization = 20;
-  // Event's Chef Infra Server
-  string chef_infra_server = 21;
 }
 
 message EventCounts {

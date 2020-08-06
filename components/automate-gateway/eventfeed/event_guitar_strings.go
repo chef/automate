@@ -8,9 +8,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	agReq "github.com/chef/automate/api/external/event_feed/request"
-	agRes "github.com/chef/automate/api/external/event_feed/response"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
+	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
+	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 )
 
 // CollectEventGuitarStrings - collect the guitar strings from all the componets
