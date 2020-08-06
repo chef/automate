@@ -65,6 +65,7 @@ export class GuitarStringDataContainer {
         reduce((acc: GuitarStringItemAccum, item: GuitarStringItem) => {
 
           const mergedItem = this.mergeItems(item, acc.currentItem);
+
           if (acc.count === this.hourlyBucketSize) {
             acc.items.push(mergedItem);
             acc.count = 1;
@@ -84,8 +85,6 @@ export class GuitarStringDataContainer {
       return new GuitarString(guitarString.eventAction, guitarStringItemAccum.items);
     });
 
-    console.log('hourly');
-    console.log(hourly);
     return hourly;
   }
 

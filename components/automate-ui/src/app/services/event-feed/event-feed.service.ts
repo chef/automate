@@ -302,6 +302,7 @@ export class EventFeedService {
 
     const guitarStringItemCollection =
       respEventCollection.map((eventCollection: RespEventCollection, index: number) => {
+
       const start = initialStart.clone().add(
         hoursBetweenItems * index, 'hours').startOf('hour');
       const end = initialStart.clone().add(
