@@ -148,7 +148,7 @@ func TestCreateRule(t *testing.T) {
 				},
 			})
 			assert.NoError(t, err)
-			assert.Equal(t, &api.CreateRuleResp{
+			passert.Equal(t, &api.CreateRuleResp{
 				Rule: &api.ProjectRule{
 					Id:        "any-name",
 					Name:      "any name",
