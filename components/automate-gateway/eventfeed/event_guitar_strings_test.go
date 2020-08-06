@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	agReq "github.com/chef/automate/api/external/event_feed/request"
-	agRes "github.com/chef/automate/api/external/event_feed/response"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
+	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
+	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"

@@ -5,10 +5,9 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	service "github.com/chef/automate/api/external/event_feed"
-	agReq "github.com/chef/automate/api/external/event_feed/request"
-	agRes "github.com/chef/automate/api/external/event_feed/response"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
+	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
+	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	"github.com/chef/automate/components/automate-gateway/eventfeed"
 )
 
@@ -66,10 +65,4 @@ func (s *EventFeedServer) GetEventStringBuckets(ctx context.Context,
 	}).Debug("rpc call")
 
 	return s.eventFeedAggregate.CollectEventGuitarStrings(ctx, request)
-}
-
-// EventExport - downloading events as JSON or CSV
-func (s *EventFeedServer) EventExport(*agReq.EventExport, service.EventFeed_EventExportServer) error {
-	// Please see components/automate-gateway/services.go eventFeedExportHandler for implementation
-	return nil
 }

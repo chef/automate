@@ -363,7 +363,6 @@ paths = [
   "api/external/compliance/*",
   "api/external/data_feed/*",
   "api/external/data_lifecycle/*",
-  "api/external/event_feed/*",
   "api/external/infra_proxy/*",
   "api/external/ingest/*",
   "api/external/nodes/*",
@@ -1169,8 +1168,6 @@ paths = [
 plan_path = "components/event-service"
 paths = [
   "components/event-service/*",
-  "api/external/common/*",
-  "api/external/event_feed/*",
   "api/external/ingest/*",
   "api/interservice/compliance/*",
   "api/interservice/event/*",
@@ -1470,7 +1467,6 @@ paths = [
   "api/config/shared/*",
   "api/external/cfgmgmt/*",
   "api/external/common/*",
-  "api/external/event_feed/*",
   "api/external/ingest/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
@@ -2031,7 +2027,6 @@ plan_path = "components/event-feed-service"
 paths = [
   "components/event-feed-service/*",
   "api/external/common/*",
-  "api/external/event_feed/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
   "api/interservice/data_lifecycle/*",
@@ -2055,7 +2050,6 @@ paths = [
   "vendor/github.com/codahale/hdrhistogram/*",
   "vendor/github.com/envoyproxy/protoc-gen-validate/*",
   "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/gocarina/gocsv/*",
   "vendor/github.com/gofrs/uuid/*",
   "vendor/github.com/golang/mock/*",
   "vendor/github.com/golang/protobuf/*",
