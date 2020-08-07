@@ -127,7 +127,7 @@ sudo chef-automate backup fix-repo-permissions <path>
 
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
 
-Learn how to [back up to AWS S3]({{< ref "backup/#backup-to-aws-s3" >}}).
+See how to [back up to AWS S3]({{< ref "backup/#backup-to-aws-s3" >}}).
 
 To restore from an AWS S3 bucket backup on a new host, run:
 
@@ -157,7 +157,7 @@ Success: Restored backup 20180517223558
 
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
 
-Learn how to [back up to GCS]({{< ref "backup/#backup-to-gcs" >}}).
+See how to [back up to GCS]({{< ref "backup/#backup-to-gcs" >}}).
 
 To restore from a Google Cloud Storage (GCS) bucket backup on a new host, run:
 

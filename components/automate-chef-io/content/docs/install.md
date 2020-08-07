@@ -194,7 +194,7 @@ To configure AWS S3 backups of Chef Automate data stored in an externally-deploy
 1. Install the [`repository-s3` plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3.html) on all nodes in your Elasticsearch cluster.
 1. If you wish to use IAM authentication to provide your Elasticsearch nodes access to the S3 bucket, you must apply the appropriate IAM policy to each host system in the cluster.
 1. Configure each Elasticsearch node with a S3 client configuration containing the proper S3 endpoint, credentials, and other settings as [described in the Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html).
-1. Enable S3 backups by adding the following settings to your config.toml:
+1. Enable S3 backups by adding the following settings to your `config.toml`:
 
     ```toml
     [global.v1.external.elasticsearch.backup]
@@ -243,9 +243,9 @@ To configure AWS S3 backups of Chef Automate data stored in an externally-deploy
 To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data stored in an externally-deployed Elasticsearch cluster:
 
 1. Install the [`repository-gcs` plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-gcs.html) on all nodes in your Elasticsearch cluster.
-1. Follow the steps [outlined on Elasticsearch's website](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-gcs-usage.html) to create a storage bucket and configure a service account to access it.
-1. Configure each Elasticsearch node with a GCS client configuration containing the proper GCS settings as [described in the Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-gcs-client.html).
-1. Enable GCS backups by adding the following settings to your config.toml:
+1. Create a storage bucket and configure a service account to access it per the steps [described in the Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-gcs-usage.html).
+1. Configure each Elasticsearch node with a GCS client configuration that contains the proper GCS settings as [described in the Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-gcs-client.html).
+1. Enable GCS backups by adding the following settings to your `config.toml`:
 
     ```toml
     [global.v1.external.elasticsearch]
@@ -254,7 +254,7 @@ To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data sto
       ## If multiple
       # nodes = ["https://my-es.node-1", "https://my-es.node-2", "etc..."]
 
-    ## The following settings are required if you have ES setup with basic auth
+    ## The following settings are required if you have Elasticsearch setup with basic auth
     #[global.v1.external.elasticsearch.auth]
     #  scheme = "basic_auth"
     #

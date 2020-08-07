@@ -95,7 +95,7 @@ To store backups in an existing AWS S3 bucket, use the supported S3-related sett
   -----END CERTIFICATE-----
 ```
 
-Learn how to [restore from AWS S3]({{< ref "restore/#restore-from-an-aws-s3-backup" >}}).
+See how to [restore from AWS S3]({{< ref "restore/#restore-from-an-aws-s3-backup" >}}).
 
 ### AWS S3 Permissions
 
@@ -168,7 +168,7 @@ json = '''
 '''
 ```
 
-Learn how to [restore from GCS]({{< ref "restore/#restore-from-a-google-cloud-storage-backup" >}}).
+See how to [restore from GCS]({{< ref "restore/#restore-from-a-google-cloud-storage-backup" >}}).
 
 ## Backup Commands
 
