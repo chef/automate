@@ -403,7 +403,11 @@ func requiredPortsForConfig(skipShared bool, config *dc.AutomateConfig) ([]int, 
 	portsToCheck = append(portsToCheck, 9631, 9638)
 	acValue := reflect.ValueOf(*config)
 	for i := 0; i < acValue.NumField(); i++ {
-		if v, ok := acValue.Field(i).Interface().(a2conf.A2ServiceConfig); ok {
+		f := acValue.Field(i)
+		if !f.CanInterface() {
+			continue
+		}
+		if v, ok := f.Interface().(a2conf.A2ServiceConfig); ok {
 			if hasServiceByName(servicesToCheck, v.ServiceName()) {
 				ports := v.ListPorts()
 				for _, p := range ports {
