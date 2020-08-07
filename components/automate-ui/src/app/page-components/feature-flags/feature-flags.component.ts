@@ -39,6 +39,7 @@ export class FeatureFlagsComponent implements OnInit {
 
   public warning: string;
   public flagType: FlagTypes;
+  private blockedElements = ['input', 'textarea', 'button', 'select'];
 
   betaWarning = 'The warranties and indemnities in your license agreement do not apply ' +
                 'to experimental features. Experimental features are provided "as is" ' +
@@ -55,7 +56,7 @@ export class FeatureFlagsComponent implements OnInit {
 
   constructor(
     public featureFlagsService: FeatureFlagsService,
-    private telemetryService: TelemetryService
+    private telemetryService: TelemetryService,
   ) {}
 
   ngOnInit() {
@@ -76,6 +77,12 @@ export class FeatureFlagsComponent implements OnInit {
 
   @HostListener('document: keyup', ['$event.keyCode'])
   handleKeyUp(keyCode: number): void {
+    // Guard against launching when focused on input elements
+    if ( document.activeElement
+      && this.blockedElements.indexOf(document.activeElement.tagName.toLowerCase()) !== -1 ) {
+        return;
+      }
+
     // when reaching codeLength, drop first item
     if (this.keysCache.push(keyCode) === codeLength + 1) {
       this.keysCache.shift();
