@@ -39,6 +39,7 @@ type DataFeedAggregateTask struct {
 	db                  *dao.DB
 	externalFqdn        string
 	acceptedStatusCodes []int32
+	contentType         string
 }
 
 func NewDataFeedAggregateTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grpc.ClientConn, complianceConn *grpc.ClientConn, secretsConn *grpc.ClientConn, db *dao.DB) *DataFeedAggregateTask {
@@ -49,6 +50,7 @@ func NewDataFeedAggregateTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn
 		db:                  db,
 		externalFqdn:        dataFeedConfig.ServiceConfig.ExternalFqdn,
 		acceptedStatusCodes: dataFeedConfig.ServiceConfig.AcceptedStatusCodes,
+		contentType:         dataFeedConfig.ServiceConfig.ContentType,
 	}
 }
 
@@ -94,7 +96,7 @@ func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (inte
 			log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
 		} else {
 			// build and send notification for this rule
-			notification := datafeedNotification{credentials: credentials, url: destinations[destination].URL, data: buffer}
+			notification := datafeedNotification{credentials: credentials, url: destinations[destination].URL, data: buffer, contentType: d.contentType}
 
 			client := NewDataClient(d.acceptedStatusCodes)
 			err = send(client, notification)
