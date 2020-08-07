@@ -345,7 +345,10 @@ func configMgmtToGatewayEventCollection(collection []*cmsRes.EventCollection, to
 			newCollection[e].EventsCount = make([]*agRes.EventCount, len(eCollection.EventsCount))
 			for c, eCount := range eCollection.EventsCount {
 				// Lets try this without assigning the casting to a variable
-				newCollection[e].EventsCount[c] = (*agRes.EventCount)(eCount)
+				newCollection[e].EventsCount[c] = &agRes.EventCount{
+					Name:  eCount.Name,
+					Count: eCount.Count,
+				}
 			}
 		}
 	}
