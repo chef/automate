@@ -2,14 +2,11 @@ package publisher
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
-
-	"github.com/chef/automate/components/ingest-service/backend"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -51,11 +48,6 @@ func cmpHandleMessage(client cfgmgmt.CfgMgmtClient, msg message.ChefAction, out 
 
 	start := time.Now()
 
-	cookbooks, err := getCookbookLocks(msg.InternalChefAction.Data)
-	if err != nil {
-		log.Warnf("Parse cookbook information err: %v", err)
-	}
-
 	req := &request.PolicyUpdateAction{
 		PolicyName:         msg.InternalChefAction.EntityName,
 		PolicyGroup:        msg.InternalChefAction.ParentName,
@@ -64,13 +56,12 @@ func cmpHandleMessage(client cfgmgmt.CfgMgmtClient, msg message.ChefAction, out 
 		ChefServerOrgname:  msg.InternalChefAction.OrganizationName,
 		ChefServerUsername: msg.InternalChefAction.RequestorName,
 		PolicyfileContent:  msg.InternalChefAction.Data,
-		Cookbooks:          cookbooks,
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err = client.HandlePolicyUpdateAction(ctx, req)
+	_, err := client.HandlePolicyUpdateAction(ctx, req)
 
 	logCtx := log.WithFields(log.Fields{
 		"message_id":  msg.ID,
@@ -85,30 +76,6 @@ func cmpHandleMessage(client cfgmgmt.CfgMgmtClient, msg message.ChefAction, out 
 	}
 	logCtx.Debug("Published actions message to config manangement service")
 	return
-}
-
-func getCookbookLocks(data string) ([]*request.PolicyCookbookLock, error) {
-	var policyData map[string]interface{}
-	err := json.Unmarshal([]byte(data), &policyData)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"object": data,
-		}).WithError(err).Debug("Unable to unmarshal the action data object for a policy action")
-		return []*request.PolicyCookbookLock{}, err
-	}
-	cookbookLocksData := policyData["cookbook_locks"].(map[string]interface{})
-
-	policyCookbookLocks := make([]*request.PolicyCookbookLock, 0, len(cookbookLocksData))
-	for cookbook, cData := range cookbookLocksData {
-		cDataMap := cData.(map[string]interface{})
-		cl := &request.PolicyCookbookLock{
-			CookbookName: cookbook,
-			PolicyId:     backend.EmptyStringIfNil(cDataMap["identifier"]),
-		}
-		policyCookbookLocks = append(policyCookbookLocks, cl)
-	}
-
-	return policyCookbookLocks, nil
 }
 
 func isPolicyUpdateAction(msg message.ChefAction) bool {

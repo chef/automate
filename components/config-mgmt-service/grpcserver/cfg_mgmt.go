@@ -71,9 +71,9 @@ func (s *CfgMgmtServer) GetPolicyCookbooks(ctx context.Context,
 		return &pcProto, status.Errorf(codes.InvalidArgument, "Parameter revision_id not provided")
 	}
 
-	policyCookbooks, err := s.pg.GetPolicyCookbooks(request.GetRevisionId())
+	policyCookbooks, err := s.client.GetPolicyCookbooks(request.GetRevisionId())
 	if err != nil {
-		if sErr, ok := err.(*errors.StandardError); ok && sErr.Type == errors.PolicyCookbooksNotFound {
+		if sErr, ok := err.(*errors.StandardError); ok && sErr.Type == errors.ActionNotFound {
 			return &pcProto, status.Errorf(codes.NotFound, err.Error())
 		}
 

@@ -11,7 +11,6 @@ import (
 )
 
 func TestRenameFromInsightsIndexName(t *testing.T) {
-	actionPrefixIndexName := "actions"
 	cases := []struct {
 		insightsIndexName string
 		newIndexTagName   string
@@ -24,7 +23,7 @@ func TestRenameFromInsightsIndexName(t *testing.T) {
 		},
 		{
 			insightsIndexName: "insights-2018.04.15",
-			newIndexTagName:   actionPrefixIndexName,
+			newIndexTagName:   mappings.Actions.Index,
 			expectedResult:    "actions-2018.04.15",
 		},
 		{
@@ -34,7 +33,7 @@ func TestRenameFromInsightsIndexName(t *testing.T) {
 		},
 		{
 			insightsIndexName: "insights-2018.04.15-1",
-			newIndexTagName:   actionPrefixIndexName,
+			newIndexTagName:   mappings.Actions.Index,
 			expectedResult:    "actions-2018.04.15",
 		},
 		{
@@ -44,7 +43,7 @@ func TestRenameFromInsightsIndexName(t *testing.T) {
 		},
 		{
 			insightsIndexName: "insights-2018.04.15-b",
-			newIndexTagName:   actionPrefixIndexName,
+			newIndexTagName:   mappings.Actions.Index,
 			expectedResult:    "actions-2018.04.15",
 		},
 	}

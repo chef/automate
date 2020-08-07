@@ -67,7 +67,7 @@ func TestDefaultSpecs(t *testing.T) {
 		spec := testSpecFor(t, "ingest-service")
 		testRequireMetadata(t, spec)
 		testRequirePath(t, spec, "/hab/svc/ingest-service/data")
-		testRequireEs(t, spec, "ingest-service", "node-state-7,node-attribute,converge-history-*")
+		testRequireEs(t, spec, "ingest-service", "node-state-7,node-attribute,converge-history-*,actions-*")
 	})
 	t.Run("license-control-service", func(t *testing.T) {
 		spec := testSpecFor(t, "license-control-service")

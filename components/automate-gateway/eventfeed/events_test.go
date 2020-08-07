@@ -4,9 +4,13 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strconv"
 	"testing"
 	"time"
 
+	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
+	cmsRes "github.com/chef/automate/api/interservice/cfgmgmt/response"
+	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
@@ -20,6 +24,14 @@ import (
 func TestEventFeedEmpty(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient.EXPECT().GetEventFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *cmsReq.EventFilter) (*cmsRes.Events, error) {
+		return &cmsRes.Events{}, nil
+	})
+
 	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
@@ -28,7 +40,7 @@ func TestEventFeedEmpty(t *testing.T) {
 		return &event_feed_api.FeedResponse{}, nil
 	})
 
-	eventFeedAggregate := subject.NewEventFeedAggregate(mockFeedServiceClient)
+	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
 
 	eventCounts, err := eventFeedAggregate.CollectEventFeed(
 		context.Background(),
@@ -46,15 +58,25 @@ func TestEventFeedEmpty(t *testing.T) {
 func TestEventFeedCollectEventFeedCollapseFalse(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient.EXPECT().GetEventFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *cmsReq.EventFilter) (*cmsRes.Events, error) {
+		// Here is where we mock the Config Mgmt Service
+		// Lets return a fixed set of actions
+		return cmsFixedEvents(t), nil
+	})
+
 	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
 	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
-		return fixedEvents(t), nil
+		return complianceEventFixedEvents(t), nil
 	})
 
-	eventFeedAggregate := subject.NewEventFeedAggregate(mockFeedServiceClient)
+	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
 	events, err := eventFeedAggregate.CollectEventFeed(context.Background(),
 		&agReq.EventFilter{
 			Collapse: false,
@@ -64,7 +86,7 @@ func TestEventFeedCollectEventFeedCollapseFalse(t *testing.T) {
 
 	assert.Nil(t, err)
 	// We should return all 202 events, we are NOT collapsing
-	assert.Equal(t, 101, len(events.Events))
+	assert.Equal(t, 202, len(events.Events))
 }
 
 // TestEventFeedCollectEventFeedCollapseTrue Sending collapse=true
@@ -72,21 +94,690 @@ func TestEventFeedCollectEventFeedCollapseNonoverlapping(t *testing.T) {
 	// Enable event grouping
 	request := &agReq.EventFilter{Collapse: true, PageSize: 1000}
 
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient.EXPECT().GetEventFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *cmsReq.EventFilter) (*cmsRes.Events, error) {
+		// Here is where we mock the Config Mgmt Service
+		// Lets return a fixed set of actions
+		return cmsFixedEvents(t), nil
+	})
+
 	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
 	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
-		return fixedEvents(t), nil
+		return complianceEventFixedEvents(t), nil
 	})
 
-	eventFeedAggregate := subject.NewEventFeedAggregate(mockFeedServiceClient)
+	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
 	events, err := eventFeedAggregate.CollectEventFeed(context.Background(), request)
 
 	assert.Nil(t, err)
-	// We should return only 2 events since we ARE collapsing
-	assert.Equal(t, 2, len(events.Events))
-	assert.Equal(t, "2018-01-20T21:20:41Z", ptypes.TimestampString(events.Events[1].EndTime))
+	// We should return only 4 events since we ARE collapsing
+	assert.Equal(t, 4, len(events.Events))
+	assert.Equal(t, "2018-01-30T21:20:41Z", ptypes.TimestampString(events.Events[1].EndTime))
+	assert.Equal(t, "2018-01-20T21:20:41Z", ptypes.TimestampString(events.Events[3].EndTime))
+}
+
+// TestEventFeedCollectEventFeedCollapseOverlapping - test that events from compliance
+// break up grouping of events from config-mgmt. We have two events from config-mgmt at the
+// same time, then two events from compliance a second after. Then two more config-mgmt events a second later
+// A total of 6 events that should be grouped into 3 items.
+func TestEventFeedCollectEventFeedCollapseOverlapping(t *testing.T) {
+	request := &agReq.EventFilter{Collapse: true, PageSize: 1000}
+
+	time1 := time.Now()
+	timestamp1, err := ptypes.TimestampProto(time1)
+	assert.Nil(t, err)
+
+	time2 := time1.Add(time.Second * -1)
+	timestamp2, err := ptypes.TimestampProto(time2)
+	assert.Nil(t, err)
+
+	time3 := time2.Add(time.Second * -1)
+	timestamp3, err := ptypes.TimestampProto(time3)
+	assert.Nil(t, err)
+
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient.EXPECT().GetEventFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *cmsReq.EventFilter) (*cmsRes.Events, error) {
+		fixedEvents := make([]*cmsRes.Event, 0)
+
+		for count := 0; count < 5; count++ {
+			fixedEvents = append(fixedEvents, &cmsRes.Event{
+				EventType:       "cookbook",
+				Task:            "update",
+				Timestamp:       timestamp1,
+				EntityName:      "mocked_event",
+				RequestorType:   "automatic",
+				RequestorName:   "golang",
+				ServiceHostname: "localhost",
+			})
+		}
+
+		for count := 0; count < 5; count++ {
+			fixedEvents = append(fixedEvents, &cmsRes.Event{
+				EventType:       "cookbook",
+				Task:            "update",
+				Timestamp:       timestamp3,
+				EntityName:      "mocked_event",
+				RequestorType:   "automatic",
+				RequestorName:   "golang",
+				ServiceHostname: "localhost",
+			})
+		}
+
+		return &cmsRes.Events{
+			Events:      fixedEvents,
+			TotalEvents: 4,
+		}, nil
+	})
+
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
+	mockFeedServiceClient.EXPECT().GetFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		fixedEvents := make([]*event_feed_api.FeedEntry, 0)
+
+		for count := 0; count < 5; count++ {
+			fixedEvents = append(fixedEvents, &event_feed_api.FeedEntry{
+				EventType:            "scanJobUpdated",
+				Tags:                 []string{"scanjob"},
+				Verb:                 "update",
+				SourceEventPublished: timestamp2,
+				Producer: &event_feed_api.Producer{
+					Name: "mocked_event",
+					ID:   "scanjob",
+				},
+				Actor: &event_feed_api.Actor{
+					Name:       "golang",
+					ObjectType: "automatic",
+				},
+				Target: &event_feed_api.Target{
+					Name: "localhost",
+				},
+			})
+		}
+
+		return &event_feed_api.FeedResponse{
+			FeedEntries:  fixedEvents,
+			TotalEntries: 2,
+		}, nil
+	})
+
+	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
+	events, err := eventFeedAggregate.CollectEventFeed(context.Background(), request)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 3, len(events.Events), "We should return only 3 events since we ARE collapsing")
+
+	assert.Equal(t, "scanjob", events.Events[1].EventType, "The center event should be the scan job event")
+
+	for _, event := range events.Events {
+		assert.Equal(t, int32(5), event.EventCount, "Each collapsed event should have a count of five")
+	}
+}
+
+// Test the sorting of events. When events have the same time the events will be sorted by their IDs in descending order
+func TestEventFeedCollectEventFeedSortedSameDates(t *testing.T) {
+	request := &agReq.EventFilter{PageSize: 1000}
+
+	time1 := time.Now()
+	timestamp1, err := ptypes.TimestampProto(time1)
+	assert.Nil(t, err)
+
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient.EXPECT().GetEventFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *cmsReq.EventFilter) (*cmsRes.Events, error) {
+		fixedEvents := make([]*cmsRes.Event, 0)
+
+		fixedEvents = append(fixedEvents, &cmsRes.Event{
+			Id:              "a",
+			EventType:       "cookbook",
+			Task:            "update",
+			Timestamp:       timestamp1,
+			EntityName:      "mocked_event",
+			RequestorType:   "automatic",
+			RequestorName:   "golang",
+			ServiceHostname: "localhost",
+		})
+
+		fixedEvents = append(fixedEvents, &cmsRes.Event{
+			Id:              "c",
+			EventType:       "node",
+			Task:            "update",
+			Timestamp:       timestamp1,
+			EntityName:      "mocked_event",
+			RequestorType:   "automatic",
+			RequestorName:   "golang",
+			ServiceHostname: "localhost",
+		})
+
+		return &cmsRes.Events{
+			Events:      fixedEvents,
+			TotalEvents: 2,
+		}, nil
+	})
+
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient((gomock.NewController(t)))
+	mockFeedServiceClient.EXPECT().GetFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		fixedEvents := make([]*event_feed_api.FeedEntry, 0)
+
+		fixedEvents = append(fixedEvents, &event_feed_api.FeedEntry{
+			ID:                   "b",
+			EventType:            "scanJobUpdated",
+			Tags:                 []string{"scanjob"},
+			Verb:                 "update",
+			SourceEventPublished: timestamp1,
+			Producer: &event_feed_api.Producer{
+				Name: "mocked_event",
+				ID:   "scanjob",
+			},
+			Actor: &event_feed_api.Actor{
+				Name:       "golang",
+				ObjectType: "automatic",
+			},
+			Target: &event_feed_api.Target{
+				Name: "localhost",
+			},
+		})
+
+		return &event_feed_api.FeedResponse{
+			FeedEntries:  fixedEvents,
+			TotalEntries: 1,
+		}, nil
+	})
+
+	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
+	events, err := eventFeedAggregate.CollectEventFeed(context.Background(), request)
+
+	assert.Nil(t, err)
+
+	// in descending order
+	assert.Equal(t, "c", events.Events[0].StartId)
+	assert.Equal(t, "b", events.Events[1].StartId)
+	assert.Equal(t, "a", events.Events[2].StartId)
+}
+
+// Testing retrieving the last page in a multiple page collection of events.
+// Here the last page is setup to contain the full page size.
+// There are 100 events; 50 from compliance 50 in config-mgmt;
+// page size is 10.
+// compliance and config-mgmt both return 10 events interweaved by date
+// Should return 5 of compliance and 5 config-mgmt events
+func TestEventFeedCollectEventFeedLastFullPage(t *testing.T) {
+	pageSize := int32(10)
+	now := time.Now()
+
+	request := &agReq.EventFilter{
+		Collapse: false,
+		PageSize: pageSize,
+		After:    now.UnixNano() / int64(time.Millisecond),
+		End:      now.UnixNano() / int64(time.Millisecond),
+		Start:    now.AddDate(0, 0, -6).UnixNano() / int64(time.Millisecond),
+	}
+
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient.EXPECT().GetEventFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *cmsReq.EventFilter) (*cmsRes.Events, error) {
+		events := make([]*cmsRes.Event, 0)
+
+		for count := 1; count <= 10; count++ {
+			// subtract 30 seconds to not have the same time as the compliance events
+			current := now.Add((time.Minute * time.Duration(count) * -1) - (time.Second * 30))
+			timestamp, err := ptypes.TimestampProto(current)
+			assert.Nil(t, err)
+			events = append(events, &cmsRes.Event{
+				Id:              strconv.Itoa(count),
+				EventType:       "cookbook",
+				Task:            "update",
+				Timestamp:       timestamp,
+				EntityName:      "mocked_event",
+				RequestorType:   "automatic",
+				RequestorName:   "golang",
+				ServiceHostname: "localhost",
+			})
+		}
+
+		return &cmsRes.Events{
+			Events:      events,
+			TotalEvents: 50,
+		}, nil
+	})
+
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
+	mockFeedServiceClient.EXPECT().GetFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		events := make([]*event_feed_api.FeedEntry, 0)
+
+		for count := 1; count <= 10; count++ {
+			current := now.Add((time.Minute * time.Duration(count) * -1))
+			timestamp, err := ptypes.TimestampProto(current)
+			assert.Nil(t, err)
+			events = append(events, &event_feed_api.FeedEntry{
+				ID:                   strconv.Itoa(count),
+				EventType:            "scanJobUpdated",
+				Tags:                 []string{"scanjob"},
+				Verb:                 "update",
+				SourceEventPublished: timestamp,
+				Producer: &event_feed_api.Producer{
+					Name: "mocked_event",
+					ID:   "scanjob",
+				},
+				Actor: &event_feed_api.Actor{
+					Name:       "golang",
+					ObjectType: "automatic",
+				},
+				Target: &event_feed_api.Target{
+					Name: "localhost",
+				},
+			})
+		}
+
+		return &event_feed_api.FeedResponse{
+			FeedEntries:  events,
+			TotalEntries: 50,
+		}, nil
+	})
+
+	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
+	events, err := eventFeedAggregate.CollectEventFeed(context.Background(), request)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, int(pageSize), len(events.Events), "Number of events should equal the pageSize")
+
+	// Should be the oldest events in descending order
+	assert.Equal(t, "6", events.Events[0].StartId)
+	assert.Equal(t, "scanjob", events.Events[0].EventType)
+
+	assert.Equal(t, "6", events.Events[1].StartId)
+	assert.Equal(t, "cookbook", events.Events[1].EventType)
+
+	assert.Equal(t, "7", events.Events[2].StartId)
+	assert.Equal(t, "scanjob", events.Events[2].EventType)
+
+	assert.Equal(t, "7", events.Events[3].StartId)
+	assert.Equal(t, "cookbook", events.Events[3].EventType)
+
+	assert.Equal(t, "8", events.Events[4].StartId)
+	assert.Equal(t, "scanjob", events.Events[4].EventType)
+
+	assert.Equal(t, "8", events.Events[5].StartId)
+	assert.Equal(t, "cookbook", events.Events[5].EventType)
+
+	assert.Equal(t, "9", events.Events[6].StartId)
+	assert.Equal(t, "scanjob", events.Events[6].EventType)
+
+	assert.Equal(t, "9", events.Events[7].StartId)
+	assert.Equal(t, "cookbook", events.Events[7].EventType)
+
+	assert.Equal(t, "10", events.Events[8].StartId)
+	assert.Equal(t, "scanjob", events.Events[8].EventType)
+
+	assert.Equal(t, "10", events.Events[9].StartId)
+	assert.Equal(t, "cookbook", events.Events[9].EventType)
+}
+
+// Testing retrieving the last page in a multiple page collection of events.
+// Here the last page is setup to contain the full page size.
+// There are 100 events; 50 from compliance 45 in config-mgmt;
+// page size is 10.
+// compliance and config-mgmt both return 10 events interweaved by date
+// 5 of compliance and 5 config-mgmt events
+func TestEventFeedCollectEventFeedLastHalfFullPage(t *testing.T) {
+	pageSize := int32(10)
+
+	now := time.Now()
+
+	request := &agReq.EventFilter{
+		Collapse: false,
+		PageSize: pageSize,
+		After:    now.UnixNano() / int64(time.Millisecond),
+		End:      now.UnixNano() / int64(time.Millisecond),
+		Start:    now.AddDate(0, 0, -6).UnixNano() / int64(time.Millisecond),
+	}
+
+	configMgmtTotalEvents := int64(50)
+	complianceTotalEvents := int64(45)
+	combinedTotalEvents := configMgmtTotalEvents + complianceTotalEvents
+
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient.EXPECT().GetEventFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *cmsReq.EventFilter) (*cmsRes.Events, error) {
+		events := make([]*cmsRes.Event, 0)
+
+		for count := 1; count <= 10; count++ {
+			// subtract 30 seconds to not have the same time as the compliance events
+			current := now.Add((time.Minute * time.Duration(count) * -1) - (time.Second * 30))
+			timestamp, err := ptypes.TimestampProto(current)
+			assert.Nil(t, err)
+			events = append(events, &cmsRes.Event{
+				Id:              strconv.Itoa(count),
+				EventType:       "cookbook",
+				Task:            "update",
+				Timestamp:       timestamp,
+				EntityName:      "mocked_event",
+				RequestorType:   "automatic",
+				RequestorName:   "golang",
+				ServiceHostname: "localhost",
+			})
+		}
+
+		return &cmsRes.Events{
+			Events:      events,
+			TotalEvents: configMgmtTotalEvents,
+		}, nil
+	})
+
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
+	mockFeedServiceClient.EXPECT().GetFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		events := make([]*event_feed_api.FeedEntry, 0)
+
+		for count := 1; count <= 10; count++ {
+			current := now.Add((time.Minute * time.Duration(count) * -1))
+			timestamp, err := ptypes.TimestampProto(current)
+			assert.Nil(t, err)
+			events = append(events, &event_feed_api.FeedEntry{
+				ID:                   strconv.Itoa(count),
+				EventType:            "scanJobUpdated",
+				Tags:                 []string{"scanjob"},
+				Verb:                 "update",
+				SourceEventPublished: timestamp,
+				Producer: &event_feed_api.Producer{
+					Name: "mocked_event",
+					ID:   "scanjob",
+				},
+				Actor: &event_feed_api.Actor{
+					Name:       "golang",
+					ObjectType: "automatic",
+				},
+				Target: &event_feed_api.Target{
+					Name: "localhost",
+				},
+			})
+		}
+
+		return &event_feed_api.FeedResponse{
+			FeedEntries:  events,
+			TotalEntries: complianceTotalEvents,
+		}, nil
+	})
+
+	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
+	events, err := eventFeedAggregate.CollectEventFeed(context.Background(), request)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, int(int32(combinedTotalEvents)%pageSize), len(events.Events),
+		"Number of events should equal the reminder of the page size")
+
+	// Should be the oldest events in descending order
+	assert.Equal(t, "8", events.Events[0].StartId)
+	assert.Equal(t, "cookbook", events.Events[0].EventType)
+
+	assert.Equal(t, "9", events.Events[1].StartId)
+	assert.Equal(t, "scanjob", events.Events[1].EventType)
+
+	assert.Equal(t, "9", events.Events[2].StartId)
+	assert.Equal(t, "cookbook", events.Events[2].EventType)
+
+	assert.Equal(t, "10", events.Events[3].StartId)
+	assert.Equal(t, "scanjob", events.Events[3].EventType)
+
+	assert.Equal(t, "10", events.Events[4].StartId)
+	assert.Equal(t, "cookbook", events.Events[4].EventType)
+}
+
+// Test when a next page request is made on a page break with a mixed collection of
+// events with the same timestamp from both compliance and config-mgmt.
+func TestEventFeedCollectEventFeedSameDatesNextFirstSecondPage(t *testing.T) {
+	pageSize := int32(10)
+
+	now := time.Now()
+
+	beforePageBreakDate := now.AddDate(0, 0, -1)
+	cursorId := "d"
+
+	request := &agReq.EventFilter{
+		Collapse: false,
+		PageSize: pageSize,
+		Before:   beforePageBreakDate.UnixNano() / int64(time.Millisecond),
+		Cursor:   cursorId,
+		End:      now.UnixNano() / int64(time.Millisecond),
+		Start:    now.AddDate(0, 0, -6).UnixNano() / int64(time.Millisecond),
+	}
+
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient.EXPECT().GetEventFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *cmsReq.EventFilter) (*cmsRes.Events, error) {
+		events := make([]*cmsRes.Event, 0)
+
+		timestamp, err := ptypes.TimestampProto(beforePageBreakDate)
+		assert.Nil(t, err)
+		for count := 0; count < 10; count++ {
+			events = append(events, &cmsRes.Event{
+				Id:              "b" + strconv.Itoa(count),
+				EventType:       "cookbook",
+				Task:            "update",
+				Timestamp:       timestamp,
+				EntityName:      "mocked_event",
+				RequestorType:   "automatic",
+				RequestorName:   "golang",
+				ServiceHostname: "localhost",
+			})
+		}
+
+		return &cmsRes.Events{
+			Events:      events,
+			TotalEvents: 50,
+		}, nil
+	})
+
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
+	mockFeedServiceClient.EXPECT().GetFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		events := make([]*event_feed_api.FeedEntry, 0)
+
+		timestamp, err := ptypes.TimestampProto(beforePageBreakDate)
+		assert.Nil(t, err)
+		for count := 0; count < 10; count++ {
+			events = append(events, &event_feed_api.FeedEntry{
+				ID:                   "a" + strconv.Itoa(count),
+				EventType:            "scanJobUpdated",
+				Tags:                 []string{"scanjob"},
+				Verb:                 "update",
+				SourceEventPublished: timestamp,
+				Producer: &event_feed_api.Producer{
+					Name: "mocked_event",
+					ID:   "scanjob",
+				},
+				Actor: &event_feed_api.Actor{
+					Name:       "golang",
+					ObjectType: "automatic",
+				},
+				Target: &event_feed_api.Target{
+					Name: "localhost",
+				},
+			})
+		}
+
+		return &event_feed_api.FeedResponse{
+			FeedEntries:  events,
+			TotalEntries: 50,
+		}, nil
+	})
+
+	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
+	events, err := eventFeedAggregate.CollectEventFeed(context.Background(), request)
+
+	assert.Nil(t, err)
+
+	// Should return only config-mgmt's events because when sorted by ID they are
+	// greater than all the compliance events.
+	assert.Equal(t, "b9", events.Events[0].StartId)
+	assert.Equal(t, "cookbook", events.Events[0].EventType)
+
+	assert.Equal(t, "b8", events.Events[1].StartId)
+	assert.Equal(t, "cookbook", events.Events[1].EventType)
+
+	assert.Equal(t, "b7", events.Events[2].StartId)
+	assert.Equal(t, "cookbook", events.Events[2].EventType)
+
+	assert.Equal(t, "b6", events.Events[3].StartId)
+	assert.Equal(t, "cookbook", events.Events[3].EventType)
+
+	assert.Equal(t, "b5", events.Events[4].StartId)
+	assert.Equal(t, "cookbook", events.Events[4].EventType)
+}
+
+// Test when a previous page request is made on a page break with a mixed collection of
+// events with the same timestamp from both compliance and config-mgmt.
+// The all the events should be sorted like:
+// f9,f8,f7,f6,f5,f4,f3,f2,f1,f0,e9,e8,e7,e6,e5,e4,e3,e2,e1,e0,d in descending order
+// We want the events after 'd' that would be: e9,e8,e7,e6,e5,e4,e3,e2,e1,e0
+func TestEventFeedCollectEventFeedSameDatesPreviousThirdToSecondPage(t *testing.T) {
+	pageSize := int32(10)
+
+	now := time.Now()
+
+	afterPageBreakDate := now.AddDate(0, 0, -3)
+	cursorId := "d"
+
+	request := &agReq.EventFilter{
+		Collapse: false,
+		PageSize: pageSize,
+		After:    afterPageBreakDate.UnixNano() / int64(time.Millisecond),
+		Cursor:   cursorId,
+		End:      now.UnixNano() / int64(time.Millisecond),
+		Start:    now.AddDate(0, 0, -6).UnixNano() / int64(time.Millisecond),
+	}
+
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient.EXPECT().GetEventFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *cmsReq.EventFilter) (*cmsRes.Events, error) {
+		events := make([]*cmsRes.Event, 0)
+
+		timestamp, err := ptypes.TimestampProto(afterPageBreakDate)
+		assert.Nil(t, err)
+		for count := 0; count < 10; count++ {
+			events = append(events, &cmsRes.Event{
+				Id:              "e" + strconv.Itoa(count),
+				EventType:       "cookbook",
+				Task:            "update",
+				Timestamp:       timestamp,
+				EntityName:      "mocked_event",
+				RequestorType:   "automatic",
+				RequestorName:   "golang",
+				ServiceHostname: "localhost",
+			})
+		}
+
+		return &cmsRes.Events{
+			Events:      events,
+			TotalEvents: 50,
+		}, nil
+	})
+
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
+	mockFeedServiceClient.EXPECT().GetFeed(
+		context.Background(),
+		gomock.Any(),
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		events := make([]*event_feed_api.FeedEntry, 0)
+
+		timestamp, err := ptypes.TimestampProto(afterPageBreakDate)
+		assert.Nil(t, err)
+		for count := 0; count < 10; count++ {
+			events = append(events, &event_feed_api.FeedEntry{
+				ID:                   "f" + strconv.Itoa(count),
+				EventType:            "scanJobUpdated",
+				Tags:                 []string{"scanjob"},
+				Verb:                 "update",
+				SourceEventPublished: timestamp,
+				Producer: &event_feed_api.Producer{
+					Name: "mocked_event",
+					ID:   "scanjob",
+				},
+				Actor: &event_feed_api.Actor{
+					Name:       "golang",
+					ObjectType: "automatic",
+				},
+				Target: &event_feed_api.Target{
+					Name: "localhost",
+				},
+			})
+		}
+
+		return &event_feed_api.FeedResponse{
+			FeedEntries:  events,
+			TotalEntries: 50,
+		}, nil
+	})
+
+	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
+	events, err := eventFeedAggregate.CollectEventFeed(context.Background(), request)
+
+	assert.Nil(t, err)
+
+	// Should return only config-mgmt's events because when sorted by ID they are
+	// less than all the compliance events.
+	assert.Equal(t, "e9", events.Events[0].StartId)
+	assert.Equal(t, "cookbook", events.Events[0].EventType)
+
+	assert.Equal(t, "e8", events.Events[1].StartId)
+	assert.Equal(t, "cookbook", events.Events[1].EventType)
+
+	assert.Equal(t, "e7", events.Events[2].StartId)
+	assert.Equal(t, "cookbook", events.Events[2].EventType)
+
+	assert.Equal(t, "e6", events.Events[3].StartId)
+	assert.Equal(t, "cookbook", events.Events[3].EventType)
+
+	assert.Equal(t, "e5", events.Events[4].StartId)
+	assert.Equal(t, "cookbook", events.Events[4].EventType)
+
+	assert.Equal(t, "e4", events.Events[5].StartId)
+	assert.Equal(t, "cookbook", events.Events[5].EventType)
+
+	assert.Equal(t, "e3", events.Events[6].StartId)
+	assert.Equal(t, "cookbook", events.Events[6].EventType)
+
+	assert.Equal(t, "e2", events.Events[7].StartId)
+	assert.Equal(t, "cookbook", events.Events[7].EventType)
+
+	assert.Equal(t, "e1", events.Events[8].StartId)
+	assert.Equal(t, "cookbook", events.Events[8].EventType)
+
+	assert.Equal(t, "e0", events.Events[9].StartId)
+	assert.Equal(t, "cookbook", events.Events[9].EventType)
 }
 
 func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
@@ -148,6 +839,14 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 			test.request, test.description), func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 
+			mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
+			mockCfgMgmtClient.EXPECT().GetEventFeed(
+				context.Background(),
+				gomock.Any(),
+			).DoAndReturn(func(c context.Context, action *cmsReq.EventFilter) (*cmsRes.Events, error) {
+				return &cmsRes.Events{}, nil
+			})
+
 			mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 			mockFeedServiceClient.EXPECT().GetFeed(
 				context.Background(),
@@ -156,7 +855,7 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 				return &event_feed_api.FeedResponse{}, nil
 			})
 
-			eventFeedAggregate := subject.NewEventFeedAggregate(mockFeedServiceClient)
+			eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
 
 			_, err := eventFeedAggregate.CollectEventFeed(
 				context.Background(),
@@ -174,8 +873,79 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 	}
 }
 
-// fixedEvents returns a fixed set of events. (101)
-func fixedEvents(t *testing.T) *event_feed_api.FeedResponse {
+// cmsFixedEvents returns a fixed set of events. (101)
+func cmsFixedEvents(t *testing.T) *cmsRes.Events {
+	time1, err := time.Parse(time.RFC3339, "2018-01-30T21:21:21Z")
+	assert.Nil(t, err)
+	timestamp1, err := ptypes.TimestampProto(time1)
+	assert.Nil(t, err)
+	time2, err := time.Parse(time.RFC3339, "2018-01-29T21:20:41Z")
+	assert.Nil(t, err)
+	timestamp2, err := ptypes.TimestampProto(time2)
+	assert.Nil(t, err)
+	time3, err := time.Parse(time.RFC3339, "2018-01-30T21:20:41Z")
+	assert.Nil(t, err)
+	timestamp3, err := ptypes.TimestampProto(time3)
+	assert.Nil(t, err)
+	var (
+		fixedEvents = []*cmsRes.Event{
+			{
+				EventType:       "node",
+				Task:            "update",
+				Timestamp:       timestamp1,
+				EntityName:      "mocked_event",
+				RequestorType:   "automatic",
+				RequestorName:   "golang",
+				ServiceHostname: "localhost",
+			},
+		}
+		// This is the event type we will add multiple times to group it or not
+		cookbookUpdateEvent = &cmsRes.Event{
+			EventType:       "cookbook",
+			Task:            "update",
+			Timestamp:       timestamp2,
+			EntityName:      "mocked_event",
+			RequestorType:   "automatic",
+			RequestorName:   "golang",
+			ServiceHostname: "localhost",
+		}
+
+		laterCookbookUpdateEvent = &cmsRes.Event{
+			EventType:       "cookbook",
+			Task:            "update",
+			Timestamp:       timestamp3,
+			EntityName:      "mocked_event",
+			RequestorType:   "automatic",
+			RequestorName:   "golang",
+			ServiceHostname: "localhost",
+		}
+	)
+
+	// Adding 9 cookbook events (updated by golang, since this is an automated test)
+	for i := 0; i < 99; i++ {
+		fixedEvents = append(fixedEvents, cookbookUpdateEvent)
+	}
+
+	//Add a final cookbook with a later timestamp to test endtime.
+	fixedEvents = append(fixedEvents, laterCookbookUpdateEvent)
+
+	// We are always returning 100 cookbook events plus 1 node edit
+	// => 101 Events
+
+	// sort fixedEvents
+	sort.Slice(fixedEvents[:], func(i, j int) bool {
+		idate, err := ptypes.Timestamp(fixedEvents[i].Timestamp)
+		assert.Nil(t, err)
+		jdate, err := ptypes.Timestamp(fixedEvents[j].Timestamp)
+		assert.Nil(t, err)
+		return idate.After(jdate)
+	})
+
+	return &cmsRes.Events{Events: fixedEvents}
+}
+
+// complianceEventFixedEvents returns a fixed set of events. (101)
+func complianceEventFixedEvents(t *testing.T) *event_feed_api.FeedResponse {
 	time1, err := time.Parse(time.RFC3339, "2018-01-20T21:21:21Z")
 	assert.Nil(t, err)
 	timestamp1, err := ptypes.TimestampProto(time1)

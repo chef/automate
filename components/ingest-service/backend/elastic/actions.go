@@ -7,60 +7,91 @@ package elastic
 
 import (
 	"context"
-	"encoding/json"
-	"time"
+	"fmt"
 
+	elastic "gopkg.in/olivere/elastic.v6"
+
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/ingest-service/backend"
-	log "github.com/sirupsen/logrus"
+	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 )
 
-func (es *Backend) GetActions(index string, pageSize int, cursorDate time.Time,
-	cursorID string, next bool) ([]backend.InternalChefAction, int64, error) {
-	actions := []backend.InternalChefAction{}
-	ascending := false
-
-	searchService := es.client.Search().
-		Index(index).
-		Size(pageSize).
-		Sort("recorded_at", ascending).
-		Sort("id", ascending)
-
-	if next {
-		milliseconds := cursorDate.UnixNano() / int64(time.Millisecond)
-		searchService = searchService.SearchAfter(milliseconds, cursorID) // the date has to be in milliseconds
-	}
-
-	searchResult, err := searchService.Do(context.Background())
-
-	// Return an error if the search was not successful
-	if err != nil {
-		return actions, 0, err
-	}
-
-	for _, hit := range searchResult.Hits.Hits {
-		var action backend.InternalChefAction
-		err := json.Unmarshal(*hit.Source, &action)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"object": hit.Source,
-			}).WithError(err).Debug("Error unmarshalling the action object")
-		} else {
-			actions = append(actions, action)
-		}
-	}
-
-	// sort actions, because if ascending = true they will not be in the descending order.
-	if ascending {
-		es.reverseActions(actions)
-	}
-
-	return actions, searchResult.Hits.TotalHits, nil
+// InsertAction inserts a Chef Client Action into action-YYYY.MM.DD index
+func (es *Backend) InsertAction(ctx context.Context, action backend.InternalChefAction) error {
+	mapping := mappings.Actions
+	// Using time field to ingest to correctly dated index
+	time := action.RecordedAt
+	err := es.addDataToTimeseriesIndex(ctx, mapping, time, action)
+	return err
 }
 
-func (es *Backend) reverseActions(actions []backend.InternalChefAction) {
-	length := len(actions)
-	for i := length/2 - 1; i >= 0; i-- {
-		opp := length - 1 - i
-		actions[i], actions[opp] = actions[opp], actions[i]
+func (es *Backend) CreateBulkActionRequest(action backend.InternalChefAction) elastic.BulkableRequest {
+	mapping := mappings.Actions
+	time := action.RecordedAt
+	return es.createBulkUpdateRequestToTimeseriesIndex(mapping, time, action)
+}
+
+func (es *Backend) UpdateActionProjectTags(ctx context.Context,
+	projectTaggingRules map[string]*authz.ProjectRules) (string, error) {
+	return es.UpdateActionProjectTagsForIndex(ctx, fmt.Sprintf("%s-%s", mappings.Actions.Index, "*"),
+		projectTaggingRules)
+}
+
+func (es *Backend) UpdateActionProjectTagsForIndex(ctx context.Context, index string,
+	projectTaggingRules map[string]*authz.ProjectRules) (string, error) {
+	script := `
+		ArrayList matchingProjects = new ArrayList();
+		for (def project : params.projects) {
+			for (def rule : project.rules) {
+				def match = rule.conditions.length != 0;
+				for (def condition : rule.conditions) {
+					if (condition.chefServers.length > 0) {
+						def found = false;
+						for (def chefServer : condition.chefServers){
+							if (ctx._source.remote_hostname == chefServer ) {
+								found = true;
+								break;
+							}
+						}
+						if ( !found ) {
+							match = false;
+							break;
+						}
+					}
+					if (condition.organizations.length > 0) {
+						def found = false;
+						for (def organization : condition.organizations){
+							if (ctx._source.organization_name == organization ) {
+								found = true;
+								break;
+							}
+						}
+						if ( !found ) {
+							match = false;
+							break;
+						}
+					}
+				}
+				if ( match ) {
+					matchingProjects.add(project.name);
+					break;
+				}
+			}
+		}
+
+		ctx._source.projects = matchingProjects.toArray();
+	`
+
+	startTaskResult, err := elastic.NewUpdateByQueryService(es.client).
+		Index(index).
+		Type(mappings.Actions.Type).
+		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
+		WaitForCompletion(false).
+		ProceedOnVersionConflict().
+		DoAsync(ctx)
+	if err != nil {
+		return "", err
 	}
+
+	return startTaskResult.TaskId, nil
 }

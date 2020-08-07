@@ -21,12 +21,10 @@ import (
 	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/interservice/authz"
-	cfgmgmt_response "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	cfgBackend "github.com/chef/automate/components/config-mgmt-service/backend"
@@ -34,7 +32,6 @@ import (
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	iElastic "github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
-	"github.com/chef/automate/components/ingest-service/pipeline"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/lib/cereal"
@@ -43,6 +40,8 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
 )
+
+var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
 
 // TODO @afiune most of this file is very similar to the suite_test.go living
 // inside config-mgmt-service, we could have a single suite file for both (or more)
@@ -65,20 +64,20 @@ import (
 //   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
 // * A PurgeServer, the exposed gRPC Server that configures and runs purge workflows
 type Suite struct {
-	ChefIngestServer           *server.ChefIngestServer
-	JobSchedulerServer         *server.JobSchedulerServer
-	JobManager                 *cereal.Manager
-	EventHandlerServer         *server.AutomateEventHandlerServer
-	PurgeServer                data_lifecycle.PurgeServer
-	cfgmgmt                    cfgBackend.Client
-	ingest                     iBackend.Client
-	client                     *elastic.Client
-	projectsClient             *authz.MockProjectsClient
-	eventFeedServiceClientMock *event_feed.MockEventFeedServiceClient
-	managerServiceClientMock   *manager.MockNodeManagerServiceClient
-	nodesServiceClientMock     *nodes.MockNodesServiceClient
-	cfgmgmtClientMock          *cfgmgmt.MockCfgMgmtClient
-	cleanup                    func() error
+	ChefIngestServer         *server.ChefIngestServer
+	JobSchedulerServer       *server.JobSchedulerServer
+	JobManager               *cereal.Manager
+	EventHandlerServer       *server.AutomateEventHandlerServer
+	PurgeServer              data_lifecycle.PurgeServer
+	cfgmgmt                  cfgBackend.Client
+	ingest                   iBackend.Client
+	client                   *elastic.Client
+	projectsClient           *authz.MockProjectsClient
+	eventServiceClientMock   *event.MockEventServiceClient
+	managerServiceClientMock *manager.MockNodeManagerServiceClient
+	nodesServiceClientMock   *nodes.MockNodesServiceClient
+	cfgmgmtClientMock        *cfgmgmt.MockCfgMgmtClient
+	cleanup                  func() error
 }
 
 // Initialize the test suite
@@ -153,6 +152,15 @@ func (s *Suite) GetNodes(x int) ([]cfgBackend.Node, error) {
 	return s.cfgmgmt.GetNodes(1, x, "node_name", true, filterMap, "", "")
 }
 
+// GetActions retrives X Chef Actions
+func (s *Suite) GetActions(x int) ([]cfgBackend.Action, error) {
+	filterMap := make(map[string][]string, 0)
+	actions, _, err := s.cfgmgmt.GetActions(filterMap,
+		time.Time{}, time.Now().Add(time.Hour*24*365), x, time.Time{}, "", true)
+
+	return actions, err
+}
+
 // GetNonExistingNodes retrives X Chef Nodes that doesn't actually exist :thinking:
 //
 // We need this custom function since we need a way to verify the nodes we update and
@@ -194,6 +202,17 @@ func (s *Suite) IngestNodes(nodes []iBackend.Node) {
 
 	// Refresh Indices
 	s.RefreshIndices(mappings.NodeState.Index)
+}
+
+// IngestActions ingests a number of actions then refreshes all the action indexes
+func (s *Suite) IngestActions(actions []iBackend.InternalChefAction) {
+	// Insert actions
+	for _, action := range actions {
+		s.ingest.InsertAction(context.Background(), action)
+	}
+
+	// Refresh Indices
+	s.RefreshIndices(actionIndexes)
 }
 
 // RefreshIndices will refresh the provided ES Index or list of Indices
@@ -335,15 +354,6 @@ func createServices(s *Suite) error {
 			NumberOfPublishers:            1,
 		},
 	}
-
-	chefActionPipeline := pipeline.NewChefActionPipeline(s.ingest, s.projectsClient,
-		s.cfgmgmtClientMock, s.eventFeedServiceClientMock,
-		chefIngestServerConfig.MessageBufferSize, chefIngestServerConfig.MaxNumberOfBundledActionMsgs)
-
-	chefRunPipeline := pipeline.NewChefRunPipeline(s.ingest, s.projectsClient,
-		s.managerServiceClientMock, chefIngestServerConfig.ChefIngestRunPipelineConfig,
-		chefIngestServerConfig.MessageBufferSize)
-
 	// A global ChefIngestServer instance to call any rpc function
 	//
 	// From any test you can directly call:
@@ -351,10 +361,10 @@ func createServices(s *Suite) error {
 	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
-		s.managerServiceClientMock, s.nodesServiceClientMock, chefActionPipeline, chefRunPipeline)
+		s.managerServiceClientMock, chefIngestServerConfig, s.nodesServiceClientMock, s.cfgmgmtClientMock)
 
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
-		s.projectsClient)
+		s.projectsClient, s.eventServiceClientMock)
 
 	// A global JobSchedulerServer instance to call any rpc function
 	//
@@ -432,13 +442,9 @@ func createMocksWithDefaultFunctions(s *Suite) {
 	s.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&authz.ListRulesForAllProjectsResp{}, nil)
 
-	s.eventFeedServiceClientMock = event_feed.NewMockEventFeedServiceClient(gomock.NewController(nil))
-	s.eventFeedServiceClientMock.EXPECT().HandleEvent(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&event.EventResponse{}, nil)
-
-	s.cfgmgmtClientMock = cfgmgmt.NewMockCfgMgmtClient(gomock.NewController(nil))
-	s.cfgmgmtClientMock.EXPECT().HandlePolicyUpdateAction(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&cfgmgmt_response.PolicyUpdateAction{}, nil)
+	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(nil))
+	s.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&event.PublishResponse{}, nil)
 
 	s.managerServiceClientMock = manager.NewMockNodeManagerServiceClient(gomock.NewController(nil))
 	s.managerServiceClientMock.EXPECT().ProcessNode(gomock.Any(), gomock.Any()).AnyTimes().Return(
@@ -451,10 +457,7 @@ func createMocksWithDefaultFunctions(s *Suite) {
 
 func createMocksWithTestObject(s *Suite, t *testing.T) {
 	s.projectsClient = authz.NewMockProjectsClient(gomock.NewController(t))
-	s.eventFeedServiceClientMock = event_feed.NewMockEventFeedServiceClient(gomock.NewController(t))
-	s.cfgmgmtClientMock = cfgmgmt.NewMockCfgMgmtClient(gomock.NewController(t))
-	s.managerServiceClientMock = manager.NewMockNodeManagerServiceClient(gomock.NewController(t))
-	s.nodesServiceClientMock = nodes.NewMockNodesServiceClient(gomock.NewController(t))
+	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
 }
 
 func secureConnFactoryHab() (*secureconn.Factory, error) {

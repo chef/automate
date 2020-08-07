@@ -165,8 +165,6 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 	if isEventFromChefServer(req) {
 		feedEntry.ChefInfraServer = getChefInfraServer(req)
 		feedEntry.ChefOrganization = getChefOrganization(req)
-		feedEntry.ParentName = getParentName(req)
-		feedEntry.ParentID = getParentID(req)
 	}
 
 	success, err := f.store.CreateFeedEntry(feedEntry)
@@ -175,20 +173,6 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 	}
 
 	return &api.EventResponse{Success: success}, nil
-}
-
-func getParentName(req *api.EventMsg) string {
-	if req.Data != nil && req.Data.Fields != nil {
-		return req.Data.Fields[feed.ParentNameFieldTag].GetStringValue()
-	}
-	return ""
-}
-
-func getParentID(req *api.EventMsg) string {
-	if req.Data != nil && req.Data.Fields != nil {
-		return req.Data.Fields[feed.ParentIDFieldTag].GetStringValue()
-	}
-	return ""
 }
 
 func getChefInfraServer(req *api.EventMsg) string {

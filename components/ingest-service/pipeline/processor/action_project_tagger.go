@@ -115,7 +115,7 @@ func actionMatchesAllConditions(action *chef.Action, conditions []*authz.Conditi
 	for _, condition := range conditions {
 		switch condition.Attribute {
 		case authz.ProjectRuleConditionAttributes_CHEF_SERVER:
-			if !stringutils.SliceContains(condition.Values, action.ServiceHostname) {
+			if !stringutils.SliceContains(condition.Values, action.RemoteHostname) {
 				return false
 			}
 		case authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION:

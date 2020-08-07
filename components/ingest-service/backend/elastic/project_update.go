@@ -2,6 +2,7 @@ package elastic
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/api/interservice/authz"
@@ -13,14 +14,38 @@ import (
 )
 
 func (backend *Backend) ListProjectUpdateTasks(ctx context.Context) ([]project_update_lib.SerializedProjectUpdateTask, error) {
-	return []project_update_lib.SerializedProjectUpdateTask{
-		project_update_lib.SerializedProjectUpdateTask{
-			Params: map[string]string{
-				"n": mappings.NodeState.Index,
-			},
-			Priority: time.Now().Unix(),
+	indexNames, err := backend.client.IndexNames()
+	if err != nil {
+		return nil, err
+	}
+
+	tasks := make([]project_update_lib.SerializedProjectUpdateTask, 0, 120)
+	for _, indexName := range indexNames {
+		if strings.HasPrefix(indexName, mappings.Actions.Index) {
+			indexDay, err := mappings.Actions.IndexTimeseriesScanDate(indexName)
+			if err != nil {
+				logrus.WithField("op", "ListProjectUpdateTasks").Warnf("Could not parse date from %s", indexName)
+				continue
+			}
+			priority := indexDay.Unix()
+			params := map[string]string{
+				"n": indexName,
+			}
+			tasks = append(tasks, project_update_lib.SerializedProjectUpdateTask{
+				Priority: priority,
+				Params:   params,
+			})
+		}
+	}
+
+	tasks = append(tasks, project_update_lib.SerializedProjectUpdateTask{
+		Params: map[string]string{
+			"n": mappings.NodeState.Index,
 		},
-	}, nil
+		Priority: time.Now().Unix(),
+	})
+
+	return tasks, nil
 }
 
 func (backend *Backend) RunProjectUpdateTask(ctx context.Context, projectUpdateID string,
@@ -42,6 +67,8 @@ func (backend *Backend) RunProjectUpdateTask(ctx context.Context, projectUpdateI
 	var err error
 	if indexName == mappings.NodeState.Index {
 		id, err = backend.UpdateNodeProjectTags(ctx, projectTaggingRules)
+	} else if strings.HasPrefix(indexName, mappings.Actions.Index) {
+		id, err = backend.UpdateActionProjectTagsForIndex(ctx, indexName, projectTaggingRules)
 	} else {
 		return "", project_update_lib.NoStatus, errors.Errorf(
 			"project update index %s does not match any current mappings", indexName)

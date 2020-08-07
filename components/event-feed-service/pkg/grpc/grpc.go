@@ -96,6 +96,8 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 		return errors.Wrap(err, "initializing purge server")
 	}
 
+	grpcServer := newGRPCServer(connFactory, c, feedStore, purgeServer)
+
 	// Authz Interface
 	authzConn, err := connFactory.DialContext(timeoutCtx, "authz-service",
 		c.Authz.Address, libgrpc.WithBlock())
@@ -128,7 +130,7 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 	}
 	defer projectUpdateManager.Stop() // nolint: errcheck
 
-	return newGRPCServer(connFactory, c, feedStore, purgeServer).Serve(conn)
+	return grpcServer.Serve(conn)
 }
 
 // newGRPCServer returns a server that provides our services:
@@ -144,12 +146,11 @@ func newGRPCServer(
 	grpcServer := connFactory.NewServer()
 
 	eventFeedServer := server.New(feedStore)
+	event_feed.RegisterEventFeedServiceServer(grpcServer, eventFeedServer)
 
 	health.RegisterHealthServer(grpcServer, eventFeedServer.Health())
 
 	data_lifecycle.RegisterPurgeServer(grpcServer, purgeServer)
-
-	event_feed.RegisterEventFeedServiceServer(grpcServer, eventFeedServer)
 
 	reflection.Register(grpcServer)
 

@@ -10,7 +10,6 @@ import (
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
-	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/backend/postgres"
 )
 
@@ -42,20 +41,6 @@ func (s *CfgMgmtServer) HandlePolicyUpdateAction(ctx context.Context, req *reque
 	}
 
 	err := s.pg.CreateRolloutFromChefAction(ctx, newRollout)
-	if err != nil {
-		return nil, err
-	}
-
-	cookbooks := make([]backend.PolicyCookbookLock, len(req.Cookbooks))
-
-	for index, cookbook := range req.Cookbooks {
-		cookbooks[index] = backend.PolicyCookbookLock{
-			PolicyID:     cookbook.PolicyId,
-			CookbookName: cookbook.CookbookName,
-		}
-	}
-
-	err = s.pg.AddPolicyCookbooks(ctx, cookbooks, req.PolicyRevisionId, req.PolicyName)
 	if err != nil {
 		return nil, err
 	}

@@ -104,7 +104,7 @@ func (m Backend) GetSuggestions(term string, text string, filters map[string][]s
 func (m Backend) GetPolicyCookbooks(revisionID string) (backend.PolicyCookbooks, error) {
 	return backend.PolicyCookbooks{
 		PolicyName: "infra_base",
-		CookbookLocks: []*backend.PolicyCookbookLock{
+		CookbookLocks: []backend.PolicyCookbookLock{
 			{
 				CookbookName: "apt",
 				PolicyID:     "any",
@@ -115,6 +115,30 @@ func (m Backend) GetPolicyCookbooks(revisionID string) (backend.PolicyCookbooks,
 			},
 		},
 	}, nil
+}
+
+// GetActions Returns a filtered list of actions
+func (m Backend) GetActions(filters map[string][]string, start time.Time, end time.Time, pageSize int,
+	cursorDate time.Time, cursorID string, ascending bool) ([]backend.Action, int64, error) {
+	var actions []backend.Action
+	action := backend.Action{}
+	actions = append(actions, action)
+	return actions, 0, nil
+}
+
+// GetActionEventTypeCounts - counts the number of action event types
+func (m Backend) GetActionEventTypeCounts(map[string][]string, time.Time, time.Time) (map[string]int64, error) {
+	return map[string]int64{}, nil
+}
+
+// GetActionEventTaskCounts - counts the number of action event task
+func (m Backend) GetActionEventTaskCounts(map[string][]string, time.Time, time.Time) (map[string]int64, error) {
+	return map[string]int64{}, nil
+}
+
+// GetEventString - return empty set of guitar strings
+func (m Backend) GetEventString(filters map[string][]string, start string, end string, timezone string, bucketSizeInHours int, eventActions string) (backend.EventString, error) {
+	return backend.EventString{}, nil
 }
 
 func (es Backend) GetDateOfOldestConvergeIndices() (time.Time, bool, error) {

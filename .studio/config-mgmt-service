@@ -79,21 +79,6 @@ function config_mgmt_grpcurl_get_suggestions() {
 	  chef.automate.domain.cfgmgmt.service.CfgMgmt.GetSuggestions
 }
 
-document "config_mgmt_grpcurl_get_policy_cookbooks" <<DOC
-  Get the list of associated cookbooks to a policy from the policy revision ID
-
-  @(arg:1) revision ID
-
-  Example: Get the cookbook for a random ID
-  -----------------------------
-  config_mgmt_grpcurl_get_policy_cookbooks e775abb4fa02004c5d0cbb7f73f082e09ebf77f1a613a6c2cbde646735b68a4c
-DOC
-function config_mgmt_grpcurl_get_policy_cookbooks() {
-  chef-automate dev grpcurl config-mgmt-service -- -d \
-    '{"revision_id": "'"$1"'"}' \
-    chef.automate.domain.cfgmgmt.service.CfgMgmt.GetPolicyCookbooks
-}
-
 document "config_mgmt_populate_rollouts" <<DOC
   Creates rollout records with a variety of policy_node_group, policy_name, and
   policy_domain_url values.

@@ -140,7 +140,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 
 	pb_eventfeed.RegisterEventFeedServer(grpcServer,
-		handler.NewEventFeedServer(eventFeedClient))
+		handler.NewEventFeedServer(cfgMgmtClient, eventFeedClient))
 
 	notifier, err := clients.Notifier()
 	if err != nil {

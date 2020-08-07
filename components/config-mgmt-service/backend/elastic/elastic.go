@@ -28,6 +28,7 @@ const (
 	IndexNodeAttribute       = "node-attribute"
 	IndexConvergeHistoryBase = "converge-history-"
 	IndexConvergeHistory     = "converge-history-*"
+	IndexAction              = "actions-*"
 
 	// Elasticsearch fields we use within this package
 	RunFieldTimestamp    = "start_time"

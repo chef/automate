@@ -3,7 +3,6 @@ package elastic
 import (
 	"context"
 	"encoding/json"
-	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -34,7 +33,7 @@ func (es *Backend) DoesAliasExists(ctx context.Context, aliasName string) bool {
 
 // DoesIndexExists - does the index 'indexName' exists in elasticsearch
 func (es *Backend) DoesIndexExists(ctx context.Context, indexName string) (bool, error) {
-	return es.client.IndexExists(indexName).AllowNoIndices(false).Do(ctx)
+	return es.client.IndexExists(indexName).Do(ctx)
 }
 
 // DeleteTemplate - delete the template with name 'templateName'
@@ -63,24 +62,6 @@ func (es *Backend) DeleteTemplate(ctx context.Context, templateName string) erro
 func (es *Backend) DeleteIndex(ctx context.Context, index string) error {
 	_, err := es.client.DeleteIndex(index).Do(ctx)
 	return err
-}
-
-func (es *Backend) DeleteAllIndexesWithPrefix(prefix string, ctx context.Context) error {
-	indexNames, err := es.client.IndexNames()
-	if err != nil {
-		return err
-	}
-
-	for _, indexName := range indexNames {
-		if strings.HasPrefix(indexName, prefix) {
-			_, err := es.client.DeleteIndex(indexName).Do(ctx)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
 }
 
 // ReindexInsightstoActions -reindex the A1 insights indexes to the actions indexes

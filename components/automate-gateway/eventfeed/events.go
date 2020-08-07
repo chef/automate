@@ -2,24 +2,35 @@ package eventfeed
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
+	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
+	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	"github.com/golang/protobuf/ptypes"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
+// A eventsFunc type returns a subset of events and an error
+type eventsFunc func() (*agRes.Events, error)
+
 type EventFeedAggregate struct {
+	cfgMgmtClient     cmsService.CfgMgmtClient
 	feedServiceClient event_feed_api.EventFeedServiceClient
 }
 
-func NewEventFeedAggregate(feedClient event_feed_api.EventFeedServiceClient) *EventFeedAggregate {
+func NewEventFeedAggregate(cfgMgmtClient cmsService.CfgMgmtClient,
+	feedClient event_feed_api.EventFeedServiceClient) *EventFeedAggregate {
 	return &EventFeedAggregate{
+		cfgMgmtClient:     cfgMgmtClient,
 		feedServiceClient: feedClient,
 	}
 }
@@ -34,11 +45,19 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventFeed(ctx context.Conte
 	request *agReq.EventFilter) (*agRes.Events, error) {
 
 	var (
-		ascending                 = false
-		isLastPage                = false
-		totalEvents               = make([]*agRes.Event, 0)
-		totalNumberOfEvents int64 = 0
-		err                       = validateRequest(request)
+		ascending                   = false
+		isLastPage                  = false
+		totalErrors                 = make([]string, 0)
+		subscribers                 = 2
+		totalEvents                 = make([]*agRes.Event, 0)
+		totalNumberOfEvents   int64 = 0
+		err                         = validateRequest(request)
+		collectComplianceFunc       = func() (*agRes.Events, error) {
+			return collectComplianceEventFeed(ctx, eventFeedAggregate.feedServiceClient, request)
+		}
+		collectCfgmgmtFunc = func() (*agRes.Events, error) {
+			return collectConfigMgmtEventFeed(ctx, eventFeedAggregate.cfgMgmtClient, request)
+		}
 	)
 
 	if err != nil {
@@ -55,12 +74,28 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventFeed(ctx context.Conte
 		ascending = true
 	}
 
-	eventCollection, err := collectEventFeed(ctx, eventFeedAggregate.feedServiceClient, request)
-	if err != nil {
-		return &agRes.Events{}, err
+	c1, e1 := fanOutEvents("config-mgmt-service", collectCfgmgmtFunc)
+	c2, e2 := fanOutEvents("compliance-service", collectComplianceFunc)
+
+	for e := range fanErrIn(e1, e2) {
+		if e != nil {
+			totalErrors = append(totalErrors, e.Error())
+		}
 	}
-	totalEvents = eventCollection.Events
-	totalNumberOfEvents += eventCollection.TotalEvents
+
+	// If the number of errors is major or equal to the number of subscribers
+	// it means that we don't have any data to display, lets return an error
+	if len(totalErrors) >= subscribers {
+		return &agRes.Events{}, fmt.Errorf(strings.Join(totalErrors, "\n"))
+	}
+
+	// TODO @afiune - In the near future we would like our API to handle partial
+	// errors so that we don't ignore them here, but for now we will.
+
+	for c := range fanInEvents(c1, c2) {
+		totalEvents = append(totalEvents, c.Events...)
+		totalNumberOfEvents += c.TotalEvents
+	}
 
 	err = sortEvents(totalEvents, ascending)
 	if err != nil {
@@ -99,6 +134,69 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventFeed(ctx context.Conte
 		Events:      totalEvents,
 		TotalEvents: totalNumberOfEvents,
 	}, nil
+}
+
+func fanOutEvents(component string, fn eventsFunc) (<-chan *agRes.Events, <-chan error) {
+	errorChan := make(chan error)
+	eventsChan := make(chan *agRes.Events)
+	go func() {
+		events, err := fn()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"err":       err,
+				"component": component,
+			}).Error("collecting events")
+		}
+		errorChan <- err
+		close(errorChan)
+		eventsChan <- events
+		close(eventsChan)
+	}()
+	return eventsChan, errorChan
+}
+
+func fanInEvents(cs ...<-chan *agRes.Events) <-chan *agRes.Events {
+	var wg sync.WaitGroup
+	out := make(chan *agRes.Events)
+
+	output := func(c <-chan *agRes.Events) {
+		for n := range c {
+			out <- n
+		}
+		wg.Done()
+	}
+	wg.Add(len(cs))
+	for _, c := range cs {
+		go output(c)
+	}
+
+	go func() {
+		wg.Wait()
+		close(out)
+	}()
+	return out
+}
+
+func fanErrIn(cs ...<-chan error) <-chan error {
+	var wg sync.WaitGroup
+	out := make(chan error)
+
+	output := func(c <-chan error) {
+		for n := range c {
+			out <- n
+		}
+		wg.Done()
+	}
+	wg.Add(len(cs))
+	for _, c := range cs {
+		go output(c)
+	}
+
+	go func() {
+		wg.Wait()
+		close(out)
+	}()
+	return out
 }
 
 type eventWithTime struct {
@@ -223,7 +321,50 @@ func groupEvents(events []*agRes.Event) []*agRes.Event {
 	return groupedEvents
 }
 
-func collectEventFeed(ctx context.Context,
+func collectConfigMgmtEventFeed(ctx context.Context,
+	cfgMgmtClient cmsService.CfgMgmtClient,
+	request *agReq.EventFilter) (*agRes.Events, error) {
+	eventFilter := &cmsReq.EventFilter{
+		Filter:   request.GetFilter(),
+		Start:    request.GetStart(),
+		End:      request.GetEnd(),
+		PageSize: request.GetPageSize(),
+		After:    request.GetAfter(),
+		Before:   request.GetBefore(),
+		Cursor:   request.GetCursor(),
+	}
+
+	csEventCollection, err := cfgMgmtClient.GetEventFeed(ctx, eventFilter)
+	if err != nil {
+		return &agRes.Events{}, err
+	}
+
+	agEvents := make([]*agRes.Event, len(csEventCollection.Events))
+	for index, csEvent := range csEventCollection.Events {
+		agEvents[index] = &agRes.Event{
+			StartId:         csEvent.GetId(),
+			EndId:           csEvent.GetId(),
+			EventType:       csEvent.GetEventType(),
+			Task:            csEvent.GetTask(),
+			StartTime:       csEvent.GetTimestamp(),
+			EndTime:         csEvent.GetTimestamp(),
+			EntityName:      csEvent.GetEntityName(),
+			RequestorType:   csEvent.GetRequestorType(),
+			RequestorName:   csEvent.GetRequestorName(),
+			ServiceHostname: csEvent.GetServiceHostname(),
+			ParentName:      csEvent.GetParentName(),
+			ParentType:      csEvent.GetParentType(),
+			EventCount:      1,
+		}
+	}
+
+	return &agRes.Events{
+		Events:      agEvents,
+		TotalEvents: csEventCollection.TotalEvents,
+	}, nil
+}
+
+func collectComplianceEventFeed(ctx context.Context,
 	feedClient event_feed_api.EventFeedServiceClient,
 	request *agReq.EventFilter) (*agRes.Events, error) {
 	eventFilter := &event_feed_api.FeedRequest{
@@ -242,20 +383,20 @@ func collectEventFeed(ctx context.Context,
 	}
 
 	agEvents := make([]*agRes.Event, len(eventCollection.FeedEntries))
-	for index, entry := range eventCollection.FeedEntries {
+	for index, complianceEvent := range eventCollection.FeedEntries {
 		agEvents[index] = &agRes.Event{
-			StartId:         entry.GetID(),
-			EndId:           entry.GetID(),
-			EventType:       entry.GetProducer().GetID(),
-			Task:            entry.GetVerb(),
-			StartTime:       entry.GetSourceEventPublished(),
-			EndTime:         entry.GetSourceEventPublished(),
-			EntityName:      entry.GetObject().GetName(),
-			RequestorType:   entry.GetActor().GetObjectType(),
-			RequestorName:   entry.GetActor().GetName(),
-			ServiceHostname: entry.GetTarget().GetName(),
-			ParentName:      entry.GetParent().GetName(),
-			ParentType:      entry.GetParent().GetID(),
+			StartId:         complianceEvent.GetID(),
+			EndId:           complianceEvent.GetID(),
+			EventType:       complianceEvent.GetProducer().GetID(),
+			Task:            complianceEvent.GetVerb(),
+			StartTime:       complianceEvent.GetSourceEventPublished(),
+			EndTime:         complianceEvent.GetSourceEventPublished(),
+			EntityName:      complianceEvent.GetObject().GetName(),
+			RequestorType:   complianceEvent.GetActor().GetObjectType(),
+			RequestorName:   complianceEvent.GetActor().GetName(),
+			ServiceHostname: complianceEvent.GetTarget().GetName(),
+			ParentName:      "Not Applicable",
+			ParentType:      "Not Applicable",
 			EventCount:      1,
 		}
 	}

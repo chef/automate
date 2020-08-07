@@ -20,6 +20,7 @@ const (
 // more mappings to this list, the function will automatically
 // initialize them
 var AllMappings = []Mapping{
+	Actions,
 	NodeState,
 	ConvergeHistory,
 	NodeAttribute,
