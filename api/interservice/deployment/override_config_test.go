@@ -3,9 +3,7 @@ package deployment
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/chef/automate/api/config/compliance"
 	dc "github.com/chef/automate/api/config/deployment"
@@ -14,7 +12,6 @@ import (
 	"github.com/chef/automate/api/config/load_balancer"
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
-	"github.com/chef/automate/lib/pcmp/passert"
 	"github.com/chef/automate/lib/pcmp/prequire"
 )
 
@@ -77,27 +74,7 @@ func TestMergeAndValidateNewUserOverrideConfig(t *testing.T) {
 		err := MergeAndValidateNewUserOverrideConfig(cfg, rt)
 		t.Log(cfg)
 		require.NoError(t, err)
-		e1 := wrapperspb.StringValue{Value: "foo"}
-		a1 := wrapperspb.StringValue{Value: "foo"}
-		assert.Equal(t, e1, a1)
-
-		e := cfg
-		a := newValidOverrideConfig()
-		//assert.Equal(t, e.Global.V1.Fqdn.Value, a.Global.V1.Fqdn.Value)
-		//assert.Equal(t, e.Global.V1.Fqdn, a.Global.V1.Fqdn)
-
-		// assert.Equal(t, e.Global.V1.Log, a.Global.V1.Log)
-		// assert.Equal(t, e.Global.V1.Backups, a.Global.V1.Backups)
-
-		// assert.Equal(t, e.Global.V1.Mlsa, a.Global.V1.Mlsa)
-		// assert.Equal(t, e.Global.V1.Proxy, a.Global.V1.Proxy)
-		// assert.Equal(t, e.Global.V1.Log, a.Global.V1.Log)
-		// assert.Equal(t, e.Global.V1.External, a.Global.V1.External)
-		// assert.Equal(t, *e.Global.V1, *a.Global.V1)
-		// assert.Equal(t, e.Global.V1, a.Global.V1)
-		// assert.Equal(t, e.Global, a.Global)
-		passert.Equal(t, e, a)
-		//require.Equal(t, newValidOverrideConfig(), cfg)
+		prequire.Equal(t, newValidOverrideConfig(), cfg)
 	})
 
 	t.Run("s3 restore task", func(t *testing.T) {
