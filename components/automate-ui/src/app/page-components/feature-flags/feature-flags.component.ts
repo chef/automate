@@ -56,7 +56,7 @@ export class FeatureFlagsComponent implements OnInit {
 
   constructor(
     public featureFlagsService: FeatureFlagsService,
-    private telemetryService: TelemetryService,
+    private telemetryService: TelemetryService
   ) {}
 
   ngOnInit() {
