@@ -39,6 +39,8 @@ describe('CreateNotificationModalComponent', () => {
       id: ['', null],
       name: ['', null],
       url: ['', null],
+      targetType: ['', null],
+      ruleType: ['', null],
       username: ['', null],
       password: ['', null]
     });

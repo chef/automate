@@ -110,3 +110,13 @@ chef-checkbox ::ng-deep .check-wrap {
 .small:first-of-type {
   margin-top: 10px;
 }
+
+::ng-deep .cdk-overlay-container {
+  position: fixed;
+  z-index: 999999999;
+}
+
+::ng-deep [panelClass="chef-dropdown"] {
+  font-size: inherit;
+  font-weight: 100;
+}

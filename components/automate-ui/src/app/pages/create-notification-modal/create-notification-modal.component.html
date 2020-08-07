@@ -22,16 +22,16 @@
           <chef-form-field>
             <label>
               <span class="label">Webhook type<span aria-hidden="true">*</span></span>
-              <chef-select
-                ngDefaultControl
+              <mat-select
+                panelClass="chef-dropdown"
                 formControlName="targetType"
-                (change)="changeSelectionForWebhookType($event)"
-                class="notification-select-menu">
-                <chef-option *ngFor="let key of targetKeysValue" [value]="key">
+                placeholder="Webhook Type"
+                (selectionChange)="changeSelectionForWebhookType($event)">
+                <mat-option *ngFor="let key of targetKeysValue" [value]="key">
                   <img src="assets/img/logo-{{key}}.png" alt="{{key}} logo"/>
-                  {{ notificationRule.TargetTypeLabels[key] }} - {{key}}
-                </chef-option>
-              </chef-select>
+                  {{ notificationRule.TargetTypeLabels[key] }}
+                </mat-option>
+              </mat-select>
             </label>
           </chef-form-field>
         </div>
@@ -39,15 +39,15 @@
           <chef-form-field>
             <label>
               <span class="label">Failure type  <span aria-hidden="true">*</span></span>
-              <chef-select
-                ngDefaultControl
+              <mat-select
+                panelClass="chef-dropdown"
                 formControlName="ruleType"
-                (change)="setFailureType($event)"
-                class="notification-select-menu">
-                <chef-option *ngFor="let key of alertTypeKeysValue" [value]="key">
+                placeholder="Failure Type"
+                (selectionChange)="setFailureType($event)">
+                <mat-option *ngFor="let key of alertTypeKeysValue" [value]="key">
                   {{ notificationRule.AlertTypeLabels[key] }}
-                </chef-option>
-              </chef-select>
+                </mat-option>
+              </mat-select>
               <div *ngIf="displayCriticalControlsCheckbox()">
                 <p class="small">
                   <chef-checkbox

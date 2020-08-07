@@ -39,9 +39,6 @@ export class CreateNotificationModalComponent implements OnInit {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
       this.conflictError = isConflict;
     });
-
-    this.notificationRule.ruleType = 'CCRFailure';
-    this.notificationRule.targetType = ServiceActionType.SLACK;
   }
 
   public handleInput(event: KeyboardEvent): void {
@@ -75,18 +72,18 @@ export class CreateNotificationModalComponent implements OnInit {
     return this.notificationRule.getTargetTypeKeys();
   }
 
-  setFailureType(event: { target: { value: RuleType } }) {
-    this.notificationRule.ruleType = event.target.value;
-    this.createForm.value.ruleType = event.target.value;
+  setFailureType(event: { value: RuleType }) {
+    this.notificationRule.ruleType = event.value;
+    this.createForm.value.ruleType = event.value;
     if (this.notificationRule.ruleType !== 'ComplianceFailure' &&
     this.notificationRule.targetType === ServiceActionType.SERVICENOW) {
       this.notificationRule.criticalControlsOnly = false;
     }
   }
 
-  changeSelectionForWebhookType(event: { target: { value: ServiceActionType } }) {
-    this.notificationRule.targetType = event.target.value;
-    this.createForm.value.targetType = event.target.value;
+  changeSelectionForWebhookType(event: { value: ServiceActionType }) {
+    this.notificationRule.targetType = event.value;
+    this.createForm.value.targetType = event.value;
     this.targetTypeChanged.emit();
   }
 

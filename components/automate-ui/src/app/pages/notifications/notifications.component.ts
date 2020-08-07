@@ -84,8 +84,8 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     this.createNotificationForm = this.fb.group({
       // Must stay in sync with error checks in create-notification-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      ruleType: ['ComplianceFailure', []],
-      targetType: [ServiceActionType.WEBHOOK, []],
+      ruleType: ['', [Validators.required]],
+      targetType: ['', [Validators.required]],
 
       // Note that URL here may be FQDN -or- IP!
       targetUrl: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -214,6 +214,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   public deleteNotification(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteNotificationRule(this.notificationToDelete));
+    this.refreshRules();
   }
 
   public closeDeleteModal(): void {
