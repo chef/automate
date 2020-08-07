@@ -219,6 +219,8 @@ message Resource {
   string conditional = 16;
   // Boolean that denotes whether or not the resource failure should be ignored.
   bool ignore_failure = 17;
+  // Chef Error information, available on failed runs.
+  ChefError error = 18;
 }
 
 message ChefError {

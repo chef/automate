@@ -1501,6 +1501,10 @@ func init() {
           "type": "boolean",
           "format": "boolean",
           "description": "Boolean that denotes whether or not the resource failure should be ignored."
+        },
+        "error": {
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ChefError",
+          "description": "Chef Error information, available on failed runs."
         }
       }
     },

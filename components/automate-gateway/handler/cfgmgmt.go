@@ -605,6 +605,7 @@ func toResponseResources(resources []*cmsRes.Resource) []*cfgRes.Resource {
 			Result:          resource.Result,
 			Conditional:     resource.Conditional,   // might be empty
 			IgnoreFailure:   resource.IgnoreFailure, // might be empty
+			Error:           toResponseError(resource.Error),
 		}
 	}
 

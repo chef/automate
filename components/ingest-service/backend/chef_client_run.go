@@ -56,6 +56,7 @@ type ChefClientResource struct {
 	CookbookType    string              `json:"cookbook_type,omitempty"`
 	RecipeName      string              `json:"recipe_name,omitempty"`
 	Conditional     string              `json:"conditional,omitempty"`
+	Error           ChefError           `json:"error,omitempty"`
 }
 
 // NodePayload is the ohai information reported in a chef client converge message
@@ -446,6 +447,7 @@ func (ccr *ChefClientRun) initializeResources() []Resource {
 			RecipeName:      resource.RecipeName,
 			Conditional:     resource.Conditional,
 			Delta:           resource.Delta,
+			Error:           resource.Error,
 		}
 	}
 	return resources
