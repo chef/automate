@@ -14,7 +14,7 @@ toc = true
 Backups are crucial for protecting your data from catastrophic loss and preparing a recovery procedure.
 The `chef-automate backup create` command creates a single backup that contains data for all products deployed with Chef Automate, including [Chef Infra Server]({{< ref "infra-server.md" >}}) and [Chef Habitat Builder on-prem]({{< ref "on-prem-builder.md" >}}).
 By default, Chef Automate stores backups to the filesystem in the directory `/var/opt/chef-automate/backups`.
-You can also configure Chef Automate to store backups in Amazon S3 buckets.
+You can also configure Chef Automate to store backups in AWS S3 buckets.
 
 ## Backup Space Requirements
 
@@ -59,9 +59,9 @@ A timestamp-based directory has a date-based name, such as `20180518010336`, in 
 
 To provide externally-deployed Elasticsearch nodes access to Chef Automate's built-in backup storage services, you must [configure Elasticsearch backup]({{< relref "install.md#configuring-external-elasticsearch" >}}) settings separately from Chef Automate's primary backup settings.
 
-## Backup to S3
+## Backup to AWS S3
 
-To store backups in an existing Amazon S3 bucket, use the supported S3-related settings below:
+To store backups in an existing AWS S3 bucket, use the supported S3-related settings below:
 
 ```toml
 [global.v1.backups]
@@ -95,7 +95,9 @@ To store backups in an existing Amazon S3 bucket, use the supported S3-related s
   -----END CERTIFICATE-----
 ```
 
-### S3 Permissions
+Learn how to [restore from AWS S3]({{< ref "restore/#restore-from-an-aws-s3-backup" >}}).
+
+### AWS S3 Permissions
 
 The following IAM policy describes the basic permissions Chef Automate requires to run backup and restore operations.
 
@@ -132,12 +134,9 @@ The following IAM policy describes the basic permissions Chef Automate requires 
 }
 ```
 
-## Backup to GCS (Google Cloud Storage Bucket)
+## Backup to GCS
 
-
-Backups can be stored in an existing GCS bucket. You will need to [generate a service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) with the `storage.admin` permission for the project the bucket is associated with.
-
-The following settings are supported:
+To store backups in an existing Google Cloud Storage (GCS) bucket, [generate a service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) with the `storage.admin` permission for the associated project and GCS bucket, and use the supported GCS-related settings below:
 
 ```toml
 [global.v1.backups]
@@ -146,12 +145,12 @@ The following settings are supported:
   # name (required): The name of the bucket
   name = "<bucket name>"
 
-  # base_path (optional):  The path within the bucket where backups should be stored
+  # base_path (optional):  The path within the bucket where backups should be stored.
   # If base_path is not set, backups will be stored at the root of the bucket.
   base_path = "<base path>"
 
 [global.v1.backups.gcs.credentials]
-# This is the JSON credentials file you generate during service account 
+# This is the JSON credentials file you generate during service account
 # creation, you must copy/paste the entire contents here (this is just an example)
 json = '''
   {
@@ -169,11 +168,7 @@ json = '''
 '''
 ```
 
-### GCS Permissions
-
-Per [Elasticsearch's documentation](https://www.elastic.co/guide/en/cloud-enterprise/current/ece-configure-gcp-snapshotting.html#ece_set_up_your_service_account_credentials_2), the service account that is used to backup should be granted the role of 
-`storage.admin` to quote;
-> so that Elasticsearch clusters can read, write, and list the bucket objects.
+Learn how to [restore from GCS]({{< ref "restore/#restore-from-a-google-cloud-storage-backup" >}}).
 
 ## Backup Commands
 
@@ -228,113 +223,25 @@ Listing backups from local directory /var/opt/chef-automate/backups
 20180508201952    completed  8 minutes old
 ```
 
-For backups stored in an Amazon S3 bucket, use:
+For backups stored in an AWS S3 bucket, use:
 
 ```shell
 chef-automate backup list s3://bucket_name/base_path
 ```
 
-For backups stored in a GCS bucket, use:
+where `bucket_name` is the name of the S3 bucket and `base_path` is an optional path within the bucket where the backups live.
+
+For backups stored in a Google Cloud Storage (GCS) bucket, use:
 
 ```shell
 chef-automate backup list gs://bucket_name/base_path
 ```
 
-where `bucket_name` is the name of the S3 bucket `base_path` an optional path within the bucket where the backups live.
-
-## Restore Chef Automate
-
-### Restore From a Filesystem Backup
-
-#### Prerequisites
-
-1. Install the `chef-automate` command line utility on the restore host.
-1. Ensure access for Chef Automate to a backup directory in the [configured location]({{< ref
-"backup.md#backup-to-filesystem" >}}):
-
-     1. To restore a network-attached filesystem backup, mount the shared backup directory to the same mount point configured at the time of the backup.
-     1. To restore a backup directory that is not a network-attached filesystem, copy the backup directory to the location that was [configured]({{< ref
-"backup.md#backup-to-filesystem" >}}) at the time of the backup.
-     1. For restoring a single-file backup archive, copy your archive to the restore host and extract it to the [configured backup directory]({{< ref "backup.md#backup-to-filesystem" >}}).
-
-#### Restore in an Internet-Connected Environment
-
-If you have [configured the backup directory]({{< ref "backup.md#backup-to-filesystem" >}}) to a directory other than the default directory (`/var/opt/chef-automate/backups`) you must supply the backup directory. Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
-
-To restore on a new host:
-
-```shell
-chef-automate backup restore </path/to/backups/>BACKUP_ID
-```
-
-To restore on an existing Chef Automate host:
-
-```shell
-chef-automate backup restore </path/to/backups/>BACKUP_ID --skip-preflight
-```
-
-#### Restore in an Airgapped Environment
-
-To restore a backup of an [airgapped installation]({{< relref "airgapped-installation.md" >}}), you must specify the [Airgap Installation Bundle]({{< relref "airgapped-installation.md#create-an-airgap-installation-bundle" >}}) used by the installation.
-If you have [configured the backup directory]({{< ref "backup.md#backup-to-filesystem" >}}) to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate uses the most recent backup in the backup directory.
-
-To restore on a new host:
-
-```shell
-chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID
-```
-
-To restore on an existing Chef Automate host:
-
-```shell
-chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID --skip-preflight
-```
-
-Using S3 or GCS:
-
-```shell
-# S3
-chef-automate backup restore --airgap-bundle </path/to/bundle> s3://bucket_name/</path/to/backups/>BACKUP_ID --skip-preflight
-
-# GCS
-hef-automate backup restore --airgap-bundle </path/to/bundle> gs://bucket_name/</path/to/backups/>BACKUP_ID --skip-preflight
-```
-
-### Restore From an S3 or GCS Backup
-
-To restore on a new host:
-
-* S3:
-
-  ```shell
-  chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID
-  ```
-* GCS:
-  ```shell
-  chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID
-  ```
-
-To restore on an existing Chef Automate host:
-
-* S3:
-
-  ```shell
-  chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
-  ```
-* GCS:
-   ```shell
-  chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
-  ```
-
-A successful restore shows the timestamp of the backup used at the end of the status output:
-
-```shell
-Success: Restored backup 20180517223558
-```
+where `bucket_name` is the name of the GCS bucket and `base_path` is an optional path within the bucket where the backups live.
 
 ## Delete Backups
 
-To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete it using [`chef automate backup delete ID`]({{< ref "cli-chef-automate/#chef-automate-backup-delete" >}}).
+To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete the backup using [`chef automate backup delete ID`]({{< ref "cli-chef-automate/#chef-automate-backup-delete" >}}).
 
 ```shell
 chef-automate backup list

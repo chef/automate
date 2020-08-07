@@ -11,7 +11,7 @@ toc = true
     weight = 80
 +++
 
-Restore Chef Automate from a [filesystem backup]({{< ref "restore.md#restore-from-a-filesystem-backup" >}}) or an [Amazon S3 bucket backup]({{< ref "restore.md#restore-from-an-s3-backup" >}}).
+Restore Chef Automate from a [filesystem backup]({{< ref "restore.md#restore-from-a-filesystem-backup" >}}), an [Amazon S3 bucket backup]({{< ref "restore.md#restore-from-an-aws-s3-backup" >}}), or a [Google Cloud Storage (GCS) bucket backup]({{< ref "restore.md#restore-from-a-google-cloud-storage-backup" >}}).
 
 ## Prerequisites
 
@@ -59,12 +59,23 @@ Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before
 If you have [configured the backup directory]({{< relref "backup.md#backup-to-a-filesystem" >}}) to a directory other than the default directory (`/var/opt/chef-automate/backups`), you must supply the backup directory.
 Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
 
+To restore on a new host, run:
+
 ```shell
-chef-automate backup restore </path/to/backups/>BACKUP_ID [--patch-config </path/to/patch.toml>] [--skip-preflight]
+chef-automate backup restore </path/to/backups/>BACKUP_ID
 ```
 
-Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host.
-Use the `--skip-preflight` option to restore to a host with a pre-existing Chef Automate installation.
+To restore on an existing Chef Automate host, run:
+
+```shell
+chef-automate backup restore </path/to/backups/>BACKUP_ID --skip-preflight
+```
+
+Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host:
+
+```shell
+chef-automate backup restore </path/to/backups/>BACKUP_ID --patch-config </path/to/patch.toml> --skip-preflight
+```
 
 Restores from a filesystem backup may fail with incorrect directory permissions.
 Run the [`fix-repo-permissions` command]({{< ref "cli-chef-automate/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
@@ -79,12 +90,31 @@ To restore a backup of an [airgapped installation]({{< relref "airgapped-install
 If you have [configured the backup directory]({{< relref "backup.md#backup-to-a-filesystem" >}}) to a directory that is not the default `/var/opt/chef-automate/backups`, then you must supply the backup directory.
 If you do not provide a backup ID, Chef Automate uses the most recent backup in the backup directory.
 
+To restore on a new host, run:
+
 ```shell
-chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID [--patch-config </path/to/patch.toml>] [--skip-preflight]
+chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID
+```
+
+To restore on an existing Chef Automate host, run:
+
+```shell
+chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID --skip-preflight
+```
+
+To restore using AWS S3 on an existing Chef Automate host, run:
+
+```shell
+chef-automate backup restore --airgap-bundle </path/to/bundle> s3://bucket_name/</path/to/backups/>BACKUP_ID --skip-preflight
+```
+
+To restore using Google Cloud Storage (GCS) on an existing Chef Automate host, run:
+
+```shell
+chef-automate backup restore --airgap-bundle </path/to/bundle> gs://bucket_name/</path/to/backups/>BACKUP_ID --skip-preflight
 ```
 
 Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host.
-Use the `--skip-preflight` option to restore to a host with a pre-existing Chef Automate installation.
 
 Restores from a filesystem backup may fail with incorrect directory permissions.
 Run the [`fix-repo-permissions` command]({{< ref "cli-chef-automate/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
@@ -93,18 +123,65 @@ Run the [`fix-repo-permissions` command]({{< ref "cli-chef-automate/#chef-automa
 sudo chef-automate backup fix-repo-permissions <path>
 ```
 
-## Restore From an S3 Backup
+## Restore From an AWS S3 Backup
 
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
 
-To restore from an S3 bucket backup, run:
+Learn how to [back up to AWS S3]({{< ref "backup/#backup-to-aws-s3" >}}).
+
+To restore from an AWS S3 bucket backup on a new host, run:
 
 ```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID [--patch-config </path/to/patch.toml>] [--skip-preflight]
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID
 ```
 
-Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host.
-Use the `--skip-preflight` option to restore to a host with a pre-existing Chef Automate installation.
+To restore from an AWS S3 bucket backup on an existing Chef Automate host, run:
+
+```shell
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
+```
+
+Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host:
+
+```shell
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --patch-config </path/to/patch.toml> --skip-preflight
+```
+
+A successful restore shows the timestamp of the backup used at the end of the status output:
+
+```shell
+Success: Restored backup 20180517223558
+```
+
+## Restore From a Google Cloud Storage Backup
+
+Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
+
+Learn how to [back up to GCS]({{< ref "backup/#backup-to-gcs" >}}).
+
+To restore from a Google Cloud Storage (GCS) bucket backup on a new host, run:
+
+```shell
+chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID
+```
+
+To restore from a Google Cloud Storage (GCS) bucket backup on an existing Chef Automate host, run:
+
+```shell
+chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
+```
+
+Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host:
+
+```shell
+chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --patch-config </path/to/patch.toml> --skip-preflight
+```
+
+A successful restore shows the timestamp of the backup used at the end of the status output:
+
+```shell
+Success: Restored backup 20180517223558
+```
 
 ## Troubleshooting
 
