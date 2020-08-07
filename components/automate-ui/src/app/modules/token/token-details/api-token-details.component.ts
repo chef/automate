@@ -95,8 +95,8 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   }
 
   public saveToken(): void {
-    this.saveInProgress = true;
     this.saveSuccessful = false;
+    this.saveInProgress = true;
     const name: string = this.updateForm.controls.name.value.trim();
     const active = <TokenStatus>this.updateForm.controls.status.value === 'active';
     const projects: string[] = this.updateForm.controls.projects.value;
