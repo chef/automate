@@ -1,12 +1,12 @@
 package shared
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"github.com/chef/automate/lib/pcmp/passert"
 )
 
 func TestMerge(t *testing.T) {
@@ -73,6 +73,6 @@ func TestMerge(t *testing.T) {
 		merged := &GlobalConfig{}
 		err := Merge(existing, overwrite, merged)
 		assert.NoError(t, err)
-		assert.True(t, reflect.DeepEqual(expected, merged), "Failed to merged")
+		passert.Equal(t, expected, merged)
 	})
 }

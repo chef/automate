@@ -75,10 +75,13 @@ func (t *LicenseServer) GetStatus(ctx context.Context,
 	}
 
 	resp := license.GetStatusResp{
-		LicenseId:      lcResp.LicenseId,
-		ConfiguredAt:   lcResp.ConfiguredAt,
-		CustomerName:   lcResp.CustomerName,
-		LicensedPeriod: (*license.GetStatusResp_DateRange)(lcResp.LicensedPeriod),
+		LicenseId:    lcResp.LicenseId,
+		ConfiguredAt: lcResp.ConfiguredAt,
+		CustomerName: lcResp.CustomerName,
+		LicensedPeriod: &license.GetStatusResp_DateRange{
+			Start: lcResp.LicensedPeriod.Start,
+			End:   lcResp.LicensedPeriod.End,
+		},
 	}
 	return &resp, nil
 }

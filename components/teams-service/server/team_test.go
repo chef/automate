@@ -18,6 +18,7 @@ import (
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/pcmp/prequire"
 	"github.com/chef/automate/lib/tls/test/helpers"
 	"github.com/chef/automate/lib/tracing"
 	"github.com/chef/automate/lib/version"
@@ -80,7 +81,7 @@ func runAllServerTests(
 			Sha:     "eaf1f3553eb64fb9f393366e8ba4ee61e515727e",
 		}
 
-		require.Equal(t, expectedVersion, resp)
+		prequire.Equal(t, expectedVersion, resp)
 	})
 
 	t.Run("GetTeam", func(t *testing.T) {
