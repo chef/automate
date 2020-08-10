@@ -68,6 +68,10 @@ var a2Config = config{
 			description: "corrupt a2 license for testing",
 			regex:       `components/license-control-service/testdata/a2-test_corrupt.license`,
 		},
+		{
+			description: "fake GCP json credentials are in the backup readme as an example",
+			regex:       `components/automate-chef-io/content/docs/backup.md`,
+		},
 		// // TODO(ssd) 2019-01-22: The following files are files that need to be checked.
 		{regex: `components/automate-deployment/pkg/persistence/boltdb/internal/v1/testdata/boltdb-20180226095149.db`},
 		{regex: `components/automate-chef-io/content/docs/configuration.md`},
