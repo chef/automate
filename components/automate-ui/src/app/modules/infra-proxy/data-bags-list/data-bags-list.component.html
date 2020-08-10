@@ -9,7 +9,7 @@
       </chef-thead>
       <chef-tbody>
         <chef-tr *ngFor="let dataBag of dataBags">
-          <chef-td><a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'data_bags', dataBag.name]">{{ dataBag.name }}</a></chef-td>
+          <chef-td><a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'data-bags', dataBag.name]">{{ dataBag.name }}</a></chef-td>
         </chef-tr>
       </chef-tbody>
     </chef-table>
