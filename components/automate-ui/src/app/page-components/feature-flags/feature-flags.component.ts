@@ -39,7 +39,7 @@ export class FeatureFlagsComponent implements OnInit {
 
   public warning: string;
   public flagType: FlagTypes;
-  private blockedElements = ['input', 'textarea', 'button', 'select', 'chef-button', 'chef-select'];
+  private blockedElements = ['input', 'textarea'];
 
   betaWarning = 'The warranties and indemnities in your license agreement do not apply ' +
                 'to experimental features. Experimental features are provided "as is" ' +
