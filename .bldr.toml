@@ -251,7 +251,8 @@ paths = [
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
   "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [automate-dex]
@@ -606,7 +607,8 @@ paths = [
   "vendor/google.golang.org/grpc/*",
   "vendor/google.golang.org/protobuf/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [config-mgmt-service]
@@ -864,7 +866,8 @@ paths = [
   "vendor/google.golang.org/protobuf/*",
   "vendor/gopkg.in/cheggaaa/pb.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [deployment-service]
@@ -1056,7 +1059,8 @@ paths = [
   "vendor/google.golang.org/protobuf/*",
   "vendor/gopkg.in/cheggaaa/pb.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [es-sidecar-service]
@@ -1169,7 +1173,8 @@ paths = [
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
   "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [automate-pg-gateway]
@@ -1474,7 +1479,8 @@ paths = [
   "vendor/google.golang.org/grpc/*",
   "vendor/google.golang.org/protobuf/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [ingest-service]
@@ -2237,7 +2243,8 @@ paths = [
   "vendor/google.golang.org/grpc/*",
   "vendor/google.golang.org/protobuf/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [automate-cds]

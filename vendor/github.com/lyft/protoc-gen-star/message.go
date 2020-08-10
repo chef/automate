@@ -35,6 +35,10 @@ type Message interface {
 	// Extensions returns all of the Extensions applied to this Message.
 	Extensions() []Extension
 
+	// Dependents returns all of the messages where message is directly or
+	// transitively used.
+	Dependents() []Message
+
 	// IsMapEntry identifies this message as a MapEntry. If true, this message is
 	// not generated as code, and is used exclusively when marshaling a map field
 	// to the wire format.
@@ -53,6 +57,8 @@ type Message interface {
 	addField(f Field)
 	addExtension(e Extension)
 	addOneOf(o OneOf)
+	addDependent(message Message)
+	getDependents(set map[string]Message)
 }
 
 type msg struct {
@@ -67,6 +73,8 @@ type msg struct {
 	fields              []Field
 	oneofs              []OneOf
 	maps                []Message
+	dependents          []Message
+	dependentsCache     map[string]Message
 
 	info SourceCodeInfo
 }
@@ -143,6 +151,31 @@ func (m *msg) Imports() (i []File) {
 		i = append(i, f)
 	}
 	return
+}
+
+func (m *msg) getDependents(set map[string]Message) {
+	m.populateDependentsCache()
+
+	for fqn, d := range m.dependentsCache {
+		set[fqn] = d
+	}
+}
+
+func (m *msg) populateDependentsCache() {
+	if m.dependentsCache != nil {
+		return
+	}
+
+	m.dependentsCache = map[string]Message{}
+	for _, dep := range m.dependents {
+		m.dependentsCache[dep.FullyQualifiedName()] = dep
+		dep.getDependents(m.dependentsCache)
+	}
+}
+
+func (m *msg) Dependents() []Message {
+	m.populateDependentsCache()
+	return messageSetToSlice(m.FullyQualifiedName(), m.dependentsCache)
 }
 
 func (m *msg) Extension(desc *proto.ExtensionDesc, ext interface{}) (bool, error) {
@@ -234,6 +267,10 @@ func (m *msg) addMapEntry(me Message) {
 	m.maps = append(m.maps, me)
 }
 
+func (m *msg) addDependent(message Message) {
+	m.dependents = append(m.dependents, message)
+}
+
 func (m *msg) childAtPath(path []int32) Entity {
 	switch {
 	case len(path) == 0:
@@ -260,5 +297,17 @@ func (m *msg) childAtPath(path []int32) Entity {
 }
 
 func (m *msg) addSourceCodeInfo(info SourceCodeInfo) { m.info = info }
+
+func messageSetToSlice(name string, set map[string]Message) []Message {
+	dependents := make([]Message, 0, len(set))
+
+	for fqn, d := range set {
+		if fqn != name {
+			dependents = append(dependents, d)
+		}
+	}
+
+	return dependents
+}
 
 var _ Message = (*msg)(nil)
