@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment as env } from 'environments/environment';
 import { CookbookDetails, RespCookbookDetails } from './cookbook-details.model';
+import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 
 @Injectable()
 export class CookbookDetailsRequests {
@@ -13,8 +14,9 @@ export class CookbookDetailsRequests {
   public getCookbookDetails(
     server_id: string, org_id: string, cookbook_name: string, cookbook_version: string):
     Observable<CookbookDetails> {
+    const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
     return this.http.get<RespCookbookDetails>(
-      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${cookbook_version}`)
+      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${cookbook_version}`, { headers })
       .pipe(
         map((respCookbookDetails:
           RespCookbookDetails) => this.createCookbookDetails(respCookbookDetails)));

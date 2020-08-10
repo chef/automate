@@ -15,6 +15,8 @@ import { ChefSessionService } from 'app/services/chef-session/chef-session.servi
 import * as selectors from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from '../projects-filter/projects-filter.reducer';
 
+export const InterceptorSkipHeader = 'Skip-Interceptor';
+
 @Injectable()
 export class HttpClientAuthInterceptor implements HttpInterceptor {
 
@@ -46,6 +48,12 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
 
     if (this.projects && filtered) {
       headers = headers.set('projects', this.projects);
+    }
+    // Check the interceptor skip header in API request
+    // To avoid session logout if 401 raised from external API
+    if (request.headers.has(InterceptorSkipHeader)) {
+      headers = headers.delete(InterceptorSkipHeader);
+      return next.handle(request.clone({ headers }));
     }
 
     return this.chefSession.token_provider.pipe(
