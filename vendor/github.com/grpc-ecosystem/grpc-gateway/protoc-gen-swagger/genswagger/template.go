@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/url"
 	"os"
 	"reflect"
 	"regexp"
@@ -19,8 +18,8 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	pbdescriptor "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	gogen "github.com/golang/protobuf/protoc-gen-go/generator"
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/grpc-ecosystem/grpc-gateway/internal/casing"
 	"github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway/descriptor"
 	swagger_options "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options"
 )
@@ -93,6 +92,13 @@ func listEnumNames(enum *descriptor.Enum) (names []string) {
 	return names
 }
 
+func listEnumNumbers(enum *descriptor.Enum) (numbers []string) {
+	for _, value := range enum.GetValue() {
+		numbers = append(numbers, strconv.Itoa(int(value.GetNumber())))
+	}
+	return
+}
+
 func getEnumDefault(enum *descriptor.Enum) string {
 	for _, value := range enum.GetValue() {
 		if value.GetNumber() == 0 {
@@ -114,8 +120,18 @@ func messageToQueryParameters(message *descriptor.Message, reg *descriptor.Regis
 	return params, nil
 }
 
-// queryParams converts a field to a list of swagger query parameters recursively.
+// queryParams converts a field to a list of swagger query parameters recursively through the use of nestedQueryParams.
 func queryParams(message *descriptor.Message, field *descriptor.Field, prefix string, reg *descriptor.Registry, pathParams []descriptor.Parameter) (params []swaggerParameterObject, err error) {
+    return nestedQueryParams(message, field, prefix, reg, pathParams, map[string]bool{})
+}
+
+// nestedQueryParams converts a field to a list of swagger query parameters recursively.
+// This function is a helper function for queryParams, that keeps track of cyclical message references
+//  through the use of
+//      touched map[string]bool
+// If a cycle is discovered, an error is returned, as cyclical data structures aren't allowed
+//  in query parameters.
+func nestedQueryParams(message *descriptor.Message, field *descriptor.Field, prefix string, reg *descriptor.Registry, pathParams []descriptor.Parameter, touched map[string]bool) (params []swaggerParameterObject, err error) {
 	// make sure the parameter is not already listed as a path parameter
 	for _, pathParam := range pathParams {
 		if pathParam.Target == field {
@@ -183,10 +199,19 @@ func queryParams(message *descriptor.Message, field *descriptor.Field, prefix st
 					Type: "string",
 					Enum: listEnumNames(enum),
 				}
+				if reg.GetEnumsAsInts() {
+					param.Items.Type = "integer"
+					param.Items.Enum = listEnumNumbers(enum)
+				}
 			} else {
 				param.Type = "string"
 				param.Enum = listEnumNames(enum)
 				param.Default = getEnumDefault(enum)
+				if reg.GetEnumsAsInts() {
+					param.Type = "integer"
+					param.Enum = listEnumNumbers(enum)
+					param.Default = "0"
+				}
 			}
 			valueComments := enumValueProtoComments(reg, enum)
 			if valueComments != "" {
@@ -201,8 +226,22 @@ func queryParams(message *descriptor.Message, field *descriptor.Field, prefix st
 	if err != nil {
 		return nil, fmt.Errorf("unknown message type %s", fieldType)
 	}
+        // Check for cyclical message reference:
+        isCycle := touched[*msg.Name]
+        if isCycle {
+            return nil, fmt.Errorf("Recursive types are not allowed for query parameters, cycle found on %q", fieldType)
+        }
+        // Update map with the massage name so a cycle further down the recursive path can be detected. 
+        touched[*msg.Name] = true
+
 	for _, nestedField := range msg.Fields {
-		p, err := queryParams(msg, nestedField, prefix+field.GetName()+".", reg, pathParams)
+		var fieldName string
+		if reg.GetUseJSONNamesForFields() {
+			fieldName = field.GetJsonName()
+		} else {
+			fieldName = field.GetName()
+		}
+		p, err := nestedQueryParams(msg, nestedField, prefix+fieldName+".", reg, pathParams, touched)
 		if err != nil {
 			return nil, err
 		}
@@ -216,28 +255,40 @@ func findServicesMessagesAndEnumerations(s []*descriptor.Service, reg *descripto
 	for _, svc := range s {
 		for _, meth := range svc.Methods {
 			// Request may be fully included in query
-			if _, ok := refs[fmt.Sprintf("#/definitions/%s", fullyQualifiedNameToSwaggerName(meth.RequestType.FQMN(), reg))]; ok {
-				if !skipRenderingRef(meth.RequestType.FQMN()) {
-					m[fullyQualifiedNameToSwaggerName(meth.RequestType.FQMN(), reg)] = meth.RequestType
+			{
+				swgReqName, ok := fullyQualifiedNameToSwaggerName(meth.RequestType.FQMN(), reg)
+				if !ok {
+					glog.Errorf("couldn't resolve swagger name for FQMN '%v'", meth.RequestType.FQMN())
+					continue
+				}
+				if _, ok := refs[fmt.Sprintf("#/definitions/%s", swgReqName)]; ok {
+					if !skipRenderingRef(meth.RequestType.FQMN()) {
+						m[swgReqName] = meth.RequestType
+					}
 				}
 			}
+
+			swgRspName, ok := fullyQualifiedNameToSwaggerName(meth.ResponseType.FQMN(), reg)
+			if !ok && !skipRenderingRef(meth.ResponseType.FQMN()) {
+				glog.Errorf("couldn't resolve swagger name for FQMN '%v'", meth.ResponseType.FQMN())
+				continue
+			}
+
 			findNestedMessagesAndEnumerations(meth.RequestType, reg, m, e)
 
 			if !skipRenderingRef(meth.ResponseType.FQMN()) {
-				m[fullyQualifiedNameToSwaggerName(meth.ResponseType.FQMN(), reg)] = meth.ResponseType
+				m[swgRspName] = meth.ResponseType
 				if meth.GetServerStreaming() {
-					runtimeStreamError := fullyQualifiedNameToSwaggerName(".grpc.gateway.runtime.StreamError", reg)
-					glog.V(1).Infof("StreamError FQMN: %s", runtimeStreamError)
-					streamError, err := reg.LookupMsg(".grpc.gateway.runtime", "StreamError")
-					if err == nil {
+					streamError, runtimeStreamError, err := lookupMsgAndSwaggerName(".grpc.gateway.runtime", "StreamError", reg)
+					if err != nil {
+						glog.Error(err)
+					} else {
 						glog.V(1).Infof("StreamError: %v", streamError)
+						glog.V(1).Infof("StreamError FQMN: %s", runtimeStreamError)
 						m[runtimeStreamError] = streamError
 						findNestedMessagesAndEnumerations(streamError, reg, m, e)
-					} else {
-						//just in case there is an error looking up StreamError
-						glog.Error(err)
 					}
-					ms[fullyQualifiedNameToSwaggerName(meth.ResponseType.FQMN(), reg)] = meth.ResponseType
+					ms[swgRspName] = meth.ResponseType
 				}
 			}
 			findNestedMessagesAndEnumerations(meth.ResponseType, reg, m, e)
@@ -276,6 +327,10 @@ func skipRenderingRef(refName string) bool {
 
 func renderMessagesAsDefinition(messages messageMap, d swaggerDefinitionsObject, reg *descriptor.Registry, customRefs refMap) {
 	for name, msg := range messages {
+		swgName, ok := fullyQualifiedNameToSwaggerName(msg.FQMN(), reg)
+		if !ok {
+			panic(fmt.Sprintf("can't resolve swagger name from '%v'", msg.FQMN()))
+		}
 		if skipRenderingRef(name) {
 			continue
 		}
@@ -349,43 +404,7 @@ func renderMessagesAsDefinition(messages messageMap, d swaggerDefinitionsObject,
 			}
 			*schema.Properties = append(*schema.Properties, kv)
 		}
-		d[fullyQualifiedNameToSwaggerName(msg.FQMN(), reg)] = schema
-	}
-}
-
-func renderMessagesAsStreamDefinition(messages messageMap, d swaggerDefinitionsObject, reg *descriptor.Registry) {
-	for name, msg := range messages {
-		if skipRenderingRef(name) {
-			continue
-		}
-
-		if opt := msg.GetOptions(); opt != nil && opt.MapEntry != nil && *opt.MapEntry {
-			continue
-		}
-		d[fullyQualifiedNameToSwaggerName(msg.FQMN(), reg)] = swaggerSchemaObject{
-			schemaCore: schemaCore{
-				Type: "object",
-			},
-			Title: fmt.Sprintf("Stream result of %s", fullyQualifiedNameToSwaggerName(msg.FQMN(), reg)),
-			Properties: &swaggerSchemaObjectProperties{
-				keyVal{
-					Key: "result",
-					Value: swaggerSchemaObject{
-						schemaCore: schemaCore{
-							Ref: fmt.Sprintf("#/definitions/%s", fullyQualifiedNameToSwaggerName(msg.FQMN(), reg)),
-						},
-					},
-				},
-				keyVal{
-					Key: "error",
-					Value: swaggerSchemaObject{
-						schemaCore: schemaCore{
-							Ref: fmt.Sprintf("#/definitions/%s", fullyQualifiedNameToSwaggerName(".grpc.gateway.runtime.StreamError", reg)),
-						},
-					},
-				},
-			},
-		}
+		d[swgName] = schema
 	}
 }
 
@@ -423,12 +442,15 @@ func schemaOfField(f *descriptor.Field, reg *descriptor.Registry, refs refMap) s
 				props = &swaggerSchemaObjectProperties{}
 			}
 		} else {
+			swgRef, ok := fullyQualifiedNameToSwaggerName(fd.GetTypeName(), reg)
+			if !ok {
+				panic(fmt.Sprintf("can't resolve swagger ref from typename '%v'", fd.GetTypeName()))
+			}
 			core = schemaCore{
-				Ref: "#/definitions/" + fullyQualifiedNameToSwaggerName(fd.GetTypeName(), reg),
+				Ref: "#/definitions/" + swgRef,
 			}
 			if refs != nil {
 				refs[fd.GetTypeName()] = struct{}{}
-
 			}
 		}
 	default:
@@ -523,6 +545,10 @@ func primitiveSchema(t pbdescriptor.FieldDescriptorProto_Type) (ftype, format st
 // renderEnumerationsAsDefinition inserts enums into the definitions object.
 func renderEnumerationsAsDefinition(enums enumMap, d swaggerDefinitionsObject, reg *descriptor.Registry) {
 	for _, enum := range enums {
+		swgName, ok := fullyQualifiedNameToSwaggerName(enum.FQEN(), reg)
+		if !ok {
+			panic(fmt.Sprintf("can't resolve swagger name from FQEN '%v'", enum.FQEN()))
+		}
 		enumComments := protoComments(reg, enum.File, enum.Outers, "EnumType", int32(enum.Index))
 
 		// it may be necessary to sort the result of the GetValue function.
@@ -539,24 +565,47 @@ func renderEnumerationsAsDefinition(enums enumMap, d swaggerDefinitionsObject, r
 				Default: defaultValue,
 			},
 		}
+		if reg.GetEnumsAsInts() {
+			enumSchemaObject.Type = "integer"
+			enumSchemaObject.Format = "int32"
+			enumSchemaObject.Default = "0"
+			enumSchemaObject.Enum = listEnumNumbers(enum)
+		}
 		if err := updateSwaggerDataFromComments(reg, &enumSchemaObject, enum, enumComments, false); err != nil {
 			panic(err)
 		}
 
-		d[fullyQualifiedNameToSwaggerName(enum.FQEN(), reg)] = enumSchemaObject
+		d[swgName] = enumSchemaObject
 	}
 }
 
-// Take in a FQMN or FQEN and return a swagger safe version of the FQMN
-func fullyQualifiedNameToSwaggerName(fqn string, reg *descriptor.Registry) string {
+// Take in a FQMN or FQEN and return a swagger safe version of the FQMN and
+// a boolean indicating if FQMN was properly resolved.
+func fullyQualifiedNameToSwaggerName(fqn string, reg *descriptor.Registry) (string, bool) {
 	registriesSeenMutex.Lock()
 	defer registriesSeenMutex.Unlock()
 	if mapping, present := registriesSeen[reg]; present {
-		return mapping[fqn]
+		ret, ok := mapping[fqn]
+		return ret, ok
 	}
 	mapping := resolveFullyQualifiedNameToSwaggerNames(append(reg.GetAllFQMNs(), reg.GetAllFQENs()...), reg.GetUseFQNForSwaggerName())
 	registriesSeen[reg] = mapping
-	return mapping[fqn]
+	ret, ok := mapping[fqn]
+	return ret, ok
+}
+
+// Lookup message type by location.name and return a swagger-safe version
+// of its FQMN.
+func lookupMsgAndSwaggerName(location, name string, reg *descriptor.Registry) (*descriptor.Message, string, error) {
+	msg, err := reg.LookupMsg(location, name)
+	if err != nil {
+		return nil, "", err
+	}
+	swgName, ok := fullyQualifiedNameToSwaggerName(msg.FQMN(), reg)
+	if !ok {
+		return nil, "", fmt.Errorf("can't map swagger name from FQMN '%v'", msg.FQMN())
+	}
+	return msg, swgName, nil
 }
 
 // registriesSeen is used to memoise calls to resolveFullyQualifiedNameToSwaggerNames so
@@ -622,7 +671,7 @@ func resolveFullyQualifiedNameToSwaggerNames(messages []string, useFQNForSwagger
 var canRegexp = regexp.MustCompile("{([a-zA-Z][a-zA-Z0-9_.]*).*}")
 
 // Swagger expects paths of the form /path/{string_value} but grpc-gateway paths are expected to be of the form /path/{string_value=strprefix/*}. This should reformat it correctly.
-func templateToSwaggerPath(path string, reg *descriptor.Registry) string {
+func templateToSwaggerPath(path string, reg *descriptor.Registry, fields []*descriptor.Field, msgs []*descriptor.Message) string {
 	// It seems like the right thing to do here is to just use
 	// strings.Split(path, "/") but that breaks badly when you hit a url like
 	// /{my_field=prefix/*}/ and end up with 2 sections representing my_field.
@@ -651,7 +700,7 @@ func templateToSwaggerPath(path string, reg *descriptor.Registry) string {
 			if reg.GetUseJSONNamesForFields() &&
 				len(jsonBuffer) > 1 {
 				jsonSnakeCaseName := string(jsonBuffer[1:])
-				jsonCamelCaseName := string(lowerCamelCase(jsonSnakeCaseName))
+				jsonCamelCaseName := string(lowerCamelCase(jsonSnakeCaseName, fields, msgs))
 				prev := string(buffer[:len(buffer)-len(jsonSnakeCaseName)-2])
 				buffer = strings.Join([]string{prev, "{", jsonCamelCaseName, "}"}, "")
 				jsonBuffer = ""
@@ -679,18 +728,13 @@ func templateToSwaggerPath(path string, reg *descriptor.Registry) string {
 	// Parts is now an array of segments of the path. Interestingly, since the
 	// syntax for this subsection CAN be handled by a regexp since it has no
 	// memory.
-	keyre := regexp.MustCompile("{(.*)}")
 	for index, part := range parts {
 		// If part is a resource name such as "parent", "name", "user.name", the format info must be retained.
 		prefix := canRegexp.ReplaceAllString(part, "$1")
 		if isResourceName(prefix) {
-			sm := keyre.FindStringSubmatch(part)
-			key := sm[1]
-			esckey := url.PathEscape(key)
-			parts[index] = keyre.ReplaceAllString(part, fmt.Sprintf("{%s}", esckey))
-		} else {
-			parts[index] = canRegexp.ReplaceAllString(part, "{$1}")
+			continue
 		}
+		parts[index] = canRegexp.ReplaceAllString(part, "{$1}")
 	}
 
 	return strings.Join(parts, "/")
@@ -705,31 +749,11 @@ func isResourceName(prefix string) bool {
 	return field == "parent" || field == "name"
 }
 
-func extractResourceName(path string) map[string]string {
-	m := map[string]string{}
-	keyre := regexp.MustCompile("{(.*)}")
-	sm := keyre.FindStringSubmatch(path)
-	count := len(sm)
-	for i := 0; i < count; i++ {
-		key := sm[1]
-		parts := strings.Split(key, "=")
-		label := parts[0]
-		parts = strings.Split(label, ".")
-		l := len(parts)
-		field := parts[l-1]
-		if field == "parent" || field == "name" {
-			m[label] = key
-		}
-	}
-	return m
-}
-
-func renderServices(services []*descriptor.Service, paths swaggerPathsObject, reg *descriptor.Registry, requestResponseRefs, customRefs refMap) error {
+func renderServices(services []*descriptor.Service, paths swaggerPathsObject, reg *descriptor.Registry, requestResponseRefs, customRefs refMap, msgs []*descriptor.Message) error {
 	// Correctness of svcIdx and methIdx depends on 'services' containing the services in the same order as the 'file.Service' array.
 	for svcIdx, svc := range services {
 		for methIdx, meth := range svc.Methods {
 			for bIdx, b := range meth.Bindings {
-				pathParamMap := extractResourceName(templateToSwaggerPath(b.PathTmpl.Template, reg))
 				// Iterate over all the swagger parameters
 				parameters := swaggerParametersObject{}
 				for _, parameter := range b.PathParams {
@@ -753,13 +777,18 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 							return fmt.Errorf("only primitive and well-known types are allowed in path parameters")
 						}
 					case pbdescriptor.FieldDescriptorProto_TYPE_ENUM:
-						paramType = "string"
-						paramFormat = ""
 						enum, err := reg.LookupEnum("", parameter.Target.GetTypeName())
 						if err != nil {
 							return err
 						}
+						paramType = "string"
+						paramFormat = ""
 						enumNames = listEnumNames(enum)
+						if reg.GetEnumsAsInts() {
+							paramType = "integer"
+							paramFormat = ""
+							enumNames = listEnumNumbers(enum)
+						}
 						schema := schemaOfField(parameter.Target, reg, customRefs)
 						desc = schema.Description
 						defaultValue = schema.Default
@@ -795,10 +824,7 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 					}
 					parameterString := parameter.String()
 					if reg.GetUseJSONNamesForFields() {
-						parameterString = lowerCamelCase(parameterString)
-					}
-					if esckey, ok := pathParamMap[parameterString]; ok {
-						parameterString = esckey
+						parameterString = lowerCamelCase(parameterString, meth.RequestType.Fields, msgs)
 					}
 					parameters = append(parameters, swaggerParameterObject{
 						Name:        parameterString,
@@ -827,7 +853,10 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 
 						wknSchemaCore, isWkn := wktSchemas[meth.RequestType.FQMN()]
 						if !isWkn {
-							schema.Ref = fmt.Sprintf("#/definitions/%s", fullyQualifiedNameToSwaggerName(meth.RequestType.FQMN(), reg))
+							err := schema.setRefFromFQN(meth.RequestType.FQMN(), reg)
+							if err != nil {
+								return err
+							}
 						} else {
 							schema.schemaCore = wknSchemaCore
 
@@ -865,7 +894,7 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 					parameters = append(parameters, queryParams...)
 				}
 
-				pathItemObject, ok := paths[templateToSwaggerPath(b.PathTmpl.Template, reg)]
+				pathItemObject, ok := paths[templateToSwaggerPath(b.PathTmpl.Template, reg, meth.RequestType.Fields, msgs)]
 				if !ok {
 					pathItemObject = swaggerPathItemObject{}
 				}
@@ -885,7 +914,10 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 					// well, without a definition
 					wknSchemaCore, isWkn := wktSchemas[meth.ResponseType.FQMN()]
 					if !isWkn {
-						responseSchema.Ref = fmt.Sprintf("#/definitions/%s", fullyQualifiedNameToSwaggerName(meth.ResponseType.FQMN(), reg))
+						err := responseSchema.setRefFromFQN(meth.ResponseType.FQMN(), reg)
+						if err != nil {
+							return err
+						}
 					} else {
 						responseSchema.schemaCore = wknSchemaCore
 
@@ -906,8 +938,32 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 				}
 				if meth.GetServerStreaming() {
 					desc += "(streaming responses)"
-					// Use the streamdefinition which wraps the message in a "result"
-					responseSchema.Ref = strings.Replace(responseSchema.Ref, `#/definitions/`, `#/x-stream-definitions/`, 1)
+					responseSchema.Type = "object"
+					swgRef, _ := fullyQualifiedNameToSwaggerName(meth.ResponseType.FQMN(), reg)
+					responseSchema.Title = "Stream result of " + swgRef
+
+					props := swaggerSchemaObjectProperties{
+						keyVal{
+							Key: "result",
+							Value: swaggerSchemaObject{
+								schemaCore: schemaCore{
+									Ref: responseSchema.Ref,
+								},
+							},
+						},
+					}
+					streamErrDef, hasStreamError := fullyQualifiedNameToSwaggerName(".grpc.gateway.runtime.StreamError", reg)
+					if hasStreamError {
+						props = append(props, keyVal{
+							Key: "error",
+							Value: swaggerSchemaObject{
+								schemaCore: schemaCore{
+									Ref: fmt.Sprintf("#/definitions/%s", streamErrDef)},
+							},
+						})
+					}
+					responseSchema.Properties = &props
+					responseSchema.Ref = ""
 				}
 
 				tag := svc.GetName()
@@ -925,11 +981,27 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 						},
 					},
 				}
-				if bIdx == 0 {
+				if !reg.GetDisableDefaultErrors() {
+					errDef, hasErrDef := fullyQualifiedNameToSwaggerName(".grpc.gateway.runtime.Error", reg)
+					if hasErrDef {
+						// https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#responses-object
+						operationObject.Responses["default"] = swaggerResponseObject{
+							Description: "An unexpected error response",
+							Schema: swaggerSchemaObject{
+								schemaCore: schemaCore{
+									Ref: fmt.Sprintf("#/definitions/%s", errDef),
+								},
+							},
+						}
+					}
+				}
+				operationObject.OperationID = fmt.Sprintf("%s_%s", svc.GetName(), meth.GetName())
+				if reg.GetSimpleOperationIDs() {
 					operationObject.OperationID = fmt.Sprintf("%s", meth.GetName())
-				} else {
+				}
+				if bIdx != 0 {
 					// OperationID must be unique in an OpenAPI v2 definition.
-					operationObject.OperationID = fmt.Sprintf("%s%d", meth.GetName(), bIdx+1)
+					operationObject.OperationID += strconv.Itoa(bIdx + 1)
 				}
 
 				// Fill reference map with referenced request messages
@@ -939,7 +1011,7 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 					}
 				}
 
-				methComments := protoComments(reg, svc.File, nil, "Method", int32(svcIdx), methProtoPath, int32(methIdx))
+				methComments := protoComments(reg, svc.File, nil, "Service", int32(svcIdx), methProtoPath, int32(methIdx))
 				if err := updateSwaggerDataFromComments(reg, operationObject, meth, methComments, false); err != nil {
 					panic(err)
 				}
@@ -962,6 +1034,9 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 					if len(opts.Tags) > 0 {
 						operationObject.Tags = make([]string, len(opts.Tags))
 						copy(operationObject.Tags, opts.Tags)
+					}
+					if opts.OperationId != "" {
+						operationObject.OperationID = opts.OperationId
 					}
 					if opts.Security != nil {
 						newSecurity := []swaggerSecurityRequirementObject{}
@@ -988,9 +1063,16 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 					}
 					if opts.Responses != nil {
 						for name, resp := range opts.Responses {
-							respObj := swaggerResponseObject{
-								Description: resp.Description,
-								Schema:      swaggerSchemaFromProtoSchema(resp.Schema, reg, customRefs, meth),
+							// Merge response data into default response if available.
+							respObj := operationObject.Responses[name]
+							if resp.Description != "" {
+								respObj.Description = resp.Description
+							}
+							if resp.Schema != nil {
+								respObj.Schema = swaggerSchemaFromProtoSchema(resp.Schema, reg, customRefs, meth)
+							}
+							if resp.Examples != nil {
+								respObj.Examples = swaggerExamplesFromProtoExamples(resp.Examples)
 							}
 							if resp.Extensions != nil {
 								exts, err := processExtensions(resp.Extensions)
@@ -1009,6 +1091,11 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 							return err
 						}
 						operationObject.extensions = exts
+					}
+
+					if len(opts.Produces) > 0 {
+						operationObject.Produces = make([]string, len(opts.Produces))
+						copy(operationObject.Produces, opts.Produces)
 					}
 
 					// TODO(ivucica): add remaining fields of operation object
@@ -1031,7 +1118,7 @@ func renderServices(services []*descriptor.Service, paths swaggerPathsObject, re
 					pathItemObject.Patch = operationObject
 					break
 				}
-				paths[templateToSwaggerPath(b.PathTmpl.Template, reg)] = pathItemObject
+				paths[templateToSwaggerPath(b.PathTmpl.Template, reg, meth.RequestType.Fields, msgs)] = pathItemObject
 			}
 		}
 	}
@@ -1046,12 +1133,11 @@ func applyTemplate(p param) (*swaggerObject, error) {
 	// defined off of.
 	s := swaggerObject{
 		// Swagger 2.0 is the version of this document
-		Swagger:           "2.0",
-		Consumes:          []string{"application/json"},
-		Produces:          []string{"application/json"},
-		Paths:             make(swaggerPathsObject),
-		Definitions:       make(swaggerDefinitionsObject),
-		StreamDefinitions: make(swaggerDefinitionsObject),
+		Swagger:     "2.0",
+		Consumes:    []string{"application/json"},
+		Produces:    []string{"application/json"},
+		Paths:       make(swaggerPathsObject),
+		Definitions: make(swaggerDefinitionsObject),
 		Info: swaggerInfoObject{
 			Title:   *p.File.Name,
 			Version: "version not set",
@@ -1062,19 +1148,30 @@ func applyTemplate(p param) (*swaggerObject, error) {
 	// and create entries for all of them.
 	// Also adds custom user specified references to second map.
 	requestResponseRefs, customRefs := refMap{}, refMap{}
-	if err := renderServices(p.Services, s.Paths, p.reg, requestResponseRefs, customRefs); err != nil {
+	if err := renderServices(p.Services, s.Paths, p.reg, requestResponseRefs, customRefs, p.Messages); err != nil {
 		panic(err)
+	}
+
+	messages := messageMap{}
+	streamingMessages := messageMap{}
+	enums := enumMap{}
+
+	if !p.reg.GetDisableDefaultErrors() {
+		// Add the error type to the message map
+		runtimeError, swgRef, err := lookupMsgAndSwaggerName(".grpc.gateway.runtime", "Error", p.reg)
+		if err == nil {
+			messages[swgRef] = runtimeError
+		} else {
+			// just in case there is an error looking up runtimeError
+			glog.Error(err)
+		}
 	}
 
 	// Find all the service's messages and enumerations that are defined (recursively)
 	// and write request, response and other custom (but referenced) types out as definition objects.
-	m := messageMap{}
-	ms := messageMap{}
-	e := enumMap{}
-	findServicesMessagesAndEnumerations(p.Services, p.reg, m, ms, e, requestResponseRefs)
-	renderMessagesAsDefinition(m, s.Definitions, p.reg, customRefs)
-	renderMessagesAsStreamDefinition(ms, s.StreamDefinitions, p.reg)
-	renderEnumerationsAsDefinition(e, s.Definitions, p.reg)
+	findServicesMessagesAndEnumerations(p.Services, p.reg, messages, streamingMessages, enums, requestResponseRefs)
+	renderMessagesAsDefinition(messages, s.Definitions, p.reg, customRefs)
+	renderEnumerationsAsDefinition(enums, s.Definitions, p.reg)
 
 	// File itself might have some comments and metadata.
 	packageProtoPath := protoPathIndex(reflect.TypeOf((*pbdescriptor.FileDescriptorProto)(nil)), "Package")
@@ -1278,6 +1375,7 @@ func applyTemplate(p param) (*swaggerObject, error) {
 						respMap[k] = swaggerResponseObject{
 							Description: v.Description,
 							Schema:      swaggerSchemaFromProtoSchema(v.Schema, p.reg, customRefs, nil),
+							Examples:    swaggerExamplesFromProtoExamples(v.Examples),
 						}
 					}
 				}
@@ -1419,6 +1517,9 @@ func enumValueProtoComments(reg *descriptor.Registry, enum *descriptor.Enum) str
 	var comments []string
 	for idx, value := range enum.GetValue() {
 		name := value.GetName()
+		if reg.GetEnumsAsInts() {
+			name = strconv.Itoa(int(value.GetNumber()))
+		}
 		str := protoComments(reg, enum.File, enum.Outers, "EnumType", int32(enum.Index), protoPath, int32(idx))
 		if str != "" {
 			comments = append(comments, name+": "+str)
@@ -1571,7 +1672,7 @@ func isProtoPathMatches(paths []int32, outerPaths []int32, typeName string, type
 // For example, if we are trying to locate comments related to a field named
 // `Address` in a message named `Person`, the path will be:
 //
-//     [4, a, 2, b]
+//	 [4, a, 2, b]
 //
 // While `a` gets determined by the order in which the messages appear in
 // the proto file, and `b` is the field index specified in the proto
@@ -1687,8 +1788,8 @@ func protoJSONSchemaToSwaggerSchemaCore(j *swagger_options.JSONSchema, reg *desc
 	ret := schemaCore{}
 
 	if j.GetRef() != "" {
-		swaggerName := fullyQualifiedNameToSwaggerName(j.GetRef(), reg)
-		if swaggerName != "" {
+		swaggerName, ok := fullyQualifiedNameToSwaggerName(j.GetRef(), reg)
+		if ok {
 			ret.Ref = "#/definitions/" + swaggerName
 			if refs != nil {
 				refs[j.GetRef()] = struct{}{}
@@ -1749,6 +1850,24 @@ func swaggerSchemaFromProtoSchema(s *swagger_options.Schema, reg *descriptor.Reg
 	return ret
 }
 
+func swaggerExamplesFromProtoExamples(in map[string]string) map[string]interface{} {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make(map[string]interface{})
+	for mimeType, exampleStr := range in {
+		switch mimeType {
+		case "application/json":
+			// JSON example objects are rendered raw.
+			out[mimeType] = json.RawMessage(exampleStr)
+		default:
+			// All other mimetype examples are rendered as strings.
+			out[mimeType] = exampleStr
+		}
+	}
+	return out
+}
+
 func protoJSONSchemaTypeToFormat(in []swagger_options.JSONSchema_JSONSchemaSimpleTypes) (string, string) {
 	if len(in) == 0 {
 		return "", ""
@@ -1806,19 +1925,24 @@ func addCustomRefs(d swaggerDefinitionsObject, reg *descriptor.Registry, refs re
 	msgMap := make(messageMap)
 	enumMap := make(enumMap)
 	for ref := range refs {
-		if _, ok := d[fullyQualifiedNameToSwaggerName(ref, reg)]; ok {
+		swgName, swgOk := fullyQualifiedNameToSwaggerName(ref, reg)
+		if !swgOk {
+			glog.Errorf("can't resolve swagger name from CustomRef '%v'", ref)
+			continue
+		}
+		if _, ok := d[swgName]; ok {
 			// Skip already existing definitions
 			delete(refs, ref)
 			continue
 		}
 		msg, err := reg.LookupMsg("", ref)
 		if err == nil {
-			msgMap[fullyQualifiedNameToSwaggerName(ref, reg)] = msg
+			msgMap[swgName] = msg
 			continue
 		}
 		enum, err := reg.LookupEnum("", ref)
 		if err == nil {
-			enumMap[fullyQualifiedNameToSwaggerName(ref, reg)] = enum
+			enumMap[swgName] = enum
 			continue
 		}
 
@@ -1831,10 +1955,54 @@ func addCustomRefs(d swaggerDefinitionsObject, reg *descriptor.Registry, refs re
 	addCustomRefs(d, reg, refs)
 }
 
-func lowerCamelCase(parameter string) string {
-	parameterString := gogen.CamelCase(parameter)
+func lowerCamelCase(fieldName string, fields []*descriptor.Field, msgs []*descriptor.Message) string {
+	for _, oneField := range fields {
+		if oneField.GetName() == fieldName {
+			return oneField.GetJsonName()
+		}
+	}
+	messageNameToFieldsToJSONName := make(map[string]map[string]string, 0)
+	fieldNameToType := make(map[string]string, 0)
+	for _, msg := range msgs {
+		fieldNameToJSONName := make(map[string]string, 0)
+		for _, oneField := range msg.GetField() {
+			fieldNameToJSONName[oneField.GetName()] = oneField.GetJsonName()
+			fieldNameToType[oneField.GetName()] = oneField.GetTypeName()
+		}
+		messageNameToFieldsToJSONName[msg.GetName()] = fieldNameToJSONName
+	}
+	if strings.Contains(fieldName, ".") {
+		fieldNames := strings.Split(fieldName, ".")
+		fieldNamesWithCamelCase := make([]string, 0)
+		for i := 0; i < len(fieldNames)-1; i++ {
+			fieldNamesWithCamelCase = append(fieldNamesWithCamelCase, doCamelCase(string(fieldNames[i])))
+		}
+		prefix := strings.Join(fieldNamesWithCamelCase, ".")
+		reservedJSONName := getReservedJSONName(fieldName, messageNameToFieldsToJSONName, fieldNameToType)
+		if reservedJSONName != "" {
+			return prefix + "." + reservedJSONName
+		}
+	}
+	return doCamelCase(fieldName)
+}
+
+func doCamelCase(input string) string {
+	parameterString := casing.Camel(input)
 	builder := &strings.Builder{}
 	builder.WriteString(strings.ToLower(string(parameterString[0])))
 	builder.WriteString(parameterString[1:])
 	return builder.String()
+}
+
+func getReservedJSONName(fieldName string, messageNameToFieldsToJSONName map[string]map[string]string, fieldNameToType map[string]string) string {
+	if len(strings.Split(fieldName, ".")) == 2 {
+		fieldNames := strings.Split(fieldName, ".")
+		firstVariable := fieldNames[0]
+		firstType := fieldNameToType[firstVariable]
+		firstTypeShortNames := strings.Split(firstType, ".")
+		firstTypeShortName := firstTypeShortNames[len(firstTypeShortNames)-1]
+		return messageNameToFieldsToJSONName[firstTypeShortName][fieldNames[1]]
+	}
+	fieldNames := strings.Split(fieldName, ".")
+	return getReservedJSONName(strings.Join(fieldNames[1:], "."), messageNameToFieldsToJSONName, fieldNameToType)
 }
