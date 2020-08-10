@@ -16,12 +16,18 @@ func init() {
   "paths": {
     "/api/v0/ingest/events/chef/action": {
       "post": {
-        "operationId": "ProcessChefAction",
+        "operationId": "ChefIngester_ProcessChefAction",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessChefActionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -42,12 +48,18 @@ func init() {
     },
     "/api/v0/ingest/events/chef/liveness": {
       "post": {
-        "operationId": "ProcessLivenessPing",
+        "operationId": "ChefIngester_ProcessLivenessPing",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessLivenessResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -68,12 +80,18 @@ func init() {
     },
     "/api/v0/ingest/events/chef/node-multiple-deletes": {
       "post": {
-        "operationId": "ProcessMultipleNodeDeletes",
+        "operationId": "ChefIngester_ProcessMultipleNodeDeletes",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -94,12 +112,18 @@ func init() {
     },
     "/api/v0/ingest/events/chef/nodedelete": {
       "post": {
-        "operationId": "ProcessNodeDelete",
+        "operationId": "ChefIngester_ProcessNodeDelete",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessNodeDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -120,12 +144,18 @@ func init() {
     },
     "/api/v0/ingest/events/chef/run": {
       "post": {
-        "operationId": "ProcessChefRun",
+        "operationId": "ChefIngester_ProcessChefRun",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessChefRunResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -146,12 +176,18 @@ func init() {
     },
     "/api/v0/ingest/version": {
       "get": {
-        "operationId": "GetVersion",
+        "operationId": "ChefIngester_GetVersion",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -553,6 +589,18 @@ func init() {
     "chef.automate.api.ingest.response.ProcessNodeDeleteResponse": {
       "type": "object"
     },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
     "google.protobuf.NullValue": {
       "type": "string",
       "enum": [
@@ -560,6 +608,27 @@ func init() {
       ],
       "default": "NULL_VALUE",
       "description": "` + "`" + `NullValue` + "`" + ` is a singleton enumeration to represent the null value for the\n` + "`" + `Value` + "`" + ` type union.\n\n The JSON representation for ` + "`" + `NullValue` + "`" + ` is JSON ` + "`" + `null` + "`" + `.\n\n - NULL_VALUE: Null value."
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
     }
   }
 }

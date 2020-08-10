@@ -13,12 +13,18 @@
   "paths": {
     "/api/v0/health": {
       "get": {
-        "operationId": "GetHealth",
+        "operationId": "IngestStatus_GetHealth",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.Health"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -29,12 +35,18 @@
     },
     "/api/v0/migration": {
       "get": {
-        "operationId": "GetMigrationStatus",
+        "operationId": "IngestStatus_GetMigrationStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.MigrationStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -99,6 +111,39 @@
         "total_action_messages": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
         }
       }
     }

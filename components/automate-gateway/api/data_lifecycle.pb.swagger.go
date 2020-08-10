@@ -17,12 +17,18 @@ func init() {
     "/api/v0/data-lifecycle/compliance/config": {
       "put": {
         "summary": "SetComplianceConfig configures the compliance data lifecycle scheduler and jobs",
-        "operationId": "SetComplianceConfig",
+        "operationId": "DataLifecycle_SetComplianceConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.SetComplianceConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -44,12 +50,18 @@ func init() {
     "/api/v0/data-lifecycle/compliance/run": {
       "post": {
         "summary": "RunCompliance runs the compliance data lifecycle jobs",
-        "operationId": "RunCompliance",
+        "operationId": "DataLifecycle_RunCompliance",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.RunComplianceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -71,12 +83,18 @@ func init() {
     "/api/v0/data-lifecycle/compliance/status": {
       "get": {
         "summary": "GetComplianceStatus returns the compliance job scheduler status",
-        "operationId": "GetComplianceStatus",
+        "operationId": "DataLifecycle_GetComplianceStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.GetComplianceStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -88,12 +106,18 @@ func init() {
     "/api/v0/data-lifecycle/config": {
       "put": {
         "summary": "SetConfig provides a singular endpoint for configuring all data lifecycle jobs",
-        "operationId": "SetConfig",
+        "operationId": "DataLifecycle_SetConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.SetConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -115,12 +139,18 @@ func init() {
     "/api/v0/data-lifecycle/event-feed/config": {
       "put": {
         "summary": "SetEventFeedConfig configures the event feed data lifecycle scheduler and jobs",
-        "operationId": "SetEventFeedConfig",
+        "operationId": "DataLifecycle_SetEventFeedConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.SetEventFeedConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -142,12 +172,18 @@ func init() {
     "/api/v0/data-lifecycle/event-feed/run": {
       "post": {
         "summary": "RunEventFeed runs the event feed data lifecycle jobs",
-        "operationId": "RunEventFeed",
+        "operationId": "DataLifecycle_RunEventFeed",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.RunEventFeedResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -169,12 +205,18 @@ func init() {
     "/api/v0/data-lifecycle/event-feed/status": {
       "get": {
         "summary": "GetEventFeedStatus returns the event feed job scheduler status",
-        "operationId": "GetEventFeedStatus",
+        "operationId": "DataLifecycle_GetEventFeedStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.GetEventFeedStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -186,12 +228,18 @@ func init() {
     "/api/v0/data-lifecycle/infra/config": {
       "put": {
         "summary": "SetInfraConfig configures the infra data lifecycle scheduler and jobs",
-        "operationId": "SetInfraConfig",
+        "operationId": "DataLifecycle_SetInfraConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.SetInfraConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -213,12 +261,18 @@ func init() {
     "/api/v0/data-lifecycle/infra/run": {
       "post": {
         "summary": "RunInfra runs the infra data lifecycle jobs",
-        "operationId": "RunInfra",
+        "operationId": "DataLifecycle_RunInfra",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.RunInfraResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -240,12 +294,18 @@ func init() {
     "/api/v0/data-lifecycle/infra/status": {
       "get": {
         "summary": "GetInfraStatus returns the infra job scheduler status",
-        "operationId": "GetInfraStatus",
+        "operationId": "DataLifecycle_GetInfraStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.GetInfraStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -257,12 +317,18 @@ func init() {
     "/api/v0/data-lifecycle/run": {
       "post": {
         "summary": "Run runs all data lifecycle actions across all data lifecycle jobs",
-        "operationId": "Run",
+        "operationId": "DataLifecycle_Run",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.RunResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -283,12 +349,18 @@ func init() {
     },
     "/api/v0/data-lifecycle/services/config": {
       "put": {
-        "operationId": "SetServicesConfig",
+        "operationId": "DataLifecycle_SetServicesConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.SetServicesConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -309,12 +381,18 @@ func init() {
     },
     "/api/v0/data-lifecycle/services/run": {
       "post": {
-        "operationId": "RunServices",
+        "operationId": "DataLifecycle_RunServices",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.RunServicesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -336,12 +414,18 @@ func init() {
     "/api/v0/data-lifecycle/services/status": {
       "get": {
         "summary": "Services",
-        "operationId": "GetServicesStatus",
+        "operationId": "DataLifecycle_GetServicesStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.GetServicesStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -353,12 +437,18 @@ func init() {
     "/api/v0/data-lifecycle/status": {
       "get": {
         "summary": "GetStatus returns the aggregate status across all data lifecycle jobs",
-        "operationId": "GetStatus",
+        "operationId": "DataLifecycle_GetStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.data_lifecycle.GetStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -694,6 +784,39 @@ func init() {
         "disabled": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
         }
       }
     }

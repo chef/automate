@@ -16,12 +16,18 @@ func init() {
   "paths": {
     "/api/v0/datafeed/destination": {
       "post": {
-        "operationId": "AddDestination",
+        "operationId": "DatafeedService_AddDestination",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.datafeed.AddDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -42,12 +48,18 @@ func init() {
     },
     "/api/v0/datafeed/destination/{id}": {
       "get": {
-        "operationId": "GetDestination",
+        "operationId": "DatafeedService_GetDestination",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.datafeed.GetDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -65,12 +77,18 @@ func init() {
         ]
       },
       "delete": {
-        "operationId": "DeleteDestination",
+        "operationId": "DatafeedService_DeleteDestination",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.datafeed.DeleteDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -88,12 +106,18 @@ func init() {
         ]
       },
       "patch": {
-        "operationId": "UpdateDestination",
+        "operationId": "DatafeedService_UpdateDestination",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.datafeed.UpdateDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -120,12 +144,18 @@ func init() {
     },
     "/api/v0/datafeed/destinations": {
       "post": {
-        "operationId": "ListDestinations",
+        "operationId": "DatafeedService_ListDestinations",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.datafeed.ListDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -146,12 +176,18 @@ func init() {
     },
     "/api/v0/datafeed/destinations/test": {
       "post": {
-        "operationId": "TestDestination",
+        "operationId": "DatafeedService_TestDestination",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.datafeed.TestDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -332,6 +368,39 @@ func init() {
         },
         "password": {
           "type": "string"
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
         }
       }
     }
