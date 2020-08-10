@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { takeUntil } from 'rxjs/operators';
 import { getOr } from 'lodash/fp';
@@ -13,9 +13,10 @@ import {
   GroupService,
   GroupServicesFilters
 } from '../../entities/service-groups/service-groups.model';
-import { UpdateSelectedSG } from 'app/entities/service-groups/service-groups.actions';
+import { UpdateSelectedSG, DeleteServicesById } from 'app/entities/service-groups/service-groups.actions';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { DateTime } from 'app/helpers/datetime/datetime';
+import { serviceDeletionStatus } from 'app/entities/service-groups/service-groups.selector';
 
 @Component({
   selector: 'app-services-sidebar',
@@ -48,6 +49,14 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   private svcHealthSummary$: Observable<ServiceGroupsHealthSummary>;
   private currentServicesFilters$: Observable<GroupServicesFilters>;
   private isDestroyed: Subject<boolean> = new Subject();
+
+  // Manual Deletion of Services
+  public servicesList: GroupService[] = [];
+  public checkedServices: number[] = [];
+  public hasAllSelected = false;
+  public isIndeterminate = false;
+  public checkedServicesDisplay = '';
+  public deleteModalVisible = false;
 
   constructor(
     private serviceGroupsFacade: ServiceGroupsFacadeService,
@@ -85,6 +94,26 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
          statusFilter: this.selectedHealth
       });
     });
+
+    this.services$.pipe(takeUntil(this.isDestroyed))
+      .subscribe((services) => {
+          this.resetServiceSelections();
+          this.servicesList = services;
+      });
+
+    this.store.pipe(
+      select(serviceDeletionStatus),
+      takeUntil(this.isDestroyed)
+    )
+      .subscribe((status) => {
+        if (status === EntityStatus.loadingSuccess) {
+          this.resetServiceSelections();
+        } else if (status === EntityStatus.loadingFailure) {
+          this.deleteModalVisible = false;
+        }
+      });
+
+    this.updateCheckedServicesDisplay();
   }
 
   ngOnDestroy() {
@@ -136,6 +165,65 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     } else {
       this.activeHealthAccordions.push(index); // open accordion
     }
+  }
+
+  public handleToggleCheckbox(id: number, checked: boolean): void {
+    if (checked) {
+      this.checkedServices.push(id);
+    } else {
+      this.checkedServices = this.checkedServices.filter(n => n !== id);
+    }
+    this.updateCheckedServicesDisplay();
+  }
+
+  public handleSelectAll(checked: boolean): void {
+    if (checked) {
+      this.checkedServices = this.servicesList.map(service => service.id);
+    } else {
+      this.checkedServices = [];
+    }
+    this.updateCheckedServicesDisplay();
+  }
+
+  private updateCheckedServicesDisplay(): void {
+    // Must reset values for indeterminate to function properly
+    this.hasAllSelected = false;
+    this.isIndeterminate = false;
+
+    const numOfCheckedServices = this.checkedServices.length;
+    if (numOfCheckedServices === 0) {
+    this.checkedServicesDisplay = 'Services';
+    } else if (numOfCheckedServices === 1) {
+      this.checkedServicesDisplay = '1 Service';
+    } else {
+      this.checkedServicesDisplay = `${numOfCheckedServices} Services`;
+    }
+
+    if (this.checkedServices.length === this.servicesList.length && this.servicesList.length > 0) {
+      this.hasAllSelected = true;
+    } else if ( this.checkedServices.length < 1 ) {
+      this.hasAllSelected = false;
+    } else {
+      this.isIndeterminate = true;
+    }
+  }
+
+  public beginServicesDelete(): void {
+    this.deleteModalVisible = true;
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
+  }
+
+  public deleteServices(): void {
+    this.store.dispatch( new DeleteServicesById({servicesToDelete: this.checkedServices}) );
+  }
+
+  private resetServiceSelections(): void {
+    this.checkedServices = [];
+    this.updateCheckedServicesDisplay();
+    this.closeDeleteModal();
   }
 
 }

@@ -118,16 +118,14 @@ describe('CreateObjectModalComponent', () => {
     expect(store.dispatch).toHaveBeenCalledWith(new GetPolicies());
   });
 
-  it('upon opening, "also create" checkboxes are checked', () => {
+  it('upon opening, "also create policies" checkbox is checked', () => {
     component.createForm = new FormBuilder().group({
       name: '',
-      addPolicies: '',
-      addTeams: ''
+      addPolicies: ''
     });
 
-    // force them to start at false
+    // force it to start at false
     component.createForm.controls.addPolicies.setValue(false);
-    component.createForm.controls.addTeams.setValue(false);
 
     component.createProjectModal = true;
 
@@ -135,7 +133,6 @@ describe('CreateObjectModalComponent', () => {
       { visible: new SimpleChange(false, true, true) });
 
     expect(component.createForm.controls.addPolicies.value).toEqual(true);
-    expect(component.createForm.controls.addTeams.value).toEqual(true);
   });
 
   describe('ordering', () => {

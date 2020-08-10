@@ -73,8 +73,8 @@ describe('project management', () => {
     cy.get('app-create-object-modal chef-checkbox')
       .should('have.attr', 'aria-checked', 'true');
 
-    // don't create associated project policies or teams
-    cy.get('app-create-object-modal chef-checkbox').click({ multiple: true });
+    // don't create associated project policies
+    cy.get('app-create-object-modal chef-checkbox').click();
 
     cy.get('[data-cy=save-button]').click();
     cy.get('app-project-list chef-modal').should('not.be.visible');
@@ -100,8 +100,8 @@ describe('project management', () => {
     cy.get('[data-cy=edit-button]').contains('Edit ID').click();
     cy.get('[data-cy=id-label]').should('not.be.visible');
 
-    // don't create associated project policies or teams
-    cy.get('app-create-object-modal chef-checkbox').click({ multiple: true });
+    // don't create associated project policies
+    cy.get('app-create-object-modal chef-checkbox').click();
 
     cy.get('[data-cy=create-id]').should('be.visible').clear()
       .type(customWithoutPolsProjectID).should('have.value', customWithoutPolsProjectID);
@@ -126,21 +126,10 @@ describe('project management', () => {
       });
     });
 
-    // verify no associated teams were generated
-    associatedTeams.forEach((team) => {
-      cy.request({
-        auth: { bearer: adminIdToken },
-        url: `/apis/iam/v2/teams/${customWithoutPolsProjectID}-${team}`,
-        failOnStatusCode: false
-      }).then((response) => {
-        expect(response.status).to.equal(404);
-      });
-    });
-
     cy.url().should('include', '/settings/projects');
   });
 
-  it('can create a project with a custom ID and generate associated policies and teams', () => {
+  it('can create a project with a custom ID and generate associated policies', () => {
     cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
 
@@ -175,16 +164,6 @@ describe('project management', () => {
       cy.request({
         auth: { bearer: adminIdToken },
         url: `/apis/iam/v2/policies/${customWithPolsProjectID}-${policy}`
-      }).then((response) => {
-        expect(response.status).to.equal(200);
-      });
-    });
-
-    // verify associated teams were generated
-    associatedTeams.forEach((team) => {
-      cy.request({
-        auth: { bearer: adminIdToken },
-        url: `/apis/iam/v2/teams/${customWithPolsProjectID}-${team}`
       }).then((response) => {
         expect(response.status).to.equal(200);
       });

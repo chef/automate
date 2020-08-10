@@ -35,10 +35,10 @@ const declarations: any[] = [
   MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
   CookbookDetailsComponent
 ];
-const serverId = '6e98f609-586d-4816-a6de-e841e659b11d';
-const orgId = '6e98f609-586d-4816-a6de';
+const server_id = '6e98f609-586d-4816-a6de-e841e659b11d';
+const org_id = '6e98f609-586d-4816-a6de';
 const cookbook_name = 'aix';
-const currentVersion = '1.1.1';
+const current_version = '1.1.1';
 const readme_content = 'test content';
 const cookbookVersion: CookbookVersions = {
   name: 'aix',
@@ -83,8 +83,8 @@ describe('CookbookDetailsComponent', () => {
       ...defaultRouterState,
       state: {
         ...defaultRouterRouterState,
-        url: `infrastructure/chef-servers/${serverId}/org/${orgId}/cookbooks/${cookbook_name}`,
-        params: { id: serverId, orgid: orgId, cookbook_name: cookbook_name }
+        url: `infrastructure/chef-servers/${server_id}/org/${org_id}/cookbooks/${cookbook_name}`,
+        params: { id: server_id, 'org-id': org_id, 'cookbook-name': cookbook_name }
       }
     }
   };
@@ -142,7 +142,7 @@ describe('CookbookDetailsComponent', () => {
     store.dispatch(new GetCookbookDetailsSuccess(cookbookDetails));
     fixture.detectChanges();
     const fileUrl = encodeURIComponent(cookbookDetails.root_files[0].url);
-    const req = httpMock.expectOne(`${env.infra_proxy_url}/servers/${serverId}/orgs/${orgId}/cookbooks/${cookbook_name}/${currentVersion}/file-content?url=${fileUrl}`);
+    const req = httpMock.expectOne(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${current_version}/file-content?url=${fileUrl}`);
     expect(req.request.method).toBe('GET');
     httpMock.verify();
     req.flush(readme_content);
@@ -152,7 +152,7 @@ describe('CookbookDetailsComponent', () => {
   it('No remote HTTP call triggered when README file URL does not exist', () => {
     store.dispatch(new GetCookbookDetailsSuccess(cookbookDetails));
     fixture.detectChanges();
-    const req = httpMock.expectNone(`${env.infra_proxy_url}/servers/${serverId}/orgs/${orgId}/cookbooks/${cookbook_name}/${currentVersion}/file-content?url=`);
+    const req = httpMock.expectNone(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${current_version}/file-content?url=`);
     expect(req).toBeUndefined();
   });
 

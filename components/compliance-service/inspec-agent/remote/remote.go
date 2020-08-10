@@ -130,7 +130,7 @@ func assembleRemoteJobConfigAndScript(job *types.InspecJob) (string, string, err
 				fi
 				exit 0
 			}
-			echo '%s' | sudo CHEF_LICENSE="accept-no-persist" inspec exec %s --json-config=-
+			echo '%s' | sudo CHEF_LICENSE="accept-no-persist" inspec exec %s --config=-
 
 			modify_exit_code $?`, job.RemoteInspecVersion, string(jsonConf), profilesString), inspec.BashScript, nil
 	case inspec.BackendSSMWindows, inspec.BackendAZWindows:
@@ -148,7 +148,7 @@ func assembleRemoteJobConfigAndScript(job *types.InspecJob) (string, string, err
 								[Parameter(Mandatory=$false)]
 								$JsonConfig
 						)
-						if($JsonConfig -ne $null) { $JsonArgument = '--json-config="-"' }
+						if($JsonConfig -ne $null) { $JsonArgument = '--config="-"' }
 						Invoke-Expression -Command "echo '$JsonConfig' | $InspecBinaryLocation.bat $Command $Path $JsonArgument".Trim()
 				}
 				$env:CHEF_LICENSE="accept-no-persist"

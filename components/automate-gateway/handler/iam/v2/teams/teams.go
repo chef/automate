@@ -103,7 +103,7 @@ func (a *Server) DeleteTeam(ctx context.Context, r *gwreq.DeleteTeamReq) (*gwres
 func (a *Server) GetTeamMembership(ctx context.Context,
 	r *gwreq.GetTeamMembershipReq) (*gwres.GetTeamMembershipResp, error) {
 
-	res, err := a.client.GetTeamMembership(ctx, (*teams.GetTeamMembershipReq)(r))
+	res, err := a.client.GetTeamMembership(ctx, &teams.GetTeamMembershipReq{Id: r.Id})
 	if err != nil {
 		return nil, err
 	}

@@ -24,8 +24,8 @@ message Environment {
     string json_class = 4;
     // Environment versined cookbooks constraints.
     map<string, string> cookbook_versions = 5;
-    // Stringified json of the default attributes.
+    // Environment default attributes JSON.
     string default_attributes = 6;
-    // Stringified json of the override attributes.
+    // Environment override attributes JSON.
     string override_attributes = 7;
 }

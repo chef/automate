@@ -16,6 +16,7 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
+	"github.com/chef/automate/lib/pcmp/passert"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -271,7 +272,7 @@ func TestSummary(t *testing.T) {
 			})
 		}
 	}
-	assert.Equal(t, expectedProfilesMin, actualProfilesMin, "profiles_min match")
+	passert.Equal(t, expectedProfilesMin, actualProfilesMin, "profiles_min match")
 
 	p3json := `{
 		"name": "mywindows",
@@ -309,7 +310,7 @@ func TestSummary(t *testing.T) {
 	}
 	expectedProfiles := parseESProfiles(fileContents("test_data/inspec_report_profiles_out.json"))
 
-	assert.Equal(t, expectedProfiles, actualProfiles, "profiles doc match")
+	passert.Equal(t, expectedProfiles, actualProfiles, "profiles doc match")
 }
 
 // ------------------------------- Inherited test --------------------------------- //
@@ -329,7 +330,7 @@ func TestInheritanceFix(t *testing.T) {
 	// Dump actualProfiles
 	// println(profilesToJson(actualProfiles))
 
-	assert.Equal(t, expectedProfiles, actualProfiles, "fix inherited profiles test")
+	passert.Equal(t, expectedProfiles, actualProfiles, "fix inherited profiles test")
 }
 
 // ------------------------------- Inherited test2 --------------------------------- //
@@ -349,7 +350,7 @@ func TestInheritanceWithParentProfileFix(t *testing.T) {
 	// Dump actualProfiles
 	// println(profilesToJsonMin(actualProfiles))
 
-	assert.Equal(t, expectedProfiles, actualProfiles, "fix inherited profiles with parent_profile test")
+	passert.Equal(t, expectedProfiles, actualProfiles, "fix inherited profiles with parent_profile test")
 }
 
 func TestStrLimitBytes(t *testing.T) {

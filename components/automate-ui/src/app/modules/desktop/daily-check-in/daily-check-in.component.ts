@@ -45,4 +45,8 @@ export class DailyCheckInComponent implements OnInit, OnDestroy, OnChanges {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
+
+  get hasData(): boolean {
+    return this.totalCount > 0;
+  }
 }

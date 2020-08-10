@@ -58,6 +58,9 @@ import { NodeDetailsResolverService } from './services/node-details/node-details
 import {
   NodeNoRunsDetailsResolverService
 } from './services/node-details/node-noruns-details-resolver.service';
+import {
+  NodeNoRunIdResolverService
+} from './services/node-details/node-norunid-resolver.service';
 
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
@@ -228,6 +231,13 @@ const routes: Routes = [
               component: ClientRunsComponent
             },
             {
+              path: ':node-id',
+              component: NodeNoRunsDetailsComponent,
+              resolve: {
+                node: NodeNoRunIdResolverService
+              }
+            },
+            {
               path: ':node-id/missing-runs',
               component: NodeNoRunsDetailsComponent,
               resolve: {
@@ -255,23 +265,23 @@ const routes: Routes = [
               component: ChefServerDetailsComponent
             },
             {
-              path: ':id/organizations/:orgid',
+              path: ':id/organizations/:org-id',
               component: OrgDetailsComponent
             },
             {
-              path: ':id/organizations/:orgid/cookbooks/:cookbook_name',
+              path: ':id/organizations/:org-id/cookbooks/:cookbook-name',
               component: CookbookDetailsComponent
             },
             {
-              path: ':id/organizations/:orgid/roles/:name',
+              path: ':id/organizations/:org-id/roles/:name',
               component: InfraRoleDetailsComponent
             },
             {
-              path: ':id/organizations/:orgid/environments/:name',
+              path: ':id/organizations/:org-id/environments/:name',
               component: EnvironmentDetailsComponent
             },
             {
-              path: ':id/organizations/:orgid/data_bags/:name',
+              path: ':id/organizations/:org-id/data-bags/:name',
               component: DataBagsDetailsComponent
             },
             {

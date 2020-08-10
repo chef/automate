@@ -262,13 +262,15 @@ defmodule Notifications.RuleAddResponse do
   @type t :: %__MODULE__{
           code: Notifications.RuleAddResponse.Code.t(),
           messages: [String.t()],
-          id: String.t()
+          id: String.t(),
+          rule: Notifications.Rule.t() | nil
         }
-  defstruct [:code, :messages, :id]
+  defstruct [:code, :messages, :id, :rule]
 
   field :code, 1, type: Notifications.RuleAddResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
   field :id, 3, type: :string
+  field :rule, 4, type: Notifications.Rule
 end
 
 defmodule Notifications.RuleGetResponse do

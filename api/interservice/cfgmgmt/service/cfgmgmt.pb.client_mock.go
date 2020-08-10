@@ -11,9 +11,9 @@ import (
 	request0 "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	response0 "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	gomock "github.com/golang/mock/gomock"
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	grpc "google.golang.org/grpc"
 	metadata "google.golang.org/grpc/metadata"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 )
 

@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
+	"github.com/chef/automate/lib/pcmp/passert"
 )
 
 func (suite *GatewayTestSuite) TestGatewayNodesClient() {
@@ -167,7 +168,7 @@ func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 	node.LastContact = nil
 	node.LastJob = nil
 	node.TargetConfig = nil
-	suite.Equal(&nodes.Node{
+	passert.Equal(suite.T(), &nodes.Node{
 		ConnectionError: "authentication failed\n\nAuthentication failed for inspec-target-rhel7-dev.cd.chef.co\n\nNet::SSH::AuthenticationFailed",
 		Id:              nodeID.Id,
 		Name:            "test node",

@@ -7,9 +7,9 @@
         <p class="tooltip-text">Most common error messages and classes returned from Chef Infra Client runs across all desktops.</p>
       </chef-tooltip>
     </div>
-    <h6 class="heading-time">Updated {{ lastUpdatedMessage }}</h6>
+    <h6 class="heading-time" *ngIf="hasData">Updated {{ lastUpdatedMessage }}</h6>
   </div>
-  <chef-table class="chart-list">
+  <chef-table class="chart-list" *ngIf="hasData">
     <chef-tbody>
       <chef-tr
         *ngFor="let item of topErrorsItems"
@@ -37,4 +37,5 @@
       </chef-tr>
     </chef-tbody>
   </chef-table>
+  <app-empty-data *ngIf="!hasData"></app-empty-data>
 </div>

@@ -2,7 +2,9 @@ package bootstrapbundle
 
 import (
 	"archive/tar"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
 	"strconv"
@@ -12,12 +14,14 @@ import (
 
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/product"
+	"github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/user"
 )
 
 const magicHeader = "ABB-1\n\n"
 const habSvcDir = "/hab/svc"
+const secretDirName = "__secrets"
 
 var ErrNoFiles = errors.New("No files to bundle")
 var ErrMalformedBundle = errors.New("Malformed install bundle file")
@@ -37,13 +41,15 @@ type Creator struct {
 	rootDir       string
 	allowedUsers  []string
 	allowedGroups []string
+	secretStore   secrets.SecretStore
 }
 
-func NewCreator(opts ...CreatorOpt) *Creator {
+func NewCreator(secretStore secrets.SecretStore, opts ...CreatorOpt) *Creator {
 	b := &Creator{
 		rootDir:       habSvcDir,
 		allowedUsers:  []string{"root", "hab"},
 		allowedGroups: []string{"root", "hab"},
+		secretStore:   secretStore,
 	}
 	for _, f := range opts {
 		f(b)
@@ -146,6 +152,17 @@ func (b *Creator) Unpack(in io.Reader) error {
 			}
 		}
 
+		if b.isSecret(hdr) {
+			secretName, secretValue, err := b.extractSecret(hdr, tarReader)
+			if err != nil {
+				return err
+			}
+			if err := b.secretStore.SetSecret(secretName, secretValue); err != nil {
+				return err
+			}
+			continue
+		}
+
 		if uid, found := users[hdr.Uname]; found {
 			hdr.Uid = uid
 		} else {
@@ -177,34 +194,46 @@ func (b *Creator) Create(pkgMetadatas []*product.PackageMetadata, out io.Writer)
 	allDirsSet := make(map[string]*tar.Header)
 	allDirs := []*tar.Header{}
 	files := make(map[string]*tar.Header)
+	secretsData := map[*tar.Header][]byte{}
+
 	for _, metadata := range pkgMetadatas {
 		if metadata != nil && len(metadata.Bootstrap) > 0 {
 			svc := metadata.Name.Name
 			for _, bootstrapSpec := range metadata.Bootstrap {
-				if bootstrapSpec.Type != product.BootstrapTypeFile {
-					return errors.New("Unknown type")
-				}
-				dname, fname := path.Split(bootstrapSpec.Path)
-				if fname == "" {
-					return errors.New("Not a file")
-				}
-				dirs, err := b.headersForDirectory(path.Join(svc, dname))
-				if err != nil {
-					return err
-				}
-				for _, d := range dirs {
-
-					if allDirsSet[d.Name] == nil {
-						allDirsSet[d.Name] = d
-						allDirs = append(allDirs, d)
+				switch bootstrapSpec.Type {
+				case product.BootstrapTypeFile:
+					dname, fname := path.Split(bootstrapSpec.Path)
+					if fname == "" {
+						return errors.New("Not a file")
 					}
+					dirs, err := b.headersForDirectory(path.Join(svc, dname))
+					if err != nil {
+						return err
+					}
+					for _, d := range dirs {
+						if allDirsSet[d.Name] == nil {
+							allDirsSet[d.Name] = d
+							allDirs = append(allDirs, d)
+						}
+					}
+					fpath := path.Join(svc, bootstrapSpec.Path)
+					f, err := b.headerForFile(fpath)
+					if err != nil {
+						return err
+					}
+					files[fpath] = f
+				case product.BootstrapTypeSecret:
+					secretName, err := secrets.SecretNameFromString(bootstrapSpec.SecretSpec)
+					if err != nil {
+						return err
+					}
+					secretValue, err := b.secretStore.GetSecret(secretName)
+					if err != nil {
+						return err
+					}
+					secretTarHeader := b.headerForSecrets(secretName)
+					secretsData[secretTarHeader] = secretValue
 				}
-				fpath := path.Join(svc, bootstrapSpec.Path)
-				f, err := b.headerForFile(fpath)
-				if err != nil {
-					return err
-				}
-				files[fpath] = f
 			}
 		}
 	}
@@ -220,6 +249,17 @@ func (b *Creator) Create(pkgMetadatas []*product.PackageMetadata, out io.Writer)
 	tarWriter := tar.NewWriter(out)
 	for _, hdr := range allDirs {
 		if err := tarWriter.WriteHeader(hdr); err != nil {
+			return err
+		}
+	}
+
+	for hdr, value := range secretsData {
+		hdr.Size = int64(len(value))
+		if err := tarWriter.WriteHeader(hdr); err != nil {
+			return err
+		}
+
+		if _, err := tarWriter.Write(value); err != nil {
 			return err
 		}
 	}
@@ -313,4 +353,34 @@ func (b *Creator) headersForDirectory(dname string) ([]*tar.Header, error) {
 		headers = append(headers, header)
 	}
 	return headers, nil
+}
+
+func (b *Creator) headerForSecrets(secretName secrets.SecretName) *tar.Header {
+	secretSpec := fmt.Sprintf("%s.%s", secretName.Group, secretName.Name)
+	headerSecret := tar.Header{
+		Name:     path.Join(secretDirName, secretSpec),
+		Typeflag: tar.TypeReg,
+		Uid:      0,
+		Gid:      0,
+		Uname:    "root",
+		Gname:    "root",
+	}
+
+	return &headerSecret
+}
+
+func (b *Creator) isSecret(hdr *tar.Header) bool {
+	dname, _ := path.Split(hdr.Name)
+	return strings.TrimRight(dname, "/") == secretDirName
+}
+
+func (b *Creator) extractSecret(hdr *tar.Header, tarReader *tar.Reader) (secrets.SecretName, []byte, error) {
+	_, fname := path.Split(hdr.Name)
+	secretName, err := secrets.SecretNameFromString(fname)
+	if err != nil {
+		return secretName, nil, err
+	}
+	value, err := ioutil.ReadAll(tarReader)
+
+	return secretName, value, err
 }

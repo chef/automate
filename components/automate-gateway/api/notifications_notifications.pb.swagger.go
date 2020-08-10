@@ -229,6 +229,12 @@ func init() {
         },
         "id": {
           "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "rule": {
+          "$ref": "#/definitions/chef.automate.api.notifications.Rule"
         }
       }
     },

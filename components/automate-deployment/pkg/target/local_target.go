@@ -34,6 +34,7 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/platform/sys"
+	"github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/user"
 )
 
@@ -282,7 +283,16 @@ func (t *LocalTarget) DeployDeploymentService(ctx context.Context, config *dc.Co
 
 	if bootstrapBundlePath != "" {
 		writer.Body("Unpacking bootstrap bundle")
-		c := bootstrapbundle.NewCreator()
+		secretStore, err := secrets.NewDefaultSecretStore()
+		if err != nil {
+			return errors.Wrapf(err, "failed to create secret store")
+		}
+
+		if err := secretStore.Initialize(); err != nil {
+			return errors.Wrapf(err, "failed to initialize secret store")
+		}
+
+		c := bootstrapbundle.NewCreator(secretStore)
 		f, err := os.Open(bootstrapBundlePath)
 		if err != nil {
 			return errors.Wrapf(err, "failed to open bootstrap bundle %q", bootstrapBundlePath)

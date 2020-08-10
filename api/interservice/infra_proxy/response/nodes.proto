@@ -27,5 +27,10 @@ message NodeAttribute {
 
 message DeleteNode {
     // Node name.
-    string name = 3;
+    string name = 1;
+}
+
+message UpdateNode {
+    // Node name.
+    string name = 1;
 }

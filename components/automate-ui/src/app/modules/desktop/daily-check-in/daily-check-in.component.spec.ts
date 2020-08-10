@@ -36,4 +36,26 @@ describe('DailyCheckInComponent', () => {
       expect(tooltip.getAttribute('for')).toEqual('daily-checkin-info');
     });
   });
+
+  describe('when data is available', () => {
+    it('does not display empty data message', () => {
+      component.totalCount = 10;
+
+      fixture.detectChanges();
+
+      const emptyMsg = fixture.debugElement.query(By.css('app-empty-data'));
+      expect(emptyMsg).toBeFalsy();
+    });
+  });
+
+  describe('when no data is available', () => {
+    it('displays empty data message', () => {
+      component.totalCount = 0;
+
+      fixture.detectChanges();
+
+      const emptyMsg = fixture.debugElement.query(By.css('app-empty-data'));
+      expect(emptyMsg).toBeTruthy();
+    });
+  });
 });
