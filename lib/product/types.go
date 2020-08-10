@@ -166,13 +166,15 @@ func (c *Collection) validate(allowedPackageSet map[PackageName]bool) error {
 type BootstrapType string
 
 const (
-	BootstrapTypeFile BootstrapType = "file"
+	BootstrapTypeFile   BootstrapType = "file"
+	BootstrapTypeSecret BootstrapType = "secret"
 )
 
 type BootstrapSpec struct {
-	Type     BootstrapType `json:"type"`
-	Path     string        `json:"path"`
-	Optional bool          `json:"optional"`
+	Type       BootstrapType `json:"type"`
+	Path       string        `json:"path,omitempty"`
+	Optional   bool          `json:"optional"`
+	SecretSpec string        `json:"secret_spec,omitempty"`
 }
 
 func (b *BootstrapSpec) validate() error {
@@ -185,6 +187,10 @@ func (b *BootstrapSpec) validate() error {
 			return errors.Errorf("path must be a relative path inside the services /hab/svc/svc-name directory")
 		}
 		// TODO: validate that the path stays in the service directory
+	case BootstrapTypeSecret:
+		if b.SecretSpec == "" {
+			return errors.Errorf("Must provide a secret name for type %s", b.Type)
+		}
 	default:
 		return errors.Errorf("%q is not a valid bootstrap type", b.Type)
 	}

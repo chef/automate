@@ -117,6 +117,7 @@ defmodule ServiceTest do
         assert RuleAddResponse.Code.value(response.code) == RuleAddResponse.Code.value(:ADDED)
         assert response.messages == []
         assert response.id == "abc123"
+        assert response.rule.action == {:SlackAlert, %Notifications.SlackAlert{url: "http://foo.bar:20/baz"}}
       end
     end
 

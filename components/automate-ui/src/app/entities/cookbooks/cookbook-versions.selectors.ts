@@ -17,5 +17,5 @@ export const getStatus = createSelector(
 export const cookbookVersionsFromRoute = createSelector(
   cookbookVersionsEntities,
   routeParams,
-  (state, {cookbook_name}) => state[cookbook_name]
+  (state, {'cookbook-name': cookbook_name}) => state[cookbook_name]
 );

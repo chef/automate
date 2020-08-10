@@ -4,7 +4,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/data-feed-service/config"
+)
+
+const (
+	reportNodeId = "e5a3d952-5dfc-3215-bfe4-541eb0b5d345"
 )
 
 func TestEmptyFilters(t *testing.T) {
@@ -130,4 +135,22 @@ func TestIncludeIPAddressWhenDisableTrue(t *testing.T) {
 		t.Error("Expected true")
 	}
 	t.Log("TestIncludeIPAddressWhenDisableTrue OK")
+}
+
+func TestResolveResourceIdNodeId(t *testing.T) {
+	report := &reporting.Report{NodeId: reportNodeId}
+	resourceId := resolveResourceId(report)
+	if resourceId != reportNodeId {
+		t.Logf("expected %s, got: %s", reportNodeId, resourceId)
+		t.Fail()
+	}
+}
+
+func TestResolveResourceIdIPAddress(t *testing.T) {
+	report := &reporting.Report{NodeId: reportNodeId, Ipaddress: ipAttr}
+	resourceId := resolveResourceId(report)
+	if resourceId != ipAttr {
+		t.Logf("expected %s, got: %s", ipAttr, resourceId)
+		t.Fail()
+	}
 }

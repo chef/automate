@@ -5,7 +5,7 @@ require "yaml"
 require "tsort"
 require "toml"
 
-FORCE_SKIP_PACKAGES = %w{automate-workflow-web automate-workflow-ctl automate-workflow-server automate-workflow-nginx}
+FORCE_SKIP_PACKAGES = %w{}
 
 class Hash
   include TSort

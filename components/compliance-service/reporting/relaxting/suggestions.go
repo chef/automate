@@ -21,7 +21,7 @@ import (
 )
 
 // GetSuggestions - Report #12
-func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, filters map[string][]string, text string, size32 int32) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, filters map[string][]string, text string, size32 int32, typeParamKey string) ([]*reportingapi.Suggestion, error) {
 	client, err := backend.ES2Client()
 	size := int(size32)
 	if err != nil {
@@ -84,19 +84,18 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 	}
 
 	controlTagFilterKey := ""
-	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	if len(typeParamKey) > 0 {
+		_, controlTagFilterKey = leftSplit(typeParamKey, ":")
+	}
+
 	for filterType := range filters {
 		if strings.HasPrefix(filterType, "control_tag:") {
-			_, controlTagFilterKey = leftSplit(filterType, ":")
 			useSummaryIndex = false
-
-			//if this filtertype already has values, get them out so that they don't prevent the others from being presented
-			filters[filterType] = nil
+			if len(controlTagFilterKey) == 0 && typeParam == "control_tag_value" {
+				logrus.Warn("please consider using the `type_key` field on the API to specify the control tag key for which values are being requested")
+				_, controlTagFilterKey = leftSplit(filterType, ":")
+			}
 			break
-			// For suggestions, prefer control_tag filter key with no values to avoid clash with full control_tag filters
-			//if len(filters[filterType]) == 0 {
-			//	break
-			//}
 		}
 	}
 

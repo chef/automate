@@ -2,7 +2,7 @@
 set -e
 
 protoc_repo=github.com/golang/protobuf/protoc-gen-go
-protoc_version="3.9.2"
+protoc_version="3.12.3"
 
 [[ $(type -P "protoc") ]] || (echo "unable to proceed. protobuf is not installed" && exit 1)
 protoc --version | grep -q $protoc_version  || (echo "unable to proceed. protobuf must be version $protoc_version" && exit 1)

@@ -189,9 +189,9 @@ func TestValidateSecretFailures(t *testing.T) {
 	for _, test := range exampleValidationFailures {
 		err := test.in.Validate()
 		if err == nil {
-			t.Errorf("Sprintf(%q, validateSecret()) => nil, want %q", test.in, test.out)
+			t.Errorf("Sprintf(%q, validateSecret()) => nil, want %q", &test.in, test.out)
 		} else if err.Error() != test.out {
-			t.Errorf("Sprintf(%q, validateSecret()) => %q, want %q", test.in, err.Error(), test.out)
+			t.Errorf("Sprintf(%q, validateSecret()) => %q, want %q", &test.in, err.Error(), test.out)
 		}
 	}
 }
@@ -200,7 +200,7 @@ func TestValidateSecretPasses(t *testing.T) {
 	for _, test := range exampleValidationSuccesses {
 		err := test.in.Validate()
 		if err != nil {
-			t.Errorf("Sprintf(%q, validateSecret()) => %q, want nil", test.in, err.Error())
+			t.Errorf("Sprintf(%q, validateSecret()) => %q, want nil", &test.in, err.Error())
 		}
 	}
 }

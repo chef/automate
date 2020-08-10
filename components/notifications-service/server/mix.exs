@@ -36,7 +36,6 @@ defmodule Notifications.Mixfile do
        :logger,
        :timex,
        :httpoison,
-       :google_protos,
        :uuid
      ],
      mod: {Notifications.Application, []}]

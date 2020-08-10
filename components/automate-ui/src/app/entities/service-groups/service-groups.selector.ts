@@ -74,3 +74,8 @@ export const selectedServiceGroupStatus = createSelector(
   serviceGroupsState,
   (serviceGroups) => serviceGroups.selectedGroup.services.status
 );
+
+export const serviceDeletionStatus = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.serviceDeletionStatus
+);

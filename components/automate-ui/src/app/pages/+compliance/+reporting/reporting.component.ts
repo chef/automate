@@ -177,7 +177,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   showSummary = false;
 
-  private suggestionSearchTerms = new Subject<{ 'type': string, 'text': string }>();
+  private suggestionSearchTerms = new Subject<
+    { 'type': string, 'text': string, 'type_key': string }>();
 
   // Used to notify all subscriptions to unsubscribe
   // http://stackoverflow.com/a/41177163/319074
@@ -323,7 +324,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   onSuggestValues(event) {
     const { type, text } = event.detail;
-    this.suggestionSearchTerms.next({ 'type': type, 'text': text });
+    this.suggestionSearchTerms.next(
+      { 'type': type, 'text': text, type_key: this.suggestionsService.selectedControlTagKey});
   }
 
   onFilterAdded(event) {

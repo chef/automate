@@ -15,10 +15,17 @@ export class SuggestionsService {
     private statsService: StatsService
   ) {}
 
+  selectedControlTagKey: string;
+
   getSuggestions(type: string, text: string, reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/suggestions`;
     const formatted = this.statsService.formatFilters(reportQuery);
-    const body = {type, text, filters: formatted};
+        const body = {
+          type,
+          text,
+          type_key: this.selectedControlTagKey,
+          filters: formatted
+        };
     return this.httpClient.post<any>(url, body).pipe(
       map(({suggestions}) => suggestions.slice(0, 100) || []));
   }

@@ -1,4 +1,10 @@
 {
   "name": "chef/automate-cs-oc-bifrost",
+  "bootstrap": [
+    {
+      "type": "secret",
+      "secret_spec": "oc_bifrost.superuser_id"
+    }
+  ],
   "uses_platform_scaffolding": true
 }

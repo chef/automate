@@ -56,6 +56,7 @@ export interface NodeRunsDailyStatusCollection {
 export interface DayPercentage {
   daysAgo: number;
   percentage: number;
+  total: number;
 }
 
 export interface TopErrorsCollection {
