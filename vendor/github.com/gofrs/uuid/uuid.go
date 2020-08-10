@@ -30,7 +30,12 @@
 package uuid
 
 import (
+	"encoding/binary"
 	"encoding/hex"
+	"fmt"
+	"io"
+	"strings"
+	"time"
 )
 
 // Size of a UUID in bytes.
@@ -64,6 +69,33 @@ const (
 	DomainOrg
 )
 
+// Timestamp is the count of 100-nanosecond intervals since 00:00:00.00,
+// 15 October 1582 within a V1 UUID. This type has no meaning for V2-V5
+// UUIDs since they don't have an embedded timestamp.
+type Timestamp uint64
+
+const _100nsPerSecond = 10000000
+
+// Time returns the UTC time.Time representation of a Timestamp
+func (t Timestamp) Time() (time.Time, error) {
+	secs := uint64(t) / _100nsPerSecond
+	nsecs := 100 * (uint64(t) % _100nsPerSecond)
+	return time.Unix(int64(secs)-(epochStart/_100nsPerSecond), int64(nsecs)), nil
+}
+
+// TimestampFromV1 returns the Timestamp embedded within a V1 UUID.
+// Returns an error if the UUID is any version other than 1.
+func TimestampFromV1(u UUID) (Timestamp, error) {
+	if u.Version() != 1 {
+		err := fmt.Errorf("uuid: %s is version %d, not version 1", u, u.Version())
+		return 0, err
+	}
+	low := binary.BigEndian.Uint32(u[0:4])
+	mid := binary.BigEndian.Uint16(u[4:6])
+	hi := binary.BigEndian.Uint16(u[6:8]) & 0xfff
+	return Timestamp(uint64(low) + (uint64(mid) << 32) + (uint64(hi) << 48)), nil
+}
+
 // String parse helpers.
 var (
 	urnPrefix  = []byte("urn:uuid:")
@@ -81,14 +113,6 @@ var (
 	NamespaceOID  = Must(FromString("6ba7b812-9dad-11d1-80b4-00c04fd430c8"))
 	NamespaceX500 = Must(FromString("6ba7b814-9dad-11d1-80b4-00c04fd430c8"))
 )
-
-// Equal returns true if a and b are equivalent.
-//
-// Deprecated: this function is deprecated and will be removed in a future major
-// version, as values of type UUID are directly comparable using `==`.
-func Equal(a UUID, b UUID) bool {
-	return a == b
-}
 
 // Version returns the algorithm version used to generate the UUID.
 func (u UUID) Version() byte {
@@ -132,6 +156,65 @@ func (u UUID) String() string {
 	hex.Encode(buf[24:], u[10:])
 
 	return string(buf)
+}
+
+// Format implements fmt.Formatter for UUID values.
+//
+// The behavior is as follows:
+// The 'x' and 'X' verbs output only the hex digits of the UUID, using a-f for 'x' and A-F for 'X'.
+// The 'v', '+v', 's' and 'q' verbs return the canonical RFC-4122 string representation.
+// The 'S' verb returns the RFC-4122 format, but with capital hex digits.
+// The '#v' verb returns the "Go syntax" representation, which is a 16 byte array initializer.
+// All other verbs not handled directly by the fmt package (like '%p') are unsupported and will return
+// "%!verb(uuid.UUID=value)" as recommended by the fmt package.
+func (u UUID) Format(f fmt.State, c rune) {
+	switch c {
+	case 'x', 'X':
+		s := hex.EncodeToString(u.Bytes())
+		if c == 'X' {
+			s = strings.Map(toCapitalHexDigits, s)
+		}
+		_, _ = io.WriteString(f, s)
+	case 'v':
+		var s string
+		if f.Flag('#') {
+			s = fmt.Sprintf("%#v", [Size]byte(u))
+		} else {
+			s = u.String()
+		}
+		_, _ = io.WriteString(f, s)
+	case 's', 'S':
+		s := u.String()
+		if c == 'S' {
+			s = strings.Map(toCapitalHexDigits, s)
+		}
+		_, _ = io.WriteString(f, s)
+	case 'q':
+		_, _ = io.WriteString(f, `"`+u.String()+`"`)
+	default:
+		// invalid/unsupported format verb
+		fmt.Fprintf(f, "%%!%c(uuid.UUID=%s)", c, u.String())
+	}
+}
+
+func toCapitalHexDigits(ch rune) rune {
+	// convert a-f hex digits to A-F
+	switch ch {
+	case 'a':
+		return 'A'
+	case 'b':
+		return 'B'
+	case 'c':
+		return 'C'
+	case 'd':
+		return 'D'
+	case 'e':
+		return 'E'
+	case 'f':
+		return 'F'
+	default:
+		return ch
+	}
 }
 
 // SetVersion sets the version bits.
