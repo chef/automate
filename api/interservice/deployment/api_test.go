@@ -7,5 +7,5 @@ import (
 )
 
 func TestGeneratedProtobufUpToDate(t *testing.T) {
-	grpctest.AssertCompiledInUpToDate(t, "api/interservice/deployment")
+	grpctest.AssertCompiledInUpToDate(t, "interservice/deployment")
 }

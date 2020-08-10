@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/interservice/ingest/job_scheduler.proto",
+    "title": "interservice/ingest/job_scheduler.proto",
     "version": "version not set"
   },
   "consumes": [

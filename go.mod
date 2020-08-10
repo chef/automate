@@ -20,7 +20,7 @@ require (
 	github.com/briandowns/spinner v0.0.0-20180123222039-b3ed21e9d3b2
 	github.com/buger/goterm v0.0.0-20180307092342-c9def0117b24
 	github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44
-	github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816
+	github.com/chef/toml v0.3.1-0.20200730001027-920c30b33b5d
 	github.com/ckaznocha/protoc-gen-lint v0.2.1
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
 	github.com/coreos/go-oidc v2.0.0+incompatible
@@ -42,7 +42,9 @@ require (
 	github.com/gofrs/uuid v2.1.0+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.4.3
-	github.com/golang/protobuf v1.4.0
+	github.com/golang/protobuf v1.4.2
+	github.com/google/go-cmp v0.5.1
+	github.com/googleapis/googleapis v0.0.0-20200727200613-a94df49e8f20 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20191106031601-ce3c9ade29de // indirect
 	github.com/gorilla/handlers v1.3.0 // indirect
 	github.com/gorilla/mux v1.7.4
@@ -65,6 +67,7 @@ require (
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
+	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
 	github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9
@@ -115,8 +118,9 @@ require (
 	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20200422022333-3d57cf2e726e // indirect
 	google.golang.org/api v0.9.0
-	google.golang.org/genproto v0.0.0-20200211111953-2dc5924e3898
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
 	google.golang.org/grpc v1.27.1
+	google.golang.org/protobuf v1.25.0
 	gopkg.in/asn1-ber.v1 v1.0.0-20170511165959-379148ca0225 // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.20
 	gopkg.in/ldap.v2 v2.5.1 // indirect
@@ -128,6 +132,3 @@ require (
 
 // https://github.com/dexidp/dex/issues/1578
 replace github.com/dexidp/dex => github.com/ryancragun/dex v2.19.0-incompatible+incompatible
-
-// bumping github.com/open-policy-agent/opa would drag in in protobuf 1.4.0
-replace github.com/golang/protobuf => github.com/golang/protobuf v1.3.5

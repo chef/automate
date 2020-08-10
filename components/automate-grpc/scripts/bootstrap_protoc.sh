@@ -11,12 +11,14 @@ set -e
 # completely clean checkout of the repo with all the compiled protos removed
 # (i.e., all files with '*pb*go' extensions deleted).
 
+pushd components
 
 printf 'GEN: %s\n' components/automate-grpc/protoc-gen-a2-config/api/a2conf/*.proto
-protoc -I /src --go_out=logtostderr=true,paths=source_relative:/src \
-  components/automate-grpc/protoc-gen-a2-config/api/a2conf/*.proto
+protoc -I /src/components --go_out=paths=source_relative:/src/components \
+  automate-grpc/protoc-gen-a2-config/api/a2conf/*.proto
 
 printf 'GEN: %s\n' components/automate-grpc/protoc-gen-policy/iam/*.proto
-protoc -I /src --go_out=logtostderr=true,paths=source_relative:/src \
-  components/automate-grpc/protoc-gen-policy/iam/*.proto
+protoc -I /src/components --go_out=paths=source_relative:/src/components \
+  automate-grpc/protoc-gen-policy/iam/*.proto
 
+popd

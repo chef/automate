@@ -11,9 +11,9 @@ import (
 	request0 "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	response0 "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	gomock "github.com/golang/mock/gomock"
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	grpc "google.golang.org/grpc"
 	metadata "google.golang.org/grpc/metadata"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 )
 
@@ -58,6 +58,26 @@ func (mr *MockCfgMgmtClientMockRecorder) CreateRollout(arg0, arg1 interface{}, a
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRollout", reflect.TypeOf((*MockCfgMgmtClient)(nil).CreateRollout), varargs...)
+}
+
+// CreateRolloutTest mocks base method
+func (m *MockCfgMgmtClient) CreateRolloutTest(arg0 context.Context, arg1 *request.CreateRolloutTest, arg2 ...grpc.CallOption) (*response.CreateRolloutTest, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateRolloutTest", varargs...)
+	ret0, _ := ret[0].(*response.CreateRolloutTest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRolloutTest indicates an expected call of CreateRolloutTest
+func (mr *MockCfgMgmtClientMockRecorder) CreateRolloutTest(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRolloutTest", reflect.TypeOf((*MockCfgMgmtClient)(nil).CreateRolloutTest), varargs...)
 }
 
 // GetAttributes mocks base method
@@ -540,6 +560,26 @@ func (mr *MockCfgMgmtClientMockRecorder) GetVersion(arg0, arg1 interface{}, arg2
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetVersion), varargs...)
 }
 
+// HandlePolicyUpdateAction mocks base method
+func (m *MockCfgMgmtClient) HandlePolicyUpdateAction(arg0 context.Context, arg1 *request0.PolicyUpdateAction, arg2 ...grpc.CallOption) (*response0.PolicyUpdateAction, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HandlePolicyUpdateAction", varargs...)
+	ret0, _ := ret[0].(*response0.PolicyUpdateAction)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HandlePolicyUpdateAction indicates an expected call of HandlePolicyUpdateAction
+func (mr *MockCfgMgmtClientMockRecorder) HandlePolicyUpdateAction(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandlePolicyUpdateAction", reflect.TypeOf((*MockCfgMgmtClient)(nil).HandlePolicyUpdateAction), varargs...)
+}
+
 // ListNodeSegmentsWithRolloutProgress mocks base method
 func (m *MockCfgMgmtClient) ListNodeSegmentsWithRolloutProgress(arg0 context.Context, arg1 *request.ListNodeSegmentsWithRolloutProgress, arg2 ...grpc.CallOption) (*response.NodeSegmentsWithRolloutProgress, error) {
 	m.ctrl.T.Helper()
@@ -882,6 +922,21 @@ func (m *MockCfgMgmtServer) CreateRollout(arg0 context.Context, arg1 *request.Cr
 func (mr *MockCfgMgmtServerMockRecorder) CreateRollout(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRollout", reflect.TypeOf((*MockCfgMgmtServer)(nil).CreateRollout), arg0, arg1)
+}
+
+// CreateRolloutTest mocks base method
+func (m *MockCfgMgmtServer) CreateRolloutTest(arg0 context.Context, arg1 *request.CreateRolloutTest) (*response.CreateRolloutTest, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateRolloutTest", arg0, arg1)
+	ret0, _ := ret[0].(*response.CreateRolloutTest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRolloutTest indicates an expected call of CreateRolloutTest
+func (mr *MockCfgMgmtServerMockRecorder) CreateRolloutTest(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRolloutTest", reflect.TypeOf((*MockCfgMgmtServer)(nil).CreateRolloutTest), arg0, arg1)
 }
 
 // GetAttributes mocks base method
@@ -1242,6 +1297,21 @@ func (m *MockCfgMgmtServer) GetVersion(arg0 context.Context, arg1 *request0.Vers
 func (mr *MockCfgMgmtServerMockRecorder) GetVersion(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetVersion), arg0, arg1)
+}
+
+// HandlePolicyUpdateAction mocks base method
+func (m *MockCfgMgmtServer) HandlePolicyUpdateAction(arg0 context.Context, arg1 *request0.PolicyUpdateAction) (*response0.PolicyUpdateAction, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HandlePolicyUpdateAction", arg0, arg1)
+	ret0, _ := ret[0].(*response0.PolicyUpdateAction)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HandlePolicyUpdateAction indicates an expected call of HandlePolicyUpdateAction
+func (mr *MockCfgMgmtServerMockRecorder) HandlePolicyUpdateAction(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandlePolicyUpdateAction", reflect.TypeOf((*MockCfgMgmtServer)(nil).HandlePolicyUpdateAction), arg0, arg1)
 }
 
 // ListNodeSegmentsWithRolloutProgress mocks base method

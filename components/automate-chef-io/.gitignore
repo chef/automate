@@ -7,5 +7,4 @@ package.json
 
 public/
 themes/
-static/api-docs
 static/redoc.standalone.js

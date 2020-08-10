@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.api.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/external/infra_proxy/response";
 
-import "api/external/infra_proxy/response/roles.proto";
+import "external/infra_proxy/response/roles.proto";
 
 message Policyfiles {
     // Policyfiles list.
@@ -34,9 +34,9 @@ message Policyfile {
     repeated IncludedPolicyLock included_policy_locks = 6;
     // List of cookbook locks under this policy.
     repeated CookbookLock cookbook_locks = 7;
-    // Stringified JSON of the default attributes.
+    // Policyfile default attributes JSON.
     string default_attributes = 8;
-    // Stringified JSON of the override attributes.
+    // Policyfile override attributes JSON.
     string override_attributes = 9;
     // Expanded run-list associated with the policy.
     repeated ExpandedRunList expanded_run_list = 10;

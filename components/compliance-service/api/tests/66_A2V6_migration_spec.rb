@@ -1,6 +1,6 @@
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/reporting/reporting_pb'
-require 'api/interservice/compliance/reporting/reporting_services_pb'
+require 'interservice/compliance/reporting/reporting_pb'
+require 'interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
   Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)
@@ -200,33 +200,33 @@ describe File.basename(__FILE__) do
 
   it "ListSuggestions: controls 'icMP' with filter by profile ID" do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
-      type: 'control',
-      text: 'icMP',
-      filters: [
-        Reporting::ListFilter.new(type: 'profile_id', values: ['b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015'])
-      ]
+        type: 'control',
+        text: 'icMP',
+        filters: [
+            Reporting::ListFilter.new(type: 'profile_id', values: ['b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015'])
+        ]
     )
     expected = [
-      "ICMP ratemask--sysctl-06--",
-      "ICMP ratelimit--sysctl-05--",
-      "ICMP echo ignore broadcasts--sysctl-04--",
-      "ICMP ignore bogus error responses--sysctl-03--" ]
+        "ICMP echo ignore broadcasts--sysctl-04--",
+        "ICMP ignore bogus error responses--sysctl-03--",
+        "ICMP ratelimit--sysctl-05--",
+        "ICMP ratemask--sysctl-06--"
+    ]
     assert_suggestions_text_id_version(expected, actual_data)
   end
 
   it "ListSuggestions: controls 'sys' with filter by profile ID" do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
-      type: 'control',
-      text: 'sys',
-      filters: [
-        Reporting::ListFilter.new(type: 'profile_id', values: ['b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015'])
-      ]
+        type: 'control',
+        text: 'sys',
+        filters: [
+            Reporting::ListFilter.new(type: 'profile_id', values: ['b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015'])
+        ]
     )
     expected = [
-      "Magic SysRq--sysctl-30--",
-      "Disable the system`s acceptance of router advertisement--sysctl-25--",
-      "Protection against SYN flood attacks--sysctl-11--",
-      "Disable Apache’s follows Symbolic Links for directories in alias.conf--apache-11--"]
+        "Disable the system`s acceptance of router advertisement--sysctl-25--",
+        "Magic SysRq--sysctl-30--"
+    ]
     assert_suggestions_text_id_version(expected, actual_data)
   end
 

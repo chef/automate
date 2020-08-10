@@ -13,6 +13,7 @@ pkg_binds=(
   [authz-service]="port"
   [event-service]="port"
   [nodemanager-service]="port"
+  [config-mgmt-service]="port"
   # TODO(ssd) 2019-05-02: We could consider making these optional
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"

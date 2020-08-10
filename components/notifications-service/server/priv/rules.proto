@@ -106,6 +106,7 @@ message RuleAddResponse {
   Code code = 1;
   repeated string messages = 2;
   string id = 3;
+  Rule rule = 4;
 }
 
 message RuleGetResponse {

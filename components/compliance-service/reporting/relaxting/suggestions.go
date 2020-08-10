@@ -21,7 +21,7 @@ import (
 )
 
 // GetSuggestions - Report #12
-func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, filters map[string][]string, text string, size32 int32) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, filters map[string][]string, text string, size32 int32, typeParamKey string) ([]*reportingapi.Suggestion, error) {
 	client, err := backend.ES2Client()
 	size := int(size32)
 	if err != nil {
@@ -84,15 +84,18 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 	}
 
 	controlTagFilterKey := ""
-	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	if len(typeParamKey) > 0 {
+		_, controlTagFilterKey = leftSplit(typeParamKey, ":")
+	}
+
 	for filterType := range filters {
 		if strings.HasPrefix(filterType, "control_tag:") {
-			_, controlTagFilterKey = leftSplit(filterType, ":")
 			useSummaryIndex = false
-			// For suggestions, prefer control_tag filter key with no values to avoid clash with full control_tag filters
-			if len(filters[filterType]) == 0 {
-				break
+			if len(controlTagFilterKey) == 0 && typeParam == "control_tag_value" {
+				logrus.Warn("please consider using the `type_key` field on the API to specify the control tag key for which values are being requested")
+				_, controlTagFilterKey = leftSplit(filterType, ":")
 			}
+			break
 		}
 	}
 
@@ -134,6 +137,17 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 		return suggs[0:size], nil
 	}
 	return suggs, nil
+}
+
+func removeControlLevelFilters(filters map[string][]string) {
+	if len(filters["control"]) > 0 {
+		delete(filters, "control")
+	}
+	for filterType := range filters {
+		if strings.HasPrefix(filterType, "control_tag:") {
+			delete(filters, filterType)
+		}
+	}
 }
 
 func suggestionFieldArray(field string) bool {
@@ -348,7 +362,7 @@ func (backend ES2Backend) getProfileWithVersionSuggestions(ctx context.Context,
 		Query(boolQuery).
 		FetchSource(false).
 		Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
-		// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+	// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
 
 	source, err := searchSource.Source()
 	if err != nil {
@@ -446,7 +460,7 @@ func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *ela
 		Query(boolQuery).
 		FetchSource(false).
 		Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
-		// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+	// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
 
 	source, err := searchSource.Source()
 	if err != nil {
@@ -513,11 +527,13 @@ func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *ela
 }
 
 func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
+	myName := "getControlSuggestions"
 	esIndex, err := GetEsIndex(filters, false, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getControlSuggestions unable to get index dates")
 	}
 
+	removeControlLevelFilters(filters)
 	boolQuery := backend.getFiltersQuery(filters, true)
 
 	var innerQuery elastic.Query
@@ -533,19 +549,37 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 		innerQuery = elastic.NewExistsQuery(target)
 	}
 
-	fsc := elastic.NewFetchSourceContext(true).
-		Include("profiles.controls.id").
-		Include("profiles.controls.title")
-	hit := elastic.NewInnerHit().Size(size)
-	hit.FetchSourceContext(fsc)
-
-	boolQuery = boolQuery.Must(elastic.NewNestedQuery("profiles.controls", innerQuery).InnerHit(hit))
-
 	searchSource := elastic.NewSearchSource().
 		Query(boolQuery).
 		FetchSource(false).
-		Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
-		// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+		Size(0) //setting size to 0 because we now use aggs to get this stuff and don't need the actual docs
+	//Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
+	// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+
+	controlsTitles := elastic.NewTermsAggregation().
+		Field("profiles.controls.title").
+		Size(10).
+		Order("_count", false)
+
+	controlIds := elastic.NewTermsAggregation().
+		Field("profiles.controls.id").
+		Size(10).
+		Order("_count", false)
+
+	controlsTitles.SubAggregation("ids", controlIds)
+
+	controlsAgg := elastic.NewFilterAggregation().Filter(innerQuery).
+		SubAggregation("titles", controlsTitles)
+
+	controlsFilterAgg := elastic.NewNestedAggregation().
+		Path("profiles.controls").
+		SubAggregation("controls", controlsAgg)
+
+	profilesAgg := elastic.NewNestedAggregation().
+		Path("profiles").
+		SubAggregation("controls_filter", controlsFilterAgg)
+
+	searchSource.Aggregation("profiles", profilesAgg)
 
 	source, err := searchSource.Source()
 	if err != nil {
@@ -557,12 +591,6 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 	searchResult, err := client.Search().
 		SearchSource(searchSource).
 		Index(esIndex).
-		FilterPath(
-			"took",
-			"hits.total",
-			"hits.hits._id",
-			"hits.hits._score",
-			"hits.hits.inner_hits").
 		Do(ctx)
 
 	if err != nil {
@@ -576,28 +604,31 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 		Title string `json:"title"`
 	}
 
-	// Using this to avoid duplicate controls in the suggestions
+	singular := false
 	addedControls := make(map[string]bool)
-
 	suggs := make([]*reportingapi.Suggestion, 0)
-	if searchResult != nil {
-		for _, hit := range searchResult.Hits.Hits {
-			if hit != nil {
-				for _, inner_hit := range hit.InnerHits {
-					if inner_hit != nil {
-						for _, hit2 := range inner_hit.Hits.Hits {
-							var c ControlSource
-							if hit2.Source != nil {
-								err := json.Unmarshal(*hit2.Source, &c)
-								if err == nil && c.ID != "" {
-									if !addedControls[c.ID] {
-										oneSugg := reportingapi.Suggestion{Id: c.ID, Text: c.Title, Score: float32(*hit2.Score)}
-										suggs = append(suggs, &oneSugg)
-										addedControls[c.ID] = true
-									}
-								} else {
-									logrus.Errorf("getControlSuggestions: Invalid control (%+v) found in report %s", c, hit2.Id)
+	if outerProfilesAggResult, found := searchResult.Aggregations.Nested("profiles"); found {
+		if outerFilteredControls, found := outerProfilesAggResult.Aggregations.Nested("controls_filter"); found {
+			if outerControlsAggResult, found := outerFilteredControls.Aggregations.Filter("controls"); found {
+				if titlesBuckets, found := outerControlsAggResult.Aggregations.Terms("titles"); found && len(titlesBuckets.Buckets) > 0 {
+					for _, titleBucket := range titlesBuckets.Buckets {
+						title, ok := titleBucket.Key.(string)
+						if !ok {
+							logrus.Errorf("could not convert the value of titleBucket: %v, to a string!", titleBucket)
+						}
+						logrus.Debugf("%s titleBucket.Key: %s", myName, title)
+						if idsBuckets, found := titleBucket.Aggregations.Terms("ids"); found && len(idsBuckets.Buckets) > 0 {
+							for _, idsBucket := range idsBuckets.Buckets {
+								id, ok := idsBucket.Key.(string)
+								if !ok {
+									logrus.Errorf("could not convert the value of idsBucket: %v, to a string!", idsBucket)
 								}
+								if !singular || !addedControls[id] {
+									oneSugg := reportingapi.Suggestion{Id: id, Text: title}
+									suggs = append(suggs, &oneSugg)
+									addedControls[id] = true
+								}
+								logrus.Debugf("%s idsBucket.Key: %s", myName, id)
 							}
 						}
 					}
@@ -609,6 +640,7 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 }
 
 func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, controlTagFilterKey string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+	myName := "getControlTagsSuggestions"
 	if typeParam == "control_tag_value" && controlTagFilterKey == "" {
 		return nil, status.Error(codes.InvalidArgument, "'control_tag' filter is required for 'control_tag_value' suggestions")
 	}
@@ -616,49 +648,61 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 	if err != nil {
 		return nil, errors.Wrap(err, "getControlTagsSuggestions unable to get index dates")
 	}
+
+	removeControlLevelFilters(filters)
 	boolQuery := backend.getFiltersQuery(filters, true)
 	text = strings.ToLower(text)
 
-	var finalInnerQuery elastic.Query
+	finalInnerBoolQuery := elastic.NewBoolQuery()
 	if len(text) >= 2 {
-		finalInnerBoolQuery := elastic.NewBoolQuery()
 		finalInnerBoolQuery.Must(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("or"))
 		finalInnerBoolQuery.Should(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and"))
 		finalInnerBoolQuery.Should(elastic.NewTermQuery(fmt.Sprintf("%s.lower", target), text).Boost(100))
 		finalInnerBoolQuery.Should(elastic.NewPrefixQuery(fmt.Sprintf("%s.lower", target), text).Boost(100))
-		finalInnerQuery = finalInnerBoolQuery
 	} else {
-		finalInnerQuery = elastic.NewExistsQuery(target)
+		finalInnerBoolQuery.Must(elastic.NewExistsQuery(target))
 	}
 
-	outerBoolQuery := elastic.NewBoolQuery()
-	nestedBoolQuery := outerBoolQuery.Must(elastic.NewNestedQuery("profiles.controls.string_tags", finalInnerQuery))
-
-	hit := elastic.NewInnerHit().Size(20)
-	boolQuery = boolQuery.Must(elastic.NewNestedQuery("profiles.controls", nestedBoolQuery).InnerHit(hit))
-
+	if typeParam == "control_tag_value" {
+		finalInnerBoolQuery.Must(elastic.NewTermQuery("profiles.controls.string_tags.key", controlTagFilterKey))
+	}
 	searchSource := elastic.NewSearchSource().
 		Query(boolQuery).
 		FetchSource(false).
-		Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
-		// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+		Size(0) //set to 0 because we do aggs now
+
+	controlsTitles := elastic.NewTermsAggregation().
+		Field(target).
+		Size(10).
+		Order("_count", false)
+
+	stringTagsAgg := elastic.NewFilterAggregation().Filter(finalInnerBoolQuery).
+		SubAggregation("totals", controlsTitles)
+
+	controlTagsAgg := elastic.NewNestedAggregation().
+		Path("profiles.controls.string_tags").
+		SubAggregation("string_tags", stringTagsAgg)
+
+	controlsFilterAgg := elastic.NewNestedAggregation().
+		Path("profiles.controls").
+		SubAggregation("controls", controlTagsAgg)
+
+	profilesAgg := elastic.NewNestedAggregation().
+		Path("profiles").
+		SubAggregation("controls_filter", controlsFilterAgg)
+
+	searchSource.Aggregation("profiles", profilesAgg)
 
 	source, err := searchSource.Source()
 	if err != nil {
 		return nil, errors.Wrap(err, "getControlTagsSuggestions unable to get Source")
 	}
 
-	LogQueryPartMin(esIndex, source, "getControlTagsSuggestions query")
+	LogQueryPartMin(esIndex, source, myName)
 
 	searchResult, err := client.Search().
 		SearchSource(searchSource).
 		Index(esIndex).
-		FilterPath(
-			"took",
-			"hits.total",
-			"hits.hits._id",
-			"hits.hits._score",
-			"hits.hits.inner_hits").
 		Do(ctx)
 
 	if err != nil {
@@ -667,90 +711,30 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
 
-	type ControlSourceTags struct {
-		ID         string                            `json:"id"`
-		StringTags []ESInSpecReportControlStringTags `json:"string_tags"`
-	}
-	type ControlTagsScore struct {
-		Score      float32
-		StringTags []ESInSpecReportControlStringTags
-	}
+	suggs := make([]*reportingapi.Suggestion, 0)
+	if outerProfilesAggResult, found := searchResult.Aggregations.Nested("profiles"); found {
+		if outerFilteredControls, found := outerProfilesAggResult.Aggregations.Nested("controls_filter"); found {
+			if outerControlsAggResult, found := outerFilteredControls.Aggregations.Nested("controls"); found {
+				if stringTagsAggResult, found := outerControlsAggResult.Aggregations.Filter("string_tags"); found {
+					if stringTagsBuckets, found := stringTagsAggResult.Aggregations.Terms("totals"); found && len(stringTagsBuckets.Buckets) > 0 {
+						for _, stringTagsBucket := range stringTagsBuckets.Buckets {
+							logrus.Debugf("%s stringTagsBucket: %v", myName, stringTagsBucket)
+							stringTagKey, ok := stringTagsBucket.Key.(string)
+							if !ok {
+								logrus.Errorf("could not convert the value of stringTagsBucket: %v, to a string!", stringTagsBucket)
+							}
 
-	// Using this array to aggregate the unsorted suggestions from the response
-	foundControlTags := make([]ControlTagsScore, 0)
-	if searchResult != nil {
-		for _, hit := range searchResult.Hits.Hits {
-			if hit == nil {
-				continue
-			}
-			for _, inner_hit := range hit.InnerHits {
-				if inner_hit == nil {
-					continue
-				}
-				for _, hit2 := range inner_hit.Hits.Hits {
-					if hit2.Source == nil {
-						continue
-					}
-					var c ControlSourceTags
-					err := json.Unmarshal(*hit2.Source, &c)
-					if err == nil && len(c.StringTags) > 0 {
-						foundControlTags = append(foundControlTags, ControlTagsScore{
-							float32(*hit2.Score),
-							c.StringTags,
-						})
-					} else {
-						logrus.Errorf("getControlTagsSuggestions: Invalid control (%+v) found in report %s", c, hit2.Id)
+							if len(text) < 2 || strings.Contains(strings.ToLower(stringTagKey), strings.ToLower(text)) {
+								suggs = append(suggs, &reportingapi.Suggestion{
+									Text:  stringTagKey,
+									Score: 0,
+								})
+							}
+						}
 					}
 				}
 			}
 		}
-	}
-	sort.Slice(foundControlTags, func(i, j int) bool {
-		return foundControlTags[i].Score > foundControlTags[j].Score
-	})
-
-	scoredTagSuggs := make(map[string]float32)
-	for _, item := range foundControlTags {
-		matches := make([]string, 0)
-		// If the suggestion is for control tag key, we need to find the one that
-		// was the closest match from all the tag keys the control might have
-		if typeParam == "control_tag_key" {
-			for _, controlTag := range item.StringTags {
-				matches = append(matches, controlTag.Key)
-			}
-		}
-
-		// If the suggestion is for control tag values, we need to find the tag that matches the
-		// tag key and then find the closest match from all the values of that tag
-		if typeParam == "control_tag_value" {
-			for _, controlTag := range item.StringTags {
-				if controlTag.Key == controlTagFilterKey {
-					matches = append(matches, controlTag.Values...)
-				}
-			}
-		}
-
-		// scoredTagSuggs maps the found tag suggestions to remove duplicates
-		// We don't offer suggestions for less than two characters
-		if len(text) < 2 {
-			for _, match := range matches {
-				scoredTagSuggs[match] = item.Score
-			}
-		} else {
-			// Find the best engram match from the array of matches
-			bestMatch := findBestArrayMatch(text, matches)
-			if bestMatch != "" {
-				scoredTagSuggs[bestMatch] = item.Score
-			}
-		}
-	}
-
-	suggs := make([]*reportingapi.Suggestion, 0, len(scoredTagSuggs))
-	for mSugg, mScore := range scoredTagSuggs {
-		suggs = append(suggs, &reportingapi.Suggestion{
-			Text:  mSugg,
-			Score: mScore,
-		})
 	}
 
 	return suggs, nil

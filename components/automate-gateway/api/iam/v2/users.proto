@@ -6,10 +6,10 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/ia
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
-import "components/automate-gateway/api/iam/v2/request/users.proto";
-import "components/automate-gateway/api/iam/v2/response/users.proto";
+import "automate-gateway/api/iam/v2/request/users.proto";
+import "automate-gateway/api/iam/v2/response/users.proto";
 
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Users {
 

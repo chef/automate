@@ -9,6 +9,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
 // GetAffectedNodes get the nodes using chef object
@@ -25,6 +26,84 @@ func (s *Server) GetAffectedNodes(ctx context.Context, req *request.AffectedNode
 
 	return &response.AffectedNodes{
 		Nodes: fromSearchAPIToAffectedNodes(*res),
+	}, nil
+}
+
+// DeleteNode deletes the node by name
+func (s *Server) DeleteNode(ctx context.Context, req *request.DeleteNode) (*response.DeleteNode, error) {
+	err := validation.New(validation.Options{
+		Target:  "node",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	err = c.client.Nodes.Delete(req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.DeleteNode{
+		Name: req.Name,
+	}, nil
+}
+
+// UpdateNode update the node attributes
+func (s *Server) UpdateNode(ctx context.Context, req *request.UpdateNode) (*response.UpdateNode, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	automatic, err := StructToJSON(req.AutomaticAttributes)
+	if err != nil {
+		return nil, err
+	}
+
+	normal, err := StructToJSON(req.NormalAttributes)
+	if err != nil {
+		return nil, err
+	}
+
+	defaults, err := StructToJSON(req.DefaultAttributes)
+	if err != nil {
+		return nil, err
+	}
+
+	override, err := StructToJSON(req.OverrideAttributes)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = c.client.Nodes.Put(chef.Node{
+		Name:                req.Name,
+		Environment:         req.Environment,
+		RunList:             req.RunList,
+		AutomaticAttributes: automatic.(map[string]interface{}),
+		NormalAttributes:    normal.(map[string]interface{}),
+		DefaultAttributes:   defaults.(map[string]interface{}),
+		OverrideAttributes:  override.(map[string]interface{}),
+		PolicyName:          req.PolicyName,
+		PolicyGroup:         req.PolicyGroup,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.UpdateNode{
+		Name: req.Name,
 	}, nil
 }
 

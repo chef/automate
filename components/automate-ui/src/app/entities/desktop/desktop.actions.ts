@@ -4,7 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { NodeRun } from 'app/types/types';
 import { DailyCheckInCountCollection, NodeRunsDailyStatusCollection,
   TopErrorsCollection, CountedDurationCollection, Desktop, TermFilter,
-  PageSizeChangeEvent, NodeMetadataCount } from './desktop.model';
+  PageSizeChangeEvent, NodeMetadataCount, DesktopColumnOptionUpdate } from './desktop.model';
 
 export enum DesktopActionTypes {
   GET_DAILY_CHECK_IN_TIME_SERIES =
@@ -63,6 +63,10 @@ export enum DesktopActionTypes {
     'DESKTOP::SET::DAYS_AGO',
   UPDATE_DESKTOPS_FILTER_CURRENT_PAGE =
     'DESKTOP::UPDATE::DESKTOPS_FILTER_CURRENT_PAGE',
+  UPDATE_DESKTOP_COLUMN_OPTIONS =
+    'DESKTOP::UPDATE::DESKTOP_COLUMN_OPTIONS',
+  GET_DESKTOP_COLUMN_OPTIONS_DEFAULTS =
+    'DESKTOP::GET::DESKTOP_COLUMN_OPTIONS_DEFAULTS',
   ADD_DESKTOPS_FILTER_TERM =
     'DESKTOP::ADD::DESKTOPS_FILTER_TERM',
   UPDATE_DESKTOPS_FILTER_TERMS =
@@ -211,6 +215,15 @@ export class UpdateDesktopFilterCurrentPage implements Action {
   constructor(public payload: { page: number}) { }
 }
 
+export class UpdateDesktopColumnOptions implements Action {
+  readonly type = DesktopActionTypes.UPDATE_DESKTOP_COLUMN_OPTIONS;
+  constructor(public payload: DesktopColumnOptionUpdate) { }
+}
+
+export class GetDesktopColumnOptionsDefaults implements Action {
+  readonly type = DesktopActionTypes.GET_DESKTOP_COLUMN_OPTIONS_DEFAULTS;
+}
+
 export class AddDesktopFilterTerm implements Action {
   readonly type = DesktopActionTypes.ADD_DESKTOPS_FILTER_TERM;
   constructor(public payload: { term: TermFilter}) { }
@@ -275,4 +288,6 @@ export type DesktopActions =
   | RemoveDesktopFilterTerm
   | UpdateDesktopSortTerm
   | UpdateDesktopDateTerm
-  | UpdateDesktopsFilterPageSizeAndCurrentPage;
+  | UpdateDesktopsFilterPageSizeAndCurrentPage
+  | UpdateDesktopColumnOptions
+  | GetDesktopColumnOptionsDefaults;

@@ -22,7 +22,9 @@ import (
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/pcmp/passert"
 
+	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	event "github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/lib/stringutils"
 )
@@ -192,6 +194,672 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 
 	// Run all the cases!
 	runCases(t, cases)
+}
+
+func TestFeedCountsTypeCountsProjectFilter(t *testing.T) {
+	startDate := time.Now().UTC()
+	request := &event_feed.FeedSummaryRequest{
+		CountCategory: "event-type",
+		Start:         startDate.AddDate(0, 0, -11).Unix() * 1000,
+	}
+
+	cases := []struct {
+		description string
+		entries     []feed.FeedEntry
+		ctx         context.Context
+		expected    *event_feed.FeedSummaryResponse
+	}{
+		{
+			description: "No Events with requesting projects",
+			entries:     []feed.FeedEntry{},
+			ctx:         contextWithProjects([]string{"project9"}),
+			expected:    &event_feed.FeedSummaryResponse{},
+		},
+		{
+			description: "Return the only event; One event with a project matching requested projects",
+			entries: []feed.FeedEntry{
+				{
+					Projects:           []string{"project9"},
+					ObjectObjectType:   "cookbook",
+					ProducerObjectType: "chef_server",
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return the only event; One non chef-server event with no projects; requesting one project",
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "profile",
+					ProducerObjectType: "profile",
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "profile",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return both events; Two events with a project matching requested projects",
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "node",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 2,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+					{
+						Category: "node",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return both events; Two events one chef-server and the other not; chef-server event has a project matching the requested project",
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "profile",
+					ProducerObjectType: "profile",
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 2,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+					{
+						Category: "profile",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return non chef-server event count; Two events one chef-server and the other not; chef-server event has a non-matching project to the requested project",
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"not-matching-project"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "profile",
+					ProducerObjectType: "profile",
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "profile",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return one of the events;Two Events with only one's project matching requested projects",
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "node",
+					Projects:           []string{"project3"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return not counts; One event with a project not matching the request's projects",
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			ctx: contextWithProjects([]string{"project3"}),
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 0,
+				EntryCounts:  []*event_feed.EntryCount{},
+			},
+		},
+		{
+			description: "Return the only event; One event with one project; request is for all projects",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return all three events; Three events with different projects and one without any projects; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "node",
+					Projects:           []string{"project12"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "bag",
+					Projects:           []string{},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 3,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+					{
+						Category: "node",
+						Count:    1,
+					},
+					{
+						Category: "bag",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return the only event; One event with no projects; request for all projects",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return the only event; One event that has no projects; request unassigned projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Returns zero count; One event with a project; request only unassigned projects",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 0,
+				EntryCounts:  []*event_feed.EntryCount{},
+			},
+		},
+		{
+			description: "Returns one count; Two events have and don't have projects; requesting only unassigned projects",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "node",
+					Projects:           []string{},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "node",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return one count; One event with a project; request unassigned and a matching project allowed",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID, "project9"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return one event count; One event with no projects; request has no projects",
+			ctx:         contextWithProjects([]string{}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+
+		{
+			description: "Return both event counts;Two events have and don't have projects; request has no projects",
+			ctx:         contextWithProjects([]string{}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "node",
+					Projects:           []string{},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 2,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "node",
+						Count:    1,
+					},
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return one event count; One event with one project matching one of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return a count of both events; Two events with one project matching different projects of several requested",
+			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "node",
+					Projects:           []string{"project3"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 2,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "node",
+						Count:    1,
+					},
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Returns zero counts; One event with one project not matching any of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 0,
+				EntryCounts:  []*event_feed.EntryCount{},
+			},
+		},
+		{
+			description: "Returns zero counts; Two events with neither having projects matching any of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project9"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "node",
+					Projects:           []string{"project10"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 0,
+				EntryCounts:  []*event_feed.EntryCount{},
+			},
+		},
+
+		{
+			description: "Returns one count; One event with several projects where only one matches a single requested project",
+			ctx:         contextWithProjects([]string{"project3"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project3", "project4", "project7", "project6"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two events with both having several projects where one matches a single requested project",
+			ctx:         contextWithProjects([]string{"project3"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project3", "project4", "project7", "project6"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "node",
+					Projects:           []string{"project12", "project10", "project11", "project3"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 2,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "node",
+						Count:    1,
+					},
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Return the count for one; Two events with several projects where only one of the event's project matches a single requested project",
+			ctx:         contextWithProjects([]string{"project3"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project3", "project4", "project7", "project6"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "node",
+					Projects:           []string{"project12", "project10", "project11", "project13"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "One event with several projects where one matches one of several requested project",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project3", "project4", "project7", "project6"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Returns both events count; Two events with several projects where one matches one of several requested project",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project3", "project4", "project7", "project6"},
+					ProducerObjectType: "chef_server",
+				},
+				{
+					ObjectObjectType:   "node",
+					Projects:           []string{"project13", "project14", "project17", "project16"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 2,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "node",
+						Count:    1,
+					},
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+		{
+			description: "Returns zero counts; One event with several projects where none matches several requested projects",
+			ctx:         contextWithProjects([]string{"project14", "project10", "project12", "project13"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType:   "cookbook",
+					Projects:           []string{"project3", "project4", "project7", "project6"},
+					ProducerObjectType: "chef_server",
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{},
+		},
+		{
+			description: "Returns one count; One event with several projects where two matches two of several requested project",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			entries: []feed.FeedEntry{
+				{
+					ObjectObjectType: "cookbook",
+					Projects:         []string{"project3", "project10", "project7", "project6"},
+				},
+			},
+			expected: &event_feed.FeedSummaryResponse{
+				TotalEntries: 1,
+				EntryCounts: []*event_feed.EntryCount{
+					{
+						Category: "cookbook",
+						Count:    1,
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+			for index := range test.entries {
+				test.entries[index].ID = newUUID()
+				test.entries[index].Published = time.Now()
+				test.entries[index].ProducerName = "Fred"
+				test.entries[index].ProducerTags = []string{"mycompany", "engineering department", "compliance team"}
+				test.entries[index].FeedType = "event"
+				test.entries[index].EventType = event.ScanJobUpdatedEventName
+				test.entries[index].Tags = []string{"org_1", "compliance", "profile"}
+				test.entries[index].ActorID = "urn:mycompany:user:fred"
+				test.entries[index].ActorObjectType = "User"
+				test.entries[index].ActorName = "Fred"
+				test.entries[index].Verb = "update"
+				test.entries[index].ObjectID = "urn:chef:compliance:scan-job"
+				test.entries[index].ObjectName = "Scan Job"
+				test.entries[index].TargetID = "urn:mycompany:environment:production"
+				test.entries[index].TargetObjectType = "Environment"
+				test.entries[index].TargetName = "Production"
+				test.entries[index].Created = time.Now().UTC()
+
+				testSuite.feedBackend.CreateFeedEntry(&test.entries[index])
+			}
+			testSuite.RefreshIndices(persistence.IndexNameFeeds)
+
+			defer testSuite.DeleteAllDocuments()
+
+			res, err := testSuite.feedClient.GetFeedSummary(test.ctx, request)
+			assert.NoError(t, err)
+
+			// test response
+			assert.Equal(t, test.expected.TotalEntries, res.TotalEntries)
+			t.Logf("counts %v", res.EntryCounts)
+			passert.ElementsMatch(t, test.expected.EntryCounts, res.EntryCounts)
+		})
+	}
 }
 
 func TestTaskCountsReturnOnlyEventsWithinDateRange(t *testing.T) {

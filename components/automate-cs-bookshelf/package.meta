@@ -1,4 +1,14 @@
 {
   "name": "chef/automate-cs-bookshelf",
+  "bootstrap": [
+    {
+      "type": "secret",
+      "secret_spec": "bookshelf.access_key_id"
+    },
+    {
+      "type": "secret",
+      "secret_spec": "bookshelf.secret_access_key"
+    }
+  ],
   "uses_platform_scaffolding": true
 }

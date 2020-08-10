@@ -13,7 +13,6 @@ import (
 	"math/big"
 	"os"
 	"os/exec"
-	"os/user"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -39,6 +38,7 @@ import (
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/platform/pg"
 	"github.com/chef/automate/lib/platform/sys"
+	"github.com/chef/automate/lib/user"
 )
 
 // deployTimeout is used as the timeout for the deployers initial

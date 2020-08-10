@@ -46,7 +46,7 @@
           <app-tab tabTitle="Clients" #clients_tab  [active]="clientsTab">
             <app-clients *ngIf="clients_tab.active" [serverId]="serverId" [orgId]="orgId"></app-clients>
           </app-tab>
-          <app-tab tabTitle="Policy Files" #policyFiles_tab  [active]="policyFilesTab">
+          <app-tab tabTitle="Policyfiles" #policyFiles_tab  [active]="policyFilesTab">
             <app-policy-files *ngIf="policyFiles_tab.active" [serverId]="serverId" [orgId]="orgId"></app-policy-files>
           </app-tab>
           <app-tab tabTitle="Details" #details_tab [active]="false">

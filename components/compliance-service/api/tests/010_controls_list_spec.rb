@@ -1,6 +1,6 @@
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/reporting/reporting_pb'
-require 'api/interservice/compliance/reporting/reporting_services_pb'
+require 'interservice/compliance/reporting/reporting_pb'
+require 'interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
   Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)
@@ -477,7 +477,7 @@ describe File.basename(__FILE__) do
     assert_equal(14, control_item_array.size)
   end
 
-  it "control list items with a size of 2" do
+  it "control list items on 2018-04-01" do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
         filters: [
             Reporting::ListFilter.new(type: 'start_time', values: ['2017-04-01T00:00:00Z']),
@@ -694,6 +694,25 @@ describe File.basename(__FILE__) do
                 "total" => 5
             }
         }
+    }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
+  it "control list items on the day without profiles" do
+    actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
+        filters: [
+            Reporting::ListFilter.new(type: 'start_time', values: ['2017-04-03T00:00:00Z']),
+            Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+        ],
+        size: 10
+    )
+    expected_data = {
+      "controlSummaryTotals" => {
+        "passed" => {},
+        "skipped" => {},
+        "failed" => {},
+        "waived" => {}
+      }
     }
     assert_equal_json_content(expected_data, actual_data)
   end

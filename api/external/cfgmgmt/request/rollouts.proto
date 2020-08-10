@@ -53,3 +53,5 @@ message ListNodeSegmentsWithRolloutProgress {
   // Filters to apply to the request for the node segments list.
   repeated string filter = 1;
 }
+
+message CreateRolloutTest {}

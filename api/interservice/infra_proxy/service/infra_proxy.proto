@@ -3,26 +3,26 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.service;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/service";
 
-import "api/external/common/version/version.proto";
-import "api/interservice/infra_proxy/request/servers.proto";
-import "api/interservice/infra_proxy/request/orgs.proto";
-import "api/interservice/infra_proxy/request/cookbooks.proto";
-import "api/interservice/infra_proxy/request/roles.proto";
-import "api/interservice/infra_proxy/request/clients.proto";
-import "api/interservice/infra_proxy/request/databags.proto";
-import "api/interservice/infra_proxy/request/environments.proto";
-import "api/interservice/infra_proxy/request/nodes.proto";
-import "api/interservice/infra_proxy/request/policyfiles.proto";
+import "external/common/version/version.proto";
+import "interservice/infra_proxy/request/servers.proto";
+import "interservice/infra_proxy/request/orgs.proto";
+import "interservice/infra_proxy/request/cookbooks.proto";
+import "interservice/infra_proxy/request/roles.proto";
+import "interservice/infra_proxy/request/clients.proto";
+import "interservice/infra_proxy/request/databags.proto";
+import "interservice/infra_proxy/request/environments.proto";
+import "interservice/infra_proxy/request/nodes.proto";
+import "interservice/infra_proxy/request/policyfiles.proto";
 
-import "api/interservice/infra_proxy/response/servers.proto";
-import "api/interservice/infra_proxy/response/orgs.proto";
-import "api/interservice/infra_proxy/response/cookbooks.proto";
-import "api/interservice/infra_proxy/response/roles.proto";
-import "api/interservice/infra_proxy/response/clients.proto";
-import "api/interservice/infra_proxy/response/databags.proto";
-import "api/interservice/infra_proxy/response/environments.proto";
-import "api/interservice/infra_proxy/response/nodes.proto";
-import "api/interservice/infra_proxy/response/policyfiles.proto";
+import "interservice/infra_proxy/response/servers.proto";
+import "interservice/infra_proxy/response/orgs.proto";
+import "interservice/infra_proxy/response/cookbooks.proto";
+import "interservice/infra_proxy/response/roles.proto";
+import "interservice/infra_proxy/response/clients.proto";
+import "interservice/infra_proxy/response/databags.proto";
+import "interservice/infra_proxy/response/environments.proto";
+import "interservice/infra_proxy/response/nodes.proto";
+import "interservice/infra_proxy/response/policyfiles.proto";
 
 service InfraProxy {
     rpc GetVersion      (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
@@ -67,7 +67,10 @@ service InfraProxy {
     rpc UpdateEnvironment (chef.automate.domain.infra_proxy.request.UpdateEnvironment) returns (chef.automate.domain.infra_proxy.response.Environment) {};
     rpc DeleteEnvironment (chef.automate.domain.infra_proxy.request.Environment) returns (chef.automate.domain.infra_proxy.response.Environment) {};
 
-    rpc GetAffectedNodes  (chef.automate.domain.infra_proxy.request.AffectedNodes) returns (chef.automate.domain.infra_proxy.response.AffectedNodes) {};
+    rpc GetAffectedNodes (chef.automate.domain.infra_proxy.request.AffectedNodes) returns (chef.automate.domain.infra_proxy.response.AffectedNodes) {};
+    rpc DeleteNode (chef.automate.domain.infra_proxy.request.DeleteNode) returns (chef.automate.domain.infra_proxy.response.DeleteNode) {};
+    rpc UpdateNode (chef.automate.domain.infra_proxy.request.UpdateNode) returns (chef.automate.domain.infra_proxy.response.UpdateNode) {};
+
 
     rpc GetPolicyfiles (chef.automate.domain.infra_proxy.request.Policyfiles) returns (chef.automate.domain.infra_proxy.response.Policyfiles) {};
     rpc GetPolicyfile (chef.automate.domain.infra_proxy.request.Policyfile) returns (chef.automate.domain.infra_proxy.response.Policyfile) {};

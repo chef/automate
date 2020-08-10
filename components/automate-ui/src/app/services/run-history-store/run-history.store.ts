@@ -46,7 +46,7 @@ export class RunHistoryStore {
       this._nodeHistoryFilter['page'] = 1;
     }
 
-    if (type === 'startDate' || type === 'endDate') {
+    if (type === 'startDate' || type === 'endDate' || type === 'status') {
       this._nodeHistoryCountsFilter[type] = filter;
       this._countsFilter.next(this._nodeHistoryCountsFilter);
     }
@@ -60,7 +60,7 @@ export class RunHistoryStore {
   }
 
   removeFilter(type) {
-    if (type === 'startDate' || type === 'endDate') {
+    if (type === 'startDate' || type === 'endDate' || type === 'status') {
       delete this._nodeHistoryCountsFilter[type];
       this._countsFilter.next(this._nodeHistoryCountsFilter);
     }

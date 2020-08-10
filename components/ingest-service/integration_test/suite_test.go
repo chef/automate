@@ -21,6 +21,7 @@ import (
 	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/interservice/authz"
+	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
@@ -75,6 +76,7 @@ type Suite struct {
 	eventServiceClientMock   *event.MockEventServiceClient
 	managerServiceClientMock *manager.MockNodeManagerServiceClient
 	nodesServiceClientMock   *nodes.MockNodesServiceClient
+	cfgmgmtClientMock        *cfgmgmt.MockCfgMgmtClient
 	cleanup                  func() error
 }
 
@@ -359,7 +361,7 @@ func createServices(s *Suite) error {
 	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
-		s.managerServiceClientMock, chefIngestServerConfig, s.nodesServiceClientMock)
+		s.managerServiceClientMock, chefIngestServerConfig, s.nodesServiceClientMock, s.cfgmgmtClientMock)
 
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
 		s.projectsClient, s.eventServiceClientMock)

@@ -5,7 +5,7 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/ia
 
 import "protoc-gen-swagger/options/annotations.proto";
 
-import "components/automate-gateway/api/iam/v2/common/tokens.proto";
+import "automate-gateway/api/iam/v2/common/tokens.proto";
 
 // NB: Doc annotations in responses will only apply for simple types; others will be ignored.
 

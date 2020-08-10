@@ -488,82 +488,85 @@ var ComplianceRepDate = Mapping{
             }
           }
         },
-				"policy_name": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
+		"policy_name": {
+			"fields": {
+				"engram": {
+					"analyzer": "autocomplete",
+					"type": "text"
+				},
+				"lower": {
+					"normalizer": "case_insensitive",
 					"type": "keyword"
-				},
-				"policy_group": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
-				},
-				"organization_name": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
-				},
-				"source_fqdn": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
-				},
-				"chef_tags": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
-				},
-				"ipaddress": {
-					"type": "ip"
-				},
-				"fqdn": {
-					"type": "keyword",
-					"doc_values": false,
-					"ignore_above": 256
-				},
-				"run_time_limit": {
-				  "type": "double"
 				}
+			},
+			"type": "keyword"
+		},
+		"policy_group": {
+			"fields": {
+				"engram": {
+					"analyzer": "autocomplete",
+					"type": "text"
+				},
+				"lower": {
+					"normalizer": "case_insensitive",
+					"type": "keyword"
+				}
+			},
+			"type": "keyword"
+		},
+		"organization_name": {
+			"fields": {
+				"engram": {
+					"analyzer": "autocomplete",
+					"type": "text"
+				},
+				"lower": {
+					"normalizer": "case_insensitive",
+					"type": "keyword"
+				}
+			},
+			"type": "keyword"
+		},
+		"source_fqdn": {
+			"fields": {
+				"engram": {
+					"analyzer": "autocomplete",
+					"type": "text"
+				},
+				"lower": {
+					"normalizer": "case_insensitive",
+					"type": "keyword"
+				}
+			},
+			"type": "keyword"
+		},
+		"chef_tags": {
+			"fields": {
+				"engram": {
+					"analyzer": "autocomplete",
+					"type": "text"
+				},
+				"lower": {
+					"normalizer": "case_insensitive",
+					"type": "keyword"
+				}
+			},
+			"type": "keyword"
+		},
+		"ipaddress": {
+			"type": "ip"
+		},
+		"fqdn": {
+			"type": "keyword",
+			"doc_values": false,
+			"ignore_above": 256
+		},
+		"run_time_limit": {
+		  "type": "double"
+		},
+		"status_message": {
+			"type": "keyword"
+		}
       }
     }
   }

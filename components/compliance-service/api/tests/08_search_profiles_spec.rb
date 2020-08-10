@@ -1,6 +1,6 @@
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/reporting/reporting_pb'
-require 'api/interservice/compliance/reporting/reporting_services_pb'
+require 'interservice/compliance/reporting/reporting_pb'
+require 'interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
   Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)
@@ -721,6 +721,13 @@ describe File.basename(__FILE__) do
         "passed": 1
       }
     }.to_json
+    assert_equal(expected_data, actual_data.to_json)
+
+    # Get profiles used by nodes on the day without profiles. Sorted by name desc
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: "end_time", values: ["2018-04-03T#{END_OF_DAY}"])
+    ], sort: 'name', order: 1)
+    expected_data = { "counts": {} }.to_json
     assert_equal(expected_data, actual_data.to_json)
 
     # Cover the other sort fields:

@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"os/user"
 	"path/filepath"
 	"syscall"
 	"testing"
@@ -29,6 +28,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/parser"
 	"github.com/chef/automate/lib/platform/command"
+	"github.com/chef/automate/lib/user"
 )
 
 type mockUserLookupProvider struct {

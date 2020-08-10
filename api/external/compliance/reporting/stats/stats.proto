@@ -4,8 +4,8 @@ package chef.automate.api.compliance.reporting.stats.v1;
 option go_package = "github.com/chef/automate/api/external/compliance/reporting/stats";
 
 import "google/api/annotations.proto";
-import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
-import "api/external/compliance/reporting/reporting.proto";
+import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "external/compliance/reporting/reporting.proto";
 
 service StatsService {
 	/*

@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("legacy_legacy", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/legacy/legacy.proto",
+    "title": "automate-gateway/api/legacy/legacy.proto",
     "version": "version not set"
   },
   "consumes": [

@@ -7,9 +7,9 @@
         <p class="tooltip-text">Count of desktops that haven't checked-in over different periods of time.</p>
       </chef-tooltip>
     </div>
-    <h6 class="heading-time">Updated {{ lastUpdatedMessage }}</h6>
+    <h6 *ngIf="hasData" class="heading-time">Updated {{ lastUpdatedMessage }}</h6>
   </div>
-  <chef-table class="chart-list">
+  <chef-table class="chart-list" *ngIf="hasData">
     <chef-tbody>
       <chef-tr
         *ngFor="let item of countedDurationItems"
@@ -37,4 +37,5 @@
       </chef-tr>
     </chef-tbody>
   </chef-table>
+  <app-empty-data *ngIf="!hasData"></app-empty-data>
 </div>

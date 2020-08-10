@@ -13,6 +13,7 @@ import (
 	"github.com/leanovate/gopter/prop"
 	"golang.org/x/text/unicode/rangetable"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	api "github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants"
@@ -815,7 +816,7 @@ func reportRules(t *testing.T, rules []api.CreateRuleReq) {
 	valueBytes := 0
 	for _, rule := range rules {
 		condCount += len(rule.Conditions)
-		ruleBytes += rule.XXX_Size()
+		ruleBytes += proto.Size(&rule)
 		for _, c := range rule.Conditions {
 			valueCount += len(c.Values)
 			for _, v := range c.Values {

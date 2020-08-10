@@ -8,9 +8,9 @@
           <p class="tooltip-text">Percentage of checked-in to total desktops at 24 hour intervals.</p>
         </chef-tooltip>
       </div>
-      <h6 class="heading-time">Updated {{ lastUpdatedMessage }}</h6>
+      <h6 *ngIf="hasData" class="heading-time">Updated {{ lastUpdatedMessage }}</h6>
     </div>
-    <select (change)="dateChanged($event.target.value)">
+    <select *ngIf="hasData" (change)="dateChanged($event.target.value)">
       <option *ngFor="let selectableDaysAgo of selectableDaysAgoCollection" [value]="selectableDaysAgo"
         [selected]="selectableDaysAgo == selectedDaysAgo">
         Last {{ selectableDaysAgo }} Days
@@ -18,5 +18,6 @@
     </select>
   </div>
 
-  <app-simple-line-graph [data]="days"></app-simple-line-graph>
+  <app-simple-line-graph *ngIf="hasData" [data]="days"></app-simple-line-graph>
+  <app-empty-data *ngIf="!hasData"></app-empty-data>
 </div>

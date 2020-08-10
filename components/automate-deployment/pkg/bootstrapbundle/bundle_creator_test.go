@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
-	"os/user"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -12,10 +11,33 @@ import (
 	"testing"
 
 	"github.com/chef/automate/lib/product"
+	"github.com/chef/automate/lib/secrets"
+	"github.com/chef/automate/lib/user"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+type secretStoreWrapper struct {
+	secrets.SecretsReader
+	secrets.SecretsWriter
+}
+
+func (secretStoreWrapper) Initialize() error {
+	return nil
+}
+
+type inMemorySecretWriter struct {
+	secrets map[secrets.SecretName][]byte
+}
+
+func (w *inMemorySecretWriter) SetSecret(s secrets.SecretName, v []byte) error {
+	if w.secrets == nil {
+		w.secrets = make(map[secrets.SecretName][]byte)
+	}
+	w.secrets[s] = v
+	return nil
+}
 
 func createBundleCreator(t *testing.T) *Creator {
 	t.Helper()
@@ -45,10 +67,15 @@ func createBundleCreator(t *testing.T) *Creator {
 		allowedGroups = append(allowedGroups, g.Name)
 	}
 
+	secretReader := secrets.NewDiskStoreReader("testdata/bootstrap-test-secrets")
+	secretStore := secretStoreWrapper{
+		SecretsReader: secretReader,
+	}
 	return &Creator{
 		rootDir:       "testdata/bootstrap-test",
 		allowedUsers:  allowedUsers,
 		allowedGroups: allowedGroups,
+		secretStore:   secretStore,
 	}
 }
 
@@ -65,6 +92,29 @@ func TestFailOnMissingFile(t *testing.T) {
 				{
 					Type: "file",
 					Path: "data/barfile",
+				},
+			},
+		},
+	}
+
+	b := bytes.NewBuffer(nil)
+	err := bundleCreator.Create(metadata, b)
+	require.Error(t, err)
+}
+
+func TestFailOnMissingSecret(t *testing.T) {
+	bundleCreator := createBundleCreator(t)
+
+	metadata := []*product.PackageMetadata{
+		{
+			Name: product.PackageName{
+				Origin: "origin",
+				Name:   "foo",
+			},
+			Bootstrap: []product.BootstrapSpec{
+				{
+					Type:       "secret",
+					SecretSpec: "service.missing",
 				},
 			},
 		},
@@ -128,10 +178,16 @@ func TestRoundTrip(t *testing.T) {
 
 	bundleCreator := createBundleCreator(t)
 
+	secretWriter := &inMemorySecretWriter{}
+	secretStore := secretStoreWrapper{
+		SecretsWriter: secretWriter,
+	}
+
 	bundleUnpacker := &Creator{
 		rootDir:       tmpdir,
 		allowedUsers:  bundleCreator.allowedUsers,
 		allowedGroups: bundleCreator.allowedGroups,
+		secretStore:   secretStore,
 	}
 
 	metadata := []*product.PackageMetadata{
@@ -144,6 +200,10 @@ func TestRoundTrip(t *testing.T) {
 				{
 					Type: "file",
 					Path: "data/foofile",
+				},
+				{
+					Type:       "secret",
+					SecretSpec: "service.secret",
 				},
 			},
 		},
@@ -169,4 +229,9 @@ func TestRoundTrip(t *testing.T) {
 	expectedData, err := ioutil.ReadFile("testdata/bootstrap-test/foo/data/foofile")
 	require.NoError(t, err)
 	assert.Equal(t, expectedData, actualData)
+
+	require.Equal(t, []byte("secret"), secretWriter.secrets[secrets.SecretName{
+		Group: "service",
+		Name:  "secret",
+	}])
 }

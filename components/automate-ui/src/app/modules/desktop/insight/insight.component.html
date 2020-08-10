@@ -25,8 +25,10 @@
       <chef-icon>expand_more</chef-icon>
     </chef-button>
     <app-insight-attributes-dropdown 
-      *ngIf="attributesMenuOpen" 
-      (onUpdateFilters)="updateFilters($event)"
+      *ngIf="attributesMenuOpen"
+      [options]="desktopColumnOptions"
+      [saveAsDefault]="desktopColumnOptionsSaveAsDefault"
+      (onUpdate)="desktopColumnOptionsUpdated.emit($event)"
       (onToggleMenu)="toggleAttributeMenu()"
     ></app-insight-attributes-dropdown>
   </div>
@@ -67,10 +69,12 @@
     <chef-thead>
       <chef-tr>
         <chef-th (click)="sortOn('name')">Desktop Name</chef-th>
-        <chef-th (click)="sortOn('check-in')">Last Check-in</chef-th>
-        <chef-th (click)="sortOn('platform')">Platform</chef-th>
-        <chef-th (click)="sortOn('platformVersion')">Platform Version</chef-th>
-        <chef-th (click)="sortOn('domain')">Domain</chef-th>
+        <chef-th (click)="sortOn('checkin')">Last Check-in</chef-th>
+        <chef-th
+          *ngFor="let column of activeDesktopColumnOptions"
+          (click)="sortOn(column.name)">
+          {{ column.label }}
+        </chef-th>
       </chef-tr>
     </chef-thead>
     <chef-tbody>
@@ -87,9 +91,9 @@
           <chef-icon [ngClass]="desktop.status">{{ desktop.status | chefStatusIcon }}</chef-icon>
           {{ desktop.checkin | timeFromNow }}
         </chef-td>
-        <chef-td data-label="Platform">{{ desktop.platformFamily }}</chef-td>
-        <chef-td data-label="Platform Version">{{ desktop.platformVersion }}</chef-td>
-        <chef-td data-label="Domain">{{ desktop.domain }}</chef-td>
+        <chef-td *ngFor="let column of activeDesktopColumnOptions" [attr.data-label]="column.label">
+          {{ desktop[column.name] }}
+        </chef-td>
       </chef-tr>
     </chef-tbody>
   </chef-table>

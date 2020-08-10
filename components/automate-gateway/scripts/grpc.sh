@@ -23,8 +23,9 @@ fauxpath=$(mktemp -d)
 # the src directory.
 function sync_from_fauxpath() {
     base_dir=$(dirname "${1}")
-    gen_dir="${fauxpath}/github.com/chef/automate/${base_dir}/"
-    [[ -d "${gen_dir}" ]] && rsync -r "${gen_dir}" "/src/${base_dir}/"
+    gen_dir="${fauxpath}/github.com/chef/automate/components/${base_dir}/"
+    dest_dir="/src/components/${base_dir}/"
+    [[ -d "${gen_dir}" ]] && rsync -r "${gen_dir}" "${dest_dir}"
 }
 
 function cleanup() {
@@ -33,18 +34,20 @@ function cleanup() {
 trap cleanup EXIT
 
 IMPORTS=(
- -I /src
- -I vendor
- -I vendor/github.com/grpc-ecosystem/grpc-gateway
- -I vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
- -I vendor/github.com/ckaznocha/protoc-gen-lint
+ -I /src/api
+ -I /src/components
+ -I /src/vendor
+ -I /src/vendor/github.com/grpc-ecosystem/grpc-gateway
+ -I /src/vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
+ -I /src/vendor/github.com/ckaznocha/protoc-gen-lint
 )
 
 # globstar: makes **/ resolve nested directories
 # nullglob: make empty-result-glob yield empty-array ($list below)
 shopt -s globstar nullglob
 
-for i in components/automate-gateway/api/**/; do
+pushd components
+for i in automate-gateway/api/**/; do
   # check if there are proto file is in that directory
   list=("$i"*.proto)
   if [ ${#list[@]} -ne 0 ]; then
@@ -55,18 +58,18 @@ for i in components/automate-gateway/api/**/; do
     # have some conventions the mocks can't handle yet (stream keyword for example).
     if [ "$thisfile" == "reporting.proto" ] || [ "$thisfile" == "profiles.proto" ]; then
       protoc "${IMPORTS[@]}" \
-        --go_out=plugins=grpc,paths=source_relative:/src \
+        --go_out=plugins=grpc,paths=source_relative:/src/components \
         --grpc-gateway_out=request_context=true,logtostderr=true:"${fauxpath}" \
         --policy_out=logtostderr=true:"${fauxpath}" \
         "${list[@]}" || exit 1
     else
       # service, grpc-gateway, policy mapping
       protoc "${IMPORTS[@]}" \
-        --go_out=plugins=grpc,paths=source_relative:/src \
+        --go_out=plugins=grpc,paths=source_relative:/src/components \
         --grpc-gateway_out=request_context=true,logtostderr=true:"${fauxpath}" \
         --policy_out=logtostderr=true:"${fauxpath}" \
         --grpc-mock_out="${fauxpath}" \
-        --a2-config_out=paths=source_relative:/src \
+        --a2-config_out=paths=source_relative:/src/components \
         "${list[@]}" || exit 1
     fi
 
@@ -81,7 +84,7 @@ for i in components/automate-gateway/api/**/; do
 done
 
 echo -e "\\nLinting proto files..."
-for i in components/automate-gateway/api/**/**/; do
+for i in automate-gateway/api/**/**/; do
   list=("$i"*.proto)
   if [ ${#list[@]} -ne 0 ]; then
       printf 'LINT: %s\n' "${list[@]}"
@@ -94,6 +97,7 @@ for i in components/automate-gateway/api/**/**/; do
       fi
   fi
 done
+popd
 
 # This script reads all swagger '.json' files in the current folder
 # and encodes them as strings literals in swagger.pb.go

@@ -82,7 +82,7 @@ _Nodes_ and _Profiles_ views include _Waived Nodes_ and _Waived Profiles_ status
 Select the _Waived_ status filter to display only the respective Node or Profile reporting with that status.
 Hover over the control's Waived icon under the Node Status column in _Controls_ to view more details about the waiver applied to the control.
 
-Use Chef InSpec to configure [waivers](https://www.inspec.io/docs/reference/waivers/).
+Use Chef InSpec to configure [waivers](https://docs.chef.io/inspec/waivers/).
 
 ### Download Report Results
 

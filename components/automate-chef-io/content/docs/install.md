@@ -173,8 +173,8 @@ Because externally-deployed Elasticsearch nodes will not have access to Chef Aut
 To configure local filesystem backups of Chef Automate data stored in an externally-deployed Elasticsearch cluster:
 
 1. Ensure that the filesystems you intend to use for backups are mounted to the same path on all Elasticsearch master and data nodes.
-1. Configure the Elasticsearch `path.repo` setting on each node as described in the Elasticsearch documentation.
-1. Add the following to your config.toml:
+1. Configure the Elasticsearch `path.repo` setting on each node as described in the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/modules-snapshots.html#_shared_file_system_repository).
+1. Add the following to your `config.toml`:
 
 ```toml
 [global.v1.external.elasticsearch.backup]
@@ -187,60 +187,99 @@ location = "fs"
 path = "/var/opt/chef-automate/backups"
 ```
 
-##### Backup Externally-Deployed Elasticsearch to S3
+##### Backup Externally-Deployed Elasticsearch to AWS S3
 
-To configure S3 backups of Chef Automate data stored in an externally-deployed Elasticsearch cluster:
+To configure AWS S3 backups of Chef Automate data stored in an externally-deployed Elasticsearch cluster:
 
 1. Install the [`repository-s3` plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3.html) on all nodes in your Elasticsearch cluster.
 1. If you wish to use IAM authentication to provide your Elasticsearch nodes access to the S3 bucket, you must apply the appropriate IAM policy to each host system in the cluster.
 1. Configure each Elasticsearch node with a S3 client configuration containing the proper S3 endpoint, credentials, and other settings as [described in the Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html).
-1. Enable S3 backups by adding the following settings to your config.toml:
+1. Enable S3 backups by adding the following settings to your `config.toml`:
 
-```toml
-[global.v1.external.elasticsearch.backup]
-enable = true
-location = "s3"
+    ```toml
+    [global.v1.external.elasticsearch.backup]
+    enable = true
+    location = "s3"
 
-[global.v1.external.elasticsearch.backup.s3]
+    [global.v1.external.elasticsearch.backup.s3]
 
-  # bucket (required): The name of the bucket
-  bucket = "<bucket name>"
+      # bucket (required): The name of the bucket
+      bucket = "<bucket name>"
 
-  # base_path (optional):  The path within the bucket where backups should be stored
-  # If base_path is not set, backups will be stored at the root of the bucket.
-  base_path = "<base path>"
+      # base_path (optional):  The path within the bucket where backups should be stored
+      # If base_path is not set, backups will be stored at the root of the bucket.
+      base_path = "<base path>"
 
-  # name of an s3 client configuration you create in your elasticsearch.yml
-  # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
-  # for full documentation on how to configure client settings on your
-  # Elasticsearch nodes
-  client = "<client name>"
+      # name of an s3 client configuration you create in your elasticsearch.yml
+      # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
+      # for full documentation on how to configure client settings on your
+      # Elasticsearch nodes
+      client = "<client name>"
 
-[global.v1.external.elasticsearch.backup.s3.settings]
-## The meaning of these settings is documented in the S3 Repository Plugin
-## documentation. See the following links:
-## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
+    [global.v1.external.elasticsearch.backup.s3.settings]
+    ## The meaning of these settings is documented in the S3 Repository Plugin
+    ## documentation. See the following links:
+    ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
 
-## Backup repo settings
-# compress = false
-# server_side_encryption = false
-# buffer_size = "100mb"
-# canned_acl = "private"
-# storage_class = "standard"
-## Snapshot settings
-# max_snapshot_bytes_per_sec = "40mb"
-# max_restore_bytes_per_sec = "40mb"
-# chunk_size = "null"
-## S3 client settings
-# read_timeout = "50s"
-# max_retries = 3
-# use_throttle_retries = true
-# protocol = "https"
-```
+    ## Backup repo settings
+    # compress = false
+    # server_side_encryption = false
+    # buffer_size = "100mb"
+    # canned_acl = "private"
+    # storage_class = "standard"
+    ## Snapshot settings
+    # max_snapshot_bytes_per_sec = "40mb"
+    # max_restore_bytes_per_sec = "40mb"
+    # chunk_size = "null"
+    ## S3 client settings
+    # read_timeout = "50s"
+    # max_retries = 3
+    # use_throttle_retries = true
+    # protocol = "https"
+    ```
+
+##### Backup Externally-Deployed Elasticsearch to GCS
+
+To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data stored in an externally-deployed Elasticsearch cluster:
+
+1. Install the [`repository-gcs` plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-gcs.html) on all nodes in your Elasticsearch cluster.
+1. Create a storage bucket and configure a service account to access it per the steps [described in the Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-gcs-usage.html).
+1. Configure each Elasticsearch node with a GCS client configuration that contains the proper GCS settings as [described in the Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-gcs-client.html).
+1. Enable GCS backups by adding the following settings to your `config.toml`:
+
+    ```toml
+    [global.v1.external.elasticsearch]
+      enable = true
+      nodes = ["https://my-es.cluster"]
+      ## If multiple
+      # nodes = ["https://my-es.node-1", "https://my-es.node-2", "etc..."]
+
+    ## The following settings are required if you have Elasticsearch setup with basic auth
+    #[global.v1.external.elasticsearch.auth]
+    #  scheme = "basic_auth"
+    #
+    #[global.v1.external.elasticsearch.auth.basic_auth]
+    #  username = "everyuser"
+    #  password = "pass123"
+
+    [global.v1.external.elasticsearch.backup]
+      enable = true
+      location = "gcs"
+
+    [global.v1.external.elasticsearch.backup.gcs]
+      bucket = "<bucket name>"
+      # Client name is normally default, but can be set here if you have generated service
+      # account credentials with a different client name
+      client = "default"
+
+    ## GCS Bucket Settings:
+    # type = nearline
+    # access control = uniform
+    ```
 
 #### Configuring an External PostgreSQL Database
 
-Add the following to your config.toml:
+Add the following settings to your `config.toml`:
 
 ```toml
 [global.v1.external.postgresql]

@@ -110,10 +110,17 @@ func (enc *Encoder) encode(key Key, rv reflect.Value) {
 	// Special case. If we can marshal the type to text, then we used that.
 	// Basically, this prevents the encoder for handling these types as
 	// generic structs (or whatever the underlying type of a TextMarshaler is).
-	switch rv.Interface().(type) {
+	switch v := rv.Interface().(type) {
 	case time.Time, wkt, TextMarshaler:
 		enc.keyEqElement(key, rv)
 		return
+	case protoreflector:
+		switch v.ProtoReflect().Descriptor().Name() {
+		case "DoubleValue", "FloatValue", "Int64Value", "UInt64Value",
+			"Int32Value", "UInt32Value", "BoolValue", "StringValue", "BytesValue":
+			enc.keyEqElement(key, rv)
+			return
+		}
 	}
 
 	k := rv.Kind()
@@ -170,6 +177,16 @@ func (enc *Encoder) eElement(rv reflect.Value) {
 			enc.writeQuoted(string(s))
 		}
 		return
+	case protoreflector:
+		switch v.ProtoReflect().Descriptor().Name() {
+		case "DoubleValue", "FloatValue", "Int64Value", "UInt64Value",
+			"Int32Value", "UInt32Value", "BoolValue", "StringValue", "BytesValue":
+			// "Wrappers use the same representation in TOML
+			//  as the wrapped primitive type, ..."
+			s := reflect.ValueOf(v).Elem()
+			enc.eElement(s.FieldByName("Value"))
+			return
+		}
 	case wkt:
 		switch v.XXX_WellKnownType() {
 		case "DoubleValue", "FloatValue", "Int64Value", "UInt64Value",
@@ -413,6 +430,14 @@ func tomlTypeOfGo(rv reflect.Value) tomlType {
 		}
 		return tomlArray
 	case reflect.Ptr, reflect.Interface:
+		if v, ok := rv.Interface().(protoreflector); ok {
+			switch v.ProtoReflect().Descriptor().Name() {
+			case "DoubleValue", "FloatValue", "Int64Value", "UInt64Value",
+				"Int32Value", "UInt32Value", "BoolValue", "StringValue", "BytesValue":
+				s := reflect.ValueOf(v).Elem()
+				return tomlTypeOfGo(s.FieldByName("Value"))
+			}
+		}
 		if v, ok := rv.Interface().(wkt); ok {
 			switch v.XXX_WellKnownType() {
 			case "DoubleValue", "FloatValue", "Int64Value", "UInt64Value",

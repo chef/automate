@@ -20,13 +20,15 @@ import {
   GetDesktopsTotal,
   UpdateDesktopFilterCurrentPage,
   UpdateDesktopFilterTerm,
+  UpdateDesktopColumnOptions,
   GetNodeMetadataCounts,
   AddDesktopFilterTerm,
   RemoveDesktopFilterTerm,
   UpdateDesktopSortTerm,
   UpdateDesktopDateTerm,
   UpdateDesktopsFilterPageSizeAndCurrentPage,
-  GetDailyNodeRunsStatusTimeSeries
+  GetDailyNodeRunsStatusTimeSeries,
+  GetDesktopColumnOptionsDefaults
 } from 'app/entities/desktop/desktop.actions';
 import {
   dailyCheckInCountCollection,
@@ -36,6 +38,8 @@ import {
   unknownDesktopDurationCounts,
   nodeMetadataCounts,
   desktopListTitle,
+  desktopListColumns,
+  desktopListColumnsSaveAsDefault,
   desktops,
   desktopsTotal,
   desktopsCurrentPage,
@@ -46,7 +50,8 @@ import {
 import {
   DailyCheckInCount, DailyCheckInCountCollection, DayPercentage,
   TopErrorsItem, CountedDurationItem, Desktop, TermFilter, Terms,
-  NodeMetadataCount, DailyNodeRuns, PageSizeChangeEvent
+  NodeMetadataCount, DailyNodeRuns, PageSizeChangeEvent, DesktopColumnOption,
+  DesktopColumnOptionUpdate
 } from 'app/entities/desktop/desktop.model';
 
 @Component({
@@ -73,6 +78,8 @@ export class DashboardComponent implements OnInit {
   public unknownDesktopCountedDurationUpdated$: Observable<Date>;
   public nodeMetadataCounts$: Observable<NodeMetadataCount[]>;
   public desktopListTitle$: Observable<string>;
+  public desktopListColumns$: Observable<DesktopColumnOption[]>;
+  public desktopListColumnsSaveAsDefault$: Observable<boolean>;
   public desktops$: Observable<Desktop[]>;
   public totalDesktopCount$: Observable<number>;
   public currentPage$: Observable<number>;
@@ -101,6 +108,7 @@ export class DashboardComponent implements OnInit {
     this.store.dispatch(new GetDesktops());
     this.store.dispatch(new GetDesktopsTotal());
     this.store.dispatch(new GetNodeMetadataCounts());
+    this.store.dispatch(new GetDesktopColumnOptionsDefaults());
 
     this.nodeMetadataCounts$ = this.store.select(nodeMetadataCounts);
 
@@ -112,6 +120,8 @@ export class DashboardComponent implements OnInit {
     this.selectedDaysAgo$ = this.store.select(getSelectedDaysAgo);
 
     this.desktopListTitle$ = this.store.select(desktopListTitle);
+    this.desktopListColumns$ = this.store.select(desktopListColumns);
+    this.desktopListColumnsSaveAsDefault$ = this.store.select(desktopListColumnsSaveAsDefault);
     this.desktops$ = this.store.select(desktops);
 
     this.selectedNodeRun$ = this.store.select(getSelectedNodeRun);
@@ -128,7 +138,7 @@ export class DashboardComponent implements OnInit {
           if (bucket.total > 0) {
             percentage = (bucket.checkInCount / bucket.total) * 100;
           }
-          return {daysAgo: index, percentage: percentage};
+          return {daysAgo: index, percentage: percentage, total: bucket.total};
         }))
     );
 
@@ -335,6 +345,10 @@ export class DashboardComponent implements OnInit {
   public onSortChange(insightField: string): void {
     const term = this.getTerm(insightField);
     this.store.dispatch(new UpdateDesktopSortTerm({ term }));
+  }
+
+  public onDesktopColumnOptionsUpdated(event: DesktopColumnOptionUpdate) {
+    this.store.dispatch(new UpdateDesktopColumnOptions(event));
   }
 
   private getTerm(field: string): string {

@@ -59,6 +59,16 @@ export const desktopListTitle = createSelector(
   (state) => state.desktopListTitle
 );
 
+export const desktopListColumns = createSelector(
+  desktopState,
+  (state) => state.desktopListColumns
+);
+
+export const desktopListColumnsSaveAsDefault = createSelector(
+  desktopState,
+  (state) => state.desktopListColumnsSaveAsDefault
+);
+
 export const desktops = createSelector(
   desktopState,
   (state) => state.desktops

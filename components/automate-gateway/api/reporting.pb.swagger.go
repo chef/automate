@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("reporting", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/compliance/reporting/reporting.proto",
+    "title": "external/compliance/reporting/reporting.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -1120,6 +1120,10 @@ func init() {
             "type": "string"
           },
           "description": "The projects the node is assigned to."
+        },
+        "status_message": {
+          "type": "string",
+          "description": "The status message of the report."
         }
       }
     },
@@ -1272,6 +1276,10 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
           },
           "description": "The criteria used to filter the suggestions returned."
+        },
+        "type_key": {
+          "type": "string",
+          "description": "The key (e.g. control_tag_key) to use for the type search."
         }
       }
     },

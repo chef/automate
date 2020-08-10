@@ -19,7 +19,7 @@ import (
 func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Deployment_BootstrapBundleServer) error {
 	var b bytes.Buffer
 	tarWriter := bufio.NewWriter(&b)
-	bundleCreator := bootstrapbundle.NewCreator()
+	bundleCreator := bootstrapbundle.NewCreator(s.secretStore)
 
 	pkgsMeta := make([]*product.PackageMetadata, 0, len(s.deployment.ExpectedServices))
 	for _, e := range s.deployment.ExpectedServices {

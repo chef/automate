@@ -586,3 +586,24 @@ dl.waiver-details {
     flex-grow: 1;
   }
 }
+
+.err-container {
+  background-color: $chef-lightest-grey;
+}
+
+.err-failed-container {
+  padding: 5px;
+}
+
+.err-color {
+  color: $chef-critical;
+}
+
+.err-bold {
+  padding-right: 5px;
+}
+
+#err-icon-id {
+  padding-left: 5px;
+  color: $chef-critical;
+}

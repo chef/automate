@@ -1,8 +1,8 @@
 require 'cgi'
 
 ##### GRPC SETUP #####
-require 'api/interservice/compliance/stats/stats_pb'
-require 'api/interservice/compliance/stats/stats_services_pb'
+require 'interservice/compliance/stats/stats_pb'
+require 'interservice/compliance/stats/stats_services_pb'
 
 if !ENV['NO_STATS_TREND_TESTS']
   describe File.basename(__FILE__) do
@@ -186,7 +186,8 @@ if !ENV['NO_STATS_TREND_TESTS']
             "failed": 1
           },
           {
-            "reportTime": "2018-04-03T23:59:59Z"
+            "reportTime": "2018-04-03T23:59:59Z",
+            "failed": 1
           },
           {
             "reportTime": "2018-04-04T23:59:59Z"

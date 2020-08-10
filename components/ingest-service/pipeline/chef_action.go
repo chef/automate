@@ -7,6 +7,7 @@ import (
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/api/interservice/authz"
+	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/chef/automate/components/ingest-service/pipeline/processor"
@@ -20,7 +21,7 @@ type ChefActionPipeline struct {
 }
 
 // NewChefActionPipeline Create a new chef action pipeline
-func NewChefActionPipeline(client backend.Client, authzClient authz.ProjectsClient,
+func NewChefActionPipeline(client backend.Client, authzClient authz.ProjectsClient, configMgmtClient cfgmgmt.CfgMgmtClient,
 	maxNumberOfBundledActionMsgs int, messageBufferSize int) ChefActionPipeline {
 	var (
 		in            = make(chan message.ChefAction, messageBufferSize)
@@ -33,6 +34,7 @@ func NewChefActionPipeline(client backend.Client, authzClient authz.ProjectsClie
 		processor.BuildActionProjectTagger(authzClient),
 		processor.BuildActionMsgToBulkRequestTransformer(client),
 		publisher.BuildBulkActionPublisher(client, maxNumberOfBundledActionMsgs),
+		publisher.BuildConfigMgmtPublisher(configMgmtClient, maxNumberOfBundledActionMsgs),
 		processor.CountActions(&counter),
 	)
 

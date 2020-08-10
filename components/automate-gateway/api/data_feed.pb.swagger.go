@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("data_feed", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/data_feed/data_feed.proto",
+    "title": "external/data_feed/data_feed.proto",
     "version": "version not set"
   },
   "consumes": [

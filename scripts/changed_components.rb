@@ -5,6 +5,8 @@ require "yaml"
 require "tsort"
 require "toml"
 
+FORCE_SKIP_PACKAGES = %w{}
+
 class Hash
   include TSort
   alias tsort_each_node each_key
@@ -85,6 +87,11 @@ hab_deps.each do |pkg, deps|
       end
     end
   end
+end
+
+FORCE_SKIP_PACKAGES.each do |skip_pkg|
+  changed_packages.delete(skip_pkg)
+  changed_packages_reasons.delete(skip_pkg)
 end
 
 hab_deps.tsort.each do |p|

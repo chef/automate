@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"os/user"
 	"reflect"
 	"strings"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 	"github.com/chef/automate/lib/proc"
+	"github.com/chef/automate/lib/user"
 )
 
 func RootUserRequiredCheck() Check {
@@ -403,7 +403,11 @@ func requiredPortsForConfig(skipShared bool, config *dc.AutomateConfig) ([]int, 
 	portsToCheck = append(portsToCheck, 9631, 9638)
 	acValue := reflect.ValueOf(*config)
 	for i := 0; i < acValue.NumField(); i++ {
-		if v, ok := acValue.Field(i).Interface().(a2conf.A2ServiceConfig); ok {
+		f := acValue.Field(i)
+		if !f.CanInterface() {
+			continue
+		}
+		if v, ok := f.Interface().(a2conf.A2ServiceConfig); ok {
 			if hasServiceByName(servicesToCheck, v.ServiceName()) {
 				ports := v.ListPorts()
 				for _, p := range ports {

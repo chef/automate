@@ -19,6 +19,10 @@ fi
 #                  Habitat depot and private repos in Chef's GitHub org
 #
 
+# Export the HAB_AUTH_TOKEN for use of promoting habitat packages to {{TARGET_CHANNE}}
+HAB_AUTH_TOKEN=$(vault kv get -field auth_token account/static/habitat/chef-ci)
+export HAB_AUTH_TOKEN
+
 source_channel=$EXPEDITOR_PROMOTABLE
 
 # Download the manifest

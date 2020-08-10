@@ -17,6 +17,7 @@ import (
 	ingestProto "github.com/chef/automate/api/external/ingest/request"
 	inspecEvent "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	subject "github.com/chef/automate/components/automate-gateway/gateway"
+	"github.com/chef/automate/lib/pcmp/passert"
 )
 
 func readExample(path string) []byte {
@@ -37,7 +38,7 @@ func TestDataCollectorUnmarshalProtoFromString(t *testing.T) {
 			"id": {Kind: &structpb.Value_StringValue{"1"}},
 		},
 	}
-	assert.Equal(t, pbStruct, expectedDataField)
+	passert.Equal(t, pbStruct, expectedDataField)
 }
 
 func TestDataCollectorUnmarshalProtoFromBytes(t *testing.T) {
@@ -50,7 +51,7 @@ func TestDataCollectorUnmarshalProtoFromBytes(t *testing.T) {
 			"id": {Kind: &structpb.Value_StringValue{"1"}},
 		},
 	}
-	assert.Equal(t, pbStruct, expectedDataField)
+	passert.Equal(t, pbStruct, expectedDataField)
 }
 
 func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
@@ -149,7 +150,7 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expectedDescription, run.Error.Description)
+	passert.Equal(t, expectedDescription, run.Error.Description)
 
 	// Verify the 'Resources' field
 	assert.Len(t, run.Resources, 7)
@@ -166,8 +167,8 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 			"path":  {Kind: &structpb.Value_StringValue{"/tmp/test.txt"}},
 		},
 	}
-	assert.Equal(t, expectedAfterForRes1, res1.After)
-	assert.Equal(t, &structpb.Struct{Fields: map[string]*structpb.Value{}}, res1.Before)
+	passert.Equal(t, expectedAfterForRes1, res1.After)
+	passert.Equal(t, &structpb.Struct{Fields: map[string]*structpb.Value{}}, res1.Before)
 	assert.Equal(t, "0", res1.Duration)
 	assert.Equal(t, "", res1.Delta)
 	assert.Equal(t, "insights-test", res1.CookbookName)
@@ -187,8 +188,8 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 			"command": {Kind: &structpb.Value_StringValue{"ls"}},
 		},
 	}
-	assert.Equal(t, expectedAfterForRes2, res2.After)
-	assert.Equal(t, &structpb.Struct{Fields: map[string]*structpb.Value{}}, res2.Before)
+	passert.Equal(t, expectedAfterForRes2, res2.After)
+	passert.Equal(t, &structpb.Struct{Fields: map[string]*structpb.Value{}}, res2.Before)
 	assert.Equal(t, "10", res2.Duration)
 	assert.Equal(t, "", res2.Delta)
 	assert.Equal(t, "insights-test", res2.CookbookName)
@@ -213,7 +214,7 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 			"group":         {Kind: &structpb.Value_StringValue{"wheel"}},
 		},
 	}
-	assert.Equal(t, expectedAfterForRes3, res3.After)
+	passert.Equal(t, expectedAfterForRes3, res3.After)
 	expectedBeforeForRes3 := &structpb.Struct{
 		Fields: map[string]*structpb.Value{
 			"owner":    {Kind: &structpb.Value_StringValue{"bob"}},
@@ -223,7 +224,7 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 			"checksum": {Kind: &structpb.Value_StringValue{"aca43b3116075c26dccd2d183f550782a06928a0dc1cc5c6f4619e32702f9c8a"}},
 		},
 	}
-	assert.Equal(t, expectedBeforeForRes3, res3.Before)
+	passert.Equal(t, expectedBeforeForRes3, res3.Before)
 	assert.Equal(t, "13", res3.Duration)
 	assert.Equal(t, "--- /tmp/test.txt\t2016-06-28 15:48:44.000000000 -0400\\n+++ /tmp/.chef-test.txt20160628-86667-1aox2pp\t2016-06-28 16:05:30.000000000 -0400\\n@@ -1,2 +1,2 @@\\n-570919d6-994a-4b73-8fd9-be8553e83ebc\\n+636f6f69-35ba-457b-9b02-16baca0fd99e", res3.Delta)
 	assert.Equal(t, "insights-test", res3.CookbookName)
@@ -248,7 +249,7 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 			"group":         {Kind: &structpb.Value_StringValue{"wheel"}},
 		},
 	}
-	assert.Equal(t, expectedAfterForRes4, res4.After)
+	passert.Equal(t, expectedAfterForRes4, res4.After)
 	expectedBeforeForRes4 := &structpb.Struct{
 		Fields: map[string]*structpb.Value{
 			"owner":    {Kind: &structpb.Value_StringValue{"bob"}},
@@ -258,7 +259,7 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 			"checksum": {Kind: &structpb.Value_StringValue{"8bb7b24c616a8d563e5424cb7d971041731e8201d4900dc634681cacd76ab302"}},
 		},
 	}
-	assert.Equal(t, expectedBeforeForRes4, res4.Before)
+	passert.Equal(t, expectedBeforeForRes4, res4.Before)
 	assert.Equal(t, "7", res4.Duration)
 	assert.Equal(t, "", res4.Delta)
 	assert.Equal(t, "insights-test", res4.CookbookName)
@@ -283,7 +284,7 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 			"group":         {Kind: &structpb.Value_StringValue{"wheel"}},
 		},
 	}
-	assert.Equal(t, expectedAfterForRes5, res5.After)
+	passert.Equal(t, expectedAfterForRes5, res5.After)
 	expectedBeforeForRes5 := &structpb.Struct{
 		Fields: map[string]*structpb.Value{
 			"owner":    {Kind: &structpb.Value_StringValue{"bob"}},
@@ -293,7 +294,7 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 			"checksum": {Kind: &structpb.Value_StringValue{"4a4268f12ec873565596c4531f93232b94d4efb233c2b192fc7a03a67683c908"}},
 		},
 	}
-	assert.Equal(t, expectedBeforeForRes5, res5.Before)
+	passert.Equal(t, expectedBeforeForRes5, res5.Before)
 	assert.Equal(t, "10", res5.Duration)
 	assert.Equal(t, "--- /tmp/always-updated.txt\t2016-06-28 15:48:44.000000000 -0400\\n+++ /tmp/.chef-always-updated.txt20160628-86667-xawnof\t2016-06-28 16:05:30.000000000 -0400\\n@@ -1,2 +1,2 @@\\n-b5a16b75-edf9-4f77-95e2-b0072f4bf4f4\\n+773bdf5e-cd2d-4d2e-b82e-eb46770ba3d4", res5.Delta)
 	assert.Equal(t, "insights-test", res5.CookbookName)
@@ -316,8 +317,8 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 			"path":  {Kind: &structpb.Value_StringValue{"/failed/file/resource"}},
 		},
 	}
-	assert.Equal(t, expectedAfterForRes6, res6.After)
-	assert.Equal(t, &structpb.Struct{Fields: map[string]*structpb.Value{}}, res6.Before)
+	passert.Equal(t, expectedAfterForRes6, res6.After)
+	passert.Equal(t, &structpb.Struct{Fields: map[string]*structpb.Value{}}, res6.Before)
 	assert.Equal(t, "5", res6.Duration)
 	assert.Equal(t, "", res6.Delta)
 	assert.Equal(t, false, res6.IgnoreFailure.GetBoolValue())
@@ -338,8 +339,8 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 			"path":  {Kind: &structpb.Value_StringValue{"/tmp/do-not-write.txt"}},
 		},
 	}
-	assert.Equal(t, expectedAfterForRes7, res7.After)
-	assert.Equal(t, &structpb.Struct{Fields: map[string]*structpb.Value{}}, res7.Before)
+	passert.Equal(t, expectedAfterForRes7, res7.After)
+	passert.Equal(t, &structpb.Struct{Fields: map[string]*structpb.Value{}}, res7.Before)
 	assert.Equal(t, "", res7.Duration)
 	assert.Equal(t, "", res7.Delta)
 	assert.Equal(t, "insights-test", res7.CookbookName)
@@ -518,7 +519,7 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 		},
 	}
 	assert.Len(t, p1.Attributes, 6)
-	assert.Equal(t, expectedP1Attributes, p1.Attributes)
+	passert.Equal(t, expectedP1Attributes, p1.Attributes)
 	expectedP1Dependencies := make([]*inspecEvent.Dependency, 0)
 	assert.Equal(t, expectedP1Dependencies, p1.Depends)
 	expectedP1Groups := []*inspecEvent.Group{
@@ -589,7 +590,7 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 		},
 	}
 	assert.Len(t, p2.Controls, 1)
-	assert.Equal(t, expectedP2Controls, p2.Controls)
+	passert.Equal(t, expectedP2Controls, p2.Controls)
 	expectedP2Support := []*inspecEvent.Support{}
 	assert.Len(t, p2.Supports, 0)
 	assert.Equal(t, expectedP2Support, p2.Supports)

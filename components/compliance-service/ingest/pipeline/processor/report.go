@@ -55,6 +55,7 @@ func complianceReport(in <-chan message.Compliance, notifierClient notifier.Noti
 				ControlsSums:     *msg.Shared.AllProfileSums,
 				Profiles:         compliance.ReportProfilesFromInSpecProfiles(msg.Report.Profiles, msg.Shared.PerProfileSums),
 				Status:           msg.Shared.Status,
+				StatusMessage:    msg.Shared.StatusMessage,
 				InSpecVersion:    msg.Report.Version,
 				DocVersion:       compliance.DocVersion,
 				ESTimestamp:      compliance.CurrentTime(),

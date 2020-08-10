@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("jobs", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/compliance/scanner/jobs/jobs.proto",
+    "title": "external/compliance/scanner/jobs/jobs.proto",
     "version": "version not set"
   },
   "consumes": [

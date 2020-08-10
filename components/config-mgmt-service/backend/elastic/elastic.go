@@ -112,7 +112,7 @@ func newBoolQueryFromFilters(filters map[string][]string) *elastic.BoolQuery {
 			refinedValues = stringutils.SliceFilter(values, func(projectId string) bool {
 				return projectId != authzConstants.UnassignedProjectID
 			})
-		} else { // Do not want projects to use wildcards
+		} else {
 			for _, value := range values {
 				// Determine if the filters contain any wildcards
 				if strings.Contains(value, "*") || strings.Contains(value, "?") {

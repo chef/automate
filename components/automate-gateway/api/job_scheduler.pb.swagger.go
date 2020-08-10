@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("job_scheduler", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/ingest/job_scheduler.proto",
+    "title": "external/ingest/job_scheduler.proto",
     "version": "version not set"
   },
   "consumes": [

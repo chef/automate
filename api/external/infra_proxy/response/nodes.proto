@@ -9,18 +9,28 @@ message AffectedNodes {
 }
 
 message NodeAttribute {
-    // ID of the node.
+    // Node ID.
     string id = 1;
-    // Name of the node.
+    // Node name.
     string name = 2;
-    // Last checked in of the node. 
+    // Node last checkin.
     string check_in = 3;
-    // Uptime of the node.
+    // Node uptime.
     string uptime = 4;
-    // Name of the platform of the node.
+    // Node platform.
     string platform = 5;
-    // Environment name of the node.
+    // Node environment name.
     string environment = 6;
-    // Policy group name of the node.
+    // Node policy group.
     string policy_group = 7;
+}
+
+message DeleteNode {
+    // Node name.
+    string name = 1;
+}
+
+message UpdateNode {
+    // Node name.
+    string name = 1;
 }

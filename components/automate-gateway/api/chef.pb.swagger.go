@@ -4,7 +4,7 @@ func init() {
 	Swagger.Add("chef", `{
   "swagger": "2.0",
   "info": {
-    "title": "api/external/ingest/chef.proto",
+    "title": "external/ingest/chef.proto",
     "version": "version not set"
   },
   "consumes": [
