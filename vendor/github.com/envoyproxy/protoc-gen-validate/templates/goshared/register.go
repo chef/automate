@@ -2,16 +2,17 @@ package goshared
 
 import (
 	"fmt"
+	"github.com/iancoleman/strcase"
 	"reflect"
 	"strings"
 	"text/template"
 
+	"github.com/envoyproxy/protoc-gen-validate/templates/shared"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/lyft/protoc-gen-star"
 	"github.com/lyft/protoc-gen-star/lang/go"
-	"github.com/envoyproxy/protoc-gen-validate/templates/shared"
 )
 
 func Register(tpl *template.Template, params pgs.Parameters) {
@@ -20,6 +21,7 @@ func Register(tpl *template.Template, params pgs.Parameters) {
 	tpl.Funcs(map[string]interface{}{
 		"accessor":      fns.accessor,
 		"byteStr":       fns.byteStr,
+		"snakeCase":	 fns.snakeCase,
 		"cmt":           pgs.C80,
 		"durGt":         fns.durGt,
 		"durLit":        fns.durLit,
@@ -73,6 +75,7 @@ func Register(tpl *template.Template, params pgs.Parameters) {
 	template.Must(tpl.New("email").Parse(emailTpl))
 	template.Must(tpl.New("hostname").Parse(hostTpl))
 	template.Must(tpl.New("address").Parse(hostTpl))
+	template.Must(tpl.New("uuid").Parse(uuidTpl))
 
 	template.Must(tpl.New("enum").Parse(enumTpl))
 	template.Must(tpl.New("repeated").Parse(repTpl))
@@ -212,6 +215,12 @@ func (fns goSharedFuncs) inType(f pgs.Field, x interface{}) string {
 		default:
 			return pgsgo.TypeName(fmt.Sprintf("%T", x)).Element().String()
 		}
+	case pgs.EnumT:
+		if f.Type().IsRepeated() {
+			return f.Type().Element().Enum().Name().String()
+		} else {
+			return fns.Type(f).String()
+		}
 	default:
 		return fns.Type(f).String()
 	}
@@ -309,4 +318,8 @@ func (fns goSharedFuncs) enumPackages(enums []pgs.Enum) map[pgs.FilePath]pgs.Nam
 	}
 
 	return out
+}
+
+func (fns goSharedFuncs) snakeCase(name string) string {
+	return strcase.ToSnake(name)
 }

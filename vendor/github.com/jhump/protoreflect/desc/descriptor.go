@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/proto"
@@ -191,7 +192,19 @@ func (fd *FileDescriptor) FindSymbol(symbol string) Descriptor {
 	if symbol[0] == '.' {
 		symbol = symbol[1:]
 	}
-	return fd.symbols[symbol]
+	if ret := fd.symbols[symbol]; ret != nil {
+		return ret
+	}
+
+	// allow accessing symbols through public imports, too
+	for _, dep := range fd.GetPublicDependencies() {
+		if ret := dep.FindSymbol(symbol); ret != nil {
+			return ret
+		}
+	}
+
+	// not found
+	return nil
 }
 
 // FindMessage finds the message with the given fully-qualified name. If no
@@ -891,10 +904,32 @@ func (fd *FieldDescriptor) String() string {
 // GetJSONName returns the name of the field as referenced in the message's JSON
 // format.
 func (fd *FieldDescriptor) GetJSONName() string {
-	if jsonName := fd.proto.GetJsonName(); jsonName != "" {
-		return jsonName
+	if jsonName := fd.proto.JsonName; jsonName != nil {
+		// if json name is present, use its value
+		return *jsonName
 	}
-	return fd.proto.GetName()
+	// otherwise, compute the proper JSON name from the field name
+	return jsonCamelCase(fd.proto.GetName())
+}
+
+func jsonCamelCase(s string) string {
+	// This mirrors the implementation in protoc/C++ runtime and in the Java runtime:
+	//   https://github.com/protocolbuffers/protobuf/blob/a104dffcb6b1958a424f5fa6f9e6bdc0ab9b6f9e/src/google/protobuf/descriptor.cc#L276
+	//   https://github.com/protocolbuffers/protobuf/blob/a1c886834425abb64a966231dd2c9dd84fb289b3/java/core/src/main/java/com/google/protobuf/Descriptors.java#L1286
+	var buf bytes.Buffer
+	prevWasUnderscore := false
+	for _, r := range s {
+		if r == '_' {
+			prevWasUnderscore = true
+			continue
+		}
+		if prevWasUnderscore {
+			r = unicode.ToUpper(r)
+			prevWasUnderscore = false
+		}
+		buf.WriteRune(r)
+	}
+	return buf.String()
 }
 
 // GetFullyQualifiedJSONName returns the JSON format name (same as GetJSONName),
@@ -957,6 +992,23 @@ func (fd *FieldDescriptor) IsRequired() bool {
 // IsRepeated returns true if this field has the "repeated" label.
 func (fd *FieldDescriptor) IsRepeated() bool {
 	return fd.proto.GetLabel() == dpb.FieldDescriptorProto_LABEL_REPEATED
+}
+
+// IsProto3Optional returns true if this field has an explicit "optional" label
+// and is in a "proto3" syntax file. Such fields will be nested in synthetic
+// oneofs that contain only the single field.
+func (fd *FieldDescriptor) IsProto3Optional() bool {
+	return internal.GetProto3Optional(fd.proto)
+}
+
+// HasPresence returns true if this field can distinguish when a value is
+// present or not. Scalar fields in "proto3" syntax files, for example, return
+// false since absent values are indistinguishable from zero values.
+func (fd *FieldDescriptor) HasPresence() bool {
+	if !fd.file.isProto3 {
+		return true
+	}
+	return fd.msgType != nil || fd.oneOf != nil
 }
 
 // IsMap returns true if this is a map field. If so, it will have the "repeated"
@@ -1580,6 +1632,10 @@ func (od *OneOfDescriptor) String() string {
 // these fields may be set for a given message.
 func (od *OneOfDescriptor) GetChoices() []*FieldDescriptor {
 	return od.choices
+}
+
+func (od *OneOfDescriptor) IsSynthetic() bool {
+	return len(od.choices) == 1 && od.choices[0].IsProto3Optional()
 }
 
 // scope represents a lexical scope in a proto file in which messages and enums

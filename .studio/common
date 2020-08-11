@@ -31,8 +31,23 @@ function bootstrap_proto_compilers() {
   compile_go_protobuf components/automate-grpc/scripts/grpc.sh
 }
 
-# TODO (tc) Please take a pass @afiune and Infra Auto team to see if some of these other helpers
-# can be deleted in the new world.
+document "install_protoc_toolchain" <<DOC
+  Install all the protobuf plugins, linters, etc. we use to compile and vet our protobufs.
+DOC
+function install_protoc_toolchain() {
+  local proto_go_tools=(
+    github.com/chef/automate/components/automate-grpc/protoc-gen-policy
+    github.com/chef/automate/components/automate-grpc/protoc-gen-grpc-mock # generate mock grpc server implementations
+    github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config
+    github.com/envoyproxy/protoc-gen-validate
+    github.com/ckaznocha/protoc-gen-lint
+    github.com/bufbuild/buf/cmd/buf
+    github.com/bufbuild/buf/cmd/protoc-gen-buf-check-breaking
+    github.com/bufbuild/buf/cmd/protoc-gen-buf-check-lint
+  )
+  install_go_tool "${proto_go_tools[@]}"
+}
+
 # Compile protobuf definitions
 document "compile_go_protobuf_component" <<DOC
   A wrapper around the compile_go_protobuf to compile the protobuf definitions of a specific component.
@@ -60,14 +75,7 @@ function compile_go_protobuf_component() {
     fi
   fi
 
-  local proto_go_tools=(
-    github.com/chef/automate/components/automate-grpc/protoc-gen-policy
-    github.com/chef/automate/components/automate-grpc/protoc-gen-grpc-mock # generate mock grpc server implementations
-    github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config
-    github.com/envoyproxy/protoc-gen-validate
-    github.com/ckaznocha/protoc-gen-lint
-  )
-  install_go_tool "${proto_go_tools[@]}"
+  install_protoc_toolchain || return 1
 
   # For handling faux GOPATH copying for non-module aware protoc extensions
   install_if_missing core/rsync rsync

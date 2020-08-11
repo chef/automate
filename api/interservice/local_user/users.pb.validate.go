@@ -33,6 +33,9 @@ var (
 	_ = ptypes.DynamicAny{}
 )
 
+// define the regex for a UUID once up-front
+var _users_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+
 // Validate checks the field values on Email with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *Email) Validate() error {
@@ -563,7 +566,22 @@ func (m *Users) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Users
+	for key, val := range m.GetUsers() {
+		_ = val
+
+		// no validation rules for Users[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UsersValidationError{
+					field:  fmt.Sprintf("Users[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }

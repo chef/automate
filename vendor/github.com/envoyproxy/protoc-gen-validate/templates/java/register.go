@@ -161,7 +161,15 @@ func classNameFile(f pgs.File) string {
 }
 
 func classNameMessage(m pgs.Message) string {
-	return sanitizeClassName(m.Name().String())
+	className := m.Name().String()
+	// This is really silly, but when the multiple files option is true, protoc puts underscores in file names.
+	// When multiple files is false, underscores are stripped. Short of rewriting all the name sanitization
+	// logic for java, using "UnderscoreUnderscoreUnderscore" is an escape sequence seems to work with an extremely
+	// small likelihood of name conflict.
+	className = strings.Replace(className, "_", "UnderscoreUnderscoreUnderscore", -1)
+	className = sanitizeClassName(className)
+	className = strings.Replace(className, "UnderscoreUnderscoreUnderscore", "_", -1)
+	return className
 }
 
 func sanitizeClassName(className string) string {
@@ -390,29 +398,45 @@ func (fns javaFuncs) javaTypeForProtoType(t pgs.ProtoType) string {
 	}
 }
 
-func (fns javaFuncs) javaTypeLiteralSuffixFor(f pgs.Field) string {
-	switch f.Type().ProtoType() {
+func (fns javaFuncs) javaTypeLiteralSuffixFor(ctx shared.RuleContext) string {
+	t := ctx.Field.Type()
+
+	if t.IsMap() {
+		switch ctx.AccessorOverride {
+		case "key":
+			return fns.javaTypeLiteralSuffixForPrototype(t.Key().ProtoType())
+		case "value":
+			return fns.javaTypeLiteralSuffixForPrototype(t.Element().ProtoType())
+		}
+	}
+
+	if t.IsEmbed() {
+		if embed := t.Embed(); embed.IsWellKnown() {
+			switch embed.WellKnownType() {
+			case pgs.Int64ValueWKT, pgs.UInt64ValueWKT:
+				return "L"
+			case pgs.FloatValueWKT:
+				return "F"
+			case pgs.DoubleValueWKT:
+				return "D"
+			}
+		}
+	}
+
+	return fns.javaTypeLiteralSuffixForPrototype(t.ProtoType())
+}
+
+func (fns javaFuncs) javaTypeLiteralSuffixForPrototype(t pgs.ProtoType) string {
+	switch t {
 	case pgs.Int64T, pgs.UInt64T, pgs.SInt64, pgs.Fixed64T, pgs.SFixed64:
 		return "L"
 	case pgs.FloatT:
 		return "F"
 	case pgs.DoubleT:
 		return "D"
+	default:
+		return ""
 	}
-
-	emb := f.Type().Embed()
-	if emb != nil && emb.IsWellKnown() {
-		switch emb.WellKnownType() {
-		case pgs.Int64ValueWKT, pgs.UInt64ValueWKT:
-			return "L"
-		case pgs.FloatValueWKT:
-			return "F"
-		case pgs.DoubleValueWKT:
-			return "D"
-		}
-	}
-
-	return ""
 }
 
 func (fns javaFuncs) javaStringEscape(s string) string {
