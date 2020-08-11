@@ -111,7 +111,9 @@ func Spawn(opts *serveropts.Opts) error {
 			}
 		}
 	} else {
-		log.Info("HA Frontend: migration is currently running on another service")
+		log.Warnf("HA Frontend: migration is currently running on another service. "+
+			"If this is an error, remove the lock from postgresql with the "+
+			"'SELECT pg_advisory_unlock(%d);' command inside the chef_ingest_service database.", migration.PgMigrationLockID)
 	}
 
 	// ChefRuns
