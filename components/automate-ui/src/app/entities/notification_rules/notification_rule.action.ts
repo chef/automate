@@ -51,13 +51,6 @@ export class GetNotificationSuccess implements Action {
   constructor(public payload: NotificationRule) { }
 }
 
-export interface CreateNotificationRulePayload {
-  id?: string;
-  name: string;
-  targetUrl: string;
-  secret?: string;
-}
-
 export class CreateNotificationRule implements Action {
   readonly type = NotificationRuleActionTypes.CREATE;
   constructor(public payload: NotificationRule,
@@ -111,19 +104,16 @@ export class TestNotificationFailure implements Action {
 
 export class DeleteNotificationRule implements Action {
   readonly type = NotificationRuleActionTypes.DELETE;
-
   constructor(public payload: { id: string, name: string }) { }
 }
 
 export class DeleteNotificationRuleSuccess implements Action {
   readonly type = NotificationRuleActionTypes.DELETE_SUCCESS;
-
   constructor(public payload: { id: string, name: string }) { }
 }
 
 export class DeleteNotificationRuleFailure implements Action {
   readonly type = NotificationRuleActionTypes.DELETE_FAILURE;
-
   constructor(public payload: HttpErrorResponse) { }
 }
 

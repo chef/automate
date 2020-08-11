@@ -30,7 +30,6 @@
               <p>Create the first notification to get started!</p>
             </div>
             <div [ngClass]="(rules$ | async)?.length === 0 ? 'empty-state' : ''">
-              <!-- <chef-button primary [routerLink]="['/settings/notifications/form']">Create Notification</chef-button> -->
               <chef-button primary (click)="openCreateModal()">Create Notification</chef-button>
             </div>
           </app-authorized>
