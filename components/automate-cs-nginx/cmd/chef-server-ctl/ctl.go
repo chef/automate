@@ -46,7 +46,6 @@ const (
 var (
 	Version           = "UNKNOWN"
 	RubyPath          = "UNKNOWN"
-	BundlePath        = "UNKNOWN"
 	KnifePath         = "UNKNOWN"
 	ChefServerCtlPath = "UNKNOWN"
 )
@@ -142,9 +141,9 @@ func (c passthrough) Run(args []string) error {
 	existingPath := os.Getenv("PATH")
 	var pathEnv string
 	if existingPath != "" {
-		pathEnv = fmt.Sprintf("PATH=%s:%s/bin:%s/bin", existingPath, RubyPath, BundlePath)
+		pathEnv = fmt.Sprintf("PATH=%s:%s/bin", existingPath, RubyPath)
 	} else {
-		pathEnv = fmt.Sprintf("PATH=%s/bin:%s/bin", RubyPath, BundlePath)
+		pathEnv = fmt.Sprintf("PATH=%s/bin", RubyPath)
 	}
 
 	// Get bifrostSuperuserID from the secrets store
@@ -177,10 +176,11 @@ func (c passthrough) Run(args []string) error {
 		fmt.Sprintf("CSC_TLS_CRT=%s", tlsCrt),
 		fmt.Sprintf("CSC_TLS_CA=%s", tlsCA),
 		fmt.Sprintf("CSC_KNIFE_BIN=%s exec %s",
-			filepath.Join(BundlePath, "bin", "bundle"),
+			filepath.Join(RubyPath, "bin", "bundle"),
 			filepath.Join(ChefServerCtlPath, "chef", "bin", "knife")),
 		"CSC_FIPS_ENABLED=false",
 		"CSC_HABITAT_MODE=true",
+		fmt.Sprintf("GEM_PATH=%s", filepath.Join(ChefServerCtlPath, "vendor", "bundle")),
 		fmt.Sprintf("BUNDLE_GEMFILE=%s", filepath.Join(ChefServerCtlPath, "omnibus-ctl", "Gemfile")),
 	}
 
@@ -194,7 +194,7 @@ func (c passthrough) Run(args []string) error {
 	os.Unsetenv("BUNDLE_GEMFILE")
 	os.Unsetenv("BUNDLE_PATH")
 
-	bundlerCmd := filepath.Join(BundlePath, "bin", "bundle")
+	bundlerCmd := filepath.Join(RubyPath, "bin", "bundle")
 	chefServerCtlCmd := filepath.Join(ChefServerCtlPath, "omnibus-ctl", "binstubs", "chef-server-ctl")
 	cmd := exec.Command(bundlerCmd, append([]string{"exec", chefServerCtlCmd, c.name}, args...)...)
 	cmd.Env = append(os.Environ(), env...)
@@ -240,9 +240,10 @@ var subCommands = map[string]map[string]subCommand{
 				fmt.Sprintf("SUPERUSER_KEY=/hab/svc/automate-cs-oc-erchef/data/pivotal.pem"),
 				fmt.Sprintf("WEBUI_KEY=/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"),
 				fmt.Sprintf("BUNDLE_GEMFILE=%s", filepath.Join(ChefServerCtlPath, "oc-chef-pedant/Gemfile")),
+				fmt.Sprintf("GEM_HOME=%s", filepath.Join(ChefServerCtlPath, "vendor/bundle")),
 			}
 
-			bundleCmd := filepath.Join(BundlePath, "bin/bundle")
+			bundleCmd := filepath.Join(RubyPath, "bin/bundle")
 			cmdArgs := []string{
 				"exec", filepath.Join(ChefServerCtlPath, "oc-chef-pedant/bin/oc-chef-pedant"),
 				"--log-file", "/dev/null",
