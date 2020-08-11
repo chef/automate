@@ -94,8 +94,11 @@ type wrapKnife struct {
 }
 
 func (c wrapKnife) Run(args []string) error {
-	args = append([]string{"opc", c.cmdNoun, c.cmdVerb}, args...)
-	cmd := exec.Command(KnifePath, args...)
+	// knife opc "org user" add
+	cmdArgs := append([]string{"opc"}, strings.Fields(c.cmdNoun)...)
+	cmdArgs = append(cmdArgs, c.cmdVerb)
+	cmdArgs = append(cmdArgs, args...)
+	cmd := exec.Command(KnifePath, cmdArgs...)
 	cmd.Env = os.Environ()
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
