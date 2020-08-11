@@ -15,7 +15,8 @@ import (
 )
 
 const (
-	selectLockCount = "SELECT COUNT(*) FROM pg_locks WHERE locktype = 'advisory' AND objid = $1;"
+	selectLockCount   = "SELECT COUNT(*) FROM pg_locks WHERE locktype = 'advisory' AND objid = $1;"
+	PgMigrationLockID = 77
 )
 
 var (
@@ -43,7 +44,6 @@ type Status struct {
 	finished  bool
 	ctx       context.Context
 	client    backend.Client
-	pgLockID  int64
 	mapper    *gorp.DbMap
 }
 
@@ -55,7 +55,6 @@ func New(client backend.Client, postgresql *sql.DB) *Status {
 		finished:  false,
 		ctx:       context.Background(),
 		client:    client,
-		pgLockID:  77,
 		mapper:    &gorp.DbMap{Db: postgresql, Dialect: gorp.PostgresDialect{}},
 	}
 }
@@ -203,7 +202,7 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 // MigrationRunning - Is a migration currently running on another service.
 // This would only be the case if this service is running in a HA frontend.
 func (ms *Status) MigrationRunning() (bool, error) {
-	count, err := ms.mapper.WithContext(context.Background()).SelectInt(selectLockCount, ms.pgLockID)
+	count, err := ms.mapper.WithContext(context.Background()).SelectInt(selectLockCount, PgMigrationLockID)
 	if err != nil {
 		return false, err
 	}
@@ -243,17 +242,22 @@ func (ms *Status) Done() bool {
 }
 
 func (ms *Status) lock() error {
-	query := `SELECT pg_advisory_lock($1)`
+	query := `SELECT pg_try_advisory_lock($1)`
 
-	if _, err := ms.mapper.WithContext(context.Background()).Exec(query, ms.pgLockID); err != nil {
+	wasLocked, err := ms.mapper.WithContext(context.Background()).SelectStr(query, PgMigrationLockID)
+	if err != nil {
 		return err
 	}
+	if wasLocked != "true" {
+		return fmt.Errorf("another process or system has the migration advisory lock %d", PgMigrationLockID)
+	}
+
 	return nil
 }
 
 func (ms *Status) unlock() error {
 	query := `SELECT pg_advisory_unlock($1)`
-	if _, err := ms.mapper.WithContext(context.Background()).Exec(query, ms.pgLockID); err != nil {
+	if _, err := ms.mapper.WithContext(context.Background()).Exec(query, PgMigrationLockID); err != nil {
 		return err
 	}
 	return nil
