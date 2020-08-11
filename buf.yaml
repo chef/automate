@@ -56,7 +56,8 @@ lint:
       - external/infra_proxy/response/policyfiles.proto
       # /api/
       - interservice/cfgmgmt/response/root.proto
-      - interservice/compliance/profiles/profiles.proto
+        # commenting this should fail the build
+        #- interservice/compliance/profiles/profiles.proto
       - interservice/es_sidecar/service.proto
       - interservice/event/event.proto
       - interservice/event_feed/event_feed.proto
