@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#
+# cypress.sh:
+# this test file executes cypress automated ui tests against our long-lived
+# dev and acceptance deployments of automate on every deploy. it's triggered
+# from the .expeditor/deploy.pipeline.yml configuration in this repository
+#
+
 set -euo pipefail
 
 cd /workdir/e2e
@@ -20,7 +27,7 @@ do
 
   npm install # get dependencies defined in e2e/package.json
 
- if ! npm run cypress:record; then
+ if ! npm run cypress:run; then
       buildkite-agent artifact upload "cypress/videos/*;cypress/videos/**/*;cypress/screenshots/*;cypress/screenshots/**/*"
       exit 1
   fi
