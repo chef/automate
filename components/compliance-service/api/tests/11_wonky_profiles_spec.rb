@@ -6,7 +6,7 @@ describe File.basename(__FILE__) do
   Profiles = Chef::Automate::Domain::Compliance::Profiles unless defined?(Profiles)
   def profiles ; Profiles::ProfilesService ; end
 
-  it "works" do
+  it "errors on invalid zip package" do
     profile_path = File.expand_path('./wonky-profiles/bad.zip', File.dirname(__FILE__))
     profile_content = File.open(profile_path, 'rb').read
     req = Profiles::ProfilePostRequest.new(
@@ -17,7 +17,9 @@ describe File.basename(__FILE__) do
     assert_grpc_error("zip: not a valid zip file", 13) do
       GRPC profiles, :create, [req]
     end
+  end
 
+  it "errors on bad inspec archive" do
     profile_path = File.expand_path('./wonky-profiles/myinvalid-resource-0.2.5.zip', File.dirname(__FILE__))
     profile_content = File.open(profile_path, 'rb').read
     req = Profiles::ProfilePostRequest.new(
@@ -28,7 +30,9 @@ describe File.basename(__FILE__) do
     assert_grpc_error(/InSpec archive failed for /, 13) do
       GRPC profiles, :create, [req]
     end
+  end
 
+  it "errors when doing inspec check on the profile" do
     profile_path = File.expand_path('./wonky-profiles/myinvalid-resource-0.2.5.tar.gz', File.dirname(__FILE__))
     profile_content = File.open(profile_path, 'rb').read
     req = Profiles::ProfilePostRequest.new(
@@ -39,7 +43,9 @@ describe File.basename(__FILE__) do
     assert_grpc_error(/Check InSpec check failed for /, 3) do
       GRPC profiles, :create, [req]
     end
+  end
 
+  it "works with warnings" do
     profile_path = File.expand_path('./wonky-profiles/myinvalid-warnings-0.2.4.tar.gz', File.dirname(__FILE__))
     profile_content = File.open(profile_path, 'rb').read
     req = Profiles::ProfilePostRequest.new(

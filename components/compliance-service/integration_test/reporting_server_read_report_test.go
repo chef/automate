@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,9 +18,11 @@ func TestReadReport(t *testing.T) {
 	reports := []*relaxting.ESInSpecReport{
 		{
 			Projects: []string{},
+			EndTime: time.Now(),
 		},
 		{
 			Projects: []string{"project1", "project2"},
+			EndTime: time.Now(),
 		},
 	}
 	reportIds, err := suite.InsertInspecReports(reports)
@@ -38,27 +41,27 @@ func TestReadReport(t *testing.T) {
 		reportId        string
 	}{
 		{
-			description:     "Projects: user has access to all projects accessing an assigned report",
+			description:     "reporting_server_read_report_test.go => Projects: user has access to all projects accessing an assigned report",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 			reportId:        assignedReportId,
 		},
 		{
-			description:     "Projects: user has access to all projects accessing an unassigned report",
+			description:     "reporting_server_read_report_test.go => Projects: user has access to all projects accessing an unassigned report",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 			reportId:        unassignedReportId,
 		},
 		{
-			description:     "Projects: user has access to all projects a report belongs to accessing an assigned report",
+			description:     "reporting_server_read_report_test.go => Projects: user has access to all projects a report belongs to accessing an assigned report",
 			allowedProjects: []string{"project1", "project2"},
 			reportId:        assignedReportId,
 		},
 		{
-			description:     "Projects: user has access to some projects a report belongs to accessing an assigned report",
+			description:     "reporting_server_read_report_test.go => Projects: user has access to some projects a report belongs to accessing an assigned report",
 			allowedProjects: []string{"project1", "project3"},
 			reportId:        assignedReportId,
 		},
 		{
-			description:     "Projects: user has access to unassigned reports accessing an unassigned report",
+			description:     "reporting_server_read_report_test.go => Projects: user has access to unassigned reports accessing an unassigned report",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 			reportId:        unassignedReportId,
 		},
@@ -82,17 +85,17 @@ func TestReadReport(t *testing.T) {
 		reportId        string
 	}{
 		{
-			description:     "Projects: user does not have access to any projects an assigned report belongs to",
+			description:     "reporting_server_read_report_test.go => Projects: user does not have access to any projects an assigned report belongs to",
 			allowedProjects: []string{"project3"},
 			reportId:        assignedReportId,
 		},
 		{
-			description:     "Projects: user with unassigned access accessing an assigned report",
+			description:     "reporting_server_read_report_test.go => Projects: user with unassigned access accessing an assigned report",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 			reportId:        assignedReportId,
 		},
 		{
-			description:     "Projects: user without unassigned access accessing an unassigned report",
+			description:     "reporting_server_read_report_test.go => Projects: user without unassigned access accessing an unassigned report",
 			allowedProjects: []string{"project1"},
 			reportId:        unassignedReportId,
 		},

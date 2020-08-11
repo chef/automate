@@ -56,8 +56,11 @@ func TestReadFailures(t *testing.T) {
 	defer suite.DeleteAllDocuments()
 
 	waitFor(func() bool {
-		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{})
-
+		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{
+			Filters: []*apiReporting.ListFilter{
+				{Type: "end_time", Values: []string{"2017-04-03T23:18:41Z"}},
+			},
+		})
 		return response != nil && len(response.Reports) == n
 	})
 
@@ -111,49 +114,49 @@ func TestReadFailures(t *testing.T) {
 		expectedFailedCnt int
 	}{
 		{
-			description:     "Projects: user has access to all projects",
+			description:     "stats_server_read_failures_test.go => Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 
 			expectedFailedCnt: 5,
 		},
 		{
-			description:     "Projects: user has access to one project with reports",
+			description:     "stats_server_read_failures_test.go => Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
 
 			expectedFailedCnt: 2,
 		},
 		{
-			description:     "Projects: user has access to some projects with reports",
+			description:     "stats_server_read_failures_test.go => Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
 
 			expectedFailedCnt: 4,
 		},
 		{
-			description:     "Projects: user has access to projects without reports",
+			description:     "stats_server_read_failures_test.go => Projects: user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
 
 			expectedFailedCnt: 0,
 		},
 		{
-			description:     "Projects: user has access to one project with reports and unassigned reports",
+			description:     "stats_server_read_failures_test.go => Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 
 			expectedFailedCnt: 3,
 		},
 		{
-			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			description:     "stats_server_read_failures_test.go => Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
 
 			expectedFailedCnt: 5,
 		},
 		{
-			description:     "Projects: user has access to projects without reports and unassigned reports",
+			description:     "stats_server_read_failures_test.go => Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
 
 			expectedFailedCnt: 1,
 		},
 		{
-			description:     "Projects: user has access to unassigned reports",
+			description:     "stats_server_read_failures_test.go => Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 
 			expectedFailedCnt: 1,

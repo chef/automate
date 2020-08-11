@@ -2,6 +2,7 @@ package integration
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"text/template"
 	"time"
@@ -97,6 +98,15 @@ const complianceReportDateTimeFormat = "2006-01-02T15:04:05Z"
 type complianceReportEntity struct {
 	NodeUUID   string `json:"node_uuid"`
 	ReportUUID string `json:"report_uuid"`
+	EndTime    string `json:"end_time"`
+}
+
+type filter struct {
+	Type string `json:"type"`
+	Values []string `json:"values"`
+}
+type request struct {
+	Filters []filter `json:"filters"`
 }
 
 type complianceReportSave struct {
@@ -151,6 +161,7 @@ func CreateComplianceReportDiagnostic() diagnostics.Diagnostic {
 				save.CreatedEntities = append(save.CreatedEntities, complianceReportEntity{
 					NodeUUID:   nodeUUID,
 					ReportUUID: reportUUID,
+					EndTime: endTime,
 				})
 
 				tstCtx.SetValue("compliance-report", save)
@@ -216,7 +227,13 @@ func CreateComplianceReportDiagnostic() diagnostics.Diagnostic {
 				reportReqPath := fmt.Sprintf("/api/v0/compliance/reporting/reports/id/%s", entity.ReportUUID)
 
 				for {
-					resp, err := tstCtx.DoLBRequest(reportReqPath, lbrequest.WithMethod("POST"))
+					requestBody := request{}
+					requestBody.Filters = make([]filter, 1)
+					requestBody.Filters[0].Type = "end_time"
+					requestBody.Filters[0].Values = []string{entity.EndTime}
+					requestStr, _ := json.Marshal(requestBody)
+
+					resp, err := tstCtx.DoLBRequest(reportReqPath, lbrequest.WithMethod("POST"), lbrequest.WithJSONBody(string(requestStr)))
 					require.NoError(tstCtx, err, "Failed to POST %s", reportReqPath)
 					defer func() {
 						_ = resp.Body.Close()

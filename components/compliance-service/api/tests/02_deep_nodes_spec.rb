@@ -4,15 +4,16 @@ require 'interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
   Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)
+  reporting = Reporting::ReportingService
 
-  it "works" do
-    reporting = Reporting::ReportingService
 
-    # Test filter by job_id
-    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+  it "list_nodes with end_time and job_id filters" do
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'job_id', values: ['74a54a28-c628-4f82-86df-333333333333']),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
-    ])
+      ]
+    )
     expected_nodes = {
         "nodes" => [
             {
@@ -69,13 +70,17 @@ describe File.basename(__FILE__) do
         "totalPassed" => 1
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+  end
 
-    # Test filter by profile_id, control - four nodes back
-    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+
+  it "list_nodes deep with end_time and profile_id and control filters" do
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988']),
         Reporting::ListFilter.new(type: "control", values: ["nginx-04"]),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
-    ])
+      ]
+    )
     expected_nodes =
         {
             "nodes" => [
@@ -255,38 +260,46 @@ describe File.basename(__FILE__) do
             "totalPassed"=>1
         }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+  end
 
-    # Test filter by profile_id, passed status filter: expect 0 nodes
-    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+
+  it "list_nodes deep with end_time and profile_id and status filters" do
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
         Reporting::ListFilter.new(type: 'status', values: ['passed'])
-    ])
-    expected_nodes =
-        {
-            "total" => 5,
-            "totalFailed"=>1,
-            "totalSkipped"=>4
-        }.to_json
-
+      ]
+    )
+    expected_nodes = {
+      "total" => 5,
+      "totalFailed"=>1,
+      "totalSkipped"=>4
+    }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+  end
 
-    # Test filter by profile_id, failed status filter: expect 1 node
-    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+
+  it "list_nodes deep with end_time and profile_id and failed status filters" do
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
         Reporting::ListFilter.new(type: 'status', values: ['failed'])
-    ])
-
+      ]
+    )
     assert_equal(1, actual_nodes['nodes'].length)
+  end
 
-    # Test filter by profile_id and waived control
-    # TODO: CONFIRM WITH THE TEAM BECAUSE AT THE MOMENT latestReport and node status is deep, where profiles array(inc status) is shallow
-    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+
+  it "list_nodes deep with end_time and profile_id and waived control filters" do
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4']),
         Reporting::ListFilter.new(type: "control", values: ["pro1-con1"]),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
-    ])
+      ]
+    )
     expected_nodes = {"nodes" => [
               {
                 "environment"=>"DevSec Prod Omega",
@@ -327,18 +340,26 @@ describe File.basename(__FILE__) do
             "totalWaived"=>1
           }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+  end
 
-    actual = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+
+  it "list_nodes deep with non-existent profile_id filter" do
+    actual = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['non-existent'])
-    ])
+      ]
+    )
     assert_equal(Reporting::Nodes.new(), actual)
+  end
 
-    # Test filter by profile_id, one node back
-    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+
+  it "list_nodes deep with profile_id filter and end_time on 2018-03-04" do
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988']),
-        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']
-        )
-    ])
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+      ]
+    )
     expected_nodes =
         {
             "nodes" => [
@@ -534,14 +555,16 @@ describe File.basename(__FILE__) do
             "totalPassed"=>1
         }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+  end
 
 
-    # Test filter by waived profile_id
-    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+  it "list_nodes deep with profile_id filter on 2018-04-01" do
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5']),
-        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z']
-        )
-    ])
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+      ]
+    )
     expected_nodes = {
       "nodes"=>[
         {
@@ -610,12 +633,16 @@ describe File.basename(__FILE__) do
       "totalWaived"=>2
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+  end
 
-    # Test filter by profile_id, multiple nodes
-    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+
+  it "list_nodes deep with profile_id and multipe node targets" do
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
-    ])
+      ]
+    )
     expected_nodes =
         {
             "nodes" => [
@@ -828,12 +855,16 @@ describe File.basename(__FILE__) do
             "totalSkipped" => 4
         }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+  end
 
-    # Get nodes that are using at least one of the given profiles
-    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+
+  it "list_nodes deep with nodes that are using at least one of the given profiles" do
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988', 'xxxdcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143yyy']),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
-    ])
+      ]
+    )
     expected_nodes =
         {
             "nodes" => [
@@ -1030,11 +1061,18 @@ describe File.basename(__FILE__) do
             "totalPassed"=>1
         }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+  end
 
-    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
-        Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8']),
+
+  it "list_nodes deep with failed profile_id filter on 2018-04-02" do
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: [
+          '41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8'
+        ]),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
-    ])
+      ]
+    )
     expected_nodes = {"nodes" =>
       [{"environment" => "DevSec Prod Alpha",
         "id" => "999f4e51-b049-4b10-9555-555789999967",
@@ -1069,6 +1107,71 @@ describe File.basename(__FILE__) do
      "total" => 1,
      "totalFailed" => 1 }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+  end
 
+
+  it "list_nodes deep with profile filter and without end_time filter (last 24h search)" do
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4'])
+      ]
+    )
+    actual_nodes_hash = actual_nodes.to_h
+    actual_nodes_hash[:nodes].each { |c| c[:latest_report][:end_time] = 'SOMETIME_IN_THE_LAST_24H' }
+    expected_nodes = {
+      "nodes": [
+        {
+          "environment": "DevSec Prod Omega",
+          "id": "34cbbb4c-c502-4971-1111-888888888888",
+          "latest_report": {
+            "controls": {
+              "failed": {
+                "critical": 0,
+                "major": 0,
+                "minor": 0,
+                "total": 0
+              },
+              "passed": {
+                "total": 4
+              },
+              "skipped": {
+                "total": 1
+              },
+              "total": 5,
+              "waived": {
+                "total": 0
+              }
+            },
+            "end_time": "SOMETIME_IN_THE_LAST_24H",
+            "id": "44024b50-2e0d-42fa-cccc-aaaaaaaaa003",
+            "status": "passed"
+          },
+          "name": "osx(2)-omega-pro1(f)-pro2(w)-failed",
+          "platform": {
+            "full": "mac_os_x 17.7.0",
+            "name": "mac_os_x",
+            "release": "17.7.0"
+          },
+          "profiles": [
+            {
+              "full": "My Profile 1 title, v1.0.1",
+              "id": "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+              "name": "myprofile1",
+              "status": "passed",
+              "version": "1.0.1"
+            }
+          ],
+          "tags": [
+
+          ]
+        }
+      ],
+      "total": 1,
+      "total_failed": 0,
+      "total_passed": 1,
+      "total_skipped": 0,
+      "total_waived": 0
+    }.to_json
+    assert_equal_json_sorted(expected_nodes, actual_nodes_hash.to_json)
   end
 end

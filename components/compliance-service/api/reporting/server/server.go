@@ -20,6 +20,7 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 // Chosen somewhat arbitrarily to be a "good enough" value.
@@ -78,7 +79,7 @@ func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*rep
 	}
 
 	// Step 1: Retrieving the latest report ID for each node based on the provided filters
-	esIndex, err := relaxting.GetEsIndex(formattedFilters, false, true)
+	esIndex, err := relaxting.GetEsIndex(formattedFilters, false)
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
 	}
@@ -94,6 +95,7 @@ func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*rep
 // ReadReport returns a report based on id
 func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*reporting.Report, error) {
 	formattedFilters := formatFilters(in.Filters)
+	logrus.Debugf("ReadReport called with filters %+v", formattedFilters)
 	//todo - deep filtering - should we open this up to more than just one?  only for ReadReport?
 	if len(formattedFilters["profile_id"]) > 1 {
 		return nil, status.Error(codes.InvalidArgument, "Only one 'profile_id' filter is allowed")
@@ -188,6 +190,7 @@ type exportHandler func(*reporting.Report) error
 // Export streams a json or csv export
 func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService_ExportServer) error {
 	formattedFilters := formatFilters(in.Filters)
+	logrus.Debugf("Export called with filters %+v", formattedFilters)
 	formattedFilters, err := filterByProjects(stream.Context(), formattedFilters)
 	if err != nil {
 		return err
@@ -204,7 +207,7 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 	}
 
 	// Step 1: Retrieving the latest report ID for each node based on the provided filters
-	esIndex, err := relaxting.GetEsIndex(formattedFilters, false, true)
+	esIndex, err := relaxting.GetEsIndex(formattedFilters, false)
 	if err != nil {
 		return status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
 	}
@@ -251,6 +254,7 @@ func validateReportQueryParams(formattedFilters map[string][]string) error {
 
 func (srv *Server) ExportNode(in *reporting.Query, stream reporting.ReportingService_ExportNodeServer) error {
 	formattedFilters := formatFilters(in.Filters)
+	logrus.Debugf("ExportNode called with filters %+v", formattedFilters)
 	formattedFilters, err := filterByProjects(stream.Context(), formattedFilters)
 	if err != nil {
 		return err
@@ -405,6 +409,9 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 // ReadNode returns a node based on id
 func (srv *Server) ReadNode(ctx context.Context, in *reporting.Id) (*reporting.Node, error) {
 	formattedFilters := formatFilters([]*reporting.ListFilter{})
+	// This method takes no filters, setting the widest start->end time range to find this node
+	formattedFilters["start_time"] = []string{ "2017-01-01T00:00:00Z" }
+	formattedFilters["end_time"] = []string{	time.Now().UTC().Format(time.RFC3339) }
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.Id)

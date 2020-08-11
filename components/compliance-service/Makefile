@@ -123,7 +123,7 @@ gateway-proto:
 wait-for-compliance-service:
 	@printf "\n===> ${blue}Waiting for the compliance service to be ready...${reset}\n"; \
 	i=1; \
-	max_loops=30; \
+	max_loops=50; \
 	printf "\n===> ${blue}Checking Compliance Service version to ensure it's ready to receive connections...${reset}\n"; \
 	$(RUN_GRPCURL_COMPLIANCE_VERSION); \
 	while [ $$? -ne 0 -a $$i -lt $$max_loops ]; do \
@@ -344,7 +344,7 @@ wait-for-ingestion:
 	i=1; \
 	curl_output="-=init=-"; \
 	max_loops=50; \
-	es_docs=35; \
+	es_docs=45; \
 	healthy_match="\"total\":$$es_docs,\"successful\":$$es_docs"; \
 	printf "\n===> ${blue}Checking ElasticSearch to ensure it has ingested our reports${reset}\n"; \
 	curl -s -X GET "$(ELASTICSEARCH_URL)/comp-*-r-20*/_doc/_count" | grep $$healthy_match > /dev/null; \
@@ -390,6 +390,18 @@ test-integration: start-es start-pg
 	  exit 1; \
 	fi;
 
+test-integration-go:
+	@printf "\n===> ${blue}These tests depend on a few things that can be provisioned with: ${green}make clean-all start-es start-pg run${reset}\n"; \
+  printf "\n===> ${blue}Running all go integration tests. To run just one, do it like this: ${green}TEST=TestReadFailures make test-integration-go${reset}\n\n"; \
+	GO_TEST_CMD='go test -v "github.com/chef/automate/components/compliance-service/integration_test"'; \
+	if [ -n "$$TEST" ]; then GO_TEST_CMD="$$GO_TEST_CMD -run $(TEST)"; fi; \
+	if ELASTICSEARCH_URL='http://localhost:9200' eval $$GO_TEST_CMD ; then \
+	  printf "===> ${green}go integration tests passed!!!${reset}\n"; \
+	else \
+	  printf "===> ${red}go integration tests failed!!!${reset}\n"; \
+	  exit 1; \
+	fi;
+
 test-integration-reporting: start-es start-pg download-sample-market-profiles clear-es run-log-level-info
 	@printf "\n===> ${blue}Running reporting integration tests with ES_VER=$(ES_VER)${reset}\n"
 	# we run the service locally so we can inspec detect and exec containers and ssh into containers
@@ -415,17 +427,19 @@ test-integration-scanner: start-es start-pg start-ssh-node download-sample-marke
 	fi;
 
 test-automate-upgrade: clean-all
-	printf "\n===> Running Automate upgrade integration tests with TEST=$(TEST)\n"
+	printf "\n===> Running Automate upgrade integration tests\n"
 	@if [ "$(A1_DATA)" != "true" ] && [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ] && [ "$(A2V3_DATA)" != "true" ] && [ "$(A2V4_DATA)" != "true" ] && [ "$(A2V5_DATA)" != "true" ] && [ "$(A2V6_DATA)" != "true" ]; then \
 	  printf "===> ${red}Aborting test-automate-upgrade as one of these ENV variables is not true: A1_DATA, A2V1_DATA, A2V2_DATA, A2V3_DATA, A2V4_DATA, A2V5_DATA, A2V6_DATA${reset}\n"; \
 	  exit 2; \
 	fi;
-	if ! [[ $(TEST) == 6* ]]; then \
+	@if printf "$(TEST)" | grep -i -q "^6.*"; then \
+	  printf "\n===> Using integration TEST=$(TEST)\n"; \
+	else \
 	  printf "===> ${red}Aborting test-automate-upgrade as TEST ENV variable must start with 6, for example: 61_A2V1_migration_spec.rb${reset}\n"; \
 	  exit 3; \
 	fi;
 	@$(MAKE) start-es-pg;
-	@$(MAKE) run-log-level-info;
+	@$(MAKE) run;
 	# Give a few seconds for the background migrations to finish
 	sleep 20;
 	@if $(MAKE) test ; then \
@@ -458,14 +472,23 @@ test-scanner:
 # Run individual tests with: TEST="02_nodes_spec.rb" make test
 # or multiple ones with: TEST="02_*" make test
 test: generate-ruby-grpc wait-for-compliance-service
-	@printf "\n===> ${blue}Running tests...${reset}\n"; \
-	if [ -z "$$TEST" ] ; then TEST='*_spec.rb'; fi; \
+	@cd api/tests; \
+	pwd; \
+	printf "\n===> ${blue}Preparing to run tests...${reset}\n"; \
+	if [ -z "$$TEST" ]; then TEST='*_spec.rb'; fi; \
+	matching_tests=`ls -1q $$TEST 2> /dev/null | wc -l`; \
+	if [ $$matching_tests -eq 0 ]; then \
+		printf "\n${red}ERROR: TEST pattern $$TEST has not match, aborting...${reset}\n"; \
+		exit 17; \
+	else \
+	  @printf "\n===> ${blue}Running $$matching_tests test files...${reset}\n"; \
+	fi; \
 	bundler_version=`grep -A 1 "BUNDLED WITH" api/tests/Gemfile.lock | tail -1 | tr -d '[:space:]'`; \
 	gem install bundler -f --version "= $$bundler_version"; \
-	cd api/tests && \
-	printf "\n===> ${blue}Running 'bundle install' in api/tests...${reset}\n" && \
-	bundle install && \
-	printf "\n===> ${blue}Running the tests via run.rb...${reset}\n" && \
+	printf "\n===> ${blue}Running 'bundle install' in api/tests...${reset}\n"; \
+	pwd; \
+	bundle install; \
+	printf "\n===> ${blue}Running the tests via run.rb...${reset}\n"; \
 	PORT=$(PORT) \
 	SS_PORT=$(SS_PORT) \
 	MANAGER_PORT=$(MANAGER_PORT) \
@@ -478,7 +501,7 @@ test: generate-ruby-grpc wait-for-compliance-service
 	SSL_ROOT_CERT=$(SSL_ROOT_CERT) \
 	MARKET_PATH=$(MARKET_PATH) \
 	PROFILES_PATH=$(PROFILES_PATH) \
-	bundle exec ./run.rb $$TEST \
+	bundle exec ./run.rb $$TEST; \
 	echo
 
 test-prep: $(MARKET_PATH) $(PROFILES_PATH) start-ssh-node download-sample-market-profiles install-inspec start-es-pg

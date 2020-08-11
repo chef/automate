@@ -167,38 +167,36 @@ func MapValues(m map[string]string) []string {
 }
 
 // GetEsIndex returns the index(s) to query based on the end_time filter
-// useStartTime should normally be false unless you have a good reason to make it true.
 // A good reason would be when you pass a job_id and you don't know when it ran so you want to search all indices
-func GetEsIndex(filters map[string][]string, useSummaryIndex bool, useStartTime bool) (esIndex string, err error) {
-	var startDateAsString string
+func GetEsIndex(filters map[string][]string, useSummaryIndex bool) (esIndex string, err error) {
+	// Extract end_time from filters or set it to today's UTC day if not specified
 	endDateAsString, err := computeIndexDate(firstOrEmpty(filters["end_time"]))
 	if err != nil {
 		return esIndex, err
 	}
 
-	if useStartTime {
-		startDateAsString = firstOrEmpty(filters["start_time"])
-	} else {
+	var startDateAsString string
+	if len(filters["start_time"]) == 0 && len(filters["end_time"]) == 0 {
+		// With `start_time` and `end_time` filters, we use start_date as yesterday's UTC date and `end_date` as today's UTC day.
+		// This way, we have the indices to query the last 24 hours worth of reports
+		startDateAsString = time.Now().Add(-24 * time.Hour).UTC().Format(time.RFC3339)
+	} else if len(filters["start_time"]) == 0 {
+		// If we have an end_time, and no start_time, setting start_time with the same value as end_time
 		startDateAsString = endDateAsString
+	} else {
+		// Using the start_time specified in the filters
+		startDateAsString, err = computeIndexDate(filters["start_time"][0])
+		if err != nil {
+			return esIndex, err
+		}
 	}
 
-	jobId := firstOrEmpty(filters["job_id"])
+	logrus.Debugf("GetEsIndex called with (filters=%+v), using startDateAsString=%s, endDateAsString=%s", filters, startDateAsString, endDateAsString)
 
-	////A job_id filter forces us to use the timeseries as there is no guarantee that the latest index will have it
-	////todo if we at least have a jobid->date map (store in dedicated index), we can at least know which timeseries to search making it fast
-	if len(jobId) == 0 {
-		if useSummaryIndex {
-			esIndex, err = IndexDates(CompDailySumIndexPrefix, startDateAsString, endDateAsString)
-		} else {
-			esIndex, err = IndexDates(CompDailyRepIndexPrefix, startDateAsString, endDateAsString)
-		}
-
+	if useSummaryIndex {
+		esIndex, err = IndexDates(CompDailySumIndexPrefix, startDateAsString, endDateAsString)
 	} else {
-		if useSummaryIndex {
-			esIndex = ComplianceDailySumTwenty
-		} else {
-			esIndex = ComplianceDailyRepTwenty
-		}
+		esIndex, err = IndexDates(CompDailyRepIndexPrefix, startDateAsString, endDateAsString)
 	}
 
 	logrus.Debugf("GetEsIndex, using indices: %s", esIndex)
@@ -228,7 +226,6 @@ func computeIndexDate(endTime string) (string, error) {
 		if err != nil {
 			return "", errors.New(fmt.Sprintf("computeIndexDate - could not parse end_time %s.", endTime))
 		}
-
 		indexDate = endTimeAsTime
 	} else {
 		indexDate = time.Now().UTC()

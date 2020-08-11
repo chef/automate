@@ -164,8 +164,7 @@ LIMIT 1;
 // see https://github.com/chef/automate/issues/3915, https://github.com/chef/a2/pull/3992
 // for more information on this query syntax
 const sqlGetOWCAScans = `
-SELECT
-j.id
+SELECT j.id, j.end_time
 FROM jobs j
 WHERE recurrence = '' AND type = 'exec' AND (end_time >= $1 OR status = 'running');
 `
@@ -254,6 +253,11 @@ type job struct {
 	JobCount      int32           `db:"job_count"`
 	NodeCount     sql.NullInt64   `db:"node_count"`
 	Deleted       bool            `db:"deleted"`
+}
+
+type jobWithTime struct {
+	ID          string          `db:"id"`
+	Endtime     time.Time       `db:"end_time"`
 }
 
 // jobSelectDetail used to read from DB one complete job
@@ -710,17 +714,19 @@ func (db *DB) GetJobs(sortField string, insortOrder jobs.Query_OrderType, pageNr
 	return jobs, totalCount, nil
 }
 
-func (db *DB) ListInitiatedScans(ctx context.Context, startTime *tspb.Timestamp) ([]string, error) {
-	var sqlIds []string
+func (db *DB) ListInitiatedScans(ctx context.Context, startTime *tspb.Timestamp) ([]jobWithTime, error) {
+	var jobsWithTime []jobWithTime
 	translatedTime, err := ptypes.Timestamp(startTime)
 	if err != nil {
-		return sqlIds, errors.Wrap(err, "unable to translate start time in request")
+		return jobsWithTime, errors.Wrap(err, "unable to translate start time in request")
 	}
-	_, err = db.Select(&sqlIds, sqlGetOWCAScans, translatedTime)
+	_, err = db.Select(&jobsWithTime, sqlGetOWCAScans, translatedTime)
+
 	if err != nil {
-		return sqlIds, err
+		return jobsWithTime, err
 	}
-	return sqlIds, nil
+
+	return jobsWithTime, nil
 }
 
 func (db *DB) GetJob(id string) (*jobs.Job, error) {

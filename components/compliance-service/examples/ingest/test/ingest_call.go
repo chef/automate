@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"strings"
+	"strconv"
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/jsonpb"
@@ -14,6 +16,7 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	"github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/examples/helpers"
+	"path/filepath"
 )
 
 func SendReportToGRPC(file string, threadCount int, reportsPerThread int) error {
@@ -43,6 +46,44 @@ func SendReportToGRPC(file string, threadCount int, reportsPerThread int) error 
 	if err = unmarshaler.Unmarshal(fileData, &iReport); err != nil {
 		logrus.Errorf("ingest_call.go - reportToGRPC was unable to unmarshal the report output into a compliance.Report struct: %s", err.Error())
 		return err
+	}
+
+	json_file := filepath.Base(file)
+	// Using the report filename convention to change the end_time of the report based on the current date and time
+	// This is needed to test the last 24 hours functionality of Automate when an end_time is not specified for API calls
+	if strings.HasPrefix(json_file, "NOW") {
+		split_file := strings.Split(json_file, "_")
+		if (len(split_file) < 6) {
+		  logrus.Fatalf("Dynamic report file (%s) is invalid. starting with NOW must have at least 5 underscores. Example: NOW_MINUS_1440_PLUS_0060_osx(2)-omega-pro1(p)-passed.json", json_file)
+		}
+		new_end_date := time.Now()
+		if (split_file[1] == "MINUS") {
+			first_minutes, err := strconv.Atoi(split_file[2])
+			if err != nil {
+				logrus.Fatalf("Can't convert '%s' to integer, aborting report %s", split_file[2], json_file)
+			}
+			second_minutes, err := strconv.Atoi(split_file[4])
+			if err != nil {
+				logrus.Fatalf("Can't convert '%s' to integer, aborting report %s", split_file[4], json_file)
+			}
+			new_end_date = new_end_date.Add(-time.Duration(first_minutes) * time.Minute)
+			if (split_file[3] == "MINUS") {
+				new_end_date = new_end_date.Add(-time.Duration(second_minutes) * time.Minute)
+			} else if (split_file[3] == "PLUS") {
+				if first_minutes == 1440 && second_minutes == 1 {
+					// Need less than a minute, otherwise some tests run before this minute expires, creating flaky tests
+					new_end_date = new_end_date.Add(15 * time.Second)
+				} else {
+					new_end_date = new_end_date.Add(time.Duration(second_minutes) * time.Minute)
+				}
+			} else {
+				logrus.Fatalf("Don't understand operand %s when processing dynamic report %s. Only MINUS and PLUS are supported.", split_file[3], json_file)
+			}
+			iReport.EndTime = new_end_date.UTC().Format(time.RFC3339)
+			logrus.Infof("[%s] Ingesting dynamic report (%s) with updated end_time (%s)", time.Now().UTC().Format(time.RFC3339), iReport.ReportUuid, iReport.EndTime)
+		} else {
+			logrus.Fatalf("'%s' not supported after NOW, only 'MINUS', aborting file %s", split_file[1], json_file)
+		}
 	}
 
 	client := ingest.NewComplianceIngesterServiceClient(conn)

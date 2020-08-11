@@ -58,26 +58,32 @@ func TestReportingServerExport(t *testing.T) {
 		{
 			NodeID:   nodeIds[0],
 			Projects: []string{},
+			EndTime: time.Now(),
 		},
 		{
 			NodeID:   nodeIds[1],
 			Projects: []string{"project1"},
+			EndTime: time.Now(),
 		},
 		{
 			NodeID:   nodeIds[2],
 			Projects: []string{"project1", "project2"},
+			EndTime: time.Now(),
 		},
 		{
 			NodeID:   nodeIds[3],
 			Projects: []string{"project2"},
+			EndTime: time.Now(),
 		},
 		{
 			NodeID:   nodeIds[4],
 			Projects: []string{"project2", "project3"},
+			EndTime: time.Now(),
 		},
 		{
 			NodeID:   nodeIds[5],
 			Projects: []string{"project3"},
+			EndTime: time.Now(),
 		},
 	}
 
@@ -94,42 +100,42 @@ func TestReportingServerExport(t *testing.T) {
 		expectedIds     []string
 	}{
 		{
-			description:     "Projects: user has access to all projects",
+			description:     "reporting_server_export_test.go => Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 			expectedIds:     reportIds,
 		},
 		{
-			description:     "Projects: user has access to one project with reports",
+			description:     "reporting_server_export_test.go => Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
 			expectedIds:     reportIds[1:3],
 		},
 		{
-			description:     "Projects: user has access to some projects with reports",
+			description:     "reporting_server_export_test.go => Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
 			expectedIds:     reportIds[1:5],
 		},
 		{
-			description:     "Projects: user has access to projects without reports",
+			description:     "reporting_server_export_test.go => Projects: user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
 			expectedIds:     []string{},
 		},
 		{
-			description:     "Projects: user has access to one project with reports and unassigned reports",
+			description:     "reporting_server_export_test.go => Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 			expectedIds:     reportIds[:3],
 		},
 		{
-			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			description:     "reporting_server_export_test.go => Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
 			expectedIds:     reportIds[:5],
 		},
 		{
-			description:     "Projects: user has access to projects without reports and unassigned reports",
+			description:     "reporting_server_export_test.go => Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
 			expectedIds:     reportIds[:1],
 		},
 		{
-			description:     "Projects: user has access to unassigned reports",
+			description:     "reporting_server_export_test.go => Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 			expectedIds:     reportIds[:1],
 		},
