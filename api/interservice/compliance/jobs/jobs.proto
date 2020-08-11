@@ -29,9 +29,17 @@ message Id {
 	string id = 1;
 	string name = 2;
 }
+
 message Ids {
 	repeated string ids = 1;
+	repeated IdsWithTime ids_with_time = 2;
 }
+
+message IdsWithTime {
+	string id = 1;
+	google.protobuf.Timestamp end_time = 2;
+}
+
 message TimeQuery {
 	google.protobuf.Timestamp start_time = 1;
 }

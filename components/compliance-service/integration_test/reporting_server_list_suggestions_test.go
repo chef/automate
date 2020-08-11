@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -28,19 +29,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 	}{
 		// organization
 		{
-			description: "Only two orgs are returned",
+			description: "reporting_server_list_suggestions_test.go => Only two orgs are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:           "1",
 					OrganizationName: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "1/75th Airborne Rangers",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -50,19 +54,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2"},
 		},
 		{
-			description: "All orgs are returned",
+			description: "reporting_server_list_suggestions_test.go => All orgs are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:           "1",
 					OrganizationName: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "org3",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -72,19 +79,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2", "org3"},
 		},
 		{
-			description: "No orgs are returned",
+			description: "reporting_server_list_suggestions_test.go => No orgs are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:           "1",
 					OrganizationName: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "org3",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -96,19 +106,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 
 		// inspec_version
 		{
-			description: "Only two versions are returned",
+			description: "reporting_server_list_suggestions_test.go => Only two versions are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "3",
 					InSpecVersion: "4.1.0",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -118,19 +131,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"3.1.0", "3.1.1"},
 		},
 		{
-			description: "All inspec_version are returned",
+			description: "reporting_server_list_suggestions_test.go => All inspec_version are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "3",
 					InSpecVersion: "4.1.0",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -140,19 +156,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"3.1.0", "3.1.1", "4.1.0"},
 		},
 		{
-			description: "No inspec_version are returned",
+			description: "reporting_server_list_suggestions_test.go => No inspec_version are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "3",
 					InSpecVersion: "4.1.0",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -164,19 +183,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 
 		// chef_server
 		{
-			description: "Only two chef servers are returned",
+			description: "reporting_server_list_suggestions_test.go => Only two chef servers are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:     "1",
 					SourceFQDN: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "bob",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -186,19 +208,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2"},
 		},
 		{
-			description: "All chef servers are returned",
+			description: "reporting_server_list_suggestions_test.go => All chef servers are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:     "1",
 					SourceFQDN: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "org3",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -208,19 +233,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2", "org3"},
 		},
 		{
-			description: "No chef servers are returned",
+			description: "reporting_server_list_suggestions_test.go => No chef servers are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:     "1",
 					SourceFQDN: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "org3",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -232,19 +260,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 
 		// chef_tags
 		{
-			description: "Only two chef tags are returned",
+			description: "reporting_server_list_suggestions_test.go => Only two chef tags are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1", "org4"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2", "org3"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"bob"},
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -254,19 +285,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2", "org3", "org4"},
 		},
 		{
-			description: "All chef tags are returned",
+			description: "reporting_server_list_suggestions_test.go => All chef tags are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1", "org4"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2", "org5"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"org3", "org6"},
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -276,19 +310,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2", "org3", "org4", "org5", "org6"},
 		},
 		{
-			description: "No chef tags are returned",
+			description: "reporting_server_list_suggestions_test.go => No chef tags are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1", "org4"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2", "org5"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"org3", "org6"},
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -300,19 +337,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 
 		// policy_group
 		{
-			description: "Only two policy groups are returned",
+			description: "reporting_server_list_suggestions_test.go => Only two policy groups are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:      "1",
 					PolicyGroup: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "bob",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -322,19 +362,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2"},
 		},
 		{
-			description: "All policy groups are returned",
+			description: "reporting_server_list_suggestions_test.go => All policy groups are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:      "1",
 					PolicyGroup: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "org3",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -344,19 +387,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2", "org3"},
 		},
 		{
-			description: "No policy groups are returned",
+			description: "reporting_server_list_suggestions_test.go => No policy groups are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:      "1",
 					PolicyGroup: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "org3",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -368,19 +414,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 
 		// policy_name
 		{
-			description: "Only two policy names are returned",
+			description: "reporting_server_list_suggestions_test.go => Only two policy names are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:     "1",
 					PolicyName: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "bob",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -390,19 +439,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2"},
 		},
 		{
-			description: "All policy names are returned",
+			description: "reporting_server_list_suggestions_test.go => All policy names are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:     "1",
 					PolicyName: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "org3",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -412,19 +464,22 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2", "org3"},
 		},
 		{
-			description: "No policy names are returned",
+			description: "reporting_server_list_suggestions_test.go => No policy names are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID:     "1",
 					PolicyName: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "org2",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "org3",
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -436,7 +491,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 
 		// platform
 		{
-			description: "Only two platform names are returned",
+			description: "reporting_server_list_suggestions_test.go => Only two platform names are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID: "1",
@@ -447,6 +502,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Name: "org1",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -457,6 +513,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Name: "org2",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -467,6 +524,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Name: "bob",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -476,7 +534,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2"},
 		},
 		{
-			description: "All platform names are returned",
+			description: "reporting_server_list_suggestions_test.go => All platform names are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID: "1",
@@ -487,6 +545,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Name: "org1",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -497,6 +556,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Name: "org2",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -507,6 +567,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Name: "org3",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -516,7 +577,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2", "org3"},
 		},
 		{
-			description: "No pratform names are returned",
+			description: "reporting_server_list_suggestions_test.go => No pratform names are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID: "1",
@@ -527,6 +588,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Name: "org1",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -537,6 +599,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Name: "org2",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -547,6 +610,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Name: "org3",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -555,10 +619,9 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			},
 			expectedTerms: []string{},
 		},
-
 		// platform_with_version
 		{
-			description: "Only two platform_with_version names are returned",
+			description: "reporting_server_list_suggestions_test.go => Only two platform_with_version names are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID: "1",
@@ -569,6 +632,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Full: "org1",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -579,6 +643,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Full: "org2",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -589,6 +654,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Full: "bob",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -598,7 +664,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2"},
 		},
 		{
-			description: "All platform_with_version names are returned",
+			description: "reporting_server_list_suggestions_test.go => All platform_with_version names are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID: "1",
@@ -609,6 +675,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Full: "org1",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -619,6 +686,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Full: "org2",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -629,6 +697,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Full: "org3",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -638,7 +707,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{"org1", "org2", "org3"},
 		},
 		{
-			description: "No platform_with_version names are returned",
+			description: "reporting_server_list_suggestions_test.go => No platform_with_version names are returned",
 			summaries: []*relaxting.ESInSpecSummary{
 				{
 					NodeID: "1",
@@ -649,6 +718,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Full: "org1",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -659,6 +729,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Full: "org2",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -669,6 +740,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 					}{
 						Full: "org3",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -720,27 +792,30 @@ func TestReportingListSuggestionsLargeArrayValues(t *testing.T) {
 		request     *reporting.SuggestionRequest
 	}{
 		{
-			description: "chef_tags",
+			description: "reporting_server_list_suggestions_test.go => chef_tags",
 			summary: &relaxting.ESInSpecSummary{
 				ChefTags: terms,
+				EndTime: time.Now(),
 			},
 			request: &reporting.SuggestionRequest{
 				Type: "chef_tags",
 			},
 		},
 		{
-			description: "recipe",
+			description: "reporting_server_list_suggestions_test.go => recipe",
 			summary: &relaxting.ESInSpecSummary{
 				Recipes: terms,
+				EndTime: time.Now(),
 			},
 			request: &reporting.SuggestionRequest{
 				Type: "recipe",
 			},
 		},
 		{
-			description: "roles",
+			description: "reporting_server_list_suggestions_test.go => roles",
 			summary: &relaxting.ESInSpecSummary{
 				Roles: terms,
+				EndTime: time.Now(),
 			},
 			request: &reporting.SuggestionRequest{
 				Type: "role",
@@ -781,7 +856,7 @@ func TestReportingListSuggestionsLargeArrayValues(t *testing.T) {
 	}
 }
 
-func TestReportingListSuggestions(t *testing.T) {
+func TestReportingListSuggestionsUsersAccess(t *testing.T) {
 	suite.DeleteAllDocuments()
 
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
@@ -819,7 +894,11 @@ func TestReportingListSuggestions(t *testing.T) {
 	defer suite.DeleteAllDocuments()
 
 	waitFor(func() bool {
-		response, _ := server.ListReports(everythingCtx, &reporting.Query{})
+		response, _ := server.ListReports(everythingCtx, &reporting.Query{
+			Filters: []*reporting.ListFilter{
+				{Type: "end_time", Values: []string{"2018-10-25T23:18:41Z"}},
+			},
+		})
 
 		return response != nil && len(response.Reports) == n
 	})
@@ -870,42 +949,42 @@ func TestReportingListSuggestions(t *testing.T) {
 		expectedIds     []string
 	}{
 		{
-			description:     "user has access to all projects",
+			description:     "reporting_server_list_suggestions_test.go => user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 			expectedIds:     reportIds,
 		},
 		{
-			description:     "user has access to one project with reports",
+			description:     "reporting_server_list_suggestions_test.go => user has access to one project with reports",
 			allowedProjects: []string{"project1"},
 			expectedIds:     reportIds[1:3],
 		},
 		{
-			description:     "user has access to some projects with reports",
+			description:     "reporting_server_list_suggestions_test.go => user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
 			expectedIds:     reportIds[1:5],
 		},
 		{
-			description:     "user has access to projects without reports",
+			description:     "reporting_server_list_suggestions_test.go => user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
 			expectedIds:     []string{},
 		},
 		{
-			description:     "user has access to one project with reports and unassigned reports",
+			description:     "reporting_server_list_suggestions_test.go => user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 			expectedIds:     reportIds[:3],
 		},
 		{
-			description:     "user has access to some projects with reports and unassigned reports",
+			description:     "reporting_server_list_suggestions_test.go => user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
 			expectedIds:     reportIds[:5],
 		},
 		{
-			description:     "user has access to projects without reports and unassigned reports",
+			description:     "reporting_server_list_suggestions_test.go => user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
 			expectedIds:     reportIds[:1],
 		},
 		{
-			description:     "user has access to unassigned reports",
+			description:     "reporting_server_list_suggestions_test.go => user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 			expectedIds:     reportIds[:1],
 		},
@@ -925,7 +1004,12 @@ func TestReportingListSuggestions(t *testing.T) {
 		for _, test := range successCases {
 			t.Run(fmt.Sprintf("Projects: %q suggestions, %s", suggestionType, test.description), func(t *testing.T) {
 				testCtx := contextWithProjects(test.allowedProjects)
-				response, err := server.ListSuggestions(testCtx, &reporting.SuggestionRequest{Type: suggestionType})
+				response, err := server.ListSuggestions(testCtx, &reporting.SuggestionRequest{
+					Type: suggestionType,
+					Filters: []*reporting.ListFilter{
+						{Type: "end_time", Values: []string{"2018-10-25T18:18:41Z"}},
+					},
+				})
 
 				assert.NoError(t, err)
 				require.NotNil(t, response)

@@ -204,17 +204,17 @@ clean:
 	@rm -rf create-ss-config create-event-config
 	@# If we don't match he process with /(tmp|var) at the beginning, in pkill will fail itself and fail the make.
 	@pkill -x -f "/(tmp|var).+nodemanager.* run --port.*" || true
-	@pkill -x -f "/(tmp|var).+event-service.* serve --config" || true
-	@pkill -x -f "/(tmp|var).+secrets-service.* serve --config" || true
+	@pkill -x -f "/(tmp|var).+event-service.* serve --config.*" || true
+	@pkill -x -f "/(tmp|var).+secrets-service.* serve --config.*" || true
 
 wait-for-nodemanager-service:
 	@i=1; \
-	max_loops=40; \
+	max_loops=50; \
 	printf "\n===> ${blue}Checking NodeManager Service health to ensure it's ready to receive connections...${reset}\n"; \
 	$(RUN_GRPCURL_NODEMANAGER_CHECK); \
 	while [ $$? -ne 0 -a $$i -lt $$max_loops ]; do \
 	  printf " * ${yellow}$$i NodeManager Service is not running, retrying...${reset}\n"; \
-	  sleep 6; \
+	  sleep 8; \
 	  i=$$(( $$i + 1 )); \
 	  $(RUN_GRPCURL_NODEMANAGER_CHECK); \
 	done; \

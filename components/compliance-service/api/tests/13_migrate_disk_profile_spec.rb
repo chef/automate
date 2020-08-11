@@ -23,7 +23,7 @@ describe File.basename(__FILE__) do
   before(:all) { cleanup }
   after(:all) { cleanup }
 
-  it "works" do
+  it "migrate works" do
     # put profile into user directory
     market_path = File.join(MARKET_PATH, 'windows-baseline-1.1.0.tar.gz')
     FileUtils.mkdir_p(File.join(PROFILES_PATH, OWNER))
@@ -33,7 +33,9 @@ describe File.basename(__FILE__) do
     # we run user migration command
     res = GRPC profiles_admin, :migrate_disk_profiles, Google::Protobuf::Empty.new()
     assert_kind_of(Google::Protobuf::Empty, res)
+  end
 
+  it "new profile exits now in the system" do
     # we check that the profile is there
     res = GRPC profiles, :read, Profiles::ProfileDetails.new(
       owner: OWNER,

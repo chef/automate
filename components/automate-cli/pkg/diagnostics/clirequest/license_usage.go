@@ -2,6 +2,7 @@ package clirequest
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -66,6 +67,8 @@ func LicenseUsage() (*LicenseUsageResp, error) {
 	}()
 
 	byteValue, err := ioutil.ReadAll(jsonFile)
+	fmt.Printf("!!!!!!!!!!!!!!! /tmp/license_usage.json: %s", string(byteValue))
+
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to read JSON output file.")
 	}

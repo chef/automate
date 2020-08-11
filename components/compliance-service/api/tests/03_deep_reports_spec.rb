@@ -8,12 +8,183 @@ describe File.basename(__FILE__) do
     Reporting::ReportingService;
   end
 
-  it "works" do
+  it "list reports deep filtered by a profile that was not scanned in the last 24h" do
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: [
+          '41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'
+        ])
+      ]
+    )
+    expected_json = {}.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+  end
 
-    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
-        Reporting::ListFilter.new(type: 'profile_id',
-                                  values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'])
-    ])
+  it "list reports deep filtered by a profile scanned in the last 24h" do
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4'])
+      ]
+    )
+    actual_data_hash = actual_data.to_h
+    actual_data_hash[:reports].each { |r| r[:end_time] = 'SOMETIME_IN_THE_LAST_24H' }
+    expected_json = {
+      "reports": [
+        {
+          "chef_organization": "",
+          "chef_server": "",
+          "chef_tags": [
+
+          ],
+          "controls": {
+            "failed": {
+              "critical": 0,
+              "major": 0,
+              "minor": 0,
+              "total": 0
+            },
+            "passed": {
+              "total": 4
+            },
+            "skipped": {
+              "total": 1
+            },
+            "total": 5,
+            "waived": {
+              "total": 0
+            }
+          },
+          "end_time": "SOMETIME_IN_THE_LAST_24H",
+          "environment": "",
+          "fqdn": "",
+          "id": "44024b50-2e0d-42fa-cccc-aaaaaaaaa002",
+          "ipaddress": "192.168.56.66",
+          "job_id": "",
+          "node_id": "34cbbb4c-c502-4971-1111-888888888888",
+          "node_name": "osx(2)-omega-pro1(f)-pro2(w)-failed",
+          "platform": nil,
+          "profiles": [
+
+          ],
+          "projects": [
+
+          ],
+          "roles": [
+
+          ],
+          "statistics": nil,
+          "status": "passed",
+          "status_message": "",
+          "version": ""
+        },
+        {
+          "chef_organization": "",
+          "chef_server": "",
+          "chef_tags": [
+
+          ],
+          "controls": {
+            "failed": {
+              "critical": 0,
+              "major": 0,
+              "minor": 0,
+              "total": 0
+            },
+            "passed": {
+              "total": 4
+            },
+            "skipped": {
+              "total": 1
+            },
+            "total": 5,
+            "waived": {
+              "total": 0
+            }
+          },
+          "end_time": "SOMETIME_IN_THE_LAST_24H",
+          "environment": "",
+          "fqdn": "",
+          "id": "44024b50-2e0d-42fa-cccc-aaaaaaaaa003",
+          "ipaddress": "192.168.56.66",
+          "job_id": "",
+          "node_id": "34cbbb4c-c502-4971-1111-888888888888",
+          "node_name": "osx(2)-omega-pro1(f)-pro2(w)-failed",
+          "platform": nil,
+          "profiles": [
+
+          ],
+          "projects": [
+
+          ],
+          "roles": [
+
+          ],
+          "statistics": nil,
+          "status": "passed",
+          "status_message": "",
+          "version": ""
+        },
+        {
+          "chef_organization": "",
+          "chef_server": "",
+          "chef_tags": [
+
+          ],
+          "controls": {
+            "failed": {
+              "critical": 2,
+              "major": 0,
+              "minor": 0,
+              "total": 2
+            },
+            "passed": {
+              "total": 0
+            },
+            "skipped": {
+              "total": 0
+            },
+            "total": 5,
+            "waived": {
+              "total": 3
+            }
+          },
+          "end_time": "SOMETIME_IN_THE_LAST_24H",
+          "environment": "",
+          "fqdn": "",
+          "id": "44024b50-2e0d-42fa-cccc-aaaaaaaaa001",
+          "ipaddress": "192.168.56.66",
+          "job_id": "",
+          "node_id": "34cbbb4c-c502-4971-1111-888888888888",
+          "node_name": "osx(2)-omega-pro1(f)-pro2(w)-failed",
+          "platform": nil,
+          "profiles": [
+
+          ],
+          "projects": [
+
+          ],
+          "roles": [
+
+          ],
+          "statistics": nil,
+          "status": "failed",
+          "status_message": "",
+          "version": ""
+        }
+      ],
+      "total": 3
+    }.to_json
+    assert_equal_json_sorted(expected_json, actual_data_hash.to_json)
+  end
+
+  it "list reports with deep profile filter, default pages" do
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-05T23:59:59Z'])
+      ]
+    )
     expected_json = {
         "reports" => [
             {
@@ -146,11 +317,16 @@ describe File.basename(__FILE__) do
         "total" => 7
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
+  end
 
-    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
-        Reporting::ListFilter.new(type: 'profile_id',
-                                  values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'])
-    ], per_page: 2)
+  it "list reports with deep profile filter second page" do
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+      ],
+      per_page: 2
+    )
     expected_json = {
         "reports": [
             {
@@ -189,14 +365,23 @@ describe File.basename(__FILE__) do
                 }
             }
         ],
-        "total": 7
+        "total": 5
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
+  end
 
-    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
-        Reporting::ListFilter.new(type: 'profile_id',
-                                  values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'])
-    ], sort: 'node_name', order: 0, page: 3, per_page: 2)
+  it "list reports with deep profile filter third page" do
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-05T23:59:59Z'])
+      ],
+      sort: 'node_name',
+      order: 0,
+      page: 3,
+      per_page: 2
+    )
     expected_json = {
         "reports" => [
             {
@@ -237,16 +422,26 @@ describe File.basename(__FILE__) do
         "total" => 7
     }
     assert_equal_json_sorted(expected_json.to_json, actual_data.to_json)
+  end
 
+  it "list reports with dupe profile_id filter values" do
     #test that we are dedup-ing in case the same profile_id is passed in twice.. we still want dedup so that deep works
-    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(
           type: 'profile_id',
           values: [
             '41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9',
             '41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'
-          ])
-    ], sort: 'node_name', order: 0, page: 3, per_page: 2)
+          ]),
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-05T23:59:59Z'])
+      ],
+      sort: 'node_name',
+      order: 0,
+      page: 3,
+      per_page: 2
+    )
     expected_json = {
         "reports" => [
             {
@@ -287,15 +482,20 @@ describe File.basename(__FILE__) do
         "total" => 7
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
+  end
 
-    # Deep filter by a profile it that failed at root
-    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
-        Reporting::ListFilter.new(
-          type: 'profile_id',
-          values: [
-            '5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888'
-          ])
-    ], sort: 'node_name', order: 0, page: 1, per_page: 3)
+  it "list reports deep filtered by a profile failed at runtime" do
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888']),
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+      ],
+      sort: 'node_name',
+      order: 0,
+      page: 1,
+      per_page: 3
+    )
     expected_json = {"reports" =>
       [{"controls" => {"failed" => {}, "passed" => {}, "skipped" => {}, "waived" => {}},
         "endTime" => "2018-04-02T03:02:02Z",
@@ -306,15 +506,20 @@ describe File.basename(__FILE__) do
         "status" => "failed"}],
      "total" => 1}.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
+  end
 
-    # Deep filter by a profile it that skipped at root
-    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
-        Reporting::ListFilter.new(
-          type: 'profile_id',
-          values: [
-            '5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777'
-          ])
-    ], sort: 'node_name', order: 0, page: 1, per_page: 3)
+  it "list reports deep filtered by a profile skipped at runtime" do
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id',values: ['5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36777']),
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+      ],
+      sort: 'node_name',
+      order: 0,
+      page: 1,
+      per_page: 3
+    )
     expected_json = {"reports" =>
       [{"controls" => {"failed" => {}, "passed" => {}, "skipped" => {}, "waived" => {}},
         "endTime" => "2018-04-02T03:02:02Z",
@@ -325,12 +530,16 @@ describe File.basename(__FILE__) do
         "status" => "skipped"}],
      "total" => 1}.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
+  end
 
-    # Get all reports for these two nodes, one missing
-    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
-        Reporting::ListFilter.new(type: 'node_id',
-                                  values: ['9b9f4e51-b049-4b10-9555-10578916e149', 'missing-in-action'])
-    ])
+  it "lists reports for two nodes, one missing" do
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'node_id', values: ['9b9f4e51-b049-4b10-9555-10578916e149', 'missing-in-action']),
+        Reporting::ListFilter.new(type: 'start_time', values: ['2017-01-01T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2020-08-25T23:59:59Z'])
+      ]
+    )
     expected_json = {
         "reports" => [
             {
@@ -397,15 +606,18 @@ describe File.basename(__FILE__) do
         "total" => 3
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
+  end
 
-
-    #######Control depth###############
-
-    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
-        Reporting::ListFilter.new(type: 'profile_id',
-                                  values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
-        Reporting::ListFilter.new(type: 'control', values: ['apache-01'])
-    ])
+  #######Control depth###############
+  it "lists reports with profile and control (apache-01) filter" do
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
+        Reporting::ListFilter.new(type: 'control', values: ['apache-01']),
+        Reporting::ListFilter.new(type: 'start_time', values: ['2017-01-01T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2020-08-25T23:59:59Z'])
+      ]
+    )
     expected_json =
         {
             "reports" => [
@@ -531,12 +743,17 @@ describe File.basename(__FILE__) do
             "total" => 7
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
+  end
 
-    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
-        Reporting::ListFilter.new(type: 'profile_id',
-                                  values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
-        Reporting::ListFilter.new(type: 'control', values: ['apache-02'])
-    ])
+  it "lists reports with profile and control (apache-02) filter" do
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
+        Reporting::ListFilter.new(type: 'control', values: ['apache-02']),
+        Reporting::ListFilter.new(type: 'start_time', values: ['2017-01-01T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2020-08-25T23:59:59Z'])
+      ]
+    )
     expected_json =
         {
             "reports" => [
@@ -663,9 +880,16 @@ describe File.basename(__FILE__) do
             "total" => 7
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
+  end
 
+  it "reads one report" do
     # Get a specific report1
-    res = GRPC reporting, :read_report, Reporting::Query.new(id: 'bb93e1b2-36d6-439e-ac70-cccccccccc04')
+    res = GRPC reporting, :read_report, Reporting::Query.new(
+      id: 'bb93e1b2-36d6-439e-ac70-cccccccccc04',
+      filters: [
+        Reporting::ListFilter.new(type: 'start_time', values: ['2017-01-01T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2020-08-25T23:59:59Z'])
+      ])
     assert_equal(Reporting::Report, res.class)
 
     assert_equal('3.1.0', res['version'])
@@ -705,13 +929,16 @@ describe File.basename(__FILE__) do
       assert_equal('skipped', res['profiles'][2]['status'])
       assert_equal("Skipping profile: 'fake-baseline' on unsupported platform: 'amazon/2'.", res['profiles'][2]['status_message'])
     end
+  end
 
+  it "reads one report with a profile filter as well" do
     # Get a specific report filter by profile_id
     res = GRPC reporting, :read_report, Reporting::Query.new(
-        id: 'bb93e1b2-36d6-439e-ac70-cccccccccc04',
-        filters: [
-            Reporting::ListFilter.new(type: 'profile_id',
-                                      values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'])]
+      id: 'bb93e1b2-36d6-439e-ac70-cccccccccc04',
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+      ]
     )
     assert_equal(Reporting::Report, res.class)
     assert_equal('3.1.0', res['version'])
@@ -748,15 +975,17 @@ describe File.basename(__FILE__) do
       passed_control = res['profiles'][0]['controls'][0]['results'].first
       assert_equal('skipped', passed_control['status'])
     end
+  end
 
+  it "reads one report with a profile and control filter" do
     # Get a specific report filter by profile_id and control
     res = GRPC reporting, :read_report, Reporting::Query.new(
-        id: 'bb93e1b2-36d6-439e-ac70-cccccccccc04',
-        filters: [
-            Reporting::ListFilter.new(type: 'profile_id',
-                                      values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
-            Reporting::ListFilter.new(type: 'control', values: ['apache-01'])
-        ]
+      id: 'bb93e1b2-36d6-439e-ac70-cccccccccc04',
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
+        Reporting::ListFilter.new(type: 'control', values: ['apache-01']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+      ]
     )
     assert_equal(Reporting::Report, res.class)
 
@@ -790,6 +1019,6 @@ describe File.basename(__FILE__) do
       passed_control = res['profiles'][0]['controls'][0]['results'].first
       assert_equal('skipped', passed_control['status'])
     end
-
   end
+
 end

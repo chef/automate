@@ -12,6 +12,7 @@ type ESInSpecSummary struct {
 	InSpecVersion string    `json:"version"`
 	ReportID      string    `json:"report_uuid"`
 	DailyLatest   bool      `json:"daily_latest"`
+	DayLatest     bool      `json:"day_latest"`
 	NodeName      string    `json:"node_name"`
 	Environment   string    `json:"environment"`
 	EndTime       time.Time `json:"end_time"`
@@ -47,6 +48,7 @@ type ESInSpecReport struct {
 	NodeID        string    `json:"node_uuid"`
 	ReportID      string    `json:"report_uuid"`
 	DailyLatest   bool      `json:"daily_latest"`
+	DayLatest     bool      `json:"day_latest"`
 	NodeName      string    `json:"node_name"`
 	Environment   string    `json:"environment"`
 	EndTime       time.Time `json:"end_time"`

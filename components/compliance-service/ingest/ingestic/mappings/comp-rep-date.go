@@ -112,6 +112,9 @@ var ComplianceRepDate = Mapping{
         "daily_latest": {
           "type": "boolean"
         },
+        "day_latest": {
+          "type": "boolean"
+        },
         "depends": {
           "type": "object",
           "properties": {

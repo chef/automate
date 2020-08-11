@@ -112,6 +112,9 @@ var ComplianceSumDate = Mapping{
         "daily_latest": {
           "type": "boolean"
         },
+        "day_latest": {
+          "type": "boolean"
+        },
         "doc_version": {
           "type": "keyword"
         },

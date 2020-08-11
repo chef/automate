@@ -1,10 +1,9 @@
 package integration_test
 
 import (
-	"testing"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"testing"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
@@ -48,7 +47,11 @@ func TestListProfiles(t *testing.T) {
 	defer suite.DeleteAllDocuments()
 
 	waitFor(func() bool {
-		response, _ := server.ListReports(everythingCtx, &reporting.Query{})
+		response, _ := server.ListReports(everythingCtx, &reporting.Query{
+			Filters: []*reporting.ListFilter{
+				{Type: "end_time", Values: []string{"2018-10-25T18:18:41Z"}},
+			},
+		})
 
 		return response != nil && len(response.Reports) == n
 	})
@@ -111,42 +114,42 @@ func TestListProfiles(t *testing.T) {
 		expectedIds     []string
 	}{
 		{
-			description:     "Projects: user has access to all projects",
+			description:     "reporting_server_list_profiles_test.go => Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 			expectedIds:     profileIds,
 		},
 		{
-			description:     "Projects: user has access to one project with reports",
+			description:     "reporting_server_list_profiles_test.go => Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
 			expectedIds:     profileIds[1:3],
 		},
 		{
-			description:     "Projects: user has access to some projects with reports",
+			description:     "reporting_server_list_profiles_test.go => Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
 			expectedIds:     profileIds[1:5],
 		},
 		{
-			description:     "Projects: user has access to projects without reports",
+			description:     "reporting_server_list_profiles_test.go => Projects: user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
 			expectedIds:     []string{},
 		},
 		{
-			description:     "Projects: user has access to one project with reports and unassigned reports",
+			description:     "reporting_server_list_profiles_test.go => Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 			expectedIds:     profileIds[:3],
 		},
 		{
-			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			description:     "reporting_server_list_profiles_test.go => Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
 			expectedIds:     profileIds[:5],
 		},
 		{
-			description:     "Projects: user has access to projects without reports and unassigned reports",
+			description:     "reporting_server_list_profiles_test.go => Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
 			expectedIds:     profileIds[:1],
 		},
 		{
-			description:     "Projects: user has access to unassigned reports",
+			description:     "reporting_server_list_profiles_test.go => Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 			expectedIds:     profileIds[:1],
 		},

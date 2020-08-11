@@ -18,12 +18,14 @@ describe File.basename(__FILE__) do
   before(:all) { cleanup }
   after(:all) { cleanup }
 
-  it "works" do
-    ##### GRPC Failure tests #####
+  it "errors out on missing secret id" do
     assert_grpc_error("Not found for id: missing", 5) do
       SS_GRPC secrets, :read, Secrets::Id.new(id: 'missing')
     end
+  end
 
+
+  it "errors out for invalid ssh data content" do
     assert_grpc_error("Invalid data content for secret type \'ssh\'. A \'username\' field is required", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
@@ -35,7 +37,9 @@ describe File.basename(__FILE__) do
         type: "ssh"
       )
     end
+  end
 
+  it "errors out for invalid aws data content" do
     assert_grpc_error("Invalid data content for secret type 'aws'. AWS_ACCESS_KEY_ID not provided", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
@@ -53,7 +57,10 @@ describe File.basename(__FILE__) do
         type: "aws"
       )
     end
+  end
 
+
+  it "errors out for invalid azure data content" do
     assert_grpc_error("Invalid data content for secret type 'azure'. AZURE_CLIENT_SECRET not provided", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
@@ -75,7 +82,9 @@ describe File.basename(__FILE__) do
         type: "azure"
       )
     end
+  end
 
+  it "errors out for invalid ssh data content, key required" do
     assert_grpc_error("Invalid data content for secret type \'ssh\'. A \'password\' or \'key\' field is required", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
@@ -87,7 +96,9 @@ describe File.basename(__FILE__) do
         type: "ssh"
       )
     end
+  end
 
+  it "errors out for invalid winrm data content" do
     assert_grpc_error("Invalid data content for secret type \'winrm\'. A \'password\' field is required", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
@@ -99,7 +110,10 @@ describe File.basename(__FILE__) do
         type: "winrm"
       )
     end
+  end
 
+
+  it "errors out for invalid sudo data content" do
     assert_grpc_error("Invalid data content for secret type \'sudo\'. A \'password\' or \'options\' field is required", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
@@ -110,7 +124,10 @@ describe File.basename(__FILE__) do
         type: "sudo"
       )
     end
+  end
 
+
+  it "errors out for secret without name" do
     assert_grpc_error("Invalid secret, \'name\' is a required parameter", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
@@ -121,12 +138,17 @@ describe File.basename(__FILE__) do
         type: "bla"
       )
     end
+  end
 
+
+  it "errors out for invalid sort field" do
     assert_grpc_error("Invalid sort field, valid ones are: [last_modified name type]", 3) do
       SS_GRPC secrets, :list, Secrets::Query.new(sort: "wrong")
     end
+  end
 
-    ##### GRPC Success tests #####
+
+  it "works" do
     actual = SS_GRPC secrets, :list, Secrets::Query.new()
     assert_equal Secrets::Secrets.new(secrets: [], total: 0), actual
 

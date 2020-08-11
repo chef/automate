@@ -1,0 +1,30 @@
+{
+  "type": "inspec_report",
+  "node_uuid": "888f4e51-b049-4b10-9555-111222333333",
+  "report_uuid": "zz93e1b2-36d6-439e-ac70-ccccccccddll",
+  "job_uuid": "74a54a28-c628-4f82-86df-125555553431",
+  "node_name": "ubuntu(0)-alpha-failed",
+  "environment": "DevSec Prod Alpha",
+  "roles": [],
+  "recipes": [],
+  "end_time": "2100-01-01T00:00:01Z",
+  "version": "4.22.0",
+  "platform": {
+    "name": "unknown",
+    "release": "unknown"
+  },
+  "statistics": {
+    "duration": 0.01
+  },
+  "other_checks": [],
+  "policy_name": "test_policy_name",
+  "policy_group": "test_policy_group",
+  "organization_name": "test_org",
+  "source_fqdn": "api.chef.io",
+  "chef_tags": ["mylinux", "my.tag", "some=tag"],
+  "ipaddress": "188.38.98.166",
+  "fqdn": "web-ubu-fail.example.com",
+  "status": "failed",
+  "status_message": "ERROR: InSpec not found.",
+  "profiles": []
+}

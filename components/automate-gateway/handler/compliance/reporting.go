@@ -2,6 +2,7 @@ package compliance
 
 import (
 	"context"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
@@ -177,6 +178,11 @@ func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQue
 		return nil, errors.Wrap(err, "unable to parse time")
 	}
 	// get all scans with end_time on or after in time OR status running
+	// TODO: must return the time of the job here as well
+	//compliance-service/api/jobs/server/server.go
+	//	260:// ListInitiatedScans returns a list of ids for all scans with an end_time after or equal to the time
+	//262:func (srv *Server) ListInitiatedScans(ctx context.Context, in *jobs.TimeQuery) (*jobs.Ids, error) {
+	//	263:	jobIDList, err := srv.db.ListInitiatedScans(ctx, in.StartTime)
 	jobsList, err := a.scanner.ListInitiatedScans(ctx, &jobs.TimeQuery{StartTime: in.GetStartTime()})
 	if err != nil {
 		return nil, errors.Wrap(err, "could not list owca scans")
@@ -185,8 +191,12 @@ func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQue
 
 	reports := make([]*reporting.Report, 0)
 	// for each job, query compliance reporting with job_id filter, get nodes
-	for _, jobId := range jobsList.GetIds() {
-		nodesList, err := a.getAllNodes(ctx, jobId)
+	for _, job := range jobsList.GetIdsWithTime() {
+		translatedTime, err := ptypes.Timestamp(job.EndTime)
+		if err != nil {
+			return nil, errors.Wrap(err, "LicenseUsageNodes: unable to translate job end_time")
+		}
+		nodesList, err := a.getAllNodes(ctx, job.Id, translatedTime.UTC().Format(time.RFC3339))
 		if err != nil {
 			return nil, errors.Wrap(err, "could not list nodes")
 		}
@@ -204,7 +214,7 @@ func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQue
 			if node.Environment != "aws-api" && node.Environment != "azure-api" && endTime.After(startTime) {
 				nodesListNoAPIScans = append(nodesListNoAPIScans, &reporting.Report{
 					Id:          node.GetLatestReport().GetId(),
-					JobId:       jobId,
+					JobId:       job.Id,
 					NodeId:      node.GetId(),
 					NodeName:    node.GetName(),
 					Environment: node.GetEnvironment(),
@@ -221,7 +231,7 @@ func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQue
 	return &reporting.Reports{Reports: reports, Total: int32(len(reports))}, nil
 }
 
-func (a *Reporting) getAllNodes(ctx context.Context, jobId string) ([]*reporting.Node, error) {
+func (a *Reporting) getAllNodes(ctx context.Context, jobId string, end_time string) ([]*reporting.Node, error) {
 	var nodesList []*reporting.Node
 	var pageNum int32 = 1
 	for {
@@ -230,8 +240,10 @@ func (a *Reporting) getAllNodes(ctx context.Context, jobId string) ([]*reporting
 			Page:    pageNum,
 			Filters: []*reporting.ListFilter{
 				{Type: "job_id", Values: []string{jobId}},
+				{Type: "end_time", Values: []string{end_time}},
 			},
 		})
+
 		if err != nil {
 			return nil, err
 		}
