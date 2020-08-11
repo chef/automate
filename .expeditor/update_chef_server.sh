@@ -11,6 +11,7 @@ set -eo pipefail
 
 CHANNEL=${1:-stable}
 NO_GIT=${NO_GIT:-false}
+SED=${SED:-sed}
 
 if [[ "$NO_GIT" != "true" ]]; then
     branch="expeditor/bump-chef-server"
@@ -50,11 +51,11 @@ for i in "${!file_for_pkg[@]}"; do
     file_to_update="${file_for_pkg[$i]}"
 
     echo "Updating pin for $package_name in $file_to_update pins to $new_ident"
-    sed -i -r "s|$package_name/[0-9]+(\\.[0-9]+){2,3}/[0-9]{14}|${new_ident#chef/}|" "$file_to_update"
+    $SED -i -r "s|$package_name/[0-9]+(\\.[0-9]+){2,3}/[0-9]{14}|${new_ident#chef/}|" "$file_to_update"
 
     if [[ "$package_name" != "openresty-noroot" ]]; then
         echo "Updating pkg_version in $file_to_update pins to $build"
-        sed -i -r "s|pkg_version=\".*\"|pkg_version=\"$build\"|" "$file_to_update"
+        $SED -i -r "s|pkg_version=\".*\"|pkg_version=\"$build\"|" "$file_to_update"
     fi
 done
 
