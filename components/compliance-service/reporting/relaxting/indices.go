@@ -51,39 +51,41 @@ func now() time.Time {
 }
 
 //IndexDates takes a start time and end time, both as strings,  formatted as RFC3339 UTC, and returns a comma separated list of strings, each of which is an ES index wildcard.
-func IndexDates(prefix string, startTimeAsStringRFC3338 string, endTimeAsStringRFC3338 string) (indices string, err error) {
+func IndexDates(prefix string, startTimeAsStringRFC3339 string, endTimeAsStringRFC3339 string) (indices string, err error) {
 	var startTime, endTime time.Time
 
-	if len(startTimeAsStringRFC3338) == 0 {
-		startTime = time.Date(2017, time.January, 1, 0, 0, 0, 0, time.UTC)
+	if len(startTimeAsStringRFC3339) == 0 {
+		err = errors.New("start_time must be defined")
+		logrus.Error(err)
+		return indices, err
 	} else {
-		startTime, err = time.Parse(time.RFC3339, startTimeAsStringRFC3338)
+		startTime, err = time.Parse(time.RFC3339, startTimeAsStringRFC3339)
 		if err != nil {
 			logrus.Error(err)
-			err = errors.New(fmt.Sprintf(TimeParseError, "startTime", startTimeAsStringRFC3338))
+			err = errors.New(fmt.Sprintf(TimeParseError, "startTime", startTimeAsStringRFC3339))
 			return indices, err
 		}
 	}
 
-	if len(endTimeAsStringRFC3338) == 0 {
+	if len(endTimeAsStringRFC3339) == 0 {
 		endTime = now().UTC()
 	} else {
-		endTime, err = time.Parse(time.RFC3339, endTimeAsStringRFC3338)
+		endTime, err = time.Parse(time.RFC3339, endTimeAsStringRFC3339)
 		if err != nil {
 			logrus.Error(err)
-			err = errors.New(fmt.Sprintf(TimeParseError, "endTime", endTimeAsStringRFC3338))
+			err = errors.New(fmt.Sprintf(TimeParseError, "endTime", endTimeAsStringRFC3339))
 			return indices, err
 		}
 	}
 
-	logrus.Debugf("startTime: %s endTime: %s", startTime, endTime)
+	//logrus.Debugf("startTime: %s endTime: %s", startTime, endTime)
 	if startTime.After(endTime) {
 		err = errors.New(StartDateGreaterThanEndDateErrMsg)
 		return indices, err
 	}
 	indicesYears, straddleYears, _ := wholeCalendarYears(prefix, startTime, endTime)
 	indices += indicesYears
-	logrus.Debugf("indices years %s", indices)
+	//logrus.Debugf("indices years %s", indices)
 
 	indices = appendIndices(indices, processYearsStraddle(prefix, straddleYears.left))
 	indices = appendIndices(indices, processYearsStraddle(prefix, straddleYears.right))
@@ -93,7 +95,7 @@ func IndexDates(prefix string, startTimeAsStringRFC3338 string, endTimeAsStringR
 
 func processYearsStraddle(prefix string, dateRange *DateRange) (indices string) {
 	if dateRange != nil {
-		logrus.Debugf("processYearsStraddle with startTime: %s endTime: %s", dateRange.StartTime, dateRange.EndTime)
+		//logrus.Debugf("processYearsStraddle with startTime: %s endTime: %s", dateRange.StartTime, dateRange.EndTime)
 		indicesMonths, straddleMonths, _ := wholeCalendarMonths(prefix, dateRange.StartTime, dateRange.EndTime)
 		if len(indicesMonths) > 0 {
 			indices = appendIndices(indices, indicesMonths)
@@ -155,7 +157,7 @@ func wholeCalendarMonths(prefix string, startTime time.Time, endTime time.Time) 
 	endOfStartMonth := time.Date(startTime.Year(), startTime.Month(), daysIn(startTime.Month(), startTime.Year()),
 		0, 0, 0, 0, time.UTC)
 
-	logrus.Debugf("wholeCalendarMonths with startTime: %s endTime: %s endOfStartMonth %s", startTime, endTime, endOfStartMonth)
+	//logrus.Debugf("wholeCalendarMonths with startTime: %s endTime: %s endOfStartMonth %s", startTime, endTime, endOfStartMonth)
 
 	firstWholeCalMonth := startTime.Month()
 	if !(startTime.Day() == 1 && (endTime.Equal(endOfStartMonth) || endTime.After(endOfStartMonth))) {
@@ -194,7 +196,7 @@ func wholeCalendarMonths(prefix string, startTime time.Time, endTime time.Time) 
 func ones(prefix string, startTime time.Time, endTime time.Time, indexFormat string) (indices string) {
 	if startTime.Day() == 1 && endTime.Day() >= 9 {
 		indices = appendIndices(indices, fmt.Sprintf(indexFormat+".0*", prefix, startTime.Year(), int(startTime.Month())))
-		logrus.Debugf("ones (all): %s", indices)
+		//logrus.Debugf("ones (all): %s", indices)
 		return indices
 	}
 
@@ -209,7 +211,7 @@ func ones(prefix string, startTime time.Time, endTime time.Time, indexFormat str
 			indices = appendIndices(indices, fmt.Sprintf(indexFormat+".0%d*", prefix, startTime.Year(), int(startTime.Month()), i))
 		}
 	}
-	logrus.Debugf("ones (some): %s", indices)
+	//logrus.Debugf("ones (some): %s", indices)
 
 	return indices
 }
@@ -220,8 +222,7 @@ func tens(prefix string, startTime time.Time, endTime time.Time, indexFormat str
 
 	if startTime.Day() <= startRange && endTime.Day() >= endRange {
 		indices = appendIndices(indices, fmt.Sprintf(indexFormat+".1*", prefix, startTime.Year(), int(startTime.Month())))
-		logrus.Debugf("tens (all): %s", indices)
-
+		//logrus.Debugf("tens (all): %s", indices)
 		return indices
 	}
 
@@ -238,7 +239,7 @@ func tens(prefix string, startTime time.Time, endTime time.Time, indexFormat str
 		}
 	}
 
-	logrus.Debugf("tens (some): %s", indices)
+	//logrus.Debugf("tens (some): %s", indices)
 	return indices
 }
 
@@ -256,7 +257,7 @@ func twenties(prefix string, startTime time.Time, endTime time.Time, indexFormat
 
 	if startTime.Day() <= startRange && endTime.Day() >= endRange {
 		indices = appendIndices(indices, fmt.Sprintf(indexFormat+".2*", prefix, startTime.Year(), int(startTime.Month())))
-		logrus.Debugf("twenties (all): %s", indices)
+		//logrus.Debugf("twenties (all): %s", indices)
 		return indices
 	}
 
@@ -272,7 +273,7 @@ func twenties(prefix string, startTime time.Time, endTime time.Time, indexFormat
 			indices = appendIndices(indices, fmt.Sprintf(indexFormat+".%d*", prefix, startTime.Year(), int(startTime.Month()), i))
 		}
 	}
-	logrus.Debugf("twenties (some): %s", indices)
+	//logrus.Debugf("twenties (some): %s", indices)
 	return indices
 }
 
@@ -280,10 +281,10 @@ func thirties(prefix string, startTime time.Time, endTime time.Time, indexFormat
 	startRange := 30
 	endRange := 31
 
-	logrus.Debugf("starttime: %s, endtime: %s", startTime, endTime)
+	//logrus.Debugf("starttime: %s, endtime: %s", startTime, endTime)
 	if startTime.Day() <= startRange && endTime.Day() >= endRange {
 		indices = appendIndices(indices, fmt.Sprintf(indexFormat+".3*", prefix, startTime.Year(), int(startTime.Month())))
-		logrus.Debugf("thirties (all): %s", indices)
+		//logrus.Debugf("thirties (all): %s", indices)
 		return indices
 	}
 
@@ -299,7 +300,7 @@ func thirties(prefix string, startTime time.Time, endTime time.Time, indexFormat
 			indices = appendIndices(indices, fmt.Sprintf(indexFormat+".%d*", prefix, startTime.Year(), int(startTime.Month()), i))
 		}
 	}
-	logrus.Debugf("thirties (some): %s", indices)
+	//logrus.Debugf("thirties (some): %s", indices)
 	return indices
 }
 
@@ -315,7 +316,7 @@ func restOfDays(prefix string, startTime time.Time, endTime time.Time) (indices 
 		indexFormat = "%s%d.%d"
 	}
 
-	logrus.Debugf("starttime: %s, endtime: %s", startTime, endTime)
+	//logrus.Debugf("starttime: %s, endtime: %s", startTime, endTime)
 
 	indices = appendIndices(indices, ones(prefix, startTime, endTime, indexFormat))
 	indices = appendIndices(indices, tens(prefix, startTime, endTime, indexFormat))

@@ -234,6 +234,11 @@ func (backend *ESClient) GetProfilesMissingMetadata(profileIDs []string) (map[st
 func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, endTime time.Time, data *relaxting.ESInSpecSummary) error {
 	mapping := mappings.ComplianceSumDate
 	index := mapping.IndexTimeseriesFmt(endTime)
+	data.DayLatest = false
+	if endTime.After(time.Now().Add(-24 * time.Hour)) {
+		// Only setting day_latest to true if it's end_time is withing the last day (24 hours)
+		data.DayLatest = true
+	}
 	data.DailyLatest = true
 	data.ReportID = id
 	// Add the summary document to the compliance timeseries index using the specified report id as document id
@@ -248,6 +253,12 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 		return errors.Wrap(err, "InsertInspecSummary")
 	}
 
+	if data.DayLatest {
+		err = backend.setDayLatestToFalse(ctx, data.NodeID, id, mapping)
+		if err != nil {
+			return err
+		}
+	}
 	return backend.setDailyLatestToFalse(ctx, data.NodeID, id, index)
 }
 
@@ -255,6 +266,10 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	docType := mappings.DocType
 	mapping := mappings.ComplianceRepDate
 	index := mapping.IndexTimeseriesFmt(endTime)
+	data.DayLatest = false
+	if endTime.After(time.Now().Add(-24 * time.Hour)) {
+		data.DayLatest = true
+	}
 	data.DailyLatest = true
 	data.ReportID = id
 	// Add the report document to the compliance timeseries index using the specified report id as document id
@@ -269,6 +284,12 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 		return errors.Wrap(err, "InsertInspecReport")
 	}
 
+	if data.DayLatest {
+		err = backend.setDayLatestToFalse(ctx, data.NodeID, id, mapping)
+		if err != nil {
+			return err
+		}
+	}
 	return backend.setDailyLatestToFalse(ctx, data.NodeID, id, index)
 }
 
@@ -284,6 +305,38 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 	return err
 }
 
+// Sets the 'day_latest' field to 'false' for all reports (except <reportId>) of node <nodeId> in two ES indices
+// setDayLatestToFalse targets two ES daily UTC indices to cover the last 24 hours
+func (backend *ESClient) setDayLatestToFalse(ctx context.Context, nodeId string, reportId string, mapping mappings.Mapping) error {
+	termQueryDayLatestTrue := elastic.NewTermQuery("day_latest", true)
+	termQueryThisNode := elastic.NewTermsQuery("node_uuid", nodeId)
+	termQueryNotThisReport := elastic.NewTermsQuery("_id", reportId)
+
+	boolQueryDayLatestThisNodeNotThisReport := elastic.NewBoolQuery().
+		Must(termQueryDayLatestTrue).
+		Must(termQueryThisNode).
+		MustNot(termQueryNotThisReport)
+
+	script := elastic.NewScript("ctx._source.day_latest = false")
+
+	indexNow := mapping.IndexTimeseriesFmt(time.Now()) + "*"
+	oneDayAgo := time.Now().Add(-24 * time.Hour)
+	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo) + "*"
+	indices := []string{indexOneDayAgo, indexNow}
+
+	// TODO: Refresh set to false prevented the setDailyLatestToFalse to work
+	_, err := elastic.NewUpdateByQueryService(backend.client).
+		Index(indices...).
+		Query(boolQueryDayLatestThisNodeNotThisReport).
+		Script(script).
+		Refresh("true").
+		Do(ctx)
+
+	return errors.Wrap(err, "setDayLatestToFalse")
+}
+
+// Sets the 'daily_latest' field to 'false' for all reports (except <reportId>) of node <nodeId> in ES index <index>
+// setDailyLatestToFalse targets only one ES daily UTC index
 func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId string, reportId string, index string) error {
 	termQueryDailyLatestTrue := elastic.NewTermQuery("daily_latest", true)
 	termQueryThisNode := elastic.NewTermsQuery("node_uuid", nodeId)

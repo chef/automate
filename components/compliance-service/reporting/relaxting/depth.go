@@ -68,14 +68,14 @@ type Depth interface {
 		searchResult *elastic.SearchResult) (map[string]*stats.Trend, error)
 }
 
-func (backend ES2Backend) NewDepth(filters map[string][]string, useStartTime bool, latestOnly bool) (Depth, error) {
+func (backend ES2Backend) NewDepth(filters map[string][]string, latestOnly bool) (Depth, error) {
 	client, err := backend.ES2Client()
 	if err != nil {
 		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
 		return nil, err
 	}
 
-	esIndex, err := GetEsIndex(filters, false, useStartTime)
+	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, "GetLevelStats")
 	}

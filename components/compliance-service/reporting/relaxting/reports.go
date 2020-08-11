@@ -223,14 +223,14 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 	sortField string, sortAsc bool) ([]*reportingapi.Report, int64, error) {
 	myName := "GetReports"
 
-	depth, err := backend.NewDepth(filters, true, false)
+	depth, err := backend.NewDepth(filters, false)
 	if err != nil {
 		return nil, 0, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
 
 	queryInfo := depth.getQueryInfo()
 
-	logrus.Debugf("%s will retrieve all nodes", myName)
+	logrus.Debugf("%s will retrieve all reports in a given timeframe with filters %+v", myName, filters)
 
 	client, err := backend.ES2Client()
 
@@ -331,14 +331,12 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 }
 
 // GetReport returns the information about a single report
-func (backend *ES2Backend) GetReport(reportId string,
-	filters map[string][]string) (*reportingapi.Report, error) {
-	myName := "GetReport"
+func (backend *ES2Backend) GetReport(reportId string, filters map[string][]string) (*reportingapi.Report, error) {
 	var report *reportingapi.Report
 
-	depth, err := backend.NewDepth(filters, true, false)
+	depth, err := backend.NewDepth(filters, false)
 	if err != nil {
-		return report, errors.Wrapf(err, "%s unable to get depth level for report", myName)
+		return report, errors.Wrap(err, "GetReport unable to get depth level for report")
 	}
 
 	queryInfo := depth.getQueryInfo()
@@ -348,7 +346,7 @@ func (backend *ES2Backend) GetReport(reportId string,
 	// information about the report being retrieved.
 	queryInfo.filtQuery = backend.getFiltersQueryForDeepReport(reportId, filters)
 
-	logrus.Debugf("%s will retrieve all nodes", myName)
+	logrus.Debugf("GetReport will retrieve report %s based on filters %+v", reportId, filters)
 
 	fsc := elastic.NewFetchSourceContext(true)
 
@@ -364,9 +362,9 @@ func (backend *ES2Backend) GetReport(reportId string,
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return report, errors.Wrapf(err, "%s unable to get Source", myName)
+		return report, errors.Wrap(err, "GetReport unable to get Source")
 	}
-	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query searchSource", myName))
+	LogQueryPartMin(queryInfo.esIndex, source, "GetReport query searchSource")
 
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
@@ -380,10 +378,10 @@ func (backend *ES2Backend) GetReport(reportId string,
 		Do(context.Background())
 
 	if err != nil {
-		return report, errors.Wrapf(err, "%s unable to complete search", myName)
+		return report, errors.Wrap(err, "GetReport unable to complete search")
 	}
 
-	logrus.Debugf("%s got %d reports in %d milliseconds\n", myName, searchResult.TotalHits(),
+	logrus.Debugf("GetReport got %d reports in %d milliseconds\n", searchResult.TotalHits(),
 		searchResult.TookInMillis)
 
 	// we should only receive one value
@@ -396,7 +394,7 @@ func (backend *ES2Backend) GetReport(reportId string,
 					//TODO: FIX Unmarshal error(json: cannot unmarshal array into Go struct field
 					// ESInSpecReportControl.results) and move the read all profiles section here
 				} else {
-					logrus.Errorf("%s unmarshal error: %s", myName, err.Error())
+					logrus.Errorf("GetReport unmarshal error: %s", err.Error())
 				}
 
 				var esInspecProfiles []ESInSpecReportProfile //`json:"profiles"`
@@ -409,7 +407,7 @@ func (backend *ES2Backend) GetReport(reportId string,
 					esInspecProfiles, status, err = getDeepInspecProfiles(hit, queryInfo)
 					if err != nil {
 						//todo - handle this
-						logrus.Errorf("%s time error: %s", myName, err.Error())
+						logrus.Errorf("GetReport time error: %s", err.Error())
 					}
 				}
 				esInSpecReport.Status = status
@@ -420,8 +418,8 @@ func (backend *ES2Backend) GetReport(reportId string,
 					logrus.Debugf("Determine profile: %s", esInSpecReportProfileMin.Name)
 					esInSpecProfile, err := backend.GetProfile(esInSpecReportProfileMin.SHA256)
 					if err != nil {
-						logrus.Errorf("%s - Could not get profile '%s' error: %s", myName, esInSpecReportProfileMin.SHA256, err.Error())
-						logrus.Debugf("%s - Making the most from the profile information in esInSpecReportProfileMin", myName)
+						logrus.Errorf("GetReport - Could not get profile '%s' error: %s", esInSpecReportProfileMin.SHA256, err.Error())
+						logrus.Debug("GetReport - Making the most from the profile information in esInSpecReportProfileMin")
 						esInSpecProfile.Name = esInSpecReportProfileMin.Name
 						esInSpecProfile.Title = esInSpecReportProfileMin.Title
 						esInSpecProfile.Version = esInSpecReportProfileMin.Version
@@ -697,9 +695,9 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		return nil, err
 	}
 
-	// we need to use start_time or else we won't see all of the controls that were used outside of end_time day
-	// we use start_time for the same reason we need it for trends
-	esIndex, err := GetEsIndex(filters, false, false)
+	// Only end_time matters for this call
+	filters["start_time"] = []string{}
+	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
 	}
@@ -1061,6 +1059,7 @@ func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationB
 //  return *elastic.BoolQuery
 func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnly bool) *elastic.BoolQuery {
 	utils.DeDupFilters(filters)
+	logrus.Debugf("????? Called getFiltersQuery with filters=%+v, latestOnly=%t", filters, latestOnly)
 
 	typeQuery := elastic.NewTypeQuery(mappings.DocType)
 
@@ -1153,10 +1152,26 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	if len(filters["job_id"]) > 0 {
 		termQuery := elastic.NewTermsQuery("job_uuid", stringArrayToInterfaceArray(filters["job_id"])...)
 		boolQuery = boolQuery.Must(termQuery)
-	} else if latestOnly {
-		//only if there is no job_id filter set, do we want the daily latest
-		termQuery := elastic.NewTermsQuery("daily_latest", true)
-		boolQuery = boolQuery.Must(termQuery)
+	}
+
+	if latestOnly {
+		// only if there is no job_id filter set, do we want the daily latest
+		if len(filters["end_time"]) > 0 {
+			// If we have an end_time filter, we use the daily_latest filter dedicated to the UTC timeseries indices
+			termQuery := elastic.NewTermsQuery("daily_latest", true)
+			boolQuery = boolQuery.Must(termQuery)
+		} else {
+			// If we don't have an end_time filter, we use the day_latest filter
+			termQuery := elastic.NewTermsQuery("day_latest", true)
+			boolQuery = boolQuery.Must(termQuery)
+		}
+	}
+
+	if len(filters["end_time"]) == 0 {
+		// If we don't have an end_time filter, we limit to last 24 hours timeframe
+		timeRangeQuery := elastic.NewRangeQuery("end_time")
+		timeRangeQuery.Gt(time.Now().Add(-24 * time.Hour).UTC().Format(time.RFC3339))
+		boolQuery = boolQuery.Must(timeRangeQuery)
 	}
 
 	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'

@@ -8,28 +8,46 @@ if !ENV['NO_STATS_TREND_TESTS']
   describe File.basename(__FILE__) do
     Stats = Chef::Automate::Domain::Compliance::Stats unless defined?(Stats)
     def stats ; Stats::StatsService ; end
+    END_OF_DAY="23:59:59Z"
 
-    it "works" do
-      ##### Failure tests #####
+    it "read_trend nodes returns error for missing or invalid end_time filter" do
       assert_grpc_error("Required filter 'end_time' must be a date with format: 'YYYY-MM-DDThh:mm:ss+|-hh:mm'", 3) do
         actual_data = GRPC stats, :read_trend, Stats::Query.new(type: "nodes")
       end
+    end
+
+    it "read_trend nodes returns error when interval is less then one hour" do
       assert_grpc_error("Minimum value for 'interval' is 3600(one hour)", 3) do
         actual_data = GRPC stats, :read_trend, Stats::Query.new(type: "nodes", interval: 1)
       end
+    end
 
+    it "read_trend controls returns error for missing or invalid end_time filter" do
       assert_grpc_error("Required filter 'end_time' must be a date with format: 'YYYY-MM-DDThh:mm:ss+|-hh:mm'", 3) do
         actual_data = GRPC stats, :read_trend, Stats::Query.new(type: "controls")
       end
+    end
+
+    it "read_trend controls returns error when interval is less then one hour" do
       assert_grpc_error("Minimum value for 'interval' is 3600(one hour)", 3) do
         actual_data = GRPC stats, :read_trend, Stats::Query.new(type: "controls", interval: 1)
       end
+    end
 
-      END_OF_DAY="23:59:59Z"
-      ##### Success tests #####
-      # The whole enchilada. For nodes
-      # Filter: none
-      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and 3/5 and zeroes in between.
+    it "read_trend nodes returns error when start_time if newer than end_time" do
+      assert_grpc_error("bad date range. end date must be greater than or equal to start date", 2) do
+        GRPC stats, :read_trend, Stats::Query.new(
+            type: "nodes",
+            interval: 86400,
+            filters: [
+                Stats::ListFilter.new(type: "start_time", values: ['2018-03-08T00:00:00Z']),
+                Stats::ListFilter.new(type: "end_time", values: ["2018-03-06T#{END_OF_DAY}"])
+            ]
+        )
+      end
+    end
+
+    it "read_trend nodes returns trend data for the whole enchilada" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "nodes",
           interval: 86400,
@@ -38,7 +56,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "end_time", values: ["2018-03-06T#{END_OF_DAY}"])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
@@ -57,10 +74,9 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      # The whole enchilada. for controls
-      # Filter: none
-      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and 3/5 and zeroes in between.
+    it "read_trend controls returns trend data for the whole enchilada" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "controls",
           interval: 86400,
@@ -69,7 +85,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "end_time", values: ["2018-03-06T#{END_OF_DAY}"])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
@@ -88,10 +103,9 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      # The whole range. For nodes
-      # Filter: environment="DevSec Prod Zeta"
-      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and 3/5 and zeroes in between.
+    it "read_trend nodes with environment filter" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "nodes",
           interval: 86400,
@@ -119,11 +133,10 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-
-      # The whole range. For nodes
+    it "read_trend nodes with control tag filter" do
       # Filter: control tag with key 'web'
-      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and zeroes in between.
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "nodes",
           interval: 86400,
@@ -133,7 +146,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: 'control_tag:web', values: [])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
         "trends":[
           {"reportTime":"2018-02-09T23:59:59Z", "failed":1},
@@ -164,8 +176,9 @@ if !ENV['NO_STATS_TREND_TESTS']
         ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      # Nodes trend for the special April month
+    it "read_trend nodes for the special April month" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
         type: "nodes",
         interval: 86400,
@@ -198,8 +211,9 @@ if !ENV['NO_STATS_TREND_TESTS']
         ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      # Nodes trend for the special April month skipped profile deep
+    it "read_trend nodes for the special April month skipped profile deep" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
         type: "nodes",
         interval: 86400,
@@ -230,8 +244,9 @@ if !ENV['NO_STATS_TREND_TESTS']
         ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      # Controls trend for the special April month
+    it "read_trend controls for the special April month" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
         type: "controls",
         interval: 86400,
@@ -263,10 +278,9 @@ if !ENV['NO_STATS_TREND_TESTS']
         ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      # The whole range. for controls
-      # Filter: environment="DevSec Prod Zeta"
-      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and 3/5 and zeroes in between.
+    it "read_trend controls with environment filter" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "controls",
           interval: 86400,
@@ -276,7 +290,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "environment", values: ['DevSec Prod Zeta'])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
@@ -295,10 +308,9 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      # The whole range. For nodes
-      # Filter: environment="DevSec Prod Zeta" roles="base_windows"
-      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and 3/5 and zeroes in between.
+    it "read_trend nodes with environment and role filters" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "nodes",
           interval: 86400,
@@ -309,7 +321,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "role", values: ['base_windows'])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},{"reportTime" => "2018-02-09T23:59:59Z"},{"reportTime" => "2018-02-10T23:59:59Z"},
@@ -325,10 +336,9 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      # The whole range. for controls
-      # Filter: environment="DevSec Prod Zeta" roles="base_windows"
-      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and 3/5 and zeroes in between.
+    it "read_trend controls with environment and role filters" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "controls",
           interval: 86400,
@@ -339,7 +349,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "role", values: ['base_windows'])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},{"reportTime" => "2018-02-09T23:59:59Z"},{"reportTime" => "2018-02-10T23:59:59Z"},
@@ -355,10 +364,9 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      # The whole range. For nodes
-      # Filter: environment="DevSec Prod Zeta" roles="base_windows"
-      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and 3/5 and zeroes in between.
+    it "read_trend nodes with environment and non-existent role filters" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "nodes",
           interval: 86400,
@@ -369,7 +377,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "role", values: ['some non-existent role'])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},{"reportTime" => "2018-02-09T23:59:59Z"},{"reportTime" => "2018-02-10T23:59:59Z"},
@@ -384,10 +391,9 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      # The whole range. for controls
-      # Filter: environment="DevSec Prod Zeta" roles="base_windows"
-      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and 3/5 and zeroes in between.
+    it "read_trend controls with environment and non-existent role filters" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "controls",
           interval: 86400,
@@ -398,7 +404,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "role", values: ['some non-existent role'])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},{"reportTime" => "2018-02-09T23:59:59Z"},{"reportTime" => "2018-02-10T23:59:59Z"},
@@ -413,12 +418,9 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      ##### Deep filtering tests #####
-
-      # The whole range. For nodes
-      # Filter: environment="DevSec Prod Zeta" roles="base_windows"
-      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and 3/5 and zeroes in between.
+    it "read_trend nodes deep filtered by profile_id and environment" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "nodes",
           interval: 86400,
@@ -429,7 +431,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "profile_id", values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
@@ -447,10 +448,9 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
-      # The whole range. for controls
-      # Filter: environment="DevSec Prod Zeta" roles="base_windows"
-      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and 3/5 and zeroes in between.
+    it "read_trend controls deep filtered by profile_id and environment" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "controls",
           interval: 86400,
@@ -461,7 +461,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "profile_id", values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8'])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
@@ -479,7 +478,9 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
+    it "read_trend controls deep filtered by profile_id and control" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "controls",
           interval: 86400,
@@ -491,7 +492,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "profile_id", values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8'])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
@@ -509,7 +509,9 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
+    it "read_trend controls deep filtered by profile_id and another control" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "controls",
           interval: 86400,
@@ -521,7 +523,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "profile_id", values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8'])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
@@ -539,7 +540,9 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
+    it "read_trend controls deep filtered by profile_id and yet another control" do
       actual_data = GRPC stats, :read_trend, Stats::Query.new(
           type: "controls",
           interval: 86400,
@@ -551,7 +554,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "profile_id", values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8'])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
@@ -569,19 +571,6 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
-
-      ##### Failure tests #####
-      # StartDate>EndDate. For nodes
-      assert_grpc_error("bad date range. end date must be greater than or equal to start date", 2) do
-        GRPC stats, :read_trend, Stats::Query.new(
-            type: "nodes",
-            interval: 86400,
-            filters: [
-                Stats::ListFilter.new(type: "start_time", values: ['2018-03-08T00:00:00Z']),
-                Stats::ListFilter.new(type: "end_time", values: ["2018-03-06T#{END_OF_DAY}"])
-            ]
-        )
-      end
     end
   end
 end

@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/sirupsen/logrus"
 )
 
 func TestIndexDatesBadRange(t *testing.T) {

@@ -85,6 +85,7 @@ dev/secrets-env.sh
 dev/license.jwt
 components/automate-deployment/a1-migration/delivery.license
 components/automate-deployment/basic-a1/delivery.license
+external/secrets/secrets_*
 
 backups
 

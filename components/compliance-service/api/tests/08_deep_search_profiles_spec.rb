@@ -4,23 +4,20 @@ require 'interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
   Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)
-
   def reporting;
     Reporting::ReportingService;
   end
+  END_OF_DAY = "23:59:59Z"
 
-  it "works" do
-    ##### Failure tests #####
+  it "errors with wrong sort param" do
     message = "Parameter 'sort' only supports one of the following fields: [name title]"
     assert_grpc_error(message, 3) do
       actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(sort: 'something')
     end
+  end
 
 
-    END_OF_DAY = "23:59:59Z"
-
-
-    # Test filter by profile_id, one node back  CONTROL!
+  it "list_nodes deep with profile and control filter" do
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988']),
         Reporting::ListFilter.new(type: "control", values: ["nginx-04"]),
@@ -209,16 +206,18 @@ describe File.basename(__FILE__) do
             "totalPassed"=>1
         }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+  end
 
 
-    #todo - this one is also in 08_search_profiles_spec.. it's in here because it has profile id in filter, making it deep
-    # Filter by profile_id
+  it "list_profiles deep with profile filter on 2018-03-04" do
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
-        filters: [
-            Reporting::ListFilter.new(type: "end_time", values: ["2018-03-04T#{END_OF_DAY}"]),
-            Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'])
-        ],
-        page: 1, per_page: 2)
+      filters: [
+        Reporting::ListFilter.new(type: "end_time", values: ["2018-03-04T#{END_OF_DAY}"]),
+        Reporting::ListFilter.new(type: 'profile_id', values: ['41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'])
+      ],
+      page: 1,
+      per_page: 2
+    )
     expected_data = {
         "profiles" => [
             {
@@ -235,38 +234,44 @@ describe File.basename(__FILE__) do
         }
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
 
-    # Filter by node_id and profile_id where profile ran on node
-    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
+  it "list_profiles deep with profile and node filter" do
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'node_id', values: ['9b9f4e51-b049-4b10-9555-10578916e149']),
         Reporting::ListFilter.new(type: 'profile_id', values: ['09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988']),
         Reporting::ListFilter.new(type: "end_time", values: ["2018-03-04T#{END_OF_DAY}"]),
-    ])
+      ]
+    )
     expected_data = {
-        "profiles" => [
-            {
-                "name" => "nginx-baseline",
-                "title" => "DevSec Nginx Baseline",
-                "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
-                "version" => "2.1.0",
-                "status" => "passed"
-            }
-        ],
-        "counts" => {
-            "total" => 1,
-            "passed" => 1
+      "profiles" => [
+        {
+          "name" => "nginx-baseline",
+          "title" => "DevSec Nginx Baseline",
+          "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+          "version" => "2.1.0",
+          "status" => "passed"
         }
+      ],
+      "counts" => {
+        "total" => 1,
+        "passed" => 1
+      }
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
 
-    # Filter by environment and profile_id where profile ran in environment
-    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
+  it "list_profiles deep with profile and environment filter" do
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'environment', values: ['DevSec Prod Zeta']),
         Reporting::ListFilter.new(type: 'profile_id', values: ['b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015']),
         Reporting::ListFilter.new(type: "end_time", values: ["2018-02-09T#{END_OF_DAY}"])
-    ])
+      ]
+    )
     expected_data = {
         "profiles" => [
             {
@@ -283,9 +288,10 @@ describe File.basename(__FILE__) do
         }
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
 
-    # Filter by platform and profile_id where profile ran on nodes on platform
+  it "list_profiles deep by platform and profile_id where profile ran on nodes on platform" do
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'platform', values: ['centos']),
         Reporting::ListFilter.new(type: 'profile_id', values: ['09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988']),
@@ -307,14 +313,20 @@ describe File.basename(__FILE__) do
         }
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
-    # Filter by platform and profile_id where profile ran on nodes on platform
-    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
+
+  it "list_profiles deep by platform and multiple profile_ids" do
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'platform', values: ['centos']),
-        Reporting::ListFilter.new(type: 'profile_id', values: ['09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988',
-                                                               '41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9']),
+        Reporting::ListFilter.new(type: 'profile_id', values:[
+          '09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988',
+          '41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9'
+        ]),
         Reporting::ListFilter.new(type: "end_time", values: ["2018-03-04T#{END_OF_DAY}"])
-    ])
+      ]
+    )
     expected_data = {
         "profiles" => [
             {
@@ -339,15 +351,18 @@ describe File.basename(__FILE__) do
         }
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
 
-    # Filter by platform and profile_id where profile ran on nodes on platform
-    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
+  it "list_profiles deep by platform and profile_id and control filters" do
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
+      filters: [
         Reporting::ListFilter.new(type: 'platform', values: ['centos']),
         Reporting::ListFilter.new(type: 'profile_id', values: ['09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988']),
         Reporting::ListFilter.new(type: "control", values: ["nginx-04"]),
         Reporting::ListFilter.new(type: "end_time", values: ["2018-03-04T#{END_OF_DAY}"])
-    ])
+      ]
+    )
     expected_data = {
         "profiles" =>
             [
@@ -363,15 +378,19 @@ describe File.basename(__FILE__) do
         }
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
-    # Filter by a waived profile_id, making it deep
+
+  it "list_profiles deep by environment and profile_id" do
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
-        filters: [
-          Reporting::ListFilter.new(type: 'environment', values: ['DevSec Prod Omega']),
-          Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5']),
-          Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
-        ],
-        page: 1, per_page: 2)
+      filters: [
+        Reporting::ListFilter.new(type: 'environment', values: ['DevSec Prod Omega']),
+        Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+      ],
+      page: 1,
+      per_page: 2
+    )
     expected_data = {
       "counts" => { "total" => 1, "waived" => 1 },
       "profiles" => [
@@ -385,15 +404,19 @@ describe File.basename(__FILE__) do
         ]
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
-    # Filter by a failed profile and a waived control, making it deep
+
+  it "list_profiles deep by profile_id and waived control id" do
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
-        filters: [
-          Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4']),
-          Reporting::ListFilter.new(type: "control", values: ["pro1-con2"]),
-          Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
-        ],
-        page: 1, per_page: 2)
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4']),
+        Reporting::ListFilter.new(type: "control", values: ["pro1-con2"]),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+      ],
+      page: 1,
+      per_page: 2
+    )
     expected_data = {
       "counts" => { "total" => 1, "waived" => 1 },
       "profiles" => [
@@ -407,15 +430,18 @@ describe File.basename(__FILE__) do
       ]
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
 
-    # Filter by a failed profile, making it deep
+  it "list_profiles deep by failed profile_id" do
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
-        filters: [
-          Reporting::ListFilter.new(type: 'profile_id', values: ['5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888']),
-          Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
-        ],
-        page: 1, per_page: 2)
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-02T23:59:59Z'])
+      ],
+      page: 1,
+      per_page: 2
+    )
     expected_data = {
       "counts" => {"failed" => 1, "total" => 1},
       "profiles" =>
@@ -426,15 +452,44 @@ describe File.basename(__FILE__) do
           "version" => "1.0.0"}]
       }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
-    # Filter by a missing profile, in the no profiles report
+
+  it "list_profiles deep by profile_id for a date containing a non profiles report" do
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
-        filters: [
-          Reporting::ListFilter.new(type: 'profile_id', values: ['5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888']),
-          Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
-        ],
-        page: 1, per_page: 2)
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-03T23:59:59Z'])
+      ],
+      page: 1,
+      per_page: 2
+    )
     expected_data = { "counts" => {} }.to_json
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
+
+
+  it "list_profiles deep by profile_id with no end_time filter, last 24h stuff" do
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
+      filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4'])
+      ]
+    )
+    expected_data = {
+      "counts"=>{
+        "passed"=>1,
+        "total"=>1
+      },
+      "profiles"=>[
+        {
+          "id"=>"447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+          "name"=>"myprofile1",
+          "status"=>"passed",
+          "title"=>"My Profile 1 title",
+          "version"=>"1.0.1"
+        }
+      ]
+    }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
   end
 end

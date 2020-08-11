@@ -14,7 +14,9 @@ import (
 //GetStatsSummary - Report #16
 func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.ReportSummary, error) {
 	myName := "GetStatsSummary"
-	depth, err := backend.NewDepth(filters, false, true)
+	// Only end_time matters for this call
+	filters["start_time"] = []string{}
+	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -53,7 +55,9 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 //GetStatsSummaryNodes - Gets summary stats, node centric, aggregate data for the given set of filters
 func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*stats.NodeSummary, error) {
 	myName := "GetStatsSummaryNodes"
-	depth, err := backend.NewDepth(filters, false, true)
+	// Only end_time matters for this call
+	filters["start_time"] = []string{}
+	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -93,7 +97,9 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (*stats.ControlsSummary, error) {
 	myName := "GetStatsSummaryControls"
 
-	depth, err := backend.NewDepth(filters, false, true)
+	// Only end_time matters for this call
+	filters["start_time"] = []string{}
+	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -143,7 +149,9 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 		}
 	}
 
-	depth, err := backend.NewDepth(filters, false, true)
+	// Only end_time matters for this call
+	filters["start_time"] = []string{}
+	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
 		return failures, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -189,7 +197,9 @@ func (backend ES2Backend) GetProfileListWithAggregatedComplianceSummaries(
 	filters map[string][]string, size int32) ([]*stats.ProfileList, error) {
 	myName := "GetProfileListWithAggregatedComplianceSummaries"
 
-	depth, err := backend.NewDepth(filters, false, true)
+	// Only end_time matters for this call
+	filters["start_time"] = []string{}
+	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -237,7 +247,9 @@ func (backend ES2Backend) GetControlListStatsByProfileID(profileID string, from 
 	// There should only be one profileID in the filters and it must be identical to the profileID being passed in.
 	filters["profile_id"] = []string{profileID}
 
-	depth, err := backend.NewDepth(filters, false, true)
+	// Only end_time matters for this call
+	filters["start_time"] = []string{}
+	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}

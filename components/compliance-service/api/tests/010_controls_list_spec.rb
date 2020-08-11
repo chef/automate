@@ -716,4 +716,197 @@ describe File.basename(__FILE__) do
     }
     assert_equal_json_content(expected_data, actual_data)
   end
+
+  it "control list items without time filters (last 24h search)" do
+    actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
+        filters: [],
+        size: 10
+    )
+    actual_data_hash = actual_data.to_h
+    actual_data_hash[:control_items].each { |c| c[:end_time] = 'SOMETIME_IN_THE_LAST_24H' }
+
+    expected_data = {
+      "control_items": [
+        {
+          "id": "pro1-con1",
+          "title": "Profile 1 - Control 1",
+          "profile": {
+            "name": "",
+            "title": "My Profile 1 title",
+            "id": "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+            "version": "1.0.1",
+            "status": ""
+          },
+          "impact": 0.800000011920929,
+          "end_time": "SOMETIME_IN_THE_LAST_24H",
+          "control_summary": {
+            "total": 1,
+            "passed": {
+              "total": 1
+            },
+            "skipped": {
+              "total": 0
+            },
+            "failed": {
+              "total": 0,
+              "minor": 0,
+              "major": 0,
+              "critical": 0
+            },
+            "waived": {
+              "total": 0
+            }
+          },
+          "waivers": []
+        },
+        {
+          "id": "pro1-con2",
+          "title": "Profile 1 - Control 2",
+          "profile": {
+            "name": "",
+            "title": "My Profile 1 title",
+            "id": "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+            "version": "1.0.1",
+            "status": ""
+          },
+          "impact": 0.8999999761581421,
+          "end_time": "SOMETIME_IN_THE_LAST_24H",
+          "control_summary": {
+            "total": 1,
+            "passed": {
+              "total": 0
+            },
+            "skipped": {
+              "total": 1
+            },
+            "failed": {
+              "total": 0,
+              "minor": 0,
+              "major": 0,
+              "critical": 0
+            },
+            "waived": {
+              "total": 0
+            }
+          },
+          "waivers": []
+        },
+        {
+          "id": "pro1-con3",
+          "title": "Profile 1 - Control 3",
+          "profile": {
+            "name": "",
+            "title": "My Profile 1 title",
+            "id": "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+            "version": "1.0.1",
+            "status": ""
+          },
+          "impact": 1.0,
+          "end_time": "SOMETIME_IN_THE_LAST_24H",
+          "control_summary": {
+            "total": 1,
+            "passed": {
+              "total": 1
+            },
+            "skipped": {
+              "total": 0
+            },
+            "failed": {
+              "total": 0,
+              "minor": 0,
+              "major": 0,
+              "critical": 0
+            },
+            "waived": {
+              "total": 0
+            }
+          },
+          "waivers": []
+        },
+        {
+          "id": "pro1-con4",
+          "title": "Profile 1 - Control 4",
+          "profile": {
+            "name": "",
+            "title": "My Profile 1 title",
+            "id": "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+            "version": "1.0.1",
+            "status": ""
+          },
+          "impact": 0.8999999761581421,
+          "end_time": "SOMETIME_IN_THE_LAST_24H",
+          "control_summary": {
+            "total": 1,
+            "passed": {
+              "total": 1
+            },
+            "skipped": {
+              "total": 0
+            },
+            "failed": {
+              "total": 0,
+              "minor": 0,
+              "major": 0,
+              "critical": 0
+            },
+            "waived": {
+              "total": 0
+            }
+          },
+          "waivers": []
+        },
+        {
+          "id": "pro1-con5",
+          "title": "Profile 1 - Control 5",
+          "profile": {
+            "name": "",
+            "title": "My Profile 1 title",
+            "id": "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+            "version": "1.0.1",
+            "status": ""
+          },
+          "impact": 0.8999999761581421,
+          "end_time": "SOMETIME_IN_THE_LAST_24H",
+          "control_summary": {
+            "total": 1,
+            "passed": {
+              "total": 1
+            },
+            "skipped": {
+              "total": 0
+            },
+            "failed": {
+              "total": 0,
+              "minor": 0,
+              "major": 0,
+              "critical": 0
+            },
+            "waived": {
+              "total": 0
+            }
+          },
+          "waivers": []
+        }
+      ],
+      "control_summary_totals": {
+        "total": 5,
+        "passed": {
+          "total": 4
+        },
+        "skipped": {
+          "total": 1
+        },
+        "failed": {
+          "total": 0,
+          "minor": 0,
+          "major": 0,
+          "critical": 0
+        },
+        "waived": {
+          "total": 0
+        }
+      }
+    }
+    assert_equal_json_content(expected_data, actual_data_hash)
+  end
 end
