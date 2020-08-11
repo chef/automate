@@ -44,7 +44,8 @@ help() {
   awk -F'### ' '/^###/{print $2}' "$0"
 }
 
-if [[ $# == 0 ]] || [[ "$1" == "-h" ]]; then
+# Sourced scripts cannot include the no-arg check here!
+if [[ "$1" == "-h" ]]; then
   help
   exit 1
 fi
