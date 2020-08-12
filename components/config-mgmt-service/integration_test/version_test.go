@@ -16,7 +16,7 @@ func TestVersionReturnsInfo(t *testing.T) {
 	expected := &response.VersionInfo{
 		Name:    "config-mgmt-service",
 		Version: "unknown",
-		SHA:     "unknown",
+		Sha:     "unknown",
 		Built:   "unknown",
 	}
 	res, err := cfgmgmt.GetVersion(ctx, req)
