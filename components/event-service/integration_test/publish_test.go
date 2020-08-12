@@ -41,58 +41,58 @@ func TestPublish(t *testing.T) {
 	require.NoErrorf(t, err, "Unable to translate time.Time %q to timestamp proto", publishedAt.UTC().String())
 
 	event := api.EventMsg{
-		EventID: uuid.Must(uuid.NewV4()).String(),
+		EventId: uuid.Must(uuid.NewV4()).String(),
 		Type:    &api.EventType{Name: config.ScanJobCreatedEventName},
 		Producer: &api.Producer{
-			ID:           "urn:chef:compliance:scan-component",
+			Id:           "urn:chef:compliance:scan-component",
 			ProducerName: "Scanner",
 			ProducerType: "system component",
 		},
 		Tags:      []string{"scanjobs", "create"},
 		Published: pub,
 		Actor: &api.Actor{
-			ID:          "urn:mycompany:user:fred",
+			Id:          "urn:mycompany:user:fred",
 			ObjectType:  "User",
 			DisplayName: "Fred",
 		},
 		Verb: "create",
 		Object: &api.Object{
-			ID:          uuid.Must(uuid.NewV4()).String(),
+			Id:          uuid.Must(uuid.NewV4()).String(),
 			ObjectType:  "scanjobs", // entity types are scanjobs, profile
 			DisplayName: "Scan Job",
 		},
 		Target: &api.Target{
-			ID:          "urn:mycompany:environment:production",
+			Id:          "urn:mycompany:environment:production",
 			ObjectType:  "Environment",
 			DisplayName: "Production",
 		},
 	}
 
 	fe := event_feed_api.FeedEntry{
-		ID:                   "unknown; assigned at feed entry creation time",
+		Id:                   "unknown; assigned at feed entry creation time",
 		EventType:            event.Type.Name,
 		FeedType:             "event",
 		Tags:                 event.Tags,
 		SourceEventPublished: pubTs,
 		Producer: &event_feed_api.Producer{
-			ID:         event.Producer.ID,
+			Id:         event.Producer.Id,
 			Name:       event.Producer.ProducerName,
 			ObjectType: event.Producer.ProducerType,
 			PTags:      event.Producer.Tags,
 		},
 		Actor: &event_feed_api.Actor{
-			ID:         event.Actor.ID,
+			Id:         event.Actor.Id,
 			Name:       event.Actor.DisplayName,
 			ObjectType: event.Actor.ObjectType,
 		},
 		Verb: event.Verb,
 		Object: &event_feed_api.Object{
-			ID:         event.Object.ID,
+			Id:         event.Object.Id,
 			Name:       event.Object.DisplayName,
 			ObjectType: event.Object.ObjectType,
 		},
 		Target: &event_feed_api.Target{
-			ID:         event.Target.ID,
+			Id:         event.Target.Id,
 			ObjectType: event.Object.ObjectType,
 			Name:       event.Target.DisplayName,
 		},
