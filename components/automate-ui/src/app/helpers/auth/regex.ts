@@ -16,7 +16,7 @@ export class Regex {
     // Legal Values: *, chef, _state, etc.
     // Illegal Values: abc*, *chef, c*h*e*f, **
 
-    // Allows no special characters except hyphen
+    // Allows no special characters except hyphen and underscore.
     NO_MIXED_WILDCARD_ALLOW_HYPHEN: '^(\\*|[-\\w]+)$',
 
     // Allows all special characters except colon :
