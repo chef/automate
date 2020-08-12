@@ -1550,6 +1550,7 @@ paths = [
   "vendor/github.com/codahale/hdrhistogram/*",
   "vendor/github.com/envoyproxy/protoc-gen-validate/*",
   "vendor/github.com/fsnotify/fsnotify/*",
+  "vendor/github.com/go-gorp/gorp/*",
   "vendor/github.com/gofrs/uuid/*",
   "vendor/github.com/golang-migrate/migrate/*",
   "vendor/github.com/golang/mock/*",

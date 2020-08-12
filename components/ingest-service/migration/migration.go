@@ -2,13 +2,21 @@ package migration
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
+
+	"github.com/go-gorp/gorp"
 
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
+)
+
+const (
+	selectLockCount   = "SELECT COUNT(*) FROM pg_locks WHERE locktype = 'advisory' AND objid = $1;"
+	PgMigrationLockID = 77
 )
 
 var (
@@ -36,9 +44,10 @@ type Status struct {
 	finished  bool
 	ctx       context.Context
 	client    backend.Client
+	mapper    *gorp.DbMap
 }
 
-func New(client backend.Client) *Status {
+func New(client backend.Client, postgresql *sql.DB) *Status {
 	return &Status{
 		total:     0,
 		completed: 0,
@@ -46,6 +55,7 @@ func New(client backend.Client) *Status {
 		finished:  false,
 		ctx:       context.Background(),
 		client:    client,
+		mapper:    &gorp.DbMap{Db: postgresql, Dialect: gorp.PostgresDialect{}},
 	}
 }
 
@@ -58,6 +68,13 @@ func New(client backend.Client) *Status {
 // For the migration framework we are always going to migrate from the current state to the current version.
 // This does cause a maintenance problem because for each new version the old migration stages need to be updated.
 func (ms *Status) Start() error {
+	err := ms.lock()
+	if err != nil {
+		ms.updateErr(err.Error(), "Unable to lock for migration")
+		return err
+	}
+	defer ms.unlock()
+
 	exists, err := ms.hasA1ElasticsearchData()
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to detect migration status")
@@ -182,6 +199,17 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 	return false, nil
 }
 
+// MigrationRunning - Is a migration currently running on another service.
+// This would only be the case if this service is running in a HA frontend.
+func (ms *Status) MigrationRunning() (bool, error) {
+	count, err := ms.mapper.WithContext(context.Background()).SelectInt(selectLockCount, PgMigrationLockID)
+	if err != nil {
+		return false, err
+	}
+
+	return count == 1, nil
+}
+
 // MarkUnneeded marks the migrations status to done
 func (ms *Status) MarkUnneeded() {
 	ms.status = "No migration is needed."
@@ -211,6 +239,28 @@ func (ms *Status) String() string {
 // Done reports when the migration is done or it is still in progress
 func (ms *Status) Done() bool {
 	return ms.finished
+}
+
+func (ms *Status) lock() error {
+	query := `SELECT pg_try_advisory_lock($1)`
+
+	wasLocked, err := ms.mapper.WithContext(context.Background()).SelectStr(query, PgMigrationLockID)
+	if err != nil {
+		return err
+	}
+	if wasLocked != "true" {
+		return fmt.Errorf("another process or system has the migration advisory lock %d", PgMigrationLockID)
+	}
+
+	return nil
+}
+
+func (ms *Status) unlock() error {
+	query := `SELECT pg_advisory_unlock($1)`
+	if _, err := ms.mapper.WithContext(context.Background()).Exec(query, PgMigrationLockID); err != nil {
+		return err
+	}
+	return nil
 }
 
 // update the migration status message (private)
