@@ -54,17 +54,17 @@ fi
 
 a2policies() {
   local user_and_teams=("$1")
-  local user_id=$(curl -sSkH "api-token: $TOK" "$TARGET_HOST/apis/iam/v2/users/$1" | jq -cr '.user.membership_id')
+  local user_id
+  user_id=$(curl -sSkH "api-token: $TOK" "$TARGET_HOST/apis/iam/v2/users/$1" | jq -cr '.user.membership_id')
   if [[ $user_id != "null" ]]; then
-    user_and_teams=(
-      "$1"
-      $(curl -sSkH "api-token: $TOK" "$TARGET_HOST/apis/iam/v2/users/$user_id/teams" | jq -r '.teams[] | .id')
-    )
+    teams=$(curl -sSkH "api-token: $TOK" "$TARGET_HOST/apis/iam/v2/users/$user_id/teams" | jq -r '.teams[] | .id')
+    # shellcheck disable=SC2206
+    user_and_teams=("$1" ${teams[@]}) 
   fi
   local resourceType="user"
-  for resource in ${user_and_teams[@]}
+  for resource in "${user_and_teams[@]}"
   do
-    echo Checking $resourceType:local:$resource...
+    printf "\nChecking %s:local:%s...\n" "$resourceType" "$resource"
     curl -sSkH "api-token: $TOK" -H "" "$TARGET_HOST/apis/iam/v2/policies" | \
       jq -cr --arg name "$resourceType:local:$resource" \
              --arg allLocal "$resourceType:local:*" \
@@ -83,7 +83,8 @@ a2userid() {
 
 # Works for local users only
 a2teams() {
-  local user_id=$(a2userid $1)
+  local user_id
+  user_id=$(a2userid "$1")
   curl -sSkH "api-token: $TOK" "$TARGET_HOST/apis/iam/v2/users/$user_id/teams" | jq -r '.teams[] | .id'
 }
 
