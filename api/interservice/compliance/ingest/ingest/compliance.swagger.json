@@ -507,13 +507,13 @@
     "chef.automate.domain.event.api.Actor": {
       "type": "object",
       "properties": {
-        "ID": {
+        "id": {
           "type": "string"
         },
-        "ObjectType": {
+        "object_type": {
           "type": "string"
         },
-        "DisplayName": {
+        "display_name": {
           "type": "string"
         }
       }
@@ -521,7 +521,7 @@
     "chef.automate.domain.event.api.EventResponse": {
       "type": "object",
       "properties": {
-        "Success": {
+        "success": {
           "type": "boolean",
           "format": "boolean"
         }
@@ -530,7 +530,7 @@
     "chef.automate.domain.event.api.EventType": {
       "type": "object",
       "properties": {
-        "Name": {
+        "name": {
           "type": "string"
         }
       }
@@ -538,13 +538,13 @@
     "chef.automate.domain.event.api.Object": {
       "type": "object",
       "properties": {
-        "ID": {
+        "id": {
           "type": "string"
         },
-        "ObjectType": {
+        "object_type": {
           "type": "string"
         },
-        "DisplayName": {
+        "display_name": {
           "type": "string"
         }
       }
@@ -552,16 +552,16 @@
     "chef.automate.domain.event.api.Producer": {
       "type": "object",
       "properties": {
-        "ID": {
+        "id": {
           "type": "string"
         },
-        "ProducerName": {
+        "producer_name": {
           "type": "string"
         },
-        "ProducerType": {
+        "producer_type": {
           "type": "string"
         },
-        "Tags": {
+        "tags": {
           "type": "array",
           "items": {
             "type": "string"
@@ -572,13 +572,13 @@
     "chef.automate.domain.event.api.Target": {
       "type": "object",
       "properties": {
-        "ID": {
+        "id": {
           "type": "string"
         },
-        "ObjectType": {
+        "object_type": {
           "type": "string"
         },
-        "DisplayName": {
+        "display_name": {
           "type": "string"
         }
       }

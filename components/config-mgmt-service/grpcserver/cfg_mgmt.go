@@ -110,7 +110,7 @@ func (s *CfgMgmtServer) GetVersion(ctx context.Context,
 		Version: s.cs.Version,
 		Built:   version.BuildTime,
 		Name:    s.cs.Name,
-		SHA:     version.GitSHA,
+		Sha:     version.GitSHA,
 	}, nil
 }
 

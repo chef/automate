@@ -54,14 +54,6 @@ lint:
       - automate-grpc/protoc-gen-a2-config/api/a2conf
     FIELD_LOWER_SNAKE_CASE:
       - external/infra_proxy/response/policyfiles.proto
-      # /api/
-      - interservice/cfgmgmt/response/root.proto
-      - interservice/compliance/profiles/profiles.proto
-      - interservice/es_sidecar/service.proto
-      - interservice/event/event.proto
-      - interservice/event_feed/event_feed.proto
-      - interservice/infra_proxy/response/policyfiles.proto
-      - interservice/license_control/license-control.proto
       # /component/
       - automate-gateway/api/notifications/notifications.proto
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto

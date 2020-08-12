@@ -151,7 +151,7 @@ func (svc *EventService) Start(r Registry) error {
 // that they are not blocked if the event input queue is full.
 func (svc *EventService) Publish(event *api.EventMsg) {
 	svc.in <- event
-	logrus.Debugf("Published event %s", event.EventID)
+	logrus.Debugf("Published event %s", event.EventId)
 }
 
 // Should return a CallStatus?
