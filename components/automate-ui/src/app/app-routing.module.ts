@@ -23,7 +23,6 @@ import { DataFeedComponent } from './pages/data-feed/data-feed.component';
 import { DataFeedDetailsComponent } from './pages/data-feed-details/data-feed-details.component';
 import { NotificationDetailsComponent } from './pages/notification-details/notification-details.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
-import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { SigninComponent } from './pages/signin/signin.component';
 
 // Components
@@ -175,14 +174,6 @@ const routes: Routes = [
             {
               path: '',
               component: NotificationsComponent
-            },
-            {
-              path: 'form',
-              component: NotificationFormComponent
-            },
-            {
-              path: 'form/:id',
-              component: NotificationFormComponent
             },
             {
               path: ':id',

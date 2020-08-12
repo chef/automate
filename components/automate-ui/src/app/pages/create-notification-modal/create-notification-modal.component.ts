@@ -92,7 +92,7 @@ export class CreateNotificationModalComponent implements OnInit {
   }
 
   displayCriticalControlsCheckbox() {
-    return this.notificationRule.targetType === ServiceActionType.SERVICENOW &&
+    return this.createForm.value.targetType === ServiceActionType.SERVICENOW &&
     this.notificationRule.ruleType === 'ComplianceFailure';
   }
 

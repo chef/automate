@@ -92,12 +92,6 @@ export class NotificationRuleRequests {
     }
   }
 
-  public testNotification(url: string, secretId: string): Observable<Object> {
-    return this.http.post(encodeURI(
-      this.joinToNotifierUrl(['webhook'])), { url, 'secret_id': { 'id': secretId } });
-  }
-
-
   public deleteNotificationRule(id: string): Observable<RuleResponse> {
     return this.http.delete<RuleResponse>(encodeURI(
       this.joinToNotifierUrl(['rules', id.toString()])));
@@ -113,6 +107,11 @@ export class NotificationRuleRequests {
     } else {
       return observableOf('');
     }
+  }
+
+  public testNotification(url: string, secretId: string): Observable<Object> {
+    return this.http.post(encodeURI(
+      this.joinToNotifierUrl(['webhook'])), { url, 'secret_id': { 'id': secretId } });
   }
 
   public testHookWithUsernamePassword(url: string,

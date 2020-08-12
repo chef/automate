@@ -14,7 +14,6 @@ import { HttpStatus } from 'app/types/types';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { NotificationRule, ServiceActionType } from 'app/entities/notification_rules/notification_rule.model';
 import { SortDirection } from '../../types/types';
-// import { RulesService } from '../../services/rules/rules.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { NotificationRuleRequests } from 'app/entities/notification_rules/notification_rule.requests';
 import {

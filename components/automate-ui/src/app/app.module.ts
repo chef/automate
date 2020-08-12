@@ -62,7 +62,6 @@ import { NodeRunsService } from './services/node-details/node-runs.service';
 import { ProjectService } from './entities/projects/project.service';
 import { ProductDeployedService } from './services/product-deployed/product-deployed.service';
 import { ProjectsFilterService } from './services/projects-filter/projects-filter.service';
-import { RulesService } from './services/rules/rules.service';
 import { RunHistoryStore } from './services/run-history-store/run-history.store';
 import { SessionStorageService } from './services/storage/sessionstorage.service';
 import { TelemetryService } from './services/telemetry/telemetry.service';
@@ -159,7 +158,6 @@ import {
 } from './pages/node-noruns-details/node-noruns-details.component';
 import { NodeRollupComponent } from './page-components/node-rollup/node-rollup.component';
 import { NotificationDetailsComponent } from './pages/notification-details/notification-details.component';
-import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import {
   ProjectsFilterComponent
@@ -236,7 +234,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     NodeNoRunsDetailsComponent,
     NodeRollupComponent,
     NotificationDetailsComponent,
-    NotificationFormComponent,
     NotificationsComponent,
     ProjectsFilterComponent,
     ProjectsFilterDropdownComponent,
@@ -337,7 +334,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ProjectsFilterService,
     RoleRequests,
     RuleRequests,
-    RulesService,
     RunHistoryStore,
     ServerRequests,
     OrgRequests,
