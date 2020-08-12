@@ -49,12 +49,6 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
     if (this.projects && filtered) {
       headers = headers.set('projects', this.projects);
     }
-    // Check the interceptor skip header in API request
-    // To avoid session logout if 401 raised from external API
-    if (request.headers.has(InterceptorSkipHeader)) {
-      headers = headers.delete(InterceptorSkipHeader);
-      return next.handle(request.clone({ headers }));
-    }
 
     return this.chefSession.token_provider.pipe(
       take(1),
@@ -63,6 +57,12 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
         //           Right now, we're throwing the ID token across the internet for telemetry,
         //           where it's not needed. It would be nice to _not_ do that.
         headers = headers.set('Authorization', `Bearer ${id_token}`);
+        // Check the interceptor skip header in API request
+        // To avoid session logout if 401 raised from external API
+        if (request.headers.has(InterceptorSkipHeader)) {
+          headers = headers.delete(InterceptorSkipHeader);
+          return next.handle(request.clone({ headers }));
+        }
         return next
           .handle(request.clone({ headers, params })).pipe(
             catchError((error: HttpErrorResponse) => {
