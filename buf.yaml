@@ -58,14 +58,9 @@ lint:
       - automate-gateway/api/notifications/notifications.proto
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
     ENUM_VALUE_UPPER_SNAKE_CASE:
-      - interservice/cfgmgmt
-      - interservice/pg_sidecar/service.proto
       - automate-gateway/api/notifications/notifications.proto
     MESSAGE_PASCAL_CASE:
       - config/dex/config_request.proto
-      - interservice/cfgmgmt/response/suggestions.proto
-    FILE_LOWER_SNAKE_CASE:
-      - interservice/license_control/license-control.proto
     PACKAGE_DEFINED:
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
   ignore:

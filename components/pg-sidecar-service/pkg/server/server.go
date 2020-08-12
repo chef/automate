@@ -291,7 +291,7 @@ func (p *PGSidecarServer) MigrateTables(ctx context.Context, req *api.MigrateTab
 			// source database is missing so that clients can determine how
 			// handle the error.
 			st := status.New(codes.FailedPrecondition, err.Error())
-			st, _ = st.WithDetails(&api.ErrorDetails{Code: api.ErrorDetails_SrcDbMissing})
+			st, _ = st.WithDetails(&api.ErrorDetails{Code: api.ErrorDetails_SRC_DB_MISSING})
 			return res, st.Err()
 		}
 	}

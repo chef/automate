@@ -42,7 +42,7 @@ func (s *server) NodeInventory(ctx context.Context,
 		PageSize: 100,
 		Start:    hourAgo,
 		Sorting: &configReq.Sorting{
-			Order: configReq.Order_desc,
+			Order: configReq.Order_DESC,
 		},
 	}
 

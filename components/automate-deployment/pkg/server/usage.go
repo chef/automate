@@ -54,7 +54,7 @@ func (s *server) getConfigMgmtNodes(ctx context.Context, startTime *tspb.Timesta
 		PageSize: 100,
 		Start:    startTime,
 		Sorting: &configReq.Sorting{
-			Order: configReq.Order_desc,
+			Order: configReq.Order_DESC,
 		},
 	}
 
