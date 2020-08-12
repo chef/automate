@@ -143,14 +143,14 @@ steps:
 
   # The nodemanager tests require access to AWS and Azure accounts as
   # they test against the actual API endpoints of those services.
-  - label: "nodemanager-integration"
+  - label: "nodemanager-integration-cloud"
     command:
       - . scripts/verify_setup.sh
       - |
         hab studio run "source scripts/verify_studio_init.sh &&
           start_deployment_service &&
           chef-automate dev deploy-some chef/compliance-service --with-deps &&
-          nodemanager_scans_integration"
+          nodemanager_cloud_scans_integration"
     timeout_in_minutes: 20
     retry:
       automatic:
