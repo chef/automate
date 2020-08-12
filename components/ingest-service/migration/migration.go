@@ -78,7 +78,6 @@ func (ms *Status) Start() error {
 		ms.updateErr(err.Error(), "Unable to lock for migration")
 		return err
 	}
-	defer ms.unlock()
 
 	exists, err := ms.hasA1ElasticsearchData()
 	if err != nil {
@@ -290,10 +289,14 @@ func (ms *Status) update(s string) {
 }
 
 // update the migration status message with an error message (private)
-func (ms *Status) updateErr(err, s string) {
-	logFatal(err, s)
+func (ms *Status) updateErr(errMessage, s string) {
+	logFatal(errMessage, s)
 	ms.status = "Error: " + s
 	ms.finished = true
+	err := ms.unlock()
+	if err != nil {
+		logFatal(err.Error(), "Failed to unlock migration in postgresql")
+	}
 }
 
 // finish updates the status and marks the migration as finished
@@ -301,6 +304,10 @@ func (ms *Status) finish(s string) {
 	logInfo(s)
 	ms.status = s
 	ms.finished = true
+	err := ms.unlock()
+	if err != nil {
+		logFatal(err.Error(), "Failed to unlock migration in postgresql")
+	}
 }
 
 func (ms *Status) hasBerlinElasticsearchData() (bool, error) {
