@@ -42,6 +42,7 @@ type ServiceConfig struct {
 	CIDRFilter          string        `mapstructure:"cidr_filter"`
 	ExternalFqdn        string        `mapstructure:"external_fqdn"`
 	AcceptedStatusCodes []int32       `mapstructure:"accepted_status_codes"`
+	ContentType         string        `mapstructure:"content_type"`
 }
 
 type PostgresConfig struct {

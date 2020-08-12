@@ -31,6 +31,7 @@ type datafeedNotification struct {
 	credentials Credentials
 	url         string
 	data        bytes.Buffer
+	contentType string
 }
 
 type DataClient struct {
@@ -158,9 +159,9 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 		return err
 	}
 	request.Header.Add("Authorization", notification.credentials.GetAuthorizationHeaderValue())
-	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("Content-Type", notification.contentType)
 	request.Header.Add("Content-Encoding", "gzip")
-	request.Header.Add("Accept", "application/json")
+	request.Header.Add("Accept", notification.contentType)
 	request.Header.Add("Chef-Data-Feed-Message-Version", version)
 
 	response, err := client.client.Do(request)
