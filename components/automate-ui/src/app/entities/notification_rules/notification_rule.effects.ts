@@ -39,7 +39,7 @@ export class NotificationRuleEffects {
   ) { }
 
   @Effect()
-  getDestinations$ = this.actions$.pipe(
+  getNotifications$ = this.actions$.pipe(
     ofType(NotificationRuleActionTypes.GET_ALL),
     mergeMap(() =>
       this.requests.getNotificationRules().pipe(
@@ -48,7 +48,7 @@ export class NotificationRuleEffects {
           observableOf(new GetNotificationRulesFailure(error))))));
 
   @Effect()
-  getDestinationsFailure$ = this.actions$.pipe(
+  getNotificationsFailure$ = this.actions$.pipe(
     ofType(NotificationRuleActionTypes.GET_ALL_FAILURE),
     map(({ payload }: GetNotificationRulesFailure) => {
       const msg = payload.error.error;
