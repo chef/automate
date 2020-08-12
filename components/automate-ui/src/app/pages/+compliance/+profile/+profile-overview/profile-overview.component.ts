@@ -22,6 +22,7 @@ import { AvailableProfilesService } from 'app/services/profiles/available-profil
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { find } from 'lodash';
 import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
+import { HttpStatus } from 'app/types/types';
 
 interface Profile {
     name: String;
@@ -64,6 +65,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
 
   // notification data
   downloadErrorVisible = false;
+  authErrorVisible = false;
 
   userProfilesDataLoaded = false;
   availableProfilesDataLoaded = false;
@@ -262,13 +264,22 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
     observableForkJoin(installProfiles).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(
-        () => this.refreshProfiles(),
-        () => this.showDownloadError()
+      () => this.refreshProfiles(),
+      (error) => this.showError(error)
       );
   }
 
-  showDownloadError() {
-    this.downloadErrorVisible = true;
+  showError(error) {
+    if (error.status === HttpStatus.FORBIDDEN) {
+      this.authErrorVisible = true;
+    } else {
+      this.downloadErrorVisible = true;
+    }
+    this.refreshProfiles();
+  }
+
+  hideAuthError() {
+    this.authErrorVisible = false;
   }
 
   hideDownloadError() {
