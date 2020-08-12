@@ -102,12 +102,12 @@ func fromUpstreamCookbookLocks(cLocks []*infra_res.CookbookLock) []*gwres.Cookbo
 			Source:           cb.GetSource(),
 			CacheKey:         cb.GetCacheKey(),
 			SCMDetail: &gwres.SCMDetail{
-				Name:                       cb.GetSCMDetail().GetName(),
-				Remote:                     cb.GetSCMDetail().GetRemote(),
-				Revision:                   cb.GetSCMDetail().GetRevision(),
-				WorkingTreeClean:           cb.GetSCMDetail().GetWorkingTreeClean(),
-				Published:                  cb.GetSCMDetail().GetPublished(),
-				SynchronizedRemoteBranches: cb.GetSCMDetail().GetSynchronizedRemoteBranches(),
+				Name:                       cb.GetScmDetail().GetName(),
+				Remote:                     cb.GetScmDetail().GetRemote(),
+				Revision:                   cb.GetScmDetail().GetRevision(),
+				WorkingTreeClean:           cb.GetScmDetail().GetWorkingTreeClean(),
+				Published:                  cb.GetScmDetail().GetPublished(),
+				SynchronizedRemoteBranches: cb.GetScmDetail().GetSynchronizedRemoteBranches(),
 			},
 			SourceOptions: &gwres.SourceOptions{
 				Path: cb.SourceOptions.GetPath(),

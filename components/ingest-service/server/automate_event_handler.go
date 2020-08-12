@@ -32,10 +32,10 @@ func NewAutomateEventHandlerServer(client backend.Client, chefIngestServer ChefI
 
 func (s *AutomateEventHandlerServer) HandleEvent(ctx context.Context,
 	req *automate_event.EventMsg) (*automate_event.EventResponse, error) {
-	logrus.Debugf("ingest-service is handling your event %s", req.EventID)
+	logrus.Debugf("ingest-service is handling your event %s", req.EventId)
 	response := &automate_event.EventResponse{}
 	if req.Type.Name == event.NodeTerminatedEventName {
-		instanceID := req.Object.ID
+		instanceID := req.Object.Id
 		// It is very likely that there is only one instanceId to nodeId
 		// just in case this is not true we will handle it
 		nodeIDs, err := s.client.FindNodeIDByInstanceId(ctx, instanceID)
@@ -48,7 +48,7 @@ func (s *AutomateEventHandlerServer) HandleEvent(ctx context.Context,
 		}
 		for _, nodeID := range nodeIDs {
 			nodeDelete := &chef.Delete{
-				Id:              req.EventID,
+				Id:              req.EventId,
 				NodeId:          nodeID,
 				ServiceHostname: "Node Manager",
 			}

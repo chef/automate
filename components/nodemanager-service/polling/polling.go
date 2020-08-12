@@ -166,28 +166,28 @@ func newEventMsg(eventType string, instanceID string) *aEvent.EventMsg {
 	tagsVal := []string{"node", "nodemanager", "terminate", "compliance", event.NodeTerminatedEventName}
 
 	return &aEvent.EventMsg{
-		EventID: uuid.Must(uuid.NewV4()).String(),
+		EventId: uuid.Must(uuid.NewV4()).String(),
 		Type:    &aEvent.EventType{Name: eventType},
 		Producer: &aEvent.Producer{
-			ID:           "urn:chef:compliance:mgrpolling",
+			Id:           "urn:chef:compliance:mgrpolling",
 			ProducerName: "Node Manager Polling",
 			ProducerType: "system component",
 		},
 		Tags:      tagsVal,
 		Published: ptypes.TimestampNow(),
 		Actor: &aEvent.Actor{
-			ID:          "",
+			Id:          "",
 			ObjectType:  "nodemanager",
 			DisplayName: "nodemanager",
 		},
 		Verb: "terminate",
 		Object: &aEvent.Object{
-			ID:          instanceID,
+			Id:          instanceID,
 			ObjectType:  "instance ID",
 			DisplayName: instanceID,
 		},
 		Target: &aEvent.Target{
-			ID:          "",
+			Id:          "",
 			ObjectType:  "Not Applicable",
 			DisplayName: "Not Applicable",
 		},

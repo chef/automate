@@ -211,7 +211,7 @@ func (s *CfgMgmtServer) GetVersion(ctx context.Context, e *version.VersionInfoRe
 		Version: r.GetVersion(),
 		Built:   r.GetBuilt(),
 		Name:    r.GetName(),
-		Sha:     r.GetSHA(),
+		Sha:     r.GetSha(),
 	}, nil
 }
 

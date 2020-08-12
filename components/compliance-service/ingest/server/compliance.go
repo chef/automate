@@ -49,7 +49,7 @@ func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.No
 }
 
 func (srv *ComplianceIngestServer) HandleEvent(ctx context.Context, req *automate_event.EventMsg) (*automate_event.EventResponse, error) {
-	log.Debugf("compliance ingest is handling your event %s", req.EventID)
+	log.Debugf("compliance ingest is handling your event %s", req.EventId)
 
 	return nil, status.Error(codes.Unimplemented, "Unimplemented")
 }

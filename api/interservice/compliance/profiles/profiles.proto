@@ -40,7 +40,7 @@ message ProfilePostRequest {
 message Metadata {
     string name = 2;
     string version = 3;
-    string contentType =4;
+    string content_type =4;
 }
 message Chunk {
     bytes data = 1;
