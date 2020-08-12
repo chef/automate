@@ -33,6 +33,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.DisableCidrFilter = w.Bool(true)
 	c.V1.Sys.Service.CidrFilter = w.String("0.0.0.0/0")
 	c.V1.Sys.Service.AcceptedStatusCodes = []*wrappers.Int32Value{w.Int32(200), w.Int32(201), w.Int32(202), w.Int32(203), w.Int32(204)}
+	c.V1.Sys.Service.ContentType = w.String("application/json")
 	c.V1.Sys.Log.Level = w.String("info")
 	c.V1.Sys.Log.Format = w.String("text")
 	return c

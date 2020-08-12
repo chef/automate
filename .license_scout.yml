@@ -150,6 +150,12 @@ fallbacks:
     - name: github.com/gogo/protobuf
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/gogo/protobuf/master/LICENSE
+    - name: gopkg.in/yaml.v3
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/go-yaml/yaml/v3/LICENSE
+    - name: github.com/bgentry/go-netrc
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/bgentry/go-netrc/master/LICENSE
   habitat:
     - name: chef/mlsa
       license_id: Chef-MLSA

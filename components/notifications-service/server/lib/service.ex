@@ -79,7 +79,7 @@ defmodule Notifications.Service do
         response_for(:validation_error, RuleAddResponse, reasons)
       :ok ->
         case Store.add_rule(rule) do
-          {:ok, new_rule_id} -> RuleAddResponse.new(id: new_rule_id)
+          {:ok, new_rule_id} -> RuleAddResponse.new(id: new_rule_id, rule: rule)
           {:error, :conflict} -> response_for(:duplicate, RuleAddResponse, rule)
           {:error, other} -> response_for(:internal_error, RuleAddResponse, other)
         end

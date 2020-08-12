@@ -28,6 +28,7 @@ DROP FUNCTION IF EXISTS set_end_time_on_superseded();
 -- they all have current_rollout == NULL. Thus we can model our requirement
 -- that CURRENT rollouts must be unique, but old ones do not have to be unique.
 ALTER TABLE rollouts ADD COLUMN IF NOT EXISTS current_rollout BOOLEAN DEFAULT TRUE;
+ALTER TABLE rollouts DROP CONSTRAINT IF EXISTS current_rollout_unique;
 ALTER TABLE rollouts ADD CONSTRAINT current_rollout_unique UNIQUE (policy_name, policy_node_group, policy_domain_url, policy_revision_id, current_rollout);
 
 -- This function is added in 02. The prior version set `end_time` to `NOW()`,
@@ -52,6 +53,7 @@ WHERE r.end_time IS NULL
 END;
 $$;
 
+DROP TRIGGER IF EXISTS set_current_rollout ON rollouts;
 CREATE TRIGGER set_current_rollout AFTER INSERT
 ON rollouts FOR EACH ROW EXECUTE PROCEDURE
 current_rollout_ended();

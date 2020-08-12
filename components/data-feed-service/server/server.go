@@ -71,15 +71,17 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	username := ""
 	password := ""
 	var err error
+	var credentials service.Credentials
 	url := request.Url
 	switch request.Credentials.(type) {
 	case *datafeed.URLValidationRequest_UsernamePassword:
 		username = request.GetUsernamePassword().GetUsername()
 		password = request.GetUsernamePassword().GetPassword()
+		credentials = service.NewBasicAuthCredentials(username, password)
 	case *datafeed.URLValidationRequest_SecretId:
 		secretId := request.GetSecretId().GetId()
 		// call secrets api
-		username, password, err = service.GetCredentials(context.Background(), datafeedServer.secrets, secretId)
+		credentials, err = service.GetCredentials(context.Background(), datafeedServer.secrets, secretId)
 		if err != nil {
 			return response, err
 		}
@@ -109,9 +111,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		log.Error("Error creating request")
 		return response, err
 	}
-	if username != "" && password != "" {
-		httpRequest.SetBasicAuth(username, password)
-	}
+	httpRequest.Header.Add("Authorization", credentials.GetAuthorizationHeaderValue())
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpRequest.Header.Add("Content-Encoding", "gzip")
 	httpRequest.Header.Add("Accept", "application/json")

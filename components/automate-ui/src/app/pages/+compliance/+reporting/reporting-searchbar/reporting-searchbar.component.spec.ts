@@ -1,10 +1,12 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReportingSearchbarComponent } from './reporting-searchbar.component';
 import { using } from 'app/testing/spec-helpers';
 import * as moment from 'moment/moment';
 import {
-  ReportQueryService
+  ReportQueryService, SuggestionsService, StatsService
 } from 'app/pages/+compliance/shared/reporting';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
 
@@ -15,13 +17,17 @@ describe('ReportingSearchbarComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
+        RouterTestingModule,
+        HttpClientTestingModule
       ],
       declarations: [
         ReportingSearchbarComponent,
         DatetimePipe
       ],
       providers: [
-        ReportQueryService
+        ReportQueryService,
+        SuggestionsService,
+        StatsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
@@ -34,7 +40,6 @@ describe('ReportingSearchbarComponent', () => {
   it('initializes', () => {
     expect(component).not.toBeNull();
   });
-
 
   describe('onDaySelect()', () => {
     using([

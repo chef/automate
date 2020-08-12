@@ -16,12 +16,18 @@ func init() {
   "paths": {
     "/api/v0/license/apply": {
       "post": {
-        "operationId": "ApplyLicense",
+        "operationId": "License_ApplyLicense",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.license.ApplyLicenseResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -42,12 +48,18 @@ func init() {
     },
     "/api/v0/license/request": {
       "post": {
-        "operationId": "RequestLicense",
+        "operationId": "License_RequestLicense",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.license.RequestLicenseResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -68,12 +80,18 @@ func init() {
     },
     "/api/v0/license/status": {
       "get": {
-        "operationId": "GetStatus",
+        "operationId": "License_GetStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.license.GetStatusResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -157,6 +175,39 @@ func init() {
         },
         "status": {
           "$ref": "#/definitions/chef.automate.api.license.GetStatusResp"
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
         }
       }
     }

@@ -27,7 +27,11 @@ export enum ServiceGroupsActionTypes {
 
   GET_SERVICE_GROUPS_SUGGESTIONS = 'SERVICE_GROUPS_SUGGESTIONS::SERVICES::GET',
   GET_SERVICE_GROUPS_SUGGESTIONS_SUCCESS = 'SERVICE_GROUPS_SUGGESTIONS::SERVICES::SUCCESS',
-  GET_SERVICE_GROUPS_SUGGESTIONS_FAILURE = 'SERVICE_GROUPS_SUGGESTIONS:SERVICES::FAILURE'
+  GET_SERVICE_GROUPS_SUGGESTIONS_FAILURE = 'SERVICE_GROUPS_SUGGESTIONS:SERVICES::FAILURE',
+
+  DELETE_SERVICES_BY_ID = 'SERVICE_GROUPS::SERVICES::DELETE',
+  DELETE_SERVICES_BY_ID_SUCCESS = 'SERVICE_GROUPS::SERVICES::DELETE::SUCCESS',
+  DELETE_SERVICES_BY_ID_FAILURE = 'SERVICE_GROUPS::SERVICES::DELETE::FAILURE'
 }
 
 export class GetServiceGroups implements Action {
@@ -110,6 +114,21 @@ export class GetServiceGroupsSuggestionsFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class DeleteServicesById implements Action {
+  readonly type = ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID;
+  constructor(public payload: { servicesToDelete: number[] }) {}
+}
+
+export class DeleteServicesByIdSuccess implements Action {
+  readonly type = ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS;
+  constructor(public payload: { amount: number } ) { }
+}
+
+export class DeleteServicesByIdFailure implements Action {
+  readonly type = ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type ServiceGroupsActions =
   | GetServiceGroupsSuccess
   | GetServiceGroupsFailure
@@ -125,4 +144,7 @@ export type ServiceGroupsActions =
   | GetServiceGroups
   | GetServiceGroupsSuggestions
   | GetServiceGroupsSuggestionsSuccess
-  | GetServiceGroupsSuggestionsFailure;
+  | GetServiceGroupsSuggestionsFailure
+  | DeleteServicesById
+  | DeleteServicesByIdSuccess
+  | DeleteServicesByIdFailure;

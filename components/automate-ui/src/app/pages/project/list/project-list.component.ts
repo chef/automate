@@ -18,7 +18,6 @@ import {
   allProjects, getAllStatus, createStatus, createError
 } from 'app/entities/projects/project.selectors';
 import { GetProjects, CreateProject, DeleteProject, ProjectPayload  } from 'app/entities/projects/project.actions';
-import { CreateTeam } from 'app/entities/teams/team.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
 
@@ -45,12 +44,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       'RULES_APPLIED': 'Applied'
   };
 
-  readonly teamsToCreate = {
-    'project-owners': 'Project Owners',
-    'editors': 'Editors',
-    'viewers': 'Viewers'
-  };
-
   constructor(
     private layoutFacade: LayoutFacadeService,
     private store: Store<NgrxStateAtom>,
@@ -62,8 +55,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       name: ['', Validators.required],
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(48)]],
-      addPolicies: [true],
-      addTeams: [true]
+      addPolicies: [true]
     });
   }
 
@@ -89,25 +81,11 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.creatingProject = false;
 
-        const createTeamsWasChecked = this.createProjectForm.controls['addTeams'].value;
-        const projectID = this.createProjectForm.controls['id'].value;
-        const projectName = this.createProjectForm.controls['name'].value;
-
         this.closeCreateModal();
 
         // This is issued periodically from projects-filter.effects.ts; we do it now
         // so the user doesn't have to wait.
         this.store.dispatch(new LoadOptions());
-
-        if (createTeamsWasChecked) {
-          for (const [teamID, teamName] of Object.entries(this.teamsToCreate)) {
-            this.store.dispatch(new CreateTeam({
-              id: `${projectID}-${teamID}`,
-              name: `${projectName} ${teamName}`,
-              projects: [projectID]
-            }));
-          }
-        }
       });
 
     combineLatest([

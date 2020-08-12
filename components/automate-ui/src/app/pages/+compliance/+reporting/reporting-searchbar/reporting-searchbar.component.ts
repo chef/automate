@@ -17,7 +17,8 @@ import { FilterC } from '../types';
 import * as moment from 'moment/moment';
 import { Chicklet } from 'app/types/types';
 import {
-  ReportQueryService
+  ReportQueryService,
+  SuggestionsService
 } from 'app/pages/+compliance/shared/reporting';
 import { DateTime } from 'app/helpers/datetime/datetime';
 
@@ -59,7 +60,11 @@ export class ReportingSearchbarComponent implements OnInit {
   inputText = '';
   delayForNoSuggestions = false;
 
-  constructor(public reportQuery: ReportQueryService, private renderer: Renderer2) {
+  constructor(
+    public reportQuery: ReportQueryService,
+    public sugg: SuggestionsService,
+    private renderer: Renderer2
+    ) {
     // This is needed because focus is lost when clicking items.
     this.suggestionsVisibleStream.pipe(
       // wait 0.2 seconds after each lost and gain focus
@@ -252,7 +257,8 @@ export class ReportingSearchbarComponent implements OnInit {
       this.clearSuggestions();
       this.requestForSuggestions({
         text: currentText,
-        type: type
+        type: type,
+        type_key: this.sugg.selectedControlTagKey
       });
       this.inputText = currentText;
     } else {
@@ -275,7 +281,8 @@ export class ReportingSearchbarComponent implements OnInit {
         this.clearSuggestions();
         this.requestForSuggestions({
           text: currentText,
-          type: type
+          type: type,
+          type_key: this.sugg.selectedControlTagKey
         });
         this.showValInput();
         this.inputText = currentText;
@@ -374,7 +381,8 @@ export class ReportingSearchbarComponent implements OnInit {
     this.clearSuggestions();
     this.requestForSuggestions({
       text: text,
-      type: type
+      type: type,
+      type_key: this.sugg.selectedControlTagKey
     });
     this.suggestionsVisibleStream.next(true);
   }
@@ -480,20 +488,17 @@ export class ReportingSearchbarComponent implements OnInit {
 
   // When value is clicked for the control tag key
   onControlTagKeyValueClick(value: any) {
-    const reportQuery = this.reportQuery.getReportQuery();
     const type = this.selectedType;
     type.name = `control_tag:${value.text}`;
     type.title = `Control Tag | ${value.text}`;
     type.placeholder = 'Enter Control Tag Values...';
-    reportQuery.filters.push({
-      type: type,
-      value: {text: undefined }
-    });
-    this.reportQuery.setState(reportQuery);
     this.clearSuggestions();
+    this.sugg.selectedControlTagKey = type.name;
     this.requestForSuggestions({
       type: 'control_tag_value',
-      text: ''
+      text: '',
+      // for control tag key filters, we want to send that info as a diff field on the api
+      type_key: type.name
     });
     this.suggestionsVisibleStream.next(true);
   }

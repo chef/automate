@@ -13,6 +13,7 @@ import (
 	api "github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/pcmp/passert"
 )
 
 const applied = "applied"
@@ -147,7 +148,7 @@ func TestCreateRule(t *testing.T) {
 				},
 			})
 			assert.NoError(t, err)
-			assert.Equal(t, &api.CreateRuleResp{
+			passert.Equal(t, &api.CreateRuleResp{
 				Rule: &api.ProjectRule{
 					Id:        "any-name",
 					Name:      "any name",
@@ -329,7 +330,7 @@ func TestUpdateRule(t *testing.T) {
 				},
 			})
 			assert.NoError(t, err)
-			assert.Equal(t, &api.UpdateRuleResp{
+			passert.Equal(t, &api.UpdateRuleResp{
 				Rule: &api.ProjectRule{
 					Id:        id,
 					Name:      "updated name",
@@ -374,7 +375,7 @@ func TestUpdateRule(t *testing.T) {
 				},
 			})
 			assert.NoError(t, err)
-			assert.Equal(t, &api.UpdateRuleResp{
+			passert.Equal(t, &api.UpdateRuleResp{
 				Rule: &api.ProjectRule{
 					Id:        id,
 					Name:      "updated name",
@@ -419,7 +420,7 @@ func TestUpdateRule(t *testing.T) {
 				},
 			})
 			assert.NoError(t, err)
-			assert.Equal(t, &api.UpdateRuleResp{
+			passert.Equal(t, &api.UpdateRuleResp{
 				Rule: &api.ProjectRule{
 					Id:        id,
 					Name:      "updated name",
@@ -570,7 +571,7 @@ func TestListRules(t *testing.T) {
 		{"if no rules exist, returns empty list", func(t *testing.T) {
 			resp, err := cl.ListRules(ctx, &api.ListRulesReq{})
 			require.NoError(t, err)
-			assert.Equal(t, &api.ListRulesResp{}, resp)
+			passert.Equal(t, &api.ListRulesResp{}, resp)
 		}},
 		{"if multiple rules exist, returns all rules", func(t *testing.T) {
 			id1, id2 := "rule-number-1", "rule-number-2"
@@ -666,7 +667,7 @@ func TestListRulesForProject(t *testing.T) {
 			addProjectToStore(t, projects, projectID, "my bar", storage.Custom)
 			resp, err := cl.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: projectID})
 			require.NoError(t, err)
-			assert.Equal(t, &api.ListRulesForProjectResp{Status: storage.NoRules.String()}, resp)
+			passert.Equal(t, &api.ListRulesForProjectResp{Status: storage.NoRules.String()}, resp)
 		}},
 		{"if multiple rules exist, returns rules for specific project", func(t *testing.T) {
 			projectID1 := "foo-project"
@@ -805,7 +806,7 @@ func TestDeleteRule(t *testing.T) {
 
 			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: id1, ProjectId: projectID})
 			require.NoError(t, err)
-			assert.Equal(t, &api.DeleteRuleResp{}, resp)
+			passert.Equal(t, &api.DeleteRuleResp{}, resp)
 
 			rule, exists := rules.Get(id1)
 			assert.Nil(t, rule)

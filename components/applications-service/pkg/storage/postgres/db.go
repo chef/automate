@@ -22,24 +22,36 @@ type Postgres struct {
 	*config.Postgres
 }
 
-// New creates a new Postgres client
-func New(dbConf *config.Postgres) (*Postgres, error) {
-	pg := &Postgres{Postgres: dbConf}
-
-	log.WithFields(log.Fields{
-		"uri": pg.URI,
-	}).Debug("Connecting to PostgreSQL")
-	err := pg.connect()
+// New creates a new Postgres client, connects to the database server and runs
+// the migrations
+func ConnectAndMigrate(dbConf *config.Postgres) (*Postgres, error) {
+	pg, err := Connect(dbConf)
 	if err != nil {
-		return pg, err
+		return nil, err
 	}
-
 	log.WithFields(log.Fields{
 		"uri":    pg.URI,
 		"schema": pg.SchemaPath,
 	}).Debug("Initializing database")
 	err = pg.initDB()
 	return pg, err
+}
+
+func Connect(dbConf *config.Postgres) (*Postgres, error) {
+	pg := &Postgres{Postgres: dbConf}
+
+	log.WithFields(log.Fields{
+		"uri": pg.URI,
+	}).Debug("Connecting to PostgreSQL")
+	err := pg.connect()
+	return pg, err
+}
+
+func (db *Postgres) DestructiveMigrateForTests() error {
+	if err := migrator.DestructiveMigrateForTests(db.URI, db.SchemaPath, logger.NewLogrusStandardLogger(), false); err != nil {
+		return errors.Wrapf(err, "Unable to create database schema. [path:%s]", db.SchemaPath)
+	}
+	return nil
 }
 
 // ping will verify if the database mapped with gorp is available

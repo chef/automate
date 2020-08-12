@@ -19,6 +19,7 @@ import (
 	mock_compliance_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/api/interservice/ingest"
 	mock_notifier "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_notifier"
+	"github.com/chef/automate/lib/pcmp/passert"
 	"github.com/golang/mock/gomock"
 	gp "github.com/golang/protobuf/ptypes/empty"
 	structpb "github.com/golang/protobuf/ptypes/struct"
@@ -362,7 +363,7 @@ func TestDataCollectorGetStructIfExistsWhenFieldIsAStringWithScapedChars(t *test
 			"id": {Kind: &structpb.Value_StringValue{StringValue: "1"}},
 		},
 	}
-	assert.Equal(t, expectedDataField, pbStruct)
+	passert.Equal(t, expectedDataField, pbStruct)
 }
 
 func TestDataCollectorGetStructIfExistsWhenFieldIsAJSONObject(t *testing.T) {
@@ -374,7 +375,7 @@ func TestDataCollectorGetStructIfExistsWhenFieldIsAJSONObject(t *testing.T) {
 			"id": {Kind: &structpb.Value_StringValue{StringValue: "1"}},
 		},
 	}
-	assert.Equal(t, expectedDataField, pbStruct)
+	passert.Equal(t, expectedDataField, pbStruct)
 }
 
 func TestDataCollectorGetStructIfExistsWhenFieldIsSomethingElseReturnEmptyStruct(t *testing.T) {
@@ -420,7 +421,7 @@ func TestDataCollectorGetStructArrayWhenTheArrayAreObjects(t *testing.T) {
 		},
 	}
 	assert.Len(t, arrayStruct, 2)
-	assert.ElementsMatch(t, expectedDataField, arrayStruct)
+	passert.Equal(t, expectedDataField, arrayStruct)
 }
 
 func TestDataCollectorGetStructArrayWhenTheArrayAreStrings(t *testing.T) {
@@ -440,5 +441,5 @@ func TestDataCollectorGetStructArrayWhenTheArrayAreStrings(t *testing.T) {
 		},
 	}
 	assert.Len(t, arrayStruct, 2)
-	assert.ElementsMatch(t, expectedDataField, arrayStruct)
+	passert.Equal(t, expectedDataField, arrayStruct)
 }

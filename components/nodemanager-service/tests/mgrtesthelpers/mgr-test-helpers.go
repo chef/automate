@@ -8,6 +8,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/compliance-service/examples/helpers"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"google.golang.org/grpc"
@@ -17,6 +18,7 @@ const (
 	SSMNodeName        = "vj-test-ssm-linux"
 	ComplianceEndpoint = "127.0.0.1:10121"
 	ManagerEndpoint    = "127.0.0.1:10120"
+	SecretsEndpoint    = "127.0.0.1:10131"
 )
 
 var AWSRegionsList = []string{
@@ -73,6 +75,17 @@ func DeleteAllManagersByType(ctx context.Context, mgrClient manager.NodeManagerS
 	return nil
 }
 
+func DeleteAllNodes(ctx context.Context, nodesClient nodes.NodesServiceClient) error {
+	nodesList, err := nodesClient.List(ctx, &nodes.Query{})
+	if err != nil {
+		return err
+	}
+	for _, node := range nodesList.GetNodes() {
+		nodesClient.Delete(ctx, &nodes.Id{Id: node.Id}) // nolint:errcheck
+	}
+	return nil
+}
+
 func AddAWSManager(ctx context.Context, mgrClient manager.NodeManagerServiceClient, mgrType string) (*manager.Ids, error) {
 	awsMgr := manager.NodeManager{
 		Name: fmt.Sprintf("my test %s mgr", mgrType),
@@ -114,6 +127,21 @@ func GetManagerConn() (*grpc.ClientConn, error) {
 		return nil, err
 	}
 	return mgrConn, nil
+}
+
+func GetSecretsConn() (*grpc.ClientConn, error) {
+	var connFactory *secureconn.Factory
+	if os.Getenv("RUN_MODE") == "local" {
+		connFactory = helpers.SecureConnFactory()
+	} else {
+		connFactory = helpers.SecureConnFactoryHab()
+	}
+
+	cmpConn, err := connFactory.Dial("secrets-service", SecretsEndpoint)
+	if err != nil {
+		return nil, err
+	}
+	return cmpConn, nil
 }
 
 func GetComplianceConn() (*grpc.ClientConn, error) {

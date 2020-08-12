@@ -36,4 +36,29 @@ describe('TopErrorsComponent', () => {
       expect(tooltip.getAttribute('for')).toEqual('top-errors-info');
     });
   });
+
+  describe('when data is available', () => {
+    it('does not display empty data message', () => {
+      component.topErrorsItems = [
+        { type: 'ErrorType1', message: 'ErrorMessage', count: 20 },
+        { type: 'ErrorType2', message: 'ErrorMessage', count: 10 }
+      ];
+
+      fixture.detectChanges();
+
+      const emptyMsg = fixture.debugElement.query(By.css('app-empty-data'));
+      expect(emptyMsg).toBeFalsy();
+    });
+  });
+
+  describe('when no data is available', () => {
+    it('displays empty data message', () => {
+      component.topErrorsItems = [];
+
+      fixture.detectChanges();
+
+      const emptyMsg = fixture.debugElement.query(By.css('app-empty-data'));
+      expect(emptyMsg).toBeTruthy();
+    });
+  });
 });

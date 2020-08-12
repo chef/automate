@@ -13,12 +13,18 @@
   "paths": {
     "/api/v0/job/delete-nodes/config": {
       "post": {
-        "operationId": "ConfigureDeleteNodesScheduler",
+        "operationId": "JobScheduler_ConfigureDeleteNodesScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.ConfigureDeleteNodesSchedulerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -30,12 +36,18 @@
     "/api/v0/job/delete-nodes/delete-marked-nodes": {
       "post": {
         "summary": "DeleteNodesScheduler",
-        "operationId": "DeleteMarkedNodes",
+        "operationId": "JobScheduler_DeleteMarkedNodes",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.DeleteMarkedNodesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -46,12 +58,18 @@
     },
     "/api/v0/job/delete-nodes/start": {
       "post": {
-        "operationId": "StartDeleteNodesScheduler",
+        "operationId": "JobScheduler_StartDeleteNodesScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.StartDeleteNodesSchedulerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -62,12 +80,18 @@
     },
     "/api/v0/job/delete-nodes/stop": {
       "post": {
-        "operationId": "StopDeleteNodesScheduler",
+        "operationId": "JobScheduler_StopDeleteNodesScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.StopDeleteNodesSchedulerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -78,12 +102,18 @@
     },
     "/api/v0/job/job-scheduler/status": {
       "get": {
-        "operationId": "GetStatusJobScheduler",
+        "operationId": "JobScheduler_GetStatusJobScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.JobSchedulerStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -94,12 +124,18 @@
     },
     "/api/v0/job/missing-nodes/config": {
       "post": {
-        "operationId": "ConfigureNodesMissingScheduler",
+        "operationId": "JobScheduler_ConfigureNodesMissingScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.ConfigureNodesMissingSchedulerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -110,12 +146,18 @@
     },
     "/api/v0/job/missing-nodes/mark-nodes-missing": {
       "post": {
-        "operationId": "MarkNodesMissing",
+        "operationId": "JobScheduler_MarkNodesMissing",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.MarkNodesMissingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -126,12 +168,18 @@
     },
     "/api/v0/job/missing-nodes/start": {
       "post": {
-        "operationId": "StartNodesMissingScheduler",
+        "operationId": "JobScheduler_StartNodesMissingScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.StartNodesMissingSchedulerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -142,12 +190,18 @@
     },
     "/api/v0/job/missing-nodes/stop": {
       "post": {
-        "operationId": "StopNodesMissingScheduler",
+        "operationId": "JobScheduler_StopNodesMissingScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.StopNodesMissingSchedulerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -242,6 +296,39 @@
     },
     "chef.automate.domain.ingest.StopNodesMissingSchedulerResponse": {
       "type": "object"
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
     }
   }
 }

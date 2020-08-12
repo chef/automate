@@ -168,6 +168,15 @@ func (md *MetaData) unify(data interface{}, rv reflect.Value) error {
 			return v.UnmarshalTOML(data)
 		}
 
+		if v, ok := rv.Addr().Interface().(protoreflector); ok {
+			switch v.ProtoReflect().Descriptor().Name() {
+			case "DoubleValue", "FloatValue", "Int64Value", "UInt64Value",
+				"Int32Value", "UInt32Value", "BoolValue", "StringValue", "BytesValue":
+				s := reflect.ValueOf(v).Elem()
+				return md.unify(data, s.FieldByName("Value"))
+			}
+		}
+
 		if v, ok := rv.Addr().Interface().(wkt); ok {
 			switch v.XXX_WellKnownType() {
 			case "DoubleValue", "FloatValue", "Int64Value", "UInt64Value",

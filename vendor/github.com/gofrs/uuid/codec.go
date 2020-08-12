@@ -114,7 +114,7 @@ func (u *UUID) UnmarshalText(text []byte) error {
 	case 41, 45:
 		return u.decodeURN(text)
 	default:
-		return fmt.Errorf("uuid: incorrect UUID length: %s", text)
+		return fmt.Errorf("uuid: incorrect UUID length %d in string %q", len(text), text)
 	}
 }
 
@@ -122,10 +122,10 @@ func (u *UUID) UnmarshalText(text []byte) error {
 // "6ba7b810-9dad-11d1-80b4-00c04fd430c8".
 func (u *UUID) decodeCanonical(t []byte) error {
 	if t[8] != '-' || t[13] != '-' || t[18] != '-' || t[23] != '-' {
-		return fmt.Errorf("uuid: incorrect UUID format %s", t)
+		return fmt.Errorf("uuid: incorrect UUID format in string %q", t)
 	}
 
-	src := t[:]
+	src := t
 	dst := u[:]
 
 	for i, byteGroup := range byteGroups {
@@ -149,10 +149,8 @@ func (u *UUID) decodeHashLike(t []byte) error {
 	src := t[:]
 	dst := u[:]
 
-	if _, err := hex.Decode(dst, src); err != nil {
-		return err
-	}
-	return nil
+	_, err := hex.Decode(dst, src)
+	return err
 }
 
 // decodeBraced decodes UUID strings that are using the following formats:
@@ -162,7 +160,7 @@ func (u *UUID) decodeBraced(t []byte) error {
 	l := len(t)
 
 	if t[0] != '{' || t[l-1] != '}' {
-		return fmt.Errorf("uuid: incorrect UUID format %s", t)
+		return fmt.Errorf("uuid: incorrect UUID format in string %q", t)
 	}
 
 	return u.decodePlain(t[1 : l-1])
@@ -177,7 +175,7 @@ func (u *UUID) decodeURN(t []byte) error {
 	urnUUIDPrefix := t[:9]
 
 	if !bytes.Equal(urnUUIDPrefix, urnPrefix) {
-		return fmt.Errorf("uuid: incorrect UUID format: %s", t)
+		return fmt.Errorf("uuid: incorrect UUID format in string %q", t)
 	}
 
 	return u.decodePlain(t[9:total])
@@ -193,7 +191,7 @@ func (u *UUID) decodePlain(t []byte) error {
 	case 36:
 		return u.decodeCanonical(t)
 	default:
-		return fmt.Errorf("uuid: incorrrect UUID length: %s", t)
+		return fmt.Errorf("uuid: incorrect UUID length %d in string %q", len(t), t)
 	}
 }
 

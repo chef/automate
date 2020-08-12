@@ -16,12 +16,18 @@ func init() {
   "paths": {
     "/api/v0/infra/servers": {
       "get": {
-        "operationId": "GetServers",
+        "operationId": "InfraProxy_GetServers",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetServers"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -30,12 +36,18 @@ func init() {
         ]
       },
       "post": {
-        "operationId": "CreateServer",
+        "operationId": "InfraProxy_CreateServer",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateServer"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -56,12 +68,18 @@ func init() {
     },
     "/api/v0/infra/servers/{id}": {
       "get": {
-        "operationId": "GetServer",
+        "operationId": "InfraProxy_GetServer",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetServer"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -79,12 +97,18 @@ func init() {
         ]
       },
       "delete": {
-        "operationId": "DeleteServer",
+        "operationId": "InfraProxy_DeleteServer",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DeleteServer"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -102,12 +126,18 @@ func init() {
         ]
       },
       "put": {
-        "operationId": "UpdateServer",
+        "operationId": "InfraProxy_UpdateServer",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateServer"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -135,12 +165,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs": {
       "get": {
-        "operationId": "GetOrgs",
+        "operationId": "InfraProxy_GetOrgs",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetOrgs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -158,12 +194,18 @@ func init() {
         ]
       },
       "post": {
-        "operationId": "CreateOrg",
+        "operationId": "InfraProxy_CreateOrg",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateOrg"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -191,12 +233,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{id}": {
       "get": {
-        "operationId": "GetOrg",
+        "operationId": "InfraProxy_GetOrg",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetOrg"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -221,12 +269,18 @@ func init() {
         ]
       },
       "delete": {
-        "operationId": "DeleteOrg",
+        "operationId": "InfraProxy_DeleteOrg",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DeleteOrg"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -251,12 +305,18 @@ func init() {
         ]
       },
       "put": {
-        "operationId": "UpdateOrg",
+        "operationId": "InfraProxy_UpdateOrg",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateOrg"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -291,12 +351,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{id}/reset-key": {
       "put": {
-        "operationId": "ResetOrgAdminKey",
+        "operationId": "InfraProxy_ResetOrgAdminKey",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ResetOrgAdminKey"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -331,12 +397,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}": {
       "get": {
-        "operationId": "GetAffectedNodes",
+        "operationId": "InfraProxy_GetAffectedNodes",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AffectedNodes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -384,12 +456,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients": {
       "get": {
-        "operationId": "GetClients",
+        "operationId": "InfraProxy_GetClients",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Clients"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -416,12 +494,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
       "get": {
-        "operationId": "GetClient",
+        "operationId": "InfraProxy_GetClient",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Client"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -455,12 +539,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
       "get": {
-        "operationId": "GetCookbooks",
+        "operationId": "InfraProxy_GetCookbooks",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Cookbooks"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -487,12 +577,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
       "get": {
-        "operationId": "GetCookbookVersions",
+        "operationId": "InfraProxy_GetCookbookVersions",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookVersions"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -526,12 +622,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
       "get": {
-        "operationId": "GetCookbook",
+        "operationId": "InfraProxy_GetCookbook",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Cookbook"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -572,12 +674,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
       "get": {
-        "operationId": "GetCookbookFileContent",
+        "operationId": "InfraProxy_GetCookbookFileContent",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookFileContent"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -625,12 +733,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags": {
       "get": {
-        "operationId": "GetDataBags",
+        "operationId": "InfraProxy_GetDataBags",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBags"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -662,12 +776,18 @@ func init() {
         ]
       },
       "post": {
-        "operationId": "CreateDataBag",
+        "operationId": "InfraProxy_CreateDataBag",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateDataBag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -702,12 +822,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
       "delete": {
-        "operationId": "DeleteDataBag",
+        "operationId": "InfraProxy_DeleteDataBag",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -746,12 +872,18 @@ func init() {
         ]
       },
       "post": {
-        "operationId": "CreateDataBagItem",
+        "operationId": "InfraProxy_CreateDataBagItem",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateDataBagItem"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -793,12 +925,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item_id}": {
       "put": {
-        "operationId": "UpdateDataBagItem",
+        "operationId": "InfraProxy_UpdateDataBagItem",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateDataBagItem"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -847,12 +985,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
       "get": {
-        "operationId": "GetDataBagItem",
+        "operationId": "InfraProxy_GetDataBagItem",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBag"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -893,12 +1037,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments": {
       "get": {
-        "operationId": "GetEnvironments",
+        "operationId": "InfraProxy_GetEnvironments",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environments"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -923,12 +1073,18 @@ func init() {
         ]
       },
       "post": {
-        "operationId": "CreateEnvironment",
+        "operationId": "InfraProxy_CreateEnvironment",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environment"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -963,12 +1119,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
       "get": {
-        "operationId": "GetEnvironment",
+        "operationId": "InfraProxy_GetEnvironment",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environment"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1000,12 +1162,18 @@ func init() {
         ]
       },
       "delete": {
-        "operationId": "DeleteEnvironment",
+        "operationId": "InfraProxy_DeleteEnvironment",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environment"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1037,12 +1205,18 @@ func init() {
         ]
       },
       "put": {
-        "operationId": "UpdateEnvironment",
+        "operationId": "InfraProxy_UpdateEnvironment",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environment"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1084,12 +1258,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}": {
       "delete": {
-        "operationId": "DeleteNode",
+        "operationId": "InfraProxy_DeleteNode",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DeleteNode"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1119,16 +1299,73 @@ func init() {
         "tags": [
           "InfraProxy"
         ]
+      },
+      "put": {
+        "operationId": "InfraProxy_UpdateNode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateNode"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Node name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateNode"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
       "get": {
-        "operationId": "GetPolicyfiles",
+        "operationId": "InfraProxy_GetPolicyfiles",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Policyfiles"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1155,12 +1392,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
       "get": {
-        "operationId": "GetPolicyfile",
+        "operationId": "InfraProxy_GetPolicyfile",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Policyfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1201,12 +1444,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
-        "operationId": "GetRoles",
+        "operationId": "InfraProxy_GetRoles",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Roles"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1231,12 +1480,18 @@ func init() {
         ]
       },
       "post": {
-        "operationId": "CreateRole",
+        "operationId": "InfraProxy_CreateRole",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Role"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1271,12 +1526,18 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}": {
       "get": {
-        "operationId": "GetRole",
+        "operationId": "InfraProxy_GetRole",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Role"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1308,12 +1569,18 @@ func init() {
         ]
       },
       "delete": {
-        "operationId": "DeleteRole",
+        "operationId": "InfraProxy_DeleteRole",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Role"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1345,12 +1612,18 @@ func init() {
         ]
       },
       "put": {
-        "operationId": "UpdateRole",
+        "operationId": "InfraProxy_UpdateRole",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Role"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1392,12 +1665,18 @@ func init() {
     },
     "/api/v0/infra/version": {
       "get": {
-        "operationId": "GetVersion",
+        "operationId": "InfraProxy_GetVersion",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1694,6 +1973,58 @@ func init() {
         "override_attributes": {
           "type": "object",
           "description": "Environment override attributes JSON."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.UpdateNode": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Node name."
+        },
+        "environment": {
+          "type": "string",
+          "description": "Node environment."
+        },
+        "policy_name": {
+          "type": "string",
+          "description": "Node policy name."
+        },
+        "policy_group": {
+          "type": "string",
+          "description": "Node policy group."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Node run-list."
+        },
+        "automatic_attributes": {
+          "type": "object",
+          "description": "Node automatic attributes JSON."
+        },
+        "default_attributes": {
+          "type": "object",
+          "description": "Node default attributes JSON."
+        },
+        "normal_attributes": {
+          "type": "object",
+          "description": "Node normal attributes JSON."
+        },
+        "override_attributes": {
+          "type": "object",
+          "description": "Node override attributes JSON."
         }
       }
     },
@@ -2227,11 +2558,11 @@ func init() {
         },
         "default_attributes": {
           "type": "string",
-          "description": "Stringified json of the default attributes."
+          "description": "Environment default attributes JSON."
         },
         "override_attributes": {
           "type": "string",
-          "description": "Stringified json of the override attributes."
+          "description": "Environment override attributes JSON."
         }
       }
     },
@@ -2457,11 +2788,11 @@ func init() {
         },
         "default_attributes": {
           "type": "string",
-          "description": "Stringified JSON of the default attributes."
+          "description": "Policyfile default attributes JSON."
         },
         "override_attributes": {
           "type": "string",
-          "description": "Stringified JSON of the override attributes."
+          "description": "Policyfile override attributes JSON."
         },
         "expanded_run_list": {
           "type": "array",
@@ -2527,11 +2858,11 @@ func init() {
         },
         "default_attributes": {
           "type": "string",
-          "description": "Stringified json of the default attributes."
+          "description": "Role default attributes JSON."
         },
         "override_attributes": {
           "type": "string",
-          "description": "Stringified json of the override attributes."
+          "description": "Role override attributes JSON."
         },
         "json_class": {
           "type": "string",
@@ -2696,6 +3027,15 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.UpdateNode": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Node name."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.UpdateOrg": {
       "type": "object",
       "properties": {
@@ -2714,6 +3054,18 @@ func init() {
         }
       }
     },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
     "google.protobuf.NullValue": {
       "type": "string",
       "enum": [
@@ -2721,6 +3073,27 @@ func init() {
       ],
       "default": "NULL_VALUE",
       "description": "` + "`" + `NullValue` + "`" + ` is a singleton enumeration to represent the null value for the\n` + "`" + `Value` + "`" + ` type union.\n\n The JSON representation for ` + "`" + `NullValue` + "`" + ` is JSON ` + "`" + `null` + "`" + `.\n\n - NULL_VALUE: Null value."
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
     }
   }
 }

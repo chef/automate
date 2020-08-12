@@ -18,12 +18,18 @@ func init() {
       "post": {
         "summary": "CreateRollout",
         "description": "Creates a Rollout record. A rollout represents the process of nodes acquiring\nthe latest policy revision pushed to a policy group.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ningest:unifiedEvents:create\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "CreateRollout",
+        "operationId": "ConfigMgmt_CreateRollout",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -46,12 +52,18 @@ func init() {
       "get": {
         "summary": "GetRolloutForChefRun",
         "description": "Returns the rollout for the given Chef Server/org, policy group, policy name, and policy revision\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetRolloutForChefRun",
+        "operationId": "ConfigMgmt_GetRolloutForChefRun",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -84,12 +96,18 @@ func init() {
       "get": {
         "summary": "GetRollouts",
         "description": "Gives a list of rollouts\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetRollouts",
+        "operationId": "ConfigMgmt_GetRollouts",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollouts"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -113,12 +131,18 @@ func init() {
     },
     "/api/beta/cfgmgmt/rollouts/progress_by_node_segment": {
       "get": {
-        "operationId": "ListNodeSegmentsWithRolloutProgress",
+        "operationId": "ConfigMgmt_ListNodeSegmentsWithRolloutProgress",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodeSegmentsWithRolloutProgress"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -144,12 +168,18 @@ func init() {
       "get": {
         "summary": "GetRolloutById",
         "description": "Returns the rollout with the given Id\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetRolloutById",
+        "operationId": "ConfigMgmt_GetRolloutById",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Rollout"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -170,12 +200,18 @@ func init() {
       "post": {
         "summary": "CreateRolloutTest",
         "description": "CreateRolloutTest is a no-op endpoint that has the same auth requirements as\nCreateRollout. It can be used to verify end-to-end config/connectivity for\nclients\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ningest:unifiedEvents:create\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "CreateRolloutTest",
+        "operationId": "ConfigMgmt_CreateRolloutTest",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CreateRolloutTest"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -198,12 +234,18 @@ func init() {
       "get": {
         "summary": "List Errors",
         "description": "Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetErrors",
+        "operationId": "ConfigMgmt_GetErrors",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Errors"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -237,12 +279,18 @@ func init() {
       "get": {
         "summary": "GetNodeMetadataCounts",
         "description": "For each type of field requested this returns distinct values the amount of each. For example, \nif the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8 could be returned. \nThe number next to each represents the number of nodes with that type of platform.\n\nExample:\nrequest\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/node_metadata_counts?type=platform\u0026type=status\n` + "`" + `` + "`" + `` + "`" + `\nresponse\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"types\": [\n{\n\"values\": [\n{\n\"value\": \"mac_os_x 10.11.5\",\n\"count\": 28\n},\n{\n\"value\": \"linux 8.9\",\n\"count\": 1\n},\n{\n\"value\": \"macos 8.9\",\n\"count\": 1\n},\n{\n\"value\": \"windows 8.9\",\n\"count\": 1\n}\n],\n\"type\": \"platform\"\n},\n{\n\"value\": [\n{\n\"value\": \"missing\",\n\"count\": 29\n},\n{\n\"value\": \"failure\",\n\"count\": 2\n}\n],\n\"type\": \"status\"\n}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetNodeMetadataCounts",
+        "operationId": "ConfigMgmt_GetNodeMetadataCounts",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodeMetadataCounts"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -293,12 +341,18 @@ func init() {
       "get": {
         "summary": "GetNodeRunsDailyStatusTimeSeries",
         "description": "Provides the status of runs for each 24-hour duration. For multiple runs in one 24-hour duration, \nthe most recent failed run will be returned. If there are no failed runs the most recent successful \nrun will be returned. If no runs are found in the 24-hour duration, the status will be \"missing\" \nand no run information will be returned.\n\nExample:\nrequest\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/node_runs_daily_status_time_series?node_id=507bd518-5c18-4c2d-a445-60fe7dde9961\u0026days_ago=3\n` + "`" + `` + "`" + `` + "`" + `\nresponse\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"durations\": [\n{\n\"start\": \"2020-04-25T19:00:00Z\",\n\"end\": \"2020-04-26T18:59:59Z\",\n\"status\": \"missing\",\n\"run_id\": \"\"\n},\n{\n\"start\": \"2020-04-26T19:00:00Z\",\n\"end\": \"2020-04-27T18:59:59Z\",\n\"status\": \"missing\",\n\"run_id\": \"\"\n},\n{\n\"start\": \"2020-04-27T19:00:00Z\",\n\"end\": \"2020-04-28T18:59:59Z\",\n\"status\": \"failure\",\n\"run_id\": \"b7904f41-68b5-44ec-9da6-cf2481ff8600\"\n}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetNodeRunsDailyStatusTimeSeries",
+        "operationId": "ConfigMgmt_GetNodeRunsDailyStatusTimeSeries",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodeRunsDailyStatusTimeSeries"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -328,7 +382,7 @@ func init() {
       "get": {
         "summary": "List Checked-in Nodes",
         "description": "Returns a list of infra nodes that have checked in to Automate.\nAdding a filter makes a list of all nodes that meet the filter criteria.\nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetNodes",
+        "operationId": "ConfigMgmt_GetNodes",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -337,6 +391,12 @@ func init() {
               "items": {
                 "type": "object"
               }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -411,12 +471,18 @@ func init() {
       "get": {
         "summary": "Show Attributes",
         "description": "Returns the latest reported attributes for the provided node ID.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:get\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetAttributes",
+        "operationId": "ConfigMgmt_GetAttributes",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodeAttribute"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -438,7 +504,7 @@ func init() {
       "get": {
         "summary": "List Run Details",
         "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node ID.\nSupports pagination.\nAccepts a ` + "`" + `start` + "`" + ` parameter to denote start date for the list and a filter of type ` + "`" + `status` + "`" + `.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetRuns",
+        "operationId": "ConfigMgmt_GetRuns",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -447,6 +513,12 @@ func init() {
               "items": {
                 "type": "object"
               }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -509,12 +581,18 @@ func init() {
       "get": {
         "summary": "Show Node Run",
         "description": "Returns the infra run report for the provided node ID and run ID.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:get\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetNodeRun",
+        "operationId": "ConfigMgmt_GetNodeRun",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Run"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -551,7 +629,7 @@ func init() {
       "get": {
         "summary": "List Organizations",
         "description": "Returns a list of all organizations associated with nodes that have checked in to Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetOrganizations",
+        "operationId": "ConfigMgmt_GetOrganizations",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -560,6 +638,12 @@ func init() {
               "items": {
                 "type": "object"
               }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -572,12 +656,18 @@ func init() {
       "get": {
         "summary": "List Policy Cookbooks",
         "description": "Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID. \nPolicy revision IDs are sent with an infra run report and identifies which instance of a policy the node used for this run.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetPolicyCookbooks",
+        "operationId": "ConfigMgmt_GetPolicyCookbooks",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.PolicyCookbooks"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -599,7 +689,7 @@ func init() {
       "get": {
         "summary": "List Associated Chef Infra Servers",
         "description": "Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetSourceFqdns",
+        "operationId": "ConfigMgmt_GetSourceFqdns",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -608,6 +698,12 @@ func init() {
               "items": {
                 "type": "object"
               }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -620,12 +716,18 @@ func init() {
       "get": {
         "summary": "List Node Checkins",
         "description": "Returns a daily time series of unique node check-ins for the number of days requested.\nIf ` + "`" + `days ago` + "`" + ` value is empty, API will return the default 1 day ago results.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetCheckInCountsTimeSeries",
+        "operationId": "ConfigMgmt_GetCheckInCountsTimeSeries",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CheckInCountsTimeSeries"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -659,12 +761,18 @@ func init() {
       "get": {
         "summary": "List Missing Nodes Count",
         "description": "Returns a count of missing nodes for the provided durations.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/missing_node_duration_counts?durations=3d\u0026durations=1w\u0026durations=2w\u0026durations=1M\u0026durations=3M\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetMissingNodeDurationCounts",
+        "operationId": "ConfigMgmt_GetMissingNodeDurationCounts",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.MissingNodeDurationCounts"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -690,12 +798,18 @@ func init() {
       "get": {
         "summary": "List Node Status Counts",
         "description": "Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.\nSupports filtering.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/node_counts?filter=name:mySO*\u0026filter=platform:ubun*\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetNodesCounts",
+        "operationId": "ConfigMgmt_GetNodesCounts",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodesCounts"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -735,12 +849,18 @@ func init() {
       "get": {
         "summary": "List Run Status Totals",
         "description": "Returns totals for failed and successful runs given a ` + "`" + `node_id` + "`" + `.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd\u0026start=2019-11-02\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetRunsCounts",
+        "operationId": "ConfigMgmt_GetRunsCounts",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunsCounts"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -787,7 +907,7 @@ func init() {
       "get": {
         "summary": "List Filter Suggestions",
         "description": "Returns possible filter values given a valid ` + "`" + `type` + "`" + ` parameter. All values returned until two or more characters are provided for the ` + "`" + `text` + "`" + ` parameter.\nSupports wildcard (* and ?).\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/suggestions?type=environment\u0026text=_d\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "GetSuggestions",
+        "operationId": "ConfigMgmt_GetSuggestions",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -796,6 +916,12 @@ func init() {
               "items": {
                 "type": "object"
               }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -833,12 +959,18 @@ func init() {
     },
     "/api/v0/cfgmgmt/version": {
       "get": {
-        "operationId": "GetVersion",
+        "operationId": "ConfigMgmt_GetVersion",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -1898,6 +2030,27 @@ func init() {
       "default": "NULL_VALUE",
       "description": "` + "`" + `NullValue` + "`" + ` is a singleton enumeration to represent the null value for the\n` + "`" + `Value` + "`" + ` type union.\n\n The JSON representation for ` + "`" + `NullValue` + "`" + ` is JSON ` + "`" + `null` + "`" + `.\n\n - NULL_VALUE: Null value."
     },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
+    },
     "grpc.gateway.runtime.StreamError": {
       "type": "object",
       "properties": {
@@ -1922,20 +2075,6 @@ func init() {
           }
         }
       }
-    }
-  },
-  "x-stream-definitions": {
-    "chef.automate.api.common.ExportData": {
-      "type": "object",
-      "properties": {
-        "result": {
-          "$ref": "#/definitions/chef.automate.api.common.ExportData"
-        },
-        "error": {
-          "$ref": "#/definitions/grpc.gateway.runtime.StreamError"
-        }
-      },
-      "title": "Stream result of chef.automate.api.common.ExportData"
     }
   }
 }

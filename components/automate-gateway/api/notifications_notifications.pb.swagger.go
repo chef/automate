@@ -16,12 +16,18 @@ func init() {
   "paths": {
     "/api/v0/notifications/rules": {
       "get": {
-        "operationId": "ListRules",
+        "operationId": "Notifications_ListRules",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.notifications.RuleListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -30,12 +36,18 @@ func init() {
         ]
       },
       "post": {
-        "operationId": "AddRule",
+        "operationId": "Notifications_AddRule",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.notifications.RuleAddResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -56,12 +68,18 @@ func init() {
     },
     "/api/v0/notifications/rules/{id}": {
       "get": {
-        "operationId": "GetRule",
+        "operationId": "Notifications_GetRule",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.notifications.RuleGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -78,12 +96,18 @@ func init() {
         ]
       },
       "delete": {
-        "operationId": "DeleteRule",
+        "operationId": "Notifications_DeleteRule",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.notifications.RuleDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -100,12 +124,18 @@ func init() {
         ]
       },
       "put": {
-        "operationId": "UpdateRule",
+        "operationId": "Notifications_UpdateRule",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.notifications.RuleUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -132,12 +162,18 @@ func init() {
     },
     "/api/v0/notifications/version": {
       "get": {
-        "operationId": "Version",
+        "operationId": "Notifications_Version",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.notifications.VersionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -148,12 +184,18 @@ func init() {
     },
     "/api/v0/notifications/webhook": {
       "post": {
-        "operationId": "ValidateWebhook",
+        "operationId": "Notifications_ValidateWebhook",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.notifications.URLValidationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -229,6 +271,12 @@ func init() {
         },
         "id": {
           "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "rule": {
+          "$ref": "#/definitions/chef.automate.api.notifications.Rule"
         }
       }
     },
@@ -371,6 +419,39 @@ func init() {
       "properties": {
         "url": {
           "type": "string"
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
         }
       }
     }

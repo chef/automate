@@ -37,7 +37,13 @@ func (s *notificationsServer) AddRule(ctx context.Context, in *pb.RuleAddRequest
 
 	switch resp.GetCode() {
 	case notifications.RuleAddResponse_ADDED:
-		return &pb.RuleAddResponse{Messages: resp.Messages, Id: resp.Id}, nil
+		var transformedResponse pb.RuleAddResponse
+		err = transform(resp, &transformedResponse)
+		if err != nil {
+			return nil, err
+		}
+		transformedResponse.Rule.Id = resp.GetId()
+		return &transformedResponse, nil
 	case notifications.RuleAddResponse_DUPLICATE_NAME:
 		return nil, status.Error(codes.AlreadyExists, strings.Join(resp.GetMessages(), "\n"))
 	case notifications.RuleAddResponse_INVALID_ACTION_CONFIG,

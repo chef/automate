@@ -71,4 +71,8 @@ export class UnknownDesktopDurationCountsComponent  implements OnInit, OnDestroy
         return duration;
     }
   }
+
+  get hasData(): boolean {
+    return this.countedDurationItems.some(item => item.count > 0);
+  }
 }

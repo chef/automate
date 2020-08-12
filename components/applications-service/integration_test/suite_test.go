@@ -67,10 +67,15 @@ func NewSuite(database string) *Suite {
 			},
 		}
 	)
-	dbClient, err := postgres.New(&c.Postgres)
+	dbClient, err := postgres.Connect(&c.Postgres)
 	if err != nil {
 		fmt.Printf("Could not create postgres client: %s\n", err)
 		os.Exit(1)
+	}
+
+	if err := dbClient.DestructiveMigrateForTests(); err != nil {
+		fmt.Println("Could not complete DestructiveMigrateForTests migrations")
+		fmt.Println(err.Error())
 	}
 
 	// A global Storage Client to call any storage function
