@@ -152,10 +152,39 @@ function compile_client_mocks() {
   )
 }
 
+function lint_all_protobuf_components() {
+  install_protoc_toolchain || return 1
+
+  local ret
+  local lintercmd="buf check lint"
+  pushd /src/ > /dev/null || return 1
+  echo "Linting protos with \`${lintercmd}\`..."
+  $lintercmd
+  ret=$?
+  if [[ $ret -ne 0 ]]; then
+    echo "😱 Command \`${lintercmd}\` failed! Refer to the docs if you need help fixing:"
+    echo "- https://buf.build/docs/style-guide/"
+    echo "- https://buf.build/docs/lint-checkers"
+    echo "- https://buf.build/docs/lint-configuration"
+  else
+    echo "😎 All good"
+  fi
+  popd > /dev/null
+  return "$ret"
+}
+
 document "compile_all_protobuf_components" <<DOC
   Compile every protobuf file for every component in A2.
 DOC
 function compile_all_protobuf_components() {
+  lint_all_protobuf_components && compile_all_protobuf_components_nolint
+}
+
+document "compile_all_protobuf_components_nolint" <<DOC
+  Compile every protobuf file for every component in A2 without running the
+  linter (linters in grpc.sh scripts will still run)
+DOC
+function compile_all_protobuf_components_nolint() {
   local components
 
   install_if_missing core/git git

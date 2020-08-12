@@ -11,12 +11,18 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/chef/automate/api/interservice/authz"
+	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
+	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/ingest"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/migration"
+	"github.com/chef/automate/components/ingest-service/pipeline"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -60,19 +66,66 @@ func Spawn(opts *serveropts.Opts) error {
 		return err
 	}
 
-	grpcServer := opts.ConnFactory.NewServer()
-
 	pgURL, err := pgURL(opts.PGURL, opts.PGDatabase)
 	if err != nil {
 		log.WithError(err).Fatal("could not get PG URL")
 		return err
 	}
 
-	dbMap, err := libdb.PGOpen(pgURL)
+	db, err := libdb.PGOpen(pgURL)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to open database with uri: %s", pgURL)
 	}
-	migrator := migration.New(client, dbMap)
+
+	// Authz Interface
+	authzConn, err := opts.ConnFactory.Dial("authz-service", opts.AuthzAddress)
+	if err != nil {
+		log.WithError(err).Error("Failed checking if a migration is running")
+		return err
+	}
+
+	authzProjectsClient := authz.NewProjectsClient(authzConn)
+
+	// event feed Interface
+	eventFeedConn, err := opts.ConnFactory.Dial("event-feed-service", opts.EventFeedAddress)
+	if err != nil {
+		// This should never happen
+		log.WithError(err).Error("Failed to create Event Feed connection")
+		return err
+	}
+	defer eventFeedConn.Close() // nolint: errcheck
+
+	eventFeedServiceClient := event_feed.NewEventFeedServiceClient(eventFeedConn)
+
+	// nodemanager Interface
+	nodeMgrConn, err := opts.ConnFactory.Dial("nodemanager-service", opts.NodeManagerAddress)
+	if err != nil {
+		// This should never happen
+		log.WithError(err).Error("Failed to create NodeManager connection")
+		return err
+	}
+	defer nodeMgrConn.Close() // nolint: errcheck
+
+	nodeMgrServiceClient := manager.NewNodeManagerServiceClient(nodeMgrConn)
+	nodesServiceClient := nodes.NewNodesServiceClient(nodeMgrConn)
+
+	configMgmtConn, err := opts.ConnFactory.Dial("config-mgmt-service", opts.ConfigMgmtAddress)
+	if err != nil {
+		log.WithError(err).WithFields(log.Fields{"config_mgmt_address": opts.ConfigMgmtAddress}).Error("Failed to connect to config-mgmt-service")
+		return err
+	}
+	configMgmtClient := cfgmgmt.NewCfgMgmtClient(configMgmtConn)
+
+	chefActionPipeline := pipeline.NewChefActionPipeline(client, authzProjectsClient,
+		configMgmtClient, eventFeedServiceClient,
+		opts.ChefIngestServerConfig.MaxNumberOfBundledActionMsgs,
+		opts.ChefIngestServerConfig.MessageBufferSize)
+
+	chefRunPipeline := pipeline.NewChefRunPipeline(client, authzProjectsClient,
+		nodeMgrServiceClient, opts.ChefIngestServerConfig.ChefIngestRunPipelineConfig,
+		opts.ChefIngestServerConfig.MessageBufferSize)
+
+	migrator := migration.New(client, chefActionPipeline, db)
 
 	// Register Status Server
 	ingestStatus := server.NewIngestStatus(client, migrator)

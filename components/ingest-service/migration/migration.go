@@ -48,10 +48,10 @@ type Status struct {
 	ctx            context.Context
 	client         backend.Client
 	actionPipeline pipeline.ChefActionPipeline
-	mapper    *gorp.DbMap
+	mapper         *gorp.DbMap
 }
 
-func New(client backend.Client, actionPipeline pipeline.ChefActionPipeline) *Status {
+func New(client backend.Client, actionPipeline pipeline.ChefActionPipeline, postgresql *sql.DB) *Status {
 	return &Status{
 		total:          0,
 		completed:      0,
@@ -60,7 +60,8 @@ func New(client backend.Client, actionPipeline pipeline.ChefActionPipeline) *Sta
 		ctx:            context.Background(),
 		client:         client,
 		actionPipeline: actionPipeline,
-		mapper:    &gorp.DbMap{Db: postgresql, Dialect: gorp.PostgresDialect{}},
+		mapper:         &gorp.DbMap{Db: postgresql, Dialect: gorp.PostgresDialect{}},
+	}
 }
 
 // Start - start the migration from a prior automate to the current automate for only the config-mgmt-service.
