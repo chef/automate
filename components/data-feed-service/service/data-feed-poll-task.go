@@ -191,7 +191,7 @@ func (d *DataFeedPollTask) GetChangedNodes(ctx context.Context, pageSize int32, 
 		Start:    feedStartString,
 		End:      feedEndString,
 		Sorting: &cfgmgmtRequest.Sorting{
-			Order: cfgmgmtRequest.Order_desc,
+			Order: cfgmgmtRequest.Order_DESC,
 		},
 	}
 

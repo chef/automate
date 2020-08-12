@@ -16,7 +16,7 @@ service PGSidecar {
 
 message ErrorDetails {
 	enum Codes {
-		SrcDbMissing = 0;
+		SRC_DB_MISSING = 0;
 	}
 
 	Codes code = 20;
