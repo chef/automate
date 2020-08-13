@@ -42,7 +42,7 @@ message HealthRequest {}
 message MetricsRequest {}
 message MigrationStatusRequest {}
 
-service IngestStatus {
+service IngestStatusService {
 	rpc GetMetrics (MetricsRequest) returns (Metrics);
 	rpc GetHealth (HealthRequest) returns (Health) {
 		option (google.api.http).get = "/api/v0/health";

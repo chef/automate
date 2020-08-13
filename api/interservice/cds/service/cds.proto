@@ -9,7 +9,7 @@ import "external/common/response.proto";
 
 import "external/common/version/version.proto";
 
-service AutomateCds {
+service AutomateCdsService {
     rpc GetVersion (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo);
     rpc ListContentItems(chef.automate.api.cds.request.ContentItems) returns (chef.automate.api.cds.response.ContentItems);
     rpc InstallContentItem(chef.automate.api.cds.request.InstallContentItem) returns (chef.automate.api.cds.response.InstallContentItem);

@@ -240,7 +240,7 @@ message PurgeSubjectFromPoliciesResp {
     repeated string ids = 1; // ids is IDs of modified policies
 }
 
-service Policies {
+service PoliciesService {
     rpc ReplacePolicyMembers (ReplacePolicyMembersReq) returns (ReplacePolicyMembersResp) {};
     rpc CreatePolicy (CreatePolicyReq) returns (Policy) {};
     rpc DeletePolicy (DeletePolicyReq) returns (DeletePolicyResp) {};

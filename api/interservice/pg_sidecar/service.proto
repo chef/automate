@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.infra.pg_sidecar;
 option go_package = "github.com/chef/automate/api/interservice/pg_sidecar";
 
-service PGSidecar {
+service PGSidecarService {
 	rpc MigrateTables(MigrateTablesReq) returns (MigrateTablesRes) {};
 	rpc RenameDB(RenameDBReq) returns (RenameDBRes) {};
 	rpc CreateDB(CreateDBReq) returns (CreateDBRes) {};

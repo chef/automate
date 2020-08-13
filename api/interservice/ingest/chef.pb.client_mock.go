@@ -13,31 +13,31 @@ import (
 	reflect "reflect"
 )
 
-// MockChefIngesterClient is a mock of ChefIngesterClient interface
-type MockChefIngesterClient struct {
+// MockChefIngesterServiceClient is a mock of ChefIngesterServiceClient interface
+type MockChefIngesterServiceClient struct {
 	ctrl     *gomock.Controller
-	recorder *MockChefIngesterClientMockRecorder
+	recorder *MockChefIngesterServiceClientMockRecorder
 }
 
-// MockChefIngesterClientMockRecorder is the mock recorder for MockChefIngesterClient
-type MockChefIngesterClientMockRecorder struct {
-	mock *MockChefIngesterClient
+// MockChefIngesterServiceClientMockRecorder is the mock recorder for MockChefIngesterServiceClient
+type MockChefIngesterServiceClientMockRecorder struct {
+	mock *MockChefIngesterServiceClient
 }
 
-// NewMockChefIngesterClient creates a new mock instance
-func NewMockChefIngesterClient(ctrl *gomock.Controller) *MockChefIngesterClient {
-	mock := &MockChefIngesterClient{ctrl: ctrl}
-	mock.recorder = &MockChefIngesterClientMockRecorder{mock}
+// NewMockChefIngesterServiceClient creates a new mock instance
+func NewMockChefIngesterServiceClient(ctrl *gomock.Controller) *MockChefIngesterServiceClient {
+	mock := &MockChefIngesterServiceClient{ctrl: ctrl}
+	mock.recorder = &MockChefIngesterServiceClientMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockChefIngesterClient) EXPECT() *MockChefIngesterClientMockRecorder {
+func (m *MockChefIngesterServiceClient) EXPECT() *MockChefIngesterServiceClientMockRecorder {
 	return m.recorder
 }
 
 // ProcessChefRun mocks base method
-func (m *MockChefIngesterClient) ProcessChefRun(ctx context.Context, in *request.Run, opts ...grpc.CallOption) (*response.ProcessChefRunResponse, error) {
+func (m *MockChefIngesterServiceClient) ProcessChefRun(ctx context.Context, in *request.Run, opts ...grpc.CallOption) (*response.ProcessChefRunResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -50,14 +50,14 @@ func (m *MockChefIngesterClient) ProcessChefRun(ctx context.Context, in *request
 }
 
 // ProcessChefRun indicates an expected call of ProcessChefRun
-func (mr *MockChefIngesterClientMockRecorder) ProcessChefRun(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceClientMockRecorder) ProcessChefRun(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessChefRun", reflect.TypeOf((*MockChefIngesterClient)(nil).ProcessChefRun), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessChefRun", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).ProcessChefRun), varargs...)
 }
 
 // ProcessChefAction mocks base method
-func (m *MockChefIngesterClient) ProcessChefAction(ctx context.Context, in *request.Action, opts ...grpc.CallOption) (*response.ProcessChefActionResponse, error) {
+func (m *MockChefIngesterServiceClient) ProcessChefAction(ctx context.Context, in *request.Action, opts ...grpc.CallOption) (*response.ProcessChefActionResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -70,14 +70,14 @@ func (m *MockChefIngesterClient) ProcessChefAction(ctx context.Context, in *requ
 }
 
 // ProcessChefAction indicates an expected call of ProcessChefAction
-func (mr *MockChefIngesterClientMockRecorder) ProcessChefAction(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceClientMockRecorder) ProcessChefAction(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessChefAction", reflect.TypeOf((*MockChefIngesterClient)(nil).ProcessChefAction), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessChefAction", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).ProcessChefAction), varargs...)
 }
 
 // ProcessLivenessPing mocks base method
-func (m *MockChefIngesterClient) ProcessLivenessPing(ctx context.Context, in *request.Liveness, opts ...grpc.CallOption) (*response.ProcessLivenessResponse, error) {
+func (m *MockChefIngesterServiceClient) ProcessLivenessPing(ctx context.Context, in *request.Liveness, opts ...grpc.CallOption) (*response.ProcessLivenessResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -90,14 +90,14 @@ func (m *MockChefIngesterClient) ProcessLivenessPing(ctx context.Context, in *re
 }
 
 // ProcessLivenessPing indicates an expected call of ProcessLivenessPing
-func (mr *MockChefIngesterClientMockRecorder) ProcessLivenessPing(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceClientMockRecorder) ProcessLivenessPing(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessLivenessPing", reflect.TypeOf((*MockChefIngesterClient)(nil).ProcessLivenessPing), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessLivenessPing", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).ProcessLivenessPing), varargs...)
 }
 
 // ProcessMultipleNodeDeletes mocks base method
-func (m *MockChefIngesterClient) ProcessMultipleNodeDeletes(ctx context.Context, in *request.MultipleNodeDeleteRequest, opts ...grpc.CallOption) (*response.ProcessMultipleNodeDeleteResponse, error) {
+func (m *MockChefIngesterServiceClient) ProcessMultipleNodeDeletes(ctx context.Context, in *request.MultipleNodeDeleteRequest, opts ...grpc.CallOption) (*response.ProcessMultipleNodeDeleteResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -110,14 +110,14 @@ func (m *MockChefIngesterClient) ProcessMultipleNodeDeletes(ctx context.Context,
 }
 
 // ProcessMultipleNodeDeletes indicates an expected call of ProcessMultipleNodeDeletes
-func (mr *MockChefIngesterClientMockRecorder) ProcessMultipleNodeDeletes(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceClientMockRecorder) ProcessMultipleNodeDeletes(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessMultipleNodeDeletes", reflect.TypeOf((*MockChefIngesterClient)(nil).ProcessMultipleNodeDeletes), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessMultipleNodeDeletes", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).ProcessMultipleNodeDeletes), varargs...)
 }
 
 // ProcessNodeDelete mocks base method
-func (m *MockChefIngesterClient) ProcessNodeDelete(ctx context.Context, in *request.Delete, opts ...grpc.CallOption) (*response.ProcessNodeDeleteResponse, error) {
+func (m *MockChefIngesterServiceClient) ProcessNodeDelete(ctx context.Context, in *request.Delete, opts ...grpc.CallOption) (*response.ProcessNodeDeleteResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -130,14 +130,14 @@ func (m *MockChefIngesterClient) ProcessNodeDelete(ctx context.Context, in *requ
 }
 
 // ProcessNodeDelete indicates an expected call of ProcessNodeDelete
-func (mr *MockChefIngesterClientMockRecorder) ProcessNodeDelete(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceClientMockRecorder) ProcessNodeDelete(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessNodeDelete", reflect.TypeOf((*MockChefIngesterClient)(nil).ProcessNodeDelete), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessNodeDelete", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).ProcessNodeDelete), varargs...)
 }
 
 // GetVersion mocks base method
-func (m *MockChefIngesterClient) GetVersion(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*Version, error) {
+func (m *MockChefIngesterServiceClient) GetVersion(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*Version, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -150,37 +150,37 @@ func (m *MockChefIngesterClient) GetVersion(ctx context.Context, in *VersionRequ
 }
 
 // GetVersion indicates an expected call of GetVersion
-func (mr *MockChefIngesterClientMockRecorder) GetVersion(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceClientMockRecorder) GetVersion(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockChefIngesterClient)(nil).GetVersion), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).GetVersion), varargs...)
 }
 
-// MockChefIngesterServer is a mock of ChefIngesterServer interface
-type MockChefIngesterServer struct {
+// MockChefIngesterServiceServer is a mock of ChefIngesterServiceServer interface
+type MockChefIngesterServiceServer struct {
 	ctrl     *gomock.Controller
-	recorder *MockChefIngesterServerMockRecorder
+	recorder *MockChefIngesterServiceServerMockRecorder
 }
 
-// MockChefIngesterServerMockRecorder is the mock recorder for MockChefIngesterServer
-type MockChefIngesterServerMockRecorder struct {
-	mock *MockChefIngesterServer
+// MockChefIngesterServiceServerMockRecorder is the mock recorder for MockChefIngesterServiceServer
+type MockChefIngesterServiceServerMockRecorder struct {
+	mock *MockChefIngesterServiceServer
 }
 
-// NewMockChefIngesterServer creates a new mock instance
-func NewMockChefIngesterServer(ctrl *gomock.Controller) *MockChefIngesterServer {
-	mock := &MockChefIngesterServer{ctrl: ctrl}
-	mock.recorder = &MockChefIngesterServerMockRecorder{mock}
+// NewMockChefIngesterServiceServer creates a new mock instance
+func NewMockChefIngesterServiceServer(ctrl *gomock.Controller) *MockChefIngesterServiceServer {
+	mock := &MockChefIngesterServiceServer{ctrl: ctrl}
+	mock.recorder = &MockChefIngesterServiceServerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockChefIngesterServer) EXPECT() *MockChefIngesterServerMockRecorder {
+func (m *MockChefIngesterServiceServer) EXPECT() *MockChefIngesterServiceServerMockRecorder {
 	return m.recorder
 }
 
 // ProcessChefRun mocks base method
-func (m *MockChefIngesterServer) ProcessChefRun(arg0 context.Context, arg1 *request.Run) (*response.ProcessChefRunResponse, error) {
+func (m *MockChefIngesterServiceServer) ProcessChefRun(arg0 context.Context, arg1 *request.Run) (*response.ProcessChefRunResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessChefRun", arg0, arg1)
 	ret0, _ := ret[0].(*response.ProcessChefRunResponse)
@@ -189,13 +189,13 @@ func (m *MockChefIngesterServer) ProcessChefRun(arg0 context.Context, arg1 *requ
 }
 
 // ProcessChefRun indicates an expected call of ProcessChefRun
-func (mr *MockChefIngesterServerMockRecorder) ProcessChefRun(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceServerMockRecorder) ProcessChefRun(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessChefRun", reflect.TypeOf((*MockChefIngesterServer)(nil).ProcessChefRun), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessChefRun", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).ProcessChefRun), arg0, arg1)
 }
 
 // ProcessChefAction mocks base method
-func (m *MockChefIngesterServer) ProcessChefAction(arg0 context.Context, arg1 *request.Action) (*response.ProcessChefActionResponse, error) {
+func (m *MockChefIngesterServiceServer) ProcessChefAction(arg0 context.Context, arg1 *request.Action) (*response.ProcessChefActionResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessChefAction", arg0, arg1)
 	ret0, _ := ret[0].(*response.ProcessChefActionResponse)
@@ -204,13 +204,13 @@ func (m *MockChefIngesterServer) ProcessChefAction(arg0 context.Context, arg1 *r
 }
 
 // ProcessChefAction indicates an expected call of ProcessChefAction
-func (mr *MockChefIngesterServerMockRecorder) ProcessChefAction(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceServerMockRecorder) ProcessChefAction(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessChefAction", reflect.TypeOf((*MockChefIngesterServer)(nil).ProcessChefAction), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessChefAction", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).ProcessChefAction), arg0, arg1)
 }
 
 // ProcessLivenessPing mocks base method
-func (m *MockChefIngesterServer) ProcessLivenessPing(arg0 context.Context, arg1 *request.Liveness) (*response.ProcessLivenessResponse, error) {
+func (m *MockChefIngesterServiceServer) ProcessLivenessPing(arg0 context.Context, arg1 *request.Liveness) (*response.ProcessLivenessResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessLivenessPing", arg0, arg1)
 	ret0, _ := ret[0].(*response.ProcessLivenessResponse)
@@ -219,13 +219,13 @@ func (m *MockChefIngesterServer) ProcessLivenessPing(arg0 context.Context, arg1 
 }
 
 // ProcessLivenessPing indicates an expected call of ProcessLivenessPing
-func (mr *MockChefIngesterServerMockRecorder) ProcessLivenessPing(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceServerMockRecorder) ProcessLivenessPing(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessLivenessPing", reflect.TypeOf((*MockChefIngesterServer)(nil).ProcessLivenessPing), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessLivenessPing", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).ProcessLivenessPing), arg0, arg1)
 }
 
 // ProcessMultipleNodeDeletes mocks base method
-func (m *MockChefIngesterServer) ProcessMultipleNodeDeletes(arg0 context.Context, arg1 *request.MultipleNodeDeleteRequest) (*response.ProcessMultipleNodeDeleteResponse, error) {
+func (m *MockChefIngesterServiceServer) ProcessMultipleNodeDeletes(arg0 context.Context, arg1 *request.MultipleNodeDeleteRequest) (*response.ProcessMultipleNodeDeleteResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessMultipleNodeDeletes", arg0, arg1)
 	ret0, _ := ret[0].(*response.ProcessMultipleNodeDeleteResponse)
@@ -234,13 +234,13 @@ func (m *MockChefIngesterServer) ProcessMultipleNodeDeletes(arg0 context.Context
 }
 
 // ProcessMultipleNodeDeletes indicates an expected call of ProcessMultipleNodeDeletes
-func (mr *MockChefIngesterServerMockRecorder) ProcessMultipleNodeDeletes(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceServerMockRecorder) ProcessMultipleNodeDeletes(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessMultipleNodeDeletes", reflect.TypeOf((*MockChefIngesterServer)(nil).ProcessMultipleNodeDeletes), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessMultipleNodeDeletes", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).ProcessMultipleNodeDeletes), arg0, arg1)
 }
 
 // ProcessNodeDelete mocks base method
-func (m *MockChefIngesterServer) ProcessNodeDelete(arg0 context.Context, arg1 *request.Delete) (*response.ProcessNodeDeleteResponse, error) {
+func (m *MockChefIngesterServiceServer) ProcessNodeDelete(arg0 context.Context, arg1 *request.Delete) (*response.ProcessNodeDeleteResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessNodeDelete", arg0, arg1)
 	ret0, _ := ret[0].(*response.ProcessNodeDeleteResponse)
@@ -249,13 +249,13 @@ func (m *MockChefIngesterServer) ProcessNodeDelete(arg0 context.Context, arg1 *r
 }
 
 // ProcessNodeDelete indicates an expected call of ProcessNodeDelete
-func (mr *MockChefIngesterServerMockRecorder) ProcessNodeDelete(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceServerMockRecorder) ProcessNodeDelete(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessNodeDelete", reflect.TypeOf((*MockChefIngesterServer)(nil).ProcessNodeDelete), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessNodeDelete", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).ProcessNodeDelete), arg0, arg1)
 }
 
 // GetVersion mocks base method
-func (m *MockChefIngesterServer) GetVersion(arg0 context.Context, arg1 *VersionRequest) (*Version, error) {
+func (m *MockChefIngesterServiceServer) GetVersion(arg0 context.Context, arg1 *VersionRequest) (*Version, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetVersion", arg0, arg1)
 	ret0, _ := ret[0].(*Version)
@@ -264,7 +264,7 @@ func (m *MockChefIngesterServer) GetVersion(arg0 context.Context, arg1 *VersionR
 }
 
 // GetVersion indicates an expected call of GetVersion
-func (mr *MockChefIngesterServerMockRecorder) GetVersion(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockChefIngesterServiceServerMockRecorder) GetVersion(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockChefIngesterServer)(nil).GetVersion), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).GetVersion), arg0, arg1)
 }

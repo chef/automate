@@ -24,7 +24,7 @@ import "interservice/infra_proxy/response/environments.proto";
 import "interservice/infra_proxy/response/nodes.proto";
 import "interservice/infra_proxy/response/policyfiles.proto";
 
-service InfraProxy {
+service InfraProxyService {
     rpc GetVersion      (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
 
     rpc CreateServer    (chef.automate.domain.infra_proxy.request.CreateServer) returns (chef.automate.domain.infra_proxy.response.CreateServer) {};
