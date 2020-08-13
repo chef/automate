@@ -63,7 +63,7 @@
           </chef-form-field>
         </form>
         <div id="save">
-          <chef-button primary [disabled]="saveInProgress || !updateForm.valid || !this.updateForm.dirty" (click)="saveToken()">
+          <chef-button primary [disabled]="saveInProgress || !updateForm.valid || !updateForm.dirty" (click)="saveToken()">
             <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
             <span *ngIf="saveInProgress">Saving...</span>
             <span *ngIf="!saveInProgress">Save</span>
