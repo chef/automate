@@ -14,31 +14,31 @@ import (
 	reflect "reflect"
 )
 
-// MockComplianceIngesterClient is a mock of ComplianceIngesterClient interface
-type MockComplianceIngesterClient struct {
+// MockComplianceIngesterServiceClient is a mock of ComplianceIngesterServiceClient interface
+type MockComplianceIngesterServiceClient struct {
 	ctrl     *gomock.Controller
-	recorder *MockComplianceIngesterClientMockRecorder
+	recorder *MockComplianceIngesterServiceClientMockRecorder
 }
 
-// MockComplianceIngesterClientMockRecorder is the mock recorder for MockComplianceIngesterClient
-type MockComplianceIngesterClientMockRecorder struct {
-	mock *MockComplianceIngesterClient
+// MockComplianceIngesterServiceClientMockRecorder is the mock recorder for MockComplianceIngesterServiceClient
+type MockComplianceIngesterServiceClientMockRecorder struct {
+	mock *MockComplianceIngesterServiceClient
 }
 
-// NewMockComplianceIngesterClient creates a new mock instance
-func NewMockComplianceIngesterClient(ctrl *gomock.Controller) *MockComplianceIngesterClient {
-	mock := &MockComplianceIngesterClient{ctrl: ctrl}
-	mock.recorder = &MockComplianceIngesterClientMockRecorder{mock}
+// NewMockComplianceIngesterServiceClient creates a new mock instance
+func NewMockComplianceIngesterServiceClient(ctrl *gomock.Controller) *MockComplianceIngesterServiceClient {
+	mock := &MockComplianceIngesterServiceClient{ctrl: ctrl}
+	mock.recorder = &MockComplianceIngesterServiceClientMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockComplianceIngesterClient) EXPECT() *MockComplianceIngesterClientMockRecorder {
+func (m *MockComplianceIngesterServiceClient) EXPECT() *MockComplianceIngesterServiceClientMockRecorder {
 	return m.recorder
 }
 
 // ProcessComplianceReport mocks base method
-func (m *MockComplianceIngesterClient) ProcessComplianceReport(ctx context.Context, in *compliance.Report, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockComplianceIngesterServiceClient) ProcessComplianceReport(ctx context.Context, in *compliance.Report, opts ...grpc.CallOption) (*empty.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -51,14 +51,14 @@ func (m *MockComplianceIngesterClient) ProcessComplianceReport(ctx context.Conte
 }
 
 // ProcessComplianceReport indicates an expected call of ProcessComplianceReport
-func (mr *MockComplianceIngesterClientMockRecorder) ProcessComplianceReport(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockComplianceIngesterServiceClientMockRecorder) ProcessComplianceReport(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessComplianceReport", reflect.TypeOf((*MockComplianceIngesterClient)(nil).ProcessComplianceReport), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessComplianceReport", reflect.TypeOf((*MockComplianceIngesterServiceClient)(nil).ProcessComplianceReport), varargs...)
 }
 
 // HandleEvent mocks base method
-func (m *MockComplianceIngesterClient) HandleEvent(ctx context.Context, in *event.EventMsg, opts ...grpc.CallOption) (*event.EventResponse, error) {
+func (m *MockComplianceIngesterServiceClient) HandleEvent(ctx context.Context, in *event.EventMsg, opts ...grpc.CallOption) (*event.EventResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -71,14 +71,14 @@ func (m *MockComplianceIngesterClient) HandleEvent(ctx context.Context, in *even
 }
 
 // HandleEvent indicates an expected call of HandleEvent
-func (mr *MockComplianceIngesterClientMockRecorder) HandleEvent(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockComplianceIngesterServiceClientMockRecorder) HandleEvent(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleEvent", reflect.TypeOf((*MockComplianceIngesterClient)(nil).HandleEvent), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleEvent", reflect.TypeOf((*MockComplianceIngesterServiceClient)(nil).HandleEvent), varargs...)
 }
 
 // ProjectUpdateStatus mocks base method
-func (m *MockComplianceIngesterClient) ProjectUpdateStatus(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateStatusResp, error) {
+func (m *MockComplianceIngesterServiceClient) ProjectUpdateStatus(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateStatusResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -91,37 +91,37 @@ func (m *MockComplianceIngesterClient) ProjectUpdateStatus(ctx context.Context, 
 }
 
 // ProjectUpdateStatus indicates an expected call of ProjectUpdateStatus
-func (mr *MockComplianceIngesterClientMockRecorder) ProjectUpdateStatus(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockComplianceIngesterServiceClientMockRecorder) ProjectUpdateStatus(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateStatus", reflect.TypeOf((*MockComplianceIngesterClient)(nil).ProjectUpdateStatus), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateStatus", reflect.TypeOf((*MockComplianceIngesterServiceClient)(nil).ProjectUpdateStatus), varargs...)
 }
 
-// MockComplianceIngesterServer is a mock of ComplianceIngesterServer interface
-type MockComplianceIngesterServer struct {
+// MockComplianceIngesterServiceServer is a mock of ComplianceIngesterServiceServer interface
+type MockComplianceIngesterServiceServer struct {
 	ctrl     *gomock.Controller
-	recorder *MockComplianceIngesterServerMockRecorder
+	recorder *MockComplianceIngesterServiceServerMockRecorder
 }
 
-// MockComplianceIngesterServerMockRecorder is the mock recorder for MockComplianceIngesterServer
-type MockComplianceIngesterServerMockRecorder struct {
-	mock *MockComplianceIngesterServer
+// MockComplianceIngesterServiceServerMockRecorder is the mock recorder for MockComplianceIngesterServiceServer
+type MockComplianceIngesterServiceServerMockRecorder struct {
+	mock *MockComplianceIngesterServiceServer
 }
 
-// NewMockComplianceIngesterServer creates a new mock instance
-func NewMockComplianceIngesterServer(ctrl *gomock.Controller) *MockComplianceIngesterServer {
-	mock := &MockComplianceIngesterServer{ctrl: ctrl}
-	mock.recorder = &MockComplianceIngesterServerMockRecorder{mock}
+// NewMockComplianceIngesterServiceServer creates a new mock instance
+func NewMockComplianceIngesterServiceServer(ctrl *gomock.Controller) *MockComplianceIngesterServiceServer {
+	mock := &MockComplianceIngesterServiceServer{ctrl: ctrl}
+	mock.recorder = &MockComplianceIngesterServiceServerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockComplianceIngesterServer) EXPECT() *MockComplianceIngesterServerMockRecorder {
+func (m *MockComplianceIngesterServiceServer) EXPECT() *MockComplianceIngesterServiceServerMockRecorder {
 	return m.recorder
 }
 
 // ProcessComplianceReport mocks base method
-func (m *MockComplianceIngesterServer) ProcessComplianceReport(arg0 context.Context, arg1 *compliance.Report) (*empty.Empty, error) {
+func (m *MockComplianceIngesterServiceServer) ProcessComplianceReport(arg0 context.Context, arg1 *compliance.Report) (*empty.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessComplianceReport", arg0, arg1)
 	ret0, _ := ret[0].(*empty.Empty)
@@ -130,13 +130,13 @@ func (m *MockComplianceIngesterServer) ProcessComplianceReport(arg0 context.Cont
 }
 
 // ProcessComplianceReport indicates an expected call of ProcessComplianceReport
-func (mr *MockComplianceIngesterServerMockRecorder) ProcessComplianceReport(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockComplianceIngesterServiceServerMockRecorder) ProcessComplianceReport(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessComplianceReport", reflect.TypeOf((*MockComplianceIngesterServer)(nil).ProcessComplianceReport), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessComplianceReport", reflect.TypeOf((*MockComplianceIngesterServiceServer)(nil).ProcessComplianceReport), arg0, arg1)
 }
 
 // HandleEvent mocks base method
-func (m *MockComplianceIngesterServer) HandleEvent(arg0 context.Context, arg1 *event.EventMsg) (*event.EventResponse, error) {
+func (m *MockComplianceIngesterServiceServer) HandleEvent(arg0 context.Context, arg1 *event.EventMsg) (*event.EventResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HandleEvent", arg0, arg1)
 	ret0, _ := ret[0].(*event.EventResponse)
@@ -145,13 +145,13 @@ func (m *MockComplianceIngesterServer) HandleEvent(arg0 context.Context, arg1 *e
 }
 
 // HandleEvent indicates an expected call of HandleEvent
-func (mr *MockComplianceIngesterServerMockRecorder) HandleEvent(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockComplianceIngesterServiceServerMockRecorder) HandleEvent(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleEvent", reflect.TypeOf((*MockComplianceIngesterServer)(nil).HandleEvent), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleEvent", reflect.TypeOf((*MockComplianceIngesterServiceServer)(nil).HandleEvent), arg0, arg1)
 }
 
 // ProjectUpdateStatus mocks base method
-func (m *MockComplianceIngesterServer) ProjectUpdateStatus(arg0 context.Context, arg1 *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error) {
+func (m *MockComplianceIngesterServiceServer) ProjectUpdateStatus(arg0 context.Context, arg1 *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProjectUpdateStatus", arg0, arg1)
 	ret0, _ := ret[0].(*ProjectUpdateStatusResp)
@@ -160,7 +160,7 @@ func (m *MockComplianceIngesterServer) ProjectUpdateStatus(arg0 context.Context,
 }
 
 // ProjectUpdateStatus indicates an expected call of ProjectUpdateStatus
-func (mr *MockComplianceIngesterServerMockRecorder) ProjectUpdateStatus(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockComplianceIngesterServiceServerMockRecorder) ProjectUpdateStatus(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateStatus", reflect.TypeOf((*MockComplianceIngesterServer)(nil).ProjectUpdateStatus), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateStatus", reflect.TypeOf((*MockComplianceIngesterServiceServer)(nil).ProjectUpdateStatus), arg0, arg1)
 }

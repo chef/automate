@@ -12,31 +12,31 @@ import (
 	reflect "reflect"
 )
 
-// MockAuthorizationClient is a mock of AuthorizationClient interface
-type MockAuthorizationClient struct {
+// MockAuthorizationServiceClient is a mock of AuthorizationServiceClient interface
+type MockAuthorizationServiceClient struct {
 	ctrl     *gomock.Controller
-	recorder *MockAuthorizationClientMockRecorder
+	recorder *MockAuthorizationServiceClientMockRecorder
 }
 
-// MockAuthorizationClientMockRecorder is the mock recorder for MockAuthorizationClient
-type MockAuthorizationClientMockRecorder struct {
-	mock *MockAuthorizationClient
+// MockAuthorizationServiceClientMockRecorder is the mock recorder for MockAuthorizationServiceClient
+type MockAuthorizationServiceClientMockRecorder struct {
+	mock *MockAuthorizationServiceClient
 }
 
-// NewMockAuthorizationClient creates a new mock instance
-func NewMockAuthorizationClient(ctrl *gomock.Controller) *MockAuthorizationClient {
-	mock := &MockAuthorizationClient{ctrl: ctrl}
-	mock.recorder = &MockAuthorizationClientMockRecorder{mock}
+// NewMockAuthorizationServiceClient creates a new mock instance
+func NewMockAuthorizationServiceClient(ctrl *gomock.Controller) *MockAuthorizationServiceClient {
+	mock := &MockAuthorizationServiceClient{ctrl: ctrl}
+	mock.recorder = &MockAuthorizationServiceClientMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockAuthorizationClient) EXPECT() *MockAuthorizationClientMockRecorder {
+func (m *MockAuthorizationServiceClient) EXPECT() *MockAuthorizationServiceClientMockRecorder {
 	return m.recorder
 }
 
 // GetVersion mocks base method
-func (m *MockAuthorizationClient) GetVersion(ctx context.Context, in *version.VersionInfoRequest, opts ...grpc.CallOption) (*version.VersionInfo, error) {
+func (m *MockAuthorizationServiceClient) GetVersion(ctx context.Context, in *version.VersionInfoRequest, opts ...grpc.CallOption) (*version.VersionInfo, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -49,14 +49,14 @@ func (m *MockAuthorizationClient) GetVersion(ctx context.Context, in *version.Ve
 }
 
 // GetVersion indicates an expected call of GetVersion
-func (mr *MockAuthorizationClientMockRecorder) GetVersion(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockAuthorizationServiceClientMockRecorder) GetVersion(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockAuthorizationClient)(nil).GetVersion), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockAuthorizationServiceClient)(nil).GetVersion), varargs...)
 }
 
 // FilterAuthorizedPairs mocks base method
-func (m *MockAuthorizationClient) FilterAuthorizedPairs(ctx context.Context, in *FilterAuthorizedPairsReq, opts ...grpc.CallOption) (*FilterAuthorizedPairsResp, error) {
+func (m *MockAuthorizationServiceClient) FilterAuthorizedPairs(ctx context.Context, in *FilterAuthorizedPairsReq, opts ...grpc.CallOption) (*FilterAuthorizedPairsResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -69,14 +69,14 @@ func (m *MockAuthorizationClient) FilterAuthorizedPairs(ctx context.Context, in 
 }
 
 // FilterAuthorizedPairs indicates an expected call of FilterAuthorizedPairs
-func (mr *MockAuthorizationClientMockRecorder) FilterAuthorizedPairs(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockAuthorizationServiceClientMockRecorder) FilterAuthorizedPairs(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedPairs", reflect.TypeOf((*MockAuthorizationClient)(nil).FilterAuthorizedPairs), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedPairs", reflect.TypeOf((*MockAuthorizationServiceClient)(nil).FilterAuthorizedPairs), varargs...)
 }
 
 // FilterAuthorizedProjects mocks base method
-func (m *MockAuthorizationClient) FilterAuthorizedProjects(ctx context.Context, in *FilterAuthorizedProjectsReq, opts ...grpc.CallOption) (*FilterAuthorizedProjectsResp, error) {
+func (m *MockAuthorizationServiceClient) FilterAuthorizedProjects(ctx context.Context, in *FilterAuthorizedProjectsReq, opts ...grpc.CallOption) (*FilterAuthorizedProjectsResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -89,14 +89,14 @@ func (m *MockAuthorizationClient) FilterAuthorizedProjects(ctx context.Context, 
 }
 
 // FilterAuthorizedProjects indicates an expected call of FilterAuthorizedProjects
-func (mr *MockAuthorizationClientMockRecorder) FilterAuthorizedProjects(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockAuthorizationServiceClientMockRecorder) FilterAuthorizedProjects(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedProjects", reflect.TypeOf((*MockAuthorizationClient)(nil).FilterAuthorizedProjects), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedProjects", reflect.TypeOf((*MockAuthorizationServiceClient)(nil).FilterAuthorizedProjects), varargs...)
 }
 
 // ProjectsAuthorized mocks base method
-func (m *MockAuthorizationClient) ProjectsAuthorized(ctx context.Context, in *ProjectsAuthorizedReq, opts ...grpc.CallOption) (*ProjectsAuthorizedResp, error) {
+func (m *MockAuthorizationServiceClient) ProjectsAuthorized(ctx context.Context, in *ProjectsAuthorizedReq, opts ...grpc.CallOption) (*ProjectsAuthorizedResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -109,14 +109,14 @@ func (m *MockAuthorizationClient) ProjectsAuthorized(ctx context.Context, in *Pr
 }
 
 // ProjectsAuthorized indicates an expected call of ProjectsAuthorized
-func (mr *MockAuthorizationClientMockRecorder) ProjectsAuthorized(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockAuthorizationServiceClientMockRecorder) ProjectsAuthorized(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectsAuthorized", reflect.TypeOf((*MockAuthorizationClient)(nil).ProjectsAuthorized), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectsAuthorized", reflect.TypeOf((*MockAuthorizationServiceClient)(nil).ProjectsAuthorized), varargs...)
 }
 
 // ValidateProjectAssignment mocks base method
-func (m *MockAuthorizationClient) ValidateProjectAssignment(ctx context.Context, in *ValidateProjectAssignmentReq, opts ...grpc.CallOption) (*ValidateProjectAssignmentResp, error) {
+func (m *MockAuthorizationServiceClient) ValidateProjectAssignment(ctx context.Context, in *ValidateProjectAssignmentReq, opts ...grpc.CallOption) (*ValidateProjectAssignmentResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -129,37 +129,37 @@ func (m *MockAuthorizationClient) ValidateProjectAssignment(ctx context.Context,
 }
 
 // ValidateProjectAssignment indicates an expected call of ValidateProjectAssignment
-func (mr *MockAuthorizationClientMockRecorder) ValidateProjectAssignment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockAuthorizationServiceClientMockRecorder) ValidateProjectAssignment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateProjectAssignment", reflect.TypeOf((*MockAuthorizationClient)(nil).ValidateProjectAssignment), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateProjectAssignment", reflect.TypeOf((*MockAuthorizationServiceClient)(nil).ValidateProjectAssignment), varargs...)
 }
 
-// MockAuthorizationServer is a mock of AuthorizationServer interface
-type MockAuthorizationServer struct {
+// MockAuthorizationServiceServer is a mock of AuthorizationServiceServer interface
+type MockAuthorizationServiceServer struct {
 	ctrl     *gomock.Controller
-	recorder *MockAuthorizationServerMockRecorder
+	recorder *MockAuthorizationServiceServerMockRecorder
 }
 
-// MockAuthorizationServerMockRecorder is the mock recorder for MockAuthorizationServer
-type MockAuthorizationServerMockRecorder struct {
-	mock *MockAuthorizationServer
+// MockAuthorizationServiceServerMockRecorder is the mock recorder for MockAuthorizationServiceServer
+type MockAuthorizationServiceServerMockRecorder struct {
+	mock *MockAuthorizationServiceServer
 }
 
-// NewMockAuthorizationServer creates a new mock instance
-func NewMockAuthorizationServer(ctrl *gomock.Controller) *MockAuthorizationServer {
-	mock := &MockAuthorizationServer{ctrl: ctrl}
-	mock.recorder = &MockAuthorizationServerMockRecorder{mock}
+// NewMockAuthorizationServiceServer creates a new mock instance
+func NewMockAuthorizationServiceServer(ctrl *gomock.Controller) *MockAuthorizationServiceServer {
+	mock := &MockAuthorizationServiceServer{ctrl: ctrl}
+	mock.recorder = &MockAuthorizationServiceServerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockAuthorizationServer) EXPECT() *MockAuthorizationServerMockRecorder {
+func (m *MockAuthorizationServiceServer) EXPECT() *MockAuthorizationServiceServerMockRecorder {
 	return m.recorder
 }
 
 // GetVersion mocks base method
-func (m *MockAuthorizationServer) GetVersion(arg0 context.Context, arg1 *version.VersionInfoRequest) (*version.VersionInfo, error) {
+func (m *MockAuthorizationServiceServer) GetVersion(arg0 context.Context, arg1 *version.VersionInfoRequest) (*version.VersionInfo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetVersion", arg0, arg1)
 	ret0, _ := ret[0].(*version.VersionInfo)
@@ -168,13 +168,13 @@ func (m *MockAuthorizationServer) GetVersion(arg0 context.Context, arg1 *version
 }
 
 // GetVersion indicates an expected call of GetVersion
-func (mr *MockAuthorizationServerMockRecorder) GetVersion(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockAuthorizationServiceServerMockRecorder) GetVersion(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockAuthorizationServer)(nil).GetVersion), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockAuthorizationServiceServer)(nil).GetVersion), arg0, arg1)
 }
 
 // FilterAuthorizedPairs mocks base method
-func (m *MockAuthorizationServer) FilterAuthorizedPairs(arg0 context.Context, arg1 *FilterAuthorizedPairsReq) (*FilterAuthorizedPairsResp, error) {
+func (m *MockAuthorizationServiceServer) FilterAuthorizedPairs(arg0 context.Context, arg1 *FilterAuthorizedPairsReq) (*FilterAuthorizedPairsResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FilterAuthorizedPairs", arg0, arg1)
 	ret0, _ := ret[0].(*FilterAuthorizedPairsResp)
@@ -183,13 +183,13 @@ func (m *MockAuthorizationServer) FilterAuthorizedPairs(arg0 context.Context, ar
 }
 
 // FilterAuthorizedPairs indicates an expected call of FilterAuthorizedPairs
-func (mr *MockAuthorizationServerMockRecorder) FilterAuthorizedPairs(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockAuthorizationServiceServerMockRecorder) FilterAuthorizedPairs(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedPairs", reflect.TypeOf((*MockAuthorizationServer)(nil).FilterAuthorizedPairs), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedPairs", reflect.TypeOf((*MockAuthorizationServiceServer)(nil).FilterAuthorizedPairs), arg0, arg1)
 }
 
 // FilterAuthorizedProjects mocks base method
-func (m *MockAuthorizationServer) FilterAuthorizedProjects(arg0 context.Context, arg1 *FilterAuthorizedProjectsReq) (*FilterAuthorizedProjectsResp, error) {
+func (m *MockAuthorizationServiceServer) FilterAuthorizedProjects(arg0 context.Context, arg1 *FilterAuthorizedProjectsReq) (*FilterAuthorizedProjectsResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FilterAuthorizedProjects", arg0, arg1)
 	ret0, _ := ret[0].(*FilterAuthorizedProjectsResp)
@@ -198,13 +198,13 @@ func (m *MockAuthorizationServer) FilterAuthorizedProjects(arg0 context.Context,
 }
 
 // FilterAuthorizedProjects indicates an expected call of FilterAuthorizedProjects
-func (mr *MockAuthorizationServerMockRecorder) FilterAuthorizedProjects(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockAuthorizationServiceServerMockRecorder) FilterAuthorizedProjects(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedProjects", reflect.TypeOf((*MockAuthorizationServer)(nil).FilterAuthorizedProjects), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedProjects", reflect.TypeOf((*MockAuthorizationServiceServer)(nil).FilterAuthorizedProjects), arg0, arg1)
 }
 
 // ProjectsAuthorized mocks base method
-func (m *MockAuthorizationServer) ProjectsAuthorized(arg0 context.Context, arg1 *ProjectsAuthorizedReq) (*ProjectsAuthorizedResp, error) {
+func (m *MockAuthorizationServiceServer) ProjectsAuthorized(arg0 context.Context, arg1 *ProjectsAuthorizedReq) (*ProjectsAuthorizedResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProjectsAuthorized", arg0, arg1)
 	ret0, _ := ret[0].(*ProjectsAuthorizedResp)
@@ -213,13 +213,13 @@ func (m *MockAuthorizationServer) ProjectsAuthorized(arg0 context.Context, arg1 
 }
 
 // ProjectsAuthorized indicates an expected call of ProjectsAuthorized
-func (mr *MockAuthorizationServerMockRecorder) ProjectsAuthorized(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockAuthorizationServiceServerMockRecorder) ProjectsAuthorized(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectsAuthorized", reflect.TypeOf((*MockAuthorizationServer)(nil).ProjectsAuthorized), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectsAuthorized", reflect.TypeOf((*MockAuthorizationServiceServer)(nil).ProjectsAuthorized), arg0, arg1)
 }
 
 // ValidateProjectAssignment mocks base method
-func (m *MockAuthorizationServer) ValidateProjectAssignment(arg0 context.Context, arg1 *ValidateProjectAssignmentReq) (*ValidateProjectAssignmentResp, error) {
+func (m *MockAuthorizationServiceServer) ValidateProjectAssignment(arg0 context.Context, arg1 *ValidateProjectAssignmentReq) (*ValidateProjectAssignmentResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ValidateProjectAssignment", arg0, arg1)
 	ret0, _ := ret[0].(*ValidateProjectAssignmentResp)
@@ -228,7 +228,7 @@ func (m *MockAuthorizationServer) ValidateProjectAssignment(arg0 context.Context
 }
 
 // ValidateProjectAssignment indicates an expected call of ValidateProjectAssignment
-func (mr *MockAuthorizationServerMockRecorder) ValidateProjectAssignment(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockAuthorizationServiceServerMockRecorder) ValidateProjectAssignment(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateProjectAssignment", reflect.TypeOf((*MockAuthorizationServer)(nil).ValidateProjectAssignment), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateProjectAssignment", reflect.TypeOf((*MockAuthorizationServiceServer)(nil).ValidateProjectAssignment), arg0, arg1)
 }

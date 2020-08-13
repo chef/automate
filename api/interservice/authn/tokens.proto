@@ -67,7 +67,7 @@ message DeleteTokenReq {
 
 message DeleteTokenResp {}
 
-service TokensMgmt {
+service TokensMgmtService {
   rpc GetTokens (GetTokensReq) returns (Tokens) {};
   rpc CreateToken (CreateTokenReq) returns (Token) {};
   rpc CreateTokenWithValue (CreateTokenWithValueReq) returns (Token) {};

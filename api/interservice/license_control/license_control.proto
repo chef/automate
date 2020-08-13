@@ -6,7 +6,7 @@ option go_package = "github.com/chef/automate/api/interservice/license_control";
 import "google/protobuf/timestamp.proto";
 import "license/license.proto";
 
-service LicenseControl {
+service LicenseControlService {
   rpc License (LicenseRequest) returns (LicenseResponse);
   rpc Policy (PolicyRequest) returns (PolicyResponse);
   rpc Status (StatusRequest) returns (StatusResponse);

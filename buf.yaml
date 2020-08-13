@@ -30,10 +30,33 @@ lint:
     # The linters below this comment should be turned on for new things (todo)
     - RPC_RESPONSE_STANDARD_NAME
     - RPC_REQUEST_RESPONSE_UNIQUE
-    - SERVICE_SUFFIX
     - ENUM_VALUE_PREFIX
     - ENUM_ZERO_VALUE_SUFFIX
   ignore_only:
+    SERVICE_SUFFIX:
+      # /api/
+      - external/cds/cds.proto
+      - external/cfgmgmt/cfgmgmt.proto
+      - external/data_lifecycle/data_lifecycle.proto
+      - external/infra_proxy/infra_proxy.proto
+      - external/ingest/chef.proto
+      - external/ingest/job_scheduler.proto
+      # /components/
+      - automate-gateway/api/deployment/deployment.proto
+      - automate-gateway/api/event_feed/event_feed.proto
+      - automate-gateway/api/gateway/gateway.proto
+      - automate-gateway/api/iam/v2/introspect.proto
+      - automate-gateway/api/iam/v2/policy.proto
+      - automate-gateway/api/iam/v2/rules.proto
+      - automate-gateway/api/iam/v2/teams.proto
+      - automate-gateway/api/iam/v2/tokens.proto
+      - automate-gateway/api/iam/v2/users.proto
+      - automate-gateway/api/legacy/legacy.proto
+      - automate-gateway/api/license/license.proto
+      - automate-gateway/api/notifications/notifications.proto
+      - automate-gateway/api/telemetry/telemetry.proto
+      # /lib/
+      - grpc/debug/debug_api/debug.proto
     RPC_REQUEST_STANDARD_NAME:
       # todo:
       - interservice

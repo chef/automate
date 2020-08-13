@@ -109,7 +109,7 @@ message DeleteSnapshotRequest{
 message DeleteSnapshotResponse{
 }
 
-service EsSidecar {
+service EsSidecarService {
 	// Will begin a new purge if the identified purge is not already in progress.
 	// If it is in progress, the PurgeResponse status field will indicate this.
 	rpc PurgeTimeSeriesIndicesByAge(PurgeRequest) returns (PurgeResponse);

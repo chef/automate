@@ -8,7 +8,7 @@ import "google/protobuf/timestamp.proto";
 import "config/deployment/config_request.proto";
 import "config/deployment/automate_config.proto";
 
-service Deployment {
+service DeploymentService {
 	rpc Deploy (DeployRequest) returns (DeployResponse);
 	rpc DeployDataServices (DeployRequest) returns (DeployResponse);
 	rpc DeploySome (DeployRequest) returns (DeployResponse);

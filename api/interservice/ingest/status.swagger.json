@@ -13,7 +13,7 @@
   "paths": {
     "/api/v0/health": {
       "get": {
-        "operationId": "IngestStatus_GetHealth",
+        "operationId": "IngestStatusService_GetHealth",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -29,13 +29,13 @@
           }
         },
         "tags": [
-          "IngestStatus"
+          "IngestStatusService"
         ]
       }
     },
     "/api/v0/migration": {
       "get": {
-        "operationId": "IngestStatus_GetMigrationStatus",
+        "operationId": "IngestStatusService_GetMigrationStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -51,7 +51,7 @@
           }
         },
         "tags": [
-          "IngestStatus"
+          "IngestStatusService"
         ]
       }
     }

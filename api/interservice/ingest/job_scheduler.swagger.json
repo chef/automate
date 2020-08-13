@@ -13,7 +13,7 @@
   "paths": {
     "/api/v0/job/delete-nodes/config": {
       "post": {
-        "operationId": "JobScheduler_ConfigureDeleteNodesScheduler",
+        "operationId": "JobSchedulerService_ConfigureDeleteNodesScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -29,14 +29,14 @@
           }
         },
         "tags": [
-          "JobScheduler"
+          "JobSchedulerService"
         ]
       }
     },
     "/api/v0/job/delete-nodes/delete-marked-nodes": {
       "post": {
         "summary": "DeleteNodesScheduler",
-        "operationId": "JobScheduler_DeleteMarkedNodes",
+        "operationId": "JobSchedulerService_DeleteMarkedNodes",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -52,13 +52,13 @@
           }
         },
         "tags": [
-          "JobScheduler"
+          "JobSchedulerService"
         ]
       }
     },
     "/api/v0/job/delete-nodes/start": {
       "post": {
-        "operationId": "JobScheduler_StartDeleteNodesScheduler",
+        "operationId": "JobSchedulerService_StartDeleteNodesScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -74,13 +74,13 @@
           }
         },
         "tags": [
-          "JobScheduler"
+          "JobSchedulerService"
         ]
       }
     },
     "/api/v0/job/delete-nodes/stop": {
       "post": {
-        "operationId": "JobScheduler_StopDeleteNodesScheduler",
+        "operationId": "JobSchedulerService_StopDeleteNodesScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -96,13 +96,13 @@
           }
         },
         "tags": [
-          "JobScheduler"
+          "JobSchedulerService"
         ]
       }
     },
     "/api/v0/job/job-scheduler/status": {
       "get": {
-        "operationId": "JobScheduler_GetStatusJobScheduler",
+        "operationId": "JobSchedulerService_GetStatusJobScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -118,13 +118,13 @@
           }
         },
         "tags": [
-          "JobScheduler"
+          "JobSchedulerService"
         ]
       }
     },
     "/api/v0/job/missing-nodes/config": {
       "post": {
-        "operationId": "JobScheduler_ConfigureNodesMissingScheduler",
+        "operationId": "JobSchedulerService_ConfigureNodesMissingScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -140,13 +140,13 @@
           }
         },
         "tags": [
-          "JobScheduler"
+          "JobSchedulerService"
         ]
       }
     },
     "/api/v0/job/missing-nodes/mark-nodes-missing": {
       "post": {
-        "operationId": "JobScheduler_MarkNodesMissing",
+        "operationId": "JobSchedulerService_MarkNodesMissing",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -162,13 +162,13 @@
           }
         },
         "tags": [
-          "JobScheduler"
+          "JobSchedulerService"
         ]
       }
     },
     "/api/v0/job/missing-nodes/start": {
       "post": {
-        "operationId": "JobScheduler_StartNodesMissingScheduler",
+        "operationId": "JobSchedulerService_StartNodesMissingScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -184,13 +184,13 @@
           }
         },
         "tags": [
-          "JobScheduler"
+          "JobSchedulerService"
         ]
       }
     },
     "/api/v0/job/missing-nodes/stop": {
       "post": {
-        "operationId": "JobScheduler_StopNodesMissingScheduler",
+        "operationId": "JobSchedulerService_StopNodesMissingScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -206,7 +206,7 @@
           }
         },
         "tags": [
-          "JobScheduler"
+          "JobSchedulerService"
         ]
       }
     }

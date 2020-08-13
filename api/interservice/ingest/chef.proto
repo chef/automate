@@ -29,7 +29,7 @@ message Version {
 message VersionRequest {
 }
 
-service ChefIngester {
+service ChefIngesterService {
 	rpc ProcessChefRun (api.ingest.request.Run) returns (api.ingest.response.ProcessChefRunResponse) {
 		option (google.api.http) = {
 			post: "/api/v0/events/chef/run"

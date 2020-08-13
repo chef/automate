@@ -83,7 +83,7 @@ message Users {
   map<string, User> users = 1;
 }
 
-service UsersMgmt {
+service UsersMgmtService {
   rpc GetUsers (GetUsersReq) returns (Users) {};
   rpc GetUser (Email) returns (User) {};
   rpc CreateUser (CreateUserReq) returns (User) {};

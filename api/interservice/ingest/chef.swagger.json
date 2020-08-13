@@ -13,7 +13,7 @@
   "paths": {
     "/api/v0/events/chef/action": {
       "post": {
-        "operationId": "ChefIngester_ProcessChefAction",
+        "operationId": "ChefIngesterService_ProcessChefAction",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -39,13 +39,13 @@
           }
         ],
         "tags": [
-          "ChefIngester"
+          "ChefIngesterService"
         ]
       }
     },
     "/api/v0/events/chef/liveness": {
       "post": {
-        "operationId": "ChefIngester_ProcessLivenessPing",
+        "operationId": "ChefIngesterService_ProcessLivenessPing",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -71,13 +71,13 @@
           }
         ],
         "tags": [
-          "ChefIngester"
+          "ChefIngesterService"
         ]
       }
     },
     "/api/v0/events/chef/nodedelete": {
       "post": {
-        "operationId": "ChefIngester_ProcessNodeDelete",
+        "operationId": "ChefIngesterService_ProcessNodeDelete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -103,13 +103,13 @@
           }
         ],
         "tags": [
-          "ChefIngester"
+          "ChefIngesterService"
         ]
       }
     },
     "/api/v0/events/chef/run": {
       "post": {
-        "operationId": "ChefIngester_ProcessChefRun",
+        "operationId": "ChefIngesterService_ProcessChefRun",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -135,13 +135,13 @@
           }
         ],
         "tags": [
-          "ChefIngester"
+          "ChefIngesterService"
         ]
       }
     },
     "/api/v0/ingest/version": {
       "get": {
-        "operationId": "ChefIngester_GetVersion",
+        "operationId": "ChefIngesterService_GetVersion",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -157,7 +157,7 @@
           }
         },
         "tags": [
-          "ChefIngester"
+          "ChefIngesterService"
         ]
       }
     }
