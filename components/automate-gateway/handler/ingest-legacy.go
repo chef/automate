@@ -10,15 +10,15 @@ import (
 )
 
 type legacyIngestServer struct {
-	ingestStatusClient ingest.IngestStatusClient
+	ingestStatusServiceClient ingest.IngestStatusServiceClient
 }
 
-func NewLegacyIngestServer(ingestStatusClient ingest.IngestStatusClient) *legacyIngestServer {
-	return &legacyIngestServer{ingestStatusClient: ingestStatusClient}
+func NewLegacyIngestServer(ingestStatusServiceClient ingest.IngestStatusServiceClient) *legacyIngestServer {
+	return &legacyIngestServer{ingestStatusServiceClient: ingestStatusServiceClient}
 }
 
 func (s *legacyIngestServer) Status(ctx context.Context, _ *gp.Empty) (*legacy.StatusResponse, error) {
-	resp, err := s.ingestStatusClient.GetHealth(ctx, &ingest.HealthRequest{})
+	resp, err := s.ingestStatusServiceClient.GetHealth(ctx, &ingest.HealthRequest{})
 	if err != nil {
 		return nil, err
 	}

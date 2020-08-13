@@ -22,9 +22,9 @@ import (
 )
 
 type RemoteJob struct {
-	TokensMgmtClient authn.TokensMgmtClient
-	PoliciesClient   authz.PoliciesClient
-	AutomateFQDN     string
+	TokensMgmtServiceClient authn.TokensMgmtServiceClient
+	PoliciesServiceClient   authz.PoliciesServiceClient
+	AutomateFQDN            string
 }
 
 var RemoteJobInfo RemoteJob
@@ -33,13 +33,13 @@ func RunSSMJob(ctx context.Context, ssmJob *types.InspecJob) *inspec.Error {
 	logrus.Debugf("Running ssm job: %+v", ssmJob)
 	// 1. CREATE TOKEN
 	// this is needed to hand over to inspec so it can report to automate
-	if RemoteJobInfo.TokensMgmtClient == nil || RemoteJobInfo.PoliciesClient == nil {
+	if RemoteJobInfo.TokensMgmtServiceClient == nil || RemoteJobInfo.PoliciesServiceClient == nil {
 		logrus.Error("unable to create auth token")
 		return translateToInspecErr(fmt.Errorf("unable to connect to auth client: aborting job run for job %+v", ssmJob))
 	}
 	tokenID := fmt.Sprintf("inspec-to-automate-scanjob-%s", ssmJob.NodeID)
 	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx, []string{"tls:service:compliance-service:internal"}, []string{}, "", ""))
-	token, err := RemoteJobInfo.TokensMgmtClient.CreateToken(ctx, &authn.CreateTokenReq{
+	token, err := RemoteJobInfo.TokensMgmtServiceClient.CreateToken(ctx, &authn.CreateTokenReq{
 		Id:     tokenID,
 		Name:   tokenID,
 		Active: true,
@@ -49,7 +49,7 @@ func RunSSMJob(ctx context.Context, ssmJob *types.InspecJob) *inspec.Error {
 		return translateToInspecErr(err)
 	}
 	// add token to ingest policy
-	_, err = RemoteJobInfo.PoliciesClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
+	_, err = RemoteJobInfo.PoliciesServiceClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
 		Id:      constants.IngestPolicyID,
 		Members: []string{fmt.Sprintf("token:%s", tokenID)},
 	})
@@ -73,7 +73,7 @@ func RunSSMJob(ctx context.Context, ssmJob *types.InspecJob) *inspec.Error {
 	// the jobs are not returned until they have a status different from "Pending" or "InProgress",
 	// because we poll for their status inside of sendJob, so now we can delete the token
 	// (https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_Command.html)
-	_, err = RemoteJobInfo.TokensMgmtClient.DeleteToken(ctx, &authn.DeleteTokenReq{Id: token.GetId()})
+	_, err = RemoteJobInfo.TokensMgmtServiceClient.DeleteToken(ctx, &authn.DeleteTokenReq{Id: token.GetId()})
 	if err != nil {
 		logrus.Errorf("unable to delete token for reporting to automate: %s", err.Error())
 		return translateToInspecErr(err)

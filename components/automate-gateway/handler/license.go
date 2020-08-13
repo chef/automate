@@ -18,16 +18,16 @@ import (
 )
 
 type LicenseServer struct {
-	client       license_control.LicenseControlClient
-	deployClient deployment_service.DeploymentClient
-	tlClient     tlc.Client
+	client              license_control.LicenseControlServiceClient
+	deployServiceClient deployment_service.DeploymentServiceClient
+	tlClient            tlc.Client
 }
 
 // NewLicenseServer returns the initialized state of the license handlers: a
 // client to license-control-service and the URL of trial-license-service
 func NewLicenseServer(
-	client license_control.LicenseControlClient,
-	deployClient deployment_service.DeploymentClient,
+	client license_control.LicenseControlServiceClient,
+	deployServiceClient deployment_service.DeploymentServiceClient,
 	trialLicenseURL *url.URL) *LicenseServer {
 	var tlClient tlc.Client
 	if trialLicenseURL != nil {
@@ -35,7 +35,7 @@ func NewLicenseServer(
 	} else {
 		tlClient = nil
 	}
-	return &LicenseServer{client, deployClient, tlClient}
+	return &LicenseServer{client, deployServiceClient, tlClient}
 }
 
 // ApplyLicense applies the provided license token (provided as string
@@ -133,7 +133,7 @@ func (t *LicenseServer) RequestLicense(ctx context.Context,
 }
 
 func (t *LicenseServer) getDeploymentID(ctx context.Context) (string, error) {
-	deployIDResponse, err := t.deployClient.DeployID(ctx, &deployment_service.DeployIDRequest{})
+	deployIDResponse, err := t.deployServiceClient.DeployID(ctx, &deployment_service.DeployIDRequest{})
 	if err != nil {
 		return "", err
 	}
@@ -142,7 +142,7 @@ func (t *LicenseServer) getDeploymentID(ctx context.Context) (string, error) {
 }
 
 func (t *LicenseServer) getAutomateVersion(ctx context.Context) (string, error) {
-	resp, err := t.deployClient.ManifestVersion(ctx, &deployment_service.ManifestVersionRequest{})
+	resp, err := t.deployServiceClient.ManifestVersion(ctx, &deployment_service.ManifestVersionRequest{})
 	if err != nil {
 		return "", err
 	}

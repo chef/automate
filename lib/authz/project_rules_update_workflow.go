@@ -194,7 +194,7 @@ func (m *ESCancelUpdateProjectTagsTask) Run(
 
 type ESStartProjectTagUpdaterTask struct {
 	esClient            EsClient
-	authzProjectsClient authz.ProjectsClient
+	authzProjectsClient authz.ProjectsServiceClient
 }
 
 func (m *ESStartProjectTagUpdaterTask) Run(
@@ -286,7 +286,7 @@ func NewWorkflowExecutorForDomainService(domainService string) *DomainProjectUpd
 	}
 }
 
-func RegisterTaskExecutors(manager *cereal.Manager, domainService string, esClient EsClient, authzProjectsClient authz.ProjectsClient) error {
+func RegisterTaskExecutors(manager *cereal.Manager, domainService string, esClient EsClient, authzProjectsClient authz.ProjectsServiceClient) error {
 	cancelUpdateProjectTagsTaskName := CancelUpdateProjectTagsTaskName(domainService)
 	startProjectTagUpdaterTaskName := StartProjectTagUpdaterTaskName(domainService)
 	projectTagUpdaterStatusTaskName := ProjectTagUpdaterStatusTaskName(domainService)

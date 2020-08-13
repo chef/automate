@@ -18,7 +18,7 @@ import (
 )
 
 type client struct {
-	client authz.AuthorizationClient
+	client authz.AuthorizationServiceClient
 }
 
 // Handle takes care of authorization in the gRPC middleware
@@ -147,6 +147,6 @@ func (c *client) FilterAuthorizedPairs(ctx context.Context, subjects []string, i
 	return respPairs, nil
 }
 
-func AuthorizationHandler(cl authz.AuthorizationClient) middleware.AuthorizationHandler {
+func AuthorizationHandler(cl authz.AuthorizationServiceClient) middleware.AuthorizationHandler {
 	return &client{client: cl}
 }

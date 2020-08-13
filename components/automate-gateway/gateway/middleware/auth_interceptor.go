@@ -30,14 +30,14 @@ import (
 // If the inquiry's result is an error, it is returned as-is. If it's not, this
 // function returns only the context, and allows for further request processing.
 func NewAuthInterceptor(
-	authn authn.AuthenticationClient,
+	authn authn.AuthenticationServiceClient,
 	authz GRPCAuthorizationHandler,
 ) AuthorizationInterceptor {
 	return &authInterceptor{authn: authn, authz: authz}
 }
 
 type authInterceptor struct {
-	authn authn.AuthenticationClient
+	authn authn.AuthenticationServiceClient
 	authz GRPCAuthorizationHandler
 }
 

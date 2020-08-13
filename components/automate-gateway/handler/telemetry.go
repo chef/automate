@@ -22,11 +22,11 @@ import (
 )
 
 type TelemetryServer struct {
-	client        license_control.LicenseControlClient
-	deploy_client deployment_service.DeploymentClient
+	client        license_control.LicenseControlServiceClient
+	deploy_client deployment_service.DeploymentServiceClient
 }
 
-func NewTelemetryServer(client license_control.LicenseControlClient, dclient deployment_service.DeploymentClient) *TelemetryServer {
+func NewTelemetryServer(client license_control.LicenseControlServiceClient, dclient deployment_service.DeploymentServiceClient) *TelemetryServer {
 	return &TelemetryServer{client: client, deploy_client: dclient}
 }
 

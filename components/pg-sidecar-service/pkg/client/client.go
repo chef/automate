@@ -82,7 +82,7 @@ func WithTLSRootCAPath(path string) OptFunc {
 
 // Client is the pg-sidecar-service client
 type Client struct {
-	api.PGSidecarClient
+	api.PGSidecarServiceClient
 }
 
 // NewClient takes optional functional client args and returns a new Client
@@ -115,5 +115,5 @@ func NewClient(OptFuncs ...OptFunc) (*Client, error) {
 		return nil, err
 	}
 
-	return &Client{PGSidecarClient: api.NewPGSidecarClient(con)}, nil
+	return &Client{PGSidecarServiceClient: api.NewPGSidecarServiceClient(con)}, nil
 }

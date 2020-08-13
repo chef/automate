@@ -23,13 +23,13 @@ import (
 
 // CfgMgmtServer stores client
 type CfgMgmtServer struct {
-	cfgMgmtClient cmsService.CfgMgmtClient
+	cfgMgmtServiceClient cmsService.CfgMgmtServiceClient
 }
 
 // NewCfgMgmtServer initializes CfgMgmtServer with client
-func NewCfgMgmtServer(cfgMgmtClient cmsService.CfgMgmtClient) *CfgMgmtServer {
+func NewCfgMgmtServer(cfgMgmtServiceClient cmsService.CfgMgmtServiceClient) *CfgMgmtServer {
 	return &CfgMgmtServer{
-		cfgMgmtClient: cfgMgmtClient,
+		cfgMgmtServiceClient: cfgMgmtServiceClient,
 	}
 }
 
@@ -44,7 +44,7 @@ func (s *CfgMgmtServer) GetPolicyCookbooks(ctx context.Context, request *cfgReq.
 		RevisionId: request.GetRevisionId(),
 	}
 
-	r, err := s.cfgMgmtClient.GetPolicyCookbooks(ctx, &policyRevision)
+	r, err := s.cfgMgmtServiceClient.GetPolicyCookbooks(ctx, &policyRevision)
 	if err != nil {
 		return &cfgRes.PolicyCookbooks{}, err
 	}
@@ -90,7 +90,7 @@ func (s *CfgMgmtServer) GetRuns(ctx context.Context, request *cfgReq.Runs) (*gpS
 	runsRequest.End = request.GetEnd()
 	runsRequest.NodeId = request.GetNodeId()
 
-	return s.cfgMgmtClient.GetRuns(ctx, &runsRequest)
+	return s.cfgMgmtServiceClient.GetRuns(ctx, &runsRequest)
 }
 
 // GetNodes returns an array of Nodes returned from the Cfgmgmt (a.k.a. config-mgmt) Service
@@ -125,7 +125,7 @@ func (s *CfgMgmtServer) GetNodes(ctx context.Context, request *cfgReq.Nodes) (*g
 		}
 	}
 
-	return s.cfgMgmtClient.GetNodes(ctx, &nodesRequest)
+	return s.cfgMgmtServiceClient.GetNodes(ctx, &nodesRequest)
 }
 
 func (s *CfgMgmtServer) GetErrors(ctx context.Context, request *cfgReq.Errors) (*cfgRes.Errors, error) {
@@ -134,7 +134,7 @@ func (s *CfgMgmtServer) GetErrors(ctx context.Context, request *cfgReq.Errors) (
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	return s.cfgMgmtClient.GetErrors(ctx, request)
+	return s.cfgMgmtServiceClient.GetErrors(ctx, request)
 }
 
 func (s *CfgMgmtServer) GetMissingNodeDurationCounts(ctx context.Context,
@@ -148,7 +148,7 @@ func (s *CfgMgmtServer) GetMissingNodeDurationCounts(ctx context.Context,
 		Durations: request.Durations,
 	}
 
-	response, err := s.cfgMgmtClient.GetMissingNodeDurationCounts(ctx, cfgMgmtRequest)
+	response, err := s.cfgMgmtServiceClient.GetMissingNodeDurationCounts(ctx, cfgMgmtRequest)
 	if err != nil {
 		return &cfgRes.MissingNodeDurationCounts{}, err
 	}
@@ -176,7 +176,7 @@ func (s *CfgMgmtServer) GetAttributes(ctx context.Context, request *cfgReq.Node)
 		NodeId: request.NodeId,
 	}
 
-	attribute, err := s.cfgMgmtClient.GetAttributes(ctx, cfgMgmtRequest)
+	attribute, err := s.cfgMgmtServiceClient.GetAttributes(ctx, cfgMgmtRequest)
 
 	if err != nil {
 		return &cfgRes.NodeAttribute{}, err
@@ -202,7 +202,7 @@ func (s *CfgMgmtServer) GetAttributes(ctx context.Context, request *cfgReq.Node)
 func (s *CfgMgmtServer) GetVersion(ctx context.Context, e *version.VersionInfoRequest) (*version.VersionInfo, error) {
 	log.WithFields(log.Fields{"func": nameOfFunc()}).Debug("rpc call")
 
-	r, err := s.cfgMgmtClient.GetVersion(ctx, &cmsReq.VersionInfo{})
+	r, err := s.cfgMgmtServiceClient.GetVersion(ctx, &cmsReq.VersionInfo{})
 	if err != nil {
 		return &version.VersionInfo{}, err
 	}
@@ -228,7 +228,7 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context, request *cfgReq.Node
 		End:    request.End,
 	}
 
-	cfgmgmtNodesCounts, err := s.cfgMgmtClient.GetNodesCounts(ctx, cfgMgmtRequest)
+	cfgmgmtNodesCounts, err := s.cfgMgmtServiceClient.GetNodesCounts(ctx, cfgMgmtRequest)
 	if err != nil {
 		return &cfgRes.NodesCounts{}, err
 	}
@@ -255,7 +255,7 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context, request *cfgReq.RunsC
 		NodeId: request.NodeId,
 	}
 
-	cfgmgmtRunsCounts, err := s.cfgMgmtClient.GetRunsCounts(ctx, cfgMgmtRequest)
+	cfgmgmtRunsCounts, err := s.cfgMgmtServiceClient.GetRunsCounts(ctx, cfgMgmtRequest)
 	if err != nil {
 		return &cfgRes.RunsCounts{}, err
 	}
@@ -280,7 +280,7 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 		DaysAgo: request.DaysAgo,
 	}
 
-	cfgmgmtResponse, err := s.cfgMgmtClient.GetCheckInCountsTimeSeries(ctx, cfgMgmtRequest)
+	cfgmgmtResponse, err := s.cfgMgmtServiceClient.GetCheckInCountsTimeSeries(ctx, cfgMgmtRequest)
 	if err != nil {
 		return &cfgRes.CheckInCountsTimeSeries{}, err
 	}
@@ -315,7 +315,7 @@ func (s *CfgMgmtServer) GetNodeRunsDailyStatusTimeSeries(ctx context.Context,
 		DaysAgo: request.DaysAgo,
 	}
 
-	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodeRunsDailyStatusTimeSeries(ctx, cfgMgmtRequest)
+	cfgmgmtResponse, err := s.cfgMgmtServiceClient.GetNodeRunsDailyStatusTimeSeries(ctx, cfgMgmtRequest)
 	if err != nil {
 		return &cfgRes.NodeRunsDailyStatusTimeSeries{}, err
 	}
@@ -351,7 +351,7 @@ func (s *CfgMgmtServer) GetNodeMetadataCounts(ctx context.Context,
 		End:    request.End,
 	}
 
-	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodeMetadataCounts(ctx, cfgMgmtRequest)
+	cfgmgmtResponse, err := s.cfgMgmtServiceClient.GetNodeMetadataCounts(ctx, cfgMgmtRequest)
 	if err != nil {
 		return &cfgRes.NodeMetadataCounts{}, err
 	}
@@ -388,7 +388,7 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context, request *cfgReq.NodeRun)
 		EndTime: request.EndTime,
 	}
 
-	cfgmgmtRun, err := s.cfgMgmtClient.GetNodeRun(ctx, cfgMgmtRequest)
+	cfgmgmtRun, err := s.cfgMgmtServiceClient.GetNodeRun(ctx, cfgMgmtRequest)
 	if err != nil {
 		return &cfgRes.Run{}, err
 	}
@@ -412,7 +412,7 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context, request *sharedReq.S
 		Filter: request.Filter,
 	}
 
-	return s.cfgMgmtClient.GetSuggestions(ctx, &sugRequest)
+	return s.cfgMgmtServiceClient.GetSuggestions(ctx, &sugRequest)
 }
 
 func (a *CfgMgmtServer) CreateRollout(ctx context.Context, req *cfgReq.CreateRollout) (*cfgRes.Rollout, error) {
@@ -421,7 +421,7 @@ func (a *CfgMgmtServer) CreateRollout(ctx context.Context, req *cfgReq.CreateRol
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	return a.cfgMgmtClient.CreateRollout(ctx, req)
+	return a.cfgMgmtServiceClient.CreateRollout(ctx, req)
 }
 func (a *CfgMgmtServer) GetRollouts(ctx context.Context, req *cfgReq.Rollouts) (*cfgRes.Rollouts, error) {
 	log.WithFields(log.Fields{
@@ -429,7 +429,7 @@ func (a *CfgMgmtServer) GetRollouts(ctx context.Context, req *cfgReq.Rollouts) (
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	return a.cfgMgmtClient.GetRollouts(ctx, req)
+	return a.cfgMgmtServiceClient.GetRollouts(ctx, req)
 }
 func (a *CfgMgmtServer) GetRolloutById(ctx context.Context, req *cfgReq.RolloutById) (*cfgRes.Rollout, error) {
 	log.WithFields(log.Fields{
@@ -437,7 +437,7 @@ func (a *CfgMgmtServer) GetRolloutById(ctx context.Context, req *cfgReq.RolloutB
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	return a.cfgMgmtClient.GetRolloutById(ctx, req)
+	return a.cfgMgmtServiceClient.GetRolloutById(ctx, req)
 }
 func (a *CfgMgmtServer) GetRolloutForChefRun(context.Context, *cfgReq.RolloutForChefRun) (*cfgRes.Rollout, error) {
 	// TODO
@@ -450,7 +450,7 @@ func (a *CfgMgmtServer) ListNodeSegmentsWithRolloutProgress(ctx context.Context,
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	return a.cfgMgmtClient.ListNodeSegmentsWithRolloutProgress(ctx, req)
+	return a.cfgMgmtServiceClient.ListNodeSegmentsWithRolloutProgress(ctx, req)
 }
 
 func (a *CfgMgmtServer) CreateRolloutTest(ctx context.Context, req *cfgReq.CreateRolloutTest) (*cfgRes.CreateRolloutTest, error) {
@@ -459,7 +459,7 @@ func (a *CfgMgmtServer) CreateRolloutTest(ctx context.Context, req *cfgReq.Creat
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	return a.cfgMgmtClient.CreateRolloutTest(ctx, req)
+	return a.cfgMgmtServiceClient.CreateRolloutTest(ctx, req)
 }
 
 func (a *CfgMgmtServer) NodeExport(*cfgReq.NodeExport, cfgService.ConfigMgmt_NodeExportServer) error {
@@ -626,10 +626,10 @@ func toVersionsCookbooks(versionedCookbooks []*cmsRes.VersionedCookbook) []*cfgR
 
 //GetOrganizations returns the names of every organization for the configuration management service
 func (s *CfgMgmtServer) GetOrganizations(ctx context.Context, e *cfgReq.Organizations) (*gpStruct.ListValue, error) {
-	return s.cfgMgmtClient.GetOrganizations(ctx, &cmsReq.Organizations{})
+	return s.cfgMgmtServiceClient.GetOrganizations(ctx, &cmsReq.Organizations{})
 }
 
 //GetSourceFqdns returns the names of every organization for the configuration management service
 func (s *CfgMgmtServer) GetSourceFqdns(ctx context.Context, e *cfgReq.SourceFqdns) (*gpStruct.ListValue, error) {
-	return s.cfgMgmtClient.GetSourceFqdns(ctx, &cmsReq.SourceFQDNS{})
+	return s.cfgMgmtServiceClient.GetSourceFqdns(ctx, &cmsReq.SourceFQDNS{})
 }

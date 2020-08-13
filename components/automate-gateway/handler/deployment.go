@@ -10,17 +10,17 @@ import (
 )
 
 type DeploymentServer struct {
-	deploymentClient api.DeploymentClient
+	deploymentServiceClient api.DeploymentServiceClient
 }
 
-func NewDeploymentServer(dc api.DeploymentClient) *DeploymentServer {
+func NewDeploymentServer(dc api.DeploymentServiceClient) *DeploymentServer {
 	return &DeploymentServer{
-		deploymentClient: dc,
+		deploymentServiceClient: dc,
 	}
 }
 
 func (s *DeploymentServer) GetVersion(ctx context.Context, _ *gp.Empty) (*deployment.Version, error) {
-	response, err := s.deploymentClient.ManifestVersion(ctx, &api.ManifestVersionRequest{})
+	response, err := s.deploymentServiceClient.ManifestVersion(ctx, &api.ManifestVersionRequest{})
 	if err != nil {
 		logrus.WithError(err).Error("failed to get manifest version")
 		return nil, err
@@ -29,7 +29,7 @@ func (s *DeploymentServer) GetVersion(ctx context.Context, _ *gp.Empty) (*deploy
 }
 
 func (s *DeploymentServer) ServiceVersions(ctx context.Context, _ *deployment.ServiceVersionsRequest) (*deployment.ServiceVersionsResponse, error) {
-	serviceVersions, err := s.deploymentClient.ServiceVersions(ctx, &api.ServiceVersionsRequest{})
+	serviceVersions, err := s.deploymentServiceClient.ServiceVersions(ctx, &api.ServiceVersionsRequest{})
 	if err != nil {
 		logrus.WithError(err).Error("failed to get ServiceVersions")
 		return nil, err

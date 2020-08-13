@@ -11,11 +11,11 @@ import (
 )
 
 type ChefIngestJobSchedulerServer struct {
-	jobSchedulerClient ingest.JobSchedulerClient
+	jobSchedulerServiceClient ingest.JobSchedulerServiceClient
 }
 
-func NewChefIngestJobSchedulerServer(jobSchedulerClient ingest.JobSchedulerClient) *ChefIngestJobSchedulerServer {
-	return &ChefIngestJobSchedulerServer{jobSchedulerClient: jobSchedulerClient}
+func NewChefIngestJobSchedulerServer(jobSchedulerServiceClient ingest.JobSchedulerServiceClient) *ChefIngestJobSchedulerServer {
+	return &ChefIngestJobSchedulerServer{jobSchedulerServiceClient: jobSchedulerServiceClient}
 }
 
 // GetStatusJobScheduler - collect and return the status of all the jobs in the Job Scheduler
@@ -23,7 +23,7 @@ func (server *ChefIngestJobSchedulerServer) GetStatusJobScheduler(ctx context.Co
 	log.WithFields(log.Fields{
 		"func": nameOfFunc(),
 	}).Debug("rpc call")
-	response, err := server.jobSchedulerClient.GetStatusJobScheduler(ctx, &ingest.JobSchedulerStatusRequest{})
+	response, err := server.jobSchedulerServiceClient.GetStatusJobScheduler(ctx, &ingest.JobSchedulerStatusRequest{})
 	if err != nil {
 		return &res.JobSchedulerStatus{}, err
 	}
@@ -37,7 +37,7 @@ func (server *ChefIngestJobSchedulerServer) MarkNodesMissing(ctx context.Context
 	log.WithFields(log.Fields{
 		"func": nameOfFunc(),
 	}).Debug("rpc call")
-	_, err := server.jobSchedulerClient.MarkNodesMissing(ctx, &ingest.MarkNodesMissingRequest{})
+	_, err := server.jobSchedulerServiceClient.MarkNodesMissing(ctx, &ingest.MarkNodesMissingRequest{})
 
 	return &res.MarkNodesMissing{}, err
 }
@@ -47,7 +47,7 @@ func (server *ChefIngestJobSchedulerServer) StartNodesMissingScheduler(ctx conte
 	log.WithFields(log.Fields{
 		"func": nameOfFunc(),
 	}).Debug("rpc call")
-	_, err := server.jobSchedulerClient.StartNodesMissingScheduler(ctx, &ingest.StartNodesMissingSchedulerRequest{})
+	_, err := server.jobSchedulerServiceClient.StartNodesMissingScheduler(ctx, &ingest.StartNodesMissingSchedulerRequest{})
 
 	return &res.StartNodesMissingScheduler{}, err
 }
@@ -57,7 +57,7 @@ func (server *ChefIngestJobSchedulerServer) StopNodesMissingScheduler(ctx contex
 	log.WithFields(log.Fields{
 		"func": nameOfFunc(),
 	}).Debug("rpc call")
-	_, err := server.jobSchedulerClient.StopNodesMissingScheduler(ctx, &ingest.StopNodesMissingSchedulerRequest{})
+	_, err := server.jobSchedulerServiceClient.StopNodesMissingScheduler(ctx, &ingest.StopNodesMissingSchedulerRequest{})
 
 	return &res.StopNodesMissingScheduler{}, err
 }
@@ -74,7 +74,7 @@ func (server *ChefIngestJobSchedulerServer) ConfigureNodesMissingScheduler(ctx c
 		Threshold: parameters.GetThreshold(),
 		Running:   parameters.GetRunning(),
 	}
-	_, err := server.jobSchedulerClient.ConfigureNodesMissingScheduler(ctx, config)
+	_, err := server.jobSchedulerServiceClient.ConfigureNodesMissingScheduler(ctx, config)
 
 	return &res.ConfigureNodesMissingScheduler{}, err
 }
@@ -84,7 +84,7 @@ func (server *ChefIngestJobSchedulerServer) DeleteMarkedNodes(ctx context.Contex
 	log.WithFields(log.Fields{
 		"func": nameOfFunc(),
 	}).Debug("rpc call")
-	_, err := server.jobSchedulerClient.DeleteMarkedNodes(ctx, &ingest.DeleteMarkedNodesRequest{})
+	_, err := server.jobSchedulerServiceClient.DeleteMarkedNodes(ctx, &ingest.DeleteMarkedNodesRequest{})
 
 	return &res.DeleteMarkedNodes{}, err
 }
@@ -94,7 +94,7 @@ func (server *ChefIngestJobSchedulerServer) StartDeleteNodesScheduler(ctx contex
 	log.WithFields(log.Fields{
 		"func": nameOfFunc(),
 	}).Debug("rpc call")
-	_, err := server.jobSchedulerClient.StartDeleteNodesScheduler(ctx, &ingest.StartDeleteNodesSchedulerRequest{})
+	_, err := server.jobSchedulerServiceClient.StartDeleteNodesScheduler(ctx, &ingest.StartDeleteNodesSchedulerRequest{})
 
 	return &res.StartDeleteNodesScheduler{}, err
 }
@@ -104,7 +104,7 @@ func (server *ChefIngestJobSchedulerServer) StopDeleteNodesScheduler(ctx context
 	log.WithFields(log.Fields{
 		"func": nameOfFunc(),
 	}).Debug("rpc call")
-	_, err := server.jobSchedulerClient.StopDeleteNodesScheduler(ctx, &ingest.StopDeleteNodesSchedulerRequest{})
+	_, err := server.jobSchedulerServiceClient.StopDeleteNodesScheduler(ctx, &ingest.StopDeleteNodesSchedulerRequest{})
 
 	return &res.StopDeleteNodesScheduler{}, err
 }
@@ -122,7 +122,7 @@ func (server *ChefIngestJobSchedulerServer) ConfigureDeleteNodesScheduler(ctx co
 		Threshold: config.GetThreshold(),
 		Running:   config.GetRunning(),
 	}
-	_, err := server.jobSchedulerClient.ConfigureDeleteNodesScheduler(ctx, parameters)
+	_, err := server.jobSchedulerServiceClient.ConfigureDeleteNodesScheduler(ctx, parameters)
 
 	return &res.ConfigureDeleteNodesScheduler{}, err
 }
@@ -131,7 +131,7 @@ func (server *ChefIngestJobSchedulerServer) ConfigureDeleteNodesScheduler(ctx co
 func (server *ChefIngestJobSchedulerServer) MarkMissingNodesForDeletion(ctx context.Context, empty *req.MarkMissingNodesForDeletion) (*res.MarkMissingNodesForDeletion, error) {
 	log.WithFields(log.Fields{"func": nameOfFunc()}).Debug("rpc call")
 
-	_, err := server.jobSchedulerClient.MarkMissingNodesForDeletion(ctx, &ingest.MarkMissingNodesForDeletionRequest{})
+	_, err := server.jobSchedulerServiceClient.MarkMissingNodesForDeletion(ctx, &ingest.MarkMissingNodesForDeletionRequest{})
 	return &res.MarkMissingNodesForDeletion{}, err
 }
 
@@ -139,7 +139,7 @@ func (server *ChefIngestJobSchedulerServer) MarkMissingNodesForDeletion(ctx cont
 func (server *ChefIngestJobSchedulerServer) StartMissingNodesForDeletionScheduler(ctx context.Context, empty *req.StartMissingNodesForDeletionScheduler) (*res.StartMissingNodesForDeletionScheduler, error) {
 	log.WithFields(log.Fields{"func": nameOfFunc()}).Debug("rpc call")
 
-	_, err := server.jobSchedulerClient.StartMissingNodesForDeletionScheduler(ctx, &ingest.StartMissingNodesForDeletionSchedulerRequest{})
+	_, err := server.jobSchedulerServiceClient.StartMissingNodesForDeletionScheduler(ctx, &ingest.StartMissingNodesForDeletionSchedulerRequest{})
 	return &res.StartMissingNodesForDeletionScheduler{}, err
 }
 
@@ -147,7 +147,7 @@ func (server *ChefIngestJobSchedulerServer) StartMissingNodesForDeletionSchedule
 func (server *ChefIngestJobSchedulerServer) StopMissingNodesForDeletionScheduler(ctx context.Context, empty *req.StopMissingNodesForDeletionScheduler) (*res.StopMissingNodesForDeletionScheduler, error) {
 	log.WithFields(log.Fields{"func": nameOfFunc()}).Debug("rpc call")
 
-	_, err := server.jobSchedulerClient.StopMissingNodesForDeletionScheduler(ctx, &ingest.StopMissingNodesForDeletionSchedulerRequest{})
+	_, err := server.jobSchedulerServiceClient.StopMissingNodesForDeletionScheduler(ctx, &ingest.StopMissingNodesForDeletionSchedulerRequest{})
 	return &res.StopMissingNodesForDeletionScheduler{}, err
 }
 
@@ -164,7 +164,7 @@ func (server *ChefIngestJobSchedulerServer) ConfigureMissingNodesForDeletionSche
 		Threshold: config.GetThreshold(),
 		Running:   config.GetRunning(),
 	}
-	_, err := server.jobSchedulerClient.ConfigureMissingNodesForDeletionScheduler(ctx, parameters)
+	_, err := server.jobSchedulerServiceClient.ConfigureMissingNodesForDeletionScheduler(ctx, parameters)
 
 	return &res.ConfigureMissingNodesForDeletionScheduler{}, err
 }

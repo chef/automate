@@ -490,7 +490,7 @@ func (s *serializedProjectUpdateListTasksTask) Run(
 
 type serializedProjectUpdateRunTaskTask struct {
 	client              SerializedProjectUpdate
-	authzProjectsClient authz.ProjectsClient
+	authzProjectsClient authz.ProjectsServiceClient
 	svc                 string
 }
 
@@ -583,7 +583,7 @@ func (s *serializedProjectUpdateCancelTaskTask) Run(
 }
 
 func RegisterSerialTaskExecutors(manager *cereal.Manager, svc string, client SerializedProjectUpdate,
-	authzProjectsClient authz.ProjectsClient) error {
+	authzProjectsClient authz.ProjectsServiceClient) error {
 
 	taskExecutorOpts := cereal.TaskExecutorOpts{
 		Workers: 1,
