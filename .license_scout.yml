@@ -163,6 +163,9 @@ fallbacks:
     - name: core/ruby
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
+    - name: core/ruby26
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
     - name: core/cacerts
       license_id: MPL-2.0
       license_content: https://curl.haxx.se/docs/caextract.html
