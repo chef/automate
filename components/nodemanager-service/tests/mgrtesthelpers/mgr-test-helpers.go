@@ -4,13 +4,17 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	"github.com/chef/automate/components/compliance-service/examples/helpers"
+	compliance_helpers "github.com/chef/automate/components/compliance-service/examples/helpers"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/tls/certs"
+	cert_helper "github.com/chef/automate/lib/tls/test/helpers"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
@@ -117,9 +121,9 @@ func AddAzureManager(ctx context.Context, mgrClient manager.NodeManagerServiceCl
 func GetManagerConn() (*grpc.ClientConn, error) {
 	var connFactory *secureconn.Factory
 	if os.Getenv("RUN_MODE") == "local" {
-		connFactory = helpers.SecureConnFactory()
+		connFactory = SecureConnFactory()
 	} else {
-		connFactory = helpers.SecureConnFactoryHab()
+		connFactory = SecureConnFactoryHab()
 	}
 
 	mgrConn, err := connFactory.Dial("nodemanager-service", ManagerEndpoint)
@@ -132,24 +136,24 @@ func GetManagerConn() (*grpc.ClientConn, error) {
 func GetSecretsConn() (*grpc.ClientConn, error) {
 	var connFactory *secureconn.Factory
 	if os.Getenv("RUN_MODE") == "local" {
-		connFactory = helpers.SecureConnFactory()
+		connFactory = SecureConnFactory()
 	} else {
-		connFactory = helpers.SecureConnFactoryHab()
+		connFactory = SecureConnFactoryHab()
 	}
 
-	cmpConn, err := connFactory.Dial("secrets-service", SecretsEndpoint)
+	secretsConn, err := connFactory.Dial("secrets-service", SecretsEndpoint)
 	if err != nil {
 		return nil, err
 	}
-	return cmpConn, nil
+	return secretsConn, nil
 }
 
 func GetComplianceConn() (*grpc.ClientConn, error) {
 	var connFactory *secureconn.Factory
 	if os.Getenv("RUN_MODE") == "local" {
-		connFactory = helpers.SecureConnFactory()
+		connFactory = compliance_helpers.SecureConnFactory()
 	} else {
-		connFactory = helpers.SecureConnFactoryHab()
+		connFactory = compliance_helpers.SecureConnFactoryHab()
 	}
 
 	cmpConn, err := connFactory.Dial("compliance-service", ComplianceEndpoint)
@@ -157,4 +161,50 @@ func GetComplianceConn() (*grpc.ClientConn, error) {
 		return nil, err
 	}
 	return cmpConn, nil
+}
+
+// LoadCerts loads the dev certs for nodemanager service
+func LoadNodeManagerCerts() *certs.ServiceCerts {
+	name := "nodemanager-service"
+	cfg := certs.TLSConfig{
+		CertPath:       cert_helper.DevCertPath(name),
+		KeyPath:        cert_helper.DevKeyPath(name),
+		RootCACertPath: cert_helper.DevRootCACert(),
+	}
+
+	serviceCerts, err := cfg.ReadCerts()
+	if err != nil {
+		logrus.WithError(err).Fatal("Could not load certs")
+	}
+
+	return serviceCerts
+}
+
+// uses the certs in a running hab env
+func LoadNodeManagerCertsHab() *certs.ServiceCerts {
+	dirname := "/hab/svc/nodemanager-service/config"
+	logrus.Infof("certs dir is %s", dirname)
+
+	cfg := certs.TLSConfig{
+		CertPath:       path.Join(dirname, "service.crt"),
+		KeyPath:        path.Join(dirname, "service.key"),
+		RootCACertPath: path.Join(dirname, "root_ca.crt"),
+	}
+
+	serviceCerts, err := cfg.ReadCerts()
+	if err != nil {
+		logrus.WithError(err).Fatal("Could not load certs:")
+	}
+
+	return serviceCerts
+}
+
+func SecureConnFactory() *secureconn.Factory {
+	serviceCerts := LoadNodeManagerCerts()
+	return secureconn.NewFactory(*serviceCerts)
+}
+
+func SecureConnFactoryHab() *secureconn.Factory {
+	certs := LoadNodeManagerCertsHab()
+	return secureconn.NewFactory(*certs)
 }
