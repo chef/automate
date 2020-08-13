@@ -530,11 +530,17 @@ function build_all_changed_components() {
       if [[ -n "$whitelist" ]]; then
         if [[ "$whitelist" == *"$(basename "$component")"* ]]; then
           log_line "Building $component"
-          build "$component"
+          if ! build "$component"; then
+            popd
+            return 1
+          fi
         fi
       else
         log_line "Building $component"
-        build "$component"
+        if ! build "$component"; then
+          popd
+          return 1
+        fi
       fi
     done
   popd >/dev/null
