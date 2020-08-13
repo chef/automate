@@ -583,23 +583,6 @@ steps:
       executor:
         docker:
 
-  - label: "nodemanager-integration-nodes"
-    command:
-      - scripts/download_verify_harts.sh
-      - |
-        hab studio run "source scripts/verify_studio_init.sh &&
-          start_deployment_service &&
-          chef-automate dev deploy-some chef/nodemanager-service --with-deps &&
-          nodemanager_nodes_scans_integration"
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
-
   - label: "compliance-service db-migrations"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6

@@ -140,6 +140,23 @@ steps:
           environment:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
+            
+  - label: "nodemanager-integration-nodes"
+    command:
+      - scripts/download_verify_harts.sh
+      - |
+        hab studio run "source scripts/verify_studio_init.sh &&
+          start_deployment_service &&
+          chef-automate dev deploy-some chef/nodemanager-service --with-deps &&
+          nodemanager_nodes_scans_integration"
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
 
   # The nodemanager tests require access to AWS and Azure accounts as
   # they test against the actual API endpoints of those services.
