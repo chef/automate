@@ -42,11 +42,10 @@ func (m *Sorting) GetParameters() (string, bool) {
 	)
 
 	if m != nil {
-		// TODO (afiune) Do we wanna validate the provided sort field?
 		if m.Field != "" {
 			sortField = m.Field
 		}
-		if m.Order.String() == "desc" {
+		if m.Order == Order_DESC {
 			sortAsc = false
 		}
 	}
