@@ -68,50 +68,51 @@ To delete a Data Feed instance in Chef Automate:
 ## Configuring Global Data Feed Behavior
 
 {{< note >}}
-The settings in `config.toml` apply across all configured Data Feed instances.
+The Data Feed configuration settings apply across all configured Data Feed instances.
 {{< /note >}}
 
-Modify Data Feed behavior with configuration settings in `config.toml`.
+To modify Data Feed behavior with the available configuration settings:
 
-1. Navigate to `/hab/svc/data-feed-service/config/config.toml` using the Chef Automate command-line tool.
-1. Change one or more configuration settings to reflect the desired global Data Feed behavior:
+1. Create a configuration patch file to update the configuration settings. Save this file in the `.toml` file format and name your file as desired. For example, `data-feed-patch.toml`
 
-  - Update the `feed_interval` setting to change the interval for the Data Feed collection. The default value is four hours
-  - Update the `node_batch_size` setting to change the number of sets of node data sent in each individual batch to your endpoint. The default value is 50 nodes
+1. Include one or more configuration settings and their updated value(s) in your configuration patch `.toml` file to reflect the desired global Data Feed behavior:
+
+  - Use the `feed_interval` setting to change the interval for the Data Feed collection. The default value is four hours
+  - Use the `node_batch_size` setting to change the number of sets of node data sent in each individual batch to your endpoint. The default value is 50 nodes
   - Use the `updated_nodes_only` setting to determine what data to include in each export. The default setting is `true`, which causes the aggregation of only the *changed* data of updated nodes since the last export. Set `updated_nodes_only` to `false` and it aggregates *all* data of updated nodes since the last export
   - To reduce the IP address range for the collected and processed node data, update the `disable_cidr_filter` setting to `false` **and** update the `cidr_filter` setting to cover the required IP address range. For example, you may wish to send only production or test node traffic
   - Use the `accepted_status_codes` setting to define an array of HTTP status codes that the Data Feed Service will treat as `success` if returned by the 3rd party endpoint. If the status code is not in the `accepted_status_codes` list, then an error will be logged
 
-1. Apply your changes with the Chef Automate command-line tool:
+1. Save your configuration patch file changes before continuing to the next step.
+
+1. Apply your configuration changes with the Chef Automate command-line tool:
 
 ```bash
-    chef-automate config patch /hab/svc/data-feed-service/config/config.toml
+    chef-automate config patch data-feed-patch.toml
 ```
 
-### Config.toml Example
+    where `data-feed-patch.toml` is this example's configuration patch file.
+
+### Configuration Patch File Example
 
 ```toml
-    [service]
-
-    host = "localhost"
-    port = 14001
-    feed_interval = "4h"
-    asset_page_size = 100
-    reports_page_size = 1000
-    node_batch_size = 50
-    updated_nodes_only = true
-    disable_cidr_filter = true
-    cidr_filter = "0.0.0.0/0"
-    external_fqdn = ""
-    accepted_status_codes = [ 200, 201, 202, 203, 204 ]
+[data_feed_service.v1.sys]
+  [data_feed_service.v1.sys.service]
+        feed_interval = "4h"
+        node_batch_size = 50
+        updated_nodes_only = true
+        disable_cidr_filter = true
+        cidr_filter = "0.0.0.0/0"
+        accepted_status_codes = [200, 201, 202, 203, 204]
+      [data_feed_service.v1.sys.log]
+        level = "info"
 ```
 
-To debug any issues with the Data Feed Service in Chef Automate, update the following section in `config.toml` by changing the `log_level` value to "debug":
+To debug any issues with the Data Feed Service in Chef Automate, update the following section in your configuration patch file by changing the `log_level` value to "debug":
 
 ```toml
-    [log]
-    log_format = "text"
-    log_level = "info"
+    [data_feed_service.v1.sys.log]
+    log_level = "debug"
 ```
 
 ## Data Feed Output Syntax and Details

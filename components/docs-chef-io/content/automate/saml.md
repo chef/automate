@@ -44,11 +44,52 @@ Users who sign in via SAML will have a session time of 24 hours before needing t
 
 ## Supported Identity Management Systems
 
+- [Azure AD]({{< relref "#azure-ad" >}})
 - Office365
 - OKTA
 - OneLogin
 - Ping
 - Tivoli Federated Identity Manager
+
+### Azure AD
+
+Using Azure AD as an SAML IdP requires specific configuration for both Azure AD and Chef Automate.
+
+{{< note >}}
+The signing certificate used for Chef Automate's SAML integration with Azure AD requires manual management.
+Signing key rotation is not done automatically.
+{{< /note >}}
+
+In Azure AD, add Chef Automate as a _"non-gallery application"_, and then configure its SAML sign-in method.
+[The Azure AD documentation](https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/configure-saml-single-sign-on) provides a detailed guide.
+Enter `https://{{< example_fqdn "automate" >}}/dex/callback` as the value for both _Identifier (Entity ID)_ and _Reply URL (Assertion Consumer Service URL)_.
+
+You may use the default claims provided by Azure AD.
+Remember to edit the Chef Automate configuration in `config.toml` to reflect this claims information.
+
+Download the _Certificate (Base64)_ in Azure AD and take note of the _Login URL_ for use in the Chef Automate configuration.
+
+After configuring Azure AD, edit your Chef Automate `config.toml` configuration file to reflect the values entered in the Azure AD interface.
+The minimal configuration snippet in `config.toml` will look similar to:
+
+```toml
+[dex.v1.sys.connectors.saml]
+ca_contents="""
+<<Certificate (Base64)>>
+"""
+sso_url = "<<Login URL>>"
+email_attr = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+username_attr = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+entity_issuer = "https://{{< example_fqdn "automate" >}}/dex/callback"
+```
+
+where:
+
+- `ca_contents` contains the value of the _Certificate (Base64)_, and includes the `-----BEGIN CERTIFICATE-----` and `-----END CERTIFICATE-----` markers
+- `sso_url` contains the value of _Login URL_
+- `entity_issuer` contains the value of _Identifier (Entity ID)_
+
+See the SAML Configuration Settings below for further configuration options.
 
 ## SAML Configuration Settings
 
