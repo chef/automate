@@ -143,11 +143,11 @@ func TestPublish(t *testing.T) {
 				assert.Equal(t, test.e.FeedType, got.FeedType)
 				assert.Equal(t, test.e.Tags, got.Tags)
 				assert.Equal(t, test.e.SourceEventPublished, got.SourceEventPublished)
-				assert.Equal(t, test.e.Producer.ID, got.Producer.ID)
-				assert.Equal(t, test.e.Actor.ID, got.Actor.ID)
+				assert.Equal(t, test.e.Producer.Id, got.Producer.Id)
+				assert.Equal(t, test.e.Actor.Id, got.Actor.Id)
 				assert.Equal(t, test.e.Verb, got.Verb)
-				assert.Equal(t, test.e.Object.ID, got.Object.ID)
-				assert.Equal(t, test.e.Target.ID, got.Target.ID)
+				assert.Equal(t, test.e.Object.Id, got.Object.Id)
+				assert.Equal(t, test.e.Target.Id, got.Target.Id)
 			}
 		})
 		suite.deleteAllDocuments()
@@ -157,28 +157,28 @@ func TestPublish(t *testing.T) {
 
 func TestPublishNodeTerminated(t *testing.T) {
 	event := api.EventMsg{
-		EventID: uuid.Must(uuid.NewV4()).String(),
+		EventId: uuid.Must(uuid.NewV4()).String(),
 		Type:    &api.EventType{Name: config.NodeTerminatedEventName},
 		Producer: &api.Producer{
-			ID:           "urn:chef:compliance:mgrpolling",
+			Id:           "urn:chef:compliance:mgrpolling",
 			ProducerName: "Node Manager Polling",
 			ProducerType: "system component",
 		},
 		Tags:      []string{"nodemgr", "terminate"},
 		Published: ptypes.TimestampNow(),
 		Actor: &api.Actor{
-			ID:          "",
+			Id:          "",
 			ObjectType:  "nodemanager",
 			DisplayName: "nodemanager",
 		},
 		Verb: "terminate",
 		Object: &api.Object{
-			ID:          "instanceID",
+			Id:          "instanceID",
 			ObjectType:  "instance ID",
 			DisplayName: "instanceID",
 		},
 		Target: &api.Target{
-			ID:          "",
+			Id:          "",
 			ObjectType:  "Not Applicable",
 			DisplayName: "Not Applicable",
 		},
