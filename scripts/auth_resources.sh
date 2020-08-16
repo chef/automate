@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ###
-### user_policies.sh -- adds utility commands to your shell
+### auth_resources.sh -- adds auth utilities to your shell
 ###
-### usage: source user_policies.sh
+### usage: source auth_resources.sh
 ###
 ### Commands added:
 ###
@@ -25,10 +25,12 @@
 ###   a2teams <local_user_name>
 ###     Enumerates all local teams for <local_user_name>.
 ###
-###
 ###   a2userid <local_user_name>
 ###     Returns the user id for <local_user_name>.
 ###     (The user id is required rather than the user name for querying the team API.)
+###
+###   a2rules
+###     Enumerates all rules for all projects. Projects with no rules are skipped.
 ###
 ### Reference:
 ###   https://blog.chef.io/now-what-were-those-permissions-for-this-user-again/
@@ -88,3 +90,13 @@ a2teams() {
   curl -sSkH "api-token: $TOK" "$TARGET_HOST/apis/iam/v2/users/$user_id/teams" | jq -r '.teams[] | .id'
 }
 
+a2rules() {
+  local projects
+  projects=$(curl -sSkH "api-token: $TOK" "$TARGET_HOST/apis/iam/v2/projects" | \
+    jq -r '.projects[] | select(.status != "NO_RULES") | .id')
+  for proj in $projects
+  do
+    printf "\nProject %s...\n" "$proj"
+    curl -sSkH "api-token: $TOK" "$TARGET_HOST/apis/iam/v2/projects/$proj/rules" | jq
+  done
+}
