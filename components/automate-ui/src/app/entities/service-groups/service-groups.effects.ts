@@ -34,8 +34,14 @@ import {
   GetServiceGroupsFailure,
   GetServiceGroupsSuggestionsSuccess,
   GetServiceGroupsSuggestionsFailure,
-  GetServiceGroupsSuggestions
+  GetServiceGroupsSuggestions,
+  DeleteServicesById,
+  DeleteServicesByIdSuccess,
+  DeleteServicesByIdFailure
 } from './service-groups.actions';
+
+import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { Type } from 'app/entities/notifications/notification.model';
 
 @Injectable()
 export class ServiceGroupsEffects {
@@ -103,4 +109,44 @@ export class ServiceGroupsEffects {
           new GetServiceGroupsSuggestionsSuccess({ serviceGroupsSuggestions })),
         catchError((error) => of(new GetServiceGroupsSuggestionsFailure(error))));
       }));
+
+  @Effect()
+  deleteServicesById$ = this.actions$.pipe(
+    ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
+    mergeMap((action: DeleteServicesById) => {
+      return this.requests.deleteServicesById(action.payload.servicesToDelete).pipe(
+        map((response: GroupServicesPayload) =>
+          new DeleteServicesByIdSuccess({ amount: response.services.length })),
+        catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error)))
+      );
+    }));
+
+  @Effect()
+  deleteServicesByIdFailure$ = this.actions$.pipe(
+    ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_FAILURE),
+    map((action: DeleteServicesByIdFailure) => {
+      const msg = `Could not delete service: ${action.payload.error}`;
+      return new CreateNotification({
+        type: Type.error,
+        message: msg
+      });
+    })
+  );
+
+  @Effect()
+  deleteServicesByIdSuccess$ = this.actions$.pipe(
+    ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS),
+    mergeMap((action: DeleteServicesByIdSuccess) => {
+      const amount = action.payload.amount;
+      const msg = amount === 1 ? '1 service deleted.' : `${amount} services deleted.`;
+      return [
+        new GetServiceGroups(),
+        new GetServiceGroupsCounts(),
+        new CreateNotification({
+          type: Type.info,
+          message: msg
+        })
+      ];
+    })
+  );
 }

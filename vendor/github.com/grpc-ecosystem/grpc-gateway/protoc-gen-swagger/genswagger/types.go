@@ -3,6 +3,7 @@ package genswagger
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 
 	"github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway/descriptor"
 )
@@ -64,7 +65,6 @@ type swaggerObject struct {
 	Produces            []string                            `json:"produces"`
 	Paths               swaggerPathsObject                  `json:"paths"`
 	Definitions         swaggerDefinitionsObject            `json:"definitions"`
-	StreamDefinitions   swaggerDefinitionsObject            `json:"x-stream-definitions,omitempty"`
 	SecurityDefinitions swaggerSecurityDefinitionsObject    `json:"securityDefinitions,omitempty"`
 	Security            []swaggerSecurityRequirementObject  `json:"security,omitempty"`
 	ExternalDocs        *swaggerExternalDocumentationObject `json:"externalDocs,omitempty"`
@@ -116,6 +116,7 @@ type swaggerOperationObject struct {
 	Parameters  swaggerParametersObject `json:"parameters,omitempty"`
 	Tags        []string                `json:"tags,omitempty"`
 	Deprecated  bool                    `json:"deprecated,omitempty"`
+	Produces    []string                `json:"produces,omitempty"`
 
 	Security     *[]swaggerSecurityRequirementObject `json:"security,omitempty"`
 	ExternalDocs *swaggerExternalDocumentationObject `json:"externalDocs,omitempty"`
@@ -161,6 +162,15 @@ type schemaCore struct {
 	Default string   `json:"default,omitempty"`
 }
 
+func (s *schemaCore) setRefFromFQN(ref string, reg *descriptor.Registry) error {
+	name, ok := fullyQualifiedNameToSwaggerName(ref, reg)
+	if !ok {
+		return fmt.Errorf("setRefFromFQN: can't resolve swagger name from '%v'", ref)
+	}
+	s.Ref = fmt.Sprintf("#/definitions/%s", name)
+	return nil
+}
+
 type swaggerItemsObject schemaCore
 
 // http://swagger.io/specification/#responsesObject
@@ -168,8 +178,9 @@ type swaggerResponsesObject map[string]swaggerResponseObject
 
 // http://swagger.io/specification/#responseObject
 type swaggerResponseObject struct {
-	Description string              `json:"description"`
-	Schema      swaggerSchemaObject `json:"schema"`
+	Description string                 `json:"description"`
+	Schema      swaggerSchemaObject    `json:"schema"`
+	Examples    map[string]interface{} `json:"examples,omitempty"`
 
 	extensions []extension
 }

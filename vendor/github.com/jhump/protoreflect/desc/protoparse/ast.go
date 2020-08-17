@@ -1,5 +1,7 @@
 package protoparse
 
+import "fmt"
+
 // This file defines all of the nodes in the proto AST.
 
 // SourcePos identifies a location in a proto source file.
@@ -7,6 +9,13 @@ type SourcePos struct {
 	Filename  string
 	Line, Col int
 	Offset    int
+}
+
+func (pos SourcePos) String() string {
+	if pos.Line <= 0 || pos.Col <= 0 {
+		return pos.Filename
+	}
+	return fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col)
 }
 
 func unknownPos(filename string) *SourcePos {
@@ -373,13 +382,27 @@ func (n *compoundStringNode) value() interface{} {
 	return n.val
 }
 
+type intLiteral interface {
+	asInt32(min, max int32) (int32, bool)
+	value() interface{}
+}
+
 type intLiteralNode struct {
 	basicNode
 	val uint64
 }
 
+var _ intLiteral = (*intLiteralNode)(nil)
+
 func (n *intLiteralNode) value() interface{} {
 	return n.val
+}
+
+func (n *intLiteralNode) asInt32(min, max int32) (int32, bool) {
+	if (min >= 0 && n.val < uint64(min)) || n.val > uint64(max) {
+		return 0, false
+	}
+	return int32(n.val), true
 }
 
 type compoundUintNode struct {
@@ -387,8 +410,17 @@ type compoundUintNode struct {
 	val uint64
 }
 
+var _ intLiteral = (*compoundUintNode)(nil)
+
 func (n *compoundUintNode) value() interface{} {
 	return n.val
+}
+
+func (n *compoundUintNode) asInt32(min, max int32) (int32, bool) {
+	if (min >= 0 && n.val < uint64(min)) || n.val > uint64(max) {
+		return 0, false
+	}
+	return int32(n.val), true
 }
 
 type compoundIntNode struct {
@@ -396,8 +428,17 @@ type compoundIntNode struct {
 	val int64
 }
 
+var _ intLiteral = (*compoundIntNode)(nil)
+
 func (n *compoundIntNode) value() interface{} {
 	return n.val
+}
+
+func (n *compoundIntNode) asInt32(min, max int32) (int32, bool) {
+	if n.val < int64(min) || n.val > int64(max) {
+		return 0, false
+	}
+	return int32(n.val), true
 }
 
 type floatLiteralNode struct {
@@ -526,6 +567,7 @@ type groupNode struct {
 	name         *identNode
 	tag          *intLiteralNode
 	decls        []*messageElement
+	options      *compactOptionsNode
 
 	// This field is populated after parsing, to allow lookup of extendee source
 	// locations when field extendees cannot be linked. (Otherwise, this is just
@@ -727,16 +769,45 @@ type extensionRangeNode struct {
 
 type rangeNode struct {
 	basicCompositeNode
-	stNode, enNode node
-	st, en         int32
+	startNode, endNode node
+	endMax             bool
 }
 
 func (n *rangeNode) rangeStart() node {
-	return n.stNode
+	return n.startNode
 }
 
 func (n *rangeNode) rangeEnd() node {
-	return n.enNode
+	if n.endNode == nil {
+		return n.startNode
+	}
+	return n.endNode
+}
+
+func (n *rangeNode) startValue() interface{} {
+	return n.startNode.(intLiteral).value()
+}
+
+func (n *rangeNode) startValueAsInt32(min, max int32) (int32, bool) {
+	return n.startNode.(intLiteral).asInt32(min, max)
+}
+
+func (n *rangeNode) endValue() interface{} {
+	l, ok := n.endNode.(intLiteral)
+	if !ok {
+		return nil
+	}
+	return l.value()
+}
+
+func (n *rangeNode) endValueAsInt32(min, max int32) (int32, bool) {
+	if n.endMax {
+		return max, true
+	}
+	if n.endNode == nil {
+		return n.startValueAsInt32(min, max)
+	}
+	return n.endNode.(intLiteral).asInt32(min, max)
 }
 
 type reservedNode struct {

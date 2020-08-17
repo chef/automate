@@ -41,7 +41,7 @@ var serveCmd = &cobra.Command{
 			secureconn.WithVersionInfo(version.Version, version.GitSHA))
 
 		// Storage client (Postgres)
-		dbClient, err := postgres.New(&conf.Postgres)
+		dbClient, err := postgres.ConnectAndMigrate(&conf.Postgres)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),

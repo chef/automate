@@ -313,6 +313,7 @@ chef-alert {
 }
 
 .fqdn-data {
+  margin-left: 8px;
   margin-bottom: 0px;
   word-break: break-all;
 }
@@ -329,4 +330,31 @@ chef-alert {
   margin-bottom: 0px;
   font-size: 14px;
   word-break: break-all;
+}
+
+.bulk-action-bar {
+  display: flex;
+  align-items: center;
+  padding: 0 35px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: $chef-white;
+
+  chef-button {
+    margin: 0 8px;
+  }
+}
+
+chef-modal[label="delete-services-modal"] {
+  text-align: center;
+
+  h1 {
+    margin-bottom: 24px;
+    color: $chef-critical;
+  }
+
+  .modal-line {
+    margin-bottom: 24px;
+  }
 }

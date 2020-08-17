@@ -29,6 +29,7 @@ import (
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/datalifecycle/purge"
+	libdb "github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	platform_config "github.com/chef/automate/lib/platform/config"
 )
@@ -56,16 +57,32 @@ func Spawn(opts *serveropts.Opts) error {
 		return err
 	}
 	grpcServer := opts.ConnFactory.NewServer()
+
 	uri := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
+	log.WithField("uri", uri).Info("Starting gRPC Server")
+	conn, err := net.Listen("tcp", uri)
+	if err != nil {
+		log.WithError(err).Error("TCP listen failed")
+		return err
+	}
+
+	pgURL, err := pgURL(opts.PGURL, opts.PGDatabase)
+	if err != nil {
+		log.WithError(err).Fatal("could not get PG URL")
+		return err
+	}
+
+	db, err := libdb.PGOpen(pgURL)
+	if err != nil {
+		return errors.Wrapf(err, "Failed to open database with uri: %s", pgURL)
+	}
 
 	// Authz Interface
 	authzConn, err := opts.ConnFactory.Dial("authz-service", opts.AuthzAddress)
 	if err != nil {
-		// This should never happen
-		log.WithError(err).Error("Failed to create Authz connection")
+		log.WithError(err).Error("Failed checking if a migration is running")
 		return err
 	}
-	defer authzConn.Close() // nolint: errcheck
 
 	authzProjectsClient := authz.NewProjectsClient(authzConn)
 
@@ -108,22 +125,16 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 	configMgmtClient := cfgmgmt.NewCfgMgmtClient(configMgmtConn)
 
-	chefActionPipeline := pipeline.NewChefActionPipeline(client, authzProjectsClient, configMgmtClient,
-		eventFeedServiceClient, opts.ChefIngestServerConfig.MessageBufferSize,
-		opts.ChefIngestServerConfig.MaxNumberOfBundledActionMsgs)
+	chefActionPipeline := pipeline.NewChefActionPipeline(client, authzProjectsClient,
+		configMgmtClient, eventFeedServiceClient,
+		opts.ChefIngestServerConfig.MaxNumberOfBundledActionMsgs,
+		opts.ChefIngestServerConfig.MessageBufferSize)
 
 	chefRunPipeline := pipeline.NewChefRunPipeline(client, authzProjectsClient,
 		nodeMgrServiceClient, opts.ChefIngestServerConfig.ChefIngestRunPipelineConfig,
 		opts.ChefIngestServerConfig.MessageBufferSize)
 
-	migrator := migration.New(client, chefActionPipeline)
-
-	log.WithField("uri", uri).Info("Starting gRPC Server")
-	conn, err := net.Listen("tcp", uri)
-	if err != nil {
-		log.WithError(err).Error("TCP listen failed")
-		return err
-	}
+	migrator := migration.New(client, chefActionPipeline, db)
 
 	// Register Status Server
 	ingestStatus := server.NewIngestStatus(client, migrator)
@@ -140,19 +151,31 @@ func Spawn(opts *serveropts.Opts) error {
 		return err
 	}
 
-	if migrationNeeded {
-		err = migrator.Start()
-		if err != nil {
-			log.WithError(err).Error("Failed starting a migration")
-			return err
+	migrationRunning, err := migrator.MigrationRunning()
+	if err != nil {
+		log.WithError(err).Error("Failed checking if a migration is running")
+		return err
+	}
+
+	if !migrationRunning {
+		if migrationNeeded {
+			err = migrator.Start()
+			if err != nil {
+				log.WithError(err).Error("Failed starting a migration")
+				return err
+			}
+		} else {
+			migrator.MarkUnneeded()
+			err = client.InitializeStore(context.Background())
+			if err != nil {
+				log.WithError(err).Error("Failed initializing elasticsearch")
+				return err
+			}
 		}
 	} else {
-		migrator.MarkUnneeded()
-		err = client.InitializeStore(context.Background())
-		if err != nil {
-			log.WithError(err).Error("Failed initializing elasticsearch")
-			return err
-		}
+		log.Warnf("HA Frontend: migration is currently running on another service. "+
+			"If this is an error, remove the lock from postgresql with the "+
+			"'SELECT pg_advisory_unlock(%d);' command inside the chef_ingest_service database.", migration.PgMigrationLockID)
 	}
 
 	// ChefRuns
@@ -163,13 +186,6 @@ func Spawn(opts *serveropts.Opts) error {
 
 	// Pass the chef ingest server to give status about the pipelines
 	ingestStatus.SetChefIngestServer(chefIngest)
-
-	// JobSchedulerServer
-	pgURL, err := pgURL(opts.PGURL, opts.PGDatabase)
-	if err != nil {
-		log.WithError(err).Fatal("could not get PG URL")
-		return err
-	}
 
 	jobManager, err := cereal.NewManager(postgres.NewPostgresBackend(pgURL))
 	if err != nil {

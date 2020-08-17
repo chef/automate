@@ -14,6 +14,7 @@ disable_cidr_filter = {{cfg.service.disable_cidr_filter}}
 cidr_filter = "{{cfg.service.cidr_filter}}"
 external_fqdn = "https://{{cfg.service.external_fqdn}}"
 accepted_status_codes = {{cfg.service.accepted_status_codes}}
+content_type = "{{cfg.service.content_type}}"
 
 [postgres]
 database = "{{cfg.storage.database}}"

@@ -53,11 +53,11 @@ func (ms *Status) calculateA1Tasks() {
 	insightsIndices, _ := ms.client.GetAllTimeseriesIndiceNames(ms.ctx, insightsIndexNameTag)
 	ms.total = ms.total + int64(len(insightsIndices))
 
-	// 4) finalCleanup
+	// 4) migrating actions to events
 	ms.total++
 
-	// migrating actions to events
-	ms.total += 2
+	// 5) finalCleanup
+	ms.total++
 }
 
 // stage1 - this is all done before the service says it is healthy.
@@ -106,12 +106,6 @@ func (ms *Status) stage2() {
 	err := ms.SendAllActionsThroughPipeline()
 	if err != nil {
 		logFatal(err.Error(), "Unable to re-insert actions")
-	}
-	ms.taskCompleted()
-
-	err = ms.DeleteAllActionsIndexes()
-	if err != nil {
-		logFatal(err.Error(), "Unable to delete action indexes")
 	}
 	ms.taskCompleted()
 

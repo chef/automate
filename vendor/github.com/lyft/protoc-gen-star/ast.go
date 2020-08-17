@@ -61,19 +61,9 @@ func ProcessCodeGeneratorRequest(debug Debugger, req *plugin_go.CodeGeneratorReq
 		g.targets[f] = nil
 	}
 
-	var allFiles []File
 	for _, f := range req.GetProtoFile() {
 		pkg := g.hydratePackage(f)
-		fl := g.hydrateFile(pkg, f)
-		allFiles = append(allFiles, fl)
-		pkg.addFile(fl)
-	}
-
-	for _, f := range allFiles {
-		for _, dep := range f.Descriptor().GetDependency() {
-			fileDep := g.mustSeen(dep).(File)
-			f.addFileDep(fileDep)
-		}
+		pkg.addFile(g.hydrateFile(pkg, f))
 	}
 
 	for _, e := range g.extensions {
@@ -88,7 +78,25 @@ func ProcessCodeGeneratorRequest(debug Debugger, req *plugin_go.CodeGeneratorReq
 	return g
 }
 
-// ProcessFileDescriptorSet conversts a FileDescriptorSet from protoc into a
+// ProcessCodeGeneratorRequestBidirectional has the same functionality as
+// ProcessCodeGeneratorRequest, but builds the AST so that files, messages,
+// and enums have references to any files or messages that directly or
+// transitively depend on them.
+func ProcessCodeGeneratorRequestBidirectional(debug Debugger, req *plugin_go.CodeGeneratorRequest) AST {
+	g := ProcessCodeGeneratorRequest(debug, req)
+	for _, pkg := range g.Packages() {
+		for _, f := range pkg.Files() {
+			for _, m := range f.AllMessages() {
+				for _, field := range m.Fields() {
+					assignDependent(field.Type(), m)
+				}
+			}
+		}
+	}
+	return g
+}
+
+// ProcessFileDescriptorSet converts a FileDescriptorSet from protoc into a
 // fully connected AST entity graph. An error is returned if the input is
 // malformed or missing dependencies. To generate a self-contained
 // FileDescriptorSet, run the following command:
@@ -101,6 +109,15 @@ func ProcessCodeGeneratorRequest(debug Debugger, req *plugin_go.CodeGeneratorReq
 func ProcessFileDescriptorSet(debug Debugger, fdset *descriptor.FileDescriptorSet) AST {
 	req := plugin_go.CodeGeneratorRequest{ProtoFile: fdset.File}
 	return ProcessCodeGeneratorRequest(debug, &req)
+}
+
+// ProcessFileDescriptorSetBidirectional has the same functionality as
+// ProcessFileDescriptorSet, but builds the AST so that files, messages,
+// and enums have references to any files or messages that directly or
+// transitively depend on them.
+func ProcessFileDescriptorSetBidirectional(debug Debugger, fdset *descriptor.FileDescriptorSet) AST {
+	req := plugin_go.CodeGeneratorRequest{ProtoFile: fdset.File}
+	return ProcessCodeGeneratorRequestBidirectional(debug, &req)
 }
 
 func (g *graph) hydratePackage(f *descriptor.FileDescriptorProto) Package {
@@ -126,6 +143,13 @@ func (g *graph) hydrateFile(pkg Package, f *descriptor.FileDescriptorProto) File
 		fl.fqn = ""
 	}
 	g.add(fl)
+
+	for _, dep := range f.GetDependency() {
+		// the AST is built in topological order so a file's dependencies are always hydrated first
+		d := g.mustSeen(dep).(File)
+		fl.addFileDependency(d)
+		d.addDependent(fl)
+	}
 
 	if _, fl.buildTarget = g.targets[f.GetName()]; fl.buildTarget {
 		g.targets[f.GetName()] = fl
@@ -167,8 +191,6 @@ func (g *graph) hydrateFile(pkg Package, f *descriptor.FileDescriptorProto) File
 			fld.addType(g.hydrateFieldType(fld))
 		}
 	}
-
-	fl.fileDeps = make([]File, 0)
 
 	g.hydrateSourceCodeInfo(fl, f)
 
@@ -427,6 +449,28 @@ func (g *graph) resolveFQN(e Entity) string {
 	}
 
 	return e.FullyQualifiedName()
+}
+
+func assignDependent(ft FieldType, parent Message) {
+	if ft.IsEnum() {
+		ft.Enum().addDependent(parent)
+	} else if ft.IsEmbed() {
+		ft.Embed().addDependent(parent)
+	} else if ft.IsRepeated() || ft.IsMap() {
+		if ft.Element().IsEnum() {
+			ft.Element().Enum().addDependent(parent)
+		} else if ft.Element().IsEmbed() {
+			ft.Element().Embed().addDependent(parent)
+		}
+
+		if ft.IsMap() {
+			if ft.Key().IsEnum() {
+				ft.Key().Enum().addDependent(parent)
+			} else if ft.Key().IsEmbed() {
+				ft.Key().Embed().addDependent(parent)
+			}
+		}
+	}
 }
 
 var _ AST = (*graph)(nil)

@@ -150,11 +150,20 @@ fallbacks:
     - name: github.com/gogo/protobuf
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/gogo/protobuf/master/LICENSE
+    - name: gopkg.in/yaml.v3
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/go-yaml/yaml/v3/LICENSE
+    - name: github.com/bgentry/go-netrc
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/bgentry/go-netrc/master/LICENSE
   habitat:
     - name: chef/mlsa
       license_id: Chef-MLSA
       license_content: https://gist.githubusercontent.com/chef-ci/6cd978229702e9cb35dbd7d29a162a22/raw/c4377c5875af52228e459e68f137d3035793c9cd/chef-mlsa.txt
     - name: core/ruby
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
+    - name: core/ruby26
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
     - name: core/cacerts

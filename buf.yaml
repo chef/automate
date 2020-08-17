@@ -14,11 +14,68 @@ build:
     - vendor/github.com/googleapis/googleapis/google/api/servicemanagement
     - vendor/github.com/envoyproxy/protoc-gen-validate/license
     - vendor/github.com/grpc-ecosystem/grpc-gateway/third_party
+    - vendor/github.com/grpc-ecosystem/grpc-gateway/runtime/internal/examplepb
 lint:
+  allow_comment_ignores: true
   use:
     - DEFAULT
   except:
-    - PACKAGE_VERSION_SUFFIX # we can adopt this with .v2 if we should need that
+    # This linter requires your proto package names to end with .v1 or similar. 
+    # Adopting this for existing code would break anyone using our protos
+    - PACKAGE_VERSION_SUFFIX 
+    # buf wants you to use a file hierarchy that matches your proto package
+    # names, but this is difficult and probably breaking to adopt now
+    - PACKAGE_SAME_DIRECTORY 
+    - PACKAGE_DIRECTORY_MATCH
+    # The linters below this comment should be turned on for new things (todo)
+    - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME
+    - RPC_REQUEST_RESPONSE_UNIQUE
+    - SERVICE_SUFFIX
+    - ENUM_VALUE_PREFIX
+    - ENUM_ZERO_VALUE_SUFFIX
+  ignore_only:
+    PACKAGE_SAME_GO_PACKAGE:
+      # /api/
+      - config
+      - interservice/authz
+      - interservice/authn
+      - interservice/cereal
+      - interservice/deployment
+      - interservice/es_sidecar
+      - interservice/ingest
+      - interservice/license_control
+      - interservice/local_user
+      - interservice/pg_sidecar
+      - interservice/teams
+      # /components/
+      - automate-gateway/api/iam/v2
+      - automate-gateway/api/gateway
+      - automate-grpc/protoc-gen-a2-config/api/a2conf
+    FIELD_LOWER_SNAKE_CASE:
+      - external/infra_proxy/response/policyfiles.proto
+      # /api/
+      - interservice/cfgmgmt/response/root.proto
+      - interservice/compliance/profiles/profiles.proto
+      - interservice/es_sidecar/service.proto
+      - interservice/event/event.proto
+      - interservice/event_feed/event_feed.proto
+      - interservice/infra_proxy/response/policyfiles.proto
+      - interservice/license_control/license-control.proto
+      # /component/
+      - automate-gateway/api/notifications/notifications.proto
+      - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
+    ENUM_VALUE_UPPER_SNAKE_CASE:
+      - interservice/cfgmgmt
+      - interservice/pg_sidecar/service.proto
+      - automate-gateway/api/notifications/notifications.proto
+    MESSAGE_PASCAL_CASE:
+      - config/dex/config_request.proto
+      - interservice/cfgmgmt/response/suggestions.proto
+    FILE_LOWER_SNAKE_CASE:
+      - interservice/license_control/license-control.proto
+    PACKAGE_DEFINED:
+      - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
   ignore:
     - protoc-gen-swagger # grpc gateway
     - internal # grpc gateway
@@ -26,6 +83,7 @@ lint:
     - google # googleapis
     - validate # envoyproxy/protoc-gen-validate
     - gogoproto # envoyproxy/protoc-gen-validate
+    - external/habitat/event.proto # this file is owned by habitat and copied here
 breaking:
   use:
     - WIRE_JSON

@@ -14,7 +14,7 @@ toc = true
 Backups are crucial for protecting your data from catastrophic loss and preparing a recovery procedure.
 The `chef-automate backup create` command creates a single backup that contains data for all products deployed with Chef Automate, including [Chef Infra Server]({{< ref "infra-server.md" >}}) and [Chef Habitat Builder on-prem]({{< ref "on-prem-builder.md" >}}).
 By default, Chef Automate stores backups to the filesystem in the directory `/var/opt/chef-automate/backups`.
-You can also configure Chef Automate to store backups in Amazon S3 buckets.
+You can also configure Chef Automate to store backups in AWS S3 buckets.
 
 ## Backup Space Requirements
 
@@ -59,9 +59,9 @@ A timestamp-based directory has a date-based name, such as `20180518010336`, in 
 
 To provide externally-deployed Elasticsearch nodes access to Chef Automate's built-in backup storage services, you must [configure Elasticsearch backup]({{< relref "install.md#configuring-external-elasticsearch" >}}) settings separately from Chef Automate's primary backup settings.
 
-## Backup to S3
+## Backup to AWS S3
 
-To store backups in an existing Amazon S3 bucket, use the supported S3-related settings below:
+To store backups in an existing AWS S3 bucket, use the supported S3-related settings below:
 
 ```toml
 [global.v1.backups]
@@ -95,7 +95,9 @@ To store backups in an existing Amazon S3 bucket, use the supported S3-related s
   -----END CERTIFICATE-----
 ```
 
-### S3 Permissions
+See how to [restore from AWS S3]({{< ref "restore/#restore-from-an-aws-s3-backup" >}}).
+
+### AWS S3 Permissions
 
 The following IAM policy describes the basic permissions Chef Automate requires to run backup and restore operations.
 
@@ -131,6 +133,42 @@ The following IAM policy describes the basic permissions Chef Automate requires 
   "Version": "2012-10-17"
 }
 ```
+
+## Backup to GCS
+
+To store backups in an existing Google Cloud Storage (GCS) bucket, [generate a service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) with the `storage.admin` permission for the associated project and GCS bucket, and use the supported GCS-related settings below:
+
+```toml
+[global.v1.backups]
+  location = "gcs"
+[global.v1.backups.gcs.bucket]
+  # name (required): The name of the bucket
+  name = "<bucket name>"
+
+  # base_path (optional):  The path within the bucket where backups should be stored.
+  # If base_path is not set, backups will be stored at the root of the bucket.
+  base_path = "<base path>"
+
+[global.v1.backups.gcs.credentials]
+# This is the JSON credentials file you generate during service account
+# creation, you must copy/paste the entire contents here (this is just an example)
+json = '''
+  {
+  "type": "service_account",
+  "project_id": "my-favorite-project",
+  "private_key_id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "private_key": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "client_email": "chef@my-favorite-project.iam.gserviceaccount.com",
+  "client_id": "XXXXXXXXXXXXXXXXXXXXX",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/chef%40my-favorite-project.iam.gserviceaccount.com"
+}
+'''
+```
+
+See how to [restore from GCS]({{< ref "restore/#restore-from-a-google-cloud-storage-backup" >}}).
 
 ## Backup Commands
 
@@ -185,7 +223,7 @@ Listing backups from local directory /var/opt/chef-automate/backups
 20180508201952    completed  8 minutes old
 ```
 
-For backups stored in an Amazon S3 bucket, use:
+For backups stored in an AWS S3 bucket, use:
 
 ```shell
 chef-automate backup list s3://bucket_name/base_path
@@ -193,9 +231,17 @@ chef-automate backup list s3://bucket_name/base_path
 
 where `bucket_name` is the name of the S3 bucket and `base_path` is an optional path within the bucket where the backups live.
 
-### Delete Backups
+For backups stored in a Google Cloud Storage (GCS) bucket, use:
 
-To delete backups from a running instance of Chef Automate, first find the backup ID with `chef-automate backup list` and then delete the backup using [`chef automate backup delete ID`]({{< ref "cli-chef-automate/#chef-automate-backup-delete" >}}).
+```shell
+chef-automate backup list gs://bucket_name/base_path
+```
+
+where `bucket_name` is the name of the GCS bucket and `base_path` is an optional path within the bucket where the backups live.
+
+## Delete Backups
+
+To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete the backup using [`chef automate backup delete ID`]({{< ref "cli-chef-automate/#chef-automate-backup-delete" >}}).
 
 ```shell
 chef-automate backup list

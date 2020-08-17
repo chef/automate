@@ -58,6 +58,9 @@ import { NodeDetailsResolverService } from './services/node-details/node-details
 import {
   NodeNoRunsDetailsResolverService
 } from './services/node-details/node-noruns-details-resolver.service';
+import {
+  NodeNoRunIdResolverService
+} from './services/node-details/node-norunid-resolver.service';
 
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
@@ -226,6 +229,13 @@ const routes: Routes = [
             {
               path: '',
               component: ClientRunsComponent
+            },
+            {
+              path: ':node-id',
+              component: NodeNoRunsDetailsComponent,
+              resolve: {
+                node: NodeNoRunIdResolverService
+              }
             },
             {
               path: ':node-id/missing-runs',

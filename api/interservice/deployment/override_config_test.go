@@ -12,6 +12,7 @@ import (
 	"github.com/chef/automate/api/config/load_balancer"
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"github.com/chef/automate/lib/pcmp/prequire"
 )
 
 // Return a valid user override config that a user must pass when configuring
@@ -73,7 +74,7 @@ func TestMergeAndValidateNewUserOverrideConfig(t *testing.T) {
 		err := MergeAndValidateNewUserOverrideConfig(cfg, rt)
 		t.Log(cfg)
 		require.NoError(t, err)
-		require.Equal(t, newValidOverrideConfig(), cfg)
+		prequire.Equal(t, newValidOverrideConfig(), cfg)
 	})
 
 	t.Run("s3 restore task", func(t *testing.T) {
@@ -104,7 +105,7 @@ func TestMergeAndValidateNewUserOverrideConfig(t *testing.T) {
 		cfg := newValidOverrideConfig()
 		err := MergeAndValidateNewUserOverrideConfig(cfg, rt)
 		require.NoError(t, err)
-		require.Equal(t, expectedCfg, cfg)
+		prequire.Equal(t, expectedCfg, cfg)
 	})
 
 	t.Run("config patch 1", func(t *testing.T) {
@@ -161,7 +162,7 @@ func TestMergeAndValidateNewUserOverrideConfig(t *testing.T) {
 		}
 		err := MergeAndValidateNewUserOverrideConfig(cfg, rt)
 		require.NoError(t, err)
-		require.Equal(t, expectedCfg, cfg)
+		prequire.Equal(t, expectedCfg, cfg)
 	})
 
 	t.Run("config patch 2", func(t *testing.T) {
@@ -184,7 +185,7 @@ func TestMergeAndValidateNewUserOverrideConfig(t *testing.T) {
 		}
 		err := MergeAndValidateNewUserOverrideConfig(cfg, rt)
 		require.NoError(t, err)
-		require.Equal(t, expectedCfg, cfg)
+		prequire.Equal(t, expectedCfg, cfg)
 	})
 
 	t.Run("config set", func(t *testing.T) {
@@ -238,7 +239,7 @@ func TestMergeAndValidateNewUserOverrideConfig(t *testing.T) {
 		}
 		err := MergeAndValidateNewUserOverrideConfig(cfg, rt)
 		require.NoError(t, err)
-		require.Equal(t, expectedCfg, cfg)
+		prequire.Equal(t, expectedCfg, cfg)
 	})
 
 	t.Run("existing deprecated config", func(t *testing.T) {

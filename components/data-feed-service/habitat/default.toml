@@ -10,6 +10,7 @@ disable_cidr_filter = true
 cidr_filter = "0.0.0.0/0"
 external_fqdn = ""
 accepted_status_codes = [ 201, 201, 202, 203, 204 ]
+content_type = "application/json"
 
 [tls]
 key_contents =""

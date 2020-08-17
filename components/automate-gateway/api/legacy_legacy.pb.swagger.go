@@ -17,12 +17,18 @@ func init() {
     "/api/v0/events/data-collector": {
       "get": {
         "summary": "This is used by chef-server, it requests a GET /data-collector/v0 to check\nAutomate's status.\nWe proxy /data-collector/v0 to /api/v0/events/data-collector, so this is\nwhere we need to respond.\nSince this is for legacy-support only, we don't bother much about having\ngoogle.protobuf.Empty as argument.",
-        "operationId": "Status",
+        "operationId": "LegacyDataCollector_Status",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.legacy.StatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -38,6 +44,39 @@ func init() {
       "properties": {
         "status": {
           "type": "string"
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
         }
       }
     }

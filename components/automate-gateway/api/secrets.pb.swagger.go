@@ -18,12 +18,18 @@ func init() {
       "post": {
         "summary": "Create a secret",
         "description": "Creates a secret. Requires values for name, type, and data.\n\nSupported types: ssh, winrm, sudo, aws, azure, gcp, service_now\nSupported keys by type: \nssh: username, password, key\nwinrm: username, password\nsudo: username, password\nservice_now: username, password\naws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN\nazure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID\ngcp: GOOGLE_CREDENTIALS_JSON\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"my ssh secret\",\n\"type\": \"ssh\",\n\"data\": [\n{ \"key\": \"username\", \"value\": \"vagrant\" },\n{ \"key\": \"password\", \"value\": \"vagrant\"} \n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nsecrets:secrets:create\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "Create",
+        "operationId": "SecretsService_Create",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.secrets.Id"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -46,12 +52,18 @@ func init() {
       "get": {
         "summary": "Read a secret",
         "description": "Reads a secret given the ID of the secret.\nNote that the secret information (password and key values) will not be returned by the API, as a safety measure.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nsecrets:secrets:get\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "Read",
+        "operationId": "SecretsService_Read",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.secrets.Secret"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -71,12 +83,18 @@ func init() {
       "delete": {
         "summary": "Delete a secret",
         "description": "Deletes a secret given the ID of the secret.\nNote that any nodes that were using the secret will no longer be associated with the deleted secret.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nsecrets:secrets:delete\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "Delete",
+        "operationId": "SecretsService_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.secrets.DeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -96,12 +114,18 @@ func init() {
       "patch": {
         "summary": "Update a secret",
         "description": "Updates a secret. \nThis is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.\nSecret information that is not in the body of the request will persist.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ngiven a credential with a username and password, a user could update the password by passing in the following body, \nand the name of the secret as well as the username for the secret be unchanged:\n\n{\n\"id\": \"525c013a-2ab3-4e6f-9005-51bc620e9157\",\n\"data\": [\n{ \"key\": \"password\", \"value\": \"new-value\"} \n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nsecrets:secrets:update\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "Update",
+        "operationId": "SecretsService_Update",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.secrets.UpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -131,12 +155,18 @@ func init() {
       "post": {
         "summary": "List and filter secrets",
         "description": "Makes a list of secrets.\nSupports filtering, pagination, and sorting.\nAdding a filter narrows the list of secrets to only those that match the filter or filters.\nSupported filters: type\nSupported sort types: name, type, last modified\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"sort\": \"type\",\n\"order\": \"ASC\",\n\"filters\": [\n{ \"key\": \"type\", \"values\": [\"ssh\",\"winrm\",\"sudo\"] }\n],\n\"page\":1,\n\"per_page\":100\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nsecrets:secrets:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "List",
+        "operationId": "SecretsService_List",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.secrets.Secrets"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -296,6 +326,39 @@ func init() {
     },
     "chef.automate.api.secrets.UpdateResponse": {
       "type": "object"
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
     }
   }
 }

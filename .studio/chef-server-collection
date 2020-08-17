@@ -44,9 +44,13 @@ function bootstrap_chef_user_data() {
     return 1
   fi
 
+  local previous_umask
+  previous_umask=$(umask)
+  umask 022
   hab pkg install chef/chef-dk
   hab pkg binlink -f chef/chef-dk chef-client
   hab pkg binlink -f chef/chef-dk berks
+  umask "$previous_umask"
 
   # create our configuration files
   cat << EOH > ${chef_server_pivotal_rb_path}
@@ -143,7 +147,11 @@ function converge_chef_client() {
 
   if [ ! -f "${chef_server_compliance_profiles_test_path}/ssl-baseline-1.4.0.tar.gz" ]; then
     if ! type curl > /dev/null 2>&1; then
+      local previous_umask
+      previous_umask=$(umask)
+      umask 022
       hab pkg install -b core/curl
+      umask "$previous_umask"
     fi
     curl -L -o "${chef_server_compliance_profiles_test_path}/ssl-baseline-1.4.0.tar.gz" https://github.com/dev-sec/ssl-baseline/archive/1.4.0.tar.gz
     # TODO: Upload the profile instead of relying on the migration

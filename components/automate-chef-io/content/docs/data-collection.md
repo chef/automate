@@ -21,14 +21,13 @@ There are two steps to getting data collection running in Chef Automate:
 
 1. You must first have an API token. You have two options:
 
-  * [Create a new API token]({{< relref "api-tokens.md#creating-api-tokens" >}}) and add the API token to the Ingest policy, preferably at time of creation.
-  * Or you can [use your existing data collector token]({{< relref "#existing-data-collector-token-setup" >}}) if you are migrating from Chef Automate 1.
+    * [Create a new API token]({{< relref "api-tokens.md#creating-api-tokens" >}}) and add the API token to the Ingest policy, preferably at time of creation.
+    * Or you can [use your existing data collector token]({{< relref "#existing-data-collector-token-setup" >}}) if you are migrating from Chef Automate 1.
 
 1. Once you have an API token, you can either:
-
-  * [Configure your Chef Infra Server to point to Chef Automate]({{< relref "#configure-your-chef-server-to-send-data-to-chef-automate" >}}).
-  **If you are using Chef Infra Server, this is the recommended method of sending data to Chef Automate.**
-  * Or, you can have [Chef Infra Client send the data directly to Chef Automate]({{< relref "#configure-your-chef-client-to-send-data-to-chef-automate-without-chef-server" >}}).
+    * [Configure your Chef Infra Server to point to Chef Automate]({{< relref "#configure-your-chef-infra-server-to-send-data-to-chef-automate" >}}).
+    **If you are using Chef Infra Server, this is the recommended method of sending data to Chef Automate.**
+    * Or, you can have [Chef Infra Client send the data directly to Chef Automate]({{< relref "#configure-your-chef-client-to-send-data-to-chef-automate-without-chef-server" >}}).
 
 ## Set Up an Existing Chef Automate 1 Data Collector Token in Chef Automate 2 {#existing-data-collector-token-setup}
 
@@ -64,7 +63,7 @@ When logged in with admin permissions, you will also find your added token in
 > Legacy data collector token ported from A1
 
 Now that you have a valid API token, you'll need to
-[update your Chef Infra Server data collector configuration]({{< relref "#configure-your-chef-server-to-send-data-to-chef-automate" >}})
+[update your Chef Infra Server data collector configuration]({{< relref "#configure-your-chef-infra-server-to-send-data-to-chef-automate" >}})
 if you are using a Chef Infra Server. Otherwise, you must
 [configure your Chef Infra Clients to send data directly to Chef Automate]({{< relref "#configure-your-chef-client-to-send-data-to-chef-automate-without-chef-server" >}}).
 

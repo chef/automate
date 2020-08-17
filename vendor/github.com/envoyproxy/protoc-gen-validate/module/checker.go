@@ -6,13 +6,26 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/envoyproxy/protoc-gen-validate/validate"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/lyft/protoc-gen-star"
-	"github.com/envoyproxy/protoc-gen-validate/validate"
 )
+
+var unknown = ""
+var httpHeaderName = "^:?[0-9a-zA-Z!#$%&'*+-.^_|~\x60]+$"
+var httpHeaderValue = "^[^\u0000-\u0008\u000A-\u001F\u007F]*$"
+var headerString = "^[^\u0000\u000A\u000D]*$" // For non-strict validation.
+
+// Map from well known regex to regex pattern.
+var regex_map = map[string]*string{
+	"UNKNOWN":           &unknown,
+	"HTTP_HEADER_NAME":  &httpHeaderName,
+	"HTTP_HEADER_VALUE": &httpHeaderValue,
+	"HEADER_STRING":     &headerString,
+}
 
 type FieldType interface {
 	ProtoType() pgs.ProtoType
@@ -42,6 +55,11 @@ func (m *Module) CheckRules(msg pgs.Message) {
 		var rules validate.FieldRules
 		_, err = f.Extension(validate.E_Rules, &rules)
 		m.CheckErr(err, "unable to read validation rules from field")
+
+		if rules.GetMessage() != nil {
+			m.MustType(f.Type(), pgs.MessageT, pgs.UnknownWKT)
+			m.CheckMessage(f, &rules)
+		}
 
 		m.CheckFieldRules(f.Type(), &rules)
 
@@ -102,8 +120,6 @@ func (m *Module) CheckFieldRules(typ FieldType, rules *validate.FieldRules) {
 	case *validate.FieldRules_Enum:
 		m.MustType(typ, pgs.EnumT, pgs.UnknownWKT)
 		m.CheckEnum(typ, r.Enum)
-	case *validate.FieldRules_Message:
-		m.MustType(typ, pgs.MessageT, pgs.UnknownWKT)
 	case *validate.FieldRules_Repeated:
 		m.CheckRepeated(typ, r.Repeated)
 	case *validate.FieldRules_Map:
@@ -193,6 +209,7 @@ func (m *Module) CheckString(r *validate.StringRules) {
 	m.checkMinMax(r.MinLen, r.MaxLen)
 	m.checkMinMax(r.MinBytes, r.MaxBytes)
 	m.checkIns(len(r.In), len(r.NotIn))
+	m.checkWellKnownRegex(r.GetWellKnownRegex(), r)
 	m.checkPattern(r.Pattern, len(r.In))
 
 	if r.MaxLen != nil {
@@ -254,9 +271,22 @@ func (m *Module) CheckEnum(ft FieldType, r *validate.EnumRules) {
 	}
 }
 
-func (m *Module) CheckMessage(ft FieldType, r *validate.MessageRules) {
-	if !r.GetSkip() {
-		m.CheckRules(m.mustFieldType(ft).Embed())
+func (m *Module) CheckMessage(f pgs.Field, rules *validate.FieldRules) {
+	m.Assert(f.Type().IsEmbed(), "field is not embedded but got message rules")
+	emb := f.Type().Embed()
+	if emb != nil && emb.IsWellKnown() {
+		switch emb.WellKnownType() {
+		case pgs.AnyWKT:
+			m.Failf("Any rules should be used for Any fields")
+		case pgs.DurationWKT:
+			m.Failf("Duration rules should be used for Duration fields")
+		case pgs.TimestampWKT:
+			m.Failf("Timestamp rules should be used for Timestamp fields")
+		}
+	}
+
+	if rules.Type != nil && rules.GetMessage().GetSkip() {
+		m.Failf("Skip should not be used with WKT scalar rules")
 	}
 }
 
@@ -436,6 +466,19 @@ func (m *Module) checkLen(len, min, max *uint64) {
 		"cannot have both `len` and `max_len` rules on the same field")
 }
 
+func (m *Module) checkWellKnownRegex(wk validate.KnownRegex, r *validate.StringRules) {
+	if wk != 0 {
+		m.Assert(r.Pattern == nil, "regex `well_known_regex` and regex `pattern` are incompatible")
+		var non_strict = r.Strict != nil && *r.Strict == false
+		if (wk.String() == "HTTP_HEADER_NAME" || wk.String() == "HTTP_HEADER_VALUE") && non_strict {
+			// Use non-strict header validation.
+			r.Pattern = regex_map["HEADER_STRING"]
+		} else {
+			r.Pattern = regex_map[wk.String()]
+		}
+	}
+}
+
 func (m *Module) checkPattern(p *string, in int) {
 	if p != nil {
 		m.Assert(in == 0, "regex `pattern` and `in` rules are incompatible")
@@ -463,4 +506,3 @@ func (m *Module) checkTS(ts *timestamp.Timestamp) *int64 {
 	m.CheckErr(err, "could not resolve timestamp")
 	return proto.Int64(t.UnixNano())
 }
-

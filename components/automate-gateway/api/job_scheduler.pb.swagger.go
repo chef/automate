@@ -16,12 +16,18 @@ func init() {
   "paths": {
     "/api/v0/retention/nodes/delete-nodes/config": {
       "post": {
-        "operationId": "ConfigureDeleteNodesScheduler",
+        "operationId": "JobScheduler_ConfigureDeleteNodesScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ConfigureDeleteNodesScheduler"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -42,12 +48,18 @@ func init() {
     },
     "/api/v0/retention/nodes/missing-nodes-deletion/config": {
       "post": {
-        "operationId": "ConfigureMissingNodesForDeletionScheduler",
+        "operationId": "JobScheduler_ConfigureMissingNodesForDeletionScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ConfigureMissingNodesForDeletionScheduler"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -68,12 +80,18 @@ func init() {
     },
     "/api/v0/retention/nodes/missing-nodes/config": {
       "post": {
-        "operationId": "ConfigureNodesMissingScheduler",
+        "operationId": "JobScheduler_ConfigureNodesMissingScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ConfigureNodesMissingScheduler"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -94,12 +112,18 @@ func init() {
     },
     "/api/v0/retention/nodes/status": {
       "get": {
-        "operationId": "GetStatusJobScheduler",
+        "operationId": "JobScheduler_GetStatusJobScheduler",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.JobSchedulerStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -176,6 +200,39 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.ingest.response.Job"
+          }
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
           }
         }
       }

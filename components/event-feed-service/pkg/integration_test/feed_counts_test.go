@@ -22,6 +22,7 @@ import (
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/pcmp/passert"
 
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	event "github.com/chef/automate/components/event-service/config"
@@ -856,7 +857,7 @@ func TestFeedCountsTypeCountsProjectFilter(t *testing.T) {
 			// test response
 			assert.Equal(t, test.expected.TotalEntries, res.TotalEntries)
 			t.Logf("counts %v", res.EntryCounts)
-			assert.ElementsMatch(t, test.expected.EntryCounts, res.EntryCounts)
+			passert.ElementsMatch(t, test.expected.EntryCounts, res.EntryCounts)
 		})
 	}
 }

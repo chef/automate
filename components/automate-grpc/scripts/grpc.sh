@@ -24,7 +24,7 @@ popd
 pushd components
 
 printf 'GEN: %s\n' components/automate-grpc/protoc-gen-a2-config/api/a2conf/*.proto
-protoc -I /src/components -I /src/lib --go_out=logtostderr=true,paths=source_relative:/src/components \
+protoc -I /src/components -I /src/lib --go_out=paths=source_relative:/src/components \
   automate-grpc/protoc-gen-a2-config/api/a2conf/*.proto
 
 popd

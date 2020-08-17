@@ -74,6 +74,12 @@ const strTpl = `
 		}
 	{{ end }}
 
+	{{ if $r.NotContains }}
+		if strings.Contains({{ accessor . }}, {{ lit $r.GetNotContains }}) {
+			return {{ err . "value contains substring " (lit $r.GetNotContains) }}
+		}
+	{{ end }}
+
 	{{ if $r.GetIp }}
 		if ip := net.ParseIP({{ accessor . }}); ip == nil {
 			return {{ err . "value must be a valid IP address" }}
@@ -109,6 +115,10 @@ const strTpl = `
 	{{ else if $r.GetUriRef }}
 		if _, err := url.Parse({{ accessor . }}); err != nil {
 			return {{ errCause . "err" "value must be a valid URI" }}
+		}
+	{{ else if $r.GetUuid }}
+		if err := m._validateUuid({{ accessor . }}); err != nil {
+			return {{ errCause . "err" "value must be a valid UUID" }}
 		}
 	{{ end }}
 

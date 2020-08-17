@@ -11,13 +11,12 @@ import (
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/sirupsen/logrus"
 
-	"reflect"
-
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	inspec_api "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	inspecTypes "github.com/chef/automate/components/compliance-service/inspec"
 	reportingTypes "github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
+	"github.com/chef/automate/lib/pcmp"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -41,7 +40,7 @@ func ProfileControlSummary(profile *inspec_api.Profile) *reportingTypes.NodeCont
 	summary := reportingTypes.NodeControlSummary{}
 	for _, control := range profile.Controls {
 		summary.Total++
-		if control.WaiverData != nil && !reflect.DeepEqual(*control.WaiverData, inspec_api.WaiverData{}) && !strings.HasPrefix(control.WaiverData.Message, "Waiver expired") {
+		if control.WaiverData != nil && !pcmp.DeepEqual(*control.WaiverData, inspec_api.WaiverData{}) && !strings.HasPrefix(control.WaiverData.Message, "Waiver expired") {
 			// Expired waived controls are not waived. This way, we can use the actual status of the executed control
 			summary.Waived.Total++
 		} else {
@@ -94,7 +93,7 @@ func ReportComplianceStatus(summary *reportingTypes.NodeControlSummary) (status 
 
 // WaivedStr returns a string label based on the control waived status
 func WaivedStr(data *inspec_api.WaiverData) (str string) {
-	if data == nil || reflect.DeepEqual(*data, inspec_api.WaiverData{}) {
+	if data == nil || pcmp.DeepEqual(*data, inspec_api.WaiverData{}) {
 		return inspec.ControlWaivedStrNo
 	}
 

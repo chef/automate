@@ -716,6 +716,7 @@ func (p *Printer) printMessageBody(md *desc.MessageDescriptor, mf *dynamic.Messa
 	}
 
 	skip := map[interface{}]bool{}
+	maxTag := internal.GetMaxTag(md.GetMessageOptions().GetMessageSetWireFormat())
 
 	elements := elementAddrs{dsc: md, opts: opts}
 	elements.addrs = append(elements.addrs, optionsAsElementAddrs(internal.Message_optionsTag, -1, opts)...)
@@ -786,7 +787,7 @@ func (p *Printer) printMessageBody(md *desc.MessageDescriptor, mf *dynamic.Messa
 				}
 			} else {
 				ood := d.GetOneOf()
-				if ood == nil {
+				if ood == nil || ood.IsSynthetic() {
 					p.printField(d, mf, w, sourceInfo, childPath, scope, indent)
 				} else {
 					// print the one-of, including all of its fields
@@ -817,7 +818,7 @@ func (p *Printer) printMessageBody(md *desc.MessageDescriptor, mf *dynamic.Messa
 				addrs = append(addrs, elnext)
 				skip[extr] = true
 			}
-			p.printExtensionRanges(md, ranges, addrs, mf, w, sourceInfo, path, indent)
+			p.printExtensionRanges(md, ranges, maxTag, addrs, mf, w, sourceInfo, path, indent)
 		case reservedRange:
 			// collapse reserved ranges into a single "reserved" block
 			ranges := []reservedRange{d}
@@ -832,7 +833,7 @@ func (p *Printer) printMessageBody(md *desc.MessageDescriptor, mf *dynamic.Messa
 				addrs = append(addrs, elnext)
 				skip[rr] = true
 			}
-			p.printReservedRanges(ranges, false, addrs, w, sourceInfo, path, indent)
+			p.printReservedRanges(ranges, maxTag, addrs, w, sourceInfo, path, indent)
 		case string: // reserved name
 			// collapse reserved names into a single "reserved" block
 			names := []string{d}
@@ -877,7 +878,10 @@ func asDynamicIfPossible(msg proto.Message, mf *dynamic.MessageFactory) proto.Me
 func (p *Printer) printField(fld *desc.FieldDescriptor, mf *dynamic.MessageFactory, w *writer, sourceInfo internal.SourceInfoMap, path []int32, scope string, indent int) {
 	var groupPath []int32
 	var si *descriptor.SourceCodeInfo_Location
-	if isGroup(fld) {
+
+	group := isGroup(fld)
+
+	if group {
 		// compute path to group message type
 		groupPath = make([]int32, len(path)-2)
 		copy(groupPath, path)
@@ -918,68 +922,68 @@ func (p *Printer) printField(fld *desc.FieldDescriptor, mf *dynamic.MessageFacto
 			p.printElementString(locSi, w, indent, labelString(fld.GetLabel()))
 		}
 
-		if isGroup(fld) {
+		if group {
 			fmt.Fprint(w, "group ")
+		}
 
-			typeSi := sourceInfo.Get(append(path, internal.Field_typeTag))
-			p.printElementString(typeSi, w, indent, p.typeString(fld, scope))
-			fmt.Fprint(w, "= ")
+		typeSi := sourceInfo.Get(append(path, internal.Field_typeTag))
+		p.printElementString(typeSi, w, indent, p.typeString(fld, scope))
 
-			numSi := sourceInfo.Get(append(path, internal.Field_numberTag))
-			p.printElementString(numSi, w, indent, fmt.Sprintf("%d", fld.GetNumber()))
+		if !group {
+			nameSi := sourceInfo.Get(append(path, internal.Field_nameTag))
+			p.printElementString(nameSi, w, indent, fld.GetName())
+		}
 
+		fmt.Fprint(w, "= ")
+		numSi := sourceInfo.Get(append(path, internal.Field_numberTag))
+		p.printElementString(numSi, w, indent, fmt.Sprintf("%d", fld.GetNumber()))
+
+		opts, err := p.extractOptions(fld, fld.GetOptions(), mf)
+		if err != nil {
+			if w.err == nil {
+				w.err = err
+			}
+			return
+		}
+
+		// we use negative values for "extras" keys so they can't collide
+		// with legit option tags
+
+		if !fld.GetFile().IsProto3() && fld.AsFieldDescriptorProto().DefaultValue != nil {
+			defVal := fld.GetDefaultValue()
+			if fld.GetEnumType() != nil {
+				defVal = fld.GetEnumType().FindValueByNumber(defVal.(int32))
+			}
+			opts[-internal.Field_defaultTag] = []option{{name: "default", val: defVal}}
+		}
+
+		jsn := fld.AsFieldDescriptorProto().GetJsonName()
+		if jsn != "" && jsn != internal.JsonName(fld.GetName()) {
+			opts[-internal.Field_jsonNameTag] = []option{{name: "json_name", val: jsn}}
+		}
+
+		elements := elementAddrs{dsc: fld, opts: opts}
+		elements.addrs = optionsAsElementAddrs(internal.Field_optionsTag, 0, opts)
+		p.sort(elements, sourceInfo, path)
+		p.printOptionElementsShort(elements, w, sourceInfo, path, indent)
+
+		if group {
 			fmt.Fprintln(w, "{")
 			p.printMessageBody(fld.GetMessageType(), mf, w, sourceInfo, groupPath, indent+1)
 
 			p.indent(w, indent)
 			fmt.Fprintln(w, "}")
+
 		} else {
-			typeSi := sourceInfo.Get(append(path, internal.Field_typeTag))
-			p.printElementString(typeSi, w, indent, p.typeString(fld, scope))
-
-			nameSi := sourceInfo.Get(append(path, internal.Field_nameTag))
-			p.printElementString(nameSi, w, indent, fld.GetName())
-			fmt.Fprint(w, "= ")
-
-			numSi := sourceInfo.Get(append(path, internal.Field_numberTag))
-			p.printElementString(numSi, w, indent, fmt.Sprintf("%d", fld.GetNumber()))
-
-			opts, err := p.extractOptions(fld, fld.GetOptions(), mf)
-			if err != nil {
-				if w.err == nil {
-					w.err = err
-				}
-				return
-			}
-
-			// we use negative values for "extras" keys so they can't collide
-			// with legit option tags
-
-			if !fld.GetFile().IsProto3() && fld.AsFieldDescriptorProto().DefaultValue != nil {
-				defVal := fld.GetDefaultValue()
-				if fld.GetEnumType() != nil {
-					defVal = fld.GetEnumType().FindValueByNumber(defVal.(int32))
-				}
-				opts[-internal.Field_defaultTag] = []option{{name: "default", val: defVal}}
-			}
-
-			jsn := fld.AsFieldDescriptorProto().GetJsonName()
-			if jsn != "" && jsn != internal.JsonName(fld.GetName()) {
-				opts[-internal.Field_jsonNameTag] = []option{{name: "json_name", val: jsn}}
-			}
-
-			elements := elementAddrs{dsc: fld, opts: opts}
-			elements.addrs = optionsAsElementAddrs(internal.Field_optionsTag, 0, opts)
-			p.sort(elements, sourceInfo, path)
-			p.printOptionElementsShort(elements, w, sourceInfo, path, indent)
-
 			fmt.Fprint(w, ";")
 		}
 	})
 }
 
 func shouldEmitLabel(fld *desc.FieldDescriptor) bool {
-	return !fld.IsMap() && fld.GetOneOf() == nil && (fld.GetLabel() != descriptor.FieldDescriptorProto_LABEL_OPTIONAL || !fld.GetFile().IsProto3())
+	return fld.IsProto3Optional() ||
+		(!fld.IsMap() && fld.GetOneOf() == nil &&
+			(fld.GetLabel() != descriptor.FieldDescriptorProto_LABEL_OPTIONAL || !fld.GetFile().IsProto3()))
 }
 
 func labelString(lbl descriptor.FieldDescriptorProto_Label) string {
@@ -1097,7 +1101,7 @@ func (p *Printer) printExtensions(exts *extensionDecl, allExts extensions, paren
 	}
 }
 
-func (p *Printer) printExtensionRanges(parent *desc.MessageDescriptor, ranges []*descriptor.DescriptorProto_ExtensionRange, addrs []elementAddr, mf *dynamic.MessageFactory, w *writer, sourceInfo internal.SourceInfoMap, parentPath []int32, indent int) {
+func (p *Printer) printExtensionRanges(parent *desc.MessageDescriptor, ranges []*descriptor.DescriptorProto_ExtensionRange, maxTag int32, addrs []elementAddr, mf *dynamic.MessageFactory, w *writer, sourceInfo internal.SourceInfoMap, parentPath []int32, indent int) {
 	p.indent(w, indent)
 	fmt.Fprint(w, "extensions ")
 
@@ -1117,7 +1121,7 @@ func (p *Printer) printExtensionRanges(parent *desc.MessageDescriptor, ranges []
 		p.printElement(true, si, w, inline(indent), func(w *writer) {
 			if extr.GetStart() == extr.GetEnd()-1 {
 				fmt.Fprintf(w, "%d ", extr.GetStart())
-			} else if extr.GetEnd()-1 == internal.MaxTag {
+			} else if extr.GetEnd()-1 == maxTag {
 				fmt.Fprintf(w, "%d to max ", extr.GetStart())
 			} else {
 				fmt.Fprintf(w, "%d to %d ", extr.GetStart(), extr.GetEnd()-1)
@@ -1130,7 +1134,7 @@ func (p *Printer) printExtensionRanges(parent *desc.MessageDescriptor, ranges []
 	fmt.Fprintln(w, ";")
 }
 
-func (p *Printer) printReservedRanges(ranges []reservedRange, isEnum bool, addrs []elementAddr, w *writer, sourceInfo internal.SourceInfoMap, parentPath []int32, indent int) {
+func (p *Printer) printReservedRanges(ranges []reservedRange, maxVal int32, addrs []elementAddr, w *writer, sourceInfo internal.SourceInfoMap, parentPath []int32, indent int) {
 	p.indent(w, indent)
 	fmt.Fprint(w, "reserved ")
 
@@ -1146,8 +1150,7 @@ func (p *Printer) printReservedRanges(ranges []reservedRange, isEnum bool, addrs
 		p.printElement(false, si, w, inline(indent), func(w *writer) {
 			if rr.start == rr.end {
 				fmt.Fprintf(w, "%d ", rr.start)
-			} else if (rr.end == internal.MaxTag && !isEnum) ||
-				(rr.end == math.MaxInt32 && isEnum) {
+			} else if rr.end == maxVal {
 				fmt.Fprintf(w, "%d to max ", rr.start)
 			} else {
 				fmt.Fprintf(w, "%d to %d ", rr.start, rr.end)
@@ -1247,7 +1250,7 @@ func (p *Printer) printEnum(ed *desc.EnumDescriptor, mf *dynamic.MessageFactory,
 					addrs = append(addrs, elnext)
 					skip[rr] = true
 				}
-				p.printReservedRanges(ranges, true, addrs, w, sourceInfo, path, indent)
+				p.printReservedRanges(ranges, math.MaxInt32, addrs, w, sourceInfo, path, indent)
 			case string: // reserved name
 				// collapse reserved names into a single "reserved" block
 				names := []string{d}
@@ -1463,7 +1466,7 @@ func (p *Printer) printOptionElementsShort(addrs elementAddrs, w *writer, source
 				fmt.Fprint(w, " ") // trailing space
 			})
 	}
-	fmt.Fprint(w, "]")
+	fmt.Fprint(w, "] ")
 }
 
 func (p *Printer) printOptions(opts []option, w *writer, indent int, siFetch func(i int32) *descriptor.SourceCodeInfo_Location, fn func(w *writer, indent int, opt option)) {
@@ -2069,7 +2072,6 @@ func (a elementSrcOrder) Less(i, j int) bool {
 		// i will be unknown and j will be known
 		swapped := false
 		if si != nil {
-			si, sj = sj, si
 			ti, tj = tj, ti
 			swapped = true
 		}

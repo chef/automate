@@ -59,6 +59,21 @@ export class NodeRunsService {
       });
   }
 
+  getNodeRunsByID(nodeId: string): Promise<AbridgedNodeRun[]> {
+    const url = `${CONFIG_MGMT_URL}/nodes/${nodeId}/runs`;
+
+    return this.httpClient
+      .get<AbridgedRespNodeRun[]>(url).toPromise()
+      .then((res) =>
+        res.map(
+          (abridgedRespNodeRun: AbridgedRespNodeRun) =>
+            new AbridgedNodeRun(abridgedRespNodeRun))
+      ).catch( reason => {
+        console.error(reason);
+        return [];
+      });
+  }
+
   downloadRuns(type: string, filters: NodeHistoryFilter): Observable<string> {
     const url = `${CONFIG_MGMT_URL}/reports/export`;
 

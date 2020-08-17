@@ -91,7 +91,10 @@ func local_request_JobScheduler_ConfigureNodesMissingScheduler_0(ctx context.Con
 	var protoReq JobSettings
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_JobScheduler_ConfigureNodesMissingScheduler_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_JobScheduler_ConfigureNodesMissingScheduler_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -214,7 +217,10 @@ func local_request_JobScheduler_ConfigureDeleteNodesScheduler_0(ctx context.Cont
 	var protoReq JobSettings
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_JobScheduler_ConfigureDeleteNodesScheduler_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_JobScheduler_ConfigureDeleteNodesScheduler_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 

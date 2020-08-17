@@ -56,6 +56,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
   "vendor/go.uber.org/atomic/*",
@@ -65,6 +66,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -164,6 +167,7 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
   "vendor/gopkg.in/square/go-jose.v2/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
@@ -233,6 +237,7 @@ paths = [
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
   "vendor/github.com/stretchr/testify/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -248,7 +253,10 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [automate-dex]
@@ -297,6 +305,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
   "vendor/golang.org/x/crypto/*",
@@ -305,6 +314,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -447,6 +458,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -457,6 +469,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
@@ -505,6 +519,7 @@ paths = [
   "lib/grpc/*",
   "lib/io/*",
   "lib/logger/*",
+  "lib/pcmp/*",
   "lib/pgutils/*",
   "lib/platform/config/*",
   "lib/proxy/*",
@@ -536,6 +551,7 @@ paths = [
   "vendor/github.com/golang/groupcache/*",
   "vendor/github.com/golang/mock/*",
   "vendor/github.com/golang/protobuf/*",
+  "vendor/github.com/google/go-cmp/*",
   "vendor/github.com/googleapis/gax-go/*",
   "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
   "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
@@ -563,6 +579,7 @@ paths = [
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
   "vendor/github.com/stretchr/testify/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -594,11 +611,15 @@ paths = [
   "vendor/golang.org/x/sync/*",
   "vendor/golang.org/x/sys/*",
   "vendor/golang.org/x/text/*",
+  "vendor/golang.org/x/xerrors/*",
   "vendor/google.golang.org/api/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [config-mgmt-service]
@@ -665,6 +686,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -679,6 +701,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
@@ -852,9 +876,11 @@ paths = [
   "vendor/google.golang.org/api/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
   "vendor/gopkg.in/cheggaaa/pb.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [deployment-service]
@@ -1000,6 +1026,7 @@ paths = [
   "vendor/github.com/spf13/viper/*",
   "vendor/github.com/stretchr/objx/*",
   "vendor/github.com/stretchr/testify/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -1043,9 +1070,12 @@ paths = [
   "vendor/google.golang.org/api/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
   "vendor/gopkg.in/cheggaaa/pb.v1/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [es-sidecar-service]
@@ -1081,6 +1111,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
   "vendor/golang.org/x/net/*",
@@ -1088,6 +1119,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
@@ -1147,6 +1180,7 @@ paths = [
   "vendor/github.com/spf13/viper/*",
   "vendor/github.com/stretchr/objx/*",
   "vendor/github.com/stretchr/testify/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
   "vendor/go.uber.org/atomic/*",
@@ -1156,7 +1190,10 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [automate-pg-gateway]
@@ -1223,6 +1260,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
   "vendor/go.etcd.io/bbolt/*",
@@ -1232,6 +1270,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -1302,6 +1342,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -1317,6 +1358,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
@@ -1344,7 +1387,8 @@ paths = [
   "vendor/github.com/spf13/pflag/*",
   "vendor/go.uber.org/atomic/*",
   "vendor/golang.org/x/crypto/*",
-  "vendor/golang.org/x/sys/*"
+  "vendor/golang.org/x/sys/*",
+  "vendor/google.golang.org/protobuf/*"
 ]
 
 [nodemanager-service]
@@ -1424,6 +1468,7 @@ paths = [
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
   "vendor/github.com/stretchr/testify/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -1458,8 +1503,11 @@ paths = [
   "vendor/google.golang.org/api/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [ingest-service]
@@ -1507,6 +1555,7 @@ paths = [
   "vendor/github.com/codahale/hdrhistogram/*",
   "vendor/github.com/envoyproxy/protoc-gen-validate/*",
   "vendor/github.com/fsnotify/fsnotify/*",
+  "vendor/github.com/go-gorp/gorp/*",
   "vendor/github.com/gofrs/uuid/*",
   "vendor/github.com/golang-migrate/migrate/*",
   "vendor/github.com/golang/mock/*",
@@ -1530,6 +1579,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -1540,6 +1590,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
@@ -1589,6 +1641,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
   "vendor/go.uber.org/atomic/*",
@@ -1602,6 +1655,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -1655,6 +1710,7 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -1709,6 +1765,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
   "vendor/go.uber.org/atomic/*",
@@ -1722,6 +1779,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
@@ -1775,6 +1834,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
   "vendor/go.uber.org/atomic/*",
@@ -1790,6 +1850,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/square/go-jose.v2/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
@@ -1845,6 +1907,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -1859,6 +1922,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -1884,6 +1949,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/xtgo/uuid/*",
   "vendor/go.uber.org/atomic/*",
   "vendor/go.uber.org/multierr/*",
@@ -1894,6 +1960,7 @@ paths = [
   "vendor/golang.org/x/sys/*",
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/segmentio/analytics-go.v3/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
@@ -2008,6 +2075,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -2022,6 +2090,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
@@ -2076,6 +2146,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -2084,6 +2155,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
@@ -2132,6 +2205,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/teambition/rrule-go/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
@@ -2142,6 +2216,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -2202,6 +2278,7 @@ paths = [
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
   "vendor/github.com/stretchr/testify/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
   "vendor/go.uber.org/atomic/*",
@@ -2215,8 +2292,11 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "vendor/gopkg.in/yaml.v2/*",
+  "vendor/gopkg.in/yaml.v3/*"
 ]
 
 [automate-cds]
@@ -2254,6 +2334,7 @@ paths = [
   "vendor/github.com/spf13/jwalterweatherman/*",
   "vendor/github.com/spf13/pflag/*",
   "vendor/github.com/spf13/viper/*",
+  "vendor/github.com/subosito/gotenv/*",
   "vendor/github.com/uber/jaeger-client-go/*",
   "vendor/github.com/uber/jaeger-lib/*",
   "vendor/go.uber.org/atomic/*",
@@ -2267,6 +2348,8 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/google.golang.org/protobuf/*",
+  "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 

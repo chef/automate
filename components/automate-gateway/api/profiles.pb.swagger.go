@@ -18,12 +18,18 @@ func init() {
       "get": {
         "summary": "Show an available profile",
         "description": "Show the details of an un-installed profile using the profile name and version.\nin the UI, these are the profiles under the \"Available\" tab.\nThese profiles are created and maintained by Chef, shipped with Chef Automate.\n\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:marketProfiles:get\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "ReadFromMarket",
+        "operationId": "ProfilesService_ReadFromMarket",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Profile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -59,12 +65,18 @@ func init() {
       "post": {
         "summary": "Check if one or multiple profiles exist in the metadata database.",
         "description": "The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend\ndoesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.\nThis is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:profiles:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "MetaSearch",
+        "operationId": "ProfilesService_MetaSearch",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Missing"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -87,12 +99,18 @@ func init() {
       "get": {
         "summary": "Show an installed profile",
         "description": "Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.\n\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:profiles:get\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "Read",
+        "operationId": "ProfilesService_Read",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Profile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -128,12 +146,18 @@ func init() {
       "post": {
         "summary": "List all available profiles",
         "description": "Lists all profiles available for the Automate instance.\nEmpty params return all \"market\" profiles.\nSpecifying the ` + "`" + `owner` + "`" + ` field returns all profiles installed for the specified user.\n\nSupports pagination, sorting, and filtering (wildcard supported).\n\nSupported sort fields: title, name (default: title)\nSupported filter fields: name, version, title\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filters\":[\n{\"type\": \"title\", \"values\": [ \"Dev*\"]}\n],\n\"page\": 1,\n\"per_page\": 3,\n\"owner\": \"admin\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:profiles:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "List",
+        "operationId": "ProfilesService_List",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Profiles"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -156,12 +180,18 @@ func init() {
       "delete": {
         "summary": "Delete an installed profile",
         "description": "Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.\nNote: this action \"uninstalls\" the profile. This has no impact on the market profiles.\n\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:profiles:delete\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "Delete",
+        "operationId": "ProfilesService_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -743,6 +773,27 @@ func init() {
         }
       }
     },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
+    },
     "grpc.gateway.runtime.StreamError": {
       "type": "object",
       "properties": {
@@ -767,20 +818,6 @@ func init() {
           }
         }
       }
-    }
-  },
-  "x-stream-definitions": {
-    "chef.automate.api.compliance.profiles.v1.ProfileData": {
-      "type": "object",
-      "properties": {
-        "result": {
-          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.ProfileData"
-        },
-        "error": {
-          "$ref": "#/definitions/grpc.gateway.runtime.StreamError"
-        }
-      },
-      "title": "Stream result of chef.automate.api.compliance.profiles.v1.ProfileData"
     }
   }
 }
