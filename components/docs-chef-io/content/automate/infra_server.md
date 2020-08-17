@@ -76,7 +76,7 @@ Installations require elevated privileges, so run the commands as the superuser 
       sudo chef-automate init-config
     ```
 
-1. Add a stanza to the configuration file to deploy Chef Automate and Chef Infra Server and bump the maximum report size:
+1. Add a stanza to the configuration file to deploy Chef Automate and Chef Infra Server:
 
     ```toml
       [deployment.v1.svc]
@@ -111,7 +111,7 @@ Installations require elevated privileges, so run the commands as the superuser 
        sudo chef-automate init-config
     ```
 
-1. Add a stanza to the configuration file to disable Chef Automate data collection and bump the maximum report size:
+1. Add a stanza to the configuration file to disable Chef Automate data collection:
 
     ```toml
        [erchef.v1.sys.data_collector]
@@ -139,7 +139,7 @@ Installations require elevated privileges, so run the commands as the superuser 
       sudo chef-automate init-config
     ```
 
-1. Add a stanza to the configuration file to deploy Chef Infra Server and bump the maximum report size:
+1. Add a stanza to the configuration file to deploy Chef Infra Server:
 
     ```toml
        [deployment.v1.svc]
@@ -162,7 +162,7 @@ Installations require elevated privileges, so run the commands as the superuser 
 
 Patch an existing Chef Automate installation to add Chef Infra Server:
 
-1. Create a `patch.toml` file to add `infra-server` to the list of products to deploy and bump the maximum report size:
+1. Create a `patch.toml` file to add `infra-server` to the list of products to deploy:
 
     ```toml
        [deployment.v1.svc]
