@@ -35,16 +35,6 @@ type Client interface {
 	GetListForField(string, map[string][]string) ([]string, error)
 	// @params (type, text, filters)
 	GetSuggestions(string, string, map[string][]string) ([]Suggestion, error)
-	// @param (revision_id)
-	GetPolicyCookbooks(string) (PolicyCookbooks, error)
-	// @params (filters, start, end, pageSize, cursorDate, cursorID, ascending)
-	GetActions(map[string][]string, time.Time, time.Time, int, time.Time, string, bool) ([]Action, int64, error)
-	// @params (filters, start, end)
-	GetActionEventTypeCounts(map[string][]string, time.Time, time.Time) (map[string]int64, error)
-	// @params (filters, start, end)
-	GetActionEventTaskCounts(map[string][]string, time.Time, time.Time) (map[string]int64, error)
-	// @params (start, end, timezone, bucketSizeInHours, eventAction)
-	GetEventString(map[string][]string, string, string, string, int, string) (EventString, error)
 	// @params ()
 	// returns (oldestIndexDate, indicesExist, error)
 	GetDateOfOldestConvergeIndices() (time.Time, bool, error)
@@ -174,13 +164,14 @@ type Suggestion struct {
 }
 
 type PolicyCookbooks struct {
-	PolicyName    string               `json:"policy_name"`
-	CookbookLocks []PolicyCookbookLock `json:"cookbook_locks"`
+	PolicyName    string                `json:"policy_name"`
+	RevisionID    string                `json:"revision_id"`
+	CookbookLocks []*PolicyCookbookLock `json:"cookbook_locks"`
 }
 
 type PolicyCookbookLock struct {
-	CookbookName string `json:"cookbook_name"`
-	PolicyID     string `json:"policy_id"`
+	CookbookName string `json:"cookbook_name" db:"cookbook_name"`
+	PolicyID     string `json:"policy_id" db:"policy_id"`
 }
 
 type EventString struct {

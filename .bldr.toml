@@ -1523,6 +1523,7 @@ paths = [
   "api/interservice/data_lifecycle/*",
   "api/interservice/es_sidecar/*",
   "api/interservice/event/*",
+  "api/interservice/event_feed/*",
   "api/interservice/ingest/*",
   "api/interservice/nodemanager/*",
   "components/automate-gateway/api/iam/*",

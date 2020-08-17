@@ -12,6 +12,7 @@ import (
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
+	"github.com/chef/automate/components/ingest-service/pipeline"
 )
 
 const (
@@ -35,27 +36,31 @@ var (
 	a1NodeStateIndexName     = "node-state-2"
 	berlinNodeStateIndexName = "node-state-1"
 	nodeStateAliasName       = "node-state"
+	actionPrefixIndexName    = "actions"
+	actionsIndexName         = actionPrefixIndexName + "-*"
 )
 
 type Status struct {
-	total     int64
-	completed int64
-	status    string
-	finished  bool
-	ctx       context.Context
-	client    backend.Client
-	mapper    *gorp.DbMap
+	total          int64
+	completed      int64
+	status         string
+	finished       bool
+	ctx            context.Context
+	client         backend.Client
+	actionPipeline pipeline.ChefActionPipeline
+	mapper         *gorp.DbMap
 }
 
-func New(client backend.Client, postgresql *sql.DB) *Status {
+func New(client backend.Client, actionPipeline pipeline.ChefActionPipeline, postgresql *sql.DB) *Status {
 	return &Status{
-		total:     0,
-		completed: 0,
-		status:    "There is no migration running",
-		finished:  false,
-		ctx:       context.Background(),
-		client:    client,
-		mapper:    &gorp.DbMap{Db: postgresql, Dialect: gorp.PostgresDialect{}},
+		total:          0,
+		completed:      0,
+		status:         "There is no migration running",
+		finished:       false,
+		ctx:            context.Background(),
+		client:         client,
+		actionPipeline: actionPipeline,
+		mapper:         &gorp.DbMap{Db: postgresql, Dialect: gorp.PostgresDialect{}},
 	}
 }
 
@@ -73,7 +78,6 @@ func (ms *Status) Start() error {
 		ms.updateErr(err.Error(), "Unable to lock for migration")
 		return err
 	}
-	defer ms.unlock()
 
 	exists, err := ms.hasA1ElasticsearchData()
 	if err != nil {
@@ -150,6 +154,17 @@ func (ms *Status) Start() error {
 		return nil
 	}
 
+	exists, err = ms.hasActionData()
+	if err != nil {
+		ms.updateErr(err.Error(), "Unable to detect migration status")
+		return err
+	}
+	if exists {
+		ms.update("Starting migration of actions to the event-feed-service")
+		go ms.migrateAction()
+		return nil
+	}
+
 	return nil
 }
 
@@ -163,6 +178,7 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 		nodeState4Exists, err4     = ms.hasNodeState4Data()
 		nodeState5Exists, err5     = ms.hasNodeState5Data()
 		nodeState6Exists, err6     = ms.hasNodeState6Data()
+		actionsExists, err7        = ms.hasActionData()
 	)
 
 	if err1 != nil {
@@ -183,6 +199,9 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 	if err6 != nil {
 		logFatal(err4.Error(), "Error detecting migration status")
 	}
+	if err7 != nil {
+		logFatal(err4.Error(), "Error detecting migration status")
+	}
 
 	// If the node-state alias doesn't exist and it is an index
 	// instead, we might have corrupted data
@@ -192,7 +211,7 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 		return false, err
 	}
 
-	if a1Exists || BerlinExists || nodeState4Exists || nodeState5Exists || nodeState6Exists {
+	if a1Exists || BerlinExists || nodeState4Exists || nodeState5Exists || nodeState6Exists || actionsExists {
 		return true, nil
 	}
 
@@ -270,10 +289,14 @@ func (ms *Status) update(s string) {
 }
 
 // update the migration status message with an error message (private)
-func (ms *Status) updateErr(err, s string) {
-	logFatal(err, s)
+func (ms *Status) updateErr(errMessage, s string) {
+	logFatal(errMessage, s)
 	ms.status = "Error: " + s
 	ms.finished = true
+	err := ms.unlock()
+	if err != nil {
+		logFatal(err.Error(), "Failed to unlock migration in postgresql")
+	}
 }
 
 // finish updates the status and marks the migration as finished
@@ -281,6 +304,10 @@ func (ms *Status) finish(s string) {
 	logInfo(s)
 	ms.status = s
 	ms.finished = true
+	err := ms.unlock()
+	if err != nil {
+		logFatal(err.Error(), "Failed to unlock migration in postgresql")
+	}
 }
 
 func (ms *Status) hasBerlinElasticsearchData() (bool, error) {
@@ -303,6 +330,10 @@ func (ms *Status) hasNodeState6Data() (bool, error) {
 	return ms.client.DoesIndexExists(ms.ctx, a2NodeState6Index)
 }
 
+func (ms *Status) hasActionData() (bool, error) {
+	return ms.client.DoesIndexExists(ms.ctx, actionsIndexName)
+}
+
 func (ms *Status) migrateBerlinToCurrent() error {
 	err := ms.migrateNodeStateToCurrent(berlinNodeStateIndexName)
 	if err != nil {
@@ -323,7 +354,7 @@ func (ms *Status) migrateBerlinToCurrent() error {
 // NOTE: If any of these steps fails, we won't be in a healthy state, so we throw
 // an error to the end user to verify what happened with the migration.
 func (ms *Status) migrateNodeStateToCurrent(previousIndex string) error {
-	ms.total = 5
+	ms.total = 6
 
 	ms.update("Initializing new node state index")
 	err := ms.client.InitializeStore(ms.ctx)
@@ -378,6 +409,13 @@ func (ms *Status) migrateNodeStateToCurrent(previousIndex string) error {
 	err = ms.client.DeleteIndex(ms.ctx, previousIndex)
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to delete previous index")
+		return err
+	}
+	ms.taskCompleted()
+
+	err = ms.SendAllActionsThroughPipeline()
+	if err != nil {
+		ms.updateErr(err.Error(), "Unable to re-insert actions")
 		return err
 	}
 	ms.taskCompleted()

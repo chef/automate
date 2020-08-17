@@ -53,7 +53,10 @@ func (ms *Status) calculateA1Tasks() {
 	insightsIndices, _ := ms.client.GetAllTimeseriesIndiceNames(ms.ctx, insightsIndexNameTag)
 	ms.total = ms.total + int64(len(insightsIndices))
 
-	// 4) finalCleanup
+	// 4) migrating actions to events
+	ms.total++
+
+	// 5) finalCleanup
 	ms.total++
 }
 
@@ -98,6 +101,12 @@ func (ms *Status) stage2() {
 
 	ms.update("Finishing migration by deleting old templates and indexes")
 	ms.finalCleanup()
+	ms.taskCompleted()
+
+	err := ms.SendAllActionsThroughPipeline()
+	if err != nil {
+		logFatal(err.Error(), "Unable to re-insert actions")
+	}
 	ms.taskCompleted()
 
 	ms.finish("Migration from Automate 1.x finished successfully")
@@ -236,7 +245,7 @@ func (ms *Status) reindexAllInsightsIndexes() {
 			logWarning(err.Error(), "ReindexInsightsToConvergeHistory")
 		}
 
-		actionsIndexName := RenameFromInsightsIndexName(insightsIndexName, mappings.Actions.Index)
+		actionsIndexName := RenameFromInsightsIndexName(insightsIndexName, actionPrefixIndexName)
 		err = ms.client.ReindexInsightstoActions(ms.ctx, insightsIndexName, actionsIndexName)
 		if err != nil {
 			logWarning(err.Error(), "ReindexInsightsToActions")

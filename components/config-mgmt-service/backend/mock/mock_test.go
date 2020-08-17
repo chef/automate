@@ -7,7 +7,6 @@ package mock_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	subject "github.com/chef/automate/components/config-mgmt-service/backend/mock"
@@ -52,15 +51,4 @@ func TestGetAttribute(t *testing.T) {
 	attribute, err := subject.New().GetAttribute("")
 	assert.Nil(t, err)
 	assert.Equal(t, attribute, expected)
-}
-
-func TestGetActions(t *testing.T) {
-	expected := make([]backend.Action, 0)
-	expected = append(expected, backend.Action{})
-	filterMap := make(map[string][]string)
-	actions, total, err := subject.New().GetActions(filterMap, time.Time{}, time.Time{}, 0,
-		time.Time{}, "", true)
-	assert.Nil(t, err)
-	assert.Equal(t, actions, expected)
-	assert.Equal(t, total, int64(0))
 }

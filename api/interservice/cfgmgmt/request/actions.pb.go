@@ -77,13 +77,14 @@ type PolicyUpdateAction struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	PolicyName         string `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty" toml:"policy_name,omitempty" mapstructure:"policy_name,omitempty"`
-	PolicyGroup        string `protobuf:"bytes,2,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty" toml:"policy_group,omitempty" mapstructure:"policy_group,omitempty"`
-	PolicyRevisionId   string `protobuf:"bytes,3,opt,name=policy_revision_id,json=policyRevisionId,proto3" json:"policy_revision_id,omitempty" toml:"policy_revision_id,omitempty" mapstructure:"policy_revision_id,omitempty"`
-	ChefServerFqdn     string `protobuf:"bytes,4,opt,name=chef_server_fqdn,json=chefServerFqdn,proto3" json:"chef_server_fqdn,omitempty" toml:"chef_server_fqdn,omitempty" mapstructure:"chef_server_fqdn,omitempty"`
-	ChefServerOrgname  string `protobuf:"bytes,5,opt,name=chef_server_orgname,json=chefServerOrgname,proto3" json:"chef_server_orgname,omitempty" toml:"chef_server_orgname,omitempty" mapstructure:"chef_server_orgname,omitempty"`
-	ChefServerUsername string `protobuf:"bytes,6,opt,name=chef_server_username,json=chefServerUsername,proto3" json:"chef_server_username,omitempty" toml:"chef_server_username,omitempty" mapstructure:"chef_server_username,omitempty"`
-	PolicyfileContent  string `protobuf:"bytes,7,opt,name=policyfile_content,json=policyfileContent,proto3" json:"policyfile_content,omitempty" toml:"policyfile_content,omitempty" mapstructure:"policyfile_content,omitempty"`
+	PolicyName         string                `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty" toml:"policy_name,omitempty" mapstructure:"policy_name,omitempty"`
+	PolicyGroup        string                `protobuf:"bytes,2,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty" toml:"policy_group,omitempty" mapstructure:"policy_group,omitempty"`
+	PolicyRevisionId   string                `protobuf:"bytes,3,opt,name=policy_revision_id,json=policyRevisionId,proto3" json:"policy_revision_id,omitempty" toml:"policy_revision_id,omitempty" mapstructure:"policy_revision_id,omitempty"`
+	ChefServerFqdn     string                `protobuf:"bytes,4,opt,name=chef_server_fqdn,json=chefServerFqdn,proto3" json:"chef_server_fqdn,omitempty" toml:"chef_server_fqdn,omitempty" mapstructure:"chef_server_fqdn,omitempty"`
+	ChefServerOrgname  string                `protobuf:"bytes,5,opt,name=chef_server_orgname,json=chefServerOrgname,proto3" json:"chef_server_orgname,omitempty" toml:"chef_server_orgname,omitempty" mapstructure:"chef_server_orgname,omitempty"`
+	ChefServerUsername string                `protobuf:"bytes,6,opt,name=chef_server_username,json=chefServerUsername,proto3" json:"chef_server_username,omitempty" toml:"chef_server_username,omitempty" mapstructure:"chef_server_username,omitempty"`
+	PolicyfileContent  string                `protobuf:"bytes,7,opt,name=policyfile_content,json=policyfileContent,proto3" json:"policyfile_content,omitempty" toml:"policyfile_content,omitempty" mapstructure:"policyfile_content,omitempty"`
+	Cookbooks          []*PolicyCookbookLock `protobuf:"bytes,8,rep,name=cookbooks,proto3" json:"cookbooks,omitempty" toml:"cookbooks,omitempty" mapstructure:"cookbooks,omitempty"`
 }
 
 func (x *PolicyUpdateAction) Reset() {
@@ -167,6 +168,68 @@ func (x *PolicyUpdateAction) GetPolicyfileContent() string {
 	return ""
 }
 
+func (x *PolicyUpdateAction) GetCookbooks() []*PolicyCookbookLock {
+	if x != nil {
+		return x.Cookbooks
+	}
+	return nil
+}
+
+type PolicyCookbookLock struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CookbookName string `protobuf:"bytes,1,opt,name=cookbook_name,json=cookbookName,proto3" json:"cookbook_name,omitempty" toml:"cookbook_name,omitempty" mapstructure:"cookbook_name,omitempty"`
+	PolicyId     string `protobuf:"bytes,2,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty" toml:"policy_id,omitempty" mapstructure:"policy_id,omitempty"`
+}
+
+func (x *PolicyCookbookLock) Reset() {
+	*x = PolicyCookbookLock{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_interservice_cfgmgmt_request_actions_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PolicyCookbookLock) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PolicyCookbookLock) ProtoMessage() {}
+
+func (x *PolicyCookbookLock) ProtoReflect() protoreflect.Message {
+	mi := &file_interservice_cfgmgmt_request_actions_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PolicyCookbookLock.ProtoReflect.Descriptor instead.
+func (*PolicyCookbookLock) Descriptor() ([]byte, []int) {
+	return file_interservice_cfgmgmt_request_actions_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *PolicyCookbookLock) GetCookbookName() string {
+	if x != nil {
+		return x.CookbookName
+	}
+	return ""
+}
+
+func (x *PolicyCookbookLock) GetPolicyId() string {
+	if x != nil {
+		return x.PolicyId
+	}
+	return ""
+}
+
 var File_interservice_cfgmgmt_request_actions_proto protoreflect.FileDescriptor
 
 var file_interservice_cfgmgmt_request_actions_proto_rawDesc = []byte{
@@ -178,7 +241,7 @@ var file_interservice_cfgmgmt_request_actions_proto_rawDesc = []byte{
 	0x73, 0x74, 0x22, 0x31, 0x0a, 0x0e, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x52, 0x65, 0x76, 0x69,
 	0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1f, 0x0a, 0x0b, 0x72, 0x65, 0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e,
 	0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x72, 0x65, 0x76, 0x69, 0x73,
-	0x69, 0x6f, 0x6e, 0x49, 0x64, 0x22, 0xc1, 0x02, 0x0a, 0x12, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79,
+	0x69, 0x6f, 0x6e, 0x49, 0x64, 0x22, 0x99, 0x03, 0x0a, 0x12, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79,
 	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x1f, 0x0a, 0x0b,
 	0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x0a, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x21, 0x0a,
@@ -198,7 +261,18 @@ var file_interservice_cfgmgmt_request_actions_proto_rawDesc = []byte{
 	0x65, 0x72, 0x55, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x2d, 0x0a, 0x12, 0x70, 0x6f,
 	0x6c, 0x69, 0x63, 0x79, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74,
 	0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x66, 0x69,
-	0x6c, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x42, 0x3b, 0x5a, 0x39, 0x67, 0x69, 0x74,
+	0x6c, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x12, 0x56, 0x0a, 0x09, 0x63, 0x6f, 0x6f,
+	0x6b, 0x62, 0x6f, 0x6f, 0x6b, 0x73, 0x18, 0x08, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x38, 0x2e, 0x63,
+	0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d,
+	0x61, 0x69, 0x6e, 0x2e, 0x63, 0x66, 0x67, 0x6d, 0x67, 0x6d, 0x74, 0x2e, 0x72, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x2e, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x43, 0x6f, 0x6f, 0x6b, 0x62, 0x6f,
+	0x6f, 0x6b, 0x4c, 0x6f, 0x63, 0x6b, 0x52, 0x09, 0x63, 0x6f, 0x6f, 0x6b, 0x62, 0x6f, 0x6f, 0x6b,
+	0x73, 0x22, 0x56, 0x0a, 0x12, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x43, 0x6f, 0x6f, 0x6b, 0x62,
+	0x6f, 0x6f, 0x6b, 0x4c, 0x6f, 0x63, 0x6b, 0x12, 0x23, 0x0a, 0x0d, 0x63, 0x6f, 0x6f, 0x6b, 0x62,
+	0x6f, 0x6f, 0x6b, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c,
+	0x63, 0x6f, 0x6f, 0x6b, 0x62, 0x6f, 0x6f, 0x6b, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1b, 0x0a, 0x09,
+	0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x08, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x49, 0x64, 0x42, 0x3b, 0x5a, 0x39, 0x67, 0x69, 0x74,
 	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74,
 	0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73,
 	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x63, 0x66, 0x67, 0x6d, 0x67, 0x6d, 0x74, 0x2f, 0x72,
@@ -217,17 +291,19 @@ func file_interservice_cfgmgmt_request_actions_proto_rawDescGZIP() []byte {
 	return file_interservice_cfgmgmt_request_actions_proto_rawDescData
 }
 
-var file_interservice_cfgmgmt_request_actions_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_interservice_cfgmgmt_request_actions_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_interservice_cfgmgmt_request_actions_proto_goTypes = []interface{}{
 	(*PolicyRevision)(nil),     // 0: chef.automate.domain.cfgmgmt.request.PolicyRevision
 	(*PolicyUpdateAction)(nil), // 1: chef.automate.domain.cfgmgmt.request.PolicyUpdateAction
+	(*PolicyCookbookLock)(nil), // 2: chef.automate.domain.cfgmgmt.request.PolicyCookbookLock
 }
 var file_interservice_cfgmgmt_request_actions_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2, // 0: chef.automate.domain.cfgmgmt.request.PolicyUpdateAction.cookbooks:type_name -> chef.automate.domain.cfgmgmt.request.PolicyCookbookLock
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_interservice_cfgmgmt_request_actions_proto_init() }
@@ -260,6 +336,18 @@ func file_interservice_cfgmgmt_request_actions_proto_init() {
 				return nil
 			}
 		}
+		file_interservice_cfgmgmt_request_actions_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PolicyCookbookLock); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -267,7 +355,7 @@ func file_interservice_cfgmgmt_request_actions_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_interservice_cfgmgmt_request_actions_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

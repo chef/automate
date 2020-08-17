@@ -44,7 +44,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 			description: "Single rule single condition matching incorrect rule type",
 			matching:    false,
 			action: &chef.Action{
-				RemoteHostname:   "chef-server.org",
+				ServiceHostname:  "chef-server.org",
 				OrganizationName: "org1",
 			},
 			rules: []*authz.ProjectRule{
@@ -63,7 +63,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 			description: "A rule of type ProjectRuleTypes_NODE does not match any actions",
 			matching:    false,
 			action: &chef.Action{
-				RemoteHostname:   "chef-server.org",
+				ServiceHostname:  "chef-server.org",
 				OrganizationName: "org_1",
 			},
 			rules: []*authz.ProjectRule{
@@ -82,7 +82,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 			description: "Two rules of type NODE and EVENT should match",
 			matching:    true,
 			action: &chef.Action{
-				RemoteHostname:   "chef-server.org",
+				ServiceHostname:  "chef-server.org",
 				OrganizationName: "org_1",
 			},
 			rules: []*authz.ProjectRule{
@@ -112,7 +112,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 			description: "Org: Single rule matching",
 			matching:    true,
 			action: &chef.Action{
-				RemoteHostname:   "chef-server.org",
+				ServiceHostname:  "chef-server.org",
 				OrganizationName: "org_1",
 			},
 			rules: []*authz.ProjectRule{
@@ -131,7 +131,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 			description: "Org: Single rule differing case non-matching",
 			matching:    false,
 			action: &chef.Action{
-				RemoteHostname:   "chef-server.org",
+				ServiceHostname:  "chef-server.org",
 				OrganizationName: "Org_1",
 			},
 			rules: []*authz.ProjectRule{
@@ -150,7 +150,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 			description: "Org: Single rule non-matching",
 			matching:    false,
 			action: &chef.Action{
-				RemoteHostname:   "chef-server.org",
+				ServiceHostname:  "chef-server.org",
 				OrganizationName: "org_1",
 			},
 			rules: []*authz.ProjectRule{
@@ -169,7 +169,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 			description: "Org: two on same field rule matching",
 			matching:    true,
 			action: &chef.Action{
-				RemoteHostname:   "chef-server.org",
+				ServiceHostname:  "chef-server.org",
 				OrganizationName: "org_1",
 			},
 			rules: []*authz.ProjectRule{
@@ -190,7 +190,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 			description: "Chef Server: Single rule matching",
 			matching:    true,
 			action: &chef.Action{
-				RemoteHostname:   "chef_server_1",
+				ServiceHostname:  "chef_server_1",
 				OrganizationName: "org_1",
 			},
 			rules: []*authz.ProjectRule{
@@ -209,7 +209,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 			description: "Chef Server: Single rule differing case non-matching",
 			matching:    false,
 			action: &chef.Action{
-				RemoteHostname:   "Chef_server_1",
+				ServiceHostname:  "Chef_server_1",
 				OrganizationName: "org_1",
 			},
 			rules: []*authz.ProjectRule{
@@ -228,7 +228,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 			description: "Chef Server: Single rule non-matching",
 			matching:    false,
 			action: &chef.Action{
-				RemoteHostname:   "chef_server_2",
+				ServiceHostname:  "chef_server_2",
 				OrganizationName: "org_1",
 			},
 			rules: []*authz.ProjectRule{
@@ -247,7 +247,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 			description: "Chef Server: two condition values on the same field one matching",
 			matching:    true,
 			action: &chef.Action{
-				RemoteHostname:   "chef_server_1",
+				ServiceHostname:  "chef_server_1",
 				OrganizationName: "org_1",
 			},
 			rules: []*authz.ProjectRule{
