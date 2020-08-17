@@ -1,7 +1,7 @@
 PACKAGE_PATH ?= github.com/chef/automate/components/automate-cli
 CHEF_AUTOMATE_PKG = ${PACKAGE_PATH}/cmd/chef-automate
 BINS = ${CHEF_AUTOMATE_PKG}
-DOCS_PATH = ../automate-chef-io/data/docs/cli_chef_automate
+DOCS_PATH = ../docs-chef-io/data/automate/cli_chef_automate
 
 package: linux
 
