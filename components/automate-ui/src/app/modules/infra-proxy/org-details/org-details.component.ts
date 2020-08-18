@@ -60,7 +60,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         } else if (path.includes('policyFiles')) {
           this.resetTabs();
           this.policyFilesTab = true;
-        } else if (path.includes('data_bags')) {
+        } else if (path.includes('data-bags')) {
           this.resetTabs();
           this.dataBagsTab = true;
         } else if (path.includes('cookbooks')) {
