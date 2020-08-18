@@ -14,8 +14,8 @@ export class CookbookVersionsRequests {
   Observable<CookbookVersions> {
     const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
     return this.http.get<CookbookVersions>(
-      // tslint:disable-next-line: max-line-length
-      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}`, { headers });
+      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}`,
+        { headers });
   }
 
 }
