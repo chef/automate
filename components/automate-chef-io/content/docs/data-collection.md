@@ -4,6 +4,8 @@ description = "Set up Data Collection"
 draft = false
 bref = "Configure Data Collection"
 toc = true
+redirect_url = "https://docs.chef.io/automate/data_collection/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "configuring_automate"

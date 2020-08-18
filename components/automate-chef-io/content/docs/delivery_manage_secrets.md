@@ -4,6 +4,8 @@ description = "Manage Secrets in a build-cookbook"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/delivery_manage_secrets/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "workflow"

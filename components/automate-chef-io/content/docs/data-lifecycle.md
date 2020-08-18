@@ -7,6 +7,8 @@ description = "Chef Automate Data Lifecycle: Data Management and Data Retention"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/data_lifecycle/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "settings"

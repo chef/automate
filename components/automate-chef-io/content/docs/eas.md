@@ -5,6 +5,8 @@ date = 2019-10-18T18:54:09+00:00
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/eas/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "applications"

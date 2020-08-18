@@ -5,6 +5,8 @@ date = 2019-10-28T14:44:28-07:00
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/monitoring/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "reference"

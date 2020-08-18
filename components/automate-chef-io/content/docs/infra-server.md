@@ -6,6 +6,8 @@ weight = 20
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/infra_server/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "get_started"

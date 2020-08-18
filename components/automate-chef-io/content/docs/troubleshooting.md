@@ -5,6 +5,8 @@ date = 2018-05-15T17:27:57-07:00
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/troubleshooting/"
+layout = "redirect"
 +++
 
 ## chef-automate CLI Errors

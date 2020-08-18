@@ -4,6 +4,8 @@ description = "Architectural Overview for Chef Automate"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/architectural_overview/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "reference"

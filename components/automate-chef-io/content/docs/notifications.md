@@ -5,6 +5,8 @@ date = 2018-05-18T13:19:02-07:00
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/notifications/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "settings"

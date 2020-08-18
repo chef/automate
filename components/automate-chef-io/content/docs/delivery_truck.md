@@ -4,6 +4,8 @@ description = "About the Delivery Truck Cookbook"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/delivery_truck/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "workflow"

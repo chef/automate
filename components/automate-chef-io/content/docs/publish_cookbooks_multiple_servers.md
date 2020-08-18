@@ -4,6 +4,8 @@ description = "Publishing Cookbooks to Multiple Chef Infra Servers"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/publish_cookbooks_multiple_servers/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "workflow"

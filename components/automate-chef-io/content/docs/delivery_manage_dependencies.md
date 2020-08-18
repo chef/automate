@@ -4,6 +4,8 @@ description = "Managing Run-time Dependencies"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/delivery_manage_dependencies/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "workflow"

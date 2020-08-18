@@ -5,6 +5,8 @@ date = 2018-03-26T16:01:47-07:00
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/desktop/"
+layout = "redirect"
 +++
 
 The Chef Automate _Desktop_ dashboard displays status information about all desktops connected to Chef Automate.

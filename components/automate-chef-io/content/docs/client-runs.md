@@ -5,6 +5,8 @@ date = 2018-03-26T16:01:58-07:00
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/client_runs/"
+layout = "redirect"
 +++
 
 ## Overview

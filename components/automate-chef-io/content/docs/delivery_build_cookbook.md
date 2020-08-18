@@ -4,6 +4,8 @@ description = "Using the Delivery Build Cookbook"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/delivery_build_cookbook/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "workflow"

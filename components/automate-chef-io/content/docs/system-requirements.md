@@ -2,9 +2,11 @@
 title = "System Requirements"
 description = "Requirements for running Chef Automate"
 weight = 1
-draft = false 
+draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/system_requirements/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "get_started"

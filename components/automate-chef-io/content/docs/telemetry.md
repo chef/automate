@@ -4,6 +4,8 @@ description = "About Telemetry"
 draft = false
 bref = "Telemetry"
 toc = true
+redirect_url = "https://docs.chef.io/automate/telemetry/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "configuring_automate"

@@ -3,6 +3,8 @@ title = "Airgapped Installation"
 description = "Install Chef Automate 2.0 on an airgapped host."
 draft = false
 bref = "Chef Automate 2.0 can be installed on an airgapped host."
+redirect_url = "https://docs.chef.io/automate/airgapped_installation/"
+layout = "redirect"
 toc = true
 [menu]
   [menu.docs]

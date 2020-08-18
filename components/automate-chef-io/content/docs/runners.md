@@ -4,6 +4,8 @@ description = ""
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/runners/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "workflow"

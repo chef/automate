@@ -4,6 +4,8 @@ description = "Create and Use API Tokens"
 draft = false
 bref = "Create and Use API Tokens"
 toc = true
+redirect_url = "https://docs.chef.io/automate/api_tokens/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "settings"
