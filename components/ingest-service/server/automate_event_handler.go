@@ -21,7 +21,7 @@ type AutomateEventHandlerServer struct {
 }
 
 func NewAutomateEventHandlerServer(client backend.Client, chefIngestServer ChefIngestServer,
-	authzProjectsClient authz.ProjectsClient) *AutomateEventHandlerServer {
+	authzProjectsClient authz.ProjectsServiceClient) *AutomateEventHandlerServer {
 
 	server := &AutomateEventHandlerServer{
 		client:           client,

@@ -130,7 +130,7 @@ func main() {
 }
 
 func fetchPolicy(conn *grpc.ClientConn) {
-	policy := requestPolicy(lc.NewLicenseControlClient(conn))
+	policy := requestPolicy(lc.NewLicenseControlServiceClient(conn))
 
 	if policy == nil {
 		log.Warn("Received empty policy response")
@@ -147,7 +147,7 @@ func fetchPolicy(conn *grpc.ClientConn) {
 	}
 }
 
-func requestPolicy(client lc.LicenseControlClient) *lc.Policy {
+func requestPolicy(client lc.LicenseControlServiceClient) *lc.Policy {
 	md := metadata.Pairs("user-agent", "splines")
 
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
@@ -214,7 +214,7 @@ func handleRules(policy *lc.Policy) {
 }
 
 func fetchStatus(conn *grpc.ClientConn) {
-	response := requestStatus(lc.NewLicenseControlClient(conn))
+	response := requestStatus(lc.NewLicenseControlServiceClient(conn))
 
 	var configuredAt string
 	if response.ConfiguredAt != nil {
@@ -244,7 +244,7 @@ func fetchStatus(conn *grpc.ClientConn) {
 	).Info("Service status")
 }
 
-func requestStatus(client lc.LicenseControlClient) *lc.StatusResponse {
+func requestStatus(client lc.LicenseControlServiceClient) *lc.StatusResponse {
 	md := metadata.Pairs("user-agent", "splines")
 
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
@@ -258,7 +258,7 @@ func requestStatus(client lc.LicenseControlClient) *lc.StatusResponse {
 }
 
 func fetchLicense(conn *grpc.ClientConn) {
-	license := requestLicense(lc.NewLicenseControlClient(conn))
+	license := requestLicense(lc.NewLicenseControlServiceClient(conn))
 
 	if license == nil {
 		log.Warn("No license loaded")
@@ -277,7 +277,7 @@ func fetchLicense(conn *grpc.ClientConn) {
 	).Info("Service status")
 }
 
-func requestLicense(client lc.LicenseControlClient) *license.License {
+func requestLicense(client lc.LicenseControlServiceClient) *license.License {
 	md := metadata.Pairs("user-agent", "splines")
 
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
@@ -296,7 +296,7 @@ func putLicense(conn *grpc.ClientConn, license string) (ok bool) {
 		return
 	}
 
-	response := requestUpdate(lc.NewLicenseControlClient(conn), license)
+	response := requestUpdate(lc.NewLicenseControlServiceClient(conn), license)
 
 	log.WithFields(
 		log.Fields{
@@ -308,7 +308,7 @@ func putLicense(conn *grpc.ClientConn, license string) (ok bool) {
 	return true
 }
 
-func requestUpdate(client lc.LicenseControlClient, license string) *lc.UpdateResponse {
+func requestUpdate(client lc.LicenseControlServiceClient, license string) *lc.UpdateResponse {
 	md := metadata.Pairs("user-agent", "splines")
 
 	ctx := metadata.NewOutgoingContext(context.Background(), md)

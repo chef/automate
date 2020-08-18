@@ -29,13 +29,13 @@ import (
 
 // AuthzServer is the server interface
 type AuthzServer struct {
-	client               authz.AuthorizationClient // now only needed for GetVersion
+	client               authz.AuthorizationServiceClient // now only needed for GetVersion
 	introspectionHandler middleware.IntrospectionHandler
 }
 
 // NewServer creates a server with its client
 func NewServer(
-	client authz.AuthorizationClient,
+	client authz.AuthorizationServiceClient,
 	introspectionHandler middleware.IntrospectionHandler,
 ) *AuthzServer {
 	return &AuthzServer{

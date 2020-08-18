@@ -46,7 +46,7 @@ func generateAdminToken(ctx context.Context,
 
 	defer authnConnection.Close() // nolint: errcheck
 
-	authnClient := authn.NewTokensMgmtClient(authnConnection)
+	authnClient := authn.NewTokensMgmtServiceClient(authnConnection)
 
 	authzConnection, err := connFactory.DialContext(
 		ctx,
@@ -60,7 +60,7 @@ func generateAdminToken(ctx context.Context,
 
 	defer authzConnection.Close() // nolint: errcheck
 
-	authzClient := authz.NewPoliciesClient(authzConnection)
+	authzClient := authz.NewPoliciesServiceClient(authzConnection)
 
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
 		Id:     uuid.Must(uuid.NewV4()).String(),

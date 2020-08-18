@@ -29,7 +29,7 @@ func NewGRPCServer(s *service.Service) *grpc.Server {
 		),
 	)
 	health.RegisterHealthServer(g, health.NewService())
-	teams.RegisterTeamsServer(g, NewTeamServer(s))
+	teams.RegisterTeamsServiceServer(g, NewTeamServer(s))
 	reflection.Register(g)
 	return g
 }

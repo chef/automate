@@ -13,7 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func BuildConfigMgmtPublisher(client cfgmgmt.CfgMgmtClient, numPublishers int) message.ChefActionPipe {
+func BuildConfigMgmtPublisher(client cfgmgmt.CfgMgmtServiceClient, numPublishers int) message.ChefActionPipe {
 	return func(in <-chan message.ChefAction) <-chan message.ChefAction {
 		if numPublishers <= 0 || client == nil {
 			log.Info("Direct publish to config management service is disabled")
@@ -29,7 +29,7 @@ func BuildConfigMgmtPublisher(client cfgmgmt.CfgMgmtClient, numPublishers int) m
 	}
 }
 
-func configMgmtPublisher(in <-chan message.ChefAction, client cfgmgmt.CfgMgmtClient, out chan<- message.ChefAction) {
+func configMgmtPublisher(in <-chan message.ChefAction, client cfgmgmt.CfgMgmtServiceClient, out chan<- message.ChefAction) {
 	for msg := range in {
 		cmpHandleMessage(client, msg, out)
 
@@ -37,7 +37,7 @@ func configMgmtPublisher(in <-chan message.ChefAction, client cfgmgmt.CfgMgmtCli
 	close(out)
 }
 
-func cmpHandleMessage(client cfgmgmt.CfgMgmtClient, msg message.ChefAction, out chan<- message.ChefAction) {
+func cmpHandleMessage(client cfgmgmt.CfgMgmtServiceClient, msg message.ChefAction, out chan<- message.ChefAction) {
 	if err := msg.Ctx.Err(); err != nil {
 		msg.FinishProcessing(err)
 		return

@@ -32,7 +32,7 @@ func NewGRPC(ctx context.Context, config *Config) (*grpc.Server, error) {
 	}
 
 	srv := NewLicenseControlServer(ctx, backend, licenseParser, config)
-	lc.RegisterLicenseControlServer(grpcServer, srv)
+	lc.RegisterLicenseControlServiceServer(grpcServer, srv)
 	health.RegisterHealthServer(grpcServer, srv.health)
 
 	// Register reflection service on gRPC server.

@@ -11,11 +11,11 @@ import (
 
 // Server is the server interface
 type Server struct {
-	client authn.TokensMgmtClient
+	client authn.TokensMgmtServiceClient
 }
 
 // NewServer creates a server with its client.
-func NewServer(client authn.TokensMgmtClient) *Server {
+func NewServer(client authn.TokensMgmtServiceClient) *Server {
 	return &Server{client: client}
 }
 

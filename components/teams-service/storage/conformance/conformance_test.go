@@ -87,15 +87,15 @@ func TestStorage(t *testing.T) {
 		authzConnFactory := secureconn.NewFactory(*authzCerts)
 		grpcAuthz := authzConnFactory.NewServer()
 
-		mockAuthz := authz.NewAuthorizationServerMock()
+		mockAuthz := authz.NewAuthorizationServiceServerMock()
 		mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-		authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
+		authz.RegisterAuthorizationServiceServer(grpcAuthz, mockAuthz)
 
 		authzServer := grpctest.NewServer(grpcAuthz)
 		authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 		require.NoError(t, err)
 
-		authzAuthorizationClient := authz.NewAuthorizationClient(authzConn)
+		authzAuthorizationClient := authz.NewAuthorizationServiceClient(authzConn)
 
 		adp, err := postgres.New(l, *migrationConfig, authzAuthorizationClient)
 		require.NoError(t, err)

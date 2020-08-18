@@ -24,7 +24,7 @@ var (
 )
 
 type DataFeedPollTask struct {
-	cfgMgmt           cfgmgmt.CfgMgmtClient
+	cfgMgmt           cfgmgmt.CfgMgmtServiceClient
 	reporting         reporting.ReportingServiceClient
 	db                *dao.DB
 	disableCIDRFilter bool
@@ -58,7 +58,7 @@ func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grp
 		return nil, err
 	}
 	return &DataFeedPollTask{
-		cfgMgmt:           cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
+		cfgMgmt:           cfgmgmt.NewCfgMgmtServiceClient(cfgMgmtConn),
 		reporting:         reporting.NewReportingServiceClient(complianceConn),
 		db:                db,
 		disableCIDRFilter: dataFeedConfig.ServiceConfig.DisableCIDRFilter,

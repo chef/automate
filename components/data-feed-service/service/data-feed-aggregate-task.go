@@ -33,7 +33,7 @@ type DataFeedAggregateTaskParams struct {
 }
 
 type DataFeedAggregateTask struct {
-	cfgMgmt             cfgmgmt.CfgMgmtClient
+	cfgMgmt             cfgmgmt.CfgMgmtServiceClient
 	reporting           reporting.ReportingServiceClient
 	secrets             secrets.SecretsServiceClient
 	db                  *dao.DB
@@ -45,7 +45,7 @@ type DataFeedAggregateTask struct {
 func NewDataFeedAggregateTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grpc.ClientConn, complianceConn *grpc.ClientConn, secretsConn *grpc.ClientConn, db *dao.DB) *DataFeedAggregateTask {
 	return &DataFeedAggregateTask{
 		reporting:           reporting.NewReportingServiceClient(complianceConn),
-		cfgMgmt:             cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
+		cfgMgmt:             cfgmgmt.NewCfgMgmtServiceClient(cfgMgmtConn),
 		secrets:             secrets.NewSecretsServiceClient(secretsConn),
 		db:                  db,
 		externalFqdn:        dataFeedConfig.ServiceConfig.ExternalFqdn,

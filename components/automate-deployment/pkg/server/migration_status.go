@@ -25,14 +25,14 @@ const a1MigrationStatusTimeout = 10 * time.Second
 // migration status.
 const a1MigrationStatusPollInterval = 2 * time.Second
 
-func (s *server) A1UpgradeStatus(_ *api.A1UpgradeStatusRequest, stream api.Deployment_A1UpgradeStatusServer) error {
+func (s *server) A1UpgradeStatus(_ *api.A1UpgradeStatusRequest, stream api.DeploymentService_A1UpgradeStatusServer) error {
 	ingestConn, err := s.connFactory.Dial("ingest-service", s.AddressForService("ingest-service"), grpc.WithBlock())
 	if err != nil {
 		return status.Errorf(codes.Unavailable, "unable to initialize connection to ingest-service: %s", err.Error())
 	}
 	defer ingestConn.Close() // nolint: errcheck
 
-	ingestClient := ingest.NewIngestStatusClient(ingestConn)
+	ingestClient := ingest.NewIngestStatusServiceClient(ingestConn)
 
 	complianceConn, err := s.connFactory.Dial("compliance-service", s.AddressForService("compliance-service"), grpc.WithBlock())
 	if err != nil {
@@ -40,7 +40,7 @@ func (s *server) A1UpgradeStatus(_ *api.A1UpgradeStatusRequest, stream api.Deplo
 	}
 	defer complianceConn.Close() // nolint: errcheck
 
-	complianceClient := compliance.NewComplianceStatusClient(complianceConn)
+	complianceClient := compliance.NewComplianceStatusServiceClient(complianceConn)
 
 	for {
 		resp := gatherA1MigrationStatuses(ingestClient, complianceClient)
@@ -60,7 +60,7 @@ func (s *server) A1UpgradeStatus(_ *api.A1UpgradeStatusRequest, stream api.Deplo
 // We have a finite number of phase 2 migrations.  For now, rather
 // than being generic, we just explicitly gather each one we know
 // about.
-func gatherA1MigrationStatuses(ingest ingest.IngestStatusClient, compliance compliance.ComplianceStatusClient) *api.A1UpgradeStatusResponse {
+func gatherA1MigrationStatuses(ingest ingest.IngestStatusServiceClient, compliance compliance.ComplianceStatusServiceClient) *api.A1UpgradeStatusResponse {
 	resp := &api.A1UpgradeStatusResponse{}
 
 	resp.ServiceStatuses = make([]*api.A1UpgradeStatusResponse_ServiceMigrationStatus, 2)
@@ -107,7 +107,7 @@ func overallStatus(statuses ...*api.A1UpgradeStatusResponse_ServiceMigrationStat
 	return api.A1UpgradeStatusResponse_COMPLETE
 }
 
-func getIngestMigrationStatus(ingestClient ingest.IngestStatusClient) *api.A1UpgradeStatusResponse_ServiceMigrationStatus {
+func getIngestMigrationStatus(ingestClient ingest.IngestStatusServiceClient) *api.A1UpgradeStatusResponse_ServiceMigrationStatus {
 	logrus.Debug("Checking migration status of ingest service")
 
 	ctx, cancel := context.WithTimeout(context.Background(), a1MigrationStatusTimeout)
@@ -163,7 +163,7 @@ func ingestResponseToServiceMigrationStatus(ingestResp *ingest.MigrationStatus) 
 	return ret
 }
 
-func getComplianceMigrationStatus(client compliance.ComplianceStatusClient) *api.A1UpgradeStatusResponse_ServiceMigrationStatus {
+func getComplianceMigrationStatus(client compliance.ComplianceStatusServiceClient) *api.A1UpgradeStatusResponse_ServiceMigrationStatus {
 	logrus.Debug("Checking migration status of compliance service")
 
 	ctx, cancel := context.WithTimeout(context.Background(), a1MigrationStatusTimeout)

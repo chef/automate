@@ -84,13 +84,13 @@ func Disconnect() {
 // deployment-service can serve.
 type DSClient struct {
 	api.DeployClientStreamer
-	api.CertificateAuthorityClient
+	api.CertificateAuthorityServiceClient
 }
 
 func NewDSClient(c *grpc.ClientConn) *DSClient {
 	return &DSClient{
 		api.NewDeployClientStreamer(c),
-		api.NewCertificateAuthorityClient(c),
+		api.NewCertificateAuthorityServiceClient(c),
 	}
 }
 

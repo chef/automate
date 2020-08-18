@@ -48,7 +48,7 @@ func (s *server) getConfigMgmtNodes(ctx context.Context, startTime *tspb.Timesta
 	}
 
 	defer configMgmtConnection.Close() // nolint: errcheck
-	configMgmtClient := service.NewCfgMgmtClient(configMgmtConnection)
+	configMgmtClient := service.NewCfgMgmtServiceClient(configMgmtConnection)
 
 	nodesRequest := &configReq.InventoryNodes{
 		PageSize: 100,

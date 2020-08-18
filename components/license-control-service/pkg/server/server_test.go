@@ -27,7 +27,7 @@ const (
 	validLicenseFile   = "../../../../dev/license.jwt"
 )
 
-func testLicenseControlServer(t *testing.T) lc.LicenseControlServer {
+func testLicenseControlServer(t *testing.T) lc.LicenseControlServiceServer {
 	licenseParser := keys.NewLicenseParser(keys.BuiltinKeyData)
 	backend := &storage.MemBackend{}
 	err := backend.Init(context.Background(), licenseParser)

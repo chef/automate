@@ -58,10 +58,10 @@ func (m *MockClientsFactory) EXPECT() *MockClientsFactoryMockRecorder {
 }
 
 // CfgMgmtClient mocks base method
-func (m *MockClientsFactory) CfgMgmtClient() (service0.CfgMgmtClient, error) {
+func (m *MockClientsFactory) CfgMgmtClient() (service0.CfgMgmtServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CfgMgmtClient")
-	ret0, _ := ret[0].(service0.CfgMgmtClient)
+	ret0, _ := ret[0].(service0.CfgMgmtServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -73,10 +73,10 @@ func (mr *MockClientsFactoryMockRecorder) CfgMgmtClient() *gomock.Call {
 }
 
 // IngestStatusClient mocks base method
-func (m *MockClientsFactory) IngestStatusClient() (ingest0.IngestStatusClient, error) {
+func (m *MockClientsFactory) IngestStatusClient() (ingest0.IngestStatusServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IngestStatusClient")
-	ret0, _ := ret[0].(ingest0.IngestStatusClient)
+	ret0, _ := ret[0].(ingest0.IngestStatusServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -88,10 +88,10 @@ func (mr *MockClientsFactoryMockRecorder) IngestStatusClient() *gomock.Call {
 }
 
 // ChefIngesterClient mocks base method
-func (m *MockClientsFactory) ChefIngesterClient() (ingest0.ChefIngesterClient, error) {
+func (m *MockClientsFactory) ChefIngesterClient() (ingest0.ChefIngesterServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChefIngesterClient")
-	ret0, _ := ret[0].(ingest0.ChefIngesterClient)
+	ret0, _ := ret[0].(ingest0.ChefIngesterServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -103,10 +103,10 @@ func (mr *MockClientsFactoryMockRecorder) ChefIngesterClient() *gomock.Call {
 }
 
 // ChefIngesterJobSchedulerClient mocks base method
-func (m *MockClientsFactory) ChefIngesterJobSchedulerClient() (ingest0.JobSchedulerClient, error) {
+func (m *MockClientsFactory) ChefIngesterJobSchedulerClient() (ingest0.JobSchedulerServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChefIngesterJobSchedulerClient")
-	ret0, _ := ret[0].(ingest0.JobSchedulerClient)
+	ret0, _ := ret[0].(ingest0.JobSchedulerServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -118,10 +118,10 @@ func (mr *MockClientsFactoryMockRecorder) ChefIngesterJobSchedulerClient() *gomo
 }
 
 // ComplianceIngesterClient mocks base method
-func (m *MockClientsFactory) ComplianceIngesterClient() (ingest.ComplianceIngesterClient, error) {
+func (m *MockClientsFactory) ComplianceIngesterClient() (ingest.ComplianceIngesterServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ComplianceIngesterClient")
-	ret0, _ := ret[0].(ingest.ComplianceIngesterClient)
+	ret0, _ := ret[0].(ingest.ComplianceIngesterServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -148,10 +148,10 @@ func (mr *MockClientsFactoryMockRecorder) NotificationsClient() *gomock.Call {
 }
 
 // AuthenticationClient mocks base method
-func (m *MockClientsFactory) AuthenticationClient() (authn.AuthenticationClient, error) {
+func (m *MockClientsFactory) AuthenticationClient() (authn.AuthenticationServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AuthenticationClient")
-	ret0, _ := ret[0].(authn.AuthenticationClient)
+	ret0, _ := ret[0].(authn.AuthenticationServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -163,10 +163,10 @@ func (mr *MockClientsFactoryMockRecorder) AuthenticationClient() *gomock.Call {
 }
 
 // AuthorizationClient mocks base method
-func (m *MockClientsFactory) AuthorizationClient() (authz.AuthorizationClient, error) {
+func (m *MockClientsFactory) AuthorizationClient() (authz.AuthorizationServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AuthorizationClient")
-	ret0, _ := ret[0].(authz.AuthorizationClient)
+	ret0, _ := ret[0].(authz.AuthorizationServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -178,10 +178,10 @@ func (mr *MockClientsFactoryMockRecorder) AuthorizationClient() *gomock.Call {
 }
 
 // PoliciesClient mocks base method
-func (m *MockClientsFactory) PoliciesClient() (authz.PoliciesClient, error) {
+func (m *MockClientsFactory) PoliciesClient() (authz.PoliciesServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PoliciesClient")
-	ret0, _ := ret[0].(authz.PoliciesClient)
+	ret0, _ := ret[0].(authz.PoliciesServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -193,10 +193,10 @@ func (mr *MockClientsFactoryMockRecorder) PoliciesClient() *gomock.Call {
 }
 
 // ProjectsClient mocks base method
-func (m *MockClientsFactory) ProjectsClient() (authz.ProjectsClient, error) {
+func (m *MockClientsFactory) ProjectsClient() (authz.ProjectsServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProjectsClient")
-	ret0, _ := ret[0].(authz.ProjectsClient)
+	ret0, _ := ret[0].(authz.ProjectsServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -208,10 +208,10 @@ func (mr *MockClientsFactoryMockRecorder) ProjectsClient() *gomock.Call {
 }
 
 // TeamsClient mocks base method
-func (m *MockClientsFactory) TeamsClient() (teams.TeamsClient, error) {
+func (m *MockClientsFactory) TeamsClient() (teams.TeamsServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TeamsClient")
-	ret0, _ := ret[0].(teams.TeamsClient)
+	ret0, _ := ret[0].(teams.TeamsServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -223,10 +223,10 @@ func (mr *MockClientsFactoryMockRecorder) TeamsClient() *gomock.Call {
 }
 
 // TokensMgmtClient mocks base method
-func (m *MockClientsFactory) TokensMgmtClient() (authn.TokensMgmtClient, error) {
+func (m *MockClientsFactory) TokensMgmtClient() (authn.TokensMgmtServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TokensMgmtClient")
-	ret0, _ := ret[0].(authn.TokensMgmtClient)
+	ret0, _ := ret[0].(authn.TokensMgmtServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -238,10 +238,10 @@ func (mr *MockClientsFactoryMockRecorder) TokensMgmtClient() *gomock.Call {
 }
 
 // UsersMgmtClient mocks base method
-func (m *MockClientsFactory) UsersMgmtClient() (local_user.UsersMgmtClient, error) {
+func (m *MockClientsFactory) UsersMgmtClient() (local_user.UsersMgmtServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UsersMgmtClient")
-	ret0, _ := ret[0].(local_user.UsersMgmtClient)
+	ret0, _ := ret[0].(local_user.UsersMgmtServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -418,10 +418,10 @@ func (mr *MockClientsFactoryMockRecorder) NodeManagerClient() *gomock.Call {
 }
 
 // LicenseControlClient mocks base method
-func (m *MockClientsFactory) LicenseControlClient() (license_control.LicenseControlClient, error) {
+func (m *MockClientsFactory) LicenseControlClient() (license_control.LicenseControlServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LicenseControlClient")
-	ret0, _ := ret[0].(license_control.LicenseControlClient)
+	ret0, _ := ret[0].(license_control.LicenseControlServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -433,10 +433,10 @@ func (mr *MockClientsFactoryMockRecorder) LicenseControlClient() *gomock.Call {
 }
 
 // DeploymentServiceClient mocks base method
-func (m *MockClientsFactory) DeploymentServiceClient() (deployment.DeploymentClient, error) {
+func (m *MockClientsFactory) DeploymentServiceClient() (deployment.DeploymentServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeploymentServiceClient")
-	ret0, _ := ret[0].(deployment.DeploymentClient)
+	ret0, _ := ret[0].(deployment.DeploymentServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -463,10 +463,10 @@ func (mr *MockClientsFactoryMockRecorder) DatafeedClient() *gomock.Call {
 }
 
 // PurgeClient mocks base method
-func (m *MockClientsFactory) PurgeClient(service string) (data_lifecycle.PurgeClient, error) {
+func (m *MockClientsFactory) PurgeClient(service string) (data_lifecycle.PurgeServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PurgeClient", service)
-	ret0, _ := ret[0].(data_lifecycle.PurgeClient)
+	ret0, _ := ret[0].(data_lifecycle.PurgeServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -478,10 +478,10 @@ func (mr *MockClientsFactoryMockRecorder) PurgeClient(service interface{}) *gomo
 }
 
 // InfraProxyClient mocks base method
-func (m *MockClientsFactory) InfraProxyClient() (service1.InfraProxyClient, error) {
+func (m *MockClientsFactory) InfraProxyClient() (service1.InfraProxyServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InfraProxyClient")
-	ret0, _ := ret[0].(service1.InfraProxyClient)
+	ret0, _ := ret[0].(service1.InfraProxyServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -493,10 +493,10 @@ func (mr *MockClientsFactoryMockRecorder) InfraProxyClient() *gomock.Call {
 }
 
 // CdsClient mocks base method
-func (m *MockClientsFactory) CdsClient() (service.AutomateCdsClient, error) {
+func (m *MockClientsFactory) CdsClient() (service.AutomateCdsServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CdsClient")
-	ret0, _ := ret[0].(service.AutomateCdsClient)
+	ret0, _ := ret[0].(service.AutomateCdsServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

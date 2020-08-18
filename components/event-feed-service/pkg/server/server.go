@@ -242,7 +242,7 @@ func fromInternalFormat(entry *feed.FeedEntry) (*event_feed.FeedEntry, error) {
 			ObjectType: entry.TargetObjectType,
 		},
 		Parent: &event_feed.Parent{
-			ID:   entry.ParentID,
+			Id:   entry.ParentID,
 			Name: entry.ParentName,
 		},
 	}, nil

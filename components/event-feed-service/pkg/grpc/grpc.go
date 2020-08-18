@@ -67,7 +67,7 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 	}
 	defer esSidecarConn.Close() //nolint errcheck
 
-	esSidecarClient := es_sidecar.NewEsSidecarClient(esSidecarConn)
+	esSidecarClient := es_sidecar.NewEsSidecarServiceClient(esSidecarConn)
 
 	cerealConn, err := connFactory.DialContext(
 		timeoutCtx, "cereal-service", c.Cereal.Address,
@@ -106,7 +106,7 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 	}
 	defer authzConn.Close() // nolint: errcheck
 
-	authzProjectsClient := authz.NewProjectsClient(authzConn)
+	authzProjectsClient := authz.NewProjectsServiceClient(authzConn)
 
 	projectUpdateManager, err := createProjectUpdateCerealManager(cerealConn)
 	if err != nil {
@@ -147,7 +147,7 @@ func newGRPCServer(
 
 	health.RegisterHealthServer(grpcServer, eventFeedServer.Health())
 
-	data_lifecycle.RegisterPurgeServer(grpcServer, purgeServer)
+	data_lifecycle.RegisterPurgeServiceServer(grpcServer, purgeServer)
 
 	event_feed.RegisterEventFeedServiceServer(grpcServer, eventFeedServer)
 
@@ -170,7 +170,7 @@ func createProjectUpdateCerealManager(conn *grpc.ClientConn) (*cereal.Manager, e
 // newJobManager returns a cereal manager to handle scheduled jobs
 func newJobManager(
 	c *config.EventFeed,
-	esSidecarClient es_sidecar.EsSidecarClient,
+	esSidecarClient es_sidecar.EsSidecarServiceClient,
 	cerealBackend cereal.Driver) (*cereal.Manager, func(), error) {
 
 	var (

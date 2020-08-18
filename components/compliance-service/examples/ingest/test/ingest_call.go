@@ -45,7 +45,7 @@ func SendReportToGRPC(file string, threadCount int, reportsPerThread int) error 
 		return err
 	}
 
-	client := ingest.NewComplianceIngesterClient(conn)
+	client := ingest.NewComplianceIngesterServiceClient(conn)
 	if client == nil {
 		logrus.Errorf("ingest_call.go - reportToGRPC got nil for NewComplianceIngesterClient: %s", err)
 		return err
@@ -80,7 +80,7 @@ func SendReportToGRPC(file string, threadCount int, reportsPerThread int) error 
 }
 
 // SendThreadedReports is sequentially sending `reportsPerThread` reports on behalf of thread `threadNr`
-func SendThreadedReports(iReport compliance.Report, onesie bool, threadNr int, reportsPerThread int, threadsProgress []int, client ingest.ComplianceIngesterClient, ctx context.Context) {
+func SendThreadedReports(iReport compliance.Report, onesie bool, threadNr int, reportsPerThread int, threadsProgress []int, client ingest.ComplianceIngesterServiceClient, ctx context.Context) {
 	for j := 1; j <= reportsPerThread; j++ {
 		SendUniqueReport(iReport, onesie, threadNr, j, client, ctx)
 		threadsProgress[threadNr-1] = j
@@ -89,7 +89,7 @@ func SendThreadedReports(iReport compliance.Report, onesie bool, threadNr int, r
 
 // SendUniqueReport is sending one report with ReportUuid and EndTime modified
 // It measures the execution time and reports success of failure
-func SendUniqueReport(iReport compliance.Report, onesie bool, threadNr int, reportNr int, client ingest.ComplianceIngesterClient, ctx context.Context) {
+func SendUniqueReport(iReport compliance.Report, onesie bool, threadNr int, reportNr int, client ingest.ComplianceIngesterServiceClient, ctx context.Context) {
 	// If the report is ingested more than once, we change the report id and time
 	// We also change the node id to avoid ES ingest 409 conflicts
 	if !onesie {

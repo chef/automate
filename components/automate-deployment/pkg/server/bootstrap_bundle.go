@@ -16,7 +16,7 @@ import (
 )
 
 // BootstrapBundle makes and downloads a bootstrap bundle
-func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Deployment_BootstrapBundleServer) error {
+func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.DeploymentService_BootstrapBundleServer) error {
 	var b bytes.Buffer
 	tarWriter := bufio.NewWriter(&b)
 	bundleCreator := bootstrapbundle.NewCreator(s.secretStore)

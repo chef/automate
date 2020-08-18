@@ -15,8 +15,8 @@ import (
 )
 
 type userMgmtClient struct {
-	teamsClient      teams.TeamsClient
-	localUsersClient local_user.UsersMgmtClient
+	teamsClient      teams.TeamsServiceClient
+	localUsersClient local_user.UsersMgmtServiceClient
 }
 
 // NewUserMgmtClient returns a client capable of creating a new user
@@ -33,7 +33,7 @@ func NewUserMgmtClient(ctx context.Context, factory *secureconn.Factory,
 	if err != nil {
 		return nil, err
 	}
-	localUsersClient := local_user.NewUsersMgmtClient(usersConnection)
+	localUsersClient := local_user.NewUsersMgmtServiceClient(usersConnection)
 
 	teamsConnection, err := factory.DialContext(
 		ctx,
@@ -44,7 +44,7 @@ func NewUserMgmtClient(ctx context.Context, factory *secureconn.Factory,
 	if err != nil {
 		return nil, err
 	}
-	teamsClient := teams.NewTeamsClient(teamsConnection)
+	teamsClient := teams.NewTeamsServiceClient(teamsConnection)
 
 	return &userMgmtClient{
 		teamsClient:      teamsClient,

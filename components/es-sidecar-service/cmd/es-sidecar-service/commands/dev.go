@@ -114,7 +114,7 @@ var grpcVersionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := readRunParams()
 		conn := grpcConnect(cfg)
-		client := api.NewEsSidecarClient(conn)
+		client := api.NewEsSidecarServiceClient(conn)
 		res, err := client.Version(context.Background(), &empty.Empty{})
 		if err != nil {
 			panic(err)
@@ -139,7 +139,7 @@ var grpcPurgeDocumentsFromIndexCmd = &cobra.Command{
 		}
 		cfg := readRunParams()
 		conn := grpcConnect(cfg)
-		client := api.NewEsSidecarClient(conn)
+		client := api.NewEsSidecarServiceClient(conn)
 		req := api.PurgeRequest{
 			Id:                   "123",
 			Index:                args[0],
@@ -170,7 +170,7 @@ var grpcPurgeTimeSeriesIndexCmd = &cobra.Command{
 		}
 		cfg := readRunParams()
 		conn := grpcConnect(cfg)
-		client := api.NewEsSidecarClient(conn)
+		client := api.NewEsSidecarServiceClient(conn)
 		req := api.PurgeRequest{
 			Id:                   "123",
 			Index:                args[0],

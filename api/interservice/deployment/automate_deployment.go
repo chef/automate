@@ -12,21 +12,21 @@ import (
 
 // DeployClientStreamer is a DeploymentClient with some extra methods added
 type DeployClientStreamer interface {
-	DeploymentClient
+	DeploymentServiceClient
 	StreamDeployEvents(taskID string, deployID *DeploymentID, e DeployEventHandler) error
 	Close() error
 }
 
 type deployClientStreamer struct {
-	DeploymentClient
+	DeploymentServiceClient
 	grpcConnection *grpc.ClientConn
 }
 
 // NewDeployClientStreamer creates a DeployClientStreamer for the given
 // connection
 func NewDeployClientStreamer(cc *grpc.ClientConn) DeployClientStreamer {
-	dc := NewDeploymentClient(cc)
-	return &deployClientStreamer{DeploymentClient: dc, grpcConnection: cc}
+	dc := NewDeploymentServiceClient(cc)
+	return &deployClientStreamer{DeploymentServiceClient: dc, grpcConnection: cc}
 }
 
 // A DeployEventHandler accepts the events streamed from the deployment

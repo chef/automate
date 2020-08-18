@@ -22,18 +22,18 @@ func TestGenerateAdminToken(t *testing.T) {
 
 	// https://github.com/chef/automate/blob/master/components/automate-grpc/protoc-gen-grpc-mock/README.md
 	serviceCerts := helpers.LoadDevCerts(t, "authn-service")
-	mockAuthN := authn.NewTokensMgmtServerMock()
+	mockAuthN := authn.NewTokensMgmtServiceServerMock()
 	connFactory := secureconn.NewFactory(*serviceCerts)
 	g := connFactory.NewServer()
-	authn.RegisterTokensMgmtServer(g, mockAuthN)
+	authn.RegisterTokensMgmtServiceServer(g, mockAuthN)
 	authnServer := grpctest.NewServer(g)
 	defer authnServer.Close()
 
 	serviceCerts = helpers.LoadDevCerts(t, "authz-service")
-	mockPolicyServer := authz.NewPoliciesServerMock()
+	mockPolicyServer := authz.NewPoliciesServiceServerMock()
 	connFactory = secureconn.NewFactory(*serviceCerts)
 	g = connFactory.NewServer()
-	authz.RegisterPoliciesServer(g, mockPolicyServer)
+	authz.RegisterPoliciesServiceServer(g, mockPolicyServer)
 	authzServer := grpctest.NewServer(g)
 	defer authzServer.Close()
 

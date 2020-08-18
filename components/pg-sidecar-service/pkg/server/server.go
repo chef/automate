@@ -55,7 +55,7 @@ func StartGRPC(ctx context.Context, cfg *Config) error {
 		return err
 	}
 
-	api.RegisterPGSidecarServer(grpcServer, sidecarSvr)
+	api.RegisterPGSidecarServiceServer(grpcServer, sidecarSvr)
 	health.RegisterHealthServer(grpcServer, sidecarSvr.health)
 	reflection.Register(grpcServer)
 

@@ -28,7 +28,7 @@ func (s *server) InfrastructureNodeDelete(ctx context.Context,
 
 	defer ingestConnection.Close() // nolint: errcheck
 
-	ingestClient := ingest.NewChefIngesterClient(ingestConnection)
+	ingestClient := ingest.NewChefIngesterServiceClient(ingestConnection)
 	nodesRequest := &iReq.Delete{
 		NodeId: req.NodeId,
 	}

@@ -525,7 +525,7 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id,
 	return addProjectToStoreWithStatus(t, store, id, name, projType, storage.NoRules.String())
 }
 
-func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, cleanupFunc) {
+func setupProjects(t *testing.T) (api.ProjectsServiceClient, *cache.Cache, cleanupFunc) {
 	cl, ca, _, _, cleanup := setupProjectsAndRules(t)
 	return cl, ca, cleanup
 }
@@ -543,7 +543,7 @@ func (m *MockPurgeClient) PurgeProject(ctx context.Context, something string) er
 
 type cleanupFunc func()
 
-func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cache.Cache,
+func setupProjectsAndRules(t *testing.T) (api.ProjectsServiceClient, *cache.Cache, *cache.Cache,
 	int64, cleanupFunc) {
 	t.Helper()
 	ctx := context.Background()
@@ -577,7 +577,7 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
 		server.InputValidationInterceptor(),
 	))
-	api.RegisterProjectsServer(serv, projectsSrv)
+	api.RegisterProjectsServiceServer(serv, projectsSrv)
 
 	grpcServ := grpctest.NewServer(serv)
 
@@ -587,7 +587,7 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	}
 
 	manager.Start(ctx)
-	return api.NewProjectsClient(conn), memInstance.ProjectsCache(), memInstance.RulesCache(), seed,
+	return api.NewProjectsServiceClient(conn), memInstance.ProjectsCache(), memInstance.RulesCache(), seed,
 		func() {
 			manager.Stop()
 			pg.Close()

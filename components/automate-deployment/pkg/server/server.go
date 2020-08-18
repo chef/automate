@@ -63,11 +63,11 @@ import (
 )
 
 type server struct {
-	deployment           *deployment.Deployment      // set in NewDeployment, read for access to target and channel config
-	deploymentStore      persistence.DeploymentStore // A place to load the deployment from
-	serverConfig         *Config                     // set in StartServer, read for access in NewDeployment
-	convergeLoop         *Looper                     // set in StartServer,
-	lcClient             lc.LicenseControlClient     // set when cachedLCClient is called
+	deployment           *deployment.Deployment         // set in NewDeployment, read for access to target and channel config
+	deploymentStore      persistence.DeploymentStore    // A place to load the deployment from
+	serverConfig         *Config                        // set in StartServer, read for access in NewDeployment
+	convergeLoop         *Looper                        // set in StartServer,
+	lcClient             lc.LicenseControlServiceClient // set when cachedLCClient is called
 	umClient             usermgmt.UserMgmt
 	converger            converge.Converger
 	senderStore          eventSenderStore
@@ -911,7 +911,7 @@ func (s *server) Ping(context.Context, *api.PingRequest) (*api.PingResponse, err
 
 func (s *server) DeployStatus(
 	req *api.DeployStatusRequest,
-	stream api.Deployment_DeployStatusServer) error {
+	stream api.DeploymentService_DeployStatusServer) error {
 
 	if !s.HasConfiguredDeployment() {
 		return ErrorNotConfigured
@@ -932,7 +932,7 @@ func (s *server) DeployStatus(
 }
 
 func (s *server) SystemLogs(_ *api.SystemLogsRequest,
-	stream api.Deployment_SystemLogsServer) error {
+	stream api.DeploymentService_SystemLogsServer) error {
 	logrus.Debug("starting a system logs command")
 
 	cmd := exec.Command("journalctl", "-u", "chef-automate", "-f")
@@ -1065,8 +1065,8 @@ func StartServer(config *Config) error {
 	}
 
 	// register grpc services
-	api.RegisterDeploymentServer(grpcServer, server)
-	api.RegisterCertificateAuthorityServer(grpcServer, server)
+	api.RegisterDeploymentServiceServer(grpcServer, server)
+	api.RegisterCertificateAuthorityServiceServer(grpcServer, server)
 
 	reflection.Register(grpcServer)
 
@@ -1738,7 +1738,7 @@ func attemptToCreateInitialUser(ctx context.Context,
 	return nil
 }
 
-func (s *server) DumpDB(req *api.DumpDBRequest, stream api.Deployment_DumpDBServer) error {
+func (s *server) DumpDB(req *api.DumpDBRequest, stream api.DeploymentService_DumpDBServer) error {
 	var dbBuf bytes.Buffer
 
 	err := s.deploymentStore.WriteTo(&dbBuf)

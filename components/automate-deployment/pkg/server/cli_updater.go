@@ -47,7 +47,7 @@ func sha256sumExecutable(path string) error {
 	return nil
 }
 
-func (s *server) GetCLIExecutable(d *api.GetCLIExecutableRequest, stream api.Deployment_GetCLIExecutableServer) error {
+func (s *server) GetCLIExecutable(d *api.GetCLIExecutableRequest, stream api.DeploymentService_GetCLIExecutableServer) error {
 	if s.deployment == nil {
 		return ErrorNoDeployment
 	}

@@ -96,7 +96,7 @@ func serve(cmd *cobra.Command, args []string) {
 	if err != nil {
 		fail(errors.Wrapf(err, "failed to dial authz-service at (%s)", cfg.AuthzAddress))
 	}
-	authzClient := authz.NewAuthorizationClient(authzConn)
+	authzClient := authz.NewAuthorizationServiceClient(authzConn)
 
 	if cfg.SecretsAddress == "" {
 		fail(errors.New("missing required config secrets_address"))

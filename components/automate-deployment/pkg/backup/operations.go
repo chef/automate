@@ -898,7 +898,7 @@ func (esop *ElasticsearchOperation) Backup(backupCtx Context, _ ObjectManifest, 
 	}
 	defer conn.Close()
 
-	client := es_sidecar.NewEsSidecarClient(conn)
+	client := es_sidecar.NewEsSidecarServiceClient(conn)
 
 	_, err = client.CreateSnapshot(backupCtx.ctx, &es_sidecar.CreateSnapshotRequest{
 		ServiceName:             esop.ServiceName,
@@ -937,7 +937,7 @@ func (esop *ElasticsearchOperation) Restore(backupCtx Context, serviceName strin
 	}
 	defer conn.Close()
 
-	client := es_sidecar.NewEsSidecarClient(conn)
+	client := es_sidecar.NewEsSidecarServiceClient(conn)
 
 	_, err = client.RestoreSnapshot(backupCtx.ctx, &es_sidecar.RestoreSnapshotRequest{
 		ServiceName: esop.ServiceName,
@@ -978,7 +978,7 @@ func (esop *ElasticsearchOperation) Delete(backupCtx Context) error {
 	}
 	defer conn.Close()
 
-	client := es_sidecar.NewEsSidecarClient(conn)
+	client := es_sidecar.NewEsSidecarServiceClient(conn)
 	if _, err := client.DeleteSnapshot(backupCtx.ctx, &es_sidecar.DeleteSnapshotRequest{
 		ServiceName: esop.ServiceName,
 		BackupId:    backupID,

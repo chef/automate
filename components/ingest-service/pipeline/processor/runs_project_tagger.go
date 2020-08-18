@@ -17,7 +17,7 @@ import (
 const maxDropOnError = 128
 
 // BuildRunProjectTagger - Build a project tagger for CCRs
-func BuildRunProjectTagger(authzClient authz.ProjectsClient) message.ChefRunPipe {
+func BuildRunProjectTagger(authzClient authz.ProjectsServiceClient) message.ChefRunPipe {
 	return func(in <-chan message.ChefRun) <-chan message.ChefRun {
 		return runBundleProjectTagger(in, authzClient)
 	}
@@ -29,7 +29,7 @@ func BuildRunProjectTagger(authzClient authz.ProjectsClient) message.ChefRunPipe
 // these rules for all the messages that are currently in the queue. The 'bundleSize' is the number
 // of messages that can use the current project rules from authz.
 func runBundleProjectTagger(in <-chan message.ChefRun,
-	authzClient authz.ProjectsClient) <-chan message.ChefRun {
+	authzClient authz.ProjectsServiceClient) <-chan message.ChefRun {
 	out := make(chan message.ChefRun, 100)
 	go func() {
 		nextNumToDrop := 1
@@ -100,7 +100,7 @@ func findMatchingProjects(node backend.Node, projects map[string]*authz.ProjectR
 	return matchingProjects
 }
 
-func getProjectRulesFromAuthz(authzClient authz.ProjectsClient) (map[string]*authz.ProjectRules, error) {
+func getProjectRulesFromAuthz(authzClient authz.ProjectsServiceClient) (map[string]*authz.ProjectRules, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	projectsCollection, err := authzClient.ListRulesForAllProjects(ctx, &authz.ListRulesForAllProjectsReq{})

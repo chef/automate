@@ -31,7 +31,7 @@ func (s *server) NodeInventory(ctx context.Context,
 
 	defer configMgmtConnection.Close() // nolint: errcheck
 
-	configMgmtClient := service.NewCfgMgmtClient(configMgmtConnection)
+	configMgmtClient := service.NewCfgMgmtServiceClient(configMgmtConnection)
 
 	hourAgo, err := ptypes.TimestampProto(time.Now().Add(-time.Hour))
 	if err != nil {

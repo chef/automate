@@ -33,7 +33,7 @@ type policyServer struct {
 // PolicyServer is the server interface for policies: what we defined via
 // protobuf + the update interceptor
 type PolicyServer interface {
-	api.PoliciesServer
+	api.PoliciesServiceServer
 
 	EngineUpdateInterceptor() grpc.UnaryServerInterceptor
 }

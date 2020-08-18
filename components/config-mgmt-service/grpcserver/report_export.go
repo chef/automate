@@ -70,7 +70,7 @@ type displayReport struct {
 }
 
 // ReportExport streams a json or csv export
-func (s *CfgMgmtServer) ReportExport(request *pRequest.ReportExport, stream service.CfgMgmt_ReportExportServer) error {
+func (s *CfgMgmtServer) ReportExport(request *pRequest.ReportExport, stream service.CfgMgmtService_ReportExportServer) error {
 	exporter, err := getReportExportHandler(request.OutputType, stream)
 	if err != nil {
 		return err
@@ -85,7 +85,7 @@ func (s *CfgMgmtServer) ReportExport(request *pRequest.ReportExport, stream serv
 	return s.exportReports(ctx, request, exporter)
 }
 
-func getReportExportHandler(outputType string, stream service.CfgMgmt_ReportExportServer) (exportReportHandler, error) {
+func getReportExportHandler(outputType string, stream service.CfgMgmtService_ReportExportServer) (exportReportHandler, error) {
 	switch outputType {
 	case "", "json":
 		return jsonReportExport(stream), nil
@@ -164,7 +164,7 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 	return nil
 }
 
-func jsonReportExport(stream service.CfgMgmt_ReportExportServer) exportReportHandler {
+func jsonReportExport(stream service.CfgMgmtService_ReportExportServer) exportReportHandler {
 	return func(runs []backend.Run) error {
 		displayNodeCollection := reportCollectionToDisplayReportCollection(runs)
 
@@ -189,7 +189,7 @@ func jsonReportExport(stream service.CfgMgmt_ReportExportServer) exportReportHan
 	}
 }
 
-func csvReportExport(stream service.CfgMgmt_ReportExportServer) exportReportHandler {
+func csvReportExport(stream service.CfgMgmtService_ReportExportServer) exportReportHandler {
 	initialRun := true
 	return func(runs []backend.Run) error {
 		res, err := runsToCSV(runs)

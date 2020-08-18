@@ -167,7 +167,7 @@ func (svc *EventService) getClient(handlerType string) (EventHandlerClient, erro
 		if err != nil {
 			return nil, errors.Wrap(err, "dialing ingest-service handler client")
 		}
-		ingestClient := ingest.NewEventHandlerClient(conn)
+		ingestClient := ingest.NewEventHandlerServiceClient(conn)
 		if ingestClient == nil {
 			return nil, errors.New("invalid ingest-service event handler client")
 		}
@@ -177,7 +177,7 @@ func (svc *EventService) getClient(handlerType string) (EventHandlerClient, erro
 		if err != nil {
 			return nil, errors.Wrap(err, "dialing compliance-service handler client")
 		}
-		complianceIngesterClient := compliance_ingest.NewComplianceIngesterClient(conn)
+		complianceIngesterClient := compliance_ingest.NewComplianceIngesterServiceClient(conn)
 		if complianceIngesterClient == nil {
 			return nil, errors.New("invalid compliance-service event handler client")
 		}

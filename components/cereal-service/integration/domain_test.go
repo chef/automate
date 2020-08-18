@@ -33,7 +33,7 @@ func TestDomains(t *testing.T) {
 
 	grpcServer := grpc.NewServer()
 	svc := server.NewCerealService(ctx, pgBackend)
-	grpccereal.RegisterCerealServer(grpcServer, svc)
+	grpccereal.RegisterCerealServiceServer(grpcServer, svc)
 	g := grpctest.NewServer(grpcServer)
 	cereal.MaxWakeupInterval = 2 * time.Second
 	defer pgBackend.Close()

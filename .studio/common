@@ -134,7 +134,12 @@ function compile_client_mocks() {
       #
       # https://github.com/golang/mock/issues/156#issuecomment-586213812
       #
-      mockgen_debug -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service -self_package github.com/chef/automate/api/interservice/cfgmgmt/service github.com/chef/automate/api/interservice/cfgmgmt/service CfgMgmtClient,CfgMgmt_NodeExportClient,CfgMgmt_ReportExportClient,CfgMgmtServer,CfgMgmt_NodeExportServer,CfgMgmt_ReportExportServer
+      mockgen_debug -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go \
+        -package service \
+        -self_package \
+        github.com/chef/automate/api/interservice/cfgmgmt/service \
+        github.com/chef/automate/api/interservice/cfgmgmt/service \
+        CfgMgmtServiceClient,CfgMgmtService_NodeExportClient,CfgMgmtService_ReportExportClient,CfgMgmtServiceServer,CfgMgmtService_NodeExportServer,CfgMgmtService_ReportExportServer
       mockgen_debug -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/ingest
       mockgen_debug -source event_feed/event_feed.pb.go -destination event_feed/event_feed.pb.client_mock.go -package event_feed -self_package github.com/chef/automate/api/interservice/event_feed
       mockgen_debug -source nodemanager/manager/manager.pb.go -destination nodemanager/manager/manager.pb.client_mock.go -package manager -self_package github.com/chef/automate/api/interservice/nodemanager/manager
