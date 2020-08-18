@@ -612,7 +612,8 @@
         "uri": "http://example.com/docker-apt-remote/ubuntu"
       },
       "sensu": {
-        "apt_repo_url": "http://example.com/sensu-apt-remote/",
+        "apt_repo_url": "http://example.com/#{node['lsb']['codename']}/",
+        "apt_key_url": "http://example.com/gpg.key",
         "client": {
           "pager_team": "acc"
         },

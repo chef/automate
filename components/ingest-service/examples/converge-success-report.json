@@ -762,7 +762,7 @@
     "override": {
       "opscode-ci": {
         "artifactory": {
-          "endpoint": "http://artifactory.chef.co:8081"
+          "endpoint": "http://artifactory.chef.co"
         },
         "omnitruck": {
           "packages_bucket": "opscode-omnibus-packages",
