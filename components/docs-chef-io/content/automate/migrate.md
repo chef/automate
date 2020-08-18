@@ -12,7 +12,8 @@ draft = false
 
 [\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/migrate.md)
 
-Chef Automate versions 1.0.0-1.8.96 reached end-of-life on December 31, 2019 and are no longer supported. For more information and for help upgrading your system, please contact your Chef account representative.
+Chef Automate versions 1.0.0-1.8.96 reached end-of-life on December 31, 2019 and are no longer supported.
+For more information and for help upgrading your system, please contact your Chef account representative.
 The current Chef Automate versions includes significant architectural and technical improvements to the core product platform.
 This guide shows you how to migrate your existing Chef Automate installation to the current Chef Automate.
 
@@ -24,7 +25,7 @@ The Chef Automate migration process performs the following steps, in order:
 
 1. Runs preflight checks to ensure the system is suitable for Chef Automate 2, your Chef Automate 1 installation can be migrated safely, and that the upgrade process will be able to migrate your data.
 1. Analyzes your Chef Automate 1 configuration files and migrates the relevant settings to a configuration file for Chef Automate 2. If incompatibilities are detected, the migration process fails and emits a description of the problem. You will have an opportunity to make any necessary changes to the generated Chef Automate 2 configuration.
-1. Downloads Automate 2. Chef Automate 2 is distributed via [Habitat](https://www.habitat.sh/) packages that are installed early in the process to minimize the downtime required for the migration.
+1. Downloads Chef Automate 2. Chef Automate 2 is distributed via [Habitat](https://www.habitat.sh/) packages that are installed early in the process to minimize the downtime required for the migration.
 1. Puts your Chef Automate 1 installation into maintenance mode, waits for queued data to be processed, and then backs up all Chef Automate 1 data. This ensures that data will not be lost in the migration process and that you will be able to recover to a working state should an unforeseen error occur.
 1. Creates a local snapshot of Chef Automate 1 data for import into Chef Automate 2.
 1. Shuts down Chef Automate 1.
@@ -65,7 +66,9 @@ You will need the `chef-automate` command line tool to initiate your upgrade.
 
 ### Internet Access
 
-The Chef Automate upgrade process currently requires connectivity to the internet to install the Chef Automate 2 binaries. The standard Automate installation requires current versions for Chrome, Edge, or Firefox browsers. If you filter internet access via proxy or by other means, you must ensure the following domains are accessible:
+The Chef Automate upgrade process requires connectivity to the internet to install the Chef Automate 2 binaries.
+The standard Chef Automate installation requires current versions for Chrome, Edge, or Firefox browsers.
+If you filter internet access via proxy or by other means, you must ensure the following domains are accessible:
 
 * `packages.chef.io`
 * `licensing.chef.io`
@@ -88,11 +91,11 @@ If you use a proxy to manage outbound HTTP(S) connections, ensure these variable
 
 ### Chef Automate 1 Version
 
-Recent versions of Chef Automate 1 contain enhancements that the migration process relies upon to ensure your data is safely migrated. Currently, Chef Automate 1.8.38 or greater is required.
+Recent versions of Chef Automate 1 contain enhancements that the migration process relies upon to ensure your data is safely migrated. Chef Automate 1.8.38 or greater is required.
 
 ### Systemd
 
-Chef Automate 2 requires the systemd init system. If you're currently using Chef Automate 1 on an operating system that makes use of a different init system, we recommend consulting Customer Support for the appropriate migration strategy.
+Chef Automate 2 requires the systemd init system. If you're using Chef Automate 1 on an operating system that makes use of a different init system, we recommend consulting Customer Support for the appropriate migration strategy.
 
 ## Considerations
 
@@ -100,11 +103,14 @@ While we've taken care to make the migration process as smooth as possible, this
 
 ### Plan for Downtime
 
-The Chef Automate 2 migration process puts your Chef Automate 1 installation into maintenance mode, shuts it down, and starts Chef Automate 2. During the downtime, the migration process takes a backup of your Chef Automate 1 data and exports some of its data to a local snapshot, which is imported into Chef Automate 2.
+The Chef Automate 2 migration process puts your Chef Automate 1 installation into maintenance mode, shuts it down, and starts Chef Automate 2.
+During the downtime, the migration process takes a backup of your Chef Automate 1 data and exports some of its data to a local snapshot, which is imported into Chef Automate 2.
 
-To minimize this downtime, we recommended that you create an online backup of Chef Automate 1 just prior to the upgrade. Historical information such as Chef Infra Client run data and compliance scan data is backed up incrementally, which means that the upgrade only needs to transfer data that has been added since the last backup.
+To minimize this downtime, we recommended that you create an online backup of Chef Automate 1 just prior to the upgrade.
+Historical information such as Chef Infra Client run data and compliance scan data is backed up incrementally, which means that the upgrade only needs to transfer data that has been added since the last backup.
 
-By default, the Chef Automate 2 upgrade process will not proceed if your Chef Automate 1 installation does not have backups configured. Invoke the migration using the `--skip-backup-check` flag to avoid this check.
+By default, the Chef Automate 2 upgrade process will not proceed if your Chef Automate 1 installation does not have backups configured.
+Invoke the migration using the `--skip-backup-check` flag to avoid this check.
 
 To configure Chef Automate 1 backups, see the [Chef Automate 1 Documentation](https://docs.chef.io/delivery_server_backup/).
 
@@ -113,13 +119,13 @@ To configure Chef Automate 1 backups, see the [Chef Automate 1 Documentation](ht
 Chef Automate 2 includes significant architectural and technical improvements to the core product platform.
 If you rely on any of the capabilities listed below, we recommend you continue to using your existing Chef Automate installation.
 
-* **Chef Manage:** Chef Automate 2, unlike Automate 1, cannot serve as a SAML auth proxy
-* **FIPS:** Chef Automate 2 cannot currently operate in FIPS mode
-* **Disaster Recovery:** Chef Automate 2 cannot currently operate in a primary/standby mode
+* **Chef Manage:** Chef Automate 2, unlike Chef Automate 1, cannot serve as a SAML auth proxy
+* **FIPS:** Chef Automate 2 cannot operate in FIPS mode
+* **Disaster Recovery:** Chef Automate 2 cannot operate in a primary/standby mode
 * **Custom Kibana dashboards:** Chef Automate 2 does not include Kibana in its technology stack
 * **SAML config migration:** Chef Automate 2 supports SAML integration, however due to configuration incompatibilities Chef Automate 2 cannot migrate Chef Automate 1 SAML settings to Chef Automate 2 as part of the upgrade. After the upgrade is completed, you may follow [these configuration instructions]({{< relref "configuration.md#saml" >}}) to set up SAML.
 
-Should you wish to migrate to Chef Automate 2 without these features, invoke the migration with the appropriate flags:
+To migrate to Chef Automate 2 without these features, invoke the migration with the appropriate flags:
 
 * `--skip-fips-check`
 * `--skip-disaster-recovery-check`
@@ -144,13 +150,15 @@ If you use dedicated disks or partitions for either of these applications in Che
 
 ### Workflow
 
-Follow the instructions in [Upgrade Workflow]{{< relref "workflow_install.md" >}}
+Follow the instructions in [Upgrade Workflow]({{< relref "workflow_install.md" >}}).
 The migration process will stop if it detects that you used the Workflow component of Chef Automate 1.
-To use Workflow with Chef Automate 2 specify the `--enable-workflow` option to enable the Workflow component. You can enable the Workflow component after upgrading with `chef-automate deploy --enable-workflow`.
+To use Workflow with Chef Automate 2, specify the `--enable-workflow` option to enable the Workflow component.
+You can enable the Workflow component after upgrading with `chef-automate deploy --enable-workflow`.
 
 ### Chef Automate 2 License
 
-Login to Chef Automate to start a trial. The trial provides you with a 60-day license.
+Login to Chef Automate to start a trial.
+The trial provides you with a 60-day license.
 Requesting a trial license requires internet connectivity in your Chef Automate 2 instance (only at the time of the license request).
 
 If you are migrating an [airgapped Chef Automate installation](https://docs.chef.io/install_chef_air_gap/#chef-automate),
@@ -164,8 +172,7 @@ contact your Chef account representative for a Chef Automate 2 license.
     automate-ctl create-backup
     ```
 
-2. Once the backup has completed, initiate the migration process. If your host is internet-connected,
-   run the command:
+1. Once the backup has completed, initiate the migration process. If your host is internet-connected, run the command:
 
     ```shell
     ./chef-automate migrate-from-v1 --channel current
@@ -185,4 +192,6 @@ If you've been using LDAP for authenticating users, that configuration will have
 Historical data will be migrated in the background.
 
 ### Upgrades
-Chef Automate 2 handles upgrades differently than Chef Automate 1 did. The [Installation]({{< relref "install.md#upgrade" >}}) documentation and [Airgapped Installation]({{< relref "airgapped_installation.md#upgrade" >}}) documentation provide further detail.
+
+Chef Automate 2 handles upgrades differently than Chef Automate 1 did.
+The [Installation]({{< relref "install.md#upgrade" >}}) documentation and [Airgapped Installation]({{< relref "airgapped_installation.md#upgrade" >}}) documentation provide further detail.
