@@ -2,29 +2,33 @@
 # Protocol Buffers Linter Configuration
 ################################################################################
 #
+# This file configures the `buf` tool, you run buf's linter as `buf check lint`, or
+# use `lint_all_protobuf_components` in the habitat studio.
+#
 # ## References:
-# - This configures the `buf` tool, you run the linter as `buf check lint`
+# 
 # - Style Guide: https://buf.build/docs/style-guide/
 # - Docs for individual checkers: https://buf.build/docs/lint-checkers
 # - Config docs: https://buf.build/docs/lint-configuration
 #
-# ## Rationale
+# ## Rationale For Exceptions
 #
 # We've adopted linting for protobufs for the same reason we have it for other
 # kinds of code: avoid dangerous legal constructions, encourage consistent
 # style, etc.
 #
 # This linter was adopted only after Automate was a mature product with
-# compatibility constraints. This project uses protocol buffers to generate the
-# external REST API along with gRPC client and server code. Thus, some portions
-# of the protocol buffer codebase are constrained to remain compatible:
+# compatibility constraints. Automate uses protocol buffers to generate the
+# external REST API along with gRPC client and server code, the configuration
+# data structures exposed to end users, &etc. Thus, some portions of the
+# protocol buffer codebase are constrained to remain compatible:
 # - At the protobuf message level
 # - At the JSON representation level
 # - At the JSON generation/consumption level (e.g., golang struct tags)
 # - At the generated code level
 # To maintain compatibility at all of these layers, we must keep some of the
-# protobuf code in violation of the style guide. This applies broadly to all of
-# the pre-existing code in api/external, some API code in
+# protobuf code as-is, in violation of the style guide. This applies broadly to
+# all of the pre-existing code in api/external, some API code in
 # components/automate-gateway, the configuration protobufs, and a handful of
 # special cases. Unless noted otherwise, the style guide exceptions configured
 # here are intended only to cover older code. Follow the style guide whenever
