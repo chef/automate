@@ -911,7 +911,7 @@ func (s *server) Ping(context.Context, *api.PingRequest) (*api.PingResponse, err
 
 func (s *server) DeployStatus(
 	req *api.DeployStatusRequest,
-	stream api.DeploymentService_DeployStatusServer) error {
+	stream api.Deployment_DeployStatusServer) error {
 
 	if !s.HasConfiguredDeployment() {
 		return ErrorNotConfigured
@@ -932,7 +932,7 @@ func (s *server) DeployStatus(
 }
 
 func (s *server) SystemLogs(_ *api.SystemLogsRequest,
-	stream api.DeploymentService_SystemLogsServer) error {
+	stream api.Deployment_SystemLogsServer) error {
 	logrus.Debug("starting a system logs command")
 
 	cmd := exec.Command("journalctl", "-u", "chef-automate", "-f")
@@ -1065,7 +1065,7 @@ func StartServer(config *Config) error {
 	}
 
 	// register grpc services
-	api.RegisterDeploymentServiceServer(grpcServer, server)
+	api.RegisterDeploymentServer(grpcServer, server)
 	api.RegisterCertificateAuthorityServiceServer(grpcServer, server)
 
 	reflection.Register(grpcServer)
@@ -1738,7 +1738,7 @@ func attemptToCreateInitialUser(ctx context.Context,
 	return nil
 }
 
-func (s *server) DumpDB(req *api.DumpDBRequest, stream api.DeploymentService_DumpDBServer) error {
+func (s *server) DumpDB(req *api.DumpDBRequest, stream api.Deployment_DumpDBServer) error {
 	var dbBuf bytes.Buffer
 
 	err := s.deploymentStore.WriteTo(&dbBuf)

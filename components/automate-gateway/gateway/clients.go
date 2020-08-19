@@ -115,7 +115,7 @@ type ClientsFactory interface {
 	ComplianceVersionServiceClient() (cc_version.VersionServiceClient, error)
 	NodeManagerClient() (manager.NodeManagerServiceClient, error)
 	LicenseControlClient() (license_control.LicenseControlServiceClient, error)
-	DeploymentServiceClient() (deployment.DeploymentServiceClient, error)
+	DeploymentServiceClient() (deployment.DeploymentClient, error)
 	DatafeedClient() (data_feed.DatafeedServiceClient, error)
 	PurgeClient(service string) (data_lifecycle.PurgeServiceClient, error)
 	InfraProxyClient() (infra_proxy.InfraProxyServiceClient, error)
@@ -415,12 +415,12 @@ func (c *clientsFactory) LicenseControlClient() (license_control.LicenseControlS
 	return license_control.NewLicenseControlServiceClient(conn), nil
 }
 
-func (c *clientsFactory) DeploymentServiceClient() (deployment.DeploymentServiceClient, error) {
+func (c *clientsFactory) DeploymentServiceClient() (deployment.DeploymentClient, error) {
 	conn, err := c.connectionByName("deployment-service")
 	if err != nil {
 		return nil, err
 	}
-	return deployment.NewDeploymentServiceClient(conn), nil
+	return deployment.NewDeploymentClient(conn), nil
 }
 
 func (c *clientsFactory) DatafeedClient() (data_feed.DatafeedServiceClient, error) {

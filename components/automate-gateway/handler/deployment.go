@@ -10,10 +10,10 @@ import (
 )
 
 type DeploymentServer struct {
-	deploymentClient api.DeploymentServiceClient
+	deploymentClient api.DeploymentClient
 }
 
-func NewDeploymentServer(dc api.DeploymentServiceClient) *DeploymentServer {
+func NewDeploymentServer(dc api.DeploymentClient) *DeploymentServer {
 	return &DeploymentServer{
 		deploymentClient: dc,
 	}

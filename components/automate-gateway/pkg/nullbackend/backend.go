@@ -49,7 +49,7 @@ func NewServer() *grpc.Server {
 	cfgmgmt.RegisterCfgMgmtServiceServer(s, &cfgmgmt.UnimplementedCfgMgmtServiceServer{})
 	data_feed.RegisterDatafeedServiceServer(s, &data_feed.UnimplementedDatafeedServiceServer{})
 	data_lifecycle.RegisterPurgeServiceServer(s, &data_lifecycle.UnimplementedPurgeServiceServer{})
-	deployment.RegisterDeploymentServiceServer(s, &deployment.UnimplementedDeploymentServiceServer{})
+	deployment.RegisterDeploymentServer(s, &deployment.UnimplementedDeploymentServer{})
 	event_feed.RegisterEventFeedServiceServer(s, &event_feed.UnimplementedEventFeedServiceServer{})
 	ingest.RegisterEventHandlerServiceServer(s, &ingest.UnimplementedEventHandlerServiceServer{})
 	ingest.RegisterChefIngesterServiceServer(s, &ingest.UnimplementedChefIngesterServiceServer{})

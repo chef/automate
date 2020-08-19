@@ -11,12 +11,12 @@ import (
 )
 
 type deploymentService struct {
-	cliUpdaterClient api.DeploymentServiceClient
+	cliUpdaterClient api.DeploymentClient
 }
 
 // DeploymentService returns an UpdateSource that knows how to fetch the desired version
 // and executable binary from the deployment-service
-func DeploymentService(cliUpdaterClient api.DeploymentServiceClient) UpdateSource {
+func DeploymentService(cliUpdaterClient api.DeploymentClient) UpdateSource {
 	return &deploymentService{
 		cliUpdaterClient: cliUpdaterClient,
 	}

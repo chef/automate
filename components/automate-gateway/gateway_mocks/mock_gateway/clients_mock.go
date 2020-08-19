@@ -433,10 +433,10 @@ func (mr *MockClientsFactoryMockRecorder) LicenseControlClient() *gomock.Call {
 }
 
 // DeploymentServiceClient mocks base method
-func (m *MockClientsFactory) DeploymentServiceClient() (deployment.DeploymentServiceClient, error) {
+func (m *MockClientsFactory) DeploymentServiceClient() (deployment.DeploymentClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeploymentServiceClient")
-	ret0, _ := ret[0].(deployment.DeploymentServiceClient)
+	ret0, _ := ret[0].(deployment.DeploymentClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

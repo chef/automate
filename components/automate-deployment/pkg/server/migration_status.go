@@ -25,7 +25,7 @@ const a1MigrationStatusTimeout = 10 * time.Second
 // migration status.
 const a1MigrationStatusPollInterval = 2 * time.Second
 
-func (s *server) A1UpgradeStatus(_ *api.A1UpgradeStatusRequest, stream api.DeploymentService_A1UpgradeStatusServer) error {
+func (s *server) A1UpgradeStatus(_ *api.A1UpgradeStatusRequest, stream api.Deployment_A1UpgradeStatusServer) error {
 	ingestConn, err := s.connFactory.Dial("ingest-service", s.AddressForService("ingest-service"), grpc.WithBlock())
 	if err != nil {
 		return status.Errorf(codes.Unavailable, "unable to initialize connection to ingest-service: %s", err.Error())

@@ -63,7 +63,7 @@ type VerificationTestContext interface {
 type testContext struct {
 	save
 	lbURL      url.URL
-	dsClient   api.DeploymentServiceClient
+	dsClient   api.DeploymentClient
 	httpClient *http.Client
 	version    string
 }
@@ -102,12 +102,12 @@ func WithLBURL(url url.URL) TestContextOpt {
 }
 
 // NewTestContext creates a test context with the given DeploymentClient
-func NewTestContext(dsClient api.DeploymentServiceClient, opts ...TestContextOpt) TestContext {
+func NewTestContext(dsClient api.DeploymentClient, opts ...TestContextOpt) TestContext {
 	return create(dsClient, save{Components: make(map[string]interface{})}, opts...)
 }
 
 // LoadTestContext loads a saved TestContext
-func LoadTestContext(dsClient api.DeploymentServiceClient, reader io.Reader, opts ...TestContextOpt) (TestContext, error) {
+func LoadTestContext(dsClient api.DeploymentClient, reader io.Reader, opts ...TestContextOpt) (TestContext, error) {
 	decoder := json.NewDecoder(reader)
 	save := save{}
 	err := decoder.Decode(&save)
@@ -118,7 +118,7 @@ func LoadTestContext(dsClient api.DeploymentServiceClient, reader io.Reader, opt
 	return create(dsClient, save, opts...), nil
 }
 
-func create(dsClient api.DeploymentServiceClient, save save, opts ...TestContextOpt) *testContext {
+func create(dsClient api.DeploymentClient, save save, opts ...TestContextOpt) *testContext {
 	tr := httputils.NewDefaultTransport()
 	tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	httpClient := &http.Client{Transport: tr}

@@ -66,6 +66,10 @@ lint:
     - ENUM_ZERO_VALUE_SUFFIX
   ignore_only:
     SERVICE_SUFFIX:
+      # The automate-cli accesses the `Deployment` service directly; making
+      # changes to it makes the CLI unable to install older versions of
+      # Automate, which is breaking.
+      - interservice/deployment/automate_deployment.proto
       # /api/
       - external/cds/cds.proto
       - external/cfgmgmt/cfgmgmt.proto

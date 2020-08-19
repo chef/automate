@@ -194,7 +194,7 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 
 func (s *server) GatherLogsDownload(
 	req *api.GatherLogsDownloadRequest,
-	stream api.DeploymentService_GatherLogsDownloadServer,
+	stream api.Deployment_GatherLogsDownloadServer,
 ) error {
 	bundlePath := path.Join(stagingDir(s.serverConfig), req.BundleName)
 
