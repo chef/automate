@@ -33,7 +33,7 @@ import (
 type Suite struct {
 	feedClient  *server.EventFeedServer
 	feedBackend persistence.FeedStore
-	purgeClient data_lifecycle.PurgeServiceClient
+	purgeClient data_lifecycle.PurgeClient
 	esClient    *olivere.Client
 	indices     []string
 	types       []string
@@ -81,7 +81,7 @@ func NewSuite(url string) (*Suite, error) {
 	}
 
 	s.feedClient = server.New(s.feedBackend)
-	s.purgeClient = data_lifecycle.NewPurgeServiceClient(conn)
+	s.purgeClient = data_lifecycle.NewPurgeClient(conn)
 	s.cleanup = conn.Close
 
 	return s, nil

@@ -242,7 +242,7 @@ func Spawn(opts *serveropts.Opts) error {
 		return err
 	}
 
-	data_lifecycle.RegisterPurgeServiceServer(grpcServer, purgeServer)
+	data_lifecycle.RegisterPurgeServer(grpcServer, purgeServer)
 
 	projectUpdateManager, err := createProjectUpdateCerealManager(opts.ConnFactory, opts.CerealAddress)
 	if err != nil {

@@ -221,7 +221,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		if err != nil {
 			logrus.Fatalf("serveGrpc aborting, can't setup purge server: %s", err)
 		}
-		data_lifecycle.RegisterPurgeServiceServer(s, purgeServer)
+		data_lifecycle.RegisterPurgeServer(s, purgeServer)
 	}
 
 	// Register reflection service on gRPC server.

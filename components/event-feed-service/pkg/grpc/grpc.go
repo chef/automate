@@ -147,7 +147,7 @@ func newGRPCServer(
 
 	health.RegisterHealthServer(grpcServer, eventFeedServer.Health())
 
-	data_lifecycle.RegisterPurgeServiceServer(grpcServer, purgeServer)
+	data_lifecycle.RegisterPurgeServer(grpcServer, purgeServer)
 
 	event_feed.RegisterEventFeedServiceServer(grpcServer, eventFeedServer)
 

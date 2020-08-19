@@ -16,7 +16,7 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 )
 
-var _ (data_lifecycle.PurgeServiceServer) = (*Server)(nil)
+var _ (data_lifecycle.PurgeServer) = (*Server)(nil)
 
 // Server is the purge server implementation
 type Server struct {

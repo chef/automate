@@ -48,7 +48,7 @@ func NewServer() *grpc.Server {
 	cc_version.RegisterVersionServiceServer(s, &cc_version.UnimplementedVersionServiceServer{})
 	cfgmgmt.RegisterCfgMgmtServiceServer(s, &cfgmgmt.UnimplementedCfgMgmtServiceServer{})
 	data_feed.RegisterDatafeedServiceServer(s, &data_feed.UnimplementedDatafeedServiceServer{})
-	data_lifecycle.RegisterPurgeServiceServer(s, &data_lifecycle.UnimplementedPurgeServiceServer{})
+	data_lifecycle.RegisterPurgeServer(s, &data_lifecycle.UnimplementedPurgeServer{})
 	deployment.RegisterDeploymentServer(s, &deployment.UnimplementedDeploymentServer{})
 	event_feed.RegisterEventFeedServiceServer(s, &event_feed.UnimplementedEventFeedServiceServer{})
 	ingest.RegisterEventHandlerServiceServer(s, &ingest.UnimplementedEventHandlerServiceServer{})

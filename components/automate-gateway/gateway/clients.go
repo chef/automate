@@ -117,7 +117,7 @@ type ClientsFactory interface {
 	LicenseControlClient() (license_control.LicenseControlServiceClient, error)
 	DeploymentServiceClient() (deployment.DeploymentClient, error)
 	DatafeedClient() (data_feed.DatafeedServiceClient, error)
-	PurgeClient(service string) (data_lifecycle.PurgeServiceClient, error)
+	PurgeClient(service string) (data_lifecycle.PurgeClient, error)
 	InfraProxyClient() (infra_proxy.InfraProxyServiceClient, error)
 	CdsClient() (cds.AutomateCdsServiceClient, error)
 	Close() error
@@ -432,12 +432,12 @@ func (c *clientsFactory) DatafeedClient() (data_feed.DatafeedServiceClient, erro
 }
 
 // PurgeClient takes a service name and returns a Purge client for the service
-func (c *clientsFactory) PurgeClient(service string) (data_lifecycle.PurgeServiceClient, error) {
+func (c *clientsFactory) PurgeClient(service string) (data_lifecycle.PurgeClient, error) {
 	conn, err := c.connectionByName(service)
 	if err != nil {
 		return nil, err
 	}
-	return data_lifecycle.NewPurgeServiceClient(conn), nil
+	return data_lifecycle.NewPurgeClient(conn), nil
 }
 
 func (c *clientsFactory) InfraProxyClient() (infra_proxy.InfraProxyServiceClient, error) {

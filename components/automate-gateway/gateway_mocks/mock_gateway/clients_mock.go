@@ -463,10 +463,10 @@ func (mr *MockClientsFactoryMockRecorder) DatafeedClient() *gomock.Call {
 }
 
 // PurgeClient mocks base method
-func (m *MockClientsFactory) PurgeClient(service string) (data_lifecycle.PurgeServiceClient, error) {
+func (m *MockClientsFactory) PurgeClient(service string) (data_lifecycle.PurgeClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PurgeClient", service)
-	ret0, _ := ret[0].(data_lifecycle.PurgeServiceClient)
+	ret0, _ := ret[0].(data_lifecycle.PurgeClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

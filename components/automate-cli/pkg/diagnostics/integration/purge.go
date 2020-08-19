@@ -292,7 +292,7 @@ func IngestPurgeDiagnostic() diagnostics.Diagnostic {
 	}
 }
 
-func newPurgeClientFor(service string) (data_lifecycle.PurgeServiceClient, func() error, error) {
+func newPurgeClientFor(service string) (data_lifecycle.PurgeClient, func() error, error) {
 	var cleanup func() error
 
 	certs, err := client.LoadLocalCerts()
@@ -326,7 +326,7 @@ func newPurgeClientFor(service string) (data_lifecycle.PurgeServiceClient, func(
 		return nil, cleanup, errors.Wrap(err, "failed to dial service")
 	}
 
-	return data_lifecycle.NewPurgeServiceClient(con), con.Close, nil
+	return data_lifecycle.NewPurgeClient(con), con.Close, nil
 }
 
 func init() {

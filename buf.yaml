@@ -74,6 +74,10 @@ lint:
       # changes to it makes the CLI unable to install older versions of
       # Automate, which is breaking.
       - interservice/deployment/automate_deployment.proto
+      # The automate-cli diagnostics accesses the `Purge` service directly; making
+      # changes to it makes upgrade tests fail. This is less breaking, but hard
+      # to change.
+      - interservice/data_lifecycle/purge.proto
       # /api/
       - external/cds/cds.proto
       - external/cfgmgmt/cfgmgmt.proto
