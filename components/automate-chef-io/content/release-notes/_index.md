@@ -4,6 +4,8 @@ redirect_url = "https://docs.chef.io/release_notes_automate/"
 layout = "redirect"
 +++
 
-This page is meant to be empty. The release notes are dynamically loaded via the Javascript references in the 'release-notes' layout.
+The Automate documentation has been moved to [`components/docs-chef-io`](https://github.com/chef/automate/blob/master/components/docs-chef-io/).
 
-Adding some frivolous content so this package is rebuilt on 2019-06-07.
+The Automate release notes are now maintained in `chef/chef-web-docs`.
+
+This page is now located in [https://github.com/chef/chef-web-docs/blob/master/content/release_notes_automate.md](https://github.com/chef/chef-web-docs/blob/master/content/release_notes_automate.md).
