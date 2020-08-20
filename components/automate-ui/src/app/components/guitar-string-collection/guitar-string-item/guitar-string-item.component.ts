@@ -1,5 +1,6 @@
 import { Component, Input, OnInit,
   OnChanges, SimpleChange } from '@angular/core';
+import { EventHelper } from 'app/helpers/event-feed/event-helper';
 
 @Component({
   selector: '[chef-guitar-string-item]',
@@ -27,26 +28,7 @@ export class GuitarStringItemComponent implements OnInit, OnChanges  {
   }
 
   getEventIcon(): string {
-    switch (this.eventType) {
-      case 'policy': return 'add_to_photos';
-      case 'user': return 'person';
-      case 'group': return 'people';
-      case 'permission': return 'lock_open';
-      case 'organization': return 'layers';
-      case 'node': return 'storage';
-      case 'cookbook': return 'chrome_reader_mode';
-      case 'version': return 'chrome_reader_mode';
-      case 'cookbook_artifact_version': return 'chrome_reader_mode';
-      case 'item': return 'business_center';
-      case 'bag': return 'business_center';
-      case 'environment': return 'public';
-      case 'role': return 'book';
-      case 'profile': return 'library_books';
-      case 'scanjobs': return 'wifi_tethering';
-      case 'client': return 'assignment_ind';
-      case 'multiple': return 'more_horiz';
-      default: return 'help';
-    }
+    return EventHelper.getEventIcon(this.eventType);
   }
 
   isUpdate(): boolean {

@@ -399,6 +399,7 @@ paths = [
   "components/automate-grpc/*",
   "components/compliance-service/*",
   "components/config-mgmt-service/*",
+  "components/event-service/*",
   "components/ingest-service/*",
   "components/notifications-client/*",
   "components/trial-license-service/*",

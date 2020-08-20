@@ -1,11 +1,12 @@
 import { Component, Input, ViewChild, ElementRef, OnDestroy, OnInit } from '@angular/core';
-import { capitalize, getOr, endsWith, replace, concat } from 'lodash/fp';
+import { capitalize, concat } from 'lodash/fp';
 import { Subject, Observable } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { ChefEvent, ChefEventCollection, EventFeedFilter, Chicklet } from '../../types/types';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
 import * as moment from 'moment/moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
+import { EventHelper } from 'app/helpers/event-feed/event-helper';
 
 const ENTITY_TYPE_TAG = 'event-type';
 @Component({
@@ -105,31 +106,7 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
   }
 
   getEventTypeLabel(event: ChefEvent): string {
-    const labelMap = {
-      version: 'cookbook',
-      cookbook_artifact_version: 'cookbook',
-      item: 'data bag item',
-      bag: 'data bag',
-      scanjobs: 'scan job'
-    };
-    const label = getOr(event.eventType, event.eventType, labelMap);
-
-    if (this.isGroup(event)) {
-      return this.pluralize(label);
-    }
-
-    return label;
-  }
-
-  pluralize(str) {
-    if (str === 'key') {
-      return 'keys';
-    }
-    if (endsWith('y', str)) {
-      return replace(/y$/, 'ies', str);
-    }
-
-    return str + 's';
+    return EventHelper.getEventTypeLabel(event.eventType, this.isGroup(event));
   }
 
   getFormattedEventType(event: ChefEvent): string {

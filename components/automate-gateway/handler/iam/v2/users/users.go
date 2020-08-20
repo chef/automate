@@ -3,20 +3,28 @@ package users
 import (
 	"context"
 
+	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/local_user"
 	pb_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
 	pb_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 	pb_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
+	event "github.com/chef/automate/components/event-service/config"
+	"github.com/gofrs/uuid"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/sirupsen/logrus"
 )
 
 // Server is the server interface
 type Server struct {
-	users local_user.UsersMgmtClient
+	users           local_user.UsersMgmtClient
+	eventFeedClient event_feed.EventFeedServiceClient
 }
 
 // NewServer creates a server with its client.
-func NewServer(users local_user.UsersMgmtClient) *Server {
-	return &Server{users: users}
+func NewServer(users local_user.UsersMgmtClient,
+	eventFeedClient event_feed.EventFeedServiceClient) *Server {
+	return &Server{users: users, eventFeedClient: eventFeedClient}
 }
 
 // CreateUser creates a new user.
@@ -37,6 +45,11 @@ func (p *Server) CreateUser(
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	_, err = p.eventFeedClient.HandleEvent(ctx, createUserCreateEvent(resp))
+	if err != nil {
+		logrus.Errorf("Problem sending event %v", err.Error())
 	}
 
 	// See note above -- the reverse mapping applies.
@@ -63,6 +76,12 @@ func (p *Server) DeleteUser(
 	if err != nil {
 		return nil, err
 	}
+
+	_, err = p.eventFeedClient.HandleEvent(ctx, createUserDeleteEvent(req))
+	if err != nil {
+		logrus.Errorf("Problem sending event %v", err.Error())
+	}
+
 	return &pb_resp.DeleteUserResp{}, nil
 }
 
@@ -87,6 +106,11 @@ func (p *Server) UpdateUser(
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	_, err = p.eventFeedClient.HandleEvent(ctx, createUserUpdateEvent(resp))
+	if err != nil {
+		logrus.Errorf("Problem sending event %v", err.Error())
 	}
 
 	return &pb_resp.UpdateUserResp{User: convert(resp)}, nil
@@ -114,6 +138,48 @@ func (p *Server) UpdateSelf(
 			MembershipId: resp.Id,
 		},
 	}, nil
+}
+
+func createUserUpdateEvent(user *local_user.User) *automate_event.EventMsg {
+	return createUserEvent(user.Id, user.Name, "update")
+}
+
+func createUserCreateEvent(user *local_user.User) *automate_event.EventMsg {
+	return createUserEvent(user.Id, user.Name, "create")
+}
+
+func createUserDeleteEvent(req *pb_req.DeleteUserReq) *automate_event.EventMsg {
+	return createUserEvent(req.Id, req.Id, "delete")
+}
+
+func createUserEvent(userID, userDisplayName, verb string) *automate_event.EventMsg {
+	entityType := "local_user"
+	return &automate_event.EventMsg{
+		EventID: uuid.Must(uuid.NewV4()).String(),
+		Type:    &automate_event.EventType{Name: event.EventFeedEventName},
+		Producer: &automate_event.Producer{
+			ID:           entityType,
+			ProducerName: entityType,
+			ProducerType: "automate",
+		},
+		Published: ptypes.TimestampNow(),
+		Actor: &automate_event.Actor{
+			ID:          "",
+			ObjectType:  "User",
+			DisplayName: "Not known",
+		},
+		Verb: verb,
+		Object: &automate_event.Object{
+			ID:          userID,
+			ObjectType:  entityType,
+			DisplayName: userDisplayName,
+		},
+		Target: &automate_event.Target{
+			ID:          "",
+			ObjectType:  "Not Applicable",
+			DisplayName: "Not Applicable",
+		},
+	}
 }
 
 func convert(in *local_user.User) *pb_common.User {

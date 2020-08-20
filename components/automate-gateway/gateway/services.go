@@ -208,7 +208,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create client for users mgmt service")
 	}
-	pb_iam.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
+	pb_iam.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient, eventFeedClient))
 
 	teamsClient, err := clients.TeamsClient()
 	if err != nil {

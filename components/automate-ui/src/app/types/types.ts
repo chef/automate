@@ -1,5 +1,6 @@
 import { merge } from 'lodash';
 import * as moment from 'moment/moment';
+import { EventHelper } from 'app/helpers/event-feed/event-helper';
 
 export type Status = 'success' | 'failure' | 'missing' | 'skipped';
 export type Compliance = 'compliant' | 'uncompliant' | 'skipped';
@@ -662,31 +663,7 @@ export class GuitarStringItem {
   }
 
   getEventTypeLabel(name, count) {
-    let label;
-
-    switch (name) {
-      case 'item':
-        label = 'data bag item';
-        break;
-      case 'version':
-        label = 'cookbook version';
-        break;
-      case 'bag':
-        label = 'data bag';
-        break;
-      case 'scanjobs':
-        label = 'scan job';
-        break;
-      default:
-        label = name;
-    }
-
-    // Pluralize the event label type if necessary
-    if (count > 1) {
-      label = label === 'policy' ? 'policies' : label + 's';
-    }
-
-    return label;
+    return EventHelper.getEventTypeLabel(name, count > 1);
   }
 }
 

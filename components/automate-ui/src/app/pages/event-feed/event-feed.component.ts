@@ -24,6 +24,7 @@ import {
   eventFeedState
 } from '../../services/event-feed/event-feed.selectors';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { EventHelper } from 'app/helpers/event-feed/event-helper';
 
 @Component({
   selector: 'app-event-feed',
@@ -81,19 +82,21 @@ export class EventFeedComponent implements OnInit, OnDestroy {
       text: 'Event Type',
       allowWildcards: false,
       providedValues: [
-        {name: 'client', title: 'Clients', icon: 'assignment_ind'},
-        {name: 'cookbook', title: 'Cookbooks', icon: 'chrome_reader_mode'},
-        {name: 'bag', title: 'Data Bags', icon: 'business_center'},
-        {name: 'environment', title: 'Environments', icon: 'public'},
-        {name: 'group', title: 'Groups', icon: 'people'},
-        {name: 'node', title: 'Nodes', icon: 'storage'},
-        {name: 'organization', title: 'Organizations', icon: 'layers'},
-        {name: 'permission', title: 'Permissions', icon: 'lock_open'},
-        {name: 'policy', title: 'Policyfiles', icon: 'add_to_photos'},
-        {name: 'profile', title: 'Profiles', icon: 'library_books'},
-        {name: 'role', title: 'Roles', icon: 'book'},
-        {name: 'scanjobs', title: 'Scan Jobs', icon: 'wifi_tethering'},
-        {name: 'user', title: 'Users', icon: 'person'}
+        {name: 'client', title: 'Clients', icon: EventHelper.getEventIcon('client')},
+        {name: 'cookbook', title: 'Cookbooks', icon: EventHelper.getEventIcon('cookbook')},
+        {name: 'bag', title: 'Data Bags', icon: EventHelper.getEventIcon('bag')},
+        {name: 'environment', title: 'Environments',
+          icon: EventHelper.getEventIcon('environment')},
+        {name: 'group', title: 'Groups', icon: EventHelper.getEventIcon('group')},
+        {name: 'node', title: 'Nodes', icon: EventHelper.getEventIcon('node')},
+        {name: 'organization', title: 'Organizations',
+          icon: EventHelper.getEventIcon('organization')},
+        {name: 'permission', title: 'Permissions', icon: EventHelper.getEventIcon('permission')},
+        {name: 'policy', title: 'Policyfiles', icon: EventHelper.getEventIcon('policy')},
+        {name: 'profile', title: 'Profiles', icon: EventHelper.getEventIcon('profile')},
+        {name: 'role', title: 'Roles', icon: EventHelper.getEventIcon('role')},
+        {name: 'scanjobs', title: 'Scan Jobs', icon: EventHelper.getEventIcon('scanjobs')},
+        {name: 'user', title: 'Users', icon: EventHelper.getEventIcon('user')}
       ]
     }
   ];
