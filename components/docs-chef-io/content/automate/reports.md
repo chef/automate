@@ -16,9 +16,9 @@ draft = false
 The _Reports_ page (Compliance > Reports) provides comprehensive insight into the compliance status of all scanned infrastructure.
 Scan results for audit cookbook configurations also appear in this view.
 
-{{% info %}}
+{{% note %}}
 The control count in the _Profile Status_ pane (Reports > Profile Status) shows the total number of executed controls, not the total number of unique controls.
-{{% /info %}}
+{{% /note %}}
 
 ![Reports](/images/docs/reports.png)
 
