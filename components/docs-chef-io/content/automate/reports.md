@@ -24,8 +24,8 @@ The control count in the _Profile Status_ pane (Reports > Profile Status) shows 
 
 ### Dates in Compliance Reports
 
-The dashboard shows the results of all scans with end times on the _currently selected day_.
-The currently selected day, as highlighted in the search bar, bases itself on timestamps in Coordinated Universal Time (UTC).
+The dashboard shows the results of all scans with end times on the _current selected day_.
+The _current selected day_, as highlighted in the search bar, bases itself on timestamps in Coordinated Universal Time (UTC).
 
 The trend graph provides a historical overview of node status over time.
 You can change it to display overviews of the past 10 days, 1 month, 3 months, or 1 year.
@@ -66,7 +66,7 @@ Recipe
 Deep filtering shifts the perspective of the results from the node to the profile and its associated control.
 Use deep filtering to see the compliance reporting for an entire profile or an individual control within a profile.
 
-Please note the only supported filters for deep filtering are:
+Deep filtering supports filtering for:
 
     * one profile
     * one profile and one of its associated controls
@@ -76,14 +76,15 @@ Please note the only supported filters for deep filtering are:
 A node's waived status appears if applicable in displays where a node's status appears in Chef Automate.
 The Compliance Reports overview displays the node count and history of waived nodes, and the count and history of waived controls.
 _Nodes_ and _Profiles_ views include _Waived Nodes_ and _Waived Profiles_ status filters respectively.
-Select the _Waived_ status filter to display only the respective Node or Profile reporting with that status.
+Selecting the _Waived_ status filter displays the respective Node or Profile reporting with the `waived` status.
 Hover over the control's Waived icon under the Node Status column in _Controls_ to view more details about the waiver applied to the control.
 
 Use Chef InSpec to configure [waivers](https://www.inspec.io/docs/reference/waivers/).
 
 ### Download Report Results
 
-The download button located to the right of the search bar allows the user to download a JSON or CSV format of the reports, based on all currently applied filters (including end time selected in calendar).
+The download button located to the right of the search bar allows users to download a JSON or CSV format of the reports.
+The downloaded contents are the result of all of the applied filters--including end time selected in calendar.
 
 ## Compliance Status and Report Metadata
 
@@ -94,7 +95,7 @@ Expand the `Report Metadata` information by selecting the compliance status bar.
 
 ## Compliance Overview
 
-Toggle between _Node Status_ and _Profile Status_ to view your system's overall compliance.
+Toggle between _Node Status_ and _Profile Status_ to view your system's compliance state.
 
 ### Node Status
 
@@ -110,10 +111,10 @@ Node Status Over Time
 : Shows the changes in size and compliance status of your system over time. Use the dropdown menu in the upper left corner to change the date range. Changing the date range also changes the displays in related charts and tables.
 
 Top Platform Failures
-: Shows the number of compliance scan failures grouped by operating system. Hovering over an individual bubble shows the platform name and the number of impacted nodes.
+: Shows the number of compliance scan failures grouped by operating system. Hovering over an individual bubble shows the platform name and the number of failed nodes.
 
  Top Environment Failures
-: Shows the number of compliance scan failures grouped by environment. Hovering over an individual bubble shows the environment name and the number of impacted nodes.
+: Shows the number of compliance scan failures grouped by environment. Hovering over an individual bubble shows the environment name and the number of failed nodes.
 
 ### Profile Status
 
@@ -129,10 +130,10 @@ Control Status Over Time
 : A line graph showing the number of controls and Compliance scan results over time. Use the calendar button in the upper right corner of the chart to change the time frame.
 
 Top Profile Failures
-: Indicates the profiles with the highest failure rate. Hover over an individual bubble to show the full profile name and the number of impacted nodes.
+: Indicates the profiles with the highest failure rate. Hover over an individual bubble to show the full profile name and the number of failed nodes.
 
 Top Control Failures
-: Indicates the most frequently failing controls. Hover over an individual bubble to show the control name and the number of impacted nodes.
+: Indicates the most frequently failing controls. Hover over an individual bubble to show the control name and the number of failed nodes.
 
 ## Switching Views
 
@@ -150,7 +151,7 @@ Node
 : A node is any machine that is under management by Chef.
 
 Platform
-: The operating system on your node, such as AIX, Amazon Linux, Apache, macOS, CentOS, Oracle Linux, Oracle Solaris, RHEL, SUSE Linux, Ubuntu, and Microsoft Windows.
+: The operating system on your node, such as AIX, Amazon Linux, Apache, macOS, CentOS, Oracle Linux, Oracle Solaris, RHEL, SUSE Linux, Ubuntu, and Windows.
 
 Environment
 : You can filter compliance reports by the environments in any stage of your workflow.
