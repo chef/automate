@@ -66,7 +66,6 @@ lint:
     # The linters below this comment should be turned on for new things (todo)
     - RPC_RESPONSE_STANDARD_NAME
     - RPC_REQUEST_RESPONSE_UNIQUE
-    - ENUM_VALUE_PREFIX
     - ENUM_ZERO_VALUE_SUFFIX
   ignore_only:
     SERVICE_SUFFIX:
@@ -159,6 +158,42 @@ lint:
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
     ENUM_VALUE_UPPER_SNAKE_CASE:
       - automate-gateway/api/notifications/notifications.proto
+    ENUM_VALUE_PREFIX:
+      # /api/
+      - external/applications/applications.proto
+      - external/common/query/parameters.proto
+      - external/compliance/profiles/profiles.proto
+      - external/compliance/reporting/reporting.proto
+      - external/compliance/reporting/stats/stats.proto
+      - external/compliance/scanner/jobs/jobs.proto
+      - external/nodes/manager/manager.proto
+      - external/nodes/nodes.proto
+      - external/secrets/secrets.proto
+      # deployment interservice is exposed to automate-cli, we treat it like an external API
+      - interservice/deployment/automate_deployment.proto
+      # Used to parse external JSON:
+      - interservice/compliance/profiles/profiles.proto
+      # The following interservice proto APIs could (should?) be updated to
+      # follow the style guide, but the churn impact is large.
+      - interservice/authz/policy.proto
+      - interservice/authz/project.proto
+      - interservice/authz/type.proto
+      - interservice/cfgmgmt/request/parameters.proto
+      - interservice/compliance/jobs/jobs.proto
+      - interservice/compliance/reporting/reporting.proto
+      - interservice/compliance/stats/stats.proto
+      - interservice/compliance/status/status.proto
+      - interservice/es_sidecar/service.proto
+      - interservice/nodemanager/manager/manager.proto
+      - interservice/nodemanager/nodes/nodes.proto
+      - interservice/pg_sidecar/service.proto
+      # /components/
+      - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
+      - automate-gateway/api/iam/v2/common/policy.proto
+      - automate-gateway/api/iam/v2/common/rules.proto
+      - automate-gateway/api/notifications/notifications.proto
+      # /lib/
+      - grpc/debug/debug_api/debug.proto
     MESSAGE_PASCAL_CASE:
       - config/dex/config_request.proto
     PACKAGE_DEFINED:

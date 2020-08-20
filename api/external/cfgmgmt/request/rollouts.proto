@@ -4,13 +4,13 @@ package chef.automate.api.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
 
 enum SCMType {
-  UNKNOWN_SCM = 0;
-  GIT = 1;
+  SCM_TYPE_UNKNOWN_SCM = 0;
+  SCM_TYPE_GIT = 1;
 }
 
 enum SCMWebType {
-  UNKNOWN_SCM_WEB = 0;
-  GITHUB = 1;
+  SCM_WEB_TYPE_UNKNOWN_SCM_WEB = 0;
+  SCM_WEB_TYPE_GITHUB = 1;
 }
 
 // CreateRollout is a request to create a new Rollout. All
