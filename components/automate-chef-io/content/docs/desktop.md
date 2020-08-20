@@ -18,10 +18,10 @@ Enable the Desktop dashboard with: `chef-automate deploy --product automate --pr
 For more installation information, see [Install Chef Infra Server with Chef Automate](https://automate.chef.io/docs/infra-server/).
 The Desktop dashboard has no supported compliance profiles, and installation with the `--product desktop` flag includes no compliance profiles.
 
-{{< info >}}
+{{< note >}}
 When installing Chef Automate with the `--product desktop` flag, _Data Lifecycle_ settings will not mark nodes as missing and not delete missing nodes by default.
 We encourage users to not change these specific settings and not defeat the monitoring purpose of the Desktop dashboard.
-{{< /info >}}
+{{< /note >}}
 
 ## Desktop Dashboard Display
 
@@ -33,7 +33,7 @@ Node counts in the _Desktop_ dashboard may include liveness agents.
 
 ### Daily Check-in
 
-The _Daily Check-in_ display shows a top-level view of daily desktop check-in statistics.  
+The _Daily Check-in_ display shows a top-level view of daily desktop check-in statistics.
 A bar graphic illustrates the proportion of desktops with `unknown` and `checked-in` statuses.
 Below the bar, boxes display counts of all desktops, desktops with an `unknown` status, and desktops with a `checked-in` status.
 `Checked-in` refers to desktops reporting into Chef Automate.

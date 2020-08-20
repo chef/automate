@@ -165,10 +165,10 @@ targets the master branch.
 
 ### Use the Delivery CLI
 
-{{< info >}}
+{{< note >}}
 These instructions assume that Chef Automate is the source of truth for your source
 code and that Chef Automate is not integrated with GitHub Enterprise or GitHub.com.
-{{< /info >}}
+{{< /note >}}
 
 This topic describes the recommended setup for a Chef cookbook project
 using Chef Automate.
@@ -191,9 +191,9 @@ privileges on the Chef Automate server, do the following:
     $ delivery setup --server=SERVER --ent=ENTERPRISE --org=ORGANIZATION --user=USERNAME --a2-mode
     ```
 
-{{< info >}}
+{{< note >}}
 The server, enterprise, organization, and user must already exist.
-{{< /info >}}
+{{< /note >}}
 
 1. Create a cookbook:
 

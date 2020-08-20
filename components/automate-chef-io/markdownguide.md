@@ -212,12 +212,12 @@ _An important statement_
 Use two asterisks (`**bold**`) to **bold** a text string.
 **A bold statement**
 
-{{< info >}}
+{{< note >}}
 Hugo italicizes words surrounded by single asterisks or underlines (*)(_)
 and emboldens all double asterisks or underlines (**)(__).
 Help your editors understand your intent by following the established conventions
 and use single underlines for _italics_ and double asterisks for **bold**.
-{{< /info >}}
+{{< /note >}}
 
 ### Links
 

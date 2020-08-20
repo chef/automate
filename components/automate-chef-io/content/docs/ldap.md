@@ -36,9 +36,9 @@ not affect your policies, as they are both LDAP configurations.
 However, switching between either of those configurations and a SAML configuration will
 require you to adjust the [IAM]({{< relref "iam-v2-overview.md" >}}) policy membership.
 
-{{< info >}}
+{{< note >}}
 Local, MSAD, and LDAP users will have their Chef Automate sessions refreshed while their Chef Automate browser window remains open or until they sign out directly.
-{{< /info >}}
+{{< /note >}}
 
 ## Supported Identity Management Systems
 

@@ -407,9 +407,9 @@ privileges on the Chef Automate server, do the following:
     $ delivery setup --server=SERVER --ent=ENTERPRISE --org=ORGANIZATION --user=USERNAME
     ```
 
-    {{< info >}}
+    {{< note >}}
     The server, enterprise, organization, and user must already exist.
-    {{< /info >}}
+    {{< /note >}}
 
 1. Create a cookbook, then navigate into it:
 

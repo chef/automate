@@ -38,9 +38,9 @@ your existing configuration by following these steps:
 2. Edit `config.toml` to replace the `dex.sys.connectors` section with the config values for your new identity provider.
 3. Run `chef-automate config set config.toml` to set your updated config.
 
-{{< info >}}
+{{< note >}}
 Users who sign in via SAML will have a session time of 24 hours before needing to sign in again.
-{{< /info >}}
+{{< /note >}}
 
 ## Supported Identity Management Systems
 
@@ -55,10 +55,10 @@ Users who sign in via SAML will have a session time of 24 hours before needing t
 
 Using Azure AD as an SAML IdP requires specific configuration for both Azure AD and Chef Automate.
 
-{{< info >}}
+{{< note >}}
 The signing certificate used for Chef Automate's SAML integration with Azure AD requires manual management.
 Signing key rotation is not done automatically.
-{{< /info >}}
+{{< /note >}}
 
 In Azure AD, add Chef Automate as a _"non-gallery application"_, and then configure its SAML sign-in method.
 [The Azure AD documentation](https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/configure-saml-single-sign-on) provides a detailed guide.

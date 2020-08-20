@@ -18,9 +18,9 @@ layout = "redirect"
     weight = 10
 +++
 
-{{< info >}}
+{{< note >}}
 This documentation covers Chef Automate's IAM feature in release 20200326170928 and later.
-{{< /info >}}
+{{< /note >}}
 
 Chef Automate's Identity and Access Management (IAM) allows direct management of policy members from Chef Automate in the browser.
 IAM supports the projects feature, which allow for filtering and segregation of your data amongst your user base.
@@ -137,10 +137,10 @@ The custom policies are Compliance Viewers and Compliance Editors.
 IAM projects are collections of resources either created in Chef Automate or ingested from external data providers, such as Chef Infra and Chef InSpec.
 Projects used in a policy reduce the scope of that policy's permissions to only the resources assigned to the given projects.
 
-{{< info >}}
+{{< note >}}
 Chef Automate limits you to 300 projects.
 See [Configuring Project Limit]({{< relref "iam-v2-guide.md#configuring-project-limit" >}}) for configuration instructions.
-{{< /info >}}
+{{< /note >}}
 
 ### Setting Up Projects
 

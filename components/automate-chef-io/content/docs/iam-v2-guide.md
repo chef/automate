@@ -12,9 +12,9 @@ layout = "redirect"
     weight = 20
 +++
 
-{{< info >}}
+{{< note >}}
 This documentation covers Chef Automate's IAM feature in release 20200326170928 and later.
-{{< /info >}}
+{{< /note >}}
 
 This guide shows you how to perform important administrative operations.
 You will add members to Chef-managed v2 policies, delete a legacy policy, and write a Team Admin v2 policy that lets a Team Admin manage their users and teams.
@@ -373,7 +373,7 @@ To create a project that contains all Effortless Infra nodes, create a ingest ru
 
 ![](/images/docs/effortless-project-rule.png)
 
-The above rule matches on a node's Chef Infra Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Infra Server` attribute as `localhost`. 
+The above rule matches on a node's Chef Infra Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Infra Server` attribute as `localhost`.
 
 If desired, create subgroups of Effortless Infra nodes by adding a second condition that matches a specific `Chef Policy Name`.
 

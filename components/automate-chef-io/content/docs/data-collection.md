@@ -71,7 +71,7 @@ if you are using a Chef Infra Server. Otherwise, you must
 
 ## Configure your Chef Infra Server to Send Data to Chef Automate
 
-{{< info >}} Multiple Chef Infra Servers can send data to a single Chef Automate server. {{< /info >}}
+{{< note >}} Multiple Chef Infra Servers can send data to a single Chef Automate server. {{< /note >}}
 
 In addition to forwarding Chef run data to Chef Automate, Chef Infra Server will send messages to Chef Automate whenever an action is taken on a Chef Infra Server object, such as when a cookbook is uploaded to the Chef Infra Server or when a user edits a role.
 

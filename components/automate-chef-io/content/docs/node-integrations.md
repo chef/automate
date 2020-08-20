@@ -105,9 +105,9 @@ Ensure the policy attached to the role used by the instance you have Chef Automa
 }
 ```
 
-{{< info >}}
+{{< note >}}
 `"ssm:*"` uses a wildcard match on the AWS EC2 Systems Manager (SSM); You may wish to use a more restrictive policy.
-{{< /info >}}
+{{< /note >}}
 
 ### Install AWS EC2 Systems Manager on Instances
 
@@ -148,9 +148,9 @@ The service makes these API calls:
 
 Set up Chef Automate to detect and scan the nodes in your Azure account by providing your Azure Credentials and creating an _Azure VM Node Manager_. To add an Azure VM Node Manager, navigate to the [_Node Integrations_]({{< relref "node-integrations.md" >}}) page in the Settings tab, select `Create Integration`, and you should see _Azure_ as one of your node management service options.
 
-{{< info >}}
+{{< note >}}
 We do not support Azure Government Cloud.
-{{< /info >}}
+{{< /note >}}
 
 ### Adding an Azure VM Node Manager
 
