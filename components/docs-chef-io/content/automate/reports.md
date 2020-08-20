@@ -25,7 +25,7 @@ The control count in the _Profile Status_ pane (Reports > Profile Status) shows 
 ### Dates in Compliance Reports
 
 The dashboard shows the results of all scans with end times on the _current selected day_.
-The _current selected day_, as highlighted in the search bar, bases itself on timestamps in Coordinated Universal Time (UTC).
+The _current selected day_ is based on timestamps in Coordinated Universal Time (UTC).
 
 The trend graph provides a historical overview of node status over time.
 You can change it to display overviews of the past 10 days, 1 month, 3 months, or 1 year.
