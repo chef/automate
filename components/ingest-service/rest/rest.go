@@ -37,13 +37,13 @@ func Spawn(endpoint string, conf *serveropts.Opts) error {
 		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{OrigName: true, EmitDefaults: true}))
 	opts := conf.ConnFactory.DialOptions("ingest-service")
 
-	err := gw.RegisterChefIngesterHandlerFromEndpoint(ctx, mux, endpoint, opts)
+	err := gw.RegisterChefIngesterServiceHandlerFromEndpoint(ctx, mux, endpoint, opts)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	err = gw.RegisterJobSchedulerHandlerFromEndpoint(ctx, mux, endpoint, opts)
+	err = gw.RegisterJobSchedulerServiceHandlerFromEndpoint(ctx, mux, endpoint, opts)
 	if err != nil {
 		log.Error(err)
 		return err

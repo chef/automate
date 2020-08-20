@@ -63,11 +63,11 @@ import (
 )
 
 type server struct {
-	deployment           *deployment.Deployment      // set in NewDeployment, read for access to target and channel config
-	deploymentStore      persistence.DeploymentStore // A place to load the deployment from
-	serverConfig         *Config                     // set in StartServer, read for access in NewDeployment
-	convergeLoop         *Looper                     // set in StartServer,
-	lcClient             lc.LicenseControlClient     // set when cachedLCClient is called
+	deployment           *deployment.Deployment         // set in NewDeployment, read for access to target and channel config
+	deploymentStore      persistence.DeploymentStore    // A place to load the deployment from
+	serverConfig         *Config                        // set in StartServer, read for access in NewDeployment
+	convergeLoop         *Looper                        // set in StartServer,
+	lcClient             lc.LicenseControlServiceClient // set when cachedLCClient is called
 	umClient             usermgmt.UserMgmt
 	converger            converge.Converger
 	senderStore          eventSenderStore
@@ -1066,7 +1066,7 @@ func StartServer(config *Config) error {
 
 	// register grpc services
 	api.RegisterDeploymentServer(grpcServer, server)
-	api.RegisterCertificateAuthorityServer(grpcServer, server)
+	api.RegisterCertificateAuthorityServiceServer(grpcServer, server)
 
 	reflection.Register(grpcServer)
 

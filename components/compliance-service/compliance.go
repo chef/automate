@@ -162,7 +162,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		logrus.Fatalf("could not connect to elasticsearch: %v", err)
 	}
 
-	var authzProjectsClient authz.ProjectsClient
+	var authzProjectsClient authz.ProjectsServiceClient
 	eventClient := getEventConnection(connFactory, conf.EventConfig.Endpoint)
 	notifier := getNotificationsConnection(connFactory, conf.Notifications.Target)
 	if os.Getenv("RUN_MODE") != "test" {
@@ -198,7 +198,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	}
 
 	// needs to be the first one, since it creates the es indices
-	ingest.RegisterComplianceIngesterServer(s,
+	ingest.RegisterComplianceIngesterServiceServer(s,
 		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient,
 			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, conf.Service.MessageBufferSize))
 
@@ -212,7 +212,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	stats.RegisterStatsServiceServer(s, statsserver.New(&esr))
 	version.RegisterVersionServiceServer(s, versionserver.New())
-	status.RegisterComplianceStatusServer(s, statusSrv)
+	status.RegisterComplianceStatusServiceServer(s, statusSrv)
 
 	if os.Getenv("RUN_MODE") == "test" {
 		logrus.Warn(`Skipping data-lifecycle setup due to RUN_MODE env var being set to "test"`)
@@ -330,7 +330,7 @@ func getNotificationsConnection(connectionFactory *secureconn.Factory,
 }
 
 func createAuthzProjectsClient(connectionFactory *secureconn.Factory,
-	authzEndpoint string) authz.ProjectsClient {
+	authzEndpoint string) authz.ProjectsServiceClient {
 	if authzEndpoint == "" || authzEndpoint == ":0" {
 		logrus.Fatal("authzEndpoint cannot be empty or Dial will get stuck")
 	}
@@ -344,7 +344,7 @@ func createAuthzProjectsClient(connectionFactory *secureconn.Factory,
 		logrus.Fatalf("getAuthzConnection, error grpc dialing to Authz %s", err.Error())
 	}
 
-	authzProjectsClient := authz.NewProjectsClient(conn)
+	authzProjectsClient := authz.NewProjectsServiceClient(conn)
 	if authzProjectsClient == nil {
 		logrus.Fatalf("getAuthzConnection got nil for NewProjectsClient")
 	}
@@ -403,7 +403,7 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 		}
 		err             error
 		esSidecarConn   *grpc.ClientConn
-		esSidecarClient es_sidecar.EsSidecarClient
+		esSidecarClient es_sidecar.EsSidecarServiceClient
 		recurrence      *rrule.RRule
 	)
 
@@ -432,7 +432,7 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 		logrus.WithFields(logrus.Fields{"error": err}).Fatal("Failed to create ES Sidecar connection")
 		return nil, err
 	}
-	esSidecarClient = es_sidecar.NewEsSidecarClient(esSidecarConn)
+	esSidecarClient = es_sidecar.NewEsSidecarServiceClient(esSidecarConn)
 
 	err = purge.ConfigureManager(
 		cerealManager,
@@ -491,7 +491,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 
 	// get ingest client
 	logrus.Debugf("compliance setup, getting an ingest client")
-	ingestClient := ingest.NewComplianceIngesterClient(conn)
+	ingestClient := ingest.NewComplianceIngesterServiceClient(conn)
 	if ingestClient == nil {
 		return fmt.Errorf("compliance setup, got nil for NewComplianceIngesterClient")
 	}
@@ -564,7 +564,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 			return err
 		}
 		// get the authn client
-		authnClient := authn.NewTokensMgmtClient(authnConn)
+		authnClient := authn.NewTokensMgmtServiceClient(authnConn)
 		if authnClient == nil {
 			logrus.Errorf("serveGrpc got nil for NewTokensMgmtClient: %s", err)
 			return err
@@ -577,7 +577,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 			return err
 		}
 		// get the authz client
-		authzClient := authz.NewPoliciesClient(authzConn)
+		authzClient := authz.NewPoliciesServiceClient(authzConn)
 		if authzClient == nil {
 			logrus.Errorf("serveGrpc got nil for NewPoliciesClient: %s", err)
 			return err

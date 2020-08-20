@@ -68,7 +68,7 @@ func migrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*mi
 
 // SetupInfraProxyService provides the connection service client.
 func SetupInfraProxyService(ctx context.Context,
-	t *testing.T) (*server.Server, *service.Service, *grpc.ClientConn, func(), *authz.PoliciesServerMock, *secrets.MockSecretsServiceClient) {
+	t *testing.T) (*server.Server, *service.Service, *grpc.ClientConn, func(), *authz.PoliciesServiceServerMock, *secrets.MockSecretsServiceClient) {
 
 	t.Helper()
 
@@ -79,19 +79,19 @@ func SetupInfraProxyService(ctx context.Context,
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
 
-	mockAuthz := authz.NewAuthorizationServerMock()
+	mockAuthz := authz.NewAuthorizationServiceServerMock()
 	mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-	authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
+	authz.RegisterAuthorizationServiceServer(grpcAuthz, mockAuthz)
 
-	mockPolicies := authz.NewPoliciesServerMock()
+	mockPolicies := authz.NewPoliciesServiceServerMock()
 	mockPolicies.PurgeSubjectFromPoliciesFunc = DefaultMockPurgeFunc
-	authz.RegisterPoliciesServer(grpcAuthz, mockPolicies)
+	authz.RegisterPoliciesServiceServer(grpcAuthz, mockPolicies)
 
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
 
-	authzClient := authz.NewAuthorizationClient(authzConn)
+	authzClient := authz.NewAuthorizationServiceClient(authzConn)
 
 	secretsClient := secrets.NewMockSecretsServiceClient(gomock.NewController(t))
 
@@ -108,7 +108,7 @@ func SetupInfraProxyService(ctx context.Context,
 	}
 	grpcServ := serviceRef.ConnFactory.NewServer(tracing.GlobalServerInterceptor())
 	newServer := server.NewServer(serviceRef)
-	infra_proxy.RegisterInfraProxyServer(grpcServ, newServer)
+	infra_proxy.RegisterInfraProxyServiceServer(grpcServ, newServer)
 	health.RegisterHealthServer(grpcServ, health.NewService())
 
 	ResetState(ctx, t, serviceRef)

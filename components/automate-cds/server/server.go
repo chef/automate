@@ -21,7 +21,7 @@ func NewGRPCServer(s *service.Service,
 	grpcServer := s.ConnFactory.NewServer(tracing.GlobalServerInterceptor())
 
 	health.RegisterHealthServer(grpcServer, health.NewService())
-	grpc_s.RegisterAutomateCdsServer(grpcServer, NewServer(s, profilesServiceClient))
+	grpc_s.RegisterAutomateCdsServiceServer(grpcServer, NewServer(s, profilesServiceClient))
 	reflection.Register(grpcServer)
 
 	return grpcServer

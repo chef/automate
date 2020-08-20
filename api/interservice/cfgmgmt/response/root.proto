@@ -6,7 +6,7 @@ option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/response"
 message VersionInfo {
   string name = 1;
   string version = 2;
-  string SHA = 3;
+  string sha = 3;
   string built = 4;
 }
 

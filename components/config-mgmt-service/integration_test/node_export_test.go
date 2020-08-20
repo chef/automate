@@ -34,7 +34,7 @@ func TestNodeExportIncludesChefTags(t *testing.T) {
 
 	lis := bufconn.Listen(1024 * 1024)
 	s := grpc.NewServer()
-	api.RegisterCfgMgmtServer(s, server)
+	api.RegisterCfgMgmtServiceServer(s, server)
 
 	go func() {
 		if err := s.Serve(lis); err != nil {
@@ -48,7 +48,7 @@ func TestNodeExportIncludesChefTags(t *testing.T) {
 	defer conn.Close()
 	require.NoError(t, err)
 
-	client := api.NewCfgMgmtClient(conn)
+	client := api.NewCfgMgmtServiceClient(conn)
 
 	nodes := []iBackend.Node{
 		{
@@ -109,7 +109,7 @@ func TestNodeExportProjectFilters(t *testing.T) {
 
 	lis := bufconn.Listen(1024 * 1024)
 	s := grpc.NewServer()
-	api.RegisterCfgMgmtServer(s, server)
+	api.RegisterCfgMgmtServiceServer(s, server)
 
 	go func() {
 		if err := s.Serve(lis); err != nil {
@@ -123,7 +123,7 @@ func TestNodeExportProjectFilters(t *testing.T) {
 	defer conn.Close()
 	require.NoError(t, err)
 
-	client := api.NewCfgMgmtClient(conn)
+	client := api.NewCfgMgmtServiceClient(conn)
 
 	cases := []struct {
 		description       string
@@ -580,7 +580,7 @@ func TestNodeExportLoopBug(t *testing.T) {
 
 	lis := bufconn.Listen(1024 * 1024)
 	s := grpc.NewServer()
-	api.RegisterCfgMgmtServer(s, server)
+	api.RegisterCfgMgmtServiceServer(s, server)
 
 	go func() {
 		if err := s.Serve(lis); err != nil {
@@ -594,7 +594,7 @@ func TestNodeExportLoopBug(t *testing.T) {
 	defer conn.Close()
 	require.NoError(t, err)
 
-	client := api.NewCfgMgmtClient(conn)
+	client := api.NewCfgMgmtServiceClient(conn)
 
 	cases := []struct {
 		description string
@@ -699,7 +699,7 @@ func TestNodeExportPagingJSON(t *testing.T) {
 
 	lis := bufconn.Listen(1024 * 1024)
 	s := grpc.NewServer()
-	api.RegisterCfgMgmtServer(s, server)
+	api.RegisterCfgMgmtServiceServer(s, server)
 
 	go func() {
 		if err := s.Serve(lis); err != nil {
@@ -713,7 +713,7 @@ func TestNodeExportPagingJSON(t *testing.T) {
 	defer conn.Close()
 	require.NoError(t, err)
 
-	client := api.NewCfgMgmtClient(conn)
+	client := api.NewCfgMgmtServiceClient(conn)
 
 	names := []string{
 		"Taco Bell",
@@ -775,7 +775,7 @@ func TestNodeExportPagingCSV(t *testing.T) {
 
 	lis := bufconn.Listen(1024 * 1024)
 	s := grpc.NewServer()
-	api.RegisterCfgMgmtServer(s, server)
+	api.RegisterCfgMgmtServiceServer(s, server)
 
 	go func() {
 		if err := s.Serve(lis); err != nil {
@@ -789,7 +789,7 @@ func TestNodeExportPagingCSV(t *testing.T) {
 	defer conn.Close()
 	require.NoError(t, err)
 
-	client := api.NewCfgMgmtClient(conn)
+	client := api.NewCfgMgmtServiceClient(conn)
 
 	names := []string{
 		"Taco Bell",

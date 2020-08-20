@@ -756,7 +756,7 @@ func rulesMatch(rules []api.CreateRuleReq, resp *api.ListRulesResp) bool {
 	return true
 }
 
-func createSystemRoles(ctx context.Context, polClient api.PoliciesClient) error {
+func createSystemRoles(ctx context.Context, polClient api.PoliciesServiceClient) error {
 	_, err := polClient.CreateRole(ctx,
 		&api.CreateRoleReq{Id: constants.ProjectOwnerRoleID, Name: "any", Actions: []string{"*"}, Projects: []string{}})
 	if err != nil {
@@ -777,8 +777,8 @@ func createSystemRoles(ctx context.Context, polClient api.PoliciesClient) error 
 
 func createProjectAndRule(
 	ctx context.Context,
-	projClient api.ProjectsClient,
-	polClient api.PoliciesClient,
+	projClient api.ProjectsServiceClient,
+	polClient api.PoliciesServiceClient,
 	reqs projectAndRuleReq) (*api.ProjectRule, error) {
 	if err := createSystemRoles(ctx, polClient); err != nil {
 		return nil, err
@@ -795,7 +795,7 @@ func createProjectAndRule(
 	return rule.Rule, nil
 }
 
-func createRules(ctx context.Context, cl api.ProjectsClient, rules []api.CreateRuleReq) ([]api.CreateRuleReq, error) {
+func createRules(ctx context.Context, cl api.ProjectsServiceClient, rules []api.CreateRuleReq) ([]api.CreateRuleReq, error) {
 	for _, rule := range rules {
 
 		_, err := cl.CreateRule(ctx, &rule)

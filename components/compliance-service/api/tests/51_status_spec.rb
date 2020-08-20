@@ -4,7 +4,7 @@ require 'interservice/compliance/status/status_services_pb'
 
 describe File.basename(__FILE__) do
   it "works" do
-    Status = Chef::Automate::Domain::Compliance::Status::ComplianceStatus unless defined?(Status)
+    Status = Chef::Automate::Domain::Compliance::Status::ComplianceStatusService unless defined?(Status)
 
     resp = GRPC Status, :get_migration_status, Google::Protobuf::Empty.new()
 

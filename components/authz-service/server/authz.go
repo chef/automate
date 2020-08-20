@@ -26,12 +26,12 @@ import (
 type authzServer struct {
 	log      logger.Logger
 	engine   engine.Authorizer
-	projects api.ProjectsServer
+	projects api.ProjectsServiceServer
 	store    storage.Storage
 }
 
 // NewPostgresAuthzServer returns a new Authz server.
-func NewPostgresAuthzServer(l logger.Logger, e engine.Authorizer, p api.ProjectsServer) (api.AuthorizationServer, error) {
+func NewPostgresAuthzServer(l logger.Logger, e engine.Authorizer, p api.ProjectsServiceServer) (api.AuthorizationServiceServer, error) {
 	s := postgres.GetInstance()
 	if s == nil {
 		return nil, errors.New("postgres singleton not yet initialized for authz server")
@@ -39,7 +39,7 @@ func NewPostgresAuthzServer(l logger.Logger, e engine.Authorizer, p api.Projects
 	return NewAuthzServer(l, e, p, s)
 }
 
-func NewAuthzServer(l logger.Logger, e engine.Authorizer, p api.ProjectsServer, s storage.Storage) (api.AuthorizationServer, error) {
+func NewAuthzServer(l logger.Logger, e engine.Authorizer, p api.ProjectsServiceServer, s storage.Storage) (api.AuthorizationServiceServer, error) {
 	return &authzServer{
 		log:      l,
 		engine:   e,

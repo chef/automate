@@ -940,7 +940,7 @@ func TestBundler5Messages(t *testing.T) {
 	numberOfMessages := 5
 	inbox := make(chan message.Compliance, numberOfMessages)
 	listProjectRulesCount := 0
-	authzClient := authz.NewMockProjectsClient(gomock.NewController(t))
+	authzClient := authz.NewMockProjectsServiceClient(gomock.NewController(t))
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(ctx interface{}, in interface{}) (*authz.ListRulesForAllProjectsResp, error) {
 			listProjectRulesCount++
@@ -989,7 +989,7 @@ func TestBundlerMatchProjectRule(t *testing.T) {
 			},
 		},
 	}
-	authzClient := authz.NewMockProjectsClient(gomock.NewController(t))
+	authzClient := authz.NewMockProjectsServiceClient(gomock.NewController(t))
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
 		&authz.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
 
@@ -1044,7 +1044,7 @@ func TestBundlerMatchProjectRuleEventRuleType(t *testing.T) {
 			},
 		},
 	}
-	authzClient := authz.NewMockProjectsClient(gomock.NewController(t))
+	authzClient := authz.NewMockProjectsServiceClient(gomock.NewController(t))
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
 		&authz.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
 
@@ -1102,7 +1102,7 @@ func TestBundlerWithScanJobReport(t *testing.T) {
 			},
 		},
 	}
-	authzClient := authz.NewMockProjectsClient(gomock.NewController(t))
+	authzClient := authz.NewMockProjectsServiceClient(gomock.NewController(t))
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
 		&authz.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
 	done := make(chan error)

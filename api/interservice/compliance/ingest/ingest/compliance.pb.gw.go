@@ -32,7 +32,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 
-func request_ComplianceIngester_ProcessComplianceReport_0(ctx context.Context, marshaler runtime.Marshaler, client ComplianceIngesterClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ComplianceIngesterService_ProcessComplianceReport_0(ctx context.Context, marshaler runtime.Marshaler, client ComplianceIngesterServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq compliance.Report
 	var metadata runtime.ServerMetadata
 
@@ -49,7 +49,7 @@ func request_ComplianceIngester_ProcessComplianceReport_0(ctx context.Context, m
 
 }
 
-func local_request_ComplianceIngester_ProcessComplianceReport_0(ctx context.Context, marshaler runtime.Marshaler, server ComplianceIngesterServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ComplianceIngesterService_ProcessComplianceReport_0(ctx context.Context, marshaler runtime.Marshaler, server ComplianceIngesterServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq compliance.Report
 	var metadata runtime.ServerMetadata
 
@@ -66,12 +66,12 @@ func local_request_ComplianceIngester_ProcessComplianceReport_0(ctx context.Cont
 
 }
 
-// RegisterComplianceIngesterHandlerServer registers the http handlers for service ComplianceIngester to "mux".
-// UnaryRPC     :call ComplianceIngesterServer directly.
+// RegisterComplianceIngesterServiceHandlerServer registers the http handlers for service ComplianceIngesterService to "mux".
+// UnaryRPC     :call ComplianceIngesterServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-func RegisterComplianceIngesterHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ComplianceIngesterServer) error {
+func RegisterComplianceIngesterServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ComplianceIngesterServiceServer) error {
 
-	mux.Handle("POST", pattern_ComplianceIngester_ProcessComplianceReport_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ComplianceIngesterService_ProcessComplianceReport_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -80,23 +80,23 @@ func RegisterComplianceIngesterHandlerServer(ctx context.Context, mux *runtime.S
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ComplianceIngester_ProcessComplianceReport_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ComplianceIngesterService_ProcessComplianceReport_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ComplianceIngester_ProcessComplianceReport_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ComplianceIngesterService_ProcessComplianceReport_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterComplianceIngesterHandlerFromEndpoint is same as RegisterComplianceIngesterHandler but
+// RegisterComplianceIngesterServiceHandlerFromEndpoint is same as RegisterComplianceIngesterServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterComplianceIngesterHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterComplianceIngesterServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -116,23 +116,23 @@ func RegisterComplianceIngesterHandlerFromEndpoint(ctx context.Context, mux *run
 		}()
 	}()
 
-	return RegisterComplianceIngesterHandler(ctx, mux, conn)
+	return RegisterComplianceIngesterServiceHandler(ctx, mux, conn)
 }
 
-// RegisterComplianceIngesterHandler registers the http handlers for service ComplianceIngester to "mux".
+// RegisterComplianceIngesterServiceHandler registers the http handlers for service ComplianceIngesterService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterComplianceIngesterHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterComplianceIngesterHandlerClient(ctx, mux, NewComplianceIngesterClient(conn))
+func RegisterComplianceIngesterServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterComplianceIngesterServiceHandlerClient(ctx, mux, NewComplianceIngesterServiceClient(conn))
 }
 
-// RegisterComplianceIngesterHandlerClient registers the http handlers for service ComplianceIngester
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ComplianceIngesterClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ComplianceIngesterClient"
+// RegisterComplianceIngesterServiceHandlerClient registers the http handlers for service ComplianceIngesterService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ComplianceIngesterServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ComplianceIngesterServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "ComplianceIngesterClient" to call the correct interceptors.
-func RegisterComplianceIngesterHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ComplianceIngesterClient) error {
+// "ComplianceIngesterServiceClient" to call the correct interceptors.
+func RegisterComplianceIngesterServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ComplianceIngesterServiceClient) error {
 
-	mux.Handle("POST", pattern_ComplianceIngester_ProcessComplianceReport_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ComplianceIngesterService_ProcessComplianceReport_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -141,14 +141,14 @@ func RegisterComplianceIngesterHandlerClient(ctx context.Context, mux *runtime.S
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ComplianceIngester_ProcessComplianceReport_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ComplianceIngesterService_ProcessComplianceReport_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ComplianceIngester_ProcessComplianceReport_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ComplianceIngesterService_ProcessComplianceReport_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -156,9 +156,9 @@ func RegisterComplianceIngesterHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_ComplianceIngester_ProcessComplianceReport_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "events", "compliance", "report"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ComplianceIngesterService_ProcessComplianceReport_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "events", "compliance", "report"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
-	forward_ComplianceIngester_ProcessComplianceReport_0 = runtime.ForwardResponseMessage
+	forward_ComplianceIngesterService_ProcessComplianceReport_0 = runtime.ForwardResponseMessage
 )

@@ -18,7 +18,7 @@ import (
 type postgres struct {
 	db          *sql.DB
 	logger      logger.Logger
-	authzClient authz.AuthorizationClient
+	authzClient authz.AuthorizationServiceClient
 }
 
 type querier interface {
@@ -26,7 +26,7 @@ type querier interface {
 }
 
 // New instantiates and returns a postgres storage implementation
-func New(logger logger.Logger, migrationConfig migration.Config, authzClient authz.AuthorizationClient) (storage.Storage, error) {
+func New(logger logger.Logger, migrationConfig migration.Config, authzClient authz.AuthorizationServiceClient) (storage.Storage, error) {
 
 	db, err := initPostgresDB(migrationConfig.PGURL.String())
 	if err != nil {

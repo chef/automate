@@ -315,28 +315,28 @@ func (srv *Server) newEventMsg(eventType string, in *jobs.Job, id *jobs.Id, user
 	}
 
 	return &automate_event.EventMsg{
-		EventID: uuid.Must(uuid.NewV4()).String(),
+		EventId: uuid.Must(uuid.NewV4()).String(),
 		Type:    &automate_event.EventType{Name: eventType},
 		Producer: &automate_event.Producer{
-			ID:           "scanjobs",
+			Id:           "scanjobs",
 			ProducerName: "Scanner",
 			ProducerType: "system component",
 		},
 		Tags:      tagsVal,
 		Published: ptypes.TimestampNow(),
 		Actor: &automate_event.Actor{
-			ID:          "",
+			Id:          "",
 			ObjectType:  "User",
 			DisplayName: userVal,
 		},
 		Verb: verbVal,
 		Object: &automate_event.Object{
-			ID:          uuid.Must(uuid.NewV4()).String(),
+			Id:          uuid.Must(uuid.NewV4()).String(),
 			ObjectType:  "scanjobs",
 			DisplayName: nameVal,
 		},
 		Target: &automate_event.Target{
-			ID:          "",
+			Id:          "",
 			ObjectType:  "Not Applicable",
 			DisplayName: "Not Applicable",
 		},

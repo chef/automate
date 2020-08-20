@@ -244,9 +244,9 @@ func collectEventFeed(ctx context.Context,
 	agEvents := make([]*agRes.Event, len(eventCollection.FeedEntries))
 	for index, entry := range eventCollection.FeedEntries {
 		agEvents[index] = &agRes.Event{
-			StartId:         entry.GetID(),
-			EndId:           entry.GetID(),
-			EventType:       entry.GetProducer().GetID(),
+			StartId:         entry.GetId(),
+			EndId:           entry.GetId(),
+			EventType:       entry.GetProducer().GetId(),
 			Task:            entry.GetVerb(),
 			StartTime:       entry.GetSourceEventPublished(),
 			EndTime:         entry.GetSourceEventPublished(),
@@ -255,7 +255,7 @@ func collectEventFeed(ctx context.Context,
 			RequestorName:   entry.GetActor().GetName(),
 			ServiceHostname: entry.GetTarget().GetName(),
 			ParentName:      entry.GetParent().GetName(),
-			ParentType:      entry.GetParent().GetID(),
+			ParentType:      entry.GetParent().GetId(),
 			EventCount:      1,
 		}
 	}

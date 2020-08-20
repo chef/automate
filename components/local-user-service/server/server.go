@@ -42,10 +42,10 @@ type Server struct {
 	validator       *password.Validator
 	connFactory     *secureconn.Factory
 	health          *health.Service
-	teamsClient     teams.TeamsClient
+	teamsClient     teams.TeamsServiceClient
 	a1UserData      string
 	a1UserRolesData string
-	authzClient     authz.PoliciesClient
+	authzClient     authz.PoliciesServiceClient
 }
 
 // NewServer constructs a server from the provided config.
@@ -94,10 +94,10 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		users:           usrs,
 		validator:       val,
 		connFactory:     secureconn.NewFactory(*c.ServiceCerts),
-		teamsClient:     teams.NewTeamsClient(conn),
+		teamsClient:     teams.NewTeamsServiceClient(conn),
 		a1UserData:      c.A1UserData,
 		a1UserRolesData: c.A1UserRolesData,
-		authzClient:     authz.NewPoliciesClient(authzConn),
+		authzClient:     authz.NewPoliciesServiceClient(authzConn),
 		health:          health.NewService(),
 	}
 

@@ -84,7 +84,7 @@ func Spawn(opts *serveropts.Opts) error {
 		return err
 	}
 
-	authzProjectsClient := authz.NewProjectsClient(authzConn)
+	authzProjectsClient := authz.NewProjectsServiceClient(authzConn)
 
 	// event feed Interface
 	eventFeedConn, err := opts.ConnFactory.Dial("event-feed-service", opts.EventFeedAddress)
@@ -123,7 +123,7 @@ func Spawn(opts *serveropts.Opts) error {
 		log.WithError(err).WithFields(log.Fields{"config_mgmt_address": opts.ConfigMgmtAddress}).Error("Failed to connect to config-mgmt-service")
 		return err
 	}
-	configMgmtClient := cfgmgmt.NewCfgMgmtClient(configMgmtConn)
+	configMgmtClient := cfgmgmt.NewCfgMgmtServiceClient(configMgmtConn)
 
 	chefActionPipeline := pipeline.NewChefActionPipeline(client, authzProjectsClient,
 		configMgmtClient, eventFeedServiceClient,
@@ -138,7 +138,7 @@ func Spawn(opts *serveropts.Opts) error {
 
 	// Register Status Server
 	ingestStatus := server.NewIngestStatus(client, migrator)
-	ingest.RegisterIngestStatusServer(grpcServer, ingestStatus)
+	ingest.RegisterIngestStatusServiceServer(grpcServer, ingestStatus)
 
 	// Initialize elasticsearch indices or trigger a migration
 	//
@@ -182,7 +182,7 @@ func Spawn(opts *serveropts.Opts) error {
 	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient,
 		nodesServiceClient, chefActionPipeline, chefRunPipeline)
 
-	ingest.RegisterChefIngesterServer(grpcServer, chefIngest)
+	ingest.RegisterChefIngesterServiceServer(grpcServer, chefIngest)
 
 	// Pass the chef ingest server to give status about the pipelines
 	ingestStatus.SetChefIngestServer(chefIngest)
@@ -200,7 +200,7 @@ func Spawn(opts *serveropts.Opts) error {
 		return err
 	}
 	defer esSidecarConn.Close() // nolint: errcheck
-	esSidecarClient := es_sidecar.NewEsSidecarClient(esSidecarConn)
+	esSidecarClient := es_sidecar.NewEsSidecarServiceClient(esSidecarConn)
 
 	err = server.InitializeJobManager(jobManager, client, esSidecarClient, nodeMgrServiceClient,
 		nodesServiceClient)
@@ -228,7 +228,7 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 
 	jobSchedulerServer := server.NewJobSchedulerServer(client, jobManager)
-	ingest.RegisterJobSchedulerServer(grpcServer, jobSchedulerServer)
+	ingest.RegisterJobSchedulerServiceServer(grpcServer, jobSchedulerServer)
 
 	purgeServer, err := purge.NewServer(
 		jobManager,
@@ -267,7 +267,7 @@ func Spawn(opts *serveropts.Opts) error {
 	// EventHandler
 	eventHandlerServer := server.NewAutomateEventHandlerServer(client, *chefIngest,
 		authzProjectsClient)
-	ingest.RegisterEventHandlerServer(grpcServer, eventHandlerServer)
+	ingest.RegisterEventHandlerServiceServer(grpcServer, eventHandlerServer)
 
 	// Register reflection service on gRPC server.
 	reflection.Register(grpcServer)

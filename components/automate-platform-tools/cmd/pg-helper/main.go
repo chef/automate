@@ -402,7 +402,7 @@ func migrateTables(fromDB string, toDB string, importUser string, tables []strin
 			// with error code 10 instead of 1 so that clients can act
 			// accordingly.
 			case *pgs.ErrorDetails:
-				if t.Code == pgs.ErrorDetails_SrcDbMissing {
+				if t.Code == pgs.ErrorDetails_SRC_DB_MISSING {
 					return NewExitError(10, st.Message())
 				}
 			}

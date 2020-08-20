@@ -33,9 +33,9 @@ import (
 )
 
 type TestFramework struct {
-	Policy               api.PoliciesClient
-	Authz                api.AuthorizationClient
-	Projects             api.ProjectsClient
+	Policy               api.PoliciesServiceClient
+	Authz                api.AuthorizationServiceClient
+	Projects             api.ProjectsServiceClient
 	TestDB               *TestDB
 	Engine               engine.Engine
 	Seed                 int64
@@ -70,7 +70,7 @@ func (tf *TestFramework) Shutdown(t *testing.T, ctx context.Context) {
 // SetupProjectsAndRulesWithDB is a simplified test framework
 // useful for integration tests with just the DB.
 func SetupProjectsAndRulesWithDB(t *testing.T) (
-	api.ProjectsClient, api.PoliciesClient, *TestDB, storage.Storage, int64) {
+	api.ProjectsServiceClient, api.PoliciesServiceClient, *TestDB, storage.Storage, int64) {
 	t.Helper()
 	ctx := context.Background()
 	seed := prng.GenSeed(t)
@@ -99,8 +99,8 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
 		server.InputValidationInterceptor(),
 	))
-	api.RegisterProjectsServer(serv, projectsSrv)
-	api.RegisterPoliciesServer(serv, polSrv)
+	api.RegisterProjectsServiceServer(serv, projectsSrv)
+	api.RegisterPoliciesServiceServer(serv, polSrv)
 
 	grpcServ := grpctest.NewServer(serv)
 
@@ -109,7 +109,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
 
-	return api.NewProjectsClient(conn), api.NewPoliciesClient(conn), testDB, pg, seed
+	return api.NewProjectsServiceClient(conn), api.NewPoliciesServiceClient(conn), testDB, pg, seed
 }
 
 func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng, *migration.Config) {

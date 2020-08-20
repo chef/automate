@@ -10,24 +10,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// verify that the mock satisfies the ProjectsServer interface (at compile time)
-var _ ProjectsServer = &ProjectsServerMock{}
+// verify that the mock satisfies the ProjectsServiceServer interface (at compile time)
+var _ ProjectsServiceServer = &ProjectsServiceServerMock{}
 
-// NewProjectsServerMock gives you a fresh instance of ProjectsServerMock.
-func NewProjectsServerMock() *ProjectsServerMock {
-	return &ProjectsServerMock{validateRequests: true}
+// NewProjectsServiceServerMock gives you a fresh instance of ProjectsServiceServerMock.
+func NewProjectsServiceServerMock() *ProjectsServiceServerMock {
+	return &ProjectsServiceServerMock{validateRequests: true}
 }
 
-// NewProjectsServerMockWithoutValidation gives you a fresh instance of
-// ProjectsServerMock which does not attempt to validate requests before passing
+// NewProjectsServiceServerMockWithoutValidation gives you a fresh instance of
+// ProjectsServiceServerMock which does not attempt to validate requests before passing
 // them to their respective '*Func'.
-func NewProjectsServerMockWithoutValidation() *ProjectsServerMock {
-	return &ProjectsServerMock{}
+func NewProjectsServiceServerMockWithoutValidation() *ProjectsServiceServerMock {
+	return &ProjectsServiceServerMock{}
 }
 
-// ProjectsServerMock is the mock-what-you-want struct that stubs all not-overridden
+// ProjectsServiceServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
-type ProjectsServerMock struct {
+type ProjectsServiceServerMock struct {
 	validateRequests                 bool
 	UpdateProjectFunc                func(context.Context, *UpdateProjectReq) (*UpdateProjectResp, error)
 	CreateProjectFunc                func(context.Context, *CreateProjectReq) (*CreateProjectResp, error)
@@ -47,7 +47,7 @@ type ProjectsServerMock struct {
 	ListRulesForAllProjectsFunc      func(context.Context, *ListRulesForAllProjectsReq) (*ListRulesForAllProjectsResp, error)
 }
 
-func (m *ProjectsServerMock) UpdateProject(ctx context.Context, req *UpdateProjectReq) (*UpdateProjectResp, error) {
+func (m *ProjectsServiceServerMock) UpdateProject(ctx context.Context, req *UpdateProjectReq) (*UpdateProjectResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -59,7 +59,7 @@ func (m *ProjectsServerMock) UpdateProject(ctx context.Context, req *UpdateProje
 	return nil, status.Error(codes.Internal, "mock: 'UpdateProject' not implemented")
 }
 
-func (m *ProjectsServerMock) CreateProject(ctx context.Context, req *CreateProjectReq) (*CreateProjectResp, error) {
+func (m *ProjectsServiceServerMock) CreateProject(ctx context.Context, req *CreateProjectReq) (*CreateProjectResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -71,7 +71,7 @@ func (m *ProjectsServerMock) CreateProject(ctx context.Context, req *CreateProje
 	return nil, status.Error(codes.Internal, "mock: 'CreateProject' not implemented")
 }
 
-func (m *ProjectsServerMock) GetProject(ctx context.Context, req *GetProjectReq) (*GetProjectResp, error) {
+func (m *ProjectsServiceServerMock) GetProject(ctx context.Context, req *GetProjectReq) (*GetProjectResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -83,7 +83,7 @@ func (m *ProjectsServerMock) GetProject(ctx context.Context, req *GetProjectReq)
 	return nil, status.Error(codes.Internal, "mock: 'GetProject' not implemented")
 }
 
-func (m *ProjectsServerMock) DeleteProject(ctx context.Context, req *DeleteProjectReq) (*DeleteProjectResp, error) {
+func (m *ProjectsServiceServerMock) DeleteProject(ctx context.Context, req *DeleteProjectReq) (*DeleteProjectResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -95,7 +95,7 @@ func (m *ProjectsServerMock) DeleteProject(ctx context.Context, req *DeleteProje
 	return nil, status.Error(codes.Internal, "mock: 'DeleteProject' not implemented")
 }
 
-func (m *ProjectsServerMock) ListProjects(ctx context.Context, req *ListProjectsReq) (*ListProjectsResp, error) {
+func (m *ProjectsServiceServerMock) ListProjects(ctx context.Context, req *ListProjectsReq) (*ListProjectsResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -107,7 +107,7 @@ func (m *ProjectsServerMock) ListProjects(ctx context.Context, req *ListProjects
 	return nil, status.Error(codes.Internal, "mock: 'ListProjects' not implemented")
 }
 
-func (m *ProjectsServerMock) ListProjectsForIntrospection(ctx context.Context, req *ListProjectsReq) (*ListProjectsResp, error) {
+func (m *ProjectsServiceServerMock) ListProjectsForIntrospection(ctx context.Context, req *ListProjectsReq) (*ListProjectsResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -119,7 +119,7 @@ func (m *ProjectsServerMock) ListProjectsForIntrospection(ctx context.Context, r
 	return nil, status.Error(codes.Internal, "mock: 'ListProjectsForIntrospection' not implemented")
 }
 
-func (m *ProjectsServerMock) ApplyRulesStart(ctx context.Context, req *ApplyRulesStartReq) (*ApplyRulesStartResp, error) {
+func (m *ProjectsServiceServerMock) ApplyRulesStart(ctx context.Context, req *ApplyRulesStartReq) (*ApplyRulesStartResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -131,7 +131,7 @@ func (m *ProjectsServerMock) ApplyRulesStart(ctx context.Context, req *ApplyRule
 	return nil, status.Error(codes.Internal, "mock: 'ApplyRulesStart' not implemented")
 }
 
-func (m *ProjectsServerMock) ApplyRulesCancel(ctx context.Context, req *ApplyRulesCancelReq) (*ApplyRulesCancelResp, error) {
+func (m *ProjectsServiceServerMock) ApplyRulesCancel(ctx context.Context, req *ApplyRulesCancelReq) (*ApplyRulesCancelResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -143,7 +143,7 @@ func (m *ProjectsServerMock) ApplyRulesCancel(ctx context.Context, req *ApplyRul
 	return nil, status.Error(codes.Internal, "mock: 'ApplyRulesCancel' not implemented")
 }
 
-func (m *ProjectsServerMock) ApplyRulesStatus(ctx context.Context, req *ApplyRulesStatusReq) (*ApplyRulesStatusResp, error) {
+func (m *ProjectsServiceServerMock) ApplyRulesStatus(ctx context.Context, req *ApplyRulesStatusReq) (*ApplyRulesStatusResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -155,7 +155,7 @@ func (m *ProjectsServerMock) ApplyRulesStatus(ctx context.Context, req *ApplyRul
 	return nil, status.Error(codes.Internal, "mock: 'ApplyRulesStatus' not implemented")
 }
 
-func (m *ProjectsServerMock) CreateRule(ctx context.Context, req *CreateRuleReq) (*CreateRuleResp, error) {
+func (m *ProjectsServiceServerMock) CreateRule(ctx context.Context, req *CreateRuleReq) (*CreateRuleResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -167,7 +167,7 @@ func (m *ProjectsServerMock) CreateRule(ctx context.Context, req *CreateRuleReq)
 	return nil, status.Error(codes.Internal, "mock: 'CreateRule' not implemented")
 }
 
-func (m *ProjectsServerMock) UpdateRule(ctx context.Context, req *UpdateRuleReq) (*UpdateRuleResp, error) {
+func (m *ProjectsServiceServerMock) UpdateRule(ctx context.Context, req *UpdateRuleReq) (*UpdateRuleResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -179,7 +179,7 @@ func (m *ProjectsServerMock) UpdateRule(ctx context.Context, req *UpdateRuleReq)
 	return nil, status.Error(codes.Internal, "mock: 'UpdateRule' not implemented")
 }
 
-func (m *ProjectsServerMock) GetRule(ctx context.Context, req *GetRuleReq) (*GetRuleResp, error) {
+func (m *ProjectsServiceServerMock) GetRule(ctx context.Context, req *GetRuleReq) (*GetRuleResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -191,7 +191,7 @@ func (m *ProjectsServerMock) GetRule(ctx context.Context, req *GetRuleReq) (*Get
 	return nil, status.Error(codes.Internal, "mock: 'GetRule' not implemented")
 }
 
-func (m *ProjectsServerMock) ListRules(ctx context.Context, req *ListRulesReq) (*ListRulesResp, error) {
+func (m *ProjectsServiceServerMock) ListRules(ctx context.Context, req *ListRulesReq) (*ListRulesResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -203,7 +203,7 @@ func (m *ProjectsServerMock) ListRules(ctx context.Context, req *ListRulesReq) (
 	return nil, status.Error(codes.Internal, "mock: 'ListRules' not implemented")
 }
 
-func (m *ProjectsServerMock) ListRulesForProject(ctx context.Context, req *ListRulesForProjectReq) (*ListRulesForProjectResp, error) {
+func (m *ProjectsServiceServerMock) ListRulesForProject(ctx context.Context, req *ListRulesForProjectReq) (*ListRulesForProjectResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -215,7 +215,7 @@ func (m *ProjectsServerMock) ListRulesForProject(ctx context.Context, req *ListR
 	return nil, status.Error(codes.Internal, "mock: 'ListRulesForProject' not implemented")
 }
 
-func (m *ProjectsServerMock) DeleteRule(ctx context.Context, req *DeleteRuleReq) (*DeleteRuleResp, error) {
+func (m *ProjectsServiceServerMock) DeleteRule(ctx context.Context, req *DeleteRuleReq) (*DeleteRuleResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -227,7 +227,7 @@ func (m *ProjectsServerMock) DeleteRule(ctx context.Context, req *DeleteRuleReq)
 	return nil, status.Error(codes.Internal, "mock: 'DeleteRule' not implemented")
 }
 
-func (m *ProjectsServerMock) ListRulesForAllProjects(ctx context.Context, req *ListRulesForAllProjectsReq) (*ListRulesForAllProjectsResp, error) {
+func (m *ProjectsServiceServerMock) ListRulesForAllProjects(ctx context.Context, req *ListRulesForAllProjectsReq) (*ListRulesForAllProjectsResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -240,7 +240,7 @@ func (m *ProjectsServerMock) ListRulesForAllProjects(ctx context.Context, req *L
 }
 
 // Reset resets all overridden functions
-func (m *ProjectsServerMock) Reset() {
+func (m *ProjectsServiceServerMock) Reset() {
 	m.UpdateProjectFunc = nil
 	m.CreateProjectFunc = nil
 	m.GetProjectFunc = nil

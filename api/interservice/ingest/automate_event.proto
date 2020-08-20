@@ -6,7 +6,7 @@ option go_package = "github.com/chef/automate/api/interservice/ingest";
 import "google/protobuf/timestamp.proto";
 import "interservice/event/event.proto";
 
-service EventHandler {
+service EventHandlerService {
   rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
   rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
 }

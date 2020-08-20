@@ -10,24 +10,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// verify that the mock satisfies the PoliciesServer interface (at compile time)
-var _ PoliciesServer = &PoliciesServerMock{}
+// verify that the mock satisfies the PoliciesServiceServer interface (at compile time)
+var _ PoliciesServiceServer = &PoliciesServiceServerMock{}
 
-// NewPoliciesServerMock gives you a fresh instance of PoliciesServerMock.
-func NewPoliciesServerMock() *PoliciesServerMock {
-	return &PoliciesServerMock{validateRequests: true}
+// NewPoliciesServiceServerMock gives you a fresh instance of PoliciesServiceServerMock.
+func NewPoliciesServiceServerMock() *PoliciesServiceServerMock {
+	return &PoliciesServiceServerMock{validateRequests: true}
 }
 
-// NewPoliciesServerMockWithoutValidation gives you a fresh instance of
-// PoliciesServerMock which does not attempt to validate requests before passing
+// NewPoliciesServiceServerMockWithoutValidation gives you a fresh instance of
+// PoliciesServiceServerMock which does not attempt to validate requests before passing
 // them to their respective '*Func'.
-func NewPoliciesServerMockWithoutValidation() *PoliciesServerMock {
-	return &PoliciesServerMock{}
+func NewPoliciesServiceServerMockWithoutValidation() *PoliciesServiceServerMock {
+	return &PoliciesServiceServerMock{}
 }
 
-// PoliciesServerMock is the mock-what-you-want struct that stubs all not-overridden
+// PoliciesServiceServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
-type PoliciesServerMock struct {
+type PoliciesServiceServerMock struct {
 	validateRequests             bool
 	ReplacePolicyMembersFunc     func(context.Context, *ReplacePolicyMembersReq) (*ReplacePolicyMembersResp, error)
 	CreatePolicyFunc             func(context.Context, *CreatePolicyReq) (*Policy, error)
@@ -47,7 +47,7 @@ type PoliciesServerMock struct {
 	PurgeSubjectFromPoliciesFunc func(context.Context, *PurgeSubjectFromPoliciesReq) (*PurgeSubjectFromPoliciesResp, error)
 }
 
-func (m *PoliciesServerMock) ReplacePolicyMembers(ctx context.Context, req *ReplacePolicyMembersReq) (*ReplacePolicyMembersResp, error) {
+func (m *PoliciesServiceServerMock) ReplacePolicyMembers(ctx context.Context, req *ReplacePolicyMembersReq) (*ReplacePolicyMembersResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -59,7 +59,7 @@ func (m *PoliciesServerMock) ReplacePolicyMembers(ctx context.Context, req *Repl
 	return nil, status.Error(codes.Internal, "mock: 'ReplacePolicyMembers' not implemented")
 }
 
-func (m *PoliciesServerMock) CreatePolicy(ctx context.Context, req *CreatePolicyReq) (*Policy, error) {
+func (m *PoliciesServiceServerMock) CreatePolicy(ctx context.Context, req *CreatePolicyReq) (*Policy, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -71,7 +71,7 @@ func (m *PoliciesServerMock) CreatePolicy(ctx context.Context, req *CreatePolicy
 	return nil, status.Error(codes.Internal, "mock: 'CreatePolicy' not implemented")
 }
 
-func (m *PoliciesServerMock) DeletePolicy(ctx context.Context, req *DeletePolicyReq) (*DeletePolicyResp, error) {
+func (m *PoliciesServiceServerMock) DeletePolicy(ctx context.Context, req *DeletePolicyReq) (*DeletePolicyResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -83,7 +83,7 @@ func (m *PoliciesServerMock) DeletePolicy(ctx context.Context, req *DeletePolicy
 	return nil, status.Error(codes.Internal, "mock: 'DeletePolicy' not implemented")
 }
 
-func (m *PoliciesServerMock) ListPolicies(ctx context.Context, req *ListPoliciesReq) (*ListPoliciesResp, error) {
+func (m *PoliciesServiceServerMock) ListPolicies(ctx context.Context, req *ListPoliciesReq) (*ListPoliciesResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -95,7 +95,7 @@ func (m *PoliciesServerMock) ListPolicies(ctx context.Context, req *ListPolicies
 	return nil, status.Error(codes.Internal, "mock: 'ListPolicies' not implemented")
 }
 
-func (m *PoliciesServerMock) GetPolicy(ctx context.Context, req *GetPolicyReq) (*Policy, error) {
+func (m *PoliciesServiceServerMock) GetPolicy(ctx context.Context, req *GetPolicyReq) (*Policy, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -107,7 +107,7 @@ func (m *PoliciesServerMock) GetPolicy(ctx context.Context, req *GetPolicyReq) (
 	return nil, status.Error(codes.Internal, "mock: 'GetPolicy' not implemented")
 }
 
-func (m *PoliciesServerMock) UpdatePolicy(ctx context.Context, req *UpdatePolicyReq) (*Policy, error) {
+func (m *PoliciesServiceServerMock) UpdatePolicy(ctx context.Context, req *UpdatePolicyReq) (*Policy, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -119,7 +119,7 @@ func (m *PoliciesServerMock) UpdatePolicy(ctx context.Context, req *UpdatePolicy
 	return nil, status.Error(codes.Internal, "mock: 'UpdatePolicy' not implemented")
 }
 
-func (m *PoliciesServerMock) GetPolicyVersion(ctx context.Context, req *GetPolicyVersionReq) (*GetPolicyVersionResp, error) {
+func (m *PoliciesServiceServerMock) GetPolicyVersion(ctx context.Context, req *GetPolicyVersionReq) (*GetPolicyVersionResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -131,7 +131,7 @@ func (m *PoliciesServerMock) GetPolicyVersion(ctx context.Context, req *GetPolic
 	return nil, status.Error(codes.Internal, "mock: 'GetPolicyVersion' not implemented")
 }
 
-func (m *PoliciesServerMock) CreateRole(ctx context.Context, req *CreateRoleReq) (*Role, error) {
+func (m *PoliciesServiceServerMock) CreateRole(ctx context.Context, req *CreateRoleReq) (*Role, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -143,7 +143,7 @@ func (m *PoliciesServerMock) CreateRole(ctx context.Context, req *CreateRoleReq)
 	return nil, status.Error(codes.Internal, "mock: 'CreateRole' not implemented")
 }
 
-func (m *PoliciesServerMock) ListRoles(ctx context.Context, req *ListRolesReq) (*ListRolesResp, error) {
+func (m *PoliciesServiceServerMock) ListRoles(ctx context.Context, req *ListRolesReq) (*ListRolesResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -155,7 +155,7 @@ func (m *PoliciesServerMock) ListRoles(ctx context.Context, req *ListRolesReq) (
 	return nil, status.Error(codes.Internal, "mock: 'ListRoles' not implemented")
 }
 
-func (m *PoliciesServerMock) GetRole(ctx context.Context, req *GetRoleReq) (*Role, error) {
+func (m *PoliciesServiceServerMock) GetRole(ctx context.Context, req *GetRoleReq) (*Role, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -167,7 +167,7 @@ func (m *PoliciesServerMock) GetRole(ctx context.Context, req *GetRoleReq) (*Rol
 	return nil, status.Error(codes.Internal, "mock: 'GetRole' not implemented")
 }
 
-func (m *PoliciesServerMock) DeleteRole(ctx context.Context, req *DeleteRoleReq) (*DeleteRoleResp, error) {
+func (m *PoliciesServiceServerMock) DeleteRole(ctx context.Context, req *DeleteRoleReq) (*DeleteRoleResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -179,7 +179,7 @@ func (m *PoliciesServerMock) DeleteRole(ctx context.Context, req *DeleteRoleReq)
 	return nil, status.Error(codes.Internal, "mock: 'DeleteRole' not implemented")
 }
 
-func (m *PoliciesServerMock) UpdateRole(ctx context.Context, req *UpdateRoleReq) (*Role, error) {
+func (m *PoliciesServiceServerMock) UpdateRole(ctx context.Context, req *UpdateRoleReq) (*Role, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -191,7 +191,7 @@ func (m *PoliciesServerMock) UpdateRole(ctx context.Context, req *UpdateRoleReq)
 	return nil, status.Error(codes.Internal, "mock: 'UpdateRole' not implemented")
 }
 
-func (m *PoliciesServerMock) ListPolicyMembers(ctx context.Context, req *ListPolicyMembersReq) (*ListPolicyMembersResp, error) {
+func (m *PoliciesServiceServerMock) ListPolicyMembers(ctx context.Context, req *ListPolicyMembersReq) (*ListPolicyMembersResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -203,7 +203,7 @@ func (m *PoliciesServerMock) ListPolicyMembers(ctx context.Context, req *ListPol
 	return nil, status.Error(codes.Internal, "mock: 'ListPolicyMembers' not implemented")
 }
 
-func (m *PoliciesServerMock) RemovePolicyMembers(ctx context.Context, req *RemovePolicyMembersReq) (*RemovePolicyMembersResp, error) {
+func (m *PoliciesServiceServerMock) RemovePolicyMembers(ctx context.Context, req *RemovePolicyMembersReq) (*RemovePolicyMembersResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -215,7 +215,7 @@ func (m *PoliciesServerMock) RemovePolicyMembers(ctx context.Context, req *Remov
 	return nil, status.Error(codes.Internal, "mock: 'RemovePolicyMembers' not implemented")
 }
 
-func (m *PoliciesServerMock) AddPolicyMembers(ctx context.Context, req *AddPolicyMembersReq) (*AddPolicyMembersResp, error) {
+func (m *PoliciesServiceServerMock) AddPolicyMembers(ctx context.Context, req *AddPolicyMembersReq) (*AddPolicyMembersResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -227,7 +227,7 @@ func (m *PoliciesServerMock) AddPolicyMembers(ctx context.Context, req *AddPolic
 	return nil, status.Error(codes.Internal, "mock: 'AddPolicyMembers' not implemented")
 }
 
-func (m *PoliciesServerMock) PurgeSubjectFromPolicies(ctx context.Context, req *PurgeSubjectFromPoliciesReq) (*PurgeSubjectFromPoliciesResp, error) {
+func (m *PoliciesServiceServerMock) PurgeSubjectFromPolicies(ctx context.Context, req *PurgeSubjectFromPoliciesReq) (*PurgeSubjectFromPoliciesResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -240,7 +240,7 @@ func (m *PoliciesServerMock) PurgeSubjectFromPolicies(ctx context.Context, req *
 }
 
 // Reset resets all overridden functions
-func (m *PoliciesServerMock) Reset() {
+func (m *PoliciesServiceServerMock) Reset() {
 	m.ReplacePolicyMembersFunc = nil
 	m.CreatePolicyFunc = nil
 	m.DeletePolicyFunc = nil

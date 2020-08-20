@@ -54,7 +54,7 @@ var (
 	ScanJobSummaryTaskName = cereal.NewTaskName("scan-job-summary")
 )
 
-func InitCerealManager(m *cereal.Manager, workerCount int, ingestClient ingest.ComplianceIngesterClient,
+func InitCerealManager(m *cereal.Manager, workerCount int, ingestClient ingest.ComplianceIngesterServiceClient,
 	scanner *scanner.Scanner, resolver *resolver.Resolver, remoteInspecVersion string) error {
 	err := m.RegisterWorkflowExecutor(ScanJobWorkflowName, &ScanJobWorkflow{})
 	if err != nil {
@@ -293,7 +293,7 @@ type CreateChildTask struct {
 }
 
 type InspecJobTask struct {
-	ingestClient  ingest.ComplianceIngesterClient
+	ingestClient  ingest.ComplianceIngesterServiceClient
 	scannerServer *scanner.Scanner
 }
 

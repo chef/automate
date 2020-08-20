@@ -23,7 +23,7 @@ var emptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 type postgres struct {
 	db          *sql.DB
 	logger      logger.Logger
-	authzClient authz.AuthorizationClient
+	authzClient authz.AuthorizationServiceClient
 }
 
 type querier interface {
@@ -32,7 +32,7 @@ type querier interface {
 
 // New instantiates and returns a postgres storage implementation
 func New(logger logger.Logger, migrationConfig migration.Config,
-	authzClient authz.AuthorizationClient) (storage.Storage, error) {
+	authzClient authz.AuthorizationServiceClient) (storage.Storage, error) {
 
 	if err := migrationConfig.Migrate(); err != nil {
 		return nil, errors.Wrap(err, "database migrations")

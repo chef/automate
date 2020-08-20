@@ -198,7 +198,7 @@ func fixedEvents(t *testing.T) *event_feed_api.FeedResponse {
 				SourceEventPublished: timestamp1,
 				Producer: &event_feed_api.Producer{
 					Name: "mocked_event",
-					ID:   "scanjob",
+					Id:   "scanjob",
 				},
 				Actor: &event_feed_api.Actor{
 					Name:       "golang",
@@ -217,7 +217,7 @@ func fixedEvents(t *testing.T) *event_feed_api.FeedResponse {
 			SourceEventPublished: timestamp2,
 			Producer: &event_feed_api.Producer{
 				Name: "mocked_event",
-				ID:   "profile",
+				Id:   "profile",
 			},
 			Actor: &event_feed_api.Actor{
 				Name:       "golang",
@@ -235,7 +235,7 @@ func fixedEvents(t *testing.T) *event_feed_api.FeedResponse {
 			SourceEventPublished: timestamp3,
 			Producer: &event_feed_api.Producer{
 				Name: "mocked_event",
-				ID:   "profile",
+				Id:   "profile",
 			},
 			Actor: &event_feed_api.Actor{
 				Name:       "golang",

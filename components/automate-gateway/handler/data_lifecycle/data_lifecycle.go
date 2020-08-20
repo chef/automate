@@ -14,7 +14,7 @@ import (
 )
 
 // NewServer returns a pointer to a new instance of the Server
-func NewServer(ingestJobClient ingest.JobSchedulerClient,
+func NewServer(ingestJobClient ingest.JobSchedulerServiceClient,
 	ingestPurgeClient data_lifecycle.PurgeClient,
 	compliancePurgeClient data_lifecycle.PurgeClient,
 	eventFeedPurgeClient data_lifecycle.PurgeClient,
@@ -32,7 +32,7 @@ func NewServer(ingestJobClient ingest.JobSchedulerClient,
 
 // Server is the data lifecycle server handler implementation
 type Server struct {
-	ingestJobClient       ingest.JobSchedulerClient
+	ingestJobClient       ingest.JobSchedulerServiceClient
 	ingestPurgeClient     data_lifecycle.PurgeClient
 	compliancePurgeClient data_lifecycle.PurgeClient
 	eventFeedPurgeClient  data_lifecycle.PurgeClient

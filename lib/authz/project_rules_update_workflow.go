@@ -193,8 +193,8 @@ func (m *ESCancelUpdateProjectTagsTask) Run(
 }
 
 type ESStartProjectTagUpdaterTask struct {
-	esClient            EsClient
-	authzProjectsClient authz.ProjectsClient
+	esClient                   EsClient
+	authzProjectsServiceClient authz.ProjectsServiceClient
 }
 
 func (m *ESStartProjectTagUpdaterTask) Run(
@@ -212,7 +212,7 @@ func (m *ESStartProjectTagUpdaterTask) Run(
 func (m *ESStartProjectTagUpdaterTask) startProjectTagUpdater(ctx context.Context) ([]string, error) {
 	logrus.Info("starting es project updater")
 
-	projectCollectionRulesResp, err := m.authzProjectsClient.ListRulesForAllProjects(ctx,
+	projectCollectionRulesResp, err := m.authzProjectsServiceClient.ListRulesForAllProjects(ctx,
 		&authz.ListRulesForAllProjectsReq{})
 	if err != nil {
 		return []string{}, errors.Wrap(err, "Failed to get authz project rules")
@@ -286,7 +286,7 @@ func NewWorkflowExecutorForDomainService(domainService string) *DomainProjectUpd
 	}
 }
 
-func RegisterTaskExecutors(manager *cereal.Manager, domainService string, esClient EsClient, authzProjectsClient authz.ProjectsClient) error {
+func RegisterTaskExecutors(manager *cereal.Manager, domainService string, esClient EsClient, authzProjectsServiceClient authz.ProjectsServiceClient) error {
 	cancelUpdateProjectTagsTaskName := CancelUpdateProjectTagsTaskName(domainService)
 	startProjectTagUpdaterTaskName := StartProjectTagUpdaterTaskName(domainService)
 	projectTagUpdaterStatusTaskName := ProjectTagUpdaterStatusTaskName(domainService)
@@ -304,8 +304,8 @@ func RegisterTaskExecutors(manager *cereal.Manager, domainService string, esClie
 	}
 
 	startTagsUpdaterTask := &ESStartProjectTagUpdaterTask{
-		esClient:            esClient,
-		authzProjectsClient: authzProjectsClient,
+		esClient:                   esClient,
+		authzProjectsServiceClient: authzProjectsServiceClient,
 	}
 	if err := manager.RegisterTaskExecutor(startProjectTagUpdaterTaskName, startTagsUpdaterTask,
 		taskExecutorOpts); err != nil {

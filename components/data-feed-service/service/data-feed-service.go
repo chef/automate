@@ -223,7 +223,7 @@ func addDataContent(nodeDataContent map[string]interface{}, attributes map[strin
 	}
 }
 
-func getNodeFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, error) {
+func getNodeFields(ctx context.Context, client cfgmgmt.CfgMgmtServiceClient, filters []string) (string, string, error) {
 
 	nodeFilters := &cfgmgmtRequest.Nodes{Filter: filters}
 	nodes, err := client.GetNodes(ctx, nodeFilters)
@@ -244,7 +244,7 @@ func getNodeFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []
 
 }
 
-func getNodeAttributes(ctx context.Context, client cfgmgmt.CfgMgmtClient, nodeId string) (map[string]interface{}, error) {
+func getNodeAttributes(ctx context.Context, client cfgmgmt.CfgMgmtServiceClient, nodeId string) (map[string]interface{}, error) {
 
 	attributesJson := make(map[string]interface{})
 
@@ -280,7 +280,7 @@ func getAttributesAsJson(attributes string, attributeType string) map[string]int
 	return attributesJson
 }
 
-func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, string, error) {
+func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtServiceClient, filters []string) (string, string, string, error) {
 	nodeId, _, err := getNodeFields(ctx, client, filters)
 	if err != nil {
 		return "", "", "", err

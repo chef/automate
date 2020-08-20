@@ -14,7 +14,7 @@
     "/api/v0/api/authenticate": {
       "get": {
         "summary": "Authenticate inspects the request's metadata -- for this, an empty argument\nis just enough. Getting a response means it was authenticated successfully.\nIf the metadata does not contain what is needed to authenticate the\nrequest, or the tokens are wrong, the AuthenticationService will return the\ncorresponding error code, with details in the message.",
-        "operationId": "Authentication_Authenticate",
+        "operationId": "AuthenticationService_Authenticate",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -30,7 +30,7 @@
           }
         },
         "tags": [
-          "Authentication"
+          "AuthenticationService"
         ]
       }
     }

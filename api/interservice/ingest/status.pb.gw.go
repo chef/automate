@@ -31,7 +31,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 
-func request_IngestStatus_GetHealth_0(ctx context.Context, marshaler runtime.Marshaler, client IngestStatusClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_IngestStatusService_GetHealth_0(ctx context.Context, marshaler runtime.Marshaler, client IngestStatusServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq HealthRequest
 	var metadata runtime.ServerMetadata
 
@@ -40,7 +40,7 @@ func request_IngestStatus_GetHealth_0(ctx context.Context, marshaler runtime.Mar
 
 }
 
-func local_request_IngestStatus_GetHealth_0(ctx context.Context, marshaler runtime.Marshaler, server IngestStatusServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_IngestStatusService_GetHealth_0(ctx context.Context, marshaler runtime.Marshaler, server IngestStatusServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq HealthRequest
 	var metadata runtime.ServerMetadata
 
@@ -49,7 +49,7 @@ func local_request_IngestStatus_GetHealth_0(ctx context.Context, marshaler runti
 
 }
 
-func request_IngestStatus_GetMigrationStatus_0(ctx context.Context, marshaler runtime.Marshaler, client IngestStatusClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_IngestStatusService_GetMigrationStatus_0(ctx context.Context, marshaler runtime.Marshaler, client IngestStatusServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq MigrationStatusRequest
 	var metadata runtime.ServerMetadata
 
@@ -58,7 +58,7 @@ func request_IngestStatus_GetMigrationStatus_0(ctx context.Context, marshaler ru
 
 }
 
-func local_request_IngestStatus_GetMigrationStatus_0(ctx context.Context, marshaler runtime.Marshaler, server IngestStatusServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_IngestStatusService_GetMigrationStatus_0(ctx context.Context, marshaler runtime.Marshaler, server IngestStatusServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq MigrationStatusRequest
 	var metadata runtime.ServerMetadata
 
@@ -67,12 +67,12 @@ func local_request_IngestStatus_GetMigrationStatus_0(ctx context.Context, marsha
 
 }
 
-// RegisterIngestStatusHandlerServer registers the http handlers for service IngestStatus to "mux".
-// UnaryRPC     :call IngestStatusServer directly.
+// RegisterIngestStatusServiceHandlerServer registers the http handlers for service IngestStatusService to "mux".
+// UnaryRPC     :call IngestStatusServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-func RegisterIngestStatusHandlerServer(ctx context.Context, mux *runtime.ServeMux, server IngestStatusServer) error {
+func RegisterIngestStatusServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server IngestStatusServiceServer) error {
 
-	mux.Handle("GET", pattern_IngestStatus_GetHealth_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_IngestStatusService_GetHealth_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -81,18 +81,18 @@ func RegisterIngestStatusHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_IngestStatus_GetHealth_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_IngestStatusService_GetHealth_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_IngestStatus_GetHealth_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_IngestStatusService_GetHealth_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_IngestStatus_GetMigrationStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_IngestStatusService_GetMigrationStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -101,23 +101,23 @@ func RegisterIngestStatusHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_IngestStatus_GetMigrationStatus_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_IngestStatusService_GetMigrationStatus_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_IngestStatus_GetMigrationStatus_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_IngestStatusService_GetMigrationStatus_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterIngestStatusHandlerFromEndpoint is same as RegisterIngestStatusHandler but
+// RegisterIngestStatusServiceHandlerFromEndpoint is same as RegisterIngestStatusServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterIngestStatusHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterIngestStatusServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -137,23 +137,23 @@ func RegisterIngestStatusHandlerFromEndpoint(ctx context.Context, mux *runtime.S
 		}()
 	}()
 
-	return RegisterIngestStatusHandler(ctx, mux, conn)
+	return RegisterIngestStatusServiceHandler(ctx, mux, conn)
 }
 
-// RegisterIngestStatusHandler registers the http handlers for service IngestStatus to "mux".
+// RegisterIngestStatusServiceHandler registers the http handlers for service IngestStatusService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterIngestStatusHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterIngestStatusHandlerClient(ctx, mux, NewIngestStatusClient(conn))
+func RegisterIngestStatusServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterIngestStatusServiceHandlerClient(ctx, mux, NewIngestStatusServiceClient(conn))
 }
 
-// RegisterIngestStatusHandlerClient registers the http handlers for service IngestStatus
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "IngestStatusClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "IngestStatusClient"
+// RegisterIngestStatusServiceHandlerClient registers the http handlers for service IngestStatusService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "IngestStatusServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "IngestStatusServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "IngestStatusClient" to call the correct interceptors.
-func RegisterIngestStatusHandlerClient(ctx context.Context, mux *runtime.ServeMux, client IngestStatusClient) error {
+// "IngestStatusServiceClient" to call the correct interceptors.
+func RegisterIngestStatusServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client IngestStatusServiceClient) error {
 
-	mux.Handle("GET", pattern_IngestStatus_GetHealth_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_IngestStatusService_GetHealth_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -162,18 +162,18 @@ func RegisterIngestStatusHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_IngestStatus_GetHealth_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_IngestStatusService_GetHealth_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_IngestStatus_GetHealth_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_IngestStatusService_GetHealth_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_IngestStatus_GetMigrationStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_IngestStatusService_GetMigrationStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -182,14 +182,14 @@ func RegisterIngestStatusHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_IngestStatus_GetMigrationStatus_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_IngestStatusService_GetMigrationStatus_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_IngestStatus_GetMigrationStatus_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_IngestStatusService_GetMigrationStatus_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -197,13 +197,13 @@ func RegisterIngestStatusHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_IngestStatus_GetHealth_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "health"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_IngestStatusService_GetHealth_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "health"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_IngestStatus_GetMigrationStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "migration"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_IngestStatusService_GetMigrationStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "migration"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
-	forward_IngestStatus_GetHealth_0 = runtime.ForwardResponseMessage
+	forward_IngestStatusService_GetHealth_0 = runtime.ForwardResponseMessage
 
-	forward_IngestStatus_GetMigrationStatus_0 = runtime.ForwardResponseMessage
+	forward_IngestStatusService_GetMigrationStatus_0 = runtime.ForwardResponseMessage
 )

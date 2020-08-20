@@ -58,13 +58,13 @@ func setup(t *testing.T) (tokens.Storage, *sql.DB) {
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
-	mockAuthz := authz.NewAuthorizationServerMock()
+	mockAuthz := authz.NewAuthorizationServiceServerMock()
 	mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-	authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
+	authz.RegisterAuthorizationServiceServer(grpcAuthz, mockAuthz)
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
-	authzClient := authz.NewAuthorizationClient(authzConn)
+	authzClient := authz.NewAuthorizationServiceClient(authzConn)
 
 	backend, err := pgCfg.Open(nil, l, authzClient)
 	require.NoError(t, err)
