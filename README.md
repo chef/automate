@@ -14,8 +14,8 @@ Key features include:
 
 For more information see:
 
-- Documentation: https://automate.chef.io/docs/
-- Release Notes: https://automate.chef.io/release-notes/
+- Documentation: https://docs.chef.io/automate/
+- Release Notes: https://docs.chef.io/release_notes_automate/
 
 **Project State**: [Active](https://github.com/chef/chef-oss-practices/blob/master/repo-management/repo-states.md#active)
 
