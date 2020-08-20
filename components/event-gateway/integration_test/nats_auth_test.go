@@ -58,7 +58,7 @@ func (s *Suite) initAuthzClient() error {
 		return err
 	}
 
-	authzClient := policies.NewPoliciesClient(authzConn)
+	authzClient := policies.NewPoliciesServiceClient(authzConn)
 
 	s.authzConn = authzConn
 	s.AuthzClient = authzClient
@@ -170,7 +170,7 @@ func getNewToken(t *testing.T, authorizedAction string) string {
 	require.NoError(t, err)
 	defer authnConnection.Close() // nolint: errcheck
 
-	authnClient := authn.NewTokensMgmtClient(authnConnection)
+	authnClient := authn.NewTokensMgmtServiceClient(authnConnection)
 
 	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx,
 		[]string{"tls:service:deployment-service:internal"}, []string{}, "res", "act"))

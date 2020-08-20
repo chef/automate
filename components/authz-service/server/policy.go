@@ -564,23 +564,23 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 		}
 
 		// ignore anything not related to the OPA store.
-		if !strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Policies/") &&
-			!strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Projects/") {
+		if !strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.PoliciesService/") &&
+			!strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.ProjectsService/") {
 			return resp, nil
 		}
 
 		switch info.FullMethod {
 		// Important! Any new endpoint that requires refreshing the OPA cache must be added here.
-		case "/chef.automate.domain.authz.Policies/ReplacePolicyMembers",
-			"/chef.automate.domain.authz.Policies/CreatePolicy",
-			"/chef.automate.domain.authz.Policies/DeletePolicy",
-			"/chef.automate.domain.authz.Policies/UpdatePolicy",
-			"/chef.automate.domain.authz.Policies/CreateRole",
-			"/chef.automate.domain.authz.Policies/DeleteRole",
-			"/chef.automate.domain.authz.Policies/UpdateRole",
-			"/chef.automate.domain.authz.Policies/RemovePolicyMembers",
-			"/chef.automate.domain.authz.Policies/AddPolicyMembers",
-			"/chef.automate.domain.authz.Policies/PurgeSubjectFromPolicies":
+		case "/chef.automate.domain.authz.PoliciesService/ReplacePolicyMembers",
+			"/chef.automate.domain.authz.PoliciesService/CreatePolicy",
+			"/chef.automate.domain.authz.PoliciesService/DeletePolicy",
+			"/chef.automate.domain.authz.PoliciesService/UpdatePolicy",
+			"/chef.automate.domain.authz.PoliciesService/CreateRole",
+			"/chef.automate.domain.authz.PoliciesService/DeleteRole",
+			"/chef.automate.domain.authz.PoliciesService/UpdateRole",
+			"/chef.automate.domain.authz.PoliciesService/RemovePolicyMembers",
+			"/chef.automate.domain.authz.PoliciesService/AddPolicyMembers",
+			"/chef.automate.domain.authz.PoliciesService/PurgeSubjectFromPolicies":
 			if err := s.updateEngineStore(ctx); err != nil {
 				return nil, status.Errorf(codes.Internal, "error updating engine store: %s", err.Error())
 			}
