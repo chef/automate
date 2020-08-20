@@ -13,10 +13,10 @@ import (
 	c "github.com/chef/automate/lib/platform/command"
 )
 
-var SCMType_UNKNOWN_SCM = req.SCMType_name[int32(req.SCMType_UNKNOWN_SCM)]
-var SCMType_GIT = req.SCMType_name[int32(req.SCMType_GIT)]
-var SCMWebType_UNKNOWN_SCM_WEB = req.SCMWebType_name[int32(req.SCMWebType_UNKNOWN_SCM_WEB)]
-var SCMWebType_GITHUB = req.SCMWebType_name[int32(req.SCMWebType_GITHUB)]
+var SCMType_UNKNOWN_SCM = req.SCMType_name[int32(req.SCMType_SCM_TYPE_UNKNOWN_SCM)]
+var SCMType_GIT = req.SCMType_name[int32(req.SCMType_SCM_TYPE_GIT)]
+var SCMWebType_UNKNOWN_SCM_WEB = req.SCMWebType_name[int32(req.SCMWebType_SCM_WEB_TYPE_UNKNOWN_SCM_WEB)]
+var SCMWebType_GITHUB = req.SCMWebType_name[int32(req.SCMWebType_SCM_WEB_TYPE_GITHUB)]
 
 type RolloutMetadata struct {
 	policyLockPath   string

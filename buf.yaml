@@ -66,7 +66,6 @@ lint:
     # The linters below this comment should be turned on for new things (todo)
     - RPC_RESPONSE_STANDARD_NAME
     - RPC_REQUEST_RESPONSE_UNIQUE
-    - ENUM_ZERO_VALUE_SUFFIX
   ignore_only:
     SERVICE_SUFFIX:
       # The automate-cli accesses the `Deployment` service directly; making
@@ -173,16 +172,51 @@ lint:
       - interservice/deployment/automate_deployment.proto
       # Used to parse external JSON:
       - interservice/compliance/profiles/profiles.proto
+      - interservice/compliance/jobs/jobs.proto
+      - interservice/compliance/reporting/reporting.proto
       # The following interservice proto APIs could (should?) be updated to
       # follow the style guide, but the churn impact is large.
       - interservice/authz/policy.proto
       - interservice/authz/project.proto
       - interservice/authz/type.proto
       - interservice/cfgmgmt/request/parameters.proto
-      - interservice/compliance/jobs/jobs.proto
-      - interservice/compliance/reporting/reporting.proto
       - interservice/compliance/stats/stats.proto
       - interservice/compliance/status/status.proto
+      - interservice/es_sidecar/service.proto
+      - interservice/nodemanager/manager/manager.proto
+      - interservice/nodemanager/nodes/nodes.proto
+      - interservice/pg_sidecar/service.proto
+      # /components/
+      - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
+      - automate-gateway/api/iam/v2/common/policy.proto
+      - automate-gateway/api/iam/v2/common/rules.proto
+      - automate-gateway/api/notifications/notifications.proto
+      # /lib/
+      - grpc/debug/debug_api/debug.proto
+    ENUM_ZERO_VALUE_SUFFIX:
+      # /api/
+      - external/applications/applications.proto
+      - external/common/query/parameters.proto
+      - external/compliance/profiles/profiles.proto
+      - external/compliance/reporting/reporting.proto
+      - external/compliance/reporting/stats/stats.proto
+      - external/compliance/scanner/jobs/jobs.proto
+      - external/nodes/manager/manager.proto
+      - external/nodes/nodes.proto
+      - external/secrets/secrets.proto
+      # deployment protos are used by the CLI and can't be changed
+      - interservice/authz/policy.proto
+      # compliance protos used to parse external JSON:
+      - interservice/compliance/jobs/jobs.proto
+      - interservice/compliance/profiles/profiles.proto
+      - interservice/compliance/reporting/reporting.proto
+      # These could be changed
+      - interservice/authz/project.proto
+      - interservice/authz/type.proto
+      - interservice/cfgmgmt/request/parameters.proto
+      - interservice/compliance/stats/stats.proto
+      - interservice/compliance/status/status.proto
+      - interservice/deployment/automate_deployment.proto
       - interservice/es_sidecar/service.proto
       - interservice/nodemanager/manager/manager.proto
       - interservice/nodemanager/nodes/nodes.proto

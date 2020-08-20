@@ -1038,18 +1038,20 @@ func init() {
     "chef.automate.api.cfgmgmt.request.SCMType": {
       "type": "string",
       "enum": [
+        "SCM_TYPE_UNSPECIFIED",
         "SCM_TYPE_UNKNOWN_SCM",
         "SCM_TYPE_GIT"
       ],
-      "default": "SCM_TYPE_UNKNOWN_SCM"
+      "default": "SCM_TYPE_UNSPECIFIED"
     },
     "chef.automate.api.cfgmgmt.request.SCMWebType": {
       "type": "string",
       "enum": [
+        "SCM_WEB_TYPE_UNSPECIFIED",
         "SCM_WEB_TYPE_UNKNOWN_SCM_WEB",
         "SCM_WEB_TYPE_GITHUB"
       ],
-      "default": "SCM_WEB_TYPE_UNKNOWN_SCM_WEB"
+      "default": "SCM_WEB_TYPE_UNSPECIFIED"
     },
     "chef.automate.api.cfgmgmt.response.CheckInCounts": {
       "type": "object",
@@ -1888,18 +1890,20 @@ func init() {
     "chef.automate.api.cfgmgmt.response.SCMType": {
       "type": "string",
       "enum": [
+        "SCM_TYPE_UNSPECIFIED",
         "SCM_TYPE_UNKNOWN_SCM",
         "SCM_TYPE_GIT"
       ],
-      "default": "SCM_TYPE_UNKNOWN_SCM"
+      "default": "SCM_TYPE_UNSPECIFIED"
     },
     "chef.automate.api.cfgmgmt.response.SCMWebType": {
       "type": "string",
       "enum": [
+        "SCM_WEB_TYPE_UNSPECIFIED",
         "SCM_WEB_TYPE_UNKNOWN_SCM_WEB",
         "SCM_WEB_TYPE_GITHUB"
       ],
-      "default": "SCM_WEB_TYPE_UNKNOWN_SCM_WEB"
+      "default": "SCM_WEB_TYPE_UNSPECIFIED"
     },
     "chef.automate.api.cfgmgmt.response.TypeCount": {
       "type": "object",
