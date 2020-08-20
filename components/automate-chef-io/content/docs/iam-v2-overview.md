@@ -10,6 +10,8 @@ description = "IAM Overview"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/iam_v2_overview/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "authorization"

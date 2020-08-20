@@ -5,6 +5,8 @@ date = 2018-03-26T16:02:53-07:00
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/profiles/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "compliance"

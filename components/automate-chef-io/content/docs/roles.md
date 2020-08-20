@@ -4,6 +4,8 @@ description = "IAM Roles"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/roles/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "settings"

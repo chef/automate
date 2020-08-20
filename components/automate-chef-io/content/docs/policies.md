@@ -4,6 +4,8 @@ description = "IAM Policies"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/policies/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "settings"

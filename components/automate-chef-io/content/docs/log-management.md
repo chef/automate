@@ -3,6 +3,8 @@ title = "Log Management"
 description = "Chef Automate 2.0 sends all log events to `stdout` and `stderr` allowing the process supervisor to handle logs in a standard way."
 draft = false
 bref = "Chef Automate 2.0 sends all log events to `stdout` and `stderr` allowing the process supervisor to handle logs in a standard way."
+redirect_url = "https://docs.chef.io/automate/log_management/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "configuring_automate"

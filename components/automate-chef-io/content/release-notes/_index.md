@@ -1,6 +1,7 @@
 +++
 title = "Release Notes"
-layout = "release-notes"
+redirect_url = "https://docs.chef.io/release_notes_automate/"
+layout = "redirect"
 +++
 
 This page is meant to be empty. The release notes are dynamically loaded via the Javascript references in the 'release-notes' layout.

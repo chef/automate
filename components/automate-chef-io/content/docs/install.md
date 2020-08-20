@@ -4,6 +4,8 @@ description = "Install Chef Automate 2.0 directly on Ubuntu or CentOS servers."
 draft = false
 bref = "Chef Automate 2.0 can be installed directly on Ubuntu or CentOS servers."
 toc = true
+redirect_url = "https://docs.chef.io/automate/install/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "get_started"

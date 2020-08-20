@@ -7,6 +7,8 @@ description = "Migrate an existing Chef Automate 1 installation"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/migrate/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "get_started"

@@ -4,6 +4,8 @@ description = "Reference Actions for Roles"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/iam_actions/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "authorization"

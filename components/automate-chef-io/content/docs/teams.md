@@ -5,6 +5,8 @@ date = 2018-05-16T16:03:13-07:00
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/teams/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "settings"

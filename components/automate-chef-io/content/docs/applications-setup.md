@@ -5,11 +5,14 @@ date = 2019-10-18T18:54:09+00:00
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/applications_setup/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "applications"
     weight = 20
 +++
+
 <!-- ## Health Checks
 
 To maximize the utility of the Chef Automate EAS Applications feature, it is recommended to implement meaningful health check hooks for your services.

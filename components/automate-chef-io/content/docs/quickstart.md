@@ -5,6 +5,8 @@ weight = 1
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "get_started"

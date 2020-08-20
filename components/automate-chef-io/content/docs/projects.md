@@ -4,6 +4,8 @@ description = "IAM Projects"
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/projects/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "settings"

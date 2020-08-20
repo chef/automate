@@ -5,6 +5,8 @@ date = 2018-05-08T18:54:09+00:00
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/configuration/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "configuring_automate"

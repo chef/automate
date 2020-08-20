@@ -4,6 +4,8 @@ description = "Installing and Configuring the Automate ServiceNow Integration fo
 draft = false
 bref = ""
 toc = true
+redirect_url = "https://docs.chef.io/automate/servicenow_integration_install/"
+layout = "redirect"
 [menu]
   [menu.docs]
     parent = "reference"
