@@ -12,3 +12,7 @@ layout = "redirect"
     parent = "reference"
     weight = 20
 +++
+
+The Automate documentation has been moved to [`components/docs-chef-io`](https://github.com/chef/automate/blob/master/components/docs-chef-io/).
+
+This page is now located in [https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/cli_chef_automate.md](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/cli_chef_automate.md).
