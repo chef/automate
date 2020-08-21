@@ -2,11 +2,17 @@
 
 set -eou pipefail
 
-mkdir -p /go/src/github.com/chef
-ln -s /workspace /go/src/github.com/chef/automate
+if [[ ! -d  /go/src/github.com/chef ]]; then
+	mkdir -p /go/src/github.com/chef
+fi
+if [[ ! -L /go/src/github.com/chef/automate ]]; then
+	ln -s /workspace /go/src/github.com/chef/automate
+fi
 
 branch="expeditor/generate-automate-api-docs"
 git checkout -b "$branch"
+
+git submodule update
 
 pushd /go/src/github.com/chef/automate/components/docs-chef-io
   make sync_swagger_files
