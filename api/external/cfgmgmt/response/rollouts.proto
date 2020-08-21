@@ -4,13 +4,15 @@ package chef.automate.api.cfgmgmt.response;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/response";
 
 enum SCMType {
-  UNKNOWN_SCM = 0;
-  GIT = 1;
+  SCM_TYPE_UNSPECIFIED = 0;
+  SCM_TYPE_UNKNOWN_SCM = 1;
+  SCM_TYPE_GIT = 2;
 }
 
 enum SCMWebType {
-  UNKNOWN_SCM_WEB = 0;
-  GITHUB = 1;
+  SCM_WEB_TYPE_UNSPECIFIED = 0;
+  SCM_WEB_TYPE_UNKNOWN_SCM_WEB = 1;
+  SCM_WEB_TYPE_GITHUB = 2;
 }
 
 /*

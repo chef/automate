@@ -110,8 +110,8 @@ func TestCreateRolloutFromMetadataAPI(t *testing.T) {
 			PolicyRevisionId:     "abc123",
 			PolicyDomainUrl:      "https://chef-server.example/organizations/example_org",
 			PolicyDomainUsername: "bobo",
-			ScmType:              request.SCMType_GIT,
-			ScmWebType:           request.SCMWebType_GITHUB,
+			ScmType:              request.SCMType_SCM_TYPE_GIT,
+			ScmWebType:           request.SCMWebType_SCM_WEB_TYPE_GITHUB,
 			ScmAuthorName:        "Bobo Tiberius Clown",
 			ScmAuthorEmail:       "bobo@example.com",
 			PolicyScmUrl:         "git@github.com:chef/automate.git",
@@ -132,8 +132,8 @@ func TestCreateRolloutFromMetadataAPI(t *testing.T) {
 			assert.Equal(t, "abc123", res.PolicyRevisionId)
 			assert.Equal(t, "https://chef-server.example/organizations/example_org", res.PolicyDomainUrl)
 			assert.Equal(t, "bobo", res.PolicyDomainUsername)
-			assert.Equal(t, response.SCMType_GIT, res.ScmType)
-			assert.Equal(t, response.SCMWebType_GITHUB, res.ScmWebType)
+			assert.Equal(t, response.SCMType_SCM_TYPE_GIT, res.ScmType)
+			assert.Equal(t, response.SCMWebType_SCM_WEB_TYPE_GITHUB, res.ScmWebType)
 			assert.Equal(t, "git@github.com:chef/automate.git", res.PolicyScmUrl)
 			assert.Equal(t, "https://github.com/chef/automate", res.PolicyScmWebUrl)
 			assert.Equal(t, "a2a344e6804629de85ffa50e84caad18ac42cf50", res.PolicyScmCommit)
@@ -207,8 +207,8 @@ func TestCreateRolloutFromMetadataAPI(t *testing.T) {
 			PolicyRevisionId:     req1.PolicyRevisionId,
 			PolicyDomainUrl:      req1.PolicyDomainUrl,
 			PolicyDomainUsername: "bobo",
-			ScmType:              request.SCMType_GIT,
-			ScmWebType:           request.SCMWebType_GITHUB,
+			ScmType:              request.SCMType_SCM_TYPE_GIT,
+			ScmWebType:           request.SCMWebType_SCM_WEB_TYPE_GITHUB,
 			ScmAuthorName:        "Bobo Tiberius Clown",
 			ScmAuthorEmail:       "bobo@example.com",
 			PolicyScmUrl:         "git@github.com:chef/automate.git",
@@ -237,8 +237,8 @@ func TestCreateRolloutFromMetadataAPI(t *testing.T) {
 
 		// These are all added by the second request
 		assert.Equal(t, "bobo", updated.PolicyDomainUsername)
-		assert.Equal(t, response.SCMType_GIT, updated.ScmType)
-		assert.Equal(t, response.SCMWebType_GITHUB, updated.ScmWebType)
+		assert.Equal(t, response.SCMType_SCM_TYPE_GIT, updated.ScmType)
+		assert.Equal(t, response.SCMWebType_SCM_WEB_TYPE_GITHUB, updated.ScmWebType)
 		assert.Equal(t, "git@github.com:chef/automate.git", updated.PolicyScmUrl)
 		assert.Equal(t, "https://github.com/chef/automate", updated.PolicyScmWebUrl)
 		assert.Equal(t, "a2a344e6804629de85ffa50e84caad18ac42cf50", updated.PolicyScmCommit)
