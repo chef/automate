@@ -86,7 +86,7 @@ func TestFetchLocalTeamsInAuthenticate(t *testing.T) {
 	factory := secureconn.NewFactory(*serviceCerts)
 	conn, err := factory.Dial("authn-service", authn.URL)
 	require.Nil(t, err)
-	client := auth.NewAuthenticationClient(conn)
+	client := auth.NewAuthenticationServiceClient(conn)
 
 	// Note: this id_token was snatched from a2-unstable, but is authenticated by
 	// the mock-oidc adapter set up above. Furthermore, the mock adapter will
@@ -138,7 +138,7 @@ func TestFetchLocalTeamsInAuthenticate(t *testing.T) {
 func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 	ctx := context.Background()
 
-	mockTeams := teams_api.NewTeamsServerMock()
+	mockTeams := teams_api.NewTeamsServiceServerMock()
 	teams := newTeamService(t, mockTeams)
 	defer teams.Close()
 
@@ -161,7 +161,7 @@ func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 	factory := secureconn.NewFactory(*serviceCerts)
 	conn, err := factory.Dial("authn-service", authn.URL)
 	require.Nil(t, err)
-	client := auth.NewAuthenticationClient(conn)
+	client := auth.NewAuthenticationServiceClient(conn)
 
 	tests := map[string]struct {
 		teamsResp *teams_api.GetTeamsForMemberResp
@@ -239,7 +239,7 @@ func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 func TestNoTeamsLookupForNonLocalUsersInAuthenticate(t *testing.T) {
 	ctx := context.Background()
 
-	mockTeams := teams_api.NewTeamsServerMock()
+	mockTeams := teams_api.NewTeamsServiceServerMock()
 	teams := newTeamService(t, mockTeams)
 	defer teams.Close()
 
@@ -262,7 +262,7 @@ func TestNoTeamsLookupForNonLocalUsersInAuthenticate(t *testing.T) {
 	factory := secureconn.NewFactory(*serviceCerts)
 	conn, err := factory.Dial("authn-service", authn.URL)
 	require.Nil(t, err)
-	client := auth.NewAuthenticationClient(conn)
+	client := auth.NewAuthenticationServiceClient(conn)
 
 	checks := []checkFunc{
 		hasTeams(2),
@@ -313,13 +313,13 @@ func containsTeam(team string) checkFunc {
 
 // mini-factories
 
-func newTeamService(t *testing.T, m *teams_api.TeamsServerMock) *grpctest.Server {
+func newTeamService(t *testing.T, m *teams_api.TeamsServiceServerMock) *grpctest.Server {
 	t.Helper()
 
 	serviceCerts := helpers.LoadDevCerts(t, "teams-service")
 	connFactory := secureconn.NewFactory(*serviceCerts)
 	g := connFactory.NewServer()
-	teams_api.RegisterTeamsServer(g, m)
+	teams_api.RegisterTeamsServiceServer(g, m)
 	return grpctest.NewServer(g)
 }
 

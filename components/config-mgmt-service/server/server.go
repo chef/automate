@@ -42,7 +42,7 @@ func StartGRPC(c *config.Service) error {
 	if err != nil {
 		return err
 	}
-	gw.RegisterCfgMgmtServer(grpcServer, rootServer)
+	gw.RegisterCfgMgmtServiceServer(grpcServer, rootServer)
 
 	// Register reflection service on gRPC server.
 	reflection.Register(grpcServer)

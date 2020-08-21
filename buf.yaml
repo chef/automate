@@ -1,3 +1,39 @@
+################################################################################
+# Protocol Buffers Linter Configuration
+################################################################################
+#
+# This file configures the `buf` tool, you run buf's linter as `buf check lint`, or
+# use `lint_all_protobuf_components` in the habitat studio.
+#
+# ## References:
+# 
+# - Style Guide: https://buf.build/docs/style-guide/
+# - Docs for individual checkers: https://buf.build/docs/lint-checkers
+# - Config docs: https://buf.build/docs/lint-configuration
+#
+# ## Rationale For Exceptions
+#
+# We've adopted linting for protobufs for the same reason we have it for other
+# kinds of code: avoid dangerous legal constructions, encourage consistent
+# style, etc.
+#
+# This linter was adopted only after Automate was a mature product with
+# compatibility constraints. Automate uses protocol buffers to generate the
+# external REST API along with gRPC client and server code, the configuration
+# data structures exposed to end users, &etc. Thus, some portions of the
+# protocol buffer codebase are constrained to remain compatible:
+# - At the protobuf message level
+# - At the JSON representation level
+# - At the JSON generation/consumption level (e.g., golang struct tags)
+# - At the generated code level
+# To maintain compatibility at all of these layers, we must keep some of the
+# protobuf code as-is, in violation of the style guide. This applies broadly to
+# all of the pre-existing code in api/external, some API code in
+# components/automate-gateway, the configuration protobufs, and a handful of
+# special cases. Unless noted otherwise, the style guide exceptions configured
+# here are intended only to cover older code. Follow the style guide whenever
+# you can do so without breaking things.
+
 build:
   roots:
     - api
@@ -28,13 +64,77 @@ lint:
     - PACKAGE_SAME_DIRECTORY 
     - PACKAGE_DIRECTORY_MATCH
     # The linters below this comment should be turned on for new things (todo)
-    - RPC_REQUEST_STANDARD_NAME
     - RPC_RESPONSE_STANDARD_NAME
     - RPC_REQUEST_RESPONSE_UNIQUE
-    - SERVICE_SUFFIX
     - ENUM_VALUE_PREFIX
     - ENUM_ZERO_VALUE_SUFFIX
   ignore_only:
+    SERVICE_SUFFIX:
+      # The automate-cli accesses the `Deployment` service directly; making
+      # changes to it makes the CLI unable to install older versions of
+      # Automate, which is breaking.
+      - interservice/deployment/automate_deployment.proto
+      # The automate-cli diagnostics accesses the `Purge` service directly; making
+      # changes to it makes upgrade tests fail. This is less breaking, but hard
+      # to change.
+      - interservice/data_lifecycle/purge.proto
+      # /api/
+      - external/cds/cds.proto
+      - external/cfgmgmt/cfgmgmt.proto
+      - external/data_lifecycle/data_lifecycle.proto
+      - external/infra_proxy/infra_proxy.proto
+      - external/ingest/chef.proto
+      - external/ingest/job_scheduler.proto
+      # /components/
+      - automate-gateway/api/deployment/deployment.proto
+      - automate-gateway/api/event_feed/event_feed.proto
+      - automate-gateway/api/gateway/gateway.proto
+      - automate-gateway/api/iam/v2/introspect.proto
+      - automate-gateway/api/iam/v2/policy.proto
+      - automate-gateway/api/iam/v2/rules.proto
+      - automate-gateway/api/iam/v2/teams.proto
+      - automate-gateway/api/iam/v2/tokens.proto
+      - automate-gateway/api/iam/v2/users.proto
+      - automate-gateway/api/legacy/legacy.proto
+      - automate-gateway/api/license/license.proto
+      - automate-gateway/api/notifications/notifications.proto
+      - automate-gateway/api/telemetry/telemetry.proto
+      # /lib/
+      - grpc/debug/debug_api/debug.proto
+    RPC_REQUEST_STANDARD_NAME:
+      # todo:
+      - interservice
+      # /api/
+      - external/applications/applications.proto
+      - external/cds/cds.proto
+      - external/cfgmgmt/cfgmgmt.proto
+      - external/compliance/profiles/profiles.proto
+      - external/compliance/reporting/reporting.proto
+      - external/compliance/reporting/stats/stats.proto
+      - external/compliance/scanner/jobs/jobs.proto
+      - external/data_feed/data_feed.proto
+      - external/infra_proxy/infra_proxy.proto
+      - external/ingest/chef.proto
+      - external/ingest/job_scheduler.proto
+      - external/nodes/manager/manager.proto
+      - external/nodes/nodes.proto
+      - external/secrets/secrets.proto
+      # /components/
+      - automate-gateway/api/deployment/deployment.proto
+      - automate-gateway/api/event_feed/event_feed.proto
+      - automate-gateway/api/gateway/gateway.proto
+      - automate-gateway/api/iam/v2/introspect.proto
+      - automate-gateway/api/iam/v2/policy.proto
+      - automate-gateway/api/iam/v2/rules.proto
+      - automate-gateway/api/iam/v2/teams.proto
+      - automate-gateway/api/iam/v2/tokens.proto
+      - automate-gateway/api/iam/v2/users.proto
+      - automate-gateway/api/legacy/legacy.proto
+      - automate-gateway/api/license/license.proto
+      - automate-gateway/api/notifications/notifications.proto
+      - automate-gateway/api/telemetry/telemetry.proto
+      # /lib/
+      - grpc/debug/debug_api/debug.proto
     PACKAGE_SAME_GO_PACKAGE:
       # /api/
       - config
@@ -54,26 +154,13 @@ lint:
       - automate-grpc/protoc-gen-a2-config/api/a2conf
     FIELD_LOWER_SNAKE_CASE:
       - external/infra_proxy/response/policyfiles.proto
-      # /api/
-      - interservice/cfgmgmt/response/root.proto
-      - interservice/compliance/profiles/profiles.proto
-      - interservice/es_sidecar/service.proto
-      - interservice/event/event.proto
-      - interservice/event_feed/event_feed.proto
-      - interservice/infra_proxy/response/policyfiles.proto
-      - interservice/license_control/license-control.proto
       # /component/
       - automate-gateway/api/notifications/notifications.proto
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
     ENUM_VALUE_UPPER_SNAKE_CASE:
-      - interservice/cfgmgmt
-      - interservice/pg_sidecar/service.proto
       - automate-gateway/api/notifications/notifications.proto
     MESSAGE_PASCAL_CASE:
       - config/dex/config_request.proto
-      - interservice/cfgmgmt/response/suggestions.proto
-    FILE_LOWER_SNAKE_CASE:
-      - interservice/license_control/license-control.proto
     PACKAGE_DEFINED:
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
   ignore:

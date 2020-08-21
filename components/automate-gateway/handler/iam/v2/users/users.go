@@ -17,12 +17,12 @@ import (
 
 // Server is the server interface
 type Server struct {
-	users           local_user.UsersMgmtClient
+	users           local_user.UsersMgmtServiceClient
 	eventFeedClient event_feed.EventFeedServiceClient
 }
 
 // NewServer creates a server with its client.
-func NewServer(users local_user.UsersMgmtClient,
+func NewServer(users local_user.UsersMgmtServiceClient,
 	eventFeedClient event_feed.EventFeedServiceClient) *Server {
 	return &Server{users: users, eventFeedClient: eventFeedClient}
 }
@@ -155,27 +155,27 @@ func createUserDeleteEvent(req *pb_req.DeleteUserReq) *automate_event.EventMsg {
 func createUserEvent(userID, userDisplayName, verb string) *automate_event.EventMsg {
 	entityType := "local_user"
 	return &automate_event.EventMsg{
-		EventID: uuid.Must(uuid.NewV4()).String(),
+		EventId: uuid.Must(uuid.NewV4()).String(),
 		Type:    &automate_event.EventType{Name: event.EventFeedEventName},
 		Producer: &automate_event.Producer{
-			ID:           entityType,
+			Id:           entityType,
 			ProducerName: entityType,
 			ProducerType: "automate",
 		},
 		Published: ptypes.TimestampNow(),
 		Actor: &automate_event.Actor{
-			ID:          "",
+			Id:          "",
 			ObjectType:  "User",
 			DisplayName: "Not known",
 		},
 		Verb: verb,
 		Object: &automate_event.Object{
-			ID:          userID,
+			Id:          userID,
 			ObjectType:  entityType,
 			DisplayName: userDisplayName,
 		},
 		Target: &automate_event.Target{
-			ID:          "",
+			Id:          "",
 			ObjectType:  "Not Applicable",
 			DisplayName: "Not Applicable",
 		},

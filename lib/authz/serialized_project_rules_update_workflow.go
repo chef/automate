@@ -489,9 +489,9 @@ func (s *serializedProjectUpdateListTasksTask) Run(
 }
 
 type serializedProjectUpdateRunTaskTask struct {
-	client              SerializedProjectUpdate
-	authzProjectsClient authz.ProjectsClient
-	svc                 string
+	client                     SerializedProjectUpdate
+	authzProjectsServiceClient authz.ProjectsServiceClient
+	svc                        string
 }
 
 func (s *serializedProjectUpdateRunTaskTask) Run(
@@ -508,7 +508,7 @@ func (s *serializedProjectUpdateRunTaskTask) Run(
 		"params":            params.Params,
 	}).Info("Running project update task")
 
-	projectCollectionRulesResp, err := s.authzProjectsClient.ListRulesForAllProjects(ctx,
+	projectCollectionRulesResp, err := s.authzProjectsServiceClient.ListRulesForAllProjects(ctx,
 		&authz.ListRulesForAllProjectsReq{})
 	if err != nil {
 		return []string{}, errors.Wrap(err, "Failed to get authz project rules")
@@ -583,7 +583,7 @@ func (s *serializedProjectUpdateCancelTaskTask) Run(
 }
 
 func RegisterSerialTaskExecutors(manager *cereal.Manager, svc string, client SerializedProjectUpdate,
-	authzProjectsClient authz.ProjectsClient) error {
+	authzProjectsServiceClient authz.ProjectsServiceClient) error {
 
 	taskExecutorOpts := cereal.TaskExecutorOpts{
 		Workers: 1,
@@ -600,9 +600,9 @@ func RegisterSerialTaskExecutors(manager *cereal.Manager, svc string, client Ser
 	}
 
 	runTaskExecutor := &serializedProjectUpdateRunTaskTask{
-		client:              client,
-		authzProjectsClient: authzProjectsClient,
-		svc:                 svc,
+		client:                     client,
+		authzProjectsServiceClient: authzProjectsServiceClient,
+		svc:                        svc,
 	}
 
 	if err := manager.RegisterTaskExecutor(runTaskTaskNameForService(svc), runTaskExecutor,

@@ -36,7 +36,7 @@ type EsPolicy struct {
 }
 
 // Purge purges based on the policy
-func (p EsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarClient) error {
+func (p EsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarServiceClient) error {
 	var (
 		err    error
 		id     = time.Now().UTC().Format(time.RFC3339)

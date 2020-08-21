@@ -22,8 +22,8 @@ type ChefActionPipeline struct {
 }
 
 // NewChefActionPipeline Create a new chef action pipeline
-func NewChefActionPipeline(client backend.Client, authzClient authz.ProjectsClient,
-	configMgmtClient cfgmgmt.CfgMgmtClient, eventFeedServiceClient event_feed.EventFeedServiceClient,
+func NewChefActionPipeline(client backend.Client, authzClient authz.ProjectsServiceClient,
+	configMgmtClient cfgmgmt.CfgMgmtServiceClient, eventFeedServiceClient event_feed.EventFeedServiceClient,
 	messageBufferSize, maxNumberOfBundledActionMsgs int) ChefActionPipeline {
 
 	var (

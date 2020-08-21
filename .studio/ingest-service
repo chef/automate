@@ -49,36 +49,36 @@ document "mark_nodes_missing" <<DOC
   Run the mark nodes missing job now
 DOC
 function mark_nodes_missing() {
-  ingest_grpcurl_get chef.automate.domain.ingest.JobScheduler.MarkNodesMissing
+  ingest_grpcurl_get chef.automate.domain.ingest.JobSchedulerService.MarkNodesMissing
 }
 
 function ingest_version() {
-  ingest_grpcurl_get chef.automate.domain.ingest.ChefIngester.GetVersion
+  ingest_grpcurl_get chef.automate.domain.ingest.ChefIngesterService.GetVersion
 }
 
 document "ingest_job_status" <<DOC
   Get the Job Scheduler's status
 DOC
 function ingest_job_status() {
-  ingest_grpcurl_get chef.automate.domain.ingest.JobScheduler.GetStatusJobScheduler
+  ingest_grpcurl_get chef.automate.domain.ingest.JobSchedulerService.GetStatusJobScheduler
 }
 
 document "ingest_job_stop" <<DOC
   Stop the Job Scheduler
 DOC
 function ingest_job_stop() {
-  ingest_grpcurl_get chef.automate.domain.ingest.JobScheduler.StopJobScheduler
+  ingest_grpcurl_get chef.automate.domain.ingest.JobSchedulerService.StopJobScheduler
 }
 
 document "ingest_job_start" <<DOC
   Start the Job Scheduler
 DOC
 function ingest_job_start() {
-  ingest_grpcurl_get chef.automate.domain.ingest.JobScheduler.StartJobScheduler
+  ingest_grpcurl_get chef.automate.domain.ingest.JobSchedulerService.StartJobScheduler
 }
 
 function ingest_migration_status() {
-  ingest_grpcurl_get chef.automate.domain.ingest.IngestStatus.GetMigrationStatus
+  ingest_grpcurl_get chef.automate.domain.ingest.IngestStatusService.GetMigrationStatus
 }
 
 function install_ingest_test_framework {
@@ -283,9 +283,9 @@ document "ingest_grpcurl_list_services" <<DOC
 
   @(arg:1) Optional: An RPC service to inspec
 
-  Example: Inspect the ChefIngester service
+  Example: Inspect the ChefIngesterService service
   -----------------------------
-  ingest_grpcurl_list_services chef.automate.domain.ingest.ChefIngester
+  ingest_grpcurl_list_services chef.automate.domain.ingest.ChefIngesterService
 DOC
 function ingest_grpcurl_list_services() {
   chef-automate dev grpcurl ingest-service -- list "$1"
@@ -298,7 +298,7 @@ document "ingest_grpcurl_get" <<DOC
 
   Example: Get the migration status (GetMigrationStatus)
   -----------------------------
-  ingest_grpcurl_get chef.automate.domain.ingest.IngestStatus.GetMigrationStatus
+  ingest_grpcurl_get chef.automate.domain.ingest.IngestStatusService.GetMigrationStatus
 
   NOTE: Run 'ingest_grpcurl_list_services' to inspec the RPC services.
 DOC

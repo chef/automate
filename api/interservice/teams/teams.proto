@@ -149,7 +149,7 @@ message PurgeUserMembershipResp {
     repeated string ids = 1;
 }
 
-service Teams {
+service TeamsService {
   rpc GetVersion (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
   rpc GetTeam (GetTeamReq) returns (GetTeamResp) {};
   rpc ListTeams (ListTeamsReq) returns (ListTeamsResp) {};

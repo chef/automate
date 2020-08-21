@@ -44,7 +44,7 @@ func Spawn(config *config.Service) error {
 	grpcServer := connFactory.NewServer()
 
 	purgeServer := server.NewEsSidecarServer(es, &config.BackupsConfig)
-	api.RegisterEsSidecarServer(grpcServer, purgeServer)
+	api.RegisterEsSidecarServiceServer(grpcServer, purgeServer)
 	reflection.Register(grpcServer)
 	return grpcServer.Serve(conn)
 }

@@ -27,7 +27,7 @@ var (
 
 type Suite struct {
 	connFactory *secureconn.Factory
-	AuthzClient policies.PoliciesClient
+	AuthzClient policies.PoliciesServiceClient
 	authzConn   *grpc.ClientConn
 }
 

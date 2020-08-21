@@ -18,7 +18,7 @@ import (
 )
 
 type LicenseServer struct {
-	client       license_control.LicenseControlClient
+	client       license_control.LicenseControlServiceClient
 	deployClient deployment_service.DeploymentClient
 	tlClient     tlc.Client
 }
@@ -26,7 +26,7 @@ type LicenseServer struct {
 // NewLicenseServer returns the initialized state of the license handlers: a
 // client to license-control-service and the URL of trial-license-service
 func NewLicenseServer(
-	client license_control.LicenseControlClient,
+	client license_control.LicenseControlServiceClient,
 	deployClient deployment_service.DeploymentClient,
 	trialLicenseURL *url.URL) *LicenseServer {
 	var tlClient tlc.Client

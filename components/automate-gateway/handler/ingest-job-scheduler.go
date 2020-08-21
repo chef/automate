@@ -11,10 +11,10 @@ import (
 )
 
 type ChefIngestJobSchedulerServer struct {
-	jobSchedulerClient ingest.JobSchedulerClient
+	jobSchedulerClient ingest.JobSchedulerServiceClient
 }
 
-func NewChefIngestJobSchedulerServer(jobSchedulerClient ingest.JobSchedulerClient) *ChefIngestJobSchedulerServer {
+func NewChefIngestJobSchedulerServer(jobSchedulerClient ingest.JobSchedulerServiceClient) *ChefIngestJobSchedulerServer {
 	return &ChefIngestJobSchedulerServer{jobSchedulerClient: jobSchedulerClient}
 }
 

@@ -32,9 +32,9 @@ chef_web_docs_submodule:
 	git submodule update --init --recursive
 	git submodule foreach git pull origin master
 	git submodule foreach git reset --hard
-	cp -R content/* chef-web-docs/_vendor/github.com/inspec/inspec/www/content
-	cp -R static/images/* chef-web-docs/_vendor/github.com/inspec/inspec/www/static/images
-	cp -R layouts/* chef-web-docs/_vendor/github.com/inspec/inspec/www/layouts
+	cp -R content/* chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/content
+	cp -R static/* chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/static
+	cp -R layouts/* chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/layouts
 
 reset_chef_web_docs:
 	git submodule foreach git reset --hard

@@ -23,7 +23,7 @@ type Server struct {
 	workflowName    cereal.WorkflowName
 	scheduleName    string
 	defaultPolicies *Policies
-	esSidecarClient es.EsSidecarClient
+	esSidecarClient es.EsSidecarServiceClient
 	jobManager      *cereal.Manager
 }
 
@@ -67,7 +67,7 @@ func NewServer(
 
 type ServerOpt func(*Server)
 
-func WithServerEsSidecarClient(esClient es.EsSidecarClient) ServerOpt {
+func WithServerEsSidecarClient(esClient es.EsSidecarServiceClient) ServerOpt {
 	return func(s *Server) {
 		s.esSidecarClient = esClient
 	}

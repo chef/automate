@@ -63,28 +63,28 @@ func (s *Suite) createEvents(amountToCreate int) []*api.EventMsg {
 
 	for i := 0; i < amountToCreate; i++ {
 		event := &api.EventMsg{
-			EventID: uuid.Must(uuid.NewV4()).String(),
+			EventId: uuid.Must(uuid.NewV4()).String(),
 			Type:    &api.EventType{Name: config.ScanJobCreatedEventName},
 			Producer: &api.Producer{
-				ID:           "urn:chef:compliance:scan-component",
+				Id:           "urn:chef:compliance:scan-component",
 				ProducerName: "Scanner",
 				ProducerType: "system component",
 			},
 			Tags:      []string{"scanjobs", "create"},
 			Published: ptypes.TimestampNow(),
 			Actor: &api.Actor{
-				ID:          "urn:mycompany:user:fred",
+				Id:          "urn:mycompany:user:fred",
 				ObjectType:  "User",
 				DisplayName: "Fred",
 			},
 			Verb: "create",
 			Object: &api.Object{
-				ID:          uuid.Must(uuid.NewV4()).String(),
+				Id:          uuid.Must(uuid.NewV4()).String(),
 				ObjectType:  "scanjobs", // entity types are scanjobs, profile
 				DisplayName: "Scan Job",
 			},
 			Target: &api.Target{
-				ID:          "urn:mycompany:environment:production",
+				Id:          "urn:mycompany:environment:production",
 				ObjectType:  "Environment",
 				DisplayName: "Production",
 			},

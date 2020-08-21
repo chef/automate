@@ -802,7 +802,7 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			// collect IDs from events response
 			eventIDs := make([]string, res.TotalEntries)
 			for index, event := range res.FeedEntries {
-				eventIDs[index] = event.ID
+				eventIDs[index] = event.Id
 			}
 
 			// test response
@@ -926,7 +926,7 @@ func TestEventFeedChefServerChefOrgFilters(t *testing.T) {
 			// collect IDs from events response
 			eventIDs := make([]string, res.TotalEntries)
 			for index, event := range res.FeedEntries {
-				eventIDs[index] = event.ID
+				eventIDs[index] = event.Id
 			}
 
 			// test response

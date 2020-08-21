@@ -57,7 +57,7 @@ func (f *FeedService) GetFeed(ctx context.Context, req *event_feed.FeedRequest) 
 	}
 
 	fq := feed.FeedQuery{
-		UserID:     req.UserID,
+		UserID:     req.UserId,
 		Size:       int(req.Size),
 		Start:      startTime.UTC(),
 		End:        endTime.UTC(),
@@ -140,7 +140,7 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 	// translate event message into feed entry
 	feedEntry := &feed.FeedEntry{
 		ID:                 uuid.Must(uuid.NewV4()).String(),
-		ProducerID:         req.Producer.ID,
+		ProducerID:         req.Producer.Id,
 		ProducerName:       req.Producer.ProducerName,
 		ProducerObjectType: req.Producer.ProducerType,
 		ProducerTags:       req.Producer.Tags,
@@ -148,14 +148,14 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 		EventType:          req.Type.Name,
 		Tags:               req.Tags,
 		Published:          publishedAt.UTC(),
-		ActorID:            req.Actor.ID,
+		ActorID:            req.Actor.Id,
 		ActorName:          req.Actor.DisplayName,
 		ActorObjectType:    req.Actor.ObjectType,
 		Verb:               req.Verb,
-		ObjectID:           req.Object.ID,
+		ObjectID:           req.Object.Id,
 		ObjectName:         req.Object.DisplayName,
 		ObjectObjectType:   req.Object.ObjectType,
-		TargetID:           req.Target.ID,
+		TargetID:           req.Target.Id,
 		TargetName:         req.Target.DisplayName,
 		TargetObjectType:   req.Target.ObjectType,
 		Created:            time.Now().UTC(),

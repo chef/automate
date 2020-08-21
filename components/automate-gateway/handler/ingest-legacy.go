@@ -10,10 +10,10 @@ import (
 )
 
 type legacyIngestServer struct {
-	ingestStatusClient ingest.IngestStatusClient
+	ingestStatusClient ingest.IngestStatusServiceClient
 }
 
-func NewLegacyIngestServer(ingestStatusClient ingest.IngestStatusClient) *legacyIngestServer {
+func NewLegacyIngestServer(ingestStatusClient ingest.IngestStatusServiceClient) *legacyIngestServer {
 	return &legacyIngestServer{ingestStatusClient: ingestStatusClient}
 }
 

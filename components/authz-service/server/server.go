@@ -122,9 +122,9 @@ func NewGRPCServer(ctx context.Context,
 
 	// register all services
 	health.RegisterHealthServer(g, health.NewService())
-	api.RegisterPoliciesServer(g, polServer)
-	api.RegisterProjectsServer(g, projectsServer)
-	api.RegisterAuthorizationServer(g, authzServer)
+	api.RegisterPoliciesServiceServer(g, polServer)
+	api.RegisterProjectsServiceServer(g, projectsServer)
+	api.RegisterAuthorizationServiceServer(g, authzServer)
 	reflection.Register(g)
 
 	if err := cerealManager.Start(ctx); err != nil {

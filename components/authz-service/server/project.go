@@ -42,7 +42,7 @@ func NewMemstoreProjectsServer(
 	l logger.Logger,
 	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
-) (api.ProjectsServer, error) {
+) (api.ProjectsServiceServer, error) {
 
 	s := memstore.New()
 	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager, l, s, pr)
@@ -62,7 +62,7 @@ func NewPostgresProjectsServer(
 	l logger.Logger,
 	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
-) (api.ProjectsServer, error) {
+) (api.ProjectsServiceServer, error) {
 
 	s := postgres.GetInstance()
 	if s == nil {
@@ -86,7 +86,7 @@ func NewProjectsServer(
 	projectUpdateManager ProjectUpdateMgr,
 	projectPurger project_purger_workflow.ProjectPurger,
 	pr PolicyRefresher,
-) (api.ProjectsServer, error) {
+) (api.ProjectsServiceServer, error) {
 
 	return &ProjectState{
 		log:                  l,

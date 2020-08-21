@@ -58,7 +58,7 @@ func checkHealth(configFile string) {
 		fmt.Printf("error connecting to local-user-service at %s\n", c.GRPC)
 		os.Exit(2) // CRIT 503
 	}
-	userClient := local_user.NewUsersMgmtClient(connection)
+	userClient := local_user.NewUsersMgmtServiceClient(connection)
 	email := local_user.Email{Email: "heath-check@habitat.sh"}
 	_, err = userClient.GetUser(context.Background(), &email)
 	if err != nil && status.Code(err) != codes.NotFound {

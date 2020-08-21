@@ -118,7 +118,7 @@ func TestUsersGRPC(t *testing.T) {
 	if err != nil {
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
-	cl := api.NewUsersMgmtClient(conn)
+	cl := api.NewUsersMgmtServiceClient(conn)
 
 	t.Run("GetUsers", func(t *testing.T) {
 		resp, err := cl.GetUsers(ctx, &api.GetUsersReq{})
@@ -516,7 +516,7 @@ func TestUsersGRPCInternalErrors(t *testing.T) {
 	if err != nil {
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
-	cl := api.NewUsersMgmtClient(conn)
+	cl := api.NewUsersMgmtServiceClient(conn)
 
 	t.Run("GetUsers", func(t *testing.T) {
 		_, err := cl.GetUsers(ctx, &api.GetUsersReq{})
@@ -552,25 +552,25 @@ func TestUsersGRPCInternalErrors(t *testing.T) {
 	})
 }
 
-func newTeamsMock(t *testing.T) (*grpctest.Server, *teams.TeamsServerMock) {
+func newTeamsMock(t *testing.T) (*grpctest.Server, *teams.TeamsServiceServerMock) {
 	t.Helper()
 	certs := helpers.LoadDevCerts(t, "teams-service")
-	mockTeams := teams.NewTeamsServerMock()
+	mockTeams := teams.NewTeamsServiceServerMock()
 	connFactory := secureconn.NewFactory(*certs)
 	g := connFactory.NewServer()
-	teams.RegisterTeamsServer(g, mockTeams)
+	teams.RegisterTeamsServiceServer(g, mockTeams)
 	teams := grpctest.NewServer(g)
 	return teams, mockTeams
 }
 
-func newAuthzMock(t *testing.T) (*grpctest.Server, *authz.PoliciesServerMock) {
+func newAuthzMock(t *testing.T) (*grpctest.Server, *authz.PoliciesServiceServerMock) {
 	t.Helper()
 	certs := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*certs)
 	g := connFactory.NewServer()
-	mockPolicies := authz.NewPoliciesServerMock()
+	mockPolicies := authz.NewPoliciesServiceServerMock()
 	mockPolicies.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-	authz.RegisterPoliciesServer(g, mockPolicies)
+	authz.RegisterPoliciesServiceServer(g, mockPolicies)
 	authzServer := grpctest.NewServer(g)
 	return authzServer, mockPolicies
 }
