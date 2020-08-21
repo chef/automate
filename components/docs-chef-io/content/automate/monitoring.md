@@ -15,12 +15,12 @@ draft = false
 
 ## Overview
 
-The `/status` endpoint is an authenticated API endpoint for users who want to monitor their Automate installation by connecting to an http endpoint. Previously, users ran the `chef-automate status` command from the Automate node itself to monitor an Automate installation.
+The `/status` endpoint is an authenticated API endpoint for users who want to monitor their Automate installation by connecting to an http endpoint.
 
 ## Checking the status endpoint
 
 The authenticated endpoint `/status` provides status for the overall Chef Automate installation as well as its component services. 
-When all Chef Automate component services are up, `/status` returns a response code of 200. Otherwise, `/status` returns 500.
+When all Chef Automate component services are up, `/status` returns a response code of 200. Otherwise, `/status` returns 500. The status of a service can be `OK`, `UNKNOWN`, or `CRITICAL`.
 
 To use `/status`, set up an authentication token that can be used with your monitoring system by following the steps below:
 
