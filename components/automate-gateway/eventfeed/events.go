@@ -31,7 +31,7 @@ func NewEventFeedAggregate(feedClient event_feed_api.EventFeedServiceClient) *Ev
 // the gateway is just collecting information from the downstream services and it
 // should be able to handle errors.
 func (eventFeedAggregate *EventFeedAggregate) CollectEventFeed(ctx context.Context,
-	request *agReq.EventFilter) (*agRes.Events, error) {
+	request *agReq.GetEventFeedRequest) (*agRes.GetEventFeedResponse, error) {
 
 	var (
 		ascending                 = false
@@ -42,7 +42,7 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventFeed(ctx context.Conte
 	)
 
 	if err != nil {
-		return &agRes.Events{}, err
+		return &agRes.GetEventFeedResponse{}, err
 	}
 
 	// This case is if the request is for the last page. For the last page request
@@ -57,14 +57,14 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventFeed(ctx context.Conte
 
 	eventCollection, err := collectEventFeed(ctx, eventFeedAggregate.feedServiceClient, request)
 	if err != nil {
-		return &agRes.Events{}, err
+		return &agRes.GetEventFeedResponse{}, err
 	}
 	totalEvents = eventCollection.Events
 	totalNumberOfEvents += eventCollection.TotalEvents
 
 	err = sortEvents(totalEvents, ascending)
 	if err != nil {
-		return &agRes.Events{}, err
+		return &agRes.GetEventFeedResponse{}, err
 	}
 
 	// If this is not the last page the max number of events to take is the page size.
@@ -95,7 +95,7 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventFeed(ctx context.Conte
 		totalEvents = groupEvents(totalEvents)
 	}
 
-	return &agRes.Events{
+	return &agRes.GetEventFeedResponse{
 		Events:      totalEvents,
 		TotalEvents: totalNumberOfEvents,
 	}, nil
@@ -146,7 +146,7 @@ func sortEvents(eventCollection []*agRes.Event, ascending bool) error {
 	return nil
 }
 
-func validateRequest(request *agReq.EventFilter) error {
+func validateRequest(request *agReq.GetEventFeedRequest) error {
 	if request.Start != 0 && request.End != 0 && request.Start > request.End {
 		return status.Error(codes.InvalidArgument, "Invalid start/end time. End before Start")
 	}
@@ -227,7 +227,7 @@ func groupEvents(events []*agRes.Event) []*agRes.Event {
 
 func collectEventFeed(ctx context.Context,
 	feedClient event_feed_api.EventFeedServiceClient,
-	request *agReq.EventFilter) (*agRes.Events, error) {
+	request *agReq.GetEventFeedRequest) (*agRes.GetEventFeedResponse, error) {
 	eventFilter := &event_feed_api.FeedRequest{
 		Filters: request.GetFilter(),
 		Start:   request.GetStart(),
@@ -240,7 +240,7 @@ func collectEventFeed(ctx context.Context,
 
 	eventCollection, err := feedClient.GetFeed(ctx, eventFilter)
 	if err != nil {
-		return &agRes.Events{}, err
+		return &agRes.GetEventFeedResponse{}, err
 	}
 
 	agEvents := make([]*agRes.Event, len(eventCollection.FeedEntries))
@@ -264,7 +264,7 @@ func collectEventFeed(ctx context.Context,
 		}
 	}
 
-	return &agRes.Events{
+	return &agRes.GetEventFeedResponse{
 		Events:      agEvents,
 		TotalEvents: eventCollection.TotalEntries,
 	}, nil

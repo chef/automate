@@ -4,7 +4,16 @@ package chef.automate.api.event_feed.request;
 option go_package = "github.com/chef/automate/api/external/event_feed/request";
 import "external/common/query/parameters.proto";
 
-message EventFilter {
+message GetEventTypeCountsRequest {
+  // Filters to be applied to the request.
+  repeated string filter = 1;
+  // Earliest events to return.
+  int64 start = 2;
+  // Latest events to return.
+  int64 end = 3;
+}
+
+message GetEventFeedRequest {
   // Filters to be applied to the request.
   repeated string filter = 1;
   // Earliest events to return.
@@ -23,7 +32,7 @@ message EventFilter {
   bool collapse = 8;
 }
 
-message EventCountsFilter {
+message GetEventTaskCountsRequest {
   // Filters to be applied to the request.
   repeated string filter = 1;
   // Earliest events to return.
@@ -32,7 +41,7 @@ message EventCountsFilter {
   int64 end = 3;
 }
 
-message EventExport {
+message EventExportRequest {
   // JSON or CSV
   string output_type      = 1;
   // Filters to be applied to the request.

@@ -9,8 +9,8 @@ import (
 )
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.event_feed.EventFeed/GetEventFeed", "event:events", "event:events:list", "GET", "/api/v0/eventfeed", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*request.EventFilter); ok {
+	policy.MapMethodTo("/chef.automate.api.event_feed.EventFeedService/GetEventFeed", "event:events", "event:events:list", "GET", "/api/v0/eventfeed", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.GetEventFeedRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
 				case "cursor":
@@ -22,14 +22,14 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.event_feed.EventFeed/GetEventTypeCounts", "event:events", "event:events:list", "GET", "/api/v0/event_type_counts", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.event_feed.EventFeedService/GetEventTypeCounts", "event:events", "event:events:list", "GET", "/api/v0/event_type_counts", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.event_feed.EventFeed/GetEventTaskCounts", "event:events", "event:events:list", "GET", "/api/v0/event_task_counts", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.event_feed.EventFeedService/GetEventTaskCounts", "event:events", "event:events:list", "GET", "/api/v0/event_task_counts", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.event_feed.EventFeed/GetEventStringBuckets", "event:events", "event:events:list", "GET", "/api/v0/eventstrings", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*request.EventStrings); ok {
+	policy.MapMethodTo("/chef.automate.api.event_feed.EventFeedService/GetEventStringBuckets", "event:events", "event:events:list", "GET", "/api/v0/eventstrings", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.GetEventStringBucketsRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
 				case "start":

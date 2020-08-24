@@ -5,7 +5,7 @@ option go_package = "github.com/chef/automate/api/external/event_feed/response";
 
 import "google/protobuf/timestamp.proto";
 
-message Events {
+message GetEventFeedResponse {
   // List of events.
   repeated Event events = 1;
   // Total count of events.
@@ -44,7 +44,14 @@ message Event {
   string chef_infra_server = 21;
 }
 
-message EventCounts {
+message GetEventTypeCountsResponse {
+  // Total count of events.
+  int64 total = 1;
+  // Total count of events per type.
+  repeated EventCount counts = 2;
+}
+
+message GetEventTaskCountsResponse {
   // Total count of events.
   int64 total = 1;
   // Total count of events per type.
@@ -56,4 +63,9 @@ message EventCount {
   string name = 1;
   // Count of events.
   int64 count = 2;
+}
+
+message EventExportResponse {
+	// Exported reports in JSON or CSV.
+	bytes content = 1;
 }

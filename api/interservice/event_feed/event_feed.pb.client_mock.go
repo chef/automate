@@ -6,8 +6,6 @@ package event_feed
 
 import (
 	context "context"
-	common "github.com/chef/automate/api/external/common"
-	request "github.com/chef/automate/api/external/event_feed/request"
 	event "github.com/chef/automate/api/interservice/event"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
@@ -39,7 +37,7 @@ func (m *MockEventFeedServiceClient) EXPECT() *MockEventFeedServiceClientMockRec
 }
 
 // EventExport mocks base method
-func (m *MockEventFeedServiceClient) EventExport(arg0 context.Context, arg1 *request.EventExport, arg2 ...grpc.CallOption) (EventFeedService_EventExportClient, error) {
+func (m *MockEventFeedServiceClient) EventExport(arg0 context.Context, arg1 *EventExportRequest, arg2 ...grpc.CallOption) (EventFeedService_EventExportClient, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -205,10 +203,10 @@ func (mr *MockEventFeedService_EventExportClientMockRecorder) Header() *gomock.C
 }
 
 // Recv mocks base method
-func (m *MockEventFeedService_EventExportClient) Recv() (*common.ExportData, error) {
+func (m *MockEventFeedService_EventExportClient) Recv() (*EventExportResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Recv")
-	ret0, _ := ret[0].(*common.ExportData)
+	ret0, _ := ret[0].(*EventExportResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -285,7 +283,7 @@ func (m *MockEventFeedServiceServer) EXPECT() *MockEventFeedServiceServerMockRec
 }
 
 // EventExport mocks base method
-func (m *MockEventFeedServiceServer) EventExport(arg0 *request.EventExport, arg1 EventFeedService_EventExportServer) error {
+func (m *MockEventFeedServiceServer) EventExport(arg0 *EventExportRequest, arg1 EventFeedService_EventExportServer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EventExport", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -410,7 +408,7 @@ func (mr *MockEventFeedService_EventExportServerMockRecorder) RecvMsg(arg0 inter
 }
 
 // Send mocks base method
-func (m *MockEventFeedService_EventExportServer) Send(arg0 *common.ExportData) error {
+func (m *MockEventFeedService_EventExportServer) Send(arg0 *EventExportResponse) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Send", arg0)
 	ret0, _ := ret[0].(error)

@@ -18,12 +18,12 @@ func init() {
       "get": {
         "summary": "List Counts Per Event Task Occurrence",
         "description": "Returns totals for update, create, and delete event tasks, which are the actions taken on the event.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\nevent_task_counts?start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "EventFeed_GetEventTaskCounts",
+        "operationId": "EventFeedService_GetEventTaskCounts",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.event_feed.response.EventCounts"
+              "$ref": "#/definitions/chef.automate.api.event_feed.response.GetEventTaskCountsResponse"
             }
           },
           "default": {
@@ -63,7 +63,7 @@ func init() {
           }
         ],
         "tags": [
-          "EventFeed"
+          "EventFeedService"
         ]
       }
     },
@@ -71,12 +71,12 @@ func init() {
       "get": {
         "summary": "List Count of Event Type Occurrence",
         "description": "Returns totals for role, cookbook, and organization event types.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\nevent_type_counts?start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "EventFeed_GetEventTypeCounts",
+        "operationId": "EventFeedService_GetEventTypeCounts",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.event_feed.response.EventCounts"
+              "$ref": "#/definitions/chef.automate.api.event_feed.response.GetEventTypeCountsResponse"
             }
           },
           "default": {
@@ -116,7 +116,7 @@ func init() {
           }
         ],
         "tags": [
-          "EventFeed"
+          "EventFeedService"
         ]
       }
     },
@@ -124,12 +124,12 @@ func init() {
       "get": {
         "summary": "List Events",
         "description": "Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).\nAdding a filter makes a list of all events that meet the filter criteria.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\neventfeed?collapse=true\u0026filter=organization:The%2520Watchmen\u0026page_size=100\u0026start=1592546400000\u0026end=1593151199999\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "EventFeed_GetEventFeed",
+        "operationId": "EventFeedService_GetEventFeed",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.event_feed.response.Events"
+              "$ref": "#/definitions/chef.automate.api.event_feed.response.GetEventFeedResponse"
             }
           },
           "default": {
@@ -208,7 +208,7 @@ func init() {
           }
         ],
         "tags": [
-          "EventFeed"
+          "EventFeedService"
         ]
       }
     },
@@ -216,12 +216,12 @@ func init() {
       "get": {
         "summary": "List Summary Stats About Events",
         "description": "Returns data that populates the guitar strings visual on the top of the event feed.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\neventstrings?timezone=America/Denver\u0026hours_between=1\u0026start=2020-06-19\u0026end=2020-06-25\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\nevent:events:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "EventFeed_GetEventStringBuckets",
+        "operationId": "EventFeedService_GetEventStringBuckets",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.event_feed.response.EventStrings"
+              "$ref": "#/definitions/chef.automate.api.event_feed.response.GetEventStringBucketsResponse"
             }
           },
           "default": {
@@ -274,22 +274,12 @@ func init() {
           }
         ],
         "tags": [
-          "EventFeed"
+          "EventFeedService"
         ]
       }
     }
   },
   "definitions": {
-    "chef.automate.api.common.ExportData": {
-      "type": "object",
-      "properties": {
-        "content": {
-          "type": "string",
-          "format": "byte",
-          "description": "Exported reports in JSON or CSV."
-        }
-      }
-    },
     "chef.automate.api.common.query.SortOrder": {
       "type": "string",
       "enum": [
@@ -390,20 +380,13 @@ func init() {
         }
       }
     },
-    "chef.automate.api.event_feed.response.EventCounts": {
+    "chef.automate.api.event_feed.response.EventExportResponse": {
       "type": "object",
       "properties": {
-        "total": {
+        "content": {
           "type": "string",
-          "format": "int64",
-          "description": "Total count of events."
-        },
-        "counts": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.event_feed.response.EventCount"
-          },
-          "description": "Total count of events per type."
+          "format": "byte",
+          "description": "Exported reports in JSON or CSV."
         }
       }
     },
@@ -421,7 +404,24 @@ func init() {
         }
       }
     },
-    "chef.automate.api.event_feed.response.EventStrings": {
+    "chef.automate.api.event_feed.response.GetEventFeedResponse": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.event_feed.response.Event"
+          },
+          "description": "List of events."
+        },
+        "total_events": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total count of events."
+        }
+      }
+    },
+    "chef.automate.api.event_feed.response.GetEventStringBucketsResponse": {
       "type": "object",
       "properties": {
         "strings": {
@@ -442,20 +442,37 @@ func init() {
         }
       }
     },
-    "chef.automate.api.event_feed.response.Events": {
+    "chef.automate.api.event_feed.response.GetEventTaskCountsResponse": {
       "type": "object",
       "properties": {
-        "events": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.event_feed.response.Event"
-          },
-          "description": "List of events."
-        },
-        "total_events": {
+        "total": {
           "type": "string",
           "format": "int64",
           "description": "Total count of events."
+        },
+        "counts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.event_feed.response.EventCount"
+          },
+          "description": "Total count of events per type."
+        }
+      }
+    },
+    "chef.automate.api.event_feed.response.GetEventTypeCountsResponse": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total count of events."
+        },
+        "counts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.event_feed.response.EventCount"
+          },
+          "description": "Total count of events per type."
         }
       }
     },

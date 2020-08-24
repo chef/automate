@@ -43,6 +43,7 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/profiles"
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
+	inter_eventfeed_Req "github.com/chef/automate/api/interservice/event_feed"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
@@ -140,7 +141,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		}).Fatal("Could not create client")
 	}
 
-	pb_eventfeed.RegisterEventFeedServer(grpcServer,
+	pb_eventfeed.RegisterEventFeedServiceServer(grpcServer,
 		handler.NewEventFeedServer(eventFeedClient))
 
 	notifier, err := clients.Notifier()
@@ -341,7 +342,7 @@ type registerFunc func(context.Context, *runtime.ServeMux, string, []grpc.DialOp
 // unversionedRESTMux returns all endpoints for the GRPC rest gateway
 func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, func(), error) {
 	return muxFromRegisterMap(grpcURI, dopts, map[string]registerFunc{
-		"event feed":               pb_eventfeed.RegisterEventFeedHandlerFromEndpoint,
+		"event feed":               pb_eventfeed.RegisterEventFeedServiceHandlerFromEndpoint,
 		"content delivery service": pb_cds.RegisterCdsHandlerFromEndpoint,
 		"config management":        pb_cfgmgmt.RegisterConfigMgmtHandlerFromEndpoint,
 		"chef ingestion":           pb_ingest.RegisterChefIngesterHandlerFromEndpoint,
@@ -794,7 +795,7 @@ func (s *Server) eventFeedExportHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	var exportRequest eventfeed_Req.EventExport
+	var exportRequest eventfeed_Req.EventExportRequest
 	if err := decoder.Decode(&exportRequest); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -806,7 +807,15 @@ func (s *Server) eventFeedExportHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	stream, err := eventFeedClient.EventExport(ctx, &exportRequest)
+	interRequst := inter_eventfeed_Req.EventExportRequest{
+		OutputType: exportRequest.OutputType,
+		Filter:     exportRequest.Filter,
+		Start:      exportRequest.Start,
+		End:        exportRequest.End,
+		Order:      exportRequest.Order,
+	}
+
+	stream, err := eventFeedClient.EventExport(ctx, &interRequst)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

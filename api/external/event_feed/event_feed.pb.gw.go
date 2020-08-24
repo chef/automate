@@ -33,17 +33,17 @@ var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 
 var (
-	filter_EventFeed_GetEventFeed_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_EventFeedService_GetEventFeed_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_EventFeed_GetEventFeed_0(ctx context.Context, marshaler runtime.Marshaler, client EventFeedClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.EventFilter
+func request_EventFeedService_GetEventFeed_0(ctx context.Context, marshaler runtime.Marshaler, client EventFeedServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.GetEventFeedRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventFeed_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeedService_GetEventFeed_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -52,14 +52,14 @@ func request_EventFeed_GetEventFeed_0(ctx context.Context, marshaler runtime.Mar
 
 }
 
-func local_request_EventFeed_GetEventFeed_0(ctx context.Context, marshaler runtime.Marshaler, server EventFeedServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.EventFilter
+func local_request_EventFeedService_GetEventFeed_0(ctx context.Context, marshaler runtime.Marshaler, server EventFeedServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.GetEventFeedRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventFeed_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeedService_GetEventFeed_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -69,17 +69,17 @@ func local_request_EventFeed_GetEventFeed_0(ctx context.Context, marshaler runti
 }
 
 var (
-	filter_EventFeed_GetEventTypeCounts_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_EventFeedService_GetEventTypeCounts_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_EventFeed_GetEventTypeCounts_0(ctx context.Context, marshaler runtime.Marshaler, client EventFeedClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.EventCountsFilter
+func request_EventFeedService_GetEventTypeCounts_0(ctx context.Context, marshaler runtime.Marshaler, client EventFeedServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.GetEventTypeCountsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventTypeCounts_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeedService_GetEventTypeCounts_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -88,14 +88,14 @@ func request_EventFeed_GetEventTypeCounts_0(ctx context.Context, marshaler runti
 
 }
 
-func local_request_EventFeed_GetEventTypeCounts_0(ctx context.Context, marshaler runtime.Marshaler, server EventFeedServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.EventCountsFilter
+func local_request_EventFeedService_GetEventTypeCounts_0(ctx context.Context, marshaler runtime.Marshaler, server EventFeedServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.GetEventTypeCountsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventTypeCounts_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeedService_GetEventTypeCounts_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -105,17 +105,17 @@ func local_request_EventFeed_GetEventTypeCounts_0(ctx context.Context, marshaler
 }
 
 var (
-	filter_EventFeed_GetEventTaskCounts_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_EventFeedService_GetEventTaskCounts_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_EventFeed_GetEventTaskCounts_0(ctx context.Context, marshaler runtime.Marshaler, client EventFeedClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.EventCountsFilter
+func request_EventFeedService_GetEventTaskCounts_0(ctx context.Context, marshaler runtime.Marshaler, client EventFeedServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.GetEventTaskCountsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventTaskCounts_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeedService_GetEventTaskCounts_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -124,14 +124,14 @@ func request_EventFeed_GetEventTaskCounts_0(ctx context.Context, marshaler runti
 
 }
 
-func local_request_EventFeed_GetEventTaskCounts_0(ctx context.Context, marshaler runtime.Marshaler, server EventFeedServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.EventCountsFilter
+func local_request_EventFeedService_GetEventTaskCounts_0(ctx context.Context, marshaler runtime.Marshaler, server EventFeedServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.GetEventTaskCountsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventTaskCounts_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeedService_GetEventTaskCounts_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -141,17 +141,17 @@ func local_request_EventFeed_GetEventTaskCounts_0(ctx context.Context, marshaler
 }
 
 var (
-	filter_EventFeed_GetEventStringBuckets_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_EventFeedService_GetEventStringBuckets_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_EventFeed_GetEventStringBuckets_0(ctx context.Context, marshaler runtime.Marshaler, client EventFeedClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.EventStrings
+func request_EventFeedService_GetEventStringBuckets_0(ctx context.Context, marshaler runtime.Marshaler, client EventFeedServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.GetEventStringBucketsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventStringBuckets_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeedService_GetEventStringBuckets_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -160,14 +160,14 @@ func request_EventFeed_GetEventStringBuckets_0(ctx context.Context, marshaler ru
 
 }
 
-func local_request_EventFeed_GetEventStringBuckets_0(ctx context.Context, marshaler runtime.Marshaler, server EventFeedServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.EventStrings
+func local_request_EventFeedService_GetEventStringBuckets_0(ctx context.Context, marshaler runtime.Marshaler, server EventFeedServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.GetEventStringBucketsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventStringBuckets_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeedService_GetEventStringBuckets_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -176,12 +176,12 @@ func local_request_EventFeed_GetEventStringBuckets_0(ctx context.Context, marsha
 
 }
 
-// RegisterEventFeedHandlerServer registers the http handlers for service EventFeed to "mux".
-// UnaryRPC     :call EventFeedServer directly.
+// RegisterEventFeedServiceHandlerServer registers the http handlers for service EventFeedService to "mux".
+// UnaryRPC     :call EventFeedServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-func RegisterEventFeedHandlerServer(ctx context.Context, mux *runtime.ServeMux, server EventFeedServer) error {
+func RegisterEventFeedServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server EventFeedServiceServer) error {
 
-	mux.Handle("GET", pattern_EventFeed_GetEventFeed_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EventFeedService_GetEventFeed_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -190,18 +190,18 @@ func RegisterEventFeedHandlerServer(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_EventFeed_GetEventFeed_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_EventFeedService_GetEventFeed_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_EventFeed_GetEventFeed_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EventFeedService_GetEventFeed_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_EventFeed_GetEventTypeCounts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EventFeedService_GetEventTypeCounts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -210,18 +210,18 @@ func RegisterEventFeedHandlerServer(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_EventFeed_GetEventTypeCounts_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_EventFeedService_GetEventTypeCounts_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_EventFeed_GetEventTypeCounts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EventFeedService_GetEventTypeCounts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_EventFeed_GetEventTaskCounts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EventFeedService_GetEventTaskCounts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -230,18 +230,18 @@ func RegisterEventFeedHandlerServer(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_EventFeed_GetEventTaskCounts_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_EventFeedService_GetEventTaskCounts_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_EventFeed_GetEventTaskCounts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EventFeedService_GetEventTaskCounts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_EventFeed_GetEventStringBuckets_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EventFeedService_GetEventStringBuckets_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -250,23 +250,23 @@ func RegisterEventFeedHandlerServer(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_EventFeed_GetEventStringBuckets_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_EventFeedService_GetEventStringBuckets_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_EventFeed_GetEventStringBuckets_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EventFeedService_GetEventStringBuckets_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterEventFeedHandlerFromEndpoint is same as RegisterEventFeedHandler but
+// RegisterEventFeedServiceHandlerFromEndpoint is same as RegisterEventFeedServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterEventFeedHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterEventFeedServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -286,23 +286,23 @@ func RegisterEventFeedHandlerFromEndpoint(ctx context.Context, mux *runtime.Serv
 		}()
 	}()
 
-	return RegisterEventFeedHandler(ctx, mux, conn)
+	return RegisterEventFeedServiceHandler(ctx, mux, conn)
 }
 
-// RegisterEventFeedHandler registers the http handlers for service EventFeed to "mux".
+// RegisterEventFeedServiceHandler registers the http handlers for service EventFeedService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterEventFeedHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterEventFeedHandlerClient(ctx, mux, NewEventFeedClient(conn))
+func RegisterEventFeedServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterEventFeedServiceHandlerClient(ctx, mux, NewEventFeedServiceClient(conn))
 }
 
-// RegisterEventFeedHandlerClient registers the http handlers for service EventFeed
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "EventFeedClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "EventFeedClient"
+// RegisterEventFeedServiceHandlerClient registers the http handlers for service EventFeedService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "EventFeedServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "EventFeedServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "EventFeedClient" to call the correct interceptors.
-func RegisterEventFeedHandlerClient(ctx context.Context, mux *runtime.ServeMux, client EventFeedClient) error {
+// "EventFeedServiceClient" to call the correct interceptors.
+func RegisterEventFeedServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client EventFeedServiceClient) error {
 
-	mux.Handle("GET", pattern_EventFeed_GetEventFeed_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EventFeedService_GetEventFeed_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -311,18 +311,18 @@ func RegisterEventFeedHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_EventFeed_GetEventFeed_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_EventFeedService_GetEventFeed_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_EventFeed_GetEventFeed_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EventFeedService_GetEventFeed_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_EventFeed_GetEventTypeCounts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EventFeedService_GetEventTypeCounts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -331,18 +331,18 @@ func RegisterEventFeedHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_EventFeed_GetEventTypeCounts_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_EventFeedService_GetEventTypeCounts_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_EventFeed_GetEventTypeCounts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EventFeedService_GetEventTypeCounts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_EventFeed_GetEventTaskCounts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EventFeedService_GetEventTaskCounts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -351,18 +351,18 @@ func RegisterEventFeedHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_EventFeed_GetEventTaskCounts_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_EventFeedService_GetEventTaskCounts_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_EventFeed_GetEventTaskCounts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EventFeedService_GetEventTaskCounts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_EventFeed_GetEventStringBuckets_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_EventFeedService_GetEventStringBuckets_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -371,14 +371,14 @@ func RegisterEventFeedHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_EventFeed_GetEventStringBuckets_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_EventFeedService_GetEventStringBuckets_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_EventFeed_GetEventStringBuckets_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_EventFeedService_GetEventStringBuckets_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -386,21 +386,21 @@ func RegisterEventFeedHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 }
 
 var (
-	pattern_EventFeed_GetEventFeed_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "eventfeed"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_EventFeedService_GetEventFeed_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "eventfeed"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EventFeed_GetEventTypeCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "event_type_counts"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_EventFeedService_GetEventTypeCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "event_type_counts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EventFeed_GetEventTaskCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "event_task_counts"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_EventFeedService_GetEventTaskCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "event_task_counts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EventFeed_GetEventStringBuckets_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "eventstrings"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_EventFeedService_GetEventStringBuckets_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v0", "eventstrings"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
-	forward_EventFeed_GetEventFeed_0 = runtime.ForwardResponseMessage
+	forward_EventFeedService_GetEventFeed_0 = runtime.ForwardResponseMessage
 
-	forward_EventFeed_GetEventTypeCounts_0 = runtime.ForwardResponseMessage
+	forward_EventFeedService_GetEventTypeCounts_0 = runtime.ForwardResponseMessage
 
-	forward_EventFeed_GetEventTaskCounts_0 = runtime.ForwardResponseMessage
+	forward_EventFeedService_GetEventTaskCounts_0 = runtime.ForwardResponseMessage
 
-	forward_EventFeed_GetEventStringBuckets_0 = runtime.ForwardResponseMessage
+	forward_EventFeedService_GetEventStringBuckets_0 = runtime.ForwardResponseMessage
 )

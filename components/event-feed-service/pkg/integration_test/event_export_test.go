@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/buger/jsonparser"
-	request "github.com/chef/automate/api/external/event_feed/request"
 	api "github.com/chef/automate/api/interservice/event_feed"
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"
@@ -59,7 +58,7 @@ func TestEventExportMatchAllFields(t *testing.T) {
 
 	defer testSuite.DeleteAllDocuments()
 
-	response, err := client.EventExport(context.Background(), &request.EventExport{})
+	response, err := client.EventExport(context.Background(), &api.EventExportRequest{})
 	assert.NoError(t, err)
 	require.NotNil(t, response)
 
@@ -262,7 +261,7 @@ func TestEventExportProjectFilters(t *testing.T) {
 			defer testSuite.DeleteAllDocuments()
 
 			ctx := auth_context.NewOutgoingContext(contextWithProjects(test.allowedProjects))
-			response, err := client.EventExport(ctx, &request.EventExport{
+			response, err := client.EventExport(ctx, &api.EventExportRequest{
 				OutputType: "json",
 			})
 			assert.NoError(t, err)
@@ -305,7 +304,7 @@ func TestEventExportFilters(t *testing.T) {
 	cases := []struct {
 		description    string
 		entries        []feed.FeedEntry
-		eventExport    *request.EventExport
+		eventExport    *api.EventExportRequest
 		expectedRunIDs []string
 	}{
 		{
@@ -316,7 +315,7 @@ func TestEventExportFilters(t *testing.T) {
 					Published: time.Now().Add(-time.Minute),
 				},
 			},
-			eventExport:    &request.EventExport{},
+			eventExport:    &api.EventExportRequest{},
 			expectedRunIDs: []string{"1"},
 		},
 		{
@@ -331,7 +330,7 @@ func TestEventExportFilters(t *testing.T) {
 					Published: time.Now().Add(-time.Minute),
 				},
 			},
-			eventExport:    &request.EventExport{},
+			eventExport:    &api.EventExportRequest{},
 			expectedRunIDs: []string{"1", "2"},
 		},
 		{
@@ -342,7 +341,7 @@ func TestEventExportFilters(t *testing.T) {
 					Published: time.Now().Add(-time.Minute),
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Start: time.Now().Add(-time.Hour).Unix() * 1000,
 				End:   time.Now().Add(time.Hour).Unix() * 1000,
 			},
@@ -356,7 +355,7 @@ func TestEventExportFilters(t *testing.T) {
 					Published: time.Now().Add(-time.Hour * 12),
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Start: time.Now().Add(-time.Hour).Unix() * 1000,
 				End:   time.Now().Add(time.Hour).Unix() * 1000,
 			},
@@ -374,7 +373,7 @@ func TestEventExportFilters(t *testing.T) {
 					Published: time.Now().Add(-time.Minute),
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Start: time.Now().Add(-time.Hour).Unix() * 1000,
 				End:   time.Now().Add(time.Hour).Unix() * 1000,
 			},
@@ -389,7 +388,7 @@ func TestEventExportFilters(t *testing.T) {
 					ObjectObjectType: "scanjobs",
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Filter: []string{"event-type:scanjobs"},
 			},
 			expectedRunIDs: []string{"1"},
@@ -408,7 +407,7 @@ func TestEventExportFilters(t *testing.T) {
 					ObjectObjectType: "profile",
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Filter: []string{"event-type:scanjobs"},
 			},
 			expectedRunIDs: []string{"1"},
@@ -424,7 +423,7 @@ func TestEventExportFilters(t *testing.T) {
 					Verb:      "update",
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Filter: []string{"task:update"},
 			},
 			expectedRunIDs: []string{"1"},
@@ -443,7 +442,7 @@ func TestEventExportFilters(t *testing.T) {
 					Verb:      "create",
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Filter: []string{"task:update"},
 			},
 			expectedRunIDs: []string{"1"},
@@ -459,7 +458,7 @@ func TestEventExportFilters(t *testing.T) {
 					ActorName: "bob",
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Filter: []string{"requestor_name:bob"},
 			},
 			expectedRunIDs: []string{"1"},
@@ -478,7 +477,7 @@ func TestEventExportFilters(t *testing.T) {
 					ActorName: "tim",
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Filter: []string{"requestor_name:bob"},
 			},
 			expectedRunIDs: []string{"1"},
@@ -494,7 +493,7 @@ func TestEventExportFilters(t *testing.T) {
 					ChefInfraServer: "chef3",
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Filter: []string{"chef_server:chef3"},
 			},
 			expectedRunIDs: []string{"1"},
@@ -513,7 +512,7 @@ func TestEventExportFilters(t *testing.T) {
 					ChefInfraServer: "chef2",
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Filter: []string{"chef_server:chef3"},
 			},
 			expectedRunIDs: []string{"1"},
@@ -529,7 +528,7 @@ func TestEventExportFilters(t *testing.T) {
 					ChefOrganization: "org1",
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Filter: []string{"chef_organization:org1"},
 			},
 			expectedRunIDs: []string{"1"},
@@ -548,7 +547,7 @@ func TestEventExportFilters(t *testing.T) {
 					ChefOrganization: "org2",
 				},
 			},
-			eventExport: &request.EventExport{
+			eventExport: &api.EventExportRequest{
 				Filter: []string{"chef_organization:org1"},
 			},
 			expectedRunIDs: []string{"1"},

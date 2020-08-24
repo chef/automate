@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chef/automate/api/external/common"
-	"github.com/chef/automate/api/external/event_feed/request"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/lib/io/chunks"
@@ -39,7 +37,7 @@ type displayEvent struct {
 }
 
 // EventExport downloading events report.
-func (eventFeedServer *EventFeedServer) EventExport(request *request.EventExport,
+func (eventFeedServer *EventFeedServer) EventExport(request *event_feed.EventExportRequest,
 	stream event_feed.EventFeedService_EventExportServer) error {
 	var sendResult exportHandler
 
@@ -119,7 +117,7 @@ func jsonExport(stream event_feed.EventFeedService_EventExportServer) exportHand
 	return func(entries []*feed.FeedEntry) error {
 		// If this is the first set of nodes to export, prepend "[" to start a JSON document.
 		if initialRun {
-			err := stream.Send(&common.ExportData{Content: []byte{'['}})
+			err := stream.Send(&event_feed.EventExportResponse{Content: []byte{'['}})
 			if err != nil {
 				return err
 			}
@@ -127,7 +125,7 @@ func jsonExport(stream event_feed.EventFeedService_EventExportServer) exportHand
 			// If this is not the first set of nodes and the collection has elements,
 			// prepend the "," that couldn't get added in the previous call to this function.
 		} else if len(entries) != 0 {
-			err := stream.Send(&common.ExportData{Content: []byte{','}})
+			err := stream.Send(&event_feed.EventExportResponse{Content: []byte{','}})
 			if err != nil {
 				return err
 			}
@@ -135,7 +133,7 @@ func jsonExport(stream event_feed.EventFeedService_EventExportServer) exportHand
 
 		// If the collection has no elements, append "]" to close the JSON document and stop.
 		if len(entries) == 0 {
-			err := stream.Send(&common.ExportData{Content: []byte{']'}})
+			err := stream.Send(&event_feed.EventExportResponse{Content: []byte{']'}})
 			if err != nil {
 				return err
 			}
@@ -143,7 +141,7 @@ func jsonExport(stream event_feed.EventFeedService_EventExportServer) exportHand
 		}
 
 		writer := chunks.NewWriter(streamBufferSize, func(p []byte) error {
-			return stream.Send(&common.ExportData{Content: p})
+			return stream.Send(&event_feed.EventExportResponse{Content: p})
 		})
 		buf := make([]byte, streamBufferSize)
 
@@ -193,7 +191,7 @@ func csvExport(stream event_feed.EventFeedService_EventExportServer) exportHandl
 		buf := make([]byte, streamBufferSize)
 
 		writer := chunks.NewWriter(streamBufferSize, func(p []byte) error {
-			return stream.Send(&common.ExportData{Content: p})
+			return stream.Send(&event_feed.EventExportResponse{Content: p})
 		})
 		_, err = io.CopyBuffer(writer, reader, buf)
 		if err != nil {

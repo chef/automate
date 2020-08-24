@@ -5,7 +5,7 @@ option go_package = "github.com/chef/automate/api/external/event_feed/response";
 import "external/event_feed/response/event.proto";
 
 
-message EventStrings {
+message GetEventStringBucketsResponse {
     repeated EventString strings = 1;
     string start = 2;
     string end = 3;

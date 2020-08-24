@@ -20,26 +20,26 @@ import (
 // the gateway is just collecting information from the downstream services and it
 // should be able to handle errors.
 func (eventFeedAggregate *EventFeedAggregate) CollectEventGuitarStrings(ctx context.Context,
-	request *agReq.EventStrings) (*agRes.EventStrings, error) {
+	request *agReq.GetEventStringBucketsRequest) (*agRes.GetEventStringBucketsResponse, error) {
 	err := validateEventStringsRequest(request)
 	if err != nil {
-		return &agRes.EventStrings{}, err
+		return &agRes.GetEventStringBucketsResponse{}, err
 	}
 
 	totalNumberOfBucketsAllowed, err := getTotalNumberOfBucketsAllowed(request)
 	if err != nil {
-		return &agRes.EventStrings{}, err
+		return &agRes.GetEventStringBucketsResponse{}, err
 	}
 
 	eventStringCollection, err := collectEventGuitarStrings(ctx, eventFeedAggregate.feedServiceClient, request, totalNumberOfBucketsAllowed)
 	if err != nil {
-		return &agRes.EventStrings{}, err
+		return &agRes.GetEventStringBucketsResponse{}, err
 	}
 
 	return eventStringCollection, nil
 }
 
-func validateEventStringsRequest(request *agReq.EventStrings) error {
+func validateEventStringsRequest(request *agReq.GetEventStringBucketsRequest) error {
 	// Validate TimeZone
 	if request.Timezone == "" {
 		return status.Error(codes.InvalidArgument, "A timezone must be provided")
@@ -69,7 +69,7 @@ func validateEventStringsRequest(request *agReq.EventStrings) error {
 	return nil
 }
 
-func getTotalNumberOfBucketsAllowed(request *agReq.EventStrings) (int, error) {
+func getTotalNumberOfBucketsAllowed(request *agReq.GetEventStringBucketsRequest) (int, error) {
 	start := request.Start
 	end := request.End
 	bucketSizeInHours := int(request.HoursBetween)
@@ -166,7 +166,7 @@ func eventFeedToGatewayEventCollection(slots []*event_feed_api.Timeslot, totalNu
 
 func collectEventGuitarStrings(ctx context.Context,
 	feedServiceClient event_feed_api.EventFeedServiceClient,
-	request *agReq.EventStrings, totalNumberOfBucketsAllowed int) (*agRes.EventStrings, error) {
+	request *agReq.GetEventStringBucketsRequest, totalNumberOfBucketsAllowed int) (*agRes.GetEventStringBucketsResponse, error) {
 
 	req := &event_feed_api.FeedTimelineRequest{
 		Start:    request.GetStart(),
@@ -190,7 +190,7 @@ func collectEventGuitarStrings(ctx context.Context,
 		}
 	}
 
-	return &agRes.EventStrings{
+	return &agRes.GetEventStringBucketsResponse{
 		Strings:      agEventStringBuckets,
 		Start:        feedTimeline.Start,
 		End:          feedTimeline.End,

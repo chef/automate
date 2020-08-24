@@ -10,7 +10,7 @@ import (
 
 // CollectEventTypeCounts - collect the event type counts from all the components
 func (eventFeedAggregate *EventFeedAggregate) CollectEventTypeCounts(
-	ctx context.Context, request *agReq.EventCountsFilter) (*agRes.EventCounts, error) {
+	ctx context.Context, request *agReq.GetEventTypeCountsRequest) (*agRes.GetEventTypeCountsResponse, error) {
 	eventFilter := &event_feed_api.FeedSummaryRequest{
 		Filters:       request.GetFilter(),
 		Start:         request.GetStart(),
@@ -20,7 +20,7 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventTypeCounts(
 
 	feedEntryCounts, err := eventFeedAggregate.feedServiceClient.GetFeedSummary(ctx, eventFilter)
 	if err != nil {
-		return &agRes.EventCounts{}, err
+		return &agRes.GetEventTypeCountsResponse{}, err
 	}
 
 	// convert feedEntryCounts to agEventTypeCounts
@@ -32,7 +32,7 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventTypeCounts(
 		}
 	}
 
-	return &agRes.EventCounts{
+	return &agRes.GetEventTypeCountsResponse{
 		Total:  feedEntryCounts.TotalEntries,
 		Counts: agEventCounts,
 	}, nil
