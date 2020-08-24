@@ -228,7 +228,7 @@ install_go_tool() {
   for tool in "$@"; do
     go_tool=$(basename "$tool")
     if [[ ! -f "${GOBIN}/${go_tool}" ]]; then
-      eval "go install -v $tool"
+      go install -v $tool || return 1
     fi
   done
 }
