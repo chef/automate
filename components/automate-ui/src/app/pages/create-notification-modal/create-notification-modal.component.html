@@ -1,5 +1,5 @@
 <chef-modal [visible]="visible" (closeModal)="closeEvent()">
-  <h2 slot="title">Create Notification </h2>
+  <h2 slot="title">Create Notification</h2>
     <div class="flex-container">
       <form [formGroup]="createForm">
         <div class="margin">
@@ -21,7 +21,7 @@
         <div class="margin">
           <chef-form-field>
             <label>
-              <span class="label">Webhook type<span aria-hidden="true">*</span></span>
+              <span class="label">Webhook type <span aria-hidden="true">*</span></span>
               <mat-select
                 panelClass="chef-dropdown"
                 formControlName="targetType"
@@ -38,7 +38,7 @@
         <div class="margin">
           <chef-form-field>
             <label>
-              <span class="label">Failure type  <span aria-hidden="true">*</span></span>
+              <span class="label">Failure type <span aria-hidden="true">*</span></span>
               <mat-select
                 panelClass="chef-dropdown"
                 formControlName="ruleType"
@@ -82,7 +82,7 @@
               <chef-error *ngIf="createForm.get('username').hasError('required') && createForm.get('username').dirty">
                 Username is required.
               </chef-error>
-              <span class="i-desc">Encrypted, and only used to access the notification.</span>
+              <span class="i-desc">Encrypted, and only used to access the notification feed.</span>
             </chef-form-field>
           </div>
           <div class="margin">
@@ -102,7 +102,7 @@
         <div id="button-bar">
           <div class="url-failed" *ngIf="hookStatus === urlState.Failure">
             <chef-icon class="url-failed-icon">warning</chef-icon>
-            <span>Unable to connect, check URL, username and password.</span>
+            <span>Unable to connect: check URL, username and password.</span>
           </div>
 
           <div class="url-success" *ngIf="hookStatus === urlState.Success">

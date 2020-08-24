@@ -51,10 +51,9 @@ export class NotificationRuleEffects {
   getNotificationsFailure$ = this.actions$.pipe(
     ofType(NotificationRuleActionTypes.GET_ALL_FAILURE),
     map(({ payload }: GetNotificationRulesFailure) => {
-      const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not get notifications: ${msg || payload.error}`
+        message: `Could not get notifications: ${payload.error.error || payload.error}`
       });
     }));
 
@@ -107,10 +106,9 @@ export class NotificationRuleEffects {
   deleteNotificationRuleFailure$ = this.actions$.pipe(
     ofType(NotificationRuleActionTypes.DELETE_FAILURE),
     map(({ payload }: DeleteNotificationRuleFailure) => {
-      const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not delete rule: ${msg || payload.error}`
+        message: `Could not delete rule: ${payload.error.error || payload.error}`
       });
     }));
 
@@ -127,10 +125,9 @@ export class NotificationRuleEffects {
   getNotificationFailure$ = this.actions$.pipe(
     ofType(NotificationRuleActionTypes.GET_FAILURE),
     map(({ payload, id }: GetNotificationFailure) => {
-      const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not get notification ${id}: ${msg || payload.error}`
+        message: `Could not get notification ${id}: ${payload.error.error || payload.error}`
       });
     }));
 
@@ -156,10 +153,9 @@ export class NotificationRuleEffects {
   updateNotificationFailure$ = this.actions$.pipe(
     ofType(NotificationRuleActionTypes.UPDATE_FAILURE),
     map(({ payload }: UpdateNotificationFailure) => {
-      const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not update notification: ${msg || payload.error}.`
+        message: `Could not update notification: ${payload.error.error || payload.error}.`
       });
     }));
 

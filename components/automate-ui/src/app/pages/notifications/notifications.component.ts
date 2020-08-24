@@ -338,7 +338,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   // successful? Seem it should be possible to update the local model with the
   // changes and have that trigger view updates?
   refreshRules() {
-    // this.rules$ = this.service.fetchRules();
     this.rules$.subscribe(rules => {
       this.sendCountToTelemetry(rules);
       this.updateSort(this.sortField, this.sortDir[this.sortField]);

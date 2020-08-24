@@ -61,15 +61,7 @@ export class CreateNotificationModalComponent implements OnInit {
   }
 
   urlPresent() {
-    return this.createForm.controls.targetUrl.value !== '' ? true : false;
-  }
-
-  getAlertTypeKeys() {
-    return this.notificationRule.getAlertTypeKeys();
-  }
-
-  getTagetTypeKeys() {
-    return this.notificationRule.getTargetTypeKeys();
+    return this.createForm.controls.targetUrl.value !== '';
   }
 
   setFailureType(event: { value: RuleType }) {

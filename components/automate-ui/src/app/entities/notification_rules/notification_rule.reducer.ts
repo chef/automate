@@ -44,51 +44,42 @@ export function notificationRuleEntityReducer(
       return set(
         GET_ALL_STATUS,
         EntityStatus.loading,
-        notificationRuleEntityAdapter.removeAll(state)
-      ) as NotificationRuleEntityState;
+        notificationRuleEntityAdapter.removeAll(state));
 
     case NotificationRuleActionTypes.GET_ALL_SUCCESS:
-      return pipe(
-        set(GET_ALL_STATUS,
-          EntityStatus.loadingSuccess)
-        )
-        (notificationRuleEntityAdapter.setAll(action.payload, state)
-      ) as NotificationRuleEntityState;
+      return set(GET_ALL_STATUS,
+        EntityStatus.loadingSuccess,
+        notificationRuleEntityAdapter.setAll(action.payload, state));
 
     case NotificationRuleActionTypes.GET_ALL_FAILURE:
       return set(
         GET_ALL_STATUS,
         EntityStatus.loadingFailure,
-        state
-      ) as NotificationRuleEntityState;
+        state);
 
     case NotificationRuleActionTypes.GET:
       return set(
         GET_STATUS,
         EntityStatus.loading,
-        notificationRuleEntityAdapter.removeAll(state)
-      ) as NotificationRuleEntityState;
+        notificationRuleEntityAdapter.removeAll(state));
 
     case NotificationRuleActionTypes.GET_SUCCESS:
       return set(
         GET_STATUS,
         EntityStatus.loadingSuccess,
-        notificationRuleEntityAdapter.addOne(action.payload, state)
-      ) as NotificationRuleEntityState;
+        notificationRuleEntityAdapter.addOne(action.payload, state));
 
     case NotificationRuleActionTypes.GET_FAILURE:
       return set(
         GET_STATUS,
         EntityStatus.loadingFailure,
-        state
-      ) as NotificationRuleEntityState;
+        state);
 
     case NotificationRuleActionTypes.CREATE: {
       return set(
         SAVE_STATUS,
         EntityStatus.loading,
-        state
-      ) as NotificationRuleEntityState;
+        state);
     }
 
     case NotificationRuleActionTypes.CREATE_SUCCESS: {
@@ -110,44 +101,38 @@ export function notificationRuleEntityReducer(
       return set(
         UPDATE_STATUS,
         EntityStatus.loading,
-        state
-      ) as NotificationRuleEntityState;
+        state);
 
     case NotificationRuleActionTypes.UPDATE_SUCCESS:
       return set(UPDATE_STATUS, EntityStatus.loadingSuccess,
         notificationRuleEntityAdapter.updateOne({
           id: action.payload.id,
           changes: action.payload
-        }, state)
-      ) as NotificationRuleEntityState;
+        }, state));
 
     case NotificationRuleActionTypes.UPDATE_FAILURE:
       return set(
         UPDATE_STATUS,
         EntityStatus.loadingFailure,
-        state
-      ) as NotificationRuleEntityState;
+        state);
 
     case NotificationRuleActionTypes.DELETE:
       return set(
         DELETE_STATUS,
         EntityStatus.loading,
-        state
-      ) as NotificationRuleEntityState;
+        state);
 
     case NotificationRuleActionTypes.DELETE_SUCCESS:
       return set(
         DELETE_STATUS,
         EntityStatus.loadingSuccess,
-        notificationRuleEntityAdapter.removeOne(action.payload.id, state)
-      ) as NotificationRuleEntityState;
+        notificationRuleEntityAdapter.removeOne(action.payload.id, state));
 
     case NotificationRuleActionTypes.DELETE_FAILURE:
       return set(
         DELETE_STATUS,
         EntityStatus.loadingFailure,
-        state
-      ) as NotificationRuleEntityState;
+        state);
 
     default:
       return state;
