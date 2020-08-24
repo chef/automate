@@ -21,13 +21,13 @@ import (
 
 type tokenAPI struct {
 	ts             tokens.Storage
-	policiesClient authz.PoliciesClient
+	policiesClient authz.PoliciesServiceClient
 	pv             tokens.ProjectValidator
 }
 
 // NewGRPCServer returns a server that provides our services: token
 // and authentication requests.
-func (s *Server) NewGRPCServer(policiesClient authz.PoliciesClient, pv tokens.ProjectValidator) *grpc.Server {
+func (s *Server) NewGRPCServer(policiesClient authz.PoliciesServiceClient, pv tokens.ProjectValidator) *grpc.Server {
 	g := s.connFactory.NewServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
@@ -36,9 +36,9 @@ func (s *Server) NewGRPCServer(policiesClient authz.PoliciesClient, pv tokens.Pr
 			),
 		),
 	)
-	api.RegisterTokensMgmtServer(g, newTokenAPI(s.TokenStorage, policiesClient, pv))
+	api.RegisterTokensMgmtServiceServer(g, newTokenAPI(s.TokenStorage, policiesClient, pv))
 	health.RegisterHealthServer(g, s.health)
-	api.RegisterAuthenticationServer(g, s)
+	api.RegisterAuthenticationServiceServer(g, s)
 	reflection.Register(g)
 
 	return g
@@ -60,7 +60,7 @@ func inputValidationInterceptor() grpc.UnaryServerInterceptor {
 	}
 }
 
-func newTokenAPI(ts tokens.Storage, policiesClient authz.PoliciesClient, pv tokens.ProjectValidator) api.TokensMgmtServer {
+func newTokenAPI(ts tokens.Storage, policiesClient authz.PoliciesServiceClient, pv tokens.ProjectValidator) api.TokensMgmtServiceServer {
 	return &tokenAPI{
 		ts:             ts,
 		policiesClient: policiesClient,

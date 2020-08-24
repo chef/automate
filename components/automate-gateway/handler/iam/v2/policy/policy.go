@@ -19,16 +19,16 @@ import (
 
 // Server is the server interface
 type Server struct {
-	policies authz.PoliciesClient
-	projects authz.ProjectsClient
-	authz    authz.AuthorizationClient
+	policies authz.PoliciesServiceClient
+	projects authz.ProjectsServiceClient
+	authz    authz.AuthorizationServiceClient
 }
 
 // NewServer creates a server with its client.
 func NewServer(
-	policies authz.PoliciesClient,
-	projects authz.ProjectsClient,
-	authz authz.AuthorizationClient) *Server {
+	policies authz.PoliciesServiceClient,
+	projects authz.ProjectsServiceClient,
+	authz authz.AuthorizationServiceClient) *Server {
 	return &Server{
 		policies: policies,
 		projects: projects,

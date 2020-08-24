@@ -30,6 +30,6 @@ message LogEntry {
 	string text = 3;
 }
 
-service ComplianceStatus {
+service ComplianceStatusService {
 	rpc GetMigrationStatus (google.protobuf.Empty) returns (MigrationStatus) {};
 }

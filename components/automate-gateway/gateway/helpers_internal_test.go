@@ -60,34 +60,34 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 	var (
 		ctrl                    = gomock.NewController(t)
 		mockClientsFactory      = mock_gateway.NewMockClientsFactory(ctrl)
-		mockAuthorizationClient authz.AuthorizationClient
+		mockAuthorizationClient authz.AuthorizationServiceClient
 		cfg                     = Config{}
 	)
 
 	// Add the provided mocked services
 	for _, service := range services {
 		switch s := service.(type) {
-		case authn.AuthenticationClient:
+		case authn.AuthenticationServiceClient:
 			// Mocking the provided mocked AuthorizationClient
-			mockAuthenticationClient := authn.AuthenticationClient(s)
+			mockAuthenticationClient := authn.AuthenticationServiceClient(s)
 			mockClientsFactory.EXPECT().AuthenticationClient().DoAndReturn(
-				func() (authn.AuthenticationClient, error) {
+				func() (authn.AuthenticationServiceClient, error) {
 					return mockAuthenticationClient, nil
 				},
 			)
-		case authz.AuthorizationClient:
+		case authz.AuthorizationServiceClient:
 			// Mocking the provided mocked AuthorizationClient
-			mockAuthorizationClient = authz.AuthorizationClient(s)
+			mockAuthorizationClient = authz.AuthorizationServiceClient(s)
 			mockClientsFactory.EXPECT().AuthorizationClient().DoAndReturn(
-				func() (authz.AuthorizationClient, error) {
+				func() (authz.AuthorizationServiceClient, error) {
 					return mockAuthorizationClient, nil
 				},
 			)
-		case compliance_ingest.ComplianceIngesterClient:
+		case compliance_ingest.ComplianceIngesterServiceClient:
 			// Mocking the provided mocked ComplianceIngesterClient
-			mockComplianceIngester := compliance_ingest.ComplianceIngesterClient(s)
+			mockComplianceIngester := compliance_ingest.ComplianceIngesterServiceClient(s)
 			mockClientsFactory.EXPECT().ComplianceIngesterClient().DoAndReturn(
-				func() (compliance_ingest.ComplianceIngesterClient, error) {
+				func() (compliance_ingest.ComplianceIngesterServiceClient, error) {
 					return mockComplianceIngester, nil
 				},
 			)
@@ -99,10 +99,10 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 					return mockNotifier, nil
 				},
 			)
-		case ingest.ChefIngesterClient:
-			mockIngestClient := ingest.ChefIngesterClient(s)
+		case ingest.ChefIngesterServiceClient:
+			mockIngestClient := ingest.ChefIngesterServiceClient(s)
 			mockClientsFactory.EXPECT().ChefIngesterClient().DoAndReturn(
-				func() (ingest.ChefIngesterClient, error) {
+				func() (ingest.ChefIngesterServiceClient, error) {
 					return mockIngestClient, nil
 				},
 			)
@@ -125,11 +125,11 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 // newAuthorizationMocks generates new mocks for AuthN and AuthZ to authorize
 // a single resource and action
 func newAuthorizationMocks(t *testing.T, resource, action string) (
-	authn.AuthenticationClient, authz.AuthorizationClient) {
+	authn.AuthenticationServiceClient, authz.AuthorizationServiceClient) {
 	var (
 		ctrl            = gomock.NewController(t)
-		mockAuthClient  = authn.NewMockAuthenticationClient(ctrl)
-		mockAuthzClient = authz.NewMockAuthorizationClient(ctrl)
+		mockAuthClient  = authn.NewMockAuthenticationServiceClient(ctrl)
+		mockAuthzClient = authz.NewMockAuthorizationServiceClient(ctrl)
 	)
 
 	// Mocking AuthN Calls

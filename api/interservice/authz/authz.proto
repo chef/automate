@@ -101,7 +101,7 @@ message ValidateProjectAssignmentReq {
 
 message ValidateProjectAssignmentResp {}
 
-service Authorization {
+service AuthorizationService {
     rpc GetVersion (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
     rpc FilterAuthorizedPairs (FilterAuthorizedPairsReq) returns (FilterAuthorizedPairsResp) {};
     rpc FilterAuthorizedProjects (FilterAuthorizedProjectsReq) returns (FilterAuthorizedProjectsResp) {};

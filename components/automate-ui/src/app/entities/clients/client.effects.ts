@@ -36,7 +36,7 @@ export class ClientEffects {
         observableOf(new GetClientsFailure(error))))));
 
   @Effect()
-  getEnvironmentsFailure$ = this.actions$.pipe(
+  getClientsFailure$ = this.actions$.pipe(
     ofType(ClientActionTypes.GET_ALL_FAILURE),
     map(({ payload }: GetClientsFailure) => {
       const msg = payload.error.error;

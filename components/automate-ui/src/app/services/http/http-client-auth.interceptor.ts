@@ -15,6 +15,8 @@ import { ChefSessionService } from 'app/services/chef-session/chef-session.servi
 import * as selectors from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from '../projects-filter/projects-filter.reducer';
 
+export const InterceptorSkipHeader = 'Skip-Interceptor';
+
 @Injectable()
 export class HttpClientAuthInterceptor implements HttpInterceptor {
 
@@ -55,6 +57,12 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
         //           Right now, we're throwing the ID token across the internet for telemetry,
         //           where it's not needed. It would be nice to _not_ do that.
         headers = headers.set('Authorization', `Bearer ${id_token}`);
+        // Check the interceptor skip header in API request
+        // To avoid session logout if 401 raised from external API
+        if (request.headers.has(InterceptorSkipHeader)) {
+          headers = headers.delete(InterceptorSkipHeader);
+          return next.handle(request.clone({ headers }));
+        }
         return next
           .handle(request.clone({ headers, params })).pipe(
             catchError((error: HttpErrorResponse) => {

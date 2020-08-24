@@ -11,11 +11,11 @@ import (
 
 // Server is the server interface
 type Server struct {
-	users local_user.UsersMgmtClient
+	users local_user.UsersMgmtServiceClient
 }
 
 // NewServer creates a server with its client.
-func NewServer(users local_user.UsersMgmtClient) *Server {
+func NewServer(users local_user.UsersMgmtServiceClient) *Server {
 	return &Server{users: users}
 }
 

@@ -17,111 +17,111 @@ service EventFeedService {
 }
 
 message FeedRequest {
-  string UserID           = 1;
-  int32 Size              = 2;
-  int64 Start             = 4;
-  int64 End               = 5;
-  int64 Before            = 6;
-  int64 After             = 7;
-  repeated string Sort    = 8;
-  repeated string Filters = 9;
-  string Cursor           = 10;
+  string user_id           = 1;
+  int32 size              = 2;
+  int64 start             = 4;
+  int64 end               = 5;
+  int64 before            = 6;
+  int64 after             = 7;
+  repeated string sort    = 8;
+  repeated string filters = 9;
+  string cursor           = 10;
 }
 
 message FeedResponse {
-  repeated FeedEntry FeedEntries = 1;
-  int64 TotalEntries             = 2;
+  repeated FeedEntry feed_entries = 1;
+  int64 total_entries             = 2;
 }
 
 message FeedEntry {
-  string ID                                       = 1;
-  string EventType                                = 2;
-  string FeedType                                 = 3;
-  repeated string Tags                            = 4;
-  google.protobuf.Timestamp SourceEventPublished  = 5;
-  google.protobuf.Timestamp Created               = 6;
-  Producer Producer                               = 7;
-  Actor Actor                                     = 8;
-  string Verb                                     = 9;
-  Object Object                                   = 10;
-  Target Target                                   = 11;
-  Parent Parent                                   = 12;
+  string id                                         = 1;
+  string event_type                                 = 2;
+  string feed_type                                  = 3;
+  repeated string tags                              = 4;
+  google.protobuf.Timestamp source_event_published  = 5;
+  google.protobuf.Timestamp created                 = 6;
+  Producer producer                                 = 7;
+  Actor actor                                       = 8;
+  string verb                                       = 9;
+  Object object                                     = 10;
+  Target target                                     = 11;
+  Parent parent                                     = 12;
   // Event's Chef Organization
-  string chef_organization                        = 13;
+  string chef_organization                          = 13;
   // Event's Chef Infra Server
-  string chef_infra_server                        = 14;
+  string chef_infra_server                          = 14;
 }
 
 message Parent {
-  string ID = 1;
-  string Name = 2;
+  string id = 1;
+  string name = 2;
 }
 
 message Producer {
-  string ID                   = 1;
-  string Name                 = 2;
-  string ObjectType           = 3;
-  repeated string PTags       = 4;
+  string id                   = 1;
+  string name                 = 2;
+  string object_type          = 3;
+  repeated string p_tags      = 4;
 }
 
 message Actor {
-  string ID                   = 1;
-  string Name                 = 2;
-  string ObjectType           = 3;
+  string id                   = 1;
+  string name                 = 2;
+  string object_type           = 3;
 }
 
 message Object {
-  string ID                   = 1;
-  string Name                 = 2;
-  string ObjectType           = 3;
+  string id                   = 1;
+  string name                 = 2;
+  string object_type           = 3;
 }
 
 message Target {
-  string ID                   = 1;
-  string Name                 = 2;
-  string ObjectType           = 3;
+  string id                   = 1;
+  string name                 = 2;
+  string object_type           = 3;
 }
 
 message FeedSummaryRequest {
-  int64 Start             = 1;
-  int64 End               = 2;
-  int32 Size              = 4;
-  int32 From              = 5;
-  string StartAfter       = 6;
-  repeated string Filters = 7;
-  string CountCategory    = 9;
+  int64 start             = 1;
+  int64 end               = 2;
+  int32 size              = 4;
+  int32 from              = 5;
+  string start_after       = 6;
+  repeated string filters = 7;
+  string count_category    = 9;
 }
 
 message FeedSummaryResponse {
-  int64 TotalEntries              = 1;
-  repeated EntryCount EntryCounts = 2;
+  int64 total_entries              = 1;
+  repeated EntryCount entry_counts = 2;
 }
 
 message EntryCount {
-  string Category = 1;
-  int64 Count     = 2;
+  string category = 1;
+  int64 count     = 2;
 }
 
 message FeedTimelineRequest {
-  string Start            = 1;
-  string End              = 2;
-  string Timezone         = 3;
-  int32 Interval          = 4;
-  repeated string Filters = 5;
+  string start            = 1;
+  string end              = 2;
+  string timezone         = 3;
+  int32 interval          = 4;
+  repeated string filters = 5;
 }
 
 message FeedTimelineResponse {
-  string Start                    = 1;
-  string End                      = 2;
-  int32 Interval                  = 3;
-  repeated ActionLine ActionLines = 4;
+  string start                    = 1;
+  string end                      = 2;
+  int32 interval                  = 3;
+  repeated ActionLine action_lines = 4;
 }
 
 message ActionLine {
-  string Action           = 1;
-  repeated Timeslot Slots = 2;
+  string action           = 1;
+  repeated Timeslot slots = 2;
 }
 
 message Timeslot {
-  repeated EntryCount Counts = 1;
+  repeated EntryCount counts = 1;
 }

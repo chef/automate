@@ -190,7 +190,7 @@ func TestPGSidecar(t *testing.T) {
 		}
 
 		require.NotNil(t, details, "error details have no been annotated")
-		require.Equal(t, api.ErrorDetails_SrcDbMissing, details.Code)
+		require.Equal(t, api.ErrorDetails_SRC_DB_MISSING, details.Code)
 	})
 
 	t.Run("MigrateTables empty table list migrates all tables", func(t *testing.T) {

@@ -245,7 +245,7 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 		}
 		defer authzConn.Close() // nolint: errcheck
 
-		authzProjectsClient := authz.NewProjectsClient(authzConn)
+		authzProjectsClient := authz.NewProjectsServiceClient(authzConn)
 
 		projectUpdateManager, err := createProjectUpdateCerealManager(connFactory, config.Cereal.Endpoint)
 		if err != nil {

@@ -2457,9 +2457,9 @@ func assertRolesMatch(t *testing.T, storageRole storage.Role, apiRole api.Role) 
 }
 
 type testSetup struct {
-	policy       api.PoliciesClient
-	authz        api.AuthorizationClient
-	projects     api.ProjectsClient
+	policy       api.PoliciesServiceClient
+	authz        api.AuthorizationServiceClient
+	projects     api.ProjectsServiceClient
 	policyCache  *cache.Cache
 	roleCache    *cache.Cache
 	projectCache *cache.Cache
@@ -2505,9 +2505,9 @@ func setup(t *testing.T, authorizer engine.Authorizer, writer engine.Writer) tes
 		),
 	))
 
-	api.RegisterPoliciesServer(serv, pol)
-	api.RegisterAuthorizationServer(serv, authz)
-	api.RegisterProjectsServer(serv, projectsSrv)
+	api.RegisterPoliciesServiceServer(serv, pol)
+	api.RegisterAuthorizationServiceServer(serv, authz)
+	api.RegisterProjectsServiceServer(serv, projectsSrv)
 	reflection.Register(serv)
 
 	grpcServ := grpctest.NewServer(serv)
@@ -2518,9 +2518,9 @@ func setup(t *testing.T, authorizer engine.Authorizer, writer engine.Writer) tes
 	}
 
 	return testSetup{
-		policy:       api.NewPoliciesClient(conn),
-		authz:        api.NewAuthorizationClient(conn),
-		projects:     api.NewProjectsClient(conn),
+		policy:       api.NewPoliciesServiceClient(conn),
+		authz:        api.NewAuthorizationServiceClient(conn),
+		projects:     api.NewProjectsServiceClient(conn),
 		policyCache:  memInstance.PoliciesCache(),
 		roleCache:    memInstance.RolesCache(),
 		projectCache: memInstance.ProjectsCache(),
@@ -2693,7 +2693,7 @@ func addSomeRolesToStore(t *testing.T, store *cache.Cache, p *prng.Prng) (storag
 }
 
 func generateTestPolicies(ctx context.Context, t *testing.T,
-	cl api.PoliciesClient, policies []*api.CreatePolicyReq) []string {
+	cl api.PoliciesServiceClient, policies []*api.CreatePolicyReq) []string {
 
 	t.Helper()
 	policyResponses := make([]string, len(policies))

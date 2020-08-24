@@ -239,8 +239,10 @@ type Metadata struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name        string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
-	Version     string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty" toml:"version,omitempty" mapstructure:"version,omitempty"`
+	Name    string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+	Version string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty" toml:"version,omitempty" mapstructure:"version,omitempty"`
+	// The field must be `contentType` in the JSON representation
+	// buf:lint:ignore FIELD_LOWER_SNAKE_CASE
 	ContentType string `protobuf:"bytes,4,opt,name=contentType,proto3" json:"contentType,omitempty" toml:"contentType,omitempty" mapstructure:"contentType,omitempty"`
 }
 

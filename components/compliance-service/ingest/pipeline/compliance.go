@@ -24,7 +24,7 @@ type Compliance struct {
 	in chan<- message.Compliance
 }
 
-func NewCompliancePipeline(client *ingestic.ESClient, authzClient authz.ProjectsClient,
+func NewCompliancePipeline(client *ingestic.ESClient, authzClient authz.ProjectsServiceClient,
 	nodeMgrClient manager.NodeManagerServiceClient, messageBufferSize int, notifierClient notifier.Notifier, automateURL string) Compliance {
 	in := make(chan message.Compliance, messageBufferSize)
 	compliancePipeline(in,

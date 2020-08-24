@@ -207,7 +207,7 @@ message ListWorkflowInstancesResponse {
   WorkflowInstance workflow_instance = 1;
 }
 
-service Cereal {
+service CerealService {
   rpc EnqueueWorkflow(EnqueueWorkflowRequest) returns (EnqueueWorkflowResponse);
   rpc DequeueWorkflow(stream DequeueWorkflowRequest)
       returns (stream DequeueWorkflowResponse);

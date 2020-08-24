@@ -99,7 +99,7 @@ func (s *CerealService) EnqueueWorkflow(ctx context.Context, req *cereal.Enqueue
 	return &cereal.EnqueueWorkflowResponse{}, nil
 }
 
-func readDeqWorkReqMsg(ctx context.Context, s cereal.Cereal_DequeueWorkflowServer) (*cereal.DequeueWorkflowRequest, error) {
+func readDeqWorkReqMsg(ctx context.Context, s cereal.CerealService_DequeueWorkflowServer) (*cereal.DequeueWorkflowRequest, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -131,7 +131,7 @@ func readDeqWorkReqMsg(ctx context.Context, s cereal.Cereal_DequeueWorkflowServe
 	}
 }
 
-func writeDeqWorkRespMsg(ctx context.Context, s cereal.Cereal_DequeueWorkflowServer, msg *cereal.DequeueWorkflowResponse) error {
+func writeDeqWorkRespMsg(ctx context.Context, s cereal.CerealService_DequeueWorkflowServer, msg *cereal.DequeueWorkflowResponse) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -155,7 +155,7 @@ func writeDeqWorkRespMsg(ctx context.Context, s cereal.Cereal_DequeueWorkflowSer
 	}
 }
 
-func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer) error {
+func (s *CerealService) DequeueWorkflow(req cereal.CerealService_DequeueWorkflowServer) error {
 	ctx, cancel := context.WithTimeout(req.Context(), time.Minute)
 	defer cancel()
 
@@ -352,7 +352,7 @@ func (s *CerealService) KillWorkflow(ctx context.Context, req *cereal.KillWorkfl
 	return &cereal.KillWorkflowResponse{}, nil
 }
 
-func readDeqTaskReqMsg(ctx context.Context, s cereal.Cereal_DequeueTaskServer) (*cereal.DequeueTaskRequest, error) {
+func readDeqTaskReqMsg(ctx context.Context, s cereal.CerealService_DequeueTaskServer) (*cereal.DequeueTaskRequest, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -384,7 +384,7 @@ func readDeqTaskReqMsg(ctx context.Context, s cereal.Cereal_DequeueTaskServer) (
 	}
 }
 
-func writeDeqTaskRespMsg(ctx context.Context, s cereal.Cereal_DequeueTaskServer, msg *cereal.DequeueTaskResponse) error {
+func writeDeqTaskRespMsg(ctx context.Context, s cereal.CerealService_DequeueTaskServer, msg *cereal.DequeueTaskResponse) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -408,7 +408,7 @@ func writeDeqTaskRespMsg(ctx context.Context, s cereal.Cereal_DequeueTaskServer,
 	}
 }
 
-func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
+func (s *CerealService) DequeueTask(req cereal.CerealService_DequeueTaskServer) error {
 	ctx, cancel := context.WithCancel(req.Context())
 	defer cancel()
 
@@ -564,7 +564,7 @@ func (s *CerealService) CreateWorkflowSchedule(ctx context.Context, req *cereal.
 	return &cereal.CreateWorkflowScheduleResponse{}, nil
 }
 
-func (s *CerealService) ListWorkflowSchedules(req *cereal.ListWorkflowSchedulesRequest, out cereal.Cereal_ListWorkflowSchedulesServer) error {
+func (s *CerealService) ListWorkflowSchedules(req *cereal.ListWorkflowSchedulesRequest, out cereal.CerealService_ListWorkflowSchedulesServer) error {
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":     generateRequestID(),
 		"method": "ListWorkflowSchedules",
@@ -757,7 +757,7 @@ func (s *CerealService) GetWorkflowInstanceByName(ctx context.Context, req *cere
 	}, nil
 }
 
-func (s *CerealService) ListWorkflowInstances(req *cereal.ListWorkflowInstancesRequest, resp cereal.Cereal_ListWorkflowInstancesServer) error {
+func (s *CerealService) ListWorkflowInstances(req *cereal.ListWorkflowInstancesRequest, resp cereal.CerealService_ListWorkflowInstancesServer) error {
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":     generateRequestID(),
 		"domain": req.Domain,

@@ -20,12 +20,12 @@ type Service struct {
 	Logger      logger.Logger
 	ConnFactory *secureconn.Factory
 	Storage     storage.Storage
-	AuthzClient authz.PoliciesClient
+	AuthzClient authz.PoliciesServiceClient
 }
 
 // NewInMemoryService returns an instance of Service that uses the memstore storage backend.
 func NewInMemoryService(l logger.Logger, connFactory *secureconn.Factory,
-	authzClient authz.PoliciesClient) (*Service, error) {
+	authzClient authz.PoliciesServiceClient) (*Service, error) {
 
 	m, err := memstore.New(context.Background(), l)
 	if err != nil {
@@ -42,7 +42,7 @@ func NewInMemoryService(l logger.Logger, connFactory *secureconn.Factory,
 
 // NewPostgresService returns an instance of Service that connects to a postgres storage backend.
 func NewPostgresService(l logger.Logger, connFactory *secureconn.Factory, migrationsConfig migration.Config,
-	authzPoliciesClient authz.PoliciesClient, authzAuthorizationClient authz.AuthorizationClient) (*Service, error) {
+	authzPoliciesClient authz.PoliciesServiceClient, authzAuthorizationClient authz.AuthorizationServiceClient) (*Service, error) {
 
 	p, err := postgres.New(l, migrationsConfig, authzAuthorizationClient)
 

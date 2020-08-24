@@ -20,6 +20,6 @@ message Suggestion {
 }
 
 enum Order {
-  asc = 0;   // By default we order ascending
-  desc = 1;
+  ASC = 0;   // By default we order ascending
+  DESC = 1;
 }

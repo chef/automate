@@ -141,7 +141,7 @@ func fromAPICookbookLocks(cLocks map[string]chef.CookbookLock) []*response.Cookb
 			DottedIdentifier: cb.DottedIdentifier,
 			Source:           cb.Source,
 
-			SCMDetail: &response.SCMDetail{
+			ScmDetail: &response.SCMDetail{
 				Name:                       cb.SCM.Name,
 				Remote:                     cb.SCM.Remote,
 				Revision:                   cb.SCM.Revision,

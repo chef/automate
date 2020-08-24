@@ -41,58 +41,58 @@ func TestPublish(t *testing.T) {
 	require.NoErrorf(t, err, "Unable to translate time.Time %q to timestamp proto", publishedAt.UTC().String())
 
 	event := api.EventMsg{
-		EventID: uuid.Must(uuid.NewV4()).String(),
+		EventId: uuid.Must(uuid.NewV4()).String(),
 		Type:    &api.EventType{Name: config.ScanJobCreatedEventName},
 		Producer: &api.Producer{
-			ID:           "urn:chef:compliance:scan-component",
+			Id:           "urn:chef:compliance:scan-component",
 			ProducerName: "Scanner",
 			ProducerType: "system component",
 		},
 		Tags:      []string{"scanjobs", "create"},
 		Published: pub,
 		Actor: &api.Actor{
-			ID:          "urn:mycompany:user:fred",
+			Id:          "urn:mycompany:user:fred",
 			ObjectType:  "User",
 			DisplayName: "Fred",
 		},
 		Verb: "create",
 		Object: &api.Object{
-			ID:          uuid.Must(uuid.NewV4()).String(),
+			Id:          uuid.Must(uuid.NewV4()).String(),
 			ObjectType:  "scanjobs", // entity types are scanjobs, profile
 			DisplayName: "Scan Job",
 		},
 		Target: &api.Target{
-			ID:          "urn:mycompany:environment:production",
+			Id:          "urn:mycompany:environment:production",
 			ObjectType:  "Environment",
 			DisplayName: "Production",
 		},
 	}
 
 	fe := event_feed_api.FeedEntry{
-		ID:                   "unknown; assigned at feed entry creation time",
+		Id:                   "unknown; assigned at feed entry creation time",
 		EventType:            event.Type.Name,
 		FeedType:             "event",
 		Tags:                 event.Tags,
 		SourceEventPublished: pubTs,
 		Producer: &event_feed_api.Producer{
-			ID:         event.Producer.ID,
+			Id:         event.Producer.Id,
 			Name:       event.Producer.ProducerName,
 			ObjectType: event.Producer.ProducerType,
 			PTags:      event.Producer.Tags,
 		},
 		Actor: &event_feed_api.Actor{
-			ID:         event.Actor.ID,
+			Id:         event.Actor.Id,
 			Name:       event.Actor.DisplayName,
 			ObjectType: event.Actor.ObjectType,
 		},
 		Verb: event.Verb,
 		Object: &event_feed_api.Object{
-			ID:         event.Object.ID,
+			Id:         event.Object.Id,
 			Name:       event.Object.DisplayName,
 			ObjectType: event.Object.ObjectType,
 		},
 		Target: &event_feed_api.Target{
-			ID:         event.Target.ID,
+			Id:         event.Target.Id,
 			ObjectType: event.Object.ObjectType,
 			Name:       event.Target.DisplayName,
 		},
@@ -143,11 +143,11 @@ func TestPublish(t *testing.T) {
 				assert.Equal(t, test.e.FeedType, got.FeedType)
 				assert.Equal(t, test.e.Tags, got.Tags)
 				assert.Equal(t, test.e.SourceEventPublished, got.SourceEventPublished)
-				assert.Equal(t, test.e.Producer.ID, got.Producer.ID)
-				assert.Equal(t, test.e.Actor.ID, got.Actor.ID)
+				assert.Equal(t, test.e.Producer.Id, got.Producer.Id)
+				assert.Equal(t, test.e.Actor.Id, got.Actor.Id)
 				assert.Equal(t, test.e.Verb, got.Verb)
-				assert.Equal(t, test.e.Object.ID, got.Object.ID)
-				assert.Equal(t, test.e.Target.ID, got.Target.ID)
+				assert.Equal(t, test.e.Object.Id, got.Object.Id)
+				assert.Equal(t, test.e.Target.Id, got.Target.Id)
 			}
 		})
 		suite.deleteAllDocuments()
@@ -157,28 +157,28 @@ func TestPublish(t *testing.T) {
 
 func TestPublishNodeTerminated(t *testing.T) {
 	event := api.EventMsg{
-		EventID: uuid.Must(uuid.NewV4()).String(),
+		EventId: uuid.Must(uuid.NewV4()).String(),
 		Type:    &api.EventType{Name: config.NodeTerminatedEventName},
 		Producer: &api.Producer{
-			ID:           "urn:chef:compliance:mgrpolling",
+			Id:           "urn:chef:compliance:mgrpolling",
 			ProducerName: "Node Manager Polling",
 			ProducerType: "system component",
 		},
 		Tags:      []string{"nodemgr", "terminate"},
 		Published: ptypes.TimestampNow(),
 		Actor: &api.Actor{
-			ID:          "",
+			Id:          "",
 			ObjectType:  "nodemanager",
 			DisplayName: "nodemanager",
 		},
 		Verb: "terminate",
 		Object: &api.Object{
-			ID:          "instanceID",
+			Id:          "instanceID",
 			ObjectType:  "instance ID",
 			DisplayName: "instanceID",
 		},
 		Target: &api.Target{
-			ID:          "",
+			Id:          "",
 			ObjectType:  "Not Applicable",
 			DisplayName: "Not Applicable",
 		},

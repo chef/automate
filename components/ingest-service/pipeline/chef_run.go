@@ -26,7 +26,7 @@ type ChefRunPipeline struct {
 }
 
 // NewChefRunPipeline Create a new chef run pipeline
-func NewChefRunPipeline(client backend.Client, authzClient authz.ProjectsClient,
+func NewChefRunPipeline(client backend.Client, authzClient authz.ProjectsServiceClient,
 	nodeMgrClient manager.NodeManagerServiceClient,
 	chefIngestRunPipelineConfig serveropts.ChefIngestRunPipelineConfig,
 	messageBufferSize int) ChefRunPipeline {

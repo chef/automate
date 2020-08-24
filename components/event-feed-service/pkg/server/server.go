@@ -213,36 +213,36 @@ func fromInternalFormat(entry *feed.FeedEntry) (*event_feed.FeedEntry, error) {
 	}
 
 	return &event_feed.FeedEntry{
-		ID:                   entry.ID,
+		Id:                   entry.ID,
 		EventType:            entry.EventType,
 		FeedType:             entry.FeedType,
 		Tags:                 entry.Tags,
 		SourceEventPublished: pubTs,
 		Created:              createTs,
 		Producer: &event_feed.Producer{
-			ID:         entry.ProducerID,
+			Id:         entry.ProducerID,
 			Name:       entry.ProducerName,
 			ObjectType: entry.ProducerObjectType,
 			PTags:      entry.ProducerTags,
 		},
 		Actor: &event_feed.Actor{
-			ID:         entry.ActorID,
+			Id:         entry.ActorID,
 			Name:       entry.ActorName,
 			ObjectType: entry.ActorObjectType,
 		},
 		Verb: entry.Verb,
 		Object: &event_feed.Object{
-			ID:         entry.ObjectID,
+			Id:         entry.ObjectID,
 			Name:       entry.ObjectName,
 			ObjectType: entry.ObjectObjectType,
 		},
 		Target: &event_feed.Target{
-			ID:         entry.TargetID,
+			Id:         entry.TargetID,
 			Name:       entry.TargetName,
 			ObjectType: entry.TargetObjectType,
 		},
 		Parent: &event_feed.Parent{
-			ID:   entry.ParentID,
+			Id:   entry.ParentID,
 			Name: entry.ParentName,
 		},
 		ChefInfraServer:  entry.ChefInfraServer,

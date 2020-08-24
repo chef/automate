@@ -32,7 +32,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 
-func request_ChefIngester_ProcessChefRun_0(ctx context.Context, marshaler runtime.Marshaler, client ChefIngesterClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ChefIngesterService_ProcessChefRun_0(ctx context.Context, marshaler runtime.Marshaler, client ChefIngesterServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.Run
 	var metadata runtime.ServerMetadata
 
@@ -49,7 +49,7 @@ func request_ChefIngester_ProcessChefRun_0(ctx context.Context, marshaler runtim
 
 }
 
-func local_request_ChefIngester_ProcessChefRun_0(ctx context.Context, marshaler runtime.Marshaler, server ChefIngesterServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ChefIngesterService_ProcessChefRun_0(ctx context.Context, marshaler runtime.Marshaler, server ChefIngesterServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.Run
 	var metadata runtime.ServerMetadata
 
@@ -66,7 +66,7 @@ func local_request_ChefIngester_ProcessChefRun_0(ctx context.Context, marshaler 
 
 }
 
-func request_ChefIngester_ProcessChefAction_0(ctx context.Context, marshaler runtime.Marshaler, client ChefIngesterClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ChefIngesterService_ProcessChefAction_0(ctx context.Context, marshaler runtime.Marshaler, client ChefIngesterServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.Action
 	var metadata runtime.ServerMetadata
 
@@ -83,7 +83,7 @@ func request_ChefIngester_ProcessChefAction_0(ctx context.Context, marshaler run
 
 }
 
-func local_request_ChefIngester_ProcessChefAction_0(ctx context.Context, marshaler runtime.Marshaler, server ChefIngesterServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ChefIngesterService_ProcessChefAction_0(ctx context.Context, marshaler runtime.Marshaler, server ChefIngesterServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.Action
 	var metadata runtime.ServerMetadata
 
@@ -100,7 +100,7 @@ func local_request_ChefIngester_ProcessChefAction_0(ctx context.Context, marshal
 
 }
 
-func request_ChefIngester_ProcessLivenessPing_0(ctx context.Context, marshaler runtime.Marshaler, client ChefIngesterClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ChefIngesterService_ProcessLivenessPing_0(ctx context.Context, marshaler runtime.Marshaler, client ChefIngesterServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.Liveness
 	var metadata runtime.ServerMetadata
 
@@ -117,7 +117,7 @@ func request_ChefIngester_ProcessLivenessPing_0(ctx context.Context, marshaler r
 
 }
 
-func local_request_ChefIngester_ProcessLivenessPing_0(ctx context.Context, marshaler runtime.Marshaler, server ChefIngesterServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ChefIngesterService_ProcessLivenessPing_0(ctx context.Context, marshaler runtime.Marshaler, server ChefIngesterServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.Liveness
 	var metadata runtime.ServerMetadata
 
@@ -134,7 +134,7 @@ func local_request_ChefIngester_ProcessLivenessPing_0(ctx context.Context, marsh
 
 }
 
-func request_ChefIngester_ProcessNodeDelete_0(ctx context.Context, marshaler runtime.Marshaler, client ChefIngesterClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ChefIngesterService_ProcessNodeDelete_0(ctx context.Context, marshaler runtime.Marshaler, client ChefIngesterServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.Delete
 	var metadata runtime.ServerMetadata
 
@@ -151,7 +151,7 @@ func request_ChefIngester_ProcessNodeDelete_0(ctx context.Context, marshaler run
 
 }
 
-func local_request_ChefIngester_ProcessNodeDelete_0(ctx context.Context, marshaler runtime.Marshaler, server ChefIngesterServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ChefIngesterService_ProcessNodeDelete_0(ctx context.Context, marshaler runtime.Marshaler, server ChefIngesterServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.Delete
 	var metadata runtime.ServerMetadata
 
@@ -168,7 +168,7 @@ func local_request_ChefIngester_ProcessNodeDelete_0(ctx context.Context, marshal
 
 }
 
-func request_ChefIngester_GetVersion_0(ctx context.Context, marshaler runtime.Marshaler, client ChefIngesterClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ChefIngesterService_GetVersion_0(ctx context.Context, marshaler runtime.Marshaler, client ChefIngesterServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq VersionRequest
 	var metadata runtime.ServerMetadata
 
@@ -177,7 +177,7 @@ func request_ChefIngester_GetVersion_0(ctx context.Context, marshaler runtime.Ma
 
 }
 
-func local_request_ChefIngester_GetVersion_0(ctx context.Context, marshaler runtime.Marshaler, server ChefIngesterServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ChefIngesterService_GetVersion_0(ctx context.Context, marshaler runtime.Marshaler, server ChefIngesterServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq VersionRequest
 	var metadata runtime.ServerMetadata
 
@@ -186,12 +186,12 @@ func local_request_ChefIngester_GetVersion_0(ctx context.Context, marshaler runt
 
 }
 
-// RegisterChefIngesterHandlerServer registers the http handlers for service ChefIngester to "mux".
-// UnaryRPC     :call ChefIngesterServer directly.
+// RegisterChefIngesterServiceHandlerServer registers the http handlers for service ChefIngesterService to "mux".
+// UnaryRPC     :call ChefIngesterServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-func RegisterChefIngesterHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ChefIngesterServer) error {
+func RegisterChefIngesterServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ChefIngesterServiceServer) error {
 
-	mux.Handle("POST", pattern_ChefIngester_ProcessChefRun_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ChefIngesterService_ProcessChefRun_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -200,18 +200,18 @@ func RegisterChefIngesterHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ChefIngester_ProcessChefRun_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ChefIngesterService_ProcessChefRun_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChefIngester_ProcessChefRun_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChefIngesterService_ProcessChefRun_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ChefIngester_ProcessChefAction_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ChefIngesterService_ProcessChefAction_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -220,18 +220,18 @@ func RegisterChefIngesterHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ChefIngester_ProcessChefAction_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ChefIngesterService_ProcessChefAction_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChefIngester_ProcessChefAction_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChefIngesterService_ProcessChefAction_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ChefIngester_ProcessLivenessPing_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ChefIngesterService_ProcessLivenessPing_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -240,18 +240,18 @@ func RegisterChefIngesterHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ChefIngester_ProcessLivenessPing_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ChefIngesterService_ProcessLivenessPing_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChefIngester_ProcessLivenessPing_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChefIngesterService_ProcessLivenessPing_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ChefIngester_ProcessNodeDelete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ChefIngesterService_ProcessNodeDelete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -260,18 +260,18 @@ func RegisterChefIngesterHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ChefIngester_ProcessNodeDelete_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ChefIngesterService_ProcessNodeDelete_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChefIngester_ProcessNodeDelete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChefIngesterService_ProcessNodeDelete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_ChefIngester_GetVersion_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ChefIngesterService_GetVersion_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -280,23 +280,23 @@ func RegisterChefIngesterHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ChefIngester_GetVersion_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ChefIngesterService_GetVersion_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChefIngester_GetVersion_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChefIngesterService_GetVersion_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterChefIngesterHandlerFromEndpoint is same as RegisterChefIngesterHandler but
+// RegisterChefIngesterServiceHandlerFromEndpoint is same as RegisterChefIngesterServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterChefIngesterHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterChefIngesterServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -316,23 +316,23 @@ func RegisterChefIngesterHandlerFromEndpoint(ctx context.Context, mux *runtime.S
 		}()
 	}()
 
-	return RegisterChefIngesterHandler(ctx, mux, conn)
+	return RegisterChefIngesterServiceHandler(ctx, mux, conn)
 }
 
-// RegisterChefIngesterHandler registers the http handlers for service ChefIngester to "mux".
+// RegisterChefIngesterServiceHandler registers the http handlers for service ChefIngesterService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterChefIngesterHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterChefIngesterHandlerClient(ctx, mux, NewChefIngesterClient(conn))
+func RegisterChefIngesterServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterChefIngesterServiceHandlerClient(ctx, mux, NewChefIngesterServiceClient(conn))
 }
 
-// RegisterChefIngesterHandlerClient registers the http handlers for service ChefIngester
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ChefIngesterClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ChefIngesterClient"
+// RegisterChefIngesterServiceHandlerClient registers the http handlers for service ChefIngesterService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ChefIngesterServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ChefIngesterServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "ChefIngesterClient" to call the correct interceptors.
-func RegisterChefIngesterHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ChefIngesterClient) error {
+// "ChefIngesterServiceClient" to call the correct interceptors.
+func RegisterChefIngesterServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ChefIngesterServiceClient) error {
 
-	mux.Handle("POST", pattern_ChefIngester_ProcessChefRun_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ChefIngesterService_ProcessChefRun_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -341,18 +341,18 @@ func RegisterChefIngesterHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ChefIngester_ProcessChefRun_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ChefIngesterService_ProcessChefRun_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChefIngester_ProcessChefRun_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChefIngesterService_ProcessChefRun_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ChefIngester_ProcessChefAction_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ChefIngesterService_ProcessChefAction_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -361,18 +361,18 @@ func RegisterChefIngesterHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ChefIngester_ProcessChefAction_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ChefIngesterService_ProcessChefAction_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChefIngester_ProcessChefAction_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChefIngesterService_ProcessChefAction_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ChefIngester_ProcessLivenessPing_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ChefIngesterService_ProcessLivenessPing_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -381,18 +381,18 @@ func RegisterChefIngesterHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ChefIngester_ProcessLivenessPing_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ChefIngesterService_ProcessLivenessPing_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChefIngester_ProcessLivenessPing_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChefIngesterService_ProcessLivenessPing_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ChefIngester_ProcessNodeDelete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ChefIngesterService_ProcessNodeDelete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -401,18 +401,18 @@ func RegisterChefIngesterHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ChefIngester_ProcessNodeDelete_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ChefIngesterService_ProcessNodeDelete_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChefIngester_ProcessNodeDelete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChefIngesterService_ProcessNodeDelete_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_ChefIngester_GetVersion_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ChefIngesterService_GetVersion_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -421,14 +421,14 @@ func RegisterChefIngesterHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ChefIngester_GetVersion_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ChefIngesterService_GetVersion_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChefIngester_GetVersion_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChefIngesterService_GetVersion_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -436,25 +436,25 @@ func RegisterChefIngesterHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_ChefIngester_ProcessChefRun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "events", "chef", "run"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ChefIngesterService_ProcessChefRun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "events", "chef", "run"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ChefIngester_ProcessChefAction_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "events", "chef", "action"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ChefIngesterService_ProcessChefAction_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "events", "chef", "action"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ChefIngester_ProcessLivenessPing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "events", "chef", "liveness"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ChefIngesterService_ProcessLivenessPing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "events", "chef", "liveness"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ChefIngester_ProcessNodeDelete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "events", "chef", "nodedelete"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ChefIngesterService_ProcessNodeDelete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "events", "chef", "nodedelete"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ChefIngester_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "ingest", "version"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ChefIngesterService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "ingest", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
-	forward_ChefIngester_ProcessChefRun_0 = runtime.ForwardResponseMessage
+	forward_ChefIngesterService_ProcessChefRun_0 = runtime.ForwardResponseMessage
 
-	forward_ChefIngester_ProcessChefAction_0 = runtime.ForwardResponseMessage
+	forward_ChefIngesterService_ProcessChefAction_0 = runtime.ForwardResponseMessage
 
-	forward_ChefIngester_ProcessLivenessPing_0 = runtime.ForwardResponseMessage
+	forward_ChefIngesterService_ProcessLivenessPing_0 = runtime.ForwardResponseMessage
 
-	forward_ChefIngester_ProcessNodeDelete_0 = runtime.ForwardResponseMessage
+	forward_ChefIngesterService_ProcessNodeDelete_0 = runtime.ForwardResponseMessage
 
-	forward_ChefIngester_GetVersion_0 = runtime.ForwardResponseMessage
+	forward_ChefIngesterService_GetVersion_0 = runtime.ForwardResponseMessage
 )

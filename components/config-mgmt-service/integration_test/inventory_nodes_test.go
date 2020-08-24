@@ -140,7 +140,7 @@ func TestInventoryNodesWithTableDriven(t *testing.T) {
 			request.InventoryNodes{
 				PageSize: 10,
 				Sorting: &request.Sorting{
-					Order: request.Order_desc,
+					Order: request.Order_DESC,
 				},
 			},
 			&response.InventoryNodes{
@@ -162,7 +162,7 @@ func TestInventoryNodesWithTableDriven(t *testing.T) {
 				CursorDate: toTimestamp(t, nodes[9].Checkin),
 				CursorId:   nodes[9].EntityUuid,
 				Sorting: &request.Sorting{
-					Order: request.Order_desc,
+					Order: request.Order_DESC,
 				},
 			},
 			&response.InventoryNodes{

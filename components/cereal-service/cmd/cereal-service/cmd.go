@@ -157,7 +157,7 @@ func serve(*cobra.Command, []string) error {
 	}
 
 	svc := server.NewCerealService(ctx, pgBackend)
-	grpccereal.RegisterCerealServer(grpcServer, svc)
+	grpccereal.RegisterCerealServiceServer(grpcServer, svc)
 
 	healthSvc := health.NewService()
 	health.RegisterHealthServer(grpcServer, healthSvc)
