@@ -97,7 +97,7 @@ The SAML configuration setting is only respected if the selected value in "Choos
 
 For example, when selecting the specific user attribute `user.email` for NameID in Azure AD:
 
-1. In Azure AD for "Choose name identifier format", select "EmailAddress", and configure the attribute and (optional) transformation.
+1. In Azure AD for "Choose name identifier format", select "Email address", and configure the attribute and (optional) transformation.
 1. In Chef Automate's configuration, set `name_id_policy_format` to `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`.
 {{< /warning >}}
 
