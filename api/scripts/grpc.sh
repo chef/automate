@@ -77,11 +77,18 @@ for i in interservice/**/; do
     list=("$i"*.proto)
     printf 'GEN: %s\n' "${list[@]}"
 
+    protoc_args=("--go_out=plugins=grpc,paths=source_relative:/src/api")
+
+    if grep -q "google.api.http" "${list[@]}"; then
+      protoc_args+=("--grpc-gateway_out=request_context=true,logtostderr=true:$fauxpath")
+    fi
+
     # service, grpc-gateway, policy mapping
     protoc "${IMPORTS[@]}" \
-      --go_out=plugins=grpc,paths=source_relative:/src/api \
-      --grpc-gateway_out="request_context=true,logtostderr=true:$fauxpath"  \
+      "${protoc_args[@]}" \
       "${list[@]}" || exit 1
+
+      ### --grpc-gateway_out="request_context=true,logtostderr=true:$fauxpath"  \
 
     sync_from_fauxpath "${list[0]}"
 
