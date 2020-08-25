@@ -126,8 +126,7 @@ Installations require elevated privileges, so run the commands as the superuser 
 
 1. [Set up `knife`]({{< relref "infra_server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
 
-1. To send data from the Chef Infra Server to an external Chef Automate installation,
-   first create a `patch.toml` file that contains the configuration stanza:
+1. To send data from the Chef Infra Server to an external Chef Automate installation, first create a `patch.toml` file that contains the configuration stanza:
 
     ```toml
     [global.v1.external.automate]
@@ -145,8 +144,8 @@ Installations require elevated privileges, so run the commands as the superuser 
     [erchef.v1.sys.data_collector]
     enabled = true
     ```
-   Then run `chef-automate config patch patch.toml` to patch your Chef Infra Server
-   configuration.
+  
+   Then run `chef-automate config patch patch.toml` to patch your Chef Infra Server configuration.
 
 ### Install a Standalone Chef Infra Server with a Configuration File
 
@@ -180,8 +179,7 @@ Installations require elevated privileges, so run the commands as the superuser 
 
 1. [Set up `knife`]({{< relref "infra_server.md#use-knife-with-chef-infra-server" >}}) for use with Chef Infra Server.
 
-1. To send data from the Chef Infra Server to an external Chef Automate installation,
-   first create a `patch.toml` file that contains the configuration stanza:
+1. To send data from the Chef Infra Server to an external Chef Automate installation, first create a `patch.toml` file that contains the configuration stanza:
 
     ```toml
     [global.v1.external.automate]
@@ -199,9 +197,8 @@ Installations require elevated privileges, so run the commands as the superuser 
     [erchef.v1.sys.data_collector]
     enabled = true
     ```
-   Then run `chef-automate config patch patch.toml` to patch your Chef Infra Server
-   configuration.
 
+   Then run `chef-automate config patch patch.toml` to patch your Chef Infra Server configuration.
 
 ## Add a New Chef Infra Server to an Existing Chef Automate Installation
 
