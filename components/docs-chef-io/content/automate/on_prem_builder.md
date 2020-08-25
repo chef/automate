@@ -242,6 +242,7 @@ export HAB_BLDR_URL=https://{{< example_fqdn "automate" >}}/bldr/v1/
 ```
 
 ## Access the Chef Habitat Builder On-prem REST API
+
 To access the [REST API](https://www.habitat.sh/docs/api/builder-api/) for your on-prem installation of Chef Habitat Builder, you must
 specify your Builder authentication token as a bearer token in your request's
 `Authorization` header. For example:
