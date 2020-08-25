@@ -167,10 +167,17 @@ func (c *PGConnInfo) String() string {
 
 func externalConnURIRenderer(ip string, port int, user string, password string, opts []string) (pgConnURIRenderer, string) {
 	fmtStr := "postgresql://%s@%s:%d/%s?%s"
+
+	userInfoDebugStr := user
+	if password != "" {
+		userInfoDebugStr += ":<redacted>"
+	}
+	debugStr := fmt.Sprintf(fmtStr, userInfoDebugStr, ip, port, "<database>", strings.Join(opts, "&"))
+
 	userInfo := url.UserPassword(user, password)
 	return func(dbname string) string {
 		return fmt.Sprintf(fmtStr, userInfo.String(), ip, port, dbname, strings.Join(opts, "&"))
-	}, fmt.Sprintf(fmtStr, user, "<readacted>", ip, port, "<database>", strings.Join(opts, "&"))
+	}, debugStr
 }
 
 func internalConnURIRenderer(ip string, port int, user string, certPath string,
