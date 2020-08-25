@@ -3,7 +3,7 @@
 
 echo "Annotate authorization actions"
 
-doc_action() { awk -f ./scripts/add_action_doc_to_proto.awk $1 > data.tmp && mv data.tmp $1 ; }
+doc_action() { awk -f ./scripts/add_action_doc_to_proto.awk "$1" > data.tmp && mv data.tmp "$1" ; }
 export -f doc_action
 grep --include=\*.proto -rwl rpc api | xargs grep -l '\*\/' | xargs -t -n1 -P1 bash -c 'doc_action "$@"' _
 
@@ -42,28 +42,28 @@ IMPORTS=(-I /src/api
         )
 
 shopt -s globstar
-pushd api
+pushd api || exit 1
 for i in external/**/; do
   # check if there are proto files in that directory
-  protos=(`find "$i" -maxdepth 1 -name "*.proto"`)
+  read -ra protos <<< "$(find "$i" -maxdepth 1 -name "*.proto")"
   if [ ${#protos[@]} -gt 0 ]; then
-    list=($i*.proto)
+    list=("$i"*.proto)
     printf 'GEN: %s\n' "${list[@]}"
 
     # service, grpc-gateway, policy mapping
-    protoc ${IMPORTS[@]} \
+    protoc "${IMPORTS[@]}" \
       --go_out=plugins=grpc,paths=source_relative:/src/api \
-      --grpc-gateway_out=request_context=true,logtostderr=true:$fauxpath  \
-      --policy_out=logtostderr=true:$fauxpath  \
-      ${list[@]} || exit 1
+      --grpc-gateway_out="request_context=true,logtostderr=true:$fauxpath"  \
+      --policy_out="logtostderr=true:$fauxpath"  \
+      "${list[@]}" || exit 1
 
     sync_from_fauxpath "${list[0]}"
 
     # generates swagger output, only generate if a gateway file was generated
-    gogw=(`find $i -maxdepth 1 -name "*.gw.go"`)
+    read -ra gogw <<< "$(find "$i" -maxdepth 1 -name "*.gw.go")"
     if [ ${#gogw[@]} -gt 0 ]; then
       printf 'SWG: %s\n' "${list[@]}"
-      protoc  ${IMPORTS[@]} --swagger_out=logtostderr=true,fqn_for_swagger_name=true:$PWD ${list[@]} || exit 1
+      protoc  "${IMPORTS[@]}" --swagger_out="logtostderr=true,fqn_for_swagger_name=true:$PWD" "${list[@]}" || exit 1
     fi
   fi
 done
@@ -71,16 +71,17 @@ done
 # This is a separate loop because we do not want to do policy generation
 for i in interservice/**/; do
   # check if there are proto files in that directory
-  protos=(`find "$i" -maxdepth 1 -name "*.proto"`)
+  #protos=$(find "$i" -maxdepth 1 -name "*.proto")
+  read -ra protos <<< "$(find "$i" -maxdepth 1 -name "*.proto")"
   if [ ${#protos[@]} -gt 0 ]; then
-    list=($i*.proto)
+    list=("$i"*.proto)
     printf 'GEN: %s\n' "${list[@]}"
 
     # service, grpc-gateway, policy mapping
-    protoc ${IMPORTS[@]} \
+    protoc "${IMPORTS[@]}" \
       --go_out=plugins=grpc,paths=source_relative:/src/api \
-      --grpc-gateway_out=request_context=true,logtostderr=true:$fauxpath  \
-      ${list[@]} || exit 1
+      --grpc-gateway_out="request_context=true,logtostderr=true:$fauxpath"  \
+      "${list[@]}" || exit 1
 
     sync_from_fauxpath "${list[0]}"
 
@@ -96,10 +97,10 @@ for i in interservice/**/; do
         "interservice/authn/"*|\
         "interservice/authz/"*)
             printf 'VAL: %s\n' "${list[@]}"
-            protoc ${IMPORTS[@]} \
+            protoc "${IMPORTS[@]}" \
                    --grpc-mock_out="${fauxpath}" \
                    --validate_out=lang=go:"${fauxpath}" \
-                   ${list[@]} || exit 1
+                   "${list[@]}" || exit 1
 
             sync_from_fauxpath "${list[0]}"
             ;;
@@ -108,22 +109,22 @@ for i in interservice/**/; do
             ;;
     esac
     # generates swagger output, only generate if a gateway file was generated
-    gogw=(`find $i -maxdepth 1 -name "*.gw.go"`)
+    read -ra gogw <<< "$(find "$i" -maxdepth 1 -name "*.gw.go")"
     if [ ${#gogw[@]} -gt 0 ]; then
       printf 'SWG: %s\n' "${list[@]}"
-      protoc  ${IMPORTS[@]} --swagger_out=logtostderr=true,fqn_for_swagger_name=true:$PWD ${list[@]} || exit 1
+      protoc  "${IMPORTS[@]}" --swagger_out="logtostderr=true,fqn_for_swagger_name=true:$PWD" "${list[@]}" || exit 1
     fi
 
     pb_files=$(ls "$i"/*.pb.go)
     # extract the first field from the json tag (the name) and apply it as the
     # contents of the toml tag
-    for i in ${pb_files}; do
-        sed -i 's/json:"\([^,]*\).*"/& toml:"\1,omitempty" mapstructure:"\1,omitempty"/;s/toml:"-,omitempty"/toml:"-"/' "$i"
+    for j in ${pb_files}; do
+        sed -i 's/json:"\([^,]*\).*"/& toml:"\1,omitempty" mapstructure:"\1,omitempty"/;s/toml:"-,omitempty"/toml:"-"/' "$j"
     done
   fi
 done
 
-popd
+popd || exit 1
 
 
 # This script reads all swagger '.json' files in the current folder
