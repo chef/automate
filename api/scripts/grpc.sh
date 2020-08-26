@@ -41,12 +41,11 @@ IMPORTS=(-I /src/api
          -I /src/lib
         )
 
+# shellcheck disable=SC1090
+source "${BASH_SOURCE%/*}/bootstrap_protoc.sh"
+
 shopt -s globstar
 pushd api || exit 1
-
-printf 'GEN: %s\n' api/external/annotations/iam/*.proto
-protoc -I /src/components --go_out=paths=source_relative:/src/api \
-  annotations/iam/*.proto
 
 for i in external/**/; do
   
@@ -57,7 +56,8 @@ for i in external/**/; do
   fi
 
   # check if there are proto files in that directory
-  read -ra protos <<< "$(find "$i" -maxdepth 1 -name "*.proto")"
+  read -d "\n" -ra protos <<< "$(find "$i" -maxdepth 1 -name "*.proto")"
+
   if [ ${#protos[@]} -gt 0 ]; then
     list=("$i"*.proto)
     printf 'GEN: %s\n' "${list[@]}"
