@@ -67,7 +67,7 @@ To restore on a new host, run:
 chef-automate backup restore </path/to/backups/>BACKUP_ID
 ```
 
-To restore on an existing Chef Automate host, run:
+To restore on an existing Chef Automate host by overwriting the existing installation with the backup, run:
 
 ```shell
 chef-automate backup restore </path/to/backups/>BACKUP_ID --skip-preflight
