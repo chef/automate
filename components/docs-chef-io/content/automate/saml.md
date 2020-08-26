@@ -92,13 +92,8 @@ where:
 See the [SAML Configuration Settings]({{< relref "saml.md#saml-configuration-settings" >}}) for further configuration options.
 
 {{< warning >}}
-Azure AD lets you chose the _NameID_ field, and optionally apply _transformations_ to it.
+Azure AD lets you choose the _NameID_ field, and optionally apply _transformations_ to it.
 The SAML configuration setting is only respected if the selected value in "Choose name identifier format" in Azure AD matches the `name_id_policy_format` configuration in Chef Automate.
-
-For example, when selecting the specific user attribute `user.email` for NameID in Azure AD:
-
-1. In Azure AD for "Choose name identifier format", select "Email address", and configure the attribute and (optional) transformation.
-1. In Chef Automate's configuration, set `name_id_policy_format` to `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`.
 {{< /warning >}}
 
 ## SAML Configuration Settings
