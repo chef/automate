@@ -20,6 +20,7 @@ service ReportingService {
 	Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	Supports pagination, filtering, and sorting.
 	Limited to 10k results.
+	Not including an end time will return results for reports ingested in the last 24 hours.
 
 	Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 
@@ -58,6 +59,7 @@ service ReportingService {
 	Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	Not including an end time will return results for reports ingested in the last 24 hours.
 	Not limited to 10k results.
 
 	Authorization Action:
@@ -81,6 +83,7 @@ service ReportingService {
 
 	Lists controls from the last run, with optional filtering.
 	Supports filtering, but not pagination or sorting.
+	Not including an end time will return results for reports ingested in the last 24 hours.
 	Limited to 100 results by default.
 
 	Authorization Action:
@@ -105,6 +108,7 @@ service ReportingService {
 	Show a specific report by ID. Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	End time value is required for reports older than 24 hours.
 
 	Authorization Action:
 	```
@@ -231,6 +235,7 @@ service ReportingService {
 
 	List all nodes, with optional filtering, pagination, and sorting.
 	Limited to 10k results.
+	Not including an end time will return results for reports ingested in the last 24 hours.
 
 	| Sort parameter | Sort value |
 	| --- | --- |

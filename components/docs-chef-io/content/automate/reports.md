@@ -23,8 +23,8 @@ Note: The count of controls listed in the _Profile Status_ pane of the Reports O
 
 ### Dates in Compliance Reports
 
-The dashboard shows the results of all scans with end times on the _currently selected day_.
-The currently selected day, as highlighted in the search bar, bases itself on timestamps in Coordinated Universal Time (UTC).
+The dashboard shows the results of all scans that have been ingested with an end time in the last 24 hours, relative to the automate machine's timezone.
+Similarly, API users should expect to receive results for reports ingested in the last 24 hours unless they specify an end time using the filters. 
 
 A historical view is provided through the trend graph, which can be adjusted to show a 10 day, month, 3 month, or year overview.
 

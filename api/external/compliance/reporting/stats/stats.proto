@@ -14,6 +14,7 @@ service StatsService {
 	Returns summary statistics for compliance reports. 
 	General report summary information is the default. 
 	Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
+	Not including an end time will return results for reports ingested in the last 24 hours.
 	Supports filtering.
 
 	Example:
@@ -50,6 +51,7 @@ service StatsService {
 	Returns trendgraph statistics for compliance reports. 
 	The `type` field is required for this api call. Options are `nodes` or `controls`.
 	Requires minimum `interval` field of 3600 and defined start time and end time filters.
+	Not including an end time will return results for reports ingested in the last 24 hours.
 	Supports filtering.
 
 	Example:
@@ -87,6 +89,7 @@ service StatsService {
 	Returns statistics and summary information for profiles executed as part of the compliance reports. 
 	If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
 	If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
+	Not including an end time will return results for reports ingested in the last 24 hours.
 	Supports filtering.
 
 	```
@@ -123,6 +126,7 @@ service StatsService {
 	Returns the top failures for the specified object. A types filter is required for this api.
 	Supported values are `platform`, `environment`, `control`, and `profile`.
 	By default, the top ten failed objects for the specified type are returned.
+	Not including an end time will return results for reports ingested in the last 24 hours.
 	Supports filtering and respects `size` parameter.
 
 	Example:
