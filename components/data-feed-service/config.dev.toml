@@ -1,6 +1,6 @@
 [service]
 host = "localhost"
-port = 14001
+port = 10105
 feed_interval = "5m"
 asset_page_size = 10
 reports_page_size = 10
@@ -41,4 +41,3 @@ target = "{{config-mgmt-service.cfg.host}}:{{config-mgmt-service.cfg.port}}"
 target = "{{compliance-service.cfg.host}}:{{compliance-service.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
-

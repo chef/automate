@@ -1,6 +1,6 @@
 [service]
 host = "localhost"
-port = 14001
+port = 10501
 feed_interval = "4h"
 asset_page_size = 100
 reports_page_size = 1000

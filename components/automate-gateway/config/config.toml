@@ -40,5 +40,5 @@ level = "debug"
     target = "0.0.0.0:9093"
     secure = true
   [grpc_clients.endpoints.data-feed-service]
-    target = "0.0.0.0:14001"
+    target = "0.0.0.0:10105"
     secure = true

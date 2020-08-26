@@ -1,9 +1,10 @@
 package data_feed
 
 import (
+	"github.com/golang/protobuf/ptypes/wrappers"
+
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
-	"github.com/golang/protobuf/ptypes/wrappers"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -24,7 +25,7 @@ func NewConfigRequest() *ConfigRequest {
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 	c.V1.Sys.Service.Host = w.String("0.0.0.0")
-	c.V1.Sys.Service.Port = w.Int32(14001)
+	c.V1.Sys.Service.Port = w.Int32(10105)
 	c.V1.Sys.Service.FeedInterval = w.String("4h")
 	c.V1.Sys.Service.AssetPageSize = w.Int32(100)
 	c.V1.Sys.Service.ReportsPageSize = w.Int32(1000)
