@@ -17,8 +17,4 @@ printf 'GEN: %s\n' components/automate-grpc/protoc-gen-a2-config/api/a2conf/*.pr
 protoc -I /src/components --go_out=paths=source_relative:/src/components \
   automate-grpc/protoc-gen-a2-config/api/a2conf/*.proto
 
-printf 'GEN: %s\n' components/automate-grpc/protoc-gen-policy/iam/*.proto
-protoc -I /src/components --go_out=paths=source_relative:/src/components \
-  automate-grpc/protoc-gen-policy/iam/*.proto
-
 popd

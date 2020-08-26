@@ -10,7 +10,7 @@ import "external/event_feed/response/eventstrings.proto";
 import "external/common/response.proto";
 
 import "google/api/annotations.proto";
-import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "external/annotations/iam/annotations.proto";
 
 service EventFeedService {
   /*

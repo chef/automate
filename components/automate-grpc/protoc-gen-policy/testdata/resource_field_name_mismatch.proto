@@ -3,7 +3,7 @@ package chef.automate.domain.resource_field_name_mismatch;
 option go_package = "github.com/chef/automate/components/mock-service/mock";
 
 import "google/api/annotations.proto";
-import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "external/annotations/iam/annotations.proto";
 
 message Foo {
   string bar = 1;

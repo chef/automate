@@ -4,7 +4,7 @@ package chef.automate.api.ingest;
 option go_package = "github.com/chef/automate/api/external/ingest";
 
 import "google/api/annotations.proto";
-import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "external/annotations/iam/annotations.proto";
 
 import "external/ingest/response/job_scheduler.proto";
 import "external/ingest/request/job_scheduler.proto";

@@ -43,7 +43,19 @@ IMPORTS=(-I /src/api
 
 shopt -s globstar
 pushd api || exit 1
+
+printf 'GEN: %s\n' api/external/annotations/iam/*.proto
+protoc -I /src/components --go_out=paths=source_relative:/src/api \
+  annotations/iam/*.proto
+
 for i in external/**/; do
+  
+  if echo "$i" | grep "^external/annotations"; then
+    # FIXME TODO REMOVE
+    echo "$\i $i matched the skip rule"
+    continue
+  fi
+
   # check if there are proto files in that directory
   read -ra protos <<< "$(find "$i" -maxdepth 1 -name "*.proto")"
   if [ ${#protos[@]} -gt 0 ]; then

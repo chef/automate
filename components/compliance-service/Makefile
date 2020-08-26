@@ -89,7 +89,7 @@ ruby-grpc-tools:
 PROTOS = $(shell find ../../api/interservice/compliance ../../api/external/common -name '*.proto')
 RUBY_PROTOS = $(patsubst %.proto, %_pb.rb, $(PROTOS))
 
-EXTRA_PROTOS = '../../components/automate-grpc/protoc-gen-policy/iam/policy_pb.rb' '../../components/automate-grpc/protoc-gen-policy/iam/annotations_pb.rb'
+EXTRA_PROTOS = '../../components/automate-grpc/protoc-gen-policy/iam/policy_pb.rb' '../../api/external/annotations/iam/annotations_pb.rb'
 
 generate-ruby-grpc:
 	@printf "\n===> ${blue}Generating ruby grpc files${reset}\n"
