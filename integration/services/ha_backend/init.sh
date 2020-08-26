@@ -86,7 +86,7 @@ ha_backend_setup() {
         echo "Trying to create dbuser (attempt #${try})"
         errcode="0"
         output="$(docker exec --env PGPASSWORD="$ha_admin_pg_password" --env HAB_LICENSE=accept-no-persist "$ha_backend_container1" \
-	hab pkg exec core/postgresql11 psql \
+	hab pkg exec core/postgresql11 -- psql \
             -h 127.0.0.1 -p 7432 -U admin -d postgres -c \
             "CREATE USER dbuser WITH PASSWORD '$ha_admin_pg_password'")" || errcode="$?"
         if [ "$errcode" -eq "0" ]; then
