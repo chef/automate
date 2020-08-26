@@ -1,13 +1,13 @@
 +++
-title = "Backup & Restore"
+title = "Backup"
 
 date = 2018-03-26T15:27:52-07:00
 draft = false
 [menu]
   [menu.automate]
-    title = "Backup & Restore"
+    title = "Backup"
     parent = "automate/getting_started"
-    identifier = "automate/getting_started/backup.md Backup & Restore"
+    identifier = "automate/getting_started/backup.md Backup"
     weight = 70
 +++
 
@@ -16,7 +16,11 @@ draft = false
 Backups are crucial for protecting your data from catastrophic loss and preparing a recovery procedure.
 The `chef-automate backup create` command creates a single backup that contains data for all products deployed with Chef Automate, including [Chef Infra Server]({{< ref "infra_server.md" >}}) and [Chef Habitat Builder on-prem]({{< ref "on_prem_builder.md" >}}).
 By default, Chef Automate stores backups to the filesystem in the directory `/var/opt/chef-automate/backups`.
-You can also configure Chef Automate to store backups in AWS S3 buckets.
+You can also configure Chef Automate to store backups in AWS S3 buckets or in Google Cloud
+Storage buckets.
+
+See the [restore]({{< ref "restore.md" >}}) page to learn how to restore a Chef Automate
+installation from a [filesystem backup]({{< ref "restore/#restore-from-a-filesystem-backup" >}}), an [AWS S3 backup]({{< ref "restore/#restore-from-an-aws-s3-backup" >}}), or a [GCS backup]({{< ref "restore/#restore-from-a-google-cloud-storage-backup" >}}).
 
 ## Backup Space Requirements
 
@@ -27,7 +31,7 @@ This amount of space needed for a backup varies depending on your Chef Automate 
 * Elasticsearch snapshots of your Chef Automate configuration and data, such as converge, scan, and report data. You will need enough disk space for the each Elasticsearch snapshot and the delta--or the list of changes--for each successive snapshot
 * Chef Habitat Builder artifacts
 
-## Backup to a Filesystem
+## Set Up Backups to a Filesystem
 
 To store backups in a configurable backup directory, the backup directory should be on network-attached storage or synced periodically to a disk on another machine.
 This best practice ensures that you can restore from your backup data during a hardware failure.
@@ -55,13 +59,13 @@ To configure your Chef Automate installation's backup directory to another locat
 
 To store backups offline in single-file archives, single-file archives must include both the configuration data and the reporting data contained in the standard backup.
 
-The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}) contains both the timestamp-based directory for the configuration and the reporting data stored in the `automate-elasticsearch-data` directory.
+The [configured backup directory]({{< ref "backup.md#set-up-backups-to-a-filesystem" >}}) contains both the timestamp-based directory for the configuration and the reporting data stored in the `automate-elasticsearch-data` directory.
 
 A timestamp-based directory has a date-based name, such as `20180518010336`, in the `automate-elasticsearch-data` directory.
 
 To provide externally-deployed Elasticsearch nodes access to Chef Automate's built-in backup storage services, you must [configure Elasticsearch backup]({{< relref "install.md#configuring-external-elasticsearch" >}}) settings separately from Chef Automate's primary backup settings.
 
-## Backup to AWS S3
+## Set up Backups to AWS S3
 
 To store backups in an existing AWS S3 bucket, use the supported S3-related settings below:
 
@@ -96,8 +100,6 @@ To store backups in an existing AWS S3 bucket, use the supported S3-related sett
   ...
   -----END CERTIFICATE-----
 ```
-
-See how to [restore from AWS S3]({{< ref "restore/#restore-from-an-aws-s3-backup" >}}).
 
 ### AWS S3 Permissions
 
@@ -136,7 +138,7 @@ The following IAM policy describes the basic permissions Chef Automate requires 
 }
 ```
 
-## Backup to GCS
+## Set Up Backups to GCS
 
 To store backups in an existing Google Cloud Storage (GCS) bucket, [generate a service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) with the `storage.admin` permission for the associated project and GCS bucket, and use the supported GCS-related settings below:
 
@@ -169,8 +171,6 @@ json = '''
 }
 '''
 ```
-
-See how to [restore from GCS]({{< ref "restore/#restore-from-a-google-cloud-storage-backup" >}}).
 
 ## Backup Commands
 
@@ -276,7 +276,7 @@ y
 Success: Backups deleted
 ```
 
-To prune all but a certain number of the most recent backups manually, parsing the output of `chef-automate backup list` and applying the command `chef-automate backup delete`.
+To prune all but a certain number of the most recent backups manually, parse the output of `chef-automate backup list` and apply the command `chef-automate backup delete`.
 For example:
 
 ```bash

@@ -26,8 +26,8 @@ Restore Chef Automate from a [filesystem backup]({{< ref "restore.md#restore-fro
 1. To restore from **filesystem backups**, Chef Automate requires access to a backup directory in the [configured location]({{< ref "backup.md#backup-to-a-filesystem" >}}).
 Ensure access for the backup type used:
 
-     1. To restore [a network-attached filesystem backup]({{< ref "backup.md#backup-to-a-filesystem" >}}), mount the shared backup directory to the same mount point configured at the time of the backup.
-     1. To restore [a backup directory that is not a network-attached filesystem]({{< ref "backup.md#backup-to-a-filesystem" >}}), copy the backup directory to the configured location at the time of the backup.
+     1. To restore [a network-attached filesystem backup]({{< ref "backup.md#set-up-backups-to-a-filesystem" >}}), mount the shared backup directory to the same mount point configured at the time of the backup.
+     1. To restore [a backup directory that is not a network-attached filesystem]({{< ref "backup.md#set-up-backups-to-a-filesystem" >}}), copy the backup directory to the configured location at the time of the backup.
      1. To restore a [single-file backup archive]({{< ref "backup.md#store-a-filesystem-backup-in-a-single-file-archive" >}}), copy your archive to the restore host and extract it to the configured backup directory.
 
 1. To restore a backup to a host with a different fully qualified domain name (FQDN) than the original backup host, create a `patch.toml` file that specifies the new FQDN and provide it at restore time:
@@ -73,7 +73,7 @@ To restore on an existing Chef Automate host by overwriting the existing install
 chef-automate backup restore </path/to/backups/>BACKUP_ID --skip-preflight
 ```
 
-Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host:
+Use the `--patch-config` option with a [configuration patch file]({{< relref "restore.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host:
 
 ```shell
 chef-automate backup restore </path/to/backups/>BACKUP_ID --patch-config </path/to/patch.toml> --skip-preflight
@@ -116,7 +116,7 @@ To restore using Google Cloud Storage (GCS) on an existing Chef Automate host, r
 chef-automate backup restore --airgap-bundle </path/to/bundle> gs://bucket_name/</path/to/backups/>BACKUP_ID --skip-preflight
 ```
 
-Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host.
+Use the `--patch-config` option with a [configuration patch file]({{< relref "restore.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host.
 
 Restores from a filesystem backup may fail with incorrect directory permissions.
 Run the [`fix-repo-permissions` command]({{< ref "cli_chef_automate/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
@@ -143,7 +143,7 @@ To restore from an AWS S3 bucket backup on an existing Chef Automate host, run:
 chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
 ```
 
-Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host:
+Use the `--patch-config` option with a [configuration patch file]({{< relref "restore.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host:
 
 ```shell
 chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --patch-config </path/to/patch.toml> --skip-preflight
@@ -173,7 +173,7 @@ To restore from a Google Cloud Storage (GCS) bucket backup on an existing Chef A
 chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
 ```
 
-Use the `--patch-config` option with a [configuration patch file]({{< relref "backup.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host:
+Use the `--patch-config` option with a [configuration patch file]({{< relref "restore.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host:
 
 ```shell
 chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --patch-config </path/to/patch.toml> --skip-preflight
