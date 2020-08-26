@@ -5,9 +5,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	service "github.com/chef/automate/api/external/event_feed"
+	agReq "github.com/chef/automate/api/external/event_feed/request"
+	agRes "github.com/chef/automate/api/external/event_feed/response"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
-	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
-	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	"github.com/chef/automate/components/automate-gateway/eventfeed"
 )
 
@@ -25,7 +26,7 @@ func NewEventFeedServer(feedClient event_feed_api.EventFeedServiceClient) *Event
 
 // GetEventFeed returns a list of all Events
 func (s *EventFeedServer) GetEventFeed(ctx context.Context,
-	request *agReq.EventFilter) (*agRes.Events, error) {
+	request *agReq.GetEventFeedRequest) (*agRes.GetEventFeedResponse, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),
 		"func":    nameOfFunc(),
@@ -36,7 +37,7 @@ func (s *EventFeedServer) GetEventFeed(ctx context.Context,
 
 // GetEventTypeCounts - gets event type counts
 func (s *EventFeedServer) GetEventTypeCounts(ctx context.Context,
-	request *agReq.EventCountsFilter) (*agRes.EventCounts, error) {
+	request *agReq.GetEventTypeCountsRequest) (*agRes.GetEventTypeCountsResponse, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),
 		"func":    nameOfFunc(),
@@ -47,7 +48,7 @@ func (s *EventFeedServer) GetEventTypeCounts(ctx context.Context,
 
 // GetEventTaskCounts - gets event type counts
 func (s *EventFeedServer) GetEventTaskCounts(ctx context.Context,
-	request *agReq.EventCountsFilter) (*agRes.EventCounts, error) {
+	request *agReq.GetEventTaskCountsRequest) (*agRes.GetEventTaskCountsResponse, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),
 		"func":    nameOfFunc(),
@@ -58,11 +59,17 @@ func (s *EventFeedServer) GetEventTaskCounts(ctx context.Context,
 
 // GetEventStringBuckets - gets the buckets for the guitar strings
 func (s *EventFeedServer) GetEventStringBuckets(ctx context.Context,
-	request *agReq.EventStrings) (*agRes.EventStrings, error) {
+	request *agReq.GetEventStringBucketsRequest) (*agRes.GetEventStringBucketsResponse, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
 	return s.eventFeedAggregate.CollectEventGuitarStrings(ctx, request)
+}
+
+// EventExport - downloading events as JSON or CSV
+func (s *EventFeedServer) EventExport(*agReq.EventExportRequest, service.EventFeedService_EventExportServer) error {
+	// Please see components/automate-gateway/services.go eventFeedExportHandler for implementation
+	return nil
 }

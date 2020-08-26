@@ -1,9 +1,9 @@
 syntax = "proto3";
 
 package chef.automate.api.event_feed.request;
-option go_package = "github.com/chef/automate/components/automate-gateway/api/event_feed/request";
+option go_package = "github.com/chef/automate/api/external/event_feed/request";
 
-message EventStrings {
+message GetEventStringBucketsRequest {
     // Earliest events to return.
     string start = 1;
     // Latest events to return.

@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	agReq "github.com/chef/automate/api/external/event_feed/request"
+	agRes "github.com/chef/automate/api/external/event_feed/response"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
-	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
-	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -49,7 +49,7 @@ func TestEventGuitarStringsNormal(t *testing.T) {
 
 	eventGuitarStrings, err := eventFeedAggregate.CollectEventGuitarStrings(
 		context.Background(),
-		&agReq.EventStrings{
+		&agReq.GetEventStringBucketsRequest{
 			Start:        start,
 			End:          end,
 			Timezone:     "America/Los_Angeles",
@@ -108,7 +108,7 @@ func TestEventGuitarStringsNotEnoughEventsStrings(t *testing.T) {
 
 	eventStrings, err := eventFeedAggregate.CollectEventGuitarStrings(
 		context.Background(),
-		&agReq.EventStrings{
+		&agReq.GetEventStringBucketsRequest{
 			Start:        start,
 			End:          end,
 			Timezone:     "America/Los_Angeles",
@@ -160,7 +160,7 @@ func TestEventGuitarStringsToManyEventsStrings(t *testing.T) {
 
 	eventStrings, err := eventFeedAggregate.CollectEventGuitarStrings(
 		context.Background(),
-		&agReq.EventStrings{
+		&agReq.GetEventStringBucketsRequest{
 			Start:        start,
 			End:          end,
 			Timezone:     "America/Los_Angeles",
@@ -181,7 +181,7 @@ func TestEventGuitarStringsTimeZones(t *testing.T) {
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockFeedServiceClient)
 
-	cases := []*agReq.EventStrings{
+	cases := []*agReq.GetEventStringBucketsRequest{
 		{
 			Start:        "2018-01-01",
 			End:          "2018-01-06",
@@ -217,7 +217,7 @@ func TestEventGuitarStringsStartAndEnd(t *testing.T) {
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockFeedServiceClient)
 
-	cases := []agReq.EventStrings{
+	cases := []agReq.GetEventStringBucketsRequest{
 		{
 			Start:        "2018-01-06",
 			End:          "2018-01-01",
@@ -305,7 +305,7 @@ func TestEventGuitarStringsHoursBetween(t *testing.T) {
 	for _, hoursBetween := range cases {
 		_, err := eventFeedAggregate.CollectEventGuitarStrings(
 			context.Background(),
-			&agReq.EventStrings{
+			&agReq.GetEventStringBucketsRequest{
 				Start:        "2018-01-01",
 				End:          "2018-01-06",
 				HoursBetween: hoursBetween,
@@ -323,7 +323,7 @@ type Params struct {
 	eventType          string
 	eventTypeCount     int
 	bucketIndex        int
-	eventGuitarStrings *agRes.EventStrings
+	eventGuitarStrings *agRes.GetEventStringBucketsResponse
 }
 
 func assertEventCount(p Params) {
@@ -355,7 +355,7 @@ func assertEventCount(p Params) {
 	assert.Equal(t, int64(eventTypeCount), matchingEventCount.Count)
 }
 
-func findGuitarString(eventStrings *agRes.EventStrings, eventAction string) (*agRes.EventString, bool) {
+func findGuitarString(eventStrings *agRes.GetEventStringBucketsResponse, eventAction string) (*agRes.EventString, bool) {
 	for _, eventString := range eventStrings.Strings {
 		if eventString.EventAction == eventAction {
 			return eventString, true

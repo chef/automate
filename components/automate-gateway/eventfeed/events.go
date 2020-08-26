@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
+	agReq "github.com/chef/automate/api/external/event_feed/request"
+	agRes "github.com/chef/automate/api/external/event_feed/response"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
-	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
-	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -31,7 +31,7 @@ func NewEventFeedAggregate(feedClient event_feed_api.EventFeedServiceClient) *Ev
 // the gateway is just collecting information from the downstream services and it
 // should be able to handle errors.
 func (eventFeedAggregate *EventFeedAggregate) CollectEventFeed(ctx context.Context,
-	request *agReq.EventFilter) (*agRes.Events, error) {
+	request *agReq.GetEventFeedRequest) (*agRes.GetEventFeedResponse, error) {
 
 	var (
 		ascending                 = false
@@ -42,7 +42,7 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventFeed(ctx context.Conte
 	)
 
 	if err != nil {
-		return &agRes.Events{}, err
+		return &agRes.GetEventFeedResponse{}, err
 	}
 
 	// This case is if the request is for the last page. For the last page request
@@ -57,14 +57,14 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventFeed(ctx context.Conte
 
 	eventCollection, err := collectEventFeed(ctx, eventFeedAggregate.feedServiceClient, request)
 	if err != nil {
-		return &agRes.Events{}, err
+		return &agRes.GetEventFeedResponse{}, err
 	}
 	totalEvents = eventCollection.Events
 	totalNumberOfEvents += eventCollection.TotalEvents
 
 	err = sortEvents(totalEvents, ascending)
 	if err != nil {
-		return &agRes.Events{}, err
+		return &agRes.GetEventFeedResponse{}, err
 	}
 
 	// If this is not the last page the max number of events to take is the page size.
@@ -95,7 +95,7 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventFeed(ctx context.Conte
 		totalEvents = groupEvents(totalEvents)
 	}
 
-	return &agRes.Events{
+	return &agRes.GetEventFeedResponse{
 		Events:      totalEvents,
 		TotalEvents: totalNumberOfEvents,
 	}, nil
@@ -146,7 +146,7 @@ func sortEvents(eventCollection []*agRes.Event, ascending bool) error {
 	return nil
 }
 
-func validateRequest(request *agReq.EventFilter) error {
+func validateRequest(request *agReq.GetEventFeedRequest) error {
 	if request.Start != 0 && request.End != 0 && request.Start > request.End {
 		return status.Error(codes.InvalidArgument, "Invalid start/end time. End before Start")
 	}
@@ -202,19 +202,21 @@ func groupEvents(events []*agRes.Event) []*agRes.Event {
 		}
 
 		groupedEvents = append(groupedEvents, &agRes.Event{
-			StartId:         event.GetStartId(),
-			EndId:           event.GetEndId(),
-			EventType:       event.GetEventType(),
-			Task:            event.GetTask(),
-			StartTime:       event.GetStartTime(),
-			EndTime:         event.GetEndTime(),
-			EntityName:      event.GetEntityName(),
-			RequestorType:   event.GetRequestorType(),
-			RequestorName:   event.GetRequestorName(),
-			ServiceHostname: event.GetServiceHostname(),
-			ParentName:      event.GetParentName(),
-			ParentType:      event.GetParentType(),
-			EventCount:      1,
+			StartId:          event.GetStartId(),
+			EndId:            event.GetEndId(),
+			EventType:        event.GetEventType(),
+			Task:             event.GetTask(),
+			StartTime:        event.GetStartTime(),
+			EndTime:          event.GetEndTime(),
+			EntityName:       event.GetEntityName(),
+			RequestorType:    event.GetRequestorType(),
+			RequestorName:    event.GetRequestorName(),
+			ServiceHostname:  event.GetServiceHostname(),
+			ParentName:       event.GetParentName(),
+			ParentType:       event.GetParentType(),
+			ChefInfraServer:  event.ChefInfraServer,
+			ChefOrganization: event.ChefOrganization,
+			EventCount:       1,
 		})
 
 		index++
@@ -225,7 +227,7 @@ func groupEvents(events []*agRes.Event) []*agRes.Event {
 
 func collectEventFeed(ctx context.Context,
 	feedClient event_feed_api.EventFeedServiceClient,
-	request *agReq.EventFilter) (*agRes.Events, error) {
+	request *agReq.GetEventFeedRequest) (*agRes.GetEventFeedResponse, error) {
 	eventFilter := &event_feed_api.FeedRequest{
 		Filters: request.GetFilter(),
 		Start:   request.GetStart(),
@@ -238,29 +240,31 @@ func collectEventFeed(ctx context.Context,
 
 	eventCollection, err := feedClient.GetFeed(ctx, eventFilter)
 	if err != nil {
-		return &agRes.Events{}, err
+		return &agRes.GetEventFeedResponse{}, err
 	}
 
 	agEvents := make([]*agRes.Event, len(eventCollection.FeedEntries))
 	for index, entry := range eventCollection.FeedEntries {
 		agEvents[index] = &agRes.Event{
-			StartId:         entry.GetId(),
-			EndId:           entry.GetId(),
-			EventType:       entry.GetProducer().GetId(),
-			Task:            entry.GetVerb(),
-			StartTime:       entry.GetSourceEventPublished(),
-			EndTime:         entry.GetSourceEventPublished(),
-			EntityName:      entry.GetObject().GetName(),
-			RequestorType:   entry.GetActor().GetObjectType(),
-			RequestorName:   entry.GetActor().GetName(),
-			ServiceHostname: entry.GetTarget().GetName(),
-			ParentName:      entry.GetParent().GetName(),
-			ParentType:      entry.GetParent().GetId(),
-			EventCount:      1,
+			StartId:          entry.GetId(),
+			EndId:            entry.GetId(),
+			EventType:        entry.GetProducer().GetId(),
+			Task:             entry.GetVerb(),
+			StartTime:        entry.GetSourceEventPublished(),
+			EndTime:          entry.GetSourceEventPublished(),
+			EntityName:       entry.GetObject().GetName(),
+			RequestorType:    entry.GetActor().GetObjectType(),
+			RequestorName:    entry.GetActor().GetName(),
+			ServiceHostname:  entry.GetTarget().GetName(),
+			ParentName:       entry.GetParent().GetName(),
+			ParentType:       entry.GetParent().GetId(),
+			EventCount:       1,
+			ChefInfraServer:  entry.ChefInfraServer,
+			ChefOrganization: entry.ChefOrganization,
 		}
 	}
 
-	return &agRes.Events{
+	return &agRes.GetEventFeedResponse{
 		Events:      agEvents,
 		TotalEvents: eventCollection.TotalEntries,
 	}, nil
