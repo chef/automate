@@ -41,6 +41,9 @@ IMPORTS=(-I /src/api
          -I /src/lib
         )
 
+# The protos in the annotations/ directory are handled separately because they
+# need to be compiled ahead of time in order for the protoc-gen-policy plugin
+# to work
 # shellcheck disable=SC1090
 source "${BASH_SOURCE%/*}/bootstrap_protoc.sh"
 
@@ -49,9 +52,8 @@ pushd api || exit 1
 
 for i in external/**/; do
   
+  # these are handled by the bootstrap_protoc.sh script which we already ran
   if echo "$i" | grep "^external/annotations"; then
-    # FIXME TODO REMOVE
-    echo "$\i $i matched the skip rule"
     continue
   fi
 
