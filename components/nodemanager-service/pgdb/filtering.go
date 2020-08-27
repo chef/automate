@@ -12,7 +12,7 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/common"
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/compliance-service/utils"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/pgutils"
 	"github.com/chef/automate/lib/stringutils"
 )

@@ -19,7 +19,7 @@ import (
 
 	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/secrets"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 

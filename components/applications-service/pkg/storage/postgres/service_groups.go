@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/chef/automate/components/applications-service/pkg/storage"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/pgutils"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"

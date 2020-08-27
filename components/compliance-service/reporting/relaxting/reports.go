@@ -21,7 +21,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 

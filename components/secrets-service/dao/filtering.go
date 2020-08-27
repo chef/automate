@@ -10,7 +10,7 @@ import (
 
 	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/components/secrets-service/utils"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/pgutils"
 )
 
