@@ -124,5 +124,5 @@ chef-dropdown {
 }
 
 ::ng-deep chef-checkbox .label-wrap {
-  overflow-wrap: anywhere;
+  word-break: break-all;
 }
