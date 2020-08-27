@@ -59,7 +59,6 @@ To use `/status`, set up an authentication token for use with your monitoring sy
              "name": "automate-postgresql",
              "status": "OK"
            },
-           ...
          ]
        }
    ```
@@ -82,7 +81,6 @@ To use `/status`, set up an authentication token for use with your monitoring sy
           "service": "ingest-service",
           "status": "OK"
         },
-        ...
          ]
        }
    ```
